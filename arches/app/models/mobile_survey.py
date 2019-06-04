@@ -196,7 +196,7 @@ class MobileSurvey(models.MobileSurveyModel):
                 singlepart = GeoUtils().convert_multipart_to_singlepart(bounds)
                 ret['bounds'] = singlepart
         except TypeError as e:
-            print 'Could not parse', ret['bounds'], e
+            logger.error('Could not parse {0}, {1}'.format(ret['bounds'], e))
         return ret
 
     def serialize(self, fields=None, exclude=None):
@@ -376,12 +376,12 @@ class MobileSurvey(models.MobileSurveyModel):
                 try:
                     for res_type in resource_types:
                         instances = {}
-                        request.GET['typeFilter'] = json.dumps([{'graphid': res_type, 'inverted': False}])
-                        request.GET['mapFilter'] = map_filter
+                        request.GET['resource-type-filter'] = json.dumps([{'graphid': res_type, 'inverted': False}])
+                        request.GET['map-filter'] = map_filter
                         request.GET['resourcecount'] = self.datadownloadconfig['count']
                         self.append_to_instances(request, instances, res_type)
                         if len(instances.keys()) < int(self.datadownloadconfig['count']):
-                            request.GET['mapFilter'] = '{}'
+                            request.GET['map-filter'] = '{}'
                             request.GET['resourcecount'] = int(
                                 self.datadownloadconfig['count']) - len(instances.keys())
                             self.append_to_instances(request, instances, res_type)

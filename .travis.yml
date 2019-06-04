@@ -41,7 +41,7 @@ cache:
 before_script:
   - ./arches/install/ci_install/setup_couch.sh
 
-language: 
+language:
   - python
   - node_js
 
@@ -57,7 +57,7 @@ matrix:
         - python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
     - name: "Javascript - Cypress.io tests"
       install:
-        - yarn install
+        - yarn --cwd arches/install install
         - npm install cypress --save-dev
         - wait-on http://localhost:9200/
         - python manage.py packages -o setup_db

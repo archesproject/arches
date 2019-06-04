@@ -88,10 +88,8 @@ class TileData(View):
                 accepted_provisional_edit = JSONDeserializer().deserialize(accepted_provisional)
             if json is not None:
                 data = JSONDeserializer().deserialize(json)
-                try:
-                    if data['resourceinstance_id'] == '':
-                        data['resourceinstance_id'] = uuid.uuid4()
-                except KeyError:
+                data['resourceinstance_id'] = '' if 'resourceinstance_id' not in data else data['resourceinstance_id']
+                if data['resourceinstance_id'] == '':
                     data['resourceinstance_id'] = uuid.uuid4()
                 try:
                     models.ResourceInstance.objects.get(pk=data['resourceinstance_id'])

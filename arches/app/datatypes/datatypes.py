@@ -1,7 +1,6 @@
 import uuid
 import json
 import decimal
-import importlib
 import distutils
 import base64
 import re
@@ -13,6 +12,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.date_utils import ExtendedDateFormat
+from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.core.cache import cache
@@ -38,6 +38,7 @@ cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
 
+
 class DataTypeFactory(object):
     def __init__(self):
         self.datatypes = {datatype.datatype:datatype for datatype in models.DDataType.objects.all()}
@@ -48,22 +49,8 @@ class DataTypeFactory(object):
         try:
             datatype_instance = self.datatype_instances[d_datatype.classname]
         except:
-            mod_path = d_datatype.modulename.replace('.py', '')
-            module = None
-            import_success = False
-            import_error = None
-            for datatype_dir in settings.DATATYPE_LOCATIONS:
-                try:
-                    module = importlib.import_module(datatype_dir + '.%s' % mod_path)
-                    import_success = True
-                except ImportError as e:
-                    import_error = e
-                if module != None:
-                    break
-            if import_success == False:
-                print 'Failed to import ' + mod_path
-                print import_error
-            datatype_instance = getattr(module, d_datatype.classname)(d_datatype)
+            class_method = get_class_from_modulename(d_datatype.modulename, d_datatype.classname, settings.DATATYPE_LOCATIONS)
+            datatype_instance = class_method(d_datatype)
             self.datatype_instances[d_datatype.classname] = datatype_instance
         return datatype_instance
 

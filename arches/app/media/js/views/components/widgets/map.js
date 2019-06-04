@@ -387,7 +387,7 @@ define([
                         'name': 'Polygon'
                     }
                 };
-                if (features.length > 0) {
+                if (!!features && features.length > 0) {
                     this.queryFeature = features[0];
                     if (this.queryFeature.properties.extent_search === true) {
                         var bounds = new mapboxgl.LngLatBounds(geojsonExtent(this.queryFeature));
@@ -738,6 +738,8 @@ define([
                     }
 
                     if (self.context === 'search-filter') {
+                        self.mouseoverInstanceId = params.mouseoverInstanceId;
+                        self.mapLinkData = params.mapLinkData;
                         self.searchAggregations = params.searchAggregations;
                         var bins = binFeatureCollection(self.searchAggregations);
                         self.searchBuffer.subscribe(function(val){
@@ -795,7 +797,7 @@ define([
                             }
 
                             var features = [];
-                            var mouseoverInstanceId = self.results.mouseoverInstanceId();
+                            var mouseoverInstanceId = self.mouseoverInstanceId();
                             var hoverData = self.hoverData();
                             var clickData = self.clickData();
                             _.each(agg.results, function(result) {
@@ -829,7 +831,7 @@ define([
                         if (self.searchAggregations()) {
                             self.updateSearchResultsLayer();
                         }
-                        self.results.mouseoverInstanceId.subscribe(updateSearchPointsGeoJSON);
+                        self.mouseoverInstanceId.subscribe(updateSearchPointsGeoJSON);
                         self.clickData.subscribe(updateSearchPointsGeoJSON);
                         self.hoverData.subscribe(function(val) {
                             var resultsHoverLayer = self.map.getLayer('search-results-hex-outline-highlighted');
@@ -842,7 +844,7 @@ define([
                             }
                             updateSearchPointsGeoJSON();
                         });
-                        self.results.mapLinkData.subscribe(function(data) {
+                        self.mapLinkData.subscribe(function(data) {
                             zoomToGeoJSON(data, true);
                         });
                     }
@@ -1320,7 +1322,9 @@ define([
                             unit: self.bufferUnit()
                         };
                         self.value().features[0] = self.queryFeature;
-                        self.updateSearchQueryLayer([{geometry: JSON.parse(self.searchBuffer())},self.queryFeature]);
+                        if (!!self.searchBuffer()) {
+                            self.updateSearchQueryLayer([{geometry: JSON.parse(self.searchBuffer())},self.queryFeature]);
+                        }
                     } else {
                         self.queryFeature.properties.buffer = {
                             width: 0,

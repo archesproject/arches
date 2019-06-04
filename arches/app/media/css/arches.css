@@ -644,7 +644,7 @@ input[type="checkbox"] {
 .tab-subheader-sm p {
     color: #28496c;
     font-size: 14px;
-    font-weight: 600; 
+    font-weight: 600;
     margin-bottom: 0;
 }
 
@@ -899,7 +899,7 @@ ul.tabbed-report-tab-list {
 .tab-site-visit-container > p {
     color: #28496c;
     font-size: 14px;
-    font-weight: 600; 
+    font-weight: 600;
     margin-bottom: 0;
 }
 
@@ -930,7 +930,7 @@ ul.tabbed-report-tab-list {
 .tab-site-visit-details p {
     color: #28496c;
     font-size: 13px;
-    font-weight: 600; 
+    font-weight: 600;
     margin-bottom: 4px;
 }
 
@@ -1000,7 +1000,7 @@ ul.tabbed-report-tab-list {
 
 .tab-site-visit-empty-details {
     padding-top: 16px;
-    width: 70%; 
+    width: 70%;
 }
 
 .tab-site-visit-empty-details p {
@@ -1016,7 +1016,7 @@ ul.tabbed-report-tab-list {
 .tab-communications-container > div > div p {
     color: #28496c;
     font-size: 14px;
-    font-weight: 600; 
+    font-weight: 600;
     margin-bottom: 0;
     /* redundant with other p styles? */
 }
@@ -4919,6 +4919,14 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 }
 
 .concept_result {
+    font-weight: 700;
+}
+
+.term-search-item {
+    font-weight: 400;
+}
+
+.term-search-group {
     font-weight: 700;
 }
 
@@ -10274,6 +10282,7 @@ a.search-query-link-captions:focus {
     overflow-x: hidden;
     transition: all .5s;
     margin-top: inherit;
+    min-width: 400px;
 }
 
 .search-title {
@@ -13190,6 +13199,16 @@ a.jstree-anchor.permissions-widget {
     padding-left: 6px;
     font-weight:bold;
     font-size: 18px;
+}
+
+.create-resource-instance-card-component {
+  position: absolute;
+  background: white;
+}
+
+.indent {
+    text-indent: 10px;
+    padding-left: 10px;
 }
 
 @keyframes loader {

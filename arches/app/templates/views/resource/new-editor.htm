@@ -112,8 +112,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
             <!--ko if: selection() === 'related-resources' -->
-            <div data-bind="with: relatedResourcesManager">
-                {% include 'views/resource/related-resources/related-resources-manager.htm' %}
+            <div>
+                 <div data-bind="component: {
+                    name: 'related-resources-manager',
+                    params: relatedResourcesManagerObj
+                }"></div>
             </div>
             <!--/ko -->
 

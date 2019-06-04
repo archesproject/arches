@@ -1,18 +1,21 @@
 
 {% load i18n %}
 
-<div>
+<div class="map-filter-panel">
   <!-- ko component: {
       name: 'map-widget',
       params: {
         searchAggregations: aggregations,
         searchBuffer: searchBuffer,
-        resizeOnChange: resizeOnChange,
+        resizeOnChange: resultsExpanded,
         type: 'search-filter',
         configForm: false,
         node: null,
         value: filter.feature_collection,
-        results: results,
+        mouseoverInstanceId: mouseoverInstanceId,
+        mapLinkData: mapLinkData,
+        isResourceRelatable: isResourceRelatable,
+        toggleRelationshipCandidacy: toggleRelationshipCandidacy,
         query: query,
         clearSearch: clearSearch,
         state: 'form',
