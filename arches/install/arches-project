@@ -2,24 +2,25 @@
 
 import arches
 import argparse
-import subprocess
 import codecs
+import django
+import errno
+import imp
 import os
 import sys
-import imp
-import errno
+import subprocess
+import shutil
 from importlib import import_module
-import django
 from django.utils.crypto import get_random_string
 from django.core.management.utils import handle_extensions
 from django.core.management.templates import TemplateCommand
 from django.core.management.base import BaseCommand, CommandError
+from arches.management.commands import utils
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")
 here = os.path.abspath(os.path.dirname(__file__))
 COMMANDS = {}
 
-from arches.management.commands import utils
 
 class ArchesCommand(TemplateCommand):
     help = ("Creates a Django project directory structure for the given "
@@ -47,18 +48,23 @@ class ArchesCommand(TemplateCommand):
         options['secret_key'] = get_random_string(50, chars)
         super(ArchesCommand, self).handle('project', project_name, target, **options)
 
+
 def command_create_app(args):
     cmd = ArchesCommand()
     options = vars(args)
     proj_name = options['name']
     cmd.handle(options)
     yarn_path = os.path.join(os.getcwd(), proj_name, proj_name)
+    packagejson_path_src = os.path.join(os.path.dirname(arches.__file__), 'install', 'package.json')
+    packagejson_path_dst = os.path.join(yarn_path, 'packages.json')
+    shutil.copy(packagejson_path_src, packagejson_path_dst)
     os.chdir(yarn_path)
     subprocess.call("yarn install", shell=True)
-    if os.path.isdir(os.path.join(os.getcwd(), 'logs')) != True:
+    if os.path.isdir(os.path.join(os.getcwd(), 'logs')) is not True:
         os.mkdir(os.path.join(os.getcwd(), 'logs'))
-    open(os.path.join(os.getcwd(),'arches.log'), 'w').close()
+    open(os.path.join(os.getcwd(), 'arches.log'), 'w').close()
     open(os.path.join(os.getcwd(), 'logs', 'resource_import.log'), 'w').close()
+
 
 parent_parser = argparse.ArgumentParser(add_help=False)
 
@@ -98,7 +104,7 @@ parser_start.add_argument(
     dest='extensions',
     help='The file extension(s) to render (default: py).',
     type=str,
-    default=['py','txt','html','js','css','log'])
+    default=['py', 'txt', 'html', 'js', 'css', 'log'])
 
 parser_start.add_argument(
     '-n', '--name',
@@ -108,8 +114,8 @@ parser_start.add_argument(
     default='',)
 
 parser.add_argument('-v', '--verbosity', action='store', dest='verbosity', default='1',
-    type=int, choices=[0, 1, 2, 3],
-    help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output')
+                    type=int, choices=[0, 1, 2, 3],
+                    help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output')
 
 try:
     # Python 3
@@ -119,10 +125,13 @@ except AttributeError:
     sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
     sys.stderr = codecs.getwriter("utf-8")(sys.stderr)
 
+
 class CommandError(Exception):
     pass
 
+
 COMMANDS['create'] = command_create_app
+
 
 def main(argv=None):
     if argv is not None:
@@ -135,6 +144,7 @@ def main(argv=None):
     except CommandError as e:
         print str(e)
         sys.exit(1)
+
 
 if __name__ == '__main__':
     main()

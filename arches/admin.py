@@ -35,7 +35,8 @@ admin.site.register([
     models.DDataType,
     models.Widget,
     models.UserProfile,
-    models.GraphModel
+    models.GraphModel,
+    models.SearchComponent,
     ])
 
 admin.site.register(models.Plugin, PluginAdmin)

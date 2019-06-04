@@ -3,7 +3,6 @@ psycopg2-binary==2.7.4
 elasticsearch>=6.0.0,<7.0.0
 rdflib==4.2.2
 unicodecsv==0.14.1
-PyYAML==3.12
 django-guardian==1.4.9
 TileStache==1.51.13
 python-memcached==1.59
@@ -21,7 +20,6 @@ django-oauth-toolkit==1.1.2
 PyLD[requests]==1.0.4
 pyprind==2.11.2
 pycryptodome<4.0.0,>=3.3.1
-urllib3==1.21.1
 requests[security]>=2.18.1
 
 # Leave the following line commented so that pip install will ignore this

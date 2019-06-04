@@ -230,7 +230,8 @@
                 plugin: function(pluginid){return "{% url 'plugins' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', pluginid)},
                 collector_manager: "{% url 'collector_manager' %}",
                 help_template: "{% url 'help_templates' %}",
-                api_card: "{% url 'api_card' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '')
+                api_card: "{% url 'api_card' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                api_search_component_data: "{% url 'api_search_component_data' 'aaaa'%}".replace('aaaa', ''),
             },
             confirmNav: {
                 title: "{% trans 'Edits pending...' %}",
@@ -413,6 +414,12 @@
 
     define('geoms', function () {
         {% autoescape off %}return {{geoms}};{% endautoescape %}
+    });
+
+    define('search-components', [{% for component in search_components %}'{{ component.componentpath }}',{% endfor %}], function () {
+            return {% autoescape off %}[{% for component in search_components %}
+                {{component.toJSON}},
+            {% endfor %}]{% endautoescape %};
     });
 
     define('leaflet-draw-local', [
