@@ -98,7 +98,7 @@ setup_arches() {
 	echo "Running: python manage.py setup_db --force"
 	python manage.py setup_db --force
 
-    echo "Running: Creating couchdb system databaess"
+    echo "Running: Creating couchdb system databases"
     curl -X PUT ${COUCHDB_URL}/_users
     curl -X PUT ${COUCHDB_URL}/_global_changes
     curl -X PUT ${COUCHDB_URL}/_replicator
