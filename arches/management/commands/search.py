@@ -72,7 +72,7 @@ class Command(BaseCommand):
                 searchcomponentid=details['searchcomponentid'],
                 name=details['name'],
                 icon=details['icon'],
-                modulename=os.path.basename(source),
+                modulename=details['modulename'],
                 classname=details['classname'],
                 type=details['type'],
                 componentpath=details['componentpath'],
