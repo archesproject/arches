@@ -1,3 +1,4 @@
+from arches.app.search.components.base import BaseSearchFilter
 from arches.app.search.elasticsearch_dsl_builder import Bool, Terms
 
 details = {
@@ -14,10 +15,11 @@ details = {
 }
 
 
-class ProvisionalFilter():
+class ProvisionalFilter(BaseSearchFilter):
 
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         search_query = Bool()
+
         if include_provisional is not True:
             provisional_resource_filter = Bool()
 
