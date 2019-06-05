@@ -45,29 +45,29 @@ define([
                         //     display:none;
                         // }
                         var results = [];
-                        $.each(data, function() {
-                            this.inverted = ko.observable(false);
-                            results.push(this);
+                        searchbox.groups = [];
+                        _.each(data, function(value, searchType) {
+                            if (value.length > 0) {
+                                searchbox.groups.push(searchType);
+                            }
+                            _.each(value, function(val) {
+                                val.inverted = ko.observable(false);
+                                results.push(val);
+                            }, this);
                         }, this);
                         //res = _.groupBy(results, 'type');
                         var res = [];
+                        res.push({
+                            inverted: ko.observable(false),
+                            type: 'group',
+                            context: '',
+                            context_label: '',
+                            id: '',
+                            text: searchbox.groups,
+                            value: '',
+                            disabled: true
+                        });
                         _.each(_.groupBy(results, 'type'), function(value, group){
-                            var label = '';
-                            if (group === 'concept') {
-                                label = 'Concepts';
-                            } else if (group === 'term') {
-                                label = 'Term Matches';
-                            }
-                            res.push({
-                                inverted: ko.observable(false),
-                                type: 'group',
-                                context: '',
-                                context_label: '',
-                                id: label,
-                                text: label,
-                                value: label,
-                                disabled: true
-                            });
                             res = res.concat(value);
                         });
                         res.unshift({
@@ -91,12 +91,30 @@ define([
                     var markup = [];
                     var indent = result.type === 'concept' || result.type === 'term' ? 'term-search-item indent' : (result.type === 'string' ? 'term-search-item' : 'term-search-group');
                     if (result.type === 'group') {
-                        markup.push(result.text);
+                        _.each(result.text, function(searchType, i){
+                            var label = searchType === 'concepts' ? 'Concepts' : 'Term Matches';
+                            var active = i === 0 ? 'active' : '';
+                            markup.push('<button id="' + searchType + 'group" class="btn search-type-btn term-search-btn ' + active + ' ">' + label + '</button>');
+                        })
                     } else {
                         window.Select2.util.markMatch(result.text, query.term, markup, escapeMarkup);
                     }
                     var context = result.context_label != '' ? '<i class="concept_result_schemaname">(' + _.escape(result.context_label) + ')</i>' : '';
-                    var formatedresult = '<span class="' + indent + '">' + markup.join("") + '</span>' + context;
+                    var formatedresult = '<span class="' + result.type + '"><span class="' + indent + '">' + markup.join("") + '</span>' + context + '</span>';
+                    container[0].className = container[0].className + ' ' + result.type;
+                    $(container).click(function(event){
+                        var btn = event.target.closest('button');
+                        if(!!btn && btn.id === 'termsgroup') {
+                            $(btn).addClass('active').siblings().removeClass('active');
+                            $('.term').show();
+                            $('.concept').hide();
+                        }
+                        if(!!btn && btn.id === 'conceptsgroup') {
+                            $(btn).addClass('active').siblings().removeClass('active');
+                            $('.concept').show();
+                            $('.term').hide();
+                        }
+                    });
                     return formatedresult;
                 },
                 formatSelection: function(result, container) {
@@ -138,6 +156,15 @@ define([
                 selectedTerm.inverted(!selectedTerm.inverted());
 
                 //terms(terms);
+
+            }).on('select2-loaded', function(e, el) {
+                if (searchbox.groups.length > 0) {
+                    if (searchbox.groups[0] === 'concepts'){
+                        $('.term').hide();
+                    } else {
+                        $('.concept').hide();
+                    }
+                }
 
             });
             searchbox.select2('data', ko.unwrap(terms).concat(ko.unwrap(tags))).trigger('change');
