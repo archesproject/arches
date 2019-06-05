@@ -189,7 +189,10 @@ LOCALE_PATHS = (
 USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
-MEDIA_ROOT =  os.path.join(ROOT_DIR)
+MEDIA_ROOT = os.path.join(ROOT_DIR)
+
+# Sets default max upload size to 15MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 
 # URL that handles the media served from MEDIA_ROOT, used for managing stored files.
 # It must end in a slash if set to a non-empty value.

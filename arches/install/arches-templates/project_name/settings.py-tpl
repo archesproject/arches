@@ -54,7 +54,6 @@ DATABASES = {
     }
 }
 
-
 ALLOWED_HOSTS = []
 
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(APP_ROOT, 'system_settings', 'System_Settings.json')
@@ -96,6 +95,8 @@ LOGGING = {
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 MEDIA_ROOT =  os.path.join(APP_ROOT)
 
+# Sets default max upload size to 15MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 
 # Unique session cookie ensures that logins are treated separately for each app
 SESSION_COOKIE_NAME = '{{ project_name }}'
