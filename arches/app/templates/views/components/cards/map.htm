@@ -31,9 +31,19 @@
     </div>
     <!--ko if: activeTab() -->
         <div class="map-card-sidepanel">
+            <h4 class="map-card-sidepanel-header" data-bind="
+                text: activeTabTitle,
+                click: function() {
+                    activeTab(undefined);
+                }
+            "></h4>
             <!--ko if: activeTab() === 'basemap' -->
                 <!--ko foreach: basemaps -->
-                <div data-bind="text: name, click: $parent.activeBasemap"></div>
+                <div class="basemap-listing" data-bind="
+                    text: name,
+                    click: $parent.activeBasemap,
+                    css: {'active-basemap': $data === $parent.activeBasemap()}
+                    "></div>
                 <!--/ko -->
             <!--/ko -->
         </div>

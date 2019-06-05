@@ -21,6 +21,16 @@ define([
             this.basemaps = [];
             this.activeBasemap = ko.observable();
             this.activeTab = ko.observable();
+            this.activeTabTitle = ko.pureComputed(function() {
+                switch (this.activeTab()) {
+                case 'basemap':
+                    return 'Basemaps';
+                case 'legend':
+                    return 'Legend';
+                case 'overlays':
+                    return 'Overlays';
+                }
+            }, this);
 
             arches.mapLayers.forEach(function(layer) {
                 if (!layer.isoverlay) self.basemaps.push(layer);

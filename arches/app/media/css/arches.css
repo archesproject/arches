@@ -1085,6 +1085,46 @@ ul.tabbed-report-tab-list {
     padding: 16px;
 }
 
+.map-card-sidepanel-header {
+    cursor: pointer;
+    color: rgb(33, 62, 95);
+}
+
+.map-card-sidepanel-header:before {
+    content: "\f00d";
+    font-family: FontAwesome;
+    margin-right: 6px;
+    color: rgb(158, 158, 158);
+    font-weight:lighter;
+}
+
+.map-card-sidepanel-header:hover:before {
+    color: rgb(33, 62, 95);
+}
+
+.basemap-listing {
+    padding: 20px;
+    cursor: pointer;
+    border-bottom: 1px solid rgb(216, 216, 216);
+    font-size: 16px;
+    color: rgb(158, 158, 158);
+}
+
+.basemap-listing:before {
+    margin-right: 16px;
+    content: "\f10c";
+    font-family: FontAwesome;
+}
+
+.basemap-listing.active-basemap, .basemap-listing:hover {
+    color: rgb(33, 62, 95);
+    background-color: rgb(247, 247, 247);
+}
+
+.basemap-listing.active-basemap:before {
+    content: "\f05d";
+}
+
 #map-settings {
     position: relative;
     margin: -40px -35px 10px -20px;
