@@ -1035,12 +1035,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
 class FileListDataType(BaseDataType):
 
-    def get_previously_saved_data(self, user_is_reviewer, user_id, previously_saved_tile):
-        if user_is_reviewer is False and previously_saved_tile.provisionaledits is not None and user_id in previously_saved_tile.provisionaledits:
-            previously_saved_data = previously_saved_tile.provisionaledits[user_id]['value']
+    def get_tile_data(self, user_is_reviewer, user_id, tile):
+        if user_is_reviewer is False and tile.provisionaledits is not None and user_id in tile.provisionaledits:
+            data = tile.provisionaledits[user_id]['value']
         else:
-            previously_saved_data = previously_saved_tile.data
-        return previously_saved_data
+            data = tile.data
+        return data
 
     def handle_request(self, current_tile, request, node):
         previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
@@ -1048,9 +1048,9 @@ class FileListDataType(BaseDataType):
         if hasattr(request.user, 'userprofile') is not True:
             models.UserProfile.objects.create(user=request.user)
         user_is_reviewer = request.user.userprofile.is_reviewer()
-        current_tile_data = current_tile.data
+        current_tile_data = self.get_tile_data(user_is_reviewer, str(user.id), current_tile)
         if previously_saved_tile.count() == 1:
-            previously_saved_tile_data = self.get_previously_saved_data(user_is_reviewer, str(user.id), previously_saved_tile[0])
+            previously_saved_tile_data = self.get_tile_data(user_is_reviewer, str(user.id), previously_saved_tile[0])
             if previously_saved_tile_data[str(node.pk)] is not None:
                 for previously_saved_file in previously_saved_tile_data[str(node.pk)]:
                     previously_saved_file_has_been_removed = True
@@ -1087,7 +1087,10 @@ class FileListDataType(BaseDataType):
                     # importing proxy model errors, so cannot use super on the proxy model to save
                     if previously_saved_tile.count() == 1:
                         tile_to_update = previously_saved_tile[0]
-                        tile_to_update.data[str(node.pk)] = updated_file_records
+                        if user_is_reviewer:
+                            tile_to_update.data[str(node.pk)] = updated_file_records
+                        else:
+                            tile_to_update.provisionaledits[str(user.id)]['value'][str(node.pk)] = updated_file_records
                         tile_to_update.save()
 
     def transform_import_values(self, value, nodeid):
