@@ -8,12 +8,12 @@
     <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
     <div id="search-results-container">
         <div class="search-inline-filters">
-            {% if user_is_reviewer %}
+            <!--ko if: userIsReviewer -->
             <div data-bind="component: {
                 name: 'provisional-filter',
                 params: $parent.sharedStateObject
             }"></div>
-            {% endif %}
+            <!--/ko-->
             <div data-bind="component: {
                 name: 'resource-type-filter',
                 params: $parent.sharedStateObject
