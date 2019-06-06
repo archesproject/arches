@@ -442,10 +442,15 @@ input[type="checkbox"] {
     background-color: white;
 }
 
-.workflow-step-icon {
-    border-radius: 50%;
+.workflowstep-nav.workflow-step-icon {
     display: block;
     margin: 0 auto;
+}
+
+.workflow-step-icon {
+    border-radius: 50%;
+    /* display: block;
+    margin: 0 auto; */
     height: 56px;
     line-height: 56px;
     text-align: center;

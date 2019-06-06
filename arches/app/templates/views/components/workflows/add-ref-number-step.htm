@@ -1,24 +1,31 @@
-<div data-bind="click: function(){console.log(this)}">Add Reference Number<span><i class="fa fa-plus"></i></span></div>
-<!-- ko if: tile() && card() -->
 <div data-bind="click: function(){console.log(this.card())}" >Click to console card</div>
 <div data-bind="click: function(){console.log(this.tile())}" >Click to console tile</div>
-<div data-bind="component: {
-    name: cardComponentLookup[card().model.component_id()].componentname,
-    params: {
-        card: card(),
-        tile: tile(),
-        provisionalTileViewModel: provisionalTileViewModel,
-        reviewer: reviewer,
-        loading: loading,
-        form: $data
-    }
-}"></div>
-    <div data-bind="click: function(){console.log(tiles())}" >CLICK FOR DATA</div>
-    <!-- ko foreach: {data: tiles, as: 'tile'} -->
-        <div></div>
-        <h4>Agency:</h4>
-        <div data-bind="text: tile.data['2c8dff14-567b-11e9-b920-dca90488358a']"></div>
-        <h5>Identifier:</h5>
-        <div data-bind="text: tile.data['67677266-567b-11e9-a2bb-dca90488358a']" ></div>
+<div data-bind="" class="workflows-ref-number-container">
+    <!-- ko if: card() -->
+    <div class="workflows-ref-number-form">
+        <h3>Add Reference Number</h3>
+        <div data-bind="component: {
+            name: cardComponentLookup[card().model.component_id()].componentname,
+            params: {
+                card: card(),
+                tile: tile(),
+                provisionalTileViewModel: provisionalTileViewModel,
+                reviewer: reviewer,
+                loading: loading,
+                form: $data
+            }
+        }"></div>
+    </div>
+    <div class=workflows-ref-number-list>
+        <!-- ko foreach: {data: card().tiles(), as: 'tile'} -->
+        <div class="workflows-ref-number-card">
+            <div class="workflow-step-icon complete"><span><i class="fa fa-hashtag"></i></span></div>
+            <h4>Agency:</h4>
+            <div data-bind="text: tile.data['2c8dff14-567b-11e9-b920-dca90488358a'] || 'undefined'"></div>
+            <h5>Identifier:</h5>
+            <div data-bind="text: tile.data['67677266-567b-11e9-a2bb-dca90488358a']" ></div>
+        </div>
+        <!-- /ko -->
+    </div>
     <!-- /ko -->
-<!-- /ko -->
+</div>

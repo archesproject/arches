@@ -29,6 +29,8 @@ define([
             this.tile = this.card.newTile;
         }
         this.form = params.form;
+        console.log("in card component, now form.tile()...");
+        // console.log(self.form.tile());
         this.provisionalTileViewModel = params.provisionalTileViewModel;
         this.reviewer = params.reviewer;
         this.expanded = ko.observable(true);
