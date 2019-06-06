@@ -229,8 +229,23 @@ class Tile(models.TileModel):
                 errors += error
         return errors
 
+    def get_tile_data(self, user_is_reviewer, user_id):
+        if user_is_reviewer is False and self.provisionaledits is not None and user_id in self.provisionaledits:
+            data = self.provisionaledits[user_id]['value']
+        else:
+            data = self.data
+        return data
+
     def datatype_post_save_actions(self, request=None):
-        for nodeid, value in self.data.items():
+        userid = None
+        user_is_reviewer = True
+        if request is not None:
+            userid = str(request.user.id)
+            if hasattr(request.user, 'userprofile') is not True:
+                models.UserProfile.objects.create(user=request.user)
+            user_is_reviewer = request.user.userprofile.is_reviewer()
+        tile_data = self.get_tile_data(user_is_reviewer, userid)
+        for nodeid, value in tile_data.items():
             datatype_factory = DataTypeFactory()
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = datatype_factory.get_instance(node.datatype)
