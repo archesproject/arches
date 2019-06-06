@@ -313,7 +313,7 @@ class DateDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value['val'] != '':
+            if value['val'] != '' and value['val'] is not None:
                 date_value = datetime.strptime(value['val'], '%Y-%m-%d').isoformat()
                 if value['op'] != 'eq':
                     operators = {'gte': None, 'lte': None, 'lt': None, 'gt': None}
