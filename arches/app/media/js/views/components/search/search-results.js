@@ -10,7 +10,8 @@ define(['jquery',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'],
 function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) {
-    return ko.components.register('search-results', {
+    var componentName = 'search-results';
+    return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
 
             events: {
@@ -39,7 +40,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                     this.updateResults();
                 }, this);
 
-                this.filters['search-results'](this);
+                this.filters[componentName](this);
                 this.restoreState();
 
                 this.mapFilter = this.getFilter('map-filter');
