@@ -46,7 +46,7 @@ logger = logging.getLogger(__name__)
 class TileData(View):
     action = 'update_tile'
 
-    def delete_provisional_edit(self, tile, user, reviewer=None):
+    def delete_provisional_edit(self, tile, user, request):
         provisionaledits = None
         if tile.provisionaledits is not None:
             provisionaledits = tile.provisionaledits
@@ -58,7 +58,11 @@ class TileData(View):
                     tile.provisionaledits = None
                 else:
                     tile.provisionaledits = provisionaledits
-                tile.save(provisional_edit_log_details={"user": reviewer, "action": "delete edit", "edit": edit, "provisional_editor": provisional_editor})
+                tile.save(request=request, provisional_edit_log_details={
+                    "user": request.user,
+                    "action": "delete edit",
+                    "edit": edit,
+                    "provisional_editor": provisional_editor})
 
     def handle_save_error(self, e, tile_id='', title=_('Saving tile failed'), message=None):
         title = title
@@ -134,7 +138,7 @@ class TileData(View):
                                             "edit": accepted_provisional_edit,
                                             "provisional_editor": provisional_editor
                                             }
-                                    tile.save(provisional_edit_log_details=prov_edit_log_details)
+                                    tile.save(request=request, provisional_edit_log_details=prov_edit_log_details)
 
                                 if tile.provisionaledits is not None and str(request.user.id) in tile.provisionaledits:
                                     tile.data = tile.provisionaledits[str(request.user.id)]['value']
@@ -179,12 +183,12 @@ class TileData(View):
             is_provisional = tile.is_provisional()
 
             if tileid is not None and user is not None:
-                provisionaledits = self.delete_provisional_edit(tile, user, reviewer=request.user)
+                provisionaledits = self.delete_provisional_edit(tile, user, request)
 
             elif tileid is not None and users is not None:
                 users = jsonparser.loads(users)
                 for user in users:
-                    self.delete_provisional_edit(tile, user, reviewer=request.user)
+                    self.delete_provisional_edit(tile, user, request)
 
             if is_provisional == True:
                 return JSONResponse({'result':'delete'})
