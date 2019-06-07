@@ -33,6 +33,14 @@ define([
             }
             return ret + ' ' + ko.unwrap(this.icon);
         }, this);
+
+        this.ready = ko.observable(false);
+        var self = this;
+
+        require([config.component], function(componentViewmodel) {
+            self.componentViewmodel = componentViewmodel;
+            self.ready(true);
+        });
     };
     return WorkflowStep;
 });
