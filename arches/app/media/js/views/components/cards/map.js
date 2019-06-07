@@ -38,7 +38,7 @@ define([
                 }
             });
 
-            _.each(arches.mapSources, function(sourceConfig, name) {
+            _.each(arches.mapSources, function(sourceConfig) {
                 if (sourceConfig.tiles) {
                     sourceConfig.tiles.forEach(function(url, i) {
                         if (url.startsWith('/')) {
