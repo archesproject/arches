@@ -30,6 +30,7 @@ define([
                 ko.unwrap(parent.widgets)
             );
         }
+        if(!children) {console.log(parent);}
         children.forEach(function(child) {
             if (child.selected && child.selected() || isChildSelected(child)) {
                 childSelected = true;
@@ -374,6 +375,10 @@ define([
         this.isChildSelected = ko.computed(function() {
             return isChildSelected(this);
         }, this);
+        // this.isChildSelected = ko.computed({
+        //     read: function() {return isChildSelected(this);},
+        //     write: function(bool) { return isChildSelected(bool);}
+        // }, this);
         this.doesChildHaveProvisionalEdits = ko.computed(function() {
             return doesChildHaveProvisionalEdits(this);
         }, this);

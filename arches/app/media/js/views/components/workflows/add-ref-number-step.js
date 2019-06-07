@@ -5,24 +5,32 @@ define([
     'knockout',
     'models/graph',
     'viewmodels/card',
+    'viewmodels/tile',
     // 'viewmodels/card-component',
     'viewmodels/provisional-tile',
     'viewmodels/alert'
-], function(_, $, arches, ko, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel) {
+], function(_, $, arches, ko, GraphModel, CardViewModel, TileViewModel, ProvisionalTileViewModel, AlertViewModel) {
     function viewModel(params) {
         var self = this;
         var url = arches.urls.api_card + (ko.unwrap(params.resourceid) || ko.unwrap(params.graphid));
 
         this.card = ko.observable();
         this.tile = ko.observable();
-        // this.tiles = ko.observableArray([]);
+        this.tileArr = ko.observableArray();
         this.loading = params.loading || ko.observable(false);
         this.alert = params.alert || ko.observable(null);
         this.resourceId = params.resourceid;
         this.complete = params.complete || ko.observable();
-        this.agencyName = ko.computed({
-            //
-        });
+
+        this.remove = function(tile) {
+            // self.tileArr(tile);
+            var idx = self.card().tiles().indexOf(tile);
+            console.log(self.card().tiles());
+            self.card().tiles().splice(idx, 1);
+            console.log("removed");
+            console.log(self.card().tiles());
+        };
+        // this.agencyName = ko.computed({});
 
         this.loading(true);
 
@@ -131,19 +139,22 @@ define([
             self.complete(!!ko.unwrap(params.tileid));
         });
 
-        self.saveTile = function(tile, callback) {
-            // console.log("params passed to saveTile");
-            // console.log(params);
-            // console.log("tile ?");
-            // console.log(tile);
-            console.log("self.card ?");
-            console.log(self.card());
-            console.log("self.card.selected ?");
-            console.log(self.card().selected());
-            console.log("self.card.tiles ?");
-            console.log(self.card().tiles());
+        this.tileArr = ko.observableArray();
 
-            self.loading(true);          
+        self.saveTile = function(tile, callback) {
+            // self.tile() is the TileViewModel
+            // self.card().tile() is not a thing
+
+            self.loading(true);
+            console.log("here's self.tile");
+            console.log(self.tile());
+            console.log("and self.card()");
+            console.log(self.card());
+
+            var tilesub = self.card().tiles.subscribe(function(val){
+                return (val);
+            });
+
             tile.save(function(response) { //onFail, onSuccess
                 self.loading(false);
                 self.alert(
@@ -156,14 +167,37 @@ define([
                     )
                 );
             }, function(tile) { //onSuccess
-                // console.log(params);
+
+                console.log(params);
+                console.log(tile);
+
+                var newTile = new TileViewModel({
+                    tile: tile,
+                    card: self.card,
+                    graphModel: params.graphModel,
+                    resourceId: params.resourceId,
+                    displayname: params.displayname,
+                    handlers: params.handlers,
+                    userisreviewer: params.userisreviewer,
+                    cards: self.tile.cards,
+                    tiles: [],
+                    provisionalTileViewModel: params.provisionalTileViewModel,
+                    selection: ko.observable(false),
+                    scrollTo: ko.observable(),
+                    loading: ko.observable(),
+                    filter: ko.observable(),
+                    cardwidgets: params.cardwidgets,
+                });
+    
+                console.log("newTile");
+                console.log(newTile);
                 
                 // self.tiles.push(tile);
-                self.card().tiles().push(tile);
+                self.card().tiles().push(newTile); //do I need to do this?
+                // self.tileArr.push
+                // self.tilesArr.push(tile);
                 console.log(self.card().tiles());
-                // console.log(params);
-                // console.log("params in saveTile else {}:")
-                // console.log(params);
+   
                 params.resourceid(tile.resourceinstance_id);
                 params.tileid(tile.tileid);
                 self.resourceId(tile.resourceinstance_id);
@@ -171,14 +205,10 @@ define([
                 if (typeof callback === 'function') {
                     callback.apply(null, arguments);
                 }
-                // console.log("here's the tile");
-                // console.log(tile);
-                // self.tile.reset();
+                self.tile(self.card().getNewTile()); //this appears to be working
+                // console.log(self.card().isChildSelected());
+   
                 self.loading(false);
-                
-                // console.log("pre-reset");
-                // console.log(self.tile());
-                // console.log(self.tile()._tileData());
             });
         };
     }
