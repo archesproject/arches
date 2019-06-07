@@ -31,13 +31,10 @@
     </div>
     <!--ko if: activeTab() -->
         <div class="map-card-sidepanel">
-            <h4 class="map-card-sidepanel-header" data-bind="
-                text: activeTabTitle,
-                click: function() {
-                    activeTab(undefined);
-                }
-            "></h4>
             <!--ko if: activeTab() === 'basemap' -->
+                <h4 class="map-card-sidepanel-header" data-bind="click: hideSidePanel">
+                    {% trans "Basemaps" %}
+                </h4>
                 <!--ko foreach: basemaps -->
                 <div class="basemap-listing" data-bind="
                     text: name,
@@ -45,6 +42,23 @@
                     css: {'active-basemap': $data === $parent.activeBasemap()}
                     "></div>
                 <!--/ko -->
+            <!--/ko -->
+
+            <!--ko if: activeTab() === 'overlays' -->
+                <h4 class="map-card-sidepanel-header" data-bind="click: hideSidePanel">
+                    {% trans "Overlays" %}
+                </h4>
+                <div data-bind="sortable: {
+                    data: overlays
+                }">
+                    <div class="basemap-listing" data-bind="
+                        text: name,
+                        click: function() {
+                            onMap(!onMap());
+                        },
+                        css: {'active-basemap': onMap}
+                        "></div>
+                </div>
             <!--/ko -->
         </div>
     <!--/ko -->

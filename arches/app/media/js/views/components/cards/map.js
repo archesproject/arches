@@ -2,12 +2,12 @@ define([
     'jquery',
     'arches',
     'knockout',
-    'viewmodels/card-component'
+    'viewmodels/card-component',
+    'bindings/sortable'
 ], function($, arches, ko, CardComponentViewModel) {
     return ko.components.register('map-card', {
         viewModel: function(params) {
             var self = this;
-            var layers = [];
             var geojsonSourceFactory = function() {
                 return {
                     "type": "geojson",
@@ -19,26 +19,33 @@ define([
             };
 
             this.basemaps = [];
+            this.overlays = ko.observableArray();
             this.activeBasemap = ko.observable();
             this.activeTab = ko.observable();
-            this.activeTabTitle = ko.pureComputed(function() {
-                switch (this.activeTab()) {
-                case 'basemap':
-                    return 'Basemaps';
-                case 'legend':
-                    return 'Legend';
-                case 'overlays':
-                    return 'Overlays';
-                }
-            }, this);
+            this.hideSidePanel = function() {
+                self.activeTab(undefined);
+            };
 
             arches.mapLayers.forEach(function(layer) {
-                if (!layer.isoverlay) self.basemaps.push(layer);
-                if (layer.addtomap) {
-                    layers = layers.concat(layer.layer_definitions);
-                    if (!layer.isoverlay) self.activeBasemap(layer);
+                if (!layer.isoverlay) {
+                    self.basemaps.push(layer);
+                    if (layer.addtomap) self.activeBasemap(layer);
+                }
+                else {
+                    layer.onMap = ko.observable(layer.addtomap);
+                    self.overlays.push(layer);
                 }
             });
+
+            var layers = ko.pureComputed(function() {
+                var layers = self.activeBasemap().layer_definitions;
+                self.overlays().forEach(function(layer) {
+                    if (layer.onMap()) {
+                        layers = layers.concat(layer.layer_definitions);
+                    }
+                });
+                return layers;
+            }, this);
 
             this.mapStyle = {
                 "version": 8,
@@ -50,7 +57,7 @@ define([
                 }, arches.mapSources),
                 "sprite": arches.mapboxSprites,
                 "glyphs": arches.mapboxGlyphs,
-                "layers": layers
+                "layers": layers()
             };
 
             this.toggleTab = function(tabName) {
@@ -64,14 +71,9 @@ define([
             this.setupMap = function(map) {
                 self.map = map;
 
-                self.activeBasemap.subscribe(function(basemap) {
+                layers.subscribe(function(layers) {
                     var style = map.getStyle();
-                    style.layers = basemap.layer_definitions;
-                    arches.mapLayers.forEach(function(layer) {
-                        if (!layer.isoverlay && layer.addtomap) {
-                            layers = layers.concat(layer.layer_definitions);
-                        }
-                    });
+                    style.layers = layers;
                     map.setStyle(style);
                 });
             };
