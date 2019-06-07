@@ -1,10 +1,11 @@
 define([
     'jquery',
+    'underscore',
     'arches',
     'knockout',
     'viewmodels/card-component',
     'bindings/sortable'
-], function($, arches, ko, CardComponentViewModel) {
+], function($, _, arches, ko, CardComponentViewModel) {
     return ko.components.register('map-card', {
         viewModel: function(params) {
             var self = this;
@@ -34,6 +35,16 @@ define([
                 else {
                     layer.onMap = ko.observable(layer.addtomap);
                     self.overlays.push(layer);
+                }
+            });
+
+            _.each(arches.mapSources, function(sourceConfig, name) {
+                if (sourceConfig.tiles) {
+                    sourceConfig.tiles.forEach(function(url, i) {
+                        if (url.startsWith('/')) {
+                            sourceConfig.tiles[i] = window.location.origin + url;
+                        }
+                    });
                 }
             });
 
