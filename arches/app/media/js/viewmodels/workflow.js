@@ -16,11 +16,6 @@ define([
         this.advance = true;
 
         this.restoreStateFromURL = function(){
-            if (Object.keys(self.state.steps).length === 0) {
-                self.advance = false;
-            } else {
-                self.advance = true;
-            }
             var urlparams = new window.URLSearchParams(window.location.search);
             var res = {};
             urlparams.forEach(function(v, k){res[k] = v;});
