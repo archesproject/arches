@@ -123,7 +123,8 @@ define([
                 }
             });
             self.loading(false);
-            self.complete(!!ko.unwrap(params.tileid));
+            // commented the line below because it causes steps to automatically advance on page reload
+            // self.complete(!!ko.unwrap(params.tileid));
         });
 
         self.saveTile = function(tile, callback) {
