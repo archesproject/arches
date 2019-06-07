@@ -41,6 +41,8 @@ function($, _, ko, moment, BaseFilter, arches) {
                 this.selectedPeriod = ko.observable();
                 this.wheelConfig = ko.observable();
                 this.getTimeWheelConfig();
+                this.date_nodes = ko.observableArray();
+                this.graph_models = ko.observableArray();
                 this.selectedPeriod.subscribe(function (d) {
                     if (d) {
                         var start = moment(0, 'YYYY').add(d.start, 'years').format(this.format);
@@ -94,8 +96,9 @@ function($, _, ko, moment, BaseFilter, arches) {
                     url: arches.urls.api_search_component_data + componentName,
                     context: this
                 }).done(function(response) {
-                    this.date_nodes = response.date_nodes;
-                    this.graph_models = response.graph_models;
+                    this.date_nodes(response.date_nodes);
+                    this.graph_models(response.graph_models);
+                    $("select[data-bind^=chosen]").trigger("chosen:updated");
                 });
 
                 this.filterChanged = ko.computed(function(){

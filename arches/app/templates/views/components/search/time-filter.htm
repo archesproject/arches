@@ -16,19 +16,17 @@
         <!-- Date Type -->
         <div class="calendar">
             <h3 class="search-label">{% trans "Type" %}</h3>
-            <select id="" class="resources" data-placeholder="Date type" tabindex="-1" data-bind="value: filter.dateNodeId, chosen:{ width: '100%' }">
+            <select class="resources" data-placeholder="Date type" tabindex="-1" data-bind="value: filter.dateNodeId, chosen:{ width: '100%' }">
                 <option value="">{% trans "Search all dates" %}</option>
-                {% for graph in graph_models %}
-                    {% if graph.isresource and graph.isactive %}
-                    <optgroup label="{{ graph.name }}">
-                        {% for node in date_nodes %}
-                            {% if graph.graphid == node.graph_id %}
-                            <option value="{{ node.nodeid }}">{{ node.name }}</option>
-                            {% endif %}
-                        {% endfor %}
+                <!-- ko foreach: { data: graph_models, as: 'graph' } -->
+                    <optgroup data-bind="if: (graph.isresource && graph.isactive), attr: { label: graph.name }">
+                        <!-- ko foreach: { data: $parent.date_nodes, as: 'node' } -->
+                            <!-- ko if: graph.graphid === node.graph_id -->
+                                <option data-bind="attr: { value: node.nodeid }, text: node.name"></option>
+                            <!-- /ko -->
+                        <!-- /ko -->
                     </optgroup>
-                    {% endif %}
-                {% endfor %}
+                <!-- /ko -->
             </select>
         </div>
 

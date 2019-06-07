@@ -82,7 +82,7 @@ define([
 
         var relatedResourceModels = ko.computed(function() {
             if (params.node) {
-                var ids = params.node.config.graphid();
+                var ids = ko.unwrap(params.node.config.graphid);
                 return arches.resources.filter(function(graph) {
                     return ids.indexOf(graph.graphid) >= 0;
                 }).map(function(g) {

@@ -11193,6 +11193,17 @@ a .search-type-link {
     color: #888;
 }
 
+.term-search-btn {
+    font-weight: 700;
+    font-size: 13px;
+    height: 30px;
+    padding-left: 0px;
+}
+
+.term-search-btn.active {
+    color: #123;
+}
+
 .search-type-btn i {
     font-size: 15px;
 }
