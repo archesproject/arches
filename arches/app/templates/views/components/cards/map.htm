@@ -51,12 +51,12 @@
                 <div data-bind="sortable: {
                     data: overlays
                 }">
-                    <div class="basemap-listing" data-bind="
+                    <div class="overlay-listing" data-bind="
                         text: name,
                         click: function() {
                             onMap(!onMap());
                         },
-                        css: {'active-basemap': onMap}
+                        css: {'active-overlay': onMap}
                         "></div>
                 </div>
             <!--/ko -->

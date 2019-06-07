@@ -1102,7 +1102,7 @@ ul.tabbed-report-tab-list {
     color: rgb(33, 62, 95);
 }
 
-.basemap-listing {
+.basemap-listing, .overlay-listing {
     padding: 20px;
     cursor: pointer;
     border-bottom: 1px solid rgb(216, 216, 216);
@@ -1110,19 +1110,32 @@ ul.tabbed-report-tab-list {
     color: rgb(158, 158, 158);
 }
 
-.basemap-listing:before {
+.basemap-listing:before, .overlay-listing:before {
     margin-right: 16px;
-    content: "\f10c";
     font-family: FontAwesome;
 }
 
-.basemap-listing.active-basemap, .basemap-listing:hover {
+.basemap-listing:before {
+    content: "\f10c";
+}
+
+.overlay-listing:before {
+    content: "\f204";
+}
+
+.basemap-listing.active-basemap, .basemap-listing:hover, .overlay-listing.active-overlay, .overlay-listing:hover {
     color: rgb(33, 62, 95);
+}
+.basemap-listing.active-basemap, .basemap-listing:hover, .overlay-listing:hover {
     background-color: rgb(247, 247, 247);
 }
 
 .basemap-listing.active-basemap:before {
     content: "\f05d";
+}
+
+.overlay-listing.active-overlay:before {
+    content: "\f205";
 }
 
 #map-settings {
