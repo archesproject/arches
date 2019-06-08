@@ -17,11 +17,13 @@
         <div class="workflow-nav-controls right"><i class="fa fa-chevron-circle-right" data-bind="click: next"></i></div>
     </div>
     <div class='workflow-step-body'>
-        <!--ko if: activeStep().component-->
+        <!--ko if: activeStep().ready() -->
+        <!--ko if: activeStep().componentname-->
             <!-- ko component: {
-                name: activeStep().component,
+                name: activeStep().componentname,
                 params: activeStep()
             } --><!--/ko-->
+            <!--/ko-->
         <!--/ko-->
     </div>
 </div>
