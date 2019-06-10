@@ -503,6 +503,7 @@ input[type="checkbox"] {
     background-color: #eee;
     height: 100%;
     padding-bottom: 207px;
+    overflow-y: auto;
 }
 
 .workflow-nav-controls {

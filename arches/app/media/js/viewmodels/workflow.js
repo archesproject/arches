@@ -32,6 +32,11 @@ define([
                     step.loading = self.loading;
                     step.alert = self.alert;
                     self.steps[i] = new Step(step);
+                    self.steps[i].ready.subscribe(function(val){
+                        if (val) {
+                            console.log(self.steps[i])
+                        }
+                    })
                     self.steps[i].complete.subscribe(function(complete) {
                         if (complete && self.advance) self.next();
                     });

@@ -82,16 +82,20 @@ define([
 
         var relatedResourceModels = ko.computed(function() {
             if (params.node) {
+                var res = [];
                 var ids = ko.unwrap(params.node.config.graphid);
-                return arches.resources.filter(function(graph) {
-                    return ids.indexOf(graph.graphid) >= 0;
-                }).map(function(g) {
-                    return {
-                        name: g.name,
-                        _id: g.graphid,
-                        isGraph: true
-                    };
-                });
+                if (ids) {
+                    res = arches.resources.filter(function(graph) {
+                        return ids.indexOf(graph.graphid) >= 0;
+                    }).map(function(g) {
+                        return {
+                            name: g.name,
+                            _id: g.graphid,
+                            isGraph: true
+                        };
+                    });
+                }
+                return res;
             }
         }, this);
 

@@ -3,11 +3,12 @@ define([
     'jquery',
     'arches',
     'knockout',
+    'knockout-mapping',
     'models/graph',
     'viewmodels/card',
     'viewmodels/provisional-tile',
     'viewmodels/alert'
-], function(_, $, arches, ko, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel) {
+], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel) {
     function viewModel(params) {
         var self = this;
         var url = arches.urls.api_card + (ko.unwrap(params.resourceid) || ko.unwrap(params.graphid));
@@ -126,6 +127,14 @@ define([
             // commented the line below because it causes steps to automatically advance on page reload
             // self.complete(!!ko.unwrap(params.tileid));
         });
+
+        params.stateProperties = function(){
+            return {
+                resourceid: ko.unwrap(params.resourceid),
+                tile: !!(params.tile) ? koMapping.toJS(params.tile().data) : undefined,
+                tileid: !!(params.tile) ? ko.unwrap(params.tile().tileid): undefined
+            };
+        };
 
         self.saveTile = function(tile, callback) {
             self.loading(true);
