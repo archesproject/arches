@@ -98,33 +98,33 @@ def search_terms(request):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
     se = SearchEngineFactory().create()
     searchString = request.GET.get('q', '')
-    query = Query(se, start=0, limit=0)
     user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
-
-    boolquery = Bool()
-    boolquery.should(Match(field='value', query=searchString.lower(), type='phrase_prefix'))
-    boolquery.should(Match(field='value.folded', query=searchString.lower(), type='phrase_prefix'))
-    boolquery.should(Match(field='value.folded', query=searchString.lower(), fuzziness='AUTO', prefix_length=settings.SEARCH_TERM_SENSITIVITY))
-
-    if user_is_reviewer is False:
-        boolquery.filter(Terms(field='provisional', terms=['false']))
-
-    query.add_query(boolquery)
-    base_agg = Aggregation(name='value_agg', type='terms', field='value.raw', size=settings.SEARCH_DROPDOWN_LENGTH, order={"max_score": "desc"})
-    nodegroupid_agg = Aggregation(name='nodegroupid', type='terms', field='nodegroupid')
-    top_concept_agg = Aggregation(name='top_concept', type='terms', field='top_concept')
-    conceptid_agg = Aggregation(name='conceptid', type='terms', field='conceptid')
-    max_score_agg = MaxAgg(name='max_score', script='_score')
-
-    top_concept_agg.add_aggregation(conceptid_agg)
-    base_agg.add_aggregation(max_score_agg)
-    base_agg.add_aggregation(top_concept_agg)
-    base_agg.add_aggregation(nodegroupid_agg)
-    query.add_aggregation(base_agg)
 
     i = 0
     ret = {}
     for index in ['terms', 'concepts']:
+        query = Query(se, start=0, limit=0)
+        boolquery = Bool()
+        boolquery.should(Match(field='value', query=searchString.lower(), type='phrase_prefix'))
+        boolquery.should(Match(field='value.folded', query=searchString.lower(), type='phrase_prefix'))
+        boolquery.should(Match(field='value.folded', query=searchString.lower(), fuzziness='AUTO', prefix_length=settings.SEARCH_TERM_SENSITIVITY))
+
+        if user_is_reviewer is False and index == 'terms':
+            boolquery.filter(Terms(field='provisional', terms=['false']))
+
+        query.add_query(boolquery)
+        base_agg = Aggregation(name='value_agg', type='terms', field='value.raw', size=settings.SEARCH_DROPDOWN_LENGTH, order={"max_score": "desc"})
+        nodegroupid_agg = Aggregation(name='nodegroupid', type='terms', field='nodegroupid')
+        top_concept_agg = Aggregation(name='top_concept', type='terms', field='top_concept')
+        conceptid_agg = Aggregation(name='conceptid', type='terms', field='conceptid')
+        max_score_agg = MaxAgg(name='max_score', script='_score')
+
+        top_concept_agg.add_aggregation(conceptid_agg)
+        base_agg.add_aggregation(max_score_agg)
+        base_agg.add_aggregation(top_concept_agg)
+        base_agg.add_aggregation(nodegroupid_agg)
+        query.add_aggregation(base_agg)
+
         ret[index] = []
         results = query.search(index=index)
         for result in results['aggregations']['value_agg']['buckets']:
