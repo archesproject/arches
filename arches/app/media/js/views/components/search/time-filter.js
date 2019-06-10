@@ -15,6 +15,7 @@ function($, _, ko, moment, BaseFilter, arches) {
         viewModel: BaseFilter.extend({
             initialize: function(options) {
                 options.name = 'Time Filter';
+                this.dateDropdownEleId = 'dateDropdownEleId' + _.random(2000, 3000000);
                 BaseFilter.prototype.initialize.call(this, options);
                 this.filter = {
                     fromDate: ko.observable(null),
@@ -91,6 +92,7 @@ function($, _, ko, moment, BaseFilter, arches) {
                     this.filter.fromDate(from);
                 }, this);
 
+
                 $.ajax({
                     type: "GET",
                     url: arches.urls.api_search_component_data + componentName,
@@ -98,22 +100,22 @@ function($, _, ko, moment, BaseFilter, arches) {
                 }).done(function(response) {
                     this.date_nodes(response.date_nodes);
                     this.graph_models(response.graph_models);
-                    $("select[data-bind^=chosen]").trigger("chosen:updated");
+                    this.restoreState();
+                    $("#" + this.dateDropdownEleId).trigger("chosen:updated");
+                    
+                    this.filterChanged = ko.computed(function(){
+                        if(!!this.filter.fromDate() || !!this.filter.toDate()){
+                            this.getFilter('term-filter').addTag(this.name, this.name, this.filter.inverted);
+                        }
+                        return ko.toJSON(this.filter);
+                    }, this).extend({ deferred: true });
+
+                    this.filterChanged.subscribe(function() {
+                        this.updateQuery();
+                    }, this);
                 });
 
-                this.filterChanged = ko.computed(function(){
-                    if(!!this.filter.fromDate() || !!this.filter.toDate()){
-                        this.getFilter('term-filter').addTag(this.name, this.name, this.filter.inverted);
-                    }
-                    return ko.toJSON(this.filter);
-                }, this).extend({ deferred: true });
-
-                this.filterChanged.subscribe(function() {
-                    this.updateQuery();
-                }, this);
-
                 this.filters[componentName](this);
-                this.restoreState();
             },
 
             updateQuery: function() {
@@ -144,12 +146,12 @@ function($, _, ko, moment, BaseFilter, arches) {
             restoreState: function() {
                 var query = this.query();
                 if (componentName in query) {
-                    query[componentName] = JSON.parse(query[componentName]);
-                    this.filter.inverted(!!query[componentName].inverted);
+                    var timeQuery = JSON.parse(query[componentName]);
+                    this.filter.inverted(!!timeQuery.inverted);
                     this.getFilter('term-filter').addTag(this.name, this.name, this.filter.inverted);
                     ['fromDate', 'toDate', 'dateNodeId'].forEach(function(key) {
-                        if (key in query[componentName]) {
-                            this.filter[key](query[componentName][key]);
+                        if (key in timeQuery) {
+                            this.filter[key](timeQuery[key]);
                         }
                     }, this);
                 }

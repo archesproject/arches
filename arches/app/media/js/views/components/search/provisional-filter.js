@@ -11,16 +11,13 @@ define([
                 this.filter = ko.observableArray();
                 this.provisionalOptions = [{'name': 'Authoritative'},{'name': 'Provisional'}];
 
-                var filterChanged = ko.computed(function() {
-                    return JSON.stringify(ko.toJS(this.filter));
-                }, this);
+                this.restoreState();
 
-                filterChanged.subscribe(function() {
+                this.filter.subscribe(function() {
                     this.updateQuery();
                 }, this);
 
                 this.filters[componentName](this);
-                this.restoreState();
             },
 
             updateQuery: function() {
@@ -34,15 +31,15 @@ define([
             },
             
             restoreState: function() {
-                var query = this.query;
+                var query = this.query();
                 if (componentName in query) {
-                    query[componentName] = JSON.parse(query[componentName]);
-                    if (query[componentName].length > 0) {
-                        query[componentName].forEach(function(type){
+                    var provisionalQuery = JSON.parse(query[componentName]);
+                    if (provisionalQuery.length > 0) {
+                        provisionalQuery.forEach(function(type){
                             type.inverted = ko.observable(!!type.inverted);
-                            this.getFilter('term-filter').addTag(type.provisionaltype, this.provisionaltype, type.inverted);
+                            this.getFilter('term-filter').addTag(type.provisionaltype, this.name, type.inverted);
                         }, this);
-                        this.filter(query[componentName]);
+                        this.filter(provisionalQuery);
                     }
                 }
             },
