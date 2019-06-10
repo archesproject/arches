@@ -17,15 +17,15 @@
         }"></div>
     </div>
     <div class=workflows-ref-number-list>
-        <!-- ko foreach: {data: card.tiles, as: 'tile'} -->
+        <!-- ko foreach: {data: tileArr, as: 'tile'} -->
         <div class="workflows-ref-number-card">
             <div class="card-info">
                 <div class="workflow-step-icon complete"><span><i class="fa fa-hashtag"></i></span></div>
                 <div class="card-info-details">
                     <h4>Agency:</h4>
-                    <div data-bind="text: tile.data['2c8dff14-567b-11e9-b920-dca90488358a']"></div>
+                    <div data-bind="text: tile.data['2c8dff14-567b-11e9-b920-dca90488358a']()"></div>
                     <h5>Identifier:</h5>
-                    <div data-bind="text: tile.data['67677266-567b-11e9-a2bb-dca90488358a']" ></div>
+                    <div data-bind="text: tile.data['67677266-567b-11e9-a2bb-dca90488358a']()" ></div>
                 </div>
             </div>
             <div>

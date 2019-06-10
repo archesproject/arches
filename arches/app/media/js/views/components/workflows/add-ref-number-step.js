@@ -24,12 +24,18 @@ define([
 
         this.remove = function(tile) {
             // self.tileArr(tile);
-            var idx = self.card().tiles().indexOf(tile);
-            console.log(self.card().tiles());
-            self.card().tiles().splice(idx, 1);
+            var tilesIdx = self.card().tiles().indexOf(tile);
+            var arrIdx = self.tileArr.indexOf(tile);
+            // console.log(self.card().tiles());
+            self.card().tiles().splice(tilesIdx, 1);
+            self.tileArr.splice(arrIdx, 1);
             console.log("removed");
             console.log(self.card().tiles());
         };
+
+        this.edit = function(tile) {
+            //
+        }
         // this.agencyName = ko.computed({});
 
         this.loading(true);
@@ -151,9 +157,9 @@ define([
             console.log("and self.card()");
             console.log(self.card());
 
-            var tilesub = self.card().tiles.subscribe(function(val){
-                return (val);
-            });
+            // self.tileArr = self.card().tiles.subscribe(function(list){
+            //     return (list);
+            // });
 
             tile.save(function(response) { //onFail, onSuccess
                 self.loading(false);
@@ -188,14 +194,13 @@ define([
                     filter: ko.observable(),
                     cardwidgets: params.cardwidgets,
                 });
+
+                self.tileArr.push(newTile);
     
-                console.log("newTile");
-                console.log(newTile);
+                // console.log("newTile");
+                // console.log(newTile);
                 
-                // self.tiles.push(tile);
-                self.card().tiles().push(newTile); //do I need to do this?
                 // self.tileArr.push
-                // self.tilesArr.push(tile);
                 console.log(self.card().tiles());
    
                 params.resourceid(tile.resourceinstance_id);
