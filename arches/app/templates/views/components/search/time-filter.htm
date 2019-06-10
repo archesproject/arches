@@ -16,7 +16,7 @@
         <!-- Date Type -->
         <div class="calendar">
             <h3 class="search-label">{% trans "Type" %}</h3>
-            <select class="resources" data-placeholder="Date type" tabindex="-1" data-bind="value: filter.dateNodeId, chosen:{ width: '100%' }">
+            <select id="" class="resources" data-placeholder="Date type" tabindex="-1" data-bind="value: filter.dateNodeId, chosen:{ width: '100%' }, attr: {id:dateDropdownEleId} ">
                 <option value="">{% trans "Search all dates" %}</option>
                 <!-- ko foreach: { data: graph_models, as: 'graph' } -->
                     <optgroup data-bind="if: (graph.isresource && graph.isactive), attr: { label: graph.name }">

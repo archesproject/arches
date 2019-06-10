@@ -18,6 +18,9 @@ define([
                 this.searchableGraphs = ko.observableArray();
                 this.datatypelookup = {};
                 this.facetFilterText = ko.observable('');
+                this.filter = {
+                    facets: ko.observableArray()
+                };
 
                 $.ajax({
                     type: "GET",
@@ -61,21 +64,17 @@ define([
                             }
                         }
                     }, this);
+                    this.restoreState();
+
+                    var filterUpdated = ko.computed(function() {
+                        return JSON.stringify(ko.toJS(this.filter.facets()));
+                    }, this);
+                    filterUpdated.subscribe(function() {
+                        this.updateQuery();
+                    }, this);
                 });
 
-                this.filter = {
-                    facets: ko.observableArray()
-                };
-
-                var filterUpdated = ko.computed(function() {
-                    return JSON.stringify(ko.toJS(this.filter.facets()));
-                }, this);
-                filterUpdated.subscribe(function() {
-                    this.updateQuery();
-                }, this);
-
                 this.filters[componentName](this);
-                this.restoreState();
             },
 
             updateQuery: function() {
