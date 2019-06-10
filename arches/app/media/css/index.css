@@ -67,7 +67,7 @@ ul.splash-list > li > a:focus, ul.splash-list > li > a:hover {
 }
 
 .navbar-brand-disco {
-    color: #FAFAFA;
+    color: #594b4b;
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
@@ -83,7 +83,7 @@ ul.splash-list > li > a:focus, ul.splash-list > li > a:hover {
 .navbar-brand-disco h2 {
     margin-bottom: 8px;
     font-size: 48px;
-    color: #FAFAFA;
+    color: #594b4b;
     display: inline-block;
 }
 
@@ -113,7 +113,7 @@ ul.splash-list > li > a:focus, ul.splash-list > li > a:hover {
     text-transform: none;
     font-size: 20px;
     font-family: "Open Sans",Arial,sans-serif;
-    color: white;
+    color: #594b4b;
 }
 
 .splash-nav .auth-welcome {
