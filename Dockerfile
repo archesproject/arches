@@ -102,6 +102,14 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main" >> /etc
   apt-get update -y &&\
   apt-get install -y postgresql-client-9.6
 
+# Install Yarn components
+COPY ./arches/install/package.json ${ARCHES_ROOT}/arches/install/package.json
+COPY ./arches/install/.yarnrc ${ARCHES_ROOT}/arches/install/.yarnrc
+COPY ./arches/install/yarn.lock ${ARCHES_ROOT}/arches/install/yarn.lock
+WORKDIR ${ARCHES_ROOT}/arches/install
+RUN mkdir -p ${ARCHES_ROOT}/arches/app/media/packages
+RUN yarn install
+
 ## Install virtualenv
 WORKDIR ${WEB_ROOT}
 
@@ -128,10 +136,6 @@ WORKDIR ${ARCHES_ROOT}
 
 RUN . ../ENV/bin/activate \
     && pip install -e . --no-binary :all:
-
-# Install Yarn components
-WORKDIR ${ARCHES_ROOT}/arches/install
-RUN yarn install
 
 # Set default workdir
 WORKDIR ${ARCHES_ROOT}
