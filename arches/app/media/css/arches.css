@@ -434,12 +434,21 @@ input[type="checkbox"] {
 .workflowstep-nav {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     width: 100%;
     border-bottom: solid 1px #ccc;
     height: fit-content;
     padding: 15px;
     background-color: white;
+}
+
+.workflowstep-nav div {
+    padding: 0 20px;
+}
+
+.workflowstep-nav div.workflow-nav-controls {
+    position: absolute;
+    padding: 15px;
+    right: 10px;
 }
 
 .workflow-step-icon {
@@ -1111,7 +1120,7 @@ ul.tabbed-report-tab-list {
     color: rgb(158, 158, 158);
 }
 
-.basemap-listing:before, .overlay-listing:before {
+.basemap-listing:before, .overlay-listing .overlay-name:before {
     margin-right: 16px;
     font-family: FontAwesome;
 }
@@ -1120,8 +1129,67 @@ ul.tabbed-report-tab-list {
     content: "\f10c";
 }
 
-.overlay-listing:before {
+.overlay-listing .overlay-name:before {
     content: "\f204";
+}
+
+.overlay-listing {
+    position: relative;
+}
+
+.overlay-listing div {
+    display: inline-block;
+    width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    top: 4px;
+}
+
+.slider-wrapper input {
+    width: 150px;
+    height: 20px;
+    margin: 0;
+    transform-origin: 75px 75px;
+    transform: rotate(-90deg);
+    z-index: 10000;
+    background: white;
+    transition: 0s;
+    border-radius: 5px;
+    border: 1px solid #808080;
+}
+
+.overlay-listing .fa-adjust {
+    position: absolute;
+    padding: 6px
+}
+
+.overlay-listing .fa-adjust .slider-wrapper {
+    /* display: none; */
+    top: 28px;
+    right: -8px;
+    width: 43px;
+    height: 170px;
+    padding: 10px;
+    position: absolute;
+    background-color: white;
+    border-radius: 3px;
+    border: 1px solid rgb(213, 213, 213);
+    transition: 0s;
+    opacity: 0;
+}
+
+.overlay-listing .fa-adjust:hover {
+    z-index: 100000;
+}
+
+.overlay-listing .fa-adjust:hover .slider-wrapper, .overlay-listing .fa-adjust .slider-wrapper:focus {
+    display: inline-block;
+    position: absolute;
+    z-index: 10000;
+    opacity: 1;
+    transition-delay: 0.5s;
 }
 
 .basemap-listing.active-basemap, .basemap-listing:hover, .overlay-listing.active-overlay, .overlay-listing:hover {
@@ -1135,7 +1203,7 @@ ul.tabbed-report-tab-list {
     content: "\f05d";
 }
 
-.overlay-listing.active-overlay:before {
+.overlay-listing.active-overlay .overlay-name:before {
     content: "\f205";
 }
 
