@@ -28,7 +28,7 @@ define([
         this.ready.subscribe(function() {
             var components = _.unique(self.steps.map(function(step) {return step.component;}));
             require(components, function() {
-                var modules = arguments;
+                // var modules = arguments;
                 self.steps.forEach(function(step, i) {
                     if (!(self.steps[i] instanceof Step)) {
                         step.workflow = self;
@@ -47,7 +47,6 @@ define([
                 else if(self.steps.length > 0) {
                     self.activeStep(self.steps[0]);
                 }
-                console.log(modules);
             });
         });
 
