@@ -33,6 +33,7 @@ from arches.app.utils.permission_backend import user_can_read_resources
 from arches.app.utils.permission_backend import user_can_edit_resources
 from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.decorators import group_required
+from arches.app.search.components.base import SearchFilterFactory
 from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
@@ -124,7 +125,9 @@ class Sync(APIBase):
         can_sync = userCanAccessMobileSurvey(request, surveyid)
         if can_sync:
             try:
+                logger.info("Starting sync for user {0}".format(request.user.username))
                 management.call_command('mobile', operation='sync_survey', id=surveyid, user=request.user.id)
+                logger.info("Sync complete for user {0}".format(request.user.username))
             except Exception:
                 logger.exception(_('Sync Failed'))
 
@@ -136,6 +139,9 @@ class Sync(APIBase):
 class Surveys(APIBase):
 
     def get(self, request, surveyid=None):
+
+        auth_header = request.META.get('HTTP_AUTHORIZATION', None)
+        logger.info("Requesting projects for user: {0}".format(request.user.username))
         try:
             if hasattr(request.user, 'userprofile') is not True:
                 models.UserProfile.objects.create(user=request.user)
@@ -146,7 +152,6 @@ class Surveys(APIBase):
                     get_child_cardids(child_card, cardset)
 
             group_ids = list(request.user.groups.values_list('id', flat=True))
-
             if request.GET.get('status', None) is not None:
                 ret = {}
                 surveys = MobileSurvey.objects.filter(users__in=[request.user]).distinct()
@@ -200,6 +205,7 @@ class Surveys(APIBase):
             logger.exception(_('Unable to fetch collector projects'))
             response = JSONResponse(_('Unable to fetch collector projects'), indent=4)
 
+        logger.info("Returning projects for user: {0}".format(request.user.username))
         return response
 
 
@@ -589,7 +595,7 @@ class Card(APIBase):
                                     # if the tile has authoritaive data and the current user is not the owner,
                                     # we don't send the provisional data of other users back to the client.
                                     tile.provisionaledits = None
-                if append_tile == True:
+                if append_tile is True:
                     provisionaltiles.append(tile)
             tiles = provisionaltiles
 
@@ -615,3 +621,13 @@ class Card(APIBase):
         }
 
         return JSONResponse(context, indent=4)
+
+
+class SearchComponentData(APIBase):
+
+    def get(self, request, componentname):
+        search_filter_factory = SearchFilterFactory(request)
+        search_filter = search_filter_factory.get_filter(componentname)
+        if search_filter:
+            return JSONResponse(search_filter.view_data())
+        return JSONResponse(status=404)

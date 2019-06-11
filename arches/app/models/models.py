@@ -13,9 +13,9 @@ from __future__ import unicode_literals
 import os
 import json
 import uuid
-import importlib
 import datetime
 from datetime import timedelta
+from arches.app.utils.module_importer import get_class_from_modulename
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
@@ -350,24 +350,7 @@ class Function(models.Model):
         return json_string
 
     def get_class_module(self):
-        mod_path = self.modulename.replace('.py', '')
-        module = None
-        import_success = False
-        import_error = None
-        for function_dir in settings.FUNCTION_LOCATIONS:
-            try:
-                module = importlib.import_module(function_dir + '.%s' % mod_path)
-                import_success = True
-            except ImportError as e:
-                import_error = e
-            if module != None:
-                break
-        if import_success == False:
-            print 'Failed to import ' + mod_path
-            print import_error
-
-        func = getattr(module, self.classname)
-        return func
+        return get_class_from_modulename(self.modulename, self.classname, settings.FUNCTION_LOCATIONS)
 
 class FunctionXGraph(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
@@ -662,7 +645,34 @@ class ResourceInstance(models.Model):
         db_table = 'resource_instances'
 
 
-class TileModel(models.Model):  # Tile
+class SearchComponent(models.Model):
+    searchcomponentid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+    name = models.TextField()
+    icon = models.TextField(default=None)
+    modulename = models.TextField(blank=True, null=True)
+    classname = models.TextField(blank=True, null=True)
+    type = models.TextField()
+    componentpath = models.TextField(unique=True)
+    componentname = models.TextField(unique=True)
+    sortorder = models.IntegerField(blank=True, null=True, default=None)
+    enabled = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        managed = True
+        db_table = 'search_component'
+
+    def get_class_module(self):
+        return get_class_from_modulename(self.modulename, self.classname, settings.SEARCH_COMPONENT_LOCATIONS)
+
+    def toJSON(self):
+        from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+        return JSONSerializer().serialize(self)
+
+
+class TileModel(models.Model): #Tile
     """
     the data JSONField has this schema:
 

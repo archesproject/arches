@@ -507,7 +507,8 @@ input[type="checkbox"] {
 .workflow-step-body {
     padding: 10px;
     background-color: #eee;
-    height: 100%;
+    height: 70%;
+    overflow-y: auto;
 }
 
 .workflow-nav-controls {
@@ -4924,6 +4925,14 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 }
 
 .concept_result {
+    font-weight: 700;
+}
+
+.term-search-item {
+    font-weight: 400;
+}
+
+.term-search-group {
     font-weight: 700;
 }
 
@@ -10279,6 +10288,7 @@ a.search-query-link-captions:focus {
     overflow-x: hidden;
     transition: all .5s;
     margin-top: inherit;
+    min-width: 400px;
 }
 
 .search-title {
@@ -11095,6 +11105,17 @@ a .search-type-link {
     height: 50px;
     font-size: 11px;
     color: #888;
+}
+
+.term-search-btn {
+    font-weight: 700;
+    font-size: 13px;
+    height: 30px;
+    padding-left: 0px;
+}
+
+.term-search-btn.active {
+    color: #123;
 }
 
 .search-type-btn i {
@@ -13200,6 +13221,11 @@ a.jstree-anchor.permissions-widget {
 .create-resource-instance-card-component {
   position: absolute;
   background: white;
+}
+
+.indent {
+    text-indent: 10px;
+    padding-left: 10px;
 }
 
 @keyframes loader {

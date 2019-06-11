@@ -1,6 +1,7 @@
 {% load i18n %}
 <!--ko if: ready() -->
 <div class="workflow-plugin">
+    <!--ko if: ko.unwrap(activeStep) -->
     <div class="workflowstep-nav">
         <!--ko foreach: {data: steps, as: 'step'}-->
         <div data-bind=""><i class="fa fa-lg" data-bind="class: step.iconClass"></i></div>
@@ -17,12 +18,13 @@
         <div class="workflow-nav-controls right"><i class="fa fa-chevron-circle-right" data-bind="click: next"></i></div>
     </div>
     <div class='workflow-step-body'>
-        <!--ko if: activeStep().component-->
+        <!--ko if: activeStep().componentname-->
             <!-- ko component: {
-                name: activeStep().component,
+                name: activeStep().componentname,
                 params: activeStep()
             } --><!--/ko-->
-        <!--/ko-->
+            <!--/ko-->
     </div>
+    <!--/ko-->
 </div>
 <!--/ko-->

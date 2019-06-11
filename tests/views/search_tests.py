@@ -486,11 +486,11 @@ def extract_pks(response_json):
 def get_response_json(client, temporal_filter=None, term_filter=None, spatial_filter=None):
     query = {}
     if temporal_filter is not None:
-        query['temporalFilter'] = JSONSerializer().serialize(temporal_filter)
+        query['time-filter'] = JSONSerializer().serialize(temporal_filter)
     if term_filter is not None:
-        query['termFilter'] = JSONSerializer().serialize(term_filter)
+        query['term-filter'] = JSONSerializer().serialize(term_filter)
     if spatial_filter is not None:
-        query['mapFilter'] = JSONSerializer().serialize(spatial_filter)
+        query['map-filter'] = JSONSerializer().serialize(spatial_filter)
 
     resource_reviewer_group = Group.objects.get(name='Resource Reviewer')
     test_user = User.objects.get(username='test')

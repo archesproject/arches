@@ -24,7 +24,6 @@ from arches.app.utils.data_management.resources.formats.format import Reader as 
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.models.system_settings import settings
 from arches.app.models import models
-from arches.db.install import truncate_db
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resources.remover as resource_remover
@@ -89,7 +88,6 @@ class Command(BaseCommand):
                 'save_system_settings',
                 'add_mapbox_layer',
                 'seed_resource_tile_cache',
-                'update_project_templates',
                 'load_package',
                 'create_package',
                 'update_package',
@@ -281,9 +279,6 @@ class Command(BaseCommand):
 
         if options['operation'] == 'create_mapping_file':
             self.create_mapping_file(options['dest_dir'], options['graphs'])
-
-        if options['operation'] == 'update_project_templates':
-            self.update_project_templates()
 
         if options['operation'] in ['load', 'load_package']:
             self.load_package(
@@ -734,7 +729,7 @@ class Command(BaseCommand):
 
         if setup_db is not False:
             if setup_db.lower() in ('t', 'true', 'y', 'yes'):
-                self.setup_db(settings.PACKAGE_NAME)
+                management.call_command("setup_db", force=True)
 
         if load_project_extensions is not False:
             if load_project_extensions.lower() in ('t', 'true', 'y', 'yes'):
@@ -786,21 +781,6 @@ class Command(BaseCommand):
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
 
-    def update_project_templates(self):
-        """
-        Moves files from the arches project to the arches-templates directory to
-        ensure that they remain in sync. Adds and comments out settings that are
-        whitelisted into the settings_local.py template
-
-        """
-        files = [
-            {'src': 'arches/app/templates/index.htm',
-                'dst': 'arches/install/arches-templates/project_name/templates/index.htm'},
-            {'src': 'package.json',
-                'dst': 'arches/install/arches-templates/project_name/package.json'}]
-        for f in files:
-            shutil.copyfile(f['src'], f['dst'])
-
     def setup(self, package_name, es_install_location=None):
         """
         Installs Elasticsearch into the package directory and
@@ -849,28 +829,12 @@ class Command(BaseCommand):
 
         """
 
-        db_settings = settings.DATABASES['default']
-        truncate_path = os.path.join(settings.ROOT_DIR, 'db', 'install', 'truncate_db.sql')
-        db_settings['truncate_path'] = truncate_path
+        management.call_command("setup_db", force=True)
 
-        truncate_db.create_sqlfile(db_settings, truncate_path)
-
-        os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
-
-        self.delete_indexes()
-        self.setup_indexes()
-
-        management.call_command('migrate')
-
-        self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'system_settings',
-                                        'Arches_System_Settings_Model.json'), overwrite_graphs=True)
-        self.import_business_data(os.path.join(settings.ROOT_DIR, 'db',
-                                               'system_settings', 'Arches_System_Settings.json'), overwrite=True)
-
-        local_settings_available = os.path.isfile(os.path.join(settings.SYSTEM_SETTINGS_LOCAL_PATH))
-
-        if local_settings_available is True:
-            self.import_business_data(settings.SYSTEM_SETTINGS_LOCAL_PATH, overwrite=True)
+        print("\n"+"~"*80+"\n"
+              "Warning: This command will be deprecated in Arches 4.5. From now on please use\n\n"
+              "    python manage.py setup_db [--force]\n\nThe --force argument will "
+              "suppress the interactive confirmation prompt.\n"+"~"*80)
 
     def setup_indexes(self):
         management.call_command('es', operation='setup_indexes')
