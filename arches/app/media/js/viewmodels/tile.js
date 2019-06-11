@@ -157,7 +157,7 @@ define([
             save: function(onFail, onSuccess) {
                 loading(true);
                 delete self.formData.data;
-                if (params.provisionalTileViewModel.selectedProvisionalEdit()) {
+                if (params.provisionalTileViewModel && params.provisionalTileViewModel.selectedProvisionalEdit()) {
                     self.formData.append('accepted_provisional', JSON.stringify(params.provisionalTileViewModel.selectedProvisionalEdit()));
                     params.provisionalTileViewModel.acceptProvisionalEdit();
                 }

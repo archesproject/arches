@@ -6,38 +6,16 @@ define([
     'models/graph',
     'viewmodels/card',
     'viewmodels/tile',
-    // 'viewmodels/card-component',
+    'views/components/workflows/new-tile-step',
     'viewmodels/provisional-tile',
     'viewmodels/alert'
-], function(_, $, arches, ko, GraphModel, CardViewModel, TileViewModel, ProvisionalTileViewModel, AlertViewModel) {
+], function(_, $, arches, ko, GraphModel, CardViewModel, TileViewModel, NewTileStepViewModel, ProvisionalTileViewModel, AlertViewModel) {
     function viewModel(params) {
+        NewTileStepViewModel.apply(this, [params]);
         var self = this;
         var url = arches.urls.api_card + (ko.unwrap(params.resourceid) || ko.unwrap(params.graphid));
 
-        this.card = ko.observable();
-        this.tile = ko.observable();
         this.tileArr = ko.observableArray();
-        this.loading = params.loading || ko.observable(false);
-        this.alert = params.alert || ko.observable(null);
-        this.resourceId = params.resourceid;
-        this.complete = params.complete || ko.observable();
-
-        this.selectedTile = ko.computed(function() {
-            //if card is undefined, return self.tile(getNewTile)
-            //else, do below
-            var item;
-            if(!self.card()) {
-                return self.card().getNewTile();
-            } else {
-                item = self.card.selection();
-                if (item && typeof item !== 'string') {
-                    if (item.tileid) {
-                        return item;
-                    }
-                    return item.getNewTile();
-                }
-            }
-        });
 
         this.remove = function(tile) {
             var tilesIdx = self.card().tiles().indexOf(tile);
@@ -45,20 +23,11 @@ define([
             // console.log(self.card().tiles());
             self.card().tiles().splice(tilesIdx, 1); //card.tiles arr
             self.tileArr.splice(arrIdx, 1); //dummy observ arr
-            console.log("removed");
-            console.log(self.card().tiles());
         };
 
         this.edit = function(tile) {
-            if(!self.card().selection) {
-                self.card().selection = ko.observable(tile);
-            } else {
-                self.card().selection(tile);
-            }
-            tile.selected(true);
+            self.tile(tile);
             console.log(tile.parent());
-            // self.card().selection(tile);
-            // console.log(self.card().selection());
             console.log("edited");
         }
         // this.agencyName = ko.computed({}); //need to key off node_id
@@ -88,16 +57,6 @@ define([
                 });
                 return flatList;
             };
-
-            // var selectedTile = ko.computed(function() {
-            //     var item = self.card.selection();
-            //     if (item && typeof item !== 'string') {
-            //         if (item.tileid) {
-            //             return item;
-            //         }
-            //         return item.getNewTile();
-            //     }
-            // });
 
             self.reviewer = data.userisreviewer;
             self.provisionalTileViewModel = new ProvisionalTileViewModel({
@@ -159,16 +118,6 @@ define([
                 }
             };
 
-            self.selectedTile = ko.computed(function() {
-                var item = ko.unwrap(self.card.selection);
-                if (item && typeof item !== 'string') {
-                    if (item.tileid) {
-                        return item;
-                    }
-                    return item.getNewTile();
-                }
-            });
-
             flattenTree(topCards, []).forEach(function(item) {
                 if (item.constructor.name === 'CardViewModel' && item.nodegroupid === ko.unwrap(params.nodegroupid)) {
                     if (ko.unwrap(params.parenttileid) && item.parent && ko.unwrap(params.parenttileid) !== item.parent.tileid) {
@@ -193,21 +142,8 @@ define([
         this.tileArr = ko.observableArray();
 
         self.saveTile = function(tile, callback) {
-            // self.tile() is the TileViewModel
-            // self.card().tile() is not a thing
-
             self.loading(true);
-            console.log("here's self.tile");
-            console.log(self.tile());
-            console.log("and self.card()");
-            console.log(self.card());
-            // self.card().selection()
-
-            // self.tileArr = self.card().tiles.subscribe(function(list){
-            //     return (list);
-            // });
-
-            tile.save(function(response) { //onFail, onSuccess
+            tile.save(function(response) {
                 self.loading(false);
                 self.alert(
                     new AlertViewModel(
@@ -218,11 +154,9 @@ define([
                         function(){ return; }
                     )
                 );
-            }, function(tile) { //onSuccess
-
+            }, function(tile) {
                 // console.log(params);
                 // console.log(tile);
-
                 var newTile = new TileViewModel({
                     tile: tile,
                     card: self.card,
@@ -239,12 +173,8 @@ define([
                     filter: ko.observable(),
                     cardwidgets: params.cardwidgets,
                 });
-
                 self.tileArr.push(newTile);
-                
-                // self.tileArr.push
                 console.log(self.card().tiles());
-   
                 params.resourceid(tile.resourceinstance_id);
                 params.tileid(tile.tileid);
                 self.resourceId(tile.resourceinstance_id);
@@ -252,8 +182,7 @@ define([
                 if (typeof callback === 'function') {
                     callback.apply(null, arguments);
                 }
-                self.tile(self.card().getNewTile()); //this appears to be working
-   
+                self.tile(self.card().getNewTile());
                 self.loading(false);
             });
         };
