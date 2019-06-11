@@ -1,9 +1,10 @@
 define([
     'jquery',
+    'underscore',
     'knockout',
     'knockout-mapping',
     'viewmodels/workflow-step'
-], function($, ko, koMapping, Step) {
+], function($, _, ko, koMapping, Step) {
     var Workflow = function(config) {
         var self = this;
         this.steps = config.steps || [];
@@ -13,7 +14,6 @@ define([
         this.loading = config.loading || ko.observable(false);
         this.alert = config.alert || ko.observable(null);
         this.state = {steps:{}};
-        this.advance = true;
 
         this.restoreStateFromURL = function(){
             var urlparams = new window.URLSearchParams(window.location.search);
@@ -26,29 +26,29 @@ define([
         this.restoreStateFromURL();
 
         this.ready.subscribe(function() {
-            self.steps.forEach(function(step, i) {
-                if (!(self.steps[i] instanceof Step)) {
-                    step.workflow = self;
-                    step.loading = self.loading;
-                    step.alert = self.alert;
-                    self.steps[i] = new Step(step);
-                    self.steps[i].ready.subscribe(function(val){
-                        if (val) {
-                            console.log(self.steps[i])
-                        }
-                    })
-                    self.steps[i].complete.subscribe(function(complete) {
-                        if (complete && self.advance) self.next();
-                    });
+            var components = _.unique(self.steps.map(function(step) {return step.component;}));
+            require(components, function() {
+                var modules = arguments;
+                self.steps.forEach(function(step, i) {
+                    if (!(self.steps[i] instanceof Step)) {
+                        step.workflow = self;
+                        step.loading = self.loading;
+                        step.alert = self.alert;
+                        self.steps[i] = new Step(step);
+                        self.steps[i].complete.subscribe(function(complete) {
+                            if (complete) self.next();
+                        });
+                    }
+                    self.steps[i]._index = i;
+                });
+                if (self.state.activestep) {
+                    self.activeStep(self.steps[self.state.activestep]);
                 }
-                self.steps[i]._index = i;
+                else if(self.steps.length > 0) {
+                    self.activeStep(self.steps[0]);
+                }
+                console.log(modules);
             });
-            if (self.state.activestep) {
-                self.activeStep(self.steps[self.state.activestep]);
-            }
-            else if(self.steps.length > 0) {
-                self.activeStep(self.steps[0]);
-            }
         });
 
         this.updateUrl = function() {
