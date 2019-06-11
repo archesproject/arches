@@ -537,6 +537,10 @@ input[type="checkbox"] {
     border-right: solid 1px #aaa;
 }
 
+.workflow-nav-controls .inactive {
+    color: #ccc;
+}
+
 .workflow-plugin {
     flex-grow: inherit;
 }
