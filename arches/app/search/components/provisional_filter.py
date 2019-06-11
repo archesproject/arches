@@ -26,7 +26,7 @@ class ProvisionalFilter(BaseSearchFilter):
             if include_provisional is False:
                 provisional_resource_filter.filter(Terms(field='provisional_resource', terms=['false', 'partial']))
 
-            elif include_provisional is 'only provisional':
+            elif include_provisional == 'only provisional':
                 provisional_resource_filter.filter(Terms(field='provisional_resource', terms=['true', 'partial']))
 
             search_query.must(provisional_resource_filter)

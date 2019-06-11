@@ -13,7 +13,10 @@ define([
 
                 this.restoreState();
 
-                this.filter.subscribe(function() {
+                var filterUpdated = ko.computed(function() {
+                    return JSON.stringify(ko.toJS(this.filter()));
+                }, this);
+                filterUpdated.subscribe(function() {
                     this.updateQuery();
                 }, this);
 
