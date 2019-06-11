@@ -60,12 +60,12 @@ define([
             restoreState: function() {
                 var query = this.query();
                 if (componentName in query) {
-                    query[componentName] = JSON.parse(query[componentName]);
-                    if (query[componentName].length > 0) {
-                        query[componentName].forEach(function(term){
+                    var termQuery = JSON.parse(query[componentName]);
+                    if (termQuery.length > 0) {
+                        termQuery.forEach(function(term){
                             term.inverted = ko.observable(term.inverted);
                         });
-                        this.filter.terms(query[componentName]);
+                        this.filter.terms(termQuery);
                     }
                 }
             },

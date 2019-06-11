@@ -33,19 +33,17 @@ define([
             },
 
             restoreState: function() {
-                var doQuery = false;
                 var query = this.query();
                 if (componentName in query) {
-                    query[componentName] = JSON.parse(query[componentName]);
-                    if (query[componentName].length > 0) {
-                        query[componentName].forEach(function(type){
+                    var resourceTypeQuery = JSON.parse(query[componentName]);
+                    if (resourceTypeQuery.length > 0) {
+                        resourceTypeQuery.forEach(function(type){
                             type.inverted = ko.observable(!!type.inverted);
                             this.getFilter('term-filter').addTag(type.name, this.name, type.inverted);
                         }, this);
-                        this.filter(query[componentName]);
+                        this.filter(resourceTypeQuery);
                     }
                 }
-                return doQuery;
             },
 
             clear: function() {
