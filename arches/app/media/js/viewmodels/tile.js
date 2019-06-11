@@ -241,7 +241,7 @@ define([
             if (selected) this.expanded(true);
         }, this);
         this.expanded.subscribe(function(expanded) {
-            if (expanded && this.parent) this.parent.expanded(true);
+            if (expanded && this.parent && typeof this.parent != "function") this.parent.expanded(true);
         }, this);
         this.isChildSelected = ko.pureComputed(function() {
             return isChildSelected(this);

@@ -8,7 +8,7 @@
             name: cardComponentLookup[card().model.component_id()].componentname,
             params: {
                 card: card(),
-                tile: tile(),
+                tile: selectedTile(),
                 provisionalTileViewModel: provisionalTileViewModel,
                 reviewer: reviewer,
                 loading: loading,
@@ -22,15 +22,15 @@
             <div class="card-info">
                 <div class="workflow-step-icon complete"><span><i class="fa fa-hashtag"></i></span></div>
                 <div class="card-info-details">
-                    <h4>Agency:</h4>
-                    <div data-bind="text: tile.data['2c8dff14-567b-11e9-b920-dca90488358a']()"></div>
-                    <h5>Identifier:</h5>
-                    <div data-bind="text: tile.data['67677266-567b-11e9-a2bb-dca90488358a']()" ></div>
+                    <!-- <h4>Agency:</h4> -->
+                    <h4 data-bind="text: tile.data['2c8dff14-567b-11e9-b920-dca90488358a']()"></h4>
+                    <!-- <h5>Identifier:</h5> -->
+                    <p data-bind="text: tile.data['67677266-567b-11e9-a2bb-dca90488358a']()" ></p>
                 </div>
             </div>
             <div>
-                <p data-bind="click: function(){$parent.remove(tile)}">Remove</p>
-                <p data-bind="click: function(){console.log('edited')}">Edit</p>
+                <div data-bind="click: function(){$parent.remove(tile)}"><span><i class="fa fa-times-circle"></i></span><span>Remove</span></div>
+                <div data-bind="click: function(){$parent.edit(tile);}"><span><i class="fa fa-pencil"></i></span><span>Edit</span></div>
             </div>
         </div>
         <!-- /ko -->

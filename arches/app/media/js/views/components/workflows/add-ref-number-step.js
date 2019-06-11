@@ -22,21 +22,46 @@ define([
         this.resourceId = params.resourceid;
         this.complete = params.complete || ko.observable();
 
+        this.selectedTile = ko.computed(function() {
+            //if card is undefined, return self.tile(getNewTile)
+            //else, do below
+            var item;
+            if(!self.card()) {
+                return self.card().getNewTile();
+            } else {
+                item = self.card.selection();
+                if (item && typeof item !== 'string') {
+                    if (item.tileid) {
+                        return item;
+                    }
+                    return item.getNewTile();
+                }
+            }
+        });
+
         this.remove = function(tile) {
-            // self.tileArr(tile);
             var tilesIdx = self.card().tiles().indexOf(tile);
             var arrIdx = self.tileArr.indexOf(tile);
             // console.log(self.card().tiles());
-            self.card().tiles().splice(tilesIdx, 1);
-            self.tileArr.splice(arrIdx, 1);
+            self.card().tiles().splice(tilesIdx, 1); //card.tiles arr
+            self.tileArr.splice(arrIdx, 1); //dummy observ arr
             console.log("removed");
             console.log(self.card().tiles());
         };
 
         this.edit = function(tile) {
-            //
+            if(!self.card().selection) {
+                self.card().selection = ko.observable(tile);
+            } else {
+                self.card().selection(tile);
+            }
+            tile.selected(true);
+            console.log(tile.parent());
+            // self.card().selection(tile);
+            // console.log(self.card().selection());
+            console.log("edited");
         }
-        // this.agencyName = ko.computed({});
+        // this.agencyName = ko.computed({}); //need to key off node_id
 
         this.loading(true);
 
@@ -63,6 +88,16 @@ define([
                 });
                 return flatList;
             };
+
+            // var selectedTile = ko.computed(function() {
+            //     var item = self.card.selection();
+            //     if (item && typeof item !== 'string') {
+            //         if (item.tileid) {
+            //             return item;
+            //         }
+            //         return item.getNewTile();
+            //     }
+            // });
 
             self.reviewer = data.userisreviewer;
             self.provisionalTileViewModel = new ProvisionalTileViewModel({
@@ -124,6 +159,16 @@ define([
                 }
             };
 
+            self.selectedTile = ko.computed(function() {
+                var item = ko.unwrap(self.card.selection);
+                if (item && typeof item !== 'string') {
+                    if (item.tileid) {
+                        return item;
+                    }
+                    return item.getNewTile();
+                }
+            });
+
             flattenTree(topCards, []).forEach(function(item) {
                 if (item.constructor.name === 'CardViewModel' && item.nodegroupid === ko.unwrap(params.nodegroupid)) {
                     if (ko.unwrap(params.parenttileid) && item.parent && ko.unwrap(params.parenttileid) !== item.parent.tileid) {
@@ -156,6 +201,7 @@ define([
             console.log(self.tile());
             console.log("and self.card()");
             console.log(self.card());
+            // self.card().selection()
 
             // self.tileArr = self.card().tiles.subscribe(function(list){
             //     return (list);
@@ -174,8 +220,8 @@ define([
                 );
             }, function(tile) { //onSuccess
 
-                console.log(params);
-                console.log(tile);
+                // console.log(params);
+                // console.log(tile);
 
                 var newTile = new TileViewModel({
                     tile: tile,
@@ -188,7 +234,6 @@ define([
                     cards: self.tile.cards,
                     tiles: [],
                     provisionalTileViewModel: params.provisionalTileViewModel,
-                    selection: ko.observable(false),
                     scrollTo: ko.observable(),
                     loading: ko.observable(),
                     filter: ko.observable(),
@@ -196,9 +241,6 @@ define([
                 });
 
                 self.tileArr.push(newTile);
-    
-                // console.log("newTile");
-                // console.log(newTile);
                 
                 // self.tileArr.push
                 console.log(self.card().tiles());
@@ -211,7 +253,6 @@ define([
                     callback.apply(null, arguments);
                 }
                 self.tile(self.card().getNewTile()); //this appears to be working
-                // console.log(self.card().isChildSelected());
    
                 self.loading(false);
             });
