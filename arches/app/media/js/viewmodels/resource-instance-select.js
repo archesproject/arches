@@ -81,14 +81,6 @@ define([
         updateName();
 
         var relatedResourceModels = ko.computed(function() {
-<<<<<<< HEAD
-            var ids = params.node.config.graphid();
-            return arches.resources.filter(function(graph) {
-                return ids == null || ids.indexOf(graph.graphid) >= 0;
-            }).map(function(g) {
-                return {name: g.name, _id: g.graphid, isGraph: true};
-            });
-=======
             if (params.node) {
                 var res = [];
                 var ids = ko.unwrap(params.node.config.graphid);
@@ -105,7 +97,6 @@ define([
                 }
                 return res;
             }
->>>>>>> master
         }, this);
 
 
