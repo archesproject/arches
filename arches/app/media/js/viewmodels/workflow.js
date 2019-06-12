@@ -29,12 +29,16 @@ define([
             var components = _.unique(self.steps.map(function(step) {return step.component;}));
             require(components, function() {
                 // var modules = arguments;
+                var stateStepCount = Object.keys(self.state.steps).length
                 self.steps.forEach(function(step, i) {
                     if (!(self.steps[i] instanceof Step)) {
                         step.workflow = self;
                         step.loading = self.loading;
                         step.alert = self.alert;
                         self.steps[i] = new Step(step);
+                        if (stateStepCount !== 0 && i <= stateStepCount) {
+                            self.steps[i].complete(true);
+                        }
                         self.steps[i].complete.subscribe(function(complete) {
                             if (complete) self.next();
                         });
