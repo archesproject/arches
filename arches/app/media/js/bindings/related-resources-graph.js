@@ -538,7 +538,7 @@ define([
                 }
             };
 
-            setRoot = function(val) {
+            var setRoot = function(val) {
                 if (val.graphid !== undefined) {
                     nodeMap = {};
                     linkMap = {};
