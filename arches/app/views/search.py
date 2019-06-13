@@ -229,7 +229,7 @@ def get_provisional_type(request):
     """
 
     result = False
-    provisional_filter = JSONDeserializer().deserialize(request.GET.get('provisionalFilter', '[]'))
+    provisional_filter = JSONDeserializer().deserialize(request.GET.get('provisional-filter', '[]'))
     user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
     if user_is_reviewer is not False:
         if len(provisional_filter) == 0:
