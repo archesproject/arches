@@ -1158,12 +1158,12 @@ ul.tabbed-report-tab-list {
     -webkit-transition-delay: 0ms;
     width: 0px;
     opacity: 0;
-}
-
-.overlay-opacity-control .overlay-opacity-slider input {
     position: relative;
     top: 2px;
     right: -8px;
+}
+
+.overlay-opacity-control .overlay-opacity-slider input {
     width: 0px;
     height: 0px;
 }
@@ -1175,7 +1175,7 @@ ul.tabbed-report-tab-list {
 
 .overlay-listing .overlay-opacity-control {
     transition: 300ms;
-    transition-property: width;
+    transition-property: all;
     transition-delay: 100ms;
     position: absolute;
     padding: 6px 6px 6px 8px;
