@@ -44,23 +44,6 @@ define([
                     )
                 );
             }, function(tile) {
-                console.log(tile);
-                var newTile = new TileViewModel({
-                    tile: tile,
-                    card: self.card,
-                    graphModel: params.graphModel,
-                    resourceId: self.resourceId,
-                    displayname: self.displayname,
-                    handlers: self.handlers,
-                    userisreviewer: params.userisreviewer,
-                    cards: self.tile.cards,
-                    tiles: [],
-                    provisionalTileViewModel: params.provisionalTileViewModel,
-                    scrollTo: ko.observable(),
-                    loading: ko.observable(),
-                    filter: ko.observable(),
-                    cardwidgets: params.cardwidgets,
-                });
                 params.resourceid(tile.resourceinstance_id);
                 params.tileid(tile.tileid);
                 self.resourceId(tile.resourceinstance_id);
@@ -70,9 +53,17 @@ define([
                 }
                 self.tile(self.card().getNewTile());
                 self.tile().reset();
+                setTimeout(function() {
+                    self.tile().reset();
+                }, 1);
                 self.loading(false);
             });
         };
+
+        var updateTileOnInit = self.tile.subscribe(function() {
+            updateTileOnInit.dispose();
+            self.tile(self.card().getNewTile());
+        });
     }
     ko.components.register('new-multi-tile-step', {
         viewModel: NewMultiTileStepViewModel,

@@ -21,18 +21,13 @@ define([
         this.complete = params.complete || ko.observable();
 
         this.loading(true);
-        this.handlers = {
-            'after-update': [],
-            'tile-reset': []
-        };
-        this.displayname = ko.observable();
 
         $.getJSON(url, function(data) {
-            // var handlers = {
-            //     'after-update': [],
-            //     'tile-reset': []
-            // };
-            self.displayname(data.displayname);
+            var handlers = {
+                'after-update': [],
+                'tile-reset': []
+            };
+            var displayname = ko.observable(data.displayname);
             var createLookup = function(list, idKey) {
                 return _.reduce(list, function(lookup, item) {
                     lookup[item[idKey]] = item;
@@ -78,8 +73,8 @@ define([
                     graphModel: graphModel,
                     tile: null,
                     resourceId: self.resourceId,
-                    displayname: self.displayname,
-                    handlers: self.handlers,
+                    displayname: displayname,
+                    handlers: handlers,
                     cards: data.cards,
                     tiles: data.tiles,
                     provisionalTileViewModel: self.provisionalTileViewModel,
@@ -106,8 +101,8 @@ define([
                 'nodeid'
             );
             self.on = function(eventName, handler) {
-                if (self.handlers[eventName]) {
-                    self.handlers[eventName].push(handler);
+                if (handlers[eventName]) {
+                    handlers[eventName].push(handler);
                 }
             };
 
