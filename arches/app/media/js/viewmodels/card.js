@@ -30,7 +30,6 @@ define([
                 ko.unwrap(parent.widgets)
             );
         }
-        if(!children) {console.log(parent);}
         children.forEach(function(child) {
             if (child.selected && child.selected() || isChildSelected(child)) {
                 childSelected = true;

@@ -25,9 +25,8 @@ define([
         };
 
         this.edit = function(tile) {
-            console.log(self.tile()._tileData());
             self.tile(tile);
-        }
+        };
 
         self.saveTile = function(tile, callback) {
             self.loading(true);
