@@ -31,7 +31,6 @@ define([
         self.saveTile = function(tile, callback) {
             self.loading(true);
             tile.save(function(response) {
-                console.log("failed");
                 self.loading(false);
                 self.alert(
                     new AlertViewModel(
