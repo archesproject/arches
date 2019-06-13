@@ -18,7 +18,7 @@ define([
                 var self = this;
                 this.propertiesDialogOpen = ko.observable(false);
                 this.searchResults = options.searchResultsVm;
-                this.editingInstanceId = options.editingInstanceId;
+                this.editingInstanceId = options.editing_instance_id;
                 this.graph = options.graph;
                 if (this.graph) {
                     this.ontologyclass = options.graph.ontologyclass || options.graph.root.ontologyclass;
@@ -42,7 +42,7 @@ define([
                     var resourceinstanceid = this.editingInstanceId;
                     var graph = this.graph;
                     return function(result) {
-                        if (result._id === resourceinstanceid || _.contains(graph.relatable_resources, result._type) === false) {
+                        if (result._id === resourceinstanceid || _.contains(graph.relatable_resources, result._source.graph_id) === false) {
                             return true;
                         } else {
                             return false;
