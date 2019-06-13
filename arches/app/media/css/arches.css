@@ -1137,7 +1137,7 @@ ul.tabbed-report-tab-list {
     position: relative;
 }
 
-.overlay-listing div {
+.overlay-listing .overlay-name {
     display: inline-block;
     width: 300px;
     white-space: nowrap;
@@ -1147,49 +1147,58 @@ ul.tabbed-report-tab-list {
     top: 4px;
 }
 
-.slider-wrapper input {
-    width: 150px;
-    height: 20px;
-    margin: 0;
-    transform-origin: 75px 75px;
-    transform: rotate(-90deg);
-    z-index: 10000;
-    background: white;
-    transition: 0s;
-    border-radius: 5px;
-    border: 1px solid #808080;
+.overlay-opacity-control .overlay-opacity-slider, .overlay-opacity-control i {
+    display: inline-block;
 }
 
-.overlay-listing .fa-adjust {
-    position: absolute;
-    padding: 6px
-}
-
-.overlay-listing .fa-adjust .slider-wrapper {
-    /* display: none; */
-    top: 28px;
-    right: -8px;
-    width: 43px;
-    height: 170px;
-    padding: 10px;
-    position: absolute;
-    background-color: white;
-    border-radius: 3px;
-    border: 1px solid rgb(213, 213, 213);
-    transition: 0s;
+.overlay-opacity-control .overlay-opacity-slider{
+    transition-property: width, opacity;
+    transition-delay: 0ms;
+    transition: 0ms;
+    -webkit-transition-delay: 0ms;
+    width: 0px;
     opacity: 0;
 }
 
-.overlay-listing .fa-adjust:hover {
-    z-index: 100000;
+.overlay-opacity-control .overlay-opacity-slider input {
+    position: relative;
+    top: 2px;
+    right: -8px;
+    width: 0px;
+    height: 0px;
 }
 
-.overlay-listing .fa-adjust:hover .slider-wrapper, .overlay-listing .fa-adjust .slider-wrapper:focus {
-    display: inline-block;
+.overlay-opacity-control:hover .overlay-opacity-slider input, .overlay-opacity-control:focus .overlay-opacity-slider input {
+    width: 150px;
+    height: 20px;
+}
+
+.overlay-listing .overlay-opacity-control {
+    transition: 300ms;
+    transition-property: width;
+    transition-delay: 100ms;
     position: absolute;
-    z-index: 10000;
+    padding: 6px 6px 6px 8px;
+    top: 16px;
+    right: 6px;
+    width: 30px;
+    height: 38px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+}
+
+.overlay-listing .overlay-opacity-control:hover, .overlay-listing .overlay-opacity-control:focus {
+    border: 1px solid rgb(217, 217, 217);
+    background-color: white;
+    width: 200px;
+}
+
+.overlay-listing .overlay-opacity-control:hover .overlay-opacity-slider, .overlay-listing .overlay-opacity-control:focus .overlay-opacity-slider {
+    transition-delay: 400ms;
+    transition: 200ms;
+    -webkit-transition-delay: 400ms;
+    width: 150px;
     opacity: 1;
-    transition-delay: 0.5s;
 }
 
 .basemap-listing.active-basemap, .basemap-listing:hover, .overlay-listing.active-overlay, .overlay-listing:hover {
