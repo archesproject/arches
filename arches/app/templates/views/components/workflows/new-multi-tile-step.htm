@@ -1,10 +1,8 @@
 <!-- ko let: { self: $data } -->
     <!-- ko if: !loading() -->
-    <div data-bind="click: function(){console.log(this.card())}" >Click to console card</div>
-    <div data-bind="click: function(){console.log(card().tiles())}" >Click to console Card tiles</div>
-    <div data-bind="" class="workflows-ref-number-container">
+    <div data-bind="" class="wf-multi-tile-step-container">
         <!-- ko if: tile() && card() -->
-        <div class="workflows-ref-number-form">
+        <div class="wf-multi-tile-step-form">
             <h3>Add Reference Number</h3>
             <div data-bind="component: {
                 name: cardComponentLookup[card().model.component_id()].componentname,
@@ -18,12 +16,12 @@
                 }
             }"></div>
         </div>
-        <div class="workflows-ref-number-list">
+        <div class="wf-multi-tile-step-list">
             <!-- ko foreach: {data: card().tiles, as: 'tile'} -->
-            <div class="workflows-ref-number-card">
-                <div class="card-info">
+            <div class="wf-multi-tile-step-card">
+                <div class="wf-multi-tile-card-info">
                     <div class="workflow-step-icon complete"><span><i class="fa fa-hashtag"></i></span></div>
-                    <div class="card-info-details">
+                    <div class="wf-multi-tile-card-info-details">
                         <!-- ko foreach: {data: $parent.card().widgets(), as: 'widget'} -->
                             <!-- ko component: {
                                         name: widget.widgetLookup[widget.get("widget_id")()].name,
@@ -41,7 +39,6 @@
                 <div>
                     <div data-bind="click: function(){$parent.remove(tile)}"><span><i class="fa fa-times-circle"></i></span><span>Remove</span></div>
                     <div data-bind="click: function(){$parent.edit(tile);}"><span><i class="fa fa-pencil"></i></span><span>Edit</span></div>
-                    <div data-bind="text: tile.tileid, click: function(){console.log($parent.tile()._tileData());}"></div>
                 </div>
             </div>
             <!-- /ko -->
