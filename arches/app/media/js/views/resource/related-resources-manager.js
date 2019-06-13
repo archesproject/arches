@@ -18,7 +18,7 @@ define([
                 var self = this;
                 this.propertiesDialogOpen = ko.observable(false);
                 this.searchResults = options.searchResultsVm;
-                this.editingInstanceId = options.editing_instance_id;
+                this.editingInstanceId = options.editingInstanceId;
                 this.graph = options.graph;
                 if (this.graph) {
                     this.ontologyclass = options.graph.ontologyclass || options.graph.root.ontologyclass;

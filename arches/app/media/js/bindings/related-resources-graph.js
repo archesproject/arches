@@ -8,7 +8,7 @@ define([
     ko.bindingHandlers.relatedResourcesGraph = {
         init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
             var modelMap = arches.resources.reduce(function(a, v) {
-                a[v.graphid] = v
+                a[v.graphid] = v;
                 return a;
             }, {});
             var options = ko.unwrap(valueAccessor());
@@ -16,8 +16,8 @@ define([
             var nodeSelection = options.nodeSelection;
             var selectedState = ko.observable(false);
             var $el = $(element);
-            var width = $el.parent().width();
-            var height = $el.parent().height();
+            var width = $el.parent().width() || 400;
+            var height = $el.parent().height() || 400;
             var newNodeId = 0;
             var nodeMap = {};
             var linkMap = {};
@@ -38,8 +38,8 @@ define([
                 .theta(0.8)
                 .size([width, height]);
 
-            var nodeList = options.nodeList
-            var currentResource = options.currentResource
+            var nodeList = options.nodeList;
+            var currentResource = options.currentResource;
 
             var selectNode = function(d) {
                 vis.selectAll("circle")
@@ -56,9 +56,9 @@ define([
                     .attr('class', function(l) {
                         return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
                     });
-                nodeSelection([d])
+                nodeSelection([d]);
                 updateNodeInfo(d);
-            }
+            };
 
             var clearHover = function(d) {
                 vis.selectAll("line")
@@ -72,7 +72,7 @@ define([
                     }
                     return className;
                 });
-            }
+            };
 
             var hoverNode = function(d) {
                 vis.selectAll("circle")
@@ -98,37 +98,35 @@ define([
                     .attr('class', function(l) {
                         return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
                     });
-            }
+            };
 
             var updateSelected = function(item) {
-                var item = item;
                 return function(val) {
                     selectedState(val);
                     if (val === true) {
                         selectNode(item);
                     } else {
-                        nodeSelection.removeAll()
+                        nodeSelection.removeAll();
                         vis.selectAll("circle")
                             .attr("class", function(d1) {
                                 return 'node-' + (d1.isRoot ? 'current' : 'ancestor');
                             });
                     }
-                }
-            }
+                };
+            };
 
             var updateHovered = function(item) {
-                var item = item;
                 return function(val) {
                     if (val === true) {
                         hoverNode(item);
                     } else {
-                        clearHover(item)
+                        clearHover(item);
                         if (selectedState() === false) {
                             nodeSelection.removeAll();
                         }
                     }
-                }
-            }
+                };
+            };
 
             var redraw = function() {
                 vis.attr("transform",
@@ -144,11 +142,12 @@ define([
             var vis = svg.append('svg:g');
 
             var update = function() {
+                $(window).trigger("resize");
                 data = {
                     nodes: force.nodes(data.nodes).nodes(),
                     links: force.links(data.links).links()
                 };
-                var linkMap = linkMap
+                var linkMap = linkMap;
 
                 var link = vis.selectAll("line")
                     .data(data.links);
@@ -156,8 +155,8 @@ define([
                     .insert("line", "circle")
                     .attr("class", "link")
                     .on("mouseover", function(d) {
-                        var hoveredNodes = []
-                        var linkMap = linkMap
+                        var hoveredNodes = [];
+                        var linkMap = linkMap;
                         d3.select(this).attr("class", "linkMouseover");
                         vis.selectAll("circle").attr("class", function(d1) {
                             var matrix;
@@ -165,18 +164,18 @@ define([
                             if (d.source === d1 || d.target === d1) {
                                 className += d1.selected() ? '-selected' : '-neighbor';
                                 d1.relationship = (d.target === d1) ? d.relationshipTarget : d.relationshipSource;
-                                d1.relationships = d.all_relationships
-                                matrix = this.getScreenCTM()
+                                d1.relationships = d.all_relationships;
+                                matrix = this.getScreenCTM();
                                 //transform svg coords to screen coords
-                                d1.absX = matrix.a * d1.x + matrix.c * d1.y + matrix.e
-                                d1.absY = matrix.b * d1.x + matrix.d * d1.y + matrix.f
+                                d1.absX = matrix.a * d1.x + matrix.c * d1.y + matrix.e;
+                                d1.absY = matrix.b * d1.x + matrix.d * d1.y + matrix.f;
                                 hoveredNodes.push(d1);
                             } else if (d1.selected()) {
                                 className += '-selected';
                             }
                             return className;
                         });
-                        nodeSelection(hoveredNodes)
+                        nodeSelection(hoveredNodes);
                     })
                     .on("mouseout", function(d) {
                         d3.select(this).attr("class", "link");
@@ -187,7 +186,7 @@ define([
                             }
                             return className;
                         });
-                        nodeSelection.removeAll()
+                        nodeSelection.removeAll();
                     });
                 link.exit()
                     .remove();
@@ -221,11 +220,11 @@ define([
                                     className += d1.selected() ? '-selected' : '-over';
                                     _.each(nodeList(), function(n) {
                                         if (n.entityid === d.entityid) {
-                                            n.hovered(true)
+                                            n.hovered(true);
                                         } else {
-                                            n.hovered(false)
+                                            n.hovered(false);
                                         }
-                                    })
+                                    });
                                 } else if (_.has(linkMap, d1.id + '_' + d.id) || _.has(linkMap, d.id + '_' + d1.id)) {
                                     if (d1.selected() === false) {
                                         className += '-neighbor';
@@ -250,16 +249,16 @@ define([
                                     className += '-selected';
                                 }
                                 _.each(nodeList(), function(n) {
-                                    n.hovered(false)
+                                    n.hovered(false);
                                     if (n.relationCount) {
-                                        n.loaded(n.relationCount.loaded)
-                                        n.total(n.relationCount.total)
+                                        n.loaded(n.relationCount.loaded);
+                                        n.total(n.relationCount.total);
                                     }
-                                })
+                                });
                                 return className;
                             });
                         if (selectedState() === false) {
-                            nodeSelection.removeAll()
+                            nodeSelection.removeAll();
                         }
                         vis.selectAll("line")
                             .attr('class', 'link');
@@ -267,7 +266,7 @@ define([
 
                     .on("click", function(d) {
                         if (!d3.event.defaultPrevented) {
-                            d.loadcount(d.loadcount()+1)
+                            d.loadcount(d.loadcount()+1);
                         }
                         vis.selectAll("circle")
                             .attr("class", function(d1) {
@@ -282,9 +281,9 @@ define([
                                                 n.selected(false);
                                             }
                                         } else {
-                                            n.selected(false)
+                                            n.selected(false);
                                         }
-                                    })
+                                    });
                                 } else if (_.has(linkMap, d1.id + '_' + d.id) || _.has(linkMap, d.id + '_' + d1.id)) {
                                     className += '-neighbor';
                                 }
@@ -386,13 +385,12 @@ define([
             };
 
             var getMoreData = function(item) {
-                var item = item;
                 return function(val) {
                     if (val) {
                         getResourceDataForNode(item);
                     }
-                }
-            }
+                };
+            };
 
             var getResourceData = function(resourceId, resourceName, resourceTypeId, callback, isRoot) {
                 var load = true;
@@ -419,7 +417,7 @@ define([
                             page: page > 0 ? page : 1
                         },
                         error: function(e) {
-                            console.log('request failed', e)
+                            console.log('request failed', e);
                         },
                         success: function(response) {
                             var links = [];
@@ -449,7 +447,7 @@ define([
                                 nodeMap[resourceId] = rootNode;
                                 newNodeId += 1;
                             } else if (rootNode.relationCount) {
-                                total_loaded = rootNode.relationCount.loaded + rr.resource_relationships.length
+                                total_loaded = rootNode.relationCount.loaded + rr.resource_relationships.length;
                                 rootNode.relationCount.loaded = total_loaded <= rr.total ? total_loaded : total_loaded - 1;
                             } else {
                                 rootNode.relationCount = {
@@ -483,7 +481,7 @@ define([
                                     nodeMap[related_resource.resourceinstanceid] = node;
                                     newNodeId += 1;
                                 }
-                            }
+                            };
 
                             _.each(rr.related_resources, getRelated);
 
@@ -512,11 +510,11 @@ define([
                                     linkMap[targetId.id + '_' + sourceId.id] = {relationships:[]};
                                 }
                                 if (_.contains(linkMap[sourceId.id + '_' + targetId.id]['relationships'], relationshipSource) === false) {
-                                    linkMap[sourceId.id + '_' + targetId.id]['relationships'].push(relationshipSource)
-                                };
+                                    linkMap[sourceId.id + '_' + targetId.id]['relationships'].push(relationshipSource);
+                                }
                                 if (_.contains(linkMap[targetId.id + '_' + sourceId.id]['relationships'], relationshipSource) === false) {
-                                    linkMap[targetId.id + '_' + sourceId.id]['relationships'].push(relationshipSource)
-                                };
+                                    linkMap[targetId.id + '_' + sourceId.id]['relationships'].push(relationshipSource);
+                                }
                             });
 
                             var links = _.uniq(links, function(item, key, source) {
@@ -525,11 +523,11 @@ define([
 
                             _.each(links, function(l){
                                 if (_.has(linkMap, l.source.id + '_' + l.target.id)) {
-                                    l.all_relationships = linkMap[l.source.id + '_' + l.target.id].relationships
+                                    l.all_relationships = linkMap[l.source.id + '_' + l.target.id].relationships;
                                 }
-                            })
+                            });
 
-                            nodeList(nodeList().concat(nodes))
+                            nodeList(nodeList().concat(nodes));
 
                             callback({
                                 nodes: nodes,
@@ -540,7 +538,7 @@ define([
                 }
             };
 
-            setRoot = function(val) {
+            var setRoot = function(val) {
                 if (val.graphid !== undefined) {
                     nodeMap = {};
                     linkMap = {};
@@ -556,21 +554,25 @@ define([
             };
 
             if (currentResource().resourceinstanceid) {
-                setRoot(currentResource())
+                setRoot(currentResource());
             }
 
             if (ko.isObservable(currentResource)) {
                 var subscription = currentResource.subscribe(setRoot, this);
                 if (subscriptions.length > 0) {
                     _.each(subscriptions, function(s) {
-                        s.dispose()
-                    })
+                        s.dispose();
+                    });
                 }
-                subscriptions.push(subscription)
+                subscriptions.push(subscription);
             }
 
             $(window).on("resize", function() {
-                svg.attr("width", $el.parent().width());
+                var w = $el.parent().width();
+                var h = $el.parent().height();
+                svg.attr("width", w);
+                svg.attr("height", h);
+                force.size([w, h]);
             }).trigger("resize");
 
 
@@ -581,21 +583,21 @@ define([
                         item.hoveredSubscription.dispose();
                         item.loadcountSubscription.dispose();
                     }
-                    item.selectedSubscription = item.selected.subscribe(updateSelected(item), this)
-                    item.hoveredSubscription = item.hovered.subscribe(updateHovered(item), this)
+                    item.selectedSubscription = item.selected.subscribe(updateSelected(item), this);
+                    item.hoveredSubscription = item.hovered.subscribe(updateHovered(item), this);
                     if (item.isRoot) {
-                        item.loadcount(1)
-                    };
-                    item.loadcountSubscription = item.loadcount.subscribe(getMoreData(item), this)
+                        item.loadcount(1);
+                    }
+                    item.loadcountSubscription = item.loadcount.subscribe(getMoreData(item), this);
 
                     if (item.relationCount) {
-                        item.loaded(item.relationCount.loaded)
-                        item.total(item.relationCount.total)
+                        item.loaded(item.relationCount.loaded);
+                        item.total(item.relationCount.total);
                     }
-                })
-            }, this)
+                });
+            }, this);
 
-            nodeList([])
+            nodeList([]);
 
         }
     };

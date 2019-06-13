@@ -6,35 +6,38 @@
 
     <!--ko if: showGraph() -->
     <div class="svg arches-related-resource-panel" data-bind="relatedResourcesGraph: {
-        nodeList: graphNodeList,
-        currentResource: newResource,
-        subscriptions: currentResourceSubscriptions,
-        nodeSelection: graphNodeSelection
-    }">
+            nodeList: graphNodeList,
+            currentResource: newResource,
+            subscriptions: currentResourceSubscriptions,
+            nodeSelection: graphNodeSelection
+        }">
 
         <!--ko if: graphNodeSelection().length == 2 -->
         <div class="hover-rr-node-info" data-bind="style: {position: 'fixed', top: (panelPosition().y - 100) + 'px', left: (panelPosition().x - 300) + 'px'}">
             <div>
                 <div class="rr-fdg-name">
-                    <div class='rr-number'>1. </div><div class="rr-fdg-details"><div data-bind="text: graphNodeSelection()[0].name"></div>
-                    <span class="rr-fdg-model-name">
-                        <i class="resource-graph-node-icon" data-bind="css: graphNodeSelection()[0].iconclass, style:{'background-color': graphNodeSelection()[0].color}"></i>
-                        <div class="list-item-model-name" data-bind="text: graphNodeSelection()[0].graphname">
-                    </span>
+                    <div class='rr-number'>1. </div>
+                    <div class="rr-fdg-details">
+                        <div data-bind="text: graphNodeSelection()[0].name"></div>
+                        <span class="rr-fdg-model-name">
+                            <i class="resource-graph-node-icon" data-bind="css: graphNodeSelection()[0].iconclass, style:{'background-color': graphNodeSelection()[0].color}"></i>
+                            <div class="list-item-model-name" data-bind="text: graphNodeSelection()[0].graphname"></div>
+                        </span>
                     </div>
                 </div>
-                </div>
+
                 <!--ko foreach: graphNodeSelection()[0].relationships -->
                 <div class="rr-fdg-edge" data-bind="text: $data"></div>
                 <!--/ko -->
                 <div class="rr-fdg-name">
-                    <div class='rr-number'>2. </div><div class="rr-fdg-details"><div data-bind="text: graphNodeSelection()[1].name"></div>
-                    <span class="rr-fdg-model-name">
-                        <i class="resource-graph-node-icon" data-bind="css: graphNodeSelection()[1].iconclass, style:{'background-color': graphNodeSelection()[1].color}"></i>
-                        <div class="list-item-model-name" data-bind="text: graphNodeSelection()[1].graphname">
-                    </span>
+                    <div class='rr-number'>2. </div>
+                    <div class="rr-fdg-details">
+                        <div data-bind="text: graphNodeSelection()[1].name"></div>
+                        <span class="rr-fdg-model-name">
+                            <i class="resource-graph-node-icon" data-bind="css: graphNodeSelection()[1].iconclass, style:{'background-color': graphNodeSelection()[1].color}"></i>
+                            <div class="list-item-model-name" data-bind="text: graphNodeSelection()[1].graphname"></div>
+                        </span>
                     </div>
-                </div>
                 </div>
             </div>
         </div>
