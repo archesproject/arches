@@ -1,15 +1,8 @@
 define([
-    'underscore',
-    'jquery',
-    'arches',
     'knockout',
-    'models/graph',
-    'viewmodels/card',
-    'viewmodels/tile',
     'views/components/workflows/new-tile-step',
-    'viewmodels/provisional-tile',
     'viewmodels/alert'
-], function(_, $, arches, ko, GraphModel, CardViewModel, TileViewModel, NewTileStepViewModel, ProvisionalTileViewModel, AlertViewModel) {
+], function(ko, NewTileStepViewModel, AlertViewModel) {
 
     /** 
      * A generic viewmodel for workflow steps that can add multiple tiles
