@@ -1,0 +1,12 @@
+<div class="workflows-get-tile-value">
+    <h4>Workflow Complete</h4>
+    <!--ko if: report() -->
+    <div class='resource-report editor-report' data-bind='component: {
+        name: "default-report",
+        params: {
+            report: report(),
+            editorContext: false
+        }
+    }'></div>
+    <!--/ko -->
+</div>
