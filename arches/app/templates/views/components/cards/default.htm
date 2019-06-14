@@ -90,6 +90,7 @@
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode()}, click: function () { card.selected(true) },">
         <i class="fa fa-file-o" role="presentation"></i>
         <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
+        <span style="padding-right: 5px;" data-bind="text: card.model.nodegroup_id"></span>
     </a>
     <!-- ko if: card.cards().length > 0 || card.widgets().length > 0 -->
     <ul class="jstree-children card-designer-tree" aria-expanded="true">
@@ -107,6 +108,7 @@
                     <i data-bind="css: widget.datatype.iconclass" role="presentation"></i>
                     <strong style="margin-right: 10px;" >
                         <span data-bind="text: !!(widget.label()) ? widget.label() : widget.node.name"></span>
+                        <span style="padding-right: 5px;" data-bind="text: widget.node.nodeid"></span>
                     </strong>
                 </a>
             </li>
