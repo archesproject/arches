@@ -11,6 +11,10 @@ define([
 ], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel) {
     function viewModel(params) {
         var self = this;
+        if (!params.resourceid() && params.requirements){
+            params.resourceid(params.requirements.resourceid);
+            params.tileid(params.requirements.tileid);
+        }
         var url = arches.urls.api_card + (ko.unwrap(params.resourceid) || ko.unwrap(params.graphid));
 
         this.card = ko.observable();
@@ -127,12 +131,12 @@ define([
             // commented the line below because it causes steps to automatically advance on page reload
             // self.complete(!!ko.unwrap(params.tileid));
         });
-
+        params.tile = self.tile;
         params.stateProperties = function(){
             return {
                 resourceid: ko.unwrap(params.resourceid),
-                tile: !!(params.tile) ? koMapping.toJS(params.tile().data) : undefined,
-                tileid: !!(params.tile) ? ko.unwrap(params.tile().tileid): undefined
+                tile: !!(ko.unwrap(params.tile)) ? koMapping.toJS(params.tile().data) : undefined,
+                tileid: !!(ko.unwrap(params.tile)) ? ko.unwrap(params.tile().tileid): undefined
             };
         };
 
