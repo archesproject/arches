@@ -21,7 +21,7 @@ define([
         this.tile = ko.observable();
         this.loading = params.loading || ko.observable(false);
         this.alert = params.alert || ko.observable(null);
-        this.resourceId = params.resourceid;
+        this.resourceId = params.resourceid || ko.observable();
         this.complete = params.complete || ko.observable();
 
         this.loading(true);

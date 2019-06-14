@@ -33,3 +33,4 @@ jsdoc.json
 migrate_graphs.py
 djcp.sh
 .vscode
+.DS_Store
