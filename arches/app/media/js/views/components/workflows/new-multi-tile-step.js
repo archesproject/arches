@@ -14,8 +14,15 @@ define([
         var self = this;
 
         this.remove = function(tile) {
-            self.card().tiles.remove(tile);
-            tile.deleteTile();
+            tile.deleteTile( function(response) {
+                self.alert(new AlertViewModel(
+                    'ep-alert-red', 
+                    response.responseJSON.message[0], 
+                    response.responseJSON.message[1], 
+                    null, 
+                    function(){ return; }
+                    ));
+            });
         };
 
         this.edit = function(tile) {
