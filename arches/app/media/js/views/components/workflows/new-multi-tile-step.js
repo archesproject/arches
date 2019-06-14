@@ -21,7 +21,7 @@ define([
                     response.responseJSON.message[1], 
                     null, 
                     function(){ return; }
-                    ));
+                ));
             });
         };
 
