@@ -39,7 +39,7 @@ define([
                         if (stateStepCount !== 0 && i <= stateStepCount) {
                             if(self.state.steps[i]) {
                                 self.steps[i].complete(self.state.steps[i].complete);
-                            };
+                            }
                         }
                         self.steps[i].complete.subscribe(function(complete) {
                             if (complete) self.next();
