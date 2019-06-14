@@ -307,10 +307,12 @@ define([
                     .data(data.nodes);
 
                 texts.enter().append("text")
-                    .attr("class", 'root-node-label')
+                    .attr("class", function(d){
+                        return d.isRoot ? 'root-node-label' : 'nodeLabels';
+                    })
                     .attr("dy", ".35em")
                     .text(function(d) {
-                        return d.isRoot ? d.name : '';
+                        return d.name;
                     });
 
                 force.on("tick", function() {

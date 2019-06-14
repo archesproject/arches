@@ -515,6 +515,72 @@ input[type="checkbox"] {
     overflow-y: auto;
 }
 
+.wf-multi-tile-step-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.wf-multi-tile-step-form {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 3;
+}
+
+.wf-multi-tile-step-list {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 24px 24px 0 24px;
+}
+
+.wf-multi-tile-step-card {
+    border: 1px solid #e8e8e8;
+    border-radius: 2px;
+    background-color: white;
+    padding: 15px 5px 15px 15px;
+    display: flex;
+    flex-direction: row;
+}
+
+.wf-multi-tile-card-info {
+    display: flex;
+    flex-direction: row;
+}
+
+div.wf-multi-tile-card-info div {
+    margin-left: 12px;
+}
+
+.wf-multi-tile-card-info-details {
+    color: #5d768f;
+    padding-left: 12px;
+}
+
+.wf-multi-tile-card-info-details > h4 {
+    margin-bottom: 2px;
+    /* margin-left: 12px; */
+}
+
+
+
+.wf-multi-tile-step-card div div {
+    margin: 0;
+}
+
+.wf-multi-tile-step-card > div.wf-multi-tile-card-info ~ div {
+    display: flex;
+    flex-direction: row;
+    color: #4f9ce9;
+    font-size: 14px;
+    cursor: pointer;
+    height: 32px;
+    /* align-self: flex-end; */
+}
+
+.wf-multi-tile-step-card > div.wf-multi-tile-card-info ~ div span {
+    margin-right: 6px;
+}
+
 .workflow-nav-controls {
     width: 60px;
     display: flex;
@@ -544,6 +610,10 @@ input[type="checkbox"] {
 
 .workflow-nav-controls.right {
     border-right: solid 1px #aaa;
+}
+
+.workflow-nav-controls .inactive {
+    color: #ccc;
 }
 
 .workflow-plugin {
