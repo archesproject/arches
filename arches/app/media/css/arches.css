@@ -434,7 +434,6 @@ input[type="checkbox"] {
 .workflowstep-nav {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     width: 100%;
     border-bottom: solid 1px #ccc;
     height: fit-content;
@@ -442,15 +441,20 @@ input[type="checkbox"] {
     background-color: white;
 }
 
-.workflowstep-nav.workflow-step-icon {
-    display: block;
-    margin: 0 auto;
+.workflowstep-nav div {
+    padding: 0 20px;
+}
+
+.workflowstep-nav div.workflow-nav-controls {
+    position: absolute;
+    padding: 15px;
+    right: 10px;
 }
 
 .workflow-step-icon {
     border-radius: 50%;
-    /* display: block;
-    margin: 0 auto; */
+    display: block;
+    margin: 0 auto;
     height: 56px;
     line-height: 56px;
     text-align: center;
@@ -505,9 +509,9 @@ input[type="checkbox"] {
 }
 
 .workflow-step-body {
-    padding: 10px;
     background-color: #eee;
-    height: 70%;
+    height: 100%;
+    padding-bottom: 207px;
     overflow-y: auto;
 }
 
@@ -571,7 +575,7 @@ div.wf-multi-tile-card-info div {
     cursor: pointer;
     height: 32px;
     /* align-self: flex-end; */
-} 
+}
 
 .wf-multi-tile-step-card > div.wf-multi-tile-card-info ~ div span {
     margin-right: 6px;
@@ -1107,6 +1111,179 @@ ul.tabbed-report-tab-list {
 .summary-panel {
     background: #f9f9f9;
     margin-top: -30px;
+}
+
+.map-card-wrapper {
+    height: 100%;
+    position: relative;
+}
+
+.map-card-container {
+    height: 100%;
+    margin-right: 92px;
+}
+
+.map-card-sidebar {
+    position:absolute;
+    right: 0;
+    height: 100%;
+    width: 92px;
+    background-color: rgb(247, 247, 247);
+    border-left: 1px solid rgb(216, 216, 216);
+}
+
+.map-card-sidebar-tab {
+    color: rgb(33, 62, 95);
+    min-height: 86px;
+    padding: 16px;
+    text-align: center;
+    font-size: 1.1em;
+    border-bottom: 1px solid rgb(216, 216, 216);
+    cursor: pointer;
+}
+
+.map-card-sidebar-tab.active {
+    background-color: white;
+    border-left: solid 1px white;
+    margin-left: -1px;
+}
+
+.map-card-sidebar-tab i {
+    font-size: 1.7em;
+    display: block;
+    padding-bottom: 6px;
+}
+
+.map-card-sidepanel {
+    position:absolute;
+    z-index: 10;
+    right: 92px;
+    height: 100%;
+    width: 400px;
+    background: white;
+    border-left: 1px solid rgb(216, 216, 216);
+    padding: 16px;
+}
+
+.map-card-sidepanel-header {
+    cursor: pointer;
+    color: rgb(33, 62, 95);
+}
+
+.map-card-sidepanel-header:before {
+    content: "\f00d";
+    font-family: FontAwesome;
+    margin-right: 6px;
+    color: rgb(158, 158, 158);
+    font-weight:lighter;
+}
+
+.map-card-sidepanel-header:hover:before {
+    color: rgb(33, 62, 95);
+}
+
+.basemap-listing, .overlay-listing {
+    padding: 20px;
+    cursor: pointer;
+    border-bottom: 1px solid rgb(216, 216, 216);
+    font-size: 16px;
+    color: rgb(158, 158, 158);
+}
+
+.basemap-listing:before, .overlay-listing .overlay-name:before {
+    margin-right: 16px;
+    font-family: FontAwesome;
+}
+
+.basemap-listing:before {
+    content: "\f10c";
+}
+
+.overlay-listing .overlay-name:before {
+    content: "\f204";
+}
+
+.overlay-listing {
+    position: relative;
+}
+
+.overlay-listing .overlay-name {
+    display: inline-block;
+    width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    top: 4px;
+}
+
+.overlay-opacity-control .overlay-opacity-slider, .overlay-opacity-control i {
+    display: inline-block;
+}
+
+.overlay-opacity-control .overlay-opacity-slider{
+    transition-property: width, opacity;
+    transition-delay: 0ms;
+    transition: 0ms;
+    -webkit-transition-delay: 0ms;
+    width: 0px;
+    opacity: 0;
+    position: relative;
+    top: 2px;
+    right: -8px;
+}
+
+.overlay-opacity-control .overlay-opacity-slider input {
+    width: 0px;
+    height: 0px;
+}
+
+.overlay-opacity-control:hover .overlay-opacity-slider input, .overlay-opacity-control:focus .overlay-opacity-slider input {
+    width: 150px;
+    height: 20px;
+}
+
+.overlay-listing .overlay-opacity-control {
+    transition: 300ms;
+    transition-property: all;
+    transition-delay: 100ms;
+    position: absolute;
+    padding: 6px 6px 6px 8px;
+    top: 16px;
+    right: 6px;
+    width: 30px;
+    height: 38px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+}
+
+.overlay-listing .overlay-opacity-control:hover, .overlay-listing .overlay-opacity-control:focus {
+    border: 1px solid rgb(217, 217, 217);
+    background-color: white;
+    width: 200px;
+}
+
+.overlay-listing .overlay-opacity-control:hover .overlay-opacity-slider, .overlay-listing .overlay-opacity-control:focus .overlay-opacity-slider {
+    transition-delay: 400ms;
+    transition: 200ms;
+    -webkit-transition-delay: 400ms;
+    width: 150px;
+    opacity: 1;
+}
+
+.basemap-listing.active-basemap, .basemap-listing:hover, .overlay-listing.active-overlay, .overlay-listing:hover {
+    color: rgb(33, 62, 95);
+}
+.basemap-listing.active-basemap, .basemap-listing:hover, .overlay-listing:hover {
+    background-color: rgb(247, 247, 247);
+}
+
+.basemap-listing.active-basemap:before {
+    content: "\f05d";
+}
+
+.overlay-listing.active-overlay .overlay-name:before {
+    content: "\f205";
 }
 
 #map-settings {
@@ -13072,6 +13249,11 @@ ul.select2-choices:after {
     color: #999;
     margin-top: -8px;
     margin-bottom: 10px;
+}
+
+.card-component-wrapper-editor {
+    height: 100%;
+    padding-bottom: 50px;
 }
 
 .card-header {
