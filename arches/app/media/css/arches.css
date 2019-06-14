@@ -608,6 +608,10 @@ div.wf-multi-tile-card-info div {
     border-right: solid 1px #aaa;
 }
 
+.workflow-nav-controls .inactive {
+    color: #ccc;
+}
+
 .workflow-plugin {
     flex-grow: inherit;
 }

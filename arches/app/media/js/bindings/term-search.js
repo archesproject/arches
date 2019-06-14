@@ -48,7 +48,7 @@ define([
                         searchbox.groups = [];
                         _.each(data, function(value, searchType) {
                             if (value.length > 0) {
-                                searchbox.groups.push(searchType);
+                                searchbox.groups.unshift(searchType);
                             }
                             _.each(value, function(val) {
                                 val.inverted = ko.observable(false);

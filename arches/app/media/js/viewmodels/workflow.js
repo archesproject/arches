@@ -13,13 +13,13 @@ define([
         this.ready = ko.observable(false);
         this.loading = config.loading || ko.observable(false);
         this.alert = config.alert || ko.observable(null);
-        this.state = {steps:{}};
+        this.state = {steps:[]};
 
         this.restoreStateFromURL = function(){
             var urlparams = new window.URLSearchParams(window.location.search);
             var res = {};
             urlparams.forEach(function(v, k){res[k] = v;});
-            res.steps = res.steps ? JSON.parse(res.steps) : {};
+            res.steps = res.steps ? JSON.parse(res.steps) : [];
             this.state = res;
         };
 
@@ -29,12 +29,18 @@ define([
             var components = _.unique(self.steps.map(function(step) {return step.component;}));
             require(components, function() {
                 // var modules = arguments;
+                var stateStepCount = self.state.steps.length;
                 self.steps.forEach(function(step, i) {
                     if (!(self.steps[i] instanceof Step)) {
                         step.workflow = self;
                         step.loading = self.loading;
                         step.alert = self.alert;
                         self.steps[i] = new Step(step);
+                        if (stateStepCount !== 0 && i <= stateStepCount) {
+                            if(self.state.steps[i]) {
+                                self.steps[i].complete(self.state.steps[i].complete);
+                            }
+                        }
                         self.steps[i].complete.subscribe(function(complete) {
                             if (complete) self.next();
                         });

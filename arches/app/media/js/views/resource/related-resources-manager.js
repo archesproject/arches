@@ -42,7 +42,7 @@ define([
                     var resourceinstanceid = this.editingInstanceId;
                     var graph = this.graph;
                     return function(result) {
-                        if (result._id === resourceinstanceid || _.contains(graph.relatable_resources, result._type) === false) {
+                        if (result._id === resourceinstanceid || _.contains(graph.relatable_resources, result._source.graph_id) === false) {
                             return true;
                         } else {
                             return false;
