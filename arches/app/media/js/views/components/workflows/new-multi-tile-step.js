@@ -15,6 +15,7 @@ define([
 
         this.remove = function(tile) {
             self.card().tiles.remove(tile);
+            tile.deleteTile();
         };
 
         this.edit = function(tile) {

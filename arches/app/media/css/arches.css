@@ -559,11 +559,11 @@ div.wf-multi-tile-card-info div {
 
 
 
-.workflows-ref-number-card div div {
+.wf-multi-tile-step-card div div {
     margin: 0;
 }
 
-.workflows-ref-number-card > div.card-info ~ div {
+.wf-multi-tile-step-card > div.wf-multi-tile-card-info ~ div {
     display: flex;
     flex-direction: row;
     color: #4f9ce9;
@@ -573,7 +573,7 @@ div.wf-multi-tile-card-info div {
     /* align-self: flex-end; */
 } 
 
-.workflows-ref-number-card > div.card-info ~ div span {
+.wf-multi-tile-step-card > div.wf-multi-tile-card-info ~ div span {
     margin-right: 6px;
 }
 
