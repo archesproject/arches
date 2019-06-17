@@ -9,13 +9,18 @@ define([
 ], function(_, $, arches, ko, GraphModel, ReportModel, CardViewModel) {
     function viewModel(params) {
         var self = this;
+        this.urls = arches.urls;
         if (!params.resourceid() && params.requirements){
             params.resourceid(params.requirements.resourceid);
         }
-
-        var url = arches.urls.api_card + (ko.unwrap(params.resourceid));
+        this.workflowid = params.workflow.state.workflowid;
+        this.resourceid = params.resourceid();
+        var url = arches.urls.api_card + (ko.unwrap(this.resourceid));
         this.report = ko.observable();
         this.loading = ko.observable(true);
+        this.nodegroupids = params.workflow.steps
+            .filter(function(step){return ko.unwrap(step.nodegroupid);})
+            .map(function(x){return ko.unwrap(x.nodegroupid);});
 
         $.getJSON(url, function(data) {
             var displayname = ko.observable(data.displayname);
@@ -30,9 +35,9 @@ define([
 
             var topCards = _.filter(data.cards, function(card) {
                 var nodegroup = _.find(data.nodegroups, function(group) {
-                    return group.nodegroupid === card.nodegroup_id;
+                    return (group.nodegroupid === card.nodegroup_id);
                 });
-                return !nodegroup || !nodegroup.parentnodegroup_id;
+                return (!nodegroup || !nodegroup.parentnodegroup_id) && _.contains(self.nodegroupids, card.nodegroup_id);
             }).map(function(card) {
                 params.nodegroupid = params.nodegroupid || card.nodegroup_id;
                 return new CardViewModel({
@@ -51,16 +56,16 @@ define([
 
             topCards.forEach(function(topCard) {
                 topCard.topCards = topCards;
-            });
+            }, this);
 
             self.report(new ReportModel(_.extend(data, {graphModel: graphModel, cards: topCards})));
             self.loading(false);
         });
 
         params.stateProperties = function(){
-                return {}
-            };
-    };
+            return {};
+        };
+    }
     return ko.components.register('final-step', {
         viewModel: viewModel,
         template: {
