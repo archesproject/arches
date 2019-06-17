@@ -65,6 +65,28 @@ define([
             history.pushState(null, '', window.location.pathname + '?' + $.param(urlparams));
         };
 
+        this.updateState = function(val) {
+            var activeStep = val;
+            var previousStep = self.previousStep();
+            var resourceId;
+            if (previousStep) {
+                self.state.steps[previousStep._index] = previousStep.stateProperties();
+                self.state.steps[previousStep._index].complete = ko.unwrap(previousStep.complete);
+                self.state.activestep = val._index;
+                self.state.previousstep = previousStep._index;
+                if (!resourceId) {
+                    resourceId = !!previousStep.resourceid ? ko.unwrap(previousStep.resourceid) : null;
+                    self.state.resourceid = resourceId;
+                    activeStep.requirements.resourceid = self.state.resourceid;
+                }
+                self.updateUrl();
+            } else {
+                activeStep.requirements = self.state.steps[activeStep._index] || {};
+                activeStep.requirements.resourceid = self.state.resourceid;
+            }
+            self.previousStep(activeStep);
+        };
+
         this.next = function(){
             var activeStep = self.activeStep();
             if (activeStep && activeStep.complete() && activeStep._index < self.steps.length - 1) {
