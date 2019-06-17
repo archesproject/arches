@@ -9,11 +9,13 @@ define([
 ], function(_, $, arches, ko, GraphModel, ReportModel, CardViewModel) {
     function viewModel(params) {
         var self = this;
+        this.urls = arches.urls;
         if (!params.resourceid() && params.requirements){
             params.resourceid(params.requirements.resourceid);
         }
-
-        var url = arches.urls.api_card + (ko.unwrap(params.resourceid));
+        this.workflowid = params.workflow.state.workflowid;
+        this.resourceid = params.resourceid();
+        var url = arches.urls.api_card + (ko.unwrap(this.resourceid));
         this.report = ko.observable();
         this.loading = ko.observable(true);
 
