@@ -55,6 +55,13 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     padding: 48px 72px 24px 72px;
 }
 
+.cons-splash-nav {
+    z-index: 500;
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+    padding: 48px 72px 24px 72px;
+}
+
 .splash-nav button {
     background-color: #23486A;
     border-radius: 3px;
@@ -63,6 +70,10 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
 }
 
 ul.splash-list > li > a:focus, ul.splash-list > li > a:hover {
+    background-color: rgba(0, 0, 0, 0.274);
+}
+
+ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     background-color: rgba(0, 0, 0, 0.274);
 }
 
@@ -92,7 +103,7 @@ ul.splash-list > li > a:focus, ul.splash-list > li > a:hover {
 }
 
 .navbar-brand-disco-icon {
-    background-color: #DDDDDD; 
+    background-color: rgba(0, 0, 0, 0); 
     width: 80px; 
     height: 80px; 
     border-radius: 100%;
@@ -105,7 +116,15 @@ ul.splash-list > li > a:focus, ul.splash-list > li > a:hover {
     background-color: transparent;
 }
 
+.cons-splash-nav #auth-link:focus, .cons-splash-nav #auth-link:hover {
+    background-color: transparent;
+}
+
 .splash-nav a {
+    font-size: 24px;
+}
+
+.cons-splash-nav a {
     font-size: 24px;
 }
 
@@ -116,7 +135,18 @@ ul.splash-list > li > a:focus, ul.splash-list > li > a:hover {
     color: #594b4b;
 }
 
+.cons-splash-nav ul > li > a {
+    text-transform: none;
+    font-size: 20px;
+    font-family: "Open Sans",Arial,sans-serif;
+    color: #493b3c;
+}
+
 .splash-nav .auth-welcome {
+    font-size: 26px;
+}
+
+.cons-splash-nav .auth-welcome {
     font-size: 26px;
 }
 
