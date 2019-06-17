@@ -62,6 +62,10 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     padding: 48px 72px 24px 72px;
 }
 
+.cons-splash-nav h2 {
+    font-weight: 200;
+}
+
 .splash-nav button {
     background-color: #23486A;
     border-radius: 3px;
@@ -93,7 +97,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .navbar-brand-disco h2 {
     margin-bottom: 8px;
-    font-size: 48px;
+    font-size: 42px;
     color: #594b4b;
     display: inline-block;
 }
@@ -111,6 +115,8 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     align-items: center;
     justify-content: center;
 }
+
+.cons-splash-nav 
 
 .splash-nav #auth-link:focus, .splash-nav #auth-link:hover {
     background-color: transparent;
@@ -138,6 +144,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .cons-splash-nav ul > li > a {
     text-transform: none;
     font-size: 20px;
+    font-weight: 750;
     font-family: "Open Sans",Arial,sans-serif;
     color: #493b3c;
 }
