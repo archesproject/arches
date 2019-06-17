@@ -18,6 +18,8 @@ define([
         this.restoreStateFromURL = function(){
             var urlparams = new window.URLSearchParams(window.location.search);
             var res = {};
+            var pathArray = window.location.pathname.split('/');
+            res.workflowid = pathArray[2];
             urlparams.forEach(function(v, k){res[k] = v;});
             res.steps = res.steps ? JSON.parse(res.steps) : [];
             this.state = res;

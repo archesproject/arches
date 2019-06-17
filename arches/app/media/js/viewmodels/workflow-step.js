@@ -16,6 +16,8 @@ define([
             return config.workflow.activeStep() === this;
         }, this);
 
+        this.requirements = {};
+
         this.value = function(){
             return {};
         };
