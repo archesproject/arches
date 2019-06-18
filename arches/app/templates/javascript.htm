@@ -299,6 +299,7 @@
                 'layer_definitions': {{ map_layer.layer_json }},
                 'isoverlay': {{ map_layer.isoverlay|lower }},
                 'icon': '{{ map_layer.icon }}',
+                'legend': '{{ map_layer.legend | default_if_none:"" | escapejs  }}',
                 'activated': {{ map_layer.activated|lower }},
                 'addtomap': {{ map_layer.addtomap|lower }},
                 'is_resource_layer': false,
@@ -311,6 +312,7 @@
                 'layer_definitions': {{ resource_map_layer.layer_definitions }},
                 'isoverlay': true,
                 'icon': '{{ resource_map_layer.icon }}',
+                'legend': '{{ resource_map_layer.legend | escapejs  }}',
                 'activated': true,
                 'addtomap': {{ resource_map_layer.addtomap|lower }},
                 'is_resource_layer': true

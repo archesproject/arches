@@ -894,6 +894,7 @@ class MapLayer(models.Model):
     centerx = models.FloatField(blank=True, null=True)
     centery = models.FloatField(blank=True, null=True)
     zoom = models.FloatField(blank=True, null=True)
+    legend = models.TextField(blank=True, null=True)
 
     @property
     def layer_json(self):

@@ -33,8 +33,13 @@ define([
                     if (layer.addtomap) self.activeBasemap(layer);
                 }
                 else {
-                    layer.onMap = ko.observable(layer.addtomap);
-                    layer.opacity = ko.observable(100);
+                    layer.opacity = ko.observable(layer.addtomap ? 100 : 0);
+                    layer.onMap = ko.pureComputed({
+                        read: function() { return layer.opacity() > 0; },
+                        write: function(value) {
+                            layer.opacity(value ? 100 : 0);
+                        }
+                    });
                     self.overlays.push(layer);
                 }
             });
