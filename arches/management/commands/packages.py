@@ -856,7 +856,8 @@ will be very jumbled.""")
                 if path is not None:
                     print 'Importing {0}. . .'.format(path)
                     BusinessDataImporter(path, config_file).import_business_data(overwrite=overwrite,
-                        bulk=bulk_load, create_concepts=create_concepts, create_collections=create_collections, use_multiprocessing=use_multiprocessing)
+                            bulk=bulk_load, create_concepts=create_concepts,
+                            create_collections=create_collections, use_multiprocessing=use_multiprocessing)
                 else:
                     utils.print_message('No file found at indicated location: {0}'.format(source))
                     sys.exit()
