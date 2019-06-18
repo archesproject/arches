@@ -624,6 +624,11 @@ div.wf-multi-tile-card-info div {
     padding: 20px;
 }
 
+#workflow-container {
+    display: flex;
+    flex-direction: row;
+}
+
 .workflow-panel-header a span {
     font-size: 16px;
     color: white;
@@ -644,9 +649,14 @@ div.wf-multi-tile-card-info div {
 
 .workflow-panel {
     background: #26476a;
-    width: 12%;
+    /* width: 12%; */
     color: white;
 }
+
+div.workflow-panel {
+    min-width: 250px;
+}
+
 .workflow-panel ul {
     /* text-decoration: none; */
     list-style-type: none;
