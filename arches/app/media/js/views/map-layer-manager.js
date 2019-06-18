@@ -382,7 +382,7 @@ define([
             'paging-filter': 1
         },
         success: function(results) {
-            results.results.aggregations.geo_aggs = results.results.aggregations.geo_aggs.inner.buckets[0];
+            results.results.aggregations['geo_aggs'] = results.results.aggregations['geo_aggs'].inner.buckets[0];
             searchAggregations(results.results.aggregations);
             searchResults(results);
         }
@@ -413,7 +413,7 @@ define([
     vm.selectedLayerJSON.subscribe(updateMapStyle);
     vm.selectedList.subscribe(function(selectedList) {
         var selection = null;
-        var layerList = ko.unwrap(vm.selectedList());
+        var layerList = ko.unwrap(selectedList);
         if (layerList && layerList.length > 0) {
             selection = layerList[0];
         }
