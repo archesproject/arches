@@ -951,8 +951,8 @@ the format of logging and console messages has not been updated.""")
 WARNING: Support for multiprocessing files is still experimental. While using
 multiprocessing to import resources, you will not be able to use ctrl+c (etc.)
 to cancel the operation. You will need to manually kill all of the processes
-with 'pkill python' (unix) or just close the terminal on Windows. Also, be
-aware that prints statements will be very jumbled.""")
+with or just close the terminal. Also, be aware that print statements
+will be very jumbled.""")
                 if not force:
                     confirm = raw_input("continue? Y/n ")
                     if len(confirm) > 0 and not confirm.lower().startswith("y"):
