@@ -3,9 +3,9 @@ import csv
 import json
 import uuid
 import psycopg2
-from lxml import etree
 from mimetypes import MimeTypes
-from rdflib import Graph as RDFGraph
+from rdflib import Graph as RDFGraph, Namespace, RDF, URIRef, Literal
+from rdflib.namespace import DCTERMS, SKOS, FOAF, NamespaceManager
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.db.models.functions import MakeValid
 from arches.app.models.graph import Graph
@@ -15,11 +15,14 @@ from arches.app.utils import v3utils
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.system_settings import settings
 
+ARCHES = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 
-def fix_v3_value(value, datatype):
+
+def fix_v3_value(value, v4nodeinfo):
     """in some cases, the v3 data must be modified before it can be saved
     into a v4 tile. this conversion is based on the v4 node datatype."""
 
+    datatype = v4nodeinfo['v4_datatype']
     # convert the WKT geometry representation from v3 to a geojson feature
     # collection which is what is needed in v4
     if datatype == "geojson-feature-collection":
@@ -403,10 +406,11 @@ class v3PreparedResource:
 
                 if verbose:
                     print dp[0]
+                v4nodeinfo = node_lookup[dp[0]]
                 dt = node_lookup[dp[0]]['v4_datatype']
 
                 # first fix the data value
-                value = fix_v3_value(dp[1], dt)
+                value = fix_v3_value(dp[1], v4nodeinfo)
 
                 # now get the UUID of the v4 target node
                 v4_uuid = node_lookup[dp[0]]['v4_uuid']
@@ -517,13 +521,14 @@ class v3Importer:
     with the rm_configs content itself). An optional truncate argument can be
     used to limit the number of resources that are loaded from the v3 json. """
 
-    def __init__(self, v3_data_dir, v4_graph_name, v3_json_file, truncate=None, exclude=[], only=[]):
+    def __init__(self, v3_data_dir, v4_graph_name, v3_resource_file=None,
+                 truncate=None, exclude=[], only=[]):
 
-        if not os.path.isfile(v3_json_file):
+        if v3_resource_file is not None and not os.path.isfile(v3_resource_file):
             raise Exception("v3 business data file {} does not exist".format(
-                v3_json_file))
+                v3_resource_file))
 
-        self.source_file = v3_json_file
+        self.source_file = v3_resource_file
 
         self.v4_graph = Graph.objects.get(name=v4_graph_name)
         self.v4_graph_name = v4_graph_name
@@ -540,8 +545,16 @@ class v3Importer:
         # create better node_lookup that holds more information
         self.node_lookup = self.augment_node_lookup()
 
+        # these properties have to do with how many/which resources to convert
+        self.truncate = truncate
+        self.exclude = exclude
+        self.only = only
+
         # finally, do the actual loading of the v3 data into this class
-        self.v3_resources = self.load_v3_data(truncate=truncate, exclude=exclude, only=only)
+        if v3_resource_file.endswith(".jsonl"):
+            self.v3_resources = []
+        else:
+            self.v3_resources = self.load_v3_data(truncate=truncate, exclude=exclude, only=only)
 
     def augment_node_lookup(self):
         """takes the node lookup csv and converts to a dictionary
@@ -593,6 +606,13 @@ class v3Importer:
 
         return self.v3_resources
 
+    def process_one_resource(self, v3_json, verbose=False):
+        """ changes a single v3 json resource into a v4 json resource """
+
+        v3_resource = v3PreparedResource(v3_json['entityid'], self.v4_graph.graphid, v3_json)
+        v3_resource.process(self.v4_nodes, self.node_lookup, verbose=verbose)
+        return v3_resource.get_json()
+
     def convert_v3_data(self, verbose=False):
         """ creates v4 resources from all the loaded v3 resources in
         self.v3_resources. returns these resources. """
@@ -600,10 +620,7 @@ class v3Importer:
         resources = []
         for res in self.v3_resources:
 
-            v3_resource = v3PreparedResource(res['entityid'], self.v4_graph.graphid, res)
-            v3_resource.process(self.v4_nodes, self.node_lookup, verbose=verbose)
-            v4_json = v3_resource.get_json()
-
+            v4_json = self.process_one_resource(res, verbose=verbose)
             resources.append(v4_json)
 
         return resources
@@ -623,6 +640,52 @@ class v3Importer:
 
         return dest_path
 
+    def write_v4_jsonl(self, dest_path, verbose=False):
+
+        ct = 0
+        with open(self.source_file, "rb") as openv3:
+
+            lines = openv3.readlines()
+            with open(dest_path, "wb") as openv4:
+                for line in lines:
+                    v3_json = json.loads(line)
+
+                    # set of checks that basically mimicks what happens
+                    # in the load_v3_data method that is used for JSON.
+                    if v3_json["entitytypeid"] != self.v3_graph_name:
+                        continue
+                    if len(v3_json['child_entities']) == 0:
+                        continue
+                    resid = v3_json['entityid']
+                    if len(self.only) > 0 and resid not in self.only:
+                        continue
+                    if resid in self.exclude:
+                        continue
+
+                    v4_json = self.process_one_resource(v3_json, verbose=verbose)
+                    v4_line = JSONSerializer().serialize(v4_json)
+
+                    openv4.write(v4_line+"\n")
+                    ct += 1
+
+                    # simple progress printing
+                    if ct == 0:
+                        print("")
+                    if ct % 1000 == 0:
+                        print(ct)
+                    elif ct % 100 == 0:
+                        print("."),
+                    if ct == self.truncate:
+                        break
+                if ct > 0:
+                    print(ct)
+
+        if ct == 0:
+            os.remove(dest_path)
+            return False
+
+        return dest_path
+
 
 class v3SkosConverter:
     """
@@ -630,134 +693,131 @@ class v3SkosConverter:
     an Arches 4 thesaurus file and collections file for import
     """
 
-    def __init__(self, skos_file, name_space="http://localhost:8000/"):
+    def __init__(self, skos_file, name_space="http://localhost:8000/",
+                 uuid_lookup={}, verbose=False):
 
         with open(skos_file, "rb") as incoming_skos:
             skos = incoming_skos.read()
             skos = skos.replace("http://www.archesproject.org/", name_space)
 
         self.v3_skos = skos
-        self.uuid_lookup = {}
-
-    def prepare_export(self, namespaces, nodes):
-        """
-        return a graph with the desired node type for writing out to XML,
-        with cleaned-up namespaces
-        """
-
-        output_graph = RDFGraph()
-        [output_graph.bind(k, v) for k, v in namespaces.items()]
-
-        [output_graph.parse(
-            data=etree.tostring(node),
-            nsmap=namespaces)
-         for node in nodes]
-
-        return output_graph
-
-    def export(self, file_path, content):
-
-        with open(file_path, 'w') as fh:
-            fh.write(content)
-            fh.close
-
-    def write_skos(self, directory, uuid_collection_file=None):
-
-        def new_or_existing_uuid(preflabel, uuid_lookup={}):
-            """
-            take a topConcept's prefLabel node, parse the JSON within, and
-            return a new or existing UUID for the collection based on
-            whether we already have one for the JSON's `value` key
-            """
-            preflabel_val = json.loads(preflabel.text)['value']
-
-            if preflabel_val in uuid_lookup:
-                return uuid_lookup[preflabel_val]
-            else:
-                new_uuid = str(uuid.uuid4())
-                uuid_lookup[preflabel_val] = new_uuid
-                return new_uuid
-
-        def new_preflabel_uuid(preflabel):
-            """
-            Concept Values in Arches have a UUID (stored in the embedded JSON)
-            and a 1-1 mapping with their Concept; if a Collection shares a
-            prefLabel with a Concept, it needs a new ID to avoid
-            clobbering the same attribute on the existing Concept
-            """
-            working = json.loads(preflabel.text)
-            working['id'] = unicode(uuid.uuid4())
-            preflabel.text = json.dumps(working)
-
-        if uuid_collection_file:
-            with open(uuid_collection_file, "rb") as openfile:
-                uuid_lookup = json.loads(openfile.read())
-        else:
-            uuid_lookup = {}
-
-        skos_xml = etree.fromstring(self.v3_skos)
-        namespaces = skos_xml.nsmap
-
-        # retrieve concepts and collections from skos with regular ol' xpath
-        concepts = skos_xml.xpath("./skos:Concept", namespaces=namespaces)
-        collections = skos_xml.xpath("./skos:Collection", namespaces=namespaces)
-        top_concepts = skos_xml.xpath(".//skos:hasTopConcept", namespaces=namespaces)
-
-        top_concept_uris = [
-            concept.get("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource")
-            for concept in top_concepts]
-
-        for concept in concepts:
-            uri = concept.get("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about")
-            if uri in top_concept_uris:
-                # create a new top level Collection based on the topConcept
-                collection = etree.Element(
-                    "{http://www.w3.org/2004/02/skos/core#}Collection",
-                    nsmap=namespaces)
-
-                # migrate nested concepts and attributes into new
-                # Collection
-                #################################################
-
-                # hacky-deepcopy the TopConcept to avoid mutating original
-                # (still needed for thesaurus export)
-                working_concept = etree.fromstring(etree.tostring(concept))
-
-                # give the collection a UUID based on the prefLabel
-                col_preflabel = working_concept.find('./skos:prefLabel',
-                                                     namespaces=namespaces)
-
-                new_preflabel_uuid(col_preflabel)
-
-                col_uuid = new_or_existing_uuid(col_preflabel, uuid_lookup=uuid_lookup)
-                fq_uuid = namespaces['arches'] + col_uuid
-                collection.set("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about",
-                               fq_uuid)
-
-                # change skos:narrower into valid skos:member tags in the
-                # Concept's first-level children
-                for narrower in working_concept.xpath("skos:narrower",
-                                                      namespaces=namespaces):
-                    narrower.tag = "{http://www.w3.org/2004/02/skos/core#}member"
-
-                # Append the child concepts to the new Collection
-                [collection.append(child) for child in
-                 working_concept.getchildren()]
-
-                collections.append(collection)
-
-        # prepare raw XML
-        thesaurus_skos = self.prepare_export(namespaces,
-                                             concepts).serialize(format='pretty-xml')
-        collections_skos = self.prepare_export(namespaces,
-                                               collections).serialize(format='pretty-xml')
-
-        # export files
-        self.export(os.path.join(directory, 'concepts', 'thesaurus.xml'), thesaurus_skos)
-        self.export(os.path.join(directory, 'collections', 'collections.xml'), collections_skos)
-
-        # update this class' uuid_lookup
         self.uuid_lookup = uuid_lookup
+        self.verbose = verbose
+        self.name_space = name_space
+
+    def new_or_existing_uuid(self, preflabel):
+        """
+        take a topConcept's prefLabel node, attempt to parse the JSON within,
+        return a new or existing UUID for the collection based on
+        whether we already have one saved in the collection uuid lookup.
+        """
+
+        if preflabel in self.uuid_lookup:
+            return self.uuid_lookup[preflabel]
+        else:
+            new_uuid = str(uuid.uuid4())
+            self.uuid_lookup[preflabel] = new_uuid
+            return new_uuid
+
+    def add_children_to_collection(self, source_graph, out_graph, parent_id, topconcept_id):
+
+        children = [i for i in source_graph.triples((topconcept_id, SKOS['narrower'], None))]
+
+        for child in children:
+            out_graph.add((ARCHES[parent_id], SKOS['member'], child[2]))
+            out_graph.add((child[2], RDF.type, SKOS['Concept']))
+            self.add_children_to_collection(source_graph, out_graph, child[2], child[2])
+
+        return out_graph
+
+    def write_skos(self, directory):
+
+        # parse the original v3 graph
+        v3graph = RDFGraph()
+        v3graph.parse(data=self.v3_skos)
+
+        # create the namespace manager
+        namespaces = (
+            ("arches", ARCHES),
+            ("skos", SKOS),
+            ("dcterms", DCTERMS)
+        )
+        nsmanager = NamespaceManager(RDFGraph())
+        for ns in namespaces:
+            nsmanager.bind(ns[0], ns[1])
+
+        # create the output graphs with the new namespace manager
+        v4thesaurus = RDFGraph(namespace_manager=nsmanager)
+        v4collections = RDFGraph(namespace_manager=nsmanager)
+
+        # add the concept schemes to the thesaurus
+        concept_schemes = [i for i in v3graph.triples((None, RDF.type, SKOS['ConceptScheme']))]
+        for cs in concept_schemes:
+            v4thesaurus.add(cs)
+
+        # iterate the concepts and make collections for them.
+        topconcepts = [i for i in v3graph.triples((None, SKOS['hasTopConcept'], None))]
+        for tc in topconcepts:
+
+            # get the top concept name and if convert it to a Literal object
+            tc_name_literal = v3graph.value(subject=tc[2], predicate=SKOS['prefLabel'])
+
+            # get the value from the JSON formatted Literal content
+            # if the Literal content is NOT JSON, then this reference data was
+            # exported from v3 with the wrong command and will not work.
+            try:
+                tc_name = json.loads(tc_name_literal.value)['value']
+                collection_id = self.new_or_existing_uuid(tc_name)
+            except ValueError:
+                docs = "https://arches.readthedocs.io/en/stable/v3-to-v4-migration/"
+                print("ERROR: Incompatible SKOS. See {} for more information.".format(docs))
+                exit()
+
+            if self.verbose:
+                children = [i for i in v3graph.triples((tc[2], SKOS['narrower'], None))]
+                print("{}: {} immediate child concepts".format(tc_name, len(children)))
+                print("    collection uuid: "+collection_id)
+
+            # create a new collection for each top concept
+            v4thesaurus.add(tc)
+            v4collections.add((ARCHES[collection_id], RDF.type, SKOS['Collection']))
+
+            # add the preflabel for the collection, if it's not the r2r types collection
+            # which already has a label in Arches by default.
+            if tc_name != "Resource To Resource Relationship Types":
+                simple_tc_name = Literal(tc_name, lang="en-US")
+                v4collections.add((ARCHES[collection_id], SKOS['prefLabel'], simple_tc_name))
+
+            # recursively add all of the concept children to the collection for this
+            # top concept.
+            v4collections = self.add_children_to_collection(v3graph, v4collections,
+                                                            collection_id, tc[2])
+
+        # add ALL concepts from the v3 graph to the thesaurus. this pulls along all
+        # child/parent relationships into the thesaurus, as well as all extra info
+        # for each concept, like sortorder, prefLabel, etc.
+        for concept in v3graph.triples((None, RDF.type, SKOS['Concept'])):
+            v4thesaurus.add(concept)
+
+            # this is the extra info related to each concept, like prefLabel, sortorder, etc.
+            for s, p, o in v3graph.triples((concept[0], None, None)):
+                # skip the label of the resource to resource relationship type concept
+                # as it's already in Arches and this would duplicate it.
+                if s.endswith("000004") and p == SKOS['prefLabel']:
+                    continue
+                v4thesaurus.add((s, p, o))
+
+        # export the thesaurus and collections to predetermined locations within the
+        # package file structure.
+        thesaurus_file = os.path.join(directory, 'concepts', 'thesaurus.xml')
+        if self.verbose:
+            print("writing thesaurus to: "+thesaurus_file)
+        v4thesaurus.serialize(destination=thesaurus_file, format="pretty-xml")
+
+        collections_file = os.path.join(directory, 'collections', 'collections.xml')
+        if self.verbose:
+            print("writing collections to: "+collections_file)
+        v4collections.serialize(destination=collections_file, format="pretty-xml")
 
     def write_uuid_lookup(self, filepath):
 
