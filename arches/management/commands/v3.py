@@ -124,7 +124,8 @@ class Command(BaseCommand):
             self.write_v4_relations(dir_path, direct_import=options['import'])
 
         if op == 'convert-v3-skos':
-            self.convert_v3_skos(dir_path, direct_import=options['import'])
+            self.convert_v3_skos(dir_path, direct_import=options['import'],
+                                 verbose=vb)
 
         if op == 'register-files':
             self.register_uploaded_files()
@@ -337,18 +338,22 @@ class Command(BaseCommand):
                 '\n  python manage.py packages -o import_business_data_relations -s '\
                 '"{}"'.format(v4_relations)
 
-    def convert_v3_skos(self, package_dir, direct_import=False):
+    def convert_v3_skos(self, package_dir, direct_import=False, verbose=False):
 
         uuid_collection_file = os.path.join(package_dir, "reference_data", "v3topconcept_lookup.json")
         if not os.path.isfile(uuid_collection_file):
+            if verbose:
+                print("creating new collection lookup file: "+uuid_collection_file)
             with open(uuid_collection_file, "wb") as openfile:
                 json.dump({}, openfile)
         try:
+            if verbose:
+                print("using existing collection lookup file: "+uuid_collection_file)
             with open(uuid_collection_file, "rb") as openfile:
-                data = json.loads(openfile.read())
+                uuid_data = json.loads(openfile.read())
         except ValueError as e:
-            print "\n  -- JSON parse error in " + uuid_collection_file +\
-                ":\n\n    " + e.message
+            print("\n  -- JSON parse error in " + uuid_collection_file +
+                  ":\n\n    " + e.message)
             exit()
 
         v3_ref_dir = os.path.join(package_dir, 'v3data', 'reference_data')
@@ -368,8 +373,9 @@ class Command(BaseCommand):
                 ":\n\n  {}".format(skos_file)
 
         skos_importer = v3SkosConverter(skos_file,
-                                        name_space=settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
-        skos_importer.write_skos(v4_ref_dir, uuid_collection_file=uuid_collection_file)
+                                        name_space=settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT,
+                                        uuid_lookup=uuid_data, verbose=verbose)
+        skos_importer.write_skos(v4_ref_dir)
         skos_importer.write_uuid_lookup(uuid_collection_file)
 
         if direct_import:
