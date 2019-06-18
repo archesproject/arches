@@ -17,10 +17,12 @@ from arches.app.models.system_settings import settings
 
 ARCHES = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 
-def fix_v3_value(value, datatype):
+
+def fix_v3_value(value, v4nodeinfo):
     """in some cases, the v3 data must be modified before it can be saved
     into a v4 tile. this conversion is based on the v4 node datatype."""
 
+    datatype = v4nodeinfo['v4_datatype']
     # convert the WKT geometry representation from v3 to a geojson feature
     # collection which is what is needed in v4
     if datatype == "geojson-feature-collection":
@@ -404,10 +406,11 @@ class v3PreparedResource:
 
                 if verbose:
                     print dp[0]
+                v4nodeinfo = node_lookup[dp[0]]
                 dt = node_lookup[dp[0]]['v4_datatype']
 
                 # first fix the data value
-                value = fix_v3_value(dp[1], dt)
+                value = fix_v3_value(dp[1], v4nodeinfo)
 
                 # now get the UUID of the v4 target node
                 v4_uuid = node_lookup[dp[0]]['v4_uuid']
