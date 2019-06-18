@@ -154,7 +154,7 @@ class Command(BaseCommand):
             help='used to force a yes answer to any user input "continue? y/n" prompt')
 
         parser.add_argument('--use_multiprocessing', action='store_true',
-            help='enables multiprocessing during data import')
+                            help='enables multiprocessing during data import')
 
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
@@ -810,7 +810,7 @@ class Command(BaseCommand):
         """
         Imports business data from all formats. A config file (mapping file) is required for .csv format.
         """
-        
+
         # messages about experimental multiprocessing and JSONL support.
         if data_source.endswith(".jsonl"):
             print("""
@@ -855,7 +855,8 @@ will be very jumbled.""")
                 path = utils.get_valid_path(source)
                 if path is not None:
                     print 'Importing {0}. . .'.format(path)
-                    BusinessDataImporter(path, config_file).import_business_data(overwrite=overwrite, bulk=bulk_load, create_concepts=create_concepts, create_collections=create_collections, use_multiprocessing=use_multiprocessing)
+                    BusinessDataImporter(path, config_file).import_business_data(overwrite=overwrite,
+                        bulk=bulk_load, create_concepts=create_concepts, create_collections=create_collections, use_multiprocessing=use_multiprocessing)
                 else:
                     utils.print_message('No file found at indicated location: {0}'.format(source))
                     sys.exit()
