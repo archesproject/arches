@@ -10,7 +10,14 @@ from time import time
 from copy import deepcopy
 from optparse import make_option
 from os.path import isfile, join
-from django.db import connection, transaction
+from multiprocessing import Pool, TimeoutError, cpu_count
+import django
+# django.setup() must be called here to prepare for multiprocessing. specifically,
+# it must be called before any models are imported, otherwise things will crash
+# during an import that uses multiprocessing.
+# see https://stackoverflow.com/a/49461944/3873885
+django.setup()
+from django.db import connection, connections, transaction
 from django.contrib.auth.models import User
 from django.contrib.gis.gdal import DataSource
 from django.forms.models import model_to_dict
@@ -37,10 +44,21 @@ from arches.setup import unzip_file
 from formats.csvfile import CsvReader
 from formats.archesfile import ArchesFileReader
 
+
 try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
+
+
+def import_one_resource(line):
+    """this single resource import function must be outside of the BusinessDataImporter
+    class in order for it to be called with multiprocessing"""
+    django.setup()
+    reader = ArchesFileReader()
+    archesresource = JSONDeserializer().deserialize(line)
+    reader.import_business_data({"resources": [archesresource]})
+
 
 class BusinessDataImporter(object):
 
@@ -138,7 +156,9 @@ class BusinessDataImporter(object):
             else:
                 print path + ' is not a valid path'
 
-    def import_business_data(self, file_format=None, business_data=None, mapping=None, overwrite='append', bulk=False, create_concepts=False, create_collections=False):
+    def import_business_data(self, file_format=None, business_data=None, mapping=None,
+                             overwrite='append', bulk=False, create_concepts=False,
+                             create_collections=False, use_multiprocessing=False):
         reader = None
         start = time()
         cursor = connection.cursor()
@@ -153,6 +173,19 @@ class BusinessDataImporter(object):
             if file_format == 'json':
                 reader = ArchesFileReader()
                 reader.import_business_data(business_data, mapping)
+            elif file_format == 'jsonl':
+                with open(self.file[0], 'rU') as openf:
+                    lines = openf.readlines()
+                    if use_multiprocessing is True:
+                        pool = Pool(cpu_count())
+                        connections.close_all()
+                        pool.map(import_one_resource, lines)
+                        reader = ArchesFileReader()
+                    else:
+                        reader = ArchesFileReader()
+                        for line in lines:
+                            archesresource = JSONDeserializer().deserialize(line)
+                            reader.import_business_data({"resources": [archesresource]})
             elif file_format == 'csv' or file_format == 'shp' or file_format == 'zip':
                 if mapping != None:
                     reader = CsvReader()
