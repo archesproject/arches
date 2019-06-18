@@ -84,6 +84,8 @@ class Command(BaseCommand):
         ow = options['overwrite']
         vb = options['verbose']
 
+        print("package directory: "+dir_path)
+
         if op == 'start-migration':
             self.prepare_package(dir_path, overwrite=ow)
 
@@ -264,12 +266,12 @@ class Command(BaseCommand):
         # files, but also to accept and process jsonl files.
         for v3_file in v3_files:
             infilename = os.path.basename(v3_file)
-            print "Processing", infilename
+            print("\n -- Processing "+infilename+" --")
             ext = os.path.splitext(v3_file)[1]
 
             for rm in resource_models:
 
-                print(rm)
+                print("looking for "+rm+" resources...")
                 importer = v3Importer(v3_data_dir, rm, v3_resource_file=v3_file,
                                       truncate=truncate, exclude=exclude, only=only)
 
@@ -277,10 +279,8 @@ class Command(BaseCommand):
                 output_file = os.path.join(package_dir, 'business_data', outfilename)
 
                 if ext == ".json":
-                    print "processing normal json"
                     output = importer.write_v4_json(output_file, verbose=verbose)
                 elif ext == ".jsonl":
-                    print "processing jsonl"
                     output = importer.write_v4_jsonl(output_file, verbose=verbose)
 
                 if output is not False:

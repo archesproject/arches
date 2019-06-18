@@ -666,14 +666,17 @@ class v3Importer:
                     ct += 1
 
                     # simple progress printing
+                    if ct == 0:
+                        print("")
                     if ct % 1000 == 0:
                         print(ct)
                     elif ct % 100 == 0:
                         print("."),
                     if ct == self.truncate:
                         break
+                if ct > 0:
+                    print(ct)
 
-        print(ct)
         if ct == 0:
             os.remove(dest_path)
             return False
