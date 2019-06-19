@@ -509,6 +509,7 @@ class Command(BaseCommand):
                     business_data.append(os.path.join(package_dir, 'business_data', f))
             else:
                 business_data += glob.glob(os.path.join(package_dir, 'business_data','*.json'))
+                business_data += glob.glob(os.path.join(package_dir, 'business_data','*.jsonl'))
                 business_data += glob.glob(os.path.join(package_dir, 'business_data','*.csv'))
 
             relations = glob.glob(os.path.join(package_dir, 'business_data', 'relations', '*.relations'))
