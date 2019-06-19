@@ -129,7 +129,6 @@ class ActivityStreamCollectionTests(ArchesTestCase):
     def test_jsonld_export_function(self):
         jsontxt = self.C.to_jsonld()
         doc = json.loads(jsontxt)
-        print(jsontxt)
 
     def test_obj(self):
         obj = self.C.to_obj()
