@@ -84,6 +84,8 @@ class Command(BaseCommand):
         ow = options['overwrite']
         vb = options['verbose']
 
+        print("package directory: "+dir_path)
+
         if op == 'start-migration':
             self.prepare_package(dir_path, overwrite=ow)
 
@@ -124,7 +126,8 @@ class Command(BaseCommand):
             self.write_v4_relations(dir_path, direct_import=options['import'])
 
         if op == 'convert-v3-skos':
-            self.convert_v3_skos(dir_path, direct_import=options['import'])
+            self.convert_v3_skos(dir_path, direct_import=options['import'],
+                                 verbose=vb)
 
         if op == 'register-files':
             self.register_uploaded_files()
@@ -250,28 +253,40 @@ class Command(BaseCommand):
         v3_data_dir = os.path.join(package_dir, "v3data")
         endmsg = "\n  -- You can load these resources later with:\n"
 
-        v3_files = glob(os.path.join(package_dir, 'v3data', 'business_data', '*.json'))
+        # get all json and jsonl files in the business_data directory
+        v3_files = glob(os.path.join(package_dir, 'v3data', 'business_data', '*.json*'))
+
         if len(v3_files) == 0:
-            print "\nThere is no v3 data to import. Put v3 json in {}".format(v3_data_dir)
+            print "\nThere is no v3 data to import. Put v3 json or jsonl in {}".format(v3_data_dir)
             exit()
 
-        business_data = v3_files[0]
-
-        if len(v3_files) > 1:
-            print "\nOnly one v3 file can be imported. This file will be used"\
-                ":\n\n  {}".format(business_data)
-
         sources = []
-        for rm in resource_models:
 
-            print rm
-            output_file = os.path.join(package_dir, 'business_data', rm+".json")
-            importer = v3Importer(v3_data_dir, rm, business_data,
-                                  truncate=truncate, exclude=exclude, only=only)
-            output = importer.write_v4_json(output_file, verbose=verbose)
-            sources.append(output_file)
-            endmsg += '\n  python manage.py packages -o import_business_data -s '\
-                '"{}" -ow overwrite'.format(output)
+        # in the process of adjusting this to not only take multiple business_data
+        # files, but also to accept and process jsonl files.
+        for v3_file in v3_files:
+            infilename = os.path.basename(v3_file)
+            print("\n -- Processing "+infilename+" --")
+            ext = os.path.splitext(v3_file)[1]
+
+            for rm in resource_models:
+
+                print("looking for "+rm+" resources...")
+                importer = v3Importer(v3_data_dir, rm, v3_resource_file=v3_file,
+                                      truncate=truncate, exclude=exclude, only=only)
+
+                outfilename = os.path.splitext(infilename)[0]+"-"+rm+os.path.splitext(infilename)[1]
+                output_file = os.path.join(package_dir, 'business_data', outfilename)
+
+                if ext == ".json":
+                    output = importer.write_v4_json(output_file, verbose=verbose)
+                elif ext == ".jsonl":
+                    output = importer.write_v4_jsonl(output_file, verbose=verbose)
+
+                if output is not False:
+                    sources.append(output_file)
+                    endmsg += '\n  python manage.py packages -o import_business_data -s '\
+                        '"{}" -ow overwrite'.format(output)
 
         if direct_import:
             for source in sources:
@@ -323,18 +338,22 @@ class Command(BaseCommand):
                 '\n  python manage.py packages -o import_business_data_relations -s '\
                 '"{}"'.format(v4_relations)
 
-    def convert_v3_skos(self, package_dir, direct_import=False):
+    def convert_v3_skos(self, package_dir, direct_import=False, verbose=False):
 
         uuid_collection_file = os.path.join(package_dir, "reference_data", "v3topconcept_lookup.json")
         if not os.path.isfile(uuid_collection_file):
+            if verbose:
+                print("creating new collection lookup file: "+uuid_collection_file)
             with open(uuid_collection_file, "wb") as openfile:
                 json.dump({}, openfile)
         try:
+            if verbose:
+                print("using existing collection lookup file: "+uuid_collection_file)
             with open(uuid_collection_file, "rb") as openfile:
-                data = json.loads(openfile.read())
+                uuid_data = json.loads(openfile.read())
         except ValueError as e:
-            print "\n  -- JSON parse error in " + uuid_collection_file +\
-                ":\n\n    " + e.message
+            print("\n  -- JSON parse error in " + uuid_collection_file +
+                  ":\n\n    " + e.message)
             exit()
 
         v3_ref_dir = os.path.join(package_dir, 'v3data', 'reference_data')
@@ -354,8 +373,9 @@ class Command(BaseCommand):
                 ":\n\n  {}".format(skos_file)
 
         skos_importer = v3SkosConverter(skos_file,
-                                        name_space=settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
-        skos_importer.write_skos(v4_ref_dir, uuid_collection_file=uuid_collection_file)
+                                        name_space=settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT,
+                                        uuid_lookup=uuid_data, verbose=verbose)
+        skos_importer.write_skos(v4_ref_dir)
         skos_importer.write_uuid_lookup(uuid_collection_file)
 
         if direct_import:
