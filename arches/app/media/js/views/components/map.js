@@ -116,6 +116,9 @@ define([
                     });
                 }
             });
+            if (params.layers) {
+                layers = layers.concat(ko.unwrap(params.layers));
+            }
             return layers;
         }, this);
 
@@ -127,7 +130,7 @@ define([
                     "search-results-hex": geojsonSourceFactory(),
                     "search-results-hashes": geojsonSourceFactory(),
                     "search-results-points": geojsonSourceFactory()
-                }, arches.mapSources),
+                }, arches.mapSources, params.sources),
                 sprite: arches.mapboxSprites,
                 glyphs: arches.mapboxGlyphs,
                 layers: layers(),
