@@ -7,7 +7,6 @@ PyYAML==3.12
 django-guardian==1.4.9
 TileStache==1.51.13
 python-memcached==1.59
-lxml==4.2.5
 mapbox-vector-tile==1.2.0
 mapnik==0.1
 SPARQLWrapper==1.8.2

@@ -30,7 +30,6 @@ from django.forms.models import model_to_dict
 import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
-from arches.db.install import truncate_db
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
@@ -609,7 +608,7 @@ class Command(BaseCommand):
 
         if setup_db != False:
             if setup_db.lower() in ('t', 'true', 'y', 'yes'):
-                self.setup_db(settings.PACKAGE_NAME)
+                management.call_command("setup_db", force=True)
 
         print 'loading package_settings.py'
         load_package_settings(package_location)
@@ -699,27 +698,12 @@ class Command(BaseCommand):
 
         """
 
-        db_settings = settings.DATABASES['default']
-        truncate_path = os.path.join(settings.ROOT_DIR, 'db', 'install', 'truncate_db.sql')
-        db_settings['truncate_path'] = truncate_path
+        management.call_command("setup_db", force=True)
 
-        truncate_db.create_sqlfile(db_settings, truncate_path)
-
-        os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
-
-        self.delete_indexes()
-        prepare_term_index(create=True)
-        prepare_resource_relations_index(create=True)
-        management.call_command('migrate')
-
-        self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Model.json'), overwrite_graphs=True)
-        self.import_business_data(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings.json'), overwrite=True)
-
-        local_settings_available = os.path.isfile(os.path.join(settings.SYSTEM_SETTINGS_LOCAL_PATH))
-
-        if local_settings_available == True:
-            self.import_business_data(settings.SYSTEM_SETTINGS_LOCAL_PATH, overwrite=True)
-
+        print("\n"+"~"*80+"\n"
+              "Warning: This command will be deprecated in Arches 4.5. From now on please use\n\n"
+              "    python manage.py setup_db [--force]\n\nThe --force argument will "
+              "suppress the interactive confirmation prompt.\n"+"~"*80)
 
     def setup_indexes(self):
         management.call_command('es', operation='setup_indexes')
