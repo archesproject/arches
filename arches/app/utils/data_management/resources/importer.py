@@ -76,7 +76,7 @@ class BusinessDataImporter(object):
             file = settings.BUSINESS_DATA_FILES
         else:
             file = [file]
-
+        self.file = file
         if mapping_file == None:
             try:
                 mapping_file = [file[0].split('.')[0] + '.mapping']
