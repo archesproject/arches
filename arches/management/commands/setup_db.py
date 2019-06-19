@@ -25,7 +25,7 @@ from django.conf import settings
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
-from arches.app.search.mappings import prepare_terms_index, prepare_resource_relations_index
+from arches.app.search.mappings import prepare_term_index, prepare_resource_relations_index
 from arches.management.commands.utils import get_yn_input
 
 
@@ -160,7 +160,7 @@ CREATE DATABASE {}
 
         # delete and setup initial Elasticsearch indexes
         management.call_command('es', operation='delete_indexes')
-        prepare_terms_index(create=True)
+        prepare_term_index(create=True)
         prepare_resource_relations_index(create=True)
 
         # run all migrations
