@@ -1182,10 +1182,20 @@ ul.tabbed-report-tab-list {
     color: rgb(33, 62, 95);
 }
 
-.basemap-listing, .overlay-listing {
+.basemap-listing, .overlay-listing, .legend-listing {
     padding: 20px;
-    cursor: pointer;
     border-bottom: 1px solid rgb(216, 216, 216);
+}
+
+.basemap-listing, .overlay-listing .overlay-opacity-control, .overlay-listing .overlay-name {
+    cursor: pointer;
+}
+
+.overlay-listing, .legend-listing {
+    cursor: grab;
+}
+
+.basemap-listing, .overlay-listing {
     font-size: 16px;
     color: rgb(158, 158, 158);
 }
@@ -1270,8 +1280,17 @@ ul.tabbed-report-tab-list {
     width: 150px;
     opacity: 1;
 }
-
-.basemap-listing.active-basemap, .basemap-listing:hover, .overlay-listing.active-overlay, .overlay-listing:hover {
+.legend-listing .legend-name {
+    font-size: 16px;
+}
+.legend-listing .legend-content {
+    padding: 10px 10px 0;
+}
+.layer-listing-icon {
+    padding-right: 10px;
+    min-width: 10px;
+}
+.basemap-listing.active-basemap, .basemap-listing:hover, .overlay-listing.active-overlay, .overlay-listing:hover, .legend-listing .legend-name {
     color: rgb(33, 62, 95);
 }
 .basemap-listing.active-basemap, .basemap-listing:hover, .overlay-listing:hover {
