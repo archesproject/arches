@@ -1301,8 +1301,8 @@ ul.tabbed-report-tab-list {
     padding: 10px 10px 0;
 }
 .layer-listing-icon {
-    padding-right: 10px;
-    min-width: 10px;
+    display: inline-block;
+    width: 20px;
 }
 .basemap-listing.active-basemap, .basemap-listing:hover, .overlay-listing.active-overlay, .overlay-listing:hover, .legend-listing .legend-name {
     color: rgb(33, 62, 95);
