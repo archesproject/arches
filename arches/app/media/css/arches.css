@@ -699,6 +699,14 @@ div.workflow-panel {
     margin-top: 15px;
 }
 
+.workflow-select-card-container-title {
+    font-size: 1.5em;
+    font-weight: 500;
+    padding-left: 30px;
+    margin-top: 5px;
+    margin-bottom: -15px;
+}
+
 .workflow-select-card-container {
     display: flex;
     flex-grow: inherit;
@@ -708,14 +716,20 @@ div.workflow-panel {
 }
 
 .workflow-select-card {
-    width: 180px;
-    height: 180px;
+    width: 200px;
+    height: 200px;
     padding: 10px;
     color: white;
     text-align: center;
-    border: 1px solid black;
+    border: 1px solid #777;
     border-radius: 1px;
     margin: 10px;
+    opacity: 0.85;
+}
+
+.workflow-select-card:hover {
+    opacity: 1.0;
+    border: 1px solid black;
 }
 
 .workflow-select-wf-circle {
@@ -732,8 +746,14 @@ div.workflow-panel {
     font-size: 40px;
 }
 
+.workflow-select-title {
+    font-size: 1.4em;
+    font-weight: 500;
+}
+
 .workflow-select-desc {
-    font-size: 11px;
+    font-size: 12px;
+    padding-top: 10px;
 }
 /* general styling for all tabs */
 .tab-subheader-sm p {
