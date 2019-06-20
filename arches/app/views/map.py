@@ -108,6 +108,7 @@ class MapLayerManagerView(MapBaseManagerView):
         map_layer.centerx = data['centerx']
         map_layer.centery = data['centery']
         map_layer.zoom = data['zoom']
+        map_layer.legend = data['legend']
         with transaction.atomic():
             map_layer.save()
             if not map_layer.isoverlay and map_layer.addtomap:

@@ -624,6 +624,15 @@ div.wf-multi-tile-card-info div {
     padding: 20px;
 }
 
+#workflow-container {
+    display: flex;
+    flex-direction: row;
+}
+
+div.workflow-content {
+    flex-grow: 2;
+}
+
 .workflow-panel-header a span {
     font-size: 16px;
     color: white;
@@ -644,9 +653,14 @@ div.wf-multi-tile-card-info div {
 
 .workflow-panel {
     background: #26476a;
-    width: 12%;
+    /* width: 12%; */
     color: white;
 }
+
+div.workflow-panel {
+    min-width: 250px;
+}
+
 .workflow-panel ul {
     /* text-decoration: none; */
     list-style-type: none;
@@ -684,6 +698,14 @@ div.wf-multi-tile-card-info div {
     margin-top: 15px;
 }
 
+.workflow-select-card-container-title {
+    font-size: 1.5em;
+    font-weight: 500;
+    padding-left: 30px;
+    margin-top: 5px;
+    margin-bottom: -15px;
+}
+
 .workflow-select-card-container {
     display: flex;
     flex-grow: inherit;
@@ -693,14 +715,20 @@ div.wf-multi-tile-card-info div {
 }
 
 .workflow-select-card {
-    width: 180px;
-    height: 180px;
+    width: 200px;
+    height: 200px;
     padding: 10px;
     color: white;
     text-align: center;
-    border: 1px solid black;
+    border: 1px solid #777;
     border-radius: 1px;
     margin: 10px;
+    opacity: 0.85;
+}
+
+.workflow-select-card:hover {
+    opacity: 1.0;
+    border: 1px solid black;
 }
 
 .workflow-select-wf-circle {
@@ -717,8 +745,14 @@ div.wf-multi-tile-card-info div {
     font-size: 40px;
 }
 
+.workflow-select-title {
+    font-size: 1.4em;
+    font-weight: 500;
+}
+
 .workflow-select-desc {
-    font-size: 11px;
+    font-size: 12px;
+    padding-top: 10px;
 }
 /* general styling for all tabs */
 .tab-subheader-sm p {

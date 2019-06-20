@@ -643,6 +643,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         if not preview and node.config["layerIcon"] != "":
             layer_icon = node.config["layerIcon"]
 
+        layer_legend = node.config["layerLegend"]
+
         if not preview and node.config["advancedStyling"]:
             try:
                 style = json.loads(node.config["advancedStyle"])
@@ -1007,6 +1009,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "name": layer_name,
             "layer_definitions": layer_def,
             "icon": layer_icon,
+            "legend": layer_legend,
             "addtomap": node.config['addToMap'],
         }
 
