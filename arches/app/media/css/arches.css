@@ -1149,6 +1149,7 @@ ul.tabbed-report-tab-list {
 }
 
 .map-card-wrapper {
+    flex: 1;
     height: 100%;
     position: relative;
 }

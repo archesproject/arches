@@ -5,6 +5,7 @@ define([
     'knockout',
     'mapbox-gl',
     'mapbox-gl-geocoder',
+    'bindings/mapbox-gl',
     'bindings/sortable'
 ], function($, _, arches, ko, mapboxgl, MapboxGeocoder) {
     var viewModel = function(params) {
