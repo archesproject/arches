@@ -145,6 +145,7 @@ define([
             parent: params.tile,
             parentCard: params.parentCard,
             expanded: ko.observable(false),
+            topCards: params.topCards,
             perms: perms,
             constraints: params.constraints || emptyConstraint,
             permsLiteral: permsLiteral,
@@ -234,7 +235,8 @@ define([
                     cardwidgets: params.cardwidgets,
                     perms: perms,
                     permsLiteral: permsLiteral,
-                    parentCard: self
+                    parentCard: self,
+                    topCards: params.topCards
                 });
             })),
             hasprovisionaledits: ko.computed(function() {
