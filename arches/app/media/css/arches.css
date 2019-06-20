@@ -20,6 +20,7 @@
 @import url(../packages/leaflet/dist/leaflet.css);
 @import url(../packages/leaflet-draw/dist/leaflet.draw.css);
 @import url(../css/tree/tree.css);
+@import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 .regular-link {
     color: #337ab7;
     text-decoration: none;
@@ -1215,7 +1216,7 @@ ul.tabbed-report-tab-list {
 }
 
 .basemap-listing:before, .overlay-listing .overlay-name:before {
-    margin-right: 16px;
+    margin-right: 4px;
     font-family: FontAwesome;
 }
 
@@ -1302,7 +1303,16 @@ ul.tabbed-report-tab-list {
 }
 .layer-listing-icon {
     display: inline-block;
-    width: 20px;
+}
+.layer-listing-icon::before {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: solid 1px rgb(216, 216, 216);
+    border-radius: 100%;
+    background-color: rgb(247, 247, 247);
 }
 .basemap-listing.active-basemap, .basemap-listing:hover, .overlay-listing.active-overlay, .overlay-listing:hover, .legend-listing .legend-name {
     color: rgb(33, 62, 95);
@@ -9867,6 +9877,10 @@ a.clear-geojson-button:hover {
 
 .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
     visibility: hidden;
+}
+
+.map-card-wrapper .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+    visibility: visible;
 }
 
 .widget-wrapper .mapboxgl-map {

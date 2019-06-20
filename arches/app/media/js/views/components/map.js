@@ -3,8 +3,10 @@ define([
     'underscore',
     'arches',
     'knockout',
+    'mapbox-gl',
+    'mapbox-gl-geocoder',
     'bindings/sortable'
-], function($, _, arches, ko) {
+], function($, _, arches, ko, mapboxgl, MapboxGeocoder) {
     var viewModel = function(params) {
         var self = this;
         var geojsonSourceFactory = function() {
@@ -21,6 +23,13 @@ define([
         var y = params.y || arches.mapDefaultY;
         var zoom = params.zoom || arches.mapDefaultZoom;
         var bounds = params.bounds || arches.hexBinBounds;
+        var sources = Object.assign({
+            "resource": geojsonSourceFactory(),
+            "search-results-hex": geojsonSourceFactory(),
+            "search-results-hashes": geojsonSourceFactory(),
+            "search-results-points": geojsonSourceFactory()
+        }, arches.mapSources, params.sources);
+        var mapLayers = params.mapLayers || arches.mapLayers;
 
         this.basemaps = [];
         this.overlays = ko.observableArray();
@@ -30,7 +39,7 @@ define([
             self.activeTab(undefined);
         };
 
-        arches.mapLayers.forEach(function(layer) {
+        mapLayers.forEach(function(layer) {
             if (!layer.isoverlay) {
                 self.basemaps.push(layer);
                 if (layer.addtomap) self.activeBasemap(layer);
@@ -47,7 +56,7 @@ define([
             }
         });
 
-        _.each(arches.mapSources, function(sourceConfig) {
+        _.each(sources, function(sourceConfig) {
             if (sourceConfig.tiles) {
                 sourceConfig.tiles.forEach(function(url, i) {
                     if (url.startsWith('/')) {
@@ -125,12 +134,7 @@ define([
         this.mapOptions = {
             style: {
                 version: 8,
-                sources: Object.assign({
-                    "resource": geojsonSourceFactory(),
-                    "search-results-hex": geojsonSourceFactory(),
-                    "search-results-hashes": geojsonSourceFactory(),
-                    "search-results-points": geojsonSourceFactory()
-                }, arches.mapSources, params.sources),
+                sources: sources,
                 sprite: arches.mapboxSprites,
                 glyphs: arches.mapboxGlyphs,
                 layers: layers(),
@@ -149,9 +153,15 @@ define([
         };
 
         this.setupMap = function(map) {
-            if (ko.isObservable(params.map)) {
-                params.map(map);
-            }
+            if (ko.isObservable(params.map)) params.map(map);
+
+            map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+            map.addControl(new MapboxGeocoder({
+                accessToken: mapboxgl.accessToken,
+                mapboxgl: mapboxgl,
+                placeholder: arches.geocoderPlaceHolder,
+                bbox: bounds
+            }), 'top-right');
 
             layers.subscribe(function(layers) {
                 var style = map.getStyle();
