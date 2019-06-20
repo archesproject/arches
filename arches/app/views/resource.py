@@ -22,6 +22,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseNotFound
 from django.http import HttpResponse
 from django.http import Http404
+from django.http import HttpResponseBadRequest, JsonResponse
+from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -44,6 +46,7 @@ from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from elasticsearch import Elasticsearch
 
 
@@ -441,6 +444,81 @@ class ResourceEditLogView(BaseManagerView):
             return render(request, view_template, context)
 
         return HttpResponseNotFound()
+
+
+@method_decorator(can_edit_resource_instance(), name='dispatch')
+class ResourceActivityStreamPageView(BaseManagerView):
+
+    def get(self, request, page=None):
+        current_page = 1
+        page_size = 100
+        if hasattr(settings, "ACTIVITY_STREAM_PAGE_SIZE"):
+            page_size = int(setting.ACTIVITY_STREAM_PAGE_SIZE)
+        st = 0
+        end = 100
+        if page is not None:
+            try:
+                current_page = int(page)
+                if current_page <= 0:
+                    current_page = 1
+                st = (current_page-1) * page_size
+                end = current_page * page_size
+            except:
+                return HttpResponseBadRequest()
+
+        totalItems = models.EditLog.objects.all().exclude(
+                resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).count()
+
+        edits = models.EditLog.objects.all().exclude(
+                resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).order_by('timestamp')[st:end]
+
+        # setting last to be same as first, changing later if there are more pages
+        uris = {"root": request.build_absolute_uri(reverse("as_stream_collection")),
+                     "this": request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': current_page})),
+                     "first": request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': 1})),
+                     "last": request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': 1})),
+                     }
+
+        if current_page > 1:
+            uris["prev"] = request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': current_page-1}))
+        if end < totalItems:
+            uris["next"] = request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': current_page+1}))
+        if totalItems > page_size:
+            uris["last"] = request.build_absolute_uri(reverse("as_stream_page",
+                                    kwargs={'page': int(totalItems/page_size)+1})),
+
+        collection = ActivityStreamCollection(uris, totalItems, 
+                                              base_uri_for_arches=request.build_absolute_uri("/").rsplit("/",1)[0])
+
+        collection_page = collection.generate_page(uris, edits)
+
+        return JsonResponse(collection_page.to_obj())
+
+
+@method_decorator(can_edit_resource_instance(), name='dispatch')
+class ResourceActivityStreamCollectionView(BaseManagerView):
+
+    def get(self, request):
+        page_size = 100
+        if hasattr(settings, "ACTIVITY_STREAM_PAGE_SIZE"):
+            page_size = int(setting.ACTIVITY_STREAM_PAGE_SIZE)
+ 
+        totalItems = models.EditLog.objects.all().exclude(
+                resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).count()
+
+        uris = {"root": request.build_absolute_uri(reverse("as_stream_collection")),
+                "first": request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': 1})),
+                "last": request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': 1})),
+                }
+
+        if totalItems > page_size:
+            uris["last"] = request.build_absolute_uri(reverse("as_stream_page",
+                                    kwargs={'page': int(totalItems/page_size)+1})),
+
+        collection = ActivityStreamCollection(uris, totalItems, 
+                                              base_uri_for_arches=request.build_absolute_uri("/").rsplit("/",1))
+
+        return JsonResponse(collection.to_obj())
 
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')

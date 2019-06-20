@@ -155,7 +155,11 @@ class ActivityStreamCollectionPage(object):
 
         return item
 
-    def to_jsonld(self, pagination=False):
+    def to_obj(self):
         export = self._boilerplate.copy()
         export["orderedItems"] = self._items
+        return export
+
+    def to_jsonld(self, pagination=False):
+        export = self.to_obj()
         return json.dumps(export)
