@@ -3,6 +3,7 @@ define([
     'views/base-manager',
     'plugin-data'
 ], function(ko, BaseManagerView, data) {
+    if (!data.config) data.config = {};
     data.config.loading = ko.observable(false);
     data.config.alert = ko.observable(null);
     return new BaseManagerView({
