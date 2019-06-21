@@ -46,6 +46,14 @@ define([
         );
     };
 
+    var getDatatypeLookup = function(params){
+        var res = {};
+        params.graphModel.get('nodes')()
+            .map(function(n){return [n.nodeid, n.datatype()];})
+            .forEach(function(v){res[v[0]] = v[1];});
+        return res;
+    };
+
     var TileViewModel = function(params) {
         var CardViewModel = require('viewmodels/card');
         var self = this;
@@ -62,6 +70,7 @@ define([
 
         this.data = koMapping.fromJS(params.tile.data);
         this.provisionaledits = ko.observable(params.tile.provisionaledits);
+        this.datatypeLookup = getDatatypeLookup(params);
 
         _.extend(this, {
             filter: filter,
