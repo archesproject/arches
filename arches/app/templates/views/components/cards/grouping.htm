@@ -68,7 +68,6 @@
             <!-- ko if: card.widgets().length > 0 -->
             {% block form_widgets %}
             <div data-bind="foreach: {data:[card.model.id].concat(groupedCards()), as: 'cardid'}">
-                <div data-bind="text: cardid"></div>
                 <!-- ko foreach: { data: $parent.cardLookup[cardid], as: 'card' } -->
                 <form class="widgets" style="margin-bottom: 20px;">
                     <div data-bind="foreach: {

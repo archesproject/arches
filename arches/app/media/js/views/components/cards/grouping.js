@@ -19,12 +19,15 @@ define([
             params.configKeys = ['groupedCards'];
             CardComponentViewModel.apply(this, [params]);
             //if (params.state !== 'editor-tree') {
-                var cards = flattenTree(params.card.topCards, []);
+                var cards = !!params.card.parent ? params.card.parent.cards : flattenTree(params.card.topCards, []);
                 this.cardLookup = {};
                 this.siblingCards = ko.observableArray();
                 _.each(cards, function(card) {
                     this.cardLookup[card.model.id] = card;
-                    if (card.parentCard === params.card.parentCard && card.cardinality === '1' && card !== params.card) {
+                    if (card.parentCard === params.card.parentCard &&
+                        card.cardinality === '1' &&
+                        card !== params.card &&
+                        card.cards().length === 0) {
                         this.siblingCards.push({'name': card.model.name(), 'id': card.model.id});
                     }
                 }, this);
