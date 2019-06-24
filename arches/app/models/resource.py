@@ -23,6 +23,7 @@ from uuid import UUID
 from django.db import transaction
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.models import EditLog
 from arches.app.models.models import TileModel
@@ -92,9 +93,9 @@ class Resource(models.ResourceInstance):
         Saves and indexes a single resource
 
         """
-        graph = models.GraphModel.objects.filter(graph_id=self.graph_id)
+        graph = models.GraphModel.objects.filter(graphid=self.graph_id)
         if graph.isactive is False:
-            raise ModelInactiveError(message)
+            raise ModelInactiveError()
         request = kwargs.pop('request', None)
         user = kwargs.pop('user', None)
         super(Resource, self).save(*args, **kwargs)
@@ -272,7 +273,7 @@ class Resource(models.ResourceInstance):
         permit_deletion = False
         graph = models.GraphModel.objects.filter(graph_id=self.graph_id)
         if graph.isactive is False:
-            raise ModelInactiveError(message)
+            raise ModelInactiveError()
         if user != {}:
             user_is_reviewer = user.groups.filter(name='Resource Reviewer').exists()
             if user_is_reviewer is False:
@@ -464,9 +465,9 @@ def is_uuid(value_to_test):
         return False
 
 class ModelInactiveError(Exception):
-    def __init__(self, message, code=None):
+    def __init__(self, code=None):
         self.title = _("Model Inactive Error")
-        self.message = message
+        self.message = _("Model status: Inactive")
         self.code = code
 
     def __str__(self):
