@@ -51,6 +51,7 @@
             'chosen': '{{ STATIC_URL }}packages/chosen-js/chosen.jquery',
             'mapbox-gl': '{{ STATIC_URL }}packages/mapbox-gl/dist/mapbox-gl',
             'mapbox-gl-draw': '{{ STATIC_URL }}packages/@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw',
+            'mapbox-gl-geocoder': '{{ STATIC_URL }}packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.min',
             'proj4': '{{ STATIC_URL }}packages/proj4/dist/proj4',
             'noUiSlider': '{{ STATIC_URL }}packages/nouislider/distribute/nouislider.min',
             'geojson-extent': '{{ STATIC_URL }}packages/@mapbox/geojson-extent/geojson-extent',
@@ -233,6 +234,7 @@
                 api_card: "{% url 'api_card' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 api_search_component_data: "{% url 'api_search_component_data' 'aaaa'%}".replace('aaaa', ''),
             },
+            geocoderPlaceHolder: "{% trans 'Find an address...' %}",
             confirmNav: {
                 title: "{% trans 'Edits pending...' %}",
                 text: "{% trans 'You currently have edits pending, are you sure you would like to proceed (and discard any pending edits)?' %}"
