@@ -51,7 +51,7 @@ class ActivityStreamCollection(object):
     def generate_page(self, page_uris, editlog_object_generator):
         page_uris['root'] = self.id
         page_uris['base_uri_for_arches'] = self.base_uri_for_arches
-        colpage = ActivityStreamCollectionPage(page_uris, perm_level=self.perm_level)
+        colpage = ActivityStreamCollectionPage(page_uris, totalItems=self.representation["totalItems"], perm_level=self.perm_level)
         for op in editlog_object_generator:
             colpage.add_item(op)
         return colpage
@@ -71,13 +71,15 @@ class ActivityStreamCollectionPage(object):
     def __init__(self, uris,  # MUST contain keys to URIs: this, root (Collection URI)
                               # SHOULD contain keys to URIs: next, prev
                        context="https://www.w3.org/ns/activitystreams",
+                       totalItems=0,
                        perm_level="full"):   # "full"|"idsonly"
         self._boilerplate = {"@context": context,
                              "type": "OrderedCollectionPage",
                              "id": uris['this']}
 
         self._boilerplate["partOf"] = {"id": uris["root"],
-                                       "type": "OrderedCollection"}
+                                       "type": "OrderedCollection",
+                                       "totalItems": totalItems}
 
         for k,v in [(x,y) for x,y in uris.items() if x in ['next', 'prev']]:
             self._boilerplate[k] = {"id": v, "type": "OrderedCollectionPage"}
