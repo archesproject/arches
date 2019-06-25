@@ -1,4 +1,4 @@
-/* eslint-env es6 */
+/* eslint-env browser, mocha */
 
 describe('Get the OrderedCollection representation', function() {
   it('Get and assert it has the correct type', function() {

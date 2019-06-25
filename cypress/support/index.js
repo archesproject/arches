@@ -1,4 +1,4 @@
-/* eslint-env es6 */
+/* eslint-env browser, mocha */
 
 // ***********************************************************
 // This example support/index.js is processed and

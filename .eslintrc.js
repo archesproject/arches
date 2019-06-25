@@ -20,6 +20,10 @@ module.exports = {
         "history": false,
         "location": false,
         "Promise": false,
-        "setTimeout": false
+        "setTimeout": false,
+        "cy": false,
+        "Cypress": false,
+        "expect": false,
+        "assert": false,
     }
 };
