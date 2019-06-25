@@ -1,8 +1,9 @@
 define([
     'knockout',
     'viewmodels/card-component',
+    'viewmodels/alert',
     'chosen'
-], function(ko, CardComponentViewModel) {
+], function(ko, CardComponentViewModel, AlertViewModel) {
     
     var flattenTree = function(parents, flatList) {
         _.each(ko.unwrap(parents), function(parent) {
@@ -69,24 +70,29 @@ define([
 
 
             this.saveTiles = function(){
-                console.log('in saveTiles');
                 var self = this;
-                var errors = [];
-                var tile = this.groupedTiles().pop();
+                var errors = ko.observableArray().extend({ rateLimit: 250 });
+                var tile = this.groupedTiles()[0];
                 tile.save(function(response) {
                     errors.push(response);
-                        //params.form.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message[0], response.responseJSON.message[1], null, function(){}));
                 }, function(response){
                     var resourceInstanceId = response.resourceinstance_id;
-                    _.each(self.groupedTiles(), function(tile) {
+                    _.each(_.rest(self.groupedTiles()), function(tile) {
                         tile.resourceinstance_id = resourceInstanceId;
                         tile.save(function(response) {
                             errors.push(response);
-                            //params.form.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message[0], response.responseJSON.message[1], null, function(){}));
                         });
                     }, self);
                 });
-                //errors.forEach
+                errors.subscribe(function(errors){
+                    var title = [];
+                    var message = [];
+                    errors.forEach(function(response) {
+                        title.push(response.responseJSON.message[0]);
+                        message.push(response.responseJSON.message[1]);
+                    })
+                    params.form.alert(new AlertViewModel('ep-alert-red', title.join(), message.join(), null, function(){}));
+                })
             };
 
             this.deleteTiles = function(){
