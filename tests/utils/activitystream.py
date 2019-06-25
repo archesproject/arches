@@ -40,14 +40,17 @@ COL_NS = Namespace(ARCHES_NS["history/"])
 
 base_uris = {"root": COL_NS,
              "first": COL_NS["1"],
-             "last": COL_NS["20"],}
+             "last": COL_NS["20"],
+             }
 
 page_1_uris = {"next": COL_NS["4"],
                "prev": COL_NS["2"],
                "root": COL_NS,
-               "this": COL_NS["3"],}
+               "this": COL_NS["3"],
+               }
 
 totalItems = 1000
+
 
 class editlog_fuzzer(object):
     def __init__(self):
@@ -56,17 +59,18 @@ class editlog_fuzzer(object):
         self.resources = [str(uuid4())]
         self.classids = cycle([str(uuid4()) for x in range(3)])
         self.users = cycle([{"userid": 1,
-                       "user_username": "admin",
-                       "user_firstname": "admin",
-                       "user_lastname": "admin"},
-                       {"userid": 2,
-                       "user_username": "benosteen",
-                       "user_firstname": "Ben",
-                       "user_lastname": "O'Steen"},
-                       {"userid": 3,
-                       "user_username": "rando",
-                       "user_firstname": "ran",
-                       "user_lastname": "do"},])
+                             "user_username": "admin",
+                             "user_firstname": "admin",
+                             "user_lastname": "admin"},
+                            {"userid": 2,
+                             "user_username": "benosteen",
+                             "user_firstname": "Ben",
+                             "user_lastname": "O'Steen"},
+                            {"userid": 3,
+                             "user_username": "rando",
+                             "user_firstname": "ran",
+                             "user_lastname": "do"},
+                           ])
         self.gm = GraphModel.objects.get(pk="fd0a5907-e11b-11e8-821b-a4d18cec433a")
     def generate_event(self):
         e_type = next(self.types)
@@ -99,6 +103,7 @@ class editlog_fuzzer(object):
         for x in range(number_of):
             yield self.generate_event()
 
+
 class ActivityStreamCollectionTests(ArchesTestCase):
     """
     Unit tests for the `to_rdf` method on Datatype classes.
@@ -122,7 +127,7 @@ class ActivityStreamCollectionTests(ArchesTestCase):
 
     def setUp(self):
         # for RDF/JSON-LD export tests
-        self.C = ActivityStreamCollection(base_uris, totalItems, 
+        self.C = ActivityStreamCollection(base_uris, totalItems,
                                           base_uri_for_arches="https://arches.getty.edu")
         self.EF = editlog_fuzzer()
 
