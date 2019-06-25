@@ -1,4 +1,4 @@
-/* eslint-env node */
+/* eslint-env es6 */
 
 describe('Get the OrderedCollection representation', function() {
   it('Get and assert it has the correct type', function() {

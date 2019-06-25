@@ -1,4 +1,4 @@
-/* eslint-env node */
+/* eslint-env es6 */
 
 // ***********************************************
 // This example commands.js shows you how to
