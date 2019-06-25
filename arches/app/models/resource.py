@@ -272,7 +272,7 @@ class Resource(models.ResourceInstance):
         """
 
         permit_deletion = False
-        graph = models.GraphModel.objects.get(graph_id=self.graph_id)
+        graph = models.GraphModel.objects.get(graphid=self.graph_id)
         if graph.isactive is False:
             message = _('This model is not yet active; unable to delete.')
             raise ModelInactiveError(message)
