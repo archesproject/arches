@@ -70,8 +70,9 @@ class editlog_fuzzer(object):
                              "user_username": "rando",
                              "user_firstname": "ran",
                              "user_lastname": "do"},
-                           ])
+                            ])
         self.gm = GraphModel.objects.get(pk="fd0a5907-e11b-11e8-821b-a4d18cec433a")
+
     def generate_event(self):
         e_type = next(self.types)
         user = next(self.users)
@@ -82,7 +83,7 @@ class editlog_fuzzer(object):
         if e_type == 'create':
             self.resources.append(str(uuid4()))
             r = ResourceInstance(resourceinstanceid=self.resources[-1],
-                         graph=self.gm)
+                                 graph=self.gm)
             r.save()
         e.resourceinstanceid = self.resources[-1]
         e.nodegroupid = str(uuid4())
