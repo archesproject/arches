@@ -73,15 +73,16 @@
                     <div data-bind="foreach: {
                             data:card.widgets, as: 'widget'
                         }">
+                        <div data-bind="text: $parent.model.name"></div>
                         <div data-bind='component: {
                             name: self.form.widgetLookup[widget.widget_id()].name,
                             params: {
-                                formData: self.tile.formData,
-                                tile: self.tile,
+                                formData: $parent.tiles()[0].formData,
+                                tile: $parent.tiles()[0],
                                 form: self.form,
                                 config: widget.configJSON,
                                 label: widget.label(),
-                                value: self.tile.data[widget.node_id()],
+                                value: $parent.tiles()[0].data[widget.node_id()],
                                 node: self.form.nodeLookup[widget.node_id()],
                                 expanded: self.expanded,
                                 graph: self.form.graph,
@@ -149,18 +150,18 @@
             {% block form_buttons %}
             <div class="install-buttons">
                 <!-- ko if: tile.tileid && self.form.deleteTile -->
-                <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: function () { self.form.deleteTile(tile); }, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }">{% trans 'Delete this record' %}</button>
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: deleteTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }">{% trans 'Delete this record' %}</button>
                 <!-- /ko -->
-                <!-- ko if: tile.dirty() -->
-                <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
-                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">{% trans 'Cancel edit' %}</button>
-                <!-- /ko -->
+                <!-- ko if: dirty() -->
+                    <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
+                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: resetTiles">{% trans 'Cancel edit' %}</button>
+                    <!-- /ko -->
                     <!-- ko if: tile.tileid -->
-                    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: function () { self.form.saveTile(tile); }, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">{% trans 'Save edit' %}</button>
+                        <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: saveTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">{% trans 'Save edit' %}</button>
                     <!-- /ko -->
                 <!-- /ko -->
                 <!-- ko if: !tile.tileid -->
-                <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: function () { self.form.saveTile(tile); }, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">{% trans 'Add'  %}</button>
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: saveTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">{% trans 'Add'  %}</button>
                 <!-- /ko -->
             </div>
             {% endblock form_buttons %}
