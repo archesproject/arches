@@ -95,13 +95,8 @@ class ActivityStreamCollectionPage(object):
 
     def startIndex(self, startIndex=None):
         if startIndex is not None:
-            self._boilerplate["startIndex": startIndex]
-        return self._boilerplate["startIndex": startIndex]
-
-    def total(self, totalItems=None):
-        if totalItems is not None:
-            self._boilerplate["totalItems": totalItems]
-        return self._boilerplate["totalItems": totalItems]
+            self._boilerplate["startIndex"] = startIndex
+        return self._boilerplate["startIndex"]
 
     def add_item(self, editlog_object, perm_level="full"):
         # add a JSON-LD obj to a list of the Activities
@@ -110,11 +105,15 @@ class ActivityStreamCollectionPage(object):
     def editlog_to_collection_item(self, editlog_object, perm_level="full"):
         def add_actor(editlog_object, perm_level = perm_level):
             actor = {"type": "Person", 
-                     "url": "{0}/{1}".format(self.base_uri_for_arches + reverse("user_profile_manager"),
+                     "id": "{0}/{1}".format(self.base_uri_for_arches + reverse("user_profile_manager"),
                                              editlog_object.userid)}
             if perm_level == "full":
                 actor["name"] = "{0}, {1}".format(editlog_object.user_lastname, editlog_object.user_firstname)
+                if actor["name"] == ", ":
+                    del actor["name"]
                 actor["tag"] = editlog_object.user_username
+                if actor["tag"] == "null":
+                    del actor["tag"]
             return actor
 
         def add_resource(editlog_object, perm_level = perm_level):

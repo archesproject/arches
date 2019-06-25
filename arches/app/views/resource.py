@@ -491,6 +491,7 @@ class ResourceActivityStreamPageView(BaseManagerView):
                                               base_uri_for_arches=request.build_absolute_uri("/").rsplit("/",1)[0])
 
         collection_page = collection.generate_page(uris, edits)
+        collection_page.startIndex((current_page-1)*page_size)
 
         return JsonResponse(collection_page.to_obj())
 
