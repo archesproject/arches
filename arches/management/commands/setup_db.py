@@ -142,7 +142,7 @@ CREATE DATABASE {}
         try:
             cursor.execute(create_query)
         except psycopg2.ProgrammingError as e:
-            print e.pgerror
+            print(e.pgerror)
             if "template database" in e.pgerror:
                 msg = """It looks like your PostGIS template database is not correctly referenced in
 settings.py/settings_local.py, or it has not yet been created.
@@ -152,7 +152,7 @@ To create it, use:
     psql -U {0} -c "CREATE DATABASE {1};"
     psql -U {0} -d {1} -c "CREATE EXTENSION postgis;"
 """.format(arches_db['USER'], arches_db['POSTGIS_TEMPLATE'])
-                print msg
+                print(msg)
             exit()
 
     def setup_db(self):
