@@ -152,6 +152,9 @@ class Command(BaseCommand):
         parser.add_argument('-y', '--yes', action='store_true', dest='yes',
             help='used to force a yes answer to any user input "continue? y/n" prompt')
 
+        parser.add_argument('--use_multiprocessing', action='store_true',
+                            help='enables multiprocessing during data import')
+
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
         package_name = settings.PACKAGE_NAME
@@ -196,7 +199,10 @@ class Command(BaseCommand):
             self.export_graphs(options['dest_dir'], options['graphs'])
 
         if options['operation'] == 'import_business_data':
-            self.import_business_data(options['source'], options['config_file'], options['overwrite'], options['bulk_load'], options['create_concepts'])
+            self.import_business_data(options['source'], options['config_file'], options['overwrite'],
+                                      options['bulk_load'], options['create_concepts'],
+                                      use_multiprocessing=options['use_multiprocessing'],
+                                      force=options['yes'])
 
         if options['operation'] == 'import_node_value_data':
             self.import_node_value_data(options['source'], options['overwrite'])
@@ -503,6 +509,7 @@ class Command(BaseCommand):
                     business_data.append(os.path.join(package_dir, 'business_data', f))
             else:
                 business_data += glob.glob(os.path.join(package_dir, 'business_data','*.json'))
+                business_data += glob.glob(os.path.join(package_dir, 'business_data','*.jsonl'))
                 business_data += glob.glob(os.path.join(package_dir, 'business_data','*.csv'))
 
             relations = glob.glob(os.path.join(package_dir, 'business_data', 'relations', '*.relations'))
@@ -782,10 +789,31 @@ class Command(BaseCommand):
         rdf = skos.read_file(data_source)
         ret = skos.save_concepts_from_skos(rdf, overwrite, stage)
 
-    def import_business_data(self, data_source, config_file=None, overwrite=None, bulk_load=False, create_concepts=False):
+    def import_business_data(self, data_source, config_file=None, overwrite=None,
+                             bulk_load=False, create_concepts=False, use_multiprocessing=False,
+                             force=False):
         """
         Imports business data from all formats. A config file (mapping file) is required for .csv format.
         """
+
+        # messages about experimental multiprocessing and JSONL support.
+        if data_source.endswith(".jsonl"):
+            print("""
+WARNING: Support for loading JSONL files is still experimental. Be aware that
+the format of logging and console messages has not been updated.""")
+            if use_multiprocessing is True:
+                print("""
+WARNING: Support for multiprocessing files is still experimental. While using
+multiprocessing to import resources, you will not be able to use ctrl+c (etc.)
+to cancel the operation. You will need to manually kill all of the processes
+with or just close the terminal. Also, be aware that print statements
+will be very jumbled.""")
+                if not force:
+                    confirm = raw_input("continue? Y/n ")
+                    if len(confirm) > 0 and not confirm.lower().startswith("y"):
+                        exit()
+        if use_multiprocessing is True and not data_source.endswith(".jsonl"):
+            print("Multiprocessing is only supported with JSONL import files.")
 
         if overwrite == '':
             utils.print_message('No overwrite option indicated. Please rerun command with \'-ow\' parameter.')
@@ -812,7 +840,9 @@ class Command(BaseCommand):
                 path = utils.get_valid_path(source)
                 if path is not None:
                     print 'Importing {0}. . .'.format(path)
-                    BusinessDataImporter(path, config_file).import_business_data(overwrite=overwrite, bulk=bulk_load, create_concepts=create_concepts, create_collections=create_collections)
+                    BusinessDataImporter(path, config_file).import_business_data(overwrite=overwrite,
+                            bulk=bulk_load, create_concepts=create_concepts,
+                            create_collections=create_collections, use_multiprocessing=use_multiprocessing)
                 else:
                     utils.print_message('No file found at indicated location: {0}'.format(source))
                     sys.exit()
