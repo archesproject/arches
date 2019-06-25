@@ -10,4 +10,4 @@ module.exports = {
         "assert": false,
         "it": false,
     }
-}
+};
