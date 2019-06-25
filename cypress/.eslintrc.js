@@ -8,5 +8,6 @@ module.exports = {
         "Cypress": false,
         "expect": false,
         "assert": false,
+        "it": false,
     }
 }

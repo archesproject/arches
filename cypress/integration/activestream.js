@@ -35,7 +35,7 @@ describe('Check the total number of items exists', function() {
     it('in the OrderedCollection', function() {
         cy.login();
         cy.request("/history").then((response) => {
-                expect(response.body.totalItems).to.exist;
+            expect(response.body.totalItems).to.exist;
         });
     });
 });
