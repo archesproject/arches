@@ -36,7 +36,8 @@ class ActivityStreamCollection(object):
                                "first": {"id": uris["first"],
                                          "type": "OrderedCollectionPage"},
                                "last": {"id": uris["last"],
-                                         "type": "OrderedCollectionPage"},}
+                                        "type": "OrderedCollectionPage"}
+                               }
         self.uris = uris
         self.id = uris["root"]
         self.perm_level = perm_level
@@ -51,7 +52,8 @@ class ActivityStreamCollection(object):
     def generate_page(self, page_uris, editlog_object_generator):
         page_uris['root'] = self.id
         page_uris['base_uri_for_arches'] = self.base_uri_for_arches
-        colpage = ActivityStreamCollectionPage(page_uris, totalItems=self.representation["totalItems"], perm_level=self.perm_level)
+        colpage = ActivityStreamCollectionPage(page_uris, totalItems=self.representation["totalItems"],
+                                               perm_level=self.perm_level)
         for op in editlog_object_generator:
             colpage.add_item(op)
         return colpage
@@ -70,9 +72,9 @@ class ActivityStreamCollectionPage(object):
 
     def __init__(self, uris,  # MUST contain keys to URIs: this, root (Collection URI)
                               # SHOULD contain keys to URIs: next, prev
-                       context="https://www.w3.org/ns/activitystreams",
-                       totalItems=0,
-                       perm_level="full"):   # "full"|"idsonly"
+                 context="https://www.w3.org/ns/activitystreams",
+                 totalItems=0,
+                 perm_level="full"):   # "full"|"idsonly"
         self._boilerplate = {"@context": context,
                              "type": "OrderedCollectionPage",
                              "id": uris['this']}
@@ -81,7 +83,7 @@ class ActivityStreamCollectionPage(object):
                                        "type": "OrderedCollection",
                                        "totalItems": totalItems}
 
-        for k,v in [(x,y) for x,y in uris.items() if x in ['next', 'prev']]:
+        for k, v in [(x, y) for x, y in uris.items() if x in ['next', 'prev']]:
             self._boilerplate[k] = {"id": v, "type": "OrderedCollectionPage"}
 
         self._items = []
@@ -103,10 +105,10 @@ class ActivityStreamCollectionPage(object):
         self._items.append(self.editlog_to_collection_item(editlog_object, self.perm_level))
 
     def editlog_to_collection_item(self, editlog_object, perm_level="full"):
-        def add_actor(editlog_object, perm_level = perm_level):
-            actor = {"type": "Person", 
+        def add_actor(editlog_object, perm_level=perm_level):
+            actor = {"type": "Person",
                      "id": "{0}/{1}".format(self.base_uri_for_arches + reverse("user_profile_manager"),
-                                             editlog_object.userid)}
+                                            editlog_object.userid)}
             if perm_level == "full":
                 actor["name"] = "{0}, {1}".format(editlog_object.user_lastname, editlog_object.user_firstname)
                 if actor["name"] == ", ":
@@ -116,7 +118,7 @@ class ActivityStreamCollectionPage(object):
                     del actor["tag"]
             return actor
 
-        def add_resource(editlog_object, perm_level = perm_level):
+        def add_resource(editlog_object, perm_level=perm_level):
             r = Resource.objects.get(pk=editlog_object.resourceinstanceid)
             rclass = r.get_root_ontology()
             # FIXME: Get real type if it exists, and potentially, add context
@@ -129,11 +131,11 @@ class ActivityStreamCollectionPage(object):
 
             return obj
 
-        def add_tile(editlog_object, perm_level = perm_level):
+        def add_tile(editlog_object, perm_level=perm_level):
             obj = {"type": "Object"}  # Tile?
             obj['url'] = "{0}node/{1}/tile/{2}".format(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT,
-                                                      editlog_object.nodegroupid,
-                                                      editlog_object.tileinstanceid)
+                                                       editlog_object.nodegroupid,
+                                                       editlog_object.tileinstanceid)
             return obj
 
         item = {"type": self.type_mapping.get(editlog_object.edittype, "Activity")}
@@ -151,7 +153,7 @@ class ActivityStreamCollectionPage(object):
             # If a Tile associated with a resource is altered, bubble that
             # change up to be about the Resource, and mark it as an 'Update'
             item["actor"] = add_actor(editlog_object)
-           #item["object"] = add_tile(editlog_object)
+            # item["object"] = add_tile(editlog_object)
             item["object"] = add_resource(editlog_object)
 
         return item

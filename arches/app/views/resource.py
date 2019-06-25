@@ -463,7 +463,7 @@ class ResourceActivityStreamPageView(BaseManagerView):
                     current_page = 1
                 st = (current_page-1) * page_size
                 end = current_page * page_size
-            except:
+            except (ValueError, TypeError) as e:
                 return HttpResponseBadRequest()
 
         totalItems = models.EditLog.objects.all().exclude(
@@ -474,10 +474,10 @@ class ResourceActivityStreamPageView(BaseManagerView):
 
         # setting last to be same as first, changing later if there are more pages
         uris = {"root": request.build_absolute_uri(reverse("as_stream_collection")),
-                     "this": request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': current_page})),
-                     "first": request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': 1})),
-                     "last": request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': 1})),
-                     }
+                "this": request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': current_page})),
+                "first": request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': 1})),
+                "last": request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': 1})),
+                }
 
         if current_page > 1:
             uris["prev"] = request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': current_page-1}))
@@ -485,10 +485,10 @@ class ResourceActivityStreamPageView(BaseManagerView):
             uris["next"] = request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': current_page+1}))
         if totalItems > page_size:
             uris["last"] = request.build_absolute_uri(reverse("as_stream_page",
-                                    kwargs={'page': int(totalItems/page_size)+1})),
+                                                              kwargs={'page': int(totalItems/page_size)+1})),
 
-        collection = ActivityStreamCollection(uris, totalItems, 
-                                              base_uri_for_arches=request.build_absolute_uri("/").rsplit("/",1)[0])
+        collection = ActivityStreamCollection(uris, totalItems,
+                                              base_uri_for_arches=request.build_absolute_uri("/").rsplit("/", 1)[0])
 
         collection_page = collection.generate_page(uris, edits)
         collection_page.startIndex((current_page-1)*page_size)
@@ -503,7 +503,7 @@ class ResourceActivityStreamCollectionView(BaseManagerView):
         page_size = 100
         if hasattr(settings, "ACTIVITY_STREAM_PAGE_SIZE"):
             page_size = int(setting.ACTIVITY_STREAM_PAGE_SIZE)
- 
+
         totalItems = models.EditLog.objects.all().exclude(
                 resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).count()
 
@@ -514,10 +514,10 @@ class ResourceActivityStreamCollectionView(BaseManagerView):
 
         if totalItems > page_size:
             uris["last"] = request.build_absolute_uri(reverse("as_stream_page",
-                                    kwargs={'page': int(totalItems/page_size)+1})),
+                                                              kwargs={'page': int(totalItems/page_size)+1}))
 
-        collection = ActivityStreamCollection(uris, totalItems, 
-                                              base_uri_for_arches=request.build_absolute_uri("/").rsplit("/",1))
+        collection = ActivityStreamCollection(uris, totalItems,
+                                              base_uri_for_arches=request.build_absolute_uri("/").rsplit("/", 1))
 
         return JsonResponse(collection.to_obj())
 
