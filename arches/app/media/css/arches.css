@@ -1199,6 +1199,7 @@ ul.tabbed-report-tab-list {
     background: white;
     border-left: 1px solid rgb(216, 216, 216);
     padding: 16px;
+    overflow-y: scroll;
 }
 
 .map-card-sidepanel-header {
