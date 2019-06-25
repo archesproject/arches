@@ -96,7 +96,6 @@ class Resource(models.ResourceInstance):
         graph = models.GraphModel.objects.get(graphid=self.graph_id)
         if graph.isactive is False:
             message = _('This model is not yet active; unable to save.')
-            print "...graph.isactive is False, now raising exception..."
             raise ModelInactiveError(message)
         request = kwargs.pop('request', None)
         user = kwargs.pop('user', None)
