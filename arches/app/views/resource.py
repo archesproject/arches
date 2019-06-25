@@ -255,11 +255,6 @@ class ResourceEditorView(MapBaseManagerView):
             resource_instance.graph_id = graphid
 
         if resourceid is not None:
-
-            if request.is_ajax() and request.GET.get('search') == 'true':
-                html = render_to_string('views/search/search-base-manager.htm', {}, request)
-                return HttpResponse(html)
-
             resource_graphs = models.GraphModel.objects.exclude(
                 pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
             graph = Graph.objects.get(graphid=graphid)

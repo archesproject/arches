@@ -2,8 +2,6 @@
 virtualenv/ENV*
 tests/elasticsearch
 tests/logs
-arches/db/install/install_db.sql
-arches/db/install/truncate_db.sql
 arches/install/elasticsearch-*.zip
 build
 arches.egg*
@@ -35,3 +33,4 @@ jsdoc.json
 migrate_graphs.py
 djcp.sh
 .vscode
+.DS_Store

@@ -20,6 +20,11 @@ import os
 import inspect
 
 
+try:
+    from corsheaders.defaults import default_headers
+except ImportError:  # unable to import corsheaders prior to installing requirements.txt in setup.py
+    pass
+
 #########################################
 ###          STATIC SETTINGS          ###
 #########################################
@@ -39,6 +44,9 @@ DATABASES = {
         'POSTGIS_TEMPLATE': 'template_postgis_20',
     }
 }
+
+PG_SUPERUSER = ""
+PG_SUPERUSER_PW = ""
 
 COUCHDB_URL = 'http://admin:admin@localhost:5984' # defaults to localhost:5984
 
@@ -184,7 +192,10 @@ LOCALE_PATHS = (
 USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
-MEDIA_ROOT =  os.path.join(ROOT_DIR)
+MEDIA_ROOT = os.path.join(ROOT_DIR)
+
+# Sets default max upload size to 15MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 
 # URL that handles the media served from MEDIA_ROOT, used for managing stored files.
 # It must end in a slash if set to a non-empty value.
@@ -303,9 +314,9 @@ MIDDLEWARE = [
     #'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'arches.app.utils.middleware.ModifyAuthorizationHeader',
     'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    #'arches.app.utils.middleware.JWTAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'arches.app.utils.middleware.SetAnonymousUser',
@@ -316,6 +327,13 @@ ROOT_URLCONF = 'arches.urls'
 WSGI_APPLICATION = 'arches.wsgi.application'
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+try:
+    CORS_ALLOW_HEADERS = list(default_headers) + [
+        'x-authorization',
+    ]
+except Exception as e:
+    print(e)
 
 LOGGING = {
     'version': 1,
@@ -447,6 +465,7 @@ SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
 RELATED_RESOURCES_PER_PAGE = 15
 RELATED_RESOURCES_EXPORT_LIMIT = 10000
 SEARCH_DROPDOWN_LENGTH = 100
+SEARCH_TERM_SENSITIVITY = 3 # a lower number will give more "Fuzzy" matches, recomend between 0-4, see "prefix_length" at https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl-fuzzy-query.html#_parameters_7
 WORDS_PER_SEARCH_TERM = 10 # set to None for unlimited number of words allowed for search terms
 
 ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
@@ -485,6 +504,8 @@ BUSINESS_DATA_FILES = (
 
 DATATYPE_LOCATIONS = ['arches.app.datatypes',]
 FUNCTION_LOCATIONS = ['arches.app.functions',]
+SEARCH_COMPONENT_LOCATIONS = ['arches.app.search.components',]
+
 # If you are manually managing your resource tile cache, you may want to "seed"
 # the cache (or prerender some tiles) for low zoom levels.  You can do this by
 # running:

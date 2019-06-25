@@ -1,7 +1,6 @@
 import uuid
 import json
 import decimal
-import importlib
 import distutils
 import base64
 import re
@@ -13,6 +12,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.date_utils import ExtendedDateFormat
+from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.core.cache import cache
@@ -38,6 +38,7 @@ cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
 
+
 class DataTypeFactory(object):
     def __init__(self):
         self.datatypes = {datatype.datatype:datatype for datatype in models.DDataType.objects.all()}
@@ -48,22 +49,8 @@ class DataTypeFactory(object):
         try:
             datatype_instance = self.datatype_instances[d_datatype.classname]
         except:
-            mod_path = d_datatype.modulename.replace('.py', '')
-            module = None
-            import_success = False
-            import_error = None
-            for datatype_dir in settings.DATATYPE_LOCATIONS:
-                try:
-                    module = importlib.import_module(datatype_dir + '.%s' % mod_path)
-                    import_success = True
-                except ImportError as e:
-                    import_error = e
-                if module != None:
-                    break
-            if import_success == False:
-                print 'Failed to import ' + mod_path
-                print import_error
-            datatype_instance = getattr(module, d_datatype.classname)(d_datatype)
+            class_method = get_class_from_modulename(d_datatype.modulename, d_datatype.classname, settings.DATATYPE_LOCATIONS)
+            datatype_instance = class_method(d_datatype)
             self.datatype_instances[d_datatype.classname] = datatype_instance
         return datatype_instance
 
@@ -311,7 +298,7 @@ class DateDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value['val'] != '':
+            if value['val'] != '' and value['val'] is not None:
                 date_value = datetime.strptime(value['val'], '%Y-%m-%d').isoformat()
                 if value['op'] != 'eq':
                     operators = {'gte': None, 'lte': None, 'lt': None, 'gt': None}
@@ -655,6 +642,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         layer_icon = node.graph.iconclass
         if not preview and node.config["layerIcon"] != "":
             layer_icon = node.config["layerIcon"]
+
+        layer_legend = node.config["layerLegend"]
 
         if not preview and node.config["advancedStyling"]:
             try:
@@ -1020,6 +1009,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "name": layer_name,
             "layer_definitions": layer_def,
             "icon": layer_icon,
+            "legend": layer_legend,
             "addtomap": node.config['addToMap'],
         }
 
@@ -1033,12 +1023,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
 class FileListDataType(BaseDataType):
 
-    def get_previously_saved_data(self, user_is_reviewer, user_id, previously_saved_tile):
-        if user_is_reviewer is False and previously_saved_tile.provisionaledits is not None and user_id in previously_saved_tile.provisionaledits:
-            previously_saved_data = previously_saved_tile.provisionaledits[user_id]['value']
+    def get_tile_data(self, user_is_reviewer, user_id, tile):
+        if user_is_reviewer is False and tile.provisionaledits is not None and user_id in tile.provisionaledits:
+            data = tile.provisionaledits[user_id]['value']
         else:
-            previously_saved_data = previously_saved_tile.data
-        return previously_saved_data
+            data = tile.data
+        return data
 
     def handle_request(self, current_tile, request, node):
         previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
@@ -1046,9 +1036,9 @@ class FileListDataType(BaseDataType):
         if hasattr(request.user, 'userprofile') is not True:
             models.UserProfile.objects.create(user=request.user)
         user_is_reviewer = request.user.userprofile.is_reviewer()
-        current_tile_data = current_tile.data
+        current_tile_data = self.get_tile_data(user_is_reviewer, str(user.id), current_tile)
         if previously_saved_tile.count() == 1:
-            previously_saved_tile_data = self.get_previously_saved_data(user_is_reviewer, str(user.id), previously_saved_tile[0])
+            previously_saved_tile_data = self.get_tile_data(user_is_reviewer, str(user.id), previously_saved_tile[0])
             if previously_saved_tile_data[str(node.pk)] is not None:
                 for previously_saved_file in previously_saved_tile_data[str(node.pk)]:
                     previously_saved_file_has_been_removed = True
@@ -1085,7 +1075,10 @@ class FileListDataType(BaseDataType):
                     # importing proxy model errors, so cannot use super on the proxy model to save
                     if previously_saved_tile.count() == 1:
                         tile_to_update = previously_saved_tile[0]
-                        tile_to_update.data[str(node.pk)] = updated_file_records
+                        if user_is_reviewer:
+                            tile_to_update.data[str(node.pk)] = updated_file_records
+                        else:
+                            tile_to_update.provisionaledits[str(user.id)]['value'][str(node.pk)] = updated_file_records
                         tile_to_update.save()
 
     def transform_import_values(self, value, nodeid):
@@ -1461,13 +1454,14 @@ class ResourceInstanceDataType(BaseDataType):
 
     def validate(self, value, row_number=None, source=''):
         errors = []
-        id_list = self.get_id_list(value)
 
-        for resourceid in id_list:
-            try:
-                models.ResourceInstance.objects.get(pk=resourceid)
-            except:
-                errors.append({'type': 'WARNING', 'message': 'The resource id: {0} does not exist in the system. The data for this card will be available in the system once resource {0} is loaded.'.format(resourceid)})
+        if value is not None:
+            id_list = self.get_id_list(value)
+            for resourceid in id_list:
+                try:
+                    models.ResourceInstance.objects.get(pk=resourceid)
+                except:
+                    errors.append({'type': 'WARNING', 'message': 'The resource id: {0} does not exist in the system. The data for this card will be available in the system once resource {0} is loaded.'.format(resourceid)})
         return errors
 
     def get_display_value(self, tile, node):

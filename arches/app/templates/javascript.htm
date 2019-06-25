@@ -51,6 +51,7 @@
             'chosen': '{{ STATIC_URL }}packages/chosen-js/chosen.jquery',
             'mapbox-gl': '{{ STATIC_URL }}packages/mapbox-gl/dist/mapbox-gl',
             'mapbox-gl-draw': '{{ STATIC_URL }}packages/@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw',
+            'mapbox-gl-geocoder': '{{ STATIC_URL }}packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.min',
             'proj4': '{{ STATIC_URL }}packages/proj4/dist/proj4',
             'noUiSlider': '{{ STATIC_URL }}packages/nouislider/distribute/nouislider.min',
             'geojson-extent': '{{ STATIC_URL }}packages/@mapbox/geojson-extent/geojson-extent',
@@ -230,8 +231,10 @@
                 plugin: function(pluginid){return "{% url 'plugins' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', pluginid)},
                 collector_manager: "{% url 'collector_manager' %}",
                 help_template: "{% url 'help_templates' %}",
-                api_card: "{% url 'api_card' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '')
+                api_card: "{% url 'api_card' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                api_search_component_data: "{% url 'api_search_component_data' 'aaaa'%}".replace('aaaa', ''),
             },
+            geocoderPlaceHolder: "{% trans 'Find an address...' %}",
             confirmNav: {
                 title: "{% trans 'Edits pending...' %}",
                 text: "{% trans 'You currently have edits pending, are you sure you would like to proceed (and discard any pending edits)?' %}"
@@ -298,6 +301,7 @@
                 'layer_definitions': {{ map_layer.layer_json }},
                 'isoverlay': {{ map_layer.isoverlay|lower }},
                 'icon': '{{ map_layer.icon }}',
+                'legend': '{{ map_layer.legend | default_if_none:"" | escapejs  }}',
                 'activated': {{ map_layer.activated|lower }},
                 'addtomap': {{ map_layer.addtomap|lower }},
                 'is_resource_layer': false,
@@ -310,6 +314,7 @@
                 'layer_definitions': {{ resource_map_layer.layer_definitions }},
                 'isoverlay': true,
                 'icon': '{{ resource_map_layer.icon }}',
+                'legend': '{{ resource_map_layer.legend | escapejs  }}',
                 'activated': true,
                 'addtomap': {{ resource_map_layer.addtomap|lower }},
                 'is_resource_layer': true
@@ -413,6 +418,12 @@
 
     define('geoms', function () {
         {% autoescape off %}return {{geoms}};{% endautoescape %}
+    });
+
+    define('search-components', [{% for component in search_components %}'{{ component.componentpath }}',{% endfor %}], function () {
+            return {% autoescape off %}[{% for component in search_components %}
+                {{component.toJSON}},
+            {% endfor %}]{% endautoescape %};
     });
 
     define('leaflet-draw-local', [
