@@ -9,5 +9,6 @@ module.exports = {
         "expect": false,
         "assert": false,
         "it": false,
+        "describe": false
     }
 };
