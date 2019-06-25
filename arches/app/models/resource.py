@@ -466,6 +466,7 @@ def is_uuid(value_to_test):
     except:
         return False
 
+
 class ModelInactiveError(Exception):
     def __init__(self, message, code=None):
         self.title = _("Model Inactive Error")

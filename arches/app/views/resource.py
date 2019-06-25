@@ -222,7 +222,7 @@ class NewResourceEditorView(MapBaseManagerView):
     def delete(self, request, resourceid=None):
         if resourceid is not None:
             ret = Resource.objects.get(pk=resourceid)
-            try: 
+            try:
                 deleted = ret.delete(user=request.user)
             except ModelInactiveError as e:
                 message = _('Unable to delete. Please verify the model status is active')
