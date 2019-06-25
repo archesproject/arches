@@ -237,6 +237,7 @@ define([
         },
         saveTile: function(tile, callback) {
             tile.save(function(response) {
+                console.log(response);
                 vm.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message[0], response.responseJSON.message[1], null, function(){}));
             }, callback);
         },

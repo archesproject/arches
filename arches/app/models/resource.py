@@ -93,9 +93,11 @@ class Resource(models.ResourceInstance):
         Saves and indexes a single resource
 
         """
-        graph = models.GraphModel.objects.filter(graphid=self.graph_id)
+        graph = models.GraphModel.objects.get(graphid=self.graph_id)
         if graph.isactive is False:
-            raise ModelInactiveError()
+            message = _('This model is not yet active; unable to save.')
+            print "...graph.isactive is False, now raising exception..."
+            raise ModelInactiveError(message)
         request = kwargs.pop('request', None)
         user = kwargs.pop('user', None)
         super(Resource, self).save(*args, **kwargs)
@@ -271,9 +273,10 @@ class Resource(models.ResourceInstance):
         """
 
         permit_deletion = False
-        graph = models.GraphModel.objects.filter(graph_id=self.graph_id)
+        graph = models.GraphModel.objects.get(graph_id=self.graph_id)
         if graph.isactive is False:
-            raise ModelInactiveError()
+            message = _('This model is not yet active; unable to delete.')
+            raise ModelInactiveError(message)
         if user != {}:
             user_is_reviewer = user.groups.filter(name='Resource Reviewer').exists()
             if user_is_reviewer is False:
@@ -465,9 +468,9 @@ def is_uuid(value_to_test):
         return False
 
 class ModelInactiveError(Exception):
-    def __init__(self, code=None):
+    def __init__(self, message, code=None):
         self.title = _("Model Inactive Error")
-        self.message = _("Model status: Inactive")
+        self.message = message
         self.code = code
 
     def __str__(self):

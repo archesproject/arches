@@ -225,8 +225,8 @@ class NewResourceEditorView(MapBaseManagerView):
             try: 
                 deleted = ret.delete(user=request.user)
             except ModelInactiveError as e:
-                title = _('Unable to delete. Please verify the model status is active')
-                return JSONResponse({'status': 'false', 'message': e.message, 'title': title}, status=500)
+                message = _('Unable to delete. Please verify the model status is active')
+                return JSONResponse({'status': 'false', 'message': message, 'title': e.title}, status=500)
             if deleted is True:
                 return JSONResponse(ret)
             else:
@@ -756,8 +756,9 @@ class RelatedResourcesView(BaseManagerView):
                 try:
                     rr.save()
                 except ModelInactiveError as e:
-                    title = _('Unable to delete. Please verify the model status is active')
-                    return JSONResponse({'status': 'false', 'message': e.message, 'title': title}, status=500)
+                    message = _('Unable to save. Please verify the model status is active')
+                    response = {'status': 'false', 'message': message, 'title': e.title}
+                    return JSONResponse(response, status=500)
             else:
                 print 'relationship not permitted'
 
@@ -770,8 +771,9 @@ class RelatedResourcesView(BaseManagerView):
             try:
                 rr.save()
             except ModelInactiveError as e:
-                title = _('Unable to delete. Please verify the model status is active')
-                return JSONResponse({'status': 'false', 'message': e.message, 'title': title}, status=500)
+                message = _('Unable to save. Please verify the model status is active')
+                response = {'status': 'false', 'message': message, 'title': e.title}
+                return JSONResponse(response, status=500)
 
         start = request.GET.get('start', 0)
         se.es.indices.refresh(index=se._add_prefix("resource_relations"))
