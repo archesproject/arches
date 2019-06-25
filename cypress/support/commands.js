@@ -1,4 +1,4 @@
-/* eslint-env browser, mocha */
+/* eslint-env node */
 
 // ***********************************************
 // This example commands.js shows you how to
