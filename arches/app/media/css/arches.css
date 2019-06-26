@@ -13120,8 +13120,12 @@ a.filter-tools:hover {
     padding: 6px 12px;
     white-space: nowrap;
 }
-.chosen-container-single .chosen-single div b, .chosen-container-single .chosen-single .search-choice-close {
+.chosen-container-single .chosen-single div b {
     background-image: none !important;
+}
+
+.chosen-container-single .chosen-single .search-choice-close {
+    top: 10px;
 }
 
 .chosen-container-single .chosen-single div b:before {
