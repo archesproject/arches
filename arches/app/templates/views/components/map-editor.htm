@@ -118,8 +118,8 @@
                                         </div>
                                         <!-- ko foreach: {data: self.featureLookup[widget.node_id()].features, as: 'feature'} -->
                                         <div>
-                                            <i class="fa fa-pencil"></i>
-                                            <i class="fa fa-times-circle-o"></i>
+                                            <i class="fa fa-pencil" data-bind="click: function() { self.editFeature(feature) }"></i>
+                                            <i class="fa fa-times-circle-o" data-bind="click: function() { self.deleteFeature(feature) }"></i>
                                             <span data-bind="text: feature.geometry.type"></span>
                                         </div>
                                         <!-- /ko -->

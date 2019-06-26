@@ -36,6 +36,7 @@ define([
                 return drawFeatures;
             };
             var drawFeatures = getDrawFeatures();
+            var newNodeId;
             this.card.widgets().forEach(function(widget) {
                 var nodeId = widget.node_id();
                 if (self.form && self.form.nodeLookup[nodeId].datatype() === 'geojson-feature-collection') {
@@ -62,18 +63,55 @@ define([
                                         value.selectedTool(null);
                                     }
                                 });
+                                newNodeId = nodeId;
                                 self.draw.changeMode(selectedTool);
-                                var updateId = self.map().on('draw.create', function(e) {
-                                    e.features.forEach(function(feature) {
-                                        self.draw.setFeatureProperty(feature.id, 'nodeId', nodeId);
-                                    });
-                                    self.map().off('draw.create', updateId);
-                                });
                             }
                         }
                     });
                 }
             });
+
+            var updateFeatures = function() {
+                var featureCollection = self.draw.getAll();
+                _.each(self.featureLookup, function(value) {
+                    value.selectedTool(null);
+                });
+                self.card.widgets().forEach(function(widget) {
+                    var nodeId = widget.node_id();
+                    if (self.form && self.form.nodeLookup[nodeId].datatype() === 'geojson-feature-collection') {
+                        var nodeFeatures = [];
+                        featureCollection.features.forEach(function(feature){
+                            if (feature.properties.nodeId === nodeId) nodeFeatures.push(feature);
+                        });
+                        if (ko.isObservable(self.tile.data[nodeId])) {
+                            self.tile.data[nodeId]({
+                                type: 'FeatureCollection',
+                                features: nodeFeatures
+                            });
+                        } else {
+                            self.tile.data[nodeId].features(nodeFeatures);
+                        }
+                    }
+                });
+            };
+
+            this.deleteFeature = function(feature) {
+                if (self.draw) {
+                    self.draw.delete(feature.id);
+                    updateFeatures();
+                }
+            };
+
+            this.editFeature = function(feature) {
+                if (self.draw) {
+                    self.draw.changeMode('simple_select', {
+                        featureIds: [feature.id]
+                    });
+                    _.each(self.featureLookup, function(value) {
+                        value.selectedTool(null);
+                    });
+                }
+            };
 
             this.draw = null;
             this.map.subscribe(function(map) {
@@ -85,26 +123,15 @@ define([
                     type: 'FeatureCollection',
                     features: drawFeatures
                 });
-                var updateFeatures = function() {
-                    var featureCollection = self.draw.getAll();
-                    self.card.widgets().forEach(function(widget) {
-                        var nodeId = widget.node_id();
-                        if (self.form && self.form.nodeLookup[nodeId].datatype() === 'geojson-feature-collection') {
-                            var nodeFeatures = [];
-                            featureCollection.features.forEach(function(feature){
-                                if (feature.properties.nodeId === nodeId) nodeFeatures.push(feature);
-                            });
-                            koMapping.fromJS({
-                                type: 'FeatureCollection',
-                                features: nodeFeatures
-                            }, self.tile.data[nodeId]);
-                            self.tile.data[nodeId].features(nodeFeatures);
-                        }
+                map.on('draw.create', function(e) {
+                    e.features.forEach(function(feature) {
+                        self.draw.setFeatureProperty(feature.id, 'nodeId', newNodeId);
                     });
-                };
-                map.on('draw.modechange', updateFeatures);
+                    updateFeatures();
+                });
                 map.on('draw.update', updateFeatures);
                 map.on('draw.delete', updateFeatures);
+                map.on('draw.modechange', updateFeatures);
 
                 self.form.on('tile-reset', function() {
                     self.draw.set({
