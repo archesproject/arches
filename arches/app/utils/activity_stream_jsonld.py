@@ -20,6 +20,7 @@ from django.utils.feedgenerator import rfc3339_date
 from django.core.urlresolvers import reverse
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
+from django.core.exceptions import ObjectDoesNotExist
 import json
 
 
@@ -119,10 +120,15 @@ class ActivityStreamCollectionPage(object):
             return actor
 
         def add_resource(editlog_object, perm_level=perm_level):
-            r = Resource.objects.get(pk=editlog_object.resourceinstanceid)
-            rclass = r.get_root_ontology()
-            # FIXME: Get real type if it exists, and potentially, add context
-            obj = {"type": rclass}
+            obj = {"type": "Object"}
+            try:
+                r = Resource.objects.get(pk=editlog_object.resourceinstanceid)
+                rclass = r.get_root_ontology()
+                # FIXME: Get real type if it exists, and potentially, add context
+                obj = {"type": rclass}
+            except ObjectDoesNotExist:
+                pass
+
             if editlog_object.edittype == 'delete':
                 # Tombstone instead.
                 obj["formerType"] = obj["type"]
