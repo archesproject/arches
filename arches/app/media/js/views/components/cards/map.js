@@ -16,11 +16,11 @@ define([
 
             this.activeTab('editor');
             this.featureLookup = {};
-            var drawFeatures = [];
-            this.card.widgets().forEach(function(widget) {
-                var nodeId = widget.node_id();
-                if (self.form && self.form.nodeLookup[nodeId].datatype() === 'geojson-feature-collection') {
-                    if (self.tile) {
+            var getDrawFeatures = function() {
+                var drawFeatures = [];
+                self.card.widgets().forEach(function(widget) {
+                    var nodeId = widget.node_id();
+                    if (self.form && self.form.nodeLookup[nodeId].datatype() === 'geojson-feature-collection' && self.tile) {
                         var featureCollection = koMapping.toJS(self.tile.data[nodeId]);
                         if (featureCollection) {
                             featureCollection.features.forEach(function(feature) {
@@ -32,6 +32,13 @@ define([
                             drawFeatures = drawFeatures.concat(featureCollection.features);
                         }
                     }
+                });
+                return drawFeatures;
+            };
+            var drawFeatures = getDrawFeatures();
+            this.card.widgets().forEach(function(widget) {
+                var nodeId = widget.node_id();
+                if (self.form && self.form.nodeLookup[nodeId].datatype() === 'geojson-feature-collection') {
                     self.featureLookup[nodeId] = {
                         features: ko.computed(function() {
                             var features = [];
@@ -98,6 +105,13 @@ define([
                 map.on('draw.modechange', updateFeatures);
                 map.on('draw.update', updateFeatures);
                 map.on('draw.delete', updateFeatures);
+
+                self.form.on('tile-reset', function() {
+                    self.draw.set({
+                        type: 'FeatureCollection',
+                        features: getDrawFeatures()
+                    });
+                });
             });
         },
         template: {
