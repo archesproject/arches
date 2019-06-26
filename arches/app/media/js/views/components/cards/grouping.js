@@ -1,9 +1,10 @@
 define([
     'knockout',
+    'arches',
     'viewmodels/card-component',
     'viewmodels/alert',
     'chosen'
-], function(ko, CardComponentViewModel, AlertViewModel) {
+], function(ko, arches, CardComponentViewModel, AlertViewModel) {
     
     var flattenTree = function(parents, flatList) {
         _.each(ko.unwrap(parents), function(parent) {
@@ -69,6 +70,13 @@ define([
             }, this);
 
 
+            this.previouslySaved = ko.computed(function() {
+                return _.find(this.groupedTiles(), function(tile) {
+                    return !!tile.tileid;
+                }, this);
+            }, this);
+
+
             this.saveTiles = function(){
                 var self = this;
                 var errors = ko.observableArray().extend({ rateLimit: 250 });
@@ -90,22 +98,60 @@ define([
                     errors.forEach(function(response) {
                         title.push(response.responseJSON.message[0]);
                         message.push(response.responseJSON.message[1]);
-                    })
+                    });
                     params.form.alert(new AlertViewModel('ep-alert-red', title.join(), message.join(), null, function(){}));
-                })
+                });
             };
+
 
             this.deleteTiles = function(){
                 console.log('in deleteTiles');
+                params.loading(true);
+                var self = this;
+                var errors = ko.observableArray().extend({ rateLimit: 250 });
+                var tilesToRemove = [];
+                
+                var requests = self.groupedTiles().map(function(tile) {
+                    return $.ajax({
+                        type: "DELETE",
+                        url: arches.urls.tile,
+                        data: JSON.stringify(tile.getData())
+                    }).done(function(response) {
+                        //tile.parent.tiles.remove(tile);
+                        tilesToRemove.push(tile);
+                        //selection(params.card);
+                    }).fail(function(response) {
+                        errors.push(response);
+                    });
+                }, self);
+
+                Promise.all(requests).then(function(ret) {
+                }).finally(function(){
+                    params.loading(false);
+                    tilesToRemove.forEach(function(tileToRemove){
+                        var card = tileToRemove.parent;
+                        card.tiles.replace(tileToRemove, card.getNewTile());
+                        card.tiles.valueHasMutated();
+                    });
+                    self.selectGroupCard();
+                });
+                errors.subscribe(function(errors){
+                    var title = [];
+                    var message = [];
+                    errors.forEach(function(response) {
+                        title.push(response.responseJSON.message[0]);
+                        message.push(response.responseJSON.message[1]);
+                    });
+                    params.form.alert(new AlertViewModel('ep-alert-red', title.join(), message.join(), null, function(){}));
+                });
+
             };
 
             this.resetTiles = function(){
                 console.log('in resetTiles');
             };
 
-            this.selectGroupCard = function(blah) {
-                console.log('selectGroupCard');
-                console.log(blah)
+            this.selectGroupCard = function() {
                 populateCardTiles();
                 this.card.selected(true);
             };

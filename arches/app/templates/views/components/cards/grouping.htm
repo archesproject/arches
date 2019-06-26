@@ -8,7 +8,7 @@
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode()}, event: {
         mousedown: function(d, e) {
             e.stopPropagation();
-            card.canAdd() ? selectGroupCard($data) : selectGroupCard($data);
+            selectGroupCard();
         }
     }">
         <!-- ko if: !card.isFuncNode() -->
@@ -33,7 +33,7 @@
         }">
             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}, event: {'dragstart': function () { console.log('dragging...') }}">
                 <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
-                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.form.selection($data);}, css:{'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight()}">
+                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { $parent.selectGroupCard()}, css:{'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight()}">
                     <i class="fa fa-file" role="presentation" data-bind="css:{'has-provisional-edits': doesChildHaveProvisionalEdits() || $data.hasprovisionaledits()}"></i>
                     <strong style="margin-right: 10px;">
                         {% block editor_tree_node_content %}
@@ -230,18 +230,18 @@
             <!-- /ko -->
             {% block form_buttons %}
             <div class="install-buttons">
-                <!-- ko if: tile.tileid && self.form.deleteTile -->
+                <!-- ko if: previouslySaved && self.form.deleteTile -->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: deleteTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }">{% trans 'Delete this record' %}</button>
                 <!-- /ko -->
                 <!-- ko if: dirty() -->
                     <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
                         <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: resetTiles">{% trans 'Cancel edit' %}</button>
                     <!-- /ko -->
-                    <!-- ko if: tile.tileid -->
+                    <!-- ko if: previouslySaved -->
                         <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: saveTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">{% trans 'Save edit' %}</button>
                     <!-- /ko -->
                 <!-- /ko -->
-                <!-- ko if: !tile.tileid -->
+                <!-- ko if: !previouslySaved()-->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: saveTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">{% trans 'Add'  %}</button>
                 <!-- /ko -->
             </div>
