@@ -57,7 +57,6 @@ define([
                                 });
                                 self.draw.changeMode(selectedTool);
                                 var updateId = self.map().on('draw.create', function(e) {
-                                    console.log(e);
                                     e.features.forEach(function(feature) {
                                         self.draw.setFeatureProperty(feature.id, 'nodeId', nodeId);
                                     });
@@ -92,9 +91,7 @@ define([
                                 type: 'FeatureCollection',
                                 features: nodeFeatures
                             }, self.tile.data[nodeId]);
-                            console.log(nodeFeatures);
                             self.tile.data[nodeId].features(nodeFeatures);
-                            console.log(koMapping.toJS(self.tile.data[nodeId]));
                         }
                     });
                 };
