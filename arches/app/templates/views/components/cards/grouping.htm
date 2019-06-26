@@ -158,12 +158,12 @@
                         <div data-bind='component: {
                             name: self.form.widgetLookup[widget.widget_id()].name,
                             params: {
-                                formData: $parent.tiles()[0].formData,
-                                tile: $parent.tiles()[0],
+                                formData: $component.getTile(widget.card.id).formData,
+                                tile: $component.getTile(widget.card.id),
                                 form: self.form,
                                 config: widget.configJSON,
                                 label: widget.label(),
-                                value: $parent.tiles()[0].data[widget.node_id()],
+                                value: $component.getTile(widget.card.id).data[widget.node_id()],
                                 node: self.form.nodeLookup[widget.node_id()],
                                 expanded: self.expanded,
                                 graph: self.form.graph,

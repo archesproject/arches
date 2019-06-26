@@ -29,6 +29,7 @@ define([
                     }
                 }, self);
             };
+
             params.configKeys = ['groupedCards'];
             
             CardComponentViewModel.apply(this, [params]);
@@ -57,10 +58,18 @@ define([
                     var card = this.cardLookup[cardid];
                     if (card.tiles().length > 0) {
                         tiles.push(card.tiles()[0]);
+                    } else {
+                        tiles.push(card.getNewTile());
                     }
                 }, this);
                 return tiles;
             }, this);
+
+            this.getTile = function(cardid) {
+                return _.find(this.groupedTiles(), function(tile) {
+                    return tile.parent.model.id === cardid;
+                })
+            }
 
 
             this.dirty = ko.computed(function() {
@@ -89,7 +98,7 @@ define([
                         tile.resourceinstance_id = resourceInstanceId;
                         tile.save(function(response) {
                             errors.push(response);
-                        });
+                        }, self.selectGroupCard());
                     }, self);
                 });
                 errors.subscribe(function(errors){
@@ -105,7 +114,6 @@ define([
 
 
             this.deleteTiles = function(){
-                console.log('in deleteTiles');
                 params.loading(true);
                 var self = this;
                 var errors = ko.observableArray().extend({ rateLimit: 250 });
@@ -117,22 +125,14 @@ define([
                         url: arches.urls.tile,
                         data: JSON.stringify(tile.getData())
                     }).done(function(response) {
-                        //tile.parent.tiles.remove(tile);
-                        tilesToRemove.push(tile);
-                        //selection(params.card);
+                        tile.parent.tiles.remove(tile);
                     }).fail(function(response) {
                         errors.push(response);
                     });
                 }, self);
 
-                Promise.all(requests).then(function(ret) {
-                }).finally(function(){
+                Promise.all(requests).finally(function(){
                     params.loading(false);
-                    tilesToRemove.forEach(function(tileToRemove){
-                        var card = tileToRemove.parent;
-                        card.tiles.replace(tileToRemove, card.getNewTile());
-                        card.tiles.valueHasMutated();
-                    });
                     self.selectGroupCard();
                 });
                 errors.subscribe(function(errors){
@@ -152,7 +152,6 @@ define([
             };
 
             this.selectGroupCard = function() {
-                populateCardTiles();
                 this.card.selected(true);
             };
 
