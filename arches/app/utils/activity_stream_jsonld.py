@@ -124,8 +124,8 @@ class ActivityStreamCollectionPage(object):
             try:
                 r = Resource.objects.get(pk=editlog_object.resourceinstanceid)
                 rclass = r.get_root_ontology()
-                # FIXME: Get real type if it exists, and potentially, add context
-                obj = {"type": rclass}
+                if rclass:
+                    obj = {"type": rclass}
             except ObjectDoesNotExist:
                 pass
 
