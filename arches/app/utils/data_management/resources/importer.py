@@ -14,7 +14,7 @@ from multiprocessing import Pool, TimeoutError, cpu_count
 import django
 # django.setup() must be called here to prepare for multiprocessing. specifically,
 # it must be called before any models are imported, otherwise things will crash
-# during an import that uses multiprocessing.
+# during a resource load that uses multiprocessing.
 # see https://stackoverflow.com/a/49461944/3873885
 django.setup()
 from django.db import connection, connections, transaction
