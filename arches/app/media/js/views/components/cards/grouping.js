@@ -19,21 +19,12 @@ define([
     
     return ko.components.register('grouping-card-component', {
         viewModel: function(params) {
+            // params.form is the CardTreeViewModel
             var self = this;
             this.saving = false;
             this.tiles = [];
-            // params.form is the CardTreeViewModel
-            var populateCardTiles = function() {
-                _.each(self.groupedCards().concat(self.card.model.id), function(cardid) {
-                    var card = self.cardLookup[cardid];
-                    if (card.tiles().length === 0) {
-                        card.tiles.push(card.getNewTile());
-                    }
-                }, self);
-            };
 
             params.configKeys = ['groupedCards'];
-            
             CardComponentViewModel.apply(this, [params]);
 
             var cards = !!params.card.parent ? params.card.parent.cards : flattenTree(params.card.topCards, []);
@@ -51,7 +42,12 @@ define([
             }, this);
 
             if (!!params.preview) {
-                populateCardTiles();
+                _.each(self.groupedCards().concat(self.card.model.id), function(cardid) {
+                    var card = self.cardLookup[cardid];
+                    if (card.tiles().length === 0) {
+                        card.tiles.push(card.getNewTile());
+                    }
+                }, self);
             }
 
             this.groupedTiles = ko.computed(function() {
@@ -73,9 +69,13 @@ define([
             }, this);
 
             this.getTile = function(cardid) {
-                return _.find(this.groupedTiles(), function(tile) {
+                var tile = _.find(this.groupedTiles(), function(tile) {
                     return tile.parent.model.id === cardid;
                 });
+                if (!tile && !!params.preview) {
+                    tile = self.cardLookup[cardid].getNewTile();
+                }
+                return tile;
             };
 
 
