@@ -20,6 +20,8 @@ define([
     return ko.components.register('grouping-card-component', {
         viewModel: function(params) {
             var self = this;
+            this.saving = false;
+            this.tiles = [];
             // params.form is the CardTreeViewModel
             var populateCardTiles = function() {
                 _.each(self.groupedCards().concat(self.card.model.id), function(cardid) {
@@ -53,23 +55,28 @@ define([
             }
 
             this.groupedTiles = ko.computed(function() {
-                var tiles = [];
-                _.each(this.groupedCards().concat(this.card.model.id), function(cardid) {
-                    var card = this.cardLookup[cardid];
-                    if (card.tiles().length > 0) {
-                        tiles.push(card.tiles()[0]);
-                    } else {
-                        tiles.push(card.getNewTile());
-                    }
-                }, this);
-                return tiles;
+                if (this.saving) {
+                    return this.tiles;
+                } else {
+                    var tiles = [];
+                    _.each(this.groupedCards().concat(this.card.model.id), function(cardid) {
+                        var card = this.cardLookup[cardid];
+                        if (card.tiles().length > 0) {
+                            tiles.push(card.tiles()[0]);
+                        } else {
+                            tiles.push(card.getNewTile());
+                        }
+                    }, this);
+                    this.tiles = tiles;
+                    return tiles;
+                }
             }, this);
 
             this.getTile = function(cardid) {
                 return _.find(this.groupedTiles(), function(tile) {
                     return tile.parent.model.id === cardid;
-                })
-            }
+                });
+            };
 
 
             this.dirty = ko.computed(function() {
@@ -80,26 +87,33 @@ define([
 
 
             this.previouslySaved = ko.computed(function() {
-                return _.find(this.groupedTiles(), function(tile) {
+                return !!(_.find(this.groupedTiles(), function(tile) {
                     return !!tile.tileid;
-                }, this);
+                }, this));
             }, this);
 
 
             this.saveTiles = function(){
                 var self = this;
                 var errors = ko.observableArray().extend({ rateLimit: 250 });
+                var tiles = this.groupedTiles();
                 var tile = this.groupedTiles()[0];
+                this.saving = true;
                 tile.save(function(response) {
                     errors.push(response);
                 }, function(response){
                     var resourceInstanceId = response.resourceinstance_id;
-                    _.each(_.rest(self.groupedTiles()), function(tile) {
+                    var requests = _.map(_.rest(tiles), function(tile) {
                         tile.resourceinstance_id = resourceInstanceId;
-                        tile.save(function(response) {
+                        return tile.save(function(response) {
                             errors.push(response);
-                        }, self.selectGroupCard());
+                        });
                     }, self);
+                    Promise.all(requests).finally(function(){
+                        self.saving = false;
+                        self.groupedCards.valueHasMutated();
+                        self.selectGroupCard();
+                    });
                 });
                 errors.subscribe(function(errors){
                     var title = [];
@@ -117,18 +131,19 @@ define([
                 params.loading(true);
                 var self = this;
                 var errors = ko.observableArray().extend({ rateLimit: 250 });
-                var tilesToRemove = [];
                 
                 var requests = self.groupedTiles().map(function(tile) {
-                    return $.ajax({
-                        type: "DELETE",
-                        url: arches.urls.tile,
-                        data: JSON.stringify(tile.getData())
-                    }).done(function(response) {
-                        tile.parent.tiles.remove(tile);
-                    }).fail(function(response) {
-                        errors.push(response);
-                    });
+                    if (!!tile.tileid) {
+                        return $.ajax({
+                            type: "DELETE",
+                            url: arches.urls.tile,
+                            data: JSON.stringify(tile.getData())
+                        }).done(function(response) {
+                            tile.parent.tiles.remove(tile);
+                        }).fail(function(response) {
+                            errors.push(response);
+                        });
+                    }
                 }, self);
 
                 Promise.all(requests).finally(function(){
@@ -148,7 +163,9 @@ define([
             };
 
             this.resetTiles = function(){
-                console.log('in resetTiles');
+                _.each(this.groupedTiles(), function(tile) {
+                    tile.reset();
+                }, this);
             };
 
             this.selectGroupCard = function() {
