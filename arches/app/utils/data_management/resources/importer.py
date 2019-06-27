@@ -54,7 +54,8 @@ except ImportError:
 def import_one_resource(line):
     """this single resource import function must be outside of the BusinessDataImporter
     class in order for it to be called with multiprocessing"""
-    django.setup()
+
+    connections.close_all()
     reader = ArchesFileReader()
     archesresource = JSONDeserializer().deserialize(line)
     reader.import_business_data({"resources": [archesresource]})
@@ -178,8 +179,8 @@ class BusinessDataImporter(object):
                     lines = openf.readlines()
                     if use_multiprocessing is True:
                         pool = Pool(cpu_count())
-                        connections.close_all()
                         pool.map(import_one_resource, lines)
+                        connections.close_all()
                         reader = ArchesFileReader()
                     else:
                         reader = ArchesFileReader()
