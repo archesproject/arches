@@ -128,7 +128,7 @@
                             </div>
                         </div>
                         <!-- /ko -->
-                        <!-- ko if: !self.form.nodeLookup[widget.node_id()].datatype() === 'geojson-feature-collection' -->
+                        <!-- ko if: self.form.nodeLookup[widget.node_id()].datatype() !== 'geojson-feature-collection' -->
                         <div data-bind='component: {
                             name: self.form.widgetLookup[widget.widget_id()].name,
                             params: {
