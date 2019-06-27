@@ -154,6 +154,13 @@ define([
             }
         };
 
+        this.updateLayers = function(layers) {
+            var map = self.map();
+            var style = map.getStyle();
+            style.layers = layers;
+            map.setStyle(style);
+        };
+
         this.setupMap = function(map) {
             map.addControl(new mapboxgl.NavigationControl(), 'top-left');
             map.addControl(new MapboxGeocoder({
@@ -163,11 +170,7 @@ define([
                 bbox: bounds
             }), 'top-right');
 
-            layers.subscribe(function(layers) {
-                var style = map.getStyle();
-                style.layers = layers;
-                map.setStyle(style);
-            });
+            layers.subscribe(self.updateLayers);
 
             self.map(map);
         };

@@ -113,6 +113,13 @@ define([
                 }
             };
 
+            this.updateLayers = function(layers) {
+                var map = self.map();
+                var style = map.getStyle();
+                style.layers = layers.concat(self.draw.options.styles);
+                map.setStyle(style);
+            };
+
             this.draw = null;
             this.map.subscribe(function(map) {
                 self.draw = new MapboxDraw({
