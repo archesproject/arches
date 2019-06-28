@@ -120,6 +120,7 @@ define([
                 map.setStyle(style);
             };
 
+            this.selectedFeatures = ko.observableArray();
             this.draw = null;
             this.map.subscribe(function(map) {
                 self.draw = new MapboxDraw({
@@ -139,6 +140,9 @@ define([
                 map.on('draw.update', updateFeatures);
                 map.on('draw.delete', updateFeatures);
                 map.on('draw.modechange', updateFeatures);
+                map.on('draw.selectionchange', function(e) {
+                    self.selectedFeatures(e.features);
+                });
 
                 self.form.on('tile-reset', function() {
                     self.draw.set({

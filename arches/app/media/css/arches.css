@@ -1351,6 +1351,14 @@ ul.tabbed-report-tab-list {
     content: "\f205";
 }
 
+.map-card-feature-tool {
+    font-size: 0.9em;
+    width: 65px;
+}
+.map-card-feature-tool a {
+    color: #2f527a;
+}
+
 #map-settings {
     position: relative;
     margin: -40px -35px 10px -20px;
