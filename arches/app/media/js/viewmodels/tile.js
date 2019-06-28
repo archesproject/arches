@@ -167,7 +167,7 @@ define([
                         self.getData()
                     )
                 );
-                $.ajax({
+                return $.ajax({
                     type: 'POST',
                     url: arches.urls.tile,
                     processData: false,

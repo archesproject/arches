@@ -159,40 +159,6 @@ define([
             on: function() {
                 return;
             },
-            topCards: ko.observableArray(_.filter(data.cards, function(card) {
-                var nodegroup = _.find(ko.unwrap(params.graphModel.get('nodegroups')), function(group) {
-                    return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
-                });
-                return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
-            }).map(function(card) {
-                var constraints =  data.constraints.filter(function(ct){return ct.card_id === card.cardid;});
-                if (constraints.length === 0) {
-                    constraints = getBlankConstraint(card);
-                }
-                return new CardViewModel({
-                    card: card,
-                    appliedFunctions: params.appliedFunctions(),
-                    graphModel: params.graphModel,
-                    tile: null,
-                    resourceId: ko.observable(),
-                    displayname: ko.observable(),
-                    handlers: {},
-                    cards: data.cards,
-                    constraints: constraints,
-                    tiles: [],
-                    selection: selection,
-                    hover: hover,
-                    scrollTo: scrollTo,
-                    multiselect: self.multiselect,
-                    loading: loading,
-                    filter: filter,
-                    provisionalTileViewModel: null,
-                    cardwidgets: data.cardwidgets,
-                    userisreviewer: true,
-                    perms: ko.observableArray(),
-                    permsLiteral: ko.observableArray()
-                });
-            })),
             beforeMove: function(e) {
                 e.cancelDrop = (e.sourceParent!==e.targetParent);
             },
@@ -393,6 +359,47 @@ define([
                 return false;
             }
         });
+
+        this.topCards = ko.observableArray();
+
+        var tc = _.filter(data.cards, function(card) {
+            var nodegroup = _.find(ko.unwrap(params.graphModel.get('nodegroups')), function(group) {
+                return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
+            });
+            return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
+        });
+        this.topCards(tc.map(function(card) {
+            var constraints =  data.constraints.filter(function(ct){return ct.card_id === card.cardid;});
+            if (constraints.length === 0) {
+                constraints = getBlankConstraint(card);
+            }
+            return new CardViewModel({
+                card: card,
+                appliedFunctions: params.appliedFunctions(),
+                graphModel: params.graphModel,
+                tile: null,
+                resourceId: ko.observable(),
+                displayname: ko.observable(),
+                handlers: {},
+                cards: data.cards,
+                constraints: constraints,
+                tiles: [],
+                selection: selection,
+                hover: hover,
+                scrollTo: scrollTo,
+                multiselect: self.multiselect,
+                loading: loading,
+                filter: filter,
+                provisionalTileViewModel: null,
+                cardwidgets: data.cardwidgets,
+                userisreviewer: true,
+                perms: ko.observableArray(),
+                permsLiteral: ko.observableArray(),
+                topCards: self.topCards
+            });
+        }));
+
+
         var topCard = self.topCards()[0];
         if (topCard != null) {
             if (self.multiselect === true) {
