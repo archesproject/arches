@@ -29,12 +29,13 @@ define([
 
             var cards = !!params.card.parent ? params.card.parent.cards : flattenTree(params.card.topCards, []);
             this.cardLookup = {};
+            this.subscriptions = {};
             this.siblingCards = ko.observableArray();
             
             _.each(cards, function(card) {
                 this.cardLookup[card.model.id] = card;
                 if (card.parentCard === params.card.parentCard &&
-                    card.cardinality === '1' &&
+                    card.model.cardinality() === '1' &&
                     card !== params.card &&
                     card.cards().length === 0) {
                     this.siblingCards.push({'name': card.model.name(), 'id': card.model.id});
@@ -42,9 +43,29 @@ define([
             }, this);
 
             this.groupedCards = ko.computed(function(){
-                return _.map([this.card.model.id].concat(this.groupedCardIds()), function(cardid) {
-                    return self.cardLookup[cardid];
+                var gc = _.map([this.card.model.id].concat(this.groupedCardIds()), function(cardid) {
+                    var card = this.cardLookup[cardid];
+                    var subscription = card.model.cardinality.subscribe(function(cardinality){
+                        if (cardinality !== '1') {
+                            card.model.cardinality('1');
+                            var errorTitle = 'Settings Conflict: Remove this card from grouped card?';
+                            var errorMesssage = 'The cardinality of this card can\'t be changed until you remove it from being grouped with the "' + self.card.model.name() + '" card.  Do you want to remove this card from being grouped with the "' + self.card.model.name() + '" card';
+                            params.pageVm.alert(new AlertViewModel('ep-alert-red', errorTitle, errorMesssage, function(){}, function(){
+                                var newgroup = _.filter(self.groupedCardIds(), function(cardid) {
+                                    return cardid !== card.model.id;
+                                });
+                                self.groupedCardIds(newgroup);
+                                self.subscriptions[cardid].dispose();
+                                card.model.cardinality('n');
+                                self.card.model.save();
+                            }));
+                        }
+                    }, this);
+                    this.subscriptions[cardid] = subscription;
+                    return card;
                 }, this);
+
+                return gc;
             }, this);
 
             if (!!params.preview) {
@@ -52,9 +73,11 @@ define([
                     if (card.tiles().length === 0) {
                         card.tiles.push(card.getNewTile());
                     }
+                    // we do this so that when you select a grouped widget
+                    // the selectedCard remains the same and doesn't jump to it's true card
                     _.each(card.widgets(), function(widget) {
                         widget.parent = self.card;
-                    })
+                    });
                 }, this);
             }
 
@@ -130,7 +153,7 @@ define([
                         title.push(response.responseJSON.message[0]);
                         message.push(response.responseJSON.message[1]);
                     });
-                    params.form.alert(new AlertViewModel('ep-alert-red', title.join(), message.join(), null, function(){}));
+                    params.pageVm.alert(new AlertViewModel('ep-alert-red', title.join(), message.join(), null, function(){}));
                 });
             };
 
@@ -164,7 +187,7 @@ define([
                         title.push(response.responseJSON.message[0]);
                         message.push(response.responseJSON.message[1]);
                     });
-                    params.form.alert(new AlertViewModel('ep-alert-red', title.join(), message.join(), null, function(){}));
+                    params.pageVm.alert(new AlertViewModel('ep-alert-red', title.join(), message.join(), null, function(){}));
                 });
 
             };
