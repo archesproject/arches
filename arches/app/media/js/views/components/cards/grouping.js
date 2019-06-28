@@ -116,7 +116,7 @@ define([
                     }, self);
                     Promise.all(requests).finally(function(){
                         self.saving = false;
-                        self.groupedCards.valueHasMutated();
+                        self.groupedCardIds.valueHasMutated();
                         self.selectGroupCard();
                     });
                 });
