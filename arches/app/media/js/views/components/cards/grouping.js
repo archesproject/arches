@@ -52,6 +52,9 @@ define([
                     if (card.tiles().length === 0) {
                         card.tiles.push(card.getNewTile());
                     }
+                    _.each(card.widgets(), function(widget) {
+                        widget.parent = self.card;
+                    })
                 }, this);
             }
 

@@ -23,6 +23,7 @@
         <!-- /ko -->
     </a>
     <ul class="jstree-children" aria-expanded="true">
+        <!-- ko foreach: {data: groupedCards, as: 'card'} -->
         <div data-bind="sortable: {
             data: card.tiles,
             options: {
@@ -78,9 +79,46 @@
                 <!-- /ko -->
             </li>
         </div>
+        <!-- /ko -->
     </ul>
 </li>
 {% endblock editor_tree %}
+
+
+{% block designer_tree %}
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}, scrollTo: card.scrollTo, container: '.designer-card-tree'">
+    <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
+    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode()}, click: function () { card.selected(true) },">
+        <i class="fa fa-file-o" role="presentation"></i>
+        <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
+    </a>
+    <!-- ko if: card.cards().length > 0 || card.widgets().length > 0 -->
+<!-- ko foreach: {data: groupedCards, as: 'card'} -->
+    <ul class="jstree-children card-designer-tree" aria-expanded="true">
+        <div data-bind="sortable: {
+                data: card.widgets,
+                as: 'widget',
+                beforeMove: self.beforeMove,
+                afterMove: function() { card.model.save() }
+            }">
+            <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
+                    'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0
+                }">
+                <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(d, e) {widget.selected(true); e.stopPropagation(); }, css:{'jstree-clicked': widget.selected, 'hover': widget.hovered}, event: { mouseover: function(){ widget.hovered(true) }, mouseout: function(){ widget.hovered(null) } }">
+                    <i data-bind="css: widget.datatype.iconclass" role="presentation"></i>
+                    <strong style="margin-right: 10px;" >
+                        <span data-bind="text: !!(widget.label()) ? widget.label() : widget.node.name"></span>
+                    </strong>
+                </a>
+            </li>
+        </div>
+       
+    </ul>
+<!-- /ko -->
+    <!-- /ko -->
+</li>
+{% endblock designer_tree %}
 
 
 {% block form %}
