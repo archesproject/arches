@@ -4,5 +4,5 @@
   "component": "/views/components/cards/grouping",
   "componentname": "grouping-card-component",
   "description": "A card component that groups sibling cards together into one form.",
-  "defaultconfig": {"groupedCards": []}
+  "defaultconfig": {"groupedCardIds": []}
 }

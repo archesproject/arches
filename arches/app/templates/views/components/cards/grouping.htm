@@ -149,8 +149,7 @@
             {% endblock form_header %}
             <!-- ko if: card.widgets().length > 0 -->
             {% block form_widgets %}
-            <div data-bind="foreach: {data:[card.model.id].concat(groupedCards()), as: 'cardid'}">
-                <!-- ko foreach: { data: $parent.cardLookup[cardid], as: 'card' } -->
+            <div data-bind="foreach: {data: groupedCards, as: 'card'}">
                 <form class="widgets" style="margin-bottom: 20px;">
                     <div data-bind="foreach: {
                             data:card.widgets, as: 'widget'
@@ -175,7 +174,6 @@
                 }, event: { mouseover: function(){ if (self.preview){widget.hovered(true) } }, mouseout: function(){ if (self.preview){widget.hovered(null)} } }, visible: widget.visible'></div>
                     </div>
                 </form>
-                <!-- /ko -->
             </div>
             {% endblock form_widgets %}
             <!-- /ko -->
@@ -270,6 +268,6 @@
 
 {% block config %}
 <div>
-    <select class="resources" multiple data-placeholder="{% trans "Choose a sibling card..." %}" data-bind="selectedOptions: groupedCards, options: siblingCards, optionsText: 'name', optionsValue: 'id', chosen: {multiple: true, disable_search_threshold: 10, width: '100%'}"></select>
+    <select class="resources" multiple data-placeholder="{% trans "Choose a sibling card..." %}" data-bind="selectedOptions: groupedCardIds, options: siblingCards, optionsText: 'name', optionsValue: 'id', chosen: {multiple: true, disable_search_threshold: 10, width: '100%'}"></select>
 </div>
 {% endblock config %}

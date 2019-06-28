@@ -24,7 +24,7 @@ define([
             this.saving = false;
             this.tiles = [];
 
-            params.configKeys = ['groupedCards'];
+            params.configKeys = ['groupedCardIds'];
             CardComponentViewModel.apply(this, [params]);
 
             var cards = !!params.card.parent ? params.card.parent.cards : flattenTree(params.card.topCards, []);
@@ -41,13 +41,18 @@ define([
                 }
             }, this);
 
+            this.groupedCards = ko.computed(function(){
+                return _.map([this.card.model.id].concat(this.groupedCardIds()), function(cardid) {
+                    return self.cardLookup[cardid];
+                }, this);
+            }, this);
+
             if (!!params.preview) {
-                _.each(self.groupedCards().concat(self.card.model.id), function(cardid) {
-                    var card = self.cardLookup[cardid];
+                _.each(this.groupedCards(), function(card) {
                     if (card.tiles().length === 0) {
                         card.tiles.push(card.getNewTile());
                     }
-                }, self);
+                }, this);
             }
 
             this.groupedTiles = ko.computed(function() {
@@ -55,8 +60,7 @@ define([
                     return this.tiles;
                 } else {
                     var tiles = [];
-                    _.each(this.groupedCards().concat(this.card.model.id), function(cardid) {
-                        var card = this.cardLookup[cardid];
+                    _.each(this.groupedCards(), function(card) {
                         if (card.tiles().length > 0) {
                             tiles.push(card.tiles()[0]);
                         } else {
@@ -78,13 +82,11 @@ define([
                 return tile;
             };
 
-
             this.dirty = ko.computed(function() {
                 return _.find(this.groupedTiles(), function(tile) {
                     return tile.dirty();
                 }, this);
             }, this);
-
 
             this.previouslySaved = ko.computed(function() {
                 return !!(_.find(this.groupedTiles(), function(tile) {
@@ -92,15 +94,18 @@ define([
                 }, this));
             }, this);
 
-
             this.saveTiles = function(){
                 var self = this;
                 var errors = ko.observableArray().extend({ rateLimit: 250 });
                 var tiles = this.groupedTiles();
                 var tile = this.groupedTiles()[0];
                 this.saving = true;
+                var requests = [];
                 tile.save(function(response) {
                     errors.push(response);
+                    self.saving = false;
+                    self.groupedCardIds.valueHasMutated();
+                    self.selectGroupCard();
                 }, function(response){
                     var resourceInstanceId = response.resourceinstance_id;
                     var requests = _.map(_.rest(tiles), function(tile) {
@@ -125,7 +130,6 @@ define([
                     params.form.alert(new AlertViewModel('ep-alert-red', title.join(), message.join(), null, function(){}));
                 });
             };
-
 
             this.deleteTiles = function(){
                 params.loading(true);
