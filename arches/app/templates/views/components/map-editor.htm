@@ -121,7 +121,7 @@
                                         <table class="table">
                                             <tbody>
                                                 <!-- ko foreach: {data: self.featureLookup[widget.node_id()].features, as: 'feature'} -->
-                                                <tr class="map-card-feature-item">
+                                                <tr class="map-card-feature-item" data-bind="css: {'active': self.selectedFeatureIds().indexOf(feature.id) >= 0}">
                                                     <td>
                                                         <span class="map-card-feature-name" data-bind="text: feature.geometry.type"></span>
                                                     </td>

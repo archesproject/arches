@@ -107,6 +107,7 @@ define([
                     self.draw.changeMode('simple_select', {
                         featureIds: [feature.id]
                     });
+                    self.selectedFeatureIds([feature.id]);
                     _.each(self.featureLookup, function(value) {
                         value.selectedTool(null);
                     });
@@ -120,7 +121,7 @@ define([
                 map.setStyle(style);
             };
 
-            this.selectedFeatures = ko.observableArray();
+            this.selectedFeatureIds = ko.observableArray();
             this.draw = null;
             this.map.subscribe(function(map) {
                 self.draw = new MapboxDraw({
@@ -141,7 +142,9 @@ define([
                 map.on('draw.delete', updateFeatures);
                 map.on('draw.modechange', updateFeatures);
                 map.on('draw.selectionchange', function(e) {
-                    self.selectedFeatures(e.features);
+                    self.selectedFeatureIds(e.features.map(function(feature) {
+                        return feature.id;
+                    }));
                 });
 
                 self.form.on('tile-reset', function() {

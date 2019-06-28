@@ -1351,6 +1351,14 @@ ul.tabbed-report-tab-list {
     content: "\f205";
 }
 
+.map-card-feature-item.active .map-card-feature-name {
+    font-weight: 600;
+}
+
+.map-card-feature-list .table {
+    margin-bottom: 0;
+}
+
 .map-card-feature-tool {
     font-size: 0.9em;
     width: 65px;
