@@ -143,7 +143,8 @@ define([
                 center: [x, y],
                 zoom: zoom
             },
-            bounds: bounds
+            bounds: bounds,
+            attributionControl: false
         };
 
         this.toggleTab = function(tabName) {
@@ -162,6 +163,7 @@ define([
         };
 
         this.setupMap = function(map) {
+            map.addControl(new mapboxgl.AttributionControl(), 'top-left');
             map.addControl(new mapboxgl.NavigationControl(), 'top-left');
             map.addControl(new MapboxGeocoder({
                 accessToken: mapboxgl.accessToken,
