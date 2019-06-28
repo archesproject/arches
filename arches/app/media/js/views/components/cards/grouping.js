@@ -29,7 +29,12 @@ define([
             params.configKeys = ['groupedCardIds'];
             CardComponentViewModel.apply(this, [params]);
 
-            var cards = !!params.card.parent ? params.card.parent.cards : flattenTree(params.card.topCards, []);
+            var cards;
+            if (params.state === 'report') {
+                cards = flattenTree(params.pageVm.report.cards, []);
+            } else {
+                cards = !!params.card.parent ? params.card.parent.cards : flattenTree(params.card.topCards, []);
+            }
             this.cardLookup = {};
             this.subscriptions = {};
             this.siblingCards = ko.observableArray();
