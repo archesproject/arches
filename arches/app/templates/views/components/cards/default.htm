@@ -71,7 +71,8 @@
                             card: card,
                             tile: null,
                             loading: self.loading,
-                            form: self.form
+                            form: self.form,
+                            pageVm: $root
                         }
                     } --> <!-- /ko -->
                 </ul>
@@ -129,7 +130,8 @@
                         card: childCard,
                         tile: null,
                         loading: self.loading,
-                        form: self.form
+                        form: self.form,
+                        pageVm: $root
                     }
                 } --> <!-- /ko -->
             </div>
@@ -195,7 +197,8 @@
                     tile: null,
                     loading: self.loading,
                     form: self.form,
-                    multiselect: true
+                    multiselect: true,
+                    pageVm: $root
                 }
             } --> <!-- /ko -->
             </div>
@@ -438,7 +441,8 @@
                                         state: 'report',
                                         preview: self.preview,
                                         card: card,
-                                        showHeaderLine: self.card.model.get("widgets")().length > 0 || $index !== 0
+                                        showHeaderLine: self.card.model.get("widgets")().length > 0 || $index !== 0,
+                                        pageVm: $root
                                     }
                                 } --> <!-- /ko -->
                         <!-- /ko -->
