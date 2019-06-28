@@ -1,8 +1,0 @@
-{
-  "name": "Grouping Card",
-  "componentid": "2f9054d8-de57-45cd-8a9c-58bbb1619030",
-  "component": "/views/components/cards/grouping",
-  "componentname": "grouping-card-component",
-  "description": "A card component that groups sibling cards together into one form.",
-  "defaultconfig": {"groupedCardIds": []}
-}
