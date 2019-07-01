@@ -2,6 +2,7 @@
 
 <div class="map-card-wrapper">
     <div class="map-card-sidebar">
+        {% block tabs %}
         <div class="map-card-sidebar-tab" data-bind="click: function() {
             toggleTab('basemap');
         }, css: {
@@ -26,9 +27,11 @@
             <i class="fa fa-list-alt"></i>
             {% trans "Legend" %}
         </div>
+        {% endblock tabs %}
     </div>
     <!--ko if: activeTab() -->
         <div class="map-card-sidepanel">
+            {% block sidepanel %}
             <!--ko if: activeTab() === 'basemap' -->
                 <h4 class="map-card-sidepanel-header" data-bind="click: hideSidePanel">
                     {% trans "Basemaps" %}
@@ -88,6 +91,7 @@
                     </div>
                 </div>
             <!--/ko -->
+            {% endblock sidepanel %}
         </div>
     <!--/ko -->
     <div class="map-card-container" data-bind="mapboxgl: {

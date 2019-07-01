@@ -32,6 +32,7 @@ define([
         }, arches.mapSources, params.sources);
         var mapLayers = params.mapLayers || arches.mapLayers;
 
+        this.map = ko.isObservable(params.map) ? params.map : ko.observable();
         this.basemaps = [];
         this.overlays = ko.observableArray();
         this.activeBasemap = ko.observable();
@@ -142,7 +143,8 @@ define([
                 center: [x, y],
                 zoom: zoom
             },
-            bounds: bounds
+            bounds: bounds,
+            attributionControl: false
         };
 
         this.toggleTab = function(tabName) {
@@ -153,9 +155,15 @@ define([
             }
         };
 
-        this.setupMap = function(map) {
-            if (ko.isObservable(params.map)) params.map(map);
+        this.updateLayers = function(layers) {
+            var map = self.map();
+            var style = map.getStyle();
+            style.layers = layers;
+            map.setStyle(style);
+        };
 
+        this.setupMap = function(map) {
+            map.addControl(new mapboxgl.AttributionControl(), 'top-left');
             map.addControl(new mapboxgl.NavigationControl(), 'top-left');
             map.addControl(new MapboxGeocoder({
                 accessToken: mapboxgl.accessToken,
@@ -164,11 +172,9 @@ define([
                 bbox: bounds
             }), 'top-right');
 
-            layers.subscribe(function(layers) {
-                var style = map.getStyle();
-                style.layers = layers;
-                map.setStyle(style);
-            });
+            layers.subscribe(self.updateLayers);
+
+            self.map(map);
         };
     };
     ko.components.register('arches-map', {
