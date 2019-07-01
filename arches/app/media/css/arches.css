@@ -13311,7 +13311,6 @@ ul.select2-choices:after {
     padding: 0px;
     flex: 1 0 250px;
     width: 250px;
-    overflow-y: auto;
     background-color: white;
 }
 
@@ -13343,6 +13342,7 @@ ul.select2-choices:after {
 .card-component-wrapper-editor {
     height: 100%;
     padding-bottom: 50px;
+    overflow-y: auto;
 }
 
 .card-header {
