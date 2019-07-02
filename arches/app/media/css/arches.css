@@ -448,8 +448,8 @@ input[type="checkbox"] {
 
 .workflowstep-nav div.workflow-nav-controls {
     position: absolute;
-    padding: 5px ;
-    right: 10px;
+    padding: 10px 0px;
+    right: 15px;
     font-size: 25px;
     width: 250px;
 }
