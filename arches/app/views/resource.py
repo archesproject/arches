@@ -32,7 +32,7 @@ from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
-from arches.app.models.resource import Resource
+from arches.app.models.resource import Resource, ModelInactiveError
 from arches.app.models.system_settings import settings
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.decorators import can_edit_resource_instance
@@ -222,7 +222,11 @@ class NewResourceEditorView(MapBaseManagerView):
     def delete(self, request, resourceid=None):
         if resourceid is not None:
             ret = Resource.objects.get(pk=resourceid)
-            deleted = ret.delete(user=request.user)
+            try:
+                deleted = ret.delete(user=request.user)
+            except ModelInactiveError as e:
+                message = _('Unable to delete. Please verify the model status is active')
+                return JSONResponse({'status': 'false', 'message': [_(e.title), _(str(message))]}, status=500)
             if deleted is True:
                 return JSONResponse(ret)
             else:
@@ -749,7 +753,11 @@ class RelatedResourcesView(BaseManagerView):
                     datestarted=datefrom,
                     dateended=dateto
                 )
-                rr.save()
+                try:
+                    rr.save()
+                except ModelInactiveError as e:
+                    message = _('Unable to save. Please verify the model status is active')
+                    return JSONResponse({'status': 'false', 'message': [_(e.title), _(str(message))]}, status=500)
             else:
                 print 'relationship not permitted'
 
@@ -759,7 +767,11 @@ class RelatedResourcesView(BaseManagerView):
             rr.relationshiptype = relationship_type
             rr.datestarted = datefrom
             rr.dateended = dateto
-            rr.save()
+            try:
+                rr.save()
+            except ModelInactiveError as e:
+                message = _('Unable to save. Please verify the model status is active')
+                return JSONResponse({'status': 'false', 'message': [_(e.title), _(str(message))]}, status=500)
 
         start = request.GET.get('start', 0)
         se.es.indices.refresh(index=se._add_prefix("resource_relations"))
