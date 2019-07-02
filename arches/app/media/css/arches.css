@@ -436,10 +436,10 @@ input[type="checkbox"] {
     display: flex;
     flex-direction: row;
     width: 100%;
-    border-bottom: solid 1px #ccc;
+    border-bottom: solid 1px #ddd;
     height: fit-content;
-    padding: 15px;
-    background-color: white;
+    padding: 20px 30px;
+    background-color: #fff;
 }
 
 .workflowstep-nav div {
@@ -448,8 +448,9 @@ input[type="checkbox"] {
 
 .workflowstep-nav div.workflow-nav-controls {
     position: absolute;
-    padding: 15px;
+    padding: 15px ;
     right: 10px;
+    font-size: 25px;
 }
 
 .workflow-step-icon {
@@ -460,11 +461,15 @@ input[type="checkbox"] {
     line-height: 56px;
     text-align: center;
     width: 56px;
-    font-size: 25px;
+    font-size: 21px;
+    color: #ccc;
 }
 
 .workflow-step-icon.active {
-    box-shadow: 0 0 0 2px #ebeef0;
+    background: #5FA2DD;
+    border: #1E6FB7;
+    color: #fff;
+    cursor: pointer;
 }
 
 .workflow-step-icon.complete {
@@ -477,8 +482,8 @@ input[type="checkbox"] {
     width: 100%;
     display: flex;
     justify-content: space-between;
-    height: 120px;
-    border-bottom: solid 1px #ccc;
+    min-height: 100px;
+    border-bottom: solid 1px #ddd;
 }
 
 .workflow-step-description {
@@ -486,27 +491,36 @@ input[type="checkbox"] {
     flex-direction: column;
     justify-content: center;
     background-color: #fff;
-    padding: 10px;
+    padding: 15px 10px;
     overflow-x: hidden;
     overflow-y: hidden;
     width: 100%;
 }
 
 .workflow-step-description .title {
-    font-size: 20px;
+    font-size: 1.5em;
     font-weight: 600;
+    color: #004577;
+    padding-top: 10px;
+}
+
+.workflow-step-description .workflow-name {
+    font-size: 1.3em;
+    font-weight: 400;
+    line-height: 1.01;
     color: #004577;
 }
 
 .workflow-step-description .subtitle {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 400;
     color: #004577;
 }
 .workflow-step-description .step {
-    font-size: 10px;
+    font-size: 14px;
     font-weight: 400;
     color: #999;
+    padding-bottom: 15px;
 }
 
 .workflow-step-body {
@@ -587,7 +601,7 @@ div.wf-multi-tile-card-info div {
     display: flex;
     background-color: #fff;
     align-items: center;
-    font-size: 41px;
+    font-size: 32px;
     justify-content: center;
     color: #004577;
 }
