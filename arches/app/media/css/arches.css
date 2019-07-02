@@ -1159,6 +1159,10 @@ ul.tabbed-report-tab-list {
     margin-right: 92px;
 }
 
+.map-card-container.map-card-container-sidepanel-active {
+    margin-right: 492px;
+}
+
 .map-card-sidebar {
     position:absolute;
     right: 0;
@@ -13311,7 +13315,6 @@ ul.select2-choices:after {
     padding: 0px;
     flex: 1 0 250px;
     width: 250px;
-    overflow-y: auto;
     background-color: white;
 }
 
@@ -13343,6 +13346,7 @@ ul.select2-choices:after {
 .card-component-wrapper-editor {
     height: 100%;
     padding-bottom: 50px;
+    overflow-y: auto;
 }
 
 .card-header {
@@ -13567,6 +13571,16 @@ a.jstree-anchor.permissions-widget {
 .indent {
     text-indent: 10px;
     padding-left: 10px;
+}
+
+.mapboxgl-popup-content {
+    width: 350px;
+    padding: 20px;
+}
+
+.mapboxgl-popup-content .hover-feature-footer {
+    padding: 10px 0 0;
+    height: auto;
 }
 
 @keyframes loader {

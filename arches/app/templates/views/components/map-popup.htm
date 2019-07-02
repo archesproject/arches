@@ -1,0 +1,33 @@
+{% load i18n %}
+{% load template_tags %}
+
+<!-- ko if: loading() -->
+<div class="hover-feature-body hover-feature-loading">
+    <i class="fa fa-spin fa-spinner"></i>
+    {% trans "Loading..." %}
+</div>
+<!--/ko-->
+
+<!-- ko if: !loading() -->
+<div class="hover-feature-title-bar">
+    <div class="hover-feature-title">
+        <span class="" data-bind="text: displayname"></span>
+    </div>
+</div>
+<div class="hover-feature-body">
+    <div class="hover-feature-metadata">
+        {% trans "Resource ID:" %}
+        <span data-bind="text: resourceinstanceid"></span>
+    </div>
+    <div class="hover-feature-metadata">
+        {% trans "Resource Model:" %}
+        <span data-bind="text: graph_name"></span>
+    </div>
+</div>
+<div class="hover-feature-footer">
+    <a data-bind="click: function () { window.open(reportURL + ko.unwrap(resourceinstanceid)); }" href="javascript:void(0)"><i class="ion-document-text"></i> {% trans "Report" %}</a>
+    {% if request.user|can_edit_resource_instance %}
+    <a data-bind="click: function () { window.open(editURL + ko.unwrap(resourceinstanceid)); }" href="javascript:void(0)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %}</a>
+    {% endif %}
+</div>
+<!--/ko-->
