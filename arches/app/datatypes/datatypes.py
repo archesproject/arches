@@ -573,7 +573,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
             sql_list.append("""
                 SELECT resourceinstanceid::text,
-                        (row_number() over ())::text as __id__,
+                        (row_number() over ()) as __id__,
                         1 as total,
                         geom AS __geometry__,
                         '' AS extent
@@ -704,7 +704,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all",["==", "$type", "Polygon"],["==", "total", 1]],
                     "paint": {
-                        "line-width": %(outlineWeight)s,
+                        "line-width": ["case",
+                            ["boolean", ["feature-state", "hover"], false],
+                            %(expanded_outlineWeight)s,
+                            %(outlineWeight)s
+                        ],
                         "line-color": "%(outlineColor)s"
                     }
                 },
@@ -746,7 +750,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all", ["==", "$type", "LineString"],["==", "total", 1]],
                     "paint": {
-                        "line-width": %(haloWeight)s,
+                        "line-width": ["case",
+                            ["boolean", ["feature-state", "hover"], false],
+                            %(expanded_haloWeight)s,
+                            %(haloWeight)s
+                        ],
                         "line-color": "%(lineHaloColor)s"
                     }
                 },
@@ -760,7 +768,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all",["==", "$type", "LineString"],["==", "total", 1]],
                     "paint": {
-                        "line-width": %(weight)s,
+                        "line-width": ["case",
+                            ["boolean", ["feature-state", "hover"], false],
+                            %(expanded_weight)s,
+                            %(weight)s
+                        ],
                         "line-color": "%(lineColor)s"
                     }
                 },
@@ -860,7 +872,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
                     "paint": {
-                        "circle-radius": %(haloRadius)s,
+                        "circle-radius": ["case",
+                            ["boolean", ["feature-state", "hover"], false],
+                            %(expanded_haloRadius)s,
+                            %(haloRadius)s
+                        ],
                         "circle-color": "%(pointHaloColor)s"
                     }
                 },
@@ -874,7 +890,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
                     "paint": {
-                        "circle-radius": %(radius)s,
+                        "circle-radius": ["case",
+                            ["boolean", ["feature-state", "hover"], false],
+                            %(expanded_radius)s,
+                            %(radius)s
+                        ],
                         "circle-color": "%(pointColor)s"
                     }
                 },

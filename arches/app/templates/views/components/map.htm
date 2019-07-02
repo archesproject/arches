@@ -97,6 +97,8 @@
     <div class="map-card-container" data-bind="mapboxgl: {
             mapOptions: mapOptions,
             afterRender: setupMap
+        }, css: {
+            'map-card-container-sidepanel-active': activeTab()
         }">
     </div>
 </div>

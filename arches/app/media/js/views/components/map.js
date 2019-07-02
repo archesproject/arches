@@ -5,9 +5,10 @@ define([
     'knockout',
     'mapbox-gl',
     'mapbox-gl-geocoder',
+    'text!templates/views/components/map-popup.htm',
     'bindings/mapbox-gl',
     'bindings/sortable'
-], function($, _, arches, ko, mapboxgl, MapboxGeocoder) {
+], function($, _, arches, ko, mapboxgl, MapboxGeocoder, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         var geojsonSourceFactory = function() {
@@ -40,6 +41,14 @@ define([
         this.hideSidePanel = function() {
             self.activeTab(undefined);
         };
+        this.activeTab.subscribe(function() {
+            var map = self.map();
+            if (map) {
+                setTimeout(function() {
+                    map.resize();
+                }, 1);
+            }
+        });
 
         mapLayers.forEach(function(layer) {
             if (!layer.isoverlay) {
@@ -143,8 +152,7 @@ define([
                 center: [x, y],
                 zoom: zoom
             },
-            bounds: bounds,
-            attributionControl: false
+            bounds: bounds
         };
 
         this.toggleTab = function(tabName) {
@@ -162,8 +170,43 @@ define([
             map.setStyle(style);
         };
 
+        this.isFeatureClickable = function(feature) {
+            return feature.properties.resourceinstanceid;
+        };
+
+        var resourceLookup = {};
+        var lookupResourceData = function(feature) {
+            var resourceData = feature.properties;
+            var resourceId = resourceData.resourceinstanceid;
+            if (resourceLookup[resourceId]) {
+                return resourceLookup[resourceId];
+            }
+            resourceData.loading = true;
+            resourceData.displaydescription = '';
+            resourceData['map_popup'] = '';
+            resourceData.displayname = '';
+            resourceData.graphid = '';
+            resourceData['graph_name'] = '';
+            resourceData.featureCollections = [];
+            resourceData = ko.mapping.fromJS(resourceData);
+            resourceLookup[resourceId] = resourceData;
+            $.get(arches.urls.resource_descriptors + resourceId, function(data) {
+                resourceLookup[resourceId].displaydescription(data.displaydescription);
+                resourceLookup[resourceId].map_popup(data.map_popup);
+                resourceLookup[resourceId].displayname(data.displayname);
+                resourceLookup[resourceId].graphid(data.graphid);
+                resourceLookup[resourceId].graph_name(data.graph_name);
+                resourceLookup[resourceId].featureCollections(data.geometries);
+                resourceLookup[resourceId].loading(false);
+            });
+            return resourceLookup[resourceId];
+        };
+
+        this.getPopupData = function(feature) {
+            return lookupResourceData(feature);
+        };
+
         this.setupMap = function(map) {
-            map.addControl(new mapboxgl.AttributionControl(), 'top-left');
             map.addControl(new mapboxgl.NavigationControl(), 'top-left');
             map.addControl(new MapboxGeocoder({
                 accessToken: mapboxgl.accessToken,
@@ -173,6 +216,30 @@ define([
             }), 'top-right');
 
             layers.subscribe(self.updateLayers);
+
+            var hoverFeature;
+            map.on('mousemove', function(e) {
+                if (hoverFeature) map.setFeatureState(hoverFeature, { hover: false });
+                hoverFeature = _.find(
+                    map.queryRenderedFeatures(e.point),
+                    self.isFeatureClickable
+                );
+                if (hoverFeature) map.setFeatureState(hoverFeature, { hover: true });
+                map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
+            });
+
+            map.on('click', function(e) {
+                if (hoverFeature) {
+                    var p = new mapboxgl.Popup()
+                        .setLngLat(e.lngLat)
+                        .setHTML(popupTemplate)
+                        .addTo(map);
+                    ko.applyBindingsToDescendants(
+                        self.getPopupData(hoverFeature),
+                        p._content
+                    );
+                }
+            });
 
             self.map(map);
         };
