@@ -438,7 +438,7 @@ input[type="checkbox"] {
     width: 100%;
     border-bottom: solid 1px #ddd;
     height: fit-content;
-    padding: 20px 30px;
+    padding: 20px 35px;
     background-color: #fff;
 }
 
@@ -448,9 +448,14 @@ input[type="checkbox"] {
 
 .workflowstep-nav div.workflow-nav-controls {
     position: absolute;
-    padding: 15px ;
+    padding: 5px ;
     right: 10px;
     font-size: 25px;
+    width: 250px;
+}
+
+.workflowstep-nav div.workflow-nav-controls button:first-child {
+    margin-right: 5px;
 }
 
 .workflow-step-icon {
@@ -461,7 +466,7 @@ input[type="checkbox"] {
     line-height: 56px;
     text-align: center;
     width: 56px;
-    font-size: 21px;
+    font-size: 25px;
     color: #ccc;
 }
 
@@ -619,9 +624,9 @@ div.wf-multi-tile-card-info div {
     color: #007799;
 }
 
-.workflow-nav-controls.left {
+/*.workflow-nav-controls.left {
     border-left: solid 1px #aaa;
-}
+}*/
 
 /*.workflow-nav-controls.right {
     border-right: solid 1px #aaa;
