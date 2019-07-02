@@ -517,7 +517,7 @@ input[type="checkbox"] {
     color: #004577;
 }
 .workflow-step-description .step {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 400;
     color: #999;
     padding-bottom: 15px;
@@ -623,9 +623,9 @@ div.wf-multi-tile-card-info div {
     border-left: solid 1px #aaa;
 }
 
-.workflow-nav-controls.right {
+/*.workflow-nav-controls.right {
     border-right: solid 1px #aaa;
-}
+}*/
 
 .workflow-nav-controls .inactive {
     color: #ccc;
