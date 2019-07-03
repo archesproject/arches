@@ -5,10 +5,11 @@ define([
     'knockout',
     'mapbox-gl',
     'mapbox-gl-geocoder',
+    'geojson-extent',
     'text!templates/views/components/map-popup.htm',
     'bindings/mapbox-gl',
     'bindings/sortable'
-], function($, _, arches, ko, mapboxgl, MapboxGeocoder, popupTemplate) {
+], function($, _, arches, ko, mapboxgl, MapboxGeocoder, geojsonExtent, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         var geojsonSourceFactory = function() {
@@ -43,12 +44,26 @@ define([
         };
         this.activeTab.subscribe(function() {
             var map = self.map();
-            if (map) {
-                setTimeout(function() {
-                    map.resize();
-                }, 1);
-            }
+            if (map) setTimeout(function() { map.resize(); }, 1);
         });
+        this.zoomToGeoJSON = function(data, fly) {
+            var method = fly ? 'flyTo' : 'jumpTo';
+            var map = self.map();
+            var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
+            var tr = map.transform;
+            var nw = tr.project(bounds.getNorthWest());
+            var se = tr.project(bounds.getSouthEast());
+            var size = se.sub(nw);
+            var scaleX = (tr.width - 80) / size.x;
+            var scaleY = (tr.height - 80) / size.y;
+            var maxZoom = ko.unwrap(self.maxZoom);
+            maxZoom = maxZoom > 17 ? 17 : maxZoom;
+            var options = {
+                center: tr.unproject(nw.add(se).div(2)),
+                zoom: Math.min(tr.scaleZoom(tr.scale * Math.min(scaleX, scaleY)), maxZoom)
+            };
+            map[method](options);
+        };
 
         mapLayers.forEach(function(layer) {
             if (!layer.isoverlay) {

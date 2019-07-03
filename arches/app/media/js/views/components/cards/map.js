@@ -5,7 +5,8 @@ define([
     'uuid',
     'mapbox-gl-draw',
     'viewmodels/card-component',
-    'views/components/map'
+    'views/components/map',
+    'bindings/chosen'
 ], function(_, ko, koMapping, uuid, MapboxDraw, CardComponentViewModel, MapComponentViewModel) {
     return ko.components.register('map-card', {
         viewModel: function(params) {
