@@ -23,6 +23,7 @@ from uuid import UUID
 from django.db import transaction
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.models import EditLog
 from arches.app.models.models import TileModel
@@ -92,6 +93,10 @@ class Resource(models.ResourceInstance):
         Saves and indexes a single resource
 
         """
+        graph = models.GraphModel.objects.get(graphid=self.graph_id)
+        if graph.isactive is False:
+            message = _('This model is not yet active; unable to save.')
+            raise ModelInactiveError(message)
         request = kwargs.pop('request', None)
         user = kwargs.pop('user', None)
         super(Resource, self).save(*args, **kwargs)
@@ -267,6 +272,10 @@ class Resource(models.ResourceInstance):
         """
 
         permit_deletion = False
+        graph = models.GraphModel.objects.get(graphid=self.graph_id)
+        if graph.isactive is False:
+            message = _('This model is not yet active; unable to delete.')
+            raise ModelInactiveError(message)
         if user != {}:
             user_is_reviewer = user.groups.filter(name='Resource Reviewer').exists()
             if user_is_reviewer is False:
@@ -306,7 +315,7 @@ class Resource(models.ResourceInstance):
 
         """
         graphs = models.GraphModel.objects.all().exclude(
-            pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False)
+            pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         graph_lookup = {str(graph.graphid): {
             'name': graph.name, 'iconclass': graph.iconclass, 'fillColor': graph.color} for graph in graphs}
         ret = {
@@ -456,3 +465,13 @@ def is_uuid(value_to_test):
         return True
     except:
         return False
+
+
+class ModelInactiveError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Model Inactive Error")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self.message)

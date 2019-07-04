@@ -20,6 +20,7 @@
 @import url(../packages/leaflet/dist/leaflet.css);
 @import url(../packages/leaflet-draw/dist/leaflet.draw.css);
 @import url(../css/tree/tree.css);
+@import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 .regular-link {
     color: #337ab7;
     text-decoration: none;
@@ -698,6 +699,14 @@ div.workflow-panel {
     margin-top: 15px;
 }
 
+.workflow-select-card-container-title {
+    font-size: 1.5em;
+    font-weight: 500;
+    padding-left: 30px;
+    margin-top: 5px;
+    margin-bottom: -15px;
+}
+
 .workflow-select-card-container {
     display: flex;
     flex-grow: inherit;
@@ -707,14 +716,20 @@ div.workflow-panel {
 }
 
 .workflow-select-card {
-    width: 180px;
-    height: 180px;
+    width: 200px;
+    height: 200px;
     padding: 10px;
     color: white;
     text-align: center;
-    border: 1px solid black;
+    border: 1px solid #777;
     border-radius: 1px;
     margin: 10px;
+    opacity: 0.85;
+}
+
+.workflow-select-card:hover {
+    opacity: 1.0;
+    border: 1px solid black;
 }
 
 .workflow-select-wf-circle {
@@ -731,8 +746,14 @@ div.workflow-panel {
     font-size: 40px;
 }
 
+.workflow-select-title {
+    font-size: 1.4em;
+    font-weight: 500;
+}
+
 .workflow-select-desc {
-    font-size: 11px;
+    font-size: 12px;
+    padding-top: 10px;
 }
 /* general styling for all tabs */
 .tab-subheader-sm p {
@@ -1128,6 +1149,7 @@ ul.tabbed-report-tab-list {
 }
 
 .map-card-wrapper {
+    flex: 1;
     height: 100%;
     position: relative;
 }
@@ -1135,6 +1157,10 @@ ul.tabbed-report-tab-list {
 .map-card-container {
     height: 100%;
     margin-right: 92px;
+}
+
+.map-card-container.map-card-container-sidepanel-active {
+    margin-right: 492px;
 }
 
 .map-card-sidebar {
@@ -1177,6 +1203,7 @@ ul.tabbed-report-tab-list {
     background: white;
     border-left: 1px solid rgb(216, 216, 216);
     padding: 16px;
+    overflow-y: scroll;
 }
 
 .map-card-sidepanel-header {
@@ -1196,16 +1223,26 @@ ul.tabbed-report-tab-list {
     color: rgb(33, 62, 95);
 }
 
-.basemap-listing, .overlay-listing {
+.basemap-listing, .overlay-listing, .legend-listing {
     padding: 20px;
-    cursor: pointer;
     border-bottom: 1px solid rgb(216, 216, 216);
+}
+
+.basemap-listing, .overlay-listing .overlay-opacity-control, .overlay-listing .overlay-name {
+    cursor: pointer;
+}
+
+.overlay-listing, .legend-listing {
+    cursor: grab;
+}
+
+.basemap-listing, .overlay-listing {
     font-size: 16px;
     color: rgb(158, 158, 158);
 }
 
 .basemap-listing:before, .overlay-listing .overlay-name:before {
-    margin-right: 16px;
+    margin-right: 4px;
     font-family: FontAwesome;
 }
 
@@ -1284,8 +1321,26 @@ ul.tabbed-report-tab-list {
     width: 150px;
     opacity: 1;
 }
-
-.basemap-listing.active-basemap, .basemap-listing:hover, .overlay-listing.active-overlay, .overlay-listing:hover {
+.legend-listing .legend-name {
+    font-size: 16px;
+}
+.legend-listing .legend-content {
+    padding: 10px 10px 0;
+}
+.layer-listing-icon {
+    display: inline-block;
+}
+.layer-listing-icon::before {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: solid 1px rgb(216, 216, 216);
+    border-radius: 100%;
+    background-color: rgb(247, 247, 247);
+}
+.basemap-listing.active-basemap, .basemap-listing:hover, .overlay-listing.active-overlay, .overlay-listing:hover, .legend-listing .legend-name {
     color: rgb(33, 62, 95);
 }
 .basemap-listing.active-basemap, .basemap-listing:hover, .overlay-listing:hover {
@@ -1298,6 +1353,22 @@ ul.tabbed-report-tab-list {
 
 .overlay-listing.active-overlay .overlay-name:before {
     content: "\f205";
+}
+
+.map-card-feature-item.active .map-card-feature-name {
+    font-weight: 600;
+}
+
+.map-card-feature-list .table {
+    margin-bottom: 0;
+}
+
+.map-card-feature-tool {
+    font-size: 0.9em;
+    width: 65px;
+}
+.map-card-feature-tool a {
+    color: #2f527a;
 }
 
 #map-settings {
@@ -9850,6 +9921,10 @@ a.clear-geojson-button:hover {
     visibility: hidden;
 }
 
+.map-card-wrapper .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+    visibility: visible;
+}
+
 .widget-wrapper .mapboxgl-map {
     z-index: 10;
     margin-bottom: -10px;
@@ -13065,8 +13140,12 @@ a.filter-tools:hover {
     padding: 6px 12px;
     white-space: nowrap;
 }
-.chosen-container-single .chosen-single div b, .chosen-container-single .chosen-single .search-choice-close {
+.chosen-container-single .chosen-single div b {
     background-image: none !important;
+}
+
+.chosen-container-single .chosen-single .search-choice-close {
+    top: 10px;
 }
 
 .chosen-container-single .chosen-single div b:before {
@@ -13236,7 +13315,6 @@ ul.select2-choices:after {
     padding: 0px;
     flex: 1 0 250px;
     width: 250px;
-    overflow-y: auto;
     background-color: white;
 }
 
@@ -13268,6 +13346,7 @@ ul.select2-choices:after {
 .card-component-wrapper-editor {
     height: 100%;
     padding-bottom: 50px;
+    overflow-y: auto;
 }
 
 .card-header {
@@ -13492,6 +13571,16 @@ a.jstree-anchor.permissions-widget {
 .indent {
     text-indent: 10px;
     padding-left: 10px;
+}
+
+.mapboxgl-popup-content {
+    width: 350px;
+    padding: 20px;
+}
+
+.mapboxgl-popup-content .hover-feature-footer {
+    padding: 10px 0 0;
+    height: auto;
 }
 
 @keyframes loader {

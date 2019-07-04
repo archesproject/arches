@@ -1,158 +1,159 @@
 define([
-    'jquery',
     'underscore',
-    'arches',
     'knockout',
+    'knockout-mapping',
+    'uuid',
+    'mapbox-gl-draw',
     'viewmodels/card-component',
-    'bindings/sortable'
-], function($, _, arches, ko, CardComponentViewModel) {
+    'views/components/map'
+], function(_, ko, koMapping, uuid, MapboxDraw, CardComponentViewModel, MapComponentViewModel) {
     return ko.components.register('map-card', {
         viewModel: function(params) {
             var self = this;
-            var geojsonSourceFactory = function() {
-                return {
-                    "type": "geojson",
-                    "data": {
-                        "type": "FeatureCollection",
-                        "features": []
-                    }
-                };
-            };
-
-            this.basemaps = [];
-            this.overlays = ko.observableArray();
-            this.activeBasemap = ko.observable();
-            this.activeTab = ko.observable();
-            this.hideSidePanel = function() {
-                self.activeTab(undefined);
-            };
-
-            arches.mapLayers.forEach(function(layer) {
-                if (!layer.isoverlay) {
-                    self.basemaps.push(layer);
-                    if (layer.addtomap) self.activeBasemap(layer);
-                }
-                else {
-                    layer.opacity = ko.observable(layer.addtomap ? 100 : 0);
-                    layer.onMap = ko.pureComputed({
-                        read: function() { return layer.opacity() > 0; },
-                        write: function(value) {
-                            layer.opacity(value ? 100 : 0);
-                        }
-                    });
-                    self.overlays.push(layer);
-                }
-            });
-
-            _.each(arches.mapSources, function(sourceConfig) {
-                if (sourceConfig.tiles) {
-                    sourceConfig.tiles.forEach(function(url, i) {
-                        if (url.startsWith('/')) {
-                            sourceConfig.tiles[i] = window.location.origin + url;
-                        }
-                    });
-                }
-            });
-
-            var multiplyStopValues = function(stops, multiplier) {
-                _.each(stops, function(stop) {
-                    if (Array.isArray(stop[1])) {
-                        multiplyStopValues(stop[1], multiplier);
-                    } else {
-                        stop[1] = stop[1] * multiplier;
-                    }
-                });
-            };
-
-            var updateOpacity = function(layer, val) {
-                var opacityVal = Number(val) / 100.0;
-                layer = JSON.parse(JSON.stringify(layer));
-                if (layer.paint === undefined) {
-                    layer.paint = {};
-                }
-                _.each([
-                    'background',
-                    'fill',
-                    'line',
-                    'text',
-                    'icon',
-                    'raster',
-                    'circle',
-                    'fill-extrusion',
-                    'heatmap'
-                ], function(opacityType) {
-                    var startVal = layer.paint ? layer.paint[opacityType + '-opacity'] : null;
-
-                    if (startVal) {
-                        if (parseFloat(startVal)) {
-                            layer.paint[opacityType + '-opacity'].base = startVal * opacityVal;
-                        } else {
-                            layer.paint[opacityType + '-opacity'] = JSON.parse(JSON.stringify(startVal));
-                            if (startVal.base) {
-                                layer.paint[opacityType + '-opacity'].base = startVal.base * opacityVal;
-                            }
-                            if (startVal.stops) {
-                                multiplyStopValues(layer.paint[opacityType + '-opacity'].stops, opacityVal);
-                            }
-                        }
-                    } else if (layer.type === opacityType ||
-                         (layer.type === 'symbol' && (opacityType === 'text' || opacityType === 'icon'))) {
-                        layer.paint[opacityType + '-opacity'] = opacityVal;
-                    }
-                }, self);
-                return layer;
-            };
-
-            var layers = ko.pureComputed(function() {
-                var layers = self.activeBasemap().layer_definitions.slice(0);
-                self.overlays().forEach(function(layer) {
-                    if (layer.onMap()) {
-                        var opacity = layer.opacity();
-                        layer.layer_definitions.forEach(function(layer) {
-                            layers.push(updateOpacity(layer, opacity));
-                        });
-                    }
-                });
-                return layers;
-            }, this);
-
-            this.mapOptions = {
-                style: {
-                    version: 8,
-                    sources: Object.assign({
-                        "resource": geojsonSourceFactory(),
-                        "search-results-hex": geojsonSourceFactory(),
-                        "search-results-hashes": geojsonSourceFactory(),
-                        "search-results-points": geojsonSourceFactory()
-                    }, arches.mapSources),
-                    sprite: arches.mapboxSprites,
-                    glyphs: arches.mapboxGlyphs,
-                    layers: layers(),
-                    center: [arches.mapDefaultX, arches.mapDefaultY],
-                    zoom: arches.mapDefaultZoom
-                },
-                bounds: arches.hexBinBounds
-            };
-
-            this.toggleTab = function(tabName) {
-                if (self.activeTab() === tabName) {
-                    self.activeTab(null);
-                } else {
-                    self.activeTab(tabName);
-                }
-            };
-
-            this.setupMap = function(map) {
-                self.map = map;
-
-                layers.subscribe(function(layers) {
-                    var style = map.getStyle();
-                    style.layers = layers;
-                    map.setStyle(style);
-                });
-            };
 
             CardComponentViewModel.apply(this, [params]);
+            MapComponentViewModel.apply(this, [params]);
+
+            this.activeTab('editor');
+            this.featureLookup = {};
+            var getDrawFeatures = function() {
+                var drawFeatures = [];
+                self.card.widgets().forEach(function(widget) {
+                    var nodeId = widget.node_id();
+                    if (self.form && self.form.nodeLookup[nodeId].datatype() === 'geojson-feature-collection' && self.tile) {
+                        var featureCollection = koMapping.toJS(self.tile.data[nodeId]);
+                        if (featureCollection) {
+                            featureCollection.features.forEach(function(feature) {
+                                if (!feature.id) {
+                                    feature.id = uuid.generate();
+                                }
+                                feature.properties.nodeId = nodeId;
+                            });
+                            drawFeatures = drawFeatures.concat(featureCollection.features);
+                        }
+                    }
+                });
+                return drawFeatures;
+            };
+            var drawFeatures = getDrawFeatures();
+            var newNodeId;
+            this.card.widgets().forEach(function(widget) {
+                var nodeId = widget.node_id();
+                if (self.form && self.form.nodeLookup[nodeId].datatype() === 'geojson-feature-collection') {
+                    self.featureLookup[nodeId] = {
+                        features: ko.computed(function() {
+                            var features = [];
+                            if (self.tile) {
+                                var featureCollection = koMapping.toJS(self.tile.data[nodeId]);
+                                if (featureCollection) {
+                                    features = featureCollection.features;
+                                }
+                            }
+                            return features;
+                        }),
+                        selectedTool: ko.observable()
+                    };
+                    self.featureLookup[nodeId].selectedTool.subscribe(function(selectedTool) {
+                        if (self.draw) {
+                            if (selectedTool === '') {
+                                self.draw.changeMode('simple_select');
+                            } else if (selectedTool) {
+                                _.each(self.featureLookup, function(value, key) {
+                                    if (key !== nodeId) {
+                                        value.selectedTool(null);
+                                    }
+                                });
+                                newNodeId = nodeId;
+                                self.draw.changeMode(selectedTool);
+                            }
+                        }
+                    });
+                }
+            });
+
+            var updateFeatures = function() {
+                var featureCollection = self.draw.getAll();
+                _.each(self.featureLookup, function(value) {
+                    value.selectedTool(null);
+                });
+                self.card.widgets().forEach(function(widget) {
+                    var nodeId = widget.node_id();
+                    if (self.form && self.form.nodeLookup[nodeId].datatype() === 'geojson-feature-collection') {
+                        var nodeFeatures = [];
+                        featureCollection.features.forEach(function(feature){
+                            if (feature.properties.nodeId === nodeId) nodeFeatures.push(feature);
+                        });
+                        if (ko.isObservable(self.tile.data[nodeId])) {
+                            self.tile.data[nodeId]({
+                                type: 'FeatureCollection',
+                                features: nodeFeatures
+                            });
+                        } else {
+                            self.tile.data[nodeId].features(nodeFeatures);
+                        }
+                    }
+                });
+            };
+
+            this.deleteFeature = function(feature) {
+                if (self.draw) {
+                    self.draw.delete(feature.id);
+                    updateFeatures();
+                }
+            };
+
+            this.editFeature = function(feature) {
+                if (self.draw) {
+                    self.draw.changeMode('simple_select', {
+                        featureIds: [feature.id]
+                    });
+                    self.selectedFeatureIds([feature.id]);
+                    _.each(self.featureLookup, function(value) {
+                        value.selectedTool(null);
+                    });
+                }
+            };
+
+            this.updateLayers = function(layers) {
+                var map = self.map();
+                var style = map.getStyle();
+                style.layers = layers.concat(self.draw.options.styles);
+                map.setStyle(style);
+            };
+
+            this.selectedFeatureIds = ko.observableArray();
+            this.draw = null;
+            this.map.subscribe(function(map) {
+                self.draw = new MapboxDraw({
+                    displayControlsDefault: false
+                });
+                map.addControl(self.draw);
+                self.draw.set({
+                    type: 'FeatureCollection',
+                    features: drawFeatures
+                });
+                map.on('draw.create', function(e) {
+                    e.features.forEach(function(feature) {
+                        self.draw.setFeatureProperty(feature.id, 'nodeId', newNodeId);
+                    });
+                    updateFeatures();
+                });
+                map.on('draw.update', updateFeatures);
+                map.on('draw.delete', updateFeatures);
+                map.on('draw.modechange', updateFeatures);
+                map.on('draw.selectionchange', function(e) {
+                    self.selectedFeatureIds(e.features.map(function(feature) {
+                        return feature.id;
+                    }));
+                });
+
+                self.form.on('tile-reset', function() {
+                    self.draw.set({
+                        type: 'FeatureCollection',
+                        features: getDrawFeatures()
+                    });
+                });
+            });
         },
         template: {
             require: 'text!templates/views/components/cards/map.htm'

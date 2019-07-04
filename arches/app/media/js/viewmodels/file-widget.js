@@ -17,7 +17,7 @@ define([
      */
     var FileWidgetViewModel = function(params) {
         var self = this;
-        params.configKeys = ['acceptedFiles', 'maxFilesize'];
+        params.configKeys = ['acceptedFiles', 'maxFilesize', 'maxFiles'];
 
         WidgetViewModel.apply(this, [params]);
 
@@ -162,6 +162,7 @@ define([
             clickable: ".fileinput-button." + this.uniqueidClass(),
             acceptedFiles: this.acceptedFiles(),
             maxFilesize: this.maxFilesize(),
+            maxFiles: Number(this.maxFiles()),
             init: function() {
                 self.dropzone = this;
 

@@ -23,7 +23,7 @@ define([
         this.alert = params.alert || ko.observable(null);
         this.resourceId = params.resourceid || ko.observable();
         this.complete = params.complete || ko.observable();
-
+        this.completeOnSave = params.completeOnSave === false ? false : true;
         this.loading(true);
 
         $.getJSON(url, function(data) {
@@ -157,7 +157,9 @@ define([
                 params.resourceid(tile.resourceinstance_id);
                 params.tileid(tile.tileid);
                 self.resourceId(tile.resourceinstance_id);
-                self.complete(true);
+                if (self.completeOnSave === true) {
+                    self.complete(true);
+                }
                 if (typeof callback === 'function') {
                     callback.apply(null, arguments);
                 }

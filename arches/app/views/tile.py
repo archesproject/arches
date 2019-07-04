@@ -23,7 +23,7 @@ import traceback
 import uuid
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
-from arches.app.models.resource import Resource
+from arches.app.models.resource import Resource, ModelInactiveError
 from arches.app.models.tile import Tile, TileValidationError
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse
@@ -101,9 +101,13 @@ class TileData(View):
                     resource = Resource()
                     graphid = models.Node.objects.filter(nodegroup=data['nodegroup_id'])[0].graph_id
                     resource.graph_id = graphid
-                    resource.save(user=request.user)
-                    data['resourceinstance_id'] = resource.pk
-                    resource.index()
+                    try:
+                        resource.save(user=request.user)
+                        data['resourceinstance_id'] = resource.pk
+                        resource.index()
+                    except ModelInactiveError as e:
+                        message = _('Unable to save. Please verify the model status is active')
+                        return JSONResponse({'status': 'false', 'message': [_(e.title), _(str(message))]}, status=500)
                 tile_id = data['tileid']
                 if tile_id is not None and tile_id != '':
                     try:
@@ -129,6 +133,11 @@ class TileData(View):
                                             Resource.objects.get(pk=tile.resourceinstance_id).delete(request.user)
                                         title = _('Unable to save. Please verify your input is valid')
                                         return self.handle_save_error(e, tile_id, title=title)
+                                    except ModelInactiveError as e:
+                                        message = _('Unable to save. Please verify the model status is active')
+                                        return JSONResponse({
+                                            'status': 'false', 'message': [_(e.title), _(str(message))]
+                                            }, status=500)
                                 else:
                                     if accepted_provisional is not None:
                                         provisional_editor = User.objects.get(pk=accepted_provisional_edit["user"])
