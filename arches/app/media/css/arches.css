@@ -478,8 +478,8 @@ input[type="checkbox"] {
 }
 
 .workflow-step-icon.complete {
-    box-shadow: 0 0 0 2px #ebeef0;
-    background-color: #598ec7;
+    border: 1px solid #3A74B0;
+    background-color: #B4D1F0;
     color: #fff;
 }
 
@@ -531,7 +531,7 @@ input[type="checkbox"] {
 .workflow-step-body {
     background-color: #eee;
     height: 100%;
-    padding-bottom: 207px;
+    padding: 20px 35px 200px 40px;
     overflow-y: auto;
 }
 
@@ -8090,7 +8090,6 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     background: #e6e6e6;
     height: 45px;
     color: rgb(89, 56, 255);
-    border: 1px solid #c4c4c4;
     border-radius: 2px;
 }
 
