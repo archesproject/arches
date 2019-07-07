@@ -3265,7 +3265,7 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .function-node-alert {
-    background: #3acaa1;
+    background: #0ab1fc;
     padding: 15px 10px;
     margin-top: -15px;
     margin-left: -5px;
@@ -12374,6 +12374,7 @@ a.filter-tools:hover {
     background: white;
     width: 100%;
     overflow-y: auto;
+    height: 100vh;
 }
 
 .editor-report .rp-report-section {
@@ -13360,6 +13361,15 @@ ul.select2-choices:after {
 
 .card-component-panel .card-component h4 {
     margin-top: 5px;
+}
+
+.card-component-panel .card-component .is-function-node {
+    background: #0ab1fc;
+    /*max-width: 500px;*/
+    color: #fff;
+    font-size: 13px;
+    padding: 15px 10px;
+    margin-bottom: 15px;
 }
 
 .card-component-panel hr {
