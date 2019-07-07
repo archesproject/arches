@@ -3264,6 +3264,17 @@ ul.nav.nav-tabs.nav-justified {
     min-width: 468px;
 }
 
+.function-node-alert {
+    background: #3acaa1;
+    padding: 15px 10px;
+    margin-top: -15px;
+    margin-left: -5px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #fff;
+}
+
 .edtf-input {
     padding-bottom: 15px;
 }
