@@ -51,18 +51,7 @@ define([
             var method = fly ? 'flyTo' : 'jumpTo';
             var map = self.map();
             var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
-            var tr = map.transform;
-            var nw = tr.project(bounds.getNorthWest());
-            var se = tr.project(bounds.getSouthEast());
-            var size = se.sub(nw);
-            var scaleX = (tr.width - 80) / size.x;
-            var scaleY = (tr.height - 80) / size.y;
-            var maxZoom = ko.unwrap(self.maxZoom);
-            maxZoom = maxZoom > 17 ? 17 : maxZoom;
-            var options = {
-                center: tr.unproject(nw.add(se).div(2)),
-                zoom: Math.min(tr.scaleZoom(tr.scale * Math.min(scaleX, scaleY)), maxZoom)
-            };
+            var options = map.cameraForBounds(bounds, {padding: 40});
             map[method](options);
         };
 
@@ -225,41 +214,43 @@ define([
         };
 
         this.setupMap = function(map) {
-            map.addControl(new mapboxgl.NavigationControl(), 'top-left');
-            map.addControl(new MapboxGeocoder({
-                accessToken: mapboxgl.accessToken,
-                mapboxgl: mapboxgl,
-                placeholder: arches.geocoderPlaceHolder,
-                bbox: bounds
-            }), 'top-right');
+            map.on('load', function() {
+                map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+                map.addControl(new MapboxGeocoder({
+                    accessToken: mapboxgl.accessToken,
+                    mapboxgl: mapboxgl,
+                    placeholder: arches.geocoderPlaceHolder,
+                    bbox: bounds
+                }), 'top-right');
 
-            layers.subscribe(self.updateLayers);
+                layers.subscribe(self.updateLayers);
 
-            var hoverFeature;
-            map.on('mousemove', function(e) {
-                if (hoverFeature) map.setFeatureState(hoverFeature, { hover: false });
-                hoverFeature = _.find(
-                    map.queryRenderedFeatures(e.point),
-                    self.isFeatureClickable
-                );
-                if (hoverFeature) map.setFeatureState(hoverFeature, { hover: true });
-                map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
-            });
-
-            map.on('click', function(e) {
-                if (hoverFeature) {
-                    var p = new mapboxgl.Popup()
-                        .setLngLat(e.lngLat)
-                        .setHTML(self.popupTemplate)
-                        .addTo(map);
-                    ko.applyBindingsToDescendants(
-                        self.getPopupData(hoverFeature),
-                        p._content
+                var hoverFeature;
+                map.on('mousemove', function(e) {
+                    if (hoverFeature) map.setFeatureState(hoverFeature, { hover: false });
+                    hoverFeature = _.find(
+                        map.queryRenderedFeatures(e.point),
+                        self.isFeatureClickable
                     );
-                }
-            });
+                    if (hoverFeature) map.setFeatureState(hoverFeature, { hover: true });
+                    map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
+                });
 
-            self.map(map);
+                map.on('click', function(e) {
+                    if (hoverFeature) {
+                        var p = new mapboxgl.Popup()
+                            .setLngLat(e.lngLat)
+                            .setHTML(self.popupTemplate)
+                            .addTo(map);
+                        ko.applyBindingsToDescendants(
+                            self.getPopupData(hoverFeature),
+                            p._content
+                        );
+                    }
+                });
+
+                self.map(map);
+            });
         };
     };
     ko.components.register('arches-map', {

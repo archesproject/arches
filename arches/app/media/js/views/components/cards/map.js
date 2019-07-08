@@ -158,7 +158,15 @@ define([
                     });
                 });
 
-                setTimeout(function() { map.resize(); }, 1);
+                setTimeout(function() {
+                    map.resize();
+                    if (drawFeatures.length > 0) {
+                        self.zoomToGeoJSON({
+                            type: 'FeatureCollection',
+                            features: drawFeatures
+                        });
+                    }
+                }, 1);
             });
         },
         template: {
