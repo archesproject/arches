@@ -157,6 +157,8 @@ define([
                         if (value.selectedTool()) value.selectedTool('');
                     });
                 });
+
+                setTimeout(function() { map.resize(); }, 1);
             });
         },
         template: {
