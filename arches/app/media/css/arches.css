@@ -535,8 +535,12 @@ input[type="checkbox"] {
     overflow-y: auto;
 }
 
-.padded-workflow-step {
+.padded-workflow-step, .workflow-step-body .card-component {
     padding: 35px;
+}
+
+.workflow-step-body .padded-workflow-step .card-component {
+    padding: 15px 25px;
 }
 
 .wf-multi-tile-step-container {
