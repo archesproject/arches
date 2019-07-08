@@ -267,7 +267,7 @@
             {% block form_header %}
             <h4 data-bind="text: card.model.name"></h4>
             <!-- ko if: card.isFuncNode && card.isFuncNode()  -->
-            <h4 data-bind="text: card.isFuncNode()"></h4>
+            <h4 class="is-function-node" data-bind="text: card.isFuncNode()"></h4>
             <!-- /ko -->
             <!-- ko if: card.model.helpenabled -->
             <span>
