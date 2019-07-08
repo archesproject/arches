@@ -22,7 +22,7 @@
              <div class="subtitle" data-bind="text:activeStep().subtitle"></div>
              <div class="step">{% trans "Step" %} <span data-bind="text:activeStep()._index+1"></span> {% trans "of" %} <span data-bind="text:steps.length"></span>: <span data-bind="text:activeStep().description"></span></div>
         </div>
-        <div class="workflow-nav-controls right"><i class="ion-arow-right-b" data-bind="click: next, css: {inactive: activeStep().complete() !== true}"></i></div>
+        <div class="workflow-nav-controls right"><i class="ion-arrow-right-b" data-bind="click: next, css: {inactive: activeStep().complete() !== true}"></i></div>
     </div>
     <div class='workflow-step-body'>
         <!--ko if: activeStep().componentname-->
