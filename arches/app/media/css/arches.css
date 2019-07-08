@@ -531,8 +531,16 @@ input[type="checkbox"] {
 .workflow-step-body {
     background-color: #eee;
     height: 100%;
-    padding: 20px 35px 300px 40px;
+    padding: 0 0 218px 0;
     overflow-y: auto;
+}
+
+.padded-workflow-step, .workflow-step-body .card-component {
+    padding: 20px 35px 82px 40px;
+}
+
+.workflow-step-body .padded-workflow-step .card-component {
+    padding: 15px 25px;
 }
 
 .wf-multi-tile-step-container {
@@ -1171,6 +1179,7 @@ ul.tabbed-report-tab-list {
     flex: 1;
     height: 100%;
     position: relative;
+    background-color: #eee;
 }
 
 .map-card-container {

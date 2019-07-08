@@ -5,10 +5,11 @@ define([
     'knockout',
     'mapbox-gl',
     'mapbox-gl-geocoder',
+    'geojson-extent',
     'text!templates/views/components/map-popup.htm',
     'bindings/mapbox-gl',
     'bindings/sortable'
-], function($, _, arches, ko, mapboxgl, MapboxGeocoder, popupTemplate) {
+], function($, _, arches, ko, mapboxgl, MapboxGeocoder, geojsonExtent, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         var geojsonSourceFactory = function() {
@@ -34,6 +35,7 @@ define([
         var mapLayers = params.mapLayers || arches.mapLayers;
 
         this.map = ko.isObservable(params.map) ? params.map : ko.observable();
+        this.popupTemplate = popupTemplate;
         this.basemaps = [];
         this.overlays = ko.observableArray();
         this.activeBasemap = ko.observable();
@@ -43,12 +45,15 @@ define([
         };
         this.activeTab.subscribe(function() {
             var map = self.map();
-            if (map) {
-                setTimeout(function() {
-                    map.resize();
-                }, 1);
-            }
+            if (map) setTimeout(function() { map.resize(); }, 1);
         });
+        this.zoomToGeoJSON = function(data, fly) {
+            var method = fly ? 'flyTo' : 'jumpTo';
+            var map = self.map();
+            var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
+            var options = map.cameraForBounds(bounds, {padding: 40});
+            map[method](options);
+        };
 
         mapLayers.forEach(function(layer) {
             if (!layer.isoverlay) {
@@ -189,6 +194,8 @@ define([
             resourceData['graph_name'] = '';
             resourceData.featureCollections = [];
             resourceData = ko.mapping.fromJS(resourceData);
+            resourceData.reportURL = arches.urls.resource_report;
+            resourceData.editURL = arches.urls.resource_editor;
             resourceLookup[resourceId] = resourceData;
             $.get(arches.urls.resource_descriptors + resourceId, function(data) {
                 resourceLookup[resourceId].displaydescription(data.displaydescription);
@@ -207,41 +214,46 @@ define([
         };
 
         this.setupMap = function(map) {
-            map.addControl(new mapboxgl.NavigationControl(), 'top-left');
-            map.addControl(new MapboxGeocoder({
-                accessToken: mapboxgl.accessToken,
-                mapboxgl: mapboxgl,
-                placeholder: arches.geocoderPlaceHolder,
-                bbox: bounds
-            }), 'top-right');
+            map.on('load', function() {
+                map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+                map.addControl(new mapboxgl.FullscreenControl({
+                    container: $(map.getContainer()).closest('.map-card-wrapper')[0]
+                }), 'top-left');
+                map.addControl(new MapboxGeocoder({
+                    accessToken: mapboxgl.accessToken,
+                    mapboxgl: mapboxgl,
+                    placeholder: arches.geocoderPlaceHolder,
+                    bbox: bounds
+                }), 'top-right');
 
-            layers.subscribe(self.updateLayers);
+                layers.subscribe(self.updateLayers);
 
-            var hoverFeature;
-            map.on('mousemove', function(e) {
-                if (hoverFeature) map.setFeatureState(hoverFeature, { hover: false });
-                hoverFeature = _.find(
-                    map.queryRenderedFeatures(e.point),
-                    self.isFeatureClickable
-                );
-                if (hoverFeature) map.setFeatureState(hoverFeature, { hover: true });
-                map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
-            });
-
-            map.on('click', function(e) {
-                if (hoverFeature) {
-                    var p = new mapboxgl.Popup()
-                        .setLngLat(e.lngLat)
-                        .setHTML(popupTemplate)
-                        .addTo(map);
-                    ko.applyBindingsToDescendants(
-                        self.getPopupData(hoverFeature),
-                        p._content
+                var hoverFeature;
+                map.on('mousemove', function(e) {
+                    if (hoverFeature) map.setFeatureState(hoverFeature, { hover: false });
+                    hoverFeature = _.find(
+                        map.queryRenderedFeatures(e.point),
+                        self.isFeatureClickable
                     );
-                }
-            });
+                    if (hoverFeature) map.setFeatureState(hoverFeature, { hover: true });
+                    map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
+                });
 
-            self.map(map);
+                map.on('click', function(e) {
+                    if (hoverFeature) {
+                        var p = new mapboxgl.Popup()
+                            .setLngLat(e.lngLat)
+                            .setHTML(self.popupTemplate)
+                            .addTo(map);
+                        ko.applyBindingsToDescendants(
+                            self.getPopupData(hoverFeature),
+                            p._content
+                        );
+                    }
+                });
+
+                self.map(map);
+            });
         };
     };
     ko.components.register('arches-map', {
