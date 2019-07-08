@@ -4,18 +4,25 @@
     <!--ko if: ko.unwrap(activeStep) -->
     <div class="workflowstep-nav">
         <!--ko foreach: {data: steps, as: 'step'}-->
-        <div data-bind=""><i class="fa fa-lg" data-bind="class: step.iconClass"></i></div>
+        <div data-bind="">
+            <i class="fa fa-lg" data-bind="class: step.iconClass"></i>
+        </div>
         <!--/ko-->
-        <div class="workflow-nav-controls"><i class="workflow-delete fa fa-times-circle"></i></div>
+        
+        <div class="workflow-nav-controls">
+            <button class="btn btn-mint btn-labeled disabled"><i class="btn-label ion-android-cloud-done"></i>{% trans "Finish" %}</button>
+            <button class="btn btn-dark btn-labeled"><i class="btn-label ion-android-cancel"></i>{% trans "Quit" %}</button>
+        </div>
     </div>
     <div class="workflow-step-description-container">
-        <div class="workflow-nav-controls left"><i class="fa fa-chevron-circle-left" data-bind="click: back, css: {inactive: activeStep()._index === 0}"></i></div>
+        <div class="workflow-nav-controls left"><i class="ion-arrow-left-b" data-bind="click: back, css: {inactive: activeStep()._index === 0}"></i></div>
         <div class="workflow-step-description">
              <div class="title" data-bind="text:activeStep().title"></div>
+             <div class="workflow-name" data-bind="">Insert Workflow Name</div>
              <div class="subtitle" data-bind="text:activeStep().subtitle"></div>
              <div class="step">{% trans "Step" %} <span data-bind="text:activeStep()._index+1"></span> {% trans "of" %} <span data-bind="text:steps.length"></span>: <span data-bind="text:activeStep().description"></span></div>
         </div>
-        <div class="workflow-nav-controls right"><i class="fa fa-chevron-circle-right" data-bind="click: next, css: {inactive: activeStep().complete() !== true}"></i></div>
+        <div class="workflow-nav-controls right"><i class="ion-arow-right-b" data-bind="click: next, css: {inactive: activeStep().complete() !== true}"></i></div>
     </div>
     <div class='workflow-step-body'>
         <!--ko if: activeStep().componentname-->

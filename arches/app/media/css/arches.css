@@ -436,10 +436,10 @@ input[type="checkbox"] {
     display: flex;
     flex-direction: row;
     width: 100%;
-    border-bottom: solid 1px #ccc;
+    border-bottom: solid 1px #ddd;
     height: fit-content;
-    padding: 15px;
-    background-color: white;
+    padding: 20px 35px;
+    background-color: #fff;
 }
 
 .workflowstep-nav div {
@@ -448,8 +448,14 @@ input[type="checkbox"] {
 
 .workflowstep-nav div.workflow-nav-controls {
     position: absolute;
-    padding: 15px;
-    right: 10px;
+    padding: 10px 0px;
+    right: 15px;
+    font-size: 25px;
+    width: 250px;
+}
+
+.workflowstep-nav div.workflow-nav-controls button:first-child {
+    margin-right: 5px;
 }
 
 .workflow-step-icon {
@@ -461,15 +467,19 @@ input[type="checkbox"] {
     text-align: center;
     width: 56px;
     font-size: 25px;
+    color: #ccc;
 }
 
 .workflow-step-icon.active {
-    box-shadow: 0 0 0 2px #ebeef0;
+    background: #5FA2DD;
+    border: #1E6FB7;
+    color: #fff;
+    cursor: pointer;
 }
 
 .workflow-step-icon.complete {
-    box-shadow: 0 0 0 2px #ebeef0;
-    background-color: #598ec7;
+    border: 1px solid #3A74B0;
+    background-color: #B4D1F0;
     color: #fff;
 }
 
@@ -477,8 +487,8 @@ input[type="checkbox"] {
     width: 100%;
     display: flex;
     justify-content: space-between;
-    height: 120px;
-    border-bottom: solid 1px #ccc;
+    min-height: 100px;
+    border-bottom: solid 1px #ddd;
 }
 
 .workflow-step-description {
@@ -486,33 +496,42 @@ input[type="checkbox"] {
     flex-direction: column;
     justify-content: center;
     background-color: #fff;
-    padding: 10px;
+    padding: 15px 10px;
     overflow-x: hidden;
     overflow-y: hidden;
     width: 100%;
 }
 
 .workflow-step-description .title {
-    font-size: 20px;
+    font-size: 1.5em;
     font-weight: 600;
+    color: #004577;
+    padding-top: 10px;
+}
+
+.workflow-step-description .workflow-name {
+    font-size: 1.3em;
+    font-weight: 400;
+    line-height: 1.01;
     color: #004577;
 }
 
 .workflow-step-description .subtitle {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 400;
     color: #004577;
 }
 .workflow-step-description .step {
-    font-size: 10px;
+    font-size: 15px;
     font-weight: 400;
     color: #999;
+    padding-bottom: 15px;
 }
 
 .workflow-step-body {
     background-color: #eee;
     height: 100%;
-    padding-bottom: 207px;
+    padding: 20px 35px 300px 40px;
     overflow-y: auto;
 }
 
@@ -587,7 +606,7 @@ div.wf-multi-tile-card-info div {
     display: flex;
     background-color: #fff;
     align-items: center;
-    font-size: 41px;
+    font-size: 32px;
     justify-content: center;
     color: #004577;
 }
@@ -605,13 +624,13 @@ div.wf-multi-tile-card-info div {
     color: #007799;
 }
 
-.workflow-nav-controls.left {
+/*.workflow-nav-controls.left {
     border-left: solid 1px #aaa;
-}
+}*/
 
-.workflow-nav-controls.right {
+/*.workflow-nav-controls.right {
     border-right: solid 1px #aaa;
-}
+}*/
 
 .workflow-nav-controls .inactive {
     color: #ccc;
@@ -3243,6 +3262,17 @@ ul.nav.nav-tabs.nav-justified {
 .graph-settings-panel-body .widgets .widget-container div div .domain-input-item {
     max-width: 468px;
     min-width: 468px;
+}
+
+.function-node-alert {
+    background: #0ab1fc;
+    padding: 15px 10px;
+    margin-top: -15px;
+    margin-left: -5px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #fff;
 }
 
 .edtf-input {
@@ -6892,12 +6922,12 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     cursor: default;
     padding: 3px 5px 5px 5px;
     margin-right: 10px;
-    background: #F5BB25;
+    background: #FFB700;
     color: #fff;
 }
 
 .has-provisional-edits {
-    color: #F5BB25;
+    color: #FFD15B;
 }
 
 .provisional-edits-list {
@@ -6911,9 +6941,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .edit-message-container {
-    background: #F799B9;
+    background: #FFD15B;
     color: #fff;
-    border-bottom: 1px solid #DF2E6A;
+    font-weight: 700;
+    border-bottom: 1px solid #FFB700;
     height: 50px;
     margin-top: -15px;
     margin-bottom: 15px;
@@ -6924,7 +6955,8 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .edit-message-container .reset-authoritative {
     float: right;
-    color: white;
+    color: #fff;
+    font-weight: 600;
 }
 
 
@@ -8075,7 +8107,6 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     background: #e6e6e6;
     height: 45px;
     color: rgb(89, 56, 255);
-    border: 1px solid #c4c4c4;
     border-radius: 2px;
 }
 
@@ -12345,6 +12376,7 @@ a.filter-tools:hover {
     background: white;
     width: 100%;
     overflow-y: auto;
+    height: 100vh;
 }
 
 .editor-report .rp-report-section {
@@ -13331,6 +13363,17 @@ ul.select2-choices:after {
 
 .card-component-panel .card-component h4 {
     margin-top: 5px;
+}
+
+.card-component-panel .card-component .is-function-node {
+    /*background: #0ab1fc;
+    color: #fff;
+    padding: 15px 10px;
+    margin-bottom: 15px;*/
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: -5px;
+    margin-bottom: 15px;
 }
 
 .card-component-panel hr {
