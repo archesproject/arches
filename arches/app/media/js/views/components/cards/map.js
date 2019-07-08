@@ -153,6 +153,9 @@ define([
                         type: 'FeatureCollection',
                         features: getDrawFeatures()
                     });
+                    _.each(self.featureLookup, function(value) {
+                        if (value.selectedTool()) value.selectedTool('');
+                    });
                 });
             });
         },

@@ -35,6 +35,7 @@ define([
         var mapLayers = params.mapLayers || arches.mapLayers;
 
         this.map = ko.isObservable(params.map) ? params.map : ko.observable();
+        this.popupTemplate = popupTemplate;
         this.basemaps = [];
         this.overlays = ko.observableArray();
         this.activeBasemap = ko.observable();
@@ -204,6 +205,8 @@ define([
             resourceData['graph_name'] = '';
             resourceData.featureCollections = [];
             resourceData = ko.mapping.fromJS(resourceData);
+            resourceData.reportURL = arches.urls.resource_report;
+            resourceData.editURL = arches.urls.resource_editor;
             resourceLookup[resourceId] = resourceData;
             $.get(arches.urls.resource_descriptors + resourceId, function(data) {
                 resourceLookup[resourceId].displaydescription(data.displaydescription);
@@ -247,7 +250,7 @@ define([
                 if (hoverFeature) {
                     var p = new mapboxgl.Popup()
                         .setLngLat(e.lngLat)
-                        .setHTML(popupTemplate)
+                        .setHTML(self.popupTemplate)
                         .addTo(map);
                     ko.applyBindingsToDescendants(
                         self.getPopupData(hoverFeature),
