@@ -1179,6 +1179,7 @@ ul.tabbed-report-tab-list {
     flex: 1;
     height: 100%;
     position: relative;
+    background-color: #eee;
 }
 
 .map-card-container {

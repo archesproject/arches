@@ -216,6 +216,9 @@ define([
         this.setupMap = function(map) {
             map.on('load', function() {
                 map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+                map.addControl(new mapboxgl.FullscreenControl({
+                    container: $(map.getContainer()).closest('.map-card-wrapper')[0]
+                }), 'top-left');
                 map.addControl(new MapboxGeocoder({
                     accessToken: mapboxgl.accessToken,
                     mapboxgl: mapboxgl,
