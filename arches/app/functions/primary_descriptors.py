@@ -9,7 +9,14 @@ class PrimaryDescriptorsFunction(BaseFunction):
     def get_primary_descriptor_from_nodes(self, resource, config):
         try:
             if 'nodegroup_id' in config and config['nodegroup_id'] != '' and config['nodegroup_id'] is not None:
-                for tile in models.TileModel.objects.filter(nodegroup_id=uuid.UUID(config['nodegroup_id']), sortorder=0).filter(resourceinstance_id=resource.resourceinstanceid):
+                tiles = models.TileModel.objects.filter(
+                        nodegroup_id=uuid.UUID(config['nodegroup_id']),
+                        sortorder=0).filter(resourceinstance_id=resource.resourceinstanceid)
+                if len(tiles) == 0:
+                    tiles = models.TileModel.objects.filter(
+                        nodegroup_id=uuid.UUID(config['nodegroup_id'])).filter(
+                        resourceinstance_id=resource.resourceinstanceid)
+                for tile in tiles:
                     for node in models.Node.objects.filter(nodegroup_id=uuid.UUID(config['nodegroup_id'])):
                         if len(tile.data.keys()) > 0:
                             data = tile.data
