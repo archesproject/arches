@@ -4,6 +4,7 @@ from arches.app.models import models
 from arches.app.models.tile import Tile
 from arches.app.datatypes.datatypes import DataTypeFactory
 
+
 class PrimaryDescriptorsFunction(BaseFunction):
 
     def get_primary_descriptor_from_nodes(self, resource, config):
@@ -29,6 +30,6 @@ class PrimaryDescriptorsFunction(BaseFunction):
                             value = datatype.get_display_value(tile, node)
                             config['string_template'] = config['string_template'].replace('<%s>' % node.name, value)
         except ValueError as e:
-            print e, 'invalid nodegroupid participating in descriptor function.'
+            print(e, 'invalid nodegroupid participating in descriptor function.')
 
         return config['string_template']
