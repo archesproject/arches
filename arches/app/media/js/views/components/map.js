@@ -186,25 +186,23 @@ define([
             if (resourceLookup[resourceId]) {
                 return resourceLookup[resourceId];
             }
-            resourceData.loading = true;
-            resourceData.displaydescription = '';
-            resourceData['map_popup'] = '';
-            resourceData.displayname = '';
-            resourceData.graphid = '';
-            resourceData['graph_name'] = '';
-            resourceData.featureCollections = [];
+            resourceData = _.defaults(resourceData, {
+                'loading': true,
+                'displaydescription': '',
+                'map_popup': '',
+                'displayname': '',
+                'graphid': '',
+                'graph_name': '',
+                'geometries': []
+            });
             resourceData = ko.mapping.fromJS(resourceData);
             resourceData.reportURL = arches.urls.resource_report;
             resourceData.editURL = arches.urls.resource_editor;
+
             resourceLookup[resourceId] = resourceData;
             $.get(arches.urls.resource_descriptors + resourceId, function(data) {
-                resourceLookup[resourceId].displaydescription(data.displaydescription);
-                resourceLookup[resourceId].map_popup(data.map_popup);
-                resourceLookup[resourceId].displayname(data.displayname);
-                resourceLookup[resourceId].graphid(data.graphid);
-                resourceLookup[resourceId].graph_name(data.graph_name);
-                resourceLookup[resourceId].featureCollections(data.geometries);
-                resourceLookup[resourceId].loading(false);
+                data.loading = false;
+                ko.mapping.fromJS(data, resourceLookup[resourceId]);
             });
             return resourceLookup[resourceId];
         };
