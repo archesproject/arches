@@ -5,17 +5,21 @@
 {% block header %}
 <div>
     <ul class="tabbed-report-tab-list">
-    <!-- ko foreach: {data: tabs, as: 'tab'}  -->
+        <!-- ko if: activeTab  -->
+        <!-- ko foreach: {data: tabs, as: 'tab'}  -->
         <li data-bind="click: function(){ $parent.makeActiveTab(tab) }, css: { 'active-report-tab': $parent.activeTab()['name'] == tab['name'] }" class="report-tab">
             <a><span><i data-bind="attr: {class: ('fa '+ tab['icon'])}"></i></span></a>
         </li>
+        <!-- /ko -->
     <!-- /ko -->
     </ul>
 </div>
 
 <div class="tab-banner">
     <div><span><i class="fa fa-file-o"></i></span><span data-bind="">[Location Info]</span></div>
+    <!-- ko if: activeTab  -->
     <div><span data-bind="text: activeTab()['name']"></span></div>
+    <!-- /ko -->
 </div>
 {% endblock header %}
 
@@ -50,6 +54,3 @@
     </div>
 
     {% endblock body %}
-
-
-

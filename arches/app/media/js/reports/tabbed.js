@@ -17,7 +17,6 @@ define([
 
             this.tabs = ko.observableArray([]);
             self.config()["tabs"].forEach( function(tab) { self.tabs().push(tab); });
-
             this.activeTab = ko.observable(self.tabs()[0]);
 
             // this.activeStatus = ko.pureComputed( function(tab) {
@@ -32,18 +31,22 @@ define([
             };
 
             this.cardInActiveTab = function(cardNodegroupId) {
-                self.activeTab()["nodegroup_ids"].forEach( function(tabNodegroupId) {
-                    if(cardNodegroupId == tabNodegroupId) { return true; }
-                });
+                if (self.activeTab()) {
+                    self.activeTab()["nodegroup_ids"].forEach( function(tabNodegroupId) {
+                        if(cardNodegroupId == tabNodegroupId) { return true; }
+                    });
+                }
                 return false;
             };
 
             this.activeCards = ko.computed( function() {
                 var cardList = [];
-                self.report.cards().forEach(function(card) {
-                    self.activeTab()["nodegroup_ids"].forEach( function(tabNodegroupId) {
-                        if(card.nodegroupid == tabNodegroupId) { cardList.push(card); }
-                    });
+                ko.unwrap(self.report.cards).forEach(function(card) {
+                    if (self.activeTab()) {
+                        self.activeTab()["nodegroup_ids"].forEach( function(tabNodegroupId) {
+                            if(card.nodegroupid == tabNodegroupId) { cardList.push(card); }
+                        });
+                    }
                 });
                 return cardList;
 
