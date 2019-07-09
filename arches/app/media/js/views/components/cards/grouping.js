@@ -151,6 +151,10 @@ define([
                         self.saving = false;
                         self.groupedCardIds.valueHasMutated();
                         self.selectGroupCard();
+                        if (params.form.onSaveSuccess) {
+                            params.form.onSaveSuccess(self.tile);
+                        }
+                        self.loading(false);
                     });
                 });
                 errors.subscribe(function(errors){
@@ -161,6 +165,9 @@ define([
                         message.push(response.responseJSON.message[1]);
                     });
                     params.pageVm.alert(new AlertViewModel('ep-alert-red', title.join(), message.join(), null, function(){}));
+                    if (params.form.onSaveError) {
+                        params.form.onSaveError(self.tile);
+                    }
                 });
             };
 

@@ -1,8 +1,9 @@
 define([
     'knockout',
     'underscore',
+    'viewmodels/alert',
     'bindings/scrollTo'
-], function(ko, _) {
+], function(ko, _, AlertViewModel) {
     return function(params) {
         var self = this;
         var getTiles = function(tile, tiles) {
@@ -73,5 +74,28 @@ define([
             }
             return tiles;
         }, this);
+        this.saveTile = function() {
+            self.loading(true);
+            self.tile.save(function(response) {
+                self.loading(false);
+                params.pageVm.alert(
+                    new AlertViewModel(
+                        'ep-alert-red',
+                        response.responseJSON.message[0],
+                        response.responseJSON.message[1],
+                        null,
+                        function(){}
+                    )
+                );
+                if (params.form.onSaveError) {
+                    params.form.onSaveError(self.tile);
+                }
+            }, function() {
+                self.loading(false);
+                if (params.form.onSaveSuccess) {
+                    params.form.onSaveSuccess(self.tile);
+                }
+            });
+        };
     };
 });
