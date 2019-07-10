@@ -97,5 +97,28 @@ define([
                 }
             });
         };
+        this.deleteTile = function() {
+            self.loading(true);
+            self.tile.deleteTile(function(response) {
+                self.loading(false);
+                params.pageVm.alert(
+                    new AlertViewModel(
+                        'ep-alert-red',
+                        response.responseJSON.message[0],
+                        response.responseJSON.message[1],
+                        null,
+                        function(){}
+                    )
+                );
+                if (params.form.onDeleteError) {
+                    params.form.onDeleteError(self.tile);
+                }
+            }, function() {
+                self.loading(false);
+                if (params.form.onDeleteSuccess) {
+                    params.form.onDeleteSuccess(self.tile);
+                }
+            });
+        };
     };
 });
