@@ -34,7 +34,7 @@ class PagingFilter(BaseSearchFilter):
         search_results_object['query'].limit = limit
 
     def post_search_hook(self, search_results_object, results, permitted_nodegroups):
-        total = results['hits']['total']
+        total = results['hits']['total'] if results['hits']['total'] <= settings.SEARCH_RESULT_LIMIT else settings.SEARCH_RESULT_LIMIT
         page = 1 if self.request.GET.get(details['componentname']) == '' else int(self.request.GET.get(details['componentname'], 1))
 
         paginator, pages = get_paginator(self.request, results, total, page, settings.SEARCH_ITEMS_PER_PAGE)
