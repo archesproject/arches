@@ -25,9 +25,19 @@
     </div>
 </div>
 <div class="hover-feature-footer">
-    <a data-bind="click: function () { window.open(reportURL + ko.unwrap(resourceinstanceid)); }" href="javascript:void(0)"><i class="ion-document-text"></i> {% trans "Report" %}</a>
+    <a data-bind="click: function () {
+        window.open(reportURL + resourceinstanceid());
+    }" href="javascript:void(0)">
+        <i class="ion-document-text"></i>
+        {% trans "Report" %}
+    </a>
     {% if request.user|can_edit_resource_instance %}
-    <a data-bind="click: function () { window.open(editURL + ko.unwrap(resourceinstanceid)); }" href="javascript:void(0)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %}</a>
+    <a data-bind="click: function () {
+        window.open(editURL + resourceinstanceid());
+    }" href="javascript:void(0)">
+        <i class="ion-ios-refresh-empty"></i>
+        {% trans "Edit" %}
+    </a>
     {% endif %}
 </div>
 <!--/ko-->

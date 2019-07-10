@@ -1175,6 +1175,10 @@ ul.tabbed-report-tab-list {
     margin-top: -30px;
 }
 
+.mouse-pointer canvas {
+    cursor: pointer;
+}
+
 .map-card-wrapper {
     flex: 1;
     height: 100%;
@@ -1390,13 +1394,18 @@ ul.tabbed-report-tab-list {
 .map-card-feature-list .table {
     margin-bottom: 0;
 }
-
 .map-card-feature-tool {
-    font-size: 0.9em;
     width: 65px;
 }
-.map-card-feature-tool a {
+.map-card-zoom-tool, .map-card-feature-tool {
+    font-size: 0.9em;
+}
+.map-card-zoom-tool a, .map-card-feature-tool a {
     color: #2f527a;
+}
+.map-card-zoom-tool {
+    float: right;
+    padding: 10px;
 }
 
 #map-settings {
