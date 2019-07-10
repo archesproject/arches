@@ -103,10 +103,11 @@ class ConceptDataType(BaseConceptDataType):
         return get_preflabel_from_valueid(nodevalue, lang)['value']
 
     def get_display_value(self, tile, node):
-        if tile.data[str(node.nodeid)] is None or tile.data[str(node.nodeid)].strip() == '':
+        data = self.get_tile_data(tile)
+        if data[str(node.nodeid)] is None or data[str(node.nodeid)].strip() == '':
             return ''
         else:
-            return self.get_value(uuid.UUID(tile.data[str(node.nodeid)])).value
+            return self.get_value(uuid.UUID(data[str(node.nodeid)])).value
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -270,8 +271,9 @@ class ConceptListDataType(BaseConceptDataType):
 
     def get_display_value(self, tile, node):
         new_values = []
-        if tile.data[str(node.nodeid)]:
-            for val in tile.data[str(node.nodeid)]:
+        data = self.get_tile_data(tile)
+        if data[str(node.nodeid)]:
+            for val in data[str(node.nodeid)]:
                 new_val = self.get_value(uuid.UUID(val))
                 new_values.append(new_val.value)
         return ','.join(new_values)

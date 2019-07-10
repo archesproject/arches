@@ -140,32 +140,15 @@ define([
             };
         };
 
-        self.saveTile = function(tile, callback) {
-            self.loading(true);
-            tile.save(function(response) {
-                self.loading(false);
-                self.alert(
-                    new AlertViewModel(
-                        'ep-alert-red',
-                        response.responseJSON.message[0],
-                        response.responseJSON.message[1],
-                        null,
-                        function(){ return; }
-                    )
-                );
-            }, function(tile) {
-                params.resourceid(tile.resourceinstance_id);
-                params.tileid(tile.tileid);
-                self.resourceId(tile.resourceinstance_id);
-                if (self.completeOnSave === true) {
-                    self.complete(true);
-                }
-                if (typeof callback === 'function') {
-                    callback.apply(null, arguments);
-                }
-                self.loading(false);
-            });
+        self.onSaveSuccess = function(tile) {
+            params.resourceid(tile.resourceinstance_id);
+            params.tileid(tile.tileid);
+            self.resourceId(tile.resourceinstance_id);
+            if (self.completeOnSave === true) {
+                self.complete(true);
+            }
         };
+
     }
     ko.components.register('new-tile-step', {
         viewModel: viewModel,
