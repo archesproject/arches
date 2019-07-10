@@ -14,6 +14,7 @@ define([
         viewModel: function(params) {
             var self = this;
             var widgets = [];
+            var padding = 40;
             var drawFeatures;
             var newNodeId;
             this.featureLookup = {};
@@ -35,18 +36,18 @@ define([
                         }),
                         selectedTool: ko.observable()
                     };
-                    self.featureLookup[id].selectedTool.subscribe(function(selectedTool) {
+                    self.featureLookup[id].selectedTool.subscribe(function(tool) {
                         if (self.draw) {
-                            if (selectedTool === '') {
+                            if (tool === '') {
                                 self.draw.changeMode('simple_select');
-                            } else if (selectedTool) {
+                            } else if (tool) {
                                 _.each(self.featureLookup, function(value, key) {
                                     if (key !== id) {
                                         value.selectedTool(null);
                                     }
                                 });
                                 newNodeId = id;
-                                self.draw.changeMode(selectedTool);
+                                self.draw.changeMode(tool);
                             }
                         }
                     });
@@ -99,7 +100,7 @@ define([
                     type: 'FeatureCollection',
                     features: drawFeatures
                 });
-                params.fitBoundsOptions = { padding: 60 };
+                params.fitBoundsOptions = { padding: padding };
             }
             params.activeTab = 'editor';
 
@@ -137,9 +138,8 @@ define([
                     type: 'FeatureCollection',
                     features: features
                 });
-                map.jumpTo(map.cameraForBounds(bounds, {
-                    padding: 40
-                }));
+                var camera = map.cameraForBounds(bounds, { padding: padding });
+                map.jumpTo(camera);
             };
 
             this.map.subscribe(function(map) {
