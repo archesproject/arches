@@ -113,9 +113,9 @@
                                                 }
                                             ">
                                                 <option value=""></option>
-                                                <option value="draw_point">Add point</option>
-                                                <option value="draw_line_string">Add line</option>
-                                                <option value="draw_polygon">Add polygon</option>
+                                                <option value="draw_point">{% trans "Add point" %}</option>
+                                                <option value="draw_line_string">{% trans "Add line" %}</option>
+                                                <option value="draw_polygon">{% trans "Add polygon" %}</option>
                                             </select>
                                         </div>
                                         <table class="table">
@@ -128,13 +128,13 @@
                                                     <td class="map-card-feature-tool">
                                                         <a href="javascript:void(0);" data-bind="click: function() { self.editFeature(feature) }">
                                                             <i class="fa fa-pencil map-card-feature-edit"></i>
-                                                            Edit
+                                                            {% trans "Edit" %}
                                                         </a>
                                                     </td>
                                                     <td class="map-card-feature-tool">
                                                         <a href="javascript:void(0);" data-bind="click: function() { self.deleteFeature(feature) }">
-                                                            <i class="fa fa-times-circle-o map-card-feature-delete"></i>
-                                                            Delete
+                                                            <i class="fa fa-trash map-card-feature-delete"></i>
+                                                            {% trans "Delete" %}
                                                         </a>
                                                     </td>
                                                 </tr>
@@ -190,9 +190,9 @@
                     }">{% trans 'Delete this record' %}</button>
                     <!-- /ko -->
                     <!-- ko if: tile.dirty() -->
-                    <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
-                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">{% trans 'Cancel edit' %}</button>
-                    <!-- /ko -->
+                        <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
+                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">{% trans 'Cancel edit' %}</button>
+                        <!-- /ko -->
                         <!-- ko if: tile.tileid -->
                         <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
                             disabled: (!card.isWritable && !self.preview),

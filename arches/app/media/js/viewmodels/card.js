@@ -356,9 +356,9 @@ define([
                         }
                         nodegroupId = params.card.nodegroup_id;
                         if(nodegroupId === appFuncDesc) {
-                            return "* This card data will show as the resource description.";
+                            return "(This card data will define the resource description.)";
                         } else if(nodegroupId === appFuncName) {
-                            return "* This card data will show as the resource name.";
+                            return "(This card data will define the resource name.)";
                         }
                     }
                 }

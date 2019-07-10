@@ -5,7 +5,8 @@ define([
     'uuid',
     'mapbox-gl-draw',
     'viewmodels/card-component',
-    'views/components/map'
+    'views/components/map',
+    'bindings/chosen'
 ], function(_, ko, koMapping, uuid, MapboxDraw, CardComponentViewModel, MapComponentViewModel) {
     return ko.components.register('map-card', {
         viewModel: function(params) {
@@ -152,7 +153,20 @@ define([
                         type: 'FeatureCollection',
                         features: getDrawFeatures()
                     });
+                    _.each(self.featureLookup, function(value) {
+                        if (value.selectedTool()) value.selectedTool('');
+                    });
                 });
+
+                setTimeout(function() {
+                    map.resize();
+                    if (drawFeatures.length > 0) {
+                        self.zoomToGeoJSON({
+                            type: 'FeatureCollection',
+                            features: drawFeatures
+                        });
+                    }
+                }, 1);
             });
         },
         template: {
