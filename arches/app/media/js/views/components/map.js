@@ -5,11 +5,10 @@ define([
     'knockout',
     'mapbox-gl',
     'mapbox-gl-geocoder',
-    'geojson-extent',
     'text!templates/views/components/map-popup.htm',
     'bindings/mapbox-gl',
     'bindings/sortable'
-], function($, _, arches, ko, mapboxgl, MapboxGeocoder, geojsonExtent, popupTemplate) {
+], function($, _, arches, ko, mapboxgl, MapboxGeocoder, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         var geojsonSourceFactory = function() {
@@ -39,7 +38,7 @@ define([
         this.basemaps = [];
         this.overlays = ko.observableArray();
         this.activeBasemap = ko.observable();
-        this.activeTab = ko.observable();
+        this.activeTab = ko.observable(params.activeTab);
         this.hideSidePanel = function() {
             self.activeTab(undefined);
         };
@@ -47,13 +46,6 @@ define([
             var map = self.map();
             if (map) setTimeout(function() { map.resize(); }, 1);
         });
-        this.zoomToGeoJSON = function(data, fly) {
-            var method = fly ? 'flyTo' : 'jumpTo';
-            var map = self.map();
-            var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
-            var options = map.cameraForBounds(bounds, {padding: 40});
-            map[method](options);
-        };
 
         mapLayers.forEach(function(layer) {
             if (!layer.isoverlay) {
@@ -157,7 +149,8 @@ define([
                 center: [x, y],
                 zoom: zoom
             },
-            bounds: bounds
+            bounds: bounds,
+            fitBoundsOptions: params.fitBoundsOptions
         };
 
         this.toggleTab = function(tabName) {
@@ -180,35 +173,27 @@ define([
         };
 
         var resourceLookup = {};
-        var lookupResourceData = function(feature) {
-            var resourceData = feature.properties;
-            var resourceId = resourceData.resourceinstanceid;
-            if (resourceLookup[resourceId]) {
-                return resourceLookup[resourceId];
-            }
-            resourceData = _.defaults(resourceData, {
-                'loading': true,
-                'displaydescription': '',
-                'map_popup': '',
-                'displayname': '',
-                'graphid': '',
-                'graph_name': '',
-                'geometries': []
-            });
-            resourceData = ko.mapping.fromJS(resourceData);
-            resourceData.reportURL = arches.urls.resource_report;
-            resourceData.editURL = arches.urls.resource_editor;
-
-            resourceLookup[resourceId] = resourceData;
-            $.get(arches.urls.resource_descriptors + resourceId, function(data) {
-                data.loading = false;
-                ko.mapping.fromJS(data, resourceLookup[resourceId]);
-            });
-            return resourceLookup[resourceId];
-        };
-
         this.getPopupData = function(feature) {
-            return lookupResourceData(feature);
+            var data = feature.properties;
+            var id = data.resourceinstanceid;
+            if (id) {
+                if (resourceLookup[id]) return resourceLookup[id];
+                data = _.defaults(data, {
+                    'loading': true,
+                    'displayname': '',
+                    'graph_name': ''
+                });
+                data = ko.mapping.fromJS(data);
+                data.reportURL = arches.urls.resource_report;
+                data.editURL = arches.urls.resource_editor;
+
+                resourceLookup[id] = data;
+                $.get(arches.urls.resource_descriptors + id, function(data) {
+                    data.loading = false;
+                    ko.mapping.fromJS(data, resourceLookup[id]);
+                });
+                return resourceLookup[id];
+            }
         };
 
         this.setupMap = function(map) {
@@ -221,7 +206,7 @@ define([
                     accessToken: mapboxgl.accessToken,
                     mapboxgl: mapboxgl,
                     placeholder: arches.geocoderPlaceHolder,
-                    bbox: bounds
+                    bbox: arches.hexBinBounds
                 }), 'top-right');
 
                 layers.subscribe(self.updateLayers);
@@ -239,18 +224,24 @@ define([
 
                 map.on('click', function(e) {
                     if (hoverFeature) {
-                        var p = new mapboxgl.Popup()
+                        var selectedFeature = hoverFeature;
+                        var popup = new mapboxgl.Popup()
                             .setLngLat(e.lngLat)
                             .setHTML(self.popupTemplate)
                             .addTo(map);
                         ko.applyBindingsToDescendants(
                             self.getPopupData(hoverFeature),
-                            p._content
+                            popup._content
                         );
+                        map.setFeatureState(selectedFeature, { selected: true });
+                        popup.on('close', function() {
+                            map.setFeatureState(selectedFeature, { selected: false });
+                        });
                     }
                 });
 
                 self.map(map);
+                setTimeout(function() { map.resize(); }, 1);
             });
         };
     };
