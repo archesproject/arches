@@ -1391,6 +1391,16 @@ ul.tabbed-report-tab-list {
     font-weight: 600;
 }
 
+.geojson-editor {
+    border: 1px solid #808080;
+    margin-bottom: 16px;
+}
+
+.geojson-error-list {
+    padding: 10px;
+    color: rgb(161, 0, 0);
+}
+
 .map-card-feature-list .table {
     margin-bottom: 0;
 }
