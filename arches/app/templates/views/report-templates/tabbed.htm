@@ -42,12 +42,12 @@
                 <select class="design" data-placeholder="{% trans "Select cards in this tab" %}" multiple data-bind="selectedOptions: tab.nodegroup_ids, options: $parent.topcards, optionsText: 'name', optionsValue: 'nodegroupid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
-        <span style="position: relative; right:2px; top:2px" data-bind="click: function(){$parent.removeTab(tab)}"><i class="fa fa-close"></i></span>
+        <span data-bind="click: function(){$parent.removeTab(tab)}"><i class="fa fa-close"></i></span>
     </div>
 </div>
 <!--/ko-->
 <div id="card-save-tile-btn" class="install-buttons">
-    <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: addTab">{% trans "Add" %}</button>
+    <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: addTab">{% trans "Add Tab" %}</button>
 </div>
 {% endblock header_form %}
 
