@@ -14,7 +14,7 @@ from multiprocessing import Pool, TimeoutError, cpu_count
 import django
 # django.setup() must be called here to prepare for multiprocessing. specifically,
 # it must be called before any models are imported, otherwise things will crash
-# during an import that uses multiprocessing.
+# during a resource load that uses multiprocessing.
 # see https://stackoverflow.com/a/49461944/3873885
 django.setup()
 from django.db import connection, connections, transaction
@@ -54,7 +54,8 @@ except ImportError:
 def import_one_resource(line):
     """this single resource import function must be outside of the BusinessDataImporter
     class in order for it to be called with multiprocessing"""
-    django.setup()
+
+    connections.close_all()
     reader = ArchesFileReader()
     archesresource = JSONDeserializer().deserialize(line)
     reader.import_business_data({"resources": [archesresource]})
@@ -178,8 +179,8 @@ class BusinessDataImporter(object):
                     lines = openf.readlines()
                     if use_multiprocessing is True:
                         pool = Pool(cpu_count())
-                        connections.close_all()
                         pool.map(import_one_resource, lines)
+                        connections.close_all()
                         reader = ArchesFileReader()
                     else:
                         reader = ArchesFileReader()
