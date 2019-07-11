@@ -5,23 +5,52 @@
 {% block header %}
 <div>
     <ul class="tabbed-report-tab-list">
-        <!-- ko if: activeTab  -->
+    <!-- ko if: activeTab()  -->
         <!-- ko foreach: {data: tabs, as: 'tab'}  -->
-        <li data-bind="click: function(){ $parent.makeActiveTab(tab) }, css: { 'active-report-tab': $parent.activeTab()['name'] == tab['name'] }" class="report-tab">
-            <a><span><i data-bind="attr: {class: ('fa '+ tab['icon'])}"></i></span></a>
+        <li data-bind="click: function(){ $parent.makeActiveTab(tab) }, css: { 'active-report-tab': $parent.activeTab().name() == tab.name() }" class="report-tab">
+            <a><span><i data-bind="attr: {class: ('fa '+ tab.icon())}"></i></span></a>
         </li>
         <!-- /ko -->
     <!-- /ko -->
     </ul>
 </div>
-
+<p data-bind="text: tabs().length"></p>
 <div class="tab-banner">
-    <div><span><i class="fa fa-file-o"></i></span><span data-bind="">[Location Info]</span></div>
-    <!-- ko if: activeTab  -->
-    <div><span data-bind="text: activeTab()['name']"></span></div>
+    <div><span><i class="fa fa-file-o"></i></span><span data-bind=""></span></div>
+    <!-- ko if: activeTab()  -->
+    <div><span data-bind="text: activeTab()['name']()"></span></div>
     <!-- /ko -->
 </div>
 {% endblock header %}
+
+
+{% block header_form %}
+<div class="control-label">
+    {% trans "Add Report Tabs" %}
+</div>
+<!--ko foreach: {data: tabs, as: 'tab'}-->
+<div style="height: 100%; display: flex; flex-direction: column; justify-content: space-evenly; margin: 15px 0px 15px; padding: 5px; background-color: #fff">
+    <div style="display: flex; flex-direction: row">
+        <div>
+            <div class="col-xs-12 pad-nor" style="padding: 5px">
+                <input type="" placeholder="{% trans "Tab Name" %}" id="" class="form-control input-md widget-input" data-bind="textInput: tab.name" />
+            </div>
+            <div class="col-xs-12 pad-nor" style="padding: 5px">
+                <input type="" placeholder="{% trans "Tab Icon" %}" id="" class="form-control input-md widget-input" data-bind="textInput: tab.icon" />
+            </div>
+            <div class="col-xs-12 pad-nor" style="padding: 5px">
+                <select class="design" data-placeholder="{% trans "Select cards in this tab" %}" multiple data-bind="selectedOptions: tab.nodegroup_ids, options: $parent.topcards, optionsText: 'name', optionsValue: 'nodegroupid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+            </div>
+        </div>
+        <span style="position: relative; right:2px; top:2px" data-bind="click: function(){$parent.removeTab(tab)}"><i class="fa fa-close"></i></span>
+    </div>
+</div>
+<!--/ko-->
+<div id="card-save-tile-btn" class="install-buttons">
+    <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: addTab">{% trans "Add" %}</button>
+</div>
+{% endblock header_form %}
+
 
 {% block body %}
 
