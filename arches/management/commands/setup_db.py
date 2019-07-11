@@ -96,9 +96,13 @@ class Command(BaseCommand):
                       "re-run this same command.")
                 exit()
 
+        cursor = conn.cursor()
+        cursor.execute("SELECT rolcreatedb FROM pg_roles WHERE rolname = '{}'".format(username))
+        cancreate = cursor.fetchone()[0]
+
         # autocommit false
         conn.set_isolation_level(0)
-        return conn
+        return {"connection": conn, "can_create_db": cancreate}
 
     def reset_db(self, cursor):
 
@@ -160,14 +164,12 @@ To create it, use:
         WARNING: This will destroy data
         """
 
-        conn = self.get_connection()
+        conninfo = self.get_connection()
+        conn = conninfo['connection']
+        can_create_db = conninfo['can_create_db']
+
         cursor = conn.cursor()
-
-        # figure out if this is a superuser or not
-        cursor.execute("SELECT current_setting('is_superuser')")
-        superuser = True if cursor.fetchone()[0] == "on" else False
-
-        if superuser:
+        if can_create_db is True:
             self.drop_and_recreate_db(cursor)
         else:
             self.reset_db(cursor)
