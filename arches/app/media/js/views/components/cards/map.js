@@ -6,10 +6,13 @@ define([
     'mapbox-gl',
     'mapbox-gl-draw',
     'geojson-extent',
+    'geojsonhint',
     'viewmodels/card-component',
     'views/components/map',
-    'bindings/chosen'
-], function(_, ko, koMapping, uuid, mapboxgl, MapboxDraw, geojsonExtent, CardComponentViewModel, MapComponentViewModel) {
+    'bindings/chosen',
+    'bindings/codemirror',
+    'codemirror/mode/javascript/javascript'
+], function(_, ko, koMapping, uuid, mapboxgl, MapboxDraw, geojsonExtent, geojsonhint, CardComponentViewModel, MapComponentViewModel) {
     return ko.components.register('map-card', {
         viewModel: function(params) {
             var self = this;
@@ -19,6 +22,7 @@ define([
             var newNodeId;
             this.featureLookup = {};
             this.selectedFeatureIds = ko.observableArray();
+            this.geoJSONString = ko.observable();
             this.draw = null;
 
             CardComponentViewModel.apply(this, [params]);
@@ -103,6 +107,71 @@ define([
                 params.fitBoundsOptions = { padding: padding };
             }
             params.activeTab = 'editor';
+            params.sources = {
+                "geojson-editor-data": {
+                    "type": "geojson",
+                    "data": {
+                        "type": "FeatureCollection",
+                        "features": []
+                    }
+                }
+            };
+            params.layers = [{
+                "id": "geojson-editor-polygon-fill",
+                "type": "fill",
+                "filter": ["==", "$type", "Polygon"],
+                "paint": {
+                    "fill-color": "#3bb2d0",
+                    "fill-outline-color": "#3bb2d0",
+                    "fill-opacity": 0.1
+                },
+                "source": "geojson-editor-data"
+            }, {
+                "id": "geojson-editor-polygon-stroke",
+                "type": "line",
+                "filter": ["==", "$type", "Polygon"],
+                "layout": {
+                    "line-cap": "round",
+                    "line-join": "round"
+                },
+                "paint": {
+                    "line-color": "#3bb2d0",
+                    "line-width": 2
+                },
+                "source": "geojson-editor-data"
+            }, {
+                "id": "geojson-editor-line",
+                "type": "line",
+                "filter": ["==", "$type", "LineString"],
+                "layout": {
+                    "line-cap": "round",
+                    "line-join": "round"
+                },
+                "paint": {
+                    "line-color": "#3bb2d0",
+                    "line-width": 2
+                },
+                "source": "geojson-editor-data"
+            }, {
+                "id": "geojson-editor-point-point-stroke",
+                "type": "circle",
+                "filter": ["==", "$type", "Point"],
+                "paint": {
+                    "circle-radius": 5,
+                    "circle-opacity": 1,
+                    "circle-color": "#fff"
+                },
+                "source": "geojson-editor-data"
+            }, {
+                "id": "geojson-editor-point",
+                "type": "circle",
+                "filter": ["==", "$type", "Point"],
+                "paint": {
+                    "circle-radius": 3,
+                    "circle-color": "#3bb2d0"
+                },
+                "source": "geojson-editor-data"
+            }];
 
             MapComponentViewModel.apply(this, [params]);
 
@@ -142,14 +211,73 @@ define([
                 map.jumpTo(camera);
             };
 
-            this.map.subscribe(function(map) {
+            this.editGeoJSON = function(features, nodeId) {
+                var geoJSONString = JSON.stringify({
+                    type: 'FeatureCollection',
+                    features: features
+                }, null, '   ');
+                this.geoJSONString(geoJSONString);
+                newNodeId = nodeId;
+            };
+            this.geoJSONString.subscribe(function(geoJSONString) {
+                var map = self.map();
+                if (geoJSONString === undefined) {
+                    setupDraw(map);
+                } else if (self.draw) {
+                    map.removeControl(self.draw);
+                    self.draw = undefined;
+                    self.selectedFeatureIds([]);
+                }
+            });
+            this.geoJSONErrors = ko.pureComputed(function() {
+                var geoJSONString = self.geoJSONString();
+                var hint = geojsonhint.hint(geoJSONString);
+                var errors = [];
+                hint.forEach(function(item) {
+                    if (item.level !== 'message') {
+                        errors.push(item);
+                    }
+                });
+                return errors;
+            }).extend({ rateLimit: 50 });
+            var geoJSONLayerData = ko.pureComputed(function() {
+                var geoJSONString = self.geoJSONString();
+                var geoJSONErrors = self.geoJSONErrors();
+                if (geoJSONErrors.length === 0) return JSON.parse(geoJSONString);
+                else return {
+                    type: 'FeatureCollection',
+                    features: []
+                };
+            }).extend({ rateLimit: 100 });
+            geoJSONLayerData.subscribe(function(data) {
+                var map = self.map();
+                map.getSource('geojson-editor-data').setData(data);
+            });
+            this.updateGeoJSON = function() {
+                if (self.geoJSONErrors().length === 0) {
+                    var geoJSON = JSON.parse(this.geoJSONString());
+                    geoJSON.features.forEach(function(feature) {
+                        if (!feature.id) feature.id = uuid.generate();
+                        if (!feature.properties) feature.properties = {};
+                        feature.properties.nodeId = newNodeId;
+                    });
+                    if (ko.isObservable(self.tile.data[newNodeId])) {
+                        self.tile.data[newNodeId](geoJSON);
+                    } else {
+                        self.tile.data[newNodeId].features(geoJSON.features);
+                    }
+                    self.geoJSONString(undefined);
+                }
+            };
+
+            var setupDraw = function(map) {
                 self.draw = new MapboxDraw({
                     displayControlsDefault: false
                 });
                 map.addControl(self.draw);
                 self.draw.set({
                     type: 'FeatureCollection',
-                    features: drawFeatures
+                    features: getDrawFeatures()
                 });
                 map.on('draw.create', function(e) {
                     e.features.forEach(function(feature) {
@@ -175,7 +303,9 @@ define([
                         if (value.selectedTool()) value.selectedTool('');
                     });
                 });
-            });
+            };
+
+            this.map.subscribe(setupDraw);
         },
         template: {
             require: 'text!templates/views/components/cards/map.htm'
