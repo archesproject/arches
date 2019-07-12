@@ -543,6 +543,10 @@ input[type="checkbox"] {
     padding: 15px 25px;
 }
 
+.workflow-step-body div div .new-provisional-edit-card-container div .widgets div div .widget-wrapper div div .widget-input {
+    max-width: 600px;
+}
+
 .wf-multi-tile-step-container {
     display: flex;
     flex-direction: row;
@@ -1490,6 +1494,10 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 .widget-input-group {
     margin-bottom: 15px;
     padding: 0 0 15px;
+}
+
+.input-group.date .input-group-addon {
+    background: #fafafa;
 }
 
 .widget-input-label {
@@ -13311,7 +13319,7 @@ ul.select2-choices:after {
 }
 
 .sidepanel-draggable {
-    background-color: #ffffff;
+    background-color: #fafafa;
     border-left: solid 1px gainsboro;
     border-right: solid 1px gainsboro;
     height:100%;
