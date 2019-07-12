@@ -13195,6 +13195,13 @@ a.filter-tools:hover {
     font-weight: bold;
 }
 
+.node-value-widget-ontology {
+    padding: 15px 20px;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+}
+
 .chosen-container-single .chosen-single {
     background: #fff;
     color: #4d627b;
