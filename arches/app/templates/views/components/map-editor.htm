@@ -75,7 +75,11 @@
 
             <!-- ko if: geoJSONString() !== undefined -->
             <div class="card">
-                <div class="geojson-editor" data-bind="codemirror: { value: geoJSONString, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
+                <div class="geojson-editor" data-bind="codemirror: {
+                    value: geoJSONString,
+                    mode: { name: 'javascript', json: true },
+                    lineNumbers: true
+                }"></div>
                 <div class="install-buttons">
                     <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
                         geoJSONString(undefined);
@@ -170,7 +174,6 @@
                                                 <!-- /ko -->
                                             </tbody>
                                         </table>
-                                        <!-- ko if: self.featureLookup[widget.node_id()].features().length > 0 -->
                                         <div class="map-card-zoom-tool">
                                             <a href="javascript:void(0);" data-bind="click: function() {
                                                 self.editGeoJSON(self.featureLookup[widget.node_id()].features(), widget.node_id());
@@ -178,6 +181,7 @@
                                                 <i class="fa fa-pencil map-card-feature-edit"></i>
                                                 {% trans "Edit GeoJSON" %}
                                             </a>
+                                            <!-- ko if: self.featureLookup[widget.node_id()].features().length > 0 -->
                                             |
                                             <a href="javascript:void(0);" data-bind="click: function() {
                                                 self.fitFeatures(self.featureLookup[widget.node_id()].features());
@@ -185,8 +189,8 @@
                                                 <i class="fa fa-search map-card-feature-edit"></i>
                                                 {% trans "Zoom to all features" %}
                                             </a>
+                                            <!-- /ko -->
                                         </div>
-                                        <!-- /ko -->
                                     </div>
                                 </div>
                             </div>
