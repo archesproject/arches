@@ -5,20 +5,23 @@
 {% block header %}
 <div>
     <ul class="tabbed-report-tab-list">
-    <!-- ko if: activeTab()  -->
+    <!-- ko if: activeTab  -->
         <!-- ko foreach: {data: tabs, as: 'tab'}  -->
-        <li data-bind="click: function(){ $parent.makeActiveTab(tab) }, css: { 'active-report-tab': $parent.activeTab().name() == tab.name() }" class="report-tab">
-            <a><span><i data-bind="attr: {class: ('fa '+ tab.icon())}"></i></span></a>
+        <li data-bind="click: function(){ $parent.activeTab(tab) }, css: { 'active-report-tab': $parent.activeTab().name() === ko.unwrap(tab.name) }" class="report-tab">
+            <a><span><i data-bind="attr: {class: ('fa '+ ko.unwrap(tab.icon))}"></i></span></a>
         </li>
         <!-- /ko -->
     <!-- /ko -->
     </ul>
 </div>
-<p data-bind="text: tabs().length"></p>
+<!-- <p data-bind="text: configtabs().length"></p> -->
 <div class="tab-banner">
-    <div><span><i class="fa fa-file-o"></i></span><span data-bind=""></span></div>
-    <!-- ko if: activeTab()  -->
-    <div><span data-bind="text: activeTab()['name']()"></span></div>
+    <div style="display: flex; flex-direction: row">
+        <span><i class="fa fa-file-o"></i></span>
+        <span style="padding-left: 5px" data-bind="text: '(Resource Instance Name)'"></span>
+    </div>
+    <!-- ko if: activeTab  -->
+    <div><span data-bind="text: activeTab().name()"></span></div>
     <!-- /ko -->
 </div>
 {% endblock header %}
