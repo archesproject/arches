@@ -3239,6 +3239,12 @@ ul.nav.nav-tabs.nav-justified {
     left: 1px;
 }
 
+.pad-hor.columns {
+    background: #fff;
+    padding: 7px 5px 5px 10px;
+    /*border: 1px solid #ddd;*/
+}
+
 .form-radio.form-normal::before  {
     left: 0px;
 }
