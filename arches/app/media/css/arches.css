@@ -12458,6 +12458,7 @@ a.filter-tools:hover {
     height: 100vh;
 }
 
+
 .editor-report .rp-report-section {
     border-bottom: none;
     padding-bottom: 0;
@@ -13452,14 +13453,16 @@ ul.select2-choices:after {
 }
 
 .card-component-panel .card-component .is-function-node {
-    /*background: #0ab1fc;
+    display: inline-block;
+    background: #0ab1fc;
     color: #fff;
-    padding: 15px 10px;
-    margin-bottom: 15px;*/
+    padding: 10px 15px;
+    margin-bottom: 15px;
     font-size: 13px;
     font-weight: 600;
-    margin-top: -5px;
-    margin-bottom: 15px;
+    margin-top: 0px;
+    margin-bottom: 5px;
+    border-radius: 2px;
 }
 
 .card-component-panel hr {
@@ -13469,7 +13472,7 @@ ul.select2-choices:after {
 .card-component-panel h5 {
     color: #999;
     margin-top: -8px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .card-component-wrapper-editor {
