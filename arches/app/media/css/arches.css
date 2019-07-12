@@ -529,7 +529,7 @@ input[type="checkbox"] {
 }
 
 .workflow-step-body {
-    background-color: #eee;
+    background-color: #f4f4f4;
     height: 100%;
     padding: 0 0 218px 0;
     overflow-y: auto;
