@@ -17,8 +17,8 @@
 <!-- <p data-bind="text: configtabs().length"></p> -->
 <div class="tab-banner">
     <div style="display: flex; flex-direction: row">
-        <span><i class="fa fa-file-o"></i></span>
-        <span style="padding-left: 5px" data-bind="text: '(Resource Instance Name)'"></span>
+        <span><i data-bind="class: report.get('iconclass') || 'fa fa-file-o'"></i></span>
+        <span style="padding-left: 5px" data-bind="text: report.get('displayname') || '(Resource Instance Name)'"></span>
     </div>
     <!-- ko if: activeTab  -->
     <div><span data-bind="text: activeTab().name()"></span></div>
