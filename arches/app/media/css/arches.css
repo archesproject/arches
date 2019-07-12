@@ -7036,6 +7036,9 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     float: right;
     color: #fff;
     font-weight: 600;
+    background: #db9a00;
+    padding: 5px;
+    margin-top: -3px;
 }
 
 
@@ -7077,6 +7080,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .new-provisional-edit-entry {
     border-bottom: 1px solid #ddd;
+    color: #999;
     background: #fdfdfd;
     padding: 5px;
     margin-left: -5px;
@@ -7113,11 +7117,13 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .new-provisional-edit-entry:hover {
     background-color: #f4f4f4;
+    color: #333;
     cursor: pointer;
 }
 
 .new-provisional-edit-entry.selected {
     background-color: #f4f4f4;
+    color: #454545;
 }
 
 .new-provisional-edit-entry .field-name {
