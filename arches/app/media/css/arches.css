@@ -431,6 +431,10 @@ input[type="checkbox"] {
     right: 10px;
 }
 
+.workflow-step-container {
+    overflow-y: auto;
+    height: 100vh;
+}
 
 .workflowstep-nav {
     display: flex;
@@ -540,7 +544,6 @@ input[type="checkbox"] {
     background-color: #f4f4f4;
     height: 100%;
     padding: 0 0 218px 0;
-    overflow-y: auto;
 }
 
 .padded-workflow-step, .workflow-step-body .card-component {
