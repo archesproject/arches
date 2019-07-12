@@ -28,8 +28,10 @@
 
 
 {% block header_form %}
-<div class="control-label">
-    {% trans "Add Report Tabs" %}
+<div style="display: flex; flex-direction: row">
+<div id="card-save-tile-btn" class="install-buttons">
+    <button id="" class="btn btn-shim btn-mint btn-labeled btn-md fa fa-plus" data-bind="click: addTab">{% trans "Add Tab" %}</button>
+</div>
 </div>
 <!--ko foreach: {data: tabs, as: 'tab'}-->
 <div style="height: 100%; display: flex; flex-direction: column; justify-content: space-evenly; margin: 15px 0px 15px; padding: 5px; background-color: #fff">
@@ -49,9 +51,6 @@
     </div>
 </div>
 <!--/ko-->
-<div id="card-save-tile-btn" class="install-buttons">
-    <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: addTab">{% trans "Add Tab" %}</button>
-</div>
 {% endblock header_form %}
 
 

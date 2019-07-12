@@ -48,12 +48,22 @@ define([
                 self.tabs(data);
             };
 
+            this.tabs().forEach(function(tab){
+                tab.nodegroup_ids.subscribe(function(){
+                    this.refreshTabs();
+                }, this);
+            }, this);
+
             this.addTab = function(){
-                this.tabs.push({
+                var newTab = {
                     icon: ko.observable(),
                     name: ko.observable(),
                     nodegroup_ids: ko.observableArray()
-                });
+                };
+                newTab.nodegroup_ids.subscribe(
+                    function(){this.refreshTabs();
+                    }, this);
+                this.tabs.unshift(newTab);
                 this.refreshTabs();// this.tabs.valueHasMutated() not working here!?;
             };
 
