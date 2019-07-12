@@ -3,7 +3,6 @@
     <div data-bind="" class="wf-multi-tile-step-container">
         <!-- ko if: tile() && card() -->
         <div class="wf-multi-tile-step-form">
-            <h3>Add Reference Number</h3>
             <div data-bind="component: {
                 name: cardComponentLookup[card().model.component_id()].componentname,
                 params: {
@@ -36,9 +35,9 @@
                         <!-- /ko -->
                     </div>
                 </div>
-                <div>
-                    <div data-bind="click: function(){$parent.remove(tile)}"><span><i class="fa fa-times-circle"></i></span><span>Remove</span></div>
-                    <div data-bind="click: function(){$parent.edit(tile);}"><span><i class="fa fa-pencil"></i></span><span>Edit</span></div>
+                <div class="wf-multi-tile-step-card-controls">
+                    <span><i class="fa fa-times-circle"></i></span><span class="" data-bind="click: function(){$parent.remove(tile)}">Remove</span>
+                    <span><i class="fa fa-pencil"></i></span><span data-bind="click: function(){$parent.edit(tile);}">Edit</span>
                 </div>
             </div>
             <!-- /ko -->

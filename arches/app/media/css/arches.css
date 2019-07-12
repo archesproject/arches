@@ -451,11 +451,19 @@ input[type="checkbox"] {
     padding: 10px 0px;
     right: 15px;
     font-size: 25px;
-    width: 250px;
+    width: 200px;
+}
+
+.workflowstep-nav div.workflow-nav-controls button {
+    font-weight: 800;
 }
 
 .workflowstep-nav div.workflow-nav-controls button:first-child {
     margin-right: 5px;
+}
+
+.workflow-step-body div .new-provisional-edit-card-container div .install-buttons button {
+    font-weight: 800;
 }
 
 .workflow-step-icon {
@@ -563,20 +571,26 @@ input[type="checkbox"] {
     flex-direction: column;
     flex-grow: 1;
     padding: 24px 24px 0 24px;
+    border-left: 1px solid #ddd;
+    background: #f0f0f0;
+    height: 100vh;
 }
 
 .wf-multi-tile-step-card {
-    border: 1px solid #e8e8e8;
+    border: 1px solid #ddd;
+    margin-bottom: 5px;
     border-radius: 2px;
-    background-color: white;
-    padding: 15px 5px 15px 15px;
-    display: flex;
-    flex-direction: row;
+    background-color: #fff;
 }
 
 .wf-multi-tile-card-info {
     display: flex;
     flex-direction: row;
+    padding: 10px 15px;
+}
+
+.wf-multi-tile-card-info .workflow-step-icon {
+    margin-top: 10px;
 }
 
 div.wf-multi-tile-card-info div {
@@ -593,24 +607,39 @@ div.wf-multi-tile-card-info div {
     /* margin-left: 12px; */
 }
 
+.wf-multi-tile-card-info-details dd {
+    margin-bottom: 3px;
+}
 
 
 .wf-multi-tile-step-card div div {
     margin: 0;
+    margin-right: 5px;
 }
 
 .wf-multi-tile-step-card > div.wf-multi-tile-card-info ~ div {
     display: flex;
     flex-direction: row;
     color: #4f9ce9;
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
     height: 32px;
     /* align-self: flex-end; */
 }
 
 .wf-multi-tile-step-card > div.wf-multi-tile-card-info ~ div span {
-    margin-right: 6px;
+    margin-right: 3px;
+}
+
+.wf-multi-tile-step-card > div.wf-multi-tile-card-info ~ div span:nth-child(2) {
+    margin-right: 15px;
+}
+
+.wf-multi-tile-step-card-controls {
+    padding: 5px 15px;
+    background: #f8f8f8;
+    border-top: 1px solid #ddd;
 }
 
 .workflow-nav-controls {
@@ -635,6 +664,11 @@ div.wf-multi-tile-card-info div {
 .workflow-nav-controls:hover {
     color: #007799;
 }
+
+.worflow-nav-controls.btn-labeled:not(.btn-block):not(.form-icon) {
+    font-weight: 600;
+}
+
 
 /*.workflow-nav-controls.left {
     border-left: solid 1px #aaa;
@@ -3241,7 +3275,7 @@ ul.nav.nav-tabs.nav-justified {
 
 .pad-hor.columns {
     background: #fff;
-    padding: 7px 5px 5px 10px;
+    padding: 8px 5px 6px 10px;
     /*border: 1px solid #ddd;*/
 }
 
