@@ -1,6 +1,6 @@
 {% load i18n %}
 <!-- ko if: !$data.search && $data.graph -->
-<div class="node-widget-label">
+<div class="node-widget-label pad-btm">
     <div class="control-label">
         {% trans "Related Node" %}
     </div>
@@ -18,7 +18,7 @@
         "></select>
     </div>
 </div>
-<div class="node-widget-label">
+<div class="node-widget-label pad-btm">
     <div class="control-label">
         {% trans "Relationship to Node" %}
     </div>
@@ -36,14 +36,10 @@
         "></select>
     </div>
 </div>
-<div style="margin-bottom:10px;" data-bind="if: properties().length > 0 && config.property()">
+<div class="node-value-widget-ontology" style="margin-bottom:10px;" data-bind="if: properties().length > 0 && config.property()">
     <div>
         (<strong data-bind="text: node.name"></strong>
-    </div>
-    <div>
         <em data-bind="text: propertyName"></em>
-    </div>
-    <div>
         <strong data-bind="text: relatedNodeName"></strong>)
     </div>
 </div>
