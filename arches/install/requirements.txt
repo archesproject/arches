@@ -16,7 +16,7 @@ couchdb==1.2
 django-revproxy==0.9.15
 django-cors-headers==2.2.0
 django-oauth-toolkit==1.1.2
-docx2html==0.2.3
+python-docx==0.8.10
 PyLD[requests]==1.0.4
 pyprind==2.11.2
 pycryptodome<4.0.0,>=3.3.1
