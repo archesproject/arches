@@ -11,45 +11,67 @@ define([
 ], function(_, ko, koMapping, $, ReportViewModel) {
     return ko.components.register('tabbed-report', {
         viewModel: function(params) {
-            var self = this;
-            params.configKeys = ['nodes'];
+            params.configKeys = ['tabs'];
             ReportViewModel.apply(this, [params]);
-
-            this.tabs = ko.observableArray([]);
-            self.config()["tabs"].forEach( function(tab) { self.tabs().push(tab); });
-
+            var self = this;
+            this.tabs(koMapping.fromJS(this.tabs())());
             this.activeTab = ko.observable(self.tabs()[0]);
 
-            // this.activeStatus = ko.pureComputed( function(tab) {
-            //     return tab["name"] == self.activeTab["name"] ? "active-report-tab": "report-tab";
-            // }, this);
-
-            this.makeActiveTab = function(tab) { self.activeTab(tab); };
-
-            this.isActiveTab = function(checkTab) {
-                self.tabs().forEach(function(tab) { if(tab["name"] == checkTab["name"]) { return true; } });
-                return false;
-            };
+            this.topcards = ko.unwrap(self.report.cards).map(function(card){
+                return {name: card.model.name(), nodegroupid: card.nodegroupid};
+            });
 
             this.cardInActiveTab = function(cardNodegroupId) {
-                self.activeTab()["nodegroup_ids"].forEach( function(tabNodegroupId) {
-                    if(cardNodegroupId == tabNodegroupId) { return true; }
-                });
+                if (self.activeTab()) {
+                    self.activeTab().nodegroup_ids().forEach( function(tabNodegroupId) {
+                        if (cardNodegroupId === tabNodegroupId) { return true; }
+                    });
+                }
                 return false;
             };
 
-            this.activeCards = ko.computed( function() {
+            this.activeCards = ko.computed(function() {
                 var cardList = [];
-                self.report.cards().forEach(function(card) {
-                    self.activeTab()["nodegroup_ids"].forEach( function(tabNodegroupId) {
-                        if(card.nodegroupid == tabNodegroupId) { cardList.push(card); }
-                    });
+                ko.unwrap(self.report.cards).forEach(function(card) {
+                    if (self.activeTab()) {
+                        self.activeTab()["nodegroup_ids"]().forEach( function(tabNodegroupId) {
+                            if(card.nodegroupid === tabNodegroupId) { cardList.push(card); }
+                        });
+                    }
                 });
                 return cardList;
-
-                //(expression below) -- filter(...cardInActiveTab(...)) wasn't working for some reason
-                // return self.report.cards().filter(function(card) { return self.cardInActiveTab(card.nodegroupid); });
             });
+
+            this.refreshTabs = function(){
+                var data = self.tabs().slice(0);
+                self.tabs([]);
+                self.tabs(data);
+            };
+
+            this.tabs().forEach(function(tab){
+                tab.nodegroup_ids.subscribe(function(){
+                    this.refreshTabs();
+                }, this);
+            }, this);
+
+            this.addTab = function(){
+                var newTab = {
+                    icon: ko.observable(),
+                    name: ko.observable(),
+                    nodegroup_ids: ko.observableArray()
+                };
+                newTab.nodegroup_ids.subscribe(
+                    function(){this.refreshTabs();
+                    }, this);
+                this.tabs.unshift(newTab);
+                this.refreshTabs();// this.tabs.valueHasMutated() not working here!?;
+            };
+
+            this.removeTab = function(tab){
+                this.tabs.remove(tab);
+                this.refreshTabs();
+            };
+
         },
         template: { require: 'text!report-templates/tabbed' }
     });

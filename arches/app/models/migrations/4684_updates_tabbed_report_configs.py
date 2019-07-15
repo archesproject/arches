@@ -14,8 +14,15 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
                         """
-                        update report_templates set defaultconfig = '{"tabs": []}'
-                        where templateid = '50000000-0000-0000-0000-000000000004'
+                        UPDATE report_templates SET defaultconfig = '{
+                          "tabs": [
+                            {
+                              "name": "New Tab",
+                              "icon": "fa-map-marker",
+                              "nodegroup_ids": []
+                            }
+                          ]
+                        }' WHERE templateid = '50000000-0000-0000-0000-000000000004';
                         """,
                         """
                         select * from report_templates
