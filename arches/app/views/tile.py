@@ -166,7 +166,7 @@ class TileData(View):
 
                     return JSONResponse(tile)
                 elif is_active is False:
-                    response = {'status': 'false', 'message': [_('Request Failed'), _('Unable to Save. Please verify the model status is active')]}
+                    response = {'status': 'false', 'message': [_('Request Failed'), _('Unable to Save. Verify model status is active')]}
                     return JSONResponse(response, status=500)
                 else:
                     response = {'status': 'false', 'message': [_('Request Failed'), _('Permission Denied')]}
@@ -225,7 +225,7 @@ class TileData(View):
                 except ObjectDoesNotExist:
                     return JSONResponse({'status':'false','message': [_('This tile is no longer available'), _('It was likely already deleted by another user')]}, status=500)
                 user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
-                if (user_is_reviewer or tile.is_provisional() == True) and is_active is True:
+                if (user_is_reviewer or tile.is_provisional() is True) and is_active is True:
                     if tile.filter_by_perm(request.user, 'delete_nodegroup'):
                         nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
                         clean_resource_cache(tile)
@@ -243,7 +243,7 @@ class TileData(View):
                     else:
                         return JSONResponse({'status':'false','message': [_('Request Failed'), _('Permission Denied')]}, status=500)
                 elif is_active is False:
-                    response = {'status': 'false', 'message': [_('Request Failed'), _('Unable to delete. Please verify the model status is active')]}
+                    response = {'status': 'false', 'message': [_('Request Failed'), _('Unable to delete. Verify model status is active')]}
                     return JSONResponse(response, status=500)
                 else:
                     return JSONResponse({'status':'false','message': [_('Request Failed'), _('You do not have permissions to delete a tile with authoritative data.')]}, status=500)
