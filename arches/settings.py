@@ -63,6 +63,13 @@ ELASTICSEARCH_CONNECTION_OPTIONS = {'timeout': 30}
 # a prefix to append to all elasticsearch indexes, note: must be lower case
 ELASTICSEARCH_PREFIX = 'arches'
 
+ELASTICSEARCH_CUSTOM_INDEXES = []  
+# [{
+#     'module': 'arches.app.search.custom_indexes.custom_index.CustomIndex',
+#     'active': False,
+#     'name': 'anptest'
+# }]
+
 USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 PACKAGE_ROOT = ROOT_DIR

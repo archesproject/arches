@@ -31,6 +31,7 @@ from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
+from arches.app.utils import import_class_from_string
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.exceptions import InvalidNodeNameException, MultipleNodesFoundException
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -199,8 +200,13 @@ class Resource(models.ResourceInstance):
             document['root_ontology_class'] = self.get_root_ontology()
             doc = JSONSerializer().serializeToPython(document)
             se.index_data(index='resources', body=doc, id=self.pk)
+
             for term in terms:
                 se.index_data('terms', body=term['_source'], id=term['_id'])
+
+            for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
+                es_index = import_class_from_string(index['module'])(index['name'])
+                es_index.index_document(self, document['tiles'])
 
     def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None):
         """

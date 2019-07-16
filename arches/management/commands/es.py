@@ -24,6 +24,7 @@ from arches.setup import get_elasticsearch_download_url, download_elasticsearch,
 from arches.management.commands import utils
 from arches.app.models import models
 from arches.app.models.system_settings import settings
+from arches.app.search.base_index import get_index
 from arches.app.search.mappings import prepare_terms_index, prepare_concepts_index, delete_terms_index, delete_concepts_index, prepare_search_index, delete_search_index, prepare_resource_relations_index, delete_resource_relations_index
 import arches.app.utils.index_database as index_database
 
@@ -36,7 +37,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('operation', nargs='?',
-            choices=['install', 'setup_indexes', 'delete_indexes', 'index_database', 'index_concepts', 'index_resources', 'index_resource_relations',],
+            choices=['install', 'setup_indexes', 'delete_indexes', 'index_database', 'index_concepts', 'index_resources', 'index_resource_relations', 'add_index', 'delete_index'],
             help='Operation Type; ' +
             '\'install\'=Install\'s Elasticsearch in the provided location with the provided port' +
             '\'setup_indexes\'=Creates the indexes in Elastic Search needed by the system' +
@@ -44,7 +45,9 @@ class Command(BaseCommand):
             '\'index_database\'=Indexes all the data (resources, concepts, and resource relations) found in the database' +
             '\'index_concepts\'=Indxes all concepts from the database'+
             '\'index_resources\'=Indexes all resources from the database'+
-            '\'index_resource_relations\'=Indexes all resource to resource relation records')
+            '\'index_resource_relations\'=Indexes all resource to resource relation records'+
+            '\'add_index\'=Register a new index in Elasticsearch'+
+            '\'delete_index\'=Deletes a named index from Elasticsearch')
 
         parser.add_argument('-d', '--dest_dir', action='store', dest='dest_dir', default='',
             help='Directory from where you want to run elasticsearch.')
@@ -58,6 +61,9 @@ class Command(BaseCommand):
         parser.add_argument('-c', '--clear_index', action='store', dest='clear_index', default=True,
             help='Set to True(default) to remove all the resources from the index before the reindexing operation')
 
+        parser.add_argument('-n', '--name ', action='store', dest='name', default=True,
+            help='Name of the custom index to register')
+
 
     def handle(self, *args, **options):
         if options['operation'] == 'install':
@@ -69,8 +75,14 @@ class Command(BaseCommand):
         if options['operation'] == 'setup_indexes':
             self.setup_indexes()
 
+        if options['operation'] == 'add_index':
+            self.register_index(name=options['name'])
+
         if options['operation'] == 'delete_indexes':
             self.delete_indexes()
+
+        if options['operation'] == 'delete_index':
+            self.remove_index(name=options['name'])
 
         if options['operation'] == 'index_database':
             index_database.index_db(clear_index=options['clear_index'], batch_size=options['batch_size'])
@@ -132,25 +144,13 @@ class Command(BaseCommand):
 
         print 'Elasticsearch installed at %s' % os.path.join(install_location, file_name_wo_extention)
 
-    # def start(self, install_location=None):
-    #     """
-    #     Starts the Elasticsearch process (blocking)
-    #     WARNING: this will block all subsequent python calls
+    def register_index(self, name):
+        es_index = get_index(name)
+        es_index.prepare_index()
 
-    #     """
-
-    #     es_start = os.path.join(install_location, 'bin')
-    #     print es_start
-
-    #     # use this instead to start in a non-blocking way
-    #     if sys.platform == 'win32':
-    #         import time
-    #         p = subprocess.Popen(['service.bat', 'install'], cwd=es_start, shell=True)
-    #         time.sleep(10)
-    #         p = subprocess.Popen(['service.bat', 'start'], cwd=es_start, shell=True)
-    #     else:
-    #         p = subprocess.Popen(es_start + '/elasticsearch', cwd=es_start, shell=False)
-    #     return p
+    def remove_index(self, name):
+        es_index = get_index(name)
+        es_index.delete_index()
 
     def setup_indexes(self):
         prepare_terms_index(create=True)
