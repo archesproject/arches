@@ -104,7 +104,7 @@ define([
                     type: 'FeatureCollection',
                     features: drawFeatures
                 });
-                params.fitBoundsOptions = { padding: padding };
+                params.fitBoundsOptions = { padding: {top: padding, left: padding + 200, bottom: padding, right: padding + 200} };
             }
             params.activeTab = 'editor';
             params.sources = {
