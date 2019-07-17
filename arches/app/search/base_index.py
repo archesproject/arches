@@ -1,9 +1,11 @@
+from datetime import datetime
 from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils import import_class_from_string
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Term
+
 
 class BaseIndex(object):
     def __init__(self, index_name=None):
@@ -15,20 +17,71 @@ class BaseIndex(object):
         self.index_name = index_name
 
     def prepare_index(self):
+        """
+        Defines the Elastic Search mapping and settings for an index
+
+        Arguments:
+        None
+
+        Keyword Arguments:
+        None
+
+        Return: None
+        """
+
         if self.index_metadata is not None:
-            if 'graph_id' not in self.index_metadata['mappings']['_doc']['properties']:
-                self.index_metadata['mappings']['_doc']['properties']['graph_id'] = {'type': 'keyword'}
             self.se.create_index(index=self.index_name, body=self.index_metadata)
         else:
             raise SearchIndexError('No index metadata defined.')
 
     def get_documents_to_index(self, resourceinstance, tiles):
+        """
+        Gets a document to index into Elastic Search
+
+        Arguments:
+        resourceinstance -- resource instance object
+        tiles -- list of tiles that make up the resource instance
+
+        Keyword Arguments:
+        None
+
+        Return: tuple of (document, document id)
+        """
+
         raise NotImplementedError
 
-    def index_document(self, resourceinstance, tiles, index=True):
-        raise NotImplementedError
+    def index_document(self, document=None, id=None):
+        """
+        Indexes a document into Elastic Search
 
-    def bulk_index(self, resources, resource_type, clear_index):
+        Arguments:
+        None
+
+        Keyword Arguments:
+        document -- the document to index
+        id -- the id of the document 
+
+        Return: None
+        """
+
+        self.se.index_data(index=self.index_name, body=document, id=id)
+
+    def bulk_index(self, resources=None, resource_type=None, graph_name=None, clear_index=True):
+        """
+        Indexes a list of documents in bulk to Elastic Search
+
+        Arguments:
+        None
+
+        Keyword Arguments:
+        resources -- the list of resource instances to index
+        resource_type -- the type of resources being indexed
+        graph_name -- the name of the graph model that represents the resources being indexed
+        clear_index -- True(default) to remove all index records of type "resource_type" before indexing
+
+        Return: None
+        """
+
         start = datetime.now()
         q = Query(se=self.se)
         term = Term(field='graph_id', term=str(resource_type))
@@ -40,15 +93,27 @@ class BaseIndex(object):
         with self.se.BulkIndexer(batch_size=settings.BULK_IMPORT_BATCH_SIZE, refresh=True) as indexer:
             for resource in resources:
                 tiles = list(models.TileModel.objects.filter(resourceinstance=resource))
-                document = self.index_document(resource, tiles, index=False)
-                indexer.add(index=self.index_name, id=resource.resourceinstanceid, data=document)
+                document, doc_id = self.get_documents_to_index(resource, tiles)
+                indexer.add(index=self.index_name, id=doc_id, data=document)
 
         result_summary['indexed'] = self.se.count(index=self.index_name, body=q.dsl)
         status = 'Passed' if result_summary['database'] == result_summary['indexed'] else 'Failed'
         print "Custom Index - %s:" % self.index_name
         print "    Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(status, graph_name, result_summary['database'], result_summary['indexed'], (datetime.now()-start).seconds)
 
-    def delete_index(self, *args, **kwargs):
+    def delete_index(self):
+        """
+        Deletes this index from Elastic Search
+
+        Arguments:
+        None
+
+        Keyword Arguments:
+        None
+
+        Return: None
+        """
+
         self.se.delete_index(index=self.index_name)
 
 
@@ -67,6 +132,7 @@ class SearchIndexError(Exception):
 
     def __str__(self):
         return repr(self.message)
+
 
 class SearchIndexNotDefinedError(Exception):
     def __init__(self, name=None):

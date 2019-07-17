@@ -7,6 +7,7 @@ from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Term
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.utils import import_class_from_string
 from datetime import datetime
 
 
@@ -83,14 +84,14 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
                     for term in terms:
                         term_indexer.add(index='terms', id=term['_id'], data=term['_source'])
 
-        for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
-            es_index = import_class_from_string(index['module'])(index['name'])
-            es_index.bulk_index(self, resources, resource_type, clear_index)
-
         result_summary['indexed'] = se.count(index='resources', body=q.dsl)
-
         status = 'Passed' if result_summary['database'] == result_summary['indexed'] else 'Failed'
         print "Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(status, graph_name, result_summary['database'], result_summary['indexed'], (datetime.now()-start).seconds)
+        
+        for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
+            es_index = import_class_from_string(index['module'])(index['name'])
+            es_index.bulk_index(resources=resources, resource_type=resource_type, graph_name=graph_name, clear_index=clear_index)
+
     return status
 
 
