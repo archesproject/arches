@@ -63,11 +63,16 @@ ELASTICSEARCH_CONNECTION_OPTIONS = {'timeout': 30}
 # a prefix to append to all elasticsearch indexes, note: must be lower case
 ELASTICSEARCH_PREFIX = 'arches'
 
-ELASTICSEARCH_CUSTOM_INDEXES = []  
+
+# a list of objects of the form below
+# {
+#     'module': dotted path to the Classname within a python module,
+#     'name': name of the custom index  <-- follow ES index naming rules
+# }
+ELASTICSEARCH_CUSTOM_INDEXES = []
 # [{
-#     'module': 'arches.app.search.custom_indexes.custom_index.CustomIndex',
-#     'active': False,
-#     'name': 'anptest'
+#     'module': 'my_project.search_indexes.sample_index.SampleIndex',
+#     'name': 'my_new_custom_index'
 # }]
 
 USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
