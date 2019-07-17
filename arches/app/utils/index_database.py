@@ -83,6 +83,10 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
                     for term in terms:
                         term_indexer.add(index='terms', id=term['_id'], data=term['_source'])
 
+        for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
+            es_index = import_class_from_string(index['module'])(index['name'])
+            es_index.bulk_index(self, resources, resource_type, clear_index)
+
         result_summary['indexed'] = se.count(index='resources', body=q.dsl)
 
         status = 'Passed' if result_summary['database'] == result_summary['indexed'] else 'Failed'

@@ -1,8 +1,9 @@
 from django.utils.translation import ugettext as _
-from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils import import_class_from_string
-
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Query, Term
 
 class BaseIndex(object):
     def __init__(self, index_name=None):
@@ -15,15 +16,37 @@ class BaseIndex(object):
 
     def prepare_index(self):
         if self.index_metadata is not None:
+            if 'graph_id' not in self.index_metadata['mappings']['_doc']['properties']:
+                self.index_metadata['mappings']['_doc']['properties']['graph_id'] = {'type': 'keyword'}
             self.se.create_index(index=self.index_name, body=self.index_metadata)
         else:
             raise SearchIndexError('No index metadata defined.')
 
-    def index_document(self, resourceinstance, tiles):
+    def get_documents_to_index(self, resourceinstance, tiles):
         raise NotImplementedError
 
-    def bulk_index(self, *args, **kwargs):
+    def index_document(self, resourceinstance, tiles, index=True):
         raise NotImplementedError
+
+    def bulk_index(self, resources, resource_type, clear_index):
+        start = datetime.now()
+        q = Query(se=self.se)
+        term = Term(field='graph_id', term=str(resource_type))
+        q.add_query(term)
+        if clear_index:
+            q.delete(index=self.index_name, refresh=True)
+
+        result_summary = {'database': len(resources), 'indexed': 0}
+        with self.se.BulkIndexer(batch_size=settings.BULK_IMPORT_BATCH_SIZE, refresh=True) as indexer:
+            for resource in resources:
+                tiles = list(models.TileModel.objects.filter(resourceinstance=resource))
+                document = self.index_document(resource, tiles, index=False)
+                indexer.add(index=self.index_name, id=resource.resourceinstanceid, data=document)
+
+        result_summary['indexed'] = self.se.count(index=self.index_name, body=q.dsl)
+        status = 'Passed' if result_summary['database'] == result_summary['indexed'] else 'Failed'
+        print "Custom Index - %s:" % self.index_name
+        print "    Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(status, graph_name, result_summary['database'], result_summary['indexed'], (datetime.now()-start).seconds)
 
     def delete_index(self, *args, **kwargs):
         self.se.delete_index(index=self.index_name)
