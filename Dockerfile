@@ -124,6 +124,7 @@ RUN pip install virtualenv==15.1.0 \
     && . ENV/bin/activate \
     && pip install -U pip setuptools \
     && pip install requests \
+    && pip install -f ${WHEELS} 'gunicorn==19.9.0' \
     && pip install -r ${WHEELS}/requirements.txt \
                    -f ${WHEELS} \
     && pip install -r ${WHEELS}/requirements_dev.txt \
