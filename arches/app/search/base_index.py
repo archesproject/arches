@@ -59,12 +59,13 @@ class BaseIndex(object):
 
         Keyword Arguments:
         document -- the document to index
-        id -- the id of the document 
+        id -- the id of the document
 
         Return: None
         """
 
-        self.se.index_data(index=self.index_name, body=document, id=id)
+        if document is not None and id is not None:
+            self.se.index_data(index=self.index_name, body=document, id=id)
 
     def bulk_index(self, resources=None, resource_type=None, graph_name=None, clear_index=True):
         """
