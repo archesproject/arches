@@ -8,10 +8,12 @@ import uuid
 import sys
 import urllib
 import os
+import imp
 from arches.app.search.mappings import prepare_terms_index, prepare_concepts_index, prepare_resource_relations_index
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 from arches.management.commands import utils
 from arches.app.views.tileserver import seed_resource_cache
+from arches.app.utils import import_class_from_string
 from arches.app.utils.skos import SKOSReader
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.system_metadata import system_metadata
@@ -441,6 +443,7 @@ class Command(BaseCommand):
                 'reference_data/concepts',
                 'reference_data/collections',
                 'system_settings',
+                'search_indexes',
             ]
             for directory in dirs:
                 os.makedirs(os.path.join(dest_dir, directory))
@@ -675,6 +678,19 @@ class Command(BaseCommand):
                     shutil.copy(module, module_dir)
                     management.call_command(cmd, 'register', source=module)
 
+        def load_indexes(package_dir):
+            index_files = glob.glob(os.path.join(package_dir, 'search_indexes', '*.py'))
+            root = settings.APP_ROOT if settings.APP_ROOT is not None else os.path.join(
+                settings.ROOT_DIR, 'app')
+            dest_dir = os.path.join(root, 'search_indexes')
+
+            for index_file in index_files:
+                shutil.copy(index_file, dest_dir)
+                package_settings = imp.load_source('', os.path.join(settings.APP_ROOT, 'package_settings.py'))
+                for index in package_settings.ELASTICSEARCH_CUSTOM_INDEXES:
+                    es_index = import_class_from_string(index['module'])(index['name'])
+                    es_index.prepare_index()
+
         def load_widgets(package_dir):
             load_extensions(package_dir, 'widgets', 'widget')
 
@@ -770,6 +786,8 @@ class Command(BaseCommand):
         load_resource_to_resource_constraints(package_location)
         print('loading map layers')
         load_map_layers(package_location)
+        print('loading search indexes')
+        load_indexes(package_location)
         print('loading business data - resource instances and relationships')
         load_business_data(package_location)
         print('loading resource views')
