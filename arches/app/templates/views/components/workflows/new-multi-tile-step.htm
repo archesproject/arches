@@ -16,6 +16,12 @@
             }"></div>
         </div>
         <div class="wf-multi-tile-step-list">
+            <div><h4 data-bind="text: (itemName())"></h4></div>
+            <!-- ko if: card().tiles().length === 0 -->
+            <div class="wf-multi-tile-step-list-empty">
+                <p data-bind="text: ('No '+itemName()+' added yet.')"></p>
+            </div>
+            <!-- /ko -->
             <!-- ko foreach: {data: card().tiles, as: 'tile'} -->
             <div class="wf-multi-tile-step-card">
                 <div class="wf-multi-tile-card-info">
