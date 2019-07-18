@@ -12,6 +12,8 @@ define([
     function NewMultiTileStepViewModel(params) {
         NewTileStepViewModel.apply(this, [params]);
         var self = this;
+        this.itemName = ko.observable();
+        params.title() != undefined ? this.itemName(params.title()) : this.itemName('Items');
 
         this.remove = function(tile) {
             tile.deleteTile( function(response) {
