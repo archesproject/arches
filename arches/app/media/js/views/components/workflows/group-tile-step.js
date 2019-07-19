@@ -4,12 +4,10 @@ define([
     'arches',
     'knockout',
     'knockout-mapping',
-    'models/graph',
-    'viewmodels/card',
     'views/components/workflows/new-tile-step',
     'viewmodels/provisional-tile',
     'viewmodels/alert'
-], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, NewTileStep, ProvisionalTileViewModel, AlertViewModel) {
+], function(_, $, arches, ko, koMapping, NewTileStep, ProvisionalTileViewModel, AlertViewModel) {
     function viewModel(params) {
         var self = this;
         NewTileStep.apply(this, [params]);
