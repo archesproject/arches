@@ -549,15 +549,24 @@ class Command(BaseCommand):
             self.import_graphs(resource_models, overwrite_graphs=overwrite_graphs)
 
         def load_concepts(package_dir, overwrite, stage):
-            concept_data = glob.glob(os.path.join(
-                package_dir, 'reference_data', 'concepts', '*.xml'))
-            collection_data = glob.glob(os.path.join(
-                package_dir, 'reference_data', 'collections', '*.xml'))
+            file_types = ['*.xml', '*.rdf']
+
+            concept_data = []
+            for file_type in file_types:
+                concept_data.extend(glob.glob(os.path.join(
+                    package_dir, 'reference_data', 'concepts', file_type)))
 
             for path in concept_data:
+                print path
                 self.import_reference_data(path, overwrite, stage)
 
+            collection_data = []
+            for file_type in file_types:
+                collection_data.extend(glob.glob(os.path.join(
+                    package_dir, 'reference_data', 'collections', file_type)))
+
             for path in collection_data:
+                print path
                 self.import_reference_data(path, overwrite, stage)
 
         def load_mapbox_styles(style_paths, basemap):
@@ -760,9 +769,10 @@ class Command(BaseCommand):
         load_functions(package_location)
         print('loading datatypes')
         load_datatypes(package_location)
-        print('loading concepts')
         if load_project_extensions:
+            print('loading project extensions')
             management.call_command('project', 'update')
+        print('loading concepts')
         load_concepts(package_location, overwrite_concepts, stage_concepts)
         print('loading resource models and branches')
         load_graphs(package_location)
