@@ -150,7 +150,7 @@ define([
                     self.groupedCardIds.valueHasMutated();
                     self.selectGroupCard();
                     if (params.form.onSaveSuccess) {
-                        params.form.onSaveSuccess(self.tile);
+                        params.form.onSaveSuccess(self.tiles);
                     }
                     self.loading(false);
                 });
