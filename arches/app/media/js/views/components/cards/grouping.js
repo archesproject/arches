@@ -132,7 +132,6 @@ define([
             var tiles = this.groupedTiles();
             var tile = this.groupedTiles()[0];
             this.saving = true;
-            var requests = [];
             tile.save(function(response) {
                 errors.push(response);
                 self.saving = false;
