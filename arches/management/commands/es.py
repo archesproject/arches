@@ -61,8 +61,8 @@ class Command(BaseCommand):
         parser.add_argument('-c', '--clear_index', action='store', dest='clear_index', default=True,
             help='Set to True(default) to remove all the resources from the index before the reindexing operation')
 
-        parser.add_argument('-n', '--name ', action='store', dest='name', default=True,
-            help='Name of the custom index to register')
+        parser.add_argument('-n', '--name ', action='store', dest='name', default=None,
+            help='Name of the custom index')
 
 
     def handle(self, *args, **options):
@@ -85,7 +85,10 @@ class Command(BaseCommand):
             self.remove_index(name=options['name'])
 
         if options['operation'] == 'index_database':
-            index_database.index_db(clear_index=options['clear_index'], batch_size=options['batch_size'])
+            if options['name'] is not None:
+                index_database.index_resources(clear_index=options['clear_index'], index_name=options['name'], batch_size=options['batch_size'])
+            else:
+                index_database.index_db(clear_index=options['clear_index'], batch_size=options['batch_size'])
 
         if options['operation'] == 'index_concepts':
             index_database.index_concepts(clear_index=options['clear_index'], batch_size=options['batch_size'])
@@ -158,8 +161,17 @@ class Command(BaseCommand):
         prepare_resource_relations_index(create=True)
         prepare_search_index(create=True)
 
+        # add custom indexes
+        for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
+            register_index(index['name'])
+
     def delete_indexes(self):
         delete_terms_index()
         delete_concepts_index()
         delete_search_index()
         delete_resource_relations_index()
+
+        # remove custom indexes
+        for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
+            remove_index(index['name'])
+
