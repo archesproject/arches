@@ -140,10 +140,14 @@ define([
             };
         };
 
-        self.onSaveSuccess = function(tile) {
-            params.resourceid(tile.resourceinstance_id);
-            params.tileid(tile.tileid);
-            self.resourceId(tile.resourceinstance_id);
+        self.onSaveSuccess = function(tiles) {
+            var tile;
+            if (tiles.length > 0) {
+                tile = tiles[0];
+                params.resourceid(tile.resourceinstance_id);
+                params.tileid(tile.tileid);
+                self.resourceId(tile.resourceinstance_id);
+            }
             if (self.completeOnSave === true) {
                 self.complete(true);
             }
