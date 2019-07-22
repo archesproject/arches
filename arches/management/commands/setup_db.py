@@ -101,9 +101,12 @@ class Command(BaseCommand):
         cursor.execute("SELECT rolcreatedb FROM pg_roles WHERE rolname = '{}'".format(username))
         cancreate = cursor.fetchone()[0]
 
+        cursor.execute("SELECT rolsuper FROM pg_roles WHERE rolname = '{}'".format(username))
+        superuser = cursor.fetchone()[0]
+
         # autocommit false
         conn.set_isolation_level(0)
-        return {"connection": conn, "can_create_db": cancreate}
+        return {"connection": conn, "can_create_db": any([cancreate, superuser])}
 
     def reset_db(self, cursor):
 
