@@ -132,7 +132,6 @@ define([
             var tiles = this.groupedTiles();
             var tile = this.groupedTiles()[0];
             this.saving = true;
-            var requests = [];
             tile.save(function(response) {
                 errors.push(response);
                 self.saving = false;
@@ -151,7 +150,7 @@ define([
                     self.groupedCardIds.valueHasMutated();
                     self.selectGroupCard();
                     if (params.form.onSaveSuccess) {
-                        params.form.onSaveSuccess(self.tile);
+                        params.form.onSaveSuccess(self.tiles);
                     }
                     self.loading(false);
                 });
