@@ -250,6 +250,7 @@ class Command(BaseCommand):
     def write_v4_json(self, package_dir, resource_models,
                       direct_import=False, truncate=None, verbose=False, exclude=[], only=[]):
 
+        start = datetime.now()
         v3_data_dir = os.path.join(package_dir, "v3data")
         endmsg = "\n  -- You can load these resources later with:\n"
 
@@ -299,8 +300,11 @@ class Command(BaseCommand):
         else:
             print endmsg+"\n"
 
+        print "elapsed time:", datetime.now() - start
+
     def write_v4_relations(self, package_dir, direct_import=False):
 
+        start = datetime.now()
         v3_business_dir = os.path.join(package_dir, 'v3data', 'business_data')
         v3_relations_files = glob(os.path.join(v3_business_dir, '*.relations'))
 
@@ -337,6 +341,8 @@ class Command(BaseCommand):
             print '\n  -- You can load these resources later with:\n'\
                 '\n  python manage.py packages -o import_business_data_relations -s '\
                 '"{}"'.format(v4_relations)
+
+        print "elapsed time:", datetime.now() - start
 
     def convert_v3_skos(self, package_dir, direct_import=False, verbose=False):
 

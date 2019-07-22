@@ -18,191 +18,125 @@ from arches.app.models.system_settings import settings
 ARCHES = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 
 
-def fix_v3_value(value, v4nodeinfo):
-    """in some cases, the v3 data must be modified before it can be saved
-    into a v4 tile. this conversion is based on the v4 node datatype."""
+class DataValueConverter():
 
-    datatype = v4nodeinfo['v4_datatype']
-    # convert the WKT geometry representation from v3 to a geojson feature
-    # collection which is what is needed in v4
-    if datatype == "geojson-feature-collection":
+    def __init__(self, skip_file_check=False):
 
-        # assume that if a dictionary is passed in, it is already geojson
-        if not isinstance(value, dict):
-            geom = json.loads(GEOSGeometry(value).geojson)
+        self.skip_file_check = skip_file_check
+        db = settings.DATABASES['default']
+        db_conn = "dbname = {} user = {} host = {} password = {} port = {}".format(
+            db['NAME'], db['USER'], db['HOST'], db['PASSWORD'], db['PORT'])
+        conn = psycopg2.connect(db_conn)
+
+        self.dbcursor = conn.cursor()
+
+    def fix_v3_value(self, value, v4nodeinfo):
+        """in some cases, the v3 data must be modified before it can be saved
+        into a v4 tile. this conversion is based on the v4 node datatype."""
+
+        datatype = v4nodeinfo['v4_datatype']
+
+        # replace the bad characters here
+        if datatype == "string":
+
+            value = value.replace("\u00e2\u20ac", '"').replace("\u00e2\u20ac\u0153", '"')
+            value = value.replace("G\u00c7\u00a3", '"').replace("G\u00c7\u00a5", '"')
+
+        # convert the WKT geometry representation from v3 to a geojson feature
+        # collection which is what is needed in v4. do some sanitation as well.
+        if datatype == "geojson-feature-collection":
+
+            # create and execute SQL statement to force a valid direction on
+            # coordinates in polygons and remove any repeated points
+            sql = '''
+            SELECT ST_AsGeoJSON(ST_RemoveRepeatedPoints(ST_Reverse(ST_ForceRHR('{0}'))));
+            '''.format(value)
+            self.dbcursor.execute(sql)
+            rows = self.dbcursor.fetchall()
+
+            # convert the validated geometry to a geojson FeatureCollection
+            geojson = json.loads(rows[0][0])
             value = {
                 "type": "FeatureCollection",
                 "features": [
                     {
                         "type": "Feature",
                         "id": str(uuid.uuid4()),
-                        "geometry": geom,
+                        "geometry": geojson,
                         "properties": {}
                     }
                 ]
             }
 
-    # sanitize number input
-    elif datatype == "number":
-        value = value.replace(",", "")
-        try:
-            value = int(value)
-        except ValueError:
-            value = float(value)
+        # sanitize number input
+        elif datatype == "number":
+            value = value.replace(",", "")
+            try:
+                value = int(value)
+            except ValueError:
+                value = float(value)
 
-    elif datatype == "date":
-        # kinda hacky but need to remove the T00:00:00 from the end of the
-        # date string, and datetime doesn't handle dates before 1900 so just
-        # use basic string slicing, as all v3 dates will end with T00:00:00.
-        value = value[:-9]
+        elif datatype == "date":
+            # kinda hacky but need to remove the T00:00:00 from the end of the
+            # date string, and datetime doesn't handle dates before 1900 so just
+            # use basic string slicing, as all v3 dates will end with T00:00:00.
+            value = value[:-9]
 
-    elif datatype == "file-list":
+        elif datatype == "file-list":
 
-        filename = os.path.basename(value)
-        fullpath = os.path.join(settings.MEDIA_ROOT, 'uploadedfiles', filename)
+            filename = os.path.basename(value)
+            fullpath = os.path.join(settings.MEDIA_ROOT, 'uploadedfiles', filename)
 
-        # handle the fact that file names could be too long, > 100 characters.
-        # a bit more complicated that you would expect, in order to accommodate
-        # iterative development.
-        shortenedpath = ""
-        if len(filename) > 100:
-            shortname = os.path.splitext(filename)[0][:96]+os.path.splitext(filename)[1]
-            shortenedpath = fullpath.replace(filename, shortname)
+            # handle the fact that file names could be too long, > 100 characters.
+            # a bit more complicated that you would expect, in order to accommodate
+            # iterative development.
+            shortenedpath = ""
+            if len(filename) > 100:
+                shortname = os.path.splitext(filename)[0][:96]+os.path.splitext(filename)[1]
+                shortenedpath = fullpath.replace(filename, shortname)
 
-        if not os.path.isfile(fullpath) and not os.path.isfile(shortenedpath):
-            print "expected file doesn't exist: {}".format(fullpath)
-            print "all files must be transferred before migration can continue"
-            exit()
+            if not self.skip_file_check:
+                if not os.path.isfile(fullpath) and not os.path.isfile(shortenedpath):
+                    print "expected file doesn't exist: {}".format(fullpath)
+                    print "all files must be transferred before migration can continue"
+                    exit()
 
-        if shortenedpath != "":
-            if not os.path.isfile(shortenedpath):
-                os.rename(fullpath, shortenedpath)
-            fullpath = shortenedpath
-            filename = shortname
+            if shortenedpath != "":
+                if not os.path.isfile(shortenedpath):
+                    os.rename(fullpath, shortenedpath)
+                fullpath = shortenedpath
+                filename = shortname
 
-        # create ORM file object
-        file_obj = File()
-        file_obj.path = filename
+            # create ORM file object
+            file_obj = File()
+            file_obj.path = filename
 
-        try:
-            file_obj.save()
-        except Exception as e:
-            print "Error saving file: {}".format(fullpath)
-            print e
-            exit()
+            try:
+                file_obj.save()
+            except Exception as e:
+                print "Error saving file: {}".format(fullpath)
+                print e
+                exit()
 
-        # construct the full json needed to define a file-list node in a tile
-        stats = os.stat(fullpath)
-        type = MimeTypes().guess_type(fullpath)[0]
-        value = [{
-            "name": filename,
-            "file_id": str(file_obj.pk),
-            "url": str(file_obj.path.url).replace("files/", "files/uploadedfiles/"),
-            "status": 'uploaded',
-            "index": 0,
-            "lastModified": stats.st_mtime,
-            "height": None,
-            "width": None,
-            "type": type,
-            "size": stats.st_size,
-            # "content":"blob:http://localhost:8000/24dd8daa-da29-49ec-805a-3dd8a683162c",
-            "accepted": True
-        }]
+            # construct the full json needed to define a file-list node in a tile
+            stats = os.stat(fullpath)
+            ftype = MimeTypes().guess_type(fullpath)[0]
+            value = [{
+                "name": filename,
+                "file_id": str(file_obj.pk),
+                "url": str(file_obj.path.url).replace("files/", "files/uploadedfiles/"),
+                "status": 'uploaded',
+                "index": 0,
+                "lastModified": stats.st_mtime,
+                "height": None,
+                "width": None,
+                "type": ftype,
+                "size": stats.st_size,
+                # "content":"blob:http://localhost:8000/24dd8daa-da29-49ec-805a-3dd8a683162c",
+                "accepted": True
+            }]
 
-    return value
-
-
-def get_empty_feature_collection():
-    """ returns a dictionary representing an empty geojson feature collection. """
-
-    collection = {
-        "type": "FeatureCollection",
-        "features": []
-    }
-
-    return collection
-
-
-def add_wkt_to_geojson_collection(wkt, collection):
-    """ takes an input WKT value, converts to geojson (with some built-in
-    validation operations) and then adds it to the input collection. return
-    the collection. """
-
-    # connect to the database in order to use it for postgis functions
-    db = settings.DATABASES['default']
-    db_conn = "dbname = {} user = {} host = {} password = {} port = {}".format(
-        db['NAME'], db['USER'], db['HOST'], db['PASSWORD'], db['PORT'])
-    conn = psycopg2.connect(db_conn)
-    cur = conn.cursor()
-
-    # create and execute SQL statement to force a valid direction on
-    # coordinates in polygons
-    sql = '''
-    SELECT ST_AsGeoJSON(ST_Reverse(ST_ForceRHR('{0}')));
-    '''.format(wkt)
-    cur.execute(sql)
-    rows = cur.fetchall()
-
-    try:
-        geo_json = json.loads(rows[0][0])
-
-        # iterate coords in polygons to remove duplicate coordinates
-        if geo_json['type'] == "Polygon":
-            lastcoord = None
-            for index, coord in enumerate(geo_json['coordinates'][0]):
-                if coord == lastcoord:
-                    geo_json['coordinates'][0].pop(index)
-                lastcoord = coord
-
-        # create feature json
-        feature = {
-            "type": "Feature",
-            "id": str(uuid.uuid4()),
-            "geometry": geo_json,
-            "properties": {}
-        }
-    except Exception as e:
-        print "Error parsing this WKT: {}".format(wkt)
-        print e
-        feature = False
-
-    if feature:
-        collection['features'].append(feature)
-
-    return collection
-
-
-def flatten_geometries(resource_data, node_lookup):
-    """ take the full input list of v3 nodes, find all geometries and combine
-    them. this is necessary, as WKTs come separately from v3, but should be
-    stored as a single geojson feature collection in v4. """
-
-    geom_found = False
-    to_remove = []
-
-    # create empty collection
-    collection = get_empty_feature_collection()
-
-    # iterate nodes, create geometry from spatial nodes, add to collection,
-    # and remove all spatial nodes besides the first one.
-    for index, dp in enumerate(resource_data):
-        dt = node_lookup[dp[0]]['v4_datatype']
-
-        if dt == "geojson-feature-collection":
-            collection = add_wkt_to_geojson_collection(dp[1], collection)
-            if geom_found:
-                to_remove.append(dp)
-            else:
-                geom = index
-                geom_found = True
-
-    # if geometry has been found, insert the full collection at the position
-    # of the first spatial node (which has not been removed)
-    if geom_found:
-        resource_data[geom] = (resource_data[geom][0], collection)
-    resource_data = [i for i in resource_data if i not in to_remove]
-
-    return resource_data
+        return value
 
 
 def duplicate_tile_json(tilejson):
