@@ -8665,8 +8665,8 @@ a.mega-dropdown-toggle.disabled {
 .rr-drag-panel-target {
     border-bottom-width: 0px;
     height: 100vh;
-    background: #fbfbfb;
-    border: 1px solid #ddd;
+    background: white;
+    border: 1px solid white;
     border-radius: 2px;
     padding: 0px 25px;
 }
@@ -11565,7 +11565,7 @@ a .search-type-link {
 }
 
 .search-type-btn.relative.active {
-    background: #f0f0f0;
+    background: white;
     border: 1px solid #ddd;
     color: #123;
 }
@@ -11574,6 +11574,8 @@ a .search-type-link {
     height: 50px;
     font-size: 11px;
     color: #888;
+    min-width: 75px;
+    background: #f4f4f4;
 }
 
 .term-search-btn {
@@ -11608,6 +11610,7 @@ a .search-type-link {
     height: calc(100vh - 115px);
     overflow-y: auto;
     padding: 20px;
+    background: white;
 }
 
 .search-facets {
