@@ -38,6 +38,21 @@
     box-shadow: none;
 }
 
+.svg-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+    vertical-align: top;
+    overflow: hidden;
+}
+.svg-content {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
 dl.inline-flex {
   display: flex;
   flex-flow: row;
@@ -10903,8 +10918,8 @@ ul.pagination {
 }
 
 #calendar .chosen-container-single .chosen-single {
-    height: 40px;
-    padding-top: 10px;
+    height: 35px;
+    padding-top: 8px;
 }
 
 #calendar .chosen-container-single .chosen-single div b:before {

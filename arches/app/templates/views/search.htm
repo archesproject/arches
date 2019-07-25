@@ -42,7 +42,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                     <!-- ko if: filter.type === 'filter' && filter.enabled -->
                     {% if user|can_read_resource_instance %}
-                    <button class=" search-type-btn relative" style="height: 60px; padding-top: 12px; border-bottom: none" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, click: function(){$parent.sharedStateObject.selectedTab(filter.componentname)}">
+                    <button class=" search-type-btn relative" style="height: 60px; padding-top: 12px; border-bottom: none; position: relative; top: 1px; z-index: 10000;" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, click: function(){$parent.sharedStateObject.selectedTab(filter.componentname)}">
                         <i data-bind="css: filter.icon"></i>
                         <p data-bind="text: filter.name"></p>
                     </button>
@@ -54,7 +54,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                     <!-- ko if: filter.type === 'popup' && filter.enabled -->
                     {% if user|can_read_resource_instance %}
-                    <button class=" search-type-btn relative" style="height: 60px; padding-top: 12px; border-bottom: none" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, click: function(){$parent.sharedStateObject.selectPopup(filter.componentname)}">
+                    <button class=" search-type-btn relative" style="height: 60px; padding-top: 12px; border-bottom: none; position: relative; top: 1px; z-index: 10000;" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, click: function(){$parent.sharedStateObject.selectPopup(filter.componentname)}">
                         <i data-bind="css: filter.icon"></i>
                         <!-- <p data-bind="text: filter.name"></p> -->
                     </button>
@@ -74,7 +74,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!-- Card Container -->
                 <div class="card-form-preview-container">
-                    <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
+                    <div class="tab-content relative" style="border-top: solid 1px #dcdcdc;" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                         <!-- ko if: filter.type === 'filter' && filter.enabled -->
                         <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}">
                             <div data-bind="component: {
@@ -85,7 +85,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- /ko -->
                     </div>
 
-                    <div class="tab-content relative" style="position: relative;z-index: 1000;background-color: white;width: 44%; float: right; height: calc(100vh - 105px);" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}, visible: sharedStateObject.selectedPopup() !== ''">
+                    <div class="tab-content relative" style="position: relative;z-index: 1000;background-color: white;width: 44%; float: right; height: calc(100vh - 112px); border-left: solid 1px #dcdcdc; border-top: solid 1px #dcdcdc;" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}, visible: sharedStateObject.selectedPopup() !== ''">
                         <!-- ko if: filter.type === 'popup' && filter.enabled -->
                         <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}">
                             <div data-bind="component: {
