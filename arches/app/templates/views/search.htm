@@ -73,7 +73,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 }"></div>
 
                 <!-- Card Container -->
-                <div class="card-form-preview-container">
+                <div class="card-form-preview-container relative">
                     <div class="tab-content relative" style="border-top: solid 1px #dcdcdc;" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                         <!-- ko if: filter.type === 'filter' && filter.enabled -->
                         <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}">
@@ -85,7 +85,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- /ko -->
                     </div>
 
-                    <div class="tab-content relative" style="position: relative;z-index: 1000;background-color: white;width: 44%; float: right; height: calc(100vh - 112px); border-left: solid 1px #dcdcdc; border-top: solid 1px #dcdcdc;" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}, visible: sharedStateObject.selectedPopup() !== ''">
+                    <div class="tab-content" style="position: absolute;top:0px;right:0px;z-index: 1000;background-color: white;width: 44%; height: calc(100vh - 112px); border-left: solid 1px #dcdcdc; border-top: solid 1px #dcdcdc;" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}, visible: sharedStateObject.selectedPopup() !== ''">
                         <!-- ko if: filter.type === 'popup' && filter.enabled -->
                         <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}">
                             <div data-bind="component: {

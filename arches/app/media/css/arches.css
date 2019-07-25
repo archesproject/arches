@@ -10958,8 +10958,11 @@ ul.pagination {
 }
 
 .rr-display-toggle {
-    padding-left: 15px;
     width: 100px;
+}
+
+.rr-display-toggle>button {
+    border-radius: 10px;
 }
 
 .rr-display-toggle.open-graph {
