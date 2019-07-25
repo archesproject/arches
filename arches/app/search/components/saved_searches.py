@@ -8,7 +8,7 @@ details = {
     "icon": "fa fa-bookmark",
     "modulename": "saved_searches.py",
     "classname": "SavedSearches",
-    "type": "filter",
+    "type": "popup",
     "componentpath": "views/components/search/saved-searches",
     "componentname": "saved-searches",
     "sortorder": "2",
