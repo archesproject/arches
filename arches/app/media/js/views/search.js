@@ -55,11 +55,19 @@ define([
             return filter.type === 'filter' && filter.enabled === true;
         }, this);
         this.selectedTab = ko.observable(firstEnabledFilter.componentname);
+        this.selectedPopup = ko.observable('');
         this.resultsExpanded = ko.observable(true);
         this.query = ko.observable(getQueryObject());
         this.mouseoverInstanceId = ko.observable();
         this.mapLinkData = ko.observable(null);
         this.searchResults = {'timestamp': ko.observable()};
+        this.selectPopup = function(componentname) {
+            if(this.selectedPopup() !== '' && componentname === this.selectedPopup()) {
+                this.selectedPopup('');
+            } else {
+                this.selectedPopup(componentname);
+            }
+        };
         this.isResourceRelatable = function(graphId) {
             var relatable = false;
             if (this.graph) {
