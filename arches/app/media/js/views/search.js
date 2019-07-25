@@ -67,7 +67,7 @@ define([
             } else {
                 this.selectedPopup(componentname);
             }
-        }
+        };
         this.isResourceRelatable = function(graphId) {
             var relatable = false;
             if (this.graph) {
