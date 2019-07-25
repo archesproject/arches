@@ -10853,6 +10853,18 @@ ul.pagination {
     padding: 20px;
 }
 
+.time-search-container .calendar {
+    display: block;
+    width: inherit;
+    padding-left: 5px;
+    max-width: 152px;
+}
+
+.time-search-container #calendar {
+    display:flex; 
+    flex-wrap:wrap;
+}
+
 .form-settings-container {
     -ms-flex: 0 0 calc(100% - 650px);
     -webkit-flex: 0 0 calc(100% - 650px);
