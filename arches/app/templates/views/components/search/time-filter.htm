@@ -10,7 +10,7 @@
         </div>
     </div>
     <hr style="margin: 0px;">
-    <div id="calendar" class="time-search-subcontainer">
+    <div id="calendar">
 
         <!-- Date Type -->
         <div class="calendar">
@@ -46,7 +46,7 @@
 
     </div>
 
-    <div id="calendar" class="time-search-subcontainer">
+    <div id="calendar">
 
         <!-- From Date -->
         <div class="calendar">
@@ -68,7 +68,7 @@
     <div style="font-size: 16px; margin-top: 20px;">{% trans "Time Wheel" %}</div>
     <div class="text-xs text-muted text-thin">{% trans "(Click on a block to set a filter, double-click to zoom in, double-click center to zoom out)" %}</div>
     <hr style="margin: 0px;">
-    <div class="time-wheel-wrap time-search-subcontainer relative" data-bind="timeWheel: { config: wheelConfig, selectedPeriod: selectedPeriod, breadCrumb: breadCrumb}">
+    <div class="time-wheel-wrap relative" data-bind="timeWheel: { config: wheelConfig, selectedPeriod: selectedPeriod, breadCrumb: breadCrumb}">
         <div class="sequence" data-bind="text: breadCrumb"></div>
         <div class="chart svg-container"></div>
     </div>
