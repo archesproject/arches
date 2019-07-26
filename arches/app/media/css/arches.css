@@ -10624,6 +10624,7 @@ a.clear-geojson-button:hover {
 
 .saved-search-container {
     padding: 5px;
+    background: #fff;
 }
 
 .saved-search-grid {
@@ -10851,6 +10852,7 @@ ul.pagination {
 
 .time-search-container {
     padding: 20px;
+    background: #fff;
 }
 
 .time-search-container .calendar {
@@ -11587,23 +11589,45 @@ a .search-type-link {
     width: 50px;
 }
 
+.search-toolbar {
+    display: -webkit-flex;
+    display: flex;
+    width: 100%;
+    height: 50px;
+    background: #f4f4f4;
+    border-bottom: 1px solid #e9e9e9;
+}
+
+.search-type-btn-panel {
+    height: 50px;
+    background: #f2f2f2;
+    margin-left: 5px;
+}
+
 .search-type-btn.relative:hover {
-    background: #f0f0f0;
-    color: #123;
+    background: #fff;
+    color: #25476A;
 }
 
 .search-type-btn.relative.active {
-    background: white;
-    border: 1px solid #ddd;
-    color: #123;
+    background: #fff;
+    color: #25476A;
+    border-bottom: 1px solid #fff;
+    margin-top: -1px;
 }
 
 .search-type-btn {
     height: 50px;
-    font-size: 11px;
+    padding: 0px;
+    font-size: 12px;
+    font-weight: 600;
     color: #888;
-    min-width: 75px;
-    background: #f4f4f4;
+    min-width: 150px;
+    border-color: #BBD1EA;
+    border-bottom: none;
+    background: #F7F9FB;
+    z-index: 10000;
+    margin-left: -5px;
 }
 
 .term-search-btn {
