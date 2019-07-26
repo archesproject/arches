@@ -1,4 +1,4 @@
-define(['knockout', 'underscore', 'moment', 'bindings/let'], function(ko, _, moment) {
+define(['knockout', 'knockout-mapping', 'underscore', 'moment', 'bindings/let'], function(ko, koMapping, _, moment) {
     var ReportViewModel = function(params) {
         var self = this;
         this.report = params.report || null;
@@ -7,12 +7,13 @@ define(['knockout', 'underscore', 'moment', 'bindings/let'], function(ko, _, mom
         this.configType = params.configType || 'header';
         this.editorContext = params.editorContext || false;
 
-        this.config = params.report.configJSON || ko.observable({});
+        this.configState = params.report.configState || ko.observable({});
+        this.configJSON = params.report.configJSON || ko.observable({});
         this.configObservables = params.configObservables || {};
         this.configKeys = params.configKeys || [];
-        if (typeof this.config !== 'function') {
-            this.config = ko.observable(this.config);
-        }
+        // if (typeof this.config !== 'function') {
+        //     this.config = ko.observable(this.config);
+        // }
 
         this.hasProvisionalData = ko.pureComputed(function() {
             return _.some(self.tiles(), function(tile){
@@ -21,29 +22,42 @@ define(['knockout', 'underscore', 'moment', 'bindings/let'], function(ko, _, mom
         });
 
         var subscribeConfigObservable = function(obs, key) {
-            self[key] = obs;
-
-            self[key].subscribe(function(val) {
-                var configObj = self.config();
-                configObj[key] = val;
-                self.config(configObj);
-            });
-
-            self.config.subscribe(function(val) {
-                if (val[key] !== self[key]()) {
-                    self[key](val[key]);
-                }
-            });
-        };
-        _.each(this.configObservables, subscribeConfigObservable);
-        _.each(this.configKeys, function(key) {
-            var obs;
-            if (Array.isArray(self.config()[key])) {
-                obs = ko.observableArray(self.config()[key]);
-            } else {
-                obs = ko.observable(self.config()[key]);
+            self[key] = obs[key];
+            if (obs[key]) {
+                obs[key].subscribe(function(val) {
+                    self.configJSON(koMapping.toJS(self.configState));
+                });
             }
-            subscribeConfigObservable(obs, key);
+
+            // self.config.subscribe(function(val) {
+            //     console.log('do you even work bro?')
+            //     if (val[key] !== obs[key]()) {
+            //         obs[key](val[key]);
+            //     }
+            // });
+
+            // if (Array.isArray(obs[key]())) {
+            //     obs[key]().forEach(function(item){
+            //         for (var property in ko.unwrap(item)) {
+            //             if (item.hasOwnProperty(property)) {
+            //                 subscribeConfigObservable(item, property);
+            //             }
+            //         }
+            //     });
+            // } else {
+            //     for (var property in ko.unwrap(obs[key])) {
+            //         if (obs[key]().hasOwnProperty(property)) {
+            //             subscribeConfigObservable(obs, property);
+            //         }
+            //     }
+            // }
+        };
+        // _.each(this.configObservables, subscribeConfigObservable);
+        // this.mappedConfigs = koMapping.fromJS(this.report.get('config'));
+
+        _.each(this.configKeys, function(key) {
+            console.log('mapping configs')
+            subscribeConfigObservable(self.configState, key);
         });
 
         var getCardTiles = function(card, tiles) {

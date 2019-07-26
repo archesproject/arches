@@ -17,6 +17,7 @@ define(['arches',
 
         initialize: function(options) {
             var self = this;
+            console.log(this);
             this.cards = options.cards || [];
             this.preview = options.preview;
             this.userisreviewer = options.userisreviewer;
@@ -27,30 +28,42 @@ define(['arches',
 
             this._data = ko.observable('{}');
 
-            this.dirty = ko.computed(function() {
-                return JSON.stringify(_.extend(JSON.parse(self._data()), self.toJSON())) !== self._data();
-            });
+            // this.dirty = ko.computed(function() {
+            //     return JSON.stringify(_.extend(JSON.parse(self._data()), self.toJSON())) !== self._data();
+            // });
+            this.resetConfigs = function() {
+                var config = self.get('config');
+                this.configKeys().forEach(function(key){
+                    self.configState[key](koMapping.fromJS(config[key]));
+                    self.configState[key].valueHasMutated();
+                });
+                // self.configState = koMapping.fromJS(self.configState);
+            };
 
-            this.configJSON = ko.computed({
-                read: function() {
-                    var configJSON = {};
-                    var config = this.get('config');
-                    _.each(this.configKeys(), function(key) {
-                        configJSON[key] = ko.unwrap(config[key]);
+            this.configJSON = ko.observable({});
+            this.configState;
+            this.configKeys.subscribe(function(val){
+                var config;
+                if (val.length) {
+                    self.configState = {};
+                    config = self.get('config');
+                    console.log('something here')
+                    _.each(val, function(key) {
+                        self.configState[key] = ko.unwrap(config[key]);
                     });
-                    return configJSON;
-                },
-                write: function(value) {
-                    var config = this.get('config');
-                    for (var key in value) {
-                        if (config[key] && config[key]() !== value[key]) {
-                            config[key](value[key]);
-                        }
-                    }
-                },
-                owner: this
+                    self.configState = koMapping.fromJS(self.configState);
+                }
             });
 
+
+            // this.configJSON = ko.computed(function() {
+            //     var configJSON = {};
+            //     var config = koMapping.fromJS(self.get('config'));
+            //     console.log('new', configJSON);
+            //     return config;
+            // });
+            //
+            console.log('loading report')
             this.graph = options.graph;
             this.parse(options.graph);
         },
@@ -85,7 +98,9 @@ define(['arches',
                             var currentConfig = this.get('config');
                             this.set('config', _.defaults(currentConfig, defaultConfig));
                             for (key in defaultConfig) {
-                                self.configKeys.push(key);
+                                if (_.contains(self.configKeys(), key) === false) {
+                                    self.configKeys.push(key);
+                                }
                             }
                             templateId(value);
                         },
@@ -97,9 +112,6 @@ define(['arches',
                     var configKeys = [];
                     self.configKeys.removeAll();
                     _.each(value, function(configVal, configKey) {
-                        if (!ko.isObservable(configVal)) {
-                            configVal = ko.observable(configVal);
-                        }
                         config[configKey] = configVal;
                         configKeys.push(configKey);
                     });
@@ -137,6 +149,7 @@ define(['arches',
         },
 
         reset: function() {
+            console.log('resetting', this._data())
             this._attributes = JSON.parse(this._data());
             this.parse(this._attributes);
         },

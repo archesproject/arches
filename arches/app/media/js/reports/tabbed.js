@@ -14,9 +14,7 @@ define([
             params.configKeys = ['tabs'];
             ReportViewModel.apply(this, [params]);
             var self = this;
-            this.tabs(koMapping.fromJS(this.tabs())());
             this.activeTab = ko.observable(self.tabs()[0]);
-
             this.topcards = ko.unwrap(self.report.cards).map(function(card){
                 return {name: card.model.name(), nodegroupid: card.nodegroupid};
             });
@@ -42,34 +40,35 @@ define([
                 return cardList;
             });
 
-            this.refreshTabs = function(){
-                var data = self.tabs().slice(0);
-                self.tabs([]);
-                self.tabs(data);
+            this.refreshTab = function(tab){
+                console.log('refershing lkdjsf')
+                tab.name.subscribe(function(){
+                    self.tabs.valueHasMutated();
+                })
+                tab.icon.subscribe(function(){
+                    self.tabs.valueHasMutated();
+                })
+                tab.nodegroup_ids.subscribe(function(){
+                    self.tabs.valueHasMutated();
+                }, this);
             };
 
             this.tabs().forEach(function(tab){
-                tab.nodegroup_ids.subscribe(function(){
-                    this.refreshTabs();
-                }, this);
+                this.refreshTab(tab);
             }, this);
 
             this.addTab = function(){
-                var newTab = {
-                    icon: ko.observable(),
-                    name: ko.observable(),
-                    nodegroup_ids: ko.observableArray()
-                };
-                newTab.nodegroup_ids.subscribe(
-                    function(){this.refreshTabs();
-                    }, this);
+                var newTab = koMapping.fromJS({
+                    icon: '',
+                    name: '',
+                    nodegroup_ids: []
+                });
+                this.refreshTab(newTab);
                 this.tabs.unshift(newTab);
-                this.refreshTabs();// this.tabs.valueHasMutated() not working here!?;
             };
 
             this.removeTab = function(tab){
                 this.tabs.remove(tab);
-                this.refreshTabs();
             };
 
         },
