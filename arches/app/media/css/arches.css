@@ -11664,6 +11664,8 @@ a .search-type-link {
     background: #F7F9FB;
     z-index: 10000;
     margin-left: -5px;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
 }
 
 .term-search-btn {
