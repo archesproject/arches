@@ -5414,6 +5414,12 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     margin-left: 20px;
 }
 
+.layer-list.search {
+    background: #f4f4f4;
+    border-bottom: 1px solid #ddd;
+    padding-top: 10px;
+}
+
 .node-current {
     stroke: #454545;
     stroke-width: 2px;
@@ -8753,6 +8759,15 @@ a.mega-dropdown-toggle.disabled {
 .report-image-grid {
     width: 100%;
     margin-bottom: 20px;
+}
+
+.search .grid .library-card {
+    background: #fafafa;
+}
+
+.search .grid .library-card:hover {
+    background: #fff;
+    border-left: 5px solid #20ce05;
 }
 
 .add-card-icon {
