@@ -50,7 +50,7 @@
 
             <div data-bind="with: fdgNodeListView">
 
-                <div class="layer-list">
+                <div class="layer-list search">
 
                     <div class="list-filter fdg-node-filter">
                         <input type="text" class="form-control" style="z-index=100" placeholder="{% trans " Find a resource " %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
@@ -62,7 +62,7 @@
                 <!-- Resource Nodes -->
 
                 <!-- ko foreach: { data: [$data], as: 'self' } -->
-                <div class="report-image-grid relative">
+                <div class="report-image-grid search relative">
                     <div class="grid" style="margin-left: 0px; background: transparent;" data-bind="foreach: {data: items}">
 
                         <div class="library-card relative" data-bind="scrollTo: selected(), container: $parent.scrollContainerSelector, event: { click: self.selectNode, mouseover: self.hoverNode, mouseout: function(e){e.hovered(false)} }, visible: filtered() == false, css:{'selected': selected() == true, 'hovered': hovered() == true}">
