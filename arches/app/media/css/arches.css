@@ -10935,8 +10935,8 @@ ul.pagination {
 }
 
 .search-label {
-    font-weight: 300;
-    font-size: 17px;
+    font-weight: 400;
+    font-size: 15px;
     margin-bottom: 3px;
 }
 
@@ -11164,8 +11164,15 @@ ul.pagination {
     width: 100%;
 }
 
+.time-wheel-instructions {
+    font-size: 14px;
+    color: #777;
+}
+
 .time-wheel-wrap .sequence {
-    font-size: 12px;
+    font-size: 16px;
+    color: #25476A;
+    font-weight: 600;
     position: absolute;
 }
 
@@ -11182,6 +11189,7 @@ ul.pagination {
 .time-wheel-wrap .chart path {
     cursor: pointer;
     stroke: #fff;
+    stroke-width: 0.5px;
 }
 
 .time-wheel-wrap .trail {
@@ -11660,12 +11668,11 @@ a .search-type-link {
     color: #888;
     min-width: 150px;
     border-color: #BBD1EA;
+    border-top: none;
     border-bottom: none;
     background: #F7F9FB;
     z-index: 10000;
     margin-left: -5px;
-    border-top-left-radius: 2px;
-    border-top-right-radius: 2px;
 }
 
 .term-search-btn {

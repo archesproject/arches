@@ -1,9 +1,9 @@
 {% load i18n %}
 <div class="search-container time-search-container">
 
-    <div style="font-size: 16px;">{% trans "Date Interval" %}
-        <div class="pull-right" style="margin-top: -4px;">
-            <div class="btn-group btn-group-xs">
+    <div style="font-size: 17px;">{% trans "Date Interval" %}
+        <div class="pull-right" style="margin-top: -14px;">
+            <div class="btn-group">
                 <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true" data-bind="click: function () { clear(); }"> <i class="fa fa-close"></i> {% trans "Clear" %}
                 </button>
             </div>
@@ -47,7 +47,6 @@
     </div>
 
     <div id="calendar">
-
         <!-- From Date -->
         <div class="calendar">
             <h3 class="search-label">{% trans "From" %}</h3>
@@ -65,9 +64,10 @@
         </div>
     </div>
 
-    <div style="font-size: 16px; margin-top: 20px;">{% trans "Time Wheel" %}</div>
-    <div class="text-xs text-muted text-thin">{% trans "(Click on a block to set a filter, double-click to zoom in, double-click center to zoom out)" %}</div>
+    <div style="font-size: 17px; margin-top: 20px;">{% trans "Time Wheel" %}</div>
+    <div class="time-wheel-instructions">{% trans "(Click on a block to set a filter, double-click to zoom in, double-click center to zoom out)" %}</div>
     <hr style="margin: 0px;">
+    
     <div class="time-wheel-wrap relative" data-bind="timeWheel: { config: wheelConfig, selectedPeriod: selectedPeriod, breadCrumb: breadCrumb}">
         <div class="sequence" data-bind="text: breadCrumb"></div>
         <div class="chart svg-container"></div>
