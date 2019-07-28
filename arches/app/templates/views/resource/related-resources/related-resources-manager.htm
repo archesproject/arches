@@ -74,7 +74,7 @@
                             </div>
 
                             <div class="crud-card-subtitle" style="left: 5px;">
-                                <span data-bind="text: loaded"></span> {% trans 'out of' %} <span data-bind="text: total"></span>{% trans 'relations loaded' %}<div class="load-relations" data-bind="click: function(){loadcount(loadcount() + 1)}, clickBubble: false, css: {'disabled' : total() === loaded()}">{% trans 'load more' %}</div>
+                                <span data-bind="text: loaded"></span> <span>{% trans 'out of' %}</span><span data-bind="text: total"></span><span>{% trans 'relations loaded' %}</span><div class="load-relations" data-bind="click: function(){loadcount(loadcount() + 1)}, clickBubble: false, css: {'disabled' : total() === loaded()}">{% trans 'load more' %}</div>
                             </div>
 
                             <div class="node-list-details" data-bind="fadeVisible: selected, delay:100, fade: 250">

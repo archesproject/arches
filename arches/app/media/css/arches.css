@@ -2327,14 +2327,18 @@ a.select2-search-choice-close {
     top: 50px;
     display: flex;
     flex-direction: row;
+    color: #25476A;
     margin-left: -2px;
     padding-bottom: 2px;
-    width: 250px
+    width: 250px;
+    height: 25px;
+    margin-top: -3px;
 }
 
 .related-resources-nodes .crud-card-subtitle span {
     padding-left: 2px;
     padding-right: 2px;
+    padding-top: 2px;
 }
 
 .related-resources-nodes .crud-card-main {
@@ -2352,8 +2356,15 @@ a.select2-search-choice-close {
 }
 
 .load-relations {
-    color: steelblue;
-    margin-left: 5px;
+    color: #fff;
+    padding: 5px;
+    background: steelblue;
+    position: absolute;
+    right: -5px;
+    margin-right: 5px;
+    top: -1px;
+    border-radius: 2px;
+    font-weight: 600;
 }
 
 .load-relations.disabled {
