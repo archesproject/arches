@@ -10893,6 +10893,15 @@ ul.pagination {
     flex-wrap:wrap;
 }
 
+.time-search-container #calendar .calendar .search-label{
+    margin-top: 10px;
+}
+
+.calendar.picker {
+    max-width: 200px;
+    min-width: 200px;
+}
+
 .form-settings-container {
     -ms-flex: 0 0 calc(100% - 650px);
     -webkit-flex: 0 0 calc(100% - 650px);
@@ -11162,6 +11171,24 @@ ul.pagination {
 
 .time-wheel-wrap {
     width: 100%;
+}
+
+.time-wheel-title {
+    font-size: 17px; 
+    margin-top: 30px;
+}
+
+.time-search-container .time-wheel-title:first-child {
+    margin-top: 3px;
+}
+
+.time-wheel-title .pull-right {
+    margin-top: -15px;
+}
+
+.title-underline {
+    margin: 3px 0px;
+    background: #ddd;
 }
 
 .time-wheel-instructions {
