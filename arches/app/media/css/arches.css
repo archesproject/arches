@@ -2139,7 +2139,7 @@ a.select2-search-choice-close {
 }
 
 .related-resources-nodes .library-card {
-    height: 75px;
+    height: 80px;
 }
 
 .library-card.active {
@@ -2357,19 +2357,20 @@ a.select2-search-choice-close {
 
 .load-relations {
     color: #fff;
-    padding: 5px;
+    padding: 3px 5px;
     background: steelblue;
     position: absolute;
     right: -5px;
     margin-right: 5px;
-    top: -1px;
+    top: 0px;
     border-radius: 2px;
     font-weight: 600;
 }
 
 .load-relations.disabled {
-    color: #ddd;
+    color: #888;
     margin-left: 5px;
+    background: #ddd;
 }
 
 .selected-group-user-permissions {
@@ -4965,6 +4966,9 @@ input.cmn-toggle-yes-no:checked+label:after {
 .list-item-name {
     font-size: 14px;
     margin-top: -5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .list-item-model-name {
@@ -8774,6 +8778,11 @@ a.mega-dropdown-toggle.disabled {
 
 .search .grid .library-card {
     background: #fafafa;
+}
+
+.search .grid .library-card.selected {
+    background: #fff;
+    font-weight: 600;
 }
 
 .search .grid .library-card:hover {
