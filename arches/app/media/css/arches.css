@@ -8928,7 +8928,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rp-tile-separator {
-    border: 1px solid rgb(179, 179, 179);
+    border: 1px solid #ddd;
     margin-right: 15%;
 }
 
@@ -11697,6 +11697,7 @@ a .search-type-link {
     border-bottom: 1px solid #fff;
     margin-top: -1px;
     padding-bottom: 1px;
+    cursor: default;
 }
 
 .search-type-btn {
