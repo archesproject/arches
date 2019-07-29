@@ -386,6 +386,7 @@
 <!-- ko if: state === 'report' && card.model.visible() -->
 {% block report %}
 <div data-bind="css: {'print-hide': !reportExpanded()}">
+    <!-- ko if: showHeaderLine--><hr class="rp-tile-separator"><!-- /ko -->
     <div class="rp-card-section" data-bind="css: card.model.cssclass, visible: card.fullyProvisional() !== 'fullyprovisional'">
             <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
             <!-- ko if: card.tiles().length > 0 -->
@@ -393,6 +394,7 @@
             <!-- ko if: reportExpanded() -->
             <!-- ko foreach: { data: self.preview ? [card.newTile] : card.tiles, as: 'tile' } -->
                 <div class="rp-card-section" data-bind="css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}">
+                    <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
                     {% block report_widgets %}
                     <!-- ko if: card.model.get('widgets')().length > 0 -->
                         <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
@@ -427,7 +429,8 @@
                                     params: {
                                         state: 'report',
                                         preview: self.preview,
-                                        card: card
+                                        card: card,
+                                        showHeaderLine: self.card.model.get("widgets")().length > 0 || $index !== 0
                                     }
                                 } --> <!-- /ko -->
                         <!-- /ko -->
@@ -444,7 +447,7 @@
             {% trans "Sorry, you don't have access to this information" %}
             <!-- /ko -->
             <!-- ko if: card.model.get('cardid') -->
-            <span>{% trans "No data added yet for " %}</span><span data-bind="text: card.model.get('name')"></span>"
+            <span>{% trans "No data added yet for " %}</span><span data-bind="text: card.model.get('name')"></span>
             <!-- /ko -->
         </div>
         <!-- /ko -->
