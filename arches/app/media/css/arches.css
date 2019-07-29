@@ -11748,6 +11748,10 @@ a .search-type-link {
     padding-top: 5px;
 }
 
+.search-type-btn-popup {
+    
+}
+
 .facets-container {
     position: absolute;
     width: 250px;
