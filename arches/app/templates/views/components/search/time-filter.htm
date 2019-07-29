@@ -1,19 +1,19 @@
 {% load i18n %}
 <div class="search-container time-search-container">
 
-    <div style="font-size: 16px;">{% trans "Date Interval" %}
-        <div class="pull-right" style="margin-top: -4px;">
-            <div class="btn-group btn-group-xs">
+    <div class="time-wheel-title">{% trans "Date Interval" %}
+        <div class="pull-right">
+            <div class="btn-group">
                 <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true" data-bind="click: function () { clear(); }"> <i class="fa fa-close"></i> {% trans "Clear" %}
                 </button>
             </div>
         </div>
     </div>
-    <hr style="margin: 0px;">
+    <hr class="title-underline">
     <div id="calendar">
 
         <!-- Date Type -->
-        <div class="calendar">
+        <div class="calendar picker">
             <h3 class="search-label">{% trans "Type" %}</h3>
             <select id="" class="resources" data-placeholder="Date type" tabindex="-1" data-bind="value: filter.dateNodeId, chosen:{ width: '100%' }, attr: {id:dateDropdownEleId} ">
                 <option value="">{% trans "Search all dates" %}</option>
@@ -30,7 +30,7 @@
         </div>
 
         <!-- Date Selector -->
-        <div class="calendar" style="max-width: 174px;">
+        <div class="calendar picker">
             <h3 class="search-label">{% trans "Within" %}</h3>
             <select id="" class="resources" placeholder="Select" tabindex="-1" data-bind="value: dateRangeType, chosen:{ width: '100%' }">
                 <option value="custom">{% trans "Custom date range" %}</option>
@@ -47,9 +47,8 @@
     </div>
 
     <div id="calendar">
-
         <!-- From Date -->
-        <div class="calendar">
+        <div class="calendar picker">
             <h3 class="search-label">{% trans "From" %}</h3>
             <div id="search-from-c">
                 <input placeholder="" class="form-control input-md" data-bind="value: filter.fromDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
@@ -57,7 +56,7 @@
         </div>
 
         <!-- To Date -->
-        <div class="calendar">
+        <div class="calendar picker">
             <h3 class="search-label">{% trans "To" %}</h3>
             <div id="search-from-b">
                 <input placeholder="" class="form-control input-md" data-bind="value: filter.toDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
@@ -65,9 +64,10 @@
         </div>
     </div>
 
-    <div style="font-size: 16px; margin-top: 20px;">{% trans "Time Wheel" %}</div>
-    <div class="text-xs text-muted text-thin">{% trans "(Click on a block to set a filter, double-click to zoom in, double-click center to zoom out)" %}</div>
-    <hr style="margin: 0px;">
+    <div class="time-wheel-title">{% trans "Time Wheel" %}</div>
+    <div class="time-wheel-instructions">{% trans "(Click on a block to set a filter, double-click to zoom in, double-click center to zoom out)" %}</div>
+    <hr class="title-underline">
+    
     <div class="time-wheel-wrap relative" data-bind="timeWheel: { config: wheelConfig, selectedPeriod: selectedPeriod, breadCrumb: breadCrumb}">
         <div class="sequence" data-bind="text: breadCrumb"></div>
         <div class="chart svg-container"></div>
