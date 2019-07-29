@@ -61,6 +61,7 @@ define([
             }
             return values;
         };
+        this.showHeaderLine = params.showHeaderLine;
         this.tiles = ko.computed(function() {
             var tiles = [];
             if (self.tile) {
