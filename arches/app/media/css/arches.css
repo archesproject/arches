@@ -11748,9 +11748,18 @@ a .search-type-link {
     padding-top: 5px;
 }
 
+.search-type-btn-popup-panel {
+    margin-top: 0px;
+    display: inline-block;
+    flex-direction: row;
+    position: absolute;
+    right: 5px;
+}
+
 .search-type-btn-popup {
     height: 50px;
     width: 50px;
+    margin-right: -5px;
     padding: 0px;
     font-size: 12px;
     font-weight: 600;
@@ -11761,9 +11770,6 @@ a .search-type-link {
     border-right: none;
     background: #F7F9FB;
     z-index: 10000;
-    position: absolute;
-    top: 0px;
-    right: 0px;
 }
 
 .search-type-btn-popup.relative:hover {
@@ -11780,7 +11786,7 @@ a .search-type-link {
     line-height: 1;
 }
 
-.search-type-btn-popup:nth-child(2) {
+/*.search-type-btn-popup:nth-child(2) {
     right: 50px;
 }
 
@@ -11798,7 +11804,7 @@ a .search-type-link {
 
 .search-type-btn-popup:nth-child(6) {
     right: 250px;
-}
+}*/
 
 .search-popup-panel {
     position: absolute;
