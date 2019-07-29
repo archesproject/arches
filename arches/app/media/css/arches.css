@@ -10739,7 +10739,7 @@ a.clear-geojson-button:hover {
     padding-left: 0;
     color: #123;
     font-size: 16px;
-    font-weight: 400;
+    font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
     margin: 0 0 20px;
@@ -10749,17 +10749,18 @@ a.clear-geojson-button:hover {
 }
 
 .search-query {
-    padding-top: 10px;
-    padding-tom: 10px;
+    padding-top: 15px;
+    padding-bottom: 10px;
     margin-top: -20px;
     margin-left: 20px;
-    margin-right: 20px;
-    background: rgba(200, 200, 200, 0.8);
+    margin-right: 30px;
+    margin-bottom: 10px;
+    background: rgba(250, 250, 250, 0.66);
 }
 
 a.search-query-link-captions:hover {
     font-weight: 600;
-    color: #fff;
+    color: #25476A;
 }
 
 a.search-query-link-captions:active {
@@ -10775,7 +10776,6 @@ a.search-query-link-captions:focus {
 .search-query-desc {
     color: #444;
     font-size: 13px;
-    text-transform: uppercase;
 }
 
 .search-results {
@@ -10918,8 +10918,8 @@ ul.pagination {
 }
 
 .calendar.picker {
-    max-width: 200px;
-    min-width: 200px;
+    max-width: 175px;
+    min-width: 175px;
 }
 
 .form-settings-container {
@@ -11212,12 +11212,12 @@ ul.pagination {
 }
 
 .time-wheel-instructions {
-    font-size: 14px;
+    font-size: 12px;
     color: #777;
 }
 
 .time-wheel-wrap .sequence {
-    font-size: 16px;
+    font-size: 14px;
     color: #25476A;
     font-weight: 600;
     position: absolute;
@@ -11230,7 +11230,7 @@ ul.pagination {
 
 .time-wheel-wrap .chart {
     position: relative;
-    margin-top: 50px;
+    margin-top: 55px;
 }
 
 .time-wheel-wrap .chart path {
@@ -11778,7 +11778,6 @@ a .search-type-link {
     border-bottom: 1px solid #fff;
     height: 51px;
     line-height: 1;
-    cursor: default;
 }
 
 .search-type-btn-popup:nth-child(2) {
@@ -11799,6 +11798,18 @@ a .search-type-link {
 
 .search-type-btn-popup:nth-child(6) {
     right: 250px;
+}
+
+.search-popup-panel {
+    position: absolute;
+    top:0px;
+    right:0px;
+    z-index: 1000;
+    background-color: #fff;
+    width: 400px; 
+    height: calc(100vh - 112px); 
+    border-left: solid 1px #dcdcdc; 
+    border-top: solid 1px #dcdcdc;
 }
 
 .facets-container {

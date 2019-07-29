@@ -54,7 +54,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                     <!-- ko if: filter.type === 'popup' && filter.enabled -->
                     {% if user|can_read_resource_instance %}
-                    <button class="search-type-btn-popup relative" style="" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, click: function(){$parent.sharedStateObject.selectPopup(filter.componentname)}">
+                    <button class="saved-search-container search-type-btn-popup relative" style="" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, click: function(){$parent.sharedStateObject.selectPopup(filter.componentname)}">
                         <i data-bind="css: filter.icon"></i>
                         <!-- <p data-bind="text: filter.name"></p> -->
                     </button>
@@ -85,7 +85,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- /ko -->
                     </div>
 
-                    <div class="tab-content" style="position: absolute;top:0px;right:0px;z-index: 1000;background-color: white;width: 44%; height: calc(100vh - 112px); border-left: solid 1px #dcdcdc; border-top: solid 1px #dcdcdc;" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}, visible: sharedStateObject.selectedPopup() !== ''">
+                    <div class="tab-content search-popup-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}, visible: sharedStateObject.selectedPopup() !== ''">
                         <!-- ko if: filter.type === 'popup' && filter.enabled -->
                         <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}">
                             <div data-bind="component: {
