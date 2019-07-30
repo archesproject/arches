@@ -15,6 +15,11 @@ define([
             ReportViewModel.apply(this, [params]);
             var self = this;
             this.activeTab = ko.observable(self.tabs()[0]);
+            this.report.configJSON.subscribe(function(){
+                if (self.tabs.indexOf(self.activeTab()) === -1) {
+                    self.activeTab(self.tabs()[0]);
+                }
+            });
             this.topcards = ko.unwrap(self.report.cards).map(function(card){
                 return {name: card.model.name(), nodegroupid: card.nodegroupid};
             });
@@ -40,30 +45,13 @@ define([
                 return cardList;
             });
 
-            this.refreshTab = function(tab){
-                console.log('refershing lkdjsf')
-                tab.name.subscribe(function(){
-                    self.tabs.valueHasMutated();
-                })
-                tab.icon.subscribe(function(){
-                    self.tabs.valueHasMutated();
-                })
-                tab.nodegroup_ids.subscribe(function(){
-                    self.tabs.valueHasMutated();
-                }, this);
-            };
-
-            this.tabs().forEach(function(tab){
-                this.refreshTab(tab);
-            }, this);
-
             this.addTab = function(){
                 var newTab = koMapping.fromJS({
                     icon: '',
                     name: '',
                     nodegroup_ids: []
                 });
-                this.refreshTab(newTab);
+                // this.refreshTab(newTab);
                 this.tabs.unshift(newTab);
             };
 
