@@ -16,12 +16,24 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='tileserverlayer',
             name='map_layer',
-            field=models.ForeignKey(db_column='map_layerid', null=True, blank=True, on_delete=django.db.models.deletion.CASCADE, to='models.MapLayer'),
+            field=models.ForeignKey(
+                db_column='map_layerid',
+                null=True,
+                blank=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to='models.MapLayer'
+            ),
         ),
         migrations.AlterField(
             model_name='tileserverlayer',
             name='map_source',
-            field=models.ForeignKey(db_column='map_sourceid', null=True, blank=True, on_delete=django.db.models.deletion.CASCADE, to='models.MapSource'),
+            field=models.ForeignKey(
+                db_column='map_sourceid',
+                null=True,
+                blank=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to='models.MapSource'
+            ),
         ),
         migrations.AlterField(
             model_name='tileserverlayer',

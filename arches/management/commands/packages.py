@@ -1186,7 +1186,11 @@ will be very jumbled.""")
                         map_source = models.MapSource(name=layer_name, source=source_dict)
                         if len(layer_list) > 0:
                             map_layer = models.MapLayer(
-                                name=layer_name, layerdefinitions=layer_list, isoverlay=(not is_basemap), icon=layer_icon)
+                                name=layer_name,
+                                layerdefinitions=layer_list,
+                                isoverlay=(not is_basemap),
+                                icon=layer_icon
+                            )
                             map_layer.save()
                             tileserver_layer.map_layer = map_layer
                         map_source.save()
