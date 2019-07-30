@@ -286,9 +286,7 @@ define([
                 "ontology_namespaces": data.ontology_namespaces,
                 onReset: function() {
                     var graph = koMapping.toJS(viewModel.graphSettingsViewModel.graph);
-                    console.log(graph.config);
-                    console.log(viewModel.report.configState)
-                    viewModel.report.resetConfigs();
+                    viewModel.report.resetConfigs(graph.config);
                     viewModel.report.get('template_id')(graph["template_id"]);
                 }
             });

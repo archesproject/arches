@@ -17,7 +17,6 @@ define(['arches',
 
         initialize: function(options) {
             var self = this;
-            console.log(this);
             this.cards = options.cards || [];
             this.preview = options.preview;
             this.userisreviewer = options.userisreviewer;
@@ -28,18 +27,6 @@ define(['arches',
 
             this._data = ko.observable('{}');
 
-            // this.dirty = ko.computed(function() {
-            //     return JSON.stringify(_.extend(JSON.parse(self._data()), self.toJSON())) !== self._data();
-            // });
-            this.resetConfigs = function() {
-                var config = self.get('config');
-                this.configKeys().forEach(function(key){
-                    self.configState[key](koMapping.fromJS(config[key]));
-                    self.configState[key].valueHasMutated();
-                });
-                // self.configState = koMapping.fromJS(self.configState);
-            };
-
             this.configJSON = ko.observable({});
             this.configState;
             this.configKeys.subscribe(function(val){
@@ -47,7 +34,7 @@ define(['arches',
                 if (val.length) {
                     self.configState = {};
                     config = self.get('config');
-                    console.log('something here')
+                    // var defaultConfigJSON.parse(reportLookup[value].defaultconfig);
                     _.each(val, function(key) {
                         self.configState[key] = ko.unwrap(config[key]);
                     });
@@ -55,15 +42,14 @@ define(['arches',
                 }
             });
 
+            this.resetConfigs = function(previousConfigs) {
+                this.configKeys().forEach(function(key){
+                    if (JSON.stringify(self.configState[key]()) !== JSON.stringify(previousConfigs[key])) {
+                        koMapping.fromJS(previousConfigs, self.configState);
+                    }
+                });
+            };
 
-            // this.configJSON = ko.computed(function() {
-            //     var configJSON = {};
-            //     var config = koMapping.fromJS(self.get('config'));
-            //     console.log('new', configJSON);
-            //     return config;
-            // });
-            //
-            console.log('loading report')
             this.graph = options.graph;
             this.parse(options.graph);
         },
