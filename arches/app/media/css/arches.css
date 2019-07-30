@@ -8649,6 +8649,7 @@ div.row.widget-wrapper {
     opacity: 0.9;
     border-left: 1px solid #ddd;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .relation-properties-buttons {
@@ -11720,7 +11721,7 @@ a .search-type-link {
     border-top: none;
     border-bottom: 1px solid #BBD1EA;
     background: #F7F9FB;
-    z-index: 10000;
+    z-index: 1000;
     margin-left: -5px;
 }
 
@@ -11769,7 +11770,7 @@ a .search-type-link {
     border-bottom: 1px solid #BBD1EA;
     border-right: none;
     background: #F7F9FB;
-    z-index: 10000;
+    z-index: 1000;
 }
 
 .search-type-btn-popup.relative:hover {
@@ -11786,31 +11787,12 @@ a .search-type-link {
     line-height: 1;
 }
 
-/*.search-type-btn-popup:nth-child(2) {
-    right: 50px;
-}
-
-.search-type-btn-popup:nth-child(3) {
-    right: 100px;
-}
-
-.search-type-btn-popup:nth-child(4) {
-    right: 150px;
-}
-
-.search-type-btn-popup:nth-child(5) {
-    right: 200px;
-}
-
-.search-type-btn-popup:nth-child(6) {
-    right: 250px;
-}*/
 
 .search-popup-panel {
     position: absolute;
     top:0px;
     right:0px;
-    z-index: 1000;
+    z-index: 900;
     background-color: #fff;
     width: 400px; 
     height: calc(100vh - 112px); 
