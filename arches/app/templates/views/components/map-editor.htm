@@ -140,9 +140,11 @@
                                                 }
                                             ">
                                                 <option value=""></option>
+                                                {% block draw_tool_options %}
                                                 <option value="draw_point">{% trans "Add point" %}</option>
                                                 <option value="draw_line_string">{% trans "Add line" %}</option>
                                                 <option value="draw_polygon">{% trans "Add polygon" %}</option>
+                                                {% endblock draw_tool_options %}
                                             </select>
                                         </div>
                                         <table class="table">

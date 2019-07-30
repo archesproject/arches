@@ -911,10 +911,10 @@ class MapLayer(models.Model):
 
 class TileserverLayer(models.Model):
     name = models.TextField(primary_key=True, unique=True)
-    path = models.TextField()
+    path = models.TextField(null=True, blank=True)
     config = JSONField()
-    map_layer = models.ForeignKey('MapLayer', db_column='map_layerid')
-    map_source = models.ForeignKey('MapSource', db_column='map_sourceid')
+    map_layer = models.ForeignKey('MapLayer', db_column='map_layerid', null=True, blank=True)
+    map_source = models.ForeignKey('MapSource', db_column='map_sourceid', null=True, blank=True)
 
     def __unicode__(self):
         return self.name

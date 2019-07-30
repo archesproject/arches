@@ -10,11 +10,14 @@
 
 <!-- ko if: !loading() -->
 <div class="hover-feature-title-bar">
+    {% block title %}
     <div class="hover-feature-title">
         <span class="" data-bind="text: displayname"></span>
     </div>
+    {% endblock title %}
 </div>
 <div class="hover-feature-body">
+    {% block body %}
     <div class="hover-feature-metadata">
         {% trans "Resource ID:" %}
         <span data-bind="text: resourceinstanceid"></span>
@@ -23,8 +26,10 @@
         {% trans "Resource Model:" %}
         <span data-bind="text: graph_name"></span>
     </div>
+    {% endblock body %}
 </div>
 <div class="hover-feature-footer">
+    {% block footer %}
     <a data-bind="click: function () {
         window.open(reportURL + resourceinstanceid());
     }" href="javascript:void(0)">
@@ -39,5 +44,6 @@
         {% trans "Edit" %}
     </a>
     {% endif %}
+    {% endblock footer %}
 </div>
 <!--/ko-->
