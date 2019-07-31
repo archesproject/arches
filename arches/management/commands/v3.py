@@ -10,7 +10,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.models import TileModel, Node
 from arches.app.utils.skos import SKOSReader
 from arches.app.utils import v3utils
-from arches.app.utils.v3migration import v3Importer, v3SkosConverter
+from arches.app.utils.v3migration import v3Importer, v3SkosConverter, DataValueConverter
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.system_settings import settings
 
@@ -273,6 +273,8 @@ class Command(BaseCommand):
             for rm in resource_models:
 
                 print("looking for "+rm+" resources...")
+                value_converter = DataValueConverter(skip_file_check=skipfilecheck)
+
                 importer = v3Importer(v3_data_dir, rm, v3_resource_file=v3_file,
                                       truncate=truncate, exclude=exclude, only=only)
 
