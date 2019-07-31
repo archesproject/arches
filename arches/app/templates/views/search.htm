@@ -74,7 +74,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!-- Card Container -->
                 <div class="card-form-preview-container relative">
-                    <div class="tab-content relative" style="border-top: solid 1px #dcdcdc;" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
+                    <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                         <!-- ko if: filter.type === 'filter' && filter.enabled -->
                         <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}">
                             <div data-bind="component: {

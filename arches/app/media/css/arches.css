@@ -11700,13 +11700,15 @@ a .search-type-link {
     color: #25476A;
 }
 
+.search-type-btn.relative:active {
+    border-style: solid;
+    border-top: 0px solid #BBD1EA;
+}
 
 .search-type-btn.relative.active {
     background: #fff;
     color: #25476A;
-    border-bottom: 1px solid #fff;
-    margin-top: -1px;
-    padding-bottom: 1px;
+    border-bottom: none;
     cursor: default;
 }
 
@@ -11776,6 +11778,12 @@ a .search-type-link {
 .search-type-btn-popup.relative:hover {
     background: #fff;
     color: #25476A;
+}
+
+.search-type-btn-popup.relative:active {
+    border-style: solid;
+    border-right: 0px solid #BBD1EA;
+    border-top: 0px solid #BBD1EA;
 }
 
 
