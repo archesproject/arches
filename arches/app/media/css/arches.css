@@ -881,7 +881,7 @@ ul.tabbed-report-tab-list {
     /* vertical-align: middle; */
 }
 
-.active-report-tab {
+.report-tab.active {
     border: #4389c9 solid 2px;
     border-radius: 100%;
     background: #5fa2dd;
@@ -895,7 +895,7 @@ ul.tabbed-report-tab-list {
     margin: 2% 0 2% 0;
 }
 
-.active-report-tab i {
+.report-tab.active i {
     color: white;
     font-size:32px;
     text-align: center;
@@ -903,8 +903,25 @@ ul.tabbed-report-tab-list {
     align-self: center;
 }
 
-.active-report-tab-form {
+.report-tab-form.active {
     border: #4389c9 solid 2px;
+}
+
+.report-tab-form {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    margin: 15px 0px 15px;
+    padding: 5px;
+    background-color: #fff;
+}
+
+.report-tab-form-title {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 5px;
 }
 
 .tab-banner {
