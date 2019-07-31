@@ -33,7 +33,7 @@ class DataValueConverter():
         # doesn't exist, but "test_arches" does.
         except OperationalError:
             db_conn = "dbname = {} user = {} host = {} password = {} port = {}".format(
-            "test_"+db['NAME'], db['USER'], db['HOST'], db['PASSWORD'], db['PORT'])
+                      "test_"+db['NAME'], db['USER'], db['HOST'], db['PASSWORD'], db['PORT'])
             conn = psycopg2.connect(db_conn)
 
         self.dbcursor = conn.cursor()
