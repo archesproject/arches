@@ -119,7 +119,13 @@ class DataValueConverter():
                 exit()
 
             # construct the full json needed to define a file-list node in a tile
-            stats = os.stat(fullpath)
+            try:
+                stats = os.stat(fullpath)
+                lastModified = stats.st_mtime
+                size = stats.st_size
+            except Exception as e:
+                lastModified = None
+                size = None
             ftype = MimeTypes().guess_type(fullpath)[0]
             value = [{
                 "name": filename,
@@ -127,11 +133,11 @@ class DataValueConverter():
                 "url": str(file_obj.path.url).replace("files/", "files/uploadedfiles/"),
                 "status": 'uploaded',
                 "index": 0,
-                "lastModified": stats.st_mtime,
+                "lastModified": lastModified,
                 "height": None,
                 "width": None,
                 "type": ftype,
-                "size": stats.st_size,
+                "size": size,
                 # "content":"blob:http://localhost:8000/24dd8daa-da29-49ec-805a-3dd8a683162c",
                 "accepted": True
             }]
