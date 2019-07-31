@@ -276,8 +276,7 @@ class Command(BaseCommand):
                         onlyids.append(line.rstrip())
                 only = onlyids
         except Exception as e:
-            print e
-            exit()
+            pass
 
         if len(only) > 0:
             print("  processing {} resources".format(len(only)))
