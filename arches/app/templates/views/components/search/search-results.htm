@@ -5,19 +5,21 @@
 <!-- Content -->
 <div class="search-control-container" data-bind="css: { 'slide': !resultsExpanded() }">
     <!-- Title Block -->
-    <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
-    <div id="search-results-container">
-        <div class="search-inline-filters">
-            <!--ko if: userIsReviewer -->
-            <div data-bind="component: {
-                name: 'provisional-filter',
-                params: $parent.sharedStateObject
-            }"></div>
-            <!--/ko-->
-            <div data-bind="component: {
-                name: 'resource-type-filter',
-                params: $parent.sharedStateObject
-            }"></div>
+    <div class="search-count-container">
+        <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
+        <div id="search-results-container">
+            <div class="search-inline-filters">
+                <!--ko if: userIsReviewer -->
+                <div data-bind="component: {
+                    name: 'provisional-filter',
+                    params: $parent.sharedStateObject
+                }"></div>
+                <!--/ko-->
+                <div data-bind="component: {
+                    name: 'resource-type-filter',
+                    params: $parent.sharedStateObject
+                }"></div>
+            </div>
         </div>
     </div>
     <div class="search-results-container">

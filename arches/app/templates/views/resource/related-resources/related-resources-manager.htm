@@ -1,6 +1,6 @@
 {% load i18n %}
 {% load template_tags %}
-<div id="related-resources-drag-panel" class="search-container related-resources-container">
+<div id="related-resources-drag-panel" style="height: calc(100vh - 162px);" class="search-container related-resources-container">
 
 
 
@@ -50,7 +50,7 @@
 
             <div data-bind="with: fdgNodeListView">
 
-                <div class="layer-list">
+                <div class="layer-list search">
 
                     <div class="list-filter fdg-node-filter">
                         <input type="text" class="form-control" style="z-index=100" placeholder="{% trans " Find a resource " %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
@@ -62,7 +62,7 @@
                 <!-- Resource Nodes -->
 
                 <!-- ko foreach: { data: [$data], as: 'self' } -->
-                <div class="report-image-grid relative">
+                <div class="report-image-grid search relative">
                     <div class="grid" style="margin-left: 0px; background: transparent;" data-bind="foreach: {data: items}">
 
                         <div class="library-card relative" data-bind="scrollTo: selected(), container: $parent.scrollContainerSelector, event: { click: self.selectNode, mouseover: self.hoverNode, mouseout: function(e){e.hovered(false)} }, visible: filtered() == false, css:{'selected': selected() == true, 'hovered': hovered() == true}">
@@ -74,7 +74,7 @@
                             </div>
 
                             <div class="crud-card-subtitle" style="left: 5px;">
-                                <span data-bind="text: loaded"></span> {% trans 'out of' %} <span data-bind="text: total"></span>{% trans 'relations loaded' %}<div class="load-relations" data-bind="click: function(){loadcount(loadcount() + 1)}, clickBubble: false, css: {'disabled' : total() === loaded()}">{% trans 'load more' %}</div>
+                                <span data-bind="text: loaded"></span> <span>{% trans 'out of' %}</span><span data-bind="text: total"></span><span>{% trans 'relations loaded' %}</span><div class="load-relations" data-bind="click: function(){loadcount(loadcount() + 1)}, clickBubble: false, css: {'disabled' : total() === loaded()}">{% trans 'load more' %}</div>
                             </div>
 
                             <div class="node-list-details" data-bind="fadeVisible: selected, delay:100, fade: 250">
@@ -97,7 +97,7 @@
     </div>
     <!--/ko-->
 
-    <div>
+    <div style="position: absolute; width: 100%;">
 
         <!-- Target -->
         <div id="rr-manager-content-id" class="rr-drag-panel-target" data-bind="style: {'margin-bottom': containerBottomMargin }">
