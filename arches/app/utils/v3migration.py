@@ -170,10 +170,6 @@ def get_nodegroup_tilegroup(v4_node_name, nodes, resource_id, verbose=False):
     v4_node = nodes.get(name=v4_node_name)
     ng_tile = Tile().get_blank_tile(v4_node.nodegroup_id, resourceid=resource_id)
 
-    if verbose:
-        print "  ", ng_tile.data
-        print "  ", ng_tile.tiles
-
     # if there are child tiles, then the ng_tile.tileid needs to be set
     # (not sure why this is the case, but it is)
     if ng_tile.tileid is None:
