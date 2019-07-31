@@ -267,18 +267,16 @@ class v3PreparedResource:
             data = dict([(k, v) for k, v in tile['data'].items() if v is not None])
             tile['data'] = data
 
-    def put_primary_name_last(self):
-        """ this method ensures that the Primary name is placed at the end of
+    def reorder_tiles_by_value(self, nodeid=None, valueid=None):
+        """ this method can ensure that the Primary name is placed at the end of
         the tile list. this is necessary to ensure that the Primary name is
         used for the "get resource descriptors" function."""
 
         p_name_index = None
         for index, tile in enumerate(self.tiles):
             try:
-                # currently, these hard-coded uuids work for hku models, but
-                # should be refactored way back to the rm_configs.json file
-                name_type = tile['data']["185b9091-943d-11e8-8c9e-94659cf754d0"]
-                if name_type == "a4c88313-52c5-4b6a-9579-3fc5aad17335":
+                node_value = tile['data'][nodeid]
+                if node_value == valueid:
                     p_name_index = index
                     break
             except KeyError:
@@ -436,7 +434,16 @@ class v3PreparedResource:
         self.strip_empty_tile_values()
         self.put_primary_name_last()
 
-    def get_json(self):
+        # reorder tiles so that the correct name and/or description are first in line
+        # and therefore used by the display resource descriptors function.
+        # THIS IS NOT CURRENTLY IMPLEMENTED
+        # the reason being that the Value uuid for "primary" is RDM-specific, and the
+        # Name Type nodeid is resource model-specific. All of the plumbing is not yet
+        # in place to pass those uuids to this function at this time.
+        if True is False:
+            self.reorder_tiles_by_value()
+
+    def get_resource_json(self):
         """ returns the full v4 json for this resource. note that self.process()
         must be run before this method is called, otherwise self.tiles will be
         empty. """
