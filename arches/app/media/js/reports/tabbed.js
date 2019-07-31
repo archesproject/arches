@@ -11,26 +11,22 @@ define([
 ], function(_, ko, koMapping, $, ReportViewModel) {
     return ko.components.register('tabbed-report', {
         viewModel: function(params) {
-            params.configKeys = ['tabs'];
+            params.configKeys = ['tabs', 'activeTabIndex'];
             ReportViewModel.apply(this, [params]);
             var self = this;
-            this.activeTab = ko.observable(self.tabs()[0]);
+            this.activeTab = ko.observable(self.tabs()[ko.unwrap(this.activeTabIndex)]);
             this.report.configJSON.subscribe(function(){
                 if (self.tabs.indexOf(self.activeTab()) === -1) {
-                    self.activeTab(self.tabs()[0]);
+                    self.activeTab(self.tabs()[ko.unwrap(this.activeTabIndex)]);
                 }
             });
             this.topcards = ko.unwrap(self.report.cards).map(function(card){
                 return {name: card.model.name(), nodegroupid: card.nodegroupid};
             });
 
-            this.cardInActiveTab = function(cardNodegroupId) {
-                if (self.activeTab()) {
-                    self.activeTab().nodegroup_ids().forEach( function(tabNodegroupId) {
-                        if (cardNodegroupId === tabNodegroupId) { return true; }
-                    });
-                }
-                return false;
+            this.setActiveTab = function(tabIndex){
+                self.activeTabIndex(tabIndex);
+                self.activeTab(self.tabs()[ko.unwrap(self.activeTabIndex)]);
             };
 
             this.activeCards = ko.computed(function() {
@@ -51,12 +47,13 @@ define([
                     name: '',
                     nodegroup_ids: []
                 });
-                // this.refreshTab(newTab);
                 this.tabs.unshift(newTab);
+                this.setActiveTab(0);
             };
 
             this.removeTab = function(tab){
                 this.tabs.remove(tab);
+                this.setActiveTab(0);
             };
 
         },

@@ -903,6 +903,10 @@ ul.tabbed-report-tab-list {
     align-self: center;
 }
 
+.active-report-tab-form {
+    border: #4389c9 solid 2px;
+}
+
 .tab-banner {
     background: #5fa2dd;
     padding: 1% 2% 1% 2%;

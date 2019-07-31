@@ -7,7 +7,7 @@
     <ul class="tabbed-report-tab-list">
     <!-- ko if: activeTab  -->
         <!-- ko foreach: {data: tabs, as: 'tab'}  -->
-        <li data-bind="click: function(){ $parent.activeTab(tab) }, css: { 'active-report-tab': ko.unwrap($parent.activeTab().name) === ko.unwrap(tab.name) }" class="report-tab">
+        <li data-bind="click: function(){ $parent.setActiveTab($index()) }, css: { 'active-report-tab': ko.unwrap($parent.activeTabIndex) === $index() }" class="report-tab">
             <a><span><i data-bind="attr: {class: ('fa '+ ko.unwrap(tab.icon))}"></i></span></a>
         </li>
         <!-- /ko -->
@@ -20,7 +20,7 @@
         <span style="padding-left: 5px" data-bind="text: report.get('displayname') || '(Resource Instance Name)'"></span>
     </div>
     <!-- ko if: activeTab()  -->
-    <div><span data-bind="text: activeTab().name()"></span></div>
+    <div><span data-bind="text: tabs()[activeTabIndex()].name"></span></div>
     <!-- /ko -->
 </div>
 {% endblock header %}
@@ -33,7 +33,7 @@
 </div>
 </div>
 <!--ko foreach: {data: tabs, as: 'tab'}-->
-<div style="height: 100%; display: flex; flex-direction: column; justify-content: space-evenly; margin: 15px 0px 15px; padding: 5px; background-color: #fff">
+<div style="height: 100%; display: flex; flex-direction: column; justify-content: space-evenly; margin: 15px 0px 15px; padding: 5px; background-color: #fff" data-bind="click: function(){$parent.setActiveTab($index())}, css: {'active-report-tab-form': ko.unwrap($parent.activeTabIndex) === $index()}">
     <div style="display: flex; flex-direction: row">
         <div>
             <div class="col-xs-12 pad-nor" style="padding: 5px">
@@ -67,7 +67,7 @@
 
     <div class="rp-report-section relative rp-report-section-root">
         <div class="rp-report-section-title">
-            <!-- ko foreach: { data: activeCards, as: 'card' } -->
+            <!-- ko foreach: { data: activeCards(), as: 'card' } -->
                 <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
                 <div class="rp-card-section">
                     <!-- ko component: {
