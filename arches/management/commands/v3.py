@@ -59,6 +59,10 @@ class Command(BaseCommand):
         parser.add_argument('--only', nargs="+", action='store', default=[],
                             help='List of specific resource ids (uuids) to use.')
 
+        parser.add_argument('--skip-file-check', action='store_true', default=False,
+                            help='Skips the check for the existence of uploaded files '
+                                 'during the conversion process.')
+
     def handle(self, *args, **options):
 
         if not options['target']:
@@ -119,7 +123,8 @@ class Command(BaseCommand):
                                truncate=options['number'],
                                verbose=vb,
                                exclude=options['exclude'],
-                               only=options['only']
+                               only=options['only'],
+                               skipfilecheck=options['skip_file_check']
                                )
 
         if op == 'write-v4-relations':
@@ -248,7 +253,8 @@ class Command(BaseCommand):
         print "PASS"
 
     def write_v4_json(self, package_dir, resource_models,
-                      direct_import=False, truncate=None, verbose=False, exclude=[], only=[]):
+                      direct_import=False, truncate=None, verbose=False, exclude=[], only=[],
+                      skipfilecheck=False):
 
         start = datetime.now()
         v3_data_dir = os.path.join(package_dir, "v3data")
@@ -260,6 +266,21 @@ class Command(BaseCommand):
         if len(v3_files) == 0:
             print "\nThere is no v3 data to import. Put v3 json or jsonl in {}".format(v3_data_dir)
             exit()
+
+        try:
+            if os.path.isfile(only[0]):
+                print("using resource ids from file")
+                onlyids = list()
+                with open(only[0], "rb") as f:
+                    for line in f.readlines():
+                        onlyids.append(line.rstrip())
+                only = onlyids
+        except Exception as e:
+            print e
+            exit()
+
+        if len(only) > 0:
+            print("  processing {} resources".format(len(only)))
 
         sources = []
 
@@ -276,7 +297,8 @@ class Command(BaseCommand):
                 value_converter = DataValueConverter(skip_file_check=skipfilecheck)
 
                 importer = v3Importer(v3_data_dir, rm, v3_resource_file=v3_file,
-                                      truncate=truncate, exclude=exclude, only=only)
+                                      truncate=truncate, exclude=exclude, only=only, verbose=verbose,
+                                      dt_converter=value_converter)
 
                 outfilename = os.path.splitext(infilename)[0]+"-"+rm+os.path.splitext(infilename)[1]
                 output_file = os.path.join(package_dir, 'business_data', outfilename)
