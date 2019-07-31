@@ -304,9 +304,9 @@ class Command(BaseCommand):
                 output_file = os.path.join(package_dir, 'business_data', outfilename)
 
                 if ext == ".json":
-                    output = importer.write_v4_json(output_file, verbose=verbose)
+                    output = importer.write_v4_json(output_file)
                 elif ext == ".jsonl":
-                    output = importer.write_v4_jsonl(output_file, verbose=verbose)
+                    output = importer.write_v4_jsonl(output_file)
 
                 if output is not False:
                     sources.append(output_file)
