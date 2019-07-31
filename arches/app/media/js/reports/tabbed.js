@@ -4,12 +4,11 @@ define([
     'knockout-mapping',
     'jquery',
     'viewmodels/report',
-    'viewmodels/alert',
     'arches',
     'knockstrap',
     'bindings/chosen',
     'views/components/widgets/map'
-], function(_, ko, koMapping, $, ReportViewModel, AlertViewModel) {
+], function(_, ko, koMapping, $, ReportViewModel) {
     return ko.components.register('tabbed-report', {
         viewModel: function(params) {
             params.configKeys = ['tabs', 'activeTabIndex'];
