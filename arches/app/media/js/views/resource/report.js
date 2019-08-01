@@ -32,7 +32,7 @@ require([
                 return new CardViewModel({
                     card: card,
                     graphModel: graphModel,
-                    resourceId: data.resourceId,
+                    resourceId: data.resourceid,
                     displayname: data.displayname,
                     cards: data.cards,
                     tiles: data.tiles,

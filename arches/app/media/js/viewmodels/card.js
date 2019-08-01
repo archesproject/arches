@@ -320,7 +320,7 @@ define([
                 return new TileViewModel({
                     tile: {
                         tileid: '',
-                        resourceinstance_id: params.resourceId(),
+                        resourceinstance_id: ko.unwrap(params.resourceId),
                         nodegroup_id: ko.unwrap(self.model.nodegroup_id),
                         parenttile_id: self.parent ? self.parent.tileid : null,
                         data: _.reduce(self.widgets(), function(data, widget) {
