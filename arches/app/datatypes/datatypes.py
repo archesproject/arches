@@ -478,7 +478,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return GeometryCollection(wkt_geoms)
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        document['geometries'].append({'geom':nodevalue, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
+        document['geometries'].append({
+            'geom': nodevalue,
+            'nodegroup_id': tile.nodegroup_id,
+            'provisional': provisional,
+            'tileid': tile.pk
+        })
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:
             minx, miny, maxx, maxy = bounds
@@ -573,6 +578,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
             sql_list.append("""
                 SELECT resourceinstanceid::text,
+                        tileid::text,
                         (row_number() over ()) as __id__,
                         1 as total,
                         geom AS __geometry__,
