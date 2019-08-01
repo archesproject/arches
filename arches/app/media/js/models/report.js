@@ -17,6 +17,7 @@ define(['arches',
 
         initialize: function(options) {
             var self = this;
+            var template = self.get('graph').template_id;
             this.cards = options.cards || [];
             this.preview = options.preview;
             this.userisreviewer = options.userisreviewer;
@@ -29,14 +30,16 @@ define(['arches',
 
             this.configJSON = ko.observable({});
             this.configState;
+            this.defaultConfig = JSON.parse(reportLookup[template].defaultconfig);
             this.configKeys.subscribe(function(val){
                 var config;
                 if (val.length) {
                     self.configState = {};
                     config = self.get('config');
-                    // var defaultConfigJSON.parse(reportLookup[value].defaultconfig);
                     _.each(val, function(key) {
-                        self.configState[key] = ko.unwrap(config[key]);
+                        if (self.defaultConfig.hasOwnProperty(key)) {
+                            self.configState[key] = ko.unwrap(config[key]);
+                        }
                     });
                     self.configState = koMapping.fromJS(self.configState);
                 }
@@ -44,8 +47,10 @@ define(['arches',
 
             this.resetConfigs = function(previousConfigs) {
                 this.configKeys().forEach(function(key){
-                    if (JSON.stringify(self.configState[key]()) !== JSON.stringify(previousConfigs[key])) {
-                        koMapping.fromJS(previousConfigs, self.configState);
+                    if (self.defaultConfig.hasOwnProperty(key)) {
+                        if (JSON.stringify(self.configState[key]()) !== JSON.stringify(previousConfigs[key])) {
+                            koMapping.fromJS(previousConfigs, self.configState);
+                        }
                     }
                 });
             };
