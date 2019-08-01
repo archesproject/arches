@@ -316,20 +316,20 @@ define([
                 } else {
                     this.searchResults.relationshipCandidates.subscribe(function(val) {
                         if (val.length > 0) {
-                            self.saveRelationships(val);
+                            this.saveRelationships(val);
                         }
-                    }, self);
+                    }, this);
 
                     this.searchResults.showRelationships.subscribe(function(val) {
-                        self.currentResource(self.createResource(val.resourceinstanceid));
-                        self.getRelatedResources();
-                        self.currentResource().resourceRelationships.subscribe(function(val) {
-                            self.resourceRelationships(val);
-                        }, self);
-                        self.currentResource().paging.subscribe(function(val) {
-                            koMapping.fromJS(val, self.paginator);
-                        }, self);
-                    });
+                        this.currentResource(this.createResource(val.resourceinstanceid));
+                        this.getRelatedResources();
+                        this.currentResource().resourceRelationships.subscribe(function(val) {
+                            this.resourceRelationships(val);
+                        }, this);
+                        this.currentResource().paging.subscribe(function(val) {
+                            koMapping.fromJS(val, this.paginator);
+                        }, this);
+                    }, this);
                 }
 
                 /**
