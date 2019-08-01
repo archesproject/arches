@@ -17,7 +17,7 @@ define(['arches',
 
         initialize: function(options) {
             var self = this;
-            this.templateid = ko.observable(self.get('graph').template_id);
+            this.templateId = ko.observable(self.get('graph').template_id);
             this.cards = options.cards || [];
             this.preview = options.preview;
             this.userisreviewer = options.userisreviewer;
@@ -32,7 +32,7 @@ define(['arches',
             this.configState = {};
             this.configKeys.subscribe(function(val){
                 var config;
-                self.defaultConfig = JSON.parse(reportLookup[self.templateid()].defaultconfig);
+                self.defaultConfig = JSON.parse(reportLookup[self.templateId()].defaultconfig);
                 if (val.length) {
                     self.configState = {};
                     config = self.get('config');
@@ -75,10 +75,10 @@ define(['arches',
                     this.get('graphid')(value);
                     break;
                 case 'template_id':
-                    var templateId = ko.observable(value);
+                    self.templateId(value);
                     this.set(key, ko.computed({
                         read: function() {
-                            return templateId();
+                            return self.templateId();
                         },
                         write: function(value) {
                             var key;
@@ -94,9 +94,8 @@ define(['arches',
                                     configKeys.push(key);
                                 }
                             }
-                            templateId(value);
-                            self.templateid(value);
-                            self.configKeys(self.configKeys().concat(configKeys))
+                            self.templateId(value);
+                            self.configKeys(self.configKeys().concat(configKeys));
                         },
                         owner: this
                     }));
