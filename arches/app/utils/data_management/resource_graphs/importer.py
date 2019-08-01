@@ -24,7 +24,8 @@ from arches.app.models.models import (CardXNodeXWidget, NodeGroup, DDataType, Wi
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.models import GraphXMapping
 from django.db import transaction
-
+import logging
+logger = logging.getLogger(__name__)
 
 class GraphImportReporter:
     def __init__(self, graphs):
@@ -33,6 +34,7 @@ class GraphImportReporter:
         self.graphs = len(graphs)
         self.graphs_saved = 0
         self.graph_id = ''
+        self.logger = logging.getLogger(__name__)
 
     def update_graphs_saved(self, count=1):
         self.graphs_saved += count
@@ -44,6 +46,7 @@ class GraphImportReporter:
             result = "Saved Branch: {0}"
 
         print result.format(self.name)
+        self.logger.debug(result.format(self.name), extra=self.name)
 
 
 class GraphImportException(Exception):
@@ -57,6 +60,7 @@ def import_graph(graphs, overwrite_graphs=True):
         if default_configs is not None:
             if configs is None:
                 configs = {}
+                logger.debug("Default config will be used for import. Nothing found in `configs`")
             else:
                 try:
                     '' in configs  # Checking if configs is a dict-like object
@@ -74,6 +78,8 @@ def import_graph(graphs, overwrite_graphs=True):
                 if resource['ontology_id'] is not None:
                     if resource['ontology_id'] not in [str(f['ontologyid']) for f in Ontology.objects.all().values('ontologyid')]:
                         errors.append('The ontologyid of the graph you\'re trying to load does not exist in Arches.')
+                else:
+                    logger.debug("`ontology_id` in resource {0} not found.".format(resource['graphid']))
 
                 reporter.name = resource['name']
                 reporter.resource_model = resource['isresource']
@@ -131,6 +137,9 @@ def import_graph(graphs, overwrite_graphs=True):
                     pass
             except Exception as e:
                 print e
+
+        for error in errors:
+            logger.debug(error)
 
         return errors, reporter
 

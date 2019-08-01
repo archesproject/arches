@@ -23,11 +23,13 @@ try:
 except ImportError:
     from StringIO import StringIO
 
+import logging
 
 class RdfWriter(Writer):
 
     def __init__(self, **kwargs):
         self.format = kwargs.pop('format', 'xml')
+        self.logger = logging.getLogger(__name__)
         super(RdfWriter, self).__init__(**kwargs)
 
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
@@ -43,7 +45,8 @@ class RdfWriter(Writer):
     def get_rdf_graph(self):
         archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
         graph_uri = URIRef(archesproject[reverse('graph', args=[self.graph_id]).lstrip('/')])
-
+        self.logger.debug("Using `{0}` for Arches URI namespace".format(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT))
+        self.logger.debug("Using `{0}` for Graph URI".format(graph_uri))
 
         dt_factory = DataTypeFactory()
         g = Graph()
@@ -225,6 +228,8 @@ class JsonLdReader(Reader):
         self.resource_model_root_classes = set()
         self.non_unique_classes = set()
         self.graph_id_lookup = {}
+        self.logger = logging.getLogger(__name__)
+        super(RdfWriter, self).__init__(**kwargs)
         for graph in models.GraphModel.objects.filter(isresource=True):
             node = models.Node.objects.get(graph_id=graph.pk, istopnode=True)
             self.graph_id_lookup[node.ontologyclass] = graph.pk
@@ -235,10 +240,16 @@ class JsonLdReader(Reader):
                 self.resource_model_root_classes.add(node.ontologyclass)
         self.resource_model_root_classes = self.resource_model_root_classes - self.non_unique_classes
         self.ontologyproperties = models.Edge.objects.values_list('ontologyproperty', flat=True).distinct()
+        self.logger.info("Initialized JsonLdReader")
+        self.logger.debug("Found {0} Non-unique root classes".format(len(self.non_unique_classes)))
+        self.logger.debug("Found {0} Resource Model Root classes".format(len(self.resource_model_root_classes)))
+        self.logger.debug("Resource Model Root classes: {0}".format("\n".join(list(map(str, self.resource_model_root_classes)))))
 
     def get_graph_id(self, root_ontologyclass):
         if root_ontologyclass in self.resource_model_root_classes:
             return self.graph_id_lookup[root_ontologyclass]
+        else:
+            self.logger.info("Incoming Root Ontology class `{0}` not found within the list of Resource Model Root Classes".format(root_ontologyclass))
         # if not isinstance(strs_to_test, list):
         #     strs_to_test = [strs_to_test]
         # for str_to_test in strs_to_test:
@@ -256,6 +267,8 @@ class JsonLdReader(Reader):
                              (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), str_to_test)
             if match:
                 return match.group('resourceid')
+            else:
+                self.logger.debug("Valid resourceid not found within `{0}`".format(str_to_test))
         return None
 
     def read_resource(self, data, use_ids=False, resourceid=None, graphid=None):
@@ -269,16 +282,21 @@ class JsonLdReader(Reader):
             jsonld = expand(jsonld)[0]
             if graphid is None:
                 graphid = self.get_graph_id(jsonld["@type"][0])
+                self.logger.debug("graphid is not set. Using the @type value instead: {0}".format(jsonld["@type"][0]))
             if graphid:
                 graph = GraphProxy.objects.get(graphid=graphid)
                 graphtree = graph.get_tree()
                 if use_ids == True:
                     resourceinstanceid = self.get_resource_id(jsonld["@id"])
                     if resourceinstanceid is None:
+                        self.logger.error(
+                            'The @id of the resource was not supplied, or was null, or the URI was not correctly formatted')
                         raise Exception(
                             'The @id of the resource was not supplied, or was null, or the URI was not correctly formatted')
+                    self.logger.debug("Resource instance ID found: {0}".format(resourceinstanceid))
                     resource = Resource.objects.get(pk=resourceinstanceid)
                 else:
+                    self.logger.debug("`use_ids` setting is set to False - creating new Resource Instance IDs on import")
                     resource = Resource()
                     resource.graph_id = graphid
                     resource.pk = resourceid
@@ -313,7 +331,7 @@ class JsonLdReader(Reader):
                     keys.append(key)
         except:
             pass
-
+        self.logger.debug("findOntologyProperties -> {0}".format("\n".join(map(str, keys))))
         return keys
 
     def findBranch(self, nodes, ontology_property, jsonld):
@@ -349,8 +367,7 @@ class JsonLdReader(Reader):
         for jsonld_graph in jsonld:
             # print ""
             # print ""
-            # print "searching for branch %s --> %s" %
-            # (ontology_property.split('/')[-1], jsonld_graph['@type'].split('/')[-1])
+            self.logger.debug("searching for branch %s --> %s" % (ontology_property.split('/')[-1], jsonld_graph['@type'].split('/')[-1]))
             found = []
             nodes_copy = set()
             invalid_nodes = set()
@@ -373,19 +390,21 @@ class JsonLdReader(Reader):
             # try to find a node in the graph among a bunch of sibling nodes that has the same incoming edge (propertyclass) as
             # the edge/node combination we're searching for from the json-ld graph
 
-            # print "Trying to match jsonld_graph:"
-            # print jsonld_graph
+            self.logger.info("Trying to match jsonld_graph fragment:")
+            self.logger.debug(str(jsonld_graph))
             for node in nodes:
-                # print "node['node'].ontologyclass == jsonld_graph['@type']"
-                # print node['node'].ontologyclass == jsonld_graph['@type']
-                # print node['node'].ontologyclass
-                # print jsonld_graph
+                self.logger.debug("Checking {0}".format(node['node'].ontologyclass))
+                self.logger.debug("node['node'].ontologyclass == jsonld_graph['@type']")
+                self.logger.debug(node['node'].ontologyclass == jsonld_graph['@type'])
+
                 if '@type' in jsonld_graph:
                     if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == jsonld_graph['@type'][0]:
-                        # print "found %s" % node['node'].name
+                        self.logger.debug("found {0}".format(node['node'].name))
                         nodes_copy.add((node['node'].name, node['node'].pk))
                         found.append(node)
                     else:
+                        self.logger.debug("Node type ontologyclass and property {0}, {1} is not a match".format(
+                                                                          node['node'].ontologyclass, node['parent_edge'].ontologyproperty))
                         invalid_nodes.add((node['node'].name, node['node'].pk))
                         pass
                 if '@value' in jsonld_graph:
@@ -399,13 +418,15 @@ class JsonLdReader(Reader):
                         nodes_copy.add((node['node'].name, node['node'].pk))
                         found.append(node)
 
-            # print 'found %s branches' % len(found)
+            self.logger.debug('found {0} branches'.format(len(found)))
             if len(found) == 0:
+                self.logger.error('branch not found for {0}'.format(str(jsonld_graph)))
                 print 'branch not found for %r' % jsonld_graph
                 raise self.DataDoesNotMatchGraphException()
 
-            # if len(self.findOntologyProperties(jsonld_graph)) == 0:
-            # print 'at a leaf -- unwinding'
+            if len(self.findOntologyProperties(jsonld_graph)) == 0:
+                # print 'at a leaf -- unwinding'
+                self.logger.debug("No further ontology properties found in this fragment; leaf of tree. Unwinding")
 
             def json_data_is_valid(node, json_ld_node):
                 datatype = self.datatype_factory.get_instance(node.datatype)
@@ -415,29 +436,39 @@ class JsonLdReader(Reader):
                 return len(datatype.validate(value)) == 0
 
             if len(found) > 1:
+                self.logger.info("Iterating through the matched nodes")
                 for found_node in found:
                     # here we follow the algorithm supplied by the Getty
                     # If the range in the model is a domain-value, and the incoming data is of the right format and part of the domain-value's enumeration, then accept that node.
                     # If the range in the model is a number, string, or date, and the incoming data is of the right format, then accept that node.
                     # If the range in the model is a file-list, and the referenced file already exists, then accept that node.
                     # If the range in the model is a concept, then consider if the incoming data is a concept that is part of the collection for the node. If it is, then accept that node. If it is a concept, and not part of the collection, then fail. If it is not a concept, then continue.
+                    self.logger.debug("Checking to see if the node is in a standard datatype: domain-value, number, string, date, file-list, concept")
                     for datatype in ['domain-value', 'number', 'string', 'date', 'file-list', 'concept']:
-                        if found_node['node'].datatype == datatype and json_data_is_valid(found_node['node'], jsonld_graph):
+                        if found_node['node'].datatype == datatype and json_data_is_valid(found_node['node'], jsonld_graph): 
+                            self.logger.debug("Matched {0} and the json fragment is valid".format(datatype))
                             return found_node
 
                     # If the range is semantic, then check the class of the incoming node is the same
                     # class as the model's node. If it does, then recursively test the edges of the
                     # semantic node to determine if it is a candidate (peek-ahead). Remove from the
                     # candidate list if it is not.
+                    self.logger.debug("Checking to see if the node is a semantic node?")
                     if found_node['node'].datatype == 'semantic':
+                        self.logger.debug("Node is semantic node. Recursively search for the children of this node and match to branch.")
+                        self.logger.debug('now searching children of {0} node UUID {1}'.format(found_node['node'].name, found_node['node'].pk))
                         for ontology_prop in self.findOntologyProperties(jsonld_graph):
                             try:
-                                # print 'now searching children of %s node' % found_node['node'].name
+                                self.logger.debug("Matches {0}?".format(ontology_prop))
                                 branch = self.findBranch(found_node['children'], ontology_prop, jsonld_graph[ontology_prop])
                             except self.DataDoesNotMatchGraphException as e:
+                                self.logger.error("Data supplied does not match")
                                 found_node['remove'] = True
                                 invalid_nodes.add((found_node['node'].name, found_node['node'].pk))
                             except self.AmbiguousGraphException as e:
+                                # Not sure this will be called, given the structure of this code
+                                # Adding a debug logger just in case it might
+                                self.logger.debug("AmbiguousGraphException thrown while iterating through children of a semantic node.")
                                 # print 'threw AmbiguousGraphException'
                                 # print nodes_copy
                                 pass
@@ -447,8 +478,13 @@ class JsonLdReader(Reader):
                     # than one model has the same top level class, then fail as the model is ambiguous.
                     # If there is exactly one possible model, then accept that node.
                     if found_node['node'].datatype == 'resource-instance':
+                        self.logger.debug("Resource Instance datatype - is there a model in Arches that matches the type?")
                         if found_node['node'].ontologyclass in self.resource_model_root_classes:
+                            self.logger.debug("Resource instance <=> Model match found")
                             return found_node
+                        else:
+                            self.logger.error("Incoming node class for this resource instance datatype does not match Model classes")
+                            self.logger.debug(found_node['node'].ontologyclass)
 
             # ORIGINAL CODE - this is probably more flexable to have this here as this allows for non-semantic nodes to have child nodes
             # for ontology_prop in self.findOntologyProperties(jsonld_graph):
@@ -465,13 +501,15 @@ class JsonLdReader(Reader):
             #             pass
 
             valid_nodes = nodes_copy.difference(invalid_nodes)
-
+            self.logger.debug("After walking the node tree, {0} valid nodes found, {1} invalid discarded".format(len(valid_nodes), len(invalid_nodes)))
+            self.logger.debug("Valid Node names/pk: {0}".format([(x['node'].name, x['node'].pk) for x in valid_nodes]))
             if len(valid_nodes) == 1:
                 # print 'branch found'
                 # print valid_nodes
                 valid_node = valid_nodes.pop()
                 for node in nodes:
                     if node['node'].pk == valid_node[1]:
+                        self.logger.info("Matching Branch found: {0}".format(node['node'].name))
                         return node
             elif len(valid_nodes) > 1:
                 raise self.AmbiguousGraphException()
