@@ -229,7 +229,6 @@ class JsonLdReader(Reader):
         self.non_unique_classes = set()
         self.graph_id_lookup = {}
         self.logger = logging.getLogger(__name__)
-        super(RdfWriter, self).__init__(**kwargs)
         for graph in models.GraphModel.objects.filter(isresource=True):
             node = models.Node.objects.get(graph_id=graph.pk, istopnode=True)
             self.graph_id_lookup[node.ontologyclass] = graph.pk
@@ -367,7 +366,8 @@ class JsonLdReader(Reader):
         for jsonld_graph in jsonld:
             # print ""
             # print ""
-            self.logger.debug("searching for branch %s --> %s" % (ontology_property.split('/')[-1], jsonld_graph['@type'].split('/')[-1]))
+            if '@type' in jsonld_graph:
+                self.logger.debug("searching for branch %s --> %s" % (ontology_property.split('/')[-1], jsonld_graph['@type'][0].split('/')[-1]))
             found = []
             nodes_copy = set()
             invalid_nodes = set()
@@ -394,8 +394,9 @@ class JsonLdReader(Reader):
             self.logger.debug(str(jsonld_graph))
             for node in nodes:
                 self.logger.debug("Checking {0}".format(node['node'].ontologyclass))
-                self.logger.debug("node['node'].ontologyclass == jsonld_graph['@type']")
-                self.logger.debug(node['node'].ontologyclass == jsonld_graph['@type'])
+                if '@type' in jsonld_graph:
+                    self.logger.debug("node['node'].ontologyclass == jsonld_graph['@type']")
+                    self.logger.debug(node['node'].ontologyclass == jsonld_graph['@type'])
 
                 if '@type' in jsonld_graph:
                     if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == jsonld_graph['@type'][0]:
@@ -502,7 +503,7 @@ class JsonLdReader(Reader):
 
             valid_nodes = nodes_copy.difference(invalid_nodes)
             self.logger.debug("After walking the node tree, {0} valid nodes found, {1} invalid discarded".format(len(valid_nodes), len(invalid_nodes)))
-            self.logger.debug("Valid Node names/pk: {0}".format([(x['node'].name, x['node'].pk) for x in valid_nodes]))
+            self.logger.debug("Valid Node names/pk: {0}".format(valid_nodes))
             if len(valid_nodes) == 1:
                 # print 'branch found'
                 # print valid_nodes
