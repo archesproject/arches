@@ -164,6 +164,7 @@ class GraphDesignerView(GraphBaseView):
         ontologies = models.Ontology.objects.filter(parentontology=None)
         ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
         datatypes = models.DDataType.objects.all()
+        icons = models.Icon.objects.order_by('name')
         datatypes_json = JSONSerializer().serialize(datatypes, exclude=['modulename', 'isgeometric'])
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
         applied_functions = JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=self.graph))
@@ -212,6 +213,7 @@ class GraphDesignerView(GraphBaseView):
             card_components_json=JSONSerializer().serialize(card_components),
             cards=JSONSerializer().serialize(cards),
             cardwidgets=JSONSerializer().serialize(cardwidgets),
+            icons=JSONSerializer().serialize(icons),
             map_layers=map_layers,
             map_markers=map_markers,
             map_sources=map_sources,
