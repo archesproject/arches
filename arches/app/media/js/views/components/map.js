@@ -201,17 +201,18 @@ define([
 
         this.onFeatureClick = function(feature, lngLat) {
             var map = self.map();
-            var popup = new mapboxgl.Popup()
+            self.popup = new mapboxgl.Popup()
                 .setLngLat(lngLat)
                 .setHTML(self.popupTemplate)
                 .addTo(map);
             ko.applyBindingsToDescendants(
                 self.getPopupData(feature),
-                popup._content
+                self.popup._content
             );
             map.setFeatureState(feature, { selected: true });
-            popup.on('close', function() {
+            self.popup.on('close', function() {
                 map.setFeatureState(feature, { selected: false });
+                self.popup = undefined;
             });
         };
 
