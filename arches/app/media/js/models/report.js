@@ -135,7 +135,6 @@ define(['arches',
         },
 
         reset: function() {
-            console.log('resetting', this._data())
             this._attributes = JSON.parse(this._data());
             this.parse(this._attributes);
         },
