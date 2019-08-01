@@ -34,7 +34,7 @@ define([
             this.activeCards = ko.computed(function() {
                 var cardList = [];
                 ko.unwrap(self.report.cards).forEach(function(card) {
-                    if (self.activeTabIndex() !== undefined && self.tabs().length > 0) {
+                    if (self.activeTabIndex() !== undefined && self.tabs().length > 0 && self.tabs().length -1 >= self.activeTabIndex()) {
                         self.tabs()[self.activeTabIndex()]["nodegroup_ids"]().forEach( function(tabNodegroupId) {
                             if (card.nodegroupid === tabNodegroupId) {
                                 cardList.push(card);
