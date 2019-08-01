@@ -538,7 +538,7 @@ class JsonLdReader(Reader):
                                              (settings.UUID_REGEX, settings.UUID_REGEX), str(jsonld_node['@id']))
                             if match:
                                 tileid = match.group('tileid')
-                                self.logger.debug("Found matching tile id `{0}` from the tile/node URI".format(tileid)) 
+                                self.logger.debug("Found matching tile id `{0}` from the tile/node URI".format(tileid))
                                 for node in parent_node['children']:
                                     if str(node['node'].pk) == match.group('nodeid'):
                                         branch = node
