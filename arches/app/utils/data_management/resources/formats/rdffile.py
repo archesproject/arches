@@ -522,7 +522,7 @@ class JsonLdReader(Reader):
             jsonld = [jsonld]
 
         # print "-------"
-        # print "INCOMING TO resolve_node_ids: %r" % jsonld
+        self.logger.debug("INCOMING TO resolve_node_ids: %r" % jsonld)
         parent_tileid = tileid
         for jsonld_node in jsonld:
             if parent_node is not None:
@@ -537,6 +537,7 @@ class JsonLdReader(Reader):
                                              (settings.UUID_REGEX, settings.UUID_REGEX), str(jsonld_node['@id']))
                             if match:
                                 tileid = match.group('tileid')
+                                self.logger.debug("Found matching tile id `{0}` from the tile/node URI".format(tileid)) 
                                 for node in parent_node['children']:
                                     if str(node['node'].pk) == match.group('nodeid'):
                                         branch = node
@@ -549,12 +550,15 @@ class JsonLdReader(Reader):
                             tileid = uuid.uuid4()
 
                 except self.DataDoesNotMatchGraphException as e:
-                    # print 'DataDoesNotMatchGraphException'
+                    self.logger.error("Mismatch when trying to match the JSON LD section with a relevant Arches Branch")
+                    self.logger.debug(jsonld_node)
                     self.errors['DataDoesNotMatchGraphException'] = e
                     branch = None
 
                 except self.AmbiguousGraphException as e:
-                    # print 'AmbiguousGraphException'
+                    self.logger.error("Ambiguous Graph exception thrown")
+                    self.logger.debug(e.message)
+                    self.logger.debug(jsonld_node)
                     self.errors['AmbiguousGraphException'] = e
                     branch = None
             else:
@@ -567,14 +571,18 @@ class JsonLdReader(Reader):
                     # jsonld_node['@archesid'] = '%stile/%s/node/%s' % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, tileid, branch['node'].nodeid)
 
                     if tileid not in self.tiles:
+                        self.logger.debug("Target tileid does not exist - creating {0}".format(tileid))
                         self.tiles[tileid] = Tile(tileid=tileid, parenttile_id=parent_tileid,
                                                   nodegroup_id=branch['node'].nodegroup_id, data={})
                         if parent_tileid is None:
+                            self.logger.debug("Tile does not have a parent_tileid - adding to resource.tiles list")
                             resource.tiles.append(self.tiles[tileid])
                         else:
+                            self.logger.debug("Tile does has {0} as parent_tileid".format(parent_tileid))
                             self.tiles[parent_tileid].tiles.append(self.tiles[tileid])
 
                     if (branch['node'].datatype != 'semantic'):
+                        self.logger.debug("Assigning value to datatype ({0}) from a non-semantic node:".format(branch['node'].datatype))
                         # if (branch['node'].datatype == 'number'):
                         #     print 'number'
                         #     import ipdb
@@ -584,14 +592,14 @@ class JsonLdReader(Reader):
                         # print jsonld_node
                         # print branch['node'].datatype
                         value = datatype.from_rdf(jsonld_node)
-                        # print ('value found! : ', value)
+                        self.logger.debug('value found! : {0}'.format(value))
                         self.tiles[tileid].data[str(branch['node'].nodeid)] = value
                         ontology_properties = self.findOntologyProperties(jsonld_node)
 
                 if len(ontology_properties) > 0:
                     for ontology_property in ontology_properties:
-                        # print "Recursing on %s" % ontology_property
-                        # print jsonld_node['@type']
+                        self.logger.debug("Recursing on %s" % ontology_property)
+                        self.logger.debug(jsonld_node['@type'])
                         # print ontology_property
                         self.resolve_node_ids(jsonld_node[ontology_property], ontology_prop=ontology_property,
                                               graph=None, parent_node=branch, tileid=tileid, parent_tileid=parent_tileid, resource=resource)
