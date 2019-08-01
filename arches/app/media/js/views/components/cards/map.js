@@ -60,7 +60,7 @@ define([
             }
         });
 
-        var updateTiles = function() {
+        this.updateTiles = function() {
             var featureCollection = self.draw.getAll();
             _.each(self.featureLookup, function(value) {
                 value.selectedTool(null);
@@ -183,7 +183,7 @@ define([
         this.deleteFeature = function(feature) {
             if (self.draw) {
                 self.draw.delete(feature.id);
-                updateTiles();
+                self.updateTiles();
             }
         };
 
@@ -303,13 +303,13 @@ define([
                 e.features.forEach(function(feature) {
                     self.draw.setFeatureProperty(feature.id, 'nodeId', self.newNodeId);
                 });
-                updateTiles();
+                self.updateTiles();
             });
-            map.on('draw.update', updateTiles);
-            map.on('draw.delete', updateTiles);
+            map.on('draw.update', self.updateTiles);
+            map.on('draw.delete', self.updateTiles);
             map.on('draw.modechange', function(e) {
                 self.drawModeChange(e);
-                updateTiles();
+                self.updateTiles();
             });
             map.on('draw.selectionchange', function(e) {
                 self.selectedFeatureIds(e.features.map(function(feature) {

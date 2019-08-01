@@ -9,7 +9,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4907_grouping_card_component'),
+        ('models', '4684_adds_config_to_tabbed_report'),
     ]
 
     operations = [
