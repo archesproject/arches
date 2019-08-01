@@ -128,6 +128,8 @@ RUN pip install virtualenv==15.1.0 \
     && pip install -f ${WHEELS} 'gunicorn==19.9.0' \
     && pip install -r ${WHEELS}/requirements.txt \
                    -f ${WHEELS} \
+    && pip install -f ${WHEELS} 'gunicorn==19.7.1' \
+    && pip install -f ${WHEELS} django-auth-ldap \
     && pip install -r ${WHEELS}/requirements_dev.txt \
                    -f ${WHEELS} \
     && rm -rf ${WHEELS} \
