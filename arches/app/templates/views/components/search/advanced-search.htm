@@ -32,7 +32,23 @@
     </div>
 
     <div class="facets-search-container" style="">
-        <h3 class="advanced-search-title"> {% trans "Advanced Search" %}</h3>
+
+        <div data-bind="visible: filter.facets().length === 0">
+            <div id="rr-splash" class="rr-splash">
+                <!-- Image -->
+                <div class="img-lg img-circle rr-splash-img-container">
+                    <img class="rr-splash-img" src="../media/img/inspection.png" alt="Advanced Search">
+                </div>
+
+                <!-- Splash Title -->
+                <div class="rr-splash-title">{% trans "Advanced Search" %}</div>
+
+                <!-- Splash Instructions -->
+                <div class="rr-splash-description">{% trans "Here we explain how to perform an adv. search." %}</div>
+                <div class="rr-splash-description">{% trans "Other text here describing advanced search" %}</div>
+                <div class="rr-splash-description">{% trans "Blah Blah" %}</div>
+            </div>
+        </div>
 
         <!-- ko foreach: filter.facets -->
 

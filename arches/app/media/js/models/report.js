@@ -17,7 +17,7 @@ define(['arches',
 
         initialize: function(options) {
             var self = this;
-            var template = self.get('graph').template_id;
+            this.templateId = ko.observable(self.get('graph').template_id);
             this.cards = options.cards || [];
             this.preview = options.preview;
             this.userisreviewer = options.userisreviewer;
@@ -29,10 +29,10 @@ define(['arches',
             this._data = ko.observable('{}');
 
             this.configJSON = ko.observable({});
-            this.configState;
-            this.defaultConfig = JSON.parse(reportLookup[template].defaultconfig);
+            this.configState = {};
             this.configKeys.subscribe(function(val){
                 var config;
+                self.defaultConfig = JSON.parse(reportLookup[self.templateId()].defaultconfig);
                 if (val.length) {
                     self.configState = {};
                     config = self.get('config');
@@ -75,13 +75,14 @@ define(['arches',
                     this.get('graphid')(value);
                     break;
                 case 'template_id':
-                    var templateId = ko.observable(value);
+                    self.templateId(value);
                     this.set(key, ko.computed({
                         read: function() {
-                            return templateId();
+                            return self.templateId();
                         },
                         write: function(value) {
                             var key;
+                            var configKeys = [];
                             var defaultConfig = JSON.parse(reportLookup[value].defaultconfig);
                             for (key in defaultConfig) {
                                 defaultConfig[key] = ko.observable(defaultConfig[key]);
@@ -90,10 +91,11 @@ define(['arches',
                             this.set('config', _.defaults(currentConfig, defaultConfig));
                             for (key in defaultConfig) {
                                 if (_.contains(self.configKeys(), key) === false) {
-                                    self.configKeys.push(key);
+                                    configKeys.push(key);
                                 }
                             }
-                            templateId(value);
+                            self.templateId(value);
+                            self.configKeys(self.configKeys().concat(configKeys));
                         },
                         owner: this
                     }));
