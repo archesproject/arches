@@ -27,29 +27,28 @@ define(['arches',
 
             this._data = ko.observable('{}');
 
-            this.dirty = ko.computed(function() {
-                return JSON.stringify(_.extend(JSON.parse(self._data()), self.toJSON())) !== self._data();
+            this.configJSON = ko.observable({});
+            this.configState;
+            this.configKeys.subscribe(function(val){
+                var config;
+                if (val.length) {
+                    self.configState = {};
+                    config = self.get('config');
+                    // var defaultConfigJSON.parse(reportLookup[value].defaultconfig);
+                    _.each(val, function(key) {
+                        self.configState[key] = ko.unwrap(config[key]);
+                    });
+                    self.configState = koMapping.fromJS(self.configState);
+                }
             });
 
-            this.configJSON = ko.computed({
-                read: function() {
-                    var configJSON = {};
-                    var config = this.get('config');
-                    _.each(this.configKeys(), function(key) {
-                        configJSON[key] = ko.unwrap(config[key]);
-                    });
-                    return configJSON;
-                },
-                write: function(value) {
-                    var config = this.get('config');
-                    for (var key in value) {
-                        if (config[key] && config[key]() !== value[key]) {
-                            config[key](value[key]);
-                        }
+            this.resetConfigs = function(previousConfigs) {
+                this.configKeys().forEach(function(key){
+                    if (JSON.stringify(self.configState[key]()) !== JSON.stringify(previousConfigs[key])) {
+                        koMapping.fromJS(previousConfigs, self.configState);
                     }
-                },
-                owner: this
-            });
+                });
+            };
 
             this.graph = options.graph;
             this.parse(options.graph);
@@ -85,7 +84,9 @@ define(['arches',
                             var currentConfig = this.get('config');
                             this.set('config', _.defaults(currentConfig, defaultConfig));
                             for (key in defaultConfig) {
-                                self.configKeys.push(key);
+                                if (_.contains(self.configKeys(), key) === false) {
+                                    self.configKeys.push(key);
+                                }
                             }
                             templateId(value);
                         },
@@ -97,9 +98,6 @@ define(['arches',
                     var configKeys = [];
                     self.configKeys.removeAll();
                     _.each(value, function(configVal, configKey) {
-                        if (!ko.isObservable(configVal)) {
-                            configVal = ko.observable(configVal);
-                        }
                         config[configKey] = configVal;
                         configKeys.push(configKey);
                     });

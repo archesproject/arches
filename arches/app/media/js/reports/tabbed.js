@@ -11,65 +11,64 @@ define([
 ], function(_, ko, koMapping, $, ReportViewModel) {
     return ko.components.register('tabbed-report', {
         viewModel: function(params) {
-            params.configKeys = ['tabs'];
+            params.configKeys = ['tabs', 'activeTabIndex'];
             ReportViewModel.apply(this, [params]);
             var self = this;
-            this.tabs(koMapping.fromJS(this.tabs())());
-            this.activeTab = ko.observable(self.tabs()[0]);
-
+            if (this.activeTabIndex() > self.tabs().length - 1) {
+                this.activeTabIndex(self.tabs().length - 1);
+            }
+            this.activeTab = ko.observable(self.tabs()[ko.unwrap(this.activeTabIndex)]);
+            this.report.configJSON.subscribe(function(){
+                if (self.tabs.indexOf(self.activeTab()) === -1) {
+                    self.activeTab(self.tabs()[ko.unwrap(this.activeTabIndex)]);
+                }
+            });
             this.topcards = ko.unwrap(self.report.cards).map(function(card){
                 return {name: card.model.name(), nodegroupid: card.nodegroupid};
             });
 
-            this.cardInActiveTab = function(cardNodegroupId) {
-                if (self.activeTab()) {
-                    self.activeTab().nodegroup_ids().forEach( function(tabNodegroupId) {
-                        if (cardNodegroupId === tabNodegroupId) { return true; }
-                    });
-                }
-                return false;
+            this.setActiveTab = function(tabIndex){
+                self.activeTabIndex(tabIndex);
+                self.activeTab(self.tabs()[ko.unwrap(self.activeTabIndex)]);
             };
 
             this.activeCards = ko.computed(function() {
                 var cardList = [];
                 ko.unwrap(self.report.cards).forEach(function(card) {
-                    if (self.activeTab()) {
-                        self.activeTab()["nodegroup_ids"]().forEach( function(tabNodegroupId) {
-                            if(card.nodegroupid === tabNodegroupId) { cardList.push(card); }
+                    if (self.activeTabIndex() !== undefined && self.tabs().length > 0) {
+                        self.tabs()[self.activeTabIndex()]["nodegroup_ids"]().forEach( function(tabNodegroupId) {
+                            if (card.nodegroupid === tabNodegroupId) {
+                                cardList.push(card);
+                            }
                         });
                     }
                 });
                 return cardList;
             });
 
-            this.refreshTabs = function(){
-                var data = self.tabs().slice(0);
-                self.tabs([]);
-                self.tabs(data);
-            };
-
-            this.tabs().forEach(function(tab){
-                tab.nodegroup_ids.subscribe(function(){
-                    this.refreshTabs();
-                }, this);
-            }, this);
+            this.moveTab = function(v) {
+                if (v.sourceIndex === self.activeTabIndex()) {
+                    self.setActiveTab(v.targetIndex);
+                }
+            }
 
             this.addTab = function(){
-                var newTab = {
-                    icon: ko.observable(),
-                    name: ko.observable(),
-                    nodegroup_ids: ko.observableArray()
-                };
-                newTab.nodegroup_ids.subscribe(
-                    function(){this.refreshTabs();
-                    }, this);
+                var newTab = koMapping.fromJS({
+                    icon: '',
+                    name: '',
+                    nodegroup_ids: []
+                });
                 this.tabs.unshift(newTab);
-                this.refreshTabs();// this.tabs.valueHasMutated() not working here!?;
+                this.setActiveTab(0);
             };
 
             this.removeTab = function(tab){
-                this.tabs.remove(tab);
-                this.refreshTabs();
+                var index;
+                if (this.tabs().length > 0) {
+                    index = this.tabs.indexOf(tab) > 0 ? this.tabs.indexOf(tab) - 1 : 0;
+                    this.setActiveTab(index);
+                    this.tabs.remove(tab);
+                }
             };
 
         },
