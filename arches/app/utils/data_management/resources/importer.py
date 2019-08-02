@@ -10,7 +10,14 @@ from time import time
 from copy import deepcopy
 from optparse import make_option
 from os.path import isfile, join
-from django.db import connection, transaction
+from multiprocessing import Pool, TimeoutError, cpu_count
+import django
+# django.setup() must be called here to prepare for multiprocessing. specifically,
+# it must be called before any models are imported, otherwise things will crash
+# during a resource load that uses multiprocessing.
+# see https://stackoverflow.com/a/49461944/3873885
+django.setup()
+from django.db import connection, connections, transaction
 from django.contrib.auth.models import User
 from django.contrib.gis.gdal import DataSource
 from django.forms.models import model_to_dict
@@ -34,14 +41,25 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.management.commands import utils
 from arches.setup import unzip_file
-from formats.archesjson import JsonReader
 from formats.csvfile import CsvReader
 from formats.archesfile import ArchesFileReader
+
 
 try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
+
+
+def import_one_resource(line):
+    """this single resource import function must be outside of the BusinessDataImporter
+    class in order for it to be called with multiprocessing"""
+
+    connections.close_all()
+    reader = ArchesFileReader()
+    archesresource = JSONDeserializer().deserialize(line)
+    reader.import_business_data({"resources": [archesresource]})
+
 
 class BusinessDataImporter(object):
 
@@ -59,7 +77,7 @@ class BusinessDataImporter(object):
             file = settings.BUSINESS_DATA_FILES
         else:
             file = [file]
-
+        self.file = file
         if mapping_file == None:
             try:
                 mapping_file = [file[0].split('.')[0] + '.mapping']
@@ -139,7 +157,9 @@ class BusinessDataImporter(object):
             else:
                 print path + ' is not a valid path'
 
-    def import_business_data(self, file_format=None, business_data=None, mapping=None, overwrite='append', bulk=False, create_concepts=False, create_collections=False):
+    def import_business_data(self, file_format=None, business_data=None, mapping=None,
+                             overwrite='append', bulk=False, create_concepts=False,
+                             create_collections=False, use_multiprocessing=False):
         reader = None
         start = time()
         cursor = connection.cursor()
@@ -154,6 +174,19 @@ class BusinessDataImporter(object):
             if file_format == 'json':
                 reader = ArchesFileReader()
                 reader.import_business_data(business_data, mapping)
+            elif file_format == 'jsonl':
+                with open(self.file[0], 'rU') as openf:
+                    lines = openf.readlines()
+                    if use_multiprocessing is True:
+                        pool = Pool(cpu_count())
+                        pool.map(import_one_resource, lines)
+                        connections.close_all()
+                        reader = ArchesFileReader()
+                    else:
+                        reader = ArchesFileReader()
+                        for line in lines:
+                            archesresource = JSONDeserializer().deserialize(line)
+                            reader.import_business_data({"resources": [archesresource]})
             elif file_format == 'csv' or file_format == 'shp' or file_format == 'zip':
                 if mapping != None:
                     reader = CsvReader()
@@ -186,79 +219,3 @@ class BusinessDataImporter(object):
             csv_record['geom'] = feat.geom.wkt
             csv_records.append(csv_record)
         return csv_records
-
-class ResourceLoader(object):
-
-    def __init__(self):
-        self.user = User()
-        self.user.first_name = settings.ETL_USERNAME
-        self.resources = []
-        self.se = SearchEngineFactory().create()
-
-    # option_list = BaseCommand.option_list + (
-    #     make_option('--source',
-    #         action='store',
-    #         dest='source',
-    #         default='',
-    #         help='.arches file containing resource records'),
-    #      make_option('--format',
-    #         action='store_true',
-    #         default='arches',
-    #         help='format extension that you would like to load: arches or shp'),
-    #     )
-
-    def load(self, source):
-        file_name, file_format = os.path.splitext(source)
-        archesjson = False
-        if file_format == '.arches':
-            reader = ArchesReader()
-            print '\nVALIDATING ARCHES FILE ({0})'.format(source)
-            reader.validate_file(source)
-        elif file_format == '.json':
-            archesjson = True
-            reader = JsonReader()
-
-        start = time()
-        resources = reader.load_file(source)
-
-        print '\nLOADING RESOURCES ({0})'.format(source)
-        relationships = None
-        related_resource_records = []
-        relationships_file = file_name + '.relations'
-        elapsed = (time() - start)
-        print 'time to parse {0} resources = {1}'.format(file_name, elapsed)
-        results = self.resource_list_to_entities(resources, archesjson)
-        if os.path.exists(relationships_file):
-            relationships = csv.DictReader(open(relationships_file, 'r'), delimiter='|')
-            for relationship in relationships:
-                related_resource_records.append(self.relate_resources(relationship, results['legacyid_to_entityid'], archesjson))
-        else:
-            print 'No relationship file'
-
-
-    # def relate_resources(self, relationship, legacyid_to_entityid, archesjson):
-    #     start_date = None if relationship['START_DATE'] in ('', 'None') else relationship['START_DATE']
-    #     end_date = None if relationship['END_DATE'] in ('', 'None') else relationship['END_DATE']
-    #
-    #     if archesjson == False:
-    #         relationshiptype_concept = Concept.objects.get(legacyoid = relationship['RELATION_TYPE'])
-    #         concept_value = Value.objects.filter(concept = relationshiptype_concept.conceptid).filter(valuetype = 'prefLabel')
-    #         entityid1 = legacyid_to_entityid[relationship['RESOURCEID_FROM']]
-    #         entityid2 = legacyid_to_entityid[relationship['RESOURCEID_TO']]
-    #
-    #     else:
-    #         concept_value = Value.objects.filter(valueid = relationship['RELATION_TYPE'])
-    #         entityid1 = relationship['RESOURCEID_FROM']
-    #         entityid2 = relationship['RESOURCEID_TO']
-    #
-    #     related_resource_record = ResourceXResource(
-    #         entityid1 = entityid1,
-    #         entityid2 = entityid2,
-    #         notes = relationship['NOTES'],
-    #         relationshiptype = concept_value[0].valueid,
-    #         datestarted = start_date,
-    #         dateended = end_date,
-    #         )
-    #
-    #     related_resource_record.save()
-    #     self.se.index_data(index='resource_relations', doc_type='all', body=model_to_dict(related_resource_record), idfield='resourcexid')

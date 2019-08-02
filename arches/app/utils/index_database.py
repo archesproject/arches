@@ -5,7 +5,7 @@ from arches.app.models.models import Value
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Query
+from arches.app.search.elasticsearch_dsl_builder import Query, Term
 from arches.app.datatypes.datatypes import DataTypeFactory
 from datetime import datetime
 
@@ -25,6 +25,7 @@ def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
     index_resources(clear_index=clear_index, batch_size=batch_size)
     index_resource_relations(clear_index=clear_index, batch_size=batch_size)
 
+
 def index_resources(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
     """
     Indexes all resources from the database
@@ -38,10 +39,11 @@ def index_resources(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE
     se = SearchEngineFactory().create()
     if clear_index:
         q = Query(se=se)
-        q.delete(index='strings', doc_type='term')
+        q.delete(index='terms')
 
     resource_types = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).values_list('graphid', flat=True)
     index_resources_by_type(resource_types, clear_index=clear_index, batch_size=batch_size)
+
 
 def index_resources_by_type(resource_types, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
     """
@@ -65,24 +67,28 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
         resources = Resource.objects.filter(graph_id=str(resource_type))
         graph_name = models.GraphModel.objects.get(graphid=str(resource_type)).name
         print "Indexing resource type '{0}'".format(graph_name)
-        result_summary = {'database':len(resources), 'indexed':0}
+        result_summary = {'database': len(resources), 'indexed': 0}
 
+        q = Query(se=se)
+        term = Term(field='graph_id', term=str(resource_type))
+        q.add_query(term)
         if clear_index:
-            q = Query(se=se)
-            q.delete(index='resource', doc_type=str(resource_type))
+            q.delete(index='resources', refresh=True)
 
         with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
             with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
                 for resource in resources:
                     document, terms = resource.get_documents_to_index(fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
-                    doc_indexer.add(index='resource', doc_type=document['graph_id'], id=document['resourceinstanceid'], data=document)
+                    doc_indexer.add(index='resources', id=document['resourceinstanceid'], data=document)
                     for term in terms:
-                        term_indexer.add(index='strings', doc_type='term', id=term['_id'], data=term['_source'])
+                        term_indexer.add(index='terms', id=term['_id'], data=term['_source'])
 
-        result_summary['indexed'] = se.count(index='resource', doc_type=str(resource_type))
+        result_summary['indexed'] = se.count(index='resources', body=q.dsl)
 
         status = 'Passed' if result_summary['database'] == result_summary['indexed'] else 'Failed'
         print "Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(status, graph_name, result_summary['database'], result_summary['indexed'], (datetime.now()-start).seconds)
+    return status
+
 
 def index_resource_relations(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
     """
@@ -111,17 +117,18 @@ def index_resource_relations(clear_index=True, batch_size=settings.BULK_IMPORT_B
 
         cursor.execute(sql)
         for resource_relation in cursor.fetchall():
-            doc  = {
+            doc = {
                 'resourcexid': resource_relation[0],
                 'resourceinstanceidfrom': resource_relation[1],
                 'notes': resource_relation[2],
                 'relationshiptype': resource_relation[3],
                 'resourceinstanceidto': resource_relation[4]
             }
-            resource_relations_indexer.add(index='resource_relations', doc_type='all', id=doc['resourcexid'], data=doc)
+            resource_relations_indexer.add(index='resource_relations', id=doc['resourcexid'], data=doc)
 
     index_count = se.count(index='resource_relations')
     print "Status: {0}, In Database: {1}, Indexed: {2}, Took: {3} seconds".format('Passed' if cursor.rowcount == index_count else 'Failed', cursor.rowcount, index_count, (datetime.now()-start).seconds)
+
 
 def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
     """
@@ -139,12 +146,12 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
     se = SearchEngineFactory().create()
     if clear_index:
         q = Query(se=se)
-        q.delete(index='strings', doc_type='concept')
+        q.delete(index='concepts')
 
     with se.BulkIndexer(batch_size=batch_size, refresh=True) as concept_indexer:
         concept_strings = []
-        for conceptValue in models.Value.objects.filter(Q(concept__nodetype='Collection') | Q(concept__nodetype='ConceptScheme'), valuetype__category ='label'):
-            doc  = {
+        for conceptValue in models.Value.objects.filter(Q(concept__nodetype='Collection') | Q(concept__nodetype='ConceptScheme'), valuetype__category='label'):
+            doc = {
                 'category': 'label',
                 'conceptid': conceptValue.concept_id,
                 'language': conceptValue.language_id,
@@ -153,10 +160,10 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
                 'id': conceptValue.valueid,
                 'top_concept': conceptValue.concept_id
             }
-            concept_indexer.add(index='strings', doc_type='concept', id=doc['id'], data=doc)
+            concept_indexer.add(index='concepts', id=doc['id'], data=doc)
 
         valueTypes = []
-        valueTypes2=[]
+        valueTypes2 = []
         for valuetype in models.DValueType.objects.filter(category='label').values_list('valuetype', flat=True):
             valueTypes2.append("%s" % valuetype)
             valueTypes.append("'%s'" % valuetype)
@@ -188,7 +195,7 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
 
             cursor.execute(sql)
             for conceptValue in cursor.fetchall():
-                doc  = {
+                doc = {
                     'category': 'label',
                     'conceptid': conceptValue[2],
                     'language': conceptValue[3],
@@ -197,9 +204,9 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
                     'id': conceptValue[0],
                     'top_concept': topConcept
                 }
-                concept_indexer.add(index='strings', doc_type='concept', id=doc['id'], data=doc)
+                concept_indexer.add(index='concepts', id=doc['id'], data=doc)
 
     cursor.execute("SELECT count(*) from values WHERE valuetype in ({0})".format(valueTypes))
     concept_count_in_db = cursor.fetchone()[0]
-    index_count = se.count(index='strings', doc_type='concept')
+    index_count = se.count(index='concepts')
     print "Status: {0}, In Database: {1}, Indexed: {2}, Took: {3} seconds".format('Passed' if concept_count_in_db == index_count else 'Failed', concept_count_in_db, index_count, (datetime.now()-start).seconds)

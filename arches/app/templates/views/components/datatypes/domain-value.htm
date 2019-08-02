@@ -2,27 +2,24 @@
 <!-- ko ifnot: $data.search -->
 <div class="node-widget-label new-option-field">
     <div class="control-label">
-        {% trans "Add new option" %}
+        {% trans "Domain options" %}
     </div>
-    <div>
+    <div class="domain-container">
         <div data-bind="text: $data.search"></div>
-        <input type="text" placeholder="{% trans "Add new option..." %}" class="form-control library-search" data-bind="disable: !isEditable, value: newOptionLabel, valueUpdate: 'keyup'">
+        <input class="domain-input" type="text" placeholder="{% trans "Add new option..." %}" class="form-control library-search" data-bind="disable: !isEditable, value: newOptionLabel, valueUpdate: 'keyup'">
         <a href="#" data-bind="disable: !$parent.isEditable, click: function(){if(isEditable){addNewOption()}}">
              <i class="fa fa-plus-circle pull-right"></i>
         </a>
-    </div>
-</div>
-<div class="node-widget-label new-option-field">
-    <div class="control-label">
-        {% trans "Added options" %}
-    </div>
-    <div data-bind="sortable: {data: options}">
-        <div class="added-domain-option">
-            <i class="fa fa-ellipsis-v" aria-hidden="true" style="color: #999; cursor: move">  </i>
-            <input type="text" class="form-control library-search" data-bind="disable: !$parent.isEditable, value: text, valueUpdate: 'keyup'">
-            <a href="#" data-bind="disable: !$parent.isEditable, click: function(){if($parent.isEditable){remove()}}">
-                 <i class="fa fa-minus-circle pull-right"></i>
-            </a>
+        <div data-bind="sortable: {data: options}">
+            <div class="added-domain-option">
+                <span class="domain-drag-handle">
+                    <i class="fa fa-ellipsis-v option-drag-handle" aria-hidden="true">  </i>
+                </span>
+                <input class="domain-input-item"  type="text" class="form-control library-search" data-bind="disable: !$parent.isEditable, value: text, valueUpdate: 'keyup'">
+                <a href="#" data-bind="disable: !$parent.isEditable, click: function(){if($parent.isEditable){remove()}}">
+                     <i class="fa fa-minus-circle pull-right"></i>
+                </a>
+            </div>
         </div>
     </div>
 </div>

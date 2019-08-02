@@ -1,0 +1,26 @@
+<div class="workflows-get-tile-value padded-workflow-step">
+    <div style='display:flex; justify-content: space-between;'>
+        <h4>Workflow Complete</h4>
+        <div>
+            <a href="#" target="_self" type="button" class="btn btn-primary"
+                data-bind="attr: { href: urls.plugin(workflowid)}">
+                <i class="fa fa-plus"></i>
+                <span>New</span>
+            </a>
+            <a href="#" target="_self" type="button" class="btn btn-primary"
+                data-bind="attr: { href: urls.resource + '/' + resourceid}">
+                <i class="fa fa-pencil"></i>
+                <span>Edit</span>
+            </a>
+        </div>
+    </div>
+    <!--ko if: report() -->
+    <div class='resource-report editor-report' data-bind='component: {
+        name: "default-report",
+        params: {
+            report: report(),
+            editorContext: false
+        }
+    }'></div>
+    <!--/ko -->
+</div>

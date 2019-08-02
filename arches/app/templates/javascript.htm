@@ -6,6 +6,7 @@
     var CKEDITOR_BASEPATH = '{{ STATIC_URL }}packages/ckeditor/';
     require.config({
         baseUrl: '{{ STATIC_URL }}js',
+        urlArgs: '_dc={{ app_settings.VERSION }}',
         paths: {
             'plugins': '{{ STATIC_URL }}plugins',
             'widget-templates': '{% url "widgets" ""%}'.replace(/\/$/, ""),
@@ -41,14 +42,20 @@
             'blueimp-helper': '{{ STATIC_URL }}packages/blueimp-gallery/js/blueimp-helper.min',
             'datatables.net': '{{ STATIC_URL }}packages/datatables.net/js/jquery.dataTables',
             'datatables.net-bs': '{{ STATIC_URL }}packages/datatables.net-bs/js/dataTables.bootstrap',
+            'datatables.net-buttons': '{{ STATIC_URL }}packages/datatables.net-buttons/js/dataTables.buttons.min',
+            'datatables.net-buttons-print': '{{ STATIC_URL }}packages/datatables.net-buttons/js/buttons.print.min',
+            'datatables.net-buttons-html5': '{{ STATIC_URL }}packages/datatables.net-buttons/js/buttons.html5.min',
+            'datatables.net-buttons-bs': '{{ STATIC_URL }}packages/datatables.net-buttons-bs/js/buttons.bootstrap.min',
             'datatables.net-responsive': '{{ STATIC_URL }}packages/datatables.net-responsive/js/dataTables.responsive',
             'datatables.net-responsive-bs': '{{ STATIC_URL }}packages/datatables.net-responsive-bs/js/responsive.bootstrap',
             'chosen': '{{ STATIC_URL }}packages/chosen-js/chosen.jquery',
             'mapbox-gl': '{{ STATIC_URL }}packages/mapbox-gl/dist/mapbox-gl',
             'mapbox-gl-draw': '{{ STATIC_URL }}packages/@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw',
+            'mapbox-gl-geocoder': '{{ STATIC_URL }}packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.min',
             'proj4': '{{ STATIC_URL }}packages/proj4/dist/proj4',
             'noUiSlider': '{{ STATIC_URL }}packages/nouislider/distribute/nouislider.min',
             'geojson-extent': '{{ STATIC_URL }}packages/@mapbox/geojson-extent/geojson-extent',
+            'geojsonhint': '{{ STATIC_URL }}packages/@mapbox/geojsonhint/geojsonhint',
             'bootstrap-colorpicker': '{{ STATIC_URL }}packages/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min',
             'uuid': '{{ STATIC_URL }}packages/uuidjs/dist/uuid.core',
             'turf': '{{ STATIC_URL }}packages/@turf/turf/turf.min',
@@ -60,7 +67,10 @@
             'mathjs': '{{ STATIC_URL }}packages/mathjs/dist/math.min',
             'metismenu': '{{ STATIC_URL }}packages/metismenu/dist/metisMenu.min',
             'knockstrap': '{{ STATIC_URL }}packages/knockstrap/build/knockstrap.min',
-            'jqtree': '{{ STATIC_URL }}packages/jqtree/tree.jquery'
+            'jqtree': '{{ STATIC_URL }}packages/jqtree/tree.jquery',
+            'core-js':'{{ STATIC_URL }}packages/core-js/client/shim.min',
+            'dom-4': '{{ STATIC_URL }}packages/dom4/build/dom4',
+            'numeral': '{{ STATIC_URL }}packages/numeral/numeral'
         },
         packages: [{
             name: "codemirror",
@@ -69,6 +79,7 @@
         }],
         shim: {
             'nifty': {
+                exports: 'nifty',
                 deps: ['bootstrap', 'jquery', 'jquery-ui', 'metismenu']
             },
             'metismenu': {
@@ -97,6 +108,9 @@
             },
             'datatables.net': {
                 deps: ['jquery']
+            },
+            'datatables.net-buttons-bs': {
+                deps: ['datatables.net-buttons']
             },
             'noUiSlider': {
                 deps: ['jquery'],
@@ -131,6 +145,9 @@
             'leaflet-draw': {
                 deps: ['leaflet']
             },
+            'ckeditor': {
+                deps: ['jquery']
+            },
             'ckeditor-jquery': {
                 deps: ['ckeditor']
             }
@@ -157,6 +174,7 @@
                 change_password: "{% url 'change_password' %}",
                 export_concept: "{% url 'export_concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 export_concept_collections: "{% url 'export_concept_collections' %}",
+                get_concept_collections: "{% url 'get_concept_collections' %}",
                 dropdown: "{% url 'dropdown' %}",
                 paged_dropdown: "{% url 'paged_dropdown' %}",
                 get_pref_label: "{% url 'get_pref_label' %}",
@@ -165,52 +183,60 @@
                 confirm_delete: "{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 search_terms: "{% url 'search_terms' %}",
                 search_results: "{% url 'search_results' %}",
-                search_results_export: "{% url 'search_results_export' %}",
                 buffer: "{% url 'buffer'%}",
                 config: "{% url 'config' %}",
                 node: "{% url 'node' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 node_layer: "{% url 'node_layer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 graph: "{% url 'graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                graph_designer: function(graphid){return "{% url 'graph_designer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                graph_settings: function(graphid){return "{% url 'graph_settings' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 card: "{% url 'card' '' %}",
-                form: "{% url 'form' '' %}",
+                reorder_cards: "{% url 'reorder_cards'%}",
                 resource: "{% url 'resource' %}",
                 resource_editor: "{% url 'resource_editor' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_copy: "{% url 'resource_copy' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_report: "{% url 'resource_report' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_edit_log: "{% url 'resource_edit_log' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                get_resource_edit_log: function(graphid){return "{% url 'resource_edit_log' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 resource_data: "{% url 'resource_data' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace(/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/g, ''),
-                report_data: "{% url 'report_data' %}",
                 resource_cards: "{% url 'resource_cards' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 related_resources: "{% url 'related_resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_descriptors: "{% url 'resource_descriptors' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_tiles: "{% url 'resource_tiles' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 tile: "{% url 'tile' %}",
-                report_editor: "{% url 'report_editor' '' %}",
                 reorder_tiles: "{% url 'reorder_tiles' %}",
+                reorder_nodes: "{% url 'reorder_nodes' %}",
                 delete_provisional_tile: "{% url 'delete_provisional_tile' %}",
+                tile_history: "{% url 'tile_history' %}",
                 apply_functions: "{% url 'apply_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 remove_functions: "{% url 'remove_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 tileserver: "{% url 'tileserver' %}",
                 time_wheel_config: "{% url 'time_wheel_config' %}",
                 reindex: "{% url 'reindex' %}",
                 permission_data: "{% url 'permission_data' %}",
+                permission_manager_data: "{% url 'permission_manager_data' %}",
                 get_user_names: "{% url 'get_user_names' %}",
                 feature_popup_content: "{% url 'feature_popup_content' %}",
+                related_resource_candidates: "{% url 'related_resource_candidates' %}",
+                relatable_resources: "{% url 'relatable_resources' %}",
                 get_domain_connections: function(graphid){return "{% url 'get_domain_connections' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 clone_graph: function(graphid){return "{% url 'clone_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_graph: function(graphid){return "{% url 'export_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                delete_graph: function(graphid){return "{% url 'delete_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                delete_instances: function(graphid){return "{% url 'delete_instances' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_mapping_file: function(graphid){return "{% url 'export_mapping_file' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                add_resource: function(resourceid, graphid){return "{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceid).replace('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', graphid)},
-                graph_settings: function(graphid){return "{% url 'graph_settings' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                card_manager: function(graphid){return "{% url 'card_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                report_manager: function(graphid){return "{% url 'report_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                add_resource: function(graphid){return "{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 function_manager: function(graphid){return "{% url 'function_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                form_manager: function(graphid){return "{% url 'form_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                permission_manager: function(graphid){return "{% url 'permission_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 mobile_survey_resources: function(surveyid){return "{% url 'mobile_survey_resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', surveyid)},
-                mobile_survey: "{% url 'mobile_survey_manager' %}",
-                help_template: "{% url 'help_templates' %}"
+                collector_designer: function(surveyid){return "{% url 'collector_designer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', surveyid)},
+                plugin: function(pluginid){return "{% url 'plugins' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', pluginid)},
+                collector_manager: "{% url 'collector_manager' %}",
+                help_template: "{% url 'help_templates' %}",
+                api_card: "{% url 'api_card' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                api_search_component_data: "{% url 'api_search_component_data' 'aaaa'%}".replace('aaaa', ''),
+                icons: "{% url 'icons' %}",
             },
+            geocoderPlaceHolder: "{% trans 'Find an address...' %}",
             confirmNav: {
                 title: "{% trans 'Edits pending...' %}",
                 text: "{% trans 'You currently have edits pending, are you sure you would like to proceed (and discard any pending edits)?' %}"
@@ -218,6 +244,10 @@
             confirmGraphDelete: {
                 title: "{% trans 'Delete Branch/Resource Model?' %}",
                 text: "{% trans 'Deleting this branch/resource model will remove it (and all associated data) entirely.  Are you sure you would like to proceed?' %}"
+            },
+            confirmAllResourceDelete: {
+                title: "{% trans 'Delete All Resources Associated with this Graph?' %}",
+                text: "{% trans 'Deleting All Resources removes all associated data with this graph entirely.  Are you sure you would like to proceed?' %}"
             },
             confirmResourceDelete: {
                 title: "{% trans 'Delete Resource?' %}",
@@ -273,6 +303,7 @@
                 'layer_definitions': {{ map_layer.layer_json }},
                 'isoverlay': {{ map_layer.isoverlay|lower }},
                 'icon': '{{ map_layer.icon }}',
+                'legend': '{{ map_layer.legend | default_if_none:"" | escapejs  }}',
                 'activated': {{ map_layer.activated|lower }},
                 'addtomap': {{ map_layer.addtomap|lower }},
                 'is_resource_layer': false,
@@ -285,14 +316,10 @@
                 'layer_definitions': {{ resource_map_layer.layer_definitions }},
                 'isoverlay': true,
                 'icon': '{{ resource_map_layer.icon }}',
+                'legend': '{{ resource_map_layer.legend | escapejs  }}',
                 'activated': true,
                 'addtomap': {{ resource_map_layer.addtomap|lower }},
                 'is_resource_layer': true
-            },{% endfor %}{% endautoescape %}],
-            iiifManifests: [{% autoescape off %}{% for manifest in iiif_manifests %}{
-                'id': '{{ manifest.id }}',
-                'url': '{{ manifest.url }}',
-                'icon': '{{ manifest.icon }}'
             },{% endfor %}{% endautoescape %}],
             conceptCollections: [{% autoescape off %}{% for concept_collection in concept_collections %}{
                 'label': '{{ concept_collection.label | escapejs }}',
@@ -354,7 +381,18 @@
             '{{ template.pk }}': {
                 'componentname': '{{ template.componentname }}',
                 'component': '{{ template.component }}',
-                'defaultconfig': '{{ template.defaultconfig_json }}'
+                'defaultconfig': '{{ template.defaultconfig_json }}',
+                'name': '{{ template.name }}'
+            },
+        {% endfor %}{% endautoescape %}};
+    });
+
+    define('card-components', [{% for component in card_components %}'{{ component.component }}',{% endfor %}], function () {
+        return {{% autoescape off %}{% for component in card_components %}
+            '{{ component.pk }}': {
+                'componentname': '{{ component.componentname }}',
+                'component': '{{ component.component }}',
+                'defaultconfig': '{{ component.defaultconfig_json }}'
             },
         {% endfor %}{% endautoescape %}};
     });
@@ -382,6 +420,12 @@
 
     define('geoms', function () {
         {% autoescape off %}return {{geoms}};{% endautoescape %}
+    });
+
+    define('search-components', [{% for component in search_components %}'{{ component.componentpath }}',{% endfor %}], function () {
+            return {% autoescape off %}[{% for component in search_components %}
+                {{component.toJSON}},
+            {% endfor %}]{% endautoescape %};
     });
 
     define('leaflet-draw-local', [

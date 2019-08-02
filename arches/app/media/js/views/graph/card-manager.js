@@ -61,7 +61,7 @@ require([
         var cardGraph = new GraphModel({
             data: data
         });
-        this.graphModel.appendBranch(this.graphModel.get('root').nodeid, null, cardGraph, function(response, status){
+        this.graphModel.appendBranch(this.graphModel.get('root'), null, cardGraph, function(response, status){
             var success = (status === 'success');
             this.loading(false);
             if (!success) alertFailure();

@@ -46,7 +46,11 @@ class SearchEngine(object):
             raise NotImplementedError("Elasticsearch index not specified.")
 
         prefix = '%s_' % self.prefix.strip() if self.prefix and self.prefix.strip() != '' else ''
-        index = '%s%s' % (prefix, index)
+        ret = []
+        for idx in index.split(','):
+            ret.append('%s%s' % (prefix, idx))
+
+        index = ','.join(ret)
         if args:
             return index
         else:
@@ -55,12 +59,13 @@ class SearchEngine(object):
     def delete(self, **kwargs):
         """
         Deletes a document from the index
-        Pass an index, doc_type, and id to delete a specific document
+        Pass an index and id to delete a specific document
         Pass a body with a query dsl to delete by query
 
         """
 
         kwargs = self._add_prefix(**kwargs)
+        kwargs['doc_type'] = kwargs.pop('doc_type', '_doc')
         body = kwargs.pop('body', None)
         if body != None:
             try:
@@ -99,15 +104,16 @@ class SearchEngine(object):
     def search(self, **kwargs):
         """
         Search for an item in the index.
-        Pass an index, doc_type, and id to get a specific document
+        Pass an index and id to get a specific document
         Pass a body with a query dsl to perform a search
 
         """
 
         kwargs = self._add_prefix(**kwargs)
+        kwargs['doc_type'] = kwargs.pop('doc_type', '_doc')
         body = kwargs.get('body', None)
         id = kwargs.get('id', None)
-        
+
         if id:
             if isinstance(id, list):
                 kwargs.setdefault('body', {'ids': kwargs.pop('id')})
@@ -124,7 +130,7 @@ class SearchEngine(object):
 
         return ret
 
-    def create_mapping(self, index, doc_type, fieldname='', fieldtype='string', fieldindex=None, body=None):
+    def create_mapping(self, index, fieldname='', fieldtype='string', fieldindex=None, body=None):
         """
         Creates an Elasticsearch body for a single field given an index name and type name
 
@@ -134,7 +140,7 @@ class SearchEngine(object):
         if not body:
             if fieldtype == 'geo_shape':
                 body =  {
-                    doc_type : {
+                    '_doc' : {
                         'properties' : {
                             fieldname : { 'type' : 'geo_shape', 'tree' : 'geohash', 'precision': '1m' }
                         }
@@ -145,7 +151,7 @@ class SearchEngine(object):
                 if fieldindex:
                     fn['index'] = fieldindex
                 body =  {
-                    doc_type : {
+                    '_doc' : {
                         'properties' : {
                             fieldname : fn
                         }
@@ -153,15 +159,15 @@ class SearchEngine(object):
                 }
 
         self.es.indices.create(index=index, ignore=400)
-        self.es.indices.put_mapping(index=index, doc_type=doc_type, body=body)
-        print 'creating index : %s/%s' % (index, doc_type)
+        self.es.indices.put_mapping(index=index, doc_type='_doc', body=body)
+        print 'creating index : %s' % (index)
 
     def create_index(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
-        self.es.indices.create(**kwargs)
+        self.es.indices.create(ignore=400, **kwargs)
         print 'creating index : %s' % kwargs.get('index', '')
 
-    def index_data(self, index=None, doc_type=None, body=None, idfield=None, id=None, **kwargs):
+    def index_data(self, index=None, body=None, idfield=None, id=None, **kwargs):
         """
         Indexes a document or list of documents into Elasticsearch
 
@@ -184,7 +190,7 @@ class SearchEngine(object):
                     id = getattr(document,idfield)
 
             try:
-                self.es.index(index=index, doc_type=doc_type, body=document, id=id)
+                self.es.index(index=index, doc_type='_doc', body=document, id=id)
             except Exception as detail:
                 self.logger.warning('%s: WARNING: failed to index document: %s \nException detail: %s\n' % (datetime.now(), document, detail))
                 raise detail
@@ -193,17 +199,26 @@ class SearchEngine(object):
     def bulk_index(self, data, **kwargs):
         return helpers.bulk(self.es, data, **kwargs)
 
-    def create_bulk_item(self, op_type='index', index=None, doc_type=None, id=None, data=None):
+    def create_bulk_item(self, op_type='index', index=None, id=None, data=None):
         return {
             '_op_type': op_type,
             '_index': self._add_prefix(index),
-            '_type': doc_type,
+            '_type': '_doc',
             '_id': id,
             '_source': data
         }
 
     def count(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
+        kwargs['doc_type'] = kwargs.pop('doc_type', '_doc')
+        body = kwargs.pop('body', None)
+
+        # need to only pass in the query key as other keys (eg: _source) are not allowed
+        if body:
+            query = body.pop('query', None)
+            if query:
+                kwargs['body'] = {'query': query}
+
         count = self.es.count(**kwargs)
         if count is not None:
             return count['count']
@@ -218,11 +233,11 @@ class SearchEngine(object):
                 self.batch_size = kwargs.pop('batch_size', 500)
                 self.kwargs = kwargs
 
-            def add(self, op_type='index', index=None, doc_type=None, id=None, data=None):
+            def add(self, op_type='index', index=None, id=None, data=None):
                 doc = {
                     '_op_type': op_type,
                     '_index': outer_self._add_prefix(index),
-                    '_type': doc_type,
+                    '_type': '_doc',
                     '_id': id,
                     '_source': data
                 }

@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 import django.contrib.postgres.fields.jsonb
 from django.db import migrations
-
+import arches.app.utils.index_database as index_database
 
 class Migration(migrations.Migration):
 
@@ -13,28 +13,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='provisionaledit',
-            name='editor',
-        ),
-        migrations.RemoveField(
-            model_name='provisionaledit',
-            name='prototile',
-        ),
-        migrations.RemoveField(
-            model_name='provisionaledit',
-            name='reviewer',
-        ),
-        migrations.RemoveField(
-            model_name='provisionaledit',
-            name='tile',
-        ),
         migrations.AddField(
             model_name='tilemodel',
             name='provisionaledits',
             field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='provisionaledits', null=True),
-        ),
-        migrations.DeleteModel(
-            name='ProvisionalEdit',
         ),
     ]

@@ -61,22 +61,28 @@ define([
                     options[key] = rawValue;
                 }
             })
+
             _.each(options, function (val, key) {
                 if (!val) {
                     delete options[key];
                 }
             });
+
+            var format = options.format;
+            if (!!options['keepInvalid']) {
+                delete options['format'];
+            }
+
             $(element).datetimepicker(options);
 
             ko.utils.registerEventHandler(element, "dp.change", function (event) {
                 var value = allBindingsAccessor().value;
                 var picker = $(element).data("DateTimePicker");
                 if (ko.isObservable(value)) {
-                    if (event.date) {
-                        value(event.date.format(picker.format()));
-                    }
-                    else if (value() === "") {
+                    if (value() === "" || event.date === false) {
                       value(null);
+                    }else if (event.date.isValid()) {
+                        value(event.date.format(format));
                     }
                 }
             });

@@ -2,7 +2,7 @@
 <!-- ko if: !configForm -->
 {% block report %}
 <!-- Report Title Bar -->
-<div id="" class="relative" style="display: block;">
+<div class="relative report-title-bar">
 
     <!-- Title Block -->
     <div class="report-toolbar-preview ep-form-toolbar">
@@ -22,108 +22,66 @@
     {% endblock header %}
 
     {% block body %}
-    <!-- ko foreach: { data: report.activeForms, as: 'form' } -->
-    <div class="rp-report-section relative">
+
+    <!--ko if: hasProvisionalData() && (editorContext === false) -->
+    <div class="report-provisional-flag">{% trans 'This resource has provisional edits (not displayed in this report) that are pending review' %}</div>
+    <!--/ko-->
+    <!--ko if: hasProvisionalData() && (editorContext === true && report.userisreviewer === true) -->
+    <div class="report-provisional-flag">{% trans 'This resource has provisional edits (not displayed in this report) that are pending review' %}</div>
+    <!--/ko-->
+    <!--ko if: hasProvisionalData() && (editorContext === true && report.userisreviewer === false) -->
+    <div class="report-provisional-flag">{% trans 'This resource has provisional edits that are pending review' %}</div>
+    <!--/ko-->
+
+    <div class="rp-report-section relative rp-report-section-root">
         <div class="rp-report-section-title">
-            <h4 class="rp-section-title" data-bind="text: form.label"></h4>
-        </div>
-
-        <!-- ko foreach: { data: form.cards, as: 'card' } -->
-        <div class="rp-card-section">
-            <!-- ko let: { tiles: card.get('tiles')() } -->
-                <!-- ko template: 'card-report' --> <!-- /ko -->
-             <!-- /ko -->
-        </div>
-        <!-- /ko -->
-    </div>
-    <!-- /ko -->
-
-    <template id="card-report">
-        <!-- ko if: card.isContainer() -->
-        <h4 class="rp-tile-title"><span class="rp-tile-title-float" data-bind="text: card.get('name')"></span></h4>
-            <!-- ko foreach: { data: tiles, as: 'tile' } -->
-            <div class="rp-report-container-tile">
-                <!-- ko foreach: {
-                    data: card.get('cards'),
-                    as: 'card'
-                } -->
-                    <!-- ko let: { tiles: tile.tiles() } -->
-                        <!-- ko if: tiles.length > 0 -->
-                            <!-- ko template: 'card-report' --> <!-- /ko -->
-                        <!-- /ko -->
-                     <!-- /ko -->
-                <!-- /ko -->
-            </div>
-            <!-- /ko -->
-        <!-- /ko -->
-
-        <!-- ko if: !card.isContainer() -->
-            <!-- ko foreach: { data: tiles, as: 'tile' } -->
-                <!-- ko if: tile.nodegroup_id() === card.get('nodegroup_id') -->
-                <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
-                    <dl class="dl-horizontal">
-                    <!-- ko foreach: { data: card.get('widgets'), as: 'widget' } -->
-                        <!-- ko component: {
-                            name: widget.widgetLookup[widget.get("widget_id")()].name,
-                            params: {
-                                config: configJSON,
-                                label: widget.get("label")(),
-                                node: widget.node,
-                                value: tile.data[widget.node.nodeid],
-                                state: "report"
-                            }
-                        } --><!-- /ko -->
-                    <!-- /ko -->
-                    </dl>
+            <!-- ko foreach: { data: report.cards, as: 'card' } -->
+                <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
+                <div class="rp-card-section">
+                    <!-- ko component: {
+                        name: card.model.cardComponentLookup[card.model.component_id()].componentname,
+                        params: {
+                            state: 'report',
+                            preview: $parent.report.preview,
+                            card: card,
+                            pageVm: $root
+                        }
+                    } --> <!-- /ko -->
                 </div>
-                <!-- /ko -->
             <!-- /ko -->
-
-        <!-- /ko -->
-
-        <!-- ko if: tiles.length === 0 -->
-        <div class="row rp-report-tile rp-no-data">
-        <!-- ko ifnot: card.get('cardid') -->
-            {% trans "Sorry, you don't have access to this information" %}
-        <!-- /ko -->
-        <!-- ko if: card.get('cardid') -->
-            {% trans "No data added yet for" %} "<span data-bind="text: card.get('name')"></span>"
-        <!-- /ko -->
         </div>
-        <!-- /ko -->
-    </template>
-
+    </div>
 
     {% endblock body %}
 
-    <div class="rp-report-section relative">
-    <div class="rp-report-section-title">
-        <h4 class="rp-section-title">{% trans 'Related Resources' %}</h4>
-    </div>
-    <!-- ko foreach: { data: report.related_resources, as: 'rr' } -->
-    <div class="rp-card-section">
-        <h5 class="rp-tile-title">
-            <span class="rp-tile-title-float" data-bind="text:rr.graph_name"></span>
-        </h5>
-        <!--ko if: rr.related.length > 0 -->
-        <div class="rp-report-container-tile">
-        <div class="row rp-report-tile">
-            <!-- ko foreach: { data: rr.related } -->
-                <dl class="dl-horizontal">
-                    <dt><a data-bind="text: $data.displayname, attr: {href: $data.link}"></a></dt>
-                    <dd data-bind="text: '( ' + $data.relationship + ' )'"></dd>
-                </dl>
-            <!-- /ko -->
+    <div class="rp-report-section relative report-related-resources">
+        <div class="rp-report-section-title">
+            <h4 class="rp-section-title">{% trans 'Related Resources' %}</h4>
         </div>
+        <!-- ko foreach: { data: report.related_resources, as: 'rr' } -->
+        <div class="rp-card-section">
+            <h5 class="rp-tile-title">
+                <span class="rp-tile-title-float" data-bind="text:rr.graph_name"></span>
+            </h5>
+            <!--ko if: rr.related.length > 0 -->
+            <div class="rp-report-container-tile">
+            <div class="row rp-report-tile">
+                <!-- ko foreach: { data: rr.related } -->
+                    <dl class="dl-horizontal">
+                        <dt><a data-bind="text: $data.displayname, attr: {href: $data.link}"></a></dt>
+                        <dd data-bind="text: '( ' + $data.relationship + ' )'"></dd>
+                    </dl>
+                <!-- /ko -->
+            </div>
+            </div>
+            <!-- /ko -->
+            <!--ko if: rr.related.length === 0 -->
+            <div class="rp-report-container-tile">
+                <div class="row rp-report-tile rp-no-data">{% trans 'No relationships added' %}</div>
+            </div>
+            <!--/ko-->
         </div>
         <!-- /ko -->
-        <!--ko if: rr.related.length === 0 -->
-        <div class="rp-report-container-tile">
-            <div class="row rp-report-tile rp-no-data">{% trans 'No relationships added' %}</div>
-        </div>
-        <!--/ko-->
-    </div>
-    <!-- /ko -->
     </div>
 </div>
 

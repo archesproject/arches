@@ -9,7 +9,7 @@ define([
         * @name FormList
         */
 
-        filter_function: null,
+        filterFunction: null,
 
         /**
         * initializes the view with optional parameters

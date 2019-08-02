@@ -1,0 +1,43 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base-manager.htm" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block title %} {{ block.super }} {{ plugin.name }} {% endblock title %}
+
+
+{% block main_content %}
+<div class="content-panel">
+    <div class="flex plugin-main" data-bind="component: {
+        name: plugin.componentname,
+        params: plugin.config
+    }"></div>
+</div>
+{% endblock main_content %}
+
+{% block tabs %}{% endblock tabs %}
+
+{% block pre_require_js %}
+{{block.super}}
+    <script>
+        define('plugin-data', ['{{ plugin.component }}'], function() {
+            return {% autoescape off %}{{plugin_json}}{% endautoescape %};
+        });
+    </script>
+{% endblock pre_require_js %}

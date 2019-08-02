@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+{% load i18n %}
+<div class="ep-help-content">
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Overview" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
+        </a>
+        <div class="ep-help-topic-content">
+            <p>{% blocktrans %}As a database administrator, you will use the Arches Collector Manager to create and manage the projects that data collection users will access through the <a href="https://arches.readthedocs.io/en/stable/using-arches-collector" target="_blank">Arches Collector</a> mobile app.{% endblocktrans %}</p>
+            <p>{% blocktrans %}When you begin creating a new project, you'll be brought to the project summary, which shows you how many users are participating, when data was last synced, and more.{% endblocktrans %}</p>
+            <p>
+                <span class="ep-help-img-link">
+                    <a href="{{ STATIC_URL }}img/help/start-new-project.jpg" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+                    </a>
+                </span>
+                <img class="reloadable-img" src="{{ STATIC_URL }}img/help/start-new-project.jpg"></img></p>
+            <p>{% blocktrans %}Once you have finished setting all of the parameters for your project, you will return to the summary page to activate it for the first time.{% endblocktrans %}</p>
+            <p>
+                <span class="ep-help-img-link">
+                    <a href="{{ STATIC_URL }}img/help/activate-mobile-project.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+                    </a>
+                </span>
+                <img class="reloadable-img" src="{{ STATIC_URL }}img/help/activate-mobile-project.gif"></img>
+            </p>
+            <p>{% blocktrans %}This initial activation saves the contents of your project to a staging database, from which Arches Collector users will download it and begin collecting data.{% endblocktrans %}</p>
+            <p><strong>{% blocktrans %}IMPORTANT: In order for Arches Collector users to connect to this Arches instance a system admin must first <a href="https://arches.readthedocs.io/en/stable/api/#registering-an-application-with-arches" target="_blank">register an application</a>.{% endblocktrans %}</strong></p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Managing Projects" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
+        </a>
+        <div class="ep-help-topic-content">
+            <p><strong>{% blocktrans %}Activation/Deactivation{% endblocktrans %}</strong> - {% blocktrans %}The first time you activate the project and click Save, all of the parameters are saved to an intermediate location, and cannot be updated. After this initial activation, you can deactivate/reactivate the project whenever you want. When a project is deactivated, users who have already downloaded it can still collect and sync their data, but new users cannot download it, even if they have the proper permissions.{% endblocktrans %}</p>
+            <p><strong>{% blocktrans %}Syncing{% endblocktrans %}</strong> - {% blocktrans %}After you have activated a project, and users have begun downloading it and entering data, they can sync their changes at any time. The following takes place when a user syncs a project:{% endblocktrans %}</p>
+            <ul style="">
+                <li>{% blocktrans %}All changes from the user's mobile device will be pushed to this database.{% endblocktrans %}</li>
+                <li>{% blocktrans %}All changes from the user's mobile device will be made available to all other participants in the same project.{% endblocktrans %}</li>
+                <li>{% blocktrans %}If other project participants have synced their data, it will be downloaded to the user's mobile device.{% endblocktrans %}</li>
+                <li>{% blocktrans %}If resources have been changed in this database since the project was first activated, these changes are <strong>not</strong> downloaded to the user's mobile device.{% endblocktrans %}</li>
+            </ul>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Project Parameters" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
+        </a>
+        <div class="ep-help-topic-content">
+            <div>
+                <a href="javascript:void(0)" class="ep-help-topic-toggle">
+                    <h5>{% trans "Settings" %}</h5>
+                </a>
+                <div class="ep-help-topic-content">
+                    <table class="ep-help-table">
+                        <tr>
+                            <td>{% trans "Name" %}</td>
+                            <td>{% trans "This name will be used in Arches Collector when users connect to this Arches instance." %}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Start Date/End Date" %}</td>
+                            <td>{% blocktrans %}The project's start and end dates are used to limit when people can add or edit data to your project. Use these dates to enforce the beginning and end of your field data collection effort. When a project has expired, users will not be able to collect new data, but they can still sync.{% endblocktrans %}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Description" %}</td>
+                            <td>{% blocktrans %}Optionally add a description for your project. This description will be included when users download the project using Arches Collector.{% endblocktrans %}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div>
+                <a href="javascript:void(0)" class="ep-help-topic-toggle">
+                    <h5>{% trans "Map Extent" %}</h5>
+                </a>
+                <div class="ep-help-topic-content">
+                    <p>{% blocktrans %}The map extent for this project will default to the extent set in System Settings, but can be changed however you like. If you allow users to download data in this project, only resources within this boundary will be used.{% endblocktrans %}</p>
+                </div>
+            </div>
+            <div>
+                <a href="javascript:void(0)" class="ep-help-topic-toggle">
+                    <h5>{% trans "Map Sources" %}</h5>
+                </a>
+                <div class="ep-help-topic-content">
+                     <p>{% blocktrans %}Define the basemap layer(s) that will be available to users while they collect data with Arches Collector.{% endblocktrans %}</p>
+                     <p>{% blocktrans %}If you expect data collection to happen in areas that do not have reliable cellular/wifi data connections, use this parameter to link to an MBTiles file that users will download when they download this project. You can learn more about creating this file in our external <a href="https://arches.readthedocs.io/en/stable/arches-collector-manager/" target="_blank">Arches Collector Manager</a> documentation.{% endblocktrans %}</p>
+                </div>
+            </div>
+            <div>
+                <a href="javascript:void(0)" class="ep-help-topic-toggle">
+                    <h5>{% trans "Models" %}</h5>
+                </a>
+                <div class="ep-help-topic-content">
+                    <p>{% blocktrans %}You must select one or more resources models to include in the project. When a user downloads the project and begins editing data, only these resource models will be available to them.{% endblocktrans %}</p>
+                    <p>{% blocktrans %}Once you have selected a model, you must further decide which cards from that model to include.{% endblocktrans %}</p>
+                    <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/project-pick-cards.png"></img></p>
+                    </p>{% blocktrans %}By only including certain cards, you can keep the Arches Collector users focused on the specific information you want them to gather.{% endblocktrans %}</p>
+                    <p>{% blocktrans %}All existing card-level permissions in a resource model will be honored during data collection.{% endblocktrans %}</p>
+                </div>
+            </div>
+            <div>
+                <a href="javascript:void(0)" class="ep-help-topic-toggle">
+                    <h5>{% trans "Data" %}</h5>
+                </a>
+                <div class="ep-help-topic-content">
+                    <p>{% blocktrans %}If you want users to edit existing resources in your database, you must include these resources in the Data Download section. You can limit the number of resources that get downloaded, with the default maximum limit being 2000. If the resource model you want to download includes geometry, only resources from within your Map Extent will be downloaded.{% endblocktrans %}</p>
+                    <p>{% blocktrans %}You can also choose a custom download of resources. Simply go to the search page, construct a search query, and copy and paste the URL in the Custom Download URL box. All of the search results from that query will be included when users download this project.{% endblocktrans %}</p>
+                </div>
+            </div>
+            <div>
+                <a href="javascript:void(0)" class="ep-help-topic-toggle">
+                    <h5>{% trans "People" %}</h5>
+                </a>
+                <div class="ep-help-topic-content">
+                    <p>{% blocktrans %}When someone connects to this Arches instance from their mobile device using Arches Collector, they will only be able to access this project if they have been approved to do so.{% endblocktrans %}</p>
+                    <p>{% blocktrans %}When modifying group and user approvals, bear in mind the following: {% endblocktrans %}</p>
+                    <ul style="">
+                        <li>{% blocktrans %}By approving a group, all members will be approved.{% endblocktrans %}</li>
+                        <li>{% blocktrans %}By disapproving a group, all members will be disapproved unless they are approved as a member of a different group.{% endblocktrans %}</li>
+                        <li>{% blocktrans %}You may approve or disapprove a user regardless of the approval status of any group to which that user belongs.{% endblocktrans %}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

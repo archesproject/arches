@@ -33,56 +33,6 @@
 	border-top: 1px solid #eee;
 }
 
-/*Image Block
-------------------------------------*/
-.image-block {
-	overflow: hidden;
-	min-height: 200px;
-	position: relative;
-}
-
-.image-block {
-	background: url(../../img/job/slider.jpg) 70% 40% no-repeat;
-}
-
-/*Company Description*/
-.image-block .company-description {
-	max-width: 500px;
-	margin: 40px auto;
-	padding: 35px 25px;	
-	position: relative;
-	text-align: center;
-	background: rgba(255,255,255,0.8);
-}
-
-.image-block .company-description h2 {
-	margin-bottom: 20px;
-	text-transform: uppercase;
-}
-
-.image-block .company-description p {
-	text-align: left;
-}
-
-.image-block .benefits {
-	margin-bottom: 20px;
-}
-
-.image-block .benefits li {
-	margin: 0 7px 10px 0;
-	font-style: italic;
-}
- 
-.image-block .benefits li i {
-	color: #555;
-	min-width: 32px;
-	font-size: 15px;
-	padding: 7px 6px;
-	margin-right: 10px;
-	text-align: center;
-	border: 1px solid #555;
-}
-
 /*Block Description
 ------------------------------------*/
 .block-description {

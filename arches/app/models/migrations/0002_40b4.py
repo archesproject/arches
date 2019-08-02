@@ -10,7 +10,6 @@ from django.db import migrations, models
 from django.core import management
 from arches.app.models.models import GraphModel
 from arches.app.models.system_settings import settings
-from arches.app.search.mappings import prepare_search_index, delete_search_index
 
 
 class Migration(migrations.Migration):

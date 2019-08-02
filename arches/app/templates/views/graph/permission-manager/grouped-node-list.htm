@@ -6,15 +6,15 @@
 {% endblock %}
 
 {% block filter %}
-<!-- ko if: $data.filter_function -->
-<div class="permission-manager-filter" style="display:none" data-bind="visible: $data.filter_function">
+<!-- ko if: $data.filterFunction -->
+<div class="permission-manager-filter" style="display:none" data-bind="visible: $data.filterFunction">
     <div class='filter-bar'>
     <input type="text" class="form-control" style="" placeholder="{% trans 'Find a card' %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
 
     <!-- Clear Search -->
     <span class="clear-node-search" data-bind="click: $data.clearSearch"><i class="fa fa-times-circle"></i></span>
 
-    <!-- ko if: $data.single_select == false -->
+    <!-- ko if: $data.singleSelect == false -->
     <div class="pad-rgt pad-btm clear-selection">
         <a class="clear-selection-link" style="" data-bind="click: clearSelection">{% trans "Clear" %}</a>
     </div>

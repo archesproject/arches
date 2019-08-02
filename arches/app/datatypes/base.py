@@ -2,6 +2,7 @@ import json
 from django.core.urlresolvers import reverse
 from arches.app.models import models
 
+
 class BaseDataType(object):
 
     def __init__(self, model=None):
@@ -10,7 +11,7 @@ class BaseDataType(object):
     def validate(self, value, row_number=None, source=None):
         return []
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         """
         Assigns a given node value to the corresponding key in a document in
         in preparation to index the document
@@ -22,6 +23,9 @@ class BaseDataType(object):
         Refreshes mv_geojson_geoms materialized view after save.
         """
         pass
+
+    def values_match(self, value1, value2):
+        return value1 == value2
 
     def transform_import_values(self, value, nodeid):
         """
@@ -46,6 +50,12 @@ class BaseDataType(object):
     def get_layer_config(self, node=None):
         """
         Gets the layer config to generate a map layer (use if spatial)
+        """
+        return None
+
+    def process_mobile_data(self, tile, node, db, couch_doc, node_value):
+        """
+        Transforms data from a mobile device to an Arches friendly format
         """
         return None
 
@@ -242,11 +252,19 @@ class BaseDataType(object):
         """
         return None
 
+    def get_tile_data(self, tile):
+        if tile.data is not None and len(tile.data.keys()) > 0:
+            return tile.data
+        elif tile.provisionaledits is not None and len(tile.provisionaledits.keys()) == 1:
+            userid = tile.provisionaledits.keys()[0]
+            return tile.provisionaledits[userid]['value']
+
     def get_display_value(self, tile, node):
         """
         Returns a list of concept values for a given node
         """
-        return unicode(tile.data[str(node.nodeid)])
+        data = self.get_tile_data(tile)
+        return unicode(data[str(node.nodeid)])
 
     def get_search_terms(self, nodevalue, nodeid=None):
         """
@@ -266,3 +284,46 @@ class BaseDataType(object):
         Updates files
         """
         pass
+
+    def is_a_literal_in_rdf(self):
+        """
+        Convenience method to determine whether or not this datatype's `to_rdf` method will express
+        its data as an RDF Literal value or as a more complex graph of nodes.
+        :return:
+
+        True: `to_rdf()` turns the range node tile data into a suitable Literal value
+        False:  `to_rdf()` uses the data to construct something more complex.
+        """
+        return False
+
+    def to_rdf(self, edge_info, edge):
+        """
+        Outputs an in-memory graph, converting the range tile data JSON into
+        an appropriate RDF representation using rdflib
+        """
+
+        # default implementation that encodes the JSON serialisation
+        # as a literal string, linked by 'RDF.value' to the source node
+        # for this tile data
+        from rdflib import Namespace, URIRef, Literal, Graph, BNode
+        from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
+        from arches.app.utils.betterJSONSerializer import JSONSerializer
+
+        g = Graph()
+
+        g.add((edge_info['r_uri'], RDF.type, URIRef(edge.rangenode.ontologyclass)))
+
+        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), edge_info['r_uri']))
+        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+
+        if edge_info['domain_tile_data'] is not None:
+            g.add((edge_info['d_uri'], RDF.value, Literal(JSONSerializer().serialize(edge_info['domain_tile_data']))))
+
+        if edge_info['range_tile_data'] is not None:
+            g.add((edge_info['r_uri'], RDF.value, Literal(JSONSerializer().serialize(edge_info['range_tile_data']))))
+
+        return g
+
+    def from_rdf(self, json_ld_node):
+        print json_ld_node
+        raise NotImplementedError

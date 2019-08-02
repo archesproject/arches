@@ -47,22 +47,5 @@ class Migration(migrations.Migration):
         resource_reviewer_group.delete()
 
     operations = [
-        migrations.CreateModel(
-            name='ProvisionalEdit',
-            fields=[
-                ('tile', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, related_name='provisionaledit', serialize=False, to='models.TileModel')),
-                ('status', models.TextField(choices=[('review', 'review'), ('approved', 'approved'), ('rejected', 'rejected')])),
-                ('action', models.TextField(choices=[('created', 'created'), ('updated', 'updated'), ('deleted', 'deleted')])),
-                ('timestamp', models.DateTimeField(blank=True, null=True)),
-                ('reviewtimestamp', models.DateTimeField(blank=True, null=True)),
-                ('editor', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='editor', to=settings.AUTH_USER_MODEL)),
-                ('prototile', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='models.TileModel')),
-                ('reviewer', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='reviewer', to=settings.AUTH_USER_MODEL)),
-            ],
-            options={
-                'db_table': 'provisional_edits',
-                'managed': True,
-            },
-        ),
         migrations.RunPython(add_permissions, reverse_code=remove_permissions),
     ]

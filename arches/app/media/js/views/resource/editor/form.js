@@ -358,6 +358,9 @@ define([
                                 } else {
                                     updatedData = koMapping.toJS(provisionaledit)
                                 }
+                                if (updatedData === null && savingParentTile === true) {
+                                    updatedData = koMapping.toJS(tile.data)
+                                }
                                 tile._data(JSON.stringify(updatedData));
                                 tile.modified(true);
                             }

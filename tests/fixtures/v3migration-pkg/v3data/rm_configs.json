@@ -1,0 +1,32 @@
+{
+    "Activity": {
+        "v3_entitytypeid": "ACTIVITY.E7", 
+        "v3_nodes_csv": "ACTIVITY.E7_nodes.csv", 
+        "v3_v4_node_lookup": "ACTIVITY.E7_v4_lookup.csv"
+    }, 
+    "Actor": {
+        "v3_entitytypeid": "ACTOR.E39", 
+        "v3_nodes_csv": "ACTOR.E39_nodes.csv", 
+        "v3_v4_node_lookup": "ACTOR.E39_v4_lookup.csv"
+    }, 
+    "Historic District": {
+        "v3_entitytypeid": "HERITAGE_RESOURCE_GROUP.E27", 
+        "v3_nodes_csv": "HERITAGE_RESOURCE_GROUP.E27_nodes.csv", 
+        "v3_v4_node_lookup": "HERITAGE_RESOURCE_GROUP.E27_v4_lookup.csv"
+    }, 
+    "Historic Event": {
+        "v3_entitytypeid": "HISTORICAL_EVENT.E5", 
+        "v3_nodes_csv": "HISTORICAL_EVENT.E5_nodes.csv", 
+        "v3_v4_node_lookup": "HISTORICAL_EVENT.E5_v4_lookup.csv"
+    }, 
+    "Historic Resource": {
+        "v3_entitytypeid": "HERITAGE_RESOURCE.E18", 
+        "v3_nodes_csv": "HERITAGE_RESOURCE.E18_nodes.csv", 
+        "v3_v4_node_lookup": "HERITAGE_RESOURCE.E18_v4_lookup.csv"
+    }, 
+    "Information Resource": {
+        "v3_entitytypeid": "INFORMATION_RESOURCE.E73", 
+        "v3_nodes_csv": "INFORMATION_RESOURCE.E73_nodes.csv", 
+        "v3_v4_node_lookup": "INFORMATION_RESOURCE.E73_v4_lookup.csv"
+    }
+}

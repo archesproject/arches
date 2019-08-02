@@ -19,6 +19,12 @@
 -   [ ] I have added tests that prove my fix is effective or that my feature works
 -   [ ] I have added necessary documentation (if appropriate)
 
+#### Ticket Background
+*   Sponsored by: <!--- Who is funding this effort? Getty Conservation Institute|Self Funded -->
+*   Found by: @ <!--- This could be the person who files the bug, but not always. -->
+*   Tested by: @ <!--- Testing is an important step in development. Who tested this? -->
+*   Designed by: @ <!--- Who designed this new feature-->
+
 ### Further comments
 
 <!--- If this is a relatively large or complex change, kick off the discussion by explaining why you chose the solution you did and what alternatives you considered, etc... -->

@@ -6,6 +6,8 @@ import os
 
 #ADMIN_MEDIA_PREFIX = '/media/admin/'
 
+#ANALYSIS_COORDINATE_SYSTEM_SRID = 3857
+
 #ANONYMOUS_USER_NAME = None
 
 #APP_NAME = 'Arches'
@@ -14,6 +16,7 @@ import os
 
 
 #AUTHENTICATION_BACKENDS = (
+#    oauth2_provider.backends.OAuth2Backend,
 #    django.contrib.auth.backends.ModelBackend,
 #    guardian.backends.ObjectPermissionBackend,
 #    arches.app.utils.permission_backend.PermissionBackend,
@@ -57,6 +60,21 @@ import os
 #]
 
 
+
+#CACHES = {
+#    "default": {
+#        "BACKEND": "django.core.cache.backends.memcached.MemcachedCache", 
+#        "LOCATION": "127.0.0.1:11211"
+#    }
+#}
+
+
+
+#CACHE_BY_USER = {
+#    "anonymous": 86400
+#}
+
+
 #COPYRIGHT_TEXT = 'All Rights Reserved.'
 
 #COPYRIGHT_YEAR = '2016'
@@ -91,6 +109,8 @@ import os
 #    "arches.app.datatypes"
 #]
 
+
+#DATE_IMPORT_EXPORT_FORMAT = '%Y-%m-%d'
 
 #DEBUG = True
 
@@ -137,6 +157,9 @@ import os
 #    arches.management,
 #    guardian,
 #    captcha,
+#    revproxy,
+#    corsheaders,
+#    oauth2_provider,
 #)
 
 

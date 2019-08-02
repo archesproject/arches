@@ -272,8 +272,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                       <label class="col-xs-12 control-label widget-input-label"> {% trans "Color" %} <i class="ion-ios-checkmark-outline"></i></label>
                                                   </div>
                                                   <div class="colorpicker-component input-group">
-                                                    <input placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: rootNodeColor, format:'rgba'}">
-                                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: rootNodeColor}"></i></span>
+                                                    <input placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: $root.graph.color, format:'rgba'}">
+                                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: $root.graph.color()}"></i></span>
                                                   </div>
                                                 </div>
                                             </div>
@@ -384,6 +384,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                         <div class="col-xs-12">
                                                             <textarea placeholder="{% trans "Abstract/description" %}" rows="6" class="form-control" data-bind="value:graph.description, valueUpdate: 'keyup'"></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row widget-container">
+                                                    <div class="form-group">
+                                                        <div class="relative">
+                                                            <label class="col-xs-12 control-label widget-input-label"> {% trans "JSON-LD Context" %}</label>
+                                                        </div>
+
+                                                        <div class="col-xs-12">
+                                                            <input placeholder="{% trans "JSON-LD Context URI" %}" class="form-control input-lg widget-input" data-bind="value:graph.jsonldcontext, valueUpdate: 'keyup'">
                                                         </div>
                                                     </div>
                                                 </div>

@@ -4,31 +4,29 @@ define([
     'knockout',
     'd3'
 ], function($, _, ko, d3) {
+    var width = 300;
+    var height = 300;
     ko.bindingHandlers.timeWheel = {
-
         init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-            var width = 750;
-            var height = 600;
             var radius = Math.min(width, height) / 2;
             var $el = $(element);
 
             var vis = d3.select($el.find('.chart')[0]).append("svg")
-                .attr("width", width)
-                .attr("height", height)
+                .attr("preserveAspectRatio", "xMinYMin meet")
+                .attr("viewBox", "0 0 " + width + " " + height)
+                .classed("svg-content", true)
                 .append("g")
                 .attr("class", "container")
                 .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
             vis.append("svg:circle")
-                .attr("r", radius)
+                .attr("r", "0")
                 .style("opacity", 0);
 
             ko.utils.domData.set(element, 'vis', vis);
         },
 
         update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-            var width = 750;
-            var height = 600;
             var radius = Math.min(width, height) / 2;
             var colortheme = d3.scale.category20c();
             var x = d3.scale.linear()
@@ -62,8 +60,8 @@ define([
             });
 
             var partition = d3.layout.partition()
-                .sort(function(d) {
-                    return d3.descending(d.start);
+                .sort(function(d, e) {
+                    return d.start - e.start;
                 })
                 .value(function(d) {
                     return d.size;

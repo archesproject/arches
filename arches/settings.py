@@ -20,6 +20,11 @@ import os
 import inspect
 
 
+try:
+    from corsheaders.defaults import default_headers
+except ImportError:  # unable to import corsheaders prior to installing requirements.txt in setup.py
+    pass
+
 #########################################
 ###          STATIC SETTINGS          ###
 #########################################
@@ -40,6 +45,9 @@ DATABASES = {
     }
 }
 
+PG_SUPERUSER = ""
+PG_SUPERUSER_PW = ""
+
 COUCHDB_URL = 'http://admin:admin@localhost:5984' # defaults to localhost:5984
 
 # from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
@@ -53,7 +61,7 @@ ELASTICSEARCH_HOSTS = [
 ]
 ELASTICSEARCH_CONNECTION_OPTIONS = {'timeout': 30}
 # a prefix to append to all elasticsearch indexes, note: must be lower case
-ELASTICSEARCH_PREFIX = ''
+ELASTICSEARCH_PREFIX = 'arches'
 
 USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -63,15 +71,14 @@ RESOURCE_IMPORT_LOG = 'arches/logs/resource_import.log'
 
 RESOURCE_FORMATERS = {
     'csv': 'arches.app.utils.data_management.resources.formats.csvfile.CsvWriter',
-    'json': 'arches.app.utils.data_management.resources.formats.archesjson.JsonWriter',
+    'json': 'arches.app.utils.data_management.resources.formats.archesfile.ArchesFileWriter',
     'tilecsv': 'arches.app.utils.data_management.resources.formats.csvfile.TileCsvWriter',
     'xml': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
     'pretty-xml': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
     'json-ld': 'arches.app.utils.data_management.resources.formats.rdffile.JsonLdWriter',
     'n3': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
     'nt': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
-    'trix': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
-    'rdfa': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter'
+    'trix': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter'
 }
 
 ONTOLOGY_PATH = os.path.join(ROOT_DIR, 'db', 'ontologies', 'cidoc_crm')
@@ -101,40 +108,19 @@ ONTOLOGY_NAMESPACES = {
     'http://www.ics.forth.gr/isl/CRMsci/': '',
 }
 
-# A context to supply for use in export of resource instances in JSON-LD format
-JSON_LD_CONTEXT = {
-    # "crm": "http://www.cidoc-crm.org/cidoc-crm/",
-    # "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-    # "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-    # "dc": "http://purl.org/dc/elements/1.1/",
-    # "dcterms": "http://purl.org/dc/terms/",
-    # "schema": "http://schema.org/",
-    # "skos": "http://www.w3.org/2004/02/skos/core#",
-    # "foaf": "http://xmlns.com/foaf/0.1/",
-    # "xsd": "http://www.w3.org/2001/XMLSchema#",
-    # "pi": "http://linked.art/ns/prov/",
-    # "aat": "http://vocab.getty.edu/aat/",
-    # "ulan": "http://vocab.getty.edu/ulan/",
-    # "tgn": "http://vocab.getty.edu/tgn/",
-    # "id": "@id",
-    # "type": "@type",
-    # "Period": "crm:E4_Period",
-    # "Event": "crm:E5_Event",
-    # "Activity": "crm:E7_Activity",
-    # "identified_by": {
-    #     "@id": "crm:P1_is_identified_by",
-    #     "@type": "@id",
-    #     "@container": "@set"
-    # },
-    # "identifies": {
-    #     "@id": "crm:P1i_identifies",
-    #     "@type": "@id"
-    # }
-}
+# Used in the JSON-LD export for determining which external concept scheme URI
+# to use in preference for the URI of a concept. If there is no match, the default
+# Arches host URI will be used (eg http://localhost/concepts/123f323f-...)
+PREFERRED_CONCEPT_SCHEME = "http://vocab.getty.edu/aat/"
 
 # This is the namespace to use for export of data (for RDF/XML for example)
 # Ideally this should point to the url where you host your site
-ARCHES_NAMESPACE_FOR_DATA_EXPORT = 'http://localhost/'
+# Make sure to use a trailing slash
+ARCHES_NAMESPACE_FOR_DATA_EXPORT = 'http://localhost:8000/'
+
+RDM_JSONLD_CONTEXT = {
+    'arches': ARCHES_NAMESPACE_FOR_DATA_EXPORT
+}
 
 PREFERRED_COORDINATE_SYSTEMS = (
     {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True}, #Required
@@ -146,6 +132,14 @@ ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 MANAGERS = ADMINS
+
+RESOURCE_EDITOR_GROUPS = (
+    'Resource Editor',
+    'Crowdsource Editor'
+)
+
+# Unique session cookie ensures that logins are treated separately for each app
+SESSION_COOKIE_NAME = 'arches'
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
 # EMAIL_USE_TLS = True
@@ -198,7 +192,10 @@ LOCALE_PATHS = (
 USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
-MEDIA_ROOT =  os.path.join(ROOT_DIR)
+MEDIA_ROOT = os.path.join(ROOT_DIR)
+
+# Sets default max upload size to 15MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 
 # URL that handles the media served from MEDIA_ROOT, used for managing stored files.
 # It must end in a slash if set to a non-empty value.
@@ -241,6 +238,17 @@ JWT_KEY = SECRET_KEY
 JWT_TOKEN_EXPIRATION = 50 #days before the token becomes stale
 JWT_ALGORITHM = 'HS256'
 
+# OAuth settings
+# https://django-oauth-toolkit.readthedocs.io/en/latest/settings.html
+OAUTH2_PROVIDER = {
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 36000
+}
+
+# This is the client id you get when you register a new application
+# see https://arches.readthedocs.io/en/stable/api/#authentication
+MOBILE_OAUTH_CLIENT_ID = ''  #'9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
+MOBILE_DEFAULT_ONLINE_BASEMAP = {'default': 'mapbox://styles/mapbox/streets-v9'}
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -271,6 +279,8 @@ TEMPLATES = [
 ]
 
 AUTHENTICATION_BACKENDS = (
+    'arches.app.utils.email_auth_backend.EmailAuthenticationBackend',
+    'oauth2_provider.backends.OAuth2Backend',
     'django.contrib.auth.backends.ModelBackend', # this is default
     'guardian.backends.ObjectPermissionBackend',
     'arches.app.utils.permission_backend.PermissionBackend',
@@ -291,6 +301,7 @@ INSTALLED_APPS = (
     'captcha',
     'revproxy',
     'corsheaders',
+    'oauth2_provider',
     #'debug_toolbar'
 )
 
@@ -299,12 +310,13 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'arches.app.utils.middleware.TokenMiddleware',
+    #'arches.app.utils.middleware.TokenMiddleware',
     #'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'arches.app.utils.middleware.ModifyAuthorizationHeader',
+    'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'arches.app.utils.middleware.JWTAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'arches.app.utils.middleware.SetAnonymousUser',
@@ -316,21 +328,39 @@ WSGI_APPLICATION = 'arches.wsgi.application'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+try:
+    CORS_ALLOW_HEADERS = list(default_headers) + [
+        'x-authorization',
+    ]
+except Exception as e:
+    print(e)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+        },
+    },
     'handlers': {
         'file': {
-            'level': 'DEBUG',
+            'level': 'WARNING',  # DEBUG, INFO, WARNING, ERROR
             'class': 'logging.FileHandler',
             'filename': os.path.join(ROOT_DIR, 'arches.log'),
+            'formatter': 'console'
         },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'console'
+        }
     },
     'loggers': {
         'arches': {
-            'handlers': ['file'],
+            'handlers': ['file', 'console'],
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': True
         }
     }
 }
@@ -342,6 +372,7 @@ PROFILE_LOG_BASE = os.path.join(ROOT_DIR, 'logs')
 BULK_IMPORT_BATCH_SIZE = 2000
 
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Local.json')
+SYSTEM_SETTINGS_RESOURCE_ID = 'a106c400-260c-11e7-a604-14109fd34195'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -387,7 +418,36 @@ CACHES = {
     }
 }
 
+# Example of a custom time wheel configuration:
+# TIMEWHEEL_DATE_TIERS = {
+#     "name": "Millennium",
+#     "interval": 1000,
+#     "root": True,
+#     "child": {
+#             "name": "Cen",
+#             "interval": 100,
+#             "range": {"min": 1500, "max": 2000},
+#             "child": {
+#                 "name": "Decade",
+#                 "interval": 10,
+#                 "range": {"min": 1750, "max": 2000}
+#           }
+#       }
+#   }
+TIMEWHEEL_DATE_TIERS = None
+
+#Identify the usernames and duration (seconds) for which you want to cache the timewheel
+CACHE_BY_USER = {'anonymous': 3600 * 24}
+
 DATE_IMPORT_EXPORT_FORMAT = '%Y-%m-%d'
+
+API_MAX_PAGE_SIZE = 500
+
+UUID_REGEX = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
+
+OAUTH2_PROVIDER = {
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 604800  # one week
+}
 
 #######################################
 ###       END STATIC SETTINGS       ###
@@ -402,10 +462,10 @@ DATE_IMPORT_EXPORT_FORMAT = '%Y-%m-%d'
 PHONE_REGEX = r'^\+\d{8,15}$'
 SEARCH_ITEMS_PER_PAGE = 5
 SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
-MOBILE_DOWNLOAD_RESOURCE_LIMIT = 50
 RELATED_RESOURCES_PER_PAGE = 15
 RELATED_RESOURCES_EXPORT_LIMIT = 10000
 SEARCH_DROPDOWN_LENGTH = 100
+SEARCH_TERM_SENSITIVITY = 3 # a lower number will give more "Fuzzy" matches, recomend between 0-4, see "prefix_length" at https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl-fuzzy-query.html#_parameters_7
 WORDS_PER_SEARCH_TERM = 10 # set to None for unlimited number of words allowed for search terms
 
 ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
@@ -436,8 +496,6 @@ RESOURCE_GRAPH_LOCATIONS = (
     os.path.join(ROOT_DIR, 'db', 'graphs', 'resource_models'),
 )
 
-PROTECTED_GRAPHS = ('22000000-0000-0000-0000-000000000000', '22000000-0000-0000-0000-000000000001',)
-
 BUSINESS_DATA_FILES = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
@@ -446,6 +504,8 @@ BUSINESS_DATA_FILES = (
 
 DATATYPE_LOCATIONS = ['arches.app.datatypes',]
 FUNCTION_LOCATIONS = ['arches.app.functions',]
+SEARCH_COMPONENT_LOCATIONS = ['arches.app.search.components',]
+
 # If you are manually managing your resource tile cache, you may want to "seed"
 # the cache (or prerender some tiles) for low zoom levels.  You can do this by
 # running:
@@ -454,7 +514,10 @@ FUNCTION_LOCATIONS = ['arches.app.functions',]
 # The following settings control the extent and max zoom level to which tiles
 # will be seeded.  Be aware, seeding tiles at high zoom levels (more zoomed in)
 # will take a long time
-CACHE_SEED_BOUNDS = (-122.0, -52.0, 128.0, 69.0)
+CACHE_SEED_BOUNDS = (
+    52.0, -122.0,
+    69.0,  128.0,
+)
 CACHE_SEED_MAX_ZOOM = 5
 
 # configure where the tileserver should store its cache

@@ -276,7 +276,7 @@
             </div>
             <!--/ko-->
 
-            <!--ko if: popupData().arches_description-->
+            <!--ko if: popupData().feature_info_content-->
             <div class="hover-feature-metadata">
                 <i class="ion-ios-close pull-right add-tooltip hover-panel-dismiss"
                 style="cursor: pointer;"
@@ -285,7 +285,7 @@
                 data-original-title="add overlay"
                 data-bind="visible: popupData() === clickData(), click: function () { clickData(null); }"
                 ></i>
-                <div class="hover-feature-body" data-bind="html: popupData().arches_description"></div>
+                <div class="hover-feature-body" data-bind="html: popupData().feature_info_content"></div>
             </div>
             <!--/ko-->
 
@@ -402,9 +402,11 @@
                             <a href="#" data-bind="click: function () { self.mapControls.moveOverlay($data, 'down') }">
                                 <i class="fa fa-arrow-circle-o-down overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay down"></i>
                             </a>
+                            <!-- ko if: self.resourceLayer && self.resourceLayer !== $data -->
                             <a href="#" data-bind="click: self.exchangeOverlay">
                                 <i class="fa fa-close overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay down"></i>
                             </a>
+                            <!-- /ko -->
                         </div>
                     </div>
                 </div>
@@ -647,3 +649,7 @@
     </div>
 </div>
 {% endblock config_form %}
+
+{% block display_value %}
+<span data-bind="text: displayValue()"></span> {% trans "feature(s)" %}
+{% endblock display_value %}

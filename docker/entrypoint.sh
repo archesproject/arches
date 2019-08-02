@@ -18,13 +18,28 @@ display_help() {
 CUSTOM_SCRIPT_FOLDER=${CUSTOM_SCRIPT_FOLDER:-/docker/entrypoint}
 if [[ -z ${ARCHES_PROJECT} ]]; then
 	APP_FOLDER=${ARCHES_ROOT}
-	PACKAGE_JSON_FOLDER=${ARCHES_ROOT}
+	PACKAGE_JSON_FOLDER=${ARCHES_ROOT}/arches/install
 else
 	APP_FOLDER=${WEB_ROOT}/${ARCHES_PROJECT}
-	PACKAGE_JSON_FOLDER=${APP_FOLDER}/${ARCHES_PROJECT}
+	# due to https://github.com/archesproject/arches/issues/4841, changes were made to yarn install
+	# and module deployment. Using the arches install directory for yarn.
+	PACKAGE_JSON_FOLDER=${ARCHES_ROOT}/arches/install
 fi
 
-DJANGO_PORT=${DJANGO_PORT:-8000}
+# Read modules folder from yarn config file
+# Get string after '--install.modules-folder' -> get first word of the result 
+# -> remove line endlings -> trim quotes -> trim leading ./
+YARN_MODULES_FOLDER=${PACKAGE_JSON_FOLDER}/$(awk \
+	-F '--install.modules-folder' '{print $2}' ${PACKAGE_JSON_FOLDER}/.yarnrc \
+	| awk '{print $1}' \
+	| tr -d $'\r' \
+	| tr -d '"' \
+	| sed -e "s/^\.\///g")
+
+export DJANGO_PORT=${DJANGO_PORT:-8000}
+COUCHDB_URL="http://$COUCHDB_USER:$COUCHDB_PASS@$COUCHDB_HOST:$COUCHDB_PORT"
+STATIC_ROOT=${STATIC_ROOT:-/static_root}
+
 
 cd_web_root() {
 	cd ${WEB_ROOT}
@@ -80,9 +95,13 @@ setup_arches() {
 
 	echo "5" && sleep 1 && echo "4" && sleep 1 && echo "3" && sleep 1 && echo "2" && sleep 1 &&	echo "1" &&	sleep 1 && echo "0" && echo ""
 
-	echo "Running: python manage.py packages -o setup_db"
-	python manage.py packages -o setup_db
+	echo "Running: python manage.py setup_db --force"
+	python manage.py setup_db --force
 
+    echo "Running: Creating couchdb system databases"
+    curl -X PUT ${COUCHDB_URL}/_users
+    curl -X PUT ${COUCHDB_URL}/_global_changes
+    curl -X PUT ${COUCHDB_URL}/_replicator
 
 	if [[ "${INSTALL_DEFAULT_GRAPHS}" == "True" ]]; then
 		# Import graphs
@@ -117,28 +136,36 @@ setup_arches() {
 	run_migrations
 }
 
-
 wait_for_db() {
 	echo "Testing if database server is up..."
 	while [[ ! ${return_code} == 0 ]]
 	do
-		psql -h ${PGHOST} -p ${PGPORT} -U postgres -c "select 1" >&/dev/null
+        psql --host=${PGHOST} --port=${PGPORT} --user=${PGUSERNAME} --dbname=postgres -c "select 1" >&/dev/null
 		return_code=$?
 		sleep 1
 	done
 	echo "Database server is up"
+
+    echo "Testing if Elasticsearch is up..."
+    while [[ ! ${return_code} == 0 ]]
+    do
+        curl -s "http://${ESHOST}:${ESPORT}" >&/dev/null
+        return_code=$?
+        sleep 1
+    done
+    echo "Elasticsearch is up"
 }
 
 db_exists() {
 	echo "Checking if database "${PGDBNAME}" exists..."
-	count=`psql -h ${PGHOST} -p ${PGPORT} -U postgres -Atc "SELECT COUNT(*) FROM pg_catalog.pg_database WHERE datname='${PGDBNAME}'"`
+	count=`psql --host=${PGHOST} --port=${PGPORT} --user=${PGUSERNAME} --dbname=postgres -Atc "SELECT COUNT(*) FROM pg_catalog.pg_database WHERE datname='${PGDBNAME}'"`
 
 	# Check if returned value is a number and not some error message
 	re='^[0-9]+$'
 	if ! [[ ${count} =~ $re ]] ; then
 	   echo "Error: Something went wrong when checking if database "${PGDBNAME}" exists..." >&2;
-		 echo "Exiting..."
-		 exit 1
+	   echo "Exiting..."
+	   exit 1
 	fi
 
 	# Return 0 (= true) if database exists
@@ -158,6 +185,15 @@ set_dev_mode() {
 	python ${ARCHES_ROOT}/setup.py develop
 }
 
+
+# Yarn
+init_yarn_components() {
+	if [[ ! -d ${YARN_MODULES_FOLDER} ]] || [[ ! "$(ls ${YARN_MODULES_FOLDER})" ]]; then
+		echo "Yarn modules do not exist, installing..."
+		install_yarn_components
+	fi
+}
+
 # This is also done in Dockerfile, but that does not include user's custom Arches app package.json
 # Also, the packages folder may have been overlaid by a Docker volume.
 install_yarn_components() {
@@ -170,14 +206,12 @@ install_yarn_components() {
 }
 
 
-
-
 #### Misc
 
 init_arches_project() {
 	if [[ ! -z ${ARCHES_PROJECT} ]]; then
 		echo "Checking if Arches project "${ARCHES_PROJECT}" exists..."
-		if [[ ! -d ${APP_FOLDER} ]] || [[ ! "$(ls -A ${APP_FOLDER})" ]]; then
+		if [[ ! -d ${APP_FOLDER} ]] || [[ ! "$(ls ${APP_FOLDER})" ]]; then
 			echo ""
 			echo "----- Custom Arches project '${ARCHES_PROJECT}' does not exist. -----"
 			echo "----- Creating '${ARCHES_PROJECT}'... -----"
@@ -243,7 +277,7 @@ copy_settings_local() {
 	cp ${ARCHES_ROOT}/arches/settings_local.py ${APP_FOLDER}/${ARCHES_PROJECT}/settings_local.py
 }
 
-# Alllows users to add scripts that are run on startup (after this entrypoint)
+# Allows users to add scripts that are run on startup (after this entrypoint)
 run_custom_scripts() {
 	for file in ${CUSTOM_SCRIPT_FOLDER}/*; do
 		if [[ -f ${file} ]]; then
@@ -251,7 +285,7 @@ run_custom_scripts() {
 			echo ""
 			echo "----- RUNNING CUSTUM SCRIPT: ${file} -----"
 			echo ""
-			${file}
+			source ${file}
 		fi
 	done
 }
@@ -302,10 +336,14 @@ run_gunicorn_server() {
 	echo "----- *** RUNNING GUNICORN PRODUCTION SERVER *** -----"
 	echo ""
 	cd_app_folder
-    if [[ ! -z ${ARCHES_PROJECT} ]]; then
-        gunicorn arches.wsgi:application -w 2 -b :${DJANGO_PORT} --pythonpath ${ARCHES_PROJECT}
+	
+	if [[ ! -z ${ARCHES_PROJECT} ]]; then
+        gunicorn arches.wsgi:application \
+            --config ${ARCHES_ROOT}/gunicorn_config.py \
+            --pythonpath ${ARCHES_PROJECT}
 	else
-        gunicorn arches.wsgi:application -w 2 -b :${DJANGO_PORT}
+        gunicorn arches.wsgi:application \
+            --config ${ARCHES_ROOT}/gunicorn_config.py
     fi
 }
 
@@ -315,7 +353,8 @@ run_gunicorn_server() {
 run_arches() {
 
 	init_arches
-	install_yarn_components
+
+	init_yarn_components
 
 	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
 		set_dev_mode
@@ -387,6 +426,9 @@ do
 		run_migrations)
 			wait_for_db
 			run_migrations
+		;;
+		install_yarn_components)
+			install_yarn_components
 		;;
 		help|-h)
 			display_help

@@ -26,6 +26,12 @@ ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe(
 ROOT_DIR = os.path.normpath(os.path.join(ROOT_DIR, '..', 'arches'))
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, '..', 'tests'))
 
+# LOAD_V3_DATA_DURING_TESTS = True will engage the most extensive the of the v3
+# data migration tests, which could add over a minute to the test process. It's
+# recommended that this setting only be set to True in tests/settings_local.py
+# and run in specific cases at the discretion of the developer.
+LOAD_V3_DATA_DURING_TESTS = False
+
 SEARCH_BACKEND = 'tests.base_test.TestSearchEngine'
 
 RESOURCE_GRAPH_LOCATIONS = (os.path.join(TEST_ROOT, 'fixtures', 'resource_graphs'),)
@@ -38,13 +44,13 @@ BUSISNESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
-PROTECTED_GRAPHS = []
+ELASTICSEARCH_PREFIX = 'test'
 
 # Use nose to run all tests
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # could add Chrome, PhantomJS etc... here
-LOCAL_BROWSERS = [] #['Firefox']
+LOCAL_BROWSERS = []  # ['Firefox']
 
 # these are set in Travis CI
 SAUCE_USERNAME = os.environ.get('SAUCE_USERNAME')

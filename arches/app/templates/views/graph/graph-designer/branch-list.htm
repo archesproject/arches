@@ -1,0 +1,48 @@
+{% extends "views/list.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block header %}
+{% endblock %}
+
+{% block search_placeholder %}{{branch_list.search_placeholder}}{% endblock %}
+
+
+{% block list_wrapper %}
+<div class="grid" class="grid-list">
+    <!-- ko if: $data.loadingBranchDomains() === false -->
+
+        <!-- ko if: $data.filtered_items().length === 0 -->
+        <div style="padding: 20px; background: white; font-weight: 600;">
+            {% trans "Because of ontology rules, there are no branches that can be appended." %}
+        </div>
+        <!-- /ko -->
+
+        <!-- ko foreach: $data.filtered_items -->
+            <div class="library-card" data-bind="click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected() && $data.isactive===true, disabled: $data.isactive === false }">
+                <div class="library-icon" style="">
+                    <!-- ko if: $data.isactive -->
+                    <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-mint" data-bind="click: $parent.appendBranch.bind($parent), clickBubble: false">
+                        <i class="branch-library-icon ion-plus-round"></i>
+                    </span>
+                    <!-- /ko -->
+                    <!-- ko ifnot: $data.isactive -->
+                    <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-gray">
+                        <i class="fa fa-hand-o-left"></i>
+                    </span>
+                    <!-- /ko -->
+                </div>
+                <div class="library-card-main" data-bind="attr: {'data-arches-graphid': $data.graphid}">
+                    <a class="listitem_name" data-bind="text: $data.name + ($data.isactive ? '': ' - inactive')">
+                    </a>
+                </div>
+                <div class="library-card-subtitle" data-bind="text: $data.description">
+                </div>
+            </div>
+        <!-- /ko -->
+
+    <!-- /ko -->
+    <div data-bind="css: {'branch-list-loading-mask': $data.loadingBranchDomains }"></div>
+</div>
+{% endblock %}
+

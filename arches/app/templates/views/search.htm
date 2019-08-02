@@ -1,26 +1,108 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
 {% extends "base-manager.htm" %}
 {% load i18n %}
+{% load template_tags %}
 {% load staticfiles %}
 
 {% block title %} {{ block.super }} {% trans "Search" %} {% endblock title %}
 
 
 {% block main_content %}
-    {% include 'views/search/search-base-manager.htm' %}
+    <div class="content-panel" data-bind="click:function() { menuActive(false); }, visible: true", style="display:none;">
+
+        <!-- Title Block -->
+        <div class="search-toolbar" style="">
+
+            <div class="search-attribute-widget" style="">
+                <div class="search-bar relative" style="margin-top: 0px; width: 370px;" >
+                    <div data-bind="component: {
+                        name: 'term-filter',
+                        params: sharedStateObject
+                    }"></div>
+                </div>
+            </div>
+
+            
+            <div class="search-type-btn-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
+                <!-- ko if: filter.type === 'filter' && filter.enabled -->
+                {% if user|can_read_resource_instance %}
+                <button class="search-type-btn relative" style="" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, click: function(){$parent.sharedStateObject.selectedTab(filter.componentname)}">
+                    <i data-bind="css: filter.icon"></i>
+                    <span data-bind="text: filter.name"></span>
+                </button>
+                {% endif %}
+                <!-- /ko -->
+            </div>
+            
+            <div class="search-type-btn-popup-panel">
+                <div class="" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
+                    <!-- ko if: filter.type === 'popup' && filter.enabled -->
+                    {% if user|can_read_resource_instance %}
+                    <button class="saved-search-container search-type-btn-popup relative" style="" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, click: function(){$parent.sharedStateObject.selectPopup(filter.componentname)}">
+                        <i data-bind="css: filter.icon"></i>
+                        <!-- <p data-bind="text: filter.name"></p> -->
+                    </button>
+                    {% endif %}
+                    <!-- /ko -->
+                </div>
+            </div>
+        </div>
+
+        <div class="flex">
+            <div class="flex">
+
+                <div class="flex" style="max-width: 400px;" data-bind="component: {
+                    name: 'search-results',
+                    params: sharedStateObject
+                }"></div>
+
+                <!-- Card Container -->
+                <div class="card-form-preview-container relative">
+                    <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
+                        <!-- ko if: filter.type === 'filter' && filter.enabled -->
+                        <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}">
+                            <div data-bind="component: {
+                                name: filter.componentname,
+                                params: $parent.sharedStateObject
+                            }"></div>
+                        </div>
+                        <!-- /ko -->
+                    </div>
+
+                    <div class="tab-content search-popup-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}, visible: sharedStateObject.selectedPopup() !== ''">
+                        <!-- ko if: filter.type === 'popup' && filter.enabled -->
+                        <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}">
+                            <div data-bind="component: {
+                                name: filter.componentname,
+                                params: $parent.sharedStateObject
+                            }"></div>
+                        </div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock main_content %}
 
 {% block tabs %}{% endblock tabs %}
 
 {% block pre_require_js %}
 {{block.super}}
-    <script>
-        define('search-data', [], function() {
-            return {{% autoescape off %}
-                searchable_nodes: {{ searchable_nodes }},
-                resource_cards: {{ resource_cards }},
-                datatypes: {{ datatypes_json }},
-                saved_searches: {{ saved_searches }}
-            {% endautoescape %}};
-        });
-    </script>
 {% endblock pre_require_js %}

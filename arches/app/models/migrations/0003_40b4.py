@@ -8,30 +8,7 @@ import django.db.models.deletion
 import django.contrib.postgres.fields.jsonb
 from django.db import migrations, models
 from django.core import management
-from arches.app.models.models import GraphModel
 from arches.app.models.system_settings import settings
-from arches.app.search.mappings import prepare_search_index, delete_search_index
-
-def forwards_func(apps, schema_editor):
-    # We get the model from the versioned app registry;
-    # if we directly import it, it'll be the wrong version
-
-    delete_search_index()
-    for graphid in GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True):
-        prepare_search_index(str(graphid), create=True)
-
-    settings_data_file = os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings.json')
-    local_settings_available = os.path.isfile(os.path.join(settings.SYSTEM_SETTINGS_LOCAL_PATH))
-
-    if local_settings_available == True:
-        settings_data_file = settings.SYSTEM_SETTINGS_LOCAL_PATH
-
-    management.call_command('es', operation='index_resources')
-    management.call_command('packages', operation='import_graphs', source=os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Model.json'))
-    management.call_command('packages', operation='import_business_data', source=settings_data_file, overwrite='overwrite')
-
-def reverse_func(apps, schema_editor):
-    GraphModel.objects.get(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).delete()
 
 def add_permissions(apps, schema_editor, with_create_permissions=True):
     db_alias = schema_editor.connection.alias
@@ -213,9 +190,9 @@ class Migration(migrations.Migration):
                     }'
                 );
             INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig) VALUES ('10000000-0000-0000-0000-000000000020', 'csv-chart-widget', 'views/components/widgets/csv-chart', 'csv-chart-json', '{"acceptedFiles": "", "maxFilesize": "200"}');
-            INSERT INTO d_data_types(datatype, iconclass, modulename, classname, defaultconfig, configcomponent, configname, isgeometric, defaultwidget) 
+            INSERT INTO d_data_types(datatype, iconclass, modulename, classname, defaultconfig, configcomponent, configname, isgeometric, defaultwidget)
                 VALUES ('csv-chart-json', 'fa fa-line-chart', 'datatypes.py', 'CSVChartJsonDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000020');
-            INSERT INTO d_data_types(datatype, iconclass, modulename, classname, defaultconfig, configcomponent, configname, isgeometric, defaultwidget) 
+            INSERT INTO d_data_types(datatype, iconclass, modulename, classname, defaultconfig, configcomponent, configname, isgeometric, defaultwidget)
                 VALUES ('iiif-drawing', 'fa fa-file-code-o', 'datatypes.py', 'IIIFDrawingDataType', '{"rdmCollection": null}', 'views/components/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000022');
             UPDATE d_data_types SET (modulename, classname) = ('datatypes.py', 'DomainDataType') WHERE datatype = 'domain-value';
             UPDATE d_data_types SET (modulename, classname) = ('datatypes.py', 'DomainListDataType') WHERE datatype = 'domain-value-list';
@@ -237,7 +214,7 @@ class Migration(migrations.Migration):
             DELETE FROM public.geocoders WHERE name = 'Mapzen';
         """),
         migrations.RunSQL("""
-            UPDATE report_templates SET (defaultconfig) = ('{
+            UPDATE report_templates SET defaultconfig = '{
                 "basemap": "streets",
                 "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
                 "overlayConfigs": [],
@@ -257,9 +234,9 @@ class Migration(migrations.Migration):
                 "featurePointSize": 3,
                 "featureEditingDisabled": true,
                 "mapControlsHidden": false
-            }') WHERE templateid = '50000000-0000-0000-0000-000000000002';
+            }' WHERE templateid = '50000000-0000-0000-0000-000000000002';
 
-            UPDATE widgets SET (defaultconfig) = ('{
+            UPDATE widgets SET defaultconfig = '{
                     "basemap": "streets",
                     "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
                     "overlayConfigs": [],
@@ -277,10 +254,10 @@ class Migration(migrations.Migration):
                     "featureColor": "#FF0000",
                     "featureLineWidth": 1,
                     "featurePointSize": 3
-                }') WHERE widgetid = '10000000-0000-0000-0000-000000000007';
+                }' WHERE widgetid = '10000000-0000-0000-0000-000000000007';
         """,
         """
-            UPDATE report_templates SET (defaultconfig) = ('{
+            UPDATE report_templates SET defaultconfig = '{
                 "basemap": "streets",
                 "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
                 "overlayConfigs": [],
@@ -300,8 +277,8 @@ class Migration(migrations.Migration):
                 "featurePointSize": null,
                 "featureEditingDisabled": true,
                 "mapControlsHidden": false
-            }') WHERE templateid = '50000000-0000-0000-0000-000000000002';
-            UPDATE widgets SET (defaultconfig) = ('{
+            }' WHERE templateid = '50000000-0000-0000-0000-000000000002';
+            UPDATE widgets SET defaultconfig = '{
                 "basemap": "streets",
                 "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
                 "overlayConfigs": [],
@@ -319,11 +296,10 @@ class Migration(migrations.Migration):
                 "featureColor": null,
                 "featureLineWidth": null,
                 "featurePointSize": null
-            }') WHERE widgetid = '10000000-0000-0000-0000-000000000007';
+            }' WHERE widgetid = '10000000-0000-0000-0000-000000000007';
         """),
 
 
         ## the following command has to be run after the previous RunSQL commands that update the domain datatype values
-        migrations.RunPython(forwards_func, reverse_func),
         migrations.RunPython(add_permissions,reverse_code=lambda *args,**kwargs: True),
     ]

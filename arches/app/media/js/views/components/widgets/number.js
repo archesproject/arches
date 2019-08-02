@@ -1,4 +1,4 @@
-define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetViewModel) {
+define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber'], function (ko, _, WidgetViewModel) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -8,32 +8,46 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     * @param {string} params.config().label - label to use alongside the text input
     * @param {string} params.config().placeholder - default text to show in the text input
     */
-    return ko.components.register('number-widget', {
-        viewModel: function(params) {
-            params.configKeys = ['placeholder', 'width', 'min', 'max', 'step', 'precision', 'prefix', 'suffix', 'defaultValue'];
 
-            WidgetViewModel.apply(this, [params]);
 
-            var self = this;
+    var NumberWidget = function(params) {
+        params.configKeys = ['placeholder', 'width', 'min', 'max', 'step', 'precision', 'prefix', 'suffix', 'defaultValue', 'format'];
 
-            updateVal = ko.computed(function(){
-                if (self.value()){
-                    var val = self.value();
-                    if (self.precision()) {
-                        val = Number(val).toFixed(self.precision())
-                    }
-                    self.value(Number(val));
+        WidgetViewModel.apply(this, [params]);
+
+        var self = this;
+
+        var updateVal = ko.computed(function(){
+            if (self.value()){
+                var val = self.value();
+                if (self.min() != "") {
+                    val = Number(val) < Number(self.min()) ? Number(self.min()) : Number(val);
                 }
-            }, self).extend({ throttle: 600 });
 
-            if (ko.isObservable(this.precision)) {
-                this.precision.subscribe(function(val){
-                    if (self.value() && val){
-                        self.value(Number(self.value()).toFixed(val))
-                    }
-                }, self);
-            };
-        },
+                if (self.max() != "") {
+                    val = Number(val) > Number(self.max()) ? Number(self.max()) : Number(val);
+                }
+
+                if (self.precision()) {
+                    val = Number(val).toFixed(self.precision());
+                }
+                self.value(Number(val));
+            }
+        }, self).extend({ throttle: 600 });
+
+        if (ko.isObservable(this.precision)) {
+            var precisionSubscription = this.precision.subscribe(function(val){
+                if (self.value() && val){
+                    self.value(Number(self.value()).toFixed(val));
+                }
+            }, self);
+            self.disposables.push(precisionSubscription);
+        }
+        self.disposables.push(updateVal);
+    };
+
+    return ko.components.register('number-widget', {
+        viewModel: NumberWidget,
         template: { require: 'text!widget-templates/number' }
     });
 });

@@ -1,0 +1,13 @@
+{
+    "resource_model_id": "69008234-e13c-11e8-9f60-f23c91527491", 
+    "resource_model_name": "Graph_with_filelist", 
+    "nodes": [
+        {
+            "arches_nodeid": "763698ee-e13c-11e8-acbb-f23c91527491", 
+            "arches_node_name": "File-list", 
+            "file_field_name": "File-list", 
+            "data_type": "file-list", 
+            "export": false
+        }
+    ]
+}

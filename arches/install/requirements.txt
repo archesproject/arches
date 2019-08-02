@@ -1,24 +1,27 @@
-Django==1.11.10
+Django==1.11.15
 psycopg2-binary==2.7.4
-elasticsearch>=5.0.0,<6.0.0
+elasticsearch>=6.0.0,<7.0.0
 rdflib==4.2.2
-rdflib-jsonld==0.4.0
 unicodecsv==0.14.1
-PyYAML==3.12
-pycrypto==2.6.1
 django-guardian==1.4.9
-TileStache==1.51.6
+TileStache==1.51.13
 python-memcached==1.59
 mapbox-vector-tile==1.2.0
 mapnik==0.1
-SPARQLWrapper==1.8.0
+SPARQLWrapper==1.8.2
 django-recaptcha==1.4.0
 python-jose==2.0.2
 edtf==2.7.0
 couchdb==1.2
-django-revproxy==0.9.14
+django-revproxy==0.9.15
 django-cors-headers==2.2.0
+django-oauth-toolkit==1.1.2
+python-docx==0.8.10
+PyLD[requests]==1.0.4
+pyprind==2.11.2
+pycryptodome<4.0.0,>=3.3.1
+requests[security]>=2.18.1
 
 # Leave the following line commented so that pip install will ignore this
 # The installer uses the following line to download the proper version of ES
-# https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.1.zip
+# https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.7.1.zip

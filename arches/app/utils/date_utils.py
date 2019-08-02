@@ -9,7 +9,7 @@ from edtf.parser.parser_classes import Date, DateAndTime, Interval, Unspecified,
     MultipleDates, Level2Interval, ExponentialYear, \
     PRECISION_YEAR, PRECISION_MONTH, PRECISION_DAY, EARLIEST, LATEST
 
-    
+
 class SortableDateRange(object):
     def __init__(self):
         self.lower = None
@@ -18,7 +18,7 @@ class SortableDateRange(object):
         self.upper_fuzzy = None
 
 class ExtendedDateFormat(SortableDateRange):
-    def __init__(self, date=None, fuzzy_year_padding=1, fuzzy_month_padding=1, fuzzy_day_padding=1, 
+    def __init__(self, date=None, fuzzy_year_padding=1, fuzzy_month_padding=1, fuzzy_day_padding=1,
         fuzzy_season_padding=12, multiplier_if_uncertain=1, multiplier_if_approximate=1, multiplier_if_both=1):
         super(ExtendedDateFormat, self).__init__()
         self.orig_date = None
@@ -35,7 +35,7 @@ class ExtendedDateFormat(SortableDateRange):
         self.multiplier_if_uncertain = int(multiplier_if_uncertain)
         self.multiplier_if_approximate = int(multiplier_if_approximate)
         self.multiplier_if_both = int(multiplier_if_both)
-        
+
         try:
             self.parse(date)
         except:
@@ -54,10 +54,10 @@ class ExtendedDateFormat(SortableDateRange):
         self.result_set = None
         self.error = None
 
-        try: 
-            # handle for incorrectly formatted year only dates 
+        try:
+            # handle for incorrectly formatted year only dates
             # (eg: 290 => 0290, 11909 => y11909)
-            if int(date) >= 0: 
+            if int(date) >= 0:
                 date = str(int(date)).zfill(4)
             else:
                 date = str(int(date)).zfill(5)
@@ -67,7 +67,7 @@ class ExtendedDateFormat(SortableDateRange):
             pass
 
         self.edtf = parse_edtf(date)
-         
+
         result = self.handle_object(self.edtf)
         if isinstance(result, list):
             self.result_set = result
@@ -96,8 +96,8 @@ class ExtendedDateFormat(SortableDateRange):
             return None
 
     def handle_object(self, object, fuzzy_padding=None):
-        """ 
-        Called to handle any date type, looks for the correct handling 
+        """
+        Called to handle any date type, looks for the correct handling
 
         """
 
@@ -118,7 +118,7 @@ class ExtendedDateFormat(SortableDateRange):
               isinstance(object, Level1Interval) or
               isinstance(object, Level2Interval)):
             return self.handle_interval(object)
-        elif (isinstance(object, LongYear) or 
+        elif (isinstance(object, LongYear) or
               isinstance(object, ExponentialYear)):
             return self.handle_yearonly(object)
         elif (isinstance(object, OneOfASet) or
@@ -154,21 +154,38 @@ class ExtendedDateFormat(SortableDateRange):
         try:
             day = date._precise_day(LATEST)
         except ValueError:
-            if month != 2:
-                day = calendar.monthrange(1, month)[1]
-            elif is_leap_year(year):
-                day = 29
-            else:
-                day = 28
+            day = self.calculate_upper_day(year, month)
         dr.upper = dr.upper_fuzzy = self.to_sortable_date(year=year, month=month, day=day)
 
         if fuzzy_padding:
             transposed_year = (year % 400) + 400
             upper_fuzzy = datetime.date(year=transposed_year, month=month, day=day) + fuzzy_padding
             year_diff = upper_fuzzy.year - transposed_year
-            dr.upper_fuzzy = self.to_sortable_date(year=(year + year_diff), month=upper_fuzzy.month, day=upper_fuzzy.day)
+            fuzzy_year = year + year_diff
+            day = upper_fuzzy.day
+
+            # we need to recaculate the day under special circumstances
+            if date.day == None and not self.is_season(date) and (date.precision == PRECISION_YEAR or date.precision == PRECISION_MONTH):
+                day = self.calculate_upper_day(fuzzy_year, upper_fuzzy.month)
+            if date.day >= 29 and upper_fuzzy.month == 2:
+                day = self.calculate_upper_day(fuzzy_year, upper_fuzzy.month)
+
+            dr.upper_fuzzy = self.to_sortable_date(year=fuzzy_year, month=upper_fuzzy.month, day=day)
 
         return dr
+
+    def calculate_upper_day(self, year, month):
+        if month != 2:
+            day = calendar.monthrange(1, month)[1]
+        elif self.is_leap_year(year):
+            day = 29
+        else:
+            day = 28
+
+        return day
+
+    def is_season(self, date):
+        return hasattr(date, 'season') and date.season != None
 
     def handle_set(self, l):
         """Called to handle a list of dates"""
@@ -180,7 +197,7 @@ class ExtendedDateFormat(SortableDateRange):
 
     def handle_interval(self, object):
         dr = SortableDateRange()
-        
+
         lower = self.handle_object(object.lower)
         dr.lower = lower.lower
         dr.lower_fuzzy = lower.lower_fuzzy
@@ -218,7 +235,7 @@ class ExtendedDateFormat(SortableDateRange):
             if not object.ua:
                 return relativedelta(0)
             multiplier = object.ua._get_multiplier()
-            
+
             if object.date.precision == PRECISION_DAY:
                 result = multiplier * padding_day_precision
             elif object.date.precision == PRECISION_MONTH:

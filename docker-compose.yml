@@ -31,6 +31,7 @@ services:
         - DJANGO_DEBUG=False
         # - DJANGO_REMOTE_DEBUG=False
         - DOMAIN_NAMES=localhost
+        - PYTHONUNBUFFERED=0
         - TZ=PST
       ports:
         - '8000:8000'
@@ -67,6 +68,7 @@ services:
       volumes:
           - postgres-data:/var/lib/postgresql/data
           - postgres-log:/var/log/postgresql
+          - ./arches/install/init-unix.sql:/docker-entrypoint-initdb.d/init.sql # to set up the DB template
       ports:
         - '5432:5432'
       environment:
@@ -87,7 +89,7 @@ services:
 
     elasticsearch:
       container_name: elasticsearch
-      image: elasticsearch:5.2
+      image: docker.elastic.co/elasticsearch/elasticsearch:6.7.1
       volumes:
         - elasticsearch-data:/usr/share/elasticsearch/data
       ports:

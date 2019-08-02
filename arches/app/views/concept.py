@@ -62,8 +62,10 @@ class RDMView(BaseManagerView):
 
         context['nav']['icon'] = 'fa fa-align-left'
         context['nav']['title'] = _('Reference Data Manager')
-        context['nav']['help'] = (_('Using the RDM'),'help/base-help.htm')
-        context['help'] = 'rdm-help'
+        context['nav']['help'] = {
+            'title': _('Using the RDM'),
+            'template': 'rdm-help',
+        }
 
         return render(request, 'rdm.htm', context)
 
@@ -110,88 +112,71 @@ def concept(request, conceptid):
         emulate_elastic_search = request.GET.get('emulate_elastic_search', 'false') == 'true'
         depth_limit = request.GET.get('depth_limit', None)
 
-        if f == 'html':
-            depth_limit = 1
-            if not conceptid:
-                return render(request, 'views/rdm/concept-report.htm', {
-                    'lang': lang,
-                    'concept_count': models.Concept.objects.filter(nodetype='Concept').count(),
-                    'collection_count': models.Concept.objects.filter(nodetype='Collection').count(),
-                    'scheme_count': models.Concept.objects.filter(nodetype='ConceptScheme').count(),
-                    'entitytype_count': models.Concept.objects.filter(nodetype='EntityType').count(),
-                    'default_report': True
-                })
+        depth_limit = 1
+        if not conceptid:
+            return render(request, 'views/rdm/concept-report.htm', {
+                'lang': lang,
+                'concept_count': models.Concept.objects.filter(nodetype='Concept').count(),
+                'collection_count': models.Concept.objects.filter(nodetype='Collection').count(),
+                'scheme_count': models.Concept.objects.filter(nodetype='ConceptScheme').count(),
+                'entitytype_count': models.Concept.objects.filter(nodetype='EntityType').count(),
+                'default_report': True
+            })
 
 
-            labels = []
+        labels = []
 
-            concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
-                include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                depth_limit=depth_limit, up_depth_limit=None, lang=lang, semantic=(mode == 'semantic' or mode == ''))
-
-            languages = sort_languages(models.DLanguage.objects.all(), lang)
-
-            valuetypes = models.DValueType.objects.all()
-            relationtypes = models.DRelationType.objects.all()
-            prefLabel = concept_graph.get_preflabel(lang=lang)
-            for subconcept in concept_graph.subconcepts:
-                subconcept.prefLabel = subconcept.get_preflabel(lang=lang)
-            for relatedconcept in concept_graph.relatedconcepts:
-                relatedconcept.prefLabel = relatedconcept.get_preflabel(lang=lang)
-            for value in concept_graph.values:
-                if value.category == 'label':
-                    labels.append(value)
-
-            if (mode == 'semantic' or mode == '') and (concept_graph.nodetype == 'Concept' or concept_graph.nodetype == 'ConceptScheme' or concept_graph.nodetype == 'EntityType'):
-                if concept_graph.nodetype == 'ConceptScheme':
-                    parent_relations = relationtypes.filter(category='Properties')
-                else:
-                    parent_relations = relationtypes.filter(category='Semantic Relations').exclude(relationtype = 'related').exclude(relationtype='broader').exclude(relationtype='broaderTransitive')
-                return render(request, 'views/rdm/concept-report.htm', {
-                    'lang': lang,
-                    'prefLabel': prefLabel,
-                    'labels': labels,
-                    'concept': concept_graph,
-                    'languages': languages,
-                    'sparql_providers': get_sparql_providers(),
-                    'valuetype_labels': valuetypes.filter(category='label'),
-                    'valuetype_notes': valuetypes.filter(category='note'),
-                    'valuetype_related_values': valuetypes.filter(category__in=['undefined','identifiers']),
-                    'parent_relations': parent_relations,
-                    'related_relations': relationtypes.filter(Q(category='Mapping Properties') | Q(relationtype = 'related')),
-                    'concept_paths': concept_graph.get_paths(lang=lang),
-                    'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
-                    'direct_parents': [parent.get_preflabel(lang=lang) for parent in concept_graph.parentconcepts]
-                })
-            elif mode == 'collections':
-                return render(request, 'views/rdm/entitytype-report.htm', {
-                    'lang': lang,
-                    'prefLabel': prefLabel,
-                    'labels': labels,
-                    'concept': concept_graph,
-                    'languages': languages,
-                    'valuetype_labels': valuetypes.filter(category='label'),
-                    'valuetype_notes': valuetypes.filter(category='note'),
-                    'valuetype_related_values': valuetypes.filter(category__in=['undefined','identifiers']),
-                    'related_relations': relationtypes.filter(relationtype = 'member'),
-                    'concept_paths': concept_graph.get_paths(lang=lang)
-                })
-
-
-        ret = []
         concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
-                include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                depth_limit=depth_limit, up_depth_limit=None, lang=lang)
+            include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
+            depth_limit=depth_limit, up_depth_limit=None, lang=lang, semantic=(mode == 'semantic' or mode == ''))
 
-        if emulate_elastic_search:
-            ret.append({'_type': id, '_source': concept_graph})
-        else:
-            ret.append(concept_graph)
+        languages = sort_languages(models.DLanguage.objects.all(), lang)
 
-        if emulate_elastic_search:
-            ret = {'hits':{'hits':ret}}
+        valuetypes = models.DValueType.objects.all()
+        relationtypes = models.DRelationType.objects.all()
+        prefLabel = concept_graph.get_preflabel(lang=lang)
+        for subconcept in concept_graph.subconcepts:
+            subconcept.prefLabel = subconcept.get_preflabel(lang=lang)
+        for relatedconcept in concept_graph.relatedconcepts:
+            relatedconcept.prefLabel = relatedconcept.get_preflabel(lang=lang)
+        for value in concept_graph.values:
+            if value.category == 'label':
+                labels.append(value)
 
-        return JSONResponse(ret, indent=4 if pretty else None)
+        if (mode == 'semantic' or mode == '') and (concept_graph.nodetype == 'Concept' or concept_graph.nodetype == 'ConceptScheme' or concept_graph.nodetype == 'EntityType'):
+            if concept_graph.nodetype == 'ConceptScheme':
+                parent_relations = relationtypes.filter(category='Properties')
+            else:
+                parent_relations = relationtypes.filter(category='Semantic Relations').exclude(relationtype = 'related').exclude(relationtype='broader').exclude(relationtype='broaderTransitive')
+            return render(request, 'views/rdm/concept-report.htm', {
+                'lang': lang,
+                'prefLabel': prefLabel,
+                'labels': labels,
+                'concept': concept_graph,
+                'languages': languages,
+                'sparql_providers': get_sparql_providers(),
+                'valuetype_labels': valuetypes.filter(category='label'),
+                'valuetype_notes': valuetypes.filter(category='note'),
+                'valuetype_related_values': valuetypes.filter(category__in=['undefined','identifiers']),
+                'parent_relations': parent_relations,
+                'related_relations': relationtypes.filter(Q(category='Mapping Properties') | Q(relationtype = 'related')),
+                'concept_paths': concept_graph.get_paths(lang=lang),
+                'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
+                'direct_parents': [parent.get_preflabel(lang=lang) for parent in concept_graph.parentconcepts]
+            })
+        elif mode == 'collections':
+            return render(request, 'views/rdm/entitytype-report.htm', {
+                'lang': lang,
+                'prefLabel': prefLabel,
+                'labels': labels,
+                'concept': concept_graph,
+                'languages': languages,
+                'valuetype_labels': valuetypes.filter(category='label'),
+                'valuetype_notes': valuetypes.filter(category='note'),
+                'valuetype_related_values': valuetypes.filter(category__in=['undefined','identifiers']),
+                'related_relations': relationtypes.filter(relationtype = 'member'),
+                'concept_paths': concept_graph.get_paths(lang=lang)
+            })
 
     if request.method == 'POST':
 
@@ -274,6 +259,11 @@ def export_collections(request):
     skos = SKOSWriter()
     return HttpResponse(skos.write(concept_graphs, format="pretty-xml"), content_type="application/xml")
 
+def get_concept_collections(request):
+    lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+    concept_collections = Concept().concept_tree(mode='collections', lang=lang)
+    return JSONResponse(concept_collections)
+
 @group_required('RDM Administrator')
 def make_collection(request, conceptid):
     concept = Concept().get(id=conceptid, values=[])
@@ -335,9 +325,9 @@ def paged_dropdown(request):
     offset = (page - 1) * limit
 
     results = Concept().get_child_collections_hierarchically(conceptid, offset=offset, limit=limit, query=query)
-    total_count = results[0][2] if len(results) > 0 else 0
-    data = [dict(zip(['valueto','depth'], d)) for d in results]
-    data = [dict(zip(['conceptid', 'id', 'type', 'text', 'language'], d['valueto'].values()), depth=d['depth']) for d in data]
+    total_count = results[0][3] if len(results) > 0 else 0
+    data = [dict(zip(['valueto','depth', 'collector'], d)) for d in results]
+    data = [dict(zip(['conceptid', 'id', 'type', 'text', 'language'], d['valueto'].values()), depth=d['depth'], collector=d['collector']) for d in data]
     return JSONResponse({
         'results': data,
         'more': offset+limit < total_count
@@ -355,7 +345,7 @@ def search(request):
     query = Query(se, start=0, limit=100)
     phrase = Match(field='value', query=searchString.lower(), type='phrase_prefix')
     query.add_query(phrase)
-    results = query.search(index='strings', doc_type='concept')
+    results = query.search(index='concepts')
 
     ids = []
     if removechildren != None:
@@ -375,7 +365,7 @@ def search(request):
                 query = Query(se, start=0, limit=100)
                 phrase = Match(field='conceptid', query=top_concept, type='phrase')
                 query.add_query(phrase)
-                scheme = query.search(index='strings', doc_type='concept')
+                scheme = query.search(index='concepts')
                 for label in scheme['hits']['hits']:
                     if label['_source']['type'] == 'prefLabel':
                         cached_scheme_names[top_concept] = label['_source']['value']
@@ -468,7 +458,7 @@ def concept_tree(request, mode):
 
 def get_concept_label_from_valueid(valueid):
     se = SearchEngineFactory().create()
-    concept_label = se.search(index='strings', doc_type='concept', id=valueid)
+    concept_label = se.search(index='concepts', id=valueid)
     if concept_label['found']:
         return concept_label['_source']
 
@@ -488,7 +478,7 @@ def get_preflabel_from_conceptid(conceptid, lang):
     bool_query.must(Match(field='type', query='prefLabel', type='phrase'))
     bool_query.filter(Terms(field='conceptid', terms=[conceptid]))
     query.add_query(bool_query)
-    preflabels = query.search(index='strings', doc_type='concept')['hits']['hits']
+    preflabels = query.search(index='concepts')['hits']['hits']
     for preflabel in preflabels:
         default = preflabel['_source']
         # get the label in the preferred language, otherwise get the label in the default language

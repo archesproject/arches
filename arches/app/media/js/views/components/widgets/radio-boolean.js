@@ -52,7 +52,7 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
             if (self.value() === null && self.defaultValue() !== null) {
                 self.value(self.defaultValue());
             }
-            if (this.tile && this.tile.tileid() == "" && defaultValue != null && defaultValue != "") {
+            if (this.tile && ko.unwrap(this.tile.tileid) == "" && defaultValue != null && defaultValue != "") {
                 this.value(defaultValue);
             }
         },

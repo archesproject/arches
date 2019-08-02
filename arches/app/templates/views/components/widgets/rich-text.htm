@@ -21,5 +21,10 @@
 {% endblock report %}
 
 {% block display_value %}
-<div data-bind="html: value()" style="padding:20px;"></div>
+<!-- ko if: value() -->
+<em>[{% trans "rich text" %}]</em>
+<!-- /ko -->
+<!-- ko if: !value() -->
+{% trans "None" %}
+<!-- /ko -->
 {% endblock display_value %}

@@ -1,10 +1,12 @@
 define([
+    'jquery',
+    'underscore',
     'knockout',
     'knockout-mapping',
     'moment',
     'arches',
     'views/components/simple-switch'
-], function (ko, koMapping, moment, arches) {
+], function($, _, ko, koMapping, moment, arches) {
     /**
     * A viewmodel for managing provisional edits
     *
@@ -15,22 +17,100 @@ define([
     */
     var ProvisionalTileViewModel = function(params) {
         var self = this;
-        self.card = null;
-        self.edits = ko.observableArray()
-        self.users = []
+        self.edits = ko.observableArray();
+        self.users = [];
+        self.selectedTile = params.tile;
+        self.provisionaledits = ko.observableArray();
         self.declineUnacceptedEdits = ko.observable(true);
-        self.loading = params.loading;
-        self.selectedForm = params.selectedForm;
-        self.parseProvisionalEdits = function(editsjson){
-            _.each(JSON.parse(editsjson), function(edit, key){
-                    self.users.push(key);
-                    edit.user = key;
-                    edit.timestamp = moment(edit.timestamp).format("MMMM Do YYYY, h:mm a");
-                    edit.username = '';
-                    edit.tileid = self.selectedProvisionalTile().tileid();
-                    self.edits.push(koMapping.fromJS(edit))
-            });
-        }
+        self.selectedProvisionalEdit = ko.observable();
+
+        self.getUserNames = function(edits, users){
+            $.ajax({
+                url: arches.urls.get_user_names,
+                context: this,
+                method: 'POST',
+                data: { userids: JSON.stringify(users) },
+                dataType: 'json'
+            })
+                .done(function(data) {
+                    _.each(this.provisionaledits(), function(edit) {
+                        edit.username(data[edit.user]);
+                    });
+                })
+                .fail(function() {
+                    // console.log('User name request failed', data)
+                });
+        };
+
+        self.updateProvisionalEdits = function(tile) {
+            var isfullyprovisional;
+            if (tile && tile.data) {
+                var users = [];
+                var data = koMapping.toJS(tile.data);
+                var provisionaleditlist = _.map(ko.unwrap(tile.provisionaledits), function(edit, key){
+                    users.push(key);
+                    edit['username'] = ko.observable('');
+                    edit['displaytimestamp'] = moment(edit.timestamp).format("hh:mm");
+                    edit['displaydate'] = moment(edit.timestamp).format("DD-MM-YYYY");
+                    edit['user'] = key;
+                    if (edit.isfullyprovisional === undefined) {
+                        edit['isfullyprovisional'] = ko.observable(false);
+                    }
+                    return edit;
+                }, this);
+                this.provisionaledits(_.sortBy(provisionaleditlist, function(pe){return moment(pe.timestamp);}));
+                if (this.provisionaledits().length > 0) {
+                    if (ko.unwrap(this.provisionaledits()[0].isfullyprovisional) === true) {
+                        isfullyprovisional = true;
+                    }
+                }
+                if ((data && _.keys(data).length === 0 && tile.provisionaledits()) ||  isfullyprovisional) {
+                    self.selectedProvisionalEdit(undefined);
+                    if (this.provisionaledits().length > 0) {
+                        this.provisionaledits()[0].isfullyprovisional(true);
+                        koMapping.fromJS(this.provisionaledits()[0]['value'], tile.data);
+                        this.selectedProvisionalEdit(this.provisionaledits()[0]);
+                        tile._tileData.valueHasMutated();
+                    }
+                } else if (self.selectedProvisionalEdit()) {
+                    self.selectedProvisionalEdit(undefined);
+                    self.selectedTile().reset();
+                }
+                this.getUserNames(this.provisionaleditlist, users);
+            }
+        };
+
+        self.removeSelectedProvisionalEdit = function() {
+            this.provisionaledits.remove(this.selectedProvisionalEdit());
+            this.selectedProvisionalEdit(undefined);
+        };
+
+        self.selectProvisionalEdit = function(val){
+            if (self.selectedProvisionalEdit() != val) {
+                self.selectedProvisionalEdit(val);
+                koMapping.fromJS(val['value'], self.selectedTile().data);
+                self.selectedTile()._tileData.valueHasMutated();
+                self.selectedTile().parent.widgets().forEach(
+                    function(w){
+                        var defaultconfig = w.widgetLookup[w.widget_id()].defaultconfig;
+                        if (JSON.parse(defaultconfig).rerender === true) {
+                            self.selectedTile().parent.widgets()[0].label.valueHasMutated();
+                        }
+                    });
+            }
+        };
+
+        self.resetAuthoritative = function(){
+            self.selectedProvisionalEdit(undefined);
+            self.selectedTile().reset();
+        };
+
+        self.tileIsFullyProvisional = ko.computed(function() {
+            return self.selectedProvisionalEdit() && self.selectedProvisionalEdit().isfullyprovisional() === true;
+        });
+
+        self.updateProvisionalEdits(self.selectedTile);
+        self.selectedTile.subscribe(self.updateProvisionalEdits, this);
 
         self.deleteProvisionalEdit = function(val){
             $.ajax({
@@ -38,96 +118,74 @@ define([
                 context: this,
                 method: 'POST',
                 dataType: 'json',
-                data: koMapping.toJS(val)
+                data: {'user': koMapping.toJS(val).user, 'tileid': this.selectedTile().tileid }
             })
-            .done(function(data) {
-                self.edits.remove(val);
-                self.form.loadForm(self.selectedForm());
-            })
-            .fail(function(data) {
-                console.log('Related resource request failed', data)
-            });
-        }
+                .done(function(data) {
+                    if (data.result === 'delete') {
+                        this.selectedTile().deleteTile();
+                    } else {
+                        var user = val.user;
+                        var provisionaledits = this.selectedTile().provisionaledits();
+                        delete provisionaledits[user];
+                        this.selectedTile().provisionaledits(provisionaledits);
+                        if (self.selectedProvisionalEdit() === val) {
+                            self.selectedProvisionalEdit(undefined);
+                            self.selectedTile().reset();
+                        }
+                        self.provisionaledits.remove(val);
+                        if (_.keys(this.selectedTile().provisionaledits()).length === 0) {
+                            this.selectedTile().provisionaledits(null);
+                        }
+                    }
+                    self.selectedTile()._tileData.valueHasMutated();
+                })
+                .fail(function(data) {
+                    console.log('request failed', data);
+                });
+        };
 
         self.deleteAllProvisionalEdits = function() {
-            var edits = koMapping.toJSON({'edits':self.edits()})
+            var users = _.map(self.provisionaledits(), function(edit){return edit.user;});
             $.ajax({
                 url: arches.urls.delete_provisional_tile,
                 context: this,
                 method: 'POST',
                 dataType: 'json',
-                data: {payload: edits}
+                data: {'users': JSON.stringify(users), 'tileid': this.selectedTile().tileid }
             })
-            .done(function(data) {
-                self.edits.removeAll();
-                self.form.loadForm(self.selectedForm());
-            })
-            .fail(function(data) {
-                console.log('Related resource request failed', data)
-            });
-        }
-
-        self.getUserNames = function(edits){
-            $.ajax({
-                url: arches.urls.get_user_names,
-                context: this,
-                method: 'POST',
-                data: { userids: this.users },
-                dataType: 'json'
-            })
-            .done(function(data) {
-                _.each(this.edits(), function(edit) {
-                    edit.username(data[edit.user()])
+                .done(function(data) {
+                    if (data.result === 'delete') {
+                        this.selectedTile().deleteTile();
+                    } else {
+                        self.selectedTile().reset();
+                        self.selectedProvisionalEdit(undefined);
+                        self.provisionaledits.removeAll();
+                        this.selectedTile().provisionaledits(null);
+                    }
                 })
-            })
-            .fail(function(data) {
-                console.log('User name request failed', data)
-            });
-        }
+                .fail(function(data) {
+                    console.log('request failed', data);
+                });
+        };
 
-        self.acceptProvisionalEdit = function(val){
-            self.loading(true);
-            this.selectedProvisionalTile().data = val.value
-            var tile = this.selectedProvisionalTile()
-            this.form.saveTile(this.parentTile, this.cardinality, this.selectedProvisionalTile())
-            this.form.on('after-update', function(){
-                if (this.declineUnacceptedEdits()) {
-                    this.deleteAllProvisionalEdits();
-                } else {
-                    this.deleteProvisionalEdit(val);
+
+        self.acceptProvisionalEdit = function(){
+            var provisionaledits = this.selectedTile().provisionaledits();
+            var user = this.selectedProvisionalEdit().user;
+            if (provisionaledits) {
+                delete provisionaledits[user];
+                if (_.keys(this.selectedTile().provisionaledits()).length === 0) {
+                    this.selectedTile().provisionaledits(null);
                 }
-                this.loading(false);
-            }, this)
-        }
+                this.provisionaledits.remove(this.selectedProvisionalEdit());
+                this.selectedProvisionalEdit(undefined);
+            }
+        };
 
         self.rejectProvisionalEdit = function(val){
             self.deleteProvisionalEdit(val);
-        }
+        };
 
-        self.findCard = function(cards, nodegroupid){
-            _.each(cards, function(card) {
-                if (card.get('nodegroup_id') == nodegroupid) {
-                    this.card = card
-                }
-                if (this.card == null) {
-                    self.findCard(card.get('cards')(), nodegroupid)
-                }
-            }, self);
-        }
-
-        self.selectedProvisionalTile = params.selectedProvisionalTile
-        self.selectedProvisionalTile.subscribe(function(val) {
-            if (!self.selectedForm()) {
-                self.selectedForm(self.form.formid)
-            };
-            self.edits.removeAll();
-            if (val) {
-                self.card = null;
-                self.findCard(this.cards(), val.nodegroup_id())
-                this.parseProvisionalEdits(val.provisionaledits());
-                this.getUserNames(self.edits())
-            }
-        }, self)
     };
 
     return ProvisionalTileViewModel;

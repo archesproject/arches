@@ -15,11 +15,13 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
-import uuid
+
 from django.db import transaction
-from arches.app.models import models
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
 from django.forms import ModelForm
+from arches.app.models import models
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 class Card(models.CardModel):
     """
@@ -29,6 +31,44 @@ class Card(models.CardModel):
 
     class Meta:
         proxy = True
+
+    def update_constraints(self, constraints):
+
+        def add_nodeconstraints(nodeids, constraint_model):
+            for nodeid in nodeids:
+                node_constraint = models.ConstraintXNode()
+                node_constraint.node = models.Node.objects.get(pk=nodeid)
+                node_constraint.constraint = constraint_model
+                node_constraint.save()
+
+        constraint_models = []
+        for constraint in constraints:
+            constraintid = constraint.get('constraintid', None)
+            unique_to_all = constraint.get('uniquetoallinstances', False)
+            nodeids = constraint.get('nodes', [])
+            try:
+                constraint_model = models.ConstraintModel.objects.get(pk=constraintid)
+                constraint_model.uniquetoallinstances = unique_to_all
+                current_nodeids = {str(i.nodeid) for i in constraint_model.nodes.all()}
+                future_nodeids = set(nodeids)
+                nodes_to_remove = current_nodeids - future_nodeids
+                nodes_to_add = future_nodeids - current_nodeids
+                add_nodeconstraints(nodes_to_add, constraint_model)
+                models.ConstraintXNode.objects.filter(
+                    Q(constraint=constraint_model) &
+                    Q(node__in=nodes_to_remove)
+                    ).delete()
+                constraint_model.save()
+            except ObjectDoesNotExist as e:
+                constraint_model = models.ConstraintModel()
+                constraint_model.card = self
+                constraint_model.constraintid = constraintid
+                constraint_model.uniquetoallinstances = unique_to_all
+                constraint_model.save()
+                add_nodeconstraints(nodeids, constraint_model)
+                constraint_model.save()
+            constraint_models.append(constraint_model)
+        self.constraints = constraint_models
 
     def __init__(self, *args, **kwargs):
         """
@@ -70,6 +110,7 @@ class Card(models.CardModel):
         # self.active
         # self.visible
         # self.sortorder
+        # self.cssclass
         # end from models.CardModel
         self.disabled = False
         self.cardinality = ''
@@ -77,35 +118,54 @@ class Card(models.CardModel):
         self.widgets = []
         self.nodes = []
         self.ontologyproperty = None
+        self.constraints = []
+
         if args:
             if isinstance(args[0], dict):
                 for key, value in args[0].iteritems():
-                    if key not in ('cards', 'widgets', 'nodes', 'is_editable'):
+                    if key not in ('cards', 'widgets', 'nodes', 'is_editable', 'nodegroup', 'constraints'):
                         setattr(self, key, value)
 
-                for card in args[0]["cards"]:
-                    self.cards.append(Card(card))
+                if 'cards' in args[0]:
+                    for card in args[0]["cards"]:
+                        self.cards.append(Card(card))
 
-                for widget in args[0]["widgets"]:
-                    widget_model = models.CardXNodeXWidget()
-                    widget_model.pk = widget.get('id', None)
-                    widget_model.node_id = widget.get('node_id', None)
-                    widget_model.card_id = widget.get('card_id', None)
-                    widget_model.widget_id = widget.get('widget_id', None)
-                    widget_model.config = widget.get('config', {})
-                    widget_model.label = widget.get('label', '')
-                    widget_model.sortorder = widget.get('sortorder', None)
-                    if widget_model.pk == None:
-                        widget_model.save()
-                    self.widgets.append(widget_model)
+                if 'constraints':
+                    self.update_constraints(args[0]["constraints"])
 
-                for node in args[0]["nodes"]:
-                    nodeid = node.get('nodeid', None)
-                    if nodeid is not None:
-                        node_model = models.Node.objects.get(nodeid=nodeid)
-                        node_model.config = node.get('config', None)
-                        node_model.isrequired = node.get('isrequired', node_model.isrequired)
-                        self.nodes.append(node_model)
+                if 'widgets' in args[0]:
+                    for widget in args[0]["widgets"]:
+                        cardxnodexwidgetid = widget.get('id', None)
+                        node_id = widget.get('node_id', None)
+                        card_id = widget.get('card_id', None)
+                        widget_id = widget.get('widget_id', None)
+                        if cardxnodexwidgetid is None and (node_id is not None and card_id is not None and widget_id is not None):
+                            try:
+                                wm = models.CardXNodeXWidget.objects.get(node_id=node_id, card_id=card_id)
+                                cardxnodexwidgetid = wm.pk
+                            except:
+                                pass
+                        widget_model = models.CardXNodeXWidget()
+                        widget_model.pk = cardxnodexwidgetid
+                        widget_model.node_id = node_id
+                        widget_model.card_id = card_id
+                        widget_model.widget_id = widget_id
+                        widget_model.config = widget.get('config', {})
+                        widget_model.label = widget.get('label', '')
+                        widget_model.visible = widget.get('visible', None)
+                        widget_model.sortorder = widget.get('sortorder', None)
+                        if widget_model.pk is None:
+                            widget_model.save()
+                        self.widgets.append(widget_model)
+
+                if 'nodes' in args[0]:
+                    for node in args[0]["nodes"]:
+                        nodeid = node.get('nodeid', None)
+                        if nodeid is not None:
+                            node_model = models.Node.objects.get(nodeid=nodeid)
+                            node_model.config = node.get('config', None)
+                            node_model.isrequired = node.get('isrequired', node_model.isrequired)
+                            self.nodes.append(node_model)
 
             else:
                 self.widgets = list(self.cardxnodexwidget_set.all())
@@ -118,13 +178,14 @@ class Card(models.CardModel):
 
     def save(self):
         """
-        Saves an a card and it's parent ontology property back to the db
+        Saves a card and its parent ontology property back to the db
 
         """
         with transaction.atomic():
             if self.graph.ontology and self.graph.isresource:
                 edge = self.get_edge_to_parent()
-                edge.ontologyproperty = self.ontologyproperty
+                if self.ontologyproperty is not None:
+                    edge.ontologyproperty = self.ontologyproperty
                 edge.save()
 
             self.nodegroup.cardinality = self.cardinality
@@ -141,7 +202,7 @@ class Card(models.CardModel):
         return self
 
     def confirm_enabled_state(self, user, nodegroup):
-        if user.has_perms(['write_nodegroup'], self.nodegroup) == False:
+        if user.has_perms(['write_nodegroup'], self.nodegroup) is False:
             self.disabled = True
 
     def get_edge_to_parent(self):
@@ -175,11 +236,11 @@ class Card(models.CardModel):
 
     def serialize(self, fields=None, exclude=None):
         """
-        serialize to a different form then used by the internal class structure
+        serialize to a different form than used by the internal class structure
 
         """
 
-        exclude = [] if exclude == None else exclude
+        exclude = [] if exclude is None else exclude
         ret = JSONSerializer().handle_model(self, fields, exclude)
 
         ret['cardinality'] = self.cardinality if 'cardinality' not in exclude else ret.pop('cardinality', None)
@@ -188,9 +249,10 @@ class Card(models.CardModel):
         ret['visible'] = self.visible if 'visible' not in exclude else ret.pop('visible', None)
         ret['active'] = self.active if 'active' not in exclude else ret.pop('active', None)
         ret['is_editable'] = self.is_editable() if 'is_editable' not in exclude else ret.pop('is_editable', None)
-        ret['ontologyproperty'] = self.ontologyproperty if 'ontologyproperty' not in exclude else ret.pop('ontologyproperty', None)
+        ret['ontologyproperty'] = self.ontologyproperty if 'ontologyproperty' not in exclude else ret.pop(
+            'ontologyproperty', None)
         ret['disabled'] = self.disabled if 'disabled' not in exclude else ret.pop('disabled', None)
-
+        ret['constraints'] = self.constraints if 'constraints' not in exclude else ret.pop('constraints', None)
         if self.graph and self.graph.ontology and self.graph.isresource:
             edge = self.get_edge_to_parent()
             ret['ontologyproperty'] = edge.ontologyproperty
@@ -221,6 +283,7 @@ class Card(models.CardModel):
 
 
 class CardXNodeXWidgetForm(ModelForm):
+
     class Meta:
         model = models.CardXNodeXWidget
         fields = '__all__'

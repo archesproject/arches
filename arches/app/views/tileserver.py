@@ -122,16 +122,18 @@ def clean_resource_cache(tile):
 
                 for (offset, count, coord) in coordinates:
                     config.cache.remove(layer, coord, format)
-    for key, tile_list in tile.tiles.iteritems():
-        for child_tile in tile_list:
-            clean_resource_cache(child_tile)
+    for tile in tile.tiles:
+        clean_resource_cache(tile)
 
 def seed_resource_cache():
     datatype_factory = DataTypeFactory()
     zooms = range(settings.CACHE_SEED_MAX_ZOOM + 1)
     extension = 'pbf'
+    try:
+        lat1, lon1, lat2, lon2 = settings.CACHE_SEED_BOUNDS
+    except:
+        lat1, lon1, lat2, lon2 = GeoUtils().get_bounds_from_geojson(settings.CACHE_SEED_BOUNDS)
 
-    lat1, lon1, lat2, lon2 = GeoUtils().get_bounds_from_geojson(settings.CACHE_SEED_BOUNDS)
     south, west = min(lat1, lat2), min(lon1, lon2)
     north, east = max(lat1, lat2), max(lon1, lon2)
 

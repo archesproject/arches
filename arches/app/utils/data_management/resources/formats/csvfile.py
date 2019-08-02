@@ -12,7 +12,7 @@ from format import Reader
 from elasticsearch import TransportError
 from arches.app.models.tile import Tile
 from arches.app.models.concept import Concept
-from arches.app.models.models import Node, NodeGroup, ResourceXResource, ResourceInstance, FunctionXGraph
+from arches.app.models.models import Node, NodeGroup, ResourceXResource, ResourceInstance, FunctionXGraph, GraphXMapping
 from arches.app.utils.data_management.resource_graphs import exporter as GraphExporter
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
@@ -26,11 +26,13 @@ try:
 except ImportError:
     from StringIO import StringIO
 
+
 class MissingConfigException(Exception):
      def __init__(self, value=None):
          self.value = value
      def __str__(self):
          return repr(self.value)
+
 
 class ConceptLookup():
     def __init__(self, create=False):
@@ -101,9 +103,10 @@ class CsvWriter(Writer):
         value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type, node=node)
         return value
 
-    def write_resources(self, graph_id=None, resourceinstanceids=None):
+    def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
+        # use the graph id from the mapping file, not the one passed in to the method
         graph_id = self.resource_export_configs[0]['resource_model_id']
-        super(CsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+        super(CsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
         csv_records = []
         other_group_records = []
@@ -155,9 +158,7 @@ class CsvWriter(Writer):
             if csv_record != {'ResourceID': resourceinstanceid}:
                 csv_records.append(csv_record)
 
-        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_name = '{0}_{1}'.format(self.file_prefix, iso_date)
-        csv_name = os.path.join('{0}.{1}'.format(file_name, 'csv'))
+        csv_name = os.path.join('{0}.{1}'.format(self.file_name, 'csv'))
 
         if self.single_file != True:
             dest = StringIO()
@@ -190,7 +191,7 @@ class CsvWriter(Writer):
                 csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
 
         if self.graph_id != None:
-            csvs_for_export = csvs_for_export + self.write_resource_relations(file_name=file_name)
+            csvs_for_export = csvs_for_export + self.write_resource_relations(file_name=self.file_name)
 
         return csvs_for_export
 
@@ -215,6 +216,7 @@ class CsvWriter(Writer):
 
         return relations_file
 
+
 class TileCsvWriter(Writer):
 
     def __init__(self, **kwargs):
@@ -227,15 +229,15 @@ class TileCsvWriter(Writer):
         value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type, node=node)
         return value
 
-    def write_resources(self, graph_id=None, resourceinstanceids=None):
-        super(TileCsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+    def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
+        super(TileCsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
         csv_records = []
         other_group_records = []
         concept_export_value_lookup = {}
         csv_header = ['ResourceID']
         mapping = {}
-        nodes = Node.objects.filter(graph_id=graph_id)
+        nodes = Node.objects.filter(graph_id=self.graph_id)
         for node in nodes:
             mapping[str(node.nodeid)] = node.name
         csv_header = ['ResourceID', 'ResourceLegacyID', 'ResourceModelID', 'TileID', 'ParentTileID', 'NodeGroupID' ] + mapping.values()
@@ -246,7 +248,7 @@ class TileCsvWriter(Writer):
             for tile in tiles:
                 csv_record = {}
                 csv_record['ResourceID'] = resourceinstanceid
-                csv_record['ResourceModelID'] = graph_id
+                csv_record['ResourceModelID'] = self.graph_id
                 csv_record['TileID'] = tile.tileid
                 csv_record['ParentTileID'] = str(tile.parenttile_id)
                 csv_record['NodeGroupID'] = str(tile.nodegroup_id)
@@ -267,28 +269,26 @@ class TileCsvWriter(Writer):
                 if csv_record != {'ResourceID': resourceinstanceid}:
                     csv_records.append(csv_record)
 
-        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_name = '{0}_{1}'.format(self.file_prefix, iso_date)
-        csv_name = os.path.join('{0}.{1}'.format(file_name, 'csv'))
-
-        all_records = sorted(csv_records, key=lambda k: k['ResourceID'])
         dest = StringIO()
         csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
         csvwriter.writeheader()
-        csvs_for_export.append({'name':csv_name, 'outputfile': dest})
+        all_records = sorted(csv_records, key=lambda k: k['ResourceID'])
         for csv_record in all_records:
             if 'populated_node_groups' in csv_record:
                 del csv_record['populated_node_groups']
             csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
 
+        csv_name = os.path.join('{0}.{1}'.format(self.file_name, 'csv'))
+        csvs_for_export.append({'name':csv_name, 'outputfile': dest})
         if self.graph_id != None:
             csvs_for_export = csvs_for_export
 
         return csvs_for_export
 
+
 class CsvReader(Reader):
 
-    def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count):
+    def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number):
         # create a resource instance only if there are populated_tiles
         errors = []
         if len(populated_tiles) > 0:
@@ -311,12 +311,12 @@ class CsvReader(Reader):
                     newresourceinstance.save()
                 except TransportError as e:
                     cause = json.dumps(e.info['error']['caused_by'],indent=1)
-                    msg = '%s: WARNING: failed to index document in resource: %s. Exception detail:\n%s\n' % (datetime.datetime.now(), resourceinstanceid, cause)
+                    msg = '%s: WARNING: failed to index document in resource: %s %s. Exception detail:\n%s\n' % (datetime.datetime.now(), resourceinstanceid, row_number, cause)
                     errors.append({'type': 'WARNING', 'message': msg})
                     newresourceinstance.delete()
                     save_count=save_count-1
                 except Exception as e:
-                    msg = '%s: WARNING: failed to index document in resource: %s. Exception detail:\n%s\n' % (datetime.datetime.now(), resourceinstanceid, e)
+                    msg = '%s: WARNING: failed to index document in resource: %s %s. Exception detail:\n%s\n' % (datetime.datetime.now(), resourceinstanceid, row_number, e)
                     errors.append({'type': 'WARNING', 'message': msg})
                     newresourceinstance.delete()
                     save_count=save_count-1
@@ -343,14 +343,14 @@ class CsvReader(Reader):
                 for k,v in f.iteritems():
                     v['node_ids'] = []
                     v['string_template'] = v['string_template'].replace('<', '').replace('>', '').split(', ')
-                    if v['nodegroup_id'] != '':
+                    if 'nodegroup_id' in v and v['nodegroup_id'] != '':
                         nodes = Node.objects.filter(nodegroup_id=v['nodegroup_id'])
                         for node in nodes:
                             if node.name in v['string_template']:
                                 display_nodeids.append(str(node.nodeid))
 
                 for k,v in f.iteritems():
-                    if v['string_template'] != ['']:
+                    if 'string_template' in v and v['string_template'] != ['']:
                         print 'The {0} {1} in the {2} display function.'.format(', '.join(v['string_template']), 'nodes participate' if len(v['string_template']) > 1 else 'node participates', k)
                     else:
                         print 'No nodes participate in the {0} display function.'.format(k)
@@ -412,7 +412,7 @@ class CsvReader(Reader):
                 concepts_to_create = {}
                 new_concepts = {}
                 required_nodes = {}
-                for node in Node.objects.filter(isrequired=True, graph_id=mapping['resource_model_id']).values_list('nodeid', 'name'):
+                for node in Node.objects.filter(~Q(datatype='semantic'), isrequired=True, graph_id=mapping['resource_model_id']).values_list('nodeid', 'name'):
                     required_nodes[str(node[0])] = node[1]
 
                 # This code can probably be moved into it's own module.
@@ -565,8 +565,8 @@ class CsvReader(Reader):
                             if key not in blanktilecache:
                                 blanktilecache[str(key)] = blank_tile
                     else:
-                        for nodegroup, tile in blank_tile.tiles.iteritems():
-                            for key in tile[0].data.keys():
+                        for tile in blank_tile.tiles:
+                            for key in tile.data.keys():
                                 if key not in blanktilecache:
                                     blanktilecache[str(key)] = blank_tile
 
@@ -641,24 +641,24 @@ class CsvReader(Reader):
                         if bool(tile.data):
                             for target_k, target_v in tile.data.iteritems():
                                 if target_k in required_nodes.keys() and target_v is None:
-                                    populated_tiles.pop(populated_tiles.index(parent_tile))
+                                    if parent_tile in populated_tiles:
+                                        populated_tiles.pop(populated_tiles.index(parent_tile))
                                     errors.append({'type': 'WARNING', 'message': 'The {0} node is required and must be populated in order to populate the {1} nodes. This data was not imported.'.format(required_nodes[target_k],  ', '.join(all_nodes.filter(nodegroup_id=str(target_tile.nodegroup_id)).values_list('name', flat=True)))})
                         elif bool(tile.tiles):
-                            for tile_k, tile_v in tile.tiles.iteritems():
-                                if len(tile_v) > 0:
-                                    for t in tile_v:
-                                        check_required_nodes(t, parent_tile, required_nodes, all_nodes)
+                            for tile in tile.tiles:
+                                check_required_nodes(tile, parent_tile, required_nodes, all_nodes)
                     if len(errors) > 0:
                         self.errors += errors
 
                 resources = []
+                missing_display_values = {}
 
                 for row_number, row in enumerate(business_data):
                     row_number = 'on line ' + unicode(row_number + 2) #to represent the row in a csv accounting for the header and 0 index
                     if row['ResourceID'] != previous_row_resourceid and previous_row_resourceid is not None:
 
                         save_count = save_count + 1
-                        self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count)
+                        self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number)
 
                         # reset values for next resource instance
                         populated_tiles = []
@@ -667,14 +667,17 @@ class CsvReader(Reader):
 
                     source_data = column_names_to_targetids(row, mapping, row_number)
 
-                    missing_display_nodes = [n for n in display_nodes if n not in [list(b) for b in zip(*[a.keys() for a in source_data])][0]]
+                    row_keys = [list(b) for b in zip(*[a.keys() for a in source_data])]
+
+                    missing_display_nodes = [n for n in display_nodes if n not in row_keys]
                     if len(missing_display_nodes) > 0:
                         errors = []
                         for mdn in missing_display_nodes:
                             mdn_name = all_nodes.filter(nodeid=mdn).values_list('name', flat=True)[0]
-                            errors.append({'type': 'WARNING', 'message': '{0} {1} is null or not mapped and participates in a {2} display value function.'.format(mdn_name, row_number, mapping['resource_model_name'])})
-                        if len(errors) > 0:
-                            self.errors += errors
+                            try:
+                                missing_display_values[mdn_name].append(row_number.split('on line ')[-1])
+                            except:
+                                missing_display_values[mdn_name] = [row_number.split('on line ')[-1]]
 
                     if len(source_data) > 0:
                         if source_data[0].keys():
@@ -713,6 +716,7 @@ class CsvReader(Reader):
                                 target_tile_cardinality = 'n'
 
                             if str(target_tile.nodegroup_id) not in populated_nodegroups[resourceinstanceid]:
+                                target_tile.nodegroup_id = str(target_tile.nodegroup_id)
                                 # Check if we are populating a parent tile by inspecting the target_tile.data array.
                                 if target_tile.data != {}:
                                     # Iterate through the target_tile nodes and begin populating by iterating througth source_data array.
@@ -734,16 +738,16 @@ class CsvReader(Reader):
 
                                 # Check if we are populating a child tile(s) by inspecting the target_tiles.tiles array.
                                 elif target_tile.tiles != None:
+                                    populated_child_tiles = []
                                     populated_child_nodegroups = []
-                                    for nodegroupid, childtile in target_tile.tiles.iteritems():
-                                        prototype_tile = childtile.pop()
-                                        if str(prototype_tile.nodegroup_id) in single_cardinality_nodegroups:
+                                    for childtile in target_tile.tiles:
+                                        if str(childtile.nodegroup_id) in single_cardinality_nodegroups:
                                             child_tile_cardinality = '1'
                                         else:
                                             child_tile_cardinality = 'n'
 
                                         def populate_child_tiles(source_data):
-                                            prototype_tile_copy = cPickle.loads(cPickle.dumps(prototype_tile, -1))
+                                            prototype_tile_copy = cPickle.loads(cPickle.dumps(childtile, -1))
                                             tileid = row['TileID'] if 'TileID' in row else uuid.uuid4()
                                             prototype_tile_copy.tileid = tileid
                                             prototype_tile_copy.parenttile = target_tile
@@ -752,6 +756,7 @@ class CsvReader(Reader):
                                                 prototype_tile_copy.parenttile.tileid = parenttileid
                                             prototype_tile_copy.resourceinstance_id = resourceinstanceid
                                             if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
+                                                prototype_tile_copy.nodegroup_id = str(prototype_tile_copy.nodegroup_id)
                                                 for target_key in prototype_tile_copy.data.keys():
                                                     for source_column in source_data:
                                                         for source_key in source_column.keys():
@@ -770,7 +775,7 @@ class CsvReader(Reader):
                                             if prototype_tile_copy.data != {}:
                                                 if len([item for item in prototype_tile_copy.data.values() if item != None]) > 0:
                                                     if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
-                                                        childtile.append(prototype_tile_copy)
+                                                        populated_child_tiles.append(prototype_tile_copy)
 
                                             if prototype_tile_copy != None:
                                                 if child_tile_cardinality == '1' and 'NodeGroupID' not in row:
@@ -779,6 +784,8 @@ class CsvReader(Reader):
                                             source_data[:] = [item for item in source_data if item != {}]
 
                                         populate_child_tiles(source_data)
+
+                                    target_tile.tiles = populated_child_tiles
 
                                 if not target_tile.is_blank():
                                     populated_tiles.append(target_tile)
@@ -804,8 +811,16 @@ class CsvReader(Reader):
                     previous_row_resourceid = row['ResourceID']
                     legacyid = row['ResourceID']
 
+                # check for missing display value nodes.
+                errors = []
+                for k,v in missing_display_values.iteritems():
+                    if len(v) > 0:
+                        errors.append({'type': 'WARNING', 'message': '{0} is null or not mapped on rows {1} and participates in a display value function.'.format(k, ','.join(v))})
+                if len(errors) > 0:
+                    self.errors += errors
+
                 if 'legacyid' in locals():
-                    self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count)
+                    self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number)
 
                 if bulk:
                     Resource.bulk_save(resources=resources)
@@ -821,6 +836,7 @@ class CsvReader(Reader):
 
         finally:
             pass
+
 
 class TileCsvReader(Reader):
 

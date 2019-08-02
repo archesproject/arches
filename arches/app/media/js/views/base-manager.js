@@ -6,7 +6,9 @@ define([
     'views/page-view',
     'view-data',
     'bindings/datatable',
-    'uuid'
+    'uuid',
+    'core-js',
+    'dom-4'
 ], function($, _, ko, Backbone, PageView, data) {
 
     var BaseManager = PageView.extend({
@@ -31,7 +33,7 @@ define([
             data.graphs.forEach(function(graph){
               graph.name = ko.observable(graph.name);
               graph.iconclass = ko.observable(graph.iconclass);
-            })
+            });
             options.viewModel.allGraphs = ko.observableArray(data.graphs);
             options.viewModel.graphs = ko.computed(function() {
                 return ko.utils.arrayFilter(options.viewModel.allGraphs(), function(graph) {
@@ -50,6 +52,15 @@ define([
                 ko.applyBindingsToNode(option, {disable: item.disable_instance_creation}, item);
               }
             };
+
+            options.viewModel.navExpanded = ko.observable(false);
+            options.viewModel.navExpanded.subscribe(function () {
+                window.nifty.window.trigger('resize');
+            });
+
+            options.viewModel.inSearch = ko.pureComputed(function() {
+                return window.location.pathname === "/search" || window.location.pathname === "/plugins/c8261a41-a409-4e45-b049-c925c28a57da";
+            });
 
             PageView.prototype.constructor.call(this, options);
             return this;

@@ -13,19 +13,21 @@ from __future__ import unicode_literals
 import os
 import json
 import uuid
-import importlib
 import datetime
+from datetime import timedelta
+from arches.app.utils.module_importer import get_class_from_modulename
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
-from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.core.validators import RegexValidator
 from django.db.models import Q, Max
+from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
+from django.core.validators import validate_slug
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -39,6 +41,7 @@ class CardModel(models.Model):
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     instructions = models.TextField(blank=True, null=True)
+    cssclass = models.TextField(blank=True, null=True)
     helpenabled = models.BooleanField(default=False)
     helptitle = models.TextField(blank=True, null=True)
     helptext = models.TextField(blank=True, null=True)
@@ -47,6 +50,8 @@ class CardModel(models.Model):
     active = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
+    component = models.ForeignKey('CardComponent', db_column='componentid', default=uuid.UUID('f05e4d3a-53c1-11e8-b0ea-784f435179ea'), on_delete=models.SET_DEFAULT)
+    config = JSONField(blank=True, null=True, db_column='config')
 
     def is_editable(self):
         result = True
@@ -61,6 +66,44 @@ class CardModel(models.Model):
         db_table = 'cards'
 
 
+class ConstraintModel(models.Model):
+    constraintid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    uniquetoallinstances = models.BooleanField(default=False)
+    card = models.ForeignKey('CardModel', db_column='cardid')
+    nodes = models.ManyToManyField(to='Node', through='ConstraintXNode')
+
+    class Meta:
+        managed = True
+        db_table = 'card_constraints'
+
+
+class ConstraintXNode(models.Model):
+    id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    constraint = models.ForeignKey('ConstraintModel', on_delete=models.CASCADE, db_column='constraintid')
+    node = models.ForeignKey('Node', on_delete=models.CASCADE, db_column='nodeid')
+
+    class Meta:
+        managed = True
+        db_table = 'constraints_x_nodes'
+
+
+class CardComponent(models.Model):
+    componentid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    name = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    component = models.TextField()
+    componentname = models.TextField()
+    defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
+
+    @property
+    def defaultconfig_json(self):
+        json_string = json.dumps(self.defaultconfig)
+        return json_string
+
+    class Meta:
+        managed = True
+        db_table = 'card_components'
+
 class CardXNodeXWidget(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
     node = models.ForeignKey('Node', db_column='nodeid')
@@ -68,6 +111,7 @@ class CardXNodeXWidget(models.Model):
     widget = models.ForeignKey('Widget', db_column='widgetid')
     config = JSONField(blank=True, null=True, db_column='config')
     label = models.TextField(blank=True, null=True)
+    visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
 
     class Meta:
@@ -96,6 +140,9 @@ class DDataType(models.Model):
     configname = models.TextField(blank=True, null=True)
     issearchable = models.NullBooleanField(default=False)
     isgeometric = models.BooleanField()
+
+    def __unicode__(self):
+        return self.datatype
 
     class Meta:
         managed = True
@@ -175,6 +222,9 @@ class EditLog(models.Model):
     user_lastname = models.TextField(blank=True, null=True)
     user_email = models.TextField(blank=True, null=True)
     user_username = models.TextField(blank=True, null=True)
+    provisional_userid = models.TextField(blank=True, null=True)
+    provisional_user_username = models.TextField(blank=True, null=True)
+    provisional_edittype = models.TextField(blank=True, null=True)
     note = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -182,9 +232,56 @@ class EditLog(models.Model):
         db_table = 'edit_log'
 
 
+class MobileSyncLog(models.Model):
+    logid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    survey = models.ForeignKey('MobileSurveyModel', on_delete=models.CASCADE, related_name='surveyid')
+    user = models.IntegerField(null=True)  # not a ForeignKey so we can track deletions
+    started = models.DateTimeField(auto_now_add=True, null=True)
+    finished = models.DateTimeField(auto_now=True, null=True)
+    tilescreated = models.IntegerField(default=0, null=True)
+    tilesupdated = models.IntegerField(default=0, null=True)
+    tilesdeleted = models.IntegerField(default=0, null=True)
+    resourcescreated = models.IntegerField(default=0, null=True)
+    note = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'mobile_sync_log'
+
+
+class ResourceRevisionLog(models.Model):
+    logid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    resourceid = models.UUIDField(default=uuid.uuid1)
+    revisionid = models.TextField(null=False)  # not a ForeignKey so we can track deletions
+    survey = models.ForeignKey('MobileSurveyModel', on_delete=models.CASCADE, related_name='mobile_survey_id')
+    synclog = models.ForeignKey('MobileSyncLog', on_delete=models.CASCADE, related_name='sync_log')
+    synctimestamp = models.DateTimeField(auto_now_add=True, null=False)
+    action = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'resource_revision_log'
+
+
+class TileRevisionLog(models.Model):
+    logid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    tileid = models.UUIDField(default=uuid.uuid1)  # not a ForeignKey so we can track deletions
+    resourceid = models.UUIDField(default=uuid.uuid1)
+    revisionid = models.TextField(null=False)  # not a ForeignKey so we can track deletions
+    survey = models.ForeignKey('MobileSurveyModel', on_delete=models.CASCADE, related_name='survey_id')
+    synclog = models.ForeignKey('MobileSyncLog',  on_delete=models.CASCADE, related_name='mobile_sync_log')
+    synctimestamp = models.DateTimeField(auto_now_add=True, null=False)
+    action = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'tile_revision_log'
+
+
 class File(models.Model):
     fileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     path = models.FileField(upload_to='uploadedfiles')
+    tile = models.ForeignKey('TileModel', db_column='tileid', null=True, on_delete=models.CASCADE)
 
     class Meta:
         managed = True
@@ -193,28 +290,29 @@ class File(models.Model):
 
 # These two event listeners auto-delete files from filesystem when they are unneeded:
 # from http://stackoverflow.com/questions/16041232/django-delete-filefield
-@receiver(models.signals.post_delete, sender=File)
-def auto_delete_file_on_delete(sender, instance, **kwargs):
+@receiver(post_delete, sender=File)
+def delete_file_on_delete(sender, instance, **kwargs):
     """Deletes file from filesystem
     when corresponding `File` object is deleted.
     """
+
     if instance.path:
         try:
             if os.path.isfile(instance.path.path):
                 os.remove(instance.path.path)
-        ## except block added to deal with S3 file deletion
-        ## see comments on 2nd answer below
-        ## http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
-        except:
+        # except block added to deal with S3 file deletion
+        # see comments on 2nd answer below
+        # http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
+        except Exception as e:
             storage, name = instance.path.storage, instance.path.name
             storage.delete(name)
 
-@receiver(models.signals.pre_save, sender=File)
-def auto_delete_file_on_change(sender, instance, **kwargs):
+
+@receiver(pre_save, sender=File)
+def delete_file_on_change(sender, instance, **kwargs):
     """Deletes file from filesystem
     when corresponding `File` object is changed.
     """
-
     if not instance.pk:
         return False
 
@@ -230,31 +328,6 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
                 os.remove(old_file.path)
         except Exception:
             return False
-
-
-class Form(models.Model):
-    formid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    title = models.TextField(blank=True, null=True)
-    subtitle = models.TextField(blank=True, null=True)
-    iconclass = models.TextField(blank=True, null=True)
-    visible = models.BooleanField(default=True)
-    sortorder = models.IntegerField(blank=True, null=True, default=None)
-    graph = models.ForeignKey('GraphModel', db_column='graphid', blank=False, null=False)
-
-    class Meta:
-        managed = True
-        db_table = 'forms'
-
-
-class FormXCard(models.Model):
-    id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
-    card = models.ForeignKey('CardModel', db_column='cardid')
-    form = models.ForeignKey('Form', db_column='formid')
-    sortorder = models.IntegerField(blank=True, null=True, default=None)
-
-    class Meta:
-        managed = True
-        db_table = 'forms_x_cards'
 
 
 class Function(models.Model):
@@ -277,24 +350,7 @@ class Function(models.Model):
         return json_string
 
     def get_class_module(self):
-        mod_path = self.modulename.replace('.py', '')
-        module = None
-        import_success = False
-        import_error = None
-        for function_dir in settings.FUNCTION_LOCATIONS:
-            try:
-                module = importlib.import_module(function_dir + '.%s' % mod_path)
-                import_success = True
-            except ImportError as e:
-                import_error = e
-            if module != None:
-                break
-        if import_success == False:
-            print 'Failed to import ' + mod_path
-            print import_error
-
-        func = getattr(module, self.classname)
-        return func
+        return get_class_from_modulename(self.modulename, self.classname, settings.FUNCTION_LOCATIONS)
 
 class FunctionXGraph(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
@@ -318,28 +374,26 @@ class GraphModel(models.Model):
     isresource = models.BooleanField()
     isactive = models.BooleanField()
     iconclass = models.TextField(blank=True, null=True)
+    color = models.TextField(blank=True, null=True)
     subtitle = models.TextField(blank=True, null=True)
     ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
     functions = models.ManyToManyField(to='Function', through='FunctionXGraph')
+    jsonldcontext = models.TextField(blank=True, null=True)
+    template = models.ForeignKey(
+        'ReportTemplate',
+        db_column='templateid',
+        default='50000000-0000-0000-0000-000000000001'
+    )
+    config = JSONField(db_column='config', default={})
+    slug = models.TextField(validators=[validate_slug], unique=True, null=True)
 
     @property
     def disable_instance_creation(self):
         if not self.isresource:
             return _('Only resource models may be edited - branches are not editable')
-        msg = []
-        forms = Form.objects.filter(graph_id=self.pk)
         if not self.isactive:
-            msg.append(_('change resource model status in graph manager'))
-        if forms.count() == 0:
-            msg.append(_('add menu(s)'))
-        else:
-            if FormXCard.objects.filter(form__in=forms).count() == 0:
-                msg.append(_('add card(s) to menu(s)'))
-            if forms.filter(visible=True).count() == 0:
-                msg.append(_('make menu(s) visible'))
-        if len(msg) == 0:
-            return False
-        return _('To make this resource editable: ') + ', '.join(msg)
+            return _('Set resource model status to Active in Graph Designer')
+        return False
 
     def is_editable(self):
         result = True
@@ -349,6 +403,9 @@ class GraphModel(models.Model):
             if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
                 result = True
         return result
+
+    def __unicode__(self):
+        return self.name
 
     class Meta:
         managed = True
@@ -401,6 +458,7 @@ class Node(models.Model):
     config = JSONField(blank=True, null=True, db_column='config')
     issearchable = models.BooleanField(default=True)
     isrequired = models.BooleanField(default=False)
+    sortorder = models.IntegerField(blank=True, null=True, default=0)
 
     def get_child_nodes_and_edges(self):
         """
@@ -534,20 +592,6 @@ class ReportTemplate(models.Model):
         db_table = 'report_templates'
 
 
-class Report(models.Model):
-    reportid = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    name = models.TextField(blank=True, null=True)
-    template = models.ForeignKey(ReportTemplate, db_column='templateid')
-    graph = models.ForeignKey(GraphModel, db_column='graphid')
-    config = JSONField(blank=True, null=True, db_column='config')
-    formsconfig = JSONField(blank=True, null=True, db_column='formsconfig')
-    active = models.BooleanField(default=False)
-
-    class Meta:
-        managed = True
-        db_table = 'reports'
-
-
 class Resource2ResourceConstraint(models.Model):
     resource2resourceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     resourceclassfrom = models.ForeignKey(Node, db_column='resourceclassfrom', blank=True, null=True, related_name='resxres_contstraint_classes_from')
@@ -572,7 +616,7 @@ class ResourceXResource(models.Model):
     def delete(self):
         from arches.app.search.search_engine_factory import SearchEngineFactory
         se = SearchEngineFactory().create()
-        se.delete(index='resource_relations', doc_type='all', id=self.resourcexid)
+        se.delete(index='resource_relations', id=self.resourcexid)
         super(ResourceXResource, self).delete()
 
     def save(self):
@@ -582,7 +626,7 @@ class ResourceXResource(models.Model):
             self.created = datetime.datetime.now()
         self.modified = datetime.datetime.now()
         document = model_to_dict(self)
-        se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
+        se.index_data(index='resource_relations', body=document, idfield='resourcexid')
         super(ResourceXResource, self).save()
 
     class Meta:
@@ -599,6 +643,33 @@ class ResourceInstance(models.Model):
     class Meta:
         managed = True
         db_table = 'resource_instances'
+
+
+class SearchComponent(models.Model):
+    searchcomponentid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+    name = models.TextField()
+    icon = models.TextField(default=None)
+    modulename = models.TextField(blank=True, null=True)
+    classname = models.TextField(blank=True, null=True)
+    type = models.TextField()
+    componentpath = models.TextField(unique=True)
+    componentname = models.TextField(unique=True)
+    sortorder = models.IntegerField(blank=True, null=True, default=None)
+    enabled = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        managed = True
+        db_table = 'search_component'
+
+    def get_class_module(self):
+        return get_class_from_modulename(self.modulename, self.classname, settings.SEARCH_COMPONENT_LOCATIONS)
+
+    def toJSON(self):
+        from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+        return JSONSerializer().serialize(self)
 
 
 class TileModel(models.Model): #Tile
@@ -678,9 +749,11 @@ class TileModel(models.Model): #Tile
 
     def save(self, *args, **kwargs):
         if(self.sortorder is None or (self.provisionaledits is not None and self.data == {})):
-            sortorder_max = TileModel.objects.filter(nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id).aggregate(Max('sortorder'))['sortorder__max']
+            sortorder_max = TileModel.objects.filter(
+                nodegroup_id=self.nodegroup_id,
+                resourceinstance_id=self.resourceinstance_id).aggregate(Max('sortorder'))['sortorder__max']
             self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
-        super(TileModel, self).save(*args, **kwargs) # Call the "real" save() method.
+        super(TileModel, self).save(*args, **kwargs)  # Call the "real" save() method.
 
 
 class Value(models.Model):
@@ -694,30 +767,32 @@ class Value(models.Model):
         managed = True
         db_table = 'values'
 
+
 class FileValue(models.Model):
-    valueid = models.UUIDField(primary_key=True, default=uuid.uuid1) # This field type is a guess.
+    valueid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     concept = models.ForeignKey('Concept', db_column='conceptid')
     valuetype = models.ForeignKey('DValueType', db_column='valuetype')
     value = models.FileField(upload_to='concepts')
     language = models.ForeignKey('DLanguage', db_column='languageid', blank=True, null=True)
+
     class Meta:
         managed = False
         db_table = 'values'
 
     def geturl(self):
-        if self.value != None:
+        if self.value is not None:
             return self.value.url
         return ''
 
     def getname(self):
-        if self.value != None:
+        if self.value is not None:
             return self.value.name
         return ''
 
 
 # These two event listeners auto-delete files from filesystem when they are unneeded:
 # from http://stackoverflow.com/questions/16041232/django-delete-filefield
-@receiver(models.signals.post_delete, sender=FileValue)
+@receiver(post_delete, sender=FileValue)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
     """Deletes file from filesystem
     when corresponding `FileValue` object is deleted.
@@ -726,14 +801,15 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
         try:
             if os.path.isfile(instance.value.path):
                 os.remove(instance.value.path)
-        ## except block added to deal with S3 file deletion
-        ## see comments on 2nd answer below
-        ## http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
-        except:
+        # except block added to deal with S3 file deletion
+        # see comments on 2nd answer below
+        # http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
+        except Exception as e:
             storage, name = instance.value.storage, instance.value.name
             storage.delete(name)
 
-@receiver(models.signals.pre_save, sender=FileValue)
+
+@receiver(pre_save, sender=FileValue)
 def auto_delete_file_on_change(sender, instance, **kwargs):
     """Deletes file from filesystem
     when corresponding `FileValue` object is changed.
@@ -767,6 +843,9 @@ class Widget(models.Model):
     def defaultconfig_json(self):
         json_string = json.dumps(self.defaultconfig)
         return json_string
+
+    def __unicode__(self):
+        return self.name
 
     class Meta:
         managed = True
@@ -815,6 +894,7 @@ class MapLayer(models.Model):
     centerx = models.FloatField(blank=True, null=True)
     centery = models.FloatField(blank=True, null=True)
     zoom = models.FloatField(blank=True, null=True)
+    legend = models.TextField(blank=True, null=True)
 
     @property
     def layer_json(self):
@@ -831,10 +911,10 @@ class MapLayer(models.Model):
 
 class TileserverLayer(models.Model):
     name = models.TextField(primary_key=True, unique=True)
-    path = models.TextField()
+    path = models.TextField(null=True, blank=True)
     config = JSONField()
-    map_layer = models.ForeignKey('MapLayer', db_column='map_layerid')
-    map_source = models.ForeignKey('MapSource', db_column='map_sourceid')
+    map_layer = models.ForeignKey('MapLayer', db_column='map_layerid', null=True, blank=True)
+    map_source = models.ForeignKey('MapSource', db_column='map_sourceid', null=True, blank=True)
 
     def __unicode__(self):
         return self.name
@@ -854,21 +934,28 @@ class GraphXMapping(models.Model):
         db_table = 'graphs_x_mapping_file'
 
 
-class IIIFManifest(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    url = models.TextField()
-
-    def __unicode__(self):
-        return self.url
-
-    class Meta:
-        managed = True
-        db_table = 'iiif_manifests'
-
-
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=16, blank=True)
+
+    def is_reviewer(self):
+        return self.user.groups.filter(name='Resource Reviewer').exists()
+
+    @property
+    def viewable_nodegroups(self):
+        from arches.app.utils.permission_backend import get_nodegroups_by_perm
+        return set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ['models.read_nodegroup'], any_perm=True))
+
+    @property
+    def editable_nodegroups(self):
+        from arches.app.utils.permission_backend import get_nodegroups_by_perm
+        return set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ['models.write_nodegroup'], any_perm=True))
+
+    @property
+    def deletable_nodegroups(self):
+        from arches.app.utils.permission_backend import get_nodegroups_by_perm
+        return set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ['models.delete_nodegroup'], any_perm=True))
+
     class Meta:
         managed = True
         db_table = 'user_profile'
@@ -888,7 +975,8 @@ class MobileSurveyModel(models.Model):
     description = models.TextField(null=True)
     bounds = models.MultiPolygonField(null=True)
     tilecache = models.TextField(null=True)
-    datadownloadconfig = JSONField(blank=True, null=True, default='{"download":false, "count":1000, "resources":[], "custom":null}')
+    onlinebasemaps = JSONField(blank=True, null=True, db_column='onlinebasemaps')
+    datadownloadconfig = JSONField(blank=True, null=True, default='{"download":false, "count":100, "resources":[], "custom":null}')
 
     def __unicode__(self):
         return self.name
@@ -896,6 +984,19 @@ class MobileSurveyModel(models.Model):
     class Meta:
         managed = True
         db_table = 'mobile_surveys'
+
+    @property
+    def expired(self):
+        result = False
+        if self.enddate is not None:
+            enddate = datetime.datetime.strftime(self.enddate, '%Y-%m-%d')
+            result = (datetime.datetime.strptime(enddate, '%Y-%m-%d') - datetime.datetime.now() + timedelta(hours=24)).days < 0
+        return result
+
+    def deactivate_expired_survey(self):
+        if self.expired:
+            self.active = False
+            self.save()
 
 
 class MobileSurveyXUser(models.Model):
@@ -941,3 +1042,24 @@ class MapMarker(models.Model):
     class Meta:
         managed = True
         db_table = 'map_markers'
+
+
+class Plugin(models.Model):
+    pluginid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+    name = models.TextField()
+    icon = models.TextField(default=None)
+    component = models.TextField()
+    componentname = models.TextField()
+    config = JSONField(blank=True, null=True, db_column='config')
+    slug = models.TextField(validators=[validate_slug], unique=True, null=True)
+    sortorder = models.IntegerField(blank=True, null=True, default=None)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        managed = True
+        db_table = 'plugins'
+        permissions = (
+            ('view_plugin', 'View plugin'),
+        )

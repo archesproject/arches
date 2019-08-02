@@ -1,0 +1,266 @@
+{% load i18n %}
+
+<div style="overflow-y: auto">
+    <div id="external-page-content">
+        <div class="settings-panel">
+
+            <div class="settings-panel-heading">
+                <div class="graph-designer-title">
+                    <i data-bind='css: graph.iconclass'></i><div class="name" data-bind='text: graph.name'></div>
+                    <span class="graph-crm-class" data-bind="if: graph.ontology()">
+                        (
+                        <span data-bind="text: graph.ontology().name"></span>,
+                        <span data-bind="text: graphSettingsViewModel.ontologyClassFriendlyName"></span>
+                        )
+                    </span>
+                </div>
+            </div>
+
+            <!-- Settings Forms -->
+            <div class="">
+                <div class="graph-designer-header" data-bind="text: graph.isresource() ? '{% trans 'Resource Model Identifiers' %}' : '{% trans 'Branch Identifiers' %}' "></div>
+                <div id="cards" class="graph-settings-panel-body fade in">
+                    <form class="widgets">
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label">
+                                        {% trans "Name" %}
+                                    </label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <input placeholder="{% trans "Name" %}" class="form-control input-md widget-input" data-bind="value:graph.name, valueUpdate: 'keyup'">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Subtitle" %} </label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <input placeholder="{% trans "Subtitle" %}" class="form-control input-md widget-input" data-bind="value:graph.subtitle, valueUpdate: 'keyup'">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Ontology" %} </label>
+                                </div>
+
+                                <div class="col-xs-12 crm-selector">
+                                    <select class="design" data-bind="attr: {'disabled': graphSettingsViewModel.nodeCount() > 1 }, value: graph.ontology_id, valueAllowUnset: true, options: ontologies, optionsText: 'name', optionsValue:'ontologyid', optionsCaption: '{% trans "No ontology" %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row widget-container" data-bind="if: graph.ontology_id()">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Root Class" %} </label>
+                                </div>
+
+                                <div class="col-xs-12 crm-selector">
+                                    <select class="design" data-bind="attr: {'disabled': graphSettingsViewModel.nodeCount() > 1 }, value: graphSettingsViewModel.ontologyClass, valueAllowUnset: false, options: ontologyClasses, optionsText: 'display', optionsValue:'source', chosen: {disable_search_threshold: 10, width: '500px', search_contains: true}"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="graph-designer-header">{% trans 'Configuration' %}</div>
+                <div id="meta-card" class="graph-settings-panel-body fade in">
+
+                    <form class="widgets">
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Status" %} </label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <div class="">
+                                        <label data-bind="css: { 'active': graph.isactive() }, click: function () { graph.isactive(true) }" class="form-radio form-normal form-text">
+                                            <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="true"> {% trans "Active" %}
+                                        </label>
+                                        <label data-bind="css: { 'active': !graph.isactive() }, click: function () { graph.isactive(false) }" class="form-radio form-normal form-text">
+                                            <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="false"> {% trans "Inactive" %}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ko ifnot: graph.isresource() -->
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label">
+                                        {% trans "Root Node Data Type" %}
+                                    </label>
+                                </div>
+
+                                <div class="col-xs-12 crm-selector">
+                                    <select class="design" data-bind="value: graphSettingsViewModel.graph.root.datatype, options: datatypes, optionsCaption: '{% trans "Choose a data type" %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row widget-container graph-settings-switch">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label">
+                                        <span class="switch switch-small arches-switch on disabled"><small></small></span>
+                                    </label>
+                                </div>
+                                <div class="col-xs-12">
+                                    <p class="control-label graph-settings-switch-label">
+                                        <span>{% trans "Make card" %}</span>
+                                    </p>
+                                    <span class="graph-settings-switch-subtitle">
+                                        {% trans "Data from nodes not collected in other cards will be collected in the root card's form section" %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /ko -->
+                        <!-- ko if: graph.isresource() -->
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Resource models that may be related:" %}</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <div class="columns">
+                                        <!-- ko foreach: graphSettingsViewModel.relatable_resources -->
+                                        <label class="form-checkbox form-normal form-primary" data-bind="css: {'form-text': true,  'active': isRelatable()}, click: function () {$data.isRelatable(!$data.isRelatable())}">
+                                            <input type="checkbox" data-bind="checked:isRelatable">
+                                            <!-- ko if: graph.graphid === $parent.graph.graphid() -->
+                                            <span data-bind="text: $parent.graph.name"></span>
+                                            <!-- /ko -->
+                                            <!-- ko if: graph.graphid !== $parent.graph.graphid() -->
+                                            <span data-bind="text: graph.name"></span>
+                                            <!-- /ko -->
+                                        </label>
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /ko -->
+                    </form>
+                </div>
+
+                <div class="graph-designer-header">{% trans 'Description' %}</div>
+                <div id="desc-card" class="graph-settings-panel-body fade in">
+
+                    <form class="widgets" style="margin-bottom: 20px;">
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Author" %}</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <input placeholder="{% trans "Author name" %}" class="form-control input-md widget-input" data-bind="value:graph.author, valueUpdate: 'keyup'">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Abstract" %}</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <textarea placeholder="{% trans "Abstract/description" %}" rows="6" class="form-control" data-bind="value:graph.description, valueUpdate: 'keyup'"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- ko if: graph.isresource() -->
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "JSON-LD Context" %}</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <textarea placeholder="{% trans "URI to a JSON-LD Context Object or a Raw Context Object or Array of Context Objects" %}" class="form-control input-md widget-input" data-bind="textInput:graph.jsonldcontext"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /ko -->
+                    </form>
+                </div>
+
+                <div class="graph-designer-header">{% trans 'Appearance' %}</div>
+                <div class="graph-settings-panel-body fade in">
+
+                    <form class="widgets">
+                        <!-- ko if: graph.isresource() -->
+                        <div class="row widget-container">
+                            <div class="form-group">
+
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Color" %} </label>
+                                </div>
+
+                                <div class="colorpicker-component input-group" id="cp1">
+                                    <input placeholder="{% trans " Map Feature Color " %}" class="form-control input-md widget-input" data-bind="colorPicker: {color: graph.color, format:'rgba', container: '#cp1'}">
+                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: graph.color}"></i></span>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- /ko -->
+                        <div class=" row widget-container">
+                            <div class="form-group">
+
+                                <!-- Icon search -->
+                                <div style="padding-left: 5px;">
+                                    <div class="relative" style="padding: 10px 0px;">
+
+                                        <!-- Currently selected icon -->
+                                        <div>
+                                            {% trans "Selected icon:" %}
+                                            <button data-bind="css: 'btn btn-default btn-icon icon-lg ' + graph.iconclass(), click: function() {}" style="height: 35px; width: 35px;"></button>
+                                        </div>
+
+                                        <div style="position: absolute; left: 130px; top: 9px;">
+                                            <input type="text" class="form-control" style="width: 500px; height: 36px;" placeholder="{% trans "Find an icon" %}" data-bind="value: graphSettingsViewModel.iconFilter, valueUpdate: 'keyup'">
+
+                                            <!-- Remove Search -->
+                                            <span class="clear-search" style="position: absolute; left: 480px; top: 5px; color: #123; font-size: 17px;"><i class="fa fa-times-circle"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Icon List -->
+                                <div style="height: 300px; overflow-y: scroll; padding-top: 15px; padding-left: 20px; border: 1px solid #e9e9e9; margin-left: 5px; margin-right: 30px;">
+
+                                    <div class="row">
+
+                                        <!-- ko foreach: graphSettingsViewModel.icons() -->
+                                        <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === $root.graph.iconclass())}, click: function() { $root.graph.iconclass(cssclass) }">
+                                            <i data-bind="css: cssclass"></i> <span data-bind="text: name"></span>
+                                        </div>
+                                        <!-- /ko -->
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

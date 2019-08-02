@@ -28,7 +28,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endif %}
 
 <head>
-    <title>{% block title %}{{ app_settings.APP_NAME }} {{ app_settings.VERSION }} - {% endblock title %}</title>
+    <title>{% block title %}{{ app_settings.APP_NAME }} - {% endblock title %}</title>
 
     <!-- Meta -->
     <meta charset="utf-8">
@@ -40,13 +40,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     {% block css %}
         <link href="{% static 'css/arches.css' %}" rel="stylesheet">
+        <link href="{% static 'css/package.css' %}" rel="stylesheet">
+        <link href="{% static 'css/project.css' %}" rel="stylesheet">
     {% endblock css%}
 
 </head>
 
 <body {% block body_attributes %}class="scroll-y-auto"{% endblock %}>
     {% block loading_mask %}
-    <div class="loading-mask" data-bind="visible:loading()"></div>
+
+    <div class="loading-mask" data-bind="visible: typeof(loading()) === 'boolean' && loading()"></div>
+
+    <div class="loading-mask" style="display: none;" data-bind="visible: typeof(loading()==='string') && loading().length > 0">
+        <div class="loading-mask-string" data-bind="text: loading"></div>
+    </div>
+
+
     {% endblock loading_mask %}
     {% block body %}
 

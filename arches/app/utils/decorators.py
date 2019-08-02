@@ -22,6 +22,9 @@ import logging
 import datetime
 from arches.app.utils.permission_backend import get_editable_resource_types
 from arches.app.utils.permission_backend import get_resource_types_by_perm
+from arches.app.utils.permission_backend import user_can_read_resources
+from arches.app.utils.permission_backend import user_can_edit_resources
+from arches.app.utils.permission_backend import user_can_read_concepts
 from django.contrib.auth.decorators import user_passes_test
 
 # Get an instance of a logger
@@ -66,20 +69,20 @@ def can_edit_resource_instance():
 
     """
 
-    def test(u):
-        if u.is_authenticated():
-            return u.is_superuser or len(get_editable_resource_types(u)) > 0
-        return False
-    return user_passes_test(test)
-
+    return user_passes_test(user_can_edit_resources)
 
 def can_read_resource_instance():
     """
     Requires that a user be able to edit or delete a single nodegroup of a resource
 
     """
-    def test(u):
-        if u.is_authenticated():
-            return u.is_superuser or len(get_resource_types_by_perm(u, ['models.read_nodegroup'])) > 0
-        return False
-    return user_passes_test(test)
+
+    return user_passes_test(user_can_read_resources)
+
+def can_read_concept():
+    """
+    Requires that a user be able to edit or delete a single nodegroup of a resource
+
+    """
+
+    return user_passes_test(user_can_read_concepts)

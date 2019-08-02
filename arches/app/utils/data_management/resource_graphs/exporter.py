@@ -8,7 +8,7 @@ import zipfile
 from arches.app.models.graph import Graph
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
-from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, Node, Resource2ResourceConstraint, FunctionXGraph, Value
+from arches.app.models.models import CardXNodeXWidget, Node, Resource2ResourceConstraint, FunctionXGraph, Value
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from pprint import pprint as pp
 from collections import OrderedDict
@@ -68,21 +68,6 @@ def get_card_x_node_x_widget_data_for_export(resource_graph):
     cards_x_nodes_x_widgets = CardXNodeXWidget.objects.filter(node_id__in=nodeids)
     return cards_x_nodes_x_widgets
 
-def get_forms_for_export(resource_graph):
-    forms = Form.objects.filter(graph_id=resource_graph['graphid'])
-    return forms
-
-def get_form_x_card_data_for_export(resource_graph):
-    forms_x_cards = []
-    for form in resource_graph['forms']:
-        forms_x_cards = forms_x_cards + list(FormXCard.objects.filter(form_id=form.formid))
-    return forms_x_cards
-
-def get_report_data_for_export(resource_graph):
-    reports = []
-    reports = Report.objects.filter(graph_id=resource_graph['graphid'])
-    return reports
-
 def get_function_x_graph_data_for_export(functionids, graphid):
     return FunctionXGraph.objects.filter(function_id__in=functionids, graph_id=graphid)
 
@@ -90,14 +75,14 @@ def get_graphs_for_export(graphids=None):
     graphs = {}
     graphs['graph'] = []
     if graphids == None or graphids[0] == 'all' or graphids == ['']:
-        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID))
+        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID), exclude=["widgets"])
     elif graphids[0] == 'resource_models':
-        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID))
+        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID), exclude=["widgets"])
     elif graphids[0] == 'branches':
-        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID))
+        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID), exclude=["widgets"])
     else:
         try:
-            resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(graphid__in=graphids))
+            resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(graphid__in=graphids), exclude=["widgets"])
         except:
             # this warning should never get thrown while doing an export from the UI, but maybe it should be moved somewhere else.
             print '*'*80
@@ -113,9 +98,6 @@ def get_graphs_for_export(graphids=None):
         del resource_graph['functions']
         del resource_graph['domain_connections']
         resource_graph['cards_x_nodes_x_widgets'] = get_card_x_node_x_widget_data_for_export(resource_graph)
-        resource_graph['forms'] = get_forms_for_export(resource_graph)
-        resource_graph['forms_x_cards'] = get_form_x_card_data_for_export(resource_graph)
-        resource_graph['reports'] = get_report_data_for_export(resource_graph)
         resource_graph['resource_2_resource_constraints'] = r2r_constraints_for_export(resource_graph)
         graphs['graph'].append(resource_graph)
     return graphs

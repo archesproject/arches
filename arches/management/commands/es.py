@@ -24,7 +24,7 @@ from arches.setup import get_elasticsearch_download_url, download_elasticsearch,
 from arches.management.commands import utils
 from arches.app.models import models
 from arches.app.models.system_settings import settings
-from arches.app.search.mappings import prepare_term_index, delete_term_index, prepare_search_index, delete_search_index, prepare_resource_relations_index, delete_resource_relations_index
+from arches.app.search.mappings import prepare_terms_index, prepare_concepts_index, delete_terms_index, delete_concepts_index, prepare_search_index, delete_search_index, prepare_resource_relations_index, delete_resource_relations_index
 import arches.app.utils.index_database as index_database
 
 
@@ -110,12 +110,21 @@ class Command(BaseCommand):
 
         os.chmod(os.path.join(install_location, file_name_wo_extention, 'bin', 'elasticsearch'), 0755)
 
+        def change_permissions_recursive(path, mode):
+            for root, dirs, files in os.walk(path, topdown=True):
+                for dir in [os.path.join(root,d) for d in dirs]:
+                    os.chmod(dir, mode)
+                for file in [os.path.join(root, f) for f in files]:
+                    if '/bin/' in file:
+                        os.chmod(file, mode)
+
+        change_permissions_recursive(os.path.join(install_location, file_name_wo_extention, 'modules', 'x-pack-ml', 'platform'), 0o755)
+
         with open(os.path.join(es_config_directory, 'elasticsearch.yml'), 'w') as f:
             f.write('# ----------------- FOR TESTING ONLY -----------------')
             f.write('\n# - THESE SETTINGS SHOULD BE REVIEWED FOR PRODUCTION -')
-            f.write('\n# -https://www.elastic.co/guide/en/elasticsearch/reference/5.0/system-config.html - ')
+            f.write('\n# -https://www.elastic.co/guide/en/elasticsearch/reference/6.7/important-settings.html - ')
             f.write('\nhttp.port: %s' % port)
-            f.write('\nscript.inline: true')
             f.write('\n\n# for the elasticsearch-head plugin')
             f.write('\nhttp.cors.enabled: true')
             f.write('\nhttp.cors.allow-origin: "*"')
@@ -144,12 +153,13 @@ class Command(BaseCommand):
     #     return p
 
     def setup_indexes(self):
-        prepare_term_index(create=True)
+        prepare_terms_index(create=True)
+        prepare_concepts_index(create=True)
         prepare_resource_relations_index(create=True)
-        for graphid in models.GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True):
-            prepare_search_index(str(graphid), create=True)
+        prepare_search_index(create=True)
 
     def delete_indexes(self):
-        delete_term_index()
+        delete_terms_index()
+        delete_concepts_index()
         delete_search_index()
         delete_resource_relations_index()

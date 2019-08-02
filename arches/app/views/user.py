@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import json
 from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User, Group
@@ -86,8 +87,10 @@ class UserManagerView(BaseManagerView):
             context['nav']['icon'] = "fa fa-user"
             context['nav']['title'] = _("Profile Manager")
             context['nav']['login'] = True
-            context['nav']['help'] = (_('Profile Editing'),'help/base-help.htm')
-            context['help'] = 'profile-manager-help'
+            context['nav']['help'] = {
+                'title': _('Profile Editing'),
+                'template': 'profile-manager-help',
+            }
             context['validation_help'] = validation.password_validators_help_texts()
 
             context['user_surveys'] = JSONSerializer().serialize(user_details['user_surveys'], sort_keys=False)
@@ -101,7 +104,7 @@ class UserManagerView(BaseManagerView):
         if self.action == 'get_user_names':
             data = {}
             if self.request.user.is_authenticated() and request.user.groups.filter(name='Resource Reviewer').exists():
-                userids = [str(id) for id in request.POST.get('userids[]', [])]
+                userids = json.loads(request.POST.get('userids', '[]'))
                 data = {u.id:u.username for u in User.objects.filter(id__in=userids)}
                 return JSONResponse(data)
 
@@ -116,8 +119,10 @@ class UserManagerView(BaseManagerView):
             context['nav']['icon'] = 'fa fa-user'
             context['nav']['title'] = _('Profile Manager')
             context['nav']['login'] = True
-            context['nav']['help'] = (_('Profile Editing'),'help/base-help.htm')
-            context['help'] = 'profile-manager-help'
+            context['nav']['help'] = {
+                'title': _('Profile Editing'),
+                'template': 'profile-manager-help',
+            }
             context['validation_help'] = validation.password_validators_help_texts()
             context['user_surveys'] = JSONSerializer().serialize(user_details['user_surveys'])
             context['identities'] = JSONSerializer().serialize(user_details['identities'])
@@ -145,6 +150,7 @@ class UserManagerView(BaseManagerView):
             return render(request, 'views/user-profile-manager.htm', context)
 
     def get_mobile_survey_resources(self, mobile_survey_models):
+        graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resources = []
         mobile_surveys = []
         all_ordered_card_ids = []
@@ -154,5 +160,13 @@ class UserManagerView(BaseManagerView):
             mobile_survey_dict = survey.serialize()
             all_ordered_card_ids += mobile_survey_dict['cards']
             mobile_surveys.append(mobile_survey_dict)
+
+        active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
+
+        for i, graph in enumerate(graphs):
+            cards = []
+            if i == 0 or unicode(graph.graphid) in active_graphs:
+                cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
+            resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
 
         return mobile_surveys, resources
