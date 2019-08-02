@@ -4521,9 +4521,9 @@ ul .collapse li:last-of-type {
     display: -ms-flexbox;
     display: -webkit-flex;
     display: flex;
-    -webkit-flex-direction: column;
-    -ms-flex-direction: column;
-    flex-direction: column;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
     width: 100%;
     height: calc(100vh - 50px);
     position: relative;
@@ -10859,8 +10859,12 @@ a.search-query-link-captions:focus {
     transition: all .5s;
 }
 
-.search-results-panel-closed {
-    left: 10px;
+.search-results-panel {
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    max-width: 400px; 
+    border-right: solid 1px #dcdcdc;
 }
 
 .search-listing-icon {
@@ -11682,11 +11686,7 @@ table.table.dataTable {
 
 .search-attribute-widget {
     display: inline-block;
-    padding-left: 15px;
-    padding-top: 5px;
-    margin-bottom: 15px;
-    margin-right: 14px;
-    border-bottom: 1px solid #ddd;
+    margin: 7px;
 }
 
 a .search-type-link {
@@ -11706,7 +11706,7 @@ a .search-type-link {
 .search-type-btn-panel {
     height: 50px;
     background: #f2f2f2;
-    margin-left: 5px;
+    margin-left: 4px;
 }
 
 .search-type-btn.relative:hover {
