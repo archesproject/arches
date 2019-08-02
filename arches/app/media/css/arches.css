@@ -13953,9 +13953,10 @@ a.jstree-anchor.permissions-widget {
 }
 
 .create-resource-instance-card-component {
-  position: absolute;
-  background: white;
-  z-index: 3;
+    position: absolute;
+    background: white;
+    z-index: 11;
+    box-shadow: 1px 2px rgba(126, 126, 126, 0.441);
 }
 
 .indent {
