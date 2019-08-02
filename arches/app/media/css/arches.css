@@ -4521,12 +4521,18 @@ ul .collapse li:last-of-type {
     display: -ms-flexbox;
     display: -webkit-flex;
     display: flex;
-    -webkit-flex-direction: row;
-    -ms-flex-direction: row;
-    flex-direction: row;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
     width: 100%;
     height: calc(100vh - 50px);
     position: relative;
+}
+
+.flexrow {
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
 }
 
 .related-resources-editor-container .content-panel {
