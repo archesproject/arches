@@ -4,9 +4,9 @@ define([
     'knockout',
     'knockout-mapping',
     'viewmodels/report',
-    'graph-designer-data',
+    'arches',
     'bindings/chosen'
-], function($, _, ko, koMapping, ReportViewModel, data) {
+], function($, _, ko, koMapping, ReportViewModel, arches) {
     return ko.components.register('tabbed-report', {
         viewModel: function(params) {
             params.configKeys = ['tabs', 'activeTabIndex'];
@@ -15,7 +15,15 @@ define([
             if (this.activeTabIndex() > self.tabs().length - 1) {
                 this.activeTabIndex(self.tabs().length - 1);
             }
-            this.icons = data.icons;
+            this.icons = ko.observableArray([]);
+
+            $.ajax({
+                type: "GET",
+                url: arches.urls.icons})
+                .done(function(response) {
+                    self.icons(response.icons);
+                });
+
             this.activeTab = ko.observable(self.tabs()[ko.unwrap(this.activeTabIndex)]);
             this.report.configJSON.subscribe(function(){
                 if (self.tabs.indexOf(self.activeTab()) === -1) {
