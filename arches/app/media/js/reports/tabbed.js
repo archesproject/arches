@@ -21,7 +21,14 @@ define([
                 type: "GET",
                 url: arches.urls.icons})
                 .done(function(response) {
-                    self.icons(response.icons);
+                    var parsed = response.icons.map(function(r){
+                        return {
+                            text: r.name,
+                            id: r.cssclass,
+                            name: r.name,
+                            cssclass: r.cssclass
+                        };})
+                    self.icons(parsed);
                 });
 
             this.activeTab = ko.observable(self.tabs()[ko.unwrap(this.activeTabIndex)]);
