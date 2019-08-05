@@ -138,9 +138,6 @@ def import_graph(graphs, overwrite_graphs=True):
             except Exception as e:
                 print e
 
-        for error in errors:
-            logger.debug(error)
-
         return errors, reporter
 
 
