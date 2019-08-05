@@ -61,6 +61,7 @@ def userCanAccessMobileSurvey(request, surveyid=None):
 
 
 class CouchdbProxy(ProtectedResourceView, ProxyView):
+    logger.debug(_('Dispatching Couch Proxy'))
     upstream = settings.COUCHDB_URL
     p = re.compile(r"project_(?P<surveyid>[\w-]{36})")
 
@@ -121,6 +122,7 @@ class APIBase(View):
 class Sync(APIBase):
 
     def get(self, request, surveyid=None):
+        logger.debug(_('Starting Synch'))
         can_sync = userCanAccessMobileSurvey(request, surveyid)
         if can_sync:
             try:
@@ -130,8 +132,9 @@ class Sync(APIBase):
             except Exception:
                 logger.exception(_('Sync Failed'))
 
-            return JSONResponse(_('Sync Failed'))
+            return JSONResponse(_('Sync executed'))
         else:
+            logger.exception(_('Sync Failed, User is not authorized to access this project'))
             return JSONResponse(_('Sync Failed'), status=403)
 
 

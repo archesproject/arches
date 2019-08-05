@@ -71,6 +71,7 @@ class Command(BaseCommand):
                     self.sync_survey(mobile_survey.id)
 
     def sync_survey(self, uuid, user=None):
+        logger.debug(_('Creating sync log'))
         mobile_survey = MobileSurvey.objects.get(id=uuid)
         synclog = MobileSyncLog(
             user=user,
