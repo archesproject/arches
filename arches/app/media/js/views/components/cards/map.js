@@ -60,6 +60,15 @@ define([
             }
         });
 
+        this.selectedTool = ko.pureComputed(function() {
+            var tool;
+            _.find(self.featureLookup, function(value) {
+                var selectedTool = value.selectedTool();
+                if (selectedTool) tool = selectedTool;
+            });
+            return tool;
+        });
+
         this.updateTiles = function() {
             var featureCollection = self.draw.getAll();
             _.each(self.featureLookup, function(value) {
@@ -179,6 +188,11 @@ define([
         }]);
 
         MapComponentViewModel.apply(this, [params]);
+
+        this.isFeatureClickable = function(feature) {
+            if (self.selectedTool()) return false;
+            return feature.properties.resourceinstanceid;
+        };
 
         this.deleteFeature = function(feature) {
             if (self.draw) {
