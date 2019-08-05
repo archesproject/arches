@@ -1765,7 +1765,7 @@ define([
 
             if (self.defaultValueType() && self.defaultValueType() != '' || self.defaultValueType() > 0) {
                 if (self.defaultValueType() == 1){
-                    self.value(self.defaultValue());
+                    koMapping.fromJS(self.defaultValue(), self.value);
                 }
                 this.loadDefaultValue(self.defaultValueType(), true);
             }
