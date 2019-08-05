@@ -250,7 +250,11 @@ class JsonLdReader(Reader):
         if root_ontologyclass in self.resource_model_root_classes:
             return self.graph_id_lookup[root_ontologyclass]
         else:
-            self.logger.info("Incoming Root Ontology class `{0}` not found within the list of Resource Model Root Classes".format(root_ontologyclass))
+            self.logger.info(
+                "Incoming Root Ontology class `{0}` not found within the list of Resource Model Root Classes".format(
+                    root_ontologyclass
+                    )
+                )
         # if not isinstance(strs_to_test, list):
         #     strs_to_test = [strs_to_test]
         # for str_to_test in strs_to_test:
@@ -297,7 +301,9 @@ class JsonLdReader(Reader):
                     self.logger.debug("Resource instance ID found: {0}".format(resourceinstanceid))
                     resource = Resource.objects.get(pk=resourceinstanceid)
                 else:
-                    self.logger.debug("`use_ids` setting is set to False, creating new Resource Instance IDs on import")
+                    self.logger.debug(
+                        "`use_ids` setting is set to False, creating new Resource Instance IDs on import"
+                        )
                     resource = Resource()
                     resource.graph_id = graphid
                     resource.pk = resourceid
@@ -456,7 +462,8 @@ class JsonLdReader(Reader):
                     self.logger.debug("Checking to see if the node is in a standard datatype: \
                         domain-value, number, string, date, file-list, concept")
                     for datatype in ['domain-value', 'number', 'string', 'date', 'file-list', 'concept']:
-                        if found_node['node'].datatype == datatype and json_data_is_valid(found_node['node'], jsonld_graph): 
+                        if found_node['node'].datatype == datatype and 
+                                json_data_is_valid(found_node['node'], jsonld_graph): 
                             self.logger.debug("Matched {0} and the json fragment is valid".format(datatype))
                             return found_node
 
@@ -568,7 +575,9 @@ class JsonLdReader(Reader):
                             tileid = uuid.uuid4()
 
                 except self.DataDoesNotMatchGraphException as e:
-                    self.logger.error("Mismatch when trying to match the JSON LD section with a relevant Arches Branch")
+                    self.logger.error(
+                        "Mismatch when trying to match the JSON LD section with a relevant Arches Branch"
+                        )
                     self.logger.debug(jsonld_node)
                     self.errors['DataDoesNotMatchGraphException'] = e
                     branch = None
