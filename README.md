@@ -46,4 +46,4 @@ Our general release cycle will typically be a functional release (either major i
 
 ##### Support for previous releases
 
-Functional releases will be supported until the next functional release. After that users are expected to upgrade to the latest release on [pypi.python.org](https://pypi.python.org/pypi/arches)
+Functional releases will be supported until the next functional release. After that users are expected to upgrade to the latest release on [pypi.python.org](https://pypi.python.org/pypi/arches) 
