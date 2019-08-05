@@ -45,6 +45,7 @@ define([
                 self.featureLookup[id].selectedTool.subscribe(function(tool) {
                     if (self.draw) {
                         if (tool === '') {
+                            self.draw.trash();
                             self.draw.changeMode('simple_select');
                         } else if (tool) {
                             _.each(self.featureLookup, function(value, key) {
@@ -67,6 +68,10 @@ define([
                 if (selectedTool) tool = selectedTool;
             });
             return tool;
+        });
+
+        this.editing = ko.pureComputed(function() {
+            return !!(self.selectedFeatureIds().length > 0 || self.selectedTool());
         });
 
         this.updateTiles = function() {
