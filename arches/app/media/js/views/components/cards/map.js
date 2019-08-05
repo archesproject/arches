@@ -69,10 +69,6 @@ define([
             return tool;
         });
 
-        this.selectedTool.subscribe(function(tool) {
-            console.log(tool);
-        });
-
         this.updateTiles = function() {
             var featureCollection = self.draw.getAll();
             _.each(self.featureLookup, function(value) {
