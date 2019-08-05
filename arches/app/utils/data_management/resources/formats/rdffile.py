@@ -462,8 +462,7 @@ class JsonLdReader(Reader):
                     self.logger.debug("Checking to see if the node is in a standard datatype: \
                         domain-value, number, string, date, file-list, concept")
                     for datatype in ['domain-value', 'number', 'string', 'date', 'file-list', 'concept']:
-                        if found_node['node'].datatype == datatype and 
-                                json_data_is_valid(found_node['node'], jsonld_graph): 
+                        if found_node['node'].datatype == datatype and json_data_is_valid(found_node['node'], jsonld_graph):
                             self.logger.debug("Matched {0} and the json fragment is valid".format(datatype))
                             return found_node
 
