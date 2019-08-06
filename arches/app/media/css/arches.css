@@ -585,6 +585,13 @@ input[type="checkbox"] {
     position: relative;
 }
 
+.wf-multi-tile-btn-complete {
+    position: absolute;
+    top: 266px;
+    left: 350px;
+    font-weight: 800;
+}
+
 .wf-multi-tile-step-list {
     display: flex;
     flex-direction: column;
