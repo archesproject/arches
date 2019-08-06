@@ -11756,7 +11756,7 @@ a .search-type-link {
 }
 
 .resource_search_widget_dropdown ul .select2-disabled {
-    background: #f7f7f7;
+    background: #eee;
     height: 35px;
 }
 
@@ -11775,7 +11775,7 @@ a .search-type-link {
 }
 
 .resource_search_widget_dropdown ul .select2-disabled div span span button.term-search-btn:not(.active) {
-    background: #E5EFFD;
+    background: #BBD1EA;
     color: #658CC9;
 }
 
@@ -11804,7 +11804,7 @@ a .search-type-link {
 }
 
 .resource_search_widget_dropdown ul .select2-highlighted {
-    background: #f1f1f1;
+    background: #E5EFFD;
 }
 
 .term-search-btn.active {
