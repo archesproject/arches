@@ -558,7 +558,7 @@ input[type="checkbox"] {
     background-color: #f4f4f4;
     height: 100%;
     overflow-y: auto;
-    padding: 0 0 218px 0;
+    padding: 0 0 218px 25px;
 }
 
 .padded-workflow-step, .workflow-step-body .card-component {
