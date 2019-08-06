@@ -68,6 +68,7 @@ class CouchdbProxy(ProtectedResourceView, ProxyView):
     def dispatch(self, request, path):
         try:
             if path is None or path == '':
+                logger.debug(_('Dispatching without path'))
                 return super(CouchdbProxy, self).dispatch(request, path)
             else:
                 m = self.p.match(path)
