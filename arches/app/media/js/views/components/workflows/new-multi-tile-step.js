@@ -1,8 +1,9 @@
 define([
     'knockout',
     'views/components/workflows/new-tile-step',
-    'viewmodels/alert'
-], function(ko, NewTileStepViewModel, AlertViewModel) {
+    'viewmodels/alert',
+    'jquery'
+], function(ko, NewTileStepViewModel, AlertViewModel, $) {
 
     /** 
      * A generic viewmodel for workflow steps that can add multiple tiles
@@ -35,7 +36,6 @@ define([
             params.resourceid(tile.resourceinstance_id);
             params.tileid(tile.tileid);
             self.resourceId(tile.resourceinstance_id);
-            self.complete(true);
             self.tile(self.card().getNewTile());
             self.tile().reset();
             setTimeout(function() {
