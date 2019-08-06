@@ -1,9 +1,8 @@
 define([
     'knockout',
     'views/components/workflows/new-tile-step',
-    'viewmodels/alert',
-    'jquery'
-], function(ko, NewTileStepViewModel, AlertViewModel, $) {
+    'viewmodels/alert'
+], function(ko, NewTileStepViewModel, AlertViewModel) {
 
     /** 
      * A generic viewmodel for workflow steps that can add multiple tiles
