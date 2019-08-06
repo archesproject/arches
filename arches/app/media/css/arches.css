@@ -11692,7 +11692,7 @@ table.table.dataTable {
 
 .search-attribute-widget {
     display: inline-block;
-    margin: 7px;
+    margin: 7px 8px;
 }
 
 a .search-type-link {
@@ -11755,12 +11755,60 @@ a .search-type-link {
     border: none;
 }
 
+.resource_search_widget_dropdown ul .select2-disabled {
+    background: #f7f7f7;
+    height: 35px;
+}
+
+.resource_search_widget_dropdown ul .select2-disabled .group {
+    padding: 0px;
+    border-top: 1px solid #C1D4F3;
+}
+
+.resource_search_widget_dropdown ul .select2-disabled div span span button {
+    width: 195px;
+    height: 35px;
+}
+
+.resource_search_widget_dropdown ul .select2-disabled div span span button.active {
+    background: #8EAFE3;
+}
+
+.resource_search_widget_dropdown ul .select2-disabled div span span button.term-search-btn:not(.active) {
+    background: #E5EFFD;
+    color: #658CC9;
+}
+
+.resource_search_widget_dropdown ul .select2-disabled div span span button:not(.active):hover {
+    background: #B9D0F4;
+    color: #4330A4;
+}
+
+.resource_search_widget_dropdown ul .select2-disabled div span span button:first-child {
+    border-right: 1px solid steelblue;
+}
+
 .resource_search_widget_dropdown .select2-results {
     background: #fdfdfd;
+    z-index: 10;
+    margin-top: 0px;
+    border-top: 1px solid steelblue;
+}
+
+.resource_search_widget_dropdown.select2-drop-active {
+    border-color: steelblue;
+}
+
+.resource_search_widget_dropdown ul li:not(.select2-no-results) {
+    color: #0A449F;
+}
+
+.resource_search_widget_dropdown ul .select2-highlighted {
+    background: #f1f1f1;
 }
 
 .term-search-btn.active {
-    color: #123;
+    color: #4330A4;
 }
 
 .search-type-btn i {
