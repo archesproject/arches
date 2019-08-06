@@ -11876,6 +11876,22 @@ a .search-type-link {
     border-top: solid 1px #dcdcdc;
 }
 
+.search-popup-panel .tab-pane.active div.saved-search-container div .rr-splash .rr-splash-img-container {
+    height: 50px;
+    width: 50px;
+}
+
+.search-popup-panel .tab-pane.active div.saved-search-container div .rr-splash .rr-splash-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.search-popup-panel .tab-pane.active div.saved-search-container div .rr-splash .rr-splash-img-container .rr-splash-img {
+    height: 325%;
+    margin-top: -13px;
+    margin-left: -8px;
+}
+
 .facets-container {
     position: absolute;
     width: 275px;
@@ -13934,9 +13950,9 @@ a.jstree-anchor.permissions-widget {
 
 .rr-splash {
     text-align: center;
-    margin: 5%;
+    margin: 48px 41px 20px 45px;
     border: 1px solid #ddd;
-    padding: 5%;
+    padding: 40px 30px;
     background: #f6f6f6;
     border-radius: 4px;
 }
@@ -13972,7 +13988,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .rr-splash-description {
-    font-size: 16px;
+    font-size: 15px;
     color: #999;
 }
 .rr-splash-subtitle {
