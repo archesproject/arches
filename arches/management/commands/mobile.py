@@ -25,8 +25,9 @@ from arches.management.commands import utils
 from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.models import MobileSyncLog
 from arches.app.models.system_settings import settings
-from django.core.management.base import BaseCommand, CommandError
 from arches.app.utils.couch import Couch
+from django.utils.translation import ugettext as _
+from django.core.management.base import BaseCommand, CommandError
 
 logger = logging.getLogger(__name__)
 
