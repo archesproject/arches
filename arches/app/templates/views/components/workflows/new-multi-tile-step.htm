@@ -20,7 +20,7 @@
             <div><h4 data-bind="text: (itemName())"></h4></div>
             <!-- ko if: card().tiles().length === 0 -->
             <div class="wf-multi-tile-step-list-empty">
-                <p data-bind="text: ('No '+itemName()+' added yet.')"></p>
+                <p data-bind="text: ('No '+itemName()+' added yet. Add one or multiple '+itemName()+'.')"></p>
             </div>
             <!-- /ko -->
             <!-- ko foreach: {data: card().tiles, as: 'tile'} -->
