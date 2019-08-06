@@ -14004,9 +14004,9 @@ a.jstree-anchor.permissions-widget {
     position: absolute;
     background: #fcfcfc;
     z-index: 11;
-    height: 70%;
+    height: 95%;
     overflow-y: auto;
-    top: 230px;
+    top: 10px;
     left: 15px;
     width: calc(100% - 25px);
     border: 1px solid #ddd;
