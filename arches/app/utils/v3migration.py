@@ -373,8 +373,11 @@ class v3PreparedResource:
                             print("-- coercing to previous group because parent cardinality is 1 --")
 
                 if self.verbose:
-                    print("v3 value: {}".format(dp[1]))
-                    print("v4 value: {}".format(value))
+                    try:
+                        print("v3 value: {}".format(dp[1]))
+                        print("v4 value: {}".format(value))
+                    except UnicodeEncodeError:
+                        print "v3/v4 value: error encoding to ascii for print statement"
 
                 # find the tile that will hold the value
                 for tile in tilegroup_json:
