@@ -1,6 +1,45 @@
 import os
 import json
+import uuid
 from arches.app.models.tile import Tile
+
+
+def get_nodegroup_tilegroup(v4_node_name, nodes, resource_id, verbose=False):
+
+    # get the corresponding v4 node and then get the tile for its nodegroup
+    v4_node = nodes.get(name=v4_node_name)
+    ng_tile = Tile().get_blank_tile(v4_node.nodegroup_id, resourceid=resource_id)
+
+    # if there are child tiles, then the ng_tile.tileid needs to be set
+    # (not sure why this is the case, but it is)
+    if ng_tile.tileid is None:
+        ng_tile.tileid = uuid.uuid4()
+
+    # create a raw json representation of the node group tile and its children
+    # and put these into a flat list of tiles that is returned
+    tile_json = {
+        "resourceinstance_id": resource_id,
+        "provisionaledits": None,
+        "parenttile_id": ng_tile.parenttile_id,
+        "nodegroup_id": ng_tile.nodegroup_id,
+        "sortorder": 0,
+        "data": ng_tile.data,
+        "tileid": ng_tile.tileid,
+    }
+    output_tiles = [tile_json]
+    for tile in ng_tile.tiles:
+        child_tile_json = {
+            "tileid": tile.tileid,
+            "resourceinstance_id": resource_id,
+            "nodegroup_id": tile.nodegroup_id,
+            "sortorder": 0,
+            "provisionaledits": None,
+            "parenttile_id": ng_tile.tileid,
+            "data": tile.data,
+        }
+        output_tiles.append(child_tile_json)
+
+    return output_tiles
 
 
 def get_v3_config_info(v3_data_dir, v4_graph_name=None):
