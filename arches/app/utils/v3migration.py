@@ -389,12 +389,24 @@ class v3PreparedResource:
                 # now get the UUID of the v4 target node
                 v4_uuid = self.node_lookup[dp[0]]['v4_uuid']
 
+                # figure out if the parent of this tilegroup has cardinality of 1.
+                # use the last tile in line to find the parent nodegroup, this is because
+                # in some cases the first tile in line represents the parent (and therefore
+                # has no parent itself) but not reliably.
+                single_parent = False
+                last_ng = NodeGroup.objects.get(nodegroupid=tilegroup_json[-1]['nodegroup_id'])
+                if last_ng.parentnodegroup_id is not None:
+                    parent_ng = NodeGroup.objects.get(nodegroupid=last_ng.parentnodegroup_id)
+                    if parent_ng.cardinality == "1":
+                        single_parent = True
+
                 # if this node is part of a new group, break the for loop and start the while loop over
                 if group_num != last_group:
                     last_group = group_num
-                    if self.verbose:
-                        print "<< breaking the loop because this node has a new group number >>"
-                    break
+                    if single_parent is False:
+                        if self.verbose:
+                            print "<< breaking the loop because this node has a new group number >>"
+                        break
                 last_group = group_num
 
                 # break the for loop (and subsequently, restart the while loop)
