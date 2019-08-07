@@ -159,8 +159,8 @@ class Command(BaseCommand):
                 exit()
         elif os.path.isdir(v3_dir) or os.path.isfile(v3_dir):
             print("The v3data directory already exists at this location:\n    "
-                  + v3_dir + "\nEither change your path, or re-run command with "
-                  "--overwrite to replace the existing file or directory.")
+                  "{}\nEither change your path, or re-run command with "
+                  "--overwrite to replace the existing file or directory.".format(v3_dir))
             exit()
 
         print("making directory")
