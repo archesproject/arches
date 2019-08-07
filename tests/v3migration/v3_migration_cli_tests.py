@@ -226,7 +226,8 @@ class v3MigrationTests(ArchesTestCase):
         management.call_command('v3', 'write-v4-json',
                                 target=self.pkg,
                                 number=10,
-                                resource_models=all_models
+                                resource_models=all_models,
+                                verbose=True
                                 )
 
         # basic test to make sure the v4 file has been created. No tests on
