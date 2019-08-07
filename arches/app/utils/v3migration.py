@@ -293,10 +293,11 @@ class v3PreparedResource:
         while len(resource_data):
 
             if self.verbose:
+                fp = resource_data[0][0]
                 print("\nSTARTING WHILE LOOP")
                 print("###################")
                 print("resource_data current length: {}".format(len(resource_data)))
-                print("first in line: {} {}".format(resource_data[0][0], self.node_lookup[resource_data[0][0]]['v4_uuid']))
+                print("first in line: {} {}".format(fp, self.node_lookup[fp]['v4_uuid']))
                 print("group number of first in line: {}".format(resource_data[0][2]))
 
             # get the v4 name of the first node in the resource list
@@ -304,7 +305,7 @@ class v3PreparedResource:
 
             # obtain a blank tile for the nodegroup that contains the corresponding
             tilegroup_json = v3utils.get_nodegroup_tilegroup(v4_name, v4_nodes, self.resourceid,
-                                                     verbose=self.verbose)
+                                                             verbose=self.verbose)
 
             # get a list of all the node UUIDs in this tile and its children
             all_node_options = []
@@ -317,8 +318,8 @@ class v3PreparedResource:
             # begin iterating resource_data, and trying to fill tile['data'] values
             # in the current tile group. if a node in the iteration doesn't fit
             # in any of the tiles, assume this is a new branch, break the for loop,
-            # and restart the while loop to get the next tile group. remove any
-            # nodes from resource_data whose value has been placed in a tile.
+            # and restart the while loop to get the next tile group. at the end, remove any
+            # nodes from resource_data whose values have been placed in a tile.
             if self.verbose:
                 print("\nSTARTING FOR LOOP")
                 print("=================")
