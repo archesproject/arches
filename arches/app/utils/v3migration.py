@@ -143,25 +143,6 @@ class DataValueConverter():
         return value
 
 
-def duplicate_tile_json(tilejson):
-    """returns a duplicate of the tilejson that is passed in, but
-    with all data values set to None."""
-
-    newtile = {
-        "resourceinstance_id": tilejson['resourceinstance_id'],
-        "provisionaledits": tilejson['provisionaledits'],
-        "parenttile_id": tilejson['parenttile_id'],
-        "nodegroup_id": tilejson['nodegroup_id'],
-        "sortorder": tilejson['sortorder'],
-        "data": {},
-        "tileid": uuid.uuid4(),
-    }
-    for k in tilejson['data'].keys():
-        newtile['data'][k] = None
-
-    return newtile
-
-
 class v3PreparedResource:
     """ Used to convert data for a single v3 resource into corresponding set
     of v4 json. """
