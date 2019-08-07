@@ -95,8 +95,8 @@ class DataValueConverter():
 
             if not self.skip_file_check:
                 if not os.path.isfile(fullpath) and not os.path.isfile(shortenedpath):
-                    print "expected file doesn't exist: {}".format(fullpath)
-                    print "all files must be transferred before migration can continue"
+                    print("expected file doesn't exist: {}".format(fullpath))
+                    print("all files must be transferred before migration can continue")
                     exit()
 
             if shortenedpath != "":
@@ -112,8 +112,8 @@ class DataValueConverter():
             try:
                 file_obj.save()
             except Exception as e:
-                print "Error saving file: {}".format(fullpath)
-                print e
+                print("Error saving file: {}".format(fullpath))
+                print(e)
                 exit()
 
             # construct the full json needed to define a file-list node in a tile
@@ -255,18 +255,24 @@ class v3PreparedResource:
 
         groups = get_group_branches(self.v3_json)
         if self.verbose:
-            print "\nGROUPING SUMMARY"
-            print "################"
-            print "number of groups:", len(groups)
+            print("\nv3 MERGENODES")
+            print("################")
+            print(self.mergenodes)
+            print("\nGROUPING SUMMARY")
+            print("################")
+            print("number of groups: {}".format(len(groups)))
 
         outlist = []
         for branch_num, group in enumerate(groups):
             branch_data = process_group(group, processed=[])
 
             if self.verbose:
-                print "{} - datapoints: {}".format(group['entitytypeid'], len(branch_data))
+                print("{} - datapoints: {}".format(group['entitytypeid'], len(branch_data)))
             for node in branch_data:
                 outlist.append(node+(branch_num,))
+
+        # The following code block can be very helpful while developing and debugging
+        # the way v3 json is parsed.
 
         # with open(self.v3_json['entityid']+"-v3.json", "wb") as f:
             # json.dump(self.v3_json, f, indent=1)
@@ -333,22 +339,22 @@ class v3PreparedResource:
         ct_total = len(resource_data)
 
         if self.verbose:
-            print "\nFULL RESOURCE DATA"
-            print "##################"
+            print("\nFULL RESOURCE DATA")
+            print("##################")
             for i in resource_data:
-                print i
-            print "resource data full length", len(resource_data)
+                print(i)
+            print("resource data full length: {}".format(len(resource_data)))
 
         # begin looping though the v3 resource data list
         last_group = resource_data[0][2]
         while len(resource_data):
 
             if self.verbose:
-                print "\nSTARTING WHILE LOOP"
-                print "###################"
-                print "resource_data current length", len(resource_data)
-                print "first in line:", resource_data[0][0], self.node_lookup[resource_data[0][0]]['v4_uuid']
-                print "group number of first in line:", resource_data[0][2]
+                print("\nSTARTING WHILE LOOP")
+                print("###################")
+                print("resource_data current length: {}".format(len(resource_data)))
+                print("first in line: {} {}".format(resource_data[0][0], self.node_lookup[resource_data[0][0]]['v4_uuid']))
+                print("group number of first in line: {}".format(resource_data[0][2]))
 
             # get the v4 name of the first node in the resource list
             v4_name = self.node_lookup[resource_data[0][0]]['v4_name']
@@ -363,7 +369,7 @@ class v3PreparedResource:
                 all_node_options += t['data'].keys()
 
             if self.verbose:
-                print "number of tiles in tilegroup:", len(tilegroup_json)
+                print("number of tiles in tilegroup: {}".format(len(tilegroup_json)))
 
             # begin iterating resource_data, and trying to fill tile['data'] values
             # in the current tile group. if a node in the iteration doesn't fit
@@ -371,8 +377,8 @@ class v3PreparedResource:
             # and restart the while loop to get the next tile group. remove any
             # nodes from resource_data whose value has been placed in a tile.
             if self.verbose:
-                print "\nSTARTING FOR LOOP"
-                print "================="
+                print("\nSTARTING FOR LOOP")
+                print("=================")
             used = []
             for index, dp in enumerate(resource_data):
 
@@ -401,20 +407,28 @@ class v3PreparedResource:
                         single_parent = True
 
                 # if this node is part of a new group, break the for loop and start the while loop over
+                # but not if the parent node group has a cardinality of 1
                 if group_num != last_group:
                     last_group = group_num
                     if single_parent is False:
                         if self.verbose:
-                            print "<< breaking the loop because this node has a new group number >>"
+                            print("<< breaking the loop because this node has a new group number >>")
                         break
+                    else:
+                        if self.verbose:
+                            print("-- coercing to previous group because parent cardinality is 1 --")
                 last_group = group_num
 
                 # break the for loop (and subsequently, restart the while loop)
                 # if this node is not in the current tile group
                 if v4_uuid not in all_node_options:
                     if self.verbose:
-                        print "<< breaking the loop because this node is not in the current tilegroup >>"
+                        print("<< breaking the loop because this node is not in the current tilegroup >>")
                     break
+
+                if self.verbose:
+                    print("v3 value: {}".format(dp[1]))
+                    print("v4 value: {}".format(value))
 
                 # find the tile that will hold the value
                 for tile in tilegroup_json:
@@ -424,7 +438,7 @@ class v3PreparedResource:
                         continue
 
                     if self.verbose:
-                        print "matched to: {} {}".format(self.node_lookup[dp[0]]['v4_name'], v4_uuid)
+                        print("matched to: {} {}".format(self.node_lookup[dp[0]]['v4_name'], v4_uuid))
 
                     ng = NodeGroup.objects.get(nodegroupid=tile['nodegroup_id'])
                     tileid_used = tile['tileid']
@@ -440,7 +454,7 @@ class v3PreparedResource:
                             tile['data'][v4_uuid] = [value]
 
                         if self.verbose:
-                            print "action: appending value to concept-list (either new or existing)"
+                            print("action: appending value to concept-list (either new or existing)")
 
                     # if there is already a value in the tile where this new value should be
                     # place, then, if the cardinality allows, a duplicate tile can be made
@@ -452,44 +466,44 @@ class v3PreparedResource:
                         tilegroup_json.insert(0, newtile)
                         tileid_used = newtile['tileid']
                         if self.verbose:
-                            print "action: adding a new tile to the same group (cardinality = n)"
+                            print("action: adding a new tile to the same group (cardinality = n)")
 
                     # if there is already a value in the tile where this new value should be
-                    # place, and cardinality = 1, then we have a problem. The graph should
+                    # placed, and cardinality = 1, then we have a problem. The graph should
                     # probably be altered.
                     elif tile['data'][v4_uuid] is not None and ng.cardinality == "1":
-                        print self.resourceid
-                        print dp[0]
-                        print "ERROR: a new tile should be added here, but the cardinality of 1 "\
-                            "does not allow it."
+                        print(self.resourceid)
+                        print(dp[0])
+                        print("ERROR: a new tile should be added here, but the cardinality of 1 "
+                              "does not allow it.")
 
                     # otherwise, place the value in the tile. This is where the majority
                     # of the action takes place
                     else:
                         tile['data'][v4_uuid] = value
                         if self.verbose:
-                            print "action: placing value in empty tile"
+                            print("action: placing value in empty tile")
 
                     if self.verbose:
-                        print "tileid:", tileid_used
+                        print("tileid: {}".format(tileid_used))
                     used.append(index)
                     break
 
             if self.verbose:
-                print "\nCLEAN-UP AFTER FOR LOOP"
-                print "-----------------------"
-                print "final number of tiles in tile_group:", len(tilegroup_json)
-                print "removing used nodes:", used
-                print "resource_data len before:", len(resource_data)
+                print("\nCLEAN-UP AFTER FOR LOOP")
+                print("-----------------------")
+                print("final number of tiles in tile_group: {}".format(len(tilegroup_json)))
+                print("removing used nodes: {}".format(used))
+                print("resource_data len before: {}".format(len(resource_data)))
             resource_data = [v for i, v in enumerate(resource_data) if i not in used]
             if self.verbose:
-                print "resource_data len after:", len(resource_data)
+                print("resource_data len after: {}".format(len(resource_data)))
 
             # append the tile group to self.tiles
             self.tiles += tilegroup_json
 
         if self.verbose:
-            print "\nTOTAL TILES IN RESOURCE:", len(self.tiles)
+            print("\nTOTAL TILES IN RESOURCE: {}".format(len(self.tiles)))
         # final processing, now that self.tiles is fully populated
         self.strip_empty_tile_values()
 
