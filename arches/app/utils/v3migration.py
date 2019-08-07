@@ -242,17 +242,14 @@ class v3PreparedResource:
         def get_group_branches(entity, outgroups=[]):
             """ get the group branches from the entity based on v3 mergenodes """
 
-            # iterate the children of this entity
-            for child in entity['child_entities']:
+            look_further = any([child['entitytypeid'] in self.mergenodes for
+                               child in entity['child_entities']])
 
-                # if one of the GRANDCHILDREN is a mergenode, then the recursion
-                # must continue. otherwise, this child is its own group.
-                look_further = any([gc['entitytypeid'] in self.mergenodes for
-                                   gc in child['child_entities']])
-                if look_further:
+            if look_further or entity['entitytypeid'] in self.mergenodes:
+                for child in entity['child_entities']:
                     get_group_branches(child, outgroups=outgroups)
-                else:
-                    outgroups.append(child)
+            else:
+                outgroups.append(entity)
 
             return outgroups
 
