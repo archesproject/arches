@@ -386,54 +386,64 @@ class v3PreparedResource:
                     if self.verbose:
                         print("matched to: {} {}".format(self.node_lookup[dp[0]]['v4_name'], v4_uuid))
 
-                    ng = NodeGroup.objects.get(nodegroupid=tile['nodegroup_id'])
                     tileid_used = tile['tileid']
+                    make_duplicate = False
 
-                    # if this is a concept-list node, assume the value should
-                    # be appended to the existing concept-list value, if extant
-                    if dt == "concept-list":
-
-                        # set value
-                        if isinstance(tile['data'][v4_uuid], list):
-                            tile['data'][v4_uuid].append(value)
-                        else:
-                            tile['data'][v4_uuid] = [value]
-
+                    # if there is no data in the tile where this new value should be placed,
+                    # then enter the value. this is where the majority of the action takes place
+                    if tile['data'][v4_uuid] is None:
+                        v3utils.set_tile_data(tile, v4_uuid, dt, value)
                         if self.verbose:
-                            print("action: appending value to concept-list (either new or existing)")
+                            print("action: placing value in empty tile")
 
                     # if there is already a value in the tile where this new value should be
-                    # place, then, if the cardinality allows, a duplicate tile can be made
-                    # and inserted.
-                    elif tile['data'][v4_uuid] is not None and ng.cardinality == "n":
+                    # placed, then we need to do a little more investigation
+                    else:
 
-                        newtile = duplicate_tile_json(tile)
-                        newtile['data'][v4_uuid] = value
+                        # first check to see if this value was in the same v3 group as the last value
+                        if last_group == group_num:
+
+                            # if it's a concept-list, just append the value to the existing list
+                            if dt == "concept-list":
+                                tile = v3utils.set_tile_data(tile, v4_uuid, dt, value)
+                                if self.verbose:
+                                    print("action: appending value to existing concept-list")
+
+                            # otherwise, duplicate the tile if cardinality allows
+                            else:
+
+                                ng = NodeGroup.objects.get(nodegroupid=tile['nodegroup_id'])
+                                if ng.cardinality == "n":
+                                    make_duplicate = True
+
+                                # In this case, a non-concept-list node exists but the v4 graph does not allow
+                                # a duplicate of the tile to be made. Print a warning message.
+                                else:
+                                    print(self.resourceid)
+                                    print(dp[0])
+                                    print("WARNING: A new tile should be added here, but the cardinality of 1 "
+                                          "does not allow it. This data will be lost. You may want to review "
+                                          "your v4 graph.")
+
+                        # if this was in a different group in v3 (but has passed the single parent test above)
+                        # then a new tile should be made and appended to this group.
+                        elif last_group != group_num:
+                            make_duplicate = True
+
+                    if make_duplicate is True:
+                        newtile = v3utils.duplicate_tile_json(tile)
+                        newtile = v3utils.set_tile_data(newtile, v4_uuid, dt, value)
                         tilegroup_json.insert(0, newtile)
                         tileid_used = newtile['tileid']
                         if self.verbose:
                             print("action: adding a new tile to the same group (cardinality = n)")
 
-                    # if there is already a value in the tile where this new value should be
-                    # placed, and cardinality = 1, then we have a problem. The graph should
-                    # probably be altered.
-                    elif tile['data'][v4_uuid] is not None and ng.cardinality == "1":
-                        print(self.resourceid)
-                        print(dp[0])
-                        print("ERROR: a new tile should be added here, but the cardinality of 1 "
-                              "does not allow it.")
-
-                    # otherwise, place the value in the tile. This is where the majority
-                    # of the action takes place
-                    else:
-                        tile['data'][v4_uuid] = value
-                        if self.verbose:
-                            print("action: placing value in empty tile")
-
                     if self.verbose:
                         print("tileid: {}".format(tileid_used))
                     used.append(index)
+
                     break
+                last_group = group_num
 
             if self.verbose:
                 print("\nCLEAN-UP AFTER FOR LOOP")
