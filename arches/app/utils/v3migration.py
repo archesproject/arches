@@ -339,36 +339,38 @@ class v3PreparedResource:
                 # now get the UUID of the v4 target node
                 v4_uuid = self.node_lookup[dp[0]]['v4_uuid']
 
-                # figure out if the parent of this tilegroup has cardinality of 1.
-                # use the last tile in line to find the parent nodegroup, this is because
-                # in some cases the first tile in line represents the parent (and therefore
-                # has no parent itself) but not reliably.
-                single_parent = False
-                last_ng = NodeGroup.objects.get(nodegroupid=tilegroup_json[-1]['nodegroup_id'])
-                if last_ng.parentnodegroup_id is not None:
-                    parent_ng = NodeGroup.objects.get(nodegroupid=last_ng.parentnodegroup_id)
-                    if parent_ng.cardinality == "1":
-                        single_parent = True
+                # break the for loop (and subsequently, restart the while loop)
+                # if this node is not in the current tile group
+                if v4_uuid not in all_node_options:
+                    last_group = group_num
+                    if self.verbose:
+                        print("<< breaking the loop because this node is not in the current tilegroup >>")
+                    break
 
                 # if this node is part of a new group, break the for loop and start the while loop over
-                # but not if the parent node group has a cardinality of 1
+                # but not if the parent node group has a cardinality of 1 in which case this node should
+                # be coerced into the previous group
                 if group_num != last_group:
-                    last_group = group_num
+
+                    # figure out if the parent of this tilegroup has cardinality of 1.
+                    # use the last tile in line to find the parent nodegroup, this is because
+                    # in some (but not all) cases the first tile in line represents the parent
+                    # (and therefore has no parent itself).
+                    single_parent = False
+                    last_ng = NodeGroup.objects.get(nodegroupid=tilegroup_json[-1]['nodegroup_id'])
+                    if last_ng.parentnodegroup_id is not None:
+                        parent_ng = NodeGroup.objects.get(nodegroupid=last_ng.parentnodegroup_id)
+                        if parent_ng.cardinality == "1":
+                            single_parent = True
+
                     if single_parent is False:
                         if self.verbose:
                             print("<< breaking the loop because this node has a new group number >>")
+                        last_group = group_num
                         break
                     else:
                         if self.verbose:
                             print("-- coercing to previous group because parent cardinality is 1 --")
-                last_group = group_num
-
-                # break the for loop (and subsequently, restart the while loop)
-                # if this node is not in the current tile group
-                if v4_uuid not in all_node_options:
-                    if self.verbose:
-                        print("<< breaking the loop because this node is not in the current tilegroup >>")
-                    break
 
                 if self.verbose:
                     print("v3 value: {}".format(dp[1]))
