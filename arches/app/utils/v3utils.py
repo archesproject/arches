@@ -42,6 +42,37 @@ def get_nodegroup_tilegroup(v4_node_name, nodes, resource_id, verbose=False):
     return output_tiles
 
 
+def duplicate_tile_json(tilejson):
+    """returns a duplicate of the tilejson that is passed in, but
+    with all data values set to None."""
+
+    newtile = {
+        "resourceinstance_id": tilejson['resourceinstance_id'],
+        "provisionaledits": tilejson['provisionaledits'],
+        "parenttile_id": tilejson['parenttile_id'],
+        "nodegroup_id": tilejson['nodegroup_id'],
+        "sortorder": tilejson['sortorder'],
+        "data": {},
+        "tileid": uuid.uuid4(),
+    }
+    for k in tilejson['data'].keys():
+        newtile['data'][k] = None
+
+    return newtile
+
+
+def set_tile_data(tile, v4_uuid, datatype, value):
+
+    if datatype == "concept-list":
+        if tile['data'][v4_uuid] is None:
+            tile['data'][v4_uuid] = [value]
+        else:
+            tile['data'][v4_uuid].append(value)
+    else:
+        tile['data'][v4_uuid] = value
+    return tile
+
+
 def get_v3_config_info(v3_data_dir, v4_graph_name=None):
 
     conf_file = os.path.join(v3_data_dir, "rm_configs.json")
