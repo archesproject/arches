@@ -26,16 +26,8 @@ class DataValueConverter():
         self.skip_file_check = skip_file_check
         db = settings.DATABASES['default']
         db_conn = "dbname = {} user = {} host = {} password = {} port = {}".format(
-            db['NAME'], db['USER'], db['HOST'], db['PASSWORD'], db['PORT'])
-        try:
-            conn = psycopg2.connect(db_conn)
-        # this is just for handling during test running where the "arches" database
-        # doesn't exist, but "test_arches" does.
-        except OperationalError:
-            db_conn = "dbname = {} user = {} host = {} password = {} port = {}".format(
-                      "test_"+db['NAME'], db['USER'], db['HOST'], db['PASSWORD'], db['PORT'])
-            conn = psycopg2.connect(db_conn)
-
+            db['POSTGIS_TEMPLATE'], db['USER'], db['HOST'], db['PASSWORD'], db['PORT'])
+        conn = psycopg2.connect(db_conn)
         self.dbcursor = conn.cursor()
 
     def fix_v3_value(self, value, v4nodeinfo):
