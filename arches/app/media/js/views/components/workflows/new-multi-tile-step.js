@@ -35,7 +35,6 @@ define([
             params.resourceid(tile.resourceinstance_id);
             params.tileid(tile.tileid);
             self.resourceId(tile.resourceinstance_id);
-            self.complete(true);
             self.tile(self.card().getNewTile());
             self.tile().reset();
             setTimeout(function() {
