@@ -1,5 +1,6 @@
 import unicodecsv
 import json
+import pyprind
 import csv
 import shutil
 import subprocess
@@ -35,6 +36,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand, CommandError
 from django.core import management
 from datetime import datetime
+from time import time
 '''
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
@@ -463,7 +465,9 @@ class Command(BaseCommand):
 
     def load_package(
             self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep', yes=False,
-            load_project_extensions=False):
+            load_project_extensions=False,start=time()):
+            
+                # start = time()
 
         def load_system_settings(package_dir):
             update_system_settings = True
@@ -548,26 +552,44 @@ class Command(BaseCommand):
             self.import_graphs(branches, overwrite_graphs=overwrite_graphs)
             self.import_graphs(resource_models, overwrite_graphs=overwrite_graphs)
 
-        def load_concepts(package_dir, overwrite, stage):
+        def load_concepts(package_dir, overwrite, stage, verbose=False):
             file_types = ['*.xml', '*.rdf']
+            # verbose = False
 
             concept_data = []
             for file_type in file_types:
                 concept_data.extend(glob.glob(os.path.join(
                     package_dir, 'reference_data', 'concepts', file_type)))
-
+            if verbose is False:
+                bar = pyprind.ProgBar(len(concept_data))
+                print(bar)
             for path in concept_data:
-                print path
+                # print path
                 self.import_reference_data(path, overwrite, stage)
+                if verbose is False:
+                    bar.update()
+                else:
+                    print path
+            if verbose is False:
+                print(bar)
 
             collection_data = []
             for file_type in file_types:
                 collection_data.extend(glob.glob(os.path.join(
                     package_dir, 'reference_data', 'collections', file_type)))
+            print('between file_types and collection_data paths')
 
+            if verbose is False:
+                bar = pyprind.ProgBar(len(collection_data))
+                print(bar)
             for path in collection_data:
-                print path
+                # print path
                 self.import_reference_data(path, overwrite, stage)
+                if verbose is False:
+                    bar.update()
+                else:
+                    print path
+            print 'time elapsed to parse rdf graph %s s' % (time() - start)
 
         def load_mapbox_styles(style_paths, basemap):
             for path in style_paths:
@@ -940,6 +962,7 @@ class Command(BaseCommand):
     def import_reference_data(self, data_source, overwrite='ignore', stage='stage'):
         if overwrite == '':
             overwrite = 'overwrite'
+        # pointer
 
         skos = SKOSReader()
         rdf = skos.read_file(data_source)

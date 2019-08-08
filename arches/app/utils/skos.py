@@ -57,7 +57,7 @@ class SKOSReader(object):
         start = time()
         try:
             rdf = rdf_graph.parse(source=path_to_file, format=format)
-            print 'time elapsed to parse rdf graph %s s' % (time() - start)
+            # print 'time elapsed to parse rdf graph %s s' % (time() - start)
         except:
             raise Exception('Error occurred while parsing the file %s' % path_to_file)
         return rdf
@@ -109,11 +109,11 @@ class SKOSReader(object):
                             if predicate == DCTERMS.title:
                                 concept_scheme.addvalue({'id': val['value_id'], 'value': val[
                                                         'value'], 'language': object.language or default_lang, 'type': 'prefLabel', 'category': value_type.category})
-                                print 'Casting dcterms:title to skos:prefLabel'
+                                # print 'Casting dcterms:title to skos:prefLabel'
                             elif predicate == DCTERMS.description:
                                 concept_scheme.addvalue({'id': val['value_id'], 'value': val[
                                                         'value'], 'language': object.language or default_lang, 'type': 'scopeNote', 'category': value_type.category})
-                                print 'Casting dcterms:description to skos:scopeNote'
+                                # print 'Casting dcterms:description to skos:scopeNote'
                             elif predicate == DCTERMS.identifier:
                                 identifier = self.unwrapJsonLiteral(str(object))
                         except:
