@@ -359,7 +359,7 @@ LOGGING = {
     'loggers': {
         'arches': {
             'handlers': ['file', 'console'],
-            'level': 'DEBUG',
+            'level': 'ERROR',
             'propagate': True
         }
     }
