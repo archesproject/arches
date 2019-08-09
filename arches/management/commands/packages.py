@@ -554,49 +554,38 @@ class Command(BaseCommand):
 
         def load_concepts(package_dir, overwrite, stage, verbose=False):
             file_types = ['*.xml', '*.rdf']
-            bar_count = 0
 
             concept_data = []
             for file_type in file_types:
                 concept_data.extend(glob.glob(os.path.join(
                     package_dir, 'reference_data', 'concepts', file_type)))
+            if verbose is False:
+                bar_concepts = pyprind.ProgBar(len(concept_data),bar_char='X')
+
+            bar = (len(concept_data) == 1 and verbose is True)
+            for path in concept_data: # ~289 seconds
+                self.import_reference_data(path, overwrite, stage, bar)
+                if verbose is False:
+                    bar_concepts.update()
+                else:
+                    print path
+            print(bar_concepts)
 
             collection_data = []
             for file_type in file_types:
                 collection_data.extend(glob.glob(os.path.join(
                     package_dir, 'reference_data', 'collections', file_type)))
-
-            if verbose is False:
-                bar_collections = pyprind.ProgBar(len(concept_data)+len(collection_data), title=None)
-            else:
-                bar_collections = None
-                # print(bar)
-            # for2 = time()
-            for path in concept_data:
-                self.import_reference_data(path, overwrite, stage)
-                if verbose is False:
+            bar = (len(collection_data) == 1 and verbose is False)
+            if verbose is False and bar is False:
+                bar_collections = pyprind.ProgBar(len(collection_data), title='loading concept collections',bar_char='X')
+            for path in collection_data: # ~49 seconds
+                self.import_reference_data(path, overwrite, stage, bar)
+                if bar is False and verbose is False:
                     bar_collections.update()
-                else:
+                elif verbose is True:
                     print path
-            print(bar_collections)
-            # print('===for2===',(time() - for2)) = 218 seconds
-
-            # collection_data = []
-            # for file_type in file_types:
-            #     collection_data.extend(glob.glob(os.path.join(
-            #         package_dir, 'reference_data', 'collections', file_type)))
-
-                # print(bar)
-            # for4 = time()
-            for path in collection_data:
-                # print path
-                self.import_reference_data(path, overwrite, stage)
-                if verbose is False:
-                    bar_collections.update()
-                else:
-                    print path
-            print(bar_collections)
-            # print('===for4===',(time() - for4)) = 49 seconds
+            if bar is False and verbose is False:
+                print(bar_collections)
             print 'time elapsed to parse rdf graph %s s' % (time() - start)
 
         def load_mapbox_styles(style_paths, basemap):
@@ -967,13 +956,13 @@ class Command(BaseCommand):
                 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.')
             sys.exit()
 
-    def import_reference_data(self, data_source, overwrite='ignore', stage='stage'):
+    def import_reference_data(self, data_source, overwrite='ignore', stage='stage',bar=False):
         if overwrite == '':
             overwrite = 'overwrite'
 
         skos = SKOSReader()
         rdf = skos.read_file(data_source)
-        ret = skos.save_concepts_from_skos(rdf, overwrite, stage)
+        ret = skos.save_concepts_from_skos(rdf, overwrite, stage, bar)
 
     def import_business_data(
         self, data_source, config_file=None, overwrite=None, bulk_load=False,

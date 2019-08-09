@@ -63,7 +63,7 @@ class SKOSReader(object):
             raise Exception('Error occurred while parsing the file %s' % path_to_file)
         return rdf
 
-    def save_concepts_from_skos(self, graph, overwrite_options='overwrite', staging_options='keep'):
+    def save_concepts_from_skos(self, graph, overwrite_options='overwrite', staging_options='keep', bar=False):
         """
         given an RDF graph, tries to save the concpets to the system
 
@@ -72,7 +72,7 @@ class SKOSReader(object):
         staging_options -- 'stage', 'keep'
 
         """
-
+        # print(bar)
         baseuuid = uuid.uuid4()
         allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
         default_lang = settings.LANGUAGE_CODE
@@ -215,6 +215,8 @@ class SKOSReader(object):
                 self.member_relations.append({'source': self.generate_uuid_from_subject(baseuuid, s),
                                     'type': 'member', 'target': self.generate_uuid_from_subject(baseuuid, o)})
 
+            if bar is True:
+                bar_nodes = pyprind.ProgBar(len(self.nodes),bar_char='X',title='loading concept nodes')
             # insert and index the concpets
             scheme_node = None
             with transaction.atomic():
@@ -240,7 +242,14 @@ class SKOSReader(object):
                         except:
                             # else save it
                             node.save()
+                    if bar is True:
+                        bar_nodes.update()
+                if bar is True:
+                    print(bar_nodes)
                 # print('===for4A===',(time() - for4A))
+                if bar is True:
+                    bar_relations = pyprind.ProgBar(len(self.relations),bar_char='X',title='loading concept relations')
+                    bar_member_relations = pyprind.ProgBar(len(self.member_relations),bar_char='X',title='loading member relations')
 
                 # insert the concept relations
                 for4B = time()
@@ -250,6 +259,10 @@ class SKOSReader(object):
                         conceptto_id=relation['target'],
                         relationtype_id=relation['type']
                     )
+                    if bar is True:
+                        bar_relations.update()
+                if bar is True:
+                    print(bar_relations)
                 # print('===for4B===',(time() - for4B))
                 
                 # need to index after the concepts and relations have been entered into the db
@@ -268,9 +281,12 @@ class SKOSReader(object):
                         relationtype_id=relation['type']
                     )
                 except IntegrityError as e:
-                    # self.logger.warning(e.message)
+                    # self.logger.info(e.message)
                     msg = e
-            # print('===for5===',(time() - for5))
+                if bar is True:
+                    bar_member_relations.update()
+            if bar is True:
+                print(bar_member_relations)
 
             return scheme_node
         else:
