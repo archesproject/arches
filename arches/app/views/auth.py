@@ -42,6 +42,8 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.arches_crypto import AESCipher
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
+logger = logging.getLogger(__name__)
+
 
 class LoginView(View):
 
@@ -275,8 +277,7 @@ class GetClientIdView(View):
                 user['is_reviewer'] = is_reviewer
                 response = JSONResponse({'user': user, 'clientid': settings.MOBILE_OAUTH_CLIENT_ID})
             else:
+                logger.exception(_('failed to get client id for ' + username + ' with password' + password))
                 response = Http401Response()
 
         return response
-
-
