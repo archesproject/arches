@@ -72,7 +72,7 @@ class SKOSReader(object):
         staging_options -- 'stage', 'keep'
 
         """
-        # print(bar)
+        
         baseuuid = uuid.uuid4()
         allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
         default_lang = settings.LANGUAGE_CODE
@@ -237,8 +237,6 @@ class SKOSReader(object):
                             node.save()
                     if bar is True:
                         bar_nodes.update()
-                if bar is True:
-                    print(bar_nodes)
                 # print('===for4A===',(time() - for4A))
                 if bar is True:
                     bar_relations = pyprind.ProgBar(len(self.relations),bar_char='X',title='loading concept relations')
@@ -254,8 +252,6 @@ class SKOSReader(object):
                     )
                     if bar is True:
                         bar_relations.update()
-                if bar is True:
-                    print(bar_relations)
                 # print('===for4B===',(time() - for4B))
                 
                 # need to index after the concepts and relations have been entered into the db
@@ -278,8 +274,6 @@ class SKOSReader(object):
                     msg = e
                 if bar is True:
                     bar_member_relations.update()
-            if bar is True:
-                print(bar_member_relations)
 
             return scheme_node
         else:

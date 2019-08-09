@@ -563,15 +563,12 @@ class Command(BaseCommand):
                 bar_concepts = pyprind.ProgBar(len(concept_data),bar_char='X')
 
             bar = (len(concept_data) == 1 and verbose is False)
-            # bar = True
             for path in concept_data: # ~289 seconds
                 self.import_reference_data(path, overwrite, stage, bar)
                 if bar is False and verbose is False:
                     bar_concepts.update(item_id=path)
                 else:
                     print path
-            if bar is False and verbose is False:
-                print(bar_concepts)
 
             collection_data = []
             for file_type in file_types:
@@ -586,8 +583,6 @@ class Command(BaseCommand):
                     bar_collections.update(item_id=path)
                 elif verbose is True:
                     print path
-            if bar is False and verbose is False:
-                print(bar_collections)
             print 'time elapsed to parse rdf graph %s s' % (time() - start)
 
         def load_mapbox_styles(style_paths, basemap):
