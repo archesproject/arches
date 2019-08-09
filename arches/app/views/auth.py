@@ -269,16 +269,21 @@ class GetClientIdView(View):
         if settings.MOBILE_OAUTH_CLIENT_ID == '':
             response = HttpResponse('Make sure to set your MOBILE_OAUTH_CLIENT_ID in settings.py', status=500)
         else:
-            if user:
-                if hasattr(user, 'userprofile') is not True:
-                    models.UserProfile.objects.create(user=user)
-                is_reviewer = user.userprofile.is_reviewer()
-                user = JSONSerializer().serializeToPython(user)
-                user['password'] = None
-                user['is_reviewer'] = is_reviewer
-                response = JSONResponse({'user': user, 'clientid': settings.MOBILE_OAUTH_CLIENT_ID})
-            else:
-                logger.exception(_('failed to get client id for ' + username + ' with password' + password))
+            try:
+                if user:
+                    if hasattr(user, 'userprofile') is not True:
+                        models.UserProfile.objects.create(user=user)
+                    is_reviewer = user.userprofile.is_reviewer()
+                    user = JSONSerializer().serializeToPython(user)
+                    user['password'] = None
+                    user['is_reviewer'] = is_reviewer
+                    response = JSONResponse({'user': user, 'clientid': settings.MOBILE_OAUTH_CLIENT_ID})
+                else:
+                    logger.exception(_('failed to get client id for ' + username + ' with password' + password))
+                    response = Http401Response()
+            except Exception as e:
+                logger.exception("Could not get client")
+                logger.exception(e)
                 response = Http401Response()
 
         return response
