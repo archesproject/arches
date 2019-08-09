@@ -571,15 +571,15 @@ class Command(BaseCommand):
             else:
                 bar_collections = None
                 # print(bar)
-            # for2 = time() = 218 seconds
+            # for2 = time()
             for path in concept_data:
-                self.import_reference_data(path, overwrite, stage, bar_collections)
+                self.import_reference_data(path, overwrite, stage)
                 if verbose is False:
                     bar_collections.update()
                 else:
                     print path
             print(bar_collections)
-            # print('===for2===',(time() - for2))
+            # print('===for2===',(time() - for2)) = 218 seconds
 
             # collection_data = []
             # for file_type in file_types:
@@ -587,16 +587,16 @@ class Command(BaseCommand):
             #         package_dir, 'reference_data', 'collections', file_type)))
 
                 # print(bar)
-            # for4 = time() = 49 seconds
+            # for4 = time()
             for path in collection_data:
                 # print path
-                self.import_reference_data(path, overwrite, stage, bar_collections)
+                self.import_reference_data(path, overwrite, stage)
                 if verbose is False:
                     bar_collections.update()
                 else:
                     print path
             print(bar_collections)
-            # print('===for4===',(time() - for4))
+            # print('===for4===',(time() - for4)) = 49 seconds
             print 'time elapsed to parse rdf graph %s s' % (time() - start)
 
         def load_mapbox_styles(style_paths, basemap):
@@ -967,13 +967,13 @@ class Command(BaseCommand):
                 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.')
             sys.exit()
 
-    def import_reference_data(self, data_source, overwrite='ignore', stage='stage', bar=None):
+    def import_reference_data(self, data_source, overwrite='ignore', stage='stage'):
         if overwrite == '':
             overwrite = 'overwrite'
 
         skos = SKOSReader()
         rdf = skos.read_file(data_source)
-        ret = skos.save_concepts_from_skos(rdf, overwrite, stage, bar)
+        ret = skos.save_concepts_from_skos(rdf, overwrite, stage)
 
     def import_business_data(
         self, data_source, config_file=None, overwrite=None, bulk_load=False,

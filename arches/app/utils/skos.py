@@ -63,7 +63,7 @@ class SKOSReader(object):
             raise Exception('Error occurred while parsing the file %s' % path_to_file)
         return rdf
 
-    def save_concepts_from_skos(self, graph, overwrite_options='overwrite', staging_options='keep', bar=None, verbose=False):
+    def save_concepts_from_skos(self, graph, overwrite_options='overwrite', staging_options='keep'):
         """
         given an RDF graph, tries to save the concpets to the system
 
@@ -209,21 +209,11 @@ class SKOSReader(object):
                             })
 
                 self.nodes.append(concept)
-                # print('===for2===',(time() - for2))
-            #     if verbose is False:
-            #         bar_skos.update()
-            # if verbose is False:
-            #     print(bar_skos)
-            # for3 = time()
 
             for s, v, o in graph.triples((None, SKOS.member, None)):
                 # print "%s %s %s " % (s,v,o)
                 self.member_relations.append({'source': self.generate_uuid_from_subject(baseuuid, s),
                                     'type': 'member', 'target': self.generate_uuid_from_subject(baseuuid, o)})
-            # print('===for3===',(time() - for3))
-            bar_count = len(self.nodes) + len(self.relations) + len(self.member_relations)
-            if verbose is False:
-                bar_skos = pyprind.ProgBar(bar_count,title=None)
 
             # insert and index the concpets
             scheme_node = None
@@ -240,7 +230,6 @@ class SKOSReader(object):
                             if node.nodetype != 'ConceptScheme':
                                 self.relations.append(
                                     {'source': '00000000-0000-0000-0000-000000000006', 'type': 'narrower', 'target': node.id})
-                                bar_count+=1
 
                     if overwrite_options == 'overwrite':
                         node.save()
@@ -251,10 +240,6 @@ class SKOSReader(object):
                         except:
                             # else save it
                             node.save()
-                    if verbose is False:
-                        bar_skos.update()
-                if verbose is False:
-                    print(bar_skos)
                 # print('===for4A===',(time() - for4A))
 
                 # insert the concept relations
@@ -265,10 +250,6 @@ class SKOSReader(object):
                         conceptto_id=relation['target'],
                         relationtype_id=relation['type']
                     )
-                    if verbose is False:
-                        bar_skos.update()
-                if verbose is False:
-                    print(bar_skos)
                 # print('===for4B===',(time() - for4B))
                 
                 # need to index after the concepts and relations have been entered into the db
@@ -289,10 +270,6 @@ class SKOSReader(object):
                 except IntegrityError as e:
                     # self.logger.warning(e.message)
                     msg = e
-                if verbose is False:
-                    bar_skos.update()
-            if verbose is False:
-                print(bar_skos)
             # print('===for5===',(time() - for5))
 
             return scheme_node
