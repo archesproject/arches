@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import re
 import logging
+import pyprind
 from django.db import transaction, IntegrityError
 from django.db.models import Q
 from django.utils.http import urlencode
@@ -62,7 +63,7 @@ class SKOSReader(object):
             raise Exception('Error occurred while parsing the file %s' % path_to_file)
         return rdf
 
-    def save_concepts_from_skos(self, graph, overwrite_options='overwrite', staging_options='keep'):
+    def save_concepts_from_skos(self, graph, overwrite_options='overwrite', staging_options='keep', bar=None, verbose=False):
         """
         given an RDF graph, tries to save the concpets to the system
 
@@ -85,7 +86,7 @@ class SKOSReader(object):
 
         # if the graph is of the type rdflib.graph.Graph
         if isinstance(graph, Graph):
-
+            # for1 = time()
             # Search for ConceptSchemes first
             for scheme, v, o in graph.triples((None, RDF.type, SKOS.ConceptScheme)):
                 identifier = self.unwrapJsonLiteral(str(scheme))
@@ -96,6 +97,7 @@ class SKOSReader(object):
                     'nodetype': 'ConceptScheme'
                 })
 
+                # for1A = time()
                 for predicate, object in graph.predicate_objects(subject=scheme):
                     if str(DCTERMS) in predicate and predicate.replace(DCTERMS, '') in dcterms_value_types.values_list('valuetype', flat=True):
                         if not self.language_exists(object, allowed_languages):
@@ -125,6 +127,7 @@ class SKOSReader(object):
                             top_concept_id = self.generate_uuid_from_subject(baseuuid, object)
                             self.relations.append(
                                 {'source': scheme_id, 'type': 'hasTopConcept', 'target': top_concept_id})
+                # print('===for1A===',(time() - for1A))
 
                 concept_scheme.addvalue({'id': identifier['value_id'], 'value': identifier[
                                         'value'], 'language': default_lang, 'type': dcterms_identifier_type.valuetype, 'category': dcterms_identifier_type.category})
@@ -140,6 +143,7 @@ class SKOSReader(object):
                     })
 
                     # loop through all the elements within a <skos:Concept> element
+                    # for1B = time()
                     for predicate, object in graph.predicate_objects(subject=s):
                         if str(SKOS) in predicate or str(ARCHES) in predicate:
                             if not self.language_exists(object, allowed_languages):
@@ -170,6 +174,9 @@ class SKOSReader(object):
                     concept.addvalue({'id': identifier['value_id'], 'value': identifier[
                                      'value'], 'language': default_lang, 'type': dcterms_identifier_type.valuetype, 'category': dcterms_identifier_type.category})
                     self.nodes.append(concept)
+                    # print('===for1B===',(time() - for1B))
+
+            # print('===for1===',(time() - for1))
 
             # Search for SKOS.Collections
             for s, v, o in graph.triples((None, RDF.type, SKOS.Collection)):
@@ -180,6 +187,7 @@ class SKOSReader(object):
                     'nodetype': 'Collection'
                 })
                 # loop through all the elements within a <skos:Concept> element
+                for2 = time()
                 for predicate, object in graph.predicate_objects(subject=s):
                     if str(SKOS) in predicate or str(ARCHES) in predicate:
                         if not self.language_exists(object, allowed_languages):
@@ -201,15 +209,26 @@ class SKOSReader(object):
                             })
 
                 self.nodes.append(concept)
+                # print('===for2===',(time() - for2))
+            #     if verbose is False:
+            #         bar_skos.update()
+            # if verbose is False:
+            #     print(bar_skos)
+            # for3 = time()
 
             for s, v, o in graph.triples((None, SKOS.member, None)):
                 # print "%s %s %s " % (s,v,o)
                 self.member_relations.append({'source': self.generate_uuid_from_subject(baseuuid, s),
                                     'type': 'member', 'target': self.generate_uuid_from_subject(baseuuid, o)})
+            # print('===for3===',(time() - for3))
+            bar_count = len(self.nodes) + len(self.relations) + len(self.member_relations)
+            if verbose is False:
+                bar_skos = pyprind.ProgBar(bar_count,title=None)
 
             # insert and index the concpets
             scheme_node = None
             with transaction.atomic():
+                for4A = time()
                 for node in self.nodes:
                     if node.nodetype == 'ConceptScheme':
                         scheme_node = node
@@ -221,6 +240,7 @@ class SKOSReader(object):
                             if node.nodetype != 'ConceptScheme':
                                 self.relations.append(
                                     {'source': '00000000-0000-0000-0000-000000000006', 'type': 'narrower', 'target': node.id})
+                                bar_count+=1
 
                     if overwrite_options == 'overwrite':
                         node.save()
@@ -231,14 +251,25 @@ class SKOSReader(object):
                         except:
                             # else save it
                             node.save()
+                    if verbose is False:
+                        bar_skos.update()
+                if verbose is False:
+                    print(bar_skos)
+                # print('===for4A===',(time() - for4A))
 
                 # insert the concept relations
+                for4B = time()
                 for relation in self.relations:
                     newrelation = models.Relation.objects.get_or_create(
                         conceptfrom_id=relation['source'],
                         conceptto_id=relation['target'],
                         relationtype_id=relation['type']
                     )
+                    if verbose is False:
+                        bar_skos.update()
+                if verbose is False:
+                    print(bar_skos)
+                # print('===for4B===',(time() - for4B))
                 
                 # need to index after the concepts and relations have been entered into the db
                 # so that the proper context gets indexed with the concept
@@ -247,6 +278,7 @@ class SKOSReader(object):
 
             # insert the concept collection relations
             # we do this outide a transaction so that we can load incomplete collections
+            for5 = time()
             for relation in self.member_relations:
                 try:
                     newrelation = models.Relation.objects.get_or_create(
@@ -255,7 +287,13 @@ class SKOSReader(object):
                         relationtype_id=relation['type']
                     )
                 except IntegrityError as e:
-                    self.logger.warning(e.message)
+                    # self.logger.warning(e.message)
+                    msg = e
+                if verbose is False:
+                    bar_skos.update()
+            if verbose is False:
+                print(bar_skos)
+            # print('===for5===',(time() - for5))
 
             return scheme_node
         else:
