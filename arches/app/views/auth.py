@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import time
 from jose import jws
+import logging
 from datetime import datetime, timedelta
 from django.http import HttpResponse
 from django.template.loader import render_to_string
