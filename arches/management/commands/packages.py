@@ -563,7 +563,7 @@ class Command(BaseCommand):
                 bar_concepts = pyprind.ProgBar(len(concept_data),bar_char='X')
 
             bar = (len(concept_data) == 1 and verbose is False)
-            bar = True
+            # bar = True
             for path in concept_data: # ~289 seconds
                 self.import_reference_data(path, overwrite, stage, bar)
                 if bar is False and verbose is False:

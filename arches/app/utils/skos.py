@@ -225,22 +225,15 @@ class SKOSReader(object):
                     if node.nodetype == 'ConceptScheme':
                         scheme_node = node
                     if staging_options == 'stage':
-                        try:
-                            models.Concept.objects.get(pk=node.id)
-                        except:
-                            # this is a new concept, so add a reference to it in the Candiates schema
+                        if models.Concept.objects.get(pk=node.id).exists() is False:
                             if node.nodetype != 'ConceptScheme':
                                 self.relations.append(
                                     {'source': '00000000-0000-0000-0000-000000000006', 'type': 'narrower', 'target': node.id})
-
+                        
                     if overwrite_options == 'overwrite':
                         node.save()
                     elif overwrite_options == 'ignore':
-                        try:
-                            # don't do anything if the concept already exists
-                            models.Concept.objects.get(pk=node.id)
-                        except:
-                            # else save it
+                        if models.Concept.objects.get(pk=node.id).exists() is False:
                             node.save()
                     if bar is True:
                         bar_nodes.update()
