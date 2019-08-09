@@ -562,14 +562,16 @@ class Command(BaseCommand):
             if verbose is False:
                 bar_concepts = pyprind.ProgBar(len(concept_data),bar_char='X')
 
-            bar = (len(concept_data) == 1 and verbose is True)
+            bar = (len(concept_data) == 1 and verbose is False)
+            bar = True
             for path in concept_data: # ~289 seconds
                 self.import_reference_data(path, overwrite, stage, bar)
-                if verbose is False:
-                    bar_concepts.update()
+                if bar is False and verbose is False:
+                    bar_concepts.update(item_id=path)
                 else:
                     print path
-            print(bar_concepts)
+            if bar is False and verbose is False:
+                print(bar_concepts)
 
             collection_data = []
             for file_type in file_types:
@@ -581,7 +583,7 @@ class Command(BaseCommand):
             for path in collection_data: # ~49 seconds
                 self.import_reference_data(path, overwrite, stage, bar)
                 if bar is False and verbose is False:
-                    bar_collections.update()
+                    bar_collections.update(item_id=path)
                 elif verbose is True:
                     print path
             if bar is False and verbose is False:
