@@ -6,6 +6,7 @@ import os
 import sys
 import uuid
 import traceback
+from time import time
 from copy import deepcopy
 from format import Writer
 from format import Reader
@@ -333,6 +334,9 @@ class CsvReader(Reader):
     def import_business_data(self, business_data=None, mapping=None, overwrite='append', bulk=False, create_concepts=False, create_collections=False):
         # errors = businessDataValidator(self.business_data)
 
+        print "Starting import of business data"
+        self.start = time()
+
         def get_display_nodes(graphid):
             display_nodeids = []
             functions = FunctionXGraph.objects.filter(function_id='60000000-0000-0000-0000-000000000001', graph_id=graphid)
@@ -398,6 +402,7 @@ class CsvReader(Reader):
                     print 'ERROR: No column \'ResourceID\' found in business data file. Please add a \'ResourceID\' column with a unique resource identifier.'
                     print '*'*80
                     sys.exit()
+                graphid = mapping['resource_model_id']
                 blanktilecache = {}
                 populated_nodegroups = {}
                 populated_nodegroups[resourceinstanceid] = []
@@ -406,13 +411,26 @@ class CsvReader(Reader):
                 target_resource_model = None
                 single_cardinality_nodegroups = [str(nodegroupid) for nodegroupid in NodeGroup.objects.values_list('nodegroupid', flat=True).filter(cardinality = '1')]
                 node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
-                display_nodes = get_display_nodes(mapping['resource_model_id'])
-                all_nodes = Node.objects.all()
+                display_nodes = get_display_nodes(graphid)
+                all_nodes = Node.objects.filter(graph_id=graphid)
+                node_list = {str(node.pk): node for node in all_nodes}
                 datatype_factory = DataTypeFactory()
+                primaryDescriptorsFunctionConfig = {}
+                try:
+                    config = FunctionXGraph.objects.get(
+                        graph_id=graphid, function__functiontype='primarydescriptors').config
+                    for key in ['map_popup', 'name', 'description']:
+                        nodegroup_id = config[key]['nodegroup_id']
+                        if nodegroup_id not in primaryDescriptorsFunctionConfig:
+                            primaryDescriptorsFunctionConfig[nodegroup_id] = {}
+                        primaryDescriptorsFunctionConfig[nodegroup_id][key] = config[key]['string_template']
+                except:
+                    pass
+
                 concepts_to_create = {}
                 new_concepts = {}
                 required_nodes = {}
-                for node in Node.objects.filter(~Q(datatype='semantic'), isrequired=True, graph_id=mapping['resource_model_id']).values_list('nodeid', 'name'):
+                for node in Node.objects.filter(~Q(datatype='semantic'), isrequired=True, graph_id=graphid).values_list('nodeid', 'name'):
                     required_nodes[str(node[0])] = node[1]
 
                 # This code can probably be moved into it's own module.
@@ -823,7 +841,8 @@ class CsvReader(Reader):
                     self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number)
 
                 if bulk:
-                    Resource.bulk_save(resources=resources)
+                    print "Time to create resource and tile objects: %s" % datetime.timedelta(seconds=time()-self.start) 
+                    Resource.bulk_save(resources=resources, primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig, graph_nodes=node_list)
 
                 print _('%s total resource saved' % (save_count + 1))
 

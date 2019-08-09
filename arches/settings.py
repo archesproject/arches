@@ -29,6 +29,9 @@ except ImportError:  # unable to import corsheaders prior to installing requirem
 ###          STATIC SETTINGS          ###
 #########################################
 
+STREAMLINE_IMPORT = True
+
+
 MODE = 'PROD' #options are either "PROD" or "DEV" (installing with Dev mode set, gets you extra dependencies)
 DEBUG = True
 INTERNAL_IPS = ('127.0.0.1',)
