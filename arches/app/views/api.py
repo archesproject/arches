@@ -232,6 +232,7 @@ class Resources(APIBase):
     # }]
 
     def get(self, request, resourceid=None, slug=None, graphid=None):
+
         if user_can_read_resources(user=request.user):
             allowed_formats = ['json', 'json-ld']
             format = request.GET.get('format', 'json-ld')
@@ -250,11 +251,11 @@ class Resources(APIBase):
                         output = exporter.writer.write_resources(
                             resourceinstanceids=[resourceid], indent=indent, user=request.user)
                         out = output[0]['outputfile'].getvalue()
-                    except models.ResourceInstance.DoesNotExist:
-                        logger.exception()
+                    except models.ResourceInstance.DoesNotExist as e:
+                        logger.exception(e)
                         return JSONResponse(status=404)
                     except Exception as e:
-                        logger.exception()
+                        logger.exception(e)
                 elif format == 'json':
                     out = Resource.objects.get(pk=resourceid)
                     out.load_tiles()
@@ -313,6 +314,7 @@ class Resources(APIBase):
 
             return JSONResponse(out, indent=indent)
         else:
+            logger.warning(_("Unable to identify user"))
             return JSONResponse(status=403)
 
     # def put(self, request, resourceid):

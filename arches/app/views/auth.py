@@ -166,7 +166,8 @@ class ConfirmSignupView(View):
                     for error in form.errors.as_data()['username']:
                         if error.code == 'unique':
                             return redirect('auth')
-                except:
+                except Exception as e:
+                    logger.exception(e)
                     pass
         else:
             form.errors['ts'] = [_('The signup link has expired, please try signing up again.  Thanks!')]
@@ -212,6 +213,7 @@ class ChangePasswordView(View):
                 messages['success'] = _('Password successfully updated')
 
         except Exception as err:
+            logger.exception(err)
             messages['other'] = err
 
         return JSONResponse(messages)
@@ -235,6 +237,7 @@ class UserProfileView(View):
             userDict['deletable_nodegroups'] = user.userprofile.deletable_nodegroups
             response = JSONResponse(userDict)
         else:
+            logger.warning(_("Could not authenticate to retrieve user profile"))
             response = Http401Response()
 
         return response
@@ -254,6 +257,7 @@ class GetTokenView(View):
 
             response = HttpResponse(token, content_type='text/plain')
         else:
+            logger.warning(_("Could not authenticate to retrieve token"))
             response = Http401Response(www_auth_header='Bearer')
 
         return response
@@ -279,10 +283,10 @@ class GetClientIdView(View):
                     user['is_reviewer'] = is_reviewer
                     response = JSONResponse({'user': user, 'clientid': settings.MOBILE_OAUTH_CLIENT_ID})
                 else:
-                    logger.exception(_('failed to get client id for ' + username + ' with password' + password))
+                    logger.exception(_('Failed to authenticate'))
                     response = Http401Response()
             except Exception as e:
-                logger.exception("Could not get client")
+                logger.error(_("Could not get clientid"))
                 logger.exception(e)
                 response = Http401Response()
 

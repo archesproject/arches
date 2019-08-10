@@ -1,4 +1,5 @@
 import time
+import logging
 from django.urls import reverse
 from django.http import HttpResponse
 from django.contrib.auth.models import User, AnonymousUser
@@ -12,7 +13,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from jose import jwt, jws, JWSError
 
 HTTP_HEADER_ENCODING = 'iso-8859-1'
-
+logger = logging.getLogger(__name__)
 
 class SetAnonymousUser(MiddlewareMixin):
     def process_request(self, request):
@@ -22,8 +23,8 @@ class SetAnonymousUser(MiddlewareMixin):
         if request.path != reverse('oauth2:authorize') and request.user.is_anonymous():
             try:
                 request.user = User.objects.get(username='anonymous')
-            except Exception:
-                pass
+            except Exception as e:
+                logger.exception(e)
 
 
 class ModifyAuthorizationHeader(MiddlewareMixin):
@@ -55,9 +56,11 @@ class TokenMiddleware(MiddlewareMixin):
         return auth
 
     def process_request(self, request):
-        token = self.get_authorization_header(request)
-        request.token = token
-
+        try:
+            token = self.get_authorization_header(request)
+            request.token = token
+        except Exception as e:
+            logger.exception(e)
 
 class AuthenticationFailed(Exception):
     pass
