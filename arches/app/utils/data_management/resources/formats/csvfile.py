@@ -289,7 +289,7 @@ class TileCsvWriter(Writer):
 
 class CsvReader(Reader):
 
-    def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number):
+    def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number, primaryDescriptorsFunctionConfig=None, graph_nodes=None):
         # create a resource instance only if there are populated_tiles
         errors = []
         if len(populated_tiles) > 0:
@@ -305,7 +305,7 @@ class CsvReader(Reader):
             if bulk:
                 resources.append(newresourceinstance)
                 if len(resources) >= settings.BULK_IMPORT_BATCH_SIZE:
-                    Resource.bulk_save(resources=resources)
+                    Resource.bulk_save(resources=resources, primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig, graph_nodes=graph_nodes)
                     del resources[:]  #clear out the array
             else:
                 try:
@@ -676,7 +676,7 @@ class CsvReader(Reader):
                     if row['ResourceID'] != previous_row_resourceid and previous_row_resourceid is not None:
 
                         save_count = save_count + 1
-                        self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number)
+                        self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number, primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig, graph_nodes=node_list)
 
                         # reset values for next resource instance
                         populated_tiles = []
@@ -838,7 +838,7 @@ class CsvReader(Reader):
                     self.errors += errors
 
                 if 'legacyid' in locals():
-                    self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number)
+                    self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number, primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig, graph_nodes=node_list)
 
                 if bulk:
                     print "Time to create resource and tile objects: %s" % datetime.timedelta(seconds=time()-self.start) 

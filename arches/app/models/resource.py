@@ -214,32 +214,32 @@ class Resource(models.ResourceInstance):
                     index='terms', id=term['_id'], data=term['_source']))
             time_to_create_bulk_term_docs = time_to_create_bulk_term_docs + (time()-s)
 
-        print "timer: %s" % datetime.timedelta(seconds=timers['timer'])
-        print "timer1: %s" % datetime.timedelta(seconds=timers['timer1'])
-        print "timer2: %s" % datetime.timedelta(seconds=timers['timer2'])
-        print "timer3: %s" % datetime.timedelta(seconds=timers['timer3'])
-        print "timer4: %s" % datetime.timedelta(seconds=timers['timer4'])
-        print "time to get documents to index: %s" % datetime.timedelta(seconds=time_to_get_docs)
-        print "time to get root ontology: %s" % datetime.timedelta(seconds=time_to_get_root_ontology)
-        print "time to create bulk docs: %s" % datetime.timedelta(seconds=time_to_create_bulk_docs)
-        print "time to create bulk term docs: %s" % datetime.timedelta(seconds=time_to_create_bulk_term_docs)
+        # print "timer: %s" % datetime.timedelta(seconds=timers['timer'])
+        # print "timer1: %s" % datetime.timedelta(seconds=timers['timer1'])
+        # print "timer2: %s" % datetime.timedelta(seconds=timers['timer2'])
+        # print "timer3: %s" % datetime.timedelta(seconds=timers['timer3'])
+        # print "timer4: %s" % datetime.timedelta(seconds=timers['timer4'])
+        # print "time to get documents to index: %s" % datetime.timedelta(seconds=time_to_get_docs)
+        # print "time to get root ontology: %s" % datetime.timedelta(seconds=time_to_get_root_ontology)
+        # print "time to create bulk docs: %s" % datetime.timedelta(seconds=time_to_create_bulk_docs)
+        # print "time to create bulk term docs: %s" % datetime.timedelta(seconds=time_to_create_bulk_term_docs)
         start = time()
 
         if not settings.STREAMLINE_IMPORT:
             for tile in tiles:
                 tile.save_edit(edit_type='tile create', new_value=tile.data)
 
-        print "time to save tile edits: %s" % datetime.timedelta(seconds=time() - start)
+        #print "time to save tile edits: %s" % datetime.timedelta(seconds=time() - start)
         start = time()
 
-        print "time to save resources to db:%s" % datetime.timedelta(seconds=time() - start)
+        #print "time to save resources to db:%s" % datetime.timedelta(seconds=time() - start)
         start = time()
         # bulk index the resources, tiles and terms
 
         #print documents[0]
         se.bulk_index(documents)
         se.bulk_index(term_list)
-        print "time to index resources:%s" % datetime.timedelta(seconds=time() - start)
+        #print "time to index resources:%s" % datetime.timedelta(seconds=time() - start)
 
     def index(self):
         """
