@@ -353,6 +353,41 @@ define([
         };
 
         this.map.subscribe(setupDraw);
+
+        if (!params.additionalDrawOptions) {
+            params.additionalDrawOptions = [];
+        }
+
+        self.card.widgets().forEach(function(widget) {
+            if (widget.config.geometryTypes) {
+                widget.drawTools = ko.pureComputed(function() {
+                    var options = [{
+                        value: '',
+                        text: ''
+                    }];
+                    options = options.concat(widget.config.geometryTypes().map(function(type) {
+                        var option = {};
+                        switch (type.id) {
+                        case 'Point':
+                            option.value = 'draw_point';
+                            option.text = 'Add point';
+                            break;
+                        case 'Line':
+                            option.value = 'draw_line_string';
+                            option.text = 'Add line';
+                            break;
+                        case 'Polygon':
+                            option.value = 'draw_polygon';
+                            option.text = 'Add polygon';
+                            break;
+                        }
+                        return option;
+                    }));
+                    options = options.concat(params.additionalDrawOptions);
+                    return options;
+                });
+            }
+        });
     };
     ko.components.register('map-card', {
         viewModel: viewModel,
