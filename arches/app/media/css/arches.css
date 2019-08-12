@@ -440,6 +440,17 @@ input[type="checkbox"] {
     padding: 5px 0 10px 10px;
 }
 
+.gsheets-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #454545;
+}
+
+.gsheets-descr {
+    font-size: 14px;
+    color: #777;
+}
+
 .graph-settings-crud {
     margin-right: 0px;
     position: absolute;
@@ -573,6 +584,10 @@ input[type="checkbox"] {
     max-width: 600px;
 }
 
+.workflow-step-body div .new-provisional-edit-card-container .card form div div .widget-wrapper .form-group .resource-instance-wrapper .select2-container {
+    width: 600px !important;
+}
+
 .wf-multi-tile-step-container {
     display: flex;
     flex-direction: row;
@@ -587,11 +602,11 @@ input[type="checkbox"] {
 .wf-multi-tile-step-list {
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
     padding: 24px 24px 0 24px;
     border-left: 1px solid #ddd;
     background: #eeeeee;
     height: 100vh;
+    width: 500px;
 }
 
 .wf-multi-tile-step-list-empty {
@@ -1816,7 +1831,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 
 .select2-container {
-    width: 100%!important;
+    width: 100%;
 }
 
 
