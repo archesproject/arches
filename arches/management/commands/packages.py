@@ -465,7 +465,7 @@ class Command(BaseCommand):
 
     def load_package(
             self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep', yes=False,
-            load_project_extensions=False,start=time()):
+            load_project_extensions=False):
             
                 # start = time()
 
@@ -563,7 +563,7 @@ class Command(BaseCommand):
                 bar_concepts = pyprind.ProgBar(len(concept_data),bar_char='X')
 
             bar = (len(concept_data) == 1 and verbose is False)
-            for path in concept_data: # ~289 seconds
+            for path in concept_data:
                 self.import_reference_data(path, overwrite, stage, bar)
                 if bar is False and verbose is False:
                     bar_concepts.update(item_id=path)
@@ -577,13 +577,12 @@ class Command(BaseCommand):
             bar = (len(collection_data) == 1 and verbose is False)
             if verbose is False and bar is False:
                 bar_collections = pyprind.ProgBar(len(collection_data), title='loading concept collections',bar_char='X')
-            for path in collection_data: # ~49 seconds
+            for path in collection_data:
                 self.import_reference_data(path, overwrite, stage, bar)
                 if bar is False and verbose is False:
                     bar_collections.update(item_id=path)
                 elif verbose is True:
                     print path
-            print 'time elapsed to parse rdf graph %s s' % (time() - start)
 
         def load_mapbox_styles(style_paths, basemap):
             for path in style_paths:
