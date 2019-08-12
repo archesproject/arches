@@ -81,8 +81,9 @@ define([
         updateName();
 
         var relatedResourceModels = ko.computed(function() {
+            var res = [];
             if (params.node) {
-                var res = [];
+                // var res = [];
                 var ids = ko.unwrap(params.node.config.graphid);
                 if (ids) {
                     res = arches.resources.filter(function(graph) {
@@ -95,8 +96,9 @@ define([
                         };
                     });
                 }
-                return res;
+                // return res;
             }
+            return res;
         }, this);
 
 

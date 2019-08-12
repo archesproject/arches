@@ -361,7 +361,7 @@
                 <button class="btn btn-primary btn-block" data-bind="click: toggleOverlaySelector">{% trans "Add Overlay" %}</button>
             </div>
           <!--ko let: { self: $data }-->
-            <div data-bind="sortable: overlays">
+            <div data-bind="sortable: {data: overlays}">
                 <div class="map-widget-overlay-item relative" data-bind="css:{'show-tools': showingTools, 'overlay-invisible':invisible}">
                     <div class="map-overlay-vis-toogle text-center" data-bind="css:{'overlay-invisible':invisible}, click: toggleOverlayVisibility">
                         <i data-bind="css: icon"></i>
@@ -418,7 +418,7 @@
             <div class="map-widget-panel-title">
                 <h4 class="">{% trans "Legend" %}</h4>
             </div>
-            <div data-bind="sortable: overlays">
+            <div data-bind="sortable: {data: overlays}">
                 <div class="map-widget-overlay-item relative">
                     <div class="map-overlay-vis-toogle text-center">
                         <i data-bind="css: icon, style: {color: color}"></i>

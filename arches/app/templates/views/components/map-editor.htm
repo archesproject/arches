@@ -237,24 +237,24 @@
                 <div class="install-buttons">
                     <!-- ko if: tile.tileid && self.deleteTile -->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: self.deleteTile, css: {
-                        disabled: (!card.isWritable && !self.preview),
+                        disabled: (!card.isWritable && !self.preview) || self.editing(),
                         'btn-warning': card.isWritable
                     }">{% trans 'Delete this record' %}</button>
                     <!-- /ko -->
                     <!-- ko if: tile.dirty() -->
                         <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
-                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">{% trans 'Cancel edit' %}</button>
+                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset, css: { disabled: self.editing()}">{% trans 'Cancel edit' %}</button>
                         <!-- /ko -->
                         <!-- ko if: tile.tileid -->
                         <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
-                            disabled: (!card.isWritable && !self.preview),
+                            disabled: (!card.isWritable && !self.preview) || self.editing(),
                             'btn-mint': card.isWritable
                         }">{% trans 'Save edit' %}</button>
                         <!-- /ko -->
                     <!-- /ko -->
                     <!-- ko if: !tile.tileid -->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
-                        disabled: (!card.isWritable && !self.preview),
+                        disabled: (!card.isWritable && !self.preview) || self.editing(),
                         'btn-mint': card.isWritable
                     }">{% trans 'Add'  %}</button>
                     <!-- /ko -->
