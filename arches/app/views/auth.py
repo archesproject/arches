@@ -168,7 +168,6 @@ class ConfirmSignupView(View):
                             return redirect('auth')
                 except Exception as e:
                     logger.exception(e)
-                    pass
         else:
             form.errors['ts'] = [_('The signup link has expired, please try signing up again.  Thanks!')]
 
@@ -283,10 +282,9 @@ class GetClientIdView(View):
                     user['is_reviewer'] = is_reviewer
                     response = JSONResponse({'user': user, 'clientid': settings.MOBILE_OAUTH_CLIENT_ID})
                 else:
-                    logger.exception(_('Failed to authenticate'))
+                    logger.error(_('Failed to authenticate'))
                     response = Http401Response()
             except Exception as e:
-                logger.error(_("Could not get clientid"))
                 logger.exception(e)
                 response = Http401Response()
 
