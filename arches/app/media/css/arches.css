@@ -440,6 +440,17 @@ input[type="checkbox"] {
     padding: 5px 0 10px 10px;
 }
 
+.gsheets-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #454545;
+}
+
+.gsheets-descr {
+    font-size: 14px;
+    color: #777;
+}
+
 .graph-settings-crud {
     margin-right: 0px;
     position: absolute;
@@ -558,7 +569,7 @@ input[type="checkbox"] {
     background-color: #f4f4f4;
     height: 100%;
     overflow-y: auto;
-    padding: 0 0 218px 0;
+    padding: 0 0 218px 25px;
 }
 
 .padded-workflow-step, .workflow-step-body .card-component {
@@ -571,6 +582,10 @@ input[type="checkbox"] {
 
 .workflow-step-body div div .new-provisional-edit-card-container div .widgets div div .widget-wrapper div div .widget-input {
     max-width: 600px;
+}
+
+.workflow-step-body div .new-provisional-edit-card-container .card form div div .widget-wrapper .form-group .resource-instance-wrapper .select2-container {
+    width: 600px !important;
 }
 
 .wf-multi-tile-step-container {
@@ -595,11 +610,11 @@ input[type="checkbox"] {
 .wf-multi-tile-step-list {
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
     padding: 24px 24px 0 24px;
     border-left: 1px solid #ddd;
     background: #eeeeee;
     height: 100vh;
+    width: 500px;
 }
 
 .wf-multi-tile-step-list-empty {
@@ -1828,7 +1843,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 
 .select2-container {
-    width: 100%!important;
+    width: 100%;
 }
 
 
@@ -11888,6 +11903,22 @@ a .search-type-link {
     border-top: solid 1px #dcdcdc;
 }
 
+.search-popup-panel .tab-pane.active div.saved-search-container div .rr-splash .rr-splash-img-container {
+    height: 50px;
+    width: 50px;
+}
+
+.search-popup-panel .tab-pane.active div.saved-search-container div .rr-splash .rr-splash-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.search-popup-panel .tab-pane.active div.saved-search-container div .rr-splash .rr-splash-img-container .rr-splash-img {
+    height: 325%;
+    margin-top: -13px;
+    margin-left: -8px;
+}
+
 .facets-container {
     position: absolute;
     width: 275px;
@@ -13946,9 +13977,9 @@ a.jstree-anchor.permissions-widget {
 
 .rr-splash {
     text-align: center;
-    margin: 5%;
+    margin: 48px 41px 20px 45px;
     border: 1px solid #ddd;
-    padding: 5%;
+    padding: 40px 30px;
     background: #f6f6f6;
     border-radius: 4px;
 }
@@ -13984,7 +14015,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .rr-splash-description {
-    font-size: 16px;
+    font-size: 15px;
     color: #999;
 }
 .rr-splash-subtitle {
@@ -14016,9 +14047,9 @@ a.jstree-anchor.permissions-widget {
     position: absolute;
     background: #fcfcfc;
     z-index: 11;
-    height: 70%;
+    height: 95%;
     overflow-y: auto;
-    top: 230px;
+    top: 10px;
     left: 15px;
     width: calc(100% - 25px);
     border: 1px solid #ddd;
