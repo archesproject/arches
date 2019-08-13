@@ -130,9 +130,8 @@ define([
                     } else {
                         url(arches.urls.search_results);
                         var graphid = params.node ? ko.unwrap(params.node.config.graphid) : undefined;
-                        var data = {
-                            'paging-filter': page
-                        };
+                        if(!!params.graphid) { graphid = [ko.unwrap(params.graphid)]; }
+                        var data = { 'paging-filter': page };
                         if (graphid && graphid.length > 0) {
                             data['resource-type-filter'] = JSON.stringify(
                                 graphid.map(function(id) {
