@@ -13,7 +13,7 @@ from arches.app.utils.data_management.resource_graphs.importer import import_gra
 from arches.app.utils.data_management.resources.formats.archesfile import ArchesFileReader
 from arches.app.utils.skos import SKOSReader
 from arches.app.utils import v3utils
-from arches.app.utils.v3migration import v3Importer, v3PreparedResource
+from arches.app.utils.v3migration import v3Importer, v3PreparedResource, DataValueConverter
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 
@@ -226,7 +226,8 @@ class v3MigrationTests(ArchesTestCase):
         management.call_command('v3', 'write-v4-json',
                                 target=self.pkg,
                                 number=10,
-                                resource_models=all_models
+                                resource_models=all_models,
+                                verbose=True
                                 )
 
         # basic test to make sure the v4 file has been created. No tests on
@@ -256,11 +257,12 @@ class v3MigrationTests(ArchesTestCase):
             # test the value and tile counts during this process.
             for res in importer.v3_resources:
 
-                v3_resource = v3PreparedResource(res['entityid'], importer.v4_graph.graphid, res)
+                v3_resource = v3PreparedResource(res, importer.v4_graph.graphid, importer.node_lookup,
+                                                 importer.v3_mergenodes)
                 v3_value_ct = len(v3_resource.node_list)
 
-                v3_resource.process(importer.v4_nodes, importer.node_lookup)
-                v4_json = v3_resource.get_json()
+                v3_resource.process(importer.v4_nodes)
+                v4_json = v3_resource.get_resource_json()
 
                 out_json = {'business_data': {'resources': [v4_json]}}
                 with open(temp_file, 'wb') as openfile:

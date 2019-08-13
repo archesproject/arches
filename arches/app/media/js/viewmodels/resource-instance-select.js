@@ -83,6 +83,7 @@ define([
         var relatedResourceModels = ko.computed(function() {
             var res = [];
             if (params.node) {
+                // var res = [];
                 var ids = ko.unwrap(params.node.config.graphid);
                 if (ids) {
                     res = arches.resources.filter(function(graph) {
@@ -95,6 +96,7 @@ define([
                         };
                     });
                 }
+                // return res;
             }
             return res;
         }, this);
@@ -128,9 +130,8 @@ define([
                     } else {
                         url(arches.urls.search_results);
                         var graphid = params.node ? ko.unwrap(params.node.config.graphid) : undefined;
-                        var data = {
-                            'paging-filter': page
-                        };
+                        if(!!params.graphid) { graphid = [ko.unwrap(params.graphid)]; }
+                        var data = { 'paging-filter': page };
                         if (graphid && graphid.length > 0) {
                             data['resource-type-filter'] = JSON.stringify(
                                 graphid.map(function(id) {

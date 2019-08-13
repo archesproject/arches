@@ -276,6 +276,7 @@ class Graph(models.GraphModel):
             card.component_id = cardobj.get('component_id', uuid.UUID('f05e4d3a-53c1-11e8-b0ea-784f435179ea'))
             card.nodegroup_id = uuid.UUID(str(cardobj.get('nodegroup_id', '')))
             card.nodegroup = self.get_or_create_nodegroup(nodegroupid=card.nodegroup_id)
+            card.config = cardobj.get('config', None)
             constraints = cardobj.get('constraints', '')
             for constraint in constraints:
                 self.add_card_contraint(constraint, card)

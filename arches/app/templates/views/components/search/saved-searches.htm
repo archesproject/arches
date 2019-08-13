@@ -1,4 +1,22 @@
+{% load i18n %}
 <div class="search-container saved-search-container relative" style="overflow-y: scroll;">
+
+    <div data-bind="visible: items().length === 0">
+        <div id="rr-splash" class="rr-splash">
+            <!-- Image -->
+            <div class="img-lg img-circle rr-splash-img-container">
+                <img class="rr-splash-img" src="../media/img/inspection.png" alt="Saved Search">
+            </div>
+
+            <!-- Splash Title -->
+            <div class="rr-splash-title">{% trans "Saved Search" %}</div>
+
+            <!-- Splash Instructions -->
+            <div class="rr-splash-description">{% trans "Here we explain how to create a savd search." %}</div>
+            <div class="rr-splash-description">{% trans "Other text here describing saved searches" %}</div>
+            <div class="rr-splash-description">{% trans "Blah Blah" %}</div>
+        </div>
+    </div>
 
     <div id="" class="saved-search-grid" style="position: relative;">
         <div class="saved-search-grid" data-bind="smartresize: {childclass: '.ss-grid-item'}, foreach: items">
@@ -8,7 +26,7 @@
                         <div class="search-caption-alignCenter">
                             <div class="search-caption-body">
                                 <div class="search-query">
-                                    <a class="search-query-link-captions" data-bind="click: function(){window.location.href = searchUrl; }"><i class="rounded-x fa fa-search"></i><span data-bind="text: title"></span></a>
+                                    <a class="search-query-link-captions" data-bind="click: function(){window.location.href = searchUrl; }"><i class="rounded-x fa fa-search"></i> <span data-bind="text: title"></span></a>
                                     <div class="search-query-desc">
                                         <span data-bind="html: subtitle"></span>
                                     </div>

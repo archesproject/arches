@@ -1,4 +1,4 @@
-define(['knockout', 'underscore', 'moment', 'bindings/let'], function(ko, _, moment) {
+define(['knockout', 'knockout-mapping', 'underscore', 'moment', 'bindings/let'], function(ko, koMapping, _, moment) {
     var ReportViewModel = function(params) {
         var self = this;
         this.report = params.report || null;
@@ -7,12 +7,10 @@ define(['knockout', 'underscore', 'moment', 'bindings/let'], function(ko, _, mom
         this.configType = params.configType || 'header';
         this.editorContext = params.editorContext || false;
 
-        this.config = params.report.configJSON || ko.observable({});
+        this.configState = params.report.configState || ko.observable({});
+        this.configJSON = params.report.configJSON || ko.observable({});
         this.configObservables = params.configObservables || {};
         this.configKeys = params.configKeys || [];
-        if (typeof this.config !== 'function') {
-            this.config = ko.observable(this.config);
-        }
 
         this.hasProvisionalData = ko.pureComputed(function() {
             return _.some(self.tiles(), function(tile){
@@ -20,30 +18,12 @@ define(['knockout', 'underscore', 'moment', 'bindings/let'], function(ko, _, mom
             });
         });
 
-        var subscribeConfigObservable = function(obs, key) {
-            self[key] = obs;
-
-            self[key].subscribe(function(val) {
-                var configObj = self.config();
-                configObj[key] = val;
-                self.config(configObj);
+        this.configJSON = ko.computed(function(){
+            self.configKeys.forEach(function(config) {
+                self[config] = self.configState[config];
             });
-
-            self.config.subscribe(function(val) {
-                if (val[key] !== self[key]()) {
-                    self[key](val[key]);
-                }
-            });
-        };
-        _.each(this.configObservables, subscribeConfigObservable);
-        _.each(this.configKeys, function(key) {
-            var obs;
-            if (Array.isArray(self.config()[key])) {
-                obs = ko.observableArray(self.config()[key]);
-            } else {
-                obs = ko.observable(self.config()[key]);
-            }
-            subscribeConfigObservable(obs, key);
+            self.report.configJSON(koMapping.toJS(self.report.configState));
+            return self.report.configJSON;
         });
 
         var getCardTiles = function(card, tiles) {

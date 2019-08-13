@@ -478,7 +478,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return GeometryCollection(wkt_geoms)
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        document['geometries'].append({'geom':nodevalue, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
+        document['geometries'].append({
+            'geom': nodevalue,
+            'nodegroup_id': tile.nodegroup_id,
+            'provisional': provisional,
+            'tileid': tile.pk
+        })
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:
             minx, miny, maxx, maxy = bounds
@@ -573,6 +578,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
             sql_list.append("""
                 SELECT resourceinstanceid::text,
+                        tileid::text,
                         (row_number() over ()) as __id__,
                         1 as total,
                         geom AS __geometry__,
@@ -1279,8 +1285,9 @@ class DomainDataType(BaseDomainDataType):
 
     def validate(self, value, row_number=None, source=''):
         errors = []
-        if len(models.Node.objects.filter(config__options__contains=[{"id": value}])) < 1:
-            errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value, row_number)})
+        if value is not None:
+            if len(models.Node.objects.filter(config__options__contains=[{"id": value}])) < 1:
+                errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value, row_number)})
         return errors
 
     def get_search_terms(self, nodevalue, nodeid=None):

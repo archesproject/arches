@@ -123,7 +123,7 @@ define([
             return layer;
         };
 
-        var layers = ko.pureComputed(function() {
+        this.layers = ko.pureComputed(function() {
             var layers = self.activeBasemap().layer_definitions.slice(0);
             self.overlays().forEach(function(layer) {
                 if (layer.onMap()) {
@@ -145,7 +145,7 @@ define([
                 sources: sources,
                 sprite: arches.mapboxSprites,
                 glyphs: arches.mapboxGlyphs,
-                layers: layers(),
+                layers: self.layers(),
                 center: [x, y],
                 zoom: zoom
             },
@@ -172,28 +172,48 @@ define([
             return feature.properties.resourceinstanceid;
         };
 
-        var resourceLookup = {};
+        this.resourceLookup = {};
         this.getPopupData = function(feature) {
             var data = feature.properties;
             var id = data.resourceinstanceid;
             if (id) {
-                if (resourceLookup[id]) return resourceLookup[id];
-                data = _.defaults(data, {
-                    'loading': true,
-                    'displayname': '',
-                    'graph_name': ''
-                });
-                data = ko.mapping.fromJS(data);
-                data.reportURL = arches.urls.resource_report;
-                data.editURL = arches.urls.resource_editor;
+                if (!self.resourceLookup[id]){
+                    data = _.defaults(data, {
+                        'loading': true,
+                        'displayname': '',
+                        'graph_name': ''
+                    });
+                    data = ko.mapping.fromJS(data);
+                    data.reportURL = arches.urls.resource_report;
+                    data.editURL = arches.urls.resource_editor;
 
-                resourceLookup[id] = data;
-                $.get(arches.urls.resource_descriptors + id, function(data) {
-                    data.loading = false;
-                    ko.mapping.fromJS(data, resourceLookup[id]);
-                });
-                return resourceLookup[id];
+                    self.resourceLookup[id] = data;
+                    $.get(arches.urls.resource_descriptors + id, function(data) {
+                        data.loading = false;
+                        ko.mapping.fromJS(data, self.resourceLookup[id]);
+                    });
+                }
+                self.resourceLookup[id].feature = feature;
+                self.resourceLookup[id].mapCard = self;
+                return self.resourceLookup[id];
             }
+        };
+
+        this.onFeatureClick = function(feature, lngLat) {
+            var map = self.map();
+            self.popup = new mapboxgl.Popup()
+                .setLngLat(lngLat)
+                .setHTML(self.popupTemplate)
+                .addTo(map);
+            ko.applyBindingsToDescendants(
+                self.getPopupData(feature),
+                self.popup._content
+            );
+            map.setFeatureState(feature, { selected: true });
+            self.popup.on('close', function() {
+                map.setFeatureState(feature, { selected: false });
+                self.popup = undefined;
+            });
         };
 
         this.setupMap = function(map) {
@@ -209,7 +229,7 @@ define([
                     bbox: arches.hexBinBounds
                 }), 'top-right');
 
-                layers.subscribe(self.updateLayers);
+                self.layers.subscribe(self.updateLayers);
 
                 var hoverFeature;
                 map.on('mousemove', function(e) {
@@ -224,19 +244,7 @@ define([
 
                 map.on('click', function(e) {
                     if (hoverFeature) {
-                        var selectedFeature = hoverFeature;
-                        var popup = new mapboxgl.Popup()
-                            .setLngLat(e.lngLat)
-                            .setHTML(self.popupTemplate)
-                            .addTo(map);
-                        ko.applyBindingsToDescendants(
-                            self.getPopupData(hoverFeature),
-                            popup._content
-                        );
-                        map.setFeatureState(selectedFeature, { selected: true });
-                        popup.on('close', function() {
-                            map.setFeatureState(selectedFeature, { selected: false });
-                        });
+                        self.onFeatureClick(hoverFeature, e.lngLat);
                     }
                 });
 
