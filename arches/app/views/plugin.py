@@ -70,9 +70,12 @@ class PluginView(MapBaseManagerView):
             ),
         )
 
+        print(plugin.config)
+
         context['nav']['title'] = ''
         context['nav']['menu'] = False
         context['nav']['icon'] = plugin.icon
+        context['nav']['show'] = plugin.config.show
         context['nav']['title'] = plugin.name
 
         return render(request, 'views/plugin.htm', context)
