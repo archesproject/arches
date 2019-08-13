@@ -200,7 +200,7 @@ define([
                     self.configKeys.removeAll();
                     _.each(value, function(configVal, configKey) {
                         if (!ko.isObservable(configVal)) {
-                            configVal = ko.observable(configVal);
+                            configVal = koMapping.fromJS(configVal);
                         }
                         config[configKey] = configVal;
                         configKeys.push(configKey);
