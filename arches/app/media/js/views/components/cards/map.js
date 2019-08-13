@@ -27,9 +27,6 @@ define([
         this.selectedFeatureIds = ko.observableArray();
         this.geoJSONString = ko.observable();
         this.draw = null;
-        this.setDrawTool = function(tool) {
-            if (tool) self.draw.changeMode(tool);
-        };
 
         CardComponentViewModel.apply(this, [params]);
 
@@ -51,6 +48,14 @@ define([
             }
         };
 
+        this.setDrawTool = function(tool) {
+            var showSelectLayers = (tool === 'select_feature');
+            self.setSelectLayersVisibility(showSelectLayers);
+            if (showSelectLayers) {
+                self.draw.changeMode('simple_select');
+                self.selectedFeatureIds([]);
+            } else if (tool) self.draw.changeMode(tool);
+        };
 
         if (self.form && self.tile) self.card.widgets().forEach(function(widget) {
             var id = widget.node_id();
@@ -217,11 +222,6 @@ define([
 
         MapComponentViewModel.apply(this, [params]);
 
-        this.isFeatureClickable = function(feature) {
-            if (self.selectedTool()) return false;
-            return feature.properties.resourceinstanceid;
-        };
-
         this.deleteFeature = function(feature) {
             if (self.draw) {
                 self.draw.delete(feature.id);
@@ -275,6 +275,7 @@ define([
                 self.draw = undefined;
                 self.selectedFeatureIds([]);
             }
+            self.setSelectLayersVisibility(false);
         });
         this.geoJSONErrors = ko.pureComputed(function() {
             var geoJSONString = self.geoJSONString();
@@ -317,10 +318,6 @@ define([
             }
         };
 
-        this.drawModeChange = function() {
-            return;
-        };
-
         var setupDraw = function(map) {
             var modes = MapboxDraw.modes;
             modes.static = {
@@ -349,9 +346,9 @@ define([
             });
             map.on('draw.update', self.updateTiles);
             map.on('draw.delete', self.updateTiles);
-            map.on('draw.modechange', function(e) {
-                self.drawModeChange(e);
+            map.on('draw.modechange', function() {
                 self.updateTiles();
+                self.setSelectLayersVisibility(false);
             });
             map.on('draw.selectionchange', function(e) {
                 self.selectedFeatureIds(e.features.map(function(feature) {
@@ -362,6 +359,7 @@ define([
                         value.selectedTool(null);
                     });
                 }
+                self.setSelectLayersVisibility(false);
             });
 
             self.form.on('tile-reset', function() {
@@ -372,14 +370,6 @@ define([
                 _.each(self.featureLookup, function(value) {
                     if (value.selectedTool()) value.selectedTool('');
                 });
-            });
-
-            map.on('draw.modechange', function() {
-                self.setSelectLayersVisibility(false);
-            });
-
-            map.on('draw.selectionchange', function() {
-                self.setSelectLayersVisibility(false);
             });
         };
 
@@ -432,20 +422,7 @@ define([
             return feature.properties.resourceinstanceid;
         };
 
-        this.geoJSONString.subscribe(function() {
-            self.setSelectLayersVisibility(false);
-        });
-
         this.popupTemplate = popupTemplate;
-
-        this.setDrawTool = function(tool) {
-            var showSelectLayers = (tool === 'select_feature');
-            self.setSelectLayersVisibility(showSelectLayers);
-            if (showSelectLayers) {
-                self.draw.changeMode('simple_select');
-                self.selectedFeatureIds([]);
-            } else if (tool) self.draw.changeMode(tool);
-        };
 
         self.isSelectable = function(feature) {
             var selectLayerIds = selectFeatureLayers.map(function(layer) {
