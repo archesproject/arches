@@ -15,6 +15,7 @@ define([
             params.resourceid(params.requirements.resourceid);
             params.tileid(params.requirements.tileid);
         }
+        if (params.requirements.tiles == undefined) { params.requirements.tiles = []; }
         var url = arches.urls.api_card + (ko.unwrap(params.resourceid) || ko.unwrap(params.graphid));
 
         this.card = ko.observable();
@@ -144,13 +145,17 @@ define([
             var tile;
             if (tiles.length > 0) {
                 tile = tiles[0];
+                console.log(tile);
+                params.requirements.tiles.push({
+                    "tileid":tile.tileid,
+                    "data":tile.data,
+                    "nodegroup_id":tile.nodegroup_id
+                });
                 params.resourceid(tile.resourceinstance_id);
                 params.tileid(tile.tileid);
                 self.resourceId(tile.resourceinstance_id);
             }
-            if (self.completeOnSave === true) {
-                self.complete(true);
-            }
+            if (self.completeOnSave === true) { self.complete(true); }
         };
 
     }
