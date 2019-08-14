@@ -1503,6 +1503,10 @@ ul.tabbed-report-tab-list {
     cursor: zoom-in;
 }
 
+.map-card-feature-item:hover {
+    background-color: rgb(250, 250, 250);
+}
+
 .map-card-feature-item.active .map-card-feature-name {
     font-weight: 600;
 }
