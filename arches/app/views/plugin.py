@@ -70,12 +70,15 @@ class PluginView(MapBaseManagerView):
             ),
         )
 
-        print(plugin.config)
+        print(plugin.sortorder)
+        show = True
+        if 'show' in plugin.config.keys():
+            show = plugin.config['show']
 
         context['nav']['title'] = ''
         context['nav']['menu'] = False
         context['nav']['icon'] = plugin.icon
-        context['nav']['show'] = plugin.config.show
+        context['nav']['show'] = show
         context['nav']['title'] = plugin.name
 
         return render(request, 'views/plugin.htm', context)
