@@ -1772,10 +1772,6 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     margin: 3px;
 }
 
-.grid-item--height2 {
-    height: 200px;
-}
-
 .select2-container {
     width: 100%!important;
 }
@@ -2798,20 +2794,10 @@ a.select2-search-choice-close {
     padding: 0 10% 0 10px;
 }
 
-.morphsearch.hideInput .morphsearch-input {
-    color: transparent;
-    -webkit-transition: color .3s;
-    transition: color .3s;
-}
-
 .morphsearch.open .morphsearch-input {
     font-size: 7em;
     color: #123;
     font-weight: 400;
-}
-
-.gn-search:focus::-webkit-input-placeholder {
-    color: transparent;
 }
 
 input[type="search"] {
@@ -3293,16 +3279,6 @@ ul.nav.nav-tabs.nav-justified {
     border-color: rgba(0, 0, 0, .1);
 }
 
-.gf-designer-container {
-    position: absolute;
-    top: 40px;
-    left: 560px;
-    padding-bottom: 50px;
-    padding-left: 0;
-    overflow-y: scroll;
-    height: 100vh;
-}
-
 .tree-container {
     overflow-x: scroll;
     padding: 0 0 10px 10px;
@@ -3553,13 +3529,6 @@ div.dropdown-menu.open {
     border: none;
 }
 
-.grid-card {
-    float: left;
-    width: 250px;
-    height: 170px;
-    margin: 3px;
-}
-
 .chosen-container {
     margin-bottom: 0px;
     color: #8d8d8d;
@@ -3702,36 +3671,6 @@ div.dropdown-menu.open {
     color: #fff;
     background-color: #000;
     z-index: 8000;
-}
-
-.graph-designer-loading-mask {
-    position: relative;
-    opacity: .5;
-    background-color: gray;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 100000000;
-}
-
-.graph-designer-loading-mask:after {
-    position: fixed;
-    opacity: .8;
-    color: #fff;
-    content: '\f110';
-    -webkit-animation: fa-spin 2s infinite linear;
-    animation: fa-spin 2s infinite linear;
-    display: inline-block;
-    font: normal normal normal 14px/1 FontAwesome;
-    font-size: 10vw;
-    margin-top: 42vh;
-    margin-left: 32vw;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    transform: translate(0, 0);
-    z-index: 100000001;
 }
 
 .branch-list-loading-mask {
@@ -7233,7 +7172,7 @@ a.list-group-item:not(.active):hover, div .switch label:hover, #demo-dt-selectio
     cursor: pointer;
 }
 
-.grid-item--width2, .columns .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn), .columns .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn), .grid-item--width2, .columns .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn), .grid-item--width2 {
+.columns .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn), .columns .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn), .columns .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn) {
     width: 225px;
     white-space: nowrap;
     overflow: hidden;
@@ -7312,14 +7251,6 @@ a.list-group-item:not(.active):hover, div .switch label:hover, #demo-dt-selectio
     display: block;
     height: 90px;
     top: 0px;
-}
-
-.graph-base-content .alert-active .ep-form-alert {
-    top: 0;
-}
-
-.graph-base-content .alert-active .ep-form-content {
-    padding-top: 100px
 }
 
 .ep-alert-red {
@@ -7486,10 +7417,6 @@ a.list-group-item:not(.active):hover, div .switch label:hover, #demo-dt-selectio
 
 .switch-panel.disabled {
     background: rgba(214, 214, 214, 0.3);
-}
-
-.graph-base-content .alert-active .ep-form-content.card-grid {
-    top: 0px;
 }
 
 .wizard-card-tools {
@@ -8421,12 +8348,6 @@ div.row.widget-wrapper.report-header:hover {
     width: -moz-calc(100% - 55px);
     width: 100%;
     opacity: .85;
-}
-
-.geometry-edit-button-group {
-    position: absolute;
-    right: 10px;
-    top: 10px;
 }
 
 .notifications-narrow {
@@ -10226,10 +10147,6 @@ table.table.dataTable {
     pointer-events: none;
 }
 
-.graph-tooltip-name {
-    font-weight: bold;
-}
-
 .map-preview-panel {
     padding-top: 5px;
 }
@@ -11606,14 +11523,6 @@ a.filter-tools:hover {
     background: #fcfcfc;
 }
 
-.get-user-detail.selected {
-    background: #f8f8f8;
-}
-
-.get-user-detail:hover {
-    background: #f8f8f8;
-}
-
 .mpm-right-panel .list-group.user-cards {
     padding-right: 35px;
 }
@@ -11652,10 +11561,6 @@ a.filter-tools:hover {
     position: absolute;
     top: 20px;
     right: 10px;
-}
-
-.list-group-item.get-user-detail:first-of-type {
-    border-top-width: 0px;
 }
 
 .msm-resource-panel .mpm-group-name {
