@@ -9,25 +9,53 @@ define([
     'geojsonhint',
     'viewmodels/card-component',
     'views/components/map',
+    'views/components/cards/select-feature-layers',
+    'text!templates/views/components/cards/map-popup.htm',
     'bindings/chosen',
     'bindings/codemirror',
     'codemirror/mode/javascript/javascript'
-], function(_, ko, koMapping, uuid, mapboxgl, MapboxDraw, geojsonExtent, geojsonhint, CardComponentViewModel, MapComponentViewModel) {
+], function(_, ko, koMapping, uuid, mapboxgl, MapboxDraw, geojsonExtent, geojsonhint, CardComponentViewModel, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         var widgets = [];
         var padding = 40;
         var drawFeatures;
+        var resourceId = params.tile ? params.tile.resourceinstance_id : '';
+
         this.newNodeId = null;
         this.featureLookup = {};
         this.selectedFeatureIds = ko.observableArray();
         this.geoJSONString = ko.observable();
         this.draw = null;
-        this.setDrawTool = function(tool) {
-            if (tool) self.draw.changeMode(tool);
-        };
 
         CardComponentViewModel.apply(this, [params]);
+
+        var configJSON = self.card.model.configJSON();
+        var selectSource = configJSON.selectSource;
+        var selectFeatureLayers = selectFeatureLayersFactory(resourceId, selectSource);
+        this.selectText = configJSON.selectText || "Select drawing";
+
+        this.setSelectLayersVisibility = function(visibility) {
+            var map = self.map();
+            if (map) {
+                selectFeatureLayers.forEach(function(layer) {
+                    map.setLayoutProperty(
+                        layer.id,
+                        'visibility',
+                        visibility ? 'visible' : 'none'
+                    );
+                });
+            }
+        };
+
+        this.setDrawTool = function(tool) {
+            var showSelectLayers = (tool === 'select_feature');
+            self.setSelectLayersVisibility(showSelectLayers);
+            if (showSelectLayers) {
+                self.draw.changeMode('simple_select');
+                self.selectedFeatureIds([]);
+            } else if (tool) self.draw.changeMode(tool);
+        };
 
         if (self.form && self.tile) self.card.widgets().forEach(function(widget) {
             var id = widget.node_id();
@@ -135,7 +163,7 @@ define([
         if (!params.layers) {
             params.layers = [];
         }
-        params.layers = params.layers.concat([{
+        params.layers = params.layers.concat(selectFeatureLayers, [{
             "id": "geojson-editor-polygon-fill",
             "type": "fill",
             "filter": ["==", "$type", "Polygon"],
@@ -194,11 +222,6 @@ define([
 
         MapComponentViewModel.apply(this, [params]);
 
-        this.isFeatureClickable = function(feature) {
-            if (self.selectedTool()) return false;
-            return feature.properties.resourceinstanceid;
-        };
-
         this.deleteFeature = function(feature) {
             if (self.draw) {
                 self.draw.delete(feature.id);
@@ -252,6 +275,7 @@ define([
                 self.draw = undefined;
                 self.selectedFeatureIds([]);
             }
+            self.setSelectLayersVisibility(false);
         });
         this.geoJSONErrors = ko.pureComputed(function() {
             var geoJSONString = self.geoJSONString();
@@ -294,10 +318,6 @@ define([
             }
         };
 
-        this.drawModeChange = function() {
-            return;
-        };
-
         var setupDraw = function(map) {
             var modes = MapboxDraw.modes;
             modes.static = {
@@ -326,9 +346,9 @@ define([
             });
             map.on('draw.update', self.updateTiles);
             map.on('draw.delete', self.updateTiles);
-            map.on('draw.modechange', function(e) {
-                self.drawModeChange(e);
+            map.on('draw.modechange', function() {
                 self.updateTiles();
+                self.setSelectLayersVisibility(false);
             });
             map.on('draw.selectionchange', function(e) {
                 self.selectedFeatureIds(e.features.map(function(feature) {
@@ -339,6 +359,7 @@ define([
                         value.selectedTool(null);
                     });
                 }
+                self.setSelectLayersVisibility(false);
             });
 
             self.form.on('tile-reset', function() {
@@ -353,6 +374,77 @@ define([
         };
 
         this.map.subscribe(setupDraw);
+
+        if (!params.additionalDrawOptions) {
+            params.additionalDrawOptions = [];
+        }
+
+        self.card.widgets().forEach(function(widget) {
+            if (widget.config.geometryTypes) {
+                widget.drawTools = ko.pureComputed(function() {
+                    var options = [{
+                        value: '',
+                        text: ''
+                    }];
+                    options = options.concat(widget.config.geometryTypes().map(function(type) {
+                        var option = {};
+                        switch (type.id) {
+                        case 'Point':
+                            option.value = 'draw_point';
+                            option.text = 'Add point';
+                            break;
+                        case 'Line':
+                            option.value = 'draw_line_string';
+                            option.text = 'Add line';
+                            break;
+                        case 'Polygon':
+                            option.value = 'draw_polygon';
+                            option.text = 'Add polygon';
+                            break;
+                        }
+                        return option;
+                    }));
+                    if (selectSource) {
+                        options.push({
+                            value: "select_feature",
+                            text: self.selectText
+                        });
+                    }
+                    options = options.concat(params.additionalDrawOptions);
+                    return options;
+                });
+            }
+        });
+
+        this.isFeatureClickable = function(feature) {
+            var tool = self.selectedTool();
+            if (tool && tool !== 'select_feature') return false;
+            return feature.properties.resourceinstanceid;
+        };
+
+        this.popupTemplate = popupTemplate;
+
+        self.isSelectable = function(feature) {
+            var selectLayerIds = selectFeatureLayers.map(function(layer) {
+                return layer.id;
+            });
+            return selectLayerIds.indexOf(feature.layer.id) >= 0;
+        };
+
+        self.selectFeature = function(feature) {
+            var newFeature = {
+                "id": uuid.generate(),
+                "type": "Feature",
+                "properties": {
+                    "nodeId": self.newNodeId
+                },
+                "geometry": JSON.parse(feature.properties.geojson)
+            };
+            self.draw.add(newFeature);
+            self.updateTiles();
+            self.popup.remove();
+            self.editFeature(newFeature);
+        };
     };
     ko.components.register('map-card', {
         viewModel: viewModel,

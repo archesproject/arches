@@ -24,8 +24,9 @@ define([
         var self = this;
         this.saving = false;
         this.tiles = [];
+        this.widgetLookup = {};
 
-        params.configKeys = ['groupedCardIds'];
+        params.configKeys = ['groupedCardIds', 'sortedWidgetIds'];
         CardComponentViewModel.apply(this, [params]);
 
         var cards;
@@ -74,6 +75,31 @@ define([
             return gc;
         }, this);
 
+        var updatedSortedWidgetsList = function(cards) {
+            this.newWidgetIdList = [];
+            this.widgetLookup = {};
+            cards.forEach(function(card){
+                card.widgets().forEach(function(widget) {
+                    this.widgetLookup[widget.id()] = widget;
+                    this.newWidgetIdList.push(widget.id());
+                }, this);
+            }, this);
+
+            _.each(this.widgetLookup, function(widget, widgetid) {
+                if(!(_.contains(this.sortedWidgetIds(), widgetid))) {
+                    this.sortedWidgetIds.push(widgetid);
+                }
+            }, this);
+
+            this.sortedWidgetIds(_.without(this.sortedWidgetIds(), ..._.difference(this.sortedWidgetIds(), this.newWidgetIdList)));
+        };
+
+        updatedSortedWidgetsList.call(this, this.groupedCards());
+
+        this.groupedCards.subscribe(function(cards) {
+            updatedSortedWidgetsList.call(this, cards);
+        }, this);
+
         if (!!params.preview) {
             _.each(this.groupedCards(), function(card) {
                 if (card.tiles().length === 0) {
@@ -103,6 +129,35 @@ define([
                 return tiles;
             }
         }, this);
+
+        this.hasTiles = ko.computed(function() {
+            return _.some(this.groupedCards(), function(card) {
+                return card.tiles().length > 0;
+            }, this);
+        }, this);
+
+        this.getDataForDisplay = function(widgetid) {
+            var widget = self.widgetLookup[widgetid];
+            var tile = self.groupedTiles().find(function(tile) {
+                return Object.keys(tile.data).includes(widget.node.nodeid);
+            });
+
+            var ret = {
+                widget: widget,
+                tile: tile,
+                tileData:  tile.data[widget.node.nodeid],
+                card: self.cardLookup[widget.card.cardid()]
+            };
+            return ret;
+        };
+
+        this.beforeMove = function(e) {
+            // do nothing
+        };
+
+        this.afterMove = function(e) {
+            // do nothing
+        };
 
         this.getTile = function(cardid) {
             var tile = _.find(this.groupedTiles(), function(tile) {
