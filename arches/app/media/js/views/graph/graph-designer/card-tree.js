@@ -132,6 +132,7 @@ define([
                 return true;
             },
             loading: loading,
+            showIds: ko.observable(false),
             cachedFlatTree: cachedFlatTree,
             widgetLookup: createLookup(data.widgets, 'widgetid'),
             cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
@@ -142,6 +143,9 @@ define([
             graph: params.graph,
             graphModel: params.graphModel,
             appliedFunctions: params.appliedFunctions(),
+            toggleIds: function() {
+                self.showIds(!self.showIds());
+            },
             expandAll: function() {
                 toggleAll(true);
             },
