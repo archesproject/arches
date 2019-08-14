@@ -193,10 +193,6 @@ dl.inline-flex dd {
     color: #888;
 }
 
-.branch-item {
-    margin-bottom: 10px;
-}
-
 .summary-divider {
     margin-left: 50px;
     margin-right: 50px;
@@ -2668,10 +2664,6 @@ a.select2-search-choice-close {
     color: #123;
 }
 
-.branch-metadata {
-    padding-top: 8px;
-}
-
 .branch-icon {
     border: 1px solid rgba(0, 0, 0, 0.25);
 }
@@ -3479,13 +3471,6 @@ div.dropdown-menu.open {
 
 .underline {
     border-bottom: 1px solid #ddd;
-}
-
-.box-vtop {
-    display: inline-block;
-    max-width: 500px;
-    vertical-align: top;
-    margin-bottom: 15px;
 }
 
 .bg-green {
@@ -4750,12 +4735,6 @@ input.cmn-toggle-yes-no:checked+label:after {
     padding-top: 5px;
 }
 
-.btn-flat-sm {
-    height: 26px;
-    font-size: 12px;
-    padding-top: 3px;
-}
-
 .btn-flat:active {
     box-shadow: none;
 }
@@ -5712,10 +5691,6 @@ a.selected {
     color: #fff;
 }
 
-.bg-tile {
-    background: #D6DBE4;
-}
-
 textarea:placeholder {
     top: 0;
 }
@@ -5756,10 +5731,6 @@ textarea:placeholder {
 
 .editable-highlight {
     background: #F1FFFB;
-}
-
-.btn-editable {
-    opacity: .75;
 }
 
 .editable-tile-title {
@@ -5937,17 +5908,6 @@ ul.jqtree-tree .jqtree-element {
 
 ul.jqtree_common li.jqtree-folder {
     margin-bottom: 4px;
-}
-
-.btn-flat-green:hover {
-    background: #63CD70;
-    color: #fff;
-}
-
-.btn-flat-md {
-    height: 32px;
-    font-size: 12px;
-    padding-top: 4px;
 }
 
 #container #profile-table td {
@@ -7382,11 +7342,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     overflow-x: hidden;
 }
 
-.branch-panel {
-    padding-left: 7px;
-    padding-right: 5px;
-}
-
 .title-block-title {
     font-size: 15px;
     font-weight: 400;
@@ -7952,7 +7907,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     color: #123;
 }
 
-.morphsearch-input::-webkit-input-placeholder, .morphsearch-input:-moz-placeholder, .morphsearch-input::-moz-placeholder, .morphsearch-input:-ms-input-placeholder, .resource-grid-tools-container a, .btn-flat-trans:focus, .resource-grid-tools-container a, .btn-flat-trans:focus, .resource-grid-tools-container a, .btn-flat-trans:focus {
+.morphsearch-input::-webkit-input-placeholder, .morphsearch-input:-moz-placeholder, .morphsearch-input::-moz-placeholder, .morphsearch-input:-ms-input-placeholder, .resource-grid-tools-container a, .resource-grid-tools-container a, .resource-grid-tools-container a {
     color: #777;
 }
 
@@ -7964,12 +7919,12 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     background: #f4f4f4;
 }
 
-.btn-flat.selected, .btn-flat-trans.selected, .btn-flat.selected, .btn-flat-trans.selected, .btn-flat-green, .btn-flat.selected, .btn-flat-trans.selected {
+.btn-flat.selected, .btn-flat.selected, .btn-flat.selected {
     background: #8ce196;
     color: #fff;
 }
 
-.btn-flat-trans, .btn-flat.right-border:hover, .btn-flat.right-border:focus, .btn-flat-trans, .btn-flat.right-border:hover, .btn-flat.right-border:focus, .btn-flat-trans, .btn-flat.right-border:hover, .btn-flat.right-border:focus {
+.btn-flat.right-border:hover, .btn-flat.right-border:focus, .btn-flat.right-border:hover, .btn-flat.right-border:focus, .btn-flat.right-border:hover, .btn-flat.right-border:focus {
     background: transparent;
     color: #777;
 }
@@ -8155,18 +8110,6 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     padding-bottom: 8px;
 }
 
-.btn-file-upload-reset {
-    color: #489EED;
-    font-size: 12px;
-    float: right;
-}
-
-.btn-file-upload-limit {
-    color: #489EED;
-    font-size: 12px;
-    float: left;
-}
-
 .file-upload-card-detail-right {
     min-width: 85px;
     float: right;
@@ -8175,23 +8118,6 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 
 .file-select-title {
     padding: 30px 0;
-}
-
-.btn-file-cancel {
-    background: #01113c;
-    border-radius: 50%;
-    border: none;
-
-}
-
-.btn-file-select {
-    background: rgb(138, 115, 255);
-    color: #fff;
-    border: 1px solid rgb(89, 56, 255);
-    border-radius: 2px;
-    width: 240px;
-    margin: 30px 0;
-
 }
 
 .file-upload input.upload {
@@ -8267,16 +8193,6 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     padding-left: 25px;
     width: 80px;
     border-right: 1px solid #ccc;
-}
-
-.btn-add-group {
-    position: absolute;
-    right: 70px;
-    top: 12px;
-}
-
-.btn-add-graph {
-    width: 73px;
 }
 
 .switch-section {
