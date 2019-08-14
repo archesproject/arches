@@ -1847,7 +1847,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 
 .select2-container {
-    width: 100%;
+    width: 600px !important;
 }
 
 
@@ -8519,7 +8519,7 @@ div.row.widget-wrapper {
 
 .select2-container.select2-allowclear .select2-choice abbr {
     margin-top: 0px;
-    padding: 6px;
+    padding: 6px 7px 8px;
     border: 1px solid #ccc;
 }
 
