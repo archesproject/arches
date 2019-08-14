@@ -2927,49 +2927,25 @@ input[type="search"] {
     transition: opacity .3s .5s;
 }
 
-.dummy-column {
-    width: 30%;
-    float: left;
-    opacity: 0;
-    -webkit-transform: translate3d(0, 100px, 0);
-    transform: translateY(100px);
-    -webkit-transition: 0 .5s opacity .5s;
-    transition: transform .5s opacity .5s;
-    padding: 0 0 6em;
-}
-
-.morphsearch.open .dummy-column:first-child {
+.morphsearch.open {
     -webkit-transition-delay: .4s;
     transition-delay: .4s;
 }
 
-.morphsearch.open .dummy-column:nth-child(2) {
+.morphsearch.open {
     -webkit-transition-delay: .45s;
     transition-delay: .45s;
 }
 
-.morphsearch.open .dummy-column:nth-child(3) {
+.morphsearch.open {
     -webkit-transition-delay: .5s;
     transition-delay: .5s;
 }
 
-.morphsearch.open .dummy-column {
+.morphsearch.open {
     opacity: 1;
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
-}
-
-.dummy-column:nth-child(2) {
-    margin: 0 5%;
-}
-
-.dummy-column h2 {
-    font-size: 1em;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-weight: 800;
-    color: #c2c2c2;
-    padding: .5em 0;
 }
 
 .round {
@@ -4553,23 +4529,6 @@ ul .collapse li:last-of-type {
     color: #aaa;
 }
 
-.dismiss-edit-panel {
-    position: absolute;
-    right: 25px;
-    top: 5px;
-    font-size: 21px;
-    color: #bbb;
-}
-
-.dismiss-edit-panel i {
-    padding-right: 5px;
-}
-
-.dismiss-panel:hover {
-    cursor: pointer;
-    color: #666;
-}
-
 .find-widget {
     position: absolute;
     left: 100px;
@@ -5373,12 +5332,6 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     cursor: pointer;
 }
 
-.drag-tool {
-    float: right;
-    padding-right: 5px;
-    color: #ddd;
-}
-
 .primary-descriptors-card-container {
     margin-top: -5px;
     margin-left: 0px;
@@ -5403,11 +5356,6 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     position: absolute;
     top: 2px;
     left: -9px;
-}
-
-.drag-tool-widget {
-    display: none;
-    transition: all .40s ease;
 }
 
 a.selected {
@@ -6018,27 +5966,6 @@ ul.jqtree_common li.jqtree-folder {
     text-overflow: ellipsis;
 }
 
-.dl-profile-accts {
-    padding-left: 10px;
-    font-size: 12px;
-    color: #888;
-}
-
-.dl-profile-accts .dt {
-    float: center;
-    width: 200px;
-    overflow: hidden;
-    clear: left;
-    text-align: right;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.dl-profile-accts dd {
-    margin-left: 25px;
-    margin-top: -20px;
-}
-
 .profile-data-container {
     position: absolute;
     top: 0;
@@ -6047,10 +5974,6 @@ ul.jqtree_common li.jqtree-folder {
     height: 100vh;
     width: calc(100%-150px);
     padding: 15px 10px;
-}
-
-.dl-profile-accts dd, dt {
-    line-height: 1.25;
 }
 
 .library-secondary-panel {
@@ -7120,13 +7043,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     z-index: 3;
 }
 
-.display-nodes-toggle {
-    z-index: 11;
-    position: absolute;
-    top: 63px;
-    left: 390px;
-}
-
 .title-block-fixed+.grid {
     margin-top: 73px;
 }
@@ -7216,21 +7132,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     font-size: 14px;
     color: #777;
     padding-left: 16px;
-}
-
-.data-preview-panel {
-    height: 500px;
-    background: #f4f4f4;
-    border: 1px solid #ddd;
-    border-radius: 2px;
-    margin: -40px 15px 20px 0;
-    padding: 5px 25px;
-}
-
-.drop-message {
-    position: absolute;
-    top: 100px;
-    width: 100%;
 }
 
 .preview-tools {
@@ -7596,7 +7497,7 @@ li.search-field {
     padding-top: 0;
 }
 
-.library-item-draggable, .drag-tool-widget .fa:hover, .edit-card-element:hover, .drag-tool-widget .fa:hover, .edit-card-element:hover, .library-item-draggable {
+.library-item-draggable, .edit-card-element:hover, .edit-card-element:hover, .library-item-draggable {
     cursor: move;
 }
 
@@ -8269,16 +8170,7 @@ a.mega-dropdown-toggle.disabled {
     color: #999;
 }
 
-.dragged-card-panel {
-    position: absolute;
-    background: transparent;
-    height: 100%;
-    width: 350px;
-    top: 0px;
-    padding: 0;
-}
-
-.dragged-card-panel .report-image-grid {
+.report-image-grid {
     padding: 45px;
     height: 100%;
     overflow-y: auto;
@@ -10403,12 +10295,6 @@ ul.pagination {
     width: 235px;
 }
 
-.date-selector {
-    position: absolute;
-    top: 10px;
-    left: 20px;
-}
-
 #calendar .chosen-container-single .chosen-single {
     height: 35px;
     padding-top: 8px;
@@ -10602,11 +10488,6 @@ ul.pagination {
     border-top: 1px solid #ddd;
 }
 
-.data-entry-container {
-    width: calc(100% - 810px);
-    background: #ebeef0;
-}
-
 .time-wheel-wrap {
     width: 100%;
 }
@@ -10739,61 +10620,6 @@ table.table.dataTable {
     opacity: 1.;
     text-anchor: middle;
     pointer-events: none;
-}
-
-.d3-tip {
-    line-height: 1.2;
-    display: block;
-    width: 200px;
-    font-size: 11px;
-    border: solid 1px #BBBBBB;
-    padding: 6px;
-    background: rgba(256, 256, 256, 0.8);
-    color: #434343;
-    border-radius: 2px;
-    pointer-events: none;
-    box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.25);
-}
-
-.d3-tip:after {
-    box-sizing: border-box;
-    display: inline;
-    font-size: 10px;
-    width: 100%;
-    line-height: 1;
-    color: rgba(180, 180, 180, 0.8);
-    position: absolute;
-    pointer-events: none;
-}
-
-.d3-tip.n:after {
-    content: "\25BC";
-    margin: -1px 0 0 0;
-    top: 100%;
-    left: 0;
-    text-align: center;
-}
-
-.d3-tip.e:after {
-    content: "\25C0";
-    margin: -4px 0 0 0;
-    top: 50%;
-    left: -8px;
-}
-
-.d3-tip.s:after {
-    content: "\25B2";
-    margin: 0 0 1px 0;
-    top: -10px;
-    left: 0;
-    text-align: center;
-}
-
-.d3-tip.w:after {
-    content: "\25B6";
-    margin: -4px 0 0 -1px;
-    top: 50%;
-    left: 100%;
 }
 
 .graph-tooltip-name {
@@ -13533,14 +13359,6 @@ a.jstree-anchor.permissions-widget {
     }
     .morphsearch.open .morphsearch-input {
         font-size: 2em;
-    }
-    .dummy-column {
-        float: none;
-        width: auto;
-        padding: 0 0 2em;
-    }
-    .dummy-column:nth-child(2) {
-        margin: 0;
     }
     .morphsearch.open .morphsearch-submit {
         -webkit-transform: translate3d(0, -50%, 0) scale3d(0.5, 0.5, 1);
