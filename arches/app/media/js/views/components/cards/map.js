@@ -1,4 +1,5 @@
 define([
+    'arches',
     'underscore',
     'knockout',
     'knockout-mapping',
@@ -14,7 +15,7 @@ define([
     'bindings/chosen',
     'bindings/codemirror',
     'codemirror/mode/javascript/javascript'
-], function(_, ko, koMapping, uuid, mapboxgl, MapboxDraw, geojsonExtent, geojsonhint, CardComponentViewModel, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function(arches, _, ko, koMapping, uuid, mapboxgl, MapboxDraw, geojsonExtent, geojsonhint, CardComponentViewModel, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         var widgets = [];
@@ -27,13 +28,13 @@ define([
         this.selectedFeatureIds = ko.observableArray();
         this.geoJSONString = ko.observable();
         this.draw = null;
+        params.configKeys = ['selectSource', 'selectText'];
 
         CardComponentViewModel.apply(this, [params]);
 
         var configJSON = self.card.model.configJSON();
-        var selectSource = configJSON.selectSource;
+        var selectSource = this.selectSource();
         var selectFeatureLayers = selectFeatureLayersFactory(resourceId, selectSource);
-        this.selectText = configJSON.selectText || "Select drawing";
 
         this.setSelectLayersVisibility = function(visibility) {
             var map = self.map();
@@ -47,6 +48,27 @@ define([
                 });
             }
         };
+
+        this.selectSource.subscribe(function(source) {
+            var map = self.map();
+            var sources = [];
+            for (var sourceName in arches.mapSources) {
+                if (arches.mapSources.hasOwnProperty(sourceName)) {
+                    sources.push(sourceName);
+                }
+            }
+            selectFeatureLayers = sources.indexOf(source) > 0 ?
+                selectFeatureLayersFactory(resourceId, source) :
+                [];
+            if (map) {
+                self.additionalLayers(
+                    extendedLayers.concat(
+                        selectFeatureLayers,
+                        geojsonLayers
+                    )
+                );
+            }
+        });
 
         this.setDrawTool = function(tool) {
             var showSelectLayers = (tool === 'select_feature');
@@ -160,10 +182,11 @@ define([
                 }
             }
         };
-        if (!params.layers) {
-            params.layers = [];
+        var extendedLayers = [];
+        if (params.layers) {
+            extendedLayers = params.layers;
         }
-        params.layers = params.layers.concat(selectFeatureLayers, [{
+        var geojsonLayers = [{
             "id": "geojson-editor-polygon-fill",
             "type": "fill",
             "filter": ["==", "$type", "Polygon"],
@@ -218,7 +241,14 @@ define([
                 "circle-color": "#3bb2d0"
             },
             "source": "geojson-editor-data"
-        }]);
+        }];
+
+        params.layers = ko.observable(
+            extendedLayers.concat(
+                selectFeatureLayers,
+                geojsonLayers
+            )
+        );
 
         MapComponentViewModel.apply(this, [params]);
 
@@ -388,7 +418,7 @@ define([
                     }];
                     options = options.concat(widget.config.geometryTypes().map(function(type) {
                         var option = {};
-                        switch (type.id) {
+                        switch (ko.unwrap(type.id)) {
                         case 'Point':
                             option.value = 'draw_point';
                             option.text = 'Add point';
@@ -407,7 +437,7 @@ define([
                     if (selectSource) {
                         options.push({
                             value: "select_feature",
-                            text: self.selectText
+                            text: self.selectText() || 'Select drawing'
                         });
                     }
                     options = options.concat(params.additionalDrawOptions);

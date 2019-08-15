@@ -123,6 +123,7 @@ define([
             return layer;
         };
 
+        this.additionalLayers = params.layers;
         this.layers = ko.pureComputed(function() {
             var layers = self.activeBasemap().layer_definitions.slice(0);
             self.overlays().forEach(function(layer) {
@@ -133,8 +134,8 @@ define([
                     });
                 }
             });
-            if (params.layers) {
-                layers = layers.concat(ko.unwrap(params.layers));
+            if (this.additionalLayers) {
+                layers = layers.concat(ko.unwrap(this.additionalLayers));
             }
             return layers;
         }, this);

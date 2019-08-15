@@ -305,7 +305,6 @@
     <!-- ko if: showHeaderLine--><hr class="rp-tile-separator"><!-- /ko -->
     <div class="rp-card-section" data-bind="css: card.model.cssclass, visible: card.fullyProvisional() !== 'fullyprovisional'">
             <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
-            <div data-bind="text: hasTiles"></div>
             <!-- ko if: hasTiles -->
             <i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': reportExpanded(), 'fa-angle-right': !reportExpanded()}, click: function () { reportExpanded(!reportExpanded()) }"></i>
             <!-- ko if: reportExpanded() -->
