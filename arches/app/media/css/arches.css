@@ -2497,11 +2497,6 @@ a.select2-search-choice-close {
     background: #f9f9f9;
 }
 
-.index-selector {
-    padding-top: 0px;
-    margin: -20px 0px 10px -20px;
-}
-
 .permissions-title {
     font-size: 15px;
 }
@@ -2561,19 +2556,8 @@ a.select2-search-choice-close {
     width: 100%;
 }
 
-.key-container {
-    position: relative;
-    padding-bottom: 15px;
-}
-
 .key-icon {
     width: 50px;
-}
-
-.key-class {
-    position: absolute;
-    top: 0;
-    left: 50px;
 }
 
 .nav-library {
@@ -4805,14 +4789,6 @@ ul .collapse li:last-of-type {
     background-image: url(../img/backgrounds/easter_island_night.jpg);
 }
 
-.img-register {
-    background-image: url(../img/backgrounds/easter_island_night.jpg);
-}
-
-.img-login-recover {
-    background-image: url(../img/backgrounds/ganges_sunrise.jpg);
-}
-
 .concept_tree {
     padding: 13px;
 }
@@ -5182,11 +5158,6 @@ a.selected {
 }
 
 textarea:placeholder {
-    top: 0;
-}
-
-.instructions-text:placeholder {
-    position: absolute;
     top: 0;
 }
 
@@ -9237,10 +9208,6 @@ a.clear-geojson-button:hover {
     background: #f8f8f8;
 }
 
-.mobile-project-manager-editor .identities-list .clear-node-search {
-    top: 6px
-}
-
 .msm-designer-panel {
     width: 100%;
     background-color: #fff;
@@ -11305,55 +11272,10 @@ a.filter-tools:hover {
     border-left: 1px solid transparent;
 }
 
-.identities-list .mpm-left-panel {
-    background-color: #f0f0f0;
-    width: 200px;
-    padding: 0px 7px 7px 7px;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-.identities-list .mpm-left-panel .project-status {
-    background-color: inherit;
-    position: absolute;
-    color: #ccc;
-    width: auto;
-    top: 25px;
-    left: 53px;
-    font-style: inherit;
-    font-size: 12px;
-    font-weight: 600;
-}
-
 .user-survey .project-status {
     position: absolute;
     right: 10px;
     top: 10px;
-}
-
-.identities-list .mpm-left-panel .library-card-main.user {
-    top: 5px;
-}
-
-.identities-list .mpm-left-panel .project-status.invited {
-    color: #64bd63;
-}
-
-.identities-list .mpm-left-panel .project-status.user {
-    top: 33px;
-}
-
-
-.mobile-project-manager-editor .identities-list .library-card {
-    margin-left: 0;
-    border-left: 0;
-    height: 75px;
-    border-left: 1px solid transparent;
-}
-
-.mobile-project-manager-editor .identities-list .library-card:first-child {
-    border-top: 1px solid #ddd;
-    margin-top: 5px;
 }
 
 .mobile-project-manager-editor .tab-content {
@@ -11383,15 +11305,6 @@ a.filter-tools:hover {
 .left-panel-overflow.mobile-designer-tree {
     height: inherit;
 }
-
-.identities-list .mpm-left-panel .user .project-status {
-    top: 33px;
-}
-
-.identities-list .title-block-fixed {
-    top: 0px;
-}
-
 
 .mpm-right-panel {
     position: absolute;
