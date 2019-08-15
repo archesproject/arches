@@ -203,7 +203,12 @@ class ConceptDataType(BaseConceptDataType):
 
         # print("Trying to get a label from the concept node.")
         if label_node:
-            label, lang = get_value_from_jsonld(label_node)
+            try:
+                label, lang = get_value_from_jsonld(label_node)
+            except AttributeError as e:
+                # a string
+                label = label_node
+
             if label:
                 # Could be:
                 #  - Blank node E55_Type with a label - a Keyword
