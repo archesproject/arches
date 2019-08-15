@@ -585,7 +585,7 @@ input[type="checkbox"] {
 }
 
 .workflow-step-body div .new-provisional-edit-card-container .card form div div .widget-wrapper .form-group .resource-instance-wrapper .select2-container {
-    width: 600px !important;
+    max-width: 600px !important;
 }
 
 .wf-multi-tile-step-container {
@@ -1848,6 +1848,15 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 
 .select2-container {
     width: 100% !important;
+}
+
+.form-group div input {
+    max-width: 600px;
+    border: 1px solid #ddd;
+}
+
+.resource-instance-wrapper .select2-container {
+    max-width: 600px !important;
 }
 
 
@@ -8519,7 +8528,7 @@ div.row.widget-wrapper {
 
 .select2-container.select2-allowclear .select2-choice abbr {
     margin-top: 0px;
-    padding: 6px 7px 8px;
+    padding: 6px 7px 6px 6px;
     border: 1px solid #ccc;
 }
 
