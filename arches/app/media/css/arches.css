@@ -1311,14 +1311,14 @@ ul.tabbed-report-tab-list {
     position:absolute;
     right: 0;
     height: 100%;
-    width: 92px;
+    width: 75px;
     background-color: rgb(247, 247, 247);
     border-left: 1px solid rgb(216, 216, 216);
 }
 
 .map-card-sidebar-tab {
     color: rgb(33, 62, 95);
-    min-height: 86px;
+    height: 75px;
     padding: 16px;
     text-align: center;
     font-size: 1.1em;
@@ -1333,15 +1333,19 @@ ul.tabbed-report-tab-list {
 }
 
 .map-card-sidebar-tab i {
-    font-size: 1.7em;
+    font-size: 1.1em;
     display: block;
     padding-bottom: 6px;
+}
+
+.map-sidebar-text {
+    font-size: 11px;
 }
 
 .map-card-sidepanel {
     position:absolute;
     z-index: 10;
-    right: 92px;
+    right: 75px;
     height: 100%;
     width: 400px;
     background: white;
