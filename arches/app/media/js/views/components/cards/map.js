@@ -388,7 +388,7 @@ define([
                     }];
                     options = options.concat(widget.config.geometryTypes().map(function(type) {
                         var option = {};
-                        switch (type.id) {
+                        switch (ko.unwrap(type.id)) {
                         case 'Point':
                             option.value = 'draw_point';
                             option.text = 'Add point';
