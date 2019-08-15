@@ -145,13 +145,9 @@ define([
             var tile;
             if (tiles.length > 0 || typeof tiles != 'Array') {
                 tile = tiles[0] || tiles;
-                console.log(tile);
-                params.requirements.tiles.push({
-                    "tileid":tile.tileid,
-                    "data":tile.data,
-                    "nodegroup_id":tile.nodegroup_id
-                });
-                console.log(params.requirements.tiles);
+                // console.log(tile);
+                params.requirements.tiles.push(tile);
+                // console.log(params.requirements.tiles);
                 params.resourceid(tile.resourceinstance_id);
                 params.tileid(tile.tileid);
                 self.resourceId(tile.resourceinstance_id);
