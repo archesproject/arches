@@ -1296,6 +1296,7 @@ ul.tabbed-report-tab-list {
     height: 100%;
     position: relative;
     background-color: #eee;
+    border-top: 1px solid #ddd;
 }
 
 .map-card-container {
@@ -1304,7 +1305,7 @@ ul.tabbed-report-tab-list {
 }
 
 .map-card-container.map-card-container-sidepanel-active {
-    margin-right: 492px;
+    margin-right: 475px;
 }
 
 .map-card-sidebar {
@@ -1312,12 +1313,12 @@ ul.tabbed-report-tab-list {
     right: 0;
     height: 100%;
     width: 75px;
-    background-color: rgb(247, 247, 247);
+    background-color: #f6f6f6;
     border-left: 1px solid rgb(216, 216, 216);
 }
 
 .map-card-sidebar-tab {
-    color: rgb(33, 62, 95);
+    color: #666;
     height: 75px;
     padding: 16px;
     text-align: center;
@@ -1326,10 +1327,16 @@ ul.tabbed-report-tab-list {
     cursor: pointer;
 }
 
+.map-card-sidebar-tab:hover {
+    background: #fafafa;
+    color: #454545;
+}
+
 .map-card-sidebar-tab.active {
     background-color: white;
     border-left: solid 1px white;
     margin-left: -1px;
+    color: #454545;
 }
 
 .map-card-sidebar-tab i {
@@ -1354,9 +1361,23 @@ ul.tabbed-report-tab-list {
     overflow-y: scroll;
 }
 
+.map-card-sidepanel div .new-provisional-edit-card-container {
+    padding-left: 10px;
+}
+
+.map-card-sidepanel-header-container {
+    padding-right: 20px;
+    border-bottom: 1px solid #eee;
+    padding: 5px 20px 15px 5px;
+    margin-right: 15px;
+    margin-left: 15px;
+    margin-bottom: 15px;
+}
+
 .map-card-sidepanel-header {
     cursor: pointer;
     color: rgb(33, 62, 95);
+    font-size: 19px;
 }
 
 .map-card-sidepanel-header:before {
@@ -1372,7 +1393,8 @@ ul.tabbed-report-tab-list {
 }
 
 .basemap-listing, .overlay-listing, .legend-listing {
-    padding: 20px;
+    padding: 16px 20px;
+    min-height: 60px;
     border-bottom: 1px solid rgb(216, 216, 216);
 }
 
@@ -1385,8 +1407,20 @@ ul.tabbed-report-tab-list {
 }
 
 .basemap-listing, .overlay-listing {
-    font-size: 16px;
+    font-size: 14px;
     color: rgb(158, 158, 158);
+}
+
+.basemap-listing-container {
+    margin-top: -15px;
+}
+
+.overlays-listing-container {
+    margin-top: -15px;
+}
+
+.legend-listing-container {
+    margin-top: -15px;
 }
 
 .basemap-listing:before, .overlay-listing .overlay-name:before {
