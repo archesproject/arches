@@ -2362,11 +2362,6 @@ a.select2-search-choice-close {
     margin-left: 0px;
 }
 
-.permission-level-icon {
-    height: 20px;
-    margin-top: -5px;
-}
-
 .permissions {
     background: rgb(240, 240, 240);
 }
@@ -2386,12 +2381,6 @@ a.select2-search-choice-close {
 
 .permission-selector {
     margin: 20px 0px 30px 0px;
-}
-
-.permissions-summary {
-    margin-top: -40px;
-    margin-left: -10px;
-    margin-right: -20px;
 }
 
 .permissions-readout {
@@ -2461,10 +2450,6 @@ a.select2-search-choice-close {
     margin-bottom: 10px;
     background: #fff;
     width: 100%;
-}
-
-.permissions-list-divider {
-    border-right: 1px solid #ddd;
 }
 
 .permissions-selected {
@@ -3098,20 +3083,6 @@ div.dropdown-menu.open {
 
 .node .node-collected, .link.link-collected {
     stroke-width: 3px;
-}
-
-.project-grid-item {
-    min-width: 200px;
-    float: left;
-    max-width: 250px;
-    border: 1px solid #ddd;
-    opacity: .79;
-    margin: 2px;
-}
-
-.project-grid-item:hover {
-    cursor: pointer;
-    opacity: 1.0;
 }
 
 .template-grid-item {
@@ -4072,16 +4043,6 @@ ul .collapse li:last-of-type {
     transition: all .5s;
 }
 
-.panel-left {
-    right: -310px;
-    transition: all .5s;
-}
-
-.panel-left-in {
-    right: 0;
-    transition: all .5s;
-}
-
 .card-preview {
     position: absolute;
     top: 56px;
@@ -4515,12 +4476,6 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     padding: 10px 15px 25px;
 }
 
-.pin-left-widget {
-    position: absolute;
-    top: 2px;
-    left: -9px;
-}
-
 a.selected {
     font-weight: 600;
     font-size: 13px;
@@ -4555,18 +4510,6 @@ a.selected {
 .panel-section-title {
     font-size: 1.3em;
     font-weight: 400;
-}
-
-.panel-section-subtitle {
-    font-size: 0.7em;
-    font-weight: 400;
-}
-
-.panel-section-heading {
-    font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 0px;
-    margin-top: 5px;
 }
 
 .form-divider {
@@ -4778,10 +4721,6 @@ ul.jqtree_common li.jqtree-folder {
     border-top: 1px solid rgba(0, 0, 0, 0.0);
 }
 
-.profile-table-body {
-    float: left;
-}
-
 .profile-summary-page {
 	width: 100%;
 	background: #fff;
@@ -4799,39 +4738,11 @@ ul.jqtree_common li.jqtree-folder {
     border-bottom: 1px solid #ccc;
 }
 
-.profile-report-table {
-    position: absolute;
-    height: 130px;
-    width: 100%;
-    left: 110px;
-    padding-bottom: 10px;
-}
-
-.profile-table-divider {
-    position: absolute;
-    display: table-cell;
-    height: 70px;
-    margin-top: 35px;
-    width: 1px;
-    padding-left: 0px;
-    padding-right: 0px;
-    border-left: 1px solid #ccc;
-}
-
-.mar-lft.profile-table-divider {
-    border-left-width: 0px;
-}
-
 .profile-list {
     width: 100%;
     padding: 40px 100px 50px 100px;
     min-height: 170px;
     border-bottom: 1px solid #ccc;
-}
-
-.profile-image {
-    height: 120px;
-    width: 120px;
 }
 
 .profile-sections {
@@ -4841,13 +4752,6 @@ ul.jqtree_common li.jqtree-folder {
 
 .profile-projects {
     height: 100vh;
-}
-
-.profile-table-cell {
-    padding: 20px;
-    width: 350px;
-    position: relative;
-    top: 25px;
 }
 
 .btn-profile {
@@ -4872,69 +4776,8 @@ ul.jqtree_common li.jqtree-folder {
     font-weight: 500;
 }
 
-.profile-table-cell-title {
-    font-size: 1.5em;
-    margin-top: 8px;
-    margin-left: 10px;
-}
-
-.profile-table-time {
-    font-size: 15px;
-}
-
-.profile-table-cell-label {
-    font-size: 14px;
-    color: #888;
-    font-weight: 500;
-    margin-left: 10px;
-}
-
-.profile-update {
-    padding-right: 10px;
-    padding-left: 10px;
-    padding-top: 0px;
-    color: steelblue;
-    font-weight: 600;
-    font-size: 13px;
-}
-
 .profile-header {
     font-size: 21px;
-}
-
-.profile-image-region {
-    position: absolute;
-    top: 20px;
-    left: 30px;
-}
-
-.profile-form-region {
-    position: absolute;
-    top: 20px;
-    left: 300px;
-    width: calc(100% - 350px);
-}
-
-.profile-form-body {
-    position: relative;
-    padding: 20px;
-    min-height: 400px;
-}
-
-.profile-form-footer {
-    height: 50px;
-}
-
-.profile-form-message {
-    font-size: 13px;
-    font-weight: 600;
-    margin-top: 3px;
-    margin-left: 20px;
-}
-
-.profile-image-size {
-    height: 200px;
-    width: 200px;
 }
 
 .account-summary {
@@ -5055,47 +4898,6 @@ ul.jqtree_common li.jqtree-folder {
 .android_app_store_icon {
     height: 58px;
     margin-top: 11px;
-}
-
-.profile-summary-container {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: -20px;
-    height: 100vh;
-    width: 220px;
-    background: #fff;
-    padding: 15px;
-}
-
-.profile-contacts-title {
-    font-size: 1.2em;
-    font-weight: 400;
-    color: #444;
-}
-
-.profile-about {
-    color: #888;
-    font-size: 12px;
-    padding-left: 10px;
-}
-
-.profile-contacts-item {
-    color: #888;
-    font-size: 12px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.profile-data-container {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 200px;
-    height: 100vh;
-    width: calc(100%-150px);
-    padding: 15px 10px;
 }
 
 .secondary-panel-left {
@@ -5589,11 +5391,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-right: solid 1px #dddddd;
     overflow-y: auto;
     overflow-x: hidden;
-}
-
-.left-column-container.permissions-identity-list {
-  overflow-y: hidden;
-  overflow-x: hidden;
 }
 
 .left-column-container.graph-designer {
@@ -6135,12 +5932,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     top: 40px;
 }
 
-.preview-tools {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-}
-
 .clear-node-search {
     position: absolute;
     top: 6px;
@@ -6154,19 +5945,11 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     width: 200px;
 }
 
-.perm-nodes-list {
-    margin-top: 72px;
-}
-
 .new-card.disabled {
     background-color: #ccc;
 }
 
 .new-card.disabled #add-card {
-    cursor: default;
-}
-
-.project-grid-item.disabled:hover {
     cursor: default;
 }
 
@@ -6521,12 +6304,6 @@ a.list-group-item:not(.active):hover, div .switch label:hover, #demo-dt-selectio
     background: #C1F8E9;
 }
 
-.profile-contacts-list, .profile-user-list {
-    list-style: none;
-    padding-left: 10px;
-    width: 200px;
-}
-
 .ep-form-alert {
     position: absolute;
     top: 0px;
@@ -6621,13 +6398,6 @@ a.list-group-item:not(.active):hover, div .switch label:hover, #demo-dt-selectio
     cursor: pointer;
     opacity: 0;
     filter: alpha(opacity=0);
-}
-
-.page-title-block {
-    height: 80px;
-    background: #fafafa;
-    border-top: 1px solid #eee;
-    border-bottom: 1px solid #ddd;
 }
 
 .resource-tools {
@@ -9862,16 +9632,6 @@ a.search-facet-item.disabled {
     cursor: default;
 }
 
-.pagination-bottom {
-    position: absolute;
-    bottom: 10px;
-    width: 400px;
-    margin-left: -20px;
-    border-top: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-    background: #f8f8f8;
-}
-
 .facet-name {
     font-size: 15px;
     color: #333;
@@ -10820,17 +10580,6 @@ a.filter-tools:hover {
 .card-panel-body {
 	/*height: 500px;
     overflow-y: scroll;*/
-}
-
-.project-map {
-	height: 500px;
-}
-
-.project-footer {
-	height: 60px;
-	padding: 20px;
-	background: #f4f4f4;
-	font-size: 14px;
 }
 
 .node-value-select-tile {
