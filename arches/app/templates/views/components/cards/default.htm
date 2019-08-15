@@ -311,7 +311,7 @@
             {% block form_cards %}
             <ul class="card-summary-section" data-bind="css: {disabled: !tile.tileid}">
                 <!-- ko foreach: { data: tile.cards, as: 'card' } -->
-                <li class="card-summary">
+                <li class="card-summary" data-bind="visible: card.model.visible()">
                     <a href="javascript:void(0)" data-bind="click: function () {
                         if (card.parent.tileid) {
                             card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true);
