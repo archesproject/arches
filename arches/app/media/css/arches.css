@@ -1524,12 +1524,6 @@ ul.tabbed-report-tab-list {
     border-top-right-radius: 0;
 }
 
-.ol-control button {
-    height: 1.9em;
-    width: 1.9em;
-    font-size: 1.3em;
-}
-
 .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn) {
     padding-right: 25px;
     padding-top: 5px;
@@ -1644,18 +1638,6 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     width: 150px;
     height: 150px;
     padding: 0;
-}
-
-.og-grid-sm {
-    padding-left: 0;
-}
-
-.og-grid-sm li {
-    display: inline-block;
-    vertical-align: top;
-    height: 150px;
-    min-width: 150px;
-    margin: 10px 5px 5px;
 }
 
 .tile-grid-container-sm {
@@ -3032,137 +3014,6 @@ div.dropdown-menu.open {
     position: relative;
 }
 
-.og-grid li.og-expanded>a::after {
-    top: auto;
-    border: solid transparent;
-    content: " ";
-    height: 0;
-    width: 0;
-    position: absolute;
-    pointer-events: none;
-    border-bottom-color: #ddd;
-    left: 50%;
-    border-width: 15px;
-    margin: -20px 0 0 -15px;
-}
-
-.og-expander {
-    position: absolute;
-    background: #ddd;
-    top: auto;
-    left: 0;
-    width: 100%;
-    margin-top: 10px;
-    text-align: left;
-    height: 0;
-    overflow: hidden;
-}
-
-.og-expander-inner {
-    height: 100%;
-    padding: 50px 30px;
-}
-
-.og-close {
-    position: absolute;
-    width: 40px;
-    height: 40px;
-    top: 20px;
-    right: 20px;
-    cursor: pointer;
-}
-
-.og-close::before, .og-close::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    top: 50%;
-    height: 1px;
-    background: #888;
-    transform: rotate(45deg);
-}
-
-.og-close::after {
-    transform: rotate(-45deg);
-}
-
-.og-close:hover::before, .og-close:hover::after {
-    background: #333;
-}
-
-.og-fullimg, .og-details {
-    width: 50%;
-    float: left;
-    height: 100%;
-    overflow: hidden;
-    position: relative;
-}
-
-.og-details {
-    padding: 0 40px 0 20px;
-}
-
-.og-fullimg {
-    text-align: center;
-}
-
-.og-fullimg img {
-    display: inline-block;
-    max-height: 100%;
-    max-width: 100%;
-}
-
-.og-details h3 {
-    font-weight: 300;
-    font-size: 52px;
-    margin-bottom: 10px;
-    padding: 40px 0 10px;
-}
-
-.og-details p {
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 22px;
-    color: #999;
-}
-
-.og-details a {
-    font-weight: 700;
-    font-size: 16px;
-    color: #333;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    border: 3px solid #333;
-    display: inline-block;
-    outline: none;
-    margin: 30px 0 0;
-    padding: 10px 20px;
-}
-
-.og-details a::before {
-    content: '\2192';
-    display: inline-block;
-    margin-right: 10px;
-}
-
-.og-details a:hover {
-    color: #999;
-    border-color: #999;
-}
-
-.og-loading {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #ddd;
-    box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ccc;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    animation: loader .5s infinite ease-in-out both;
-    margin: -25px 0 0 -25px;
-}
-
 .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
     border: 1px solid #fff;
 }
@@ -3988,17 +3839,6 @@ ul .collapse li:last-of-type {
     height: 690px;
 }
 
-.o-pane-content {
-    padding: 15px 10px 20px;
-}
-
-.o-pane-title {
-    color: #f4f4f4;
-    font-weight: 400;
-    margin-top: 0;
-    margin-bottom: 0;
-}
-
 .list-group-item:hover {
     cursor: pointer;
 }
@@ -4055,14 +3895,6 @@ ul .collapse li:last-of-type {
 
 .demo-icon-font .selected {
     background: #eee;
-}
-
-.outlined-text {
-    color: #fff;
-    font-size: 21px;
-    -webkit-text-fill-color: #000;
-    -webkit-text-stroke-width: .020em;
-    -webkit-text-stroke-color: #fff;
 }
 
 .library-in {
@@ -10397,11 +10229,6 @@ a.filter-tools:hover {
     margin: 15px 100px 15px 100px;
 }
 
-.mpm-card-content .oddrow {
-    background: #fff;
-    border-left: solid 1px #ccc;
-}
-
 .mpm-resource-selection {
     display: flex;
     flex-direction: column;
@@ -11631,25 +11458,10 @@ a.jstree-anchor.permissions-widget {
 }
 
 @media screen and (max-width: 830px) {
-    .og-expander h3 {
-        font-size: 32px;
-    }
-    .og-expander p {
-        font-size: 13px;
-    }
-    .og-expander a {
-        font-size: 12px;
-    }
 }
 
 @media screen and (max-width: 650px) {
-    .og-fullimg {
-        display: none;
-    }
-    .og-details {
-        float: none;
-        width: 100%;
-    }
+
 }
 
 @media screen and (max-width: 768px) {
