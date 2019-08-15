@@ -26,9 +26,13 @@ from arches.app.utils.skos import SKOSReader
 from arches.app.models.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
 from rdflib import Namespace, URIRef, Literal, Graph
-from rdflib.namespace import RDF, RDFS, XSD
+from rdflib.namespace import RDF, RDFS, XSD, SKOS, DCTERMS
 from arches.app.utils.data_management.resources.formats.rdffile import RdfWriter
-from mock import Mock
+from pyld.jsonld import compact, frame, from_rdf
+from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
+from arches.app.models import models
+from arches.app.models.concept import Concept
+from arches.app.models.graph import Graph
 
 # these tests can be run from the command line via
 # python manage.py test tests/importer/datatype_from_rdf_tests.py --settings="tests.test_settings"
@@ -63,45 +67,63 @@ class ConceptListJSONLDUnitTests(ArchesTestCase):
     def tearDownClass(cls):
         pass
 
-    def test_jsonld_concept_internal(self):
+    def test_jsonld_concept_list_expanded(self):
         dt = self.DT.get_instance("concept-list")
         # from the thesaurus that should be loaded into Arches,
         # the following concept value should have a key of 4beb7055-8a6e-45a3-9bfb-32984b6f82e0
         jf = [
                 {
                   "@id": "http://localhost:8000/concepts/c3c4b8a8-39bb-41e7-af45-3a0c60fa4ddf",
-                  "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
-                  "http://www.w3.org/2000/01/rdf-schema#label": "Concept 2"
+                  "@type": [
+                    "http://www.cidoc-crm.org/cidoc-crm/E55_Type"
+                  ],
+                  "http://www.w3.org/2000/01/rdf-schema#label": [
+                    {
+                      "@value": "Concept 2"
+                    }
+                  ]
                 },
                 {
                   "@id": "http://localhost:8000/concepts/0bb450bc-8fe3-46cb-968e-2b56849e6e96",
-                  "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
-                  "http://www.w3.org/2000/01/rdf-schema#label": "Concept 1"
+                  "@type": [
+                    "http://www.cidoc-crm.org/cidoc-crm/E55_Type"
+                  ],
+                  "http://www.w3.org/2000/01/rdf-schema#label": [
+                    {
+                      "@value": "Concept 1"
+                    }
+                  ]
                 }
               ]
         resp = dt.from_rdf(jf)
         self.assertTrue(len(resp) == 2)
-        print(resp)
 
-"""
-        {
-  "@id": "http://localhost:8001/resources/0b4439a8-beca-11e9-b4dc-0242ac160002",
-  "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person",
-  "http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by": {
-    "@id": "http://localhost:8000/tile/cad329aa-1802-416e-bbce-5f71e21b1a47/node/accb030c-bec9-11e9-b4dc-0242ac160002",
+    def test_jsonld_concept_list_full_import(self):
+        reader = JsonLdReader()
+        slug = "92ccf5aa-bec9-11e9-bd39-0242ac160002"
+        graphid = models.GraphModel.objects.get(slug=slug).pk
+
+        data = """
+{"@id": "http://localhost:8001/resources/0b4439a8-beca-11e9-b4dc-0242ac160002",
+"@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person",
+"http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by":
+  {"@id": "http://localhost:8000/tile/cad329aa-1802-416e-bbce-5f71e21b1a47/node/accb030c-bec9-11e9-b4dc-0242ac160002",
     "@type": "http://www.cidoc-crm.org/cidoc-crm/E33_Linguistic_Object",
     "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": [
-      {
-        "@id": "http://localhost:8000/concepts/c3c4b8a8-39bb-41e7-af45-3a0c60fa4ddf",
-        "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
-        "http://www.w3.org/2000/01/rdf-schema#label": "Concept 2"
-      },
-      {
-        "@id": "http://localhost:8000/concepts/0bb450bc-8fe3-46cb-968e-2b56849e6e96",
-        "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
-        "http://www.w3.org/2000/01/rdf-schema#label": "Concept 1"
-      }
-    ]
+      {"@id": "http://localhost:8000/concepts/c3c4b8a8-39bb-41e7-af45-3a0c60fa4ddf",
+      "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
+      "http://www.w3.org/2000/01/rdf-schema#label": "Concept 2"}, 
+      {"@id": "http://localhost:8000/concepts/0bb450bc-8fe3-46cb-968e-2b56849e6e96",
+      "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
+      "http://www.w3.org/2000/01/rdf-schema#label": "Concept 1"}]
   }
 }
 """
+
+        reader.read_resource(data, resourceid=resourceid, graphid=graphid)
+        if reader.errors:
+            response = []
+            for value in reader.errors.itervalues():
+                response.append(value.message)
+            print(response)
+        self.assertTrue(len(reader.errors) == 0)
