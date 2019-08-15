@@ -69,8 +69,7 @@ class ConceptListJSONLDUnitTests(ArchesTestCase):
 
     def test_jsonld_concept_list_expanded(self):
         dt = self.DT.get_instance("concept-list")
-        # from the thesaurus that should be loaded into Arches,
-        # the following concept value should have a key of 4beb7055-8a6e-45a3-9bfb-32984b6f82e0
+        # This is the expanded version of a concept-list fragment:
         jf = [
                 {
                   "@id": "http://localhost:8000/concepts/c3c4b8a8-39bb-41e7-af45-3a0c60fa4ddf",
@@ -121,6 +120,10 @@ class ConceptListJSONLDUnitTests(ArchesTestCase):
 }
 """
 
+        # The above concepts map onto the following ConceptValue UUIDs with the default lang
+        # Concept 2 -> '9a94ce98-4d76-4405-89df-b9ddeaddfae1' 
+        # Concept 1 -> 'ac1d498c-9c61-4573-bfe8-1653641c028a'
+
         data = JSONDeserializer().deserialize(raw_data)
         reader.read_resource(data, resourceid=resourceid, graphid=graphid)
         if reader.errors:
@@ -129,3 +132,10 @@ class ConceptListJSONLDUnitTests(ArchesTestCase):
                 response.append(value.message)
             print(response)
         self.assertTrue(len(reader.errors) == 0)
+
+        # Get the tile with the concept-list in (should be the only tile)
+        clist_tile = reader.tiles[reader.tiles.keys()[0]]
+        self.assertTrue(len(clist_tile) == 1).  # single datatype node from input
+        clist_data = clist_tile.data[clist_tile.data.keys()[0]]
+        self.assertTrue('ac1d498c-9c61-4573-bfe8-1653641c028a' in clist_data) # Concept 1 in list?
+        self.assertTrue('9a94ce98-4d76-4405-89df-b9ddeaddfae1' in clist_data) # Concept 2 in list?
