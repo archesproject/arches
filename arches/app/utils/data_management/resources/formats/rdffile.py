@@ -276,7 +276,7 @@ class JsonLdReader(Reader):
                 self.logger.debug("Valid resourceid not found within `{0}`".format(str_to_test))
         return None
 
-    def read_resource(self, data, use_ids=False, resourceid=None, graphid=None):
+    def read_resource(self, data, use_ids=True, resourceid=None, graphid=None):
         self.use_ids = use_ids
         if not isinstance(data, list):
             data = [data]
