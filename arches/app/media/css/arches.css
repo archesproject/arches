@@ -93,15 +93,6 @@ dl.inline-flex dd {
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
 }
 
-.main-navbar-item {
-    width: 48px;
-    border-right-width: 0px;
-}
-
-.main-navbar-icon {
-    font-size: 17px;
-}
-
 .username {
     margin: 0px;
     padding-left: 10px;
@@ -1749,10 +1740,6 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     height: calc(100% - 60px); /*60px accounts for header so list scrolls to bottom*/
 }
 
-.msm-resource-panel .list-wrapper {
-    overflow: hidden;
-}
-
 .grid {
     background: #ebeef0;
     max-width: 1200px;
@@ -2679,176 +2666,9 @@ a.select2-search-choice-close {
     padding: 0 10px;
 }
 
-.morphsearch {
-    width: 200px;
-    min-height: 30px;
-    background: #f1f1f1;
-    position: absolute;
-    z-index: 500;
-    top: 45px;
-    right: 50px;
-    -webkit-transform-origin: 100% 0;
-    transform-origin: 100% 0;
-    -webkit-transition-property: min-height, width, top, right;
-    transition-property: min-height, width, top, right;
-    -webkit-transition-duration: .5s;
-    transition-duration: .5s;
-    -webkit-transition-timing-function: cubic-bezier(0.7, 0, 0.3, 1);
-    transition-timing-function: cubic-bezier(0.7, 0, 0.3, 1);
-}
-
-.morphsearch.open {
-    width: 100%;
-    min-height: 100%;
-    top: 0;
-    right: 0;
-}
-
-.morphsearch-form {
-    width: 100%;
-    height: 30px;
-    position: relative;
-    -webkit-transition-property: width, height, 0;
-    transition-property: width, height, transform;
-    -webkit-transition-duration: .5s;
-    transition-duration: .5s;
-    -webkit-transition-timing-function: cubic-bezier(0.7, 0, 0.3, 1);
-    transition-timing-function: cubic-bezier(0.7, 0, 0.3, 1);
-    margin: 0 auto;
-}
-
-.morphsearch.open .morphsearch-form {
-    width: 80%;
-    height: 160px;
-    -webkit-transform: translate3d(0, 3em, 0);
-    transform: translate3d(0, 3em, 0);
-}
-
-.morphsearch-input {
-    width: 100%;
-    height: 100%;
-    border: none;
-    background: transparent;
-    font-size: 1.2em;
-    font-weight: 600;
-    color: #123;
-    -webkit-transition: font-size .5s cubic-bezier(0.7, 0, 0.3, 1);
-    transition: font-size .5s cubic-bezier(0.7, 0, 0.3, 1);
-    padding: 0 10% 0 10px;
-}
-
-.morphsearch.open .morphsearch-input {
-    font-size: 7em;
-    color: #123;
-    font-weight: 400;
-}
-
 input[type="search"] {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-}
-
-.morphsearch-input:focus, .morphsearch-submit:focus {
-    outline: none;
-}
-
-.morphsearch-submit {
-    position: absolute;
-    width: 80px;
-    height: 80px;
-    text-indent: 100px;
-    overflow: hidden;
-    right: 0;
-    top: 50%;
-    background: transparent url(../img/magnifier.svg) no-repeat center center;
-    background-size: 100%;
-    border: none;
-    pointer-events: none;
-    transform-origin: 50% 50%;
-    opacity: 0;
-    -webkit-transform: translate3d(-30px, -50%, 0) scale3d(0, 0, 1);
-    transform: translate3d(-30px, -50%, 0) scale3d(0, 0, 1);
-}
-
-.morphsearch.open .morphsearch-submit {
-    pointer-events: auto;
-    opacity: 1;
-    -webkit-transform: translate3d(-30px, -50%, 0) scale3d(1, 1, 1);
-    transform: translate3d(-30px, -50%, 0) scale3d(1, 1, 1);
-    -webkit-transition: opacity .3s 0 .3s;
-    transition: opacity .3s transform .3s;
-    -webkit-transition-delay: .5s;
-    transition-delay: .5s;
-}
-
-.morphsearch-close {
-    width: 36px;
-    height: 36px;
-    position: absolute;
-    right: 1em;
-    top: 1em;
-    overflow: hidden;
-    text-indent: 100%;
-    cursor: pointer;
-    pointer-events: none;
-    opacity: 0;
-    -webkit-transform: scale3d(0, 0, 1);
-    transform: scale3d(0, 0, 1);
-}
-
-.morphsearch.open .morphsearch-close {
-    opacity: 1;
-    pointer-events: auto;
-    -webkit-transform: scale3d(1, 1, 1);
-    transform: scale3d(1, 1, 1);
-    -webkit-transition: opacity .3s 0 .3s;
-    transition: opacity .3s transform .3s;
-    -webkit-transition-delay: .5s;
-    transition-delay: .5s;
-}
-
-.morphsearch-close::before, .morphsearch-close::after {
-    content: '';
-    position: absolute;
-    width: 2px;
-    height: 100%;
-    top: 0;
-    left: 50%;
-    border-radius: 3px;
-    opacity: 0.2;
-    background: #000;
-}
-
-.morphsearch-close::before {
-    -webkit-transform: rotate(45deg);
-    transform: rotate(45deg);
-}
-
-.morphsearch-close::after {
-    -webkit-transform: rotate(-45deg);
-    transform: rotate(-45deg);
-}
-
-.morphsearch-content {
-    color: #333;
-    margin-top: 4.5em;
-    width: 100%;
-    height: 0;
-    overflow: hidden;
-    background: #f1f1f1;
-    position: absolute;
-    pointer-events: none;
-    opacity: 0;
-    padding: 0 10.5%;
-}
-
-.morphsearch.open .morphsearch-content {
-    opacity: 1;
-    height: 100vh;
-    overflow: visible;
-    pointer-events: auto;
-    -webkit-transition: opacity .3s .5s;
-    transition: opacity .3s .5s;
 }
 
 .round {
@@ -2882,10 +2702,6 @@ input[type="search"] {
     background: #526373;
     margin: 0;
     padding: 50px;
-}
-
-.mainnav-patch {
-    background: #2d3c4b;
 }
 
 .arches-form {
@@ -3524,10 +3340,6 @@ div.dropdown-menu.open {
 
 .node .node-collected, .link.link-collected {
     stroke-width: 3px;
-}
-
-.morphsearch-close:hover.morphsearch-close::before, .morphsearch-close:hover.morphsearch-close::after, .morphsearch.open~.overlay {
-    opacity: 1;
 }
 
 .project-grid-item {
@@ -4948,7 +4760,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     margin: 0;
 }
 
-#nodeCrud.hidden, .morphsearch-input::-ms-clear, ul.jqtree-tree li.jqtree-ghost span.jqtree-circle, .node_info.hidden {
+#nodeCrud.hidden, ul.jqtree-tree li.jqtree-ghost span.jqtree-circle, .node_info.hidden {
     display: none;
 }
 
@@ -6620,25 +6432,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     top: 40px;
 }
 
-.menu-title-shim-right {
-    top: 60px;
-}
-
-.menu-item-subtitle-right {
-    font-size: 11px;
-    padding-left: 33px;
-    padding-right: 5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.menu-item-title-right {
-    font-size: 14px;
-    color: #777;
-    padding-left: 16px;
-}
-
 .preview-tools {
     position: absolute;
     right: 10px;
@@ -7008,7 +6801,7 @@ a.list-group-item:not(.active):hover, div .switch label:hover, #demo-dt-selectio
     color: #123;
 }
 
-.morphsearch-input::-webkit-input-placeholder, .morphsearch-input:-moz-placeholder, .morphsearch-input::-moz-placeholder, .morphsearch-input:-ms-input-placeholder, .resource-grid-tools-container a, .resource-grid-tools-container a, .resource-grid-tools-container a {
+.resource-grid-tools-container a, .resource-grid-tools-container a, .resource-grid-tools-container a {
     color: #777;
 }
 
@@ -7872,15 +7665,6 @@ div.row.widget-wrapper.report-header:hover {
     display: none;
 }
 
-.map-controls-config-toggle {
-    padding: 10px;
-}
-
-.map-controls-overlay-icon {
-    padding-right: 10px;
-    /*margin-right: -10px;*/
-}
-
 .overlay-selection-container {
     position: absolute;
     top: 6px;
@@ -8501,76 +8285,14 @@ a#close-map-tools.map-widget-icon:hover {
     text-overflow: ellipsis;
 }
 
-.map-draw-tools-item-icon {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 50px;
-    height: 50px;
-    padding-top: 13px;
-    font-size: 19px;
-    border-right: 1px solid #ddd;
-    color: inherit;
-    vertical-align: middle;
-    display: table-cell;
-}
-
-.map-draw-tools-item {
-    width: 249px;
-    height: 50px;
-    padding: 7px;
-    background: #fbfbfb;
-    color: #aaa;
-    border-bottom: 1px solid #ddd;
-}
-
-.map-draw-tools-item a {
-    color: inherit;
-}
-
-.map-draw-tools-item i {
-    color: inherit;
-}
-
 .leaflet-draw-toolbar .active {
     background-color: #efefef;
-}
-
-.map-draw-tools-item.map-draw-tools-active {
-    background-color: #fff;
-    color: #666;
-}
-
-.map-draw-tools-item.map-draw-tools-active:hover {
-    background-color: #fff;
-}
-
-.map-draw-tools-item:hover {
-    background-color: #fafafa;
-    color: #666;
-    cursor: pointer;
-}
-
-.map-draw-tools-item.query-tool {
-    background: #fff;
-    color: #666;
-    border-bottom: 1px solid #ddd;
 }
 
 .map-query-tool {
     display: flex;
     flex-direction: row;
     justify-content: left;
-}
-
-.map-query-tool-name {
-    width: 70px;
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-left: 5px;
-    margin-top: 5px;
 }
 
 .map-query-tool-input {
@@ -8695,20 +8417,6 @@ a.clear-geojson-button.enabled {
 a.clear-geojson-button:hover {
     background-color: #fff;
     cursor: pointer;
-}
-
-.map-json-tool-item-icon {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 50px;
-    height: 100px;
-    padding-top: 13px;
-    font-size: 19px;
-    border-right: 1px solid #ddd;
-    color: #777;
-    vertical-align: middle;
-    display: table-cell;
 }
 
 .form-control.map-json-tool-input {
@@ -9997,10 +9705,6 @@ table.table.dataTable {
     margin-bottom: 10px;
 }
 
-.map-service-config {
-    padding: 0px 30px 10px 30px;
-}
-
 .service-url {
     font-size: 12px;
     color: #999;
@@ -10614,19 +10318,6 @@ a.search-facet-item.disabled {
     font-size: 15px;
 }
 
-.mpm-project-subtitle {
-    width: 220px;
-    position: absolute;
-    left: 10px;
-    top: 28px;
-    padding: 2px 2px 3px 0px;
-    color: #8ba2b9;
-    font-size: 12px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 .mpm-card {
     min-height: 550px;
     background: #fff;
@@ -10698,10 +10389,6 @@ a.search-facet-item.disabled {
 .mpm-group-panel-content.list {
     border-top: solid 0px #ccc;
     padding: 0px;
-}
-
-.msm-user-edit-stats-panel {
-    margin-top: 25px;
 }
 
 .mpm-card-content .userrow {
@@ -10796,15 +10483,6 @@ a.search-facet-item.disabled {
     border-left: solid 1px #ccc;
 }
 
-.msm-user-summary-item-panel {
-    margin-bottom: 3px;
-}
-
-.msm-user-summary-label {
-    font-size: 13px;
-    color: #565656;
-}
-
 .msm-icon-wrap {
     height: 60px;
     width: 60px;
@@ -10887,50 +10565,6 @@ a.filter-tools:hover {
 .account-wrapper {
     padding-top: 20px;
 }
-
-.mpm-card-list {
-    min-height: 300px;
-    min-width: 200px;
-    /*max-width: 1125px;*/
-    width: 50%;
-}
-
-.mpm-card-list.available {
-    padding-right: 5px;
-}
-
-.mpm-card-list.approved {
-    padding-left: 5px;
-}
-
-.mpm-card-list-items {
-    overflow-y: auto;
-    height: 361px;
-}
-
-.mpm-card-list-items .ko_container {
-    min-height: 100%;
-    background-color: #fbfbfb;
-}
-
-.mpm-card-list-header {
-    padding: 10px;
-    border-style: solid;
-    border-width: 0.25px;
-    border-color: #eaeaea;
-    background-color: #f8f8f8;
-}
-
-.mpm-left-panel {
-    -ms-flex: 0 0 250px;
-    -webkit-flex: 0 0 250px;
-    flex: 0 0 250px;
-    height: 550px;
-    margin-left: -2px;
-    background: #fcfcfc;
-    border-right: 1px solid #ddd;
-}
-
 
 .msm-data-selection .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn) {
     margin-top: 1px;
@@ -11119,36 +10753,6 @@ a.filter-tools:hover {
     height: inherit;
 }
 
-.mpm-right-panel {
-    position: absolute;
-    top: 15px;
-    left: 270px;
-    width: calc(100% - 250px);
-    height: 550px;
-    padding: 10px;
-}
-
-.msm-resource-cards {
-    position: absolute;
-    top: 15px;
-    width: 100%;
-    height: 490px;
-    padding: 10px 35px;
-}
-
-.msm-resource-cards.identities {
-    height: 435px;
-}
-
-.msm-basemap-location {
-    margin-bottom: 15px;
-    border-bottom: 1px solid #eee;
-}
-
-.msm-basemap-location:last-child {
-    border-bottom: transparent;
-}
-
 .msm-basemap-subtitle {
     font-size: 13px;
     color: #888;
@@ -11220,49 +10824,6 @@ a.filter-tools:hover {
     display: none;
 }
 
-.msm-item-status {
-    position: absolute;
-    right: 10px;
-    padding-right: 10px;
-    padding-top: 25px;
-    text-align: right;
-    font-size: 13px;
-    color: #999;
-}
-
-.msm-user-summary {
-    display:flex;
-    flex-direction: row;
-    width: 100%;
-    height: 350px;
-}
-
-.msm-group-users {
-    height: 350px;
-    overflow-y: scroll;
-    margin-top: 10px;
-    margin-bottom: 15px;
-    border-top: solid;
-    border-width: 0.25px;
-    border-color: #eee;
-    width: 50%;
-    background: #fcfcfc;
-}
-
-.mpm-right-panel .list-group.user-cards {
-    padding-right: 35px;
-}
-
-.mpm-account-detail-panel {
-    margin: 20px 0px;
-}
-
-.mpm-form-finder {
-    width: 300px;
-    margin-bottom: 10px;
-    margin-left: 8px;
-}
-
 .mpm-selector-header {
     height: 55px;
     padding: 10px 5px;
@@ -11283,335 +10844,12 @@ a.filter-tools:hover {
     padding-right: 5px;
 }
 
-.mpm-selector-btns {
-    position: absolute;
-    top: 20px;
-    right: 10px;
-}
-
-.msm-resource-panel .mpm-group-name {
-    position: relative;
-    padding-left: 25px;
-    left: 0px;
-    top: 2px;
-}
-
-.msm-resource-panel .mpm-group-subtitle {
-    position: relative;
-    padding-left: 25px;
-    left: 0px;
-    top: 0px;
-}
-
-.msm-resource-panel .library-icon {
-    position: relative;
-    padding: 0 5px;
-    left: 0;
-    top: 3px;
-}
-
-.msm-resource-panel .title-block-title {
-    width: auto;
-    margin-top: 5px;
-}
-
-.mpm-group-name {
-    width: 400px;
-    position: absolute;
-    left: 55px;
-    top: 1px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 15px;
-    font-weight: 600;
-}
-
-.mpm-group-subtitle {
-    width: 400px;
-    position: absolute;
-    left: 55px;
-    top: 18px;
-    padding: 2px 2px 3px 0px;
-    color: #8ba2b9;
-    font-size: 13px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.mpm-card-container {
-    position: absolute;
-    top: 80px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    overflow-y: hidden;
-    margin-top: 5px;
-    margin-right: 35px;
-    width: 100%;
-}
-
-.msm-card-toolbar {
-    position: absolute;
-    top: 70px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-end;
-}
-
-.mpm-card-filter {
-    width: 400px;
-}
-
-.mpm-user-name h4 {
-    font-size: 15px;
-    font-weight: 500;
-    color: #156AB7;
-    margin-top: 5px;
-    margin-bottom: 5px;
-}
-
-.mpm-user-info-panel {
-    margin-top: -3px;
-    padding: 15px 20px;
-    background: #fcfcfc;
-    margin-right: -6px;
-    margin-left: -5px;
-}
-
-.mpm-user-name.mpm-user-title {
-    display: flex;
-    flex-direction: row;
-    align-items: baseline;
-    justify-content: space-between;
-}
-
-.mpm-toggle-container {
-    width: 400px;
-    display: flex;
-}
-
-.library-card-main.mpm-resource-list {
-    top: 12px;
-    overflow:visible;
-    cursor: pointer;
-    width:100%;
-    padding: 0px 5px;
-}
-
-.selected-card div .library-card-main.mpm-resource-list {
-    height: 75px;
-    background: #fbfbfb;
-    padding: 12px 5px;
-    margin-top: -12px;
-    border-bottom: 1px solid #eee;
-}
-
-.library-card-main.mpm-resource-list .added {
-    color: #1E6FB7;
-}
-
-.msm-resource-list-header {
-    display:flex;
-    flex-direction: row;
-    left: 0px;
-}
-
-.msm-resource-panel {
-    width: 100%;
-}
-
-.msm-resource-name {
-    display: flex;
-    flex-direction: column;
-}
-
-.msm-resource-panel .library-card.selected.selected-card {
-    height: 605px;
-    -webkit-transition: height 0.25s;
-    /* Safari */
-    transition: height 0.25s;
-    background: #ffffff;
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-}
-
-.msm-resource-panel.identities .library-card.selected.selected-card {
-    height: 510px;
-    -webkit-transition: height 0.25s;
-    /* Safari */
-    transition: height 0.25s;
-    background: #ffffff;
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-}
-
-
-.msm-resource-panel .title-block-fixed {
-    display: flex;
-    background: white;
-    border-bottom-width: 0px;
-    width: -webkit-fill-available;
-    margin-left: 0;
-    padding-bottom: 5px;
-    padding-top: 12px;
-    margin-left: 10px;
-    margin-right: 10px;
-    justify-content: space-between;
-}
-
-.list-group-item .mpm-user-summary {
-    height: 0;
-    transition: height 600ms ease-out;
-    overflow: hidden;
-    padding: 0;
-}
-
-.msm-resource-panel .grid {
-    margin-left: 1px;
-    margin-right: 1px;
-    margin-top: 68px;
-    width: 100%;
-    padding: 0px 20px 0px 20px;
-    background: #fff;
-    border-top-width: 0px;
-    max-width: unset;
-}
-
-
-.msm-resource-panel .list-filter {
-    width: 400px;
-    height: 40px;
-    margin-top: -5px;
-}
-
-.msm-resource-panel .list-filter .clear-node-search {
-    margin-top: 4px;
-}
-
-.msm-resource-cards .mpm-card-container {
-    margin-right: 0;
-}
-
-.list-group-item .mpm-user-summary.expanded {
-    height: 280px;
-}
-
-
-.mpm-user-subtitle {
-    color: #777;
-    font-size: 13px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 0px 10px 0px 0px;
-    margin-top: -3px;
-}
-
-.mpm-user-subtitle.user {
-    padding: 0px;
-    justify-content: left;
-}
-
-.mpm-user-subtitle.resource {
-    padding: 0px;
-    justify-content: left;
-}
-
-.mpm-widget-labels {
-    padding-left: 5px;
-}
-
-.msm-resource-panel .ep-graph-title-icon {
-    background: #eee;
-}
-
-.mpm-user-groups {
-    color: #777;
-    font-weight: 600;
-    font-size: 14px;
-    padding-top:12px;
-}
-
-.mpm-user-groups ul {
-    list-style-type: none;
-}
-
-.mpm-user-groups li {
-    font-weight: 400;
-    font-size: 13px;
-    margin-left: -40px;
-    padding-top: 3px;
-}
-
-.mpm-title-block {
-    display: flex;
-    flex-direction: row;
-    padding-bottom: 10px
-}
-
-.mpm-title-block .title-block-title {
-    width: 107px;
-    margin-top: 3px;
-    padding-bottom: 0px;
-    margin-bottom: 0px;
-    padding-top: 12px;
-}
-
-.mpm-project-status {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    font-size: 12px;
-    color: #999;
-}
-
-.mpm-user-status {
-    color: #ccc;
-    padding: 4px 10px;
-    margin-top: -4px;
-    font-size: 14px;
-    width: 115px;
-    font-weight: 600;
-    text-align: right;
-}
-
-.mpm-user-status.user {
-    padding: 4px 0px;
-    text-align: left;
-}
-
-
 .mpm-manager .btn-rr {
     margin: 0;
 }
 
-.mpm-instructions {
-    display: table-cell;
-    vertical-align: middle;
-    color: #555;
-    font-size: 13px;
-}
-
-.mpm-user-name .mpm-user-status.invited {
-    color: #64bd63;
-}
-
-.mpm-user-status.add {
-    background: #f4f4f4;
-    color: #454545;
-    border: 1px solid #ddd;
-}
-
 .library-card.inactive {
     background: #f7f7f7;
-}
-
-.mpm-item-listing-header-panel {
-    padding-top: 10px;
-    padding-bottom: 5px;
 }
 
 .mpm-item-listing-header {
@@ -11686,11 +10924,6 @@ a.filter-tools:hover {
     padding-top: 0px;
 }
 
-
-.msm-splash-instruction {
-    padding: 0px 60px;
-}
-
 .msm-report-section {
     padding: 40px 30px;
     background: #fefefe;
@@ -11716,15 +10949,6 @@ a.filter-tools:hover {
     padding-left: 0px;
 }
 
-.mpm-account-switch {
-    margin-top: 20px;
-}
-
-.mpm-account-switch-text {
-    padding-left: 40px;
-    margin-top: -17px;
-}
-
 .msm-download-header {
     font-size: 15px;
     padding-left: 0px;
@@ -11738,23 +10962,8 @@ a.filter-tools:hover {
     right: 0px;
 }
 
-.mpm-user-summary {
-    padding: 10px;
-}
-
-.msm-user-summary .mpm-user-summary {
-    width: 50%;
-}
-
-
 .mpm-model-detail-panel {
     padding-left: 10px;
-}
-
-.mpm-node-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: #454545;
 }
 
 .mpm-node-detail-metadata {
@@ -12557,22 +11766,6 @@ a.jstree-anchor.permissions-widget {
 }
 
 @media screen and (max-width: 767px) {
-    .morphsearch {
-        width: 30%;
-        top: 50px;
-        right: 10%;
-    }
-    .morphsearch-input {
-        padding: 0 25% 0 10px;
-    }
-    .morphsearch.open .morphsearch-input {
-        font-size: 2em;
-    }
-    .morphsearch.open .morphsearch-submit {
-        -webkit-transform: translate3d(0, -50%, 0) scale3d(0.5, 0.5, 1);
-        transform: translate3d(0, -50%, 0) scale3d(0.5, 0.5, 1);
-    }
-
     .rp-no-data {
         color: #888;
         position: relative;
@@ -12581,19 +11774,9 @@ a.jstree-anchor.permissions-widget {
 }
 
 @media screen and (max-width: 969px) {
-    .morphsearch {
-        width: 30%;
-        top: 10px;
-        right: 25px;
-    }
 }
 
 @media screen and (min-width: 970px) {
-    .morphsearch {
-        width: 30%;
-        top: 15px;
-        right: 25px;
-    }
 }
 
 @media screen and (max-width: 830px) {
