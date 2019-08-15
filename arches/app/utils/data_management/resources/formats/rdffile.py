@@ -368,6 +368,14 @@ class JsonLdReader(Reader):
                 ]
             }
         """
+
+        self.logger.debug(
+            "entered 'findBranch' with {0} nodes, ontology_property='{1}' and jsonld_fragment:".format(
+                len(nodes), str(ontology_property)
+                )
+            )
+        self.logger.debug(str(jsonld))
+
         if not isinstance(jsonld, list):
             jsonld = [jsonld]
 
@@ -407,8 +415,14 @@ class JsonLdReader(Reader):
             for node in nodes:
                 self.logger.debug("Checking {0}".format(node['node'].ontologyclass))
                 if '@type' in jsonld_graph:
-                    self.logger.debug("node['node'].ontologyclass == jsonld_graph['@type']")
-                    self.logger.debug(node['node'].ontologyclass == jsonld_graph['@type'])
+                    self.logger.debug("node['parent_edge'].ontologyproperty")
+                    self.logger.debug(node['parent_edge'].ontologyproperty)
+                    self.logger.debug("node['parent_edge'].ontologyproperty == ontology_property")
+                    self.logger.debug(node['parent_edge'].ontologyproperty == ontology_property)
+                    self.logger.debug("node['node'].ontologyclass")
+                    self.logger.debug(node['node'].ontologyclass)
+                    self.logger.debug("node['node'].ontologyclass == jsonld_graph['@type'][0]")
+                    self.logger.debug(node['node'].ontologyclass == jsonld_graph['@type'][0])
 
                 if '@type' in jsonld_graph:
                     if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == jsonld_graph['@type'][0]:
