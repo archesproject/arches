@@ -206,7 +206,7 @@ class ConceptDataType(BaseConceptDataType):
             try:
                 label, lang = get_value_from_jsonld(label_node)
             except AttributeError as e:
-                # a string
+                # a string literal instead of a "@value" node?
                 label = label_node
 
             if label:
