@@ -135,7 +135,7 @@ class ConceptListJSONLDUnitTests(ArchesTestCase):
 
         # Get the tile with the concept-list in (should be the only tile)
         clist_tile = reader.tiles[reader.tiles.keys()[0]]
-        self.assertTrue(len(clist_tile) == 1)  # single datatype node from input
+        self.assertTrue(len(clist_tile.keys()) == 1)  # single datatype node from input
         clist_data = clist_tile.data[clist_tile.data.keys()[0]]
         self.assertTrue('ac1d498c-9c61-4573-bfe8-1653641c028a' in clist_data)  # Concept 1 in list?
         self.assertTrue('9a94ce98-4d76-4405-89df-b9ddeaddfae1' in clist_data)  # Concept 2 in list?
