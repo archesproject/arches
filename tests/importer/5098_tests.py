@@ -104,7 +104,7 @@ class ConceptListJSONLDUnitTests(ArchesTestCase):
         resourceid = "0b4439a8-beca-11e9-b4dc-0242ac160002"
         graphid = models.GraphModel.objects.get(slug=slug).pk
 
-        data = """
+        raw_data = """
 {"@id": "http://localhost:8001/resources/0b4439a8-beca-11e9-b4dc-0242ac160002",
 "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person",
 "http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by":
@@ -121,6 +121,7 @@ class ConceptListJSONLDUnitTests(ArchesTestCase):
 }
 """
 
+        data = JSONDeserializer().deserialize(raw_data)
         reader.read_resource(data, resourceid=resourceid, graphid=graphid)
         if reader.errors:
             response = []
