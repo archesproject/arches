@@ -101,6 +101,7 @@ class ConceptListJSONLDUnitTests(ArchesTestCase):
     def test_jsonld_concept_list_full_import(self):
         reader = JsonLdReader()
         slug = "92ccf5aa-bec9-11e9-bd39-0242ac160002"
+        resourceid = "0b4439a8-beca-11e9-b4dc-0242ac160002"
         graphid = models.GraphModel.objects.get(slug=slug).pk
 
         data = """
