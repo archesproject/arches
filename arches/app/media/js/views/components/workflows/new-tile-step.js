@@ -14,8 +14,8 @@ define([
         if (!params.resourceid() && params.requirements){
             params.resourceid(params.requirements.resourceid);
             params.tileid(params.requirements.tileid);
+            if (params.requirements.tiles == undefined) { params.requirements.tiles = []; }
         }
-        if (params.requirements.tiles == undefined) { params.requirements.tiles = []; }
         var url = arches.urls.api_card + (ko.unwrap(params.resourceid) || ko.unwrap(params.graphid));
 
         this.card = ko.observable();
@@ -145,9 +145,7 @@ define([
             var tile;
             if (tiles.length > 0 || typeof tiles != 'Array') {
                 tile = tiles[0] || tiles;
-                // console.log(tile);
-                params.requirements.tiles.push(tile);
-                // console.log(params.requirements.tiles);
+                if(params.requirements) { params.requirements.tiles.push(tile); }
                 params.resourceid(tile.resourceinstance_id);
                 params.tileid(tile.tileid);
                 self.resourceId(tile.resourceinstance_id);
