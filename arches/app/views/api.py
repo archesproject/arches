@@ -236,6 +236,8 @@ class GeoJSON(APIBase):
                         feature['properties']['resourceinstanceid'] = tile.resourceinstance_id
                         feature['properties']['tileid'] = tile.pk
                         feature['properties']['nodeid'] = node.pk
+                        feature['properties']['node'] = node.name
+                        feature['properties']['model'] = node.graph.name
                         feature['properties']['featureid'] = feature['id']
                         feature['id'] = i
                         i += 1
