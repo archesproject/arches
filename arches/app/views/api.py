@@ -209,6 +209,43 @@ class Surveys(APIBase):
         return response
 
 
+class GeoJSON(APIBase):
+    def get(self, request):
+        resourceid = request.GET.get('resourceid', None)
+        nodeid = request.GET.get('nodeid', None)
+        tileid = request.GET.get('tileid', None)
+        if hasattr(request.user, 'userprofile') is not True:
+            models.UserProfile.objects.create(user=request.user)
+        viewable_nodegroups = request.user.userprofile.viewable_nodegroups
+        nodes = models.Node.objects.filter(datatype='geojson-feature-collection',nodegroup_id__in=viewable_nodegroups)
+        if nodeid is not None:
+            nodes = nodes.filter(nodeid=nodeid)
+        features = []
+        i = 1
+        for node in nodes:
+            tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup)
+            if resourceid is not None:
+                tiles = tiles.filter(resourceinstance_id=resourceid)
+            if tileid is not None:
+                tiles = tiles.filter(tileid=tileid)
+            for tile in tiles:
+                data = tile.data
+                try:
+                    for i, feature in enumerate(data[unicode(node.pk)]['features']):
+                        feature['properties']['index'] = i
+                        feature['properties']['resourceinstanceid'] = tile.resourceinstance_id
+                        feature['properties']['tileid'] = tile.pk
+                        feature['properties']['nodeid'] = node.pk
+                        feature['properties']['featureid'] = feature['id']
+                        feature['id'] = i
+                        i += 1
+                        features.append(feature)
+                except KeyError:
+                    pass
+        response = JSONResponse({'type': 'FeatureCollection', 'features': features})
+        return response
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class Resources(APIBase):
 
