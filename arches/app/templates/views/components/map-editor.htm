@@ -8,14 +8,17 @@
     'active': activeTab() === 'editor'
 }">
     <i class="fa fa-pencil"></i>
-    {% trans "Edit" %}
+    <span class="map-sidebar-text">{% trans "Edit" %}</span>
 </div>
 {{ block.super }}
 {% endblock tabs %}
 
 {% block sidepanel %}
 <!--ko if: activeTab() === 'editor' -->
-    <h4 class="map-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
+    <div class="map-card-sidepanel-header-container">
+        <h4 class="map-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
+    </div>
+
     <div data-bind="css: card.model.cssclass">
 
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
@@ -229,17 +232,17 @@
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: self.deleteTile, css: {
                         disabled: (!card.isWritable && !self.preview) || self.editing(),
                         'btn-warning': card.isWritable
-                    }">{% trans 'Delete this record' %}</button>
+                    }">{% trans 'Delete' %}</button>
                     <!-- /ko -->
                     <!-- ko if: tile.dirty() -->
                         <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
-                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset, css: { disabled: self.editing()}">{% trans 'Cancel edit' %}</button>
+                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset, css: { disabled: self.editing()}">{% trans 'Cancel' %}</button>
                         <!-- /ko -->
                         <!-- ko if: tile.tileid -->
                         <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
                             disabled: (!card.isWritable && !self.preview) || self.editing(),
                             'btn-mint': card.isWritable
-                        }">{% trans 'Save edit' %}</button>
+                        }">{% trans 'Save' %}</button>
                         <!-- /ko -->
                     <!-- /ko -->
                     <!-- ko if: !tile.tileid -->
