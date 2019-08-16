@@ -1318,7 +1318,7 @@ ul.tabbed-report-tab-list {
 }
 
 .map-card-sidebar-tab {
-    color: #666;
+    color: #787878;
     height: 75px;
     padding: 16px;
     text-align: center;
@@ -1328,7 +1328,7 @@ ul.tabbed-report-tab-list {
 }
 
 .map-card-sidebar-tab:hover {
-    background: #fafafa;
+    background: #fbfbfb;
     color: #454545;
 }
 
@@ -10719,11 +10719,44 @@ a.clear-geojson-button:hover {
     padding: 10px;
     background: #ebebeb;
     max-width: 400px;
+    margin-left: -20px;
+    margin-right: -20px;
+    margin-top: -20px;
+    margin-bottom: 10px;
+}
+
+.mapboxgl-popup-close-button {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    border: 0;
+    border-radius: 2px;
+    padding-bottom: 4px;
+    cursor: pointer;
+    background-color: #bbb;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.mapboxgl-popup-close-button:hover {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    border: 0;
+    border-radius: 2px;
+    padding-bottom: 4px;
+    cursor: pointer;
+    background-color: #337ab7;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
 }
 
 .hover-feature-title {
     font-size: 15px;
-    max-width: 360px;
+    max-width: 300px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
