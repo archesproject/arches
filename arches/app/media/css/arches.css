@@ -1368,7 +1368,7 @@ ul.tabbed-report-tab-list {
 .map-card-sidepanel-header-container {
     padding-right: 20px;
     border-bottom: 1px solid #eee;
-    padding: 5px 20px 15px 5px;
+    padding: 5px 20px 11px 5px;
     margin-right: 15px;
     margin-left: 15px;
     margin-bottom: 15px;
@@ -7213,7 +7213,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     flex-direction: column;
     top: -15px;
     position: relative;
-    margin-right: 15px;
+    margin-right: -25px;
     width: 250px;
     padding: 5px 5px 0px 5px;
     border-left: 1px solid #ddd;
@@ -7238,7 +7238,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     background: #fafafa;
     padding: 5px;
     margin-left: -5px;
-    margin-right: -45px;
+    width: 200px;
 }
 
 .new-provisional-edit-entry .title {
@@ -7263,7 +7263,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-bottom: 1px solid #ddd;
     height: 40px;
     margin-left: -5px;
-    margin-right: -40px;
+    /*margin-right: -40px;*/
     margin-top: -5px;
     padding: 10px 10px;
     height: 75px;
