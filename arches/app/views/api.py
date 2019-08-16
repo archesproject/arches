@@ -217,7 +217,7 @@ class GeoJSON(APIBase):
         if hasattr(request.user, 'userprofile') is not True:
             models.UserProfile.objects.create(user=request.user)
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
-        nodes = models.Node.objects.filter(datatype='geojson-feature-collection',nodegroup_id__in=viewable_nodegroups)
+        nodes = models.Node.objects.filter(datatype='geojson-feature-collection', nodegroup_id__in=viewable_nodegroups)
         if nodeid is not None:
             nodes = nodes.filter(nodeid=nodeid)
         features = []
