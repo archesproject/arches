@@ -34,6 +34,7 @@ define([
         self.onSaveSuccess = function(tile) {
             params.resourceid(tile.resourceinstance_id);
             params.tileid(tile.tileid);
+            params.requirements.tiles.push(tile);
             self.resourceId(tile.resourceinstance_id);
             self.tile(self.card().getNewTile());
             self.tile().reset();
