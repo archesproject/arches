@@ -231,8 +231,8 @@ class GeoJSON(APIBase):
             for tile in tiles:
                 data = tile.data
                 try:
-                    for i, feature in enumerate(data[unicode(node.pk)]['features']):
-                        feature['properties']['index'] = i
+                    for feature_index, feature in enumerate(data[unicode(node.pk)]['features']):
+                        feature['properties']['index'] = feature_index
                         feature['properties']['resourceinstanceid'] = tile.resourceinstance_id
                         feature['properties']['tileid'] = tile.pk
                         feature['properties']['nodeid'] = node.pk
