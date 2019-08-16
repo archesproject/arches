@@ -143,7 +143,7 @@ define([
 
         self.onSaveSuccess = function(tiles) {
             var tile;
-            if (tiles.length > 0 || typeof tiles != 'array') {
+            if (tiles.length > 0 || typeof tiles == 'object') {
                 tile = tiles[0] || tiles;
                 if(params.requirements) { params.requirements.tiles.push(tile); }
                 params.resourceid(tile.resourceinstance_id);
