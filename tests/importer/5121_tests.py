@@ -39,7 +39,7 @@ ARCHES_NS = Namespace(test_settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 CIDOC_NS = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 
 
-class ConceptListJSONLDUnitTests(ArchesTestCase):
+class FalseAmbiguityJSONLDUnitTests(ArchesTestCase):
     """
     Unit tests for the `from_rdf` method on Datatype classes.
     """
@@ -71,8 +71,8 @@ class ConceptListJSONLDUnitTests(ArchesTestCase):
 
     def test_jsonld_concept_list_full_import(self):
         reader = JsonLdReader()
-        slug = "92ccf5aa-bec9-11e9-bd39-0242ac160002"
-        resourceid = "0b4439a8-beca-11e9-b4dc-0242ac160002"
+        slug = "9f716aa2-bf96-11e9-bd39-0242ac160002"
+        resourceid = "72e6a574-bfa5-11e9-b4dc-0242ac160002"
         graphid = models.GraphModel.objects.get(slug=slug).pk
 
         raw_data = """
