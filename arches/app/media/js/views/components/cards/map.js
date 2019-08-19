@@ -467,7 +467,9 @@ define([
             var featureIds = [];
             features.forEach(function(feature) {
                 feature.id = uuid.generate();
-                feature.properties.nodeId = self.newNodeId;
+                feature.properties = {
+                    nodeId: self.newNodeId
+                };
                 self.draw.add(feature);
                 featureIds.push(feature.id);
             });
