@@ -124,7 +124,7 @@
                     <div data-bind="foreach: {
                             data:card.widgets, as: 'widget'
                         }">
-                        <!-- ko if: self.form.nodeLookup[widget.node_id()].datatype() === 'geojson-feature-collection' -->
+                        <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) === 'geojson-feature-collection' -->
                         <div class="row widget-wrapper">
                             <div class="form-group">
                                 <label class="control-label widget-input-label" for="" data-bind="text:widget.label"></label>
@@ -191,7 +191,7 @@
                             </div>
                         </div>
                         <!-- /ko -->
-                        <!-- ko if: self.form.nodeLookup[widget.node_id()].datatype() !== 'geojson-feature-collection' -->
+                        <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) !== 'geojson-feature-collection' -->
                         <div data-bind='component: {
                             name: self.form.widgetLookup[widget.widget_id()].name,
                             params: {

@@ -83,7 +83,7 @@ define([
 
         if (self.form && self.tile) self.card.widgets().forEach(function(widget) {
             var id = widget.node_id();
-            var type = self.form.nodeLookup[id].datatype();
+            var type = ko.unwrap(self.form.nodeLookup[id].datatype);
             if (type === 'geojson-feature-collection') {
                 widgets.push(widget);
                 self.featureLookup[id] = {
