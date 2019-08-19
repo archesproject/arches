@@ -530,6 +530,11 @@ define([
             return initialLayers;
         };
 
+        ko.unwrap(this.geometryTypes).forEach(function(geometryType) {
+            geometryType.id = ko.unwrap(geometryType.id);
+            geometryType.text = ko.unwrap(geometryType.text);
+        });
+
         this.geometryTypeDetails = {
             Point: {
                 name: 'Point',
