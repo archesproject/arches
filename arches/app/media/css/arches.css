@@ -382,16 +382,6 @@ input[type="checkbox"] {
     color: lightcoral;
 }
 
-.record-close {
-    position: absolute;
-    font-size: 10px;
-    top: 5px;
-    right: px;
-    height: 20px;
-    width: 20px;
-    margin-right: 10px;
-}
-
 .wizard-buttons {
     direction: rtl;
     padding: 5px 0 10px 10px;
@@ -2923,57 +2913,12 @@ div.dropdown-menu.open {
     min-height: 250px;
 }
 
-.rotated-text {
-    display: inline-block;
-    overflow: hidden;
-    width: 1.5em;
-}
-
-.rotated-text__inner {
-    display: inline-block;
-    white-space: nowrap;
-    -webkit-transform: translate(1.1em, 0) rotate(-90deg);
-    -moz-transform: translate(1.1em, 0) rotate(-90deg);
-    -o-transform: translate(1.1em, 0) rotate(-90deg);
-    transform: translate(1.1em, 0) rotate(-90deg);
-    -webkit-transform-origin: 0 0;
-    -moz-transform-origin: 0 0;
-    -o-transform-origin: 0 0;
-    transform-origin: 0 0;
-    -ms-transform: none;
-    -ms-transform-origin: none;
-    -ms-writing-mode: tb-rl;
-    writing-mode: tb-rl;
-}
-
-.rotated-text__inner:before {
-    content: "";
-    float: left;
-    margin-top: 100%;
-}
-
 .underline {
     border-bottom: 1px solid #ddd;
 }
 
 .bg-green {
     background: #139F78;
-}
-
-.rp-card-bg {
-    background-color: #42cca5;
-    color: #fff;
-}
-
-.rp-tile-menu {
-    width: 60px;
-    height: 32px;
-    border-radius: 2px;
-    margin: -15px 0 15px -10px;
-}
-
-.rp-results-icon-bg {
-    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .og-grid {
@@ -3205,17 +3150,6 @@ div.dropdown-menu.open {
     -moz-osx-font-smoothing: grayscale;
     transform: translate(0, 0);
     z-index: 100000001;
-}
-
-.resource-editor-search.loading-mask {
-    position: relative;
-    opacity: .5;
-    background-color: gray;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 100000000;
 }
 
 .ep-help-body.loading-mask::before {
@@ -3508,12 +3442,6 @@ ul .collapse li:last-of-type {
     margin-top: 0px;
 }
 
-.resource-grid-meta-container {
-    position: absolute;
-    right: 15px;
-    top: 45px;
-}
-
 .resource-grid-tools-container a:last-of-type {
     padding-right: 0;
 }
@@ -3521,11 +3449,6 @@ ul .collapse li:last-of-type {
 .hightlight-tool {
     color: #4F49DB;
     font-weight: 600;
-}
-
-.resource-grid-meta {
-    font-size: 12px;
-    color: #959595;
 }
 
 .eh-timeline-panel {
@@ -3681,10 +3604,6 @@ ul .collapse li:last-of-type {
     flex-direction: row;
 }
 
-.related-resources-editor-container .content-panel {
-    height: calc(100vh - 100px);
-}
-
 .resource-search-container {
     display: flex;
 }
@@ -3818,11 +3737,6 @@ ul .collapse li:last-of-type {
     cursor: default;
 }
 
-.results-counter:hover {
-    background: #fff;
-    cursor: default;
-}
-
 .bg-trans {
     background: transparent;
 }
@@ -3842,14 +3756,6 @@ ul .collapse li:last-of-type {
 .btn-flat:hover {
     color: #fff;
     background: #8ce196;
-}
-
-.btn-flat.right-border {
-    border-right: 1px solid #ccc;
-}
-
-.btn-flat.right-border:active {
-    box-shadow: inset 0 0 0 rgba(0, 0, 0, 0);
 }
 
 .demo-icon-font {
@@ -4567,17 +4473,6 @@ span.editable-card i.fa.fa-align-justify:hover {
     border-bottom-width: 1px;
 }
 
-.res-container {
-    margin-bottom: 20px;
-    background: #ebeef0;
-}
-
-.res-page-banner {
-    background: #f8f8f8;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
 .report li {
     margin-left: -10px;
     padding-left: 5px;
@@ -4599,20 +4494,6 @@ span.editable-card i.fa.fa-align-justify:hover {
 .report-image-grid {
     width: 100%;
     margin-bottom: 20px;
-}
-
-.report-image-grid.rr-image-grid {
-    top: 100px;
-    left: 25px;
-}
-
-.report-grid-item {
-    float: left;
-    margin: 3px;
-}
-
-.report-section-indent {
-    padding-left: 20px;
 }
 
 .navbar-top-links .dropdown-menu .recent-additions-container {
@@ -6282,7 +6163,7 @@ a.list-group-item:not(.active):hover, div .switch label:hover, #demo-dt-selectio
     color: #777;
 }
 
-.text-green, .rp-results-icon-color, .text-green, .rp-results-icon-color, .text-green, .rp-results-icon-color, .text-green, .rp-results-icon-color {
+.text-green {
     color: #139F78;
 }
 
@@ -6293,11 +6174,6 @@ a.list-group-item:not(.active):hover, div .switch label:hover, #demo-dt-selectio
 .btn-flat.selected {
     background: #8ce196;
     color: #fff;
-}
-
-.btn-flat.right-border:hover, .btn-flat.right-border:focus, .btn-flat.right-border:hover, .btn-flat.right-border:focus, .btn-flat.right-border:hover, .btn-flat.right-border:focus {
-    background: transparent;
-    color: #777;
 }
 
 .editable:hover, .editable.selected, .editable:hover, .editable.selected {
@@ -6562,12 +6438,6 @@ div.row.widget-wrapper {
     margin-top: -40px;
 }
 
-.rr-card-icon-placement {
-    position: absolute;
-    top: 210px;
-    left: 40%;
-}
-
 .arches-menu-icon {
     font-size: 10px;
     color: #abb1b7;
@@ -6653,11 +6523,6 @@ a.mega-dropdown-toggle.disabled {
     margin-top: 5px;
 }
 
-.related-resources-editor-container {
-    position: absolute;
-    width: 100%;
-}
-
 .rr-panel-note {
     text-align: center;
     font-size: 27px;
@@ -6671,11 +6536,6 @@ a.mega-dropdown-toggle.disabled {
     border: 1px solid white;
     border-radius: 2px;
     padding: 0px 25px;
-}
-
-.recent-edits-panel {
-    margin-left: 50px;
-    overflow-y: auto;
 }
 
 #container .table-bordered td, #container .table-bordered th.rr-tab-field {
@@ -6702,20 +6562,6 @@ a.mega-dropdown-toggle.disabled {
 
 .shim {
     margin-top: -25px;
-}
-
-.rr-grid {
-    position: absolute;
-    top: 50px;
-    left: 20px;
-}
-
-.rr-grid-item {
-    float: left;
-    margin: 3px;
-    width: 360px;
-    border: 1px solid #ddd;
-    opacity: .79;
 }
 
 .resource-relation-description {
@@ -6754,16 +6600,6 @@ a.mega-dropdown-toggle.disabled {
 .search .grid .library-card:hover {
     background: #fff;
     border-left: 5px solid #20ce05;
-}
-
-.rr-card-message-placement {
-    margin-top: 280px;
-    width: 100%;
-    font-size: 16px;
-    padding-left: 20px;
-    padding-right: 20px;
-    font-weight: 300;
-    color: #999;
 }
 
 .table>tbody>.rr-table-row>td {
@@ -6833,11 +6669,6 @@ a.mega-dropdown-toggle.disabled {
 .rp-report-section.rp-report-section-root {
     padding-top: 30px;
     background-color: #fff;
-}
-
-.rp-report-header {
-    height: 500px;
-    border-bottom: 1px solid #ddd;
 }
 
 .rp-report-section {
@@ -6920,10 +6751,6 @@ a.mega-dropdown-toggle.disabled {
     margin-top: 10px;
 }
 
-.rp-report-tile-map {
-    margin-left: -270px;
-}
-
 .rp-report-container-tile .rp-report-tile {
     padding-bottom: 0;
 }
@@ -6933,22 +6760,8 @@ a.mega-dropdown-toggle.disabled {
     padding-top: 15px;
 }
 
-.rp-report-tile-left-panel {
-    padding: 0px 15px 0px 0px;
-}
-
-.rp-report-tile-right-panel {
-    padding: 0px 15px 0px 0px;
-}
-
 .rp-report-tile dt {
     font-weight: 600;
-}
-
-.rp-tile-divider {
-    margin-left: 100px;
-    margin-right: 100px;
-    border-color: #ddd;
 }
 
 .rp-image-grid-item {
@@ -6968,26 +6781,12 @@ a.mega-dropdown-toggle.disabled {
     padding-right: 20px;
 }
 
-.responsive-content {
-    margin-left: 50px;
-}
-
-.report-icon {
-    height: 25px;
-    width: 101px;
-    margin: 10px;
-}
-
 .report-toolbar {
     top: 50px;
     width: calc(100% - 50px);
     height: 50px;
     background: #f8f8f8;
     border-bottom: 1px solid #ddd;
-}
-
-.report-template-preview-container {
-    margin: 20px;
 }
 
 .stamp {
@@ -6998,10 +6797,6 @@ a.mega-dropdown-toggle.disabled {
 
 .report-toolbar a {
     width: 500px;
-}
-
-.rr-panel-search-bar a {
-    width: 75px;
 }
 
 .report-toolbar-preview {
@@ -7023,12 +6818,6 @@ a.mega-dropdown-toggle.disabled {
 
 h4.report-toolbar-title {
     width: 500px;
-}
-
-.report-undefined {
-    margin: 25px;
-    font-size: 16px;
-    color: #808080;
 }
 
 .dataTable tr:hover {
@@ -7262,95 +7051,6 @@ div.row.widget-wrapper.report-header:hover {
 
 .overlay-filter {
     height: 38px;
-}
-
-.required-node-card {
-    float: left;
-    width: 100%;
-    height: 50px;
-    margin-bottom: -2px;
-    position: relative;
-    padding: 0px;
-    border-top-width: 1px;
-    background: #fcfcfc;
-    z-index: 10;
-}
-
-.required-node-filter {
-    height: 38px;
-    margin-bottom: 15px;
-    position: relative;
-}
-
-.required-node-card:hover {
-    background: #fff;
-    cursor: pointer;
-}
-
-.required-node-card.selected {
-    background: #fff;
-}
-
-.required-node-card-item {
-    position: relative;
-}
-
-.required-node-card-main {
-    position: absolute;
-    left: 67px;
-    top: 15px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 14px;
-}
-
-.required-node-card-group {
-    float: left;
-    width: 100%;
-    height: 50px;
-    margin-bottom: -2px;
-    position: relative;
-    padding: 0px;
-    border-top-width: 1px;
-    background: #f5f5f5;
-    z-index: 10;
-}
-
-.required-node-card-main-group {
-    position: absolute;
-    top: 15px;
-    left: 10px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 14px;
-}
-
-.required-node-card-vis-toggle {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    text-align: center;
-    width: 50px;
-    height: 50px;
-    padding-top: 15px;
-    font-size: 17px;
-    color: #999;
-    vertical-align: middle;
-    display: table-cell;
-}
-
-.required-node-card-main a {
-    color: #999;
-}
-
-.required-node-card.selected div div a {
-    color: #555;
-}
-
-.required-node-card.selected div div i {
-    color: #666;
 }
 
 .resource-color-swatch {
@@ -9116,10 +8816,6 @@ table.table.dataTable {
 .basemap-preview-panel {
     padding-top: 5px;
     padding-left: 7.5px;
-}
-
-.resource-map-service-container {
-    padding-top: 10px;
 }
 
 .map-service-container {
@@ -11013,10 +10709,6 @@ a.jstree-anchor.permissions-widget {
     height: 110%;
 }
 
-.rr-splash-icon {
-    font-size: 48px;
-}
-
 .surveys {
     height: 72px;
     width: 72px;
@@ -11024,9 +10716,6 @@ a.jstree-anchor.permissions-widget {
 
 .rr-splash-description {
     font-size: 16px;
-    color: #999;
-}
-.rr-splash-subtitle {
     color: #999;
 }
 
@@ -11225,10 +10914,6 @@ a.jstree-anchor.permissions-widget {
     }
     .resource-grid-tools-container {
         top: 70px;
-        left: 70px;
-    }
-    .resource-grid-meta-container {
-        top: 90px;
         left: 70px;
     }
     .rp-report-tile dd {
