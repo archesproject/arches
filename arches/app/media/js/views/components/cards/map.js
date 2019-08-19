@@ -337,7 +337,7 @@ define([
             if (self.geoJSONErrors().length === 0) {
                 var geoJSON = JSON.parse(this.geoJSONString());
                 geoJSON.features.forEach(function(feature) {
-                    if (!feature.id) feature.id = uuid.generate();
+                    feature.id = uuid.generate();
                     if (!feature.properties) feature.properties = {};
                     feature.properties.nodeId = self.newNodeId;
                 });
