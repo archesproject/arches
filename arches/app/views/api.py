@@ -238,6 +238,7 @@ class GeoJSON(APIBase):
                         feature['properties']['nodeid'] = node.pk
                         feature['properties']['node'] = node.name
                         feature['properties']['model'] = node.graph.name
+                        feature['properties']['geojson'] = '%s?tileid=%s&nodeid=%s' % (reverse('geojson'), tile.pk, node.pk)
                         feature['properties']['featureid'] = feature['id']
                         feature['id'] = i
                         i += 1
