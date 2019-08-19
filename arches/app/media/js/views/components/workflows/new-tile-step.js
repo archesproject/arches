@@ -162,7 +162,7 @@ define([
             var tile;
             if (tiles.length > 0 || typeof tiles == 'object') {
                 tile = tiles[0] || tiles;
-                if(params.requirements) { params.requirements.tiles.push(tile); }
+                if(params.requirements && typeof params.requirements.tiles === 'function') { params.requirements.tiles.push(tile); }
                 params.resourceid(tile.resourceinstance_id);
                 params.tileid(tile.tileid);
                 self.resourceId(tile.resourceinstance_id);

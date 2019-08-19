@@ -72,6 +72,9 @@ define([
                     }
                 });
             }
+            if (sourceConfig.data && typeof sourceConfig.data === 'string' && sourceConfig.data.startsWith('/')) {
+                sourceConfig.data = arches.urls.root + sourceConfig.data.substr(1);
+            }
         });
 
         var multiplyStopValues = function(stops, multiplier) {
