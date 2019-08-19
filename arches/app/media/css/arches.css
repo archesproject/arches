@@ -373,11 +373,6 @@ input[type="checkbox"] {
     color: lightcoral;
 }
 
-.wizard-buttons {
-    direction: rtl;
-    padding: 5px 0 10px 10px;
-}
-
 .graph-settings-crud {
     margin-right: 0px;
     position: absolute;
@@ -624,15 +619,6 @@ div.wf-multi-tile-card-info div {
     color: #004577;
 }
 
-.workflow-delete {
-    font-size: 30px;
-    color: red;
-}
-
-.workflow-delete:hover {
-    color: #DD6666;
-}
-
 .workflow-nav-controls:hover {
     color: #007799;
 }
@@ -640,11 +626,6 @@ div.wf-multi-tile-card-info div {
 .card .install-buttons .btn-labeled {
     font-weight: 600;
 }
-
-.worflow-nav-controls.btn-labeled:not(.btn-block):not(.form-icon) {
-    font-weight: 600;
-}
-
 
 /*.workflow-nav-controls.left {
     border-left: solid 1px #aaa;
@@ -671,131 +652,6 @@ div.wf-multi-tile-card-info div {
     flex-direction: row;
 }
 
-div.workflow-content {
-    flex-grow: 2;
-}
-
-.workflow-panel-header a span {
-    font-size: 16px;
-    color: white;
-    margin-bottom: 12px;
-    margin-left: 20px;
-    padding-right: 50px;
-    width: 100%;
-}
-
-.workflow-panel-header {
-    padding-top: 20px;
-}
-
-.workflow-panel-header > hr {
-    border-color: #142638;
-    width: 100%;
-}
-
-.workflow-panel {
-    background: #26476a;
-    /* width: 12%; */
-    color: white;
-}
-
-div.workflow-panel {
-    min-width: 250px;
-}
-
-.workflow-panel ul {
-    /* text-decoration: none; */
-    list-style-type: none;
-    /* padding-left: 12px; */
-    margin-bottom: 20px;
-    min-height: 200px;
-    padding-left: 0;
-    /* border-bottom: #fff; */
-    border-width: 2px;
-}
-
-.workflow-panel i {
-    margin-right: 12px;
-}
-
-.workflow-panel li {
-    padding-top: 12px;
-    padding-left: 30px;
-    padding-bottom: 12px;
-}
-
-.workflow-panel li:hover {
-    background-color: #5f7892;
-}
-
-.workflow-panel > hr {
-    border-color: white;
-    margin-left: 30px;
-    margin-right: 30px;
-}
-
-.workflow-panel li a span {
-    color: white;
-    font-size: 16px;
-    margin-top: 15px;
-}
-
-.workflow-select-card-container-title {
-    font-size: 1.5em;
-    font-weight: 500;
-    padding-left: 30px;
-    margin-top: 5px;
-    margin-bottom: -15px;
-}
-
-.workflow-select-card-container {
-    display: flex;
-    flex-grow: inherit;
-    flex-direction: row;
-    flex-wrap: wrap;
-    padding: 20px;
-}
-
-.workflow-select-card {
-    width: 200px;
-    height: 200px;
-    padding: 10px;
-    color: white;
-    text-align: center;
-    border: 1px solid #777;
-    border-radius: 1px;
-    margin: 10px;
-    opacity: 0.85;
-}
-
-.workflow-select-card:hover {
-    opacity: 1.0;
-    border: 1px solid black;
-}
-
-.workflow-select-wf-circle {
-    width: 80px;
-    height: 80px;
-    display: inline-block;
-    text-align: center;
-    padding: 18px;
-    border-radius: 40px;
-}
-
-.workflow-select-wf-icon {
-    color: white;
-    font-size: 40px;
-}
-
-.workflow-select-title {
-    font-size: 1.4em;
-    font-weight: 500;
-}
-
-.workflow-select-desc {
-    font-size: 12px;
-    padding-top: 10px;
-}
 /* general styling for all tabs */
 .tabbed-report-tab-list {
     display: flex;
@@ -1200,11 +1056,6 @@ ul.tabbed-report-tab-list {
 span.icon-wrap.icon-circle.bg-gray-dark:hover {
     background: #94A6BC;
     color: #123;
-}
-
-.widget-input-group {
-    margin-bottom: 15px;
-    padding: 0 0 15px;
 }
 
 .input-group.date .input-group-addon {
@@ -2161,45 +2012,10 @@ ul.nav.nav-tabs.nav-justified {
     padding: 0 0 0 12px;
 }
 
-.v-menu-title {
-    height: 60px;
-    border-bottom: 1px solid #eee;
-}
-
-.v-menu-items {
-    width: 286px;
-}
-
 .form-page {
     background-color: #e7ebee;
     width: 100%;
     padding: 20px 20px 100px 5px;
-}
-
-.widget-design {
-    border: 2px dashed #ddd;
-    background: #fcfcfc;
-    margin-top: 10px;
-    margin-bottom: 15px;
-    border-radius: 2px;
-    padding: 20px;
-}
-
-.widget-design-edit {
-    border: 3px dashed #ccc;
-    background: #f1f1f1;
-    border-radius: 2px;
-}
-
-.widget-results {
-    opacity: 1.0;
-    padding: 0;
-}
-
-.widget-results-edit {
-    border: 1px solid #139F78;
-    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.59);
-    opacity: 1.0;
 }
 
 .node-configuration {
@@ -2363,42 +2179,6 @@ ul.nav.nav-tabs.nav-justified {
 
 .concept-label {
     padding-top: 0px;
-}
-
-.widget-display-container {
-    position: relative;
-    left: 305px;
-    z-index: 100;
-    top: 125px;
-    width: 600px;
-}
-
-.widget-display-panel {
-    margin-bottom: 0;
-    background: #49596A;
-    color: #fff;
-    padding: 0 0 20px;
-}
-
-.widget-display-panel-body {
-    height: 350px;
-    background-color: #3c4d5e;
-    margin-left: 8px;
-    margin-right: 8px;
-    overflow-y: scroll;
-}
-
-.widget-panel-body {
-    margin-top: 0;
-    margin-bottom: 0;
-    padding: 20px 10px 10px 5px;
-}
-
-.widget-display-footer {
-    background: #49596A;
-    height: 40px;
-    color: #fff;
-    border-color: rgba(0, 0, 0, .1);
 }
 
 .tree-container {
@@ -3863,22 +3643,6 @@ a.selected {
 .tile-record {
     display: inline-block;
     font-size: 11px;
-}
-
-.wizard-level-tile {
-    height: 50px;
-    margin-left: 20px;
-    margin-right: 20px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    background: #f4f5f7;
-}
-
-.wizard-tile-title {
-    font-size: 13px;
-    font-weight: 300;
-    color: #123;
-    padding: 15px;
 }
 
 .dark-colored-text {
@@ -5505,7 +5269,7 @@ li.search-field {
     color: #123;
 }
 
-.ltr, .wizard-buttons *, .ltr {
+.ltr, .ltr {
     direction: ltr;
 }
 
@@ -5561,7 +5325,7 @@ li.search-field {
     padding-top: 0;
 }
 
-a.list-group-item:not(.active):hover, div .switch label:hover, #demo-dt-selection tbody tr:hover, .highlight, .wizard-level-tile:hover, div .switch label:hover, #demo-dt-selection tbody tr:hover, .highlight, .wizard-level-tile:hover, div .switch label:hover, #demo-dt-selection tbody tr:hover, .highlight, .editable-card:hover, .clear-node-search:hover, .dismiss-card-library:hover {
+a.list-group-item:not(.active):hover, div .switch label:hover, #demo-dt-selection tbody tr:hover, .highlight, div .switch label:hover, #demo-dt-selection tbody tr:hover, .highlight, div .switch label:hover, #demo-dt-selection tbody tr:hover, .highlight, .editable-card:hover, .clear-node-search:hover, .dismiss-card-library:hover {
     cursor: pointer;
 }
 
