@@ -229,7 +229,7 @@ define([
             "type": "circle",
             "filter": ["==", "$type", "Point"],
             "paint": {
-                "circle-radius": 5,
+                "circle-radius": 6,
                 "circle-opacity": 1,
                 "circle-color": "#fff"
             },
@@ -239,7 +239,7 @@ define([
             "type": "circle",
             "filter": ["==", "$type", "Point"],
             "paint": {
-                "circle-radius": 3,
+                "circle-radius": 5,
                 "circle-color": "#3bb2d0"
             },
             "source": "geojson-editor-data"
