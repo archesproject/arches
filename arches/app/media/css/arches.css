@@ -1313,13 +1313,13 @@ ul.tabbed-report-tab-list {
     right: 0;
     height: 100%;
     width: 75px;
-    background-color: #f6f6f6;
+    background-color: #ecf0f5;
     border-left: 1px solid rgb(216, 216, 216);
 }
 
 .map-card-sidebar-tab {
     color: #787878;
-    height: 75px;
+    height: 65px;
     padding: 16px;
     text-align: center;
     font-size: 1.1em;
@@ -1342,7 +1342,7 @@ ul.tabbed-report-tab-list {
 .map-card-sidebar-tab i {
     font-size: 1.1em;
     display: block;
-    padding-bottom: 6px;
+    padding-bottom: 2px;
 }
 
 .map-sidebar-text {
@@ -1895,6 +1895,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 
 .resource-instance-wrapper .select2-container {
     max-width: 600px !important;
+    border-color: #ddd;
 }
 
 
@@ -13681,7 +13682,7 @@ a.filter-tools:hover {
 .chosen-container-single .chosen-single {
     background: #fff;
     color: #4d627b;
-    border: 1px solid rgba(0,0,0,0.09);
+    border: 1px solid #ddd;
     box-shadow: none;
     border-radius: 3px;
     display: block;
