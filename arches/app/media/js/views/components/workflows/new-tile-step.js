@@ -138,14 +138,14 @@ define([
             var tiles = [];
             flattenTree(self.topCards, []).forEach(function(item) {
                 if (item.constructor.name === 'CardViewModel' && item.nodegroupid === nodegroupId) {
-                    tiles = ko.unwrap(item.tiles);
-                    if (tileId) {
-                        tiles = tiles.filter(function(tile) {
-                            return tile.tileid === tileId;
-                        });
-                    }
+                    tiles = tiles.concat(ko.unwrap(item.tiles));
                 }
             });
+            if (tileId) {
+                tiles = tiles.filter(function(tile) {
+                    return tile.tileid === tileId;
+                });
+            }
             return tiles;
         };
 
