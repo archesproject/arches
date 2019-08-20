@@ -14,7 +14,6 @@ define([
         if (!params.resourceid() && params.requirements){
             params.resourceid(params.requirements.resourceid);
             params.tileid(params.requirements.tileid);
-            if (params.requirements.tiles == undefined) { params.requirements.tiles = []; }
         }
         var url = arches.urls.api_card + (ko.unwrap(params.resourceid) || ko.unwrap(params.graphid));
 
@@ -162,7 +161,6 @@ define([
             var tile;
             if (tiles.length > 0 || typeof tiles == 'object') {
                 tile = tiles[0] || tiles;
-                if(params.requirements && typeof params.requirements.tiles === 'function') { params.requirements.tiles.push(tile); }
                 params.resourceid(tile.resourceinstance_id);
                 params.tileid(tile.tileid);
                 self.resourceId(tile.resourceinstance_id);
