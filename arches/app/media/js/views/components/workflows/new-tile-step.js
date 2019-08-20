@@ -14,7 +14,6 @@ define([
         if (!params.resourceid() && params.requirements){
             params.resourceid(params.requirements.resourceid);
             params.tileid(params.requirements.tileid);
-            if (params.requirements.tiles == undefined) { params.requirements.tiles = []; }
         }
         var url = arches.urls.api_card + (ko.unwrap(params.resourceid) || ko.unwrap(params.graphid));
 
@@ -26,6 +25,18 @@ define([
         this.complete = params.complete || ko.observable();
         this.completeOnSave = params.completeOnSave === false ? false : true;
         this.loading(true);
+        var flattenTree = function(parents, flatList) {
+            _.each(ko.unwrap(parents), function(parent) {
+                flatList.push(parent);
+                var childrenKey = parent.tiles ? 'tiles' : 'cards';
+                flattenTree(
+                    ko.unwrap(parent[childrenKey]),
+                    flatList
+                );
+            });
+            return flatList;
+        };
+        self.topCards = [];
 
         $.getJSON(url, function(data) {
             var handlers = {
@@ -38,17 +49,6 @@ define([
                     lookup[item[idKey]] = item;
                     return lookup;
                 }, {});
-            };
-            var flattenTree = function(parents, flatList) {
-                _.each(ko.unwrap(parents), function(parent) {
-                    flatList.push(parent);
-                    var childrenKey = parent.tiles ? 'tiles' : 'cards';
-                    flattenTree(
-                        ko.unwrap(parent[childrenKey]),
-                        flatList
-                    );
-                });
-                return flatList;
             };
 
             self.reviewer = data.userisreviewer;
@@ -66,7 +66,7 @@ define([
                 datatypes: data.datatypes
             });
 
-            var topCards = _.filter(data.cards, function(card) {
+            self.topCards = _.filter(data.cards, function(card) {
                 var nodegroup = _.find(data.nodegroups, function(group) {
                     return group.nodegroupid === card.nodegroup_id;
                 });
@@ -89,8 +89,8 @@ define([
                 });
             });
 
-            topCards.forEach(function(topCard) {
-                topCard.topCards = topCards;
+            self.topCards.forEach(function(topCard) {
+                topCard.topCards = self.topCards;
             });
 
             self.widgetLookup = createLookup(
@@ -111,7 +111,7 @@ define([
                 }
             };
 
-            flattenTree(topCards, []).forEach(function(item) {
+            flattenTree(self.topCards, []).forEach(function(item) {
                 if (item.constructor.name === 'CardViewModel' && item.nodegroupid === ko.unwrap(params.nodegroupid)) {
                     if (ko.unwrap(params.parenttileid) && item.parent && ko.unwrap(params.parenttileid) !== item.parent.tileid) {
                         return;
@@ -132,6 +132,22 @@ define([
             // commented the line below because it causes steps to automatically advance on page reload
             // self.complete(!!ko.unwrap(params.tileid));
         });
+
+        self.getTiles = function(nodegroupId, tileId) {
+            var tiles = [];
+            flattenTree(self.topCards, []).forEach(function(item) {
+                if (item.constructor.name === 'CardViewModel' && item.nodegroupid === nodegroupId) {
+                    tiles = ko.unwrap(item.tiles);
+                    if (tileId) {
+                        tiles = tiles.filter(function(tile) {
+                            return tile.tileid === tileId;
+                        });
+                    }
+                }
+            });
+            return tiles;
+        };
+
         params.tile = self.tile;
         params.stateProperties = function(){
             return {
@@ -145,7 +161,6 @@ define([
             var tile;
             if (tiles.length > 0 || typeof tiles == 'object') {
                 tile = tiles[0] || tiles;
-                if(params.requirements) { params.requirements.tiles.push(tile); }
                 params.resourceid(tile.resourceinstance_id);
                 params.tileid(tile.tileid);
                 self.resourceId(tile.resourceinstance_id);

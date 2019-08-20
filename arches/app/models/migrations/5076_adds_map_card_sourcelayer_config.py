@@ -6,25 +6,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4990_relax_tileserver_layer_constraints'),
+        ('models', '5076_adds_map_card_configs'),
     ]
 
     operations = [
         migrations.RunSQL(
             sql="""
             update card_components
-                set defaultconfig = '{"selectSource": "", "selectText": ""}'
+                set defaultconfig = jsonb_set(defaultconfig, '{selectSourceLayer}', '""')
                 where componentid = '3c103484-22d1-4ca9-a9f3-eb3902d567ac';
             update cards
-                set config = '{"selectSource": "", "selectText": ""}'
-                where componentid = '3c103484-22d1-4ca9-a9f3-eb3902d567ac';
+                set config = jsonb_set(config, '{selectSourceLayer}', '""')
+                where componentid = '3c103484-22d1-4ca9-a9f3-eb3902d567ac' and config;
             """,
             reverse_sql="""
             update card_components
-                set defaultconfig = null
+                set defaultconfig = defaultconfig - 'selectSourceLayer'
                 where componentid = '3c103484-22d1-4ca9-a9f3-eb3902d567ac';
             update cards
-                set config = null
+                set config = config - 'selectSourceLayer'
                 where componentid = '3c103484-22d1-4ca9-a9f3-eb3902d567ac';
             """,
         ),
