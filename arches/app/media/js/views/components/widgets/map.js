@@ -529,8 +529,8 @@ define([
             }, this);
             return initialLayers;
         };
-
-        ko.unwrap(this.geometryTypes).forEach(function(geometryType) {
+        var geometryTypes = ko.unwrap(this.geometryTypes);
+        if (geometryTypes) geometryTypes.forEach(function(geometryType) {
             geometryType.id = ko.unwrap(geometryType.id);
             geometryType.text = ko.unwrap(geometryType.text);
         });
