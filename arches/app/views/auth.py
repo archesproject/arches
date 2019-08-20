@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import time
 from jose import jws
+import logging
 from datetime import datetime, timedelta
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -41,6 +42,8 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.arches_crypto import AESCipher
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+
+logger = logging.getLogger(__name__)
 
 
 class LoginView(View):
@@ -163,8 +166,8 @@ class ConfirmSignupView(View):
                     for error in form.errors.as_data()['username']:
                         if error.code == 'unique':
                             return redirect('auth')
-                except:
-                    pass
+                except Exception as e:
+                    logger.exception(e)
         else:
             form.errors['ts'] = [_('The signup link has expired, please try signing up again.  Thanks!')]
 
@@ -209,6 +212,7 @@ class ChangePasswordView(View):
                 messages['success'] = _('Password successfully updated')
 
         except Exception as err:
+            logger.exception(err)
             messages['other'] = err
 
         return JSONResponse(messages)
@@ -232,6 +236,7 @@ class UserProfileView(View):
             userDict['deletable_nodegroups'] = user.userprofile.deletable_nodegroups
             response = JSONResponse(userDict)
         else:
+            logger.warning(_("Could not authenticate to retrieve user profile"))
             response = Http401Response()
 
         return response
@@ -251,6 +256,7 @@ class GetTokenView(View):
 
             response = HttpResponse(token, content_type='text/plain')
         else:
+            logger.warning(_("Could not authenticate to retrieve token"))
             response = Http401Response(www_auth_header='Bearer')
 
         return response
@@ -266,17 +272,20 @@ class GetClientIdView(View):
         if settings.MOBILE_OAUTH_CLIENT_ID == '':
             response = HttpResponse('Make sure to set your MOBILE_OAUTH_CLIENT_ID in settings.py', status=500)
         else:
-            if user:
-                if hasattr(user, 'userprofile') is not True:
-                    models.UserProfile.objects.create(user=user)
-                is_reviewer = user.userprofile.is_reviewer()
-                user = JSONSerializer().serializeToPython(user)
-                user['password'] = None
-                user['is_reviewer'] = is_reviewer
-                response = JSONResponse({'user': user, 'clientid': settings.MOBILE_OAUTH_CLIENT_ID})
-            else:
+            try:
+                if user:
+                    if hasattr(user, 'userprofile') is not True:
+                        models.UserProfile.objects.create(user=user)
+                    is_reviewer = user.userprofile.is_reviewer()
+                    user = JSONSerializer().serializeToPython(user)
+                    user['password'] = None
+                    user['is_reviewer'] = is_reviewer
+                    response = JSONResponse({'user': user, 'clientid': settings.MOBILE_OAUTH_CLIENT_ID})
+                else:
+                    logger.error(_('Failed to authenticate'))
+                    response = Http401Response()
+            except Exception as e:
+                logger.exception(e)
                 response = Http401Response()
 
         return response
-
-
