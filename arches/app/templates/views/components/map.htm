@@ -9,7 +9,7 @@
             'active': activeTab() === 'basemap'
         }">
             <i class="fa fa-globe"></i>
-            {% trans "Basemap" %}
+            <span class="map-sidebar-text">{% trans "Basemap" %}</span>
         </div>
         <div class="map-card-sidebar-tab" data-bind="click: function() {
             toggleTab('overlays');
@@ -17,7 +17,7 @@
             'active': activeTab() === 'overlays'
         }">
             <i class="fa fa-list"></i>
-            {% trans "Overlays" %}
+            <span class="map-sidebar-text">{% trans "Overlays" %}</span>
         </div>
         <div class="map-card-sidebar-tab" data-bind="click: function() {
             toggleTab('legend');
@@ -25,7 +25,7 @@
             'active': activeTab() === 'legend'
         }">
             <i class="fa fa-list-alt"></i>
-            {% trans "Legend" %}
+            <span class="map-sidebar-text">{% trans "Legend" %}</span>
         </div>
         {% endblock tabs %}
     </div>
@@ -33,25 +33,33 @@
         <div class="map-card-sidepanel">
             {% block sidepanel %}
             <!--ko if: activeTab() === 'basemap' -->
-                <h4 class="map-card-sidepanel-header" data-bind="click: hideSidePanel">
-                    {% trans "Basemaps" %}
-                </h4>
-                <!--ko foreach: basemaps -->
-                <div class="basemap-listing" data-bind="
-                    click: $parent.activeBasemap,
-                    css: {'active-basemap': $data === $parent.activeBasemap()}
-                    ">
-                    <i data-bind="css: icon" class="layer-listing-icon"></i>
-                    <span data-bind="text: name"></span>
+                <div class="map-card-sidepanel-header-container">
+                    <h4 class="map-card-sidepanel-header" data-bind="click: hideSidePanel">
+                        {% trans "Basemaps" %}
+                    </h4>
                 </div>
+                
+                <div class="basemap-listing-container">
+                <!--ko foreach: basemaps -->
+                    <div class="basemap-listing" data-bind="
+                        click: $parent.activeBasemap,
+                        css: {'active-basemap': $data === $parent.activeBasemap()}
+                        ">
+                        <i data-bind="css: icon" class="layer-listing-icon"></i>
+                        <span data-bind="text: name"></span>
+                    </div>
                 <!--/ko -->
+                </div>
+
             <!--/ko -->
 
             <!--ko if: activeTab() === 'overlays' -->
-                <h4 class="map-card-sidepanel-header" data-bind="click: hideSidePanel">
-                    {% trans "Overlays" %}
-                </h4>
-                <div data-bind="sortable: {
+                <div class="map-card-sidepanel-header-container">
+                    <h4 class="map-card-sidepanel-header" data-bind="click: hideSidePanel">
+                        {% trans "Overlays" %}
+                    </h4>
+                </div>
+                <div class="overlays-listing-container" data-bind="sortable: {
                     data: overlays
                 }">
                     <div class="overlay-listing" data-bind="css: {'active-overlay': onMap}">
@@ -74,10 +82,13 @@
             <!--/ko -->
 
             <!--ko if: activeTab() === 'legend' -->
-                <h4 class="map-card-sidepanel-header" data-bind="click: hideSidePanel">
-                    {% trans "Legend" %}
-                </h4>
-                <div data-bind="sortable: {
+                <div class="map-card-sidepanel-header-container">
+                    <h4 class="map-card-sidepanel-header" data-bind="click: hideSidePanel">
+                        {% trans "Legend" %}
+                    </h4>
+                </div>
+
+                <div class="legend-listing-container" data-bind="sortable: {
                     data: overlays
                 }">
                     <div class="legend-listing" data-bind="css: {'hidden': !onMap()}">

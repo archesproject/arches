@@ -1,4 +1,6 @@
 define([
+    'arches',
+    'jquery',
     'underscore',
     'knockout',
     'knockout-mapping',
@@ -9,29 +11,79 @@ define([
     'geojsonhint',
     'viewmodels/card-component',
     'views/components/map',
+    'views/components/cards/select-feature-layers',
+    'text!templates/views/components/cards/map-popup.htm',
     'bindings/chosen',
     'bindings/codemirror',
     'codemirror/mode/javascript/javascript'
-], function(_, ko, koMapping, uuid, mapboxgl, MapboxDraw, geojsonExtent, geojsonhint, CardComponentViewModel, MapComponentViewModel) {
+], function(arches, $, _, ko, koMapping, uuid, mapboxgl, MapboxDraw, geojsonExtent, geojsonhint, CardComponentViewModel, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         var widgets = [];
         var padding = 40;
         var drawFeatures;
+        var resourceId = params.tile ? params.tile.resourceinstance_id : '';
+
         this.newNodeId = null;
         this.featureLookup = {};
         this.selectedFeatureIds = ko.observableArray();
         this.geoJSONString = ko.observable();
         this.draw = null;
-        this.setDrawTool = function(tool) {
-            if (tool) self.draw.changeMode(tool);
-        };
+        params.configKeys = ['selectSource', 'selectSourceLayer', 'selectText'];
 
         CardComponentViewModel.apply(this, [params]);
 
+        var selectSource = this.selectSource();
+        var selectSourceLayer = this.selectSourceLayer();
+        var selectFeatureLayers = selectFeatureLayersFactory(resourceId, selectSource, selectSourceLayer);
+
+        this.setSelectLayersVisibility = function(visibility) {
+            var map = self.map();
+            if (map) {
+                selectFeatureLayers.forEach(function(layer) {
+                    map.setLayoutProperty(
+                        layer.id,
+                        'visibility',
+                        visibility ? 'visible' : 'none'
+                    );
+                });
+            }
+        };
+
+        var sources = [];
+        for (var sourceName in arches.mapSources) {
+            if (arches.mapSources.hasOwnProperty(sourceName)) {
+                sources.push(sourceName);
+            }
+        }
+        var updateSelectLayers = function() {
+            var source = self.selectSource();
+            var sourceLayer = self.selectSourceLayer();
+            selectFeatureLayers = sources.indexOf(source) > 0 ?
+                selectFeatureLayersFactory(resourceId, source, sourceLayer) :
+                [];
+            self.additionalLayers(
+                extendedLayers.concat(
+                    selectFeatureLayers,
+                    geojsonLayers
+                )
+            );
+        };
+        this.selectSource.subscribe(updateSelectLayers);
+        this.selectSourceLayer.subscribe(updateSelectLayers);
+
+        this.setDrawTool = function(tool) {
+            var showSelectLayers = (tool === 'select_feature');
+            self.setSelectLayersVisibility(showSelectLayers);
+            if (showSelectLayers) {
+                self.draw.changeMode('simple_select');
+                self.selectedFeatureIds([]);
+            } else if (tool) self.draw.changeMode(tool);
+        };
+
         if (self.form && self.tile) self.card.widgets().forEach(function(widget) {
             var id = widget.node_id();
-            var type = self.form.nodeLookup[id].datatype();
+            var type = ko.unwrap(self.form.nodeLookup[id].datatype);
             if (type === 'geojson-feature-collection') {
                 widgets.push(widget);
                 self.featureLookup[id] = {
@@ -132,10 +184,11 @@ define([
                 }
             }
         };
-        if (!params.layers) {
-            params.layers = [];
+        var extendedLayers = [];
+        if (params.layers) {
+            extendedLayers = params.layers;
         }
-        params.layers = params.layers.concat([{
+        var geojsonLayers = [{
             "id": "geojson-editor-polygon-fill",
             "type": "fill",
             "filter": ["==", "$type", "Polygon"],
@@ -176,7 +229,7 @@ define([
             "type": "circle",
             "filter": ["==", "$type", "Point"],
             "paint": {
-                "circle-radius": 5,
+                "circle-radius": 6,
                 "circle-opacity": 1,
                 "circle-color": "#fff"
             },
@@ -186,18 +239,20 @@ define([
             "type": "circle",
             "filter": ["==", "$type", "Point"],
             "paint": {
-                "circle-radius": 3,
+                "circle-radius": 5,
                 "circle-color": "#3bb2d0"
             },
             "source": "geojson-editor-data"
-        }]);
+        }];
+
+        params.layers = ko.observable(
+            extendedLayers.concat(
+                selectFeatureLayers,
+                geojsonLayers
+            )
+        );
 
         MapComponentViewModel.apply(this, [params]);
-
-        this.isFeatureClickable = function(feature) {
-            if (self.selectedTool()) return false;
-            return feature.properties.resourceinstanceid;
-        };
 
         this.deleteFeature = function(feature) {
             if (self.draw) {
@@ -252,6 +307,7 @@ define([
                 self.draw = undefined;
                 self.selectedFeatureIds([]);
             }
+            self.setSelectLayersVisibility(false);
         });
         this.geoJSONErrors = ko.pureComputed(function() {
             var geoJSONString = self.geoJSONString();
@@ -281,7 +337,7 @@ define([
             if (self.geoJSONErrors().length === 0) {
                 var geoJSON = JSON.parse(this.geoJSONString());
                 geoJSON.features.forEach(function(feature) {
-                    if (!feature.id) feature.id = uuid.generate();
+                    feature.id = uuid.generate();
                     if (!feature.properties) feature.properties = {};
                     feature.properties.nodeId = self.newNodeId;
                 });
@@ -292,10 +348,6 @@ define([
                 }
                 self.geoJSONString(undefined);
             }
-        };
-
-        this.drawModeChange = function() {
-            return;
         };
 
         var setupDraw = function(map) {
@@ -326,9 +378,9 @@ define([
             });
             map.on('draw.update', self.updateTiles);
             map.on('draw.delete', self.updateTiles);
-            map.on('draw.modechange', function(e) {
-                self.drawModeChange(e);
+            map.on('draw.modechange', function() {
                 self.updateTiles();
+                self.setSelectLayersVisibility(false);
             });
             map.on('draw.selectionchange', function(e) {
                 self.selectedFeatureIds(e.features.map(function(feature) {
@@ -339,6 +391,7 @@ define([
                         value.selectedTool(null);
                     });
                 }
+                self.setSelectLayersVisibility(false);
             });
 
             self.form.on('tile-reset', function() {
@@ -353,6 +406,99 @@ define([
         };
 
         this.map.subscribe(setupDraw);
+
+        if (!params.additionalDrawOptions) {
+            params.additionalDrawOptions = [];
+        }
+
+        self.card.widgets().forEach(function(widget) {
+            if (widget.config.geometryTypes) {
+                widget.drawTools = ko.pureComputed(function() {
+                    var options = [{
+                        value: '',
+                        text: ''
+                    }];
+                    options = options.concat(widget.config.geometryTypes().map(function(type) {
+                        var option = {};
+                        switch (ko.unwrap(type.id)) {
+                        case 'Point':
+                            option.value = 'draw_point';
+                            option.text = 'Add point';
+                            break;
+                        case 'Line':
+                            option.value = 'draw_line_string';
+                            option.text = 'Add line';
+                            break;
+                        case 'Polygon':
+                            option.value = 'draw_polygon';
+                            option.text = 'Add polygon';
+                            break;
+                        }
+                        return option;
+                    }));
+                    if (self.selectSource()) {
+                        options.push({
+                            value: "select_feature",
+                            text: self.selectText() || 'Select drawing'
+                        });
+                    }
+                    options = options.concat(params.additionalDrawOptions);
+                    return options;
+                });
+            }
+        });
+
+        this.isFeatureClickable = function(feature) {
+            var tool = self.selectedTool();
+            if (tool && tool !== 'select_feature') return false;
+            return feature.properties.resourceinstanceid;
+        };
+
+        this.popupTemplate = popupTemplate;
+
+        self.isSelectable = function(feature) {
+            var selectLayerIds = selectFeatureLayers.map(function(layer) {
+                return layer.id;
+            });
+            return selectLayerIds.indexOf(feature.layer.id) >= 0;
+        };
+
+        var addSelectFeatures = function(features) {
+            var featureIds = [];
+            features.forEach(function(feature) {
+                feature.id = uuid.generate();
+                feature.properties = {
+                    nodeId: self.newNodeId
+                };
+                self.draw.add(feature);
+                featureIds.push(feature.id);
+            });
+            self.updateTiles();
+            self.popup.remove();
+            self.draw.changeMode('simple_select', {
+                featureIds: featureIds
+            });
+            self.selectedFeatureIds(featureIds);
+            _.each(self.featureLookup, function(value) {
+                value.selectedTool(null);
+            });
+        };
+
+        self.selectFeature = function(feature) {
+            try {
+                var geometry = JSON.parse(feature.properties.geojson);
+                var newFeature = {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": geometry
+                };
+                addSelectFeatures([newFeature]);
+            } catch(e) {
+                $.getJSON(feature.properties.geojson, function(data) {
+                    addSelectFeatures(data.features);
+                });
+            }
+        };
     };
     ko.components.register('map-card', {
         viewModel: viewModel,

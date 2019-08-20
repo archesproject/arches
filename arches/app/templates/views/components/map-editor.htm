@@ -8,14 +8,17 @@
     'active': activeTab() === 'editor'
 }">
     <i class="fa fa-pencil"></i>
-    {% trans "Edit" %}
+    <span class="map-sidebar-text">{% trans "Edit" %}</span>
 </div>
 {{ block.super }}
 {% endblock tabs %}
 
 {% block sidepanel %}
 <!--ko if: activeTab() === 'editor' -->
-    <h4 class="map-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
+    <div class="map-card-sidepanel-header-container">
+        <h4 class="map-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
+    </div>
+
     <div data-bind="css: card.model.cssclass">
 
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
@@ -121,7 +124,7 @@
                     <div data-bind="foreach: {
                             data:card.widgets, as: 'widget'
                         }">
-                        <!-- ko if: self.form.nodeLookup[widget.node_id()].datatype() === 'geojson-feature-collection' -->
+                        <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) === 'geojson-feature-collection' -->
                         <div class="row widget-wrapper">
                             <div class="form-group">
                                 <label class="control-label widget-input-label" for="" data-bind="text:widget.label"></label>
@@ -133,41 +136,31 @@
                                             <select data-placeholder="{% trans "Add a new feature..." %}" data-bind="
                                                 value: self.featureLookup[widget.node_id()].selectedTool,
                                                 valueAllowUnset: true,
+                                                options: widget.drawTools,
+                                                optionsText: 'text',
+                                                optionsValue: 'value',
                                                 chosen: {
                                                     'width': '100%',
                                                     'disable_search_threshold': 10,
                                                     'allow_single_deselect': true
                                                 }
-                                            ">
-                                                <option value=""></option>
-                                                {% block draw_tool_options %}
-                                                <option value="draw_point">{% trans "Add point" %}</option>
-                                                <option value="draw_line_string">{% trans "Add line" %}</option>
-                                                <option value="draw_polygon">{% trans "Add polygon" %}</option>
-                                                {% endblock draw_tool_options %}
-                                            </select>
+                                            "></select>
                                         </div>
                                         <table class="table">
                                             <tbody>
                                                 <!-- ko foreach: {data: self.featureLookup[widget.node_id()].features, as: 'feature'} -->
-                                                <tr class="map-card-feature-item" data-bind="css: {'active': self.selectedFeatureIds().indexOf(feature.id) >= 0}">
+                                                <tr class="map-card-feature-item" data-bind="css: {'active': self.selectedFeatureIds().indexOf(feature.id) >= 0}, click: function() { self.fitFeatures([feature]) }">
                                                     <td>
                                                         <span class="map-card-feature-name" data-bind="text: feature.geometry.type"></span>
                                                     </td>
                                                     <td class="map-card-feature-tool">
-                                                        <a href="javascript:void(0);" data-bind="click: function() { self.fitFeatures([feature]) }">
-                                                            <i class="fa fa-search map-card-feature-edit"></i>
-                                                            {% trans "Zoom" %}
-                                                        </a>
-                                                    </td>
-                                                    <td class="map-card-feature-tool">
-                                                        <a href="javascript:void(0);" data-bind="click: function() { self.editFeature(feature) }">
+                                                        <a href="javascript:void(0);" data-bind="click: function() { self.editFeature(feature) }, clickBubble: false">
                                                             <i class="fa fa-pencil map-card-feature-edit"></i>
                                                             {% trans "Edit" %}
                                                         </a>
                                                     </td>
                                                     <td class="map-card-feature-tool">
-                                                        <a href="javascript:void(0);" data-bind="click: function() { self.deleteFeature(feature) }">
+                                                        <a href="javascript:void(0);" data-bind="click: function() { self.deleteFeature(feature) }, clickBubble: false">
                                                             <i class="fa fa-trash map-card-feature-delete"></i>
                                                             {% trans "Delete" %}
                                                         </a>
@@ -198,7 +191,7 @@
                             </div>
                         </div>
                         <!-- /ko -->
-                        <!-- ko if: self.form.nodeLookup[widget.node_id()].datatype() !== 'geojson-feature-collection' -->
+                        <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) !== 'geojson-feature-collection' -->
                         <div data-bind='component: {
                             name: self.form.widgetLookup[widget.widget_id()].name,
                             params: {
@@ -239,17 +232,17 @@
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: self.deleteTile, css: {
                         disabled: (!card.isWritable && !self.preview) || self.editing(),
                         'btn-warning': card.isWritable
-                    }">{% trans 'Delete this record' %}</button>
+                    }">{% trans 'Delete' %}</button>
                     <!-- /ko -->
                     <!-- ko if: tile.dirty() -->
                         <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
-                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset, css: { disabled: self.editing()}">{% trans 'Cancel edit' %}</button>
+                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset, css: { disabled: self.editing()}">{% trans 'Cancel' %}</button>
                         <!-- /ko -->
                         <!-- ko if: tile.tileid -->
                         <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
                             disabled: (!card.isWritable && !self.preview) || self.editing(),
                             'btn-mint': card.isWritable
-                        }">{% trans 'Save edit' %}</button>
+                        }">{% trans 'Save' %}</button>
                         <!-- /ko -->
                     <!-- /ko -->
                     <!-- ko if: !tile.tileid -->
