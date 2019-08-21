@@ -61,7 +61,7 @@ define([], function() {
                 "!=", "resourceinstanceid", resourceId
             ]],
             "paint": {
-                "circle-radius": 5,
+                "circle-radius": 6,
                 "circle-opacity": 1,
                 "circle-color": "#fff"
             },
