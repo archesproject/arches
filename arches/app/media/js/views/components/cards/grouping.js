@@ -87,7 +87,7 @@ define([
 
             _.each(this.widgetLookup, function(widget, widgetid) {
                 if(!(_.contains(this.sortedWidgetIds(), widgetid))) {
-                    this.sortedWidgetIds.push(widgetid);
+                    this.sortedWidgetIds().push(widgetid);
                 }
             }, this);
 
