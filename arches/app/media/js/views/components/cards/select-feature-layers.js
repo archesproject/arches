@@ -1,9 +1,8 @@
 define([], function() {
-    return function(resourceId, source, sourceLayer, areaSelectColor) {
+    return function(resourceId, source, sourceLayer) {
+        var color = "#f0c200";
         if (!source) return [];
-        if (!areaSelectColor) areaSelectColor = "#f0c200";
-        if (!sourceLayer) sourceLayer = source;
-        return [{
+        var layers = [{
             "id": "select-feature-polygon-fill",
             "type": "fill",
             "filter": ['all',[
@@ -12,12 +11,10 @@ define([], function() {
                 "!=", "resourceinstanceid", resourceId
             ]],
             "paint": {
-                "fill-color": areaSelectColor,
-                "fill-outline-color": areaSelectColor,
+                "fill-color": color,
+                "fill-outline-color": color,
                 "fill-opacity": 0.1
             },
-            "source": source,
-            "source-layer": sourceLayer,
             "layout": {
                 "visibility": "none"
             }
@@ -35,11 +32,9 @@ define([], function() {
                 "visibility": "none"
             },
             "paint": {
-                "line-color": areaSelectColor,
+                "line-color": color,
                 "line-width": 2
-            },
-            "source": source,
-            "source-layer": sourceLayer
+            }
         }, {
             "id": "select-feature-line",
             "type": "line",
@@ -54,11 +49,9 @@ define([], function() {
                 "visibility": "none"
             },
             "paint": {
-                "line-color": areaSelectColor,
+                "line-color": color,
                 "line-width": 2
-            },
-            "source": source,
-            "source-layer": sourceLayer
+            }
         }, {
             "id": "select-feature-point-point-stroke",
             "type": "circle",
@@ -68,12 +61,10 @@ define([], function() {
                 "!=", "resourceinstanceid", resourceId
             ]],
             "paint": {
-                "circle-radius": 5,
+                "circle-radius": 6,
                 "circle-opacity": 1,
                 "circle-color": "#fff"
             },
-            "source": source,
-            "source-layer": sourceLayer,
             "layout": {
                 "visibility": "none"
             }
@@ -87,13 +78,16 @@ define([], function() {
             ]],
             "paint": {
                 "circle-radius": 3,
-                "circle-color": areaSelectColor
+                "circle-color": color
             },
-            "source": source,
-            "source-layer": sourceLayer,
             "layout": {
                 "visibility": "none"
             }
         }];
+        layers.forEach(function(layer) {
+            layer["source"] = source;
+            if (sourceLayer) layer["source-layer"] = sourceLayer;
+        });
+        return layers;
     };
 });

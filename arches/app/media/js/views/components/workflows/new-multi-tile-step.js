@@ -27,9 +27,7 @@ define([
             });
         };
 
-        this.edit = function(tile) {
-            self.tile(tile);
-        };
+        this.edit = function(tile) { self.tile(tile); };
 
         self.onSaveSuccess = function(tile) {
             params.resourceid(tile.resourceinstance_id);

@@ -27,6 +27,6 @@ class ResourceTypeFilter(BaseSearchFilter):
             if resouceTypeFilter['inverted'] is True:
                 search_query.must_not(term)
             else:
-                search_query.must(term)
+                search_query.should(term)
 
         search_results_object['query'].add_query(search_query)

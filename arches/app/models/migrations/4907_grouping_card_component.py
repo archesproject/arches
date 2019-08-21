@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL("""
             INSERT INTO card_components(componentid, name, description, component, componentname, defaultconfig)
-                VALUES ('2f9054d8-de57-45cd-8a9c-58bbb1619030', 'Grouping Card', 'A card component that groups sibling cards together into one form.', 'views/components/cards/grouping', 'grouping-card-component', '{"groupedCardIds": []}');
+                VALUES ('2f9054d8-de57-45cd-8a9c-58bbb1619030', 'Grouping Card', 'A card component that groups sibling cards together into one form.', 'views/components/cards/grouping', 'grouping-card-component', '{"groupedCardIds": [], "sortedWidgetIds": []}');
         """,
         """
             UPDATE public.cards

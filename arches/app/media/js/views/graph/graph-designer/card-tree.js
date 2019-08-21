@@ -183,6 +183,9 @@ define([
             },
             updateNode: function(parents, node) {
                 var updatedCards = [];
+                if (_.contains(_.keys(self.nodeLookup), node.nodeid) === false) {
+                    self.nodeLookup[node.nodeid] = node;
+                }
                 _.each(ko.unwrap(parents), function(parent) {
                     if (parent.nodegroupid === node.nodegroup_id) {
                         var attributes = parent.model.attributes;
