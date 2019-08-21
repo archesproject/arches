@@ -16,7 +16,7 @@ define([
             });
             return tiles;
         };
-        this.configKeys = params.configKeys || [];
+        this.showIds = params.showIds || false;
         this.state = params.state || 'form';
         this.preview = params.preview;
         this.loading = params.loading || ko.observable(false);
