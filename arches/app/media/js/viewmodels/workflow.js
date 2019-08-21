@@ -10,6 +10,7 @@ define([
         this.steps = config.steps || [];
         this.activeStep = ko.observable();
         this.previousStep = ko.observable();
+        this.hoverStep = ko.observable();
         this.ready = ko.observable(false);
         this.loading = config.loading || ko.observable(false);
         this.alert = config.alert || ko.observable(null);
@@ -70,7 +71,7 @@ define([
             var activeStep = val;
             var previousStep = self.previousStep();
             var resourceId;
-            if (previousStep) {
+            if (previousStep && previousStep.hasOwnProperty('getStateProperties')) {
                 self.state.steps[previousStep._index] = previousStep.getStateProperties();
                 self.state.steps[previousStep._index].complete = ko.unwrap(previousStep.complete);
                 self.state.activestep = val._index;

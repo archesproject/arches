@@ -4,11 +4,22 @@
     <!--ko if: ko.unwrap(activeStep) -->
     <div class="workflowstep-nav">
         <!--ko foreach: {data: steps, as: 'step'}-->
-        <div data-bind="">
-            <i class="fa fa-lg" data-bind="class: step.iconClass"></i>
+        <div class="nav-group">
+            <div
+            data-bind="click: function(){$parent.activeStep(step)},
+                       event: { mouseover: function(){$parent.hoverStep(step)}, mouseout: function(){$parent.hoverStep(null)}}">
+                <i class="fa fa-lg" data-bind="class: step.iconClass"></i>
+            </div>
+
+            <!--ko if: $parent.hoverStep() && $parent.hoverStep()._index === step._index -->
+            <div class="step-title">
+                <div class="arrow-up"></div>
+                <div class="step-title-text" data-bind="text:$parent.hoverStep().title"></div>
+            </div>
+            <!--/ko-->
         </div>
         <!--/ko-->
-        
+
         <div class="workflow-nav-controls">
             <button class="btn btn-mint btn-labeled disabled"><i class="btn-label ion-android-cloud-done"></i>{% trans "Finish" %}</button>
             <button class="btn btn-dark btn-labeled"><i class="btn-label ion-android-cancel"></i>{% trans "Quit" %}</button>
