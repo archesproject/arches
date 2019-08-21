@@ -6,7 +6,7 @@
         <!--ko foreach: {data: steps, as: 'step'}-->
         <div class="nav-group">
             <div
-            data-bind="click: function(){$parent.activeStep(step)},
+            data-bind="click: function(){if (step.complete() || ($parent.steps[step._index - 1].complete())){$parent.activeStep(step)}},
                        event: { mouseover: function(){$parent.hoverStep(step)}, mouseout: function(){$parent.hoverStep(null)}}">
                 <i class="fa fa-lg" data-bind="class: step.iconClass"></i>
             </div>
