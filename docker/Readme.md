@@ -72,8 +72,6 @@ Optional Environment Variables:
 	-> **Allows you to run multiple projects in one ElasticSearch instance. It should be the same as `ARCHES_PROJECT`**
 -   `DJANGO_PORT` = *Django server port*  
 	-> **Runs your Django server on an alternative port. Default = 8000**
--   `DJANGO_REMOTE_DEBUG` = True | False  
-	-> **Runs Django with options --noreload --nothreading. Useful for remote debugging.**
 -   `DJANGO_SECRET_KEY` = *50 character string*  
 	-> **Used by Django for security. Use this environment variable only if you run Arches without custom project (i.e. the `ARCHES_PROJECT` environment variable is not set)**
 -   `TZ` = *Time Zone*  
@@ -391,15 +389,7 @@ For more information, see the [```docker exec``` command documentation](https://
 
 
 ### Remote Debugging
-In order to enable remote debugging, see [this tutorial](https://gist.github.com/veuncent/1e7fcfe891883dfc52516443a008cfcb) for Visual Studio (Code).  
-Point 4 is handled for you, all you need to do is set this environment variable:
-```
-    environment:
-        - DJANGO_REMOTE_DEBUG=True
-```
-
-For remote debugging Pycharm, see [this tutorial](https://gist.github.com/veuncent/1e7fcfe891883dfc52516443a008cfcb.)
-
+In order to enable remote debugging for Visual Studio (Code), see [this tutorial](https://gist.github.com/veuncent/1e7fcfe891883dfc52516443a008cfcb).  
 
 
 ### Housekeeping

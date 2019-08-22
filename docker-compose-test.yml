@@ -24,7 +24,6 @@ services:
         # - ELASTICSEARCH_PREFIX=insert_project_name
         - DJANGO_MODE=PROD
         - DJANGO_DEBUG=False
-        # - DJANGO_REMOTE_DEBUG=False
         - DOMAIN_NAMES=localhost
         - PYTHONUNBUFFERED=0
         - TZ=PST
