@@ -6025,12 +6025,6 @@ a.mega-dropdown-toggle.disabled {
     color: #999;
 }
 
-.report-image-grid {
-    padding: 45px;
-    height: 100%;
-    overflow-y: auto;
-}
-
 .form-data-card-library {
     display: flex;
     flex-direction: column;
