@@ -10,6 +10,7 @@ define([
         this.steps = config.steps || [];
         this.activeStep = ko.observable();
         this.previousStep = ko.observable();
+        this.hoverStep = ko.observable();
         this.ready = ko.observable(false);
         this.loading = config.loading || ko.observable(false);
         this.alert = config.alert || ko.observable(null);
@@ -66,23 +67,20 @@ define([
         };
 
         this.updateState = function(val) {
+            //Collects information from the previous step and sets it to the URL
             var activeStep = val;
             var previousStep = self.previousStep();
             var resourceId;
-            if (previousStep) {
-                self.state.steps[previousStep._index] = previousStep.stateProperties();
+            if (previousStep && previousStep.hasOwnProperty('getStateProperties')) {
+                self.state.steps[previousStep._index] = previousStep.getStateProperties();
                 self.state.steps[previousStep._index].complete = ko.unwrap(previousStep.complete);
                 self.state.activestep = val._index;
                 self.state.previousstep = previousStep._index;
                 if (!resourceId) {
                     resourceId = !!previousStep.resourceid ? ko.unwrap(previousStep.resourceid) : null;
                     self.state.resourceid = resourceId;
-                    activeStep.requirements.resourceid = self.state.resourceid;
                 }
                 self.updateUrl();
-            } else {
-                activeStep.requirements = self.state.steps[activeStep._index] || {};
-                activeStep.requirements.resourceid = self.state.resourceid;
             }
             self.previousStep(activeStep);
         };
@@ -97,7 +95,7 @@ define([
         this.back = function(){
             var activeStep = self.activeStep();
             if (activeStep && activeStep._index > 0) {
-                self.activeStep(self.steps[activeStep._index-1]);
+                self.activeStep(self.steps[activeStep._index - 1]);
             }
         };
     };

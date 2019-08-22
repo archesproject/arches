@@ -529,6 +529,11 @@ define([
             }, this);
             return initialLayers;
         };
+        var geometryTypes = ko.unwrap(this.geometryTypes);
+        if (geometryTypes) geometryTypes.forEach(function(geometryType) {
+            geometryType.id = ko.unwrap(geometryType.id);
+            geometryType.text = ko.unwrap(geometryType.text);
+        });
 
         this.geometryTypeDetails = {
             Point: {
@@ -655,7 +660,7 @@ define([
             this.map.on('load', function() {
                 if (!self.configForm) {
                     if (self.context === 'report-header') {
-                        map.on('moveend', _.throttle(generatePrintMap, 3000));
+                        setTimeout(generatePrintMap, 3000);
                     }
                     var zoomToGeoJSON = function(data, fly) {
                         var method = fly ? 'flyTo' : 'jumpTo';
@@ -1765,7 +1770,7 @@ define([
 
             if (self.defaultValueType() && self.defaultValueType() != '' || self.defaultValueType() > 0) {
                 if (self.defaultValueType() == 1){
-                    self.value(self.defaultValue());
+                    koMapping.fromJS(self.defaultValue(), self.value);
                 }
                 this.loadDefaultValue(self.defaultValueType(), true);
             }

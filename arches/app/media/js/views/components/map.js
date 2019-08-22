@@ -5,9 +5,10 @@ define([
     'knockout',
     'mapbox-gl',
     'mapbox-gl-geocoder',
+    'text!templates/views/components/map-popup.htm',
     'bindings/mapbox-gl',
     'bindings/sortable'
-], function($, _, arches, ko, mapboxgl, MapboxGeocoder) {
+], function($, _, arches, ko, mapboxgl, MapboxGeocoder, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         var geojsonSourceFactory = function() {
@@ -32,13 +33,19 @@ define([
         }, arches.mapSources, params.sources);
         var mapLayers = params.mapLayers || arches.mapLayers;
 
+        this.map = ko.isObservable(params.map) ? params.map : ko.observable();
+        this.popupTemplate = popupTemplate;
         this.basemaps = [];
         this.overlays = ko.observableArray();
         this.activeBasemap = ko.observable();
-        this.activeTab = ko.observable();
+        this.activeTab = ko.observable(params.activeTab);
         this.hideSidePanel = function() {
             self.activeTab(undefined);
         };
+        this.activeTab.subscribe(function() {
+            var map = self.map();
+            if (map) setTimeout(function() { map.resize(); }, 1);
+        });
 
         mapLayers.forEach(function(layer) {
             if (!layer.isoverlay) {
@@ -64,6 +71,9 @@ define([
                         sourceConfig.tiles[i] = window.location.origin + url;
                     }
                 });
+            }
+            if (sourceConfig.data && typeof sourceConfig.data === 'string' && sourceConfig.data.startsWith('/')) {
+                sourceConfig.data = arches.urls.root + sourceConfig.data.substr(1);
             }
         });
 
@@ -116,7 +126,8 @@ define([
             return layer;
         };
 
-        var layers = ko.pureComputed(function() {
+        this.additionalLayers = params.layers;
+        this.layers = ko.pureComputed(function() {
             var layers = self.activeBasemap().layer_definitions.slice(0);
             self.overlays().forEach(function(layer) {
                 if (layer.onMap()) {
@@ -126,8 +137,8 @@ define([
                     });
                 }
             });
-            if (params.layers) {
-                layers = layers.concat(ko.unwrap(params.layers));
+            if (this.additionalLayers) {
+                layers = layers.concat(ko.unwrap(this.additionalLayers));
             }
             return layers;
         }, this);
@@ -138,11 +149,12 @@ define([
                 sources: sources,
                 sprite: arches.mapboxSprites,
                 glyphs: arches.mapboxGlyphs,
-                layers: layers(),
+                layers: self.layers(),
                 center: [x, y],
                 zoom: zoom
             },
-            bounds: bounds
+            bounds: bounds,
+            fitBoundsOptions: params.fitBoundsOptions
         };
 
         this.toggleTab = function(tabName) {
@@ -153,21 +165,95 @@ define([
             }
         };
 
+        this.updateLayers = function(layers) {
+            var map = self.map();
+            var style = map.getStyle();
+            style.layers = layers;
+            map.setStyle(style);
+        };
+
+        this.isFeatureClickable = function(feature) {
+            return feature.properties.resourceinstanceid;
+        };
+
+        this.resourceLookup = {};
+        this.getPopupData = function(feature) {
+            var data = feature.properties;
+            var id = data.resourceinstanceid;
+            if (id) {
+                if (!self.resourceLookup[id]){
+                    data = _.defaults(data, {
+                        'loading': true,
+                        'displayname': '',
+                        'graph_name': ''
+                    });
+                    data = ko.mapping.fromJS(data);
+                    data.reportURL = arches.urls.resource_report;
+                    data.editURL = arches.urls.resource_editor;
+
+                    self.resourceLookup[id] = data;
+                    $.get(arches.urls.resource_descriptors + id, function(data) {
+                        data.loading = false;
+                        ko.mapping.fromJS(data, self.resourceLookup[id]);
+                    });
+                }
+                self.resourceLookup[id].feature = feature;
+                self.resourceLookup[id].mapCard = self;
+                return self.resourceLookup[id];
+            }
+        };
+
+        this.onFeatureClick = function(feature, lngLat) {
+            var map = self.map();
+            self.popup = new mapboxgl.Popup()
+                .setLngLat(lngLat)
+                .setHTML(self.popupTemplate)
+                .addTo(map);
+            ko.applyBindingsToDescendants(
+                self.getPopupData(feature),
+                self.popup._content
+            );
+            map.setFeatureState(feature, { selected: true });
+            self.popup.on('close', function() {
+                map.setFeatureState(feature, { selected: false });
+                self.popup = undefined;
+            });
+        };
+
         this.setupMap = function(map) {
-            if (ko.isObservable(params.map)) params.map(map);
+            map.on('load', function() {
+                map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+                map.addControl(new mapboxgl.FullscreenControl({
+                    container: $(map.getContainer()).closest('.map-card-wrapper')[0]
+                }), 'top-left');
+                map.addControl(new MapboxGeocoder({
+                    accessToken: mapboxgl.accessToken,
+                    mapboxgl: mapboxgl,
+                    placeholder: arches.geocoderPlaceHolder,
+                    bbox: arches.hexBinBounds
+                }), 'top-right');
 
-            map.addControl(new mapboxgl.NavigationControl(), 'top-left');
-            map.addControl(new MapboxGeocoder({
-                accessToken: mapboxgl.accessToken,
-                mapboxgl: mapboxgl,
-                placeholder: arches.geocoderPlaceHolder,
-                bbox: bounds
-            }), 'top-right');
+                self.layers.subscribe(self.updateLayers);
 
-            layers.subscribe(function(layers) {
-                var style = map.getStyle();
-                style.layers = layers;
-                map.setStyle(style);
+                var hoverFeature;
+                map.on('mousemove', function(e) {
+                    if (hoverFeature) map.setFeatureState(hoverFeature, { hover: false });
+                    hoverFeature = _.find(
+                        map.queryRenderedFeatures(e.point),
+                        self.isFeatureClickable
+                    );
+                    if (hoverFeature) map.setFeatureState(hoverFeature, { hover: true });
+                    map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
+                });
+
+                map.on('click', function(e) {
+                    if (hoverFeature) {
+                        self.onFeatureClick(hoverFeature, e.lngLat);
+                    }
+                });
+
+                self.map(map);
+                setTimeout(function() { map.resize(); }, 1);
             });
         };
     };

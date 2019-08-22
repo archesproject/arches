@@ -1,10 +1,11 @@
 define([
     'underscore',
     'knockout',
+    'knockout-mapping',
     'models/abstract',
     'widgets',
     'utils/dispose'
-], function(_, ko, AbstractModel, widgets, dispose) {
+], function(_, ko, koMapping, AbstractModel, widgets, dispose) {
     return AbstractModel.extend({
         /**
         * A backbone model to manage cards_x_nodes_x_widgets records
@@ -114,10 +115,9 @@ define([
                     var configKeys = [];
                     _.each(value, function(configVal, configKey) {
                         if (!ko.isObservable(configVal)) {
-                            value[configKey] = ko.observable(configVal);
-                        } else {
-                            value[configKey] = configVal;
+                            configVal = koMapping.fromJS(configVal);
                         }
+                        value[configKey] = configVal;
                         configKeys.push(configKey);
                     });
                     this.set(key, value);

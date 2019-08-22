@@ -1,5 +1,5 @@
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.search.elasticsearch_dsl_builder import Bool, Term
+from arches.app.search.elasticsearch_dsl_builder import Bool, Terms
 from arches.app.search.components.base import BaseSearchFilter
 
 details = {
@@ -22,11 +22,14 @@ class ResourceTypeFilter(BaseSearchFilter):
         search_query = Bool()
         querysting_params = self.request.GET.get(details['componentname'], '')
 
+        graph_ids = []
         for resouceTypeFilter in JSONDeserializer().deserialize(querysting_params):
-            term = Term(field='graph_id', term=str(resouceTypeFilter['graphid']))
-            if resouceTypeFilter['inverted'] is True:
-                search_query.must_not(term)
-            else:
-                search_query.must(term)
+            graph_ids.append(str(resouceTypeFilter['graphid']))
+            
+        terms = Terms(field='graph_id', terms=graph_ids)
+        if resouceTypeFilter['inverted'] is True:
+            search_query.must_not(terms)
+        else:
+            search_query.filter(terms)
 
         search_results_object['query'].add_query(search_query)

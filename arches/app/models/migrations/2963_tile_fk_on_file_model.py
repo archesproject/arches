@@ -9,7 +9,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4661_workflowselect_plugin'),
+        ('models', '4679_resource_editor_permissions'),
     ]
 
     operations = [

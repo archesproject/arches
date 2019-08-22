@@ -102,6 +102,14 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main" >> /etc
   apt-get update -y &&\
   apt-get install -y postgresql-client-9.6
 
+# Install Yarn components
+COPY ./arches/install/package.json ${ARCHES_ROOT}/arches/install/package.json
+COPY ./arches/install/.yarnrc ${ARCHES_ROOT}/arches/install/.yarnrc
+COPY ./arches/install/yarn.lock ${ARCHES_ROOT}/arches/install/yarn.lock
+WORKDIR ${ARCHES_ROOT}/arches/install
+RUN mkdir -p ${ARCHES_ROOT}/arches/app/media/packages
+RUN yarn install
+
 ## Install virtualenv
 WORKDIR ${WEB_ROOT}
 
@@ -116,6 +124,8 @@ RUN pip install virtualenv==15.1.0 \
     && . ENV/bin/activate \
     && pip install -U pip setuptools \
     && pip install requests \
+    && pip install -f ${WHEELS} django-auth-ldap \
+    && pip install -f ${WHEELS} 'gunicorn==19.9.0' \
     && pip install -r ${WHEELS}/requirements.txt \
                    -f ${WHEELS} \
     && pip install -r ${WHEELS}/requirements_dev.txt \
@@ -129,9 +139,8 @@ WORKDIR ${ARCHES_ROOT}
 RUN . ../ENV/bin/activate \
     && pip install -e . --no-binary :all:
 
-# Install Yarn components
-COPY ./package.json ${ARCHES_ROOT}/package.json
-RUN yarn install
+# Set default workdir
+WORKDIR ${ARCHES_ROOT}
 
 COPY docker/gunicorn_config.py ${ARCHES_ROOT}/gunicorn_config.py
 COPY docker/settings_local.py ${ARCHES_ROOT}/arches/settings_local.py
@@ -143,5 +152,3 @@ CMD ["run_arches"]
 # Expose port 8000
 EXPOSE 8000
 
-# Set default workdir
-WORKDIR ${ARCHES_ROOT}

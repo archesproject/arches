@@ -478,7 +478,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return GeometryCollection(wkt_geoms)
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        document['geometries'].append({'geom':nodevalue, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
+        document['geometries'].append({
+            'geom': nodevalue,
+            'nodegroup_id': tile.nodegroup_id,
+            'provisional': provisional,
+            'tileid': tile.pk
+        })
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:
             minx, miny, maxx, maxy = bounds
@@ -573,7 +578,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
             sql_list.append("""
                 SELECT resourceinstanceid::text,
-                        (row_number() over ())::text as __id__,
+                        tileid::text,
+                        (row_number() over ()) as __id__,
                         1 as total,
                         geom AS __geometry__,
                         '' AS extent
@@ -704,7 +710,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all",["==", "$type", "Polygon"],["==", "total", 1]],
                     "paint": {
-                        "line-width": %(outlineWeight)s,
+                        "line-width": ["case",
+                            ["boolean", ["feature-state", "hover"], false],
+                            %(expanded_outlineWeight)s,
+                            %(outlineWeight)s
+                        ],
                         "line-color": "%(outlineColor)s"
                     }
                 },
@@ -746,7 +756,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all", ["==", "$type", "LineString"],["==", "total", 1]],
                     "paint": {
-                        "line-width": %(haloWeight)s,
+                        "line-width": ["case",
+                            ["boolean", ["feature-state", "hover"], false],
+                            %(expanded_haloWeight)s,
+                            %(haloWeight)s
+                        ],
                         "line-color": "%(lineHaloColor)s"
                     }
                 },
@@ -760,7 +774,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all",["==", "$type", "LineString"],["==", "total", 1]],
                     "paint": {
-                        "line-width": %(weight)s,
+                        "line-width": ["case",
+                            ["boolean", ["feature-state", "hover"], false],
+                            %(expanded_weight)s,
+                            %(weight)s
+                        ],
                         "line-color": "%(lineColor)s"
                     }
                 },
@@ -860,7 +878,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
                     "paint": {
-                        "circle-radius": %(haloRadius)s,
+                        "circle-radius": ["case",
+                            ["boolean", ["feature-state", "hover"], false],
+                            %(expanded_haloRadius)s,
+                            %(haloRadius)s
+                        ],
                         "circle-color": "%(pointHaloColor)s"
                     }
                 },
@@ -874,7 +896,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
                     "paint": {
-                        "circle-radius": %(radius)s,
+                        "circle-radius": ["case",
+                            ["boolean", ["feature-state", "hover"], false],
+                            %(expanded_radius)s,
+                            %(radius)s
+                        ],
                         "circle-color": "%(pointColor)s"
                     }
                 },
@@ -1259,8 +1285,9 @@ class DomainDataType(BaseDomainDataType):
 
     def validate(self, value, row_number=None, source=''):
         errors = []
-        if len(models.Node.objects.filter(config__options__contains=[{"id": value}])) < 1:
-            errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value, row_number)})
+        if value is not None:
+            if len(models.Node.objects.filter(config__options__contains=[{"id": value}])) < 1:
+                errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value, row_number)})
         return errors
 
     def get_search_terms(self, nodevalue, nodeid=None):
@@ -1284,7 +1311,8 @@ class DomainDataType(BaseDomainDataType):
             document['strings'].append({'string': domain_text, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
 
     def get_display_value(self, tile, node):
-        return self.get_option_text(node, tile.data[str(node.nodeid)])
+        data = self.get_tile_data(tile)
+        return self.get_option_text(node, data[str(node.nodeid)])
 
     def transform_export_values(self, value, *args, **kwargs):
         ret = ''
@@ -1371,8 +1399,9 @@ class DomainListDataType(BaseDomainDataType):
 
     def get_display_value(self, tile, node):
         new_values = []
-        if tile.data[str(node.nodeid)] is not None:
-            for val in tile.data[str(node.nodeid)]:
+        data = self.get_tile_data(tile)
+        if data[str(node.nodeid)] is not None:
+            for val in data[str(node.nodeid)]:
                 option = self.get_option_text(node, val)
                 new_values.append(option)
         return ','.join(new_values)
@@ -1465,7 +1494,8 @@ class ResourceInstanceDataType(BaseDataType):
         return errors
 
     def get_display_value(self, tile, node):
-        nodevalue = tile.data[str(node.nodeid)]
+        data = self.get_tile_data(tile)
+        nodevalue = data[str(node.nodeid)]
         resource_names = self.get_resource_names(nodevalue)
         return ', '.join(resource_names)
 
@@ -1546,7 +1576,8 @@ class NodeValueDataType(BaseDataType):
     def get_display_value(self, tile, node):
         datatype_factory = DataTypeFactory()
         value_node = models.Node.objects.get(nodeid=node.config['nodeid'])
-        tileid = tile.data[str(node.pk)]
+        data = self.get_tile_data(tile)
+        tileid = data[str(node.pk)]
         if tileid:
             value_tile = models.TileModel.objects.get(tileid=tileid)
             datatype = datatype_factory.get_instance(value_node.datatype)

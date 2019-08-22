@@ -24,47 +24,69 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 {% block main_content %}
-    <div class="content-panel" data-bind="click:function() { menuActive(false); }, visible: true", style="display:none;">
+    <div class="content-panel flexrow" data-bind="click:function() { menuActive(false); }, visible: true", style="display:none;">
 
-        <!-- Title Block -->
-        <div class="ep-form-toolbar">
-
-            <div class="" style="display: inline-block; padding-left: 15px; padding-top: 10px; margin-bottom: 15px; margin-right: 20px;">
-                <div class="search-bar relative" style="margin-top: 0px; width: 375px;" >
-                    <div data-bind="component: {
-                        name: 'term-filter',
-                        params: sharedStateObject
-                    }"></div>
-                </div>
+        <div class="flex search-results-panel">
+            <div class="search-attribute-widget">
+                <div data-bind="component: {
+                    name: 'term-filter',
+                    params: sharedStateObject
+                }"></div>
             </div>
+            <div class="flex" style="max-width: 400px;" data-bind="component: {
+                name: 'search-results',
+                params: sharedStateObject
+            }"></div>
+        </div>
 
-            <div class="" style="margin-top: 0px;">
-                <div class="" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
+
+        <div class="flex" style="flex-direction: column">
+            <!-- Title Block -->
+            <div class="search-toolbar" style="">
+                <div class="search-type-btn-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                     <!-- ko if: filter.type === 'filter' && filter.enabled -->
                     {% if user|can_read_resource_instance %}
-                    <button class="btn search-type-btn relative" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, click: function(){$parent.sharedStateObject.selectedTab(filter.componentname)}">
+                    <button class="search-type-btn relative" style="" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, click: function(){$parent.sharedStateObject.selectedTab(filter.componentname)}">
                         <i data-bind="css: filter.icon"></i>
-                        <p data-bind="text: filter.name"></p>
+                        <span data-bind="text: filter.name"></span>
                     </button>
                     {% endif %}
                     <!-- /ko -->
                 </div>
+                
+                <div class="search-type-btn-popup-panel">
+                    <div class="" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
+                        <!-- ko if: filter.type === 'popup' && filter.enabled -->
+                        {% if user|can_read_resource_instance %}
+                        <button class="saved-search-container search-type-btn-popup relative" style="" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, click: function(){$parent.sharedStateObject.selectPopup(filter.componentname)}">
+                            <i data-bind="css: filter.icon"></i>
+                            <!-- <p data-bind="text: filter.name"></p> -->
+                        </button>
+                        {% endif %}
+                        <!-- /ko -->
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="flex">
             <div class="flex">
 
-                <div class="flex" style="max-width: 400px;" data-bind="component: {
-                    name: 'search-results',
-                    params: sharedStateObject
-                }"></div>
 
                 <!-- Card Container -->
-                <div class="card-form-preview-container">
+                <div class="card-form-preview-container relative">
                     <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                         <!-- ko if: filter.type === 'filter' && filter.enabled -->
                         <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}">
+                            <div data-bind="component: {
+                                name: filter.componentname,
+                                params: $parent.sharedStateObject
+                            }"></div>
+                        </div>
+                        <!-- /ko -->
+                    </div>
+
+                    <div class="tab-content search-popup-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}, visible: sharedStateObject.selectedPopup() !== ''">
+                        <!-- ko if: filter.type === 'popup' && filter.enabled -->
+                        <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}">
                             <div data-bind="component: {
                                 name: filter.componentname,
                                 params: $parent.sharedStateObject

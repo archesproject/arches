@@ -18,7 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import re
-from django.db import transaction
+import logging
+from django.db import transaction, IntegrityError
 from django.db.models import Q
 from django.utils.http import urlencode
 from rdflib import Literal, Namespace, RDF, URIRef
@@ -39,6 +40,8 @@ class SKOSReader(object):
     def __init__(self):
         self.nodes = []
         self.relations = []
+        self.member_relations = []
+        self.logger = logging.getLogger(__name__)
 
     def read_file(self, path_to_file, format='xml'):
         """
@@ -201,8 +204,8 @@ class SKOSReader(object):
 
             for s, v, o in graph.triples((None, SKOS.member, None)):
                 # print "%s %s %s " % (s,v,o)
-                self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s),
-                                       'type': 'member', 'target': self.generate_uuid_from_subject(baseuuid, o)})
+                self.member_relations.append({'source': self.generate_uuid_from_subject(baseuuid, s),
+                                    'type': 'member', 'target': self.generate_uuid_from_subject(baseuuid, o)})
 
             # insert and index the concpets
             scheme_node = None
@@ -236,11 +239,23 @@ class SKOSReader(object):
                         conceptto_id=relation['target'],
                         relationtype_id=relation['type']
                     )
-
+                
                 # need to index after the concepts and relations have been entered into the db
                 # so that the proper context gets indexed with the concept
                 if scheme_node:
                     scheme_node.bulk_index()
+
+            # insert the concept collection relations
+            # we do this outide a transaction so that we can load incomplete collections
+            for relation in self.member_relations:
+                try:
+                    newrelation = models.Relation.objects.get_or_create(
+                        conceptfrom_id=relation['source'],
+                        conceptto_id=relation['target'],
+                        relationtype_id=relation['type']
+                    )
+                except IntegrityError as e:
+                    self.logger.warning(e.message)
 
             return scheme_node
         else:
