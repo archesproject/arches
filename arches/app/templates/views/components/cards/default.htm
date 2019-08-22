@@ -91,6 +91,9 @@
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode()}, click: function () { card.selected(true) },">
         <i class="fa fa-file-o" role="presentation"></i>
         <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
+        <!-- ko if: $parent.showIds -->
+        <span style="padding-right: 5px; font-weight:bold" data-bind="text: card.model.nodegroup_id"></span>
+        <!-- /ko -->
     </a>
     <!-- ko if: card.cards().length > 0 || card.widgets().length > 0 -->
     <ul class="jstree-children card-designer-tree" aria-expanded="true">
@@ -108,6 +111,9 @@
                     <i data-bind="css: widget.datatype.iconclass" role="presentation"></i>
                     <strong style="margin-right: 10px;" >
                         <span data-bind="text: !!(widget.label()) ? widget.label() : widget.node.name"></span>
+                        <!-- ko if: $parent.showIds -->
+                        <span style="font-weight:bold" data-bind="text: !!(widget.label()) ? widget.node.nodeid : ''"></span>
+                        <!-- /ko -->
                     </strong>
                 </a>
             </li>
@@ -266,7 +272,7 @@
         <div class="card">
             {% block form_header %}
             <h4 data-bind="text: card.model.name"></h4>
-            
+
             <!-- ko if: card.model.helpenabled -->
             <span>
                 <a class="pull-right card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
