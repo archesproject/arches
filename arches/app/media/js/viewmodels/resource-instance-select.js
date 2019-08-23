@@ -14,15 +14,13 @@ define([
         this.disable = params.disable || function() {
             return false;
         };
+        this.graphids = ko.unwrap(params.node.config.graphid);
         this.disableMessage = params.disableMessage || '';
 
         WidgetViewModel.apply(this, [params]);
 
         var displayName = ko.observable('');
         self.newTileStep = ko.observable();
-        this.close = function(){
-            this.newTileStep(null);
-        };
         this.valueList = ko.computed(function() {
             var valueList = self.value();
             displayName();
@@ -34,6 +32,25 @@ define([
             }
             return [];
         });
+
+        this.removeGraphIdsFromValue = function(value) {
+            if (Array.isArray(value)) {
+                self.graphids.forEach(function(graphid){
+                    self.value.remove(graphid);
+                });
+                return value;
+            } else if (self.graphids.indexOf(value) !== -1) {
+                return null;
+            } else {
+                return value;
+            }
+        };
+
+        this.close = function(){
+            var cleanval = self.removeGraphIdsFromValue(this.value());
+            this.value(cleanval);
+            this.newTileStep(null);
+        };
 
         this.valueObjects = ko.computed(function() {
             displayName();
@@ -242,7 +259,13 @@ define([
                             };
                             self.newTileStep(params);
                             params.complete.subscribe(function() {
-                                self.value(params.resourceid());
+                                var result = params.resourceid();
+                                if (self.multiple) {
+                                    result = self.valueList.push(params.resourceid());
+                                }
+                                result = self.removeGraphIdsFromValue(result);
+                                self.value.extend({ rateLimit: 500 });
+                                self.value(result);
                                 self.newTileStep(null);
                             });
                         }
