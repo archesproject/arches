@@ -20,7 +20,9 @@ define([
 
         var displayName = ko.observable('');
         self.newTileStep = ko.observable();
-
+        this.close = function(){
+            this.newTileStep(null);
+        };
         this.valueList = ko.computed(function() {
             var valueList = self.value();
             displayName();

@@ -14184,8 +14184,19 @@ a.jstree-anchor.permissions-widget {
     color: #004577;
     padding: 20px 40px;
     margin-top: 0px;
-    background: #f4f4f4;
+    width: 100%;
 }
+
+ .create-instance-header {
+     display: flex;
+     justify-content: space-between;
+    background: #f4f4f4;
+ }
+
+  .create-instance-header .close-new-step {
+      padding: 12px;
+      font-size: 20px;
+  }
 
 .create-resource-instance-card-component .card-component {
     padding-top: 10px;
