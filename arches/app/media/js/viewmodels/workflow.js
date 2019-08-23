@@ -26,6 +26,10 @@ define([
             this.state = res;
         };
 
+        this.finishWorkflow = function() {
+            self.activeStep(self.steps[self.steps.length-1]);
+        }
+
         this.restoreStateFromURL();
 
         this.ready.subscribe(function() {
