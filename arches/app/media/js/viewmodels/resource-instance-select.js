@@ -36,9 +36,9 @@ define([
         this.removeGraphIdsFromValue = function(value) {
             if (Array.isArray(value)) {
                 self.graphids.forEach(function(graphid){
-                    self.value.remove(graphid);
+                    self.value().pop(self.value().indexOf(graphid));
                 });
-                return value;
+                return ko.unwrap(value);
             } else if (self.graphids.indexOf(value) !== -1) {
                 return null;
             } else {
@@ -261,7 +261,7 @@ define([
                             params.complete.subscribe(function() {
                                 var result = params.resourceid();
                                 if (self.multiple) {
-                                    result = self.valueList.push(params.resourceid());
+                                    result = self.valueList().push(params.resourceid());
                                 }
                                 result = self.removeGraphIdsFromValue(result);
                                 self.value.extend({ rateLimit: 500 });
