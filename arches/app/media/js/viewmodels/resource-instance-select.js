@@ -36,9 +36,12 @@ define([
         this.removeGraphIdsFromValue = function(value) {
             if (Array.isArray(value)) {
                 self.graphids.forEach(function(graphid){
-                    self.value().pop(self.value().indexOf(graphid));
+                    var graphindex = self.value().indexOf(graphid);
+                    if (graphindex > -1) {
+                        self.value().splice(graphindex, 1);
+                    }
                 });
-                return ko.unwrap(value);
+                return ko.unwrap(value).length > 0 ? ko.unwrap(value) : null;
             } else if (self.graphids.indexOf(value) !== -1) {
                 return null;
             } else {
@@ -261,7 +264,8 @@ define([
                             params.complete.subscribe(function() {
                                 var result = params.resourceid();
                                 if (self.multiple) {
-                                    result = self.valueList().push(params.resourceid());
+                                    self.valueList().push(params.resourceid());
+                                    result = self.valueList();
                                 }
                                 result = self.removeGraphIdsFromValue(result);
                                 self.value.extend({ rateLimit: 500 });
