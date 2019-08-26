@@ -268,9 +268,10 @@ define([
                                     result = self.valueList();
                                 }
                                 result = self.removeGraphIdsFromValue(result);
-                                self.value.extend({ rateLimit: 500 });
-                                self.value(result);
                                 self.newTileStep(null);
+                                setTimeout(function(){
+                                    self.value(result);
+                                }, 600);
                             });
                         }
                     }
