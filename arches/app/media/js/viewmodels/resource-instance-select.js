@@ -14,7 +14,7 @@ define([
         this.disable = params.disable || function() {
             return false;
         };
-        this.graphids = ko.unwrap(params.node.config.graphid);
+        this.graphids = [params.graphid] ||  ko.unwrap(params.node.config.graphid);
         this.disableMessage = params.disableMessage || '';
 
         WidgetViewModel.apply(this, [params]);
