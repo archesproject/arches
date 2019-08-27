@@ -48,6 +48,9 @@ from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from elasticsearch import Elasticsearch
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
@@ -583,18 +586,21 @@ class ResourceCards(View):
 class ResourceDescriptors(View):
 
     def get(self, request, resourceid=None):
-        if resourceid is not None:
-            se = SearchEngineFactory().create()
-            document = se.search(index='resources', id=resourceid)
-            resource = Resource.objects.get(pk=resourceid)
-            return JSONResponse({
-                'graphid': document['_source']['graph_id'],
-                'graph_name': resource.graph.name,
-                'displaydescription': document['_source']['displaydescription'],
-                'map_popup': document['_source']['map_popup'],
-                'displayname': document['_source']['displayname'],
-                'geometries': document['_source']['geometries'],
-            })
+        if Resource.objects.filter(pk=resourceid).exists():
+            try:
+                resource = Resource.objects.get(pk=resourceid)
+                se = SearchEngineFactory().create()
+                document = se.search(index='resources', id=resourceid)
+                return JSONResponse({
+                    'graphid': document['_source']['graph_id'],
+                    'graph_name': resource.graph.name,
+                    'displaydescription': document['_source']['displaydescription'],
+                    'map_popup': document['_source']['map_popup'],
+                    'displayname': document['_source']['displayname'],
+                    'geometries': document['_source']['geometries'],
+                })
+            except Exception as e:
+                logger.exception(_('Failed to fetch resource instance descriptors'))
 
         return HttpResponseNotFound()
 

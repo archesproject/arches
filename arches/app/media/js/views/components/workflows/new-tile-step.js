@@ -11,11 +11,13 @@ define([
 ], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel) {
     function viewModel(params) {
         var self = this;
-        if (!params.resourceid()) {
-            params.resourceid(params.workflow.state.resourceid);
-        }
-        if (params.workflow.state.steps[params._index]) {
-            params.tileid(params.workflow.state.steps[params._index].tileid);
+        if (params.workflow) {
+            if (!params.resourceid()) {
+                params.resourceid(params.workflow.state.resourceid);
+            }
+            if (params.workflow.state.steps[params._index]) {
+                params.tileid(params.workflow.state.steps[params._index].tileid);
+            }
         }
         var url = arches.urls.api_card + (ko.unwrap(params.resourceid) || ko.unwrap(params.graphid));
         this.card = ko.observable();
@@ -158,7 +160,9 @@ define([
             };
         };
         this.setStateProperties = function(){
-            params.workflow.state.steps[params._index] = params.getStateProperties();
+            if (params.workflow) {
+                params.workflow.state.steps[params._index] = params.getStateProperties();
+            }
         };
 
         self.onSaveSuccess = function(tiles) {
@@ -170,7 +174,9 @@ define([
                 self.resourceId(tile.resourceinstance_id);
             }
             self.setStateProperties();
-            params.workflow.updateUrl();
+            if (params.workflow) {
+                params.workflow.updateUrl();
+            }
             if (self.completeOnSave === true) { self.complete(true); }
         };
 

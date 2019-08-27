@@ -14,13 +14,13 @@ define([
         this.disable = params.disable || function() {
             return false;
         };
+        this.graphids = [params.graphid] ||  ko.unwrap(params.node.config.graphid);
         this.disableMessage = params.disableMessage || '';
 
         WidgetViewModel.apply(this, [params]);
 
         var displayName = ko.observable('');
         self.newTileStep = ko.observable();
-
         this.valueList = ko.computed(function() {
             var valueList = self.value();
             displayName();
@@ -32,6 +32,28 @@ define([
             }
             return [];
         });
+
+        this.removeGraphIdsFromValue = function(value) {
+            if (Array.isArray(value)) {
+                self.graphids.forEach(function(graphid){
+                    var graphindex = self.value().indexOf(graphid);
+                    if (graphindex > -1) {
+                        self.value().splice(graphindex, 1);
+                    }
+                });
+                return ko.unwrap(value).length > 0 ? ko.unwrap(value) : null;
+            } else if (self.graphids.indexOf(value) !== -1) {
+                return null;
+            } else {
+                return value;
+            }
+        };
+
+        this.close = function(){
+            var cleanval = self.removeGraphIdsFromValue(this.value());
+            this.value(cleanval);
+            this.newTileStep(null);
+        };
 
         this.valueObjects = ko.computed(function() {
             displayName();
@@ -240,8 +262,16 @@ define([
                             };
                             self.newTileStep(params);
                             params.complete.subscribe(function() {
-                                self.value(params.resourceid());
+                                var result = params.resourceid();
+                                if (self.multiple) {
+                                    self.valueList().push(params.resourceid());
+                                    result = self.valueList();
+                                }
+                                result = self.removeGraphIdsFromValue(result);
                                 self.newTileStep(null);
+                                setTimeout(function(){
+                                    self.value(result);
+                                }, 600);
                             });
                         }
                     }
