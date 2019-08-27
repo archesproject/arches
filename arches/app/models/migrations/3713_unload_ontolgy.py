@@ -8,7 +8,7 @@ from django.core import management
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '5076_adds_map_card_sourcelayer_config'),
+        ('models', '5199_add_resource_instance_ids_to_es_mappings'),
     ]
 
     def forwards_func(apps, schema_editor):
