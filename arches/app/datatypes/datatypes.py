@@ -1502,8 +1502,6 @@ class ResourceInstanceDataType(BaseDataType):
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         resource_names = self.get_resource_names(nodevalue)
         for value in resource_names:
-            if 'ids' not in document:
-                document['ids'] = []
             document['ids'].append({'id': nodevalue, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
             if value not in document['strings']:
                 document['strings'].append({'string': value, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
