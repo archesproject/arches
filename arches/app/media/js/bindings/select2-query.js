@@ -26,6 +26,9 @@ define([
                     $(el).select2("destroy").select2(select2Config);
                 });
                 select2Config.placeholder = select2Config.placeholder();
+                if (select2Config.allowClear) {
+                    select2Config.placeholder = select2Config.placeholder === "" ? " " : select2Config.placeholder;
+                }
             }
 
             select2Config.value = value();
