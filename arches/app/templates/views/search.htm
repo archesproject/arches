@@ -37,26 +37,35 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- Title Block -->
                 <div class="search-count-container">
                     <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
-                    <div id="search-results-container">
-                        <div class="search-inline-filters">
-                            <!--ko if: sharedStateObject.userIsReviewer-->
-                            <div data-bind="component: {
-                                name: 'provisional-filter',
-                                params: sharedStateObject
-                            }"></div>
-                            <!--/ko-->
-                            <div data-bind="component: {
-                                name: 'resource-type-filter',
-                                params: sharedStateObject
-                            }"></div>
-                        </div>
+                    <div class="search-inline-filters">
+                        <!--ko if: sharedStateObject.userIsReviewer-->
+                        <div data-bind="component: {
+                            name: 'provisional-filter',
+                            params: sharedStateObject
+                        }"></div>
+                        <!--/ko-->
+                        <div data-bind="component: {
+                            name: 'resource-type-filter',
+                            params: sharedStateObject
+                        }"></div>
                     </div>
                 </div>
 
-                <div class="flex" style="max-width: 400px;" data-bind="component: {
-                    name: 'search-results',
-                    params: sharedStateObject
-                }"></div>
+                <div class="search-results-container">
+
+                    <div data-bind="component: {
+                        name: 'search-results',
+                        params: sharedStateObject
+                    }"></div>
+                    <div class="margin-bottom-30"></div>
+
+                    <div data-bind="component: {
+                        name: 'paging-filter',
+                        params: sharedStateObject
+                    }"></div>
+
+                </div>
+
             </div>
         </div>
 
