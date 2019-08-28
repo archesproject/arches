@@ -10975,26 +10975,26 @@ a.search-query-link-captions:focus {
 .search-control-container {
     -ms-flex: 0 0 400px;
     -webkit-flex: 0 0 400px;
-    flex: 0 0 400px;
+    flex: 1 0 400px;
     margin-bottom: 0px;
     background-color: #fafafa;
-    padding: 10px 20px 80px 20px;
+    /* padding: 10px 20px 80px 20px; */
     border-right: solid 1px #dddddd;
     border-top: 1px solid #ddd;
     overflow-y: scroll;
     overflow-x: hidden;
     transition: all .5s;
     margin-top: inherit;
-    min-width: 400px;
+    /* min-width: 400px; */
     z-index: 5;
 }
 
 .search-count-container {
-    height: 40px;
+    /* height: 40px; */
     padding: 10px 20px 0px 20px;
     background: #f4f4f4;
     border-bottom: 1px solid #ddd;
-    margin: -10px -20px 10px -20px;
+    /* margin: -10px -20px 10px -20px; */
 }
 
 .search-title {

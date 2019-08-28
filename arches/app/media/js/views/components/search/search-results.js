@@ -25,13 +25,11 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 options.name = 'Search Results';
                 BaseFilter.prototype.initialize.call(this, options);
 
-                this.total = ko.observable();
                 this.results = ko.observableArray();
                 this.showRelationships = ko.observable();
                 this.mouseoverInstanceId = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
                 this.selectedResourceId = ko.observable(null);
-                this.userIsReviewer = ko.observable(false);
 
                 this.showRelationships.subscribe(function(res) {
                     this.selectedResourceId(res.resourceinstanceid);
@@ -77,10 +75,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 var data = $('div[name="search-result-data"]').data();
 
                 if (!!this.searchResults.results){
-                    this.total(this.searchResults.results.hits.total);
                     this.results.removeAll();
                     this.selectedResourceId(null);
-                    this.userIsReviewer(this.searchResults.reviewer);
                     this.searchResults.results.hits.hits.forEach(function(result){
                         var graphdata = _.find(viewdata.graphs, function(graphdata){
                             return result._source.graph_id === graphdata.graphid;
