@@ -60,6 +60,7 @@ define([
         this.query = ko.observable(getQueryObject());
         this.mouseoverInstanceId = ko.observable();
         this.mapLinkData = ko.observable(null);
+        this.userIsReviewer = ko.observable(false);
         this.searchResults = {'timestamp': ko.observable()};
         this.selectPopup = function(componentname) {
             if(this.selectedPopup() !== '' && componentname === this.selectedPopup()) {
@@ -91,6 +92,7 @@ define([
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
             this.viewModel.sharedStateObject = new CommonSearchViewModel();
+            this.viewModel.total = ko.observable();
             _.extend(this, this.viewModel.sharedStateObject);
 
             this.queryString = ko.computed(function() {
@@ -126,6 +128,8 @@ define([
                         }
                     }, this);
                     this.viewModel.sharedStateObject.searchResults.timestamp(response.timestamp);
+                    this.viewModel.sharedStateObject.userIsReviewer(response.reviewer);
+                    this.viewModel.total(response.results.hits.total);
                     this.viewModel.alert(false);
                 },
                 error: function(response, status, error) {
