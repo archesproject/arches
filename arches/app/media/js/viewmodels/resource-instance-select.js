@@ -15,10 +15,16 @@ define([
             return false;
         };
         this.graphids = params.node ? ko.unwrap(params.node.config.graphid) : [params.graphid];
+        this.graphNames = {}
+        this.graphids.forEach(function(graphid){
+            self.graphNames[graphid] = arches.resources.find(function(resource){
+                return resource.graphid === graphid;
+            });
+        });
+
         this.disableMessage = params.disableMessage || '';
 
         WidgetViewModel.apply(this, [params]);
-
         var displayName = ko.observable('');
         self.newTileStep = ko.observable();
         this.valueList = ko.computed(function() {
