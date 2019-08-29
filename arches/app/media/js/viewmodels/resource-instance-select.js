@@ -81,32 +81,17 @@ define([
                             nameLookup[val] = data.displayname;
                             names.push(data.displayname);
                             displayName(names.join(', '));
-                            // console.log('displayname =', displayName());
                         });
                     }
                 }
             });
         };
 
-        // this.value.subscribe(updateName);
-
-        // this.displayValue = ko.computed(function() {
-        //     var val = self.value();
-        //     var name = displayName();
-        //     var displayVal = null;
-        //
-        //     if (val) {
-        //         displayVal = name;
-        //     }
-        //     return displayVal;
-        // });
-
         updateName();
 
         var relatedResourceModels = ko.computed(function() {
             var res = [];
             if (params.node) {
-                // var res = [];
                 var ids = ko.unwrap(params.node.config.graphid);
                 if (ids) {
                     res = arches.resources.filter(function(graph) {
@@ -119,7 +104,6 @@ define([
                         };
                     });
                 }
-                // return res;
             }
             return res;
         }, this);
@@ -252,12 +236,9 @@ define([
                                 $.ajax(arches.urls.resource_descriptors + value, {
                                     dataType: "json"
                                 }).done(function(data) {
-                                    console.log('got description in initSelection')
                                     nameLookup[value] = data.displayname;
                                     names.push(data.displayname);
                                     displayName(names.join(', '));
-                                    console.log('displayname in init', displayName())
-                                    console.log('name lookup', nameLookup[value])
                                     setSelectionData();
                                 });
                             }
