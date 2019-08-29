@@ -415,14 +415,10 @@ class JsonLdReader(Reader):
             for node in nodes:
                 self.logger.debug("Checking {0}".format(node['node'].ontologyclass))
                 if '@type' in jsonld_graph:
-                    self.logger.debug("node['parent_edge'].ontologyproperty")
-                    self.logger.debug(node['parent_edge'].ontologyproperty)
-                    self.logger.debug("node['parent_edge'].ontologyproperty == ontology_property")
-                    self.logger.debug(node['parent_edge'].ontologyproperty == ontology_property)
-                    self.logger.debug("node['node'].ontologyclass")
-                    self.logger.debug(node['node'].ontologyclass)
-                    self.logger.debug("node['node'].ontologyclass == jsonld_graph['@type'][0]")
-                    self.logger.debug(node['node'].ontologyclass == jsonld_graph['@type'][0])
+                    self.logger.debug("  node['parent_edge'].ontologyproperty: " + node['parent_edge'].ontologyproperty)
+                    self.logger.debug("  node['parent_edge'].ontologyproperty == ontology_property: " + node['parent_edge'].ontologyproperty == ontology_property)
+                    self.logger.debug("  node['node'].ontologyclass: " + node['node'].ontologyclass)
+                    self.logger.debug("  node['node'].ontologyclass == jsonld_graph['@type'][0]: " + node['node'].ontologyclass == jsonld_graph['@type'][0])
 
                 if '@type' in jsonld_graph:
                     if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == jsonld_graph['@type'][0]:
@@ -450,7 +446,7 @@ class JsonLdReader(Reader):
 
             self.logger.debug('found {0} branches'.format(len(found)))
             if len(found) == 0:
-                self.logger.error('branch not found for {0}'.format(str(jsonld_graph)))
+                self.logger.error(' *** branch not found for {0}'.format(str(jsonld_graph)))
                 print 'branch not found for %r' % jsonld_graph
                 raise self.DataDoesNotMatchGraphException()
 
