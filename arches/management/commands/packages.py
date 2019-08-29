@@ -690,6 +690,9 @@ class Command(BaseCommand):
         def load_card_components(package_dir):
             load_extensions(package_dir, 'card_components', 'card_component')
 
+        def load_search_components(package_dir):
+            load_extensions(package_dir, 'search', 'search')
+
         def load_plugins(package_dir):
             load_extensions(package_dir, 'plugins', 'plugin')
 
@@ -761,6 +764,8 @@ class Command(BaseCommand):
         load_widgets(package_location)
         print('loading card components')
         load_card_components(package_location)
+        print('loading search components')
+        load_search_components(package_location)
         print('loading plugins')
         load_plugins(package_location)
         print('loading reports')
