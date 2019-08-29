@@ -14,7 +14,7 @@ define([
         this.disable = params.disable || function() {
             return false;
         };
-        this.graphids = [params.graphid] ||  ko.unwrap(params.node.config.graphid);
+        this.graphids = params.node ? ko.unwrap(params.node.config.graphid) : [params.graphid];
         this.disableMessage = params.disableMessage || '';
 
         WidgetViewModel.apply(this, [params]);
@@ -56,7 +56,6 @@ define([
         };
 
         this.valueObjects = ko.computed(function() {
-            displayName();
             return self.valueList().map(function(value) {
                 return {
                     id: value,
@@ -82,24 +81,26 @@ define([
                             nameLookup[val] = data.displayname;
                             names.push(data.displayname);
                             displayName(names.join(', '));
+                            // console.log('displayname =', displayName());
                         });
                     }
                 }
             });
         };
-        this.value.subscribe(updateName);
 
-        this.displayValue = ko.computed(function() {
-            var val = self.value();
-            var name = displayName();
-            var displayVal = null;
+        // this.value.subscribe(updateName);
 
-            if (val) {
-                displayVal = name;
-            }
+        // this.displayValue = ko.computed(function() {
+        //     var val = self.value();
+        //     var name = displayName();
+        //     var displayVal = null;
+        //
+        //     if (val) {
+        //         displayVal = name;
+        //     }
+        //     return displayVal;
+        // });
 
-            return displayVal;
-        });
         updateName();
 
         var relatedResourceModels = ko.computed(function() {
@@ -237,7 +238,9 @@ define([
                         callback(valueData);
                     }
                 };
+
                 valueList.forEach(function(value) {
+                    var names = [];
                     if (value) {
                         var modelIds = relatedResourceModels().map(function(model) {
                             return model._id;
@@ -249,7 +252,12 @@ define([
                                 $.ajax(arches.urls.resource_descriptors + value, {
                                     dataType: "json"
                                 }).done(function(data) {
+                                    console.log('got description in initSelection')
                                     nameLookup[value] = data.displayname;
+                                    names.push(data.displayname);
+                                    displayName(names.join(', '));
+                                    console.log('displayname in init', displayName())
+                                    console.log('name lookup', nameLookup[value])
                                     setSelectionData();
                                 });
                             }
@@ -269,9 +277,7 @@ define([
                                 }
                                 result = self.removeGraphIdsFromValue(result);
                                 self.newTileStep(null);
-                                setTimeout(function(){
-                                    self.value(result);
-                                }, 600);
+                                self.value(result);
                             });
                         }
                     }
