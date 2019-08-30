@@ -3,13 +3,18 @@
 }
 
 div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
-    margin-right: 40px;
+    margin-right: 10px;
+    margin-top: 5px;
 }
 
 .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
     padding: 0px 0px 0px;
     z-index: 100;
     margin-top: 20px;
+}
+
+#intro {
+    margin-top: -165px;
 }
 
 .disco-caption {
@@ -107,7 +112,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .navbar-brand-disco h2 {
     margin-bottom: 8px;
     margin-top: 0px;
-    margin-left: -5px;
+    margin-left: -12px;
     font-size: 28px;
     color: #25476A;
     display: inline-block;
@@ -135,13 +140,10 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     margin-top: -5px
 }
 
-.cons-splash-nav 
 
 .splash-nav #auth-link:focus, .splash-nav #auth-link:hover {
     background-color: transparent;
 }
-
-
 
 .splash-nav a {
     font-size: 24px;
@@ -195,6 +197,39 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+}
+
+.image-gradient {
+    position: absolute; 
+    top: 60%; 
+    width: 100%; 
+    height: 40%; 
+    background-image: linear-gradient(transparent, rgba(0,0,0,.45));
+}
+
+.image-attribution {
+    position: absolute; 
+    top: 94%; 
+    right: 15px; 
+    color: #fff; 
+    padding: 10px; 
+    background: rgba(0,0,0,.5);
+}
+
+.app-info-block {
+    min-height: 600px;
+    padding: 70px 100px;
+    background: #fff;
+    border-top: 1px solid #ddd;
+}
+
+.app-info-block:nth-child(even) {
+    background: #f8f8f8;
+}
+
+.app-info-block h2 {
+    font-size: 21px;
+    color: #25476A;
 }
 
 @media (min-width: 768px) {
