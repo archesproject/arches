@@ -30,7 +30,7 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
 
 .disco-caption h2 a {
     color: #CAFF00;
-    font-size: 21px;
+    font-size: 24px;
     font-weight: 500;
     display: inline-flex;
     margin-bottom: 12px;
@@ -48,7 +48,7 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     white-space: normal;
     word-wrap: break-word;
     margin-bottom: 22px;
-    margin-top: -10px;
+    margin-top: -15px;
 }
 
 .disco-caption a {
@@ -228,7 +228,8 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .app-info-block h2 {
-    font-size: 21px;
+    font-size: 32px;
+    font-weight: 300;
     color: #25476A;
 }
 
