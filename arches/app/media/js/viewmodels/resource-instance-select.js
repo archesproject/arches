@@ -14,11 +14,17 @@ define([
         this.disable = params.disable || function() {
             return false;
         };
-        this.graphids = [params.graphid] ||  ko.unwrap(params.node.config.graphid);
+        this.graphids = params.node ? ko.unwrap(params.node.config.graphid) : [params.graphid];
+        this.graphNames = {}
+        this.graphids.forEach(function(graphid){
+            self.graphNames[graphid] = arches.resources.find(function(resource){
+                return resource.graphid === graphid;
+            });
+        });
+
         this.disableMessage = params.disableMessage || '';
 
         WidgetViewModel.apply(this, [params]);
-
         var displayName = ko.observable('');
         self.newTileStep = ko.observable();
         this.valueList = ko.computed(function() {
@@ -56,7 +62,6 @@ define([
         };
 
         this.valueObjects = ko.computed(function() {
-            displayName();
             return self.valueList().map(function(value) {
                 return {
                     id: value,
@@ -87,25 +92,12 @@ define([
                 }
             });
         };
-        this.value.subscribe(updateName);
 
-        this.displayValue = ko.computed(function() {
-            var val = self.value();
-            var name = displayName();
-            var displayVal = null;
-
-            if (val) {
-                displayVal = name;
-            }
-
-            return displayVal;
-        });
         updateName();
 
         var relatedResourceModels = ko.computed(function() {
             var res = [];
             if (params.node) {
-                // var res = [];
                 var ids = ko.unwrap(params.node.config.graphid);
                 if (ids) {
                     res = arches.resources.filter(function(graph) {
@@ -118,7 +110,6 @@ define([
                         };
                     });
                 }
-                // return res;
             }
             return res;
         }, this);
@@ -237,7 +228,9 @@ define([
                         callback(valueData);
                     }
                 };
+
                 valueList.forEach(function(value) {
+                    var names = [];
                     if (value) {
                         var modelIds = relatedResourceModels().map(function(model) {
                             return model._id;
@@ -250,6 +243,8 @@ define([
                                     dataType: "json"
                                 }).done(function(data) {
                                     nameLookup[value] = data.displayname;
+                                    names.push(data.displayname);
+                                    displayName(names.join(', '));
                                     setSelectionData();
                                 });
                             }
@@ -269,9 +264,7 @@ define([
                                 }
                                 result = self.removeGraphIdsFromValue(result);
                                 self.newTileStep(null);
-                                setTimeout(function(){
-                                    self.value(result);
-                                }, 600);
+                                self.value(result);
                             });
                         }
                     }
