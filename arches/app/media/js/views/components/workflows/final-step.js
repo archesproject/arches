@@ -10,9 +10,6 @@ define([
     function viewModel(params) {
         var self = this;
         this.urls = arches.urls;
-        if (!params.resourceid() && params.requirements){
-            params.resourceid(params.requirements.resourceid);
-        }
         this.workflowid = params.workflow.state.workflowid;
         this.resourceid = params.resourceid();
         var url = arches.urls.api_card + (ko.unwrap(this.resourceid));
@@ -66,10 +63,11 @@ define([
             return {};
         };
     }
-    return ko.components.register('final-step', {
+    ko.components.register('final-step', {
         viewModel: viewModel,
         template: {
             require: 'text!templates/views/components/workflows/final-step.htm'
         }
     });
+    return viewModel;
 });
