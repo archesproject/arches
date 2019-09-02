@@ -211,13 +211,13 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     position: absolute; 
     top: 94%; 
     right: 15px; 
-    color: #fff; 
+    color: #bbb; 
     padding: 10px; 
     background: rgba(0,0,0,.5);
 }
 
 .app-info-block {
-    min-height: 600px;
+    min-height: 700px;
     padding: 70px 100px;
     background: #fff;
     border-top: 1px solid #ddd;
@@ -231,6 +231,68 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     font-size: 32px;
     font-weight: 300;
     color: #25476A;
+}
+
+.app-footer {
+    background: #0F2E4F;
+    color: #fff;
+}
+
+.app-footer-content-container {
+    display: flex;
+    flex-direction: row;
+    min-height: 500px
+}
+
+.app-footer-branding {
+    width: 33%;
+    max-width: 600px;
+    min-width: 300px;
+    padding: 40px 80px;
+}
+
+.app-footer-info {
+    width: 66%;
+    padding: 40px;
+}
+
+.app-footer-heading {
+    font-size: 23px;
+    font-weight: 200;
+    color: #dcdcdc;
+    margin-top: 27px;
+}
+
+.app-footer-image {
+    height: 50px;
+    margin-top: 20px;
+}
+
+.organization-address {
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.5;
+    margin-top: 20px;
+}
+
+.copyright-container {
+    height: 80px;
+    background: #041B33;
+    color: #fff;
+    padding: 30px 80px;
+}
+
+.app-footer-links {
+    font-size: 15px;
+    color: ; #041B33;
+}
+
+.link-spacing {
+    margin-right: 20px;
+}
+
+.app-footer-arches-link {
+    float: right;
 }
 
 @media (min-width: 768px) {
