@@ -72,7 +72,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     card: card,
                                     tile: null,
                                     loading: self.loading,
-                                    form: self
+                                    form: self,
+                                    pageVm: $root
                                 }
                             } --> <!-- /ko -->
                         </ul>
@@ -245,7 +246,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     provisionalTileViewModel: provisionalTileViewModel,
                     reviewer: reviewer,
                     loading: loading,
-                    form: $data
+                    form: $data,
+                    pageVm: $root
+
                 }
             }"></div>
             <!-- /ko -->

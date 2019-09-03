@@ -9,7 +9,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '2963_tile_fk_on_file_model'),
+        ('models', '4661_workflowselect_plugin'),
     ]
 
     operations = [

@@ -188,6 +188,9 @@ class Command(BaseCommand):
             '-y', '--yes', action='store_true', dest='yes',
             help='used to force a yes answer to any user input "continue? y/n" prompt')
 
+        parser.add_argument('--use_multiprocessing', action='store_true',
+                            help='enables multiprocessing during data import')
+
     def handle(self, *args, **options):
         print('operation: ' + options['operation'])
         package_name = settings.PACKAGE_NAME
@@ -237,12 +240,15 @@ class Command(BaseCommand):
             self.export_graphs(options['dest_dir'], options['graphs'])
 
         if options['operation'] == 'import_business_data':
+
             self.import_business_data(
                 options['source'],
                 options['config_file'],
                 options['overwrite'],
                 options['bulk_load'],
-                options['create_concepts'])
+                options['create_concepts'],
+                use_multiprocessing=options['use_multiprocessing'],
+                force=options['yes'])
 
         if options['operation'] == 'import_node_value_data':
             self.import_node_value_data(options['source'], options['overwrite'])
@@ -543,15 +549,24 @@ class Command(BaseCommand):
             self.import_graphs(resource_models, overwrite_graphs=overwrite_graphs)
 
         def load_concepts(package_dir, overwrite, stage):
-            concept_data = glob.glob(os.path.join(
-                package_dir, 'reference_data', 'concepts', '*.xml'))
-            collection_data = glob.glob(os.path.join(
-                package_dir, 'reference_data', 'collections', '*.xml'))
+            file_types = ['*.xml', '*.rdf']
+
+            concept_data = []
+            for file_type in file_types:
+                concept_data.extend(glob.glob(os.path.join(
+                    package_dir, 'reference_data', 'concepts', file_type)))
 
             for path in concept_data:
+                print path
                 self.import_reference_data(path, overwrite, stage)
 
+            collection_data = []
+            for file_type in file_types:
+                collection_data.extend(glob.glob(os.path.join(
+                    package_dir, 'reference_data', 'collections', file_type)))
+
             for path in collection_data:
+                print path
                 self.import_reference_data(path, overwrite, stage)
 
         def load_mapbox_styles(style_paths, basemap):
@@ -617,6 +632,7 @@ class Command(BaseCommand):
                     business_data.append(os.path.join(package_dir, 'business_data', f))
             else:
                 business_data += glob.glob(os.path.join(package_dir, 'business_data', '*.json'))
+                business_data += glob.glob(os.path.join(package_dir, 'business_data', '*.jsonl'))
                 business_data += glob.glob(os.path.join(package_dir, 'business_data', '*.csv'))
 
             relations = glob.glob(os.path.join(
@@ -673,6 +689,9 @@ class Command(BaseCommand):
 
         def load_card_components(package_dir):
             load_extensions(package_dir, 'card_components', 'card_component')
+
+        def load_search_components(package_dir):
+            load_extensions(package_dir, 'search', 'search')
 
         def load_plugins(package_dir):
             load_extensions(package_dir, 'plugins', 'plugin')
@@ -745,6 +764,8 @@ class Command(BaseCommand):
         load_widgets(package_location)
         print('loading card components')
         load_card_components(package_location)
+        print('loading search components')
+        load_search_components(package_location)
         print('loading plugins')
         load_plugins(package_location)
         print('loading reports')
@@ -753,9 +774,10 @@ class Command(BaseCommand):
         load_functions(package_location)
         print('loading datatypes')
         load_datatypes(package_location)
-        print('loading concepts')
         if load_project_extensions:
+            print('loading project extensions')
             management.call_command('project', 'update')
+        print('loading concepts')
         load_concepts(package_location, overwrite_concepts, stage_concepts)
         print('loading resource models and branches')
         load_graphs(package_location)
@@ -930,11 +952,29 @@ class Command(BaseCommand):
 
     def import_business_data(
         self, data_source, config_file=None, overwrite=None, bulk_load=False,
-            create_concepts=False):
-
+            create_concepts=False, use_multiprocessing=False, force=False):
         """
         Imports business data from all formats. A config file (mapping file) is required for .csv format.
         """
+
+        # messages about experimental multiprocessing and JSONL support.
+        if data_source.endswith(".jsonl"):
+            print("""
+WARNING: Support for loading JSONL files is still experimental. Be aware that
+the format of logging and console messages has not been updated.""")
+            if use_multiprocessing is True:
+                print("""
+WARNING: Support for multiprocessing files is still experimental. While using
+multiprocessing to import resources, you will not be able to use ctrl+c (etc.)
+to cancel the operation. You will need to manually kill all of the processes
+with or just close the terminal. Also, be aware that print statements
+will be very jumbled.""")
+                if not force:
+                    confirm = raw_input("continue? Y/n ")
+                    if len(confirm) > 0 and not confirm.lower().startswith("y"):
+                        exit()
+        if use_multiprocessing is True and not data_source.endswith(".jsonl"):
+            print("Multiprocessing is only supported with JSONL import files.")
 
         if overwrite == '':
             utils.print_message(
@@ -966,7 +1006,8 @@ class Command(BaseCommand):
                         overwrite=overwrite,
                         bulk=bulk_load,
                         create_concepts=create_concepts,
-                        create_collections=create_collections)
+                        create_collections=create_collections,
+                        use_multiprocessing=use_multiprocessing)
                 else:
                     utils.print_message('No file found at indicated location: {0}'.format(source))
                     sys.exit()
@@ -1043,12 +1084,14 @@ class Command(BaseCommand):
 
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
+                print os.path.join(path)
                 with open(path, 'rU') as f:
                     archesfile = JSONDeserializer().deserialize(f)
                     ResourceGraphImporter(archesfile['graph'], overwrite_graphs)
             else:
                 file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith('.json')]
                 for file_path in file_paths:
+                    print os.path.join(path, file_path)
                     with open(os.path.join(path, file_path), 'rU') as f:
                         archesfile = JSONDeserializer().deserialize(f)
                         ResourceGraphImporter(archesfile['graph'], overwrite_graphs)
@@ -1146,11 +1189,16 @@ class Command(BaseCommand):
                     }
                     try:
                         map_source = models.MapSource(name=layer_name, source=source_dict)
-                        map_layer = models.MapLayer(
-                            name=layer_name, layerdefinitions=layer_list, isoverlay=(not is_basemap), icon=layer_icon)
+                        if len(layer_list) > 0:
+                            map_layer = models.MapLayer(
+                                name=layer_name,
+                                layerdefinitions=layer_list,
+                                isoverlay=(not is_basemap),
+                                icon=layer_icon
+                            )
+                            map_layer.save()
+                            tileserver_layer.map_layer = map_layer
                         map_source.save()
-                        map_layer.save()
-                        tileserver_layer.map_layer = map_layer
                         tileserver_layer.map_source = map_source
                         tileserver_layer.save()
                     except IntegrityError as e:

@@ -230,16 +230,6 @@ define([
                 }));
             }
         },
-        deleteTile: function(tile) {
-            tile.deleteTile(function(response) {
-                vm.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message[0], response.responseJSON.message[1], null, function(){}));
-            });
-        },
-        saveTile: function(tile, callback) {
-            tile.save(function(response) {
-                vm.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message[0], response.responseJSON.message[1], null, function(){}));
-            }, callback);
-        },
         viewEditHistory: function() {
             if (resourceId()) {
                 vm.menuActive(false);

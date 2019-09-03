@@ -11,6 +11,12 @@
         <div class="tree-display-tools-panel">
             <a class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
             <a class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
+            <!--ko ifnot: showIds -->
+            <a class="tree-display-tool" data-bind="click: toggleIds"><i class="ion-information-circled"></i>{% trans ' Show IDs' %}</a>
+            <!--/ko-->
+            <!--ko if: showIds -->
+            <a class="tree-display-tool" data-bind="click: toggleIds"><i class="ion-information-circled"></i>{% trans ' Hide IDs' %}</a>
+            <!--/ko-->
         </div>
     </div>
     <div class="left-panel-overflow designer-card-tree">
@@ -43,7 +49,9 @@
                             card: card,
                             tile: null,
                             loading: self.loading,
-                            form: self
+                            form: self,
+                            pageVm: $root,
+                            showIds: self.showIds
                         }
                     }, css: {
                         'jstree-last': $index() === ($parent.topCards().length - 1)

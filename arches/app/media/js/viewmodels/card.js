@@ -145,6 +145,7 @@ define([
             parent: params.tile,
             parentCard: params.parentCard,
             expanded: ko.observable(false),
+            topCards: params.topCards,
             perms: perms,
             constraints: params.constraints || emptyConstraint,
             permsLiteral: permsLiteral,
@@ -234,7 +235,8 @@ define([
                     cardwidgets: params.cardwidgets,
                     perms: perms,
                     permsLiteral: permsLiteral,
-                    parentCard: self
+                    parentCard: self,
+                    topCards: params.topCards
                 });
             })),
             hasprovisionaledits: ko.computed(function() {
@@ -318,7 +320,7 @@ define([
                 return new TileViewModel({
                     tile: {
                         tileid: '',
-                        resourceinstance_id: params.resourceId(),
+                        resourceinstance_id: ko.unwrap(params.resourceId),
                         nodegroup_id: ko.unwrap(self.model.nodegroup_id),
                         parenttile_id: self.parent ? self.parent.tileid : null,
                         data: _.reduce(self.widgets(), function(data, widget) {
@@ -354,9 +356,9 @@ define([
                         }
                         nodegroupId = params.card.nodegroup_id;
                         if(nodegroupId === appFuncDesc) {
-                            return "* This card data will show as the resource description.";
+                            return "(This card data will define the resource description.)";
                         } else if(nodegroupId === appFuncName) {
-                            return "* This card data will show as the resource name.";
+                            return "(This card data will define the resource name.)";
                         }
                     }
                 }

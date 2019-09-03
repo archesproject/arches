@@ -13,7 +13,7 @@ details = {
     "icon": "fa fa-calendar",
     "modulename": "time_filter.py",
     "classname": "TimeFilter",
-    "type": "filter",
+    "type": "popup",
     "componentpath": "views/components/search/time-filter",
     "componentname": "time-filter",
     "sortorder": "1",
