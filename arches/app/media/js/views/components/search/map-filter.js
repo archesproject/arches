@@ -9,7 +9,9 @@ define([
     'views/components/widgets/map/map-styles',
     'turf',
     'geohash',
-], function($, _, arches, ko, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash) {
+    'mapbox-gl',
+    'geojson-extent',
+], function($, _, arches, ko, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash, mapboxgl, geojsonExtent) {
     var componentName = 'map-filter';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -256,9 +258,9 @@ define([
                 //     }
                 //     updateSearchPointsGeoJSON();
                 // }, this);
-                // this.mapLinkData.subscribe(function(data) {
-                //     zoomToGeoJSON(data, true);
-                // },this);
+                this.mapLinkData.subscribe(function(data) {
+                    zoomToGeoJSON(data, true);
+                },this);
 
             },
 
