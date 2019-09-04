@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '5199_add_resource_instance_ids_to_es_mappings'),
+        ('models', '3713_unload_ontolgy'),
     ]
 
     operations = [
