@@ -104,6 +104,13 @@ define([
                 }
             }
         };
+
+        this.isSelectable = function(feature) {
+            var selectLayerIds = selectFeatureLayers.map(function(layer) {
+                return layer.id;
+            });
+            return selectLayerIds.indexOf(feature.layer.id) >= 0;
+        };
     };
     ko.components.register('related-resources-map-card', {
         viewModel: viewModel,
