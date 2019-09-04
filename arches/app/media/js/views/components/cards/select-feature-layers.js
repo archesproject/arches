@@ -1,7 +1,7 @@
 define([], function() {
     return function(resourceId, source, sourceLayer, selectedResourceIds, visible) {
         var color = "#f0c200";
-        if (selectedResourceIds.length > 0) {
+        if (selectedResourceIds && selectedResourceIds.length > 0) {
             color = [
                 'match',
                 ['get', 'resourceinstanceid'],
