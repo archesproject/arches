@@ -541,6 +541,10 @@ input[type="checkbox"] {
     padding: 0 0 218px 25px;
 }
 
+.workflow-step-body .map-card-wrapper {
+    margin-left: -25px;
+}
+
 .padded-workflow-step, .workflow-step-body .card-component {
     padding: 20px 35px 82px 40px;
 }

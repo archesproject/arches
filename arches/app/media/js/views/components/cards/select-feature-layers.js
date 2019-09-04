@@ -1,6 +1,14 @@
 define([], function() {
-    return function(resourceId, source, sourceLayer) {
+    return function(resourceId, source, sourceLayer, selectedResourceIds, visible) {
         var color = "#f0c200";
+        if (selectedResourceIds.length > 0) {
+            color = [
+                'match',
+                ['get', 'resourceinstanceid'],
+                selectedResourceIds, "#3bb2d0",
+                color
+            ];
+        }
         if (!source) return [];
         var layers = [{
             "id": "select-feature-polygon-fill",
@@ -16,7 +24,7 @@ define([], function() {
                 "fill-opacity": 0.1
             },
             "layout": {
-                "visibility": "none"
+                "visibility": visible ? "visible": "none"
             }
         }, {
             "id": "select-feature-polygon-stroke",
@@ -29,7 +37,7 @@ define([], function() {
             "layout": {
                 "line-cap": "round",
                 "line-join": "round",
-                "visibility": "none"
+                "visibility": visible ? "visible": "none"
             },
             "paint": {
                 "line-color": color,
@@ -46,7 +54,7 @@ define([], function() {
             "layout": {
                 "line-cap": "round",
                 "line-join": "round",
-                "visibility": "none"
+                "visibility": visible ? "visible": "none"
             },
             "paint": {
                 "line-color": color,
@@ -66,7 +74,7 @@ define([], function() {
                 "circle-color": "#fff"
             },
             "layout": {
-                "visibility": "none"
+                "visibility": visible ? "visible": "none"
             }
         }, {
             "id": "select-feature-point",
@@ -81,7 +89,7 @@ define([], function() {
                 "circle-color": color
             },
             "layout": {
-                "visibility": "none"
+                "visibility": visible ? "visible": "none"
             }
         }];
         layers.forEach(function(layer) {
