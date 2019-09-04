@@ -11,6 +11,7 @@ define([
         var self = this;
         this.urls = arches.urls;
         this.workflowid = params.workflow.state.workflowid;
+        if (!params.resourceid()) { params.resourceid(params.workflow.state.resourceid); }
         this.resourceid = params.resourceid();
         var url = arches.urls.api_card + (ko.unwrap(this.resourceid));
         this.report = ko.observable();
