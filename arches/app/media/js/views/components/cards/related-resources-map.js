@@ -18,7 +18,6 @@ define([
     var viewModel = function(params) {
         var self = this;
         this.widgets = [];
-        var padding = 40;
 
         params.configKeys = ['selectSource', 'selectSourceLayer'];
 
