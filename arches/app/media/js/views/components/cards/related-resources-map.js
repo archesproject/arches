@@ -1,24 +1,15 @@
 define([
     'arches',
-    'jquery',
-    'underscore',
     'knockout',
     'knockout-mapping',
-    'uuid',
-    'mapbox-gl',
-    'mapbox-gl-draw',
-    'geojson-extent',
-    'geojsonhint',
     'viewmodels/card-component',
     'views/components/map',
     'views/components/cards/select-feature-layers',
-    'text!templates/views/components/cards/related-resources-map-popup.htm',
-    'bindings/chosen'
-], function(arches, $, _, ko, koMapping, uuid, mapboxgl, MapboxDraw, geojsonExtent, geojsonhint, CardComponentViewModel, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
+    'text!templates/views/components/cards/related-resources-map-popup.htm'
+], function(arches, ko, koMapping, CardComponentViewModel, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         this.widgets = [];
-        var padding = 40;
 
         params.configKeys = ['selectSource', 'selectSourceLayer'];
 
