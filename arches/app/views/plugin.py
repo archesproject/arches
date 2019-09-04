@@ -21,6 +21,7 @@ from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.response import JSONResponse
 from arches.app.views.base import MapBaseManagerView
 
 
@@ -34,6 +35,8 @@ class PluginView(MapBaseManagerView):
             plugin = models.Plugin.objects.get(pk=pluginid)
         if not request.user.has_perm('view_plugin', plugin):
             return redirect('home')
+        if request.GET.get('json', False):
+            return JSONResponse(plugin)
         resource_graphs = models.GraphModel.objects.exclude(
             pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         widgets = models.Widget.objects.all()

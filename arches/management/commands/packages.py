@@ -465,6 +465,15 @@ class Command(BaseCommand):
             self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep', yes=False,
             load_project_extensions=False):
 
+        def load_ontology():
+            response = raw_input(
+                'Would you like to load the {0} ontology? (Y/N): '.format(settings.ONTOLOGY_BASE_NAME))
+            if response.lower() in ('t', 'true', 'y', 'yes'):
+                print('loading the {0} ontology'.format(settings.ONTOLOGY_BASE_NAME))
+                extensions = [os.path.join(settings.ONTOLOGY_PATH, x) for x in settings.ONTOLOGY_EXT]
+                management.call_command('load_ontology', source=os.path.join(settings.ONTOLOGY_PATH, settings.ONTOLOGY_BASE),
+                    version=settings.ONTOLOGY_BASE_VERSION, ontology_name=settings.ONTOLOGY_BASE_NAME, id=settings.ONTOLOGY_BASE_ID, extensions=','.join(extensions), verbosity=0)
+
         def load_system_settings(package_dir):
             update_system_settings = True
             if os.path.exists(settings.SYSTEM_SETTINGS_LOCAL_PATH):
@@ -754,6 +763,7 @@ class Command(BaseCommand):
             if load_project_extensions.lower() in ('t', 'true', 'y', 'yes'):
                 load_project_extensions = True
 
+        load_ontology()
         print('loading package_settings.py')
         load_package_settings(package_location)
         print('loading preliminary sql')

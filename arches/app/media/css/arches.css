@@ -845,7 +845,6 @@ ul.tabbed-report-tab-list {
 
 .map-card-sidebar-tab {
     color: rgb(33, 62, 95);
-    min-height: 86px;
     padding: 16px;
     text-align: center;
     font-size: 1.1em;
@@ -3751,6 +3750,15 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     opacity: 1.;
     text-anchor: middle;
     pointer-events: none;
+}
+
+.node-ancestor-selected {
+    stroke: rgb(17, 95, 165);
+    stroke-width: 5px;
+    stroke-dasharray: 5, 1;
+    fill: rgb(220, 236, 250);
+    opacity: 1;
+    cursor: pointer;
 }
 
 .relatedlink {
@@ -8504,7 +8512,6 @@ table.table.dataTable {
     width: 400px;
     height: calc(100vh - 100px);
     border-left: solid 1px #dcdcdc;
-    border-top: solid 1px #dcdcdc;
 }
 
 .search-popup-panel .tab-pane.active div.saved-search-container div .rr-splash .rr-splash-img-container {
@@ -9813,7 +9820,7 @@ ul.select2-choices:after {
 }
 
 .card-breadcrumbs, .card-breadcrumbs a {
-    color: #6494cc;
+    color: #041B33;
     margin-top: 17px;
     font-size: 17px;
 }
