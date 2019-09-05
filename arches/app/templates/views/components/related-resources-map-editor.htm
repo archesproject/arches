@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block tabs %}
-<div class="map-card-sidebar-tab" data-bind="click: function() {
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('editor');
 }, css: {
     'active': activeTab() === 'editor'
@@ -15,8 +15,8 @@
 
 {% block sidepanel %}
 <!--ko if: activeTab() === 'editor' -->
-    <div class="map-card-sidepanel-header-container">
-        <h4 class="map-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
+    <div class="workbench-card-sidepanel-header-container">
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
     </div>
 
     <div data-bind="css: card.model.cssclass">

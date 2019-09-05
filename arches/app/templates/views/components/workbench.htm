@@ -1,18 +1,18 @@
 {% load i18n %}
 
-<div class="map-card-wrapper">
-    <div class="map-card-sidebar">
+<div class="workbench-card-wrapper">
+    <div class="workbench-card-sidebar">
         {% block tabs %}
         {% endblock tabs %}
     </div>
     <!--ko if: activeTab() -->
-    <div class="map-card-sidepanel">
+    <div class="workbench-card-sidepanel">
     {% block sidepanel %}
     {% endblock sidepanel %}
     </div>
     <!--/ko -->
     {% block content_management %}
-    <div class="map-card-container">
+    <div class="workbench-card-container">
         <div>Main content goes here</div>
     </div>
     {% endblock content_management %}
