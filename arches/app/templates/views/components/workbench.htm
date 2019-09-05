@@ -1,0 +1,32 @@
+{% load i18n %}
+
+<div class="map-card-wrapper">
+    <div class="map-card-sidebar">
+        {% block tabs %}
+        {% endblock tabs %}
+    </div>
+    <!--ko if: activeTab() -->
+    <div class="map-card-sidepanel">
+    {% block sidepanel %}
+    <!--ko if: activeTab() === 'default' -->
+        <div class="workbench-card-sidepanel-header-container">
+            <h4 class="map-card-sidepanel-header" data-bind="click: hideSidePanel">
+                {% trans "Basemaps" %}
+            </h4>
+        </div>
+
+        <div class="basemap-listing-container">
+            <div class="basemap-listing"
+                <span>List item</span>
+            </div>
+        </div>
+    <!--/ko -->
+    {% endblock sidepanel %}
+    </div>
+    <!--/ko -->
+    {% block content_management %}
+    <div class="map-card-container">
+        <div>Main content goes here</div>
+    </div>
+    {% endblock content_management %}
+</div>
