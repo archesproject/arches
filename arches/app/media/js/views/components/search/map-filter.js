@@ -10,8 +10,10 @@ define([
     'turf',
     'geohash',
     'mapbox-gl',
+    'mapbox-gl-draw',
     'geojson-extent',
-], function($, _, arches, ko, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash, mapboxgl, geojsonExtent) {
+    'mathjs',
+], function($, _, arches, ko, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash, mapboxgl, MapboxDraw, geojsonExtent, mathjs) {
     var componentName = 'map-filter';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -22,11 +24,127 @@ define([
                 options.name = "Map Filter";
                 BaseFilter.prototype.initialize.call(this, options);
 
+                this.searchGeometries = ko.observable(null);
                 this.extentSearch = ko.observable(false);
                 this.searchAggregations = ko.observable();
                 this.searchBuffer = ko.observable();
                 this.hoverData = ko.observable(null);
                 this.clickData = ko.observable(null);
+                this.drawMode = ko.observable();
+                this.extentSearch = ko.observable(false);
+
+                this.bufferUnits = [{
+                    name: 'meters',
+                    val: 'm'
+                },{
+                    name: 'feet',
+                    val: 'ft'
+                }];
+                this.buffer = ko.observable('100');
+                this.bufferUnit = ko.observable('m');
+
+                this.geometryTypes = [{'id':'Point','text':'Point'},{'id':'Line','text':'Line'},{'id':'Polygon','text':'Polygon'}];
+                this.geometryTypeDetails = {
+                    Point: {
+                        name: 'Point',
+                        title: 'Draw a Marker',
+                        class: 'leaflet-draw-draw-marker',
+                        icon: 'ion-location',
+                        drawMode: 'draw_point',
+                        active: ko.observable(false)
+                    },
+                    Line: {
+                        name: 'Line',
+                        title: 'Draw a Polyline',
+                        icon: 'ion-steam',
+                        class: 'leaflet-draw-draw-polyline',
+                        drawMode: 'draw_line_string',
+                        active: ko.observable(false)
+                    },
+                    Polygon: {
+                        name: 'Polygon',
+                        title: 'Draw a Polygon',
+                        icon: 'fa fa-pencil-square-o',
+                        class: 'leaflet-draw-draw-polygon',
+                        drawMode: 'draw_polygon',
+                        active: ko.observable(false)
+                    }
+                };
+
+                this.drawModes = _.pluck(this.geometryTypeDetails, 'drawMode');
+
+
+                var setupDraw = function(map) {
+                    var modes = MapboxDraw.modes;
+                    modes.static = {
+                        onSetup: function() {
+                            this.setActionableState();
+                            return {};
+                        },
+                        toDisplayFeatures: function(state, geojson, display) {
+                            display(geojson);
+                        }
+                    };
+                    this.draw = new MapboxDraw({
+                        displayControlsDefault: false,
+                        modes: modes
+                    });
+                    map.addControl(this.draw);
+                    this.draw.set({
+                        type: 'FeatureCollection',
+                        features: []
+                    });
+                    map.on('draw.create', function(e) {
+                        console.log('in draw create');
+                        console.log(e);
+
+                        self.searchGeometries = e.features;
+                        self.updateFilterGeom();
+                        // self.filter.feature_collection({
+                        //     "type": "FeatureCollection",
+                        //     "features": e.features,
+                        //     "properties": {
+                        //         "buffer": {
+                        //             "width": self.buffer(),
+                        //             "unit": self.bufferUnit()
+                        //         }
+                        //     }
+                        // });
+                        // e.features.forEach(function(feature) {
+                        //     self.draw.setFeatureProperty(feature.id, 'nodeId', self.newNodeId);
+                        // });
+                        // self.updateTiles();
+                    });
+                    // map.on('draw.update', self.updateTiles);
+                    // map.on('draw.delete', self.updateTiles);
+                    map.on('draw.modechange', function() {
+                        // self.updateTiles();
+                        // self.setSelectLayersVisibility(false);
+                    });
+                    // map.on('draw.selectionchange', function(e) {
+                    //     self.selectedFeatureIds(e.features.map(function(feature) {
+                    //         return feature.id;
+                    //     }));
+                    //     if (e.features.length > 0) {
+                    //         _.each(self.featureLookup, function(value) {
+                    //             value.selectedTool(null);
+                    //         });
+                    //     }
+                    //     self.setSelectLayersVisibility(false);
+                    // });
+
+                    // self.form.on('tile-reset', function() {
+                    //     self.draw.set({
+                    //         type: 'FeatureCollection',
+                    //         features: getDrawFeatures()
+                    //     });
+                    //     _.each(self.featureLookup, function(value) {
+                    //         if (value.selectedTool()) value.selectedTool('');
+                    //     });
+                    // });
+                };
+
+                this.map.subscribe(setupDraw, this);
 
                 this.searchResults.timestamp.subscribe(function(timestamp) {
                     this.updateResults();
@@ -40,18 +158,18 @@ define([
                     "features": []
                 });
                 this.filter.inverted = ko.observable(false);
-                var basemaps = _.filter(arches.mapLayers, function(layer) {
-                    return !layer.isoverlay;
-                });
+                // var basemaps = _.filter(arches.mapLayers, function(layer) {
+                //     return !layer.isoverlay;
+                // });
 
-                if (!this.defaultBasemap) {
-                    this.defaultBasemap = _.find(basemaps, function (basemap) {
-                        return basemap.addtomap;
-                    });
-                }
-                if (!this.defaultBasemap) {
-                    this.defaultBasemap = basemaps[0];
-                }
+                // if (!this.defaultBasemap) {
+                //     this.defaultBasemap = _.find(basemaps, function (basemap) {
+                //         return basemap.addtomap;
+                //     });
+                // }
+                // if (!this.defaultBasemap) {
+                //     this.defaultBasemap = basemaps[0];
+                // }
 
                 this.geocoderDefault = arches.geocoderDefault;
 
@@ -79,13 +197,24 @@ define([
                 }, this);
 
                 this.filters[componentName](this);
-                this.restoreState();
-                
-                var filterUpdated = ko.computed(function() {
-                    return JSON.stringify(ko.toJS(this.filter.feature_collection())) + this.filter.inverted();
-                }, this);
-                filterUpdated.subscribe(function() {
-                    this.updateQuery();
+
+                this.map.subscribe(function(){
+                    this.restoreState();
+                    
+                    var filterUpdated = ko.computed(function() {
+                        return JSON.stringify(ko.toJS(this.filter.feature_collection())) + this.filter.inverted();
+                    }, this);
+                    filterUpdated.subscribe(function() {
+                        this.updateQuery();
+                    }, this);
+
+                    this.buffer.subscribe(function(val) {
+                        this.updateFilterGeom();
+                    }, this);
+
+                    this.bufferUnit.subscribe(function(val) {
+                        this.updateFilterGeom();
+                    }, this);
                 }, this);
 
 
@@ -150,9 +279,9 @@ define([
                 this.mapLinkData = options.mapLinkData;
 
                 var bins = binFeatureCollection(this.searchAggregations);
-                this.searchBuffer.subscribe(function(val){
-                    this.updateSearchQueryLayer([{geometry: JSON.parse(this.searchBuffer())}, this.queryFeature]);
-                }, this);
+                // this.searchBuffer.subscribe(function(val){
+                //     this.updateSearchQueryLayer([{geometry: JSON.parse(this.searchBuffer())}, this.queryFeature]);
+                // }, this);
                 var getSearchAggregationGeoJSON = function() {
                     var agg = ko.unwrap(self.searchAggregations);
                     if (!agg || !agg.geo_aggs.grid.buckets) {
@@ -264,7 +393,155 @@ define([
 
             },
 
-            updateQuery: function(filterParams) {
+            toggleExtentSearch: function(val) {
+                this.extentSearch(!this.extentSearch());
+                if (this.extentSearch() === true) {
+                    this.draw.deleteAll();
+                    this.xyInput.active(false);
+                    this.deactivateDrawTools();
+                } else {
+                    this.value({
+                        "type": "FeatureCollection",
+                        "features": []
+                    });
+                }
+            },
+
+            searchByExtent: function() {
+                if (this.extentSearch() === true) {
+                    this.queryFeature = undefined;
+                    if (_.contains(this.drawModes, this.drawMode())) {
+                        this.updateSearchQueryLayer([]);
+                    }
+                    var bounds = this.map.getBounds();
+                    var ll = bounds.getSouthWest().toArray();
+                    var ul = bounds.getNorthWest().toArray();
+                    var ur = bounds.getNorthEast().toArray();
+                    var lr = bounds.getSouthEast().toArray();
+                    var coordinates = [ll, ul, ur, lr, ll];
+                    var boundsFeature = {
+                        "type": "Feature",
+                        "properties": {
+                            "buffer": {
+                                "width": 0,
+                                "unit": this.bufferUnit()
+                            },
+                            "extent_search": true
+                        },
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [coordinates]
+                        }
+                    };
+                    this.value().features = [boundsFeature];
+                    this.value(this.value());
+                }
+            },
+
+            updateFilterGeom: function(){
+                var maxBuffer = 100000;
+                var maxBufferUnits = 'm';
+                var maxBufferUnit = mathjs.unit(maxBuffer, maxBufferUnits);
+                var unit = mathjs.unit(this.buffer() + this.bufferUnit());
+                unit.equalBase(maxBufferUnit);
+                if (this.buffer() < 0) {
+                    this.buffer(0);
+                } else if (unit.value > maxBufferUnit.value) {
+                    this.buffer(maxBuffer);
+                    this.bufferUnit(maxBufferUnits);
+                }
+                this.searchGeometries.forEach(function(feature){
+                    if(!feature.properties){
+                        feature.properties = {};
+                    }
+                    feature.properties.buffer = {
+                        "width": this.buffer(),
+                        "unit": this.bufferUnit()
+                    };
+                }, this);
+                this.filter.feature_collection({
+                    "type": "FeatureCollection",
+                    "features": this.searchGeometries
+                });
+            },
+
+
+            /**
+              * Updates the draw mode of the draw layer when a user selects a draw tool in the map controls
+              * @param  {string} selectedDrawTool the draw tool name selected in the map controls
+              * @return {null}
+              */
+            selectEditingTool: function(selectedDrawTool) {
+                self = self || this;
+                this.setDrawTool = function(tool) {
+                    var showSelectLayers = (tool === 'select_feature');
+                    self.setSelectLayersVisibility(showSelectLayers);
+                    if (showSelectLayers) {
+                        self.draw.changeMode('simple_select');
+                        self.selectedFeatureIds([]);
+                    } else if (tool) self.draw.changeMode(tool);
+                };
+
+                this.context = 'search-filter';
+                if (this.context === 'search-filter') {
+                    this.extentSearch(false);
+                    //this.xyInput.active(false);
+                    this.draw.deleteAll();
+                    this.queryFeature = undefined;
+                    if (selectedDrawTool === 'end' || this.geometryTypeDetails[selectedDrawTool].drawMode === this.drawMode() || this.geometryTypeDetails[selectedDrawTool].drawMode !== this.drawMode()) {
+                        this.updateSearchQueryLayer([]);
+                    }
+                } else if (this.context === 'resource-editor') {
+                    if (this.geojsonInput()) {
+                        this.geojsonInput(false);
+                    }
+                }
+                if (this.form) {
+                    this.featureColor(this.featureColorCache);
+                }
+                _.each(this.geometryTypeDetails, function(geomtype) {
+                    if (geomtype.name === selectedDrawTool) {
+                        this.geometryTypeDetails[selectedDrawTool].active(!this.geometryTypeDetails[selectedDrawTool].active());
+                    } else {
+                        this.geometryTypeDetails[geomtype.name].active(false);
+                    }
+                }, this);
+
+                this.draw.changeMode(this.geometryTypeDetails[selectedDrawTool].drawMode);
+                this.drawMode(this.geometryTypeDetails[selectedDrawTool].drawMode);
+
+                // if (selectedDrawTool === 'delete') {
+                //     this.draw.trash();
+                //     this.drawMode('simple_select');
+                // } else if (selectedDrawTool === 'end') {
+                //     this.switchToEditMode();
+                // } else {
+                //     if (!this.drawMode()) {
+                //         this.draw.changeMode(this.geometryTypeDetails[selectedDrawTool].drawMode);
+                //         this.drawMode(this.geometryTypeDetails[selectedDrawTool].drawMode);
+                //     } else if (this.geometryTypeDetails[selectedDrawTool].drawMode === this.drawMode()) {
+                //         this.draw.changeMode('simple_select');
+                //         if (this.mapControls.mapControlsExpanded()) {
+                //             this.drawMode(undefined);
+                //         } else {
+                //             this.drawMode('simple_select');
+                //         }
+                //     } else {
+                //         this.draw.changeMode(this.geometryTypeDetails[selectedDrawTool].drawMode);
+                //         this.drawMode(this.geometryTypeDetails[selectedDrawTool].drawMode);
+                //     }
+                // }
+
+            },
+
+            updateSearchQueryLayer: function(geojson_features) {
+                this.draw.set({
+                    "type": "FeatureCollection",
+                    "features": geojson_features
+                });
+            },
+
+            updateQuery: function() {
                 var self = this;
                 var queryObj = this.query();
                 if (this.filter.feature_collection().features.length > 0) {
@@ -285,9 +562,14 @@ define([
                 if (componentName in query) {
                     var mapQuery = JSON.parse(query[componentName]);
                     if (mapQuery.features.length > 0) {
-                        this.filter.inverted(mapQuery.features[0].properties.inverted);
+                        var properties = mapQuery.features[0].properties;
+                        this.filter.inverted(properties.inverted);
                         this.getFilter('term-filter').addTag('Map Filter Enabled', this.name, this.filter.inverted);
                         this.filter.feature_collection(mapQuery);
+                        this.buffer(properties.buffer.width);
+                        this.bufferUnit(properties.buffer.unit);
+                        this.updateSearchQueryLayer(mapQuery.features);
+                        this.fitToAggregationBounds();
                     }
                 }
                 this.updateResults();

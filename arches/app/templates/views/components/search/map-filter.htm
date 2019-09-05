@@ -12,3 +12,29 @@
 </div>
 {{ block.super }}
 {% endblock tabs %}
+
+{% block sidepanel %}
+<!--ko if: activeTab() === 'filter' -->
+    <div class="map-card-sidepanel-header-container">
+        <h4 class="map-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Search by Map" %}</h4>
+    </div>
+
+    <div>
+        <!-- ko foreach: geometryTypes -->
+        <button class="" href="#" data-bind="click: function(){$parent.selectEditingTool($parent.geometryTypeDetails[ko.unwrap($data.id)].name)}, attr: {'class': $parent.geometryTypeDetails[ko.unwrap($data.id)].class}, 'text': $parent.geometryTypeDetails[ko.unwrap($data.id)].title, css: {'active': $parent.geometryTypeDetails[ko.unwrap($data.id)].active}">
+        </button>
+        <!-- /ko -->
+
+        <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Search Map Extent" %}' data-bind="click: toggleExtentSearch, css:{'active': extentSearch}"><span class="sr-only">{% trans "Search Map Extent" %}</span><i class="fa fa-search"></i></a>
+        <div class="map-tool-container form-control map-query-tool-input buffer">
+            <div class="form-group form-inline">
+              <label for="buffer-input">{% trans "Buffer" %}</label>
+              <input type="number" min=0.0 id="buffer-input" placeholder="{% trans " buffer " %}" class="buffer" data-bind="textInput: buffer">
+              <select class="form-control"  data-bind="options: bufferUnits, optionsText:'name', optionsValue:'val', value: bufferUnit"></select>
+            </div>
+        </div>
+    </div>
+
+<!--/ko -->
+{{ block.super }}
+{% endblock sidepanel %}
