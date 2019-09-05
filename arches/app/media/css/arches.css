@@ -541,7 +541,7 @@ input[type="checkbox"] {
     padding: 0 0 218px 25px;
 }
 
-.workflow-step-body .map-card-wrapper {
+.workflow-step-body .workbench-card-wrapper {
     margin-left: -25px;
 }
 
@@ -818,23 +818,23 @@ ul.tabbed-report-tab-list {
     cursor: pointer;
 }
 
-.map-card-wrapper {
+.workbench-card-wrapper {
     flex: 1;
     height: 100%;
     position: relative;
     background-color: #eee;
 }
 
-.map-card-container {
+.workbench-card-container {
     height: 100%;
     margin-right: 92px;
 }
 
-.map-card-container.map-card-container-sidepanel-active {
+.workbench-card-container.workbench-card-container-sidepanel-active {
     margin-right: 492px;
 }
 
-.map-card-sidebar {
+.workbench-card-sidebar {
     position:absolute;
     right: 0;
     height: 100%;
@@ -843,7 +843,7 @@ ul.tabbed-report-tab-list {
     border-left: 1px solid rgb(216, 216, 216);
 }
 
-.map-card-sidebar-tab {
+.workbench-card-sidebar-tab {
     color: rgb(33, 62, 95);
     padding: 16px;
     text-align: center;
@@ -852,19 +852,19 @@ ul.tabbed-report-tab-list {
     cursor: pointer;
 }
 
-.map-card-sidebar-tab.active {
+.workbench-card-sidebar-tab.active {
     background-color: white;
     border-left: solid 1px white;
     margin-left: -1px;
 }
 
-.map-card-sidebar-tab i {
+.workbench-card-sidebar-tab i {
     font-size: 1.7em;
     display: block;
     padding-bottom: 6px;
 }
 
-.map-card-sidepanel {
+.workbench-card-sidepanel {
     position:absolute;
     z-index: 10;
     right: 92px;
@@ -876,12 +876,12 @@ ul.tabbed-report-tab-list {
     overflow-y: scroll;
 }
 
-.map-card-sidepanel-header {
+.workbench-card-sidepanel-header {
     cursor: pointer;
     color: rgb(33, 62, 95);
 }
 
-.map-card-sidepanel-header:before {
+.workbench-card-sidepanel-header:before {
     content: "\f00d";
     font-family: FontAwesome;
     margin-right: 6px;
@@ -889,7 +889,7 @@ ul.tabbed-report-tab-list {
     font-weight:lighter;
 }
 
-.map-card-sidepanel-header:hover:before {
+.workbench-card-sidepanel-header:hover:before {
     color: rgb(33, 62, 95);
 }
 
@@ -937,7 +937,7 @@ ul.tabbed-report-tab-list {
     cursor: pointer;
 }
 
-.map-card-wrapper {
+.workbench-card-wrapper {
     flex: 1;
     height: 100%;
     position: relative;
@@ -945,16 +945,16 @@ ul.tabbed-report-tab-list {
     border-top: 1px solid #ddd;
 }
 
-.map-card-container {
+.workbench-card-container {
     height: 100%;
     margin-right: 75px;
 }
 
-.map-card-container.map-card-container-sidepanel-active {
+.workbench-card-container.workbench-card-container-sidepanel-active {
     margin-right: 475px;
 }
 
-.map-card-sidebar {
+.workbench-card-sidebar {
     position:absolute;
     right: 0;
     height: 100%;
@@ -963,7 +963,7 @@ ul.tabbed-report-tab-list {
     border-left: 1px solid rgb(216, 216, 216);
 }
 
-.map-card-sidebar-tab {
+.workbench-card-sidebar-tab {
     color: #787878;
     height: 65px;
     padding: 16px;
@@ -973,19 +973,19 @@ ul.tabbed-report-tab-list {
     cursor: pointer;
 }
 
-.map-card-sidebar-tab:hover {
+.workbench-card-sidebar-tab:hover {
     background: #fbfbfb;
     color: #454545;
 }
 
-.map-card-sidebar-tab.active {
+.workbench-card-sidebar-tab.active {
     background-color: white;
     border-left: solid 1px white;
     margin-left: -1px;
     color: #454545;
 }
 
-.map-card-sidebar-tab i {
+.workbench-card-sidebar-tab i {
     font-size: 1.1em;
     display: block;
     padding-bottom: 2px;
@@ -995,7 +995,7 @@ ul.tabbed-report-tab-list {
     font-size: 11px;
 }
 
-.map-card-sidepanel {
+.workbench-card-sidepanel {
     position:absolute;
     z-index: 10;
     right: 75px;
@@ -1007,11 +1007,11 @@ ul.tabbed-report-tab-list {
     overflow-y: scroll;
 }
 
-.map-card-sidepanel div .new-provisional-edit-card-container {
+.workbench-card-sidepanel div .new-provisional-edit-card-container {
     padding-left: 10px;
 }
 
-.map-card-sidepanel-header-container {
+.workbench-card-sidepanel-header-container {
     padding-right: 20px;
     border-bottom: 1px solid #eee;
     padding: 5px 20px 11px 5px;
@@ -1020,13 +1020,13 @@ ul.tabbed-report-tab-list {
     margin-bottom: 15px;
 }
 
-.map-card-sidepanel-header {
+.workbench-card-sidepanel-header {
     cursor: pointer;
     color: rgb(33, 62, 95);
     font-size: 19px;
 }
 
-.map-card-sidepanel-header:before {
+.workbench-card-sidepanel-header:before {
     content: "\f00d";
     font-family: FontAwesome;
     margin-right: 6px;
@@ -1034,7 +1034,7 @@ ul.tabbed-report-tab-list {
     font-weight:lighter;
 }
 
-.map-card-sidepanel-header:hover:before {
+.workbench-card-sidepanel-header:hover:before {
     color: rgb(33, 62, 95);
 }
 
@@ -6987,7 +6987,7 @@ a.clear-geojson-button:hover {
     visibility: hidden;
 }
 
-.map-card-wrapper .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+.workbench-card-wrapper .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
     visibility: visible;
 }
 
