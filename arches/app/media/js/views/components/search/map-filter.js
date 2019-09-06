@@ -81,35 +81,50 @@ define([
                     "source": "geojson-editor-data"
                 }];
 
-                this.geometryTypes = [{'id':'Point','text':'Point'},{'id':'Line','text':'Line'},{'id':'Polygon','text':'Polygon'}];
-                this.geometryTypeDetails = {
-                    Point: {
-                        name: 'Point',
-                        title: 'Draw a Marker',
-                        class: 'leaflet-draw-draw-marker',
-                        icon: 'ion-location',
-                        drawMode: 'draw_point',
-                        active: ko.observable(false)
-                    },
-                    Line: {
-                        name: 'Line',
-                        title: 'Draw a Polyline',
-                        icon: 'ion-steam',
-                        class: 'leaflet-draw-draw-polyline',
-                        drawMode: 'draw_line_string',
-                        active: ko.observable(false)
-                    },
-                    Polygon: {
-                        name: 'Polygon',
-                        title: 'Draw a Polygon',
-                        icon: 'fa fa-pencil-square-o',
-                        class: 'leaflet-draw-draw-polygon',
-                        drawMode: 'draw_polygon',
-                        active: ko.observable(false)
-                    }
-                };
+                // this.geometryTypes = [
+                //     {'id':'Point','text':'Point'},
+                //     {'id':'Line','text':'Line'},{'id':'Polygon','text':'Polygon'}];
+                this.spatialFilterTypes = [{
+                    name: 'Point',
+                    title: 'Draw a Marker',
+                    class: 'leaflet-draw-draw-marker',
+                    icon: 'ion-location',
+                    drawMode: 'draw_point',
+                    active: ko.observable(false)
+                }, {
+                    name: 'Line',
+                    title: 'Draw a Polyline',
+                    icon: 'ion-steam',
+                    class: 'leaflet-draw-draw-polyline',
+                    drawMode: 'draw_line_string',
+                    active: ko.observable(false)
+                }, {
+                    name: 'Polygon',
+                    title: 'Draw a Polygon',
+                    icon: 'fa fa-pencil-square-o',
+                    class: 'leaflet-draw-draw-polygon',
+                    drawMode: 'draw_polygon',
+                    active: ko.observable(false)
+                }, {
+                    name: 'Extent',
+                    title: 'Search by Map Extent',
+                    icon: 'fa fa-pencil-square-o',
+                    class: 'leaflet-draw-draw-polygon',
+                    drawMode: 'extent',
+                    active: ko.observable(false)
+                }];
 
-                this.drawModes = _.pluck(this.geometryTypeDetails, 'drawMode');
+                this.drawModes = _.pluck(this.spatialFilterTypes, 'drawMode');
+
+                this.drawMode.subscribe(function(selectedDrawTool){
+                    if(!!selectedDrawTool){
+                        if(selectedDrawTool === 'extent'){
+                            this.searchByExtent();
+                        } else {
+                            this.draw.changeMode(selectedDrawTool);
+                        }
+                    }
+                }, this);
 
 
                 var setupDraw = function(map) {
@@ -143,6 +158,7 @@ define([
                         //self.clearBuffer();
                         self.searchGeometries(e.features);
                         self.updateFilterGeom();
+                        self.drawMode(undefined);
                         // self.filter.feature_collection({
                         //     "type": "FeatureCollection",
                         //     "features": e.features,
@@ -413,6 +429,7 @@ define([
                 });
                 this.searchGeometries([boundsFeature]);
                 this.updateFilterGeom();
+                this.drawMode(undefined);
                 // this.filter.feature_collection({
                 //     "type": "FeatureCollection",
                 //     "features": [boundsFeature]
@@ -446,13 +463,20 @@ define([
                 });
             },
 
+            editGeoJSON: function() {
+                var geoJSONString = JSON.stringify({
+                    type: 'FeatureCollection',
+                    features: features
+                }, null, '   ');
+                this.geoJSONString(geoJSONString);
+            },
 
             /**
               * Updates the draw mode of the draw layer when a user selects a draw tool in the map controls
               * @param  {string} selectedDrawTool the draw tool name selected in the map controls
               * @return {null}
               */
-            selectEditingTool: function(selectedDrawTool) {
+            selectEditingTool: function(drawMode) {
                 self = self || this;
                 // this.setDrawTool = function(tool) {
                 //     var showSelectLayers = (tool === 'select_feature');
@@ -480,8 +504,8 @@ define([
                 //     }
                 // }, this);
 
-                this.draw.changeMode(this.geometryTypeDetails[selectedDrawTool].drawMode);
-                this.drawMode(this.geometryTypeDetails[selectedDrawTool].drawMode);
+                this.draw.changeMode(drawMode);
+                this.drawMode(drawMode);
 
             },
 
@@ -576,6 +600,7 @@ define([
                 this.getFilter('term-filter').removeTag('Map Filter Enabled');
                 this.draw.deleteAll();
                 this.clearBuffer();
+                this.searchGeometries([]);
             },
 
             clearBuffer: function() {
