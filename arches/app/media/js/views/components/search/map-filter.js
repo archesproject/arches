@@ -464,11 +464,11 @@ define([
             },
 
             editGeoJSON: function() {
-                var geoJSONString = JSON.stringify({
-                    type: 'FeatureCollection',
-                    features: features
-                }, null, '   ');
-                this.geoJSONString(geoJSONString);
+                // var geoJSONString = JSON.stringify({
+                //     type: 'FeatureCollection',
+                //     features: features
+                // }, null, '   ');
+                // this.geoJSONString(geoJSONString);
             },
 
             /**
