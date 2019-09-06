@@ -7415,6 +7415,9 @@ a.clear-geojson-button:hover {
     padding: 10px;
     background: #ebebeb;
     max-width: 400px;
+}
+
+.mapboxgl-popup-content .hover-feature-title-bar {
     margin-left: -20px;
     margin-right: -20px;
     margin-top: -20px;
@@ -7452,6 +7455,7 @@ a.clear-geojson-button:hover {
 
 .hover-feature-title {
     font-size: 15px;
+    font-weight: 500;
     max-width: 300px;
     white-space: nowrap;
     overflow: hidden;
