@@ -11,9 +11,12 @@
     {% endblock sidepanel %}
     </div>
     <!--/ko -->
+    <div data-bind="css: {
+        'workbench-card-container-sidepanel-active': activeTab()
+    }">
     {% block content_management %}
-    <div class="workbench-card-container">
-        <div>Main content goes here</div>
-    </div>
+        <div class="workbench-card-container">
+        </div>
     {% endblock content_management %}
+    </div>
 </div>
