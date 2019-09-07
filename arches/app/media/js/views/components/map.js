@@ -14,6 +14,7 @@ define([
         var geojsonSourceFactory = function() {
             return {
                 "type": "geojson",
+                "generateId": true,
                 "data": {
                     "type": "FeatureCollection",
                     "features": []

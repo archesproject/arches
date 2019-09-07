@@ -34,7 +34,7 @@ class MapFilter(BaseSearchFilter):
                 if 'buffer' in feature_properties:
                     buffer = feature_properties['buffer']
                 search_buffer = _buffer(feature_geom, buffer['width'], buffer['unit'])
-                feature_geom = JSONDeserializer().deserialize(search_buffer.json)
+                feature_geom = JSONDeserializer().deserialize(search_buffer.geojson)
                 geoshape = GeoShape(field='geometries.geom.features.geometry', type=feature_geom['type'], coordinates=feature_geom['coordinates'])
 
                 invert_spatial_search = False
@@ -62,7 +62,7 @@ class MapFilter(BaseSearchFilter):
 
         if details['componentname'] not in search_results_object:
             search_results_object[details['componentname']] = {}
-        search_results_object[details['componentname']]['search_buffer'] = search_buffer.geojson
+        search_results_object[details['componentname']]['search_buffer'] = feature_geom
 
 
 def _buffer(geojson, width=0, unit='ft'):

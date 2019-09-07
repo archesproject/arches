@@ -6892,8 +6892,23 @@ a#close-map-tools.map-widget-icon:hover {
     text-overflow: ellipsis;
 }
 
+.buffer-control {
+    color: #4d627b;
+    /* border: none; */
+    /* height: 40px; */
+    padding: 5px;
+    padding-left: 12px;
+    border-radius: 3px;
+    margin-bottom: 5px;
+    border-color: #dddddd;
+}
+
+.buffer-input {
+    width: 75px;
+}
+
 .map-tool-container {
-    position: absolute;
+    position: absolute; 
     top: 75px;
     left: 30px;
     font-size: 14px;
@@ -6902,13 +6917,9 @@ a#close-map-tools.map-widget-icon:hover {
     text-overflow: ellipsis;
 }
 
-.form-control .buffer {
-    width: 75px;
-}
-
 .map-tool-container.buffer {
-    position: absolute;
-    top: 0px;
+    position: absolute; 
+    top: 0px; 
     width: 220px;
 }
 
