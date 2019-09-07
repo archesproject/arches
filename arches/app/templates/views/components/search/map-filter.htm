@@ -2,21 +2,21 @@
 {% load i18n %}
 
 {% block tabs %}
-<div class="map-card-sidebar-tab" data-bind="click: function() {
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('filter');
 }, css: {
     'active': activeTab() === 'filter'
 }">
     <i class="fa fa-pencil"></i>
-    <span class="map-sidebar-text">{% trans "Filter" %}</span>
+    <span class="workbench-sidebar-text">{% trans "Filter" %}</span>
 </div>
 {{ block.super }}
 {% endblock tabs %}
 
 {% block sidepanel %}
 <!--ko if: activeTab() === 'filter' -->
-    <div class="map-card-sidepanel-header-container">
-        <h4 class="map-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Search by Map" %}</h4>
+    <div class="workbench-card-sidepanel-header-container">
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Search by Map" %}</h4>
     </div>
 
     <div>
