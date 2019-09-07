@@ -24,6 +24,7 @@ Replace this with more appropriate tests for your application.
 """
 
 import os
+from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory, Client
@@ -46,6 +47,7 @@ class APITests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.loadOntology()
         with open(os.path.join('tests/fixtures/resource_graphs/unique_graph_shape.json'), 'rU') as f:
             json = JSONDeserializer().deserialize(f)
             cls.unique_graph = Graph(json['graph'][0])
