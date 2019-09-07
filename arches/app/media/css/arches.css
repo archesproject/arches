@@ -561,6 +561,17 @@ input[type="checkbox"] {
     max-width: 600px !important;
 }
 
+
+.workflow-step-body div .new-provisional-edit-card-container .card form div div .widget-wrapper .form-group div .columns {
+    border: 1px solid #ddd;
+    padding: 20px;
+}
+
+.new-provisional-edit-card-container .card form div div .widget-wrapper .form-group div .select2-container {
+    max-width: 600px !important;
+}
+
+
 .wf-multi-tile-step-container {
     display: flex;
     flex-direction: row;
@@ -629,8 +640,13 @@ div.wf-multi-tile-card-info div {
     /* margin-left: 12px; */
 }
 
+.wf-multi-tile-card-info-details dd a {
+    color: #999;
+}
+
 .wf-multi-tile-card-info-details dd {
     margin-bottom: 3px;
+    color: #999;
 }
 
 
@@ -646,7 +662,8 @@ div.wf-multi-tile-card-info div {
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    height: 32px;
+    padding-top: 10px;
+    height: 40px;
     /* align-self: flex-end; */
 }
 
@@ -656,6 +673,10 @@ div.wf-multi-tile-card-info div {
 
 .wf-multi-tile-step-card > div.wf-multi-tile-card-info ~ div span:nth-child(2) {
     margin-right: 15px;
+}
+
+.wf-multi-tile-step-card > div.wf-multi-tile-card-info ~ div span:hover {
+    color: #0D70CF;
 }
 
 .wf-multi-tile-step-card-controls {
@@ -8550,6 +8571,13 @@ table.table.dataTable {
     background: white;
 }
 
+.faceted-search-card-container {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 10px;
+    background: #f9f9f9;
+}
+
 .search-facets {
     height: calc(100vh - 115px);
     overflow-y: auto;
@@ -9816,7 +9844,7 @@ ul.select2-choices:after {
 .card-header {
     height: 50px;
     padding: 10px 20px;
-    background: #f4f4f4;
+    background: #25476a;
 }
 
 .card-header-title {
@@ -9824,7 +9852,7 @@ ul.select2-choices:after {
 }
 
 .card-breadcrumbs, .card-breadcrumbs a {
-    color: #041B33;
+    color: #f1f1f1;
     margin-top: 17px;
     font-size: 17px;
 }
