@@ -251,6 +251,11 @@ define([
             )
         );
 
+        if (this.card.overlaysObservable) {
+            params.overlaysObservable = this.card.overlaysObservable;
+            params.activeBasemap = this.card.activeBasemap;
+        }
+
         MapComponentViewModel.apply(this, [params]);
 
         this.deleteFeature = function(feature) {
@@ -498,6 +503,11 @@ define([
                 });
             }
         };
+
+        if (!this.card.overlaysObservable) {
+            this.card.overlaysObservable = this.overlays;
+            this.card.activeBasemap = this.activeBasemap;
+        }
     };
     ko.components.register('map-card', {
         viewModel: viewModel,
