@@ -466,9 +466,17 @@ class Command(BaseCommand):
             load_project_extensions=False):
 
         def load_ontology():
-            response = raw_input(
-                'Would you like to load the {0} ontology? (Y/N): '.format(settings.ONTOLOGY_BASE_NAME))
-            if response.lower() in ('t', 'true', 'y', 'yes'):
+            load_default_ontology = True
+            if settings.ONTOLOGY_BASE_NAME != None:
+                if yes is False:
+                    response = raw_input(
+                        'Would you like to load the {0} ontology? (Y/N): '.format(settings.ONTOLOGY_BASE_NAME))
+                    if response.lower() not in ('t', 'true', 'y', 'yes'):
+                        load_default_ontology = False
+            else:
+                load_default_ontology = False
+
+            if load_default_ontology == True:
                 print('loading the {0} ontology'.format(settings.ONTOLOGY_BASE_NAME))
                 extensions = [os.path.join(settings.ONTOLOGY_PATH, x) for x in settings.ONTOLOGY_EXT]
                 management.call_command('load_ontology', source=os.path.join(settings.ONTOLOGY_PATH, settings.ONTOLOGY_BASE),
