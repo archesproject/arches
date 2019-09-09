@@ -169,8 +169,10 @@ define([
         this.updateLayers = function(layers) {
             var map = self.map();
             var style = map.getStyle();
-            style.layers = layers;
-            map.setStyle(style);
+            if (style) {
+                style.layers = layers;
+                map.setStyle(style);
+            }
         };
 
         this.isFeatureClickable = function(feature) {
