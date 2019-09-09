@@ -36,9 +36,9 @@ define([
 
         this.map = ko.isObservable(params.map) ? params.map : ko.observable();
         this.popupTemplate = popupTemplate;
-        this.basemaps = [];
-        this.overlays = ko.observableArray();
-        this.activeBasemap = ko.observable();
+        this.basemaps = params.basemaps || [];
+        this.overlays = params.overlaysObservable || ko.observableArray();
+        this.activeBasemap = params.activeBasemap || ko.observable();
         this.activeTab = ko.observable(params.activeTab);
         this.hideSidePanel = function() {
             self.activeTab(undefined);
@@ -50,10 +50,10 @@ define([
 
         mapLayers.forEach(function(layer) {
             if (!layer.isoverlay) {
-                self.basemaps.push(layer);
-                if (layer.addtomap) self.activeBasemap(layer);
+                if (!params.basemaps) self.basemaps.push(layer);
+                if (layer.addtomap && !params.activeBasemap) self.activeBasemap(layer);
             }
-            else {
+            else if (!params.overlaysObservable) {
                 layer.opacity = ko.observable(layer.addtomap ? 100 : 0);
                 layer.onMap = ko.pureComputed({
                     read: function() { return layer.opacity() > 0; },
