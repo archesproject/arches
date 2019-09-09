@@ -240,15 +240,15 @@ define([
 
                 this.geocoderDefault = arches.geocoderDefault;
 
-                this.overlays = _.filter(arches.mapLayers, function(layer) {
-                    return layer.isoverlay && layer.addtomap;
-                }).map(function(layer) {
-                    return {
-                        'maplayerid': layer.maplayerid,
-                        'name': layer.name,
-                        'opacity': 100
-                    };
-                });
+                // this.overlays = _.filter(arches.mapLayers, function(layer) {
+                //     return layer.isoverlay && layer.addtomap;
+                // }).map(function(layer) {
+                //     return {
+                //         'maplayerid': layer.maplayerid,
+                //         'name': layer.name,
+                //         'opacity': 100
+                //     };
+                // });
 
                 this.defaultZoom = arches.mapDefaultZoom;
                 this.minZoom = arches.mapDefaultMinZoom;
