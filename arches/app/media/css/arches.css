@@ -7008,6 +7008,10 @@ a.clear-geojson-button:hover {
     visibility: hidden;
 }
 
+.mapboxgl-ctrl-geocoder--input {
+    font-size: 13px;
+}
+
 .workbench-card-wrapper .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
     visibility: visible;
 }
