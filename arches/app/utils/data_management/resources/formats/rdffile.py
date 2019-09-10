@@ -14,7 +14,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from rdflib import Namespace
 from rdflib import URIRef, Literal
-from rdflib import Graph
+from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS
 from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand
 

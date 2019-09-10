@@ -30,7 +30,8 @@ from edtf import parse_edtf
 # One benefit of shifting to python3.x would be to use
 # importlib.util.LazyLoader to load rdflib (and other lesser
 # used but memory soaking libs)
-from rdflib import Namespace, URIRef, Literal, Graph, BNode
+from rdflib import Namespace, URIRef, Literal, BNode
+from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")

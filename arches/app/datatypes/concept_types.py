@@ -11,7 +11,8 @@ from arches.app.utils.date_utils import ExtendedDateFormat
 from django.core.exceptions import ObjectDoesNotExist
 
 # for the RDF graph export helper functions
-from rdflib import Namespace, URIRef, Literal, Graph, BNode
+from rdflib import Namespace, URIRef, Literal, BNode
+from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS, SKOS
 from arches.app.models.concept import ConceptValue
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
