@@ -14,7 +14,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from rdflib import Namespace
 from rdflib import URIRef, Literal
-from rdflib import Graph
+from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS
 from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand
 
@@ -169,7 +169,7 @@ class JsonLdWriter(RdfWriter):
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
         g = self.get_rdf_graph()
-        value = g.serialize(format='nt')
+        value = g.serialize(format='nquads')
         js = from_rdf(value, {'format': 'application/nquads', 'useNativeTypes': True})
 
         assert len(resourceinstanceids) == 1  # currently, this should be limited to a single top resource

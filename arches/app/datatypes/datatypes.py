@@ -30,7 +30,8 @@ from edtf import parse_edtf
 # One benefit of shifting to python3.x would be to use
 # importlib.util.LazyLoader to load rdflib (and other lesser
 # used but memory soaking libs)
-from rdflib import Namespace, URIRef, Literal, Graph, BNode
+from rdflib import Namespace, URIRef, Literal, BNode
+from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
@@ -117,7 +118,7 @@ class StringDataType(BaseDataType):
         g = Graph()
         if edge_info['range_tile_data'] is not None:
             g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
-            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(str(edge_info['range_tile_data']))))
+            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(edge_info['range_tile_data'])))
         return g
 
     def from_rdf(self, json_ld_node):
@@ -325,7 +326,7 @@ class DateDataType(BaseDataType):
         if edge_info['range_tile_data'] is not None:
             g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
             g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
-                   Literal(str(edge_info['range_tile_data']), datatype=XSD.dateTime)))
+                   Literal(edge_info['range_tile_data'], datatype=XSD.dateTime)))
         return g
 
     def from_rdf(self, json_ld_node):
@@ -1345,7 +1346,7 @@ class DomainDataType(BaseDomainDataType):
         if edge_info['range_tile_data'] is not None:
             g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
             g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
-                   Literal(str(self.get_option_text(edge.rangenode, edge_info['range_tile_data'])))))
+                   Literal(self.get_option_text(edge.rangenode, edge_info['range_tile_data']))))
         return g
 
     def from_rdf(self, json_ld_node):
