@@ -187,8 +187,9 @@ class NumberDataType(BaseDataType):
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
         rtd = int(edge_info['range_tile_data']) if type(edge_info['range_tile_data']) == float and edge_info['range_tile_data'].is_integer() else edge_info['range_tile_data']
-        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
-        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(rtd)))
+        if rtd is not None:
+            g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(rtd)))
         return g
 
     def from_rdf(self, json_ld_node):
