@@ -371,6 +371,16 @@ define([
                 displayControlsDefault: false,
                 modes: modes
             });
+
+            self.draw.options.styles.forEach(function(layer) {
+                if (layer.paint['fill-opacity']) layer.paint['fill-opacity'] = ["case",
+                    ["boolean", ["feature-state", "hover"], false],
+                    0.1,
+                    0.9
+                ];
+            });
+
+
             map.addControl(self.draw);
             self.draw.set({
                 type: 'FeatureCollection',
@@ -455,6 +465,10 @@ define([
         });
 
         this.isFeatureClickable = function(feature) {
+            return feature.properties.resourceinstanceid || feature.properties.mode;
+        };
+
+        this.showFeaturePopup = function(feature) {
             var tool = self.selectedTool();
             if (tool && tool !== 'select_feature') return false;
             return feature.properties.resourceinstanceid;

@@ -206,21 +206,24 @@ define([
             }
         };
 
+        this.showFeaturePopup = this.isFeatureClickable;
         this.onFeatureClick = function(feature, lngLat) {
             var map = self.map();
-            self.popup = new mapboxgl.Popup()
-                .setLngLat(lngLat)
-                .setHTML(self.popupTemplate)
-                .addTo(map);
-            ko.applyBindingsToDescendants(
-                self.getPopupData(feature),
-                self.popup._content
-            );
-            map.setFeatureState(feature, { selected: true });
-            self.popup.on('close', function() {
-                map.setFeatureState(feature, { selected: false });
-                self.popup = undefined;
-            });
+            if (self.showFeaturePopup(feature)) {
+                self.popup = new mapboxgl.Popup()
+                    .setLngLat(lngLat)
+                    .setHTML(self.popupTemplate)
+                    .addTo(map);
+                ko.applyBindingsToDescendants(
+                    self.getPopupData(feature),
+                    self.popup._content
+                );
+                map.setFeatureState(feature, { selected: true });
+                self.popup.on('close', function() {
+                    map.setFeatureState(feature, { selected: false });
+                    self.popup = undefined;
+                });
+            }
         };
 
         this.setupMap = function(map) {
