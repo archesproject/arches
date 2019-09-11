@@ -20,6 +20,8 @@ define([
         viewModel: BaseFilter.extend({
             initialize: function(options) {
                 var self = this;
+                options.name = "Map Filter";
+                BaseFilter.prototype.initialize.call(this, options);
 
                 options.sources = {
                     "geojson-search-buffer-data": {
@@ -48,8 +50,12 @@ define([
 
                 MapComponentViewModel.apply(this, [options]);
 
-                options.name = "Map Filter";
-                BaseFilter.prototype.initialize.call(this, options);
+                this.updateLayers = function(layers) {
+                    var map = self.map();
+                    var style = map.getStyle();
+                    style.layers = self.draw ? layers.concat(self.draw.options.styles) : layers;
+                    map.setStyle(style);
+                };
 
                 this.searchGeometries = ko.observableArray(null);
                 this.extentSearch = ko.observable(false);
