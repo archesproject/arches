@@ -1,10 +1,11 @@
 define([
+    'arches',
     'jquery',
     'underscore',
     'knockout',
     'knockout-mapping',
     'viewmodels/workflow-step'
-], function($, _, ko, koMapping, Step) {
+], function(arches, $, _, ko, koMapping, Step) {
     var Workflow = function(config) {
         var self = this;
         this.steps = config.steps || [];
@@ -15,6 +16,17 @@ define([
         this.loading = config.loading || ko.observable(false);
         this.alert = config.alert || ko.observable(null);
         this.state = {steps:[]};
+
+        this.workflowName = ko.observable();
+        this.getJSON = function(pluginJsonFileName) {
+            $.ajax({
+                type: "GET",
+                url: arches.urls.plugin(pluginJsonFileName),
+                data: { "json":true },
+                context: self,
+                success: function(workflowJson){ self.workflowName(workflowJson.name); }
+            });
+        };
 
         this.restoreStateFromURL = function(){
             var urlparams = new window.URLSearchParams(window.location.search);
