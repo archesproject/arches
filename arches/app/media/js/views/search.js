@@ -122,6 +122,11 @@ define([
                 data: queryString,
                 context: this,
                 success: function(response) {
+                    _.each(this.viewModel.sharedStateObject.searchResults, function(value, key, results) {
+                        if (key !== 'timestamp') {
+                            delete this.viewModel.sharedStateObject.searchResults[key];
+                        }
+                    }, this);
                     _.each(response, function(value, key, response) {
                         if (key !== 'timestamp') {
                             this.viewModel.sharedStateObject.searchResults[key] = value;

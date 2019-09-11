@@ -541,6 +541,10 @@ input[type="checkbox"] {
     padding: 0 0 218px 25px;
 }
 
+.workflow-step-body .workbench-card-wrapper {
+    margin-left: -25px;
+}
+
 .padded-workflow-step, .workflow-step-body .card-component {
     padding: 20px 35px 82px 40px;
 }
@@ -556,6 +560,17 @@ input[type="checkbox"] {
 .workflow-step-body div .new-provisional-edit-card-container .card form div div .widget-wrapper .form-group .resource-instance-wrapper .select2-container {
     max-width: 600px !important;
 }
+
+
+.workflow-step-body div .new-provisional-edit-card-container .card form div div .widget-wrapper .form-group div .columns {
+    border: 1px solid #ddd;
+    padding: 20px;
+}
+
+.new-provisional-edit-card-container .card form div div .widget-wrapper .form-group div .select2-container {
+    max-width: 600px !important;
+}
+
 
 .wf-multi-tile-step-container {
     display: flex;
@@ -625,8 +640,13 @@ div.wf-multi-tile-card-info div {
     /* margin-left: 12px; */
 }
 
+.wf-multi-tile-card-info-details dd a {
+    color: #999;
+}
+
 .wf-multi-tile-card-info-details dd {
     margin-bottom: 3px;
+    color: #999;
 }
 
 
@@ -642,7 +662,8 @@ div.wf-multi-tile-card-info div {
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    height: 32px;
+    padding-top: 10px;
+    height: 40px;
     /* align-self: flex-end; */
 }
 
@@ -652,6 +673,10 @@ div.wf-multi-tile-card-info div {
 
 .wf-multi-tile-step-card > div.wf-multi-tile-card-info ~ div span:nth-child(2) {
     margin-right: 15px;
+}
+
+.wf-multi-tile-step-card > div.wf-multi-tile-card-info ~ div span:hover {
+    color: #0D70CF;
 }
 
 .wf-multi-tile-step-card-controls {
@@ -814,23 +839,23 @@ ul.tabbed-report-tab-list {
     cursor: pointer;
 }
 
-.map-card-wrapper {
+.workbench-card-wrapper {
     flex: 1;
     height: 100%;
     position: relative;
     background-color: #eee;
 }
 
-.map-card-container {
+.workbench-card-container {
     height: 100%;
     margin-right: 92px;
 }
 
-.map-card-container.map-card-container-sidepanel-active {
+.workbench-card-container.workbench-card-container-sidepanel-active {
     margin-right: 492px;
 }
 
-.map-card-sidebar {
+.workbench-card-sidebar {
     position:absolute;
     right: 0;
     height: 100%;
@@ -839,9 +864,8 @@ ul.tabbed-report-tab-list {
     border-left: 1px solid rgb(216, 216, 216);
 }
 
-.map-card-sidebar-tab {
+.workbench-card-sidebar-tab {
     color: rgb(33, 62, 95);
-    min-height: 86px;
     padding: 16px;
     text-align: center;
     font-size: 1.1em;
@@ -849,19 +873,19 @@ ul.tabbed-report-tab-list {
     cursor: pointer;
 }
 
-.map-card-sidebar-tab.active {
+.workbench-card-sidebar-tab.active {
     background-color: white;
     border-left: solid 1px white;
     margin-left: -1px;
 }
 
-.map-card-sidebar-tab i {
+.workbench-card-sidebar-tab i {
     font-size: 1.7em;
     display: block;
     padding-bottom: 6px;
 }
 
-.map-card-sidepanel {
+.workbench-card-sidepanel {
     position:absolute;
     z-index: 10;
     right: 92px;
@@ -873,12 +897,12 @@ ul.tabbed-report-tab-list {
     overflow-y: scroll;
 }
 
-.map-card-sidepanel-header {
+.workbench-card-sidepanel-header {
     cursor: pointer;
     color: rgb(33, 62, 95);
 }
 
-.map-card-sidepanel-header:before {
+.workbench-card-sidepanel-header:before {
     content: "\f00d";
     font-family: FontAwesome;
     margin-right: 6px;
@@ -886,7 +910,7 @@ ul.tabbed-report-tab-list {
     font-weight:lighter;
 }
 
-.map-card-sidepanel-header:hover:before {
+.workbench-card-sidepanel-header:hover:before {
     color: rgb(33, 62, 95);
 }
 
@@ -934,7 +958,7 @@ ul.tabbed-report-tab-list {
     cursor: pointer;
 }
 
-.map-card-wrapper {
+.workbench-card-wrapper {
     flex: 1;
     height: 100%;
     position: relative;
@@ -942,16 +966,16 @@ ul.tabbed-report-tab-list {
     border-top: 1px solid #ddd;
 }
 
-.map-card-container {
+.workbench-card-container {
     height: 100%;
     margin-right: 75px;
 }
 
-.map-card-container.map-card-container-sidepanel-active {
+.workbench-card-container.workbench-card-container-sidepanel-active {
     margin-right: 475px;
 }
 
-.map-card-sidebar {
+.workbench-card-sidebar {
     position:absolute;
     right: 0;
     height: 100%;
@@ -960,7 +984,7 @@ ul.tabbed-report-tab-list {
     border-left: 1px solid rgb(216, 216, 216);
 }
 
-.map-card-sidebar-tab {
+.workbench-card-sidebar-tab {
     color: #787878;
     height: 65px;
     padding: 16px;
@@ -970,19 +994,19 @@ ul.tabbed-report-tab-list {
     cursor: pointer;
 }
 
-.map-card-sidebar-tab:hover {
+.workbench-card-sidebar-tab:hover {
     background: #fbfbfb;
     color: #454545;
 }
 
-.map-card-sidebar-tab.active {
+.workbench-card-sidebar-tab.active {
     background-color: white;
     border-left: solid 1px white;
     margin-left: -1px;
     color: #454545;
 }
 
-.map-card-sidebar-tab i {
+.workbench-card-sidebar-tab i {
     font-size: 1.1em;
     display: block;
     padding-bottom: 2px;
@@ -992,7 +1016,7 @@ ul.tabbed-report-tab-list {
     font-size: 11px;
 }
 
-.map-card-sidepanel {
+.workbench-card-sidepanel {
     position:absolute;
     z-index: 10;
     right: 75px;
@@ -1004,11 +1028,11 @@ ul.tabbed-report-tab-list {
     overflow-y: scroll;
 }
 
-.map-card-sidepanel div .new-provisional-edit-card-container {
+.workbench-card-sidepanel div .new-provisional-edit-card-container {
     padding-left: 10px;
 }
 
-.map-card-sidepanel-header-container {
+.workbench-card-sidepanel-header-container {
     padding-right: 20px;
     border-bottom: 1px solid #eee;
     padding: 5px 20px 11px 5px;
@@ -1017,13 +1041,13 @@ ul.tabbed-report-tab-list {
     margin-bottom: 15px;
 }
 
-.map-card-sidepanel-header {
+.workbench-card-sidepanel-header {
     cursor: pointer;
     color: rgb(33, 62, 95);
     font-size: 19px;
 }
 
-.map-card-sidepanel-header:before {
+.workbench-card-sidepanel-header:before {
     content: "\f00d";
     font-family: FontAwesome;
     margin-right: 6px;
@@ -1031,7 +1055,7 @@ ul.tabbed-report-tab-list {
     font-weight:lighter;
 }
 
-.map-card-sidepanel-header:hover:before {
+.workbench-card-sidepanel-header:hover:before {
     color: rgb(33, 62, 95);
 }
 
@@ -3747,6 +3771,15 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     opacity: 1.;
     text-anchor: middle;
     pointer-events: none;
+}
+
+.node-ancestor-selected {
+    stroke: rgb(17, 95, 165);
+    stroke-width: 5px;
+    stroke-dasharray: 5, 1;
+    fill: rgb(220, 236, 250);
+    opacity: 1;
+    cursor: pointer;
 }
 
 .relatedlink {
@@ -6859,8 +6892,23 @@ a#close-map-tools.map-widget-icon:hover {
     text-overflow: ellipsis;
 }
 
+.buffer-control {
+    color: #4d627b;
+    /* border: none; */
+    /* height: 40px; */
+    padding: 5px;
+    padding-left: 12px;
+    border-radius: 3px;
+    margin-bottom: 5px;
+    border-color: #dddddd;
+}
+
+.buffer-input {
+    width: 75px;
+}
+
 .map-tool-container {
-    position: absolute;
+    position: absolute; 
     top: 75px;
     left: 30px;
     font-size: 14px;
@@ -6869,13 +6917,9 @@ a#close-map-tools.map-widget-icon:hover {
     text-overflow: ellipsis;
 }
 
-.form-control .buffer {
-    width: 75px;
-}
-
 .map-tool-container.buffer {
-    position: absolute;
-    top: 0px;
+    position: absolute; 
+    top: 0px; 
     width: 220px;
 }
 
@@ -6975,7 +7019,11 @@ a.clear-geojson-button:hover {
     visibility: hidden;
 }
 
-.map-card-wrapper .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+.mapboxgl-ctrl-geocoder--input {
+    font-size: 13px;
+}
+
+.workbench-card-wrapper .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
     visibility: visible;
 }
 
@@ -7403,6 +7451,9 @@ a.clear-geojson-button:hover {
     padding: 10px;
     background: #ebebeb;
     max-width: 400px;
+}
+
+.mapboxgl-popup-content .hover-feature-title-bar {
     margin-left: -20px;
     margin-right: -20px;
     margin-top: -20px;
@@ -7440,6 +7491,7 @@ a.clear-geojson-button:hover {
 
 .hover-feature-title {
     font-size: 15px;
+    font-weight: 500;
     max-width: 300px;
     white-space: nowrap;
     overflow: hidden;
@@ -8500,7 +8552,6 @@ table.table.dataTable {
     width: 400px;
     height: calc(100vh - 100px);
     border-left: solid 1px #dcdcdc;
-    border-top: solid 1px #dcdcdc;
 }
 
 .search-popup-panel .tab-pane.active div.saved-search-container div .rr-splash .rr-splash-img-container {
@@ -8533,6 +8584,13 @@ table.table.dataTable {
     overflow-y: auto;
     padding: 20px;
     background: white;
+}
+
+.faceted-search-card-container {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 10px;
+    background: #f9f9f9;
 }
 
 .search-facets {
@@ -9801,7 +9859,7 @@ ul.select2-choices:after {
 .card-header {
     height: 50px;
     padding: 10px 20px;
-    background: #f4f4f4;
+    background: #25476a;
 }
 
 .card-header-title {
@@ -9809,7 +9867,7 @@ ul.select2-choices:after {
 }
 
 .card-breadcrumbs, .card-breadcrumbs a {
-    color: #6494cc;
+    color: #f1f1f1;
     margin-top: 17px;
     font-size: 17px;
 }

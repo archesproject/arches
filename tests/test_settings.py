@@ -88,6 +88,19 @@ INSTALLED_APPS = INSTALLED_APPS + (
     'django_nose',
 )
 
+ONTOLOGY_PATH = os.path.join(ROOT_DIR, 'db', 'ontologies', 'cidoc_crm')
+ONTOLOGY_BASE = 'cidoc_crm_v6.2.xml'
+ONTOLOGY_BASE_VERSION = '6.2'
+ONTOLOGY_BASE_NAME = 'CIDOC CRM v6.2'
+ONTOLOGY_BASE_ID = 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd'
+ONTOLOGY_EXT = [
+    'CRMsci_v1.2.3.rdfs.xml',
+    'CRMarchaeo_v1.4.rdfs.xml',
+    'CRMgeo_v1.2.rdfs.xml',
+    'CRMdig_v3.2.1.rdfs.xml',
+    'CRMinf_v0.7.rdfs.xml',
+    'arches_crm_enhancements.xml'
+]
 
 try:
     from settings_local import *

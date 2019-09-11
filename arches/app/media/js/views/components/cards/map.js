@@ -5,7 +5,6 @@ define([
     'knockout',
     'knockout-mapping',
     'uuid',
-    'mapbox-gl',
     'mapbox-gl-draw',
     'geojson-extent',
     'geojsonhint',
@@ -16,7 +15,7 @@ define([
     'bindings/chosen',
     'bindings/codemirror',
     'codemirror/mode/javascript/javascript'
-], function(arches, $, _, ko, koMapping, uuid, mapboxgl, MapboxDraw, geojsonExtent, geojsonhint, CardComponentViewModel, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function(arches, $, _, ko, koMapping, uuid, MapboxDraw, geojsonExtent, geojsonhint, CardComponentViewModel, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         var widgets = [];
@@ -252,6 +251,11 @@ define([
             )
         );
 
+        if (this.card.overlaysObservable) {
+            params.overlaysObservable = this.card.overlaysObservable;
+            params.activeBasemap = this.card.activeBasemap;
+        }
+
         MapComponentViewModel.apply(this, [params]);
 
         this.deleteFeature = function(feature) {
@@ -276,8 +280,10 @@ define([
         this.updateLayers = function(layers) {
             var map = self.map();
             var style = map.getStyle();
-            style.layers = self.draw ? layers.concat(self.draw.options.styles) : layers;
-            map.setStyle(style);
+            if (style) {
+                style.layers = self.draw ? layers.concat(self.draw.options.styles) : layers;
+                map.setStyle(style);
+            }
         };
 
         this.fitFeatures = function(features) {
@@ -499,6 +505,11 @@ define([
                 });
             }
         };
+
+        if (!this.card.overlaysObservable) {
+            this.card.overlaysObservable = this.overlays;
+            this.card.activeBasemap = this.activeBasemap;
+        }
     };
     ko.components.register('map-card', {
         viewModel: viewModel,

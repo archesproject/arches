@@ -25,6 +25,7 @@ class v3MigrationTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.loadOntology()
         management.call_command('packages', operation='import_graphs',
                                 source=os.path.join(cls.pkg_fixture, 'graphs', 'resource_models')
                                 )

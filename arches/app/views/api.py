@@ -285,8 +285,9 @@ class Resources(APIBase):
             allowed_formats = ['json', 'json-ld']
             format = request.GET.get('format', 'json-ld')
             if format not in allowed_formats:
-                return JSONResponse(status=406, reason='incorrect format specified, only %s formats allowed' % allowed_formats)
-
+                return JSONResponse(
+                    status=406, reason='incorrect format specified, only %s formats allowed' % allowed_formats
+                    )
             try:
                 indent = int(request.GET.get('indent', None))
             except Exception:
@@ -300,10 +301,12 @@ class Resources(APIBase):
                             resourceinstanceids=[resourceid], indent=indent, user=request.user)
                         out = output[0]['outputfile'].getvalue()
                     except models.ResourceInstance.DoesNotExist:
-                        logger.exception()
+                        logger.exception(
+                            _("The specified resource '{0}' does not exist. JSON-LD export failed.".format(
+                                resourceid
+                                ))
+                            )
                         return JSONResponse(status=404)
-                    except Exception as e:
-                        logger.exception()
                 elif format == 'json':
                     out = Resource.objects.get(pk=resourceid)
                     out.load_tiles()

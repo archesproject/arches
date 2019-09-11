@@ -32,6 +32,7 @@ class GraphTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.loadOntology()
 
         for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
             management.call_command('packages', operation='import_graphs', source=path)

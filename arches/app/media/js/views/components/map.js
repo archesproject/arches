@@ -14,6 +14,7 @@ define([
         var geojsonSourceFactory = function() {
             return {
                 "type": "geojson",
+                "generateId": true,
                 "data": {
                     "type": "FeatureCollection",
                     "features": []
@@ -35,9 +36,9 @@ define([
 
         this.map = ko.isObservable(params.map) ? params.map : ko.observable();
         this.popupTemplate = popupTemplate;
-        this.basemaps = [];
-        this.overlays = ko.observableArray();
-        this.activeBasemap = ko.observable();
+        this.basemaps = params.basemaps || [];
+        this.overlays = params.overlaysObservable || ko.observableArray();
+        this.activeBasemap = params.activeBasemap || ko.observable();
         this.activeTab = ko.observable(params.activeTab);
         this.hideSidePanel = function() {
             self.activeTab(undefined);
@@ -49,10 +50,10 @@ define([
 
         mapLayers.forEach(function(layer) {
             if (!layer.isoverlay) {
-                self.basemaps.push(layer);
-                if (layer.addtomap) self.activeBasemap(layer);
+                if (!params.basemaps) self.basemaps.push(layer);
+                if (layer.addtomap && !params.activeBasemap) self.activeBasemap(layer);
             }
-            else {
+            else if (!params.overlaysObservable) {
                 layer.opacity = ko.observable(layer.addtomap ? 100 : 0);
                 layer.onMap = ko.pureComputed({
                     read: function() { return layer.opacity() > 0; },
@@ -168,8 +169,10 @@ define([
         this.updateLayers = function(layers) {
             var map = self.map();
             var style = map.getStyle();
-            style.layers = layers;
-            map.setStyle(style);
+            if (style) {
+                style.layers = layers;
+                map.setStyle(style);
+            }
         };
 
         this.isFeatureClickable = function(feature) {
@@ -224,7 +227,7 @@ define([
             map.on('load', function() {
                 map.addControl(new mapboxgl.NavigationControl(), 'top-left');
                 map.addControl(new mapboxgl.FullscreenControl({
-                    container: $(map.getContainer()).closest('.map-card-wrapper')[0]
+                    container: $(map.getContainer()).closest('.workbench-card-wrapper')[0]
                 }), 'top-left');
                 map.addControl(new MapboxGeocoder({
                     accessToken: mapboxgl.accessToken,

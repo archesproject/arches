@@ -90,9 +90,9 @@
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode()}, click: function () { card.selected(true) },">
         <i class="fa fa-file-o" role="presentation"></i>
-        <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
-        <!-- ko if: $parent.showIds -->
-        <span style="padding-right: 5px; font-weight:bold" data-bind="text: card.model.nodegroup_id"></span>
+        <span data-bind="text: card.model.name"></span>
+        <!-- ko if: card.showIds -->
+        <span style="font-weight:bold" data-bind="text: ': ' + card.model.nodegroup_id()"></span>
         <!-- /ko -->
     </a>
     <!-- ko if: card.cards().length > 0 || card.widgets().length > 0 -->
@@ -112,7 +112,7 @@
                     <strong style="margin-right: 10px;" >
                         <span data-bind="text: !!(widget.label()) ? widget.label() : widget.node.name"></span>
                         <!-- ko if: $parent.showIds -->
-                        <span style="font-weight:bold" data-bind="text: !!(widget.label()) ? widget.node.nodeid : ''"></span>
+                        <span style="font-weight:bold" data-bind="text: ': ' + (!!(widget.label()) ? widget.node.nodeid : '')"></span>
                         <!-- /ko -->
                     </strong>
                 </a>
@@ -137,7 +137,8 @@
                         tile: null,
                         loading: self.loading,
                         form: self.form,
-                        pageVm: $root
+                        pageVm: $root,
+                        showIds: card.showIds
                     }
                 } --> <!-- /ko -->
             </div>
