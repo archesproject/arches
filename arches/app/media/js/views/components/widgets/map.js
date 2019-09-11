@@ -240,12 +240,14 @@ define([
         };
 
         this.clearGeometries = function(val) {
-            if (self.draw !== undefined && !val) {
-                self.draw.deleteAll();
-            } else if (val && val.features) {
-                if (val.features.length === 0 && self.context === 'search-filter') {
-                    self.searchBuffer(null);
-                    self.updateSearchQueryLayer([]);
+            if (self.map && self.map.getStyle()) {
+                if (self.draw !== undefined && !val) {
+                    self.draw.deleteAll();
+                } else if (val && val.features) {
+                    if (val.features.length === 0 && self.context === 'search-filter') {
+                        self.searchBuffer(null);
+                        self.updateSearchQueryLayer([]);
+                    }
                 }
             }
         };
@@ -273,7 +275,7 @@ define([
                 //    self.map.setStyle(style);
                 // }
 
-                if (self.draw !== undefined) {
+                if (self.draw !== undefined && self.map.getStyle()) {
                     self.draw.changeMode('simple_select');
                     self.loadGeometriesIntoDrawLayer();
                 }
@@ -859,9 +861,11 @@ define([
                         data = self.value();
                         source.setData(data);
                         self.value.subscribe(function(value) {
-                            source.setData(value);
-                            if (value.features.length > 0){
-                                zoomToGeoJSON(value);
+                            if (self.map.getStyle()) {
+                                source.setData(value);
+                                if (value.features.length > 0){
+                                    zoomToGeoJSON(value);
+                                }
                             }
                         });
                         _.each(['resource-poly' + self.graphId, 'resource-line' + self.graphId, 'resource-point' + self.graphId], function(layerId) { //clear and add resource layers so that they are on top of map
