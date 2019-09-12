@@ -315,9 +315,8 @@ define([
                 };
 
                 this.map.subscribe(function(){
-                    this.setupDraw();
-
                     this.filters[componentName](this);
+                    this.setupDraw();
                     this.restoreState();
                     
                     var filterUpdated = ko.computed(function() {
@@ -347,6 +346,7 @@ define([
             },
 
             setupDraw: function() {
+                var self = this;
                 var modes = MapboxDraw.modes;
                 modes.static = {
                     toDisplayFeatures: function(state, geojson, display) {
