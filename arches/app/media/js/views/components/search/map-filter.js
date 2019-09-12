@@ -62,8 +62,6 @@ define([
                 this.searchGeometries = ko.observableArray(null);
                 this.extentSearch = ko.observable(false);
                 this.searchAggregations = ko.observable();
-                this.hoverData = ko.observable(null);
-                this.clickData = ko.observable(null);
                 this.drawMode = ko.observable();
                 this.geoJSONString = ko.observable(undefined);
                 this.geoJSONErrors = ko.observableArray();
@@ -75,6 +73,14 @@ define([
                     "type": "FeatureCollection",
                     "features": []
                 });
+
+                this.bufferUnits = [{
+                    name: 'meters',
+                    val: 'm'
+                },{
+                    name: 'feet',
+                    val: 'ft'
+                }];
 
                 this.mapLinkData.subscribe(function(data) {
                     this.zoomToGeoJSON(data, true);
@@ -165,25 +171,6 @@ define([
                         return errors;
                     }
                 };
-
-                this.bufferUnits = [{
-                    name: 'meters',
-                    val: 'm'
-                },{
-                    name: 'feet',
-                    val: 'ft'
-                }];
-                this.buffLayer =  [{
-                    "id": "geojson-search-buffer",
-                    "type": "fill",
-                    "filter": ["==", "$type", "Polygon"],
-                    "paint": {
-                        "fill-color": "#3bb2d0",
-                        "fill-outline-color": "#3bb2d0",
-                        "fill-opacity": 0.1
-                    },
-                    "source": "geojson-editor-data"
-                }];
 
                 this.spatialFilterTypes = [{
                     name: 'Point',
@@ -286,16 +273,11 @@ define([
 
                     var features = [];
                     var mouseoverInstanceId = self.mouseoverInstanceId();
-                    var hoverData = self.hoverData();
-                    var clickData = self.clickData();
                     _.each(agg.results, function(result) {
                         _.each(result._source.points, function(point) {
                             var feature = turf.point([point.point.lon, point.point.lat], _.extend(result._source, {
                                 resourceinstanceid: result._id,
-                                highlight: result._id === mouseoverInstanceId ||
-                                     (clickData ? (ko.unwrap(clickData.resourceinstanceid) === result._id) : false) ||
-                                     (hoverData ? (ko.unwrap(hoverData.resourceinstanceid) === result._id) : false)
-
+                                highlight: result._id === mouseoverInstanceId
                             }));
                             features.push(feature);
                         });
