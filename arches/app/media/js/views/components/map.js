@@ -188,7 +188,8 @@ define([
                     data = _.defaults(data, {
                         'loading': true,
                         'displayname': '',
-                        'graph_name': ''
+                        'graph_name': '',
+                        'map_popup': ''
                     });
                     data = ko.mapping.fromJS(data);
                     data.reportURL = arches.urls.resource_report;
