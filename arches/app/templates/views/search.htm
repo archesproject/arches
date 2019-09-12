@@ -32,12 +32,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     name: 'term-filter',
                     params: sharedStateObject
                 }"></div>
-            </div>
-            <div class="search-control-container" data-bind="css: { 'slide': !sharedStateObject.resultsExpanded() }">
-                <!-- Title Block -->
-                <div class="search-count-container">
-                    <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
-                    <div class="search-inline-filters">
+
+                <!-- Inline Filters (for QA and Resource Type) -->
+                <div class="search-inline-filters">
                         <!--ko if: sharedStateObject.userIsReviewer-->
                         <div data-bind="component: {
                             name: 'provisional-filter',
@@ -49,6 +46,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             params: sharedStateObject
                         }"></div>
                     </div>
+                </div>
+
+            <div class="search-control-container" data-bind="css: { 'slide': !sharedStateObject.resultsExpanded() }">
+                <!-- Title Block -->
+                <div class="search-count-container">
+                    <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
+                    
                 </div>
 
                 <div class="search-results-container">
