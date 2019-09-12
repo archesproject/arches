@@ -285,10 +285,6 @@ define([
 
                 this.map.subscribe(function(){
                     this.restoreState();
-                }, this);
-
-                this.map.subscribe(function(){
-                    //this.restoreState();
                     
                     var filterUpdated = ko.computed(function() {
                         return JSON.stringify(ko.toJS(this.filter.feature_collection())) + this.filter.inverted();
@@ -533,12 +529,14 @@ define([
 
             restoreState: function() {
                 var query = this.query();
+                var buffer = 10;
+                var bufferUnit = 'm';
+                var inverted = false;
+                var hasSpatialFilter = false;
                 if (componentName in query) {
                     var mapQuery = JSON.parse(query[componentName]);
-                    var buffer = 10;
-                    var bufferUnit = 'm';
-                    var inverted = false;
                     if (mapQuery.features.length > 0) {
+                        hasSpatialFilter = true;
                         var properties = mapQuery.features[0].properties;
                         //this.filter.inverted(properties.inverted);
                         inverted = properties.inverted;
@@ -553,14 +551,13 @@ define([
                             "features": mapQuery.features
                         });
                     }
-                    this.buffer = ko.observable(buffer).extend({ deferred: true });
-                    this.bufferUnit = ko.observable(bufferUnit).extend({ deferred: true });
-                    this.filter.inverted = ko.observable(inverted).extend({ deferred: true });
-                    if (mapQuery.features.length > 0) {
-                        this.getFilter('term-filter').addTag('Map Filter Enabled', this.name, this.filter.inverted);
-                    }
                 }
-                console.log('from restoreState')
+                this.buffer = ko.observable(buffer).extend({ deferred: true });
+                this.bufferUnit = ko.observable(bufferUnit).extend({ deferred: true });
+                this.filter.inverted = ko.observable(inverted).extend({ deferred: true });
+                if (hasSpatialFilter) {
+                    this.getFilter('term-filter').addTag('Map Filter Enabled', this.name, this.filter.inverted);
+                }
                 this.updateResults();
                 this.pageLoaded = true;
             },
