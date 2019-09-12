@@ -7449,21 +7449,20 @@ a.clear-geojson-button:hover {
 .hover-feature-title-bar {
     height: 40px;
     padding: 10px;
-    background: #ebebeb;
+    background: #ddd;
+    border: 1px solid #ccc;
+    border-bottom: none;
     max-width: 400px;
 }
 
 .mapboxgl-popup-content .hover-feature-title-bar {
-    margin-left: -20px;
-    margin-right: -20px;
-    margin-top: -20px;
-    margin-bottom: 10px;
+    margin-bottom: 0px;
 }
 
 .mapboxgl-popup-close-button {
     position: absolute;
-    right: 5px;
-    top: 5px;
+    right: 7px;
+    top: 7px;
     border: 0;
     border-radius: 2px;
     padding-bottom: 4px;
@@ -7490,7 +7489,7 @@ a.clear-geojson-button:hover {
 }
 
 .hover-feature-title {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     max-width: 300px;
     white-space: nowrap;
@@ -7499,16 +7498,14 @@ a.clear-geojson-button:hover {
 }
 
 .hover-feature-body {
-    padding: 10px 10px 20px 10px;
-    overflow-y: scroll;
+    padding: 10px 15px 15px 15px;
+    width: 350px;
 }
 
 .hover-feature {
     font-size: 13px;
     color: #555;
-    font-weight: 500;
     margin-bottom: 20px;
-    width: 380px;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -7518,6 +7515,7 @@ a.clear-geojson-button:hover {
     line-height: 1.2em;
     /* fallback */
     max-height: 12em;
+    min-height: 3em;
     /* fallback */
 }
 
@@ -7530,6 +7528,11 @@ a.clear-geojson-button:hover {
 
 .hover-feature-metadata {
     margin-bottom: -4px;
+    color: #888;
+}
+
+.hover-feature-metadata span {
+    color: steelblue;
 }
 
 .saved-search-container {
@@ -10108,11 +10111,11 @@ a.jstree-anchor.permissions-widget {
 
 .mapboxgl-popup-content {
     width: 350px;
-    padding: 20px;
+    padding: 0px;
 }
 
 .mapboxgl-popup-content .hover-feature-footer {
-    padding: 10px 0 0;
+    padding: 10px;
     height: auto;
 }
 
