@@ -495,19 +495,19 @@ define([
             zoomToGeoJSON: function(data, fly) {
                 var method = fly ? 'flyTo' : 'jumpTo';
                 var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
-                var tr = self.map().transform;
+                var tr = this.map().transform;
                 var nw = tr.project(bounds.getNorthWest());
                 var se = tr.project(bounds.getSouthEast());
                 var size = se.sub(nw);
                 var scaleX = (tr.width - 80) / size.x;
                 var scaleY = (tr.height - 80) / size.y;
-                var maxZoom = ko.unwrap(self.maxZoom);
+                var maxZoom = ko.unwrap(this.maxZoom);
                 maxZoom = maxZoom > 17 ? 17 : maxZoom;
                 var options = {
                     center: tr.unproject(nw.add(se).div(2)),
                     zoom: Math.min(tr.scaleZoom(tr.scale * Math.min(scaleX, scaleY)), maxZoom)
                 };
-                self.map()[method](options);
+                this.map()[method](options);
             },
 
             updateQuery: function() {
