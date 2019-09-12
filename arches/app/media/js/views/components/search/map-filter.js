@@ -86,12 +86,6 @@ define([
                             });
                         }
                         this.searchGeometries(geoJSON.features);
-                        // this.searchGeometries().forEach(function(feature){
-                        //     if(!!feature.properties && !!feature.properties.buffer){
-                        //         this.buffer(parseInt(feature.properties.buffer.width, 10));
-                        //         this.bufferUnit(feature.properties.buffer.unit);
-                        //     }
-                        // }, this);
                         this.draw.set(geoJSON);
                     }
                 }, this);
@@ -243,75 +237,23 @@ define([
                         modes: modes
                     });
                     map.addControl(this.draw);
-                    // this.draw.set({
-                    //     type: 'FeatureCollection',
-                    //     features: []
-                    // });
                     map.on('draw.create', function(e) {
-                        console.log('in draw create');
-                        console.log(e);
-
-                        //self.draw.deleteAll();
                         self.searchGeometries().forEach(function(feature){
                             self.draw.delete(feature.id);
                         });
-                        //self.clearBuffer();
                         self.searchGeometries(e.features);
                         self.updateFilterGeom();
                         self.drawMode(undefined);
-                        // self.filter.feature_collection({
-                        //     "type": "FeatureCollection",
-                        //     "features": e.features,
-                        //     "properties": {
-                        //         "buffer": {
-                        //             "width": self.buffer(),
-                        //             "unit": self.bufferUnit()
-                        //         }
-                        //     }
-                        // });
-                        // e.features.forEach(function(feature) {
-                        //     self.draw.setFeatureProperty(feature.id, 'nodeId', self.newNodeId);
-                        // });
-                        // self.updateTiles();
                     });
-                    // map.on('draw.update', self.updateTiles);
-                    // map.on('draw.delete', self.updateTiles);
                     map.on('draw.update', function(e) {
                         self.searchGeometries(e.features);
                         self.updateFilterGeom();
-                        // console.log('render');
-                        // console.log(e)
-                        // self.updateTiles();
-                        // self.setSelectLayersVisibility(false);
                     });
-                    // map.on('draw.selectionchange', function(e) {
-                    //     self.selectedFeatureIds(e.features.map(function(feature) {
-                    //         return feature.id;
-                    //     }));
-                    //     if (e.features.length > 0) {
-                    //         _.each(self.featureLookup, function(value) {
-                    //             value.selectedTool(null);
-                    //         });
-                    //     }
-                    //     self.setSelectLayersVisibility(false);
-                    // });
-
-                    // self.form.on('tile-reset', function() {
-                    //     self.draw.set({
-                    //         type: 'FeatureCollection',
-                    //         features: getDrawFeatures()
-                    //     });
-                    //     _.each(self.featureLookup, function(value) {
-                    //         if (value.selectedTool()) value.selectedTool('');
-                    //     });
-                    // });
                 };
 
                 this.map.subscribe(setupDraw, this);
 
                 this.searchResults.timestamp.subscribe(function(timestamp) {
-                    //this.map.subscribe(this.updateResults, this);
-                    console.log('timestamp updated');
                     if(this.pageLoaded) {
                         this.updateResults();
                     }
@@ -325,36 +267,12 @@ define([
                     "features": []
                 });
                 //this.filter.inverted = ko.observable(false).extend({ deferred: true });
-                // var basemaps = _.filter(arches.mapLayers, function(layer) {
-                //     return !layer.isoverlay;
-                // });
-
-                // if (!this.defaultBasemap) {
-                //     this.defaultBasemap = _.find(basemaps, function (basemap) {
-                //         return basemap.addtomap;
-                //     });
-                // }
-                // if (!this.defaultBasemap) {
-                //     this.defaultBasemap = basemaps[0];
-                // }
 
                 this.geocoderDefault = arches.geocoderDefault;
-
-                // this.overlays = _.filter(arches.mapLayers, function(layer) {
-                //     return layer.isoverlay && layer.addtomap;
-                // }).map(function(layer) {
-                //     return {
-                //         'maplayerid': layer.maplayerid,
-                //         'name': layer.name,
-                //         'opacity': 100
-                //     };
-                // });
-
                 this.defaultZoom = arches.mapDefaultZoom;
                 this.minZoom = arches.mapDefaultMinZoom;
                 this.maxZoom = arches.mapDefaultMaxZoom;
                 this.defaultCenter = [arches.mapDefaultX, arches.mapDefaultY];
-
 
                 this.clearSearch = ko.observable();
                 this.clearSearch.subscribe(function(val) {
@@ -484,23 +402,9 @@ define([
                     this.mouseoverInstanceId.subscribe(updateSearchPointsGeoJSON);
                 }, this);
 
-                // this.clickData.subscribe(updateSearchPointsGeoJSON);
-                // this.hoverData.subscribe(function(val) {
-                //     var resultsHoverLayer = this.map.getLayer('search-results-hex-outline-highlighted');
-                //     var filter = ['==', 'id', ''];
-                //     if (val && val.doc_count) {
-                //         filter[2] = val.id;
-                //     }
-                //     if (resultsHoverLayer) {
-                //         this.map.setFilter(resultsHoverLayer.id, filter);
-                //     }
-                //     updateSearchPointsGeoJSON();
-                // }, this);
-
                 this.mapLinkData.subscribe(function(data) {
                     this.zoomToGeoJSON(data, true);
                 },this);
-
             },
 
             searchByExtent: function() {
@@ -515,12 +419,7 @@ define([
                 var coordinates = [ll, ul, ur, lr, ll];
                 var boundsFeature = {
                     "type": "Feature",
-                    "properties": {
-                    //     "buffer": {
-                    //         "width": 0,
-                    //         "unit": this.bufferUnit()
-                    //     }
-                    },
+                    "properties": {},
                     "id": uuid.generate(),
                     "geometry": {
                         "type": "Polygon",
@@ -534,10 +433,6 @@ define([
                 this.searchGeometries([boundsFeature]);
                 this.updateFilterGeom();
                 this.drawMode(undefined);
-                // this.filter.feature_collection({
-                //     "type": "FeatureCollection",
-                //     "features": [boundsFeature]
-                // });
             },
 
             updateFilterGeom: function(){
@@ -570,10 +465,6 @@ define([
                 var geoJSON = feature();
                 var geoJSONString = JSON.stringify(geoJSON, null, 4);
                 this.geoJSONString(geoJSONString);
-                // this.draw.set(geoJson);
-                // this.searchGeometries(geoJson.features);
-                // this.updateFilterGeom();
-                // this.drawMode(undefined);
             },
 
             updateGeoJSON: function() {
@@ -590,12 +481,10 @@ define([
                             this.filter.inverted(feature.properties.inverted);
                         }
                     }, this);
-                    //this.updateFilterGeom();
                     this.drawMode(undefined);
                     this.geoJSONString(undefined);
                 }
             },
-
 
             /**
               * Updates the draw mode of the draw layer when a user selects a draw tool in the map controls
@@ -603,36 +492,8 @@ define([
               * @return {null}
               */
             selectEditingTool: function(drawMode) {
-                self = self || this;
-                // this.setDrawTool = function(tool) {
-                //     var showSelectLayers = (tool === 'select_feature');
-                //     self.setSelectLayersVisibility(showSelectLayers);
-                //     if (showSelectLayers) {
-                //         self.draw.changeMode('simple_select');
-                //         self.selectedFeatureIds([]);
-                //     } else if (tool) self.draw.changeMode(tool);
-                // };
-
-                // this.draw.deleteAll();
-                // this.clearBuffer();
-
-                // if (selectedDrawTool === 'end' || this.geometryTypeDetails[selectedDrawTool].drawMode === this.drawMode() || this.geometryTypeDetails[selectedDrawTool].drawMode !== this.drawMode()) {
-                //     this.draw.deleteAll();
-    
-                // if (this.form) {
-                //     this.featureColor(this.featureColorCache);
-                // }
-                // _.each(this.geometryTypeDetails, function(geomtype) {
-                //     if (geomtype.name === selectedDrawTool) {
-                //         this.geometryTypeDetails[selectedDrawTool].active(!this.geometryTypeDetails[selectedDrawTool].active());
-                //     } else {
-                //         this.geometryTypeDetails[geomtype.name].active(false);
-                //     }
-                // }, this);
-
                 this.draw.changeMode(drawMode);
                 this.drawMode(drawMode);
-
             },
 
             zoomToGeoJSON: function(data, fly) {
@@ -713,17 +574,8 @@ define([
                     this.fitToAggregationBounds();
                 }
                 if(!!this.searchResults[componentName]) {
-                    // var buffer = {
-                    //     "type": "FeatureCollection",
-                    //     "features": [{
-                    //         "type": "Feature",
-                    //         "geometry": this.searchResults[componentName].search_buffer
-                    //     }]
-                    // };
                     var buffer = this.searchResults[componentName].search_buffer;
-                    console.log(buffer);
                     this.map().getSource('geojson-search-buffer-data').setData(buffer);
-                    //this.searchBuffer(this.searchResults[componentName].search_buffer);
                 }
             },
 
@@ -775,12 +627,4 @@ define([
         }),
         template: { require: 'text!templates/views/components/search/map-filter.htm' }
     });
-    // var viewModel = function(params) {
-    // // ko.components.register(componentName, {
-    // //     viewModel: BaseFilter.extend(viewModel),
-    // //     template: {
-    // //         require: 'text!templates/views/components/search/map-filter.htm'
-    // //     }
-    // // });
-    // return viewModel;
 });
