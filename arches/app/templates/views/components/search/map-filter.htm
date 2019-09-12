@@ -19,13 +19,8 @@
         <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Search by Map" %}</h4>
     </div>
 
+    <!-- ko if: geoJSONString() === undefined -->
     <div>
-        <!-- ko foreach: { data: spatialFilterTypes, as: 'filterType' }-->
-       <!--   <button class="" href="#" data-bind="click: function(){$parent.selectEditingTool(filterType.drawMode)}, attr: {'class': filterType.class}, 'text': filterType.title, css: {'active': filterType.active}">
-        </button> -->
-        <!-- /ko -->
-
-        <!-- <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Search Map Extent" %}' data-bind="click: searchByExtent, css:{'active': extentSearch}"><span class="sr-only">{% trans "Search Map Extent" %}</span><i class="fa fa-search"></i></a> -->
         <div class="add-new-feature" style="margin-bottom: 4px;">
             <select data-placeholder="{% trans "Select a spatial filter..." %}" data-bind="
                 value: drawMode,
@@ -48,9 +43,38 @@
             </div>
         </div>
     </div>
+    <!-- /ko-->
 
+    <!-- ko if: geoJSONString() !== undefined -->
+    <div class="card">
+        <div class="geojson-editor" data-bind="codemirror: {
+            value: geoJSONString,
+            mode: { name: 'javascript', json: true },
+            lineNumbers: true
+        }"></div>
+        <div class="install-buttons">
+            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
+                geoJSONString(undefined);
+            }">{% trans 'Cancel' %}</button>
+            <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" data-bind="css: {
+                disabled: geoJSONErrors().length !== 0
+            }, click: updateGeoJSON">{% trans 'Accept GeoJSON' %}</button>
+        </div>
+        <!-- ko if: geoJSONErrors().length !== 0 -->
+        <div class="geojson-error-list">
+            {% trans "GeoJSON has the following errors that must be resolved:" %}
+            <ul>
+                <!-- ko foreach: geoJSONErrors() -->
+                <li data-bind="text: message"></li>
+                <!-- /ko-->
+            </ul>
+        </div>
+        <!-- /ko-->
+    </div>
+    <!-- /ko-->
     <div class="map-card-zoom-tool">
-        <a href="javascript:void(0);" data-bind="click: editGeoJSON">
+        <a href="javascript:void(0);" data-bind="click: function(){
+            editGeoJSON(filter.feature_collection);}">
             <i class="fa fa-pencil map-card-feature-edit"></i>
             {% trans "Edit GeoJSON" %}
         </a>
@@ -66,6 +90,7 @@
         </a>
 
     </div>
+
 
 <!--/ko -->
 {{ block.super }}
