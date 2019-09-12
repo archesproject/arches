@@ -359,9 +359,11 @@ define([
                 });
                 this.map().addControl(this.draw);
                 this.map().on('draw.create', function(e) {
-                    self.searchGeometries().forEach(function(feature){
-                        self.draw.delete(feature.id);
-                    });
+                    self.draw.getAll().features.forEach(function(feature){
+                        if(feature.id !== e.features[0].id){
+                            self.draw.delete(feature.id);
+                        }
+                    })
                     self.searchGeometries(e.features);
                     self.updateFilterGeom();
                     self.drawMode(undefined);
