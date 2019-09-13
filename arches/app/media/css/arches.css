@@ -966,6 +966,10 @@ ul.tabbed-report-tab-list {
     border-top: 1px solid #ddd;
 }
 
+.card-component-wrapper-editor .workbench-card-wrapper {
+    border-top: 1px solid #041B33;
+}
+
 .workbench-card-container {
     height: 100%;
     margin-right: 75px;
@@ -7482,18 +7486,11 @@ a.clear-geojson-button:hover {
 }
 
 .mapboxgl-popup-close-button:hover {
-    position: absolute;
-    right: 5px;
-    top: 5px;
-    border: 0;
-    border-radius: 2px;
-    padding-bottom: 4px;
     cursor: pointer;
     background-color: #337ab7;
     color: #fff;
     font-size: 17px;
     font-weight: 600;
-    cursor: pointer;
 }
 
 .hover-feature-title {
@@ -10133,7 +10130,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .mapboxgl-popup-content .hover-feature-footer {
-    padding: 10px;
+    padding: 10px 15px;
     height: auto;
 }
 
