@@ -351,7 +351,7 @@ LOGGING = {
             'formatter': 'console'
         },
         'console': {
-            'level': 'DEBUG',
+            'level': 'WARNING',
             'class': 'logging.StreamHandler',
             'formatter': 'console'
         }
@@ -359,7 +359,7 @@ LOGGING = {
     'loggers': {
         'arches': {
             'handlers': ['file', 'console'],
-            'level': 'DEBUG',
+            'level': 'WARNING',
             'propagate': True
         }
     }

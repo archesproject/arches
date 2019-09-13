@@ -61,7 +61,7 @@ define([
                             }
                         }
                         self.steps[i].complete.subscribe(function(complete) {
-                            if (complete) self.next();
+                            if (complete && self.steps[i].autoAdvance()) self.next();
                         });
                     }
                     self.steps[i]._index = i;

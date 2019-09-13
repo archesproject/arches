@@ -126,7 +126,7 @@ define([
                                 self.tile(tile);
                             }
                         });
-                    } else {
+                    } else if (ko.unwrap(params.createTile) !== false) {
                         self.tile(item.getNewTile());
                     }
                 }
