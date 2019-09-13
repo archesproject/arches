@@ -6892,15 +6892,23 @@ a#close-map-tools.map-widget-icon:hover {
     text-overflow: ellipsis;
 }
 
+.spatial-filter-container {
+    padding: 0px 5px 15px 5px;
+    margin-top: -15px;
+    border-bottom: 1px solid #ddd;
+}
+
 .buffer-control {
     color: #4d627b;
-    /* border: none; */
-    /* height: 40px; */
+    border: none; 
     padding: 5px;
     padding-left: 12px;
     border-radius: 3px;
     margin-bottom: 5px;
-    border-color: #dddddd;
+}
+
+.buffer-control h5 {
+    font-size: 13px;
 }
 
 .buffer-input {
