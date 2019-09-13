@@ -60,7 +60,6 @@ define([
                 };
 
                 this.searchGeometries = ko.observableArray(null);
-                this.extentSearch = ko.observable(false);
                 this.searchAggregations = ko.observable();
                 this.drawMode = ko.observable();
                 this.geoJSONString = ko.observable(undefined);
@@ -220,57 +219,9 @@ define([
                     }
                 }, this);
 
-                var getSearchAggregationGeoJSON = function() {
-                    var agg = ko.unwrap(self.searchAggregations);
-                    if (!agg || !agg.geo_aggs.grid.buckets) {
-                        return {
-                            "type": "FeatureCollection",
-                            "features": []
-                        };
-                    }
-
-                    if (self.filter.feature_collection() && self.filter.feature_collection()['features'].length > 0 && self.extentSearch() === false) {
-                        var geojsonFC = self.filter.feature_collection();
-                        var extent = geojsonExtent(geojsonFC);
-                        var bounds = new mapboxgl.LngLatBounds(extent);
-                        self.map().fitBounds(bounds, {
-                            padding: self.buffer()
-                        });
-                    } else {
-                        self.fitToAggregationBounds();
-                    }
-                    var features = [];
-                    _.each(agg.geo_aggs.grid.buckets, function(cell) {
-                        var pt = geohash.decode(cell.key);
-                        var feature = turf.point([pt.lon, pt.lat], {
-                            doc_count: cell.doc_count
-                        });
-                        features.push(feature);
-                    });
-                    var pointsFC = turf.featureCollection(features);
-
-                    var aggregated = turf.collect(ko.unwrap(bins), pointsFC, 'doc_count', 'doc_count');
-                    _.each(aggregated.features, function(feature) {
-                        feature.properties.doc_count = _.reduce(feature.properties.doc_count, function(i, ii) {
-                            return i + ii;
-                        }, 0);
-                    });
-
-                    return {
-                        points: pointsFC,
-                        agg: aggregated
-                    };
-                };
-                var updateSearchPointsGeoJSON = function() {
+                var updateSearchResultPointLayer = function() {
                     var pointSource = self.map().getSource('search-results-points');
                     var agg = ko.unwrap(self.searchAggregations);
-                    if (!agg || !agg.results) {
-                        return {
-                            "type": "FeatureCollection",
-                            "features": []
-                        };
-                    }
-
                     var features = [];
                     var mouseoverInstanceId = self.mouseoverInstanceId();
                     _.each(agg.results, function(result) {
@@ -287,13 +238,45 @@ define([
                     pointSource.setData(pointsFC);
                 };
 
-                this.updateSearchResultsLayer = function() {
+                this.updateSearchResultsLayers = function() {
+                    if (self.filter.feature_collection() && self.filter.feature_collection()['features'].length > 0) {
+                        var geojsonFC = self.filter.feature_collection();
+                        var extent = geojsonExtent(geojsonFC);
+                        var bounds = new mapboxgl.LngLatBounds(extent);
+                        self.map().fitBounds(bounds, {
+                            padding: self.buffer()
+                        });
+                    } else {
+                        self.fitToAggregationBounds();
+                    }
+                    var features = [];
+                    var agg = ko.unwrap(self.searchAggregations);
+                    _.each(agg.geo_aggs.grid.buckets, function(cell) {
+                        var pt = geohash.decode(cell.key);
+                        var feature = turf.point([pt.lon, pt.lat], {
+                            doc_count: cell.doc_count
+                        });
+                        features.push(feature);
+                    });
+                    var pointsFC = turf.featureCollection(features);
+
+                    var aggregated = turf.collect(ko.unwrap(bins), pointsFC, 'doc_count', 'doc_count');
+                    _.each(aggregated.features, function(feature) {
+                        feature.properties.doc_count = _.reduce(feature.properties.doc_count, function(i, ii) {
+                            return i + ii;
+                        }, 0);
+                    });
+
+                    var aggData = {
+                        points: pointsFC,
+                        agg: aggregated
+                    };
+
                     var aggSource = self.map().getSource('search-results-hex');
                     var hashSource = self.map().getSource('search-results-hashes');
-                    var aggData = getSearchAggregationGeoJSON();
                     aggSource.setData(aggData.agg);
                     hashSource.setData(aggData.points);
-                    updateSearchPointsGeoJSON();
+                    updateSearchResultPointLayer();
                 };
 
                 this.map.subscribe(function(){
@@ -309,21 +292,21 @@ define([
                     }, this);
 
                     this.buffer.subscribe(function(val) {
-                        this.updateFilterGeom();
+                        this.updateFilter();
                     }, this);
 
                     this.bufferUnit.subscribe(function(val) {
-                        this.updateFilterGeom();
+                        this.updateFilter();
                     }, this);
 
-                    this.searchAggregations.subscribe(this.updateSearchResultsLayer, this);
+                    this.searchAggregations.subscribe(this.updateSearchResultsLayers, this);
                     if (ko.isObservable(bins)) {
-                        bins.subscribe(this.updateSearchResultsLayer, this);
+                        bins.subscribe(this.updateSearchResultsLayers, this);
                     }
                     if (this.searchAggregations()) {
-                        this.updateSearchResultsLayer();
+                        this.updateSearchResultsLayers();
                     }
-                    this.mouseoverInstanceId.subscribe(updateSearchPointsGeoJSON);
+                    this.mouseoverInstanceId.subscribe(updateSearchResultPointLayer);
                 }, this);
             },
 
@@ -347,12 +330,12 @@ define([
                         }
                     })
                     self.searchGeometries(e.features);
-                    self.updateFilterGeom();
+                    self.updateFilter();
                     self.drawMode(undefined);
                 });
                 this.map().on('draw.update', function(e) {
                     self.searchGeometries(e.features);
-                    self.updateFilterGeom();
+                    self.updateFilter();
                 });
             },
 
@@ -380,11 +363,11 @@ define([
                     "features": [boundsFeature]
                 });
                 this.searchGeometries([boundsFeature]);
-                this.updateFilterGeom();
+                this.updateFilter();
                 this.drawMode(undefined);
             },
 
-            updateFilterGeom: function(){
+            updateFilter: function(){
                 var maxBufferUnit = mathjs.unit(this.maxBuffer, this.maxBufferUnits);
                 var unit = mathjs.unit(this.buffer() + this.bufferUnit());
                 unit.equalBase(maxBufferUnit);
@@ -454,7 +437,6 @@ define([
             },
 
             updateQuery: function() {
-                console.log('in updateQuery')
                 var self = this;
                 var queryObj = this.query();
                 if (this.filter.feature_collection().features.length > 0) {
@@ -490,8 +472,8 @@ define([
                         });
                     }
                 }
-                // we need to add these observables here AFTER initial values have been discoved
-                // because of the race nature or these variables subscriptions
+                // we need to add these observables here AFTER initial values have been discovered
+                // because of the race nature of these variables' subscriptions
                 this.buffer = ko.observable(buffer).extend({ deferred: true });
                 this.bufferUnit = ko.observable(bufferUnit).extend({ deferred: true });
                 this.filter.inverted = ko.observable(inverted).extend({ deferred: true });
@@ -517,25 +499,17 @@ define([
             },
 
             clear: function(reset_features) {
-                if (reset_features !== false){
-                    if (this.filter.feature_collection().features.length > 0) {
-                        this.filter.feature_collection({
-                            "type": "FeatureCollection",
-                            "features": []
-                        });
-                    }
-                }
-                this.getFilter('term-filter').removeTag('Map Filter Enabled');
-                this.draw.deleteAll();
-                this.clearBuffer();
-                this.searchGeometries([]);
-            },
-
-            clearBuffer: function() {
+                this.filter.feature_collection({
+                    "type": "FeatureCollection",
+                    "features": []
+                });
                 this.map().getSource('geojson-search-buffer-data').setData({
                     "type": "FeatureCollection",
                     "features": []
                 });
+                this.getFilter('term-filter').removeTag('Map Filter Enabled');
+                this.draw.deleteAll();
+                this.searchGeometries([]);
             },
 
             fitToAggregationBounds: function() {
