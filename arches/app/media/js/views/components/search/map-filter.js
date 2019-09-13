@@ -279,8 +279,8 @@ define([
                     updateSearchResultPointLayer();
                 };
 
+                this.filters[componentName](this);
                 this.map.subscribe(function(){
-                    this.filters[componentName](this);
                     this.setupDraw();
                     this.restoreState();
                     
