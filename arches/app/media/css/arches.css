@@ -7656,9 +7656,9 @@ a.search-query-link-captions:focus {
 }
 
 .search-inline-filters {
-        display: flex;
+        /*display: flex;
         flex-direction: row;
-        justify-content: right;
+        justify-content: right;*/
         margin-top: 10px;
         margin-left: -5px;
         margin-bottom: 5px;
@@ -7666,14 +7666,15 @@ a.search-query-link-captions:focus {
 
 .search-inline-filters div {
     padding-left: 2px;
+    margin-bottom: 2px;
 }
 
-.resource-selector-button div .btn {
+.qa-filter .resource-selector-button div .btn {
     padding: 2px 47px;
 }
 
-.search-inline-filters div:nth-child(2) .resource-selector-button div .btn {
-    padding: 2px 58px;
+.resource-filter .resource-selector-button div .btn {
+    padding: 2px 59px;
 }
 
 .search-control-container {
