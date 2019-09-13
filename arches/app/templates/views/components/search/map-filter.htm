@@ -16,13 +16,26 @@
 {% block sidepanel %}
 <!--ko if: activeTab() === 'filter' -->
     <div class="workbench-card-sidepanel-header-container">
-        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Search by Map" %}</h4>
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Map Search" %}</h4>
     </div>
 
     <!-- ko if: geoJSONString() === undefined -->
-    <div>
-        <div class="add-new-feature" style="margin-bottom: 4px;">
-            <select data-placeholder="{% trans "Select a spatial filter..." %}" data-bind="
+    <div class="spatial-filter-container">
+        
+        <!-- Buffer Definition -->
+        <div class="buffer-control form-control">
+            <h5 class="">{% trans "Buffer" %}</h5>
+            <div class="form-inline">
+                <label for="buffer-input">{% trans "Distance" %}</label>
+                <input type="number" min=0.0 id="buffer-input" placeholder="{% trans " buffer " %}" class="buffer-input" data-bind="textInput: buffer">
+                <select class="form-control" style="vertical-align: top;" data-bind="options: bufferUnits, optionsText:'name', optionsValue:'val', value: bufferUnit"></select>
+            </div>
+        </div>
+
+        <!-- Geometry -->
+        <div class="add-new-feature buffer-control" style="">
+            <h5 class="">{% trans "Select a filter" %}</h5>
+            <select data-placeholder="{% trans "Draw a..." %}" data-bind="
                 value: drawMode,
                 valueAllowUnset: true,
                 options: spatialFilterTypes,
@@ -35,13 +48,7 @@
                 }
             "></select>
         </div>
-        <div class="buffer-control form-control">
-            <div class="form-inline">
-              <label for="buffer-input">{% trans "Buffer" %}</label>
-              <input type="number" min=0.0 id="buffer-input" placeholder="{% trans " buffer " %}" class="buffer-input" data-bind="textInput: buffer">
-              <select class="form-control"  data-bind="options: bufferUnits, optionsText:'name', optionsValue:'val', value: bufferUnit"></select>
-            </div>
-        </div>
+        
     </div>
     <!-- /ko-->
 

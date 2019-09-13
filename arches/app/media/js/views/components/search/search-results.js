@@ -27,7 +27,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
 
                 this.results = ko.observableArray();
                 this.showRelationships = ko.observable();
-                this.mouseoverInstanceId = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
                 this.selectedResourceId = ko.observable(null);
 

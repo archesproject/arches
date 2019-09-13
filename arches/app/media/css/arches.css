@@ -966,6 +966,10 @@ ul.tabbed-report-tab-list {
     border-top: 1px solid #ddd;
 }
 
+.card-component-wrapper-editor .workbench-card-wrapper {
+    border-top: 1px solid #041B33;
+}
+
 .workbench-card-container {
     height: 100%;
     margin-right: 75px;
@@ -6892,15 +6896,23 @@ a#close-map-tools.map-widget-icon:hover {
     text-overflow: ellipsis;
 }
 
+.spatial-filter-container {
+    padding: 0px 5px 15px 5px;
+    margin-top: -15px;
+    border-bottom: 1px solid #ddd;
+}
+
 .buffer-control {
     color: #4d627b;
-    /* border: none; */
-    /* height: 40px; */
+    border: none; 
     padding: 5px;
     padding-left: 12px;
     border-radius: 3px;
     margin-bottom: 5px;
-    border-color: #dddddd;
+}
+
+.buffer-control h5 {
+    font-size: 13px;
 }
 
 .buffer-input {
@@ -7449,21 +7461,20 @@ a.clear-geojson-button:hover {
 .hover-feature-title-bar {
     height: 40px;
     padding: 10px;
-    background: #ebebeb;
+    background: #ddd;
+    border: 1px solid #ccc;
+    border-bottom: none;
     max-width: 400px;
 }
 
 .mapboxgl-popup-content .hover-feature-title-bar {
-    margin-left: -20px;
-    margin-right: -20px;
-    margin-top: -20px;
-    margin-bottom: 10px;
+    margin-bottom: 0px;
 }
 
 .mapboxgl-popup-close-button {
     position: absolute;
-    right: 5px;
-    top: 5px;
+    right: 7px;
+    top: 7px;
     border: 0;
     border-radius: 2px;
     padding-bottom: 4px;
@@ -7475,22 +7486,15 @@ a.clear-geojson-button:hover {
 }
 
 .mapboxgl-popup-close-button:hover {
-    position: absolute;
-    right: 5px;
-    top: 5px;
-    border: 0;
-    border-radius: 2px;
-    padding-bottom: 4px;
     cursor: pointer;
     background-color: #337ab7;
     color: #fff;
     font-size: 17px;
     font-weight: 600;
-    cursor: pointer;
 }
 
 .hover-feature-title {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     max-width: 300px;
     white-space: nowrap;
@@ -7499,16 +7503,14 @@ a.clear-geojson-button:hover {
 }
 
 .hover-feature-body {
-    padding: 10px 10px 20px 10px;
-    overflow-y: scroll;
+    padding: 10px 15px 15px 15px;
+    width: 350px;
 }
 
 .hover-feature {
     font-size: 13px;
     color: #555;
-    font-weight: 500;
     margin-bottom: 20px;
-    width: 380px;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -7518,6 +7520,7 @@ a.clear-geojson-button:hover {
     line-height: 1.2em;
     /* fallback */
     max-height: 12em;
+    min-height: 3em;
     /* fallback */
 }
 
@@ -7530,6 +7533,11 @@ a.clear-geojson-button:hover {
 
 .hover-feature-metadata {
     margin-bottom: -4px;
+    color: #888;
+}
+
+.hover-feature-metadata span {
+    color: steelblue;
 }
 
 .saved-search-container {
@@ -7653,15 +7661,25 @@ a.search-query-link-captions:focus {
 }
 
 .search-inline-filters {
-        display: flex;
+        /*display: flex;
         flex-direction: row;
-        justify-content: right;
-        margin-top: -30px;
-        float: right;
+        justify-content: right;*/
+        margin-top: 10px;
+        margin-left: -5px;
+        margin-bottom: 5px;
 }
 
 .search-inline-filters div {
     padding-left: 2px;
+    margin-bottom: 2px;
+}
+
+.qa-filter .resource-selector-button div .btn {
+    padding: 2px 47px;
+}
+
+.resource-filter .resource-selector-button div .btn {
+    padding: 2px 59px;
 }
 
 .search-control-container {
@@ -10108,11 +10126,11 @@ a.jstree-anchor.permissions-widget {
 
 .mapboxgl-popup-content {
     width: 350px;
-    padding: 20px;
+    padding: 0px;
 }
 
 .mapboxgl-popup-content .hover-feature-footer {
-    padding: 10px 0 0;
+    padding: 10px 15px;
     height: auto;
 }
 
