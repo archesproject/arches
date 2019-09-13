@@ -60,17 +60,32 @@ define([
                 };
 
                 this.searchGeometries = ko.observableArray(null);
-                this.extentSearch = ko.observable(false);
                 this.searchAggregations = ko.observable();
-                this.searchBuffer = ko.observable();
-                this.hoverData = ko.observable(null);
-                this.clickData = ko.observable(null);
                 this.drawMode = ko.observable();
                 this.geoJSONString = ko.observable(undefined);
                 this.geoJSONErrors = ko.observableArray();
                 this.pageLoaded = false;
                 this.maxBuffer = 100000;
                 this.maxBufferUnits = 'm';
+                this.maxZoom = arches.mapDefaultMaxZoom;
+                this.filter.feature_collection = ko.observable({
+                    "type": "FeatureCollection",
+                    "features": []
+                });
+
+                this.bufferUnits = [{
+                    name: 'meters',
+                    val: 'm'
+                },{
+                    name: 'feet',
+                    val: 'ft'
+                }];
+
+                this.mapLinkData.subscribe(function(data) {
+                    this.zoomToGeoJSON(data, true);
+                },this);
+
+                var bins = binFeatureCollection(this.searchAggregations);
 
                 this.geoJSONString.subscribe(function(geoJSONString) {
                     this.geoJSONErrors(this.getGeoJSONErrors(geoJSONString));
@@ -156,28 +171,6 @@ define([
                     }
                 };
 
-
-                this.bufferUnits = [{
-                    name: 'meters',
-                    val: 'm'
-                },{
-                    name: 'feet',
-                    val: 'ft'
-                }];
-                // this.buffer = ko.observable(10).extend({ deferred: true });
-                // this.bufferUnit = ko.observable('m').extend({ deferred: true });
-                this.buffLayer =  [{
-                    "id": "geojson-search-buffer",
-                    "type": "fill",
-                    "filter": ["==", "$type", "Polygon"],
-                    "paint": {
-                        "fill-color": "#3bb2d0",
-                        "fill-outline-color": "#3bb2d0",
-                        "fill-opacity": 0.1
-                    },
-                    "source": "geojson-editor-data"
-                }];
-
                 this.spatialFilterTypes = [{
                     name: 'Point',
                     title: 'Draw a Marker',
@@ -220,103 +213,33 @@ define([
                     }
                 }, this);
 
-
-                var setupDraw = function(map) {
-                    var modes = MapboxDraw.modes;
-                    modes.static = {
-                        onSetup: function() {
-                            this.setActionableState();
-                            return {};
-                        },
-                        toDisplayFeatures: function(state, geojson, display) {
-                            display(geojson);
-                        }
-                    };
-                    this.draw = new MapboxDraw({
-                        displayControlsDefault: false,
-                        modes: modes
-                    });
-                    map.addControl(this.draw);
-                    map.on('draw.create', function(e) {
-                        self.searchGeometries().forEach(function(feature){
-                            self.draw.delete(feature.id);
-                        });
-                        self.searchGeometries(e.features);
-                        self.updateFilterGeom();
-                        self.drawMode(undefined);
-                    });
-                    map.on('draw.update', function(e) {
-                        self.searchGeometries(e.features);
-                        self.updateFilterGeom();
-                    });
-                };
-
-                this.map.subscribe(setupDraw, this);
-
                 this.searchResults.timestamp.subscribe(function(timestamp) {
                     if(this.pageLoaded) {
                         this.updateResults();
                     }
                 }, this);
 
-                this.resizeOnChange = ko.computed(function() {
-                    return ko.unwrap(options.resizeOnChange);
-                });
-                this.filter.feature_collection = ko.observable({
-                    "type": "FeatureCollection",
-                    "features": []
-                });
-                //this.filter.inverted = ko.observable(false).extend({ deferred: true });
-
-                this.geocoderDefault = arches.geocoderDefault;
-                this.defaultZoom = arches.mapDefaultZoom;
-                this.minZoom = arches.mapDefaultMinZoom;
-                this.maxZoom = arches.mapDefaultMaxZoom;
-                this.defaultCenter = [arches.mapDefaultX, arches.mapDefaultY];
-
-                this.clearSearch = ko.observable();
-                this.clearSearch.subscribe(function(val) {
-                    if (!val) {
-                        this.clear(false);
-                    }
-                }, this);
-
-                this.filters[componentName](this);
-
-                this.map.subscribe(function(){
-                    this.restoreState();
-                    
-                    var filterUpdated = ko.computed(function() {
-                        return JSON.stringify(ko.toJS(this.filter.feature_collection())) + this.filter.inverted();
-                    }, this);
-                    filterUpdated.subscribe(function() {
-                        this.updateQuery();
-                    }, this);
-
-                    this.buffer.subscribe(function(val) {
-                        this.updateFilterGeom();
-                    }, this);
-
-                    this.bufferUnit.subscribe(function(val) {
-                        this.updateFilterGeom();
-                    }, this);
-                }, this);
-
-                this.mouseoverInstanceId = options.mouseoverInstanceId;
-                this.mapLinkData = options.mapLinkData;
-
-                var bins = binFeatureCollection(this.searchAggregations);
-
-                var getSearchAggregationGeoJSON = function() {
+                var updateSearchResultPointLayer = function() {
+                    var pointSource = self.map().getSource('search-results-points');
                     var agg = ko.unwrap(self.searchAggregations);
-                    if (!agg || !agg.geo_aggs.grid.buckets) {
-                        return {
-                            "type": "FeatureCollection",
-                            "features": []
-                        };
-                    }
+                    var features = [];
+                    var mouseoverInstanceId = self.mouseoverInstanceId();
+                    _.each(agg.results, function(result) {
+                        _.each(result._source.points, function(point) {
+                            var feature = turf.point([point.point.lon, point.point.lat], _.extend(result._source, {
+                                resourceinstanceid: result._id,
+                                highlight: result._id === mouseoverInstanceId
+                            }));
+                            features.push(feature);
+                        });
+                    });
 
-                    if (self.filter.feature_collection() && self.filter.feature_collection()['features'].length > 0 && self.extentSearch() === false) {
+                    var pointsFC = turf.featureCollection(features);
+                    pointSource.setData(pointsFC);
+                };
+
+                this.updateSearchResultsLayers = function() {
+                    if (self.filter.feature_collection() && self.filter.feature_collection()['features'].length > 0) {
                         var geojsonFC = self.filter.feature_collection();
                         var extent = geojsonExtent(geojsonFC);
                         var bounds = new mapboxgl.LngLatBounds(extent);
@@ -327,6 +250,7 @@ define([
                         self.fitToAggregationBounds();
                     }
                     var features = [];
+                    var agg = ko.unwrap(self.searchAggregations);
                     _.each(agg.geo_aggs.grid.buckets, function(cell) {
                         var pt = geohash.decode(cell.key);
                         var feature = turf.point([pt.lon, pt.lat], {
@@ -343,64 +267,76 @@ define([
                         }, 0);
                     });
 
-                    return {
+                    var aggData = {
                         points: pointsFC,
                         agg: aggregated
                     };
-                };
-                var updateSearchPointsGeoJSON = function() {
-                    var pointSource = self.map().getSource('search-results-points');
-                    var agg = ko.unwrap(self.searchAggregations);
-                    if (!agg || !agg.results) {
-                        return {
-                            "type": "FeatureCollection",
-                            "features": []
-                        };
-                    }
 
-                    var features = [];
-                    var mouseoverInstanceId = self.mouseoverInstanceId();
-                    var hoverData = self.hoverData();
-                    var clickData = self.clickData();
-                    _.each(agg.results, function(result) {
-                        _.each(result._source.points, function(point) {
-                            var feature = turf.point([point.point.lon, point.point.lat], _.extend(result._source, {
-                                resourceinstanceid: result._id,
-                                // highlight: result._id === mouseoverInstanceId ||
-                                //      (clickData ? (ko.unwrap(clickData.resourceinstanceid) === result._id) : false) ||
-                                //      (hoverData ? (ko.unwrap(hoverData.resourceinstanceid) === result._id) : false)
-                            }));
-                            features.push(feature);
-                        });
-                    });
-
-                    var pointsFC = turf.featureCollection(features);
-                    pointSource.setData(pointsFC);
-                };
-
-                this.updateSearchResultsLayer = function() {
                     var aggSource = self.map().getSource('search-results-hex');
                     var hashSource = self.map().getSource('search-results-hashes');
-                    var aggData = getSearchAggregationGeoJSON();
                     aggSource.setData(aggData.agg);
                     hashSource.setData(aggData.points);
-                    updateSearchPointsGeoJSON();
+                    updateSearchResultPointLayer();
                 };
 
+                this.filters[componentName](this);
                 this.map.subscribe(function(){
-                    this.searchAggregations.subscribe(this.updateSearchResultsLayer, this);
+                    this.setupDraw();
+                    this.restoreState();
+                    
+                    var filterUpdated = ko.computed(function() {
+                        return JSON.stringify(ko.toJS(this.filter.feature_collection())) + this.filter.inverted();
+                    }, this);
+                    filterUpdated.subscribe(function() {
+                        this.updateQuery();
+                    }, this);
+
+                    this.buffer.subscribe(function(val) {
+                        this.updateFilter();
+                    }, this);
+
+                    this.bufferUnit.subscribe(function(val) {
+                        this.updateFilter();
+                    }, this);
+
+                    this.searchAggregations.subscribe(this.updateSearchResultsLayers, this);
                     if (ko.isObservable(bins)) {
-                        bins.subscribe(this.updateSearchResultsLayer, this);
+                        bins.subscribe(this.updateSearchResultsLayers, this);
                     }
                     if (this.searchAggregations()) {
-                        this.updateSearchResultsLayer();
+                        this.updateSearchResultsLayers();
                     }
-                    this.mouseoverInstanceId.subscribe(updateSearchPointsGeoJSON);
+                    this.mouseoverInstanceId.subscribe(updateSearchResultPointLayer);
                 }, this);
+            },
 
-                this.mapLinkData.subscribe(function(data) {
-                    this.zoomToGeoJSON(data, true);
-                },this);
+            setupDraw: function() {
+                var self = this;
+                var modes = MapboxDraw.modes;
+                modes.static = {
+                    toDisplayFeatures: function(state, geojson, display) {
+                        display(geojson);
+                    }
+                };
+                this.draw = new MapboxDraw({
+                    displayControlsDefault: false,
+                    modes: modes
+                });
+                this.map().addControl(this.draw);
+                this.map().on('draw.create', function(e) {
+                    self.draw.getAll().features.forEach(function(feature){
+                        if(feature.id !== e.features[0].id){
+                            self.draw.delete(feature.id);
+                        }
+                    })
+                    self.searchGeometries(e.features);
+                    self.updateFilter();
+                    self.drawMode(undefined);
+                });
+                this.map().on('draw.update', function(e) {
+                    self.searchGeometries(e.features);
+                    self.updateFilter();
+                });
             },
 
             searchByExtent: function() {
@@ -427,11 +363,11 @@ define([
                     "features": [boundsFeature]
                 });
                 this.searchGeometries([boundsFeature]);
-                this.updateFilterGeom();
+                this.updateFilter();
                 this.drawMode(undefined);
             },
 
-            updateFilterGeom: function(){
+            updateFilter: function(){
                 var maxBufferUnit = mathjs.unit(this.maxBuffer, this.maxBufferUnits);
                 var unit = mathjs.unit(this.buffer() + this.bufferUnit());
                 unit.equalBase(maxBufferUnit);
@@ -482,16 +418,6 @@ define([
                 }
             },
 
-            /**
-              * Updates the draw mode of the draw layer when a user selects a draw tool in the map controls
-              * @param  {string} selectedDrawTool the draw tool name selected in the map controls
-              * @return {null}
-              */
-            selectEditingTool: function(drawMode) {
-                this.draw.changeMode(drawMode);
-                this.drawMode(drawMode);
-            },
-
             zoomToGeoJSON: function(data, fly) {
                 var method = fly ? 'flyTo' : 'jumpTo';
                 var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
@@ -511,7 +437,6 @@ define([
             },
 
             updateQuery: function() {
-                console.log('in updateQuery')
                 var self = this;
                 var queryObj = this.query();
                 if (this.filter.feature_collection().features.length > 0) {
@@ -521,7 +446,6 @@ define([
                     this.filter.feature_collection().features[0].properties['inverted'] = this.filter.inverted();
                     queryObj[componentName] = ko.toJSON(this.filter.feature_collection());
                 } else {
-                    //this.clear();
                     delete queryObj[componentName];
                 }
                 this.query(queryObj);
@@ -538,12 +462,8 @@ define([
                     if (mapQuery.features.length > 0) {
                         hasSpatialFilter = true;
                         var properties = mapQuery.features[0].properties;
-                        //this.filter.inverted(properties.inverted);
                         inverted = properties.inverted;
-                        //this.getFilter('term-filter').addTag('Map Filter Enabled', this.name, this.filter.inverted);
                         this.filter.feature_collection(mapQuery);
-                        // this.buffer(properties.buffer.width);
-                        // this.bufferUnit(properties.buffer.unit);
                         buffer = properties.buffer.width;
                         bufferUnit = properties.buffer.unit
                         this.draw.set({
@@ -552,6 +472,8 @@ define([
                         });
                     }
                 }
+                // we need to add these observables here AFTER initial values have been discovered
+                // because of the race nature of these variables' subscriptions
                 this.buffer = ko.observable(buffer).extend({ deferred: true });
                 this.bufferUnit = ko.observable(bufferUnit).extend({ deferred: true });
                 this.filter.inverted = ko.observable(inverted).extend({ deferred: true });
@@ -577,25 +499,17 @@ define([
             },
 
             clear: function(reset_features) {
-                if (reset_features !== false){
-                    if (this.filter.feature_collection().features.length > 0) {
-                        this.filter.feature_collection({
-                            "type": "FeatureCollection",
-                            "features": []
-                        });
-                    }
-                }
-                this.getFilter('term-filter').removeTag('Map Filter Enabled');
-                this.draw.deleteAll();
-                this.clearBuffer();
-                this.searchGeometries([]);
-            },
-
-            clearBuffer: function() {
+                this.filter.feature_collection({
+                    "type": "FeatureCollection",
+                    "features": []
+                });
                 this.map().getSource('geojson-search-buffer-data').setData({
                     "type": "FeatureCollection",
                     "features": []
                 });
+                this.getFilter('term-filter').removeTag('Map Filter Enabled');
+                this.draw.deleteAll();
+                this.searchGeometries([]);
             },
 
             fitToAggregationBounds: function() {
