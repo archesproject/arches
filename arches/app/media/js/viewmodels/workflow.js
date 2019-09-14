@@ -77,6 +77,7 @@ define([
             };
             resourcesToDelete.forEach(function(resource){deleteObject('resource', resource.resourceid);});
             tilesToDelete.forEach(function(tile){deleteObject('tile', tile.tile);});
+            window.location.href = arches.urls.home
         };
 
         this.restoreStateFromURL();

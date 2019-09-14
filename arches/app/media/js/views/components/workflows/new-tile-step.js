@@ -155,13 +155,18 @@ define([
 
         params.getStateProperties = function(){
             // Collects those properties that you want to set to the state.
+            var wastebin = !!(ko.unwrap(params.wastebin)) ? koMapping.toJS(params.wastebin) : undefined;
+            if (wastebin && ko.unwrap(wastebin.hasOwnProperty('resourceid'))) {
+                wastebin.resourceid = ko.unwrap(params.resourceid);
+            }
             return {
                 resourceid: ko.unwrap(params.resourceid),
                 tile: !!(ko.unwrap(params.tile)) ? koMapping.toJS(params.tile().data) : undefined,
-                wastebin: !!(ko.unwrap(params.wastebin)) ? koMapping.toJS(params.wastebin().data) : undefined,
-                tileid: !!(ko.unwrap(params.tile)) ? ko.unwrap(params.tile().tileid): undefined
+                tileid: !!(ko.unwrap(params.tile)) ? ko.unwrap(params.tile().tileid): undefined,
+                wastebin: wastebin
             };
         };
+
 
         this.setStateProperties = function(){
             //Sets properties in getStateProperties to the state.
