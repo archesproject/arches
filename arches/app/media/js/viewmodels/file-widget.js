@@ -162,7 +162,7 @@ define([
             clickable: ".fileinput-button." + this.uniqueidClass(),
             acceptedFiles: this.acceptedFiles(),
             maxFilesize: this.maxFilesize(),
-            maxFiles: Number(this.maxFiles()),
+            // maxFiles: Number(this.maxFiles()),
             init: function() {
                 self.dropzone = this;
 
