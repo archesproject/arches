@@ -16,6 +16,7 @@ define([
         this.loading = config.loading || ko.observable(false);
         this.alert = config.alert || ko.observable(null);
         this.state = {steps:[]};
+        this.quitUrl = arches.urls.home;
 
         this.workflowName = ko.observable();
         this.getJSON = function(pluginJsonFileName) {
@@ -77,7 +78,7 @@ define([
             };
             resourcesToDelete.forEach(function(resource){deleteObject('resource', resource.resourceid);});
             tilesToDelete.forEach(function(tile){deleteObject('tile', tile.tile);});
-            window.location.href = arches.urls.home
+            window.location.href = self.quitUrl;
         };
 
         this.restoreStateFromURL();
