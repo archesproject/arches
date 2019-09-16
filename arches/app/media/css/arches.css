@@ -427,6 +427,10 @@ input[type="checkbox"] {
     flex-direction:column;
 }
 
+.workflowstep-nav .selectable i {
+    cursor: pointer;
+}
+
 .arrow-up {
     width: 0;
     height: 0;
@@ -473,6 +477,12 @@ input[type="checkbox"] {
     width: 56px;
     font-size: 25px;
     color: #ccc;
+}
+
+.selectable .workflow-step-icon {
+    background-color: rgb(244, 244, 244);
+    border: 1px solid rgb(221, 221, 221);
+    color: #26476a;
 }
 
 
@@ -6904,7 +6914,7 @@ a#close-map-tools.map-widget-icon:hover {
 
 .buffer-control {
     color: #4d627b;
-    border: none; 
+    border: none;
     padding: 5px;
     padding-left: 12px;
     border-radius: 3px;
@@ -6920,7 +6930,7 @@ a#close-map-tools.map-widget-icon:hover {
 }
 
 .map-tool-container {
-    position: absolute; 
+    position: absolute;
     top: 75px;
     left: 30px;
     font-size: 14px;
@@ -6930,8 +6940,8 @@ a#close-map-tools.map-widget-icon:hover {
 }
 
 .map-tool-container.buffer {
-    position: absolute; 
-    top: 0px; 
+    position: absolute;
+    top: 0px;
     width: 220px;
 }
 
