@@ -8,7 +8,7 @@
             <div
             data-bind="click: function(){if (step.complete() || ($parent.steps[step._index - 1].complete())){$parent.activeStep(step)}},
                        event: { mouseover: function(){$parent.hoverStep(step)}, mouseout: function(){$parent.hoverStep(null)}},
-                       css: { selectable: step.complete() || ($parent.steps[step._index - 1].complete()) }">
+                       css: { selectable: step.complete() || ($parent.steps[step._index - 1] && $parent.steps[step._index - 1].complete()) }">
                 <i class="fa fa-lg" data-bind="class: step.iconClass"></i>
             </div>
 
