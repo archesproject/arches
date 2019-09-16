@@ -258,6 +258,28 @@ define([
                 });
 
                 self.map(map);
+                if (params.fitBounds){
+                    var padding = 40;
+                    var activeTab = self.activeTab();
+                    var options = {
+                        padding: {
+                            top: padding,
+                            left: padding + (activeTab ? 200: 0),
+                            bottom: padding,
+                            right: padding + (activeTab ? 200: 0)
+                        },
+                        animate: false
+                    };
+                    var bounds = params.fitBounds();
+                    if (bounds) {
+                        map.fitBounds(bounds, options);
+                    } else {
+                        var fitBounds = params.fitBounds.subscribe(function(bounds) {
+                            map.fitBounds(bounds, options);
+                            fitBounds.dispose();
+                        });
+                    }
+                }
                 setTimeout(function() { map.resize(); }, 1);
             });
         };
