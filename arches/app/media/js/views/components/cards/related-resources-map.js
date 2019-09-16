@@ -1,12 +1,14 @@
 define([
+    'jquery',
     'arches',
     'knockout',
     'knockout-mapping',
+    'geojson-extent',
     'viewmodels/card-component',
     'views/components/map',
     'views/components/cards/select-feature-layers',
     'text!templates/views/components/cards/related-resources-map-popup.htm'
-], function(arches, ko, koMapping, CardComponentViewModel, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function($, arches, ko, koMapping, geojsonExtent, CardComponentViewModel, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         this.widgets = [];
@@ -23,6 +25,7 @@ define([
             }
         });
 
+        var resourceBounds = ko.observable();
         var selectSource = this.selectSource();
         var selectSourceLayer = this.selectSourceLayer();
         var selectedResourceIds = ko.computed(function() {
@@ -40,6 +43,16 @@ define([
             });
             return ids;
         });
+        if (selectedResourceIds().length > 0) {
+            $.getJSON({
+                url: arches.urls.geojson,
+                data: {
+                    resourceid: selectedResourceIds().join(',')
+                }
+            }, function(geojson) {
+                if (geojson.features.length > 0) resourceBounds(geojsonExtent(geojson));
+            });
+        }
         var selectFeatureLayers = selectFeatureLayersFactory('', selectSource, selectSourceLayer, selectedResourceIds(), true);
 
         var sources = [];
@@ -74,6 +87,8 @@ define([
         params.layers = ko.observable(
             extendedLayers.concat(selectFeatureLayers)
         );
+
+        params.fitBounds = resourceBounds;
 
         MapComponentViewModel.apply(this, [params]);
 

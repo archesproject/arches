@@ -225,7 +225,8 @@ class GeoJSON(APIBase):
         for node in nodes:
             tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup)
             if resourceid is not None:
-                tiles = tiles.filter(resourceinstance_id=resourceid)
+                # resourceid = resourceid.split(',')
+                tiles = tiles.filter(resourceinstance_id__in=resourceid.split(','))
             if tileid is not None:
                 tiles = tiles.filter(tileid=tileid)
             for tile in tiles:
