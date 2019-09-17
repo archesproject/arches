@@ -174,7 +174,7 @@ define([
             params.fitBoundsOptions = { padding: {top: padding, left: padding + 200, bottom: padding, right: padding + 200} };
         }
         params.activeTab = 'editor';
-        params.sources = {
+        params.sources = Object.assign({
             "geojson-editor-data": {
                 "type": "geojson",
                 "data": {
@@ -182,7 +182,7 @@ define([
                     "features": []
                 }
             }
-        };
+        }, params.sources);
         var extendedLayers = [];
         if (params.layers) {
             extendedLayers = params.layers;
