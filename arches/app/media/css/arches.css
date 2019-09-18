@@ -397,11 +397,12 @@ input[type="checkbox"] {
 .workflowstep-nav {
     display: flex;
     flex-direction: row;
-    width: 100%;
+    width: calc(100% - 220px);
     border-bottom: solid 1px #ddd;
     height: fit-content;
-    padding: 20px 35px;
+    padding: 20px 25px;
     background-color: #fff;
+    overflow-x: scroll;
 }
 
 .workflowstep-nav div {
@@ -410,10 +411,14 @@ input[type="checkbox"] {
 
 .workflowstep-nav div.workflow-nav-controls {
     position: absolute;
-    padding: 10px 0px;
-    right: 15px;
+    padding: 29px 0px;
+    right: 0px;
+    top: 0;
     font-size: 25px;
-    width: 200px;
+    width: 230px;
+    background: #fafafa;
+    border-left: 1px solid #f1f1f1;
+    border-bottom: 1px solid #ddd;
 }
 
 .workflowstep-nav div .step-title {
@@ -471,11 +476,11 @@ input[type="checkbox"] {
     border-radius: 50%;
     display: block;
     margin: 0 auto;
-    height: 56px;
-    line-height: 56px;
+    height: 50px;
+    line-height: 50px;
     text-align: center;
-    width: 56px;
-    font-size: 25px;
+    width: 50px;
+    font-size: 23px;
     color: #ccc;
 }
 
