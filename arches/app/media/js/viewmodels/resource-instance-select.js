@@ -15,6 +15,7 @@ define([
             return false;
         };
         this.graphids = params.node ? ko.unwrap(params.node.config.graphid) : [params.graphid];
+        this.graphids = this.graphids || [];
         this.graphNames = {}
         this.graphids.forEach(function(graphid){
             self.graphNames[graphid] = arches.resources.find(function(resource){
