@@ -352,14 +352,16 @@ define([
                     appFuncs = this.appliedFunctions();
                     nodegroupId = params.card.nodegroup_id;
                     for(var i = 0; i < appFuncs.length; i++) {
-                        if(appFuncs[i]['config']['description']['nodegroup_id']) {
-                            appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
-                        }
-                        if(appFuncs[i]['config']['name']['nodegroup_id']) {
-                            appFuncName = appFuncs[i]['config']['name']['nodegroup_id'];
-                        }
-                        if(nodegroupId === appFuncDesc || nodegroupId === appFuncName) {
-                            return true;
+                        if(appFuncs[i]['function_id'] == "60000000-0000-0000-0000-000000000001") {
+                            if(appFuncs[i]['config']['description']['nodegroup_id']) {
+                                appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
+                            }
+                            if(appFuncs[i]['config']['name']['nodegroup_id']) {
+                                appFuncName = appFuncs[i]['config']['name']['nodegroup_id'];
+                            }
+                            if(nodegroupId === appFuncDesc || nodegroupId === appFuncName) {
+                                return true;
+                            }
                         }
                     }
                 }
