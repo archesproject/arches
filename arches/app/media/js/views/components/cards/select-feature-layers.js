@@ -1,11 +1,14 @@
 define([], function() {
     return function(resourceId, source, sourceLayer, selectedResourceIds, visible) {
-        var color = "#f0c200";
+        var color = "#F0C200";
+        var strokecolor = "#fff";
+        var overviewzoom = 11;
+        var minzoom = 15;
         if (selectedResourceIds && selectedResourceIds.length > 0) {
             color = [
                 'match',
                 ['get', 'resourceinstanceid'],
-                selectedResourceIds, "#3bb2d0",
+                selectedResourceIds, "#2F14A6",
                 color
             ];
         }
@@ -13,6 +16,7 @@ define([], function() {
         var layers = [{
             "id": "select-feature-polygon-fill",
             "type": "fill",
+            "minzoom": overviewzoom,
             "filter": ['all',[
                 "==", "$type", "Polygon"
             ], [
@@ -21,14 +25,33 @@ define([], function() {
             "paint": {
                 "fill-color": color,
                 "fill-outline-color": color,
-                "fill-opacity": 0.1
+                "fill-opacity": 0.2
             },
             "layout": {
                 "visibility": visible ? "visible": "none"
             }
+        },  {
+            "id": "select-feature-polygon-under-stroke",
+            "type": "line",
+            "minzoom": minzoom,
+            "filter": ['all',[
+                "==", "$type", "Polygon"
+            ], [
+                "!=", "resourceinstanceid", resourceId
+            ]],
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round",
+                "visibility": visible ? "visible": "none"
+            },
+            "paint": {
+                "line-color": strokecolor,
+                "line-width": 4
+            }
         }, {
             "id": "select-feature-polygon-stroke",
             "type": "line",
+            "minzoom": overviewzoom,
             "filter": ['all',[
                 "==", "$type", "Polygon"
             ], [
@@ -46,6 +69,7 @@ define([], function() {
         }, {
             "id": "select-feature-line",
             "type": "line",
+            "minzoom": minzoom,
             "filter": ['all',[
                 "==", "$type", "LineString"
             ], [
@@ -63,6 +87,7 @@ define([], function() {
         }, {
             "id": "select-feature-point-point-stroke",
             "type": "circle",
+            "minzoom": minzoom,
             "filter": ['all',[
                 "==", "$type", "Point"
             ], [
@@ -79,13 +104,14 @@ define([], function() {
         }, {
             "id": "select-feature-point",
             "type": "circle",
+            "minzoom": minzoom,
             "filter": ['all',[
                 "==", "$type", "Point"
             ], [
                 "!=", "resourceinstanceid", resourceId
             ]],
             "paint": {
-                "circle-radius": 3,
+                "circle-radius": 4,
                 "circle-color": color
             },
             "layout": {

@@ -7,7 +7,8 @@
         <div class="nav-group">
             <div
             data-bind="click: function(){if (step.complete() || ($parent.steps[step._index - 1].complete())){$parent.activeStep(step)}},
-                       event: { mouseover: function(){$parent.hoverStep(step)}, mouseout: function(){$parent.hoverStep(null)}}">
+                       event: { mouseover: function(){$parent.hoverStep(step)}, mouseout: function(){$parent.hoverStep(null)}},
+                       css: { selectable: step.complete() || ($parent.steps[step._index - 1] && $parent.steps[step._index - 1].complete()) }">
                 <i class="fa fa-lg" data-bind="class: step.iconClass"></i>
             </div>
 
@@ -22,7 +23,7 @@
 
         <div class="workflow-nav-controls">
             <button data-bind="click: finishWorkflow" class="btn btn-mint btn-labeled"><i class="btn-label ion-android-cloud-done"></i>{% trans "Finish" %}</button>
-            <button class="btn btn-dark btn-labeled"><i class="btn-label ion-android-cancel"></i>{% trans "Quit" %}</button>
+            <button data-bind="click: quitWorkflow" class="btn btn-dark btn-labeled"><i class="btn-label ion-android-cancel"></i>{% trans "Quit" %}</button>
         </div>
     </div>
     <div class="workflow-step-container">

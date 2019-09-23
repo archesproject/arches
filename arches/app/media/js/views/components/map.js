@@ -45,7 +45,7 @@ define([
         };
         this.activeTab.subscribe(function() {
             var map = self.map();
-            if (map) setTimeout(function() { map.resize(); }, 1);
+            if (map && map.getStyle()) setTimeout(function() { map.resize(); }, 1);
         });
 
         mapLayers.forEach(function(layer) {
@@ -217,9 +217,9 @@ define([
                 self.getPopupData(feature),
                 self.popup._content
             );
-            map.setFeatureState(feature, { selected: true });
+            if (map.getStyle()) map.setFeatureState(feature, { selected: true });
             self.popup.on('close', function() {
-                map.setFeatureState(feature, { selected: false });
+                if (map.getStyle()) map.setFeatureState(feature, { selected: false });
                 self.popup = undefined;
             });
         };
@@ -241,12 +241,13 @@ define([
 
                 var hoverFeature;
                 map.on('mousemove', function(e) {
-                    if (hoverFeature) map.setFeatureState(hoverFeature, { hover: false });
+                    var style = map.getStyle();
+                    if (hoverFeature && style) map.setFeatureState(hoverFeature, { hover: false });
                     hoverFeature = _.find(
                         map.queryRenderedFeatures(e.point),
                         self.isFeatureClickable
                     );
-                    if (hoverFeature) map.setFeatureState(hoverFeature, { hover: true });
+                    if (hoverFeature && style) map.setFeatureState(hoverFeature, { hover: true });
                     map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
                 });
 
@@ -257,6 +258,28 @@ define([
                 });
 
                 self.map(map);
+                if (params.fitBounds){
+                    var padding = 40;
+                    var activeTab = self.activeTab();
+                    var options = {
+                        padding: {
+                            top: padding,
+                            left: padding + (activeTab ? 200: 0),
+                            bottom: padding,
+                            right: padding + (activeTab ? 200: 0)
+                        },
+                        animate: false
+                    };
+                    var bounds = params.fitBounds();
+                    if (bounds) {
+                        map.fitBounds(bounds, options);
+                    } else {
+                        var fitBounds = params.fitBounds.subscribe(function(bounds) {
+                            map.fitBounds(bounds, options);
+                            fitBounds.dispose();
+                        });
+                    }
+                }
                 setTimeout(function() { map.resize(); }, 1);
             });
         };

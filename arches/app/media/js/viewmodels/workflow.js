@@ -16,6 +16,7 @@ define([
         this.loading = config.loading || ko.observable(false);
         this.alert = config.alert || ko.observable(null);
         this.state = {steps:[]};
+        this.quitUrl = arches.urls.home;
 
         this.workflowName = ko.observable();
         this.getJSON = function(pluginJsonFileName) {
@@ -40,7 +41,45 @@ define([
 
         this.finishWorkflow = function() {
             self.activeStep(self.steps[self.steps.length-1]);
-        }
+        };
+
+        this.quitWorkflow = function(){
+            var resourcesToDelete = [];
+            var tilesToDelete = [];
+            self.state.steps.forEach(function(step) {
+                if (step.wastebin && step.wastebin.resourceid) {
+                    resourcesToDelete.push(step.wastebin);
+                } else if (step.wastebin && step.wastebin.tile) {
+                    tilesToDelete.push(step.wastebin);
+                }
+            });
+            var deleteObject = function(type, obj){
+                if (type === 'resource') {
+                    $.ajax({
+                        url: arches.urls.api_resources(obj),
+                        type: 'DELETE',
+                        success: function(result) {
+                            console.log('result', result);
+                        }
+                    });
+                } else if (type === 'tile') {
+                    $.ajax({
+                        type: "DELETE",
+                        url: arches.urls.tile,
+                        data: JSON.stringify(obj)
+                    }).done(function(response) {
+                        console.log('deleted', obj.tileid);
+                    }).fail(function(response) {
+                        if (typeof onFail === 'function') {
+                            console.log(response);
+                        }
+                    });
+                }
+            };
+            resourcesToDelete.forEach(function(resource){deleteObject('resource', resource.resourceid);});
+            tilesToDelete.forEach(function(tile){deleteObject('tile', tile.tile);});
+            window.location.href = self.quitUrl;
+        };
 
         this.restoreStateFromURL();
 
