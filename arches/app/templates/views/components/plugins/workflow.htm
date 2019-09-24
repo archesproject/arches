@@ -22,7 +22,12 @@
         <!--/ko-->
 
         <div class="workflow-nav-controls">
+            <!--ko if: activeStep()._index+1 !== steps.length -->
             <button data-bind="click: finishWorkflow" class="btn btn-mint btn-labeled"><i class="btn-label ion-android-cloud-done"></i>{% trans "Finish" %}</button>
+            <!--/ko-->
+            <!--ko if: activeStep()._index+1 === steps.length -->
+            <button disabled class="btn btn-mint btn-labeled"><i class="btn-label ion-android-cloud-done"></i>{% trans "Finished!" %}</button>
+            <!--/ko-->
             <button data-bind="click: quitWorkflow" class="btn btn-dark btn-labeled"><i class="btn-label ion-android-cancel"></i>{% trans "Quit" %}</button>
         </div>
     </div>

@@ -4,8 +4,9 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'viewmodels/alert',
     'viewmodels/workflow-step'
-], function(arches, $, _, ko, koMapping, Step) {
+], function(arches, $, _, ko, koMapping, AlertViewModel, Step) {
     var Workflow = function(config) {
         var self = this;
         this.steps = config.steps || [];
@@ -17,6 +18,10 @@ define([
         this.alert = config.alert || ko.observable(null);
         this.state = {steps:[]};
         this.quitUrl = arches.urls.home;
+        this.wastebinWarning = function(val){
+            return [["You are about to delete " + val + "."],["Are you sure you want to continue?"]];
+        };
+        this.warning = '';
 
         this.workflowName = ko.observable();
         this.getJSON = function(pluginJsonFileName) {
@@ -46,13 +51,17 @@ define([
         this.quitWorkflow = function(){
             var resourcesToDelete = [];
             var tilesToDelete = [];
+            var warnings = []
             self.state.steps.forEach(function(step) {
                 if (step.wastebin && step.wastebin.resourceid) {
+                    warnings.push(step.wastebin.description)
                     resourcesToDelete.push(step.wastebin);
                 } else if (step.wastebin && step.wastebin.tile) {
+                    warnings.push(step.wastebin.description)
                     tilesToDelete.push(step.wastebin);
                 }
             });
+            self.warning = self.wastebinWarning(warnings.join());
             var deleteObject = function(type, obj){
                 if (type === 'resource') {
                     $.ajax({
@@ -76,9 +85,20 @@ define([
                     });
                 }
             };
-            resourcesToDelete.forEach(function(resource){deleteObject('resource', resource.resourceid);});
-            tilesToDelete.forEach(function(tile){deleteObject('tile', tile.tile);});
-            window.location.href = self.quitUrl;
+
+            self.alert(
+                new AlertViewModel(
+                    'ep-alert-red',
+                    self.warning[0],
+                    self.warning[1],
+                    null,
+                    function(){
+                        resourcesToDelete.forEach(function(resource){deleteObject('resource', resource.resourceid);});
+                        tilesToDelete.forEach(function(tile){deleteObject('tile', tile.tile);});
+                        window.location.href = self.quitUrl;
+                    }
+                )
+            );
         };
 
         this.restoreStateFromURL();
