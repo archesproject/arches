@@ -62,6 +62,7 @@ class Command(BaseCommand):
         self.register('widgets', 'widget')
         self.register('card_components', 'card_component')
         self.register('functions', 'fn')
+        self.register('search', 'search')
         self.register('plugins', 'plugin')
         self.register('reports', 'report')
         self.register('datatypes', 'datatype')
