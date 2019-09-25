@@ -583,14 +583,16 @@ class Command(BaseCommand):
         def load_mapbox_styles(style_paths, basemap):
             for path in style_paths:
                 style = json.load(open(path))
-                meta = {
-                    "icon": "fa fa-globe",
-                    "name": style["name"]
-                }
-                if os.path.exists(os.path.join(os.path.dirname(path), 'meta.json')):
-                    meta = json.load(open(os.path.join(os.path.dirname(path), 'meta.json')))
-
-                self.add_mapbox_layer(meta["name"], path, meta["icon"], basemap)
+                try:
+                    meta = {
+                        "icon": "fa fa-globe",
+                        "name": style["name"]
+                    }
+                    if os.path.exists(os.path.join(os.path.dirname(path), 'meta.json')):
+                        meta = json.load(open(os.path.join(os.path.dirname(path), 'meta.json')))
+                    self.add_mapbox_layer(meta["name"], path, meta["icon"], basemap)
+                except KeyError as e:
+                    print("The map layer '{}' was not imported: {} is missing.".format(path, e))
 
         def load_tile_server_layers(paths, basemap):
             for path in paths:
