@@ -169,10 +169,6 @@ class Command(BaseCommand):
             help='Rebuild database')
 
         parser.add_argument(
-            '-ex', '--load_ext_from_prj', action='store', dest='load_project_extensions', default=False,
-            help='Load extensions from the project directory')
-
-        parser.add_argument(
             '-bulk', '--bulk_load', action='store_true', dest='bulk_load',
             help='Bulk load values into the database.  By setting this flag the system will bypass any PreSave \
             functions attached to the resource.')
@@ -295,8 +291,7 @@ class Command(BaseCommand):
                 options['setup_db'],
                 options['overwrite'],
                 options['stage'],
-                options['yes'],
-                options['load_project_extensions'])
+                options['yes'])
 
         if options['operation'] in ['create', 'create_package']:
             self.create_package(options['dest_dir'])
@@ -465,8 +460,7 @@ class Command(BaseCommand):
             self.export_package_settings(dest_dir, 'true')
 
     def load_package(
-            self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep', yes=False,
-            load_project_extensions=False):
+            self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep', yes=False):
 
         def load_ontology():
             load_default_ontology = True
@@ -556,9 +550,6 @@ class Command(BaseCommand):
             except Exception as e:
                 print(e)
                 print('Could not connect to db')
-
-        def load_datatypes(package_dir):
-            load_extensions(package_dir, 'datatypes', 'datatype')
 
         def load_graphs(package_dir):
             branches = glob.glob(os.path.join(package_dir, 'graphs', 'branches'))[0]
@@ -688,21 +679,37 @@ class Command(BaseCommand):
                 components = glob.glob(os.path.join(extension, '*.js'))
 
                 if len(templates) == 1:
-                    if os.path.exists(template_dir) is False:
-                        os.mkdir(template_dir)
-                    shutil.copy(templates[0], template_dir)
+                    dest_path = os.path.join(template_dir, os.path.basename(templates[0]))
+                    if os.path.exists(dest_path) is False:
+                        if os.path.exists(template_dir) is False:
+                            os.mkdir(template_dir)
+                        shutil.copy(templates[0], template_dir)
+                    else:
+                        logger.info('Not loading {0} from package. Extension already exists'.format(templates[0]))
+
                 if len(components) == 1:
-                    if os.path.exists(component_dir) is False:
-                        os.mkdir(component_dir)
-                    shutil.copy(components[0], component_dir)
+                    dest_path = os.path.join(component_dir, os.path.basename(components[0]))
+                    if os.path.exists(dest_path) is False:
+                        if os.path.exists(component_dir) is False:
+                            os.mkdir(component_dir)
+                        shutil.copy(components[0], component_dir)
+                    else:
+                        logger.info('Not loading {0} from package. Extension already exists'.format(components[0]))
 
                 modules = glob.glob(os.path.join(extension, '*.json'))
                 modules.extend(glob.glob(os.path.join(extension, '*.py')))
 
                 if len(modules) > 0:
-                    module = modules[0]
-                    shutil.copy(module, module_dir)
-                    management.call_command(cmd, 'register', source=module)
+                    dest_path = os.path.join(module_dir, os.path.basename(modules[0]))
+                    if os.path.exists(dest_path) is False:
+                        module = modules[0]
+                        shutil.copy(module, module_dir)
+                        management.call_command(cmd, 'register', source=module)
+                    else:
+                        logger.info('Not loading {0} from package. Extension already exists'.format(modules[0]))
+
+        def load_datatypes(package_dir):
+            load_extensions(package_dir, 'datatypes', 'datatype')
 
         def load_widgets(package_dir):
             load_extensions(package_dir, 'widgets', 'widget')
@@ -770,10 +777,6 @@ class Command(BaseCommand):
             if setup_db.lower() in ('t', 'true', 'y', 'yes'):
                 management.call_command("setup_db", force=True)
 
-        if load_project_extensions is not False:
-            if load_project_extensions.lower() in ('t', 'true', 'y', 'yes'):
-                load_project_extensions = True
-
         load_ontology()
         print('loading package_settings.py')
         load_package_settings(package_location)
@@ -781,6 +784,8 @@ class Command(BaseCommand):
         load_preliminary_sql(package_location)
         print('loading system settings')
         load_system_settings(package_location)
+        print('loading project extensions from project')
+        management.call_command('project', 'update')
         print('loading widgets')
         load_widgets(package_location)
         print('loading card components')
@@ -795,9 +800,6 @@ class Command(BaseCommand):
         load_functions(package_location)
         print('loading datatypes')
         load_datatypes(package_location)
-        if load_project_extensions:
-            print('loading project extensions')
-            management.call_command('project', 'update')
         print('loading concepts')
         load_concepts(package_location, overwrite_concepts, stage_concepts)
         print('loading resource models and branches')
@@ -810,11 +812,11 @@ class Command(BaseCommand):
         load_business_data(package_location)
         print('loading resource views')
         load_resource_views(package_location)
-        print('loading package css')
         print('loading apps')
         load_apps(package_location)
         root = settings.APP_ROOT if settings.APP_ROOT is not None else os.path.join(
             settings.ROOT_DIR, 'app')
+        print('loading package css')
         css_source = os.path.join(package_location, 'extensions', 'css')
         if os.path.exists(css_source):
             css_dest = os.path.join(root, 'media', 'css')
@@ -823,6 +825,7 @@ class Command(BaseCommand):
             css_files = glob.glob(os.path.join(css_source, '*.css'))
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
+        print('package load complete')
 
     def setup(self, package_name, es_install_location=None):
         """
