@@ -10149,6 +10149,20 @@ a.jstree-anchor.permissions-widget {
     height: auto;
 }
 
+.tabbed-report-header {
+    min-height: 300px;
+    border-bottom: 1px solid #ddd;
+}
+
+.tabbed-report-sidepanel {
+    position: absolute;
+    width: 300px;
+}
+
+.rp-report-section-title.tabbed-report-sidepanel-active {
+    margin-left: 300px;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
