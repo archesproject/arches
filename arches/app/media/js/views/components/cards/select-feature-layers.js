@@ -1,6 +1,6 @@
 define([], function() {
-    return function(resourceId, source, sourceLayer, selectedResourceIds, visible) {
-        var color = "#F0C200";
+    return function(resourceId, source, sourceLayer, selectedResourceIds, visible, color) {
+        color = color || "#F0C200";
         var strokecolor = "#fff";
         var overviewzoom = 11;
         var minzoom = 15;
