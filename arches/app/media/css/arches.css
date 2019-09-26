@@ -10154,6 +10154,10 @@ a.jstree-anchor.permissions-widget {
     border-bottom: 1px solid #ddd;
 }
 
+.tabbed-report-header .workbench-card-wrapper {
+    height: 300px;
+}
+
 .tabbed-report-sidepanel {
     position: absolute;
     width: 300px;
