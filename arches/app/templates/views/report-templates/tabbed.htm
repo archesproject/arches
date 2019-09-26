@@ -25,6 +25,12 @@
     </div>
     <div><span data-bind="text: tabs()[activeTabIndex()].name"></span></div>
 </div>
+<!-- ko if: tabs()[activeTabIndex()].header_component  -->
+<div class="tabbed-report-header" data-bind="component: {
+    name: tabs()[activeTabIndex()].header_component,
+    params: $data
+}"></div>
+<!-- /ko -->
 <!-- /ko -->
 {% endblock header %}
 
@@ -91,7 +97,13 @@
     <!--/ko-->
 
     <div class="rp-report-section relative rp-report-section-root">
-        <div class="rp-report-section-title">
+        <!-- ko if: tabs()[activeTabIndex()].side_component  -->
+        <div class="tabbed-report-sidepanel" data-bind="component: {
+            name: tabs()[activeTabIndex()].side_component,
+            params: $data
+        }"></div>
+        <!-- /ko -->
+        <div class="rp-report-section-title", data-bind="css: {'tabbed-report-sidepanel-active': tabs()[activeTabIndex()].side_component}">
             <!-- ko foreach: { data: activeCards(), as: 'card' } -->
                 <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
                 <div class="rp-card-section">
