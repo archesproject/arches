@@ -10150,21 +10150,50 @@ a.jstree-anchor.permissions-widget {
 }
 
 .tabbed-report-header {
-    min-height: 300px;
     border-bottom: 1px solid #ddd;
 }
 
 .tabbed-report-header .workbench-card-wrapper {
-    height: 300px;
+    height: 400px;
 }
 
 .tabbed-report-sidepanel {
     position: absolute;
     width: 300px;
+    margin-left: 50px;
+}
+
+.tabbed-report-sidepanel .tabbed-report-sidepanel-content {
+    border: 1px solid #ddd;
+}
+
+.tabbed-report-sidepanel-title {
+    padding: 5px 15px;
+    color: white;
+    background-color: rgb(234, 141, 148);
+    font-size: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.tabbed-report-sidepanel-subtitle {
+    color: rgb(222, 222, 222);
+}
+
+.tabbed-report-sidepanel-main {
+    padding: 5px 15px 15px;
+}
+
+.tabbed-report-sidepanel-main dt {
+    color: #2f527a;
+    font-weight: normal;
+    float: left;
+    width: 130px;
+    text-align: right;
+    padding-right: 10px;
 }
 
 .rp-report-section-title.tabbed-report-sidepanel-active {
-    margin-left: 300px;
+    margin-left: 350px;
 }
 
 @keyframes loader {
