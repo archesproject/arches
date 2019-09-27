@@ -10195,6 +10195,10 @@ a.jstree-anchor.permissions-widget {
     padding-right: 10px;
 }
 
+.report-map-header-component {
+    height: 400px;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
