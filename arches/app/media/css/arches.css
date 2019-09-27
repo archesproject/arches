@@ -6108,6 +6108,7 @@ a.mega-dropdown-toggle.disabled {
 .rp-report-section.rp-report-section-root {
     padding-top: 30px;
     background-color: #fff;
+    display: flex;
 }
 
 .rp-report-section {
@@ -10158,9 +10159,11 @@ a.jstree-anchor.permissions-widget {
 }
 
 .tabbed-report-sidepanel {
-    position: absolute;
     width: 300px;
-    margin-left: 50px;
+    margin: 0 25px;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 25px;
 }
 
 .tabbed-report-sidepanel .tabbed-report-sidepanel-content {
@@ -10190,10 +10193,6 @@ a.jstree-anchor.permissions-widget {
     width: 130px;
     text-align: right;
     padding-right: 10px;
-}
-
-.rp-report-section-title.tabbed-report-sidepanel-active {
-    margin-left: 350px;
 }
 
 @keyframes loader {
