@@ -10180,7 +10180,16 @@ a.jstree-anchor.permissions-widget {
 }
 
 .tabbed-report-sidepanel-main {
-    padding: 5px 15px;
+    padding: 5px 15px 15px;
+}
+
+.tabbed-report-sidepanel-main dt {
+    color: #2f527a;
+    font-weight: normal;
+    float: left;
+    width: 130px;
+    text-align: right;
+    padding-right: 10px;
 }
 
 .rp-report-section-title.tabbed-report-sidepanel-active {
