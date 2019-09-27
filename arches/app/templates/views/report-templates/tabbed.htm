@@ -98,10 +98,12 @@
 
     <div class="rp-report-section relative rp-report-section-root">
         <!-- ko if: tabs()[activeTabIndex()].side_component  -->
-        <div class="tabbed-report-sidepanel" data-bind="component: {
-            name: tabs()[activeTabIndex()].side_component,
-            params: $data
-        }"></div>
+        <div class="tabbed-report-sidepanel-wrapper">
+            <div class="tabbed-report-sidepanel" data-bind="component: {
+                name: tabs()[activeTabIndex()].side_component,
+                params: $data
+            }"></div>
+        </div>
         <!-- /ko -->
         <div class="rp-report-section-title", data-bind="css: {'tabbed-report-sidepanel-active': tabs()[activeTabIndex()].side_component}">
             <!-- ko foreach: { data: activeCards(), as: 'card' } -->
