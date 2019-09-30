@@ -96,6 +96,14 @@
     <div class="report-provisional-flag">{% trans 'This resource has provisional edits that are pending review' %}</div>
     <!--/ko-->
 
+
+    <!-- ko if: activeTabEmpty() && tabs()[activeTabIndex()].empty_component  -->
+    <div class="tabbed-report-emptypanel" data-bind="component: {
+        name: tabs()[activeTabIndex()].empty_component,
+        params: $data
+    }"></div>
+    <!--/ko-->
+    <!-- ko if: !tabs()[activeTabIndex()].empty_component || !activeTabEmpty()  -->
     <div class="rp-report-section relative rp-report-section-root">
         <!-- ko if: tabs()[activeTabIndex()].side_component  -->
         <div class="tabbed-report-sidepanel-wrapper">
@@ -121,5 +129,6 @@
             <!-- /ko -->
         </div>
     </div>
+    <!--/ko-->
 
     {% endblock body %}

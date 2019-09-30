@@ -6126,6 +6126,7 @@ a.mega-dropdown-toggle.disabled {
     padding-bottom: 0px;
     /* padding-left: 40px; */
     background: #fff;
+    width: 100%
 }
 
 .rp-section-title {
@@ -8586,6 +8587,11 @@ table.table.dataTable {
     width: 400px;
     height: calc(100vh - 100px);
     border-left: solid 1px #dcdcdc;
+}
+
+.rr-splash-img-container .fa {
+    font-size: 56px;
+    color: steelblue;
 }
 
 .search-popup-panel .tab-pane.active div.saved-search-container div .rr-splash .rr-splash-img-container {
