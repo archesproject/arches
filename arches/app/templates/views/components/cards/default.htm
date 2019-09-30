@@ -414,7 +414,7 @@
             <i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': reportExpanded(), 'fa-angle-right': !reportExpanded()}, click: function () { reportExpanded(!reportExpanded()) }"></i>
             <!-- ko if: reportExpanded() -->
             <!-- ko foreach: { data: self.preview ? [card.newTile] : card.tiles, as: 'tile' } -->
-                <div class="rp-card-section" data-bind="css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}">
+                <div class="rp-card-section" data-bind="css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}, attr: {id: tile.tileid}">
                     <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
                     {% block report_widgets %}
                     <!-- ko if: card.model.get('widgets')().length > 0 -->

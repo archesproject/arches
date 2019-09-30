@@ -10177,14 +10177,18 @@ a.jstree-anchor.permissions-widget {
 
 .tabbed-report-sidepanel-title {
     padding: 5px 15px;
-    color: white;
-    background-color: rgb(234, 141, 148);
     font-size: 12px;
     border-bottom: 1px solid #ddd;
+    background-color: rgb(237, 237, 237);
+}
+
+.tabbed-report-sidepanel-title.consultation-status-title {
+    color: white;
+    background-color: rgb(234, 141, 148);
 }
 
 
-.tabbed-report-sidepanel-title.completed {
+.tabbed-report-sidepanel-title.consultation-status-title.completed {
     background-color: rgb(202, 247, 225);
     color: rgb(84, 84, 84);
 }
