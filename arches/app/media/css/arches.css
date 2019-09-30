@@ -8420,7 +8420,6 @@ table.table.dataTable {
     width: 100%;
     height: 50px;
     background: #f4f4f4;
-    border-bottom: 1px solid #BBD1EA;
 }
 
 .search-type-btn-panel {
@@ -8455,7 +8454,7 @@ table.table.dataTable {
     min-width: 150px;
     border-color: #BBD1EA;
     border-top: none;
-    border-bottom: 1px solid #BBD1EA;
+    border-bottom: none;
     background: #F7F9FB;
     z-index: 1000;
     margin-left: -5px;
@@ -8551,7 +8550,7 @@ table.table.dataTable {
     color: #888;
     border-color: #BBD1EA;
     border-top: none;
-    border-bottom: 1px solid #BBD1EA;
+    border-bottom: none;
     border-right: none;
     background: #F7F9FB;
     z-index: 1000;
