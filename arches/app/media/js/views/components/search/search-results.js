@@ -84,15 +84,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                         if (result._source.points.length > 0) {
                             point = result._source.points[0].point;
                         }
-                        var mapData = result._source.geometries.reduce(function(fc1, fc2) {
-                            fc1.geom.features = fc1.geom.features.concat(fc2.geom.features);
-                            return fc1;
-                        }, {
-                            "geom": {
-                                "type": "FeatureCollection",
-                                "features": []
-                            }
-                        });
                         this.results.push({
                             displayname: result._source.displayname,
                             resourceinstanceid: result._source.resourceinstanceid,
@@ -112,7 +103,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                                 if (self.selectedTab() !== 'map-filter') {
                                     self.selectedTab('map-filter');
                                 }
-                                self.mapLinkData(mapData.geom);
+                                self.mapLinkData({'properties':result._source});
                             },
                             selected: ko.computed(function() {
                                 return result._source.resourceinstanceid === ko.unwrap(self.selectedResourceId);
