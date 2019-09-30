@@ -12,7 +12,7 @@ define([
         ReportViewModel.apply(this, [params]);
         var self = this;
         if (this.activeTabIndex() > self.tabs().length - 1) {
-            this.activeTabIndex(self.tabs().length - 1);
+            this.activeTabIndex(0);
         }
         this.icons = ko.observableArray([]);
 
