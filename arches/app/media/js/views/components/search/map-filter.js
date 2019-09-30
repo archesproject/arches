@@ -82,7 +82,7 @@ define([
                 }];
 
                 this.mapLinkData.subscribe(function(data) {
-                    this.zoomToGeoJSON(data, true);
+                    this.zoomToGeoJSON(data);
                 },this);
 
                 var bins = binFeatureCollection(this.searchAggregations);
@@ -418,22 +418,21 @@ define([
                 }
             },
 
-            zoomToGeoJSON: function(data, fly) {
-                var method = fly ? 'flyTo' : 'jumpTo';
-                var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
-                var tr = this.map().transform;
-                var nw = tr.project(bounds.getNorthWest());
-                var se = tr.project(bounds.getSouthEast());
-                var size = se.sub(nw);
-                var scaleX = (tr.width - 80) / size.x;
-                var scaleY = (tr.height - 80) / size.y;
+            zoomToGeoJSON: function(data) {
+                var mapData = data.properties.geometries.reduce(function(fc1, fc2) {
+                    fc1.geom.features = fc1.geom.features.concat(fc2.geom.features);
+                    return fc1;
+                }, {
+                    "geom": {
+                        "type": "FeatureCollection",
+                        "features": []
+                    }
+                });
+                var bounds = new mapboxgl.LngLatBounds(geojsonExtent(mapData.geom));
                 var maxZoom = ko.unwrap(this.maxZoom);
-                maxZoom = maxZoom > 17 ? 17 : maxZoom;
-                var options = {
-                    center: tr.unproject(nw.add(se).div(2)),
-                    zoom: Math.min(tr.scaleZoom(tr.scale * Math.min(scaleX, scaleY)), maxZoom)
-                };
-                this.map()[method](options);
+                this.map().fitBounds(bounds, {
+                    maxZoom: maxZoom > 17 ? 17 : maxZoom
+                });
             },
 
             updateQuery: function() {
