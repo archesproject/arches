@@ -59,6 +59,12 @@ define([
             return cardList;
         });
 
+        this.activeTabEmpty = ko.computed(function() {
+            return self.activeCards().reduce(function(count, card) {
+                return count += ko.unwrap(card.tiles).length || 0;
+            }, 0) <= 0;
+        });
+
         this.moveTab = function(v) {
             if (v.sourceIndex === self.activeTabIndex()) {
                 self.setActiveTab(v.targetIndex);
