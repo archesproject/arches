@@ -411,9 +411,9 @@ class GraphDataView(View):
             try:
                 graph = Graph.objects.get(graphid=graphid)
                 if graph.isresource:
+                    graph.delete_instances()
                     graph.isactive = False
                     graph.save(validate=False)
-                    graph.delete_instances()
                 graph.delete()
                 return JSONResponse({'success': True})
             except GraphValidationError as e:
