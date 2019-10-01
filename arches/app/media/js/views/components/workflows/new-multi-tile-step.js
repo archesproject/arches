@@ -12,6 +12,8 @@ define([
     function NewMultiTileStepViewModel(params) {
         NewTileStepViewModel.apply(this, [params]);
         var self = this;
+        this.itemName = ko.observable();
+        params.title() != undefined ? this.itemName(params.title()) : this.itemName('Items');
 
         this.remove = function(tile) {
             tile.deleteTile( function(response) {
@@ -25,15 +27,12 @@ define([
             });
         };
 
-        this.edit = function(tile) {
-            self.tile(tile);
-        };
+        this.edit = function(tile) { self.tile(tile); };
 
         self.onSaveSuccess = function(tile) {
             params.resourceid(tile.resourceinstance_id);
             params.tileid(tile.tileid);
             self.resourceId(tile.resourceinstance_id);
-            self.complete(true);
             self.tile(self.card().getNewTile());
             self.tile().reset();
             setTimeout(function() {

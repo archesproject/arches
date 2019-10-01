@@ -232,6 +232,7 @@ class Resource(models.ResourceInstance):
         document['points'] = []
         document['numbers'] = []
         document['date_ranges'] = []
+        document['ids'] = []
         document['provisional_resource'] = 'true' if sum(
             [len(t.data) for t in tiles]) == 0 else 'false'
 

@@ -22,7 +22,7 @@ from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from arches.app.views import concept, main, map, search, graph, tileserver, api
 from arches.app.views.admin import ReIndexResources
-from arches.app.views.graph import GraphDesignerView, GraphSettingsView, GraphDataView, GraphManagerView, DatatypeTemplateView, CardView, FunctionManagerView, PermissionDataView
+from arches.app.views.graph import GraphDesignerView, GraphSettingsView, GraphDataView, GraphManagerView, DatatypeTemplateView, CardView, FunctionManagerView, PermissionDataView, IconDataView
 from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceCards, ResourceReportView, RelatedResourcesView, ResourceDescriptors, ResourceEditLogView, ResourceTiles
 from arches.app.views.resource import NewResourceEditorView, ResourceActivityStreamPageView, \
                                       ResourceActivityStreamCollectionView
@@ -151,8 +151,10 @@ urlpatterns = [
     url(r'^plugins/(?P<slug>[-\w]+)$', PluginView.as_view(), name='plugins'),
     url(r'^cards/(?P<resourceid>%s|())$' % uuid_regex, api.Card.as_view(), name='api_card'),
     url(r'^search_component_data/(?P<componentname>[-\w]+)$', api.SearchComponentData.as_view(), name='api_search_component_data'),
+    url(r'^geojson$', api.GeoJSON.as_view(), name='geojson'),
     url(r'^history/$', ResourceActivityStreamCollectionView.as_view(), name="as_stream_collection"),
     url(r'^history/(?P<page>[0-9]+)$', ResourceActivityStreamPageView.as_view(), name='as_stream_page'),
+    url(r'^icons$', IconDataView.as_view(), name='icons'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

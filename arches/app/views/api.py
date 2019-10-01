@@ -209,6 +209,47 @@ class Surveys(APIBase):
         return response
 
 
+class GeoJSON(APIBase):
+    def get(self, request):
+        resourceid = request.GET.get('resourceid', None)
+        nodeid = request.GET.get('nodeid', None)
+        tileid = request.GET.get('tileid', None)
+        if hasattr(request.user, 'userprofile') is not True:
+            models.UserProfile.objects.create(user=request.user)
+        viewable_nodegroups = request.user.userprofile.viewable_nodegroups
+        nodes = models.Node.objects.filter(datatype='geojson-feature-collection', nodegroup_id__in=viewable_nodegroups)
+        if nodeid is not None:
+            nodes = nodes.filter(nodeid=nodeid)
+        features = []
+        i = 1
+        for node in nodes:
+            tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup)
+            if resourceid is not None:
+                # resourceid = resourceid.split(',')
+                tiles = tiles.filter(resourceinstance_id__in=resourceid.split(','))
+            if tileid is not None:
+                tiles = tiles.filter(tileid=tileid)
+            for tile in tiles:
+                data = tile.data
+                try:
+                    for feature_index, feature in enumerate(data[unicode(node.pk)]['features']):
+                        feature['properties']['index'] = feature_index
+                        feature['properties']['resourceinstanceid'] = tile.resourceinstance_id
+                        feature['properties']['tileid'] = tile.pk
+                        feature['properties']['nodeid'] = node.pk
+                        feature['properties']['node'] = node.name
+                        feature['properties']['model'] = node.graph.name
+                        feature['properties']['geojson'] = '%s?tileid=%s&nodeid=%s' % (reverse('geojson'), tile.pk, node.pk)
+                        feature['properties']['featureid'] = feature['id']
+                        feature['id'] = i
+                        i += 1
+                        features.append(feature)
+                except KeyError:
+                    pass
+        response = JSONResponse({'type': 'FeatureCollection', 'features': features})
+        return response
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class Resources(APIBase):
 
@@ -245,8 +286,9 @@ class Resources(APIBase):
             allowed_formats = ['json', 'json-ld']
             format = request.GET.get('format', 'json-ld')
             if format not in allowed_formats:
-                return JSONResponse(status=406, reason='incorrect format specified, only %s formats allowed' % allowed_formats)
-
+                return JSONResponse(
+                    status=406, reason='incorrect format specified, only %s formats allowed' % allowed_formats
+                    )
             try:
                 indent = int(request.GET.get('indent', None))
             except Exception:
@@ -260,10 +302,12 @@ class Resources(APIBase):
                             resourceinstanceids=[resourceid], indent=indent, user=request.user)
                         out = output[0]['outputfile'].getvalue()
                     except models.ResourceInstance.DoesNotExist:
-                        logger.exception()
+                        logger.exception(
+                            _("The specified resource '{0}' does not exist. JSON-LD export failed.".format(
+                                resourceid
+                                ))
+                            )
                         return JSONResponse(status=404)
-                    except Exception as e:
-                        logger.exception()
                 elif format == 'json':
                     out = Resource.objects.get(pk=resourceid)
                     out.load_tiles()

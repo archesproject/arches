@@ -9,6 +9,7 @@ import sys
 import urllib
 import os
 import imp
+import logging
 from arches.app.search.mappings import prepare_terms_index, prepare_concepts_index, prepare_resource_relations_index
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 from arches.management.commands import utils
@@ -37,6 +38,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand, CommandError
 from django.core import management
 from datetime import datetime
+logger = logging.getLogger(__name__)
+
 '''
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
@@ -168,10 +171,6 @@ class Command(BaseCommand):
             help='Rebuild database')
 
         parser.add_argument(
-            '-ex', '--load_ext_from_prj', action='store', dest='load_project_extensions', default=False,
-            help='Load extensions from the project directory')
-
-        parser.add_argument(
             '-bulk', '--bulk_load', action='store_true', dest='bulk_load',
             help='Bulk load values into the database.  By setting this flag the system will bypass any PreSave \
             functions attached to the resource.')
@@ -294,8 +293,7 @@ class Command(BaseCommand):
                 options['setup_db'],
                 options['overwrite'],
                 options['stage'],
-                options['yes'],
-                options['load_project_extensions'])
+                options['yes'])
 
         if options['operation'] in ['create', 'create_package']:
             self.create_package(options['dest_dir'])
@@ -465,8 +463,24 @@ class Command(BaseCommand):
             self.export_package_settings(dest_dir, 'true')
 
     def load_package(
-            self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep', yes=False,
-            load_project_extensions=False):
+            self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep', yes=False):
+
+        def load_ontology():
+            load_default_ontology = True
+            if settings.ONTOLOGY_BASE_NAME != None:
+                if yes is False:
+                    response = raw_input(
+                        'Would you like to load the {0} ontology? (Y/N): '.format(settings.ONTOLOGY_BASE_NAME))
+                    if response.lower() not in ('t', 'true', 'y', 'yes'):
+                        load_default_ontology = False
+            else:
+                load_default_ontology = False
+
+            if load_default_ontology == True:
+                print('loading the {0} ontology'.format(settings.ONTOLOGY_BASE_NAME))
+                extensions = [os.path.join(settings.ONTOLOGY_PATH, x) for x in settings.ONTOLOGY_EXT]
+                management.call_command('load_ontology', source=os.path.join(settings.ONTOLOGY_PATH, settings.ONTOLOGY_BASE),
+                    version=settings.ONTOLOGY_BASE_VERSION, ontology_name=settings.ONTOLOGY_BASE_NAME, id=settings.ONTOLOGY_BASE_ID, extensions=','.join(extensions), verbosity=0)
 
         def load_system_settings(package_dir):
             update_system_settings = True
@@ -540,9 +554,6 @@ class Command(BaseCommand):
                 print(e)
                 print('Could not connect to db')
 
-        def load_datatypes(package_dir):
-            load_extensions(package_dir, 'datatypes', 'datatype')
-
         def load_graphs(package_dir):
             branches = glob.glob(os.path.join(package_dir, 'graphs', 'branches'))[0]
             resource_models = glob.glob(os.path.join(package_dir, 'graphs', 'resource_models'))[0]
@@ -552,28 +563,39 @@ class Command(BaseCommand):
             self.import_graphs(resource_models, overwrite_graphs=overwrite_graphs)
 
         def load_concepts(package_dir, overwrite, stage):
-            concept_data = glob.glob(os.path.join(
-                package_dir, 'reference_data', 'concepts', '*.xml'))
-            collection_data = glob.glob(os.path.join(
-                package_dir, 'reference_data', 'collections', '*.xml'))
+            file_types = ['*.xml', '*.rdf']
+
+            concept_data = []
+            for file_type in file_types:
+                concept_data.extend(glob.glob(os.path.join(
+                    package_dir, 'reference_data', 'concepts', file_type)))
 
             for path in concept_data:
+                print path
                 self.import_reference_data(path, overwrite, stage)
 
+            collection_data = []
+            for file_type in file_types:
+                collection_data.extend(glob.glob(os.path.join(
+                    package_dir, 'reference_data', 'collections', file_type)))
+
             for path in collection_data:
+                print path
                 self.import_reference_data(path, overwrite, stage)
 
         def load_mapbox_styles(style_paths, basemap):
             for path in style_paths:
                 style = json.load(open(path))
-                meta = {
-                    "icon": "fa fa-globe",
-                    "name": style["name"]
-                }
-                if os.path.exists(os.path.join(os.path.dirname(path), 'meta.json')):
-                    meta = json.load(open(os.path.join(os.path.dirname(path), 'meta.json')))
-
-                self.add_mapbox_layer(meta["name"], path, meta["icon"], basemap)
+                try:
+                    meta = {
+                        "icon": "fa fa-globe",
+                        "name": style["name"]
+                    }
+                    if os.path.exists(os.path.join(os.path.dirname(path), 'meta.json')):
+                        meta = json.load(open(os.path.join(os.path.dirname(path), 'meta.json')))
+                    self.add_mapbox_layer(meta["name"], path, meta["icon"], basemap)
+                except KeyError as e:
+                    logger.warning("The map layer '{}' was not imported: {} is missing.".format(path, e))
 
         def load_tile_server_layers(paths, basemap):
             for path in paths:
@@ -662,21 +684,34 @@ class Command(BaseCommand):
                 components = glob.glob(os.path.join(extension, '*.js'))
 
                 if len(templates) == 1:
-                    if os.path.exists(template_dir) is False:
-                        os.mkdir(template_dir)
-                    shutil.copy(templates[0], template_dir)
+                    dest_path = os.path.join(template_dir, os.path.basename(templates[0]))
+                    if os.path.exists(dest_path) is False:
+                        if os.path.exists(template_dir) is False:
+                            os.mkdir(template_dir)
+                        shutil.copy(templates[0], template_dir)
+                    else:
+                        logger.info('Not loading {0} from package. Extension already exists'.format(templates[0]))
+
                 if len(components) == 1:
-                    if os.path.exists(component_dir) is False:
-                        os.mkdir(component_dir)
-                    shutil.copy(components[0], component_dir)
+                    dest_path = os.path.join(component_dir, os.path.basename(components[0]))
+                    if os.path.exists(dest_path) is False:
+                        if os.path.exists(component_dir) is False:
+                            os.mkdir(component_dir)
+                        shutil.copy(components[0], component_dir)
+                    else:
+                        logger.info('Not loading {0} from package. Extension already exists'.format(components[0]))
 
                 modules = glob.glob(os.path.join(extension, '*.json'))
                 modules.extend(glob.glob(os.path.join(extension, '*.py')))
 
                 if len(modules) > 0:
-                    module = modules[0]
-                    shutil.copy(module, module_dir)
-                    management.call_command(cmd, 'register', source=module)
+                    dest_path = os.path.join(module_dir, os.path.basename(modules[0]))
+                    if os.path.exists(dest_path) is False:
+                        module = modules[0]
+                        shutil.copy(module, module_dir)
+                        management.call_command(cmd, 'register', source=module)
+                    else:
+                        logger.info('Not loading {0} from package. Extension already exists'.format(modules[0]))
 
         def load_indexes(package_dir):
             index_files = glob.glob(os.path.join(package_dir, 'search_indexes', '*.py'))
@@ -691,11 +726,17 @@ class Command(BaseCommand):
                     es_index = import_class_from_string(index['module'])(index['name'])
                     es_index.prepare_index()
 
+        def load_datatypes(package_dir):
+            load_extensions(package_dir, 'datatypes', 'datatype')
+
         def load_widgets(package_dir):
             load_extensions(package_dir, 'widgets', 'widget')
 
         def load_card_components(package_dir):
             load_extensions(package_dir, 'card_components', 'card_component')
+
+        def load_search_components(package_dir):
+            load_extensions(package_dir, 'search', 'search')
 
         def load_plugins(package_dir):
             load_extensions(package_dir, 'plugins', 'plugin')
@@ -754,20 +795,21 @@ class Command(BaseCommand):
             if setup_db.lower() in ('t', 'true', 'y', 'yes'):
                 management.call_command("setup_db", force=True)
 
-        if load_project_extensions is not False:
-            if load_project_extensions.lower() in ('t', 'true', 'y', 'yes'):
-                load_project_extensions = True
-
+        load_ontology()
         print('loading package_settings.py')
         load_package_settings(package_location)
         print('loading preliminary sql')
         load_preliminary_sql(package_location)
         print('loading system settings')
         load_system_settings(package_location)
+        print('loading project extensions from project')
+        management.call_command('project', 'update')
         print('loading widgets')
         load_widgets(package_location)
         print('loading card components')
         load_card_components(package_location)
+        print('loading search components')
+        load_search_components(package_location)
         print('loading plugins')
         load_plugins(package_location)
         print('loading reports')
@@ -777,8 +819,6 @@ class Command(BaseCommand):
         print('loading datatypes')
         load_datatypes(package_location)
         print('loading concepts')
-        if load_project_extensions:
-            management.call_command('project', 'update')
         load_concepts(package_location, overwrite_concepts, stage_concepts)
         print('loading resource models and branches')
         load_graphs(package_location)
@@ -792,11 +832,11 @@ class Command(BaseCommand):
         load_business_data(package_location)
         print('loading resource views')
         load_resource_views(package_location)
-        print('loading package css')
         print('loading apps')
         load_apps(package_location)
         root = settings.APP_ROOT if settings.APP_ROOT is not None else os.path.join(
             settings.ROOT_DIR, 'app')
+        print('loading package css')
         css_source = os.path.join(package_location, 'extensions', 'css')
         if os.path.exists(css_source):
             css_dest = os.path.join(root, 'media', 'css')
@@ -805,6 +845,7 @@ class Command(BaseCommand):
             css_files = glob.glob(os.path.join(css_source, '*.css'))
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
+        print('package load complete')
 
     def setup(self, package_name, es_install_location=None):
         """
@@ -1087,12 +1128,14 @@ will be very jumbled.""")
 
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
+                print os.path.join(path)
                 with open(path, 'rU') as f:
                     archesfile = JSONDeserializer().deserialize(f)
                     ResourceGraphImporter(archesfile['graph'], overwrite_graphs)
             else:
                 file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith('.json')]
                 for file_path in file_paths:
+                    print os.path.join(path, file_path)
                     with open(os.path.join(path, file_path), 'rU') as f:
                         archesfile = JSONDeserializer().deserialize(f)
                         ResourceGraphImporter(archesfile['graph'], overwrite_graphs)
@@ -1190,11 +1233,16 @@ will be very jumbled.""")
                     }
                     try:
                         map_source = models.MapSource(name=layer_name, source=source_dict)
-                        map_layer = models.MapLayer(
-                            name=layer_name, layerdefinitions=layer_list, isoverlay=(not is_basemap), icon=layer_icon)
+                        if len(layer_list) > 0:
+                            map_layer = models.MapLayer(
+                                name=layer_name,
+                                layerdefinitions=layer_list,
+                                isoverlay=(not is_basemap),
+                                icon=layer_icon
+                            )
+                            map_layer.save()
+                            tileserver_layer.map_layer = map_layer
                         map_source.save()
-                        map_layer.save()
-                        tileserver_layer.map_layer = map_layer
                         tileserver_layer.map_source = map_source
                         tileserver_layer.save()
                     except IntegrityError as e:

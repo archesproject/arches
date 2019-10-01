@@ -52,7 +52,7 @@ class Command(BaseCommand):
             if os.path.basename(module) != '__init__.py':
                 try:
                     management.call_command(cmd, 'register', source=module)
-                    print('registring', module)
+                    print('registering', module)
                 except IntegrityError as e:
                     management.call_command(cmd, 'update', source=module)
                     print('updating', module)
@@ -62,6 +62,7 @@ class Command(BaseCommand):
         self.register('widgets', 'widget')
         self.register('card_components', 'card_component')
         self.register('functions', 'fn')
+        self.register('search', 'search')
         self.register('plugins', 'plugin')
         self.register('reports', 'report')
         self.register('datatypes', 'datatype')

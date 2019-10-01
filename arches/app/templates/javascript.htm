@@ -233,7 +233,10 @@
                 collector_manager: "{% url 'collector_manager' %}",
                 help_template: "{% url 'help_templates' %}",
                 api_card: "{% url 'api_card' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                api_resources: function(resourceid){return "{% url 'resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceid)},
                 api_search_component_data: "{% url 'api_search_component_data' 'aaaa'%}".replace('aaaa', ''),
+                geojson: "{% url 'geojson' %}",
+                icons: "{% url 'icons' %}",
             },
             geocoderPlaceHolder: "{% trans 'Find an address...' %}",
             confirmNav: {

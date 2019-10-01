@@ -244,7 +244,6 @@ class GraphDesignerView(GraphBaseView):
         return render(request, 'views/graph-designer.htm', context)
 
 
-
 class GraphDataView(View):
 
     action = 'update_node'
@@ -511,7 +510,6 @@ class CardView(GraphBaseView):
 
 
 class DatatypeTemplateView(TemplateView):
-
     def get(sefl, request, template='text'):
         return render(request, 'views/components/datatypes/%s.htm' % template)
 
@@ -683,3 +681,12 @@ class PermissionDataView(View):
                         # then add the new permissions
                         for perm in data['selectedPermissions']:
                             assign_perm(perm['codename'], identityModel, nodegroup)
+
+
+class IconDataView(View):
+    def get(self, request):
+        icons = models.Icon.objects.order_by('name')
+        data = {
+            'icons': JSONSerializer().serializeToPython(icons)
+        }
+        return JSONResponse(data)

@@ -30,7 +30,8 @@ from edtf import parse_edtf
 # One benefit of shifting to python3.x would be to use
 # importlib.util.LazyLoader to load rdflib (and other lesser
 # used but memory soaking libs)
-from rdflib import Namespace, URIRef, Literal, Graph, BNode
+from rdflib import Namespace, URIRef, Literal, BNode
+from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
@@ -117,7 +118,7 @@ class StringDataType(BaseDataType):
         g = Graph()
         if edge_info['range_tile_data'] is not None:
             g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
-            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(str(edge_info['range_tile_data']))))
+            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(edge_info['range_tile_data'])))
         return g
 
     def from_rdf(self, json_ld_node):
@@ -186,8 +187,9 @@ class NumberDataType(BaseDataType):
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
         rtd = int(edge_info['range_tile_data']) if type(edge_info['range_tile_data']) == float and edge_info['range_tile_data'].is_integer() else edge_info['range_tile_data']
-        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
-        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(rtd)))
+        if rtd is not None:
+            g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(rtd)))
         return g
 
     def from_rdf(self, json_ld_node):
@@ -325,7 +327,7 @@ class DateDataType(BaseDataType):
         if edge_info['range_tile_data'] is not None:
             g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
             g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
-                   Literal(str(edge_info['range_tile_data']), datatype=XSD.dateTime)))
+                   Literal(edge_info['range_tile_data'], datatype=XSD.dateTime)))
         return g
 
     def from_rdf(self, json_ld_node):
@@ -478,7 +480,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return GeometryCollection(wkt_geoms)
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        document['geometries'].append({'geom':nodevalue, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
+        document['geometries'].append({
+            'geom': nodevalue,
+            'nodegroup_id': tile.nodegroup_id,
+            'provisional': provisional,
+            'tileid': tile.pk
+        })
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:
             minx, miny, maxx, maxy = bounds
@@ -573,6 +580,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
             sql_list.append("""
                 SELECT resourceinstanceid::text,
+                        tileid::text,
                         (row_number() over ()) as __id__,
                         1 as total,
                         geom AS __geometry__,
@@ -1279,8 +1287,9 @@ class DomainDataType(BaseDomainDataType):
 
     def validate(self, value, row_number=None, source=''):
         errors = []
-        if len(models.Node.objects.filter(config__options__contains=[{"id": value}])) < 1:
-            errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value, row_number)})
+        if value is not None:
+            if len(models.Node.objects.filter(config__options__contains=[{"id": value}])) < 1:
+                errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value, row_number)})
         return errors
 
     def get_search_terms(self, nodevalue, nodeid=None):
@@ -1338,7 +1347,7 @@ class DomainDataType(BaseDomainDataType):
         if edge_info['range_tile_data'] is not None:
             g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
             g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
-                   Literal(str(self.get_option_text(edge.rangenode, edge_info['range_tile_data'])))))
+                   Literal(self.get_option_text(edge.rangenode, edge_info['range_tile_data']))))
         return g
 
     def from_rdf(self, json_ld_node):
@@ -1495,6 +1504,7 @@ class ResourceInstanceDataType(BaseDataType):
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         resource_names = self.get_resource_names(nodevalue)
         for value in resource_names:
+            document['ids'].append({'id': nodevalue, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
             if value not in document['strings']:
                 document['strings'].append({'string': value, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
 

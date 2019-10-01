@@ -92,12 +92,24 @@ class RDFExportUnitTests(ArchesTestCase):
         obj = Literal(edge_info['range_tile_data'])
         self.assertTrue((edge_info['d_uri'], edge.ontologyproperty, obj) in graph)
 
+    def test_rdf_None_number(self):
+        dt = self.DT.get_instance("number")
+        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'], None, '', None)
+        graph = dt.to_rdf(edge_info, edge)
+        self.assertTrue(len(graph) == 0)  # the graph should be empty
+
     def test_rdf_bool(self):
         dt = self.DT.get_instance("boolean")
         edge_info, edge = mock_edge(1, CIDOC_NS['some_value'], None, '', True)
         graph = dt.to_rdf(edge_info, edge)
         obj = Literal(edge_info['range_tile_data'])
         self.assertTrue((edge_info['d_uri'], edge.ontologyproperty, obj) in graph)
+
+    def test_rdf_None_bool(self):
+        dt = self.DT.get_instance("boolean")
+        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'], None, '', None)
+        graph = dt.to_rdf(edge_info, edge)
+        self.assertTrue(len(graph) == 0)  # the graph should be empty
 
     def test_rdf_date(self):
         dt = self.DT.get_instance("date")

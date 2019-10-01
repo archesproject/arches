@@ -240,12 +240,14 @@ define([
         };
 
         this.clearGeometries = function(val) {
-            if (self.draw !== undefined && !val) {
-                self.draw.deleteAll();
-            } else if (val && val.features) {
-                if (val.features.length === 0 && self.context === 'search-filter') {
-                    self.searchBuffer(null);
-                    self.updateSearchQueryLayer([]);
+            if (self.map && self.map.getStyle()) {
+                if (self.draw !== undefined && !val) {
+                    self.draw.deleteAll();
+                } else if (val && val.features) {
+                    if (val.features.length === 0 && self.context === 'search-filter') {
+                        self.searchBuffer(null);
+                        self.updateSearchQueryLayer([]);
+                    }
                 }
             }
         };
@@ -273,7 +275,7 @@ define([
                 //    self.map.setStyle(style);
                 // }
 
-                if (self.draw !== undefined) {
+                if (self.draw !== undefined && self.map.getStyle()) {
                     self.draw.changeMode('simple_select');
                     self.loadGeometriesIntoDrawLayer();
                 }
@@ -529,6 +531,11 @@ define([
             }, this);
             return initialLayers;
         };
+        var geometryTypes = ko.unwrap(this.geometryTypes);
+        if (geometryTypes) geometryTypes.forEach(function(geometryType) {
+            geometryType.id = ko.unwrap(geometryType.id);
+            geometryType.text = ko.unwrap(geometryType.text);
+        });
 
         this.geometryTypeDetails = {
             Point: {
@@ -655,7 +662,7 @@ define([
             this.map.on('load', function() {
                 if (!self.configForm) {
                     if (self.context === 'report-header') {
-                        map.on('moveend', _.throttle(generatePrintMap, 3000));
+                        setTimeout(generatePrintMap, 3000);
                     }
                     var zoomToGeoJSON = function(data, fly) {
                         var method = fly ? 'flyTo' : 'jumpTo';
@@ -854,9 +861,11 @@ define([
                         data = self.value();
                         source.setData(data);
                         self.value.subscribe(function(value) {
-                            source.setData(value);
-                            if (value.features.length > 0){
-                                zoomToGeoJSON(value);
+                            if (self.map.getStyle()) {
+                                source.setData(value);
+                                if (value.features.length > 0){
+                                    zoomToGeoJSON(value);
+                                }
                             }
                         });
                         _.each(['resource-poly' + self.graphId, 'resource-line' + self.graphId, 'resource-point' + self.graphId], function(layerId) { //clear and add resource layers so that they are on top of map
@@ -1765,7 +1774,7 @@ define([
 
             if (self.defaultValueType() && self.defaultValueType() != '' || self.defaultValueType() > 0) {
                 if (self.defaultValueType() == 1){
-                    self.value(self.defaultValue());
+                    koMapping.fromJS(self.defaultValue(), self.value);
                 }
                 this.loadDefaultValue(self.defaultValueType(), true);
             }

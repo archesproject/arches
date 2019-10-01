@@ -17,10 +17,12 @@ define([
             return tiles;
         };
         this.configKeys = params.configKeys || [];
+        this.showIds = params.showIds || false;
         this.state = params.state || 'form';
         this.preview = params.preview;
         this.loading = params.loading || ko.observable(false);
         this.card = params.card;
+        this.card.showIds = this.showIds;
         this.tile = params.tile;
         this.reportExpanded = ko.observable(true);
         if (this.preview) {

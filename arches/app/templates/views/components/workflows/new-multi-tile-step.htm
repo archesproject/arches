@@ -3,7 +3,6 @@
     <div data-bind="" class="wf-multi-tile-step-container">
         <!-- ko if: tile() && card() -->
         <div class="wf-multi-tile-step-form">
-            <h3>Add Reference Number</h3>
             <div data-bind="component: {
                 name: cardComponentLookup[card().model.component_id()].componentname,
                 params: {
@@ -12,11 +11,19 @@
                     provisionalTileViewModel: provisionalTileViewModel,
                     reviewer: reviewer,
                     loading: loading,
-                    form: $data
+                    form: $data,
+                    pageVm: $root
                 }
             }"></div>
+            <button class="btn btn-shim btn-labeled btn-lg fa fa-caret-right btn-mint wf-multi-tile-btn-complete" data-bind="click: function(){complete(true)}">Continue</button>
         </div>
         <div class="wf-multi-tile-step-list">
+            <div><h4 data-bind="text: (itemName())"></h4></div>
+            <!-- ko if: card().tiles().length === 0 -->
+            <div class="wf-multi-tile-step-list-empty">
+                <p data-bind="text: ('No '+itemName()+' added yet. Add one or multiple '+itemName()+'.')"></p>
+            </div>
+            <!-- /ko -->
             <!-- ko foreach: {data: card().tiles, as: 'tile'} -->
             <div class="wf-multi-tile-step-card">
                 <div class="wf-multi-tile-card-info">
@@ -36,9 +43,9 @@
                         <!-- /ko -->
                     </div>
                 </div>
-                <div>
-                    <div data-bind="click: function(){$parent.remove(tile)}"><span><i class="fa fa-times-circle"></i></span><span>Remove</span></div>
-                    <div data-bind="click: function(){$parent.edit(tile);}"><span><i class="fa fa-pencil"></i></span><span>Edit</span></div>
+                <div class="wf-multi-tile-step-card-controls">
+                    <span><i class="fa fa-times-circle"></i></span><span class="" data-bind="click: function(){$parent.remove(tile)}">Remove</span>
+                    <span><i class="fa fa-pencil"></i></span><span data-bind="click: function(){$parent.edit(tile);}">Edit</span>
                 </div>
             </div>
             <!-- /ko -->

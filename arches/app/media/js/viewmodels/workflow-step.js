@@ -12,11 +12,10 @@ define([
         this.subtitle = '';
         this.description = '';
         this.complete = ko.observable(false);
+        this.autoAdvance = ko.observable(true);
         this.active = ko.computed(function() {
             return config.workflow.activeStep() === this;
         }, this);
-
-        this.requirements = {};
 
         this.value = function(){
             return {};
