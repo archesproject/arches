@@ -49,11 +49,11 @@ define([
                 var self = this;
                 var $element = $(element);
                 var newValue = ko.utils.unwrapObservable(valueAccessor());
-                if ($element.ckeditorGet().getData() != newValue) {
+                if (editor.getData() != newValue) {
                     // remove the listener and then add back to prevent `setData`
                     // from triggering the onChange event
                     editor.removeListener('change', onChange );
-                    $element.ckeditorGet().setData(newValue);
+                    editor.setData(newValue);
                     editor.on('change', onChange, modelValue, element);
                 }
             }, this)
