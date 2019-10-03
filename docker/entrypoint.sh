@@ -97,11 +97,20 @@ setup_arches() {
 
 	echo "Running: python manage.py setup_db --force"
 	python manage.py setup_db --force
+	if [[ $? -ne 0 ]]; then
+		echo "Error during setup - could be connection issue. Waiting 5 seconds and reattempting"
+		sleep 5
+		python manage.py setup_db --force
+		if [[ $? -ne 0 ]]; then
+			echo "Failed to run the setup routine succesfully. Quitting."
+			exit
+		fi
+	fi
 
-    echo "Running: Creating couchdb system databases"
-    curl -X PUT ${COUCHDB_URL}/_users
-    curl -X PUT ${COUCHDB_URL}/_global_changes
-    curl -X PUT ${COUCHDB_URL}/_replicator
+	echo "Running: Creating couchdb system databases"
+	curl -X PUT ${COUCHDB_URL}/_users
+	curl -X PUT ${COUCHDB_URL}/_global_changes
+	curl -X PUT ${COUCHDB_URL}/_replicator
 
 	if [[ "${INSTALL_DEFAULT_GRAPHS}" == "True" ]]; then
 		# Import graphs
