@@ -55,7 +55,7 @@ define([
                 relatable_resource_ids: relatableResourceIds,
                 ontology_class: ontologyClass(),
             });
-        });
+        }).extend({deferred: true});
 
         self.jsonCache = ko.observable(self.jsonData());
 

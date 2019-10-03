@@ -303,6 +303,8 @@ define([
                 koMapping.fromJS(graph, viewModel.graphSettingsViewModel.graph);
             });
 
+            viewModel.report.configJSON.extend({deferred: true});
+
             viewModel.report.get('template_id').subscribe(function(val) {
                 viewModel.graphSettingsViewModel.graph["template_id"](val);
             });
