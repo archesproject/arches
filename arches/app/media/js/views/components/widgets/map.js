@@ -211,11 +211,13 @@ define([
         }));
 
         this.geocodeProvider.subscribe(function(geocoderid) {
-            var provider = _.findWhere(this.geocodingProviders, {
-                'geocoderid': geocoderid
-            });
-            this.geocodeProviderDetails.api_key(provider.api_key);
-            this.geocodeProviderDetails.component(provider.component);
+            if (geocoderid) {
+                var provider = _.findWhere(this.geocodingProviders, {
+                    'geocoderid': geocoderid
+                });
+                this.geocodeProviderDetails.api_key(provider.api_key);
+                this.geocodeProviderDetails.component(provider.component);
+            }
         }, this);
 
         this.loadGeometriesIntoDrawLayer = function() {
