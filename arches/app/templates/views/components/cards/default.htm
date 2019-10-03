@@ -5,7 +5,7 @@
 {% block editor_tree %}
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}, scrollTo: card.scrollTo, container: '.resource-editor-tree'">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
-    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode()}, event: {
+    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode(),'unsaved-edit': !!card.model.dirty()}, event: {
         mousedown: function(d, e) {
             e.stopPropagation();
             card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true);
