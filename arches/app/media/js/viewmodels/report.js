@@ -24,7 +24,7 @@ define(['knockout', 'knockout-mapping', 'underscore', 'moment', 'bindings/let'],
             });
             self.report.configJSON(koMapping.toJS(self.report.configState));
             return self.report.configJSON;
-        });
+        }).extend({deferred: true});
 
         var getCardTiles = function(card, tiles) {
             var cardTiles = ko.unwrap(card.tiles);
