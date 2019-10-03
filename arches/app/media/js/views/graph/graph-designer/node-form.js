@@ -41,8 +41,6 @@ define([
                 if(this.appliedFunctions()) {
                     appFuncs = this.appliedFunctions();
                     for(var i = 0; i < appFuncs.length; i++) {
-                        console.log(appFuncs[i]['functionid']);
-                        console.log(ko.unwrap(appFuncs[i]));
                         if(appFuncs[i]['function_id'] == "60000000-0000-0000-0000-000000000001") {
                             if(appFuncs[i]['config']['description']['nodegroup_id']) {
                                 appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
@@ -62,7 +60,7 @@ define([
                                         } else if(child['id'] === appFuncName) {
                                             return "This node participates in the name function";
                                         }
-                                    }); 
+                                    });
                                 }
                             }
                         }
