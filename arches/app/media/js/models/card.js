@@ -115,7 +115,6 @@ define([
             this._card = ko.observable('{}');
 
             this.dirty = ko.computed(function() {
-                console.log(ko.unwrap(self));
                 return JSON.stringify(
                     _.extend(
                         JSON.parse(self._card()),

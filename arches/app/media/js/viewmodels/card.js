@@ -397,6 +397,13 @@ define([
             }
         };
 
+       this.isDirty = function(){
+            if(self.newTile) {
+                if(self.newTile.dirty()) { return true; }
+            }
+            return false;
+        };
+
         this.selectChildCards = function(value) {
             if (value !== undefined){
                 this.selected(value);
