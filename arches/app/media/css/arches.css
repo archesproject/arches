@@ -5748,6 +5748,112 @@ a.list-group-item:not(.active):hover, div .switch label:hover, #demo-dt-selectio
     filter: alpha(opacity=0);
 }
 
+.dz-previews {
+    border: 1px solid #ddd;
+    height: 300px;
+    overflow-y: scroll;
+}
+
+.file-upload-filter {
+    margin-right: 5px;
+    padding: 5px 10px;
+    width: 250px;
+}
+
+.dz-previews .file-upload-card {
+    border-bottom: 1px solid #D3E5F4;
+    border-radius: 2px;
+    padding: 7px 8px 5px 15px;
+    background: #fff;
+    color: #666;
+    height: 50px;
+}
+
+.dz-previews .file-upload-card:nth-child(odd) {
+    background: #F5FAFE;
+}
+
+.file-upload-options {
+    padding-bottom: 8px;
+}
+
+.file-size-label {
+    float: right;
+    margin-top: 2px;
+}
+
+.btn-file-upload-reset {
+    color: #489EED;
+    font-size: 12px;
+    float: right;
+}
+
+
+.file-upload-card-detail-right {
+    min-width: 85px;
+    float: right;
+    margin-top: 6px;
+}
+
+.file-upload-card-detail a:hover {
+    cursor: pointer;
+}
+
+.btn-file-upload-limit {
+    color: #489EED;
+    font-size: 12px;
+    float: left;
+}
+
+.btn-file-cancel {
+    background: #01113c;
+    border-radius: 50%;
+    border: none;
+}
+
+.file-upload-footer {
+    background: #f1f1f1;
+    color: rgb(89, 56, 255);;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    border-top: 1px solid #ddd;
+    padding-left: 10px;
+    padding: 12px 15px;
+}
+
+.file-select {
+    text-align: center;
+    padding: 70px 0;
+    background: #f9f9f9;
+}
+
+.file-select-window {
+    border: 1px solid #c4c4c4;
+    border-radius: 2px;
+}
+
+.btn-file-select {
+    background: rgb(138, 115, 255);
+    color: #fff;
+    border: 1px solid rgb(89, 56, 255);
+    border-radius: 2px;
+    width: 240px;
+    margin: 30px 0;
+}
+
+.btn-file-select:hover {
+    color: #fff;
+}
+
+.btn-file-select:focus {
+    color: #fff;
+}
+
+div.hide-file-list > div > div > div > div > form > div > div:nth-child(3) {
+    visibility: hidden;
+}
+
 .resource-tools {
     margin-left: 120px;
     margin-top: 0px;
