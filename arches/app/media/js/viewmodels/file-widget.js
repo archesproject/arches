@@ -21,18 +21,9 @@ define([
 
         WidgetViewModel.apply(this, [params]);
 
-        this.filter = ko.observable("");
-        this.filteredList = ko.computed(function() {
-            var arr = [], lowerName = "", filter = self.filter().toLowerCase();
-            if(filter) {
-                self.filesJSON().forEach(function(f, i) {
-                    lowerName = f.name.toLowerCase();
-                    if(lowerName.includes(filter)) { arr.push(self.filesJSON()[i]); }
-                });
-            }
-            return arr;
-        });
         this.uploadMulti = ko.observable(true);
+        this.filesForUpload = ko.observableArray();
+        this.uploadedFiles = ko.observableArray();
 
         if (this.form) {
             this.form.on('after-update', function(req, tile) {
@@ -89,47 +80,6 @@ define([
             }
         });
 
-        this.filesForUpload = ko.observableArray();
-        this.uploadedFiles = ko.observableArray();
-        if (Array.isArray(self.value())) {
-            this.uploadedFiles(self.value());
-        }
-
-        this.selectedFile = ko.observable(self.filesJSON()[0]);
-        this.selectFile = function(sFile) { self.selectedFile(sFile); };
-
-        this.removeFile = function(file) {
-            var filePosition;
-            self.filesJSON().forEach(function(f, i) { if (f.file_id === file.file_id) { filePosition = i; } });
-            var newfilePosition = filePosition === 0 ? 1 : filePosition - 1;
-            var filesForUpload = self.filesForUpload();
-            var uploadedFiles = self.uploadedFiles();
-            if (file.file_id) {
-                file = _.find(uploadedFiles, function(uploadedFile) {
-                    return file.file_id ===  ko.unwrap(uploadedFile.file_id);
-                });
-                self.uploadedFiles.remove(file);
-            } else {
-                file = filesForUpload[file.index];
-                self.filesForUpload.remove(file);
-            }
-            if (self.filesJSON().length > 0) { self.selectedFile(self.filesJSON()[newfilePosition]); }
-        };
-        
-        this.pageCt = ko.observable(5);
-        this.pageCtReached = ko.computed(function() {
-            return (self.filesJSON().length > self.pageCt() ? 'visible' : 'hidden');
-        });
-
-        this.pagedList = function(list) {
-            var arr = [], i = 0;
-            if(list.length > self.pageCt()) {
-                while(arr.length < self.pageCt()) { arr.push(list[i++]); }
-                return arr;
-            }
-            return list;
-        };
-
         this.formatSize = function(file) {
             var bytes = ko.unwrap(file.size);
             if(bytes == 0) return '0 Byte';
@@ -165,8 +115,10 @@ define([
         }).extend({throttle: 100});
 
         this.filesJSON.subscribe(function(value) {
-            if (_.contains(self.formData.keys(), 'file-list_' + self.node.nodeid)) {
-                self.formData.delete('file-list_' + self.node.nodeid);
+            if (self.formData) {
+                if (_.contains(self.formData.keys(), 'file-list_' + self.node.nodeid)) {
+                    self.formData.delete('file-list_' + self.node.nodeid);
+                }
             }
             if (value.length > 1 && self.selectedFile() == undefined) { self.selectedFile(value[0]); }
             _.each(self.filesForUpload(), function(file) {
@@ -182,6 +134,56 @@ define([
                 );
             }
         });
+
+        if (Array.isArray(self.value())) {
+            this.uploadedFiles(self.value());
+        }
+        this.filter = ko.observable("");
+        this.filteredList = ko.computed(function() {
+            var arr = [], lowerName = "", filter = self.filter().toLowerCase();
+            if(filter) {
+                self.filesJSON().forEach(function(f, i) {
+                    lowerName = f.name.toLowerCase();
+                    if(lowerName.includes(filter)) { arr.push(self.filesJSON()[i]); }
+                });
+            }
+            return arr;
+        });
+
+        this.selectedFile = ko.observable(self.filesJSON()[0]);
+        this.selectFile = function(sFile) { self.selectedFile(sFile); };
+
+        this.removeFile = function(file) {
+            var filePosition;
+            self.filesJSON().forEach(function(f, i) { if (f.file_id === file.file_id) { filePosition = i; } });
+            var newfilePosition = filePosition === 0 ? 1 : filePosition - 1;
+            var filesForUpload = self.filesForUpload();
+            var uploadedFiles = self.uploadedFiles();
+            if (file.file_id) {
+                file = _.find(uploadedFiles, function(uploadedFile) {
+                    return file.file_id ===  ko.unwrap(uploadedFile.file_id);
+                });
+                self.uploadedFiles.remove(file);
+            } else {
+                file = filesForUpload[file.index];
+                self.filesForUpload.remove(file);
+            }
+            if (self.filesJSON().length > 0) { self.selectedFile(self.filesJSON()[newfilePosition]); }
+        };
+        
+        this.pageCt = ko.observable(5);
+        this.pageCtReached = ko.computed(function() {
+            return (self.filesJSON().length > self.pageCt() ? 'visible' : 'hidden');
+        });
+
+        this.pagedList = function(list) {
+            var arr = [], i = 0;
+            if(list.length > self.pageCt()) {
+                while(arr.length < self.pageCt()) { arr.push(list[i++]); }
+                return arr;
+            }
+            return list;
+        };
 
         this.unique_id = uuid.generate();
         this.uniqueidClass = ko.computed(function() {
