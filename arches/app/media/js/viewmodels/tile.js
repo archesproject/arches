@@ -197,6 +197,7 @@ define([
                             return self._tileData() !== koMapping.toJSON(self.data);
                         }, self);
                         self.parent.tiles.push(self);
+                        self.parent.newTile = undefined;
                         self.parent.expanded(true);
                         selection(self);
                     }
