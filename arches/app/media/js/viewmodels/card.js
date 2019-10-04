@@ -43,7 +43,7 @@ define([
             return true;
         }
         return false;
-    }
+    };
 
     var doesChildHaveProvisionalEdits = function(parent) {
         var hasEdits = false;
@@ -324,7 +324,7 @@ define([
                 });
             },
             getNewTile: function() {
-                return new TileViewModel({
+                if (!this.newTile) this.newTile = new TileViewModel({
                     tile: {
                         tileid: '',
                         resourceinstance_id: ko.unwrap(params.resourceId),
@@ -350,6 +350,7 @@ define([
                     loading: loading,
                     cardwidgets: params.cardwidgets,
                 });
+                return this.newTile;
             },
             isFuncNode: function() {
                 var appFuncDesc = false, appFuncName = false, nodegroupId = null;
