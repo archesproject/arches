@@ -7584,7 +7584,6 @@ a.clear-geojson-button:hover {
 #map-popup .hover-feature-title-bar {
     height: 60px;
     padding: 10px;
-    background: #fff;
     border-bottom: 1px solid #25476A;
     border-top: none;
     border-right: none;
@@ -7595,8 +7594,8 @@ a.clear-geojson-button:hover {
 .hover-feature-title-bar {
     height: 40px;
     padding: 10px;
-    background: #ddd;
-    border: 1px solid #ccc;
+    background: #f4f4f4;
+    border: 1px solid #ddd;
     border-bottom: none;
     max-width: 400px;
 }
@@ -7605,25 +7604,45 @@ a.clear-geojson-button:hover {
     margin-bottom: 0px;
 }
 
+#map-popup .mapboxgl-popup-close-button {
+    height: 60px !important;
+    width: 60px;
+    margin-top: -7px;
+    margin-right: -7px;
+    padding-top: 7px;
+    border-radius: 0px;
+    font-size: 27px;
+    background: #f7f7f7;
+    color: #454545;
+    border-left: 1px solid #bbb;
+    border-bottom: 1px solid #bbb;
+}
+
+#map-popup .mapboxgl-popup-close-button:hover {
+    background: #fcfcfc;
+}
+
 .mapboxgl-popup-close-button {
     position: absolute;
-    right: 7px;
-    top: 7px;
-    border: 0;
+    right: 0px;
+    top: 0px;
+    height: 40px;
+    width: 40px;
+    border-left: 1px solid #ddd;
     border-radius: 2px;
     padding-bottom: 4px;
     cursor: pointer;
-    background-color: #bbb;
-    color: #fff;
-    font-size: 17px;
+    background-color: #e9e9e9;
+    color: #676767;
+    font-size: 23px;
     font-weight: 600;
 }
 
 .mapboxgl-popup-close-button:hover {
     cursor: pointer;
-    background-color: #337ab7;
-    color: #fff;
-    font-size: 17px;
+    background-color: #e2e2e2;
+    color: #454545;
+    font-size: 23px;
     font-weight: 600;
 }
 
@@ -7631,6 +7650,7 @@ a.clear-geojson-button:hover {
     font-size: 14px;
     font-weight: 500;
     max-width: 300px;
+    color: #25476A;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
