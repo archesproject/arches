@@ -7581,6 +7581,17 @@ a.clear-geojson-button:hover {
     flex-direction: column;
 }
 
+#map-popup .hover-feature-title-bar {
+    height: 60px;
+    padding: 10px;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    max-width: 400px;
+}
+
 .hover-feature-title-bar {
     height: 40px;
     padding: 10px;
