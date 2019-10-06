@@ -7636,6 +7636,20 @@ a.clear-geojson-button:hover {
     text-overflow: ellipsis;
 }
 
+#map-popup .hover-feature-body {
+    padding: 0px;
+}
+
+#map-popup img {
+    width: 100%;
+    height: auto;
+    margin-top: -25px;
+}
+
+#map-popup .cons-stubs {
+    padding: 10px 0px;
+}
+
 .hover-feature-body {
     padding: 10px 15px 15px 15px;
     width: 350px;
@@ -8511,6 +8525,16 @@ table.table.dataTable {
 
 .hover-feature-body .row.widget-wrapper label {
     display: none;
+}
+
+#map-popup .hover-feature-footer {
+    position: fixed;
+    padding-left: 20px;
+    bottom: 0px;
+    left: 449px;
+    width: 350px;
+    background: #f4f4f4;
+    font-size: 14px;
 }
 
 .hover-feature-footer {
