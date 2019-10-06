@@ -8630,12 +8630,13 @@ table.table.dataTable {
 .search-type-btn.relative:active {
     border-style: solid;
     border-top: 0px solid #BBD1EA;
+    border-bottom: 0px solid transparent;
 }
 
 .search-type-btn.relative.active {
     background: #fff;
     color: #25476A;
-    border-bottom: none;
+    border-bottom: 1px solid #fff;
     cursor: default;
 }
 
@@ -8759,6 +8760,7 @@ table.table.dataTable {
     border-style: solid;
     border-right: 0px solid #BBD1EA;
     border-top: 0px solid #BBD1EA;
+    border-bottom: 0px solid #BBD1EA;
 }
 
 
