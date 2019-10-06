@@ -7597,7 +7597,7 @@ a.clear-geojson-button:hover {
     background: #fff;
     border: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
-    max-width: 400px;
+    max-width: 311px;
 }
 
 .mapboxgl-popup-content .hover-feature-title-bar {
@@ -7657,6 +7657,34 @@ a.clear-geojson-button:hover {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.hover-feature-nav-left {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: 40px;
+    background: #fafafa;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.hover-feature-nav-left.disabled {
+    display: none;
+}
+
+.hover-feature-nav-right {
+    position: absolute;
+    right: 39px;
+    top: 0px;
+    height: 40px;
+    background: #fafafa;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.hover-feature-nav-right.disabled {
+    display: none;
 }
 
 #map-popup .hover-feature-body {
@@ -8563,6 +8591,7 @@ table.table.dataTable {
 .hover-feature-footer {
     height: 50px;
     border-top: 1px solid #ddd;
+    background: #f8f8f8;
     padding: 10px;
     padding-top: 15px;
 }
