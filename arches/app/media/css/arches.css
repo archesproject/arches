@@ -391,7 +391,7 @@ input[type="checkbox"] {
 }
 
 .workflow-step-container {
-    height: 100%;
+    height: calc(100% + 41px);
 }
 
 .workflowstep-nav {
@@ -400,7 +400,7 @@ input[type="checkbox"] {
     width: calc(100% - 220px);
     border-bottom: solid 1px #ddd;
     height: fit-content;
-    padding: 20px 25px;
+    padding: 12px 25px;
     background-color: #fff;
     overflow-x: scroll;
 }
@@ -411,7 +411,7 @@ input[type="checkbox"] {
 
 .workflowstep-nav div.workflow-nav-controls {
     position: absolute;
-    padding: 29px 0px;
+    padding: 19px 0px;
     right: 0px;
     top: 0;
     font-size: 25px;
@@ -476,11 +476,11 @@ input[type="checkbox"] {
     border-radius: 50%;
     display: block;
     margin: 0 auto;
-    height: 50px;
-    line-height: 50px;
+    height: 45px;
+    line-height: 45px;
     text-align: center;
-    width: 50px;
-    font-size: 23px;
+    width: 45px;
+    font-size: 21px;
     color: #ccc;
 }
 
@@ -517,21 +517,21 @@ input[type="checkbox"] {
     flex-direction: column;
     justify-content: center;
     background-color: #fff;
-    padding: 15px 10px;
+    padding: 10px 10px;
     overflow-x: hidden;
     overflow-y: hidden;
     width: 100%;
 }
 
 .workflow-step-description .title {
-    font-size: 1.5em;
+    font-size: 1.3em;
     font-weight: 600;
     color: #004577;
     padding-top: 10px;
 }
 
 .workflow-step-description .workflow-name {
-    font-size: 1.3em;
+    font-size: 1.2em;
     font-weight: 400;
     line-height: 1.01;
     color: #004577;
@@ -543,7 +543,7 @@ input[type="checkbox"] {
     color: #004577;
 }
 .workflow-step-description .step {
-    font-size: 15px;
+    font-size: 1.1em;
     font-weight: 400;
     color: #999;
     padding-bottom: 15px;
@@ -749,26 +749,23 @@ div.wf-multi-tile-card-info div {
     flex-direction: row;
     list-style-type: none;
     flex-wrap: wrap;
-    justify-content: space-evenly;
 }
 
 ul.tabbed-report-tab-list {
     margin: 0;
-    padding: 0;
+    padding: 0 20px;
 }
 
 .report-tab {
     background: #f4f4f4;
-    border: #e9e9e9 solid 2px;
+    border: #e9e9e9 solid 1px;
     border-radius: 100%;
     display: flex;
-    height: 72px;
-    width: 72px;
-    justify-content: center;
-    text-align: center;
-    align-items: center;
+    height: 50px;
+    width: 50px;
+    line-height: 50px;
     flex-direction: column;
-    margin: 2% 0 2% 0;
+    margin: 15px 40px 15px 0px;
 }
 
 .report-tab:hover {
@@ -777,31 +774,18 @@ ul.tabbed-report-tab-list {
 
 .report-tab i {
     color: #bbbbbb;
-    font-size:32px;
-    /* text-align: center; */
-    /* vertical-align: middle; */
+    font-size: 21px;
+    padding: 0px 14px;
 }
 
 .report-tab.active {
     border: #4389c9 solid 2px;
     border-radius: 100%;
     background: #5fa2dd;
-    width: 72px;
-    height: 72px;
-    display: flex;
-    justify-content: center;
-    text-align: center;
-    align-items: center;
-    flex-direction: column;
-    margin: 2% 0 2% 0;
 }
 
 .report-tab.active i {
     color: white;
-    font-size:32px;
-    text-align: center;
-    vertical-align: middle;
-    align-self: center;
 }
 
 .report-tab-form.active {
@@ -827,16 +811,16 @@ ul.tabbed-report-tab-list {
 
 .tab-banner {
     background: #5fa2dd;
-    padding: 1% 2% 1% 2%;
+    padding: 5px 20px 7px 20px;
 }
 
 .tab-banner > div + div span {
-    font-size: 11px;
-    padding-left: 18px;
+    font-size: 13px;
+    padding-left: 20px;
 }
 
 .tab-banner span {
-    font-size: 18px;
+    font-size: 15px;
     color: white;
 }
 
@@ -10356,7 +10340,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .tabbed-report-header .workbench-card-wrapper {
-    height: 400px;
+    height: 500px;
 }
 
 .tabbed-report-sidepanel {
@@ -10380,9 +10364,18 @@ a.jstree-anchor.permissions-widget {
 
 .tabbed-report-sidepanel-title.consultation-status-title {
     color: white;
+    font-size: 16px;
     background-color: rgb(234, 141, 148);
 }
 
+.sidebar-section {
+    padding: 0px 10px 20px 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.sidebar-section:last-child {
+    border-bottom: none;
+}
 
 .tabbed-report-sidepanel-title.consultation-status-title.completed {
     background-color: rgb(202, 247, 225);
@@ -10391,6 +10384,9 @@ a.jstree-anchor.permissions-widget {
 
 .tabbed-report-sidepanel-subtitle {
     color: rgb(222, 222, 222);
+    font-size: 13px;
+    margin-top: -2px;
+    margin-bottom: 2px;
 }
 
 .completed .tabbed-report-sidepanel-subtitle {
