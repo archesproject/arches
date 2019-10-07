@@ -408,7 +408,7 @@ class Concept(object):
         columns = "valueidto::text, conceptidto::text, valuetypeto, categoryto, valueto, languageto"
         data = self.get_child_edges(conceptid, ['narrower', 'hasTopConcept'],
                                     child_valuetypes, parent_valuetype, columns, depth_limit)
-        return [dict(zip(['id', 'conceptid', 'type', 'category', 'value', 'language'], d), top_concept='') for d in data]
+        return [dict(list(zip(['id', 'conceptid', 'type', 'category', 'value', 'language'], d)), top_concept='') for d in data]
 
     def get_child_edges(self, conceptid, relationtypes, child_valuetypes=None, parent_valuetype='prefLabel', columns=None, depth_limit=None, offset=None, limit=20, order_hierarchically=False, query=None, languageid=settings.LANGUAGE_CODE):
         """
@@ -1104,7 +1104,7 @@ class Concept(object):
                 val.children.sort(key=lambda x: (x.sortorder, x.text))
 
         for row in rows:
-            rec = dict(zip(column_names, row))
+            rec = dict(list(zip(column_names, row)))
             path = rec['conceptpath'][1:-1].split(',')
             _findNarrower(result, path, rec)
 
