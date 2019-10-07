@@ -106,7 +106,7 @@ class StringDataType(BaseDataType):
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
                     query.must(match_query)
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def is_a_literal_in_rdf(self):
@@ -176,7 +176,7 @@ class NumberDataType(BaseDataType):
                 else:
                     search_query = Match(field='tiles.data.%s' % (str(node.pk)), query=value['val'], type='phrase_prefix')
                 query.must(search_query)
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def is_a_literal_in_rdf(self):
@@ -225,7 +225,7 @@ class BooleanDataType(BaseDataType):
             if value['val'] != '':
                 term = True if value['val'] == 't' else False
                 query.must(Term(field='tiles.data.%s' % (str(node.pk)), term=term))
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def to_rdf(self, edge_info, edge):
@@ -309,7 +309,7 @@ class DateDataType(BaseDataType):
                 else:
                     search_query = Match(field='tiles.data.%s' % (str(node.pk)), query=date_value, type='phrase_prefix')
                 query.must(search_query)
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def after_update_all(self):
@@ -596,7 +596,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
         try:
             simplification = config['simplification']
-        except KeyError, e:
+        except KeyError as e:
             simplification = 0.3
 
         return {
@@ -1337,7 +1337,7 @@ class DomainDataType(BaseDomainDataType):
                 else:
                     query.must(search_query)
 
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def to_rdf(self, edge_info, edge):
@@ -1440,7 +1440,7 @@ class DomainListDataType(BaseDomainDataType):
                 else:
                     query.must(search_query)
 
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def to_rdf(self, edge_info, edge):
@@ -1531,7 +1531,7 @@ class ResourceInstanceDataType(BaseDataType):
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
                     query.must(search_query)
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def to_rdf(self, edge_info, edge):

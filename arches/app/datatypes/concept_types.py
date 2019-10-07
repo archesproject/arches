@@ -120,7 +120,7 @@ class ConceptDataType(BaseConceptDataType):
                 else:
                     query.must(match_query)
 
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def to_rdf(self, edge_info, edge):
@@ -289,7 +289,7 @@ class ConceptListDataType(BaseConceptDataType):
                 else:
                     query.must(match_query)
 
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def to_rdf(self, edge_info, edge):
