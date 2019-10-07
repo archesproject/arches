@@ -10039,6 +10039,7 @@ ul.select2-choices:after {
 
 .card-component-panel h4 {
     color: #2f527a;
+    font-size: 15px;
     font-weight: 400;
 }
 
@@ -10364,7 +10365,7 @@ a.jstree-anchor.permissions-widget {
 
 .tabbed-report-sidepanel-title.consultation-status-title {
     color: white;
-    font-size: 16px;
+    font-size: 15px;
     background-color: rgb(234, 141, 148);
 }
 
