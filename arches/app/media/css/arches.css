@@ -391,7 +391,7 @@ input[type="checkbox"] {
 }
 
 .workflow-step-container {
-    height: 100%;
+    height: calc(100% + 41px);
 }
 
 .workflowstep-nav {
@@ -400,7 +400,7 @@ input[type="checkbox"] {
     width: calc(100% - 220px);
     border-bottom: solid 1px #ddd;
     height: fit-content;
-    padding: 20px 25px;
+    padding: 12px 25px;
     background-color: #fff;
     overflow-x: scroll;
 }
@@ -411,7 +411,7 @@ input[type="checkbox"] {
 
 .workflowstep-nav div.workflow-nav-controls {
     position: absolute;
-    padding: 29px 0px;
+    padding: 19px 0px;
     right: 0px;
     top: 0;
     font-size: 25px;
@@ -476,11 +476,11 @@ input[type="checkbox"] {
     border-radius: 50%;
     display: block;
     margin: 0 auto;
-    height: 50px;
-    line-height: 50px;
+    height: 45px;
+    line-height: 45px;
     text-align: center;
-    width: 50px;
-    font-size: 23px;
+    width: 45px;
+    font-size: 21px;
     color: #ccc;
 }
 
@@ -517,21 +517,21 @@ input[type="checkbox"] {
     flex-direction: column;
     justify-content: center;
     background-color: #fff;
-    padding: 15px 10px;
+    padding: 10px 10px;
     overflow-x: hidden;
     overflow-y: hidden;
     width: 100%;
 }
 
 .workflow-step-description .title {
-    font-size: 1.5em;
+    font-size: 1.3em;
     font-weight: 600;
     color: #004577;
     padding-top: 10px;
 }
 
 .workflow-step-description .workflow-name {
-    font-size: 1.3em;
+    font-size: 1.2em;
     font-weight: 400;
     line-height: 1.01;
     color: #004577;
@@ -543,7 +543,7 @@ input[type="checkbox"] {
     color: #004577;
 }
 .workflow-step-description .step {
-    font-size: 15px;
+    font-size: 1.1em;
     font-weight: 400;
     color: #999;
     padding-bottom: 15px;
@@ -749,26 +749,23 @@ div.wf-multi-tile-card-info div {
     flex-direction: row;
     list-style-type: none;
     flex-wrap: wrap;
-    justify-content: space-evenly;
 }
 
 ul.tabbed-report-tab-list {
     margin: 0;
-    padding: 0;
+    padding: 0 20px;
 }
 
 .report-tab {
     background: #f4f4f4;
-    border: #e9e9e9 solid 2px;
+    border: #e9e9e9 solid 1px;
     border-radius: 100%;
     display: flex;
-    height: 72px;
-    width: 72px;
-    justify-content: center;
-    text-align: center;
-    align-items: center;
+    height: 50px;
+    width: 50px;
+    line-height: 50px;
     flex-direction: column;
-    margin: 2% 0 2% 0;
+    margin: 15px 40px 15px 0px;
 }
 
 .report-tab:hover {
@@ -777,31 +774,18 @@ ul.tabbed-report-tab-list {
 
 .report-tab i {
     color: #bbbbbb;
-    font-size:32px;
-    /* text-align: center; */
-    /* vertical-align: middle; */
+    font-size: 21px;
+    padding: 0px 14px;
 }
 
 .report-tab.active {
     border: #4389c9 solid 2px;
     border-radius: 100%;
     background: #5fa2dd;
-    width: 72px;
-    height: 72px;
-    display: flex;
-    justify-content: center;
-    text-align: center;
-    align-items: center;
-    flex-direction: column;
-    margin: 2% 0 2% 0;
 }
 
 .report-tab.active i {
     color: white;
-    font-size:32px;
-    text-align: center;
-    vertical-align: middle;
-    align-self: center;
 }
 
 .report-tab-form.active {
@@ -827,16 +811,16 @@ ul.tabbed-report-tab-list {
 
 .tab-banner {
     background: #5fa2dd;
-    padding: 1% 2% 1% 2%;
+    padding: 5px 20px 7px 20px;
 }
 
 .tab-banner > div + div span {
-    font-size: 11px;
-    padding-left: 18px;
+    font-size: 13px;
+    padding-left: 20px;
 }
 
 .tab-banner span {
-    font-size: 18px;
+    font-size: 15px;
     color: white;
 }
 
@@ -7581,48 +7565,124 @@ a.clear-geojson-button:hover {
     flex-direction: column;
 }
 
+#map-popup .hover-feature-title-bar {
+    height: 60px;
+    padding: 10px;
+    border-bottom: 1px solid #25476A;
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    max-width: 290px;
+}
+
 .hover-feature-title-bar {
     height: 40px;
     padding: 10px;
-    background: #ddd;
-    border: 1px solid #ccc;
-    border-bottom: none;
-    max-width: 400px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    max-width: 311px;
 }
 
 .mapboxgl-popup-content .hover-feature-title-bar {
     margin-bottom: 0px;
 }
 
+#map-popup .mapboxgl-popup-close-button {
+    height: 60px !important;
+    width: 60px;
+    padding-top: 7px;
+    border-radius: 0px;
+    font-size: 27px;
+    background: #fafafa;
+    color: #454545;
+    border-left: 1px solid #bbb;
+    border-bottom: 1px solid #25476A;
+}
+
+#map-popup .mapboxgl-popup-close-button:hover {
+    background: #f4f4f4;
+}
+
 .mapboxgl-popup-close-button {
     position: absolute;
-    right: 7px;
-    top: 7px;
-    border: 0;
-    border-radius: 2px;
+    right: 0px;
+    top: 0px;
+    height: 40px;
+    width: 40px;
+    border: 1px solid #ddd;
     padding-bottom: 4px;
     cursor: pointer;
-    background-color: #bbb;
-    color: #fff;
-    font-size: 17px;
+    background-color: #fafafa;
+    color: #676767;
+    font-size: 23px;
     font-weight: 600;
 }
 
 .mapboxgl-popup-close-button:hover {
     cursor: pointer;
-    background-color: #337ab7;
-    color: #fff;
-    font-size: 17px;
+    background-color: #f4f4f4;
+    color: #454545;
+    font-size: 23px;
     font-weight: 600;
+}
+
+#map-popup .hover-feature-title {
+    height: 40px;
+    text-align: center;
+    white-space: inherit;
 }
 
 .hover-feature-title {
     font-size: 14px;
     font-weight: 500;
     max-width: 300px;
+    color: #25476A;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.hover-feature-nav-left {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: 40px;
+    background: #fafafa;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.hover-feature-nav-left.disabled {
+    display: none;
+}
+
+.hover-feature-nav-right {
+    position: absolute;
+    right: 39px;
+    top: 0px;
+    height: 40px;
+    background: #fafafa;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.hover-feature-nav-right.disabled {
+    display: none;
+}
+
+#map-popup .hover-feature-body {
+    padding: 0px;
+}
+
+#map-popup img {
+    width: 100%;
+    height: auto;
+    margin-top: -25px;
+}
+
+#map-popup .cons-stubs {
+    padding: 10px 0px;
 }
 
 .hover-feature-body {
@@ -8502,9 +8562,20 @@ table.table.dataTable {
     display: none;
 }
 
+#map-popup .hover-feature-footer {
+    position: fixed;
+    padding-left: 20px;
+    bottom: 0px;
+    left: 449px;
+    width: 350px;
+    background: #f4f4f4;
+    font-size: 14px;
+}
+
 .hover-feature-footer {
     height: 50px;
     border-top: 1px solid #ddd;
+    background: #f8f8f8;
     padding: 10px;
     padding-top: 15px;
 }
@@ -8543,12 +8614,13 @@ table.table.dataTable {
 .search-type-btn.relative:active {
     border-style: solid;
     border-top: 0px solid #BBD1EA;
+    border-bottom: 0px solid transparent;
 }
 
 .search-type-btn.relative.active {
     background: #fff;
     color: #25476A;
-    border-bottom: none;
+    border-bottom: 1px solid #fff;
     cursor: default;
 }
 
@@ -8672,6 +8744,7 @@ table.table.dataTable {
     border-style: solid;
     border-right: 0px solid #BBD1EA;
     border-top: 0px solid #BBD1EA;
+    border-bottom: 0px solid #BBD1EA;
 }
 
 
@@ -9966,6 +10039,7 @@ ul.select2-choices:after {
 
 .card-component-panel h4 {
     color: #2f527a;
+    font-size: 15px;
     font-weight: 400;
 }
 
@@ -10267,7 +10341,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .tabbed-report-header .workbench-card-wrapper {
-    height: 400px;
+    height: 500px;
 }
 
 .tabbed-report-sidepanel {
@@ -10291,9 +10365,18 @@ a.jstree-anchor.permissions-widget {
 
 .tabbed-report-sidepanel-title.consultation-status-title {
     color: white;
+    font-size: 15px;
     background-color: rgb(234, 141, 148);
 }
 
+.sidebar-section {
+    padding: 0px 10px 20px 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.sidebar-section:last-child {
+    border-bottom: none;
+}
 
 .tabbed-report-sidepanel-title.consultation-status-title.completed {
     background-color: rgb(202, 247, 225);
@@ -10302,6 +10385,9 @@ a.jstree-anchor.permissions-widget {
 
 .tabbed-report-sidepanel-subtitle {
     color: rgb(222, 222, 222);
+    font-size: 13px;
+    margin-top: -2px;
+    margin-bottom: 2px;
 }
 
 .completed .tabbed-report-sidepanel-subtitle {
