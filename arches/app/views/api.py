@@ -247,7 +247,8 @@ class GeoJSON(APIBase):
                 except KeyError:
                     pass
                 except TypeError as e:
-                    print(e, tile.data)
+                    print(e)
+                    print(tile.data)
 
         response = JSONResponse({'type': 'FeatureCollection', 'features': features})
         return response
