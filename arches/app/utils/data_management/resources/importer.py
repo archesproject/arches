@@ -71,7 +71,7 @@ class BusinessDataImporter(object):
         self.business_data = ''
         self.file_format = ''
         self.relations = ''
-        csv.field_size_limit(sys.maxint)
+        csv.field_size_limit(sys.maxsize)
 
         if not file:
             file = settings.BUSINESS_DATA_FILES
