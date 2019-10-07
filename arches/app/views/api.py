@@ -246,6 +246,9 @@ class GeoJSON(APIBase):
                         features.append(feature)
                 except KeyError:
                     pass
+                except TypeError as e:
+                    print(e, tile.data)
+
         response = JSONResponse({'type': 'FeatureCollection', 'features': features})
         return response
 
