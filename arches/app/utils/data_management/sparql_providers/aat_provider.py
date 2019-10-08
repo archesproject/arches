@@ -23,7 +23,7 @@ from arches.app.models.concept import Concept, ConceptValue
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from SPARQLWrapper import SPARQLWrapper, JSON
-from abstract_provider import Abstract_Provider
+from .abstract_provider import Abstract_Provider
 from rdflib.namespace import SKOS, DCTERMS
 
 class AAT_Provider(Abstract_Provider):
