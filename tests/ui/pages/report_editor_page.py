@@ -1,5 +1,5 @@
-from base_widget_page import BaseWidgetPage
-from page_locators import ReportEditorPageLocators as locators
+from .base_widget_page import BaseWidgetPage
+from .page_locators import ReportEditorPageLocators as locators
 
 class ReportEditorPage(BaseWidgetPage):
     """

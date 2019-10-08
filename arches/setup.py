@@ -145,7 +145,7 @@ def get_changeset(path_to_file=None):
     import os
     import subprocess
     from StringIO import StringIO
-    from management.commands.utils import write_to_file
+    from .management.commands.utils import write_to_file
 
     sb = StringIO()
     if not path_to_file:

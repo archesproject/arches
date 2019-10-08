@@ -1,6 +1,6 @@
 import re
-from base_widget import BaseWidget
-from element_locators import StringWidgetLocators as locators
+from .base_widget import BaseWidget
+from .element_locators import StringWidgetLocators as locators
 
 class StringWidget(BaseWidget):
     """
