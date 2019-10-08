@@ -53,8 +53,8 @@ def userCanAccessMobileSurvey(request, surveyid=None):
     if user in ms.users.all():
         allowed = True
     else:
-        users_groups = set([group.id for group in user.groups.all()])
-        ms_groups = set([group.id for group in ms.groups.all()])
+        users_groups = {group.id for group in user.groups.all()}
+        ms_groups = {group.id for group in ms.groups.all()}
         if len(ms_groups.intersection(users_groups)) > 0:
             allowed = True
 

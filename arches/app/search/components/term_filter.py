@@ -65,7 +65,7 @@ class TermFilter(BaseSearchFilter):
 
 
 def _get_child_concepts(conceptid):
-    ret = set([conceptid])
+    ret = {conceptid}
     for row in Concept().get_child_concepts(conceptid, ['prefLabel']):
         ret.add(row[0])
     return list(ret)

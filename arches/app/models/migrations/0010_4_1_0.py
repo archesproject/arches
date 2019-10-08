@@ -135,15 +135,15 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='mobilesurveyxuser',
-            unique_together=set([('mobile_survey', 'user')]),
+            unique_together={('mobile_survey', 'user')},
         ),
         migrations.AlterUniqueTogether(
             name='mobilesurveyxgroup',
-            unique_together=set([('mobile_survey', 'group')]),
+            unique_together={('mobile_survey', 'group')},
         ),
         migrations.AlterUniqueTogether(
             name='mobilesurveyxcard',
-            unique_together=set([('mobile_survey', 'card')]),
+            unique_together={('mobile_survey', 'card')},
         ),
         migrations.RunSQL(
             sql="\n                    update widgets\n                    \tset defaultconfig = (SELECT defaultconfig || jsonb_build_object('defaultValue', '') FROM widgets WHERE name = 'text-widget')\n                    \tWHERE name = 'text-widget';\n                    update cards_x_nodes_x_widgets\n                    \tset config = (SELECT config || jsonb_build_object('defaultValue', '') FROM widgets WHERE name = 'text-widget')\n                    \tWHERE widgetid in (SELECT widgetid FROM widgets WHERE name = 'text-widget');\n\n\n                ",
