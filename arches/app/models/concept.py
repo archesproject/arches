@@ -263,7 +263,7 @@ class Concept(object):
 
         for subconcept in self.subconcepts:
             concepts_to_delete = Concept.gather_concepts_to_delete(subconcept)
-            for key, concept in concepts_to_delete.iteritems():
+            for key, concept in concepts_to_delete.items():
                 models.Concept.objects.get(pk=key).delete()
 
         for parentconcept in self.parentconcepts:
@@ -309,7 +309,7 @@ class Concept(object):
 
         if delete_self:
             concepts_to_delete = Concept.gather_concepts_to_delete(self)
-            for key, concept in concepts_to_delete.iteritems():
+            for key, concept in concepts_to_delete.items():
                 # delete only member relationships if the nodetype == Collection
                 if concept.nodetype == 'Collection':
                     concept = Concept().get(id=concept.id, include_subconcepts=True, include_parentconcepts=True,
@@ -786,7 +786,7 @@ class Concept(object):
 
         def delete_concept_values_index(concepts_to_delete):
             se = SearchEngineFactory().create()
-            for concept in concepts_to_delete.itervalues():
+            for concept in concepts_to_delete.values():
                 query = Query(se, start=0, limit=10000)
                 term = Term(field='conceptid', term=concept.id)
                 query.add_query(term)

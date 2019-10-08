@@ -84,7 +84,7 @@ class Tile(models.TileModel):
 
         if args:
             if isinstance(args[0], dict):
-                for key, value in args[0].iteritems():
+                for key, value in args[0].items():
                     if not (key == 'tiles'):
                         setattr(self, key, value)
 
@@ -233,7 +233,7 @@ class Tile(models.TileModel):
 
     def check_for_missing_nodes(self, request):
         missing_nodes = []
-        for nodeid, value in self.data.iteritems():
+        for nodeid, value in self.data.items():
             datatype_factory = DataTypeFactory()
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = datatype_factory.get_instance(node.datatype)
@@ -250,7 +250,7 @@ class Tile(models.TileModel):
             raise TileValidationError(message)
 
     def validate(self, errors=None):
-        for nodeid, value in self.data.iteritems():
+        for nodeid, value in self.data.items():
             datatype_factory = DataTypeFactory()
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = datatype_factory.get_instance(node.datatype)
@@ -278,7 +278,7 @@ class Tile(models.TileModel):
                 models.UserProfile.objects.create(user=request.user)
             user_is_reviewer = request.user.userprofile.is_reviewer()
         tile_data = self.get_tile_data(user_is_reviewer, userid)
-        for nodeid, value in tile_data.items():
+        for nodeid, value in list(tile_data.items()):
             datatype_factory = DataTypeFactory()
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = datatype_factory.get_instance(node.datatype)
@@ -435,7 +435,7 @@ class Tile(models.TileModel):
 
     def is_blank(self):
         if self.data != {}:
-            if len([item for item in self.data.values() if item is not None]) > 0:
+            if len([item for item in list(self.data.values()) if item is not None]) > 0:
                 return False
 
         child_tiles_are_blank = True

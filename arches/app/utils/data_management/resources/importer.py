@@ -120,11 +120,11 @@ class BusinessDataImporter(object):
                     if self.file_format == 'json':
                         with open(file[0], 'rU') as f:
                             archesfile = JSONDeserializer().deserialize(f)
-                            if 'graph' in archesfile.keys():
+                            if 'graph' in list(archesfile.keys()):
                                 self.graphs = archesfile['graph']
-                            if 'reference_data' in archesfile.keys():
+                            if 'reference_data' in list(archesfile.keys()):
                                 self.reference_data = archesfile['reference_data']
-                            if 'business_data' in archesfile.keys():
+                            if 'business_data' in list(archesfile.keys()):
                                 self.business_data = archesfile['business_data']
                     elif self.file_format == 'csv':
                         data = unicodecsv.DictReader(open(file[0], 'rU'), encoding='utf-8-sig', restkey='ADDITIONAL', restval='MISSING')

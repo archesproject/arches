@@ -58,7 +58,7 @@ class ArchesFileWriter(Writer):
         export = {}
         export['business_data'] = {}
 
-        for resourceinstanceid, tiles in self.resourceinstances.iteritems():
+        for resourceinstanceid, tiles in self.resourceinstances.items():
             resourceinstanceid = uuid.UUID(str(resourceinstanceid))
             resource = {}
             resource['tiles'] = tiles
@@ -126,7 +126,7 @@ class ArchesFileReader(Reader):
     def replace_source_nodeid(self, tiles, mapping):
         for tile in tiles:
             new_data = []
-            for sourcekey in tile['data'].keys():
+            for sourcekey in list(tile['data'].keys()):
                 for row in mapping['nodes']:
                     if row['file_field_name'] == sourcekey:
                         d = {}
@@ -191,15 +191,15 @@ class ArchesFileReader(Reader):
     def get_blank_tile(self, sourcetilegroup, blanktilecache, tiles, resourceinstanceid):
         if len(sourcetilegroup[0]['data']) > 0:
             if sourcetilegroup[0]['data'][0] != {}:
-                if sourcetilegroup[0]['data'][0].keys()[0] not in blanktilecache:
-                    blank_tile = Tile.get_blank_tile(tiles[0]['data'][0].keys()[0], resourceid=resourceinstanceid)
+                if list(sourcetilegroup[0]['data'][0].keys())[0] not in blanktilecache:
+                    blank_tile = Tile.get_blank_tile(list(tiles[0]['data'][0].keys())[0], resourceid=resourceinstanceid)
                     if blank_tile.data != {}:
                         for tile in blank_tile.tiles:
                             if isinstance(tile, Tile):
-                                for key in tile.data.keys():
+                                for key in list(tile.data.keys()):
                                     blanktilecache[key] = blank_tile
                 else:
-                    blank_tile = blanktilecache[tiles[0]['data'][0].keys()[0]]
+                    blank_tile = blanktilecache[list(tiles[0]['data'][0].keys())[0]]
             else:
                 blank_tile = None
         else:
@@ -245,7 +245,7 @@ class ArchesFileReader(Reader):
                                 #deletes nodes that don't have values
                                 if ret is not None:
                                     for tile in ret:
-                                        for key, value in tile['data'].iteritems():
+                                        for key, value in tile['data'].items():
                                             if value == "":
                                                 del tile['data'][key]
                                 return ret
@@ -262,11 +262,11 @@ class ArchesFileReader(Reader):
                                         if target_tile.data != {}:
                                             for source_tile in sourcetilegroup:
                                                 for tiledata in source_tile['data']:
-                                                    for nodeid in tiledata.keys():
+                                                    for nodeid in list(tiledata.keys()):
                                                         if nodeid in target_tile.data:
                                                             if target_tile.data[nodeid] == None:
                                                                 target_tile.data[nodeid] = tiledata[nodeid]
-                                                                for key in tiledata.keys():
+                                                                for key in list(tiledata.keys()):
                                                                     if key == nodeid:
                                                                         del tiledata[nodeid]
                                                 for tiledata in source_tile['data']:
@@ -288,11 +288,11 @@ class ArchesFileReader(Reader):
                                                             prototype_tile_copy = deepcopy(prototype_tile)
 
                                                             for data in source_tile['data']:
-                                                                for nodeid in data.keys():
-                                                                    if nodeid in prototype_tile.data.keys():
+                                                                for nodeid in list(data.keys()):
+                                                                    if nodeid in list(prototype_tile.data.keys()):
                                                                         if prototype_tile.data[nodeid] == None:
                                                                             prototype_tile_copy.data[nodeid] = data[nodeid]
-                                                                            for key in data.keys():
+                                                                            for key in list(data.keys()):
                                                                                 if key == nodeid:
                                                                                     del data[nodeid]
                                                                             if child_tile_cardinality == '1':
@@ -301,7 +301,7 @@ class ArchesFileReader(Reader):
                                                                 if data == {}:
                                                                     source_tile['data'].remove(data)
 
-                                                            for key in prototype_tile_copy.data.keys():
+                                                            for key in list(prototype_tile_copy.data.keys()):
                                                                 if prototype_tile_copy.data[key] != None:
                                                                     childtile_empty = False
                                                             if prototype_tile_copy.data == {} or childtile_empty:
