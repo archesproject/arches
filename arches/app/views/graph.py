@@ -102,7 +102,7 @@ class GraphSettingsView(GraphBaseView):
     def post(self, request, graphid):
         graph = Graph.objects.get(graphid=graphid)
         data = JSONDeserializer().deserialize(request.body)
-        for key, value in data.get('graph').iteritems():
+        for key, value in data.get('graph').items():
             if key in ['iconclass', 'name', 'author', 'description', 'isresource',
                        'ontology_id', 'version',  'subtitle', 'isactive', 'color',
                        'jsonldcontext', 'config', 'template_id']:

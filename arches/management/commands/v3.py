@@ -198,7 +198,7 @@ class Command(BaseCommand):
         with open(config_file, "rb") as openfile:
             configs = json.load(openfile)
 
-        for rm, config in configs.iteritems():
+        for rm, config in configs.items():
             v3_type = config['v3_entitytypeid']
             if v3_type.startswith("<") or v3_type.endswith(">"):
                 print("you must fill out the 'v3_entitytypeid' attribute "
@@ -206,7 +206,7 @@ class Command(BaseCommand):
                 exit()
         csv_dir = os.path.join(path, 'v3data', 'graph_data')
 
-        for rm, config in configs.iteritems():
+        for rm, config in configs.items():
             v3_type = config['v3_entitytypeid']
             csv_file = os.path.join(csv_dir, "{}_nodes.csv".format(v3_type))
             if not os.path.isfile(csv_file):

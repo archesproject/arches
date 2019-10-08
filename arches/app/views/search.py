@@ -178,7 +178,7 @@ def search_results(request):
 
     search_filter_factory = SearchFilterFactory(request)
     try:
-        for filter_type, querystring in request.GET.items() + [('search-results', '')]:
+        for filter_type, querystring in list(request.GET.items()) + [('search-results', '')]:
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
                 search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional)
@@ -202,7 +202,7 @@ def search_results(request):
 
     if results is not None:
         # allow filters to modify the results
-        for filter_type, querystring in request.GET.items() + [('search-results', '')]:
+        for filter_type, querystring in list(request.GET.items()) + [('search-results', '')]:
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
                 search_filter.post_search_hook(search_results_object, results, permitted_nodegroups)
@@ -210,7 +210,7 @@ def search_results(request):
         ret = {}
         ret['results'] = results
 
-        for key, value in search_results_object.items():
+        for key, value in list(search_results_object.items()):
             ret[key] = value
 
         ret['reviewer'] = request.user.groups.filter(name='Resource Reviewer').exists()
@@ -284,7 +284,7 @@ def _buffer(geojson, width=0, unit='ft'):
 
 
 def _get_child_concepts(conceptid):
-    ret = set([conceptid])
+    ret = {conceptid}
     for row in Concept().get_child_concepts(conceptid, ['prefLabel']):
         ret.add(row[0])
     return list(ret)

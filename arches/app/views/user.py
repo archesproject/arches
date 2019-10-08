@@ -161,7 +161,7 @@ class UserManagerView(BaseManagerView):
             all_ordered_card_ids += mobile_survey_dict['cards']
             mobile_surveys.append(mobile_survey_dict)
 
-        active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
+        active_graphs = {unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)}
 
         for i, graph in enumerate(graphs):
             cards = []

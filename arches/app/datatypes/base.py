@@ -253,10 +253,10 @@ class BaseDataType(object):
         return None
 
     def get_tile_data(self, tile):
-        if tile.data is not None and len(tile.data.keys()) > 0:
+        if tile.data is not None and len(list(tile.data.keys())) > 0:
             return tile.data
-        elif tile.provisionaledits is not None and len(tile.provisionaledits.keys()) == 1:
-            userid = tile.provisionaledits.keys()[0]
+        elif tile.provisionaledits is not None and len(list(tile.provisionaledits.keys())) == 1:
+            userid = list(tile.provisionaledits.keys())[0]
             return tile.provisionaledits[userid]['value']
 
     def get_display_value(self, tile, node):

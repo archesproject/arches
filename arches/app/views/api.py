@@ -53,8 +53,8 @@ def userCanAccessMobileSurvey(request, surveyid=None):
     if user in ms.users.all():
         allowed = True
     else:
-        users_groups = set([group.id for group in user.groups.all()])
-        ms_groups = set([group.id for group in ms.groups.all()])
+        users_groups = {group.id for group in user.groups.all()}
+        ms_groups = {group.id for group in ms.groups.all()}
         if len(ms_groups.intersection(users_groups)) > 0:
             allowed = True
 
@@ -106,7 +106,7 @@ class APIBase(View):
             }
             if not format and accept in format_values:
                 get_params['format'] = format_values[accept]
-            for key, value in request.META.iteritems():
+            for key, value in request.META.items():
                 if key.startswith('HTTP_X_ARCHES_'):
                     if key.replace('HTTP_X_ARCHES_', '').lower() not in request.GET:
                         get_params[key.replace('HTTP_X_ARCHES_', '').lower()] = value
@@ -246,6 +246,10 @@ class GeoJSON(APIBase):
                         features.append(feature)
                 except KeyError:
                     pass
+                except TypeError as e:
+                    print(e)
+                    print(tile.data)
+
         response = JSONResponse({'type': 'FeatureCollection', 'features': features})
         return response
 
@@ -433,7 +437,7 @@ class Resources(APIBase):
                     reader.read_resource(data, resourceid=resourceid, graphid=graphid)
                     if reader.errors:
                         response = []
-                        for value in reader.errors.itervalues():
+                        for value in reader.errors.values():
                             response.append(value.message)
                         return JSONResponse({"error": response}, indent=indent, status=400)
                     else:
@@ -464,7 +468,7 @@ class Resources(APIBase):
                 reader.read_resource(data, graphid=graphid)
                 if reader.errors:
                     response = []
-                    for value in reader.errors.itervalues():
+                    for value in reader.errors.values():
                         response.append(value.message)
                     return JSONResponse({"error": response}, indent=indent, status=400)
                 else:
@@ -622,7 +626,7 @@ class Card(APIBase):
                 append_tile = True
                 isfullyprovisional = False
                 if tile.provisionaledits is not None:
-                    if len(tile.provisionaledits.keys()) > 0:
+                    if len(list(tile.provisionaledits.keys())) > 0:
                         if len(tile.data) == 0:
                             isfullyprovisional = True
                         if user_is_reviewer is False:

@@ -127,7 +127,7 @@ class RdfWriter(Writer):
             graph += dt.to_rdf(pkg, edge)
 
 
-        for resourceinstanceid, tiles in self.resourceinstances.iteritems():
+        for resourceinstanceid, tiles in self.resourceinstances.items():
             graph_info = get_graph_parts(self.graph_id)
 
             # add the edges for the group of nodes that include the root (this group of nodes has no nodegroup)
@@ -206,7 +206,7 @@ class JsonLdWriter(RdfWriter):
         # simulate omitGraph:
         if '@graph' in js and len(js['@graph']) == 1:
             # merge up
-            for (k, v) in js['@graph'][0].items():
+            for (k, v) in list(js['@graph'][0].items()):
                 js[k] = v
             del js['@graph']
 
@@ -333,7 +333,7 @@ class JsonLdReader(Reader):
     def findOntologyProperties(self, o):
         keys = []
         try:
-            for key in o.keys():
+            for key in list(o.keys()):
                 if key in self.ontologyproperties:
                     keys.append(key)
         except:

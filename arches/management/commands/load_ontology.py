@@ -150,7 +150,7 @@ class Command(BaseCommand):
                         models.Ontology.objects.filter(path=self.get_relative_path(extension)).delete()
 
                 models.OntologyClass.objects.filter(ontology=ontology).delete()
-                for ontology_class, data in self.crawl_graph().iteritems():
+                for ontology_class, data in self.crawl_graph().items():
                     models.OntologyClass.objects.update_or_create(source=ontology_class, ontology=ontology, defaults={'target': data})
 
     def add_ontology(self, id=None, data_source=None, version=None, name=None, parentontology=None):

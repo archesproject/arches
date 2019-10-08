@@ -10,7 +10,7 @@ def name_to_id(entity_json):
         suffix = 'E55'
     if entity_json['type'] == 'authority document':
         suffix = 'E32'
-    if 'crm_class' in entity_json.keys():
+    if 'crm_class' in list(entity_json.keys()):
         suffix = entity_json['crm_class']
     ret = unicode.upper(entity_json['name'])
     ret = unicode.replace(ret, ' ', '_')
@@ -28,10 +28,10 @@ def add_entity(nodes_writer, edges_writer, entity_json, parent_id, current_node_
     next_node_id = current_node_id + 1
     next_edge_id = current_edge_id + 1
     mergenode = resource_id
-    if 'mergenode' in entity_json.keys():
+    if 'mergenode' in list(entity_json.keys()):
         mergenode = entity_json['mergenode']
     relationship = 'P1'
-    if 'relationship' in entity_json.keys():
+    if 'relationship' in list(entity_json.keys()):
         relationship = entity_json['relationship']
     nodes_writer.writerow([
         current_node_id,
@@ -48,9 +48,9 @@ def add_entity(nodes_writer, edges_writer, entity_json, parent_id, current_node_
             relationship,
             '1.0'
         ])
-    if 'entities' in entity_json.keys():
+    if 'entities' in list(entity_json.keys()):
         for child_json in entity_json['entities']:
-            if child_json['type'] not in ['primary key', 'foreign key'] or 'entities' in child_json.keys() and len(child_json['entities']) > 0:
+            if child_json['type'] not in ['primary key', 'foreign key'] or 'entities' in list(child_json.keys()) and len(child_json['entities']) > 0:
                 next_ids = add_entity(nodes_writer, edges_writer, child_json, current_node_id, next_node_id, next_edge_id, resource_id, True)
                 next_node_id = next_ids["next_node_id"] + 1
                 next_edge_id = next_ids["next_edge_id"] + 1
