@@ -921,7 +921,7 @@ class Command(BaseCommand):
         for mapping in mappings:
             # print('%s -- %s' % (mapping.entitytypeidfrom_id, mapping.entitytypeidto_id))
             if mapping.entitytypeidfrom_id not in resourcetypes:
-                resourcetypes[mapping.entitytypeidfrom_id] = set([mapping.entitytypeidfrom_id])
+                resourcetypes[mapping.entitytypeidfrom_id] = {mapping.entitytypeidfrom_id}
             for step in mapping_steps.filter(pk=mapping.pk):
                 resourcetypes[mapping.entitytypeidfrom_id].add(step.ruleid.entitytyperange_id)
 
@@ -1265,7 +1265,7 @@ will be very jumbled.""")
                 return
             all_sources = [i.get('source') for i in mapbox_layer.layerdefinitions]
             # remove duplicates and None
-            sources = set([i for i in all_sources if i])
+            sources = {i for i in all_sources if i}
             with transaction.atomic():
                 for source in sources:
                     src = models.MapSource.objects.get(name=source)

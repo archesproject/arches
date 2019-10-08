@@ -376,7 +376,7 @@ class ResourceEditLogView(BaseManagerView):
         if resourceid is None:
             recent_edits = models.EditLog.objects.all().exclude(
                 resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).order_by('-timestamp')[:100]
-            edited_ids = list(set([edit.resourceinstanceid for edit in recent_edits]))
+            edited_ids = list({edit.resourceinstanceid for edit in recent_edits})
             resources = Resource.objects.filter(resourceinstanceid__in=edited_ids)
             edit_type_lookup = {
                 'create': _('Resource Created'),
@@ -750,7 +750,7 @@ class RelatedResourcesView(BaseManagerView):
         if self.action == 'get_relatable_resources':
             graphid = request.GET.get('graphid', None)
             nodes = models.Node.objects.filter(graph=graphid).exclude(istopnode=False)[0].get_relatable_resources()
-            ret = set([str(node.graph_id) for node in nodes])
+            ret = {str(node.graph_id) for node in nodes}
             return JSONResponse(ret)
 
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
