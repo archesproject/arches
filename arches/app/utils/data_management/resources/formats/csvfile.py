@@ -7,8 +7,8 @@ import sys
 import uuid
 import traceback
 from copy import deepcopy
-from format import Writer
-from format import Reader
+from .format import Writer
+from .format import Reader
 from elasticsearch import TransportError
 from arches.app.models.tile import Tile
 from arches.app.models.concept import Concept

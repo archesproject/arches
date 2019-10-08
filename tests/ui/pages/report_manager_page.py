@@ -1,6 +1,6 @@
 import re
-from base_page import BasePage
-from page_locators import ReportManagerPageLocators as locators
+from .base_page import BasePage
+from .page_locators import ReportManagerPageLocators as locators
 from selenium.webdriver.support import expected_conditions as EC
 
 

@@ -1,6 +1,6 @@
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from page_locators import BasePageLocators as locators
+from .page_locators import BasePageLocators as locators
 
 class BasePage(object):
     """

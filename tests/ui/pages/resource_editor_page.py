@@ -1,5 +1,5 @@
-from base_widget_page import BaseWidgetPage
-from page_locators import ResourceEditorPageLocators as locators
+from .base_widget_page import BaseWidgetPage
+from .page_locators import ResourceEditorPageLocators as locators
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
