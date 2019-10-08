@@ -218,7 +218,7 @@ def worker_int(worker):
     import traceback
     id2name = {th.ident: th.name for th in threading.enumerate()}
     code = []
-    for threadId, stack in sys._current_frames().items():
+    for threadId, stack in list(sys._current_frames().items()):
         code.append("\n# Thread: %s(%d)" % (id2name.get(threadId, ""),
                                             threadId))
         for filename, lineno, name, line in traceback.extract_stack(stack):

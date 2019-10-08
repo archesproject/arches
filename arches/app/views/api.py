@@ -106,7 +106,7 @@ class APIBase(View):
             }
             if not format and accept in format_values:
                 get_params['format'] = format_values[accept]
-            for key, value in request.META.iteritems():
+            for key, value in request.META.items():
                 if key.startswith('HTTP_X_ARCHES_'):
                     if key.replace('HTTP_X_ARCHES_', '').lower() not in request.GET:
                         get_params[key.replace('HTTP_X_ARCHES_', '').lower()] = value
@@ -437,7 +437,7 @@ class Resources(APIBase):
                     reader.read_resource(data, resourceid=resourceid, graphid=graphid)
                     if reader.errors:
                         response = []
-                        for value in reader.errors.itervalues():
+                        for value in reader.errors.values():
                             response.append(value.message)
                         return JSONResponse({"error": response}, indent=indent, status=400)
                     else:
@@ -468,7 +468,7 @@ class Resources(APIBase):
                 reader.read_resource(data, graphid=graphid)
                 if reader.errors:
                     response = []
-                    for value in reader.errors.itervalues():
+                    for value in reader.errors.values():
                         response.append(value.message)
                     return JSONResponse({"error": response}, indent=indent, status=400)
                 else:
@@ -626,7 +626,7 @@ class Card(APIBase):
                 append_tile = True
                 isfullyprovisional = False
                 if tile.provisionaledits is not None:
-                    if len(tile.provisionaledits.keys()) > 0:
+                    if len(list(tile.provisionaledits.keys())) > 0:
                         if len(tile.data) == 0:
                             isfullyprovisional = True
                         if user_is_reviewer is False:

@@ -316,7 +316,7 @@ class Writer(object):
         """
         If multiple values are found for a column, joins them into a semi-colon concatenated string.
         """
-        for k, v in template_record.iteritems():
+        for k, v in template_record.items():
             if type(v) == list:
                 v.sort()
                 try:

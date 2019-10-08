@@ -84,7 +84,7 @@ class ActivityStreamCollectionPage(object):
                                        "type": "OrderedCollection",
                                        "totalItems": totalItems}
 
-        for k, v in [(x, y) for x, y in uris.items() if x in ['next', 'prev']]:
+        for k, v in [(x, y) for x, y in list(uris.items()) if x in ['next', 'prev']]:
             self._boilerplate[k] = {"id": v, "type": "OrderedCollectionPage"}
 
         self._items = []

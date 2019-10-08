@@ -92,7 +92,7 @@ class v3MigrationTests(ArchesTestCase):
         num_rms = len(glob(os.path.join(self.pkg, 'graphs', 'resource_models', '*.json')))
         with open(os.path.join(self.pkg, 'v3data', 'rm_configs.json'), "rb") as conf:
             data = json.loads(conf.read())
-            self.assertEqual(num_rms, len(data.keys()))
+            self.assertEqual(num_rms, len(list(data.keys())))
 
     def test_v3migration_003_generate_lookup_files(self):
         """Test the generation of node lookup files."""

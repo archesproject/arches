@@ -34,7 +34,7 @@ def write_nodes(export_dir):
             entitytypeids[node.assettype] = []
         entitytypeids[node.assettype].append([node.id,node.label,node.mergenode,node.businesstablename])
 
-    for k, v in entitytypeids.iteritems():
+    for k, v in entitytypeids.items():
         with open(os.path.join(export_dir, k + '_nodes.csv'), 'w') as csvfile:
             writer = csv.writer(csvfile, delimiter= ',')
             writer.writerow(['Id','Label','mergenode','businesstablename'])
@@ -50,7 +50,7 @@ def write_edges(export_dir):
             entitytypeids[edge.assettype] = []
         entitytypeids[edge.assettype].append([edge.source,edge.target,"Directed",edge.target,edge.label,1.0])
 
-    for k, v in entitytypeids.iteritems():
+    for k, v in entitytypeids.items():
         with open(os.path.join(export_dir, k + '_edges.csv'), 'w') as csvfile:
             writer = csv.writer(csvfile, delimiter= ',')
             writer.writerow(['Source','Target','Type','Id','Label','Weight'])
@@ -152,7 +152,7 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
                             concept = Concept().get(node.config['rdmCollection'], include_subconcepts=True, semantic=False)
                             rdmCollectionLabel = concept.get_preflabel().value
                             collection_values = {}
-                            concepts = OrderedDict(sorted(get_values(concept, collection_values).items(), key=itemgetter(1)))
+                            concepts = OrderedDict(sorted(list(get_values(concept, collection_values).items()), key=itemgetter(1)))
                             values[rdmCollectionLabel] = concepts
                         except:
                             values[node.name] = node.name + ' does not appear to be configured with a valid concept collectionid'
@@ -162,11 +162,11 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
                             for concept in node.config['options']:
                                 concepts[concept['id']] = concept['text']
 
-                        values[node.name] = OrderedDict(sorted(concepts.items(), key=itemgetter(1)))
+                        values[node.name] = OrderedDict(sorted(list(concepts.items()), key=itemgetter(1)))
 
         if include_concepts == True:
             try:
-                relation_concepts = OrderedDict(sorted(get_values(Concept().get('00000000-0000-0000-0000-000000000005', include_subconcepts=True, semantic=False), {}).items(), key=itemgetter(1)))
+                relation_concepts = OrderedDict(sorted(list(get_values(Concept().get('00000000-0000-0000-0000-000000000005', include_subconcepts=True, semantic=False), {}).items()), key=itemgetter(1)))
             except:
                 relations_concepts = 'You do not appear to have values for resource to resource relationships in your rdm.'
             values['Resource to Resource Relationship Types'] = relation_concepts

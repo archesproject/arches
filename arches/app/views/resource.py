@@ -145,7 +145,7 @@ class NewResourceEditorView(MapBaseManagerView):
                 append_tile = True
                 isfullyprovisional = False
                 if tile.provisionaledits is not None:
-                    if len(tile.provisionaledits.keys()) > 0:
+                    if len(list(tile.provisionaledits.keys())) > 0:
                         if len(tile.data) == 0:
                             isfullyprovisional = True
                         if user_is_reviewer is False:
@@ -277,7 +277,7 @@ class ResourceEditorView(MapBaseManagerView):
             geocoding_providers = models.Geocoder.objects.all()
             required_widgets = []
 
-            widget_datatypes = [v.datatype for k, v in graph.nodes.iteritems()]
+            widget_datatypes = [v.datatype for k, v in graph.nodes.items()]
             widgets = widgets.filter(datatype__in=widget_datatypes)
 
             if resource_instance_exists == True:
@@ -355,7 +355,7 @@ class ResourceEditLogView(BaseManagerView):
 
     def getEditConceptValue(self, values):
         if values != None:
-            for k, v in values.iteritems():
+            for k, v in values.items():
                 try:
                     uuid.UUID(v)
                     v = models.Value.objects.get(pk=v).value

@@ -31,7 +31,7 @@ class AdvancedSearch(BaseSearchFilter):
         grouped_queries = [grouped_query]
         for index, advanced_filter in enumerate(advanced_filters):
             tile_query = Bool()
-            for key, val in advanced_filter.iteritems():
+            for key, val in advanced_filter.items():
                 if key != 'op':
                     node = models.Node.objects.get(pk=key)
                     if self.request.user.has_perm('read_nodegroup', node.nodegroup):

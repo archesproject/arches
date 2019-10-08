@@ -123,7 +123,7 @@ class JSONSerializer(object):
     def handle_dictionary(self, d):
         """Called to handle a Dictionary"""
         obj = {}
-        for key, value in d.iteritems():
+        for key, value in d.items():
             try:
                 #print key + ': ' + str(type(value))
                 obj[str(key)] = self.handle_object(value)
@@ -159,7 +159,7 @@ class JSONSerializer(object):
         opts = instance._meta
         data = {}
         #print '='*40
-        properties = [k for k,v in instance.__class__.__dict__.iteritems() if type(v) is property]
+        properties = [k for k,v in instance.__class__.__dict__.items() if type(v) is property]
         for property_name in properties:
             if fields and property_name not in fields:
                 continue
@@ -247,7 +247,7 @@ class JSONDeserializer(object):
     def handle_dictionary(self, d):
         """Called to handle a Dictionary"""
         obj = {}
-        for key, value in d.iteritems():
+        for key, value in d.items():
             obj[key] = self.handle_object(value)
 
         return obj

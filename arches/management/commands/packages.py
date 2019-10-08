@@ -1238,7 +1238,7 @@ will be very jumbled.""")
                     for layer in data['layers']:
                         if 'source' in layer:
                             layer['source'] = layer['source'] + '-' + layer_name
-                    for source_name, source_dict in data['sources'].iteritems():
+                    for source_name, source_dict in data['sources'].items():
                         map_source = models.MapSource.objects.get_or_create(
                             name=source_name + '-' + layer_name, source=source_dict)
                     map_layer = models.MapLayer(
