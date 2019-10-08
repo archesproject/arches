@@ -1263,7 +1263,7 @@ class Graph(models.GraphModel):
             # if node_tile_count > 0:
             res = None
             pre_diff = self._compare(obj_a, obj_b, ignore_list)
-            diff = filter(lambda x: len(list(x.keys())) > 0, pre_diff)
+            diff = [x for x in pre_diff if len(list(x.keys())) > 0]
             if len(diff) > 0:
                 if obj_type == 'node':
                     tile_count = models.TileModel.objects.filter(nodegroup_id=db_node.nodegroup_id).count()
