@@ -45,4 +45,4 @@ class Command(BaseCommand):
             module_name = os.path.basename(data_source).split('.')[0]
             apps.import_string('arches.management.patches.%s' % module_name)
         else: 
-            print 'You need to specify a file with the -s option'
+            print('You need to specify a file with the -s option')

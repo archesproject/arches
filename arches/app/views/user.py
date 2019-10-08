@@ -143,7 +143,7 @@ class UserManagerView(BaseManagerView):
                     message = _('Your arches profile was just changed.  If this was unexpected, please contact your Arches administrator at %s.' % (admin_info))
                     user.email_user(_('You\'re Arches Profile Has Changed'), message)
                 except Exception as e:
-                    print e
+                    print(e)
                 request.user = user
             context['form'] = form
 

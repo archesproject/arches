@@ -70,7 +70,7 @@ class Command(BaseCommand):
             uuid.UUID(details['functionid'])
         except:
             details['functionid'] = unicode(uuid.uuid4())
-            print "Registering function with functionid:", details['functionid']
+            print("Registering function with functionid: {}".format(details['functionid']))
 
         fn = models.Function(
             functionid = details['functionid'],
@@ -94,7 +94,7 @@ class Command(BaseCommand):
             fn = models.Function.objects.filter(name=fn_name)
             fn[0].delete()
         except Exception as e:
-            print e
+            print(e)
 
     def list(self):
         """
@@ -104,9 +104,9 @@ class Command(BaseCommand):
         try:
             fn = models.Function.objects.all()
             for function in fn:
-                print function.name
+                print(function.name)
         except Exception as e:
-            print e
+            print(e)
 
     def validate(self):
         """

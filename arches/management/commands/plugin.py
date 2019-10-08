@@ -68,7 +68,7 @@ class Command(BaseCommand):
             uuid.UUID(details['pluginid'])
         except:
             details['pluginid'] = unicode(uuid.uuid4())
-            print "Registering plugin with pluginid:", details['pluginid']
+            print("Registering plugin with pluginid: {}".format(details['pluginid']))
 
         instance = models.Plugin(
             pluginid=details['pluginid'],
@@ -111,7 +111,7 @@ class Command(BaseCommand):
             instance = models.Plugin.objects.get(name=name)
             instance.delete()
         except Exception as e:
-            print e
+            print(e)
 
     def list(self):
         """
@@ -121,6 +121,6 @@ class Command(BaseCommand):
         try:
             instances = models.Plugin.objects.all()
             for instance in instances:
-                print instance.name
+                print(instance.name)
         except Exception as e:
-            print e
+            print(e)

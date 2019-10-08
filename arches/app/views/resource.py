@@ -778,7 +778,7 @@ class RelatedResourcesView(BaseManagerView):
             try:
                 ret = models.ResourceXResource.objects.get(pk=resourcexid).delete()
             except:
-                print 'resource relation does not exist'
+                print('resource relation does not exist')
         start = request.GET.get('start', 0)
         se.es.indices.refresh(index=se._add_prefix("resource_relations"))
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
@@ -844,7 +844,7 @@ class RelatedResourcesView(BaseManagerView):
                     message = _('Unable to save. Please verify the model status is active')
                     return JSONResponse({'status': 'false', 'message': [_(e.title), _(str(message))]}, status=500)
             else:
-                print 'relationship not permitted'
+                print('relationship not permitted')
 
         for relationshipid in relationships_to_update:
             rr = models.ResourceXResource.objects.get(pk=relationshipid)

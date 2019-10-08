@@ -130,7 +130,7 @@ class Command(BaseCommand):
             f.write('\nhttp.cors.allow-origin: "*"')
             f.write('\n')
 
-        print 'Elasticsearch installed at %s' % os.path.join(install_location, file_name_wo_extention)
+        print('Elasticsearch installed at %s' % os.path.join(install_location, file_name_wo_extention))
 
     # def start(self, install_location=None):
     #     """

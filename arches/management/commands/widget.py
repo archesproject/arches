@@ -68,7 +68,7 @@ class Command(BaseCommand):
             uuid.UUID(details['widgetid'])
         except:
             details['widgetid'] = unicode(uuid.uuid4())
-            print "Registering widget with widgetid:", details['widgetid']
+            print("Registering widget with widgetid: {}".format(details['widgetid']))
 
         instance = models.Widget(
             widgetid = details['widgetid'],
@@ -109,7 +109,7 @@ class Command(BaseCommand):
             instances = models.Widget.objects.filter(name=name)
             instances[0].delete()
         except Exception as e:
-            print e
+            print(e)
 
     def list(self):
         """
@@ -119,6 +119,6 @@ class Command(BaseCommand):
         try:
             instances = models.Widget.objects.all()
             for instance in instances:
-                print instance.name
+                print(instance.name)
         except Exception as e:
-            print e
+            print(e)

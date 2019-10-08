@@ -29,4 +29,4 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        print __version__
+        print(__version__)

@@ -78,7 +78,7 @@ class Command(BaseCommand):
         if len(models.DDataType.objects.filter(datatype=dt.datatype)) == 0:
             dt.save()
         else:
-            print "{0} already exists".format(dt.datatype)
+            print("{0} already exists".format(dt.datatype))
 
     def unregister(self, datatype):
         """
@@ -87,10 +87,10 @@ class Command(BaseCommand):
         """
         try:
             dt = models.DDataType.objects.filter(datatype=datatype)
-            print dt
+            print(dt)
             dt[0].delete()
         except Exception as e:
-            print e
+            print(e)
 
     def update(self, source):
         """
@@ -123,6 +123,6 @@ class Command(BaseCommand):
         try:
             dt = models.DDataType.objects.all()
             for datatype in dt:
-                print datatype.datatype
+                print(datatype.datatype)
         except Exception as e:
-            print e
+            print(e)

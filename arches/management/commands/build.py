@@ -32,7 +32,7 @@ class Command(BaseCommand):
     
     
     def handle(self, *args, **options):
-        print 'operation: '+ options['operation']
+        print('operation: '+ options['operation'])
         if options['operation'] == 'collectstatic':
             if settings.STATIC_ROOT != '':
                 management.call_command('collectstatic', interactive=False)

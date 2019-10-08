@@ -17,13 +17,13 @@ def get_yn_input(msg="are you sure you want to continue?", default="Y"):
         if o.lower().startswith("y") or o == "":
             ret = True
         else:
-            print "operation cancelled."
+            print("operation cancelled.")
             ret = False
 
     if default == "N":
         o = raw_input(msg + " [y/N] ")
         if o.lower().startswith("n") or o == "":
-            print "operation cancelled."
+            print("operation cancelled.")
             ret = False
         else:
             ret = True
@@ -59,4 +59,4 @@ def get_valid_path(path):
 
 def print_message(message):
     border = '*' * 80
-    print '{1}\n{0}\n{1}'.format(message, border)
+    print('{1}\n{0}\n{1}'.format(message, border))

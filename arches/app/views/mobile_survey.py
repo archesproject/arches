@@ -107,7 +107,7 @@ class MobileSurveyManagerView(BaseManagerView):
             try:
                 mobile_survey_id = JSONDeserializer().deserialize(request.body)['id']
             except Exception as e:
-                print e
+                print(e)
 
             try:
                 connection_error = False

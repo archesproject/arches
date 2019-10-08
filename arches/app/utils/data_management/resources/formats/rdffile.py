@@ -451,7 +451,7 @@ class JsonLdReader(Reader):
             self.logger.debug('found {0} branches'.format(len(found)))
             if len(found) == 0:
                 self.logger.error('branch not found for {0}'.format(str(jsonld_graph)))
-                print 'branch not found for %r' % jsonld_graph
+                print('branch not found for %r' % jsonld_graph)
                 raise self.DataDoesNotMatchGraphException()
 
             if len(self.findOntologyProperties(jsonld_graph)) == 0:
