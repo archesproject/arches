@@ -102,7 +102,7 @@ class GraphSettingsView(GraphBaseView):
     def post(self, request, graphid):
         graph = Graph.objects.get(graphid=graphid)
         data = JSONDeserializer().deserialize(request.body)
-        for key, value in data.get('graph').iteritems():
+        for key, value in data.get('graph').items():
             if key in ['iconclass', 'name', 'author', 'description', 'isresource',
                        'ontology_id', 'version',  'subtitle', 'isactive', 'color',
                        'jsonldcontext', 'config', 'template_id']:
@@ -411,9 +411,9 @@ class GraphDataView(View):
             try:
                 graph = Graph.objects.get(graphid=graphid)
                 if graph.isresource:
+                    graph.delete_instances()
                     graph.isactive = False
                     graph.save(validate=False)
-                    graph.delete_instances()
                 graph.delete()
                 return JSONResponse({'success': True})
             except GraphValidationError as e:

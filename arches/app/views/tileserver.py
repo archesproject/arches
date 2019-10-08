@@ -55,7 +55,7 @@ def handle_request(request):
 
         response.content = content
         response.status_code = status_code
-        for header, value in headers.items():
+        for header, value in list(headers.items()):
             response[header] = value
 
         response['Content-length'] = str(len(content))
@@ -101,7 +101,7 @@ def clean_resource_cache(tile):
         if datatype.should_cache(node) and datatype.should_manage_cache(node):
             bounds = datatype.get_bounds(tile, node)
             if bounds is not None:
-                zooms = range(20)
+                zooms = list(range(20))
                 config = TileStache.parseConfig(
                     get_tileserver_config(node.nodeid))
                 layer = config.layers[str(node.nodeid)]
@@ -127,7 +127,7 @@ def clean_resource_cache(tile):
 
 def seed_resource_cache():
     datatype_factory = DataTypeFactory()
-    zooms = range(settings.CACHE_SEED_MAX_ZOOM + 1)
+    zooms = list(range(settings.CACHE_SEED_MAX_ZOOM + 1))
     extension = 'pbf'
     try:
         lat1, lon1, lat2, lon2 = settings.CACHE_SEED_BOUNDS

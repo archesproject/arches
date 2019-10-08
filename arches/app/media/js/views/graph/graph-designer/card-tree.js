@@ -349,6 +349,7 @@ define([
             isFuncNode: function() {
                 var appFuncs = null, appFuncDesc = false, appFuncName = false, nodegroupId = null;
                 if(params.card && this.appliedFunctions()) {
+                    // console.log(ko.unwrap(params));
                     appFuncs = this.appliedFunctions();
                     nodegroupId = params.card.nodegroup_id;
                     for(var i = 0; i < appFuncs.length; i++) {

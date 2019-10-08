@@ -239,7 +239,7 @@ class Resource(models.ResourceInstance):
         terms = []
 
         for tile in document['tiles']:
-            for nodeid, nodevalue in tile.data.iteritems():
+            for nodeid, nodevalue in tile.data.items():
                 datatype = node_datatypes[nodeid]
                 if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
                     datatype_instance = datatype_factory.get_instance(datatype)
@@ -256,9 +256,9 @@ class Resource(models.ResourceInstance):
                 if len(provisionaledits) > 0:
                     if document['provisional_resource'] == 'false':
                         document['provisional_resource'] = 'partial'
-                    for user, edit in provisionaledits.iteritems():
+                    for user, edit in provisionaledits.items():
                         if edit['status'] == 'review':
-                            for nodeid, nodevalue in edit['value'].iteritems():
+                            for nodeid, nodevalue in edit['value'].items():
                                 datatype = node_datatypes[nodeid]
                                 if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
                                     datatype_instance = datatype_factory.get_instance(
@@ -447,7 +447,7 @@ class Resource(models.ResourceInstance):
 
         values = []
         for tile in tiles:
-            for node_id, value in tile.data.iteritems():
+            for node_id, value in tile.data.items():
                 if node_id == str(nodes[0].nodeid):
                     if type(value) is list:
                         for v in value:

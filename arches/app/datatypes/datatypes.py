@@ -106,7 +106,7 @@ class StringDataType(BaseDataType):
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
                     query.must(match_query)
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def is_a_literal_in_rdf(self):
@@ -176,7 +176,7 @@ class NumberDataType(BaseDataType):
                 else:
                     search_query = Match(field='tiles.data.%s' % (str(node.pk)), query=value['val'], type='phrase_prefix')
                 query.must(search_query)
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def is_a_literal_in_rdf(self):
@@ -225,7 +225,7 @@ class BooleanDataType(BaseDataType):
             if value['val'] != '':
                 term = True if value['val'] == 't' else False
                 query.must(Term(field='tiles.data.%s' % (str(node.pk)), term=term))
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def to_rdf(self, edge_info, edge):
@@ -309,7 +309,7 @@ class DateDataType(BaseDataType):
                 else:
                     search_query = Match(field='tiles.data.%s' % (str(node.pk)), query=date_value, type='phrase_prefix')
                 query.must(search_query)
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def after_update_all(self):
@@ -596,7 +596,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
         try:
             simplification = config['simplification']
-        except KeyError, e:
+        except KeyError as e:
             simplification = 0.3
 
         return {
@@ -1255,7 +1255,7 @@ class FileListDataType(BaseDataType):
                     file_model.path = file_data
                     file_model.pk = file['file_id']
                     file_model.save()
-                    if file["name"] == file_data.name and 'url' not in file.keys():
+                    if file["name"] == file_data.name and 'url' not in list(file.keys()):
                         file["file_id"] = str(file_model.pk)
                         file["url"] = str(file_model.path.url)
                         file["status"] = 'uploaded'
@@ -1304,7 +1304,7 @@ class DomainDataType(BaseDomainDataType):
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         domain_text = None
         for tile in document['tiles']:
-            for k, v in tile.data.iteritems():
+            for k, v in tile.data.items():
                 if v == nodevalue:
                     node = models.Node.objects.get(nodeid=k)
                     domain_text = self.get_option_text(node, v)
@@ -1337,7 +1337,7 @@ class DomainDataType(BaseDomainDataType):
                 else:
                     query.must(search_query)
 
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def to_rdf(self, edge_info, edge):
@@ -1388,7 +1388,7 @@ class DomainListDataType(BaseDomainDataType):
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         domain_text_values = set([])
         for tile in document['tiles']:
-            for k, v in tile.data.iteritems():
+            for k, v in tile.data.items():
                 if v == nodevalue:
                     node = models.Node.objects.get(nodeid=k)
                     for value in nodevalue:
@@ -1440,7 +1440,7 @@ class DomainListDataType(BaseDomainDataType):
                 else:
                     query.must(search_query)
 
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def to_rdf(self, edge_info, edge):
@@ -1531,7 +1531,7 @@ class ResourceInstanceDataType(BaseDataType):
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
                     query.must(search_query)
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def to_rdf(self, edge_info, edge):

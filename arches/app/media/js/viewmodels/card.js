@@ -38,6 +38,13 @@ define([
         return childSelected;
     };
 
+    var isDirty = function(){
+        if(self.tile) {
+            return true;
+        }
+        return false;
+    };
+
     var doesChildHaveProvisionalEdits = function(parent) {
         var hasEdits = false;
         var childrenKey = 'tileid' in parent ? 'cards': 'tiles';
@@ -317,7 +324,7 @@ define([
                 });
             },
             getNewTile: function() {
-                return new TileViewModel({
+                if (!this.newTile) this.newTile = new TileViewModel({
                     tile: {
                         tileid: '',
                         resourceinstance_id: ko.unwrap(params.resourceId),
@@ -343,6 +350,7 @@ define([
                     loading: loading,
                     cardwidgets: params.cardwidgets,
                 });
+                return this.newTile;
             },
             isFuncNode: function() {
                 var appFuncDesc = false, appFuncName = false, nodegroupId = null;
@@ -387,6 +395,13 @@ define([
                 item.parent.expanded(true);
                 expandParents(item.parent);
             }
+        };
+
+       this.isDirty = function(){
+            if(self.newTile) {
+                if(self.newTile.dirty()) { return true; }
+            }
+            return false;
         };
 
         this.selectChildCards = function(value) {

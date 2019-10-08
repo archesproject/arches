@@ -123,7 +123,7 @@ class Command(BaseCommand):
             os.rename(os.path.join(es_config_directory, 'elasticsearch.yml'), os.path.join(es_config_directory, 'elasticsearch.yml.orig'))
         except: pass
 
-        os.chmod(os.path.join(install_location, file_name_wo_extention, 'bin', 'elasticsearch'), 0755)
+        os.chmod(os.path.join(install_location, file_name_wo_extention, 'bin', 'elasticsearch'), 0o755)
 
         def change_permissions_recursive(path, mode):
             for root, dirs, files in os.walk(path, topdown=True):

@@ -169,7 +169,7 @@ class MobileSurvey(models.MobileSurveyModel):
                 card_lookup[str(card.graph_id)].append(card)
             else:
                 card_lookup[str(card.graph_id)] = [card]
-        for graphid, cards in iter(card_lookup.items()):
+        for graphid, cards in iter(list(card_lookup.items())):
             graph = Graph.objects.get(pk=graphid)
             graph_obj = graph.serialize(exclude=['domain_connections', 'edges', 'relatable_resource_model_ids'])
             graph_obj['widgets'] = list(models.CardXNodeXWidget.objects.filter(card__graph=graph).distinct())
@@ -181,7 +181,7 @@ class MobileSurvey(models.MobileSurveyModel):
 
             nodegroup_filters = {'nodes': 'nodegroup_id', 'cards': 'nodegroup_id', 'nodegroups': 'nodegroupid'}
 
-            for prop, id in iter(nodegroup_filters.items()):
+            for prop, id in iter(list(nodegroup_filters.items())):
                 relevant_items = [item for item in graph_obj[prop] if item[id] in nodegroupids]
                 graph_obj[prop] = relevant_items
 
@@ -242,7 +242,7 @@ class MobileSurvey(models.MobileSurveyModel):
         if doc['provisionaledits'] != '':
             if sync_user_id in doc['provisionaledits']:
                 user_edit = doc['provisionaledits'][sync_user_id]
-                for nodeid, value in iter(user_edit['value'].items()):
+                for nodeid, value in iter(list(user_edit['value'].items())):
                     datatype_factory = DataTypeFactory()
                     node = models.Node.objects.get(nodeid=nodeid)
                     datatype = datatype_factory.get_instance(node.datatype)
@@ -350,7 +350,7 @@ class MobileSurvey(models.MobileSurveyModel):
         search_res_json = search.search_results(request)
         search_res = JSONDeserializer().deserialize(search_res_json.content)
         for hit in search_res['results']['hits']['hits']:
-            if hit['_type'] == resource_type_id and len(instances.keys()) < int(self.datadownloadconfig['count']):
+            if hit['_type'] == resource_type_id and len(list(instances.keys())) < int(self.datadownloadconfig['count']):
                 instances[hit['_source']['resourceinstanceid']] = hit['_source']
 
     def collect_resource_instances_for_couch(self):
@@ -384,12 +384,12 @@ class MobileSurvey(models.MobileSurveyModel):
                         request.GET['map-filter'] = map_filter
                         request.GET['resourcecount'] = self.datadownloadconfig['count']
                         self.append_to_instances(request, instances, res_type)
-                        if len(instances.keys()) < int(self.datadownloadconfig['count']):
+                        if len(list(instances.keys())) < int(self.datadownloadconfig['count']):
                             request.GET['map-filter'] = '{}'
                             request.GET['resourcecount'] = int(
-                                self.datadownloadconfig['count']) - len(instances.keys())
+                                self.datadownloadconfig['count']) - len(list(instances.keys()))
                             self.append_to_instances(request, instances, res_type)
-                        for key, value in instances.iteritems():
+                        for key, value in instances.items():
                             all_instances[key] = value
                 except KeyError:
                     print 'no instances found in', search_res
@@ -398,13 +398,13 @@ class MobileSurvey(models.MobileSurveyModel):
                     instances = {}
                     parsed = urlparse.urlparse(query)
                     urlparams = urlparse.parse_qs(parsed.query)
-                    for k, v in urlparams.iteritems():
+                    for k, v in urlparams.items():
                         request.GET[k] = v[0]
                     search_res_json = search.search_results(request)
                     search_res = JSONDeserializer().deserialize(search_res_json.content)
                     for hit in search_res['results']['hits']['hits']:
                         instances[hit['_source']['resourceinstanceid']] = hit['_source']
-                    for key, value in instances.iteritems():
+                    for key, value in instances.items():
                         all_instances[key] = value
                 except KeyError:
                     print 'no instances found in', search_res
@@ -436,7 +436,7 @@ class MobileSurvey(models.MobileSurveyModel):
         of resource instances and loads them into the database instance.
         """
         db = self.couch.create_db('project_' + str(self.id))
-        for instanceid, instance in instances.iteritems():
+        for instanceid, instance in instances.items():
             try:
                 instance['type'] = 'resource'
                 self.couch.update_doc(db, instance, instanceid)
