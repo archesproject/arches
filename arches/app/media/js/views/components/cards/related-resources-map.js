@@ -60,7 +60,7 @@ define([
         var zoomToData = true;
         resourceBounds.subscribe(function(bounds) {
             var map = self.map();
-            if (map && zoomToData) {
+            if (map && map.getStyle() && zoomToData) {
                 map.fitBounds(bounds);
             }
             zoomToData = true;
