@@ -1255,7 +1255,7 @@ class FileListDataType(BaseDataType):
                     file_model.path = file_data
                     file_model.pk = file['file_id']
                     file_model.save()
-                    if file["name"] == file_data.name and 'url' not in file.keys():
+                    if file["name"] == file_data.name and 'url' not in list(file.keys()):
                         file["file_id"] = str(file_model.pk)
                         file["url"] = str(file_model.path.url)
                         file["status"] = 'uploaded'
@@ -1304,7 +1304,7 @@ class DomainDataType(BaseDomainDataType):
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         domain_text = None
         for tile in document['tiles']:
-            for k, v in tile.data.iteritems():
+            for k, v in tile.data.items():
                 if v == nodevalue:
                     node = models.Node.objects.get(nodeid=k)
                     domain_text = self.get_option_text(node, v)
@@ -1388,7 +1388,7 @@ class DomainListDataType(BaseDomainDataType):
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         domain_text_values = set([])
         for tile in document['tiles']:
-            for k, v in tile.data.iteritems():
+            for k, v in tile.data.items():
                 if v == nodevalue:
                     node = models.Node.objects.get(nodeid=k)
                     for value in nodevalue:

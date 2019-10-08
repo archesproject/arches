@@ -249,7 +249,7 @@ class v3PreparedResource:
         not have a value """
 
         for tile in self.tiles:
-            data = dict([(k, v) for k, v in tile['data'].items() if v is not None])
+            data = dict([(k, v) for k, v in list(tile['data'].items()) if v is not None])
             tile['data'] = data
 
     def reorder_tiles_by_value(self, nodeid=None, valueid=None):
@@ -310,7 +310,7 @@ class v3PreparedResource:
             # get a list of all the node UUIDs in this tile and its children
             all_node_options = []
             for t in tilegroup_json:
-                all_node_options += t['data'].keys()
+                all_node_options += list(t['data'].keys())
 
             if self.verbose:
                 print("number of tiles in tilegroup: {}".format(len(tilegroup_json)))
@@ -383,7 +383,7 @@ class v3PreparedResource:
                 for tile in tilegroup_json:
 
                     # skip if the node is not in this tile
-                    if v4_uuid not in tile['data'].keys():
+                    if v4_uuid not in list(tile['data'].keys()):
                         continue
 
                     if self.verbose:

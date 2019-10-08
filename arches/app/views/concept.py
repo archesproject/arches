@@ -307,7 +307,7 @@ def manage_parents(request, conceptid):
 def confirm_delete(request, conceptid):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
     concept = Concept().get(id=conceptid)
-    concepts_to_delete = [concept.get_preflabel(lang=lang).value for key, concept in Concept.gather_concepts_to_delete(concept, lang=lang).iteritems()]
+    concepts_to_delete = [concept.get_preflabel(lang=lang).value for key, concept in Concept.gather_concepts_to_delete(concept, lang=lang).items()]
     #return HttpResponse('<div>Showing only 50 of %s concepts</div><ul><li>%s</ul>' % (len(concepts_to_delete), '<li>'.join(concepts_to_delete[:50]) + ''))
     return HttpResponse('<ul><li>%s</ul>' % ('<li>'.join(concepts_to_delete) + ''))
 
@@ -327,7 +327,7 @@ def paged_dropdown(request):
     results = Concept().get_child_collections_hierarchically(conceptid, offset=offset, limit=limit, query=query)
     total_count = results[0][3] if len(results) > 0 else 0
     data = [dict(zip(['valueto','depth', 'collector'], d)) for d in results]
-    data = [dict(zip(['conceptid', 'id', 'type', 'text', 'language'], d['valueto'].values()), depth=d['depth'], collector=d['collector']) for d in data]
+    data = [dict(zip(['conceptid', 'id', 'type', 'text', 'language'], list(d['valueto'].values())), depth=d['depth'], collector=d['collector']) for d in data]
     return JSONResponse({
         'results': data,
         'more': offset+limit < total_count

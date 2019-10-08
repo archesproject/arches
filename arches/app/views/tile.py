@@ -229,8 +229,8 @@ class TileData(View):
                     if tile.filter_by_perm(request.user, 'delete_nodegroup'):
                         nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
                         clean_resource_cache(tile)
-                        if tile.is_provisional() is True and len(tile.provisionaledits.keys()) == 1:
-                            provisional_editor_id = tile.provisionaledits.keys()[0]
+                        if tile.is_provisional() is True and len(list(tile.provisionaledits.keys())) == 1:
+                            provisional_editor_id = list(tile.provisionaledits.keys())[0]
                             edit = tile.provisionaledits[provisional_editor_id]
                             provisional_editor = User.objects.get(pk=provisional_editor_id)
                             reviewer = request.user
@@ -278,7 +278,7 @@ class TileData(View):
             cards = models.CardModel.objects.all().values('name', 'nodegroup_id')
             card_lookup = {str(card['nodegroup_id']): card for card in cards}
             resource_model_lookup = {str(graph['graphid']): graph for graph in resource_models}
-            for k, v in summary.iteritems():
+            for k, v in summary.items():
                 if v['lastedittype'] not in ['accept edit', 'delete edit']:
                     if models.TileModel.objects.filter(pk=k).exists():
                         tile = models.TileModel.objects.get(pk=k)

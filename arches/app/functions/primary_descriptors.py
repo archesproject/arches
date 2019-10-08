@@ -19,10 +19,10 @@ class PrimaryDescriptorsFunction(BaseFunction):
                         resourceinstance_id=resource.resourceinstanceid)
                 for tile in tiles:
                     for node in models.Node.objects.filter(nodegroup_id=uuid.UUID(config['nodegroup_id'])):
-                        if len(tile.data.keys()) > 0:
+                        if len(list(tile.data.keys())) > 0:
                             data = tile.data
-                        elif tile.provisionaledits is not None and len(tile.provisionaledits.keys()) == 1:
-                            userid = tile.provisionaledits.keys()[0]
+                        elif tile.provisionaledits is not None and len(list(tile.provisionaledits.keys())) == 1:
+                            userid = list(tile.provisionaledits.keys())[0]
                             data = tile.provisionaledits[userid]['value']
                         if str(node.nodeid) in data:
                             datatype_factory = DataTypeFactory()

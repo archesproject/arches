@@ -45,7 +45,7 @@ class Command(BaseCommand):
         for o in objs:
             print(80*"-")
             print(o)
-            keys = vars(o).keys()
+            keys = list(vars(o).keys())
             keys.sort()
             for k in keys:
                 print(k)

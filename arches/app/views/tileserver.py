@@ -55,7 +55,7 @@ def handle_request(request):
 
         response.content = content
         response.status_code = status_code
-        for header, value in headers.items():
+        for header, value in list(headers.items()):
             response[header] = value
 
         response['Content-length'] = str(len(content))
