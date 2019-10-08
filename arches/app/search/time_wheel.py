@@ -102,7 +102,7 @@ class TimeWheel(object):
         if 'buckets' not in results:
             return d3ItemInstance
 
-        for key, value in results['buckets'][0].iteritems():
+        for key, value in results['buckets'][0].items():
             if key == 'from':
                 d3ItemInstance.start = int(value)
             elif key == 'to':
@@ -122,7 +122,7 @@ class TimeWheel(object):
     def appendDateRanges(self, results, range_lookup):
         if 'buckets' in results:
             bucket = results['buckets'][0]
-            for key, value in bucket.iteritems():
+            for key, value in bucket.items():
                 if key in range_lookup:
                     bucket[key]['buckets'][0]['from'] = range_lookup[key][0]
                     bucket[key]['buckets'][0]['to'] = range_lookup[key][1]

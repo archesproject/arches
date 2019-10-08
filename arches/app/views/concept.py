@@ -307,7 +307,7 @@ def manage_parents(request, conceptid):
 def confirm_delete(request, conceptid):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
     concept = Concept().get(id=conceptid)
-    concepts_to_delete = [concept.get_preflabel(lang=lang).value for key, concept in Concept.gather_concepts_to_delete(concept, lang=lang).iteritems()]
+    concepts_to_delete = [concept.get_preflabel(lang=lang).value for key, concept in Concept.gather_concepts_to_delete(concept, lang=lang).items()]
     #return HttpResponse('<div>Showing only 50 of %s concepts</div><ul><li>%s</ul>' % (len(concepts_to_delete), '<li>'.join(concepts_to_delete[:50]) + ''))
     return HttpResponse('<ul><li>%s</ul>' % ('<li>'.join(concepts_to_delete) + ''))
 
