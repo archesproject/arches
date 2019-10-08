@@ -251,7 +251,7 @@ class v3MigrationTests(ArchesTestCase):
         v3_bd = os.path.join(self.pkg, 'v3data', 'business_data', 'v3sample.json')
         for rm in all_models:
 
-            print "testing import of "+rm
+            print("testing import of "+rm)
             importer = v3Importer(os.path.join(self.pkg, 'v3data'), rm, v3_bd)
 
             # process and import the v3 resources one at a time and

@@ -506,7 +506,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             node_data = tile.data[str(node.pk)]
             bounds = self.get_bounds_from_value(node_data)
         except KeyError as e:
-            print e
+            print(e)
         return bounds
 
     def get_bounds_from_value(self, node_data):
@@ -1078,7 +1078,7 @@ class FileListDataType(BaseDataType):
                             deleted_file = models.File.objects.get(pk=previously_saved_file["file_id"])
                             deleted_file.delete()
                         except models.File.DoesNotExist:
-                            print 'file does not exist'
+                            print('file does not exist')
 
         files = request.FILES.getlist('file-list_' + str(node.pk), [])
 
@@ -1478,9 +1478,9 @@ class ResourceInstanceDataType(BaseDataType):
                     resource_document = se.search(index='resources', id=resourceid)
                     resource_names.add(resource_document['_source']['displayname'])
                 except:
-                    print 'resource not available'
+                    print('resource not available')
         else:
-            print 'resource not avalable'
+            print('resource not avalable')
         return resource_names
 
     def validate(self, value, row_number=None, source=''):

@@ -328,7 +328,7 @@ class CsvReader(Reader):
             self.errors += errors
 
         if save_count % (settings.BULK_IMPORT_BATCH_SIZE/4) == 0:
-            print '%s resources processed' % str(save_count)
+            print('%s resources processed' % str(save_count))
 
     def import_business_data(self, business_data=None, mapping=None, overwrite='append', bulk=False, create_concepts=False, create_collections=False):
         # errors = businessDataValidator(self.business_data)
@@ -351,9 +351,9 @@ class CsvReader(Reader):
 
                 for k,v in f.iteritems():
                     if 'string_template' in v and v['string_template'] != ['']:
-                        print 'The {0} {1} in the {2} display function.'.format(', '.join(v['string_template']), 'nodes participate' if len(v['string_template']) > 1 else 'node participates', k)
+                        print('The {0} {1} in the {2} display function.'.format(', '.join(v['string_template']), 'nodes participate' if len(v['string_template']) > 1 else 'node participates', k))
                     else:
-                        print 'No nodes participate in the {0} display function.'.format(k)
+                        print('No nodes participate in the {0} display function.'.format(k))
 
             return display_nodeids
 
@@ -394,9 +394,9 @@ class CsvReader(Reader):
                 try:
                     resourceinstanceid = process_resourceid(business_data[0]['ResourceID'], overwrite)
                 except KeyError:
-                    print '*'*80
-                    print 'ERROR: No column \'ResourceID\' found in business data file. Please add a \'ResourceID\' column with a unique resource identifier.'
-                    print '*'*80
+                    print('*'*80)
+                    print('ERROR: No column \'ResourceID\' found in business data file. Please add a \'ResourceID\' column with a unique resource identifier.')
+                    print('*'*80)
                     sys.exit()
                 blanktilecache = {}
                 populated_nodegroups = {}
@@ -449,11 +449,11 @@ class CsvReader(Reader):
                                         concepts_to_create[node['arches_nodeid']][str(uuid.uuid4())] = concept_value
 
                 if len(non_contiguous_resource_ids) > 0:
-                    print '*'*80
+                    print('*'*80)
                     for non_contiguous_resource_id in non_contiguous_resource_ids:
-                        print 'ResourceID: ' + non_contiguous_resource_id
-                    print 'ERROR: The preceding ResourceIDs are non-contiguous in your csv file. Please sort your csv file by ResourceID and try import again.'
-                    print '*'*80
+                        print('ResourceID: ' + non_contiguous_resource_id)
+                    print('ERROR: The preceding ResourceIDs are non-contiguous in your csv file. Please sort your csv file by ResourceID and try import again.')
+                    print('*'*80)
                     sys.exit()
 
                 def create_reference_data(new_concepts, create_collections):
@@ -614,7 +614,7 @@ class CsvReader(Reader):
                                 value = None
                             self.errors += errors
                     else:
-                        print _('No datatype detected for {0}'.format(value))
+                        print(_('No datatype detected for {0}'.format(value)))
 
                     return {'value': value, 'request': request}
 
@@ -684,9 +684,9 @@ class CsvReader(Reader):
                             try:
                                 target_resource_model = all_nodes.get(nodeid=source_data[0].keys()[0]).graph_id
                             except:
-                                print '*'*80
-                                print 'ERROR: No resource model found. Please make sure the resource model this business data is mapped to has been imported into Arches.'
-                                print '*'*80
+                                print('*'*80)
+                                print('ERROR: No resource model found. Please make sure the resource model this business data is mapped to has been imported into Arches.')
+                                print('*'*80)
                                 sys.exit()
 
                         target_tile = get_blank_tile(source_data)
@@ -825,14 +825,14 @@ class CsvReader(Reader):
                 if bulk:
                     Resource.bulk_save(resources=resources)
 
-                print _('%s total resource saved' % (save_count + 1))
+                print(_('%s total resource saved' % (save_count + 1)))
 
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             formatted = traceback.format_exception(exc_type, exc_value, exc_traceback)
             if len(formatted):
                 for message in formatted:
-                    print message
+                    print(message)
 
         finally:
             pass

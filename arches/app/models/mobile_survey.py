@@ -86,7 +86,7 @@ class MobileSurvey(models.MobileSurveyModel):
         try:
             self.couch.delete_db('project_' + str(self.id))
         except Exception as e:
-            print(e), _("Could not delete database in CouchDB")
+            print(e, _("Could not delete database in CouchDB"))
         super(MobileSurvey, self).delete()
 
     def collect_card_widget_node_data(self, graph_obj, graph, parentcard, nodegroupids=[]):
@@ -222,7 +222,7 @@ class MobileSurvey(models.MobileSurveyModel):
                 singlepart = GeoUtils().convert_multipart_to_singlepart(bounds)
                 ret['bounds'] = singlepart
         except TypeError as e:
-            print 'Could not parse', ret['bounds'], e
+            print('Could not parse', ret['bounds'], e)
         return ret
 
     def get_ordered_cards(self):
@@ -363,7 +363,7 @@ class MobileSurvey(models.MobileSurveyModel):
         resource_types = self.datadownloadconfig['resources']
         all_instances = {}
         if query in ('', None) and len(resource_types) == 0:
-            print "No resources or data query defined"
+            print("No resources or data query defined")
         else:
             request = HttpRequest()
             request.user = self.lasteditedby
@@ -392,7 +392,7 @@ class MobileSurvey(models.MobileSurveyModel):
                         for key, value in instances.iteritems():
                             all_instances[key] = value
                 except KeyError:
-                    print 'no instances found in', search_res
+                    print('no instances found in', search_res)
             else:
                 try:
                     instances = {}
@@ -407,7 +407,7 @@ class MobileSurvey(models.MobileSurveyModel):
                     for key, value in instances.iteritems():
                         all_instances[key] = value
                 except KeyError:
-                    print 'no instances found in', search_res
+                    print('no instances found in', search_res)
         return all_instances
 
     def load_tiles_into_couch(self, instances, nodegroup):
@@ -425,7 +425,7 @@ class MobileSurvey(models.MobileSurveyModel):
                     tile['type'] = 'tile'
                     self.couch.update_doc(db, tile, tile['tileid'])
                 except Exception as e:
-                    print e, tile
+                    print(e, tile)
         nodegroups = models.NodeGroup.objects.filter(parentnodegroup=nodegroup)
         for nodegroup in nodegroups:
             self.load_tiles_into_couch(instances, nodegroup)
@@ -441,7 +441,7 @@ class MobileSurvey(models.MobileSurveyModel):
                 instance['type'] = 'resource'
                 self.couch.update_doc(db, instance, instanceid)
             except Exception as e:
-                print e, instance
+                print(e, instance)
 
     def load_data_into_couch(self):
         """

@@ -97,7 +97,7 @@ class Command(BaseCommand):
 
     def create_associated_surveys(self):
         for mobile_survey in MobileSurvey.objects.all():
-            print "Writing", mobile_survey, "to CouchDB"
+            print("Writing {} to CouchDB".format(mobile_survey))
             mobile_survey.save()
 
     def rebuild_couch_surveys(self):

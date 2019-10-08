@@ -113,7 +113,7 @@ class GraphSettingsView(GraphBaseView):
         try:
             node.datatype = data['graph']['root']['datatype']
         except KeyError as e:
-            print e, 'Cannot find root node datatype'
+            print(e, 'Cannot find root node datatype')
         node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
         node.name = graph.name
         graph.root.name = node.name

@@ -568,7 +568,7 @@ class Command(BaseCommand):
                     package_dir, 'reference_data', 'concepts', file_type)))
 
             for path in concept_data:
-                print path
+                print(path)
                 self.import_reference_data(path, overwrite, stage)
 
             collection_data = []
@@ -577,7 +577,7 @@ class Command(BaseCommand):
                     package_dir, 'reference_data', 'collections', file_type)))
 
             for path in collection_data:
-                print path
+                print(path)
                 self.import_reference_data(path, overwrite, stage)
 
         def load_mapbox_styles(style_paths, basemap):
@@ -1110,14 +1110,14 @@ will be very jumbled.""")
 
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
-                print os.path.join(path)
+                print(os.path.join(path))
                 with open(path, 'rU') as f:
                     archesfile = JSONDeserializer().deserialize(f)
                     ResourceGraphImporter(archesfile['graph'], overwrite_graphs)
             else:
                 file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith('.json')]
                 for file_path in file_paths:
-                    print os.path.join(path, file_path)
+                    print(os.path.join(path, file_path))
                     with open(os.path.join(path, file_path), 'rU') as f:
                         archesfile = JSONDeserializer().deserialize(f)
                         ResourceGraphImporter(archesfile['graph'], overwrite_graphs)

@@ -102,7 +102,7 @@ def test_rm_configs(v3_data_dir):
     )
     errors = []
     for rm, conf in configs.iteritems():
-        print rm
+        print(rm)
         graph_file_path = os.path.join(v4_rm_dir, rm+".json")
         if not os.path.isfile(graph_file_path):
             errors.append("Missing graph json: "+graph_file_path)

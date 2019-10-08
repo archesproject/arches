@@ -95,7 +95,7 @@ class UITest(StaticLiveServerTestCase):
         self.desired_capabilities['build'] = os.environ['TRAVIS_BUILD_NUMBER']
         self.desired_capabilities['tags'] = [os.environ['TRAVIS_PYTHON_VERSION'], 'CI']
 
-        print self.desired_capabilities
+        print(self.desired_capabilities)
 
         sauce_url = "http://%s:%s@ondemand.saucelabs.com:80/wd/hub"
         self.driver = webdriver.Remote(
@@ -126,14 +126,14 @@ class UITest(StaticLiveServerTestCase):
             self.driver.quit()
 
     def test_login(self):
-        print "Testing login"
+        print("Testing login")
         page = LoginPage(self.driver, self.live_server_url)
         page.login('admin', 'admin')
 
         self.assertEqual(self.driver.current_url, self.live_server_url + '/index.htm')
 
     def test_make_graph(self):
-        print "Testing graph creation"
+        print("Testing graph creation")
         page = LoginPage(self.driver, self.live_server_url)
         page.login('admin', 'admin')
 
@@ -143,7 +143,7 @@ class UITest(StaticLiveServerTestCase):
         self.assertEqual(self.driver.current_url, '%s/graph/%s/settings' % (self.live_server_url, graph_id))
 
     def test_make_node(self):
-        print "Testing node creation and appendment to a graph"
+        print("Testing node creation and appendment to a graph")
         page = LoginPage(self.driver, self.live_server_url)
         page.login('admin', 'admin')
         graph_page = GraphPage(self.driver, self.live_server_url)
@@ -159,7 +159,7 @@ class UITest(StaticLiveServerTestCase):
         self.assertTrue(node_ids_are_valid)
 
     def test_make_map_widget(self):
-        print "Testing creation and function of the map widget in a card"
+        print("Testing creation and function of the map widget in a card")
         page = LoginPage(self.driver, self.live_server_url)
         page.login('admin', 'admin')
         #Create a new branch model
@@ -186,11 +186,11 @@ class UITest(StaticLiveServerTestCase):
         results['added basemap'] = map_widget.add_basemap()
         results['added overlay'] = map_widget.add_overlay(1)
 
-        print results
+        print(results)
         self.assertTrue(results['opened maptools'] == True and results['added basemap'] == True and results['added overlay'] == True)
 
     def test_make_form(self):
-        print "Testing form creation"
+        print("Testing form creation")
         page = LoginPage(self.driver, self.live_server_url)
         page.login('admin', 'admin')
         #Create a new branch model
@@ -218,7 +218,7 @@ class UITest(StaticLiveServerTestCase):
         self.assertTrue(form_id_is_valid)
 
     def test_make_report(self):
-        print "Testing report creation"
+        print("Testing report creation")
         page = LoginPage(self.driver, self.live_server_url)
         page.login('admin', 'admin')
         #Create a new branch model
@@ -254,11 +254,11 @@ class UITest(StaticLiveServerTestCase):
         results['added overlay'] = map_widget.add_overlay(2)
         report_editor_page.save_report("ReportA")
 
-        print results
+        print(results)
         self.assertTrue(results['opened maptools'] == True and results['added basemap'] == True and results['added overlay'] == True)
 
     def test_add_resource(self):
-        print "Testing resource instance creation and crud"
+        print("Testing resource instance creation and crud")
         page = LoginPage(self.driver, self.live_server_url)
         page.login('admin', 'admin')
         #Create a new branch model

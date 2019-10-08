@@ -353,7 +353,7 @@ class ArchesFileReader(Reader):
                         # reporter.update_tiles_saved(tile_saved)
 
         except (KeyError, TypeError) as e:
-            print e
+            print(e)
 
         finally:
             reporter.report_results()
@@ -369,4 +369,4 @@ class ArchesFileReader(Reader):
                 self.import_business_data(self.business_data, self.mapping)
         else:
             for error in errors:
-                print "{0} {1}".format(error[0], error[1])
+                print("{0} {1}".format(error[0], error[1]))

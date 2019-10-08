@@ -377,7 +377,7 @@ class v3PreparedResource:
                         print("v3 value: {}".format(dp[1]))
                         print("v4 value: {}".format(value))
                     except UnicodeEncodeError:
-                        print "v3/v4 value: error encoding to ascii for print statement"
+                        print("v3/v4 value: error encoding to ascii for print statement")
 
                 # find the tile that will hold the value
                 for tile in tilegroup_json:
@@ -671,7 +671,7 @@ class v3Importer:
                     if ct % 1000 == 0:
                         print(ct)
                     elif ct % 100 == 0:
-                        print("."),
+                        print(".")
                     if ct == self.truncate:
                         break
                 if ct > 0:

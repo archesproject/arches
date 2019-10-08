@@ -43,7 +43,7 @@ class GraphImportReporter:
         else:
             result = "Saved Branch: {0}"
 
-        print result.format(self.name)
+        print(result.format(self.name))
 
 
 class GraphImportException(Exception):
@@ -130,7 +130,7 @@ def import_graph(graphs, overwrite_graphs=True):
                 except:
                     pass
             except Exception as e:
-                print e
+                print(e)
 
         return errors, reporter
 
