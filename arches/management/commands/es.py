@@ -163,7 +163,7 @@ class Command(BaseCommand):
 
         # add custom indexes
         for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
-            register_index(index['name'])
+            self.register_index(index['name'])
 
     def delete_indexes(self):
         delete_terms_index()
@@ -173,5 +173,5 @@ class Command(BaseCommand):
 
         # remove custom indexes
         for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
-            remove_index(index['name'])
+            self.remove_index(index['name'])
 

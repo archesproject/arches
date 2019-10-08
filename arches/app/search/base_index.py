@@ -78,26 +78,31 @@ class BaseIndex(object):
         resources -- the list of resource instances to index
         resource_type -- the type of resources being indexed
         graph_name -- the name of the graph model that represents the resources being indexed
-        clear_index -- True(default) to remove all index records of type "resource_type" before indexing
+        clear_index -- True(default) to remove all index records of type "resource_type" before indexing, 
+            assumes that a field called "graph_id" exists on the indexed documents
 
         Return: None
         """
 
         start = datetime.now()
         q = Query(se=self.se)
-        term = Term(field='graph_id', term=str(resource_type))
-        q.add_query(term)
         if clear_index:
+            term = Term(field='graph_id', term=str(resource_type))
+            q.add_query(term)
             q.delete(index=self.index_name, refresh=True)
+
+        q = Query(se=self.se)
+        count_before = self.se.count(index=self.index_name, body=q.dsl)
 
         result_summary = {'database': len(resources), 'indexed': 0}
         with self.se.BulkIndexer(batch_size=settings.BULK_IMPORT_BATCH_SIZE, refresh=True) as indexer:
             for resource in resources:
                 tiles = list(models.TileModel.objects.filter(resourceinstance=resource))
                 document, doc_id = self.get_documents_to_index(resource, tiles)
-                indexer.add(index=self.index_name, id=doc_id, data=document)
+                if document is not None and id is not None:
+                    indexer.add(index=self.index_name, id=doc_id, data=document)
 
-        result_summary['indexed'] = self.se.count(index=self.index_name, body=q.dsl)
+        result_summary['indexed'] = self.se.count(index=self.index_name, body=q.dsl) - count_before
         status = 'Passed' if result_summary['database'] == result_summary['indexed'] else 'Failed'
         print "Custom Index - %s:" % self.index_name
         print "    Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(status, graph_name, result_summary['database'], result_summary['indexed'], (datetime.now()-start).seconds)
