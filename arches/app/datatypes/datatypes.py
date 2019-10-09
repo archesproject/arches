@@ -1464,7 +1464,7 @@ class DomainListDataType(BaseDomainDataType):
 class ResourceInstanceDataType(BaseDataType):
     def get_id_list(self, nodevalue):
         id_list = nodevalue
-        if type(nodevalue) is unicode:
+        if type(nodevalue) is str:
             id_list = [nodevalue]
         return id_list
 
@@ -1514,7 +1514,7 @@ class ResourceInstanceDataType(BaseDataType):
     def transform_export_values(self, value, *args, **kwargs):
         result = value
         try:
-            if not isinstance(value, basestring): #change basestring to str in python3
+            if not isinstance(value, str): #changed from basestring to str for python3 branch
                 result = ",".join(value)
         except:
             pass

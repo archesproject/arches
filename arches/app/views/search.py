@@ -38,9 +38,9 @@ from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
 
 try:
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 
 
 class SearchView(MapBaseManagerView):

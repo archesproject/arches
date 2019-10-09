@@ -67,7 +67,7 @@ class Command(BaseCommand):
         try:
             uuid.UUID(details['widgetid'])
         except:
-            details['widgetid'] = unicode(uuid.uuid4())
+            details['widgetid'] = str(uuid.uuid4())
             print("Registering widget with widgetid: {}".format(details['widgetid']))
 
         instance = models.Widget(

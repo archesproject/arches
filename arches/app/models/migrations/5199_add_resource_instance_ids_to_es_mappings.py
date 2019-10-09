@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.db import migrations

@@ -103,7 +103,7 @@ class Graph(models.GraphModel):
                 self.populate_null_nodegroups()
 
             else:
-                if (len(args) == 1 and (isinstance(args[0], basestring) or isinstance(args[0], uuid.UUID))):
+                if (len(args) == 1 and (isinstance(args[0], str) or isinstance(args[0], uuid.UUID))):
                     for key, value in models.GraphModel.objects.get(pk=args[0]).__dict__.items():
                         setattr(self, key, value)
 
@@ -621,7 +621,7 @@ class Graph(models.GraphModel):
         str_forms_config = json.dumps(config)
         for map in maps:
             for k, v in map.items():
-                str_forms_config = str_forms_config.replace(unicode(k), unicode(v))
+                str_forms_config = str_forms_config.replace(str(k), str(v))
         return json.loads(str_forms_config)
 
     def copy_functions(self, other_graph, id_maps=[]):

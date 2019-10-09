@@ -401,10 +401,13 @@ define([
             });
 
             self.form.on('tile-reset', function() {
-                self.draw.set({
-                    type: 'FeatureCollection',
-                    features: getDrawFeatures()
-                });
+                var style = self.map().getStyle();
+                if (style) {
+                    self.draw.set({
+                        type: 'FeatureCollection',
+                        features: getDrawFeatures()
+                    });
+                }
                 _.each(self.featureLookup, function(value) {
                     if (value.selectedTool()) value.selectedTool('');
                 });

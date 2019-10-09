@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import json
 import couchdb
-import urlparse
+import urllib.parse
 from datetime import datetime
 from datetime import timedelta
 from django.db import transaction
@@ -52,10 +52,10 @@ def get_survey_resources(mobile_survey):
     graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
     resources = []
     all_ordered_card_ids = mobile_survey['cards']
-    active_graphs = {unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)}
+    active_graphs = {str(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)}
     for i, graph in enumerate(graphs):
         cards = []
-        if i == 0 or unicode(graph.graphid) in active_graphs:
+        if i == 0 or str(graph.graphid) in active_graphs:
             cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(
                 graph=graph).order_by('sortorder')]
         resources.append({'name': graph.name, 'id': graph.graphid,
@@ -282,7 +282,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         self.update_identities(data, mobile_survey, mobile_survey.users.all(), 'users', User, models.MobileSurveyXUser)
         self.update_identities(data, mobile_survey, mobile_survey.groups.all(), 'groups', Group, models.MobileSurveyXGroup)
 
-        mobile_survey_card_ids = {unicode(c.cardid) for c in mobile_survey.cards.all()}
+        mobile_survey_card_ids = {str(c.cardid) for c in mobile_survey.cards.all()}
         form_card_ids = set(data['cards'])
         cards_to_remove = mobile_survey_card_ids - form_card_ids
         cards_to_add = form_card_ids - mobile_survey_card_ids
@@ -411,10 +411,10 @@ class MobileSurveyResources(View):
         all_ordered_card_ids = []
         proj = MobileSurvey.objects.get(id=surveyid)
         all_ordered_card_ids = proj.get_ordered_cards()
-        active_graphs = {unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)}
+        active_graphs = {str(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)}
         for i, graph in enumerate(graphs):
             cards = []
-            if unicode(graph.graphid) in active_graphs:
+            if str(graph.graphid) in active_graphs:
                 cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
                 resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
 

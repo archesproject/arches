@@ -189,7 +189,7 @@ class Resource(models.ResourceInstance):
         Indexes all the nessesary items values of a resource to support search
 
         """
-        if unicode(self.graph_id) != unicode(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
+        if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             se = SearchEngineFactory().create()
             datatype_factory = DataTypeFactory()
             node_datatypes = {str(nodeid): datatype for nodeid,
@@ -241,7 +241,7 @@ class Resource(models.ResourceInstance):
                     node_terms = datatype_instance.get_search_terms(
                         nodevalue, nodeid)
                     for index, term in enumerate(node_terms):
-                        terms.append({'_id': unicode(nodeid)+unicode(tile.tileid)+unicode(index), '_source': {'value': term, 'nodeid': nodeid,
+                        terms.append({'_id': str(nodeid)+str(tile.tileid)+str(index), '_source': {'value': term, 'nodeid': nodeid,
                                                                                                               'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid, 'resourceinstanceid': tile.resourceinstance_id, 'provisional': False}})
 
             if tile.provisionaledits is not None:
@@ -261,7 +261,7 @@ class Resource(models.ResourceInstance):
                                     node_terms = datatype_instance.get_search_terms(
                                         nodevalue, nodeid)
                                     for index, term in enumerate(node_terms):
-                                        terms.append({'_id': unicode(nodeid)+unicode(tile.tileid)+unicode(index), '_source': {'value': term, 'nodeid': nodeid,
+                                        terms.append({'_id': str(nodeid)+str(tile.tileid)+str(index), '_source': {'value': term, 'nodeid': nodeid,
                                                                                                                               'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid, 'resourceinstanceid': tile.resourceinstance_id, 'provisional': True}})
 
         return document, terms

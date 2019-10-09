@@ -56,7 +56,7 @@ class Concept(object):
         self.hassubconcepts = False
 
         if len(args) != 0:
-            if isinstance(args[0], basestring):
+            if isinstance(args[0], str):
                 try:
                     uuid.UUID(args[0])
                     self.get(args[0])
@@ -1148,7 +1148,7 @@ class ConceptValue(object):
         self.language = ''
 
         if len(args) != 0:
-            if isinstance(args[0], basestring):
+            if isinstance(args[0], str):
                 try:
                     uuid.UUID(args[0])
                     self.get(args[0])

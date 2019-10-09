@@ -42,11 +42,11 @@ def deprecated(func):
         warnings.warn_explicit(
             "Call to deprecated function {}.".format(func.__name__),
             category=DeprecationWarning,
-            filename=func.func_code.co_filename,
-            lineno=func.func_code.co_firstlineno + 1
+            filename=func.__code__.co_filename,
+            lineno=func.__code__.co_firstlineno + 1
         )
         warnings.simplefilter('default', DeprecationWarning) #reset filter
-        logger.warn("%s - DeprecationWarning: Call to deprecated function %s. %s:%s" % (datetime.datetime.now(), func.__name__, func.func_code.co_filename, func.func_code.co_firstlineno + 1))
+        logger.warn("%s - DeprecationWarning: Call to deprecated function %s. %s:%s" % (datetime.datetime.now(), func.__name__, func.__code__.co_filename, func.__code__.co_firstlineno + 1))
         return func(*args, **kwargs)
     return new_func
 

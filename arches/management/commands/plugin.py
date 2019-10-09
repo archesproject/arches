@@ -67,7 +67,7 @@ class Command(BaseCommand):
         try:
             uuid.UUID(details['pluginid'])
         except:
-            details['pluginid'] = unicode(uuid.uuid4())
+            details['pluginid'] = str(uuid.uuid4())
             print("Registering plugin with pluginid: {}".format(details['pluginid']))
 
         instance = models.Plugin(

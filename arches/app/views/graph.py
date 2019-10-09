@@ -44,9 +44,9 @@ from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_pe
 from rdflib import Graph as RDFGraph
 
 try:
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 
 
 def get_ontology_namespaces():

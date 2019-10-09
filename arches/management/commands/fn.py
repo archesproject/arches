@@ -69,7 +69,7 @@ class Command(BaseCommand):
         try:
             uuid.UUID(details['functionid'])
         except:
-            details['functionid'] = unicode(uuid.uuid4())
+            details['functionid'] = str(uuid.uuid4())
             print("Registering function with functionid: {}".format(details['functionid']))
 
         fn = models.Function(

@@ -346,7 +346,7 @@ class Command(BaseCommand):
 
         with open(v3_relations, "rb") as openv3:
             reader = csv.reader(openv3, delimiter="|")
-            reader.next()
+            next(reader)
             with open(v4_relations, "wb") as openv4:
                 writer = csv.writer(openv4)
                 writer.writerow(['resourceinstanceidfrom', 'resourceinstanceidto',

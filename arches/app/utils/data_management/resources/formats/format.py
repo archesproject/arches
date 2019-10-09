@@ -131,7 +131,7 @@ class Reader(object):
                 relation = ResourceXResource(
                     resourceinstanceidfrom = Resource(resourceinstancefrom),
                     resourceinstanceidto = Resource(resourceinstanceto),
-                    relationshiptype = unicode(relation['relationshiptype']),
+                    relationshiptype = str(relation['relationshiptype']),
                     datestarted = relation['datestarted'],
                     dateended = relation['dateended'],
                     notes = relation['notes']
@@ -167,7 +167,7 @@ class Reader(object):
                 try:
                     f.write(_(timestamp + ' ' + '{0}: {1}\n'.format(error['type'], error['message'])))
                 except TypeError as e:
-                    f.write(timestamp + ' ' + e + unicode(error))
+                    f.write(timestamp + ' ' + e + str(error))
 
 
 class Writer(object):
@@ -322,7 +322,7 @@ class Writer(object):
                 try:
                     template_record[k] = ("; ").join(v)
                 except:
-                    unicode_vals = [unicode(x) for x in v]
+                    unicode_vals = [str(x) for x in v]
                     template_record[k] = ("; ").join(unicode_vals)
         return template_record
 

@@ -147,7 +147,7 @@ class Tile(models.TileModel):
         if self.tile_collects_data() is True and data != {}:
 
             utc_date_format = '%Y-%m-%dT%H:%M:%S.%fZ'
-            timestamp_utc = unicode(datetime.datetime.now(pytz.utc).strftime(utc_date_format))
+            timestamp_utc = str(datetime.datetime.now(pytz.utc).strftime(utc_date_format))
 
             provisionaledit = {
                 "value": data,

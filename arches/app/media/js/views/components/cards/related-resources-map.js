@@ -43,16 +43,28 @@ define([
             });
             return ids;
         });
-        if (selectedResourceIds().length > 0) {
-            $.getJSON({
-                url: arches.urls.geojson,
-                data: {
-                    resourceid: selectedResourceIds().join(',')
-                }
-            }, function(geojson) {
-                if (geojson.features.length > 0) resourceBounds(geojsonExtent(geojson));
-            });
-        }
+        var updateResourceBounds = function(ids) {
+            if (ids.length > 0) {
+                $.getJSON({
+                    url: arches.urls.geojson,
+                    data: {
+                        resourceid: ids.join(',')
+                    }
+                }, function(geojson) {
+                    if (geojson.features.length > 0) resourceBounds(geojsonExtent(geojson));
+                });
+            }
+        };
+        updateResourceBounds(selectedResourceIds());
+        selectedResourceIds.subscribe(updateResourceBounds);
+        var zoomToData = true;
+        resourceBounds.subscribe(function(bounds) {
+            var map = self.map();
+            if (map && map.getStyle() && zoomToData) {
+                map.fitBounds(bounds);
+            }
+            zoomToData = true;
+        });
         var selectFeatureLayers = selectFeatureLayersFactory('', selectSource, selectSourceLayer, selectedResourceIds(), true);
 
         var sources = [];
@@ -98,6 +110,7 @@ define([
             var id = widget.node_id();
             var resourceinstanceid = ko.unwrap(popupData.resourceinstanceid);
             var type = ko.unwrap(self.form.nodeLookup[id].datatype);
+            zoomToData = false;
             if (type === 'resource-instance') {
                 self.tile.data[id](resourceinstanceid);
             } else {

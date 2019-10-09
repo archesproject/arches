@@ -65,7 +65,7 @@ class Command(BaseCommand):
             try:
                 uuid.UUID(details['searchcomponentid'])
             except:
-                details['searchcomponentid'] = unicode(uuid.uuid4())
+                details['searchcomponentid'] = str(uuid.uuid4())
             print("Registering the search component, %s, with componentid: %s" % (details['name'], details['searchcomponentid']))
 
             instance = models.SearchComponent(

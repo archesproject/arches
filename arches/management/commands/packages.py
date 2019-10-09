@@ -6,7 +6,7 @@ import subprocess
 import glob
 import uuid
 import sys
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import os
 import logging
 from arches.app.search.mappings import prepare_terms_index, prepare_concepts_index, prepare_resource_relations_index
@@ -347,7 +347,7 @@ class Command(BaseCommand):
                 else:
                     output_file = existing_resource_graphs[graph['graphid']]['path']
                     if force is False:
-                        overwrite = raw_input('"{0}" already exists in this directory. \
+                        overwrite = input('"{0}" already exists in this directory. \
                         Overwrite? (Y/N): '.format(existing_resource_graphs[graph['graphid']]['name']))
                     else:
                         overwrite = 'true'
@@ -362,7 +362,7 @@ class Command(BaseCommand):
         packages_package_settings_file = os.path.join(dest_dir, 'package_settings.py')
         if os.path.exists(projects_package_settings_file):
             if os.path.exists(packages_package_settings_file) and force is False:
-                resp = raw_input('"{0}" already exists in this directory.\
+                resp = input('"{0}" already exists in this directory.\
                     Overwrite? (Y/N): '.format('package_settings.py'))
                 if resp.lower() in ('t', 'true', 'y', 'yes'):
                     overwrite = True
@@ -395,7 +395,7 @@ class Command(BaseCommand):
                         details = json.load(f)
                         if 'widgetid' not in details:
                             widget_instance = models.Widget.objects.get(name=details['name'])
-                            details['widgetid'] = unicode(widget_instance.widgetid)
+                            details['widgetid'] = str(widget_instance.widgetid)
                             f.close()
                             with open(widget_config_file, 'w') as of:
                                 json.dump(details, of, sort_keys=True, indent=4)
@@ -466,7 +466,7 @@ class Command(BaseCommand):
             load_default_ontology = True
             if settings.ONTOLOGY_BASE_NAME != None:
                 if yes is False:
-                    response = raw_input(
+                    response = input(
                         'Would you like to load the {0} ontology? (Y/N): '.format(settings.ONTOLOGY_BASE_NAME))
                     if response.lower() not in ('t', 'true', 'y', 'yes'):
                         load_default_ontology = False
@@ -483,7 +483,7 @@ class Command(BaseCommand):
             update_system_settings = True
             if os.path.exists(settings.SYSTEM_SETTINGS_LOCAL_PATH):
                 if yes is False:
-                    response = raw_input(
+                    response = input(
                         'Overwrite current system settings with package settings? (Y/N): ')
                     if response.lower() in ('t', 'true', 'y', 'yes'):
                         update_system_settings = True
@@ -503,7 +503,7 @@ class Command(BaseCommand):
                 update_package_settings = True
                 if os.path.exists(os.path.join(settings.APP_ROOT, 'package_settings.py')):
                     if yes is False:
-                        response = raw_input('Overwrite current packages_settings.py? (Y/N): ')
+                        response = input('Overwrite current packages_settings.py? (Y/N): ')
                         if response.lower() not in ('t', 'true', 'y', 'yes'):
                             update_package_settings = False
                     if update_package_settings is True \
@@ -757,7 +757,7 @@ class Command(BaseCommand):
 
             try:
                 zip_file = os.path.join(unzip_into_dir, "source_data.zip")
-                urllib.urlretrieve(source, zip_file)
+                urllib.request.urlretrieve(source, zip_file)
                 unzip_file(zip_file, unzip_into_dir)
             except Exception as e:
                 pass
@@ -996,7 +996,7 @@ to cancel the operation. You will need to manually kill all of the processes
 with or just close the terminal. Also, be aware that print statements
 will be very jumbled.""")
                 if not force:
-                    confirm = raw_input("continue? Y/n ")
+                    confirm = input("continue? Y/n ")
                     if len(confirm) > 0 and not confirm.lower().startswith("y"):
                         exit()
         if use_multiprocessing is True and not data_source.endswith(".jsonl"):
@@ -1010,7 +1010,7 @@ will be very jumbled.""")
         if data_source == '':
             data_source = settings.BUSINESS_DATA_FILES
 
-        if isinstance(data_source, basestring):
+        if isinstance(data_source, str):
             data_source = [data_source]
 
         create_collections = False
@@ -1054,7 +1054,7 @@ will be very jumbled.""")
                 'No overwrite option indicated. Please rerun command with \'-ow\' parameter.')
             sys.exit()
 
-        if isinstance(data_source, basestring):
+        if isinstance(data_source, str):
             data_source = [data_source]
 
         if len(data_source) > 0:
@@ -1079,7 +1079,7 @@ will be very jumbled.""")
         """
         Imports business data relations
         """
-        if isinstance(data_source, basestring):
+        if isinstance(data_source, str):
             data_source = [data_source]
 
         for path in data_source:
@@ -1105,7 +1105,7 @@ will be very jumbled.""")
         if data_source == '':
             data_source = settings.RESOURCE_GRAPH_LOCATIONS
 
-        if isinstance(data_source, basestring):
+        if isinstance(data_source, str):
             data_source = [data_source]
 
         for path in data_source:
@@ -1287,7 +1287,7 @@ will be very jumbled.""")
             utils.print_message(
                 'No data source indicated. Please rerun command with \'-s\' parameter.')
 
-        if isinstance(source, basestring):
+        if isinstance(source, str):
             source = [source]
 
         for path in source:
