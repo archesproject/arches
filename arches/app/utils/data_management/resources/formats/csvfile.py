@@ -1,5 +1,5 @@
 import csv
-import cPickle
+import pickle
 import datetime
 import json
 import os
@@ -22,9 +22,9 @@ from django.db.models import Q
 from django.utils.translation import ugettext as _
 
 try:
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 
 
 class MissingConfigException(Exception):
@@ -632,7 +632,7 @@ class CsvReader(Reader):
                     else:
                         blank_tile = None
                     # return deepcopy(blank_tile)
-                    return cPickle.loads(cPickle.dumps(blank_tile, -1))
+                    return pickle.loads(pickle.dumps(blank_tile, -1))
 
                 def check_required_nodes(tile, parent_tile, required_nodes, all_nodes):
                     # Check that each required node in a tile is populated.
@@ -747,7 +747,7 @@ class CsvReader(Reader):
                                             child_tile_cardinality = 'n'
 
                                         def populate_child_tiles(source_data):
-                                            prototype_tile_copy = cPickle.loads(cPickle.dumps(childtile, -1))
+                                            prototype_tile_copy = pickle.loads(pickle.dumps(childtile, -1))
                                             tileid = row['TileID'] if 'TileID' in row else uuid.uuid4()
                                             prototype_tile_copy.tileid = tileid
                                             prototype_tile_copy.parenttile = target_tile

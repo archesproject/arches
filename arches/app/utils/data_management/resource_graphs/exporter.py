@@ -15,9 +15,9 @@ from collections import OrderedDict
 from operator import itemgetter
 
 try:
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 
 def export(export_dir):
     """

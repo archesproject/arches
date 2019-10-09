@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import json
 import couchdb
-import urlparse
+import urllib.parse
 from datetime import datetime
 from datetime import timedelta
 from django.db import transaction

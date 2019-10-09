@@ -19,9 +19,9 @@ from rdflib.namespace import RDF, RDFS
 from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand
 
 try:
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 
 import logging
 

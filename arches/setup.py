@@ -144,7 +144,7 @@ def get_complete_version(version=None):
 def get_changeset(path_to_file=None):
     import os
     import subprocess
-    from StringIO import StringIO
+    from io import StringIO
     from management.commands.utils import write_to_file
 
     sb = StringIO()

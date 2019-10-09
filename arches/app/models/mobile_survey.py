@@ -15,7 +15,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import json
-import urlparse
+import urllib.parse
 from datetime import datetime
 from datetime import timedelta
 from copy import copy, deepcopy
@@ -396,8 +396,8 @@ class MobileSurvey(models.MobileSurveyModel):
             else:
                 try:
                     instances = {}
-                    parsed = urlparse.urlparse(query)
-                    urlparams = urlparse.parse_qs(parsed.query)
+                    parsed = urllib.parse.urlparse(query)
+                    urlparams = urllib.parse.parse_qs(parsed.query)
                     for k, v in urlparams.items():
                         request.GET[k] = v[0]
                     search_res_json = search.search_results(request)

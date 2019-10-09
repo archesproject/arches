@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os
 import urllib.request, urllib.error, urllib.parse
 import json
-from urlparse import urlparse, urljoin
+from urllib.parse import urlparse, urljoin
 from arches.management.commands import utils
 from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.models import MobileSyncLog

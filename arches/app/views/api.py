@@ -41,9 +41,9 @@ from rdflib.namespace import SKOS, DCTERMS
 logger = logging.getLogger(__name__)
 
 try:
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 
 
 def userCanAccessMobileSurvey(request, surveyid=None):
