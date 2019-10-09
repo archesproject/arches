@@ -157,7 +157,7 @@ class SearchEngine(object):
                 }
 
         self.es.indices.create(index=index, ignore=400)
-        self.es.indices.put_mapping(index=index, doc_type='_doc', body=body)
+        self.es.indices.put_mapping(index=index, doc_type='_doc', body=body, include_type_name=True)
         print('creating index : %s' % (index))
 
     def create_index(self, **kwargs):

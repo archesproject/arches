@@ -18,10 +18,13 @@ class Migration(migrations.Migration):
         se = SearchEngineFactory().create()
         prefix = settings.ELASTICSEARCH_PREFIX
 
-        if(se.es.indices.exists(index="%s_strings" % prefix)):
+        if (se.es.indices.exists(index="%s_terms" % prefix) == False):
             prepare_terms_index(create=True)
             doc = {
                 "source": {
+                    "remote": {
+                        "host": settings.ELASTICSEARCH_TEMP_HTTP_ENDPOINT
+                    },
                     "index": "%s_strings" % prefix,
                     "type": "term"
                 },
@@ -32,9 +35,13 @@ class Migration(migrations.Migration):
             }
             se.es.reindex(body=doc)
 
+        if (se.es.indices.exists(index="%s_concepts" % prefix) == False):
             prepare_concepts_index(create=True)
             doc = {
                 "source": {
+                    "remote": {
+                        "host": settings.ELASTICSEARCH_TEMP_HTTP_ENDPOINT
+                    },
                     "index": "%s_strings" % prefix,
                     "type": "concept"
                 },
@@ -45,10 +52,13 @@ class Migration(migrations.Migration):
             }
             se.es.reindex(body=doc)
 
-        if(se.es.indices.exists(index="%s_resource" % prefix)):
+        if(se.es.indices.exists(index="%s_resource" % prefix) == False):
             prepare_search_index(create=True)
             doc = {
                 "source": {
+                    "remote": {
+                        "host": settings.ELASTICSEARCH_TEMP_HTTP_ENDPOINT
+                    },
                     "index": "%s_resource" % prefix
                 },
                 "dest": {
