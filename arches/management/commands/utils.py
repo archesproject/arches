@@ -13,7 +13,7 @@ def get_yn_input(msg="are you sure you want to continue?", default="Y"):
         raise Exception("function must be called with default = 'Y' or 'N'")
 
     if default == "Y":
-        o = raw_input(msg + " [Y/n] ")
+        o = input(msg + " [Y/n] ")
         if o.lower().startswith("y") or o == "":
             ret = True
         else:
@@ -21,7 +21,7 @@ def get_yn_input(msg="are you sure you want to continue?", default="Y"):
             ret = False
 
     if default == "N":
-        o = raw_input(msg + " [y/N] ")
+        o = input(msg + " [y/N] ")
         if o.lower().startswith("n") or o == "":
             print("operation cancelled.")
             ret = False

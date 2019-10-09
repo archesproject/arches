@@ -62,7 +62,7 @@ class Command(BaseCommand):
                 selections = []
                 for index, ontology in enumerate(available_ontologies, start=1):
                     selections.append(('%s. %s (%s)') % (index, ontology.name, ontology.pk))
-                selected_ontology = raw_input(message + '\n'.join(selections)+'\n')
+                selected_ontology = input(message + '\n'.join(selections)+'\n')
                 return available_ontologies[int(selected_ontology)-1]
             else:
                 return None
