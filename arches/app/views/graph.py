@@ -102,7 +102,7 @@ class GraphSettingsView(GraphBaseView):
     def post(self, request, graphid):
         graph = Graph.objects.get(graphid=graphid)
         data = JSONDeserializer().deserialize(request.body)
-        for key, value in data.get('graph').iteritems():
+        for key, value in data.get('graph').items():
             if key in ['iconclass', 'name', 'author', 'description', 'isresource',
                        'ontology_id', 'version',  'subtitle', 'isactive', 'color',
                        'jsonldcontext', 'config', 'template_id']:
@@ -113,7 +113,7 @@ class GraphSettingsView(GraphBaseView):
         try:
             node.datatype = data['graph']['root']['datatype']
         except KeyError as e:
-            print e, 'Cannot find root node datatype'
+            print(e, 'Cannot find root node datatype')
         node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
         node.name = graph.name
         graph.root.name = node.name
@@ -242,7 +242,6 @@ class GraphDesignerView(GraphBaseView):
         context['constraints'] = JSONSerializer().serialize(constraints)
 
         return render(request, 'views/graph-designer.htm', context)
-
 
 
 class GraphDataView(View):
@@ -412,9 +411,9 @@ class GraphDataView(View):
             try:
                 graph = Graph.objects.get(graphid=graphid)
                 if graph.isresource:
+                    graph.delete_instances()
                     graph.isactive = False
                     graph.save(validate=False)
-                    graph.delete_instances()
                 graph.delete()
                 return JSONResponse({'success': True})
             except GraphValidationError as e:
@@ -511,7 +510,6 @@ class CardView(GraphBaseView):
 
 
 class DatatypeTemplateView(TemplateView):
-
     def get(sefl, request, template='text'):
         return render(request, 'views/components/datatypes/%s.htm' % template)
 
@@ -683,3 +681,12 @@ class PermissionDataView(View):
                         # then add the new permissions
                         for perm in data['selectedPermissions']:
                             assign_perm(perm['codename'], identityModel, nodegroup)
+
+
+class IconDataView(View):
+    def get(self, request):
+        icons = models.Icon.objects.order_by('name')
+        data = {
+            'icons': JSONSerializer().serializeToPython(icons)
+        }
+        return JSONResponse(data)

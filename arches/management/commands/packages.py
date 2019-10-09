@@ -8,6 +8,7 @@ import uuid
 import sys
 import urllib
 import os
+import logging
 from arches.app.search.mappings import prepare_terms_index, prepare_concepts_index, prepare_resource_relations_index
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 from arches.management.commands import utils
@@ -24,7 +25,6 @@ from arches.app.utils.data_management.resources.formats.format import Reader as 
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.models.system_settings import settings
 from arches.app.models import models
-from arches.db.install import truncate_db
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resources.remover as resource_remover
@@ -36,6 +36,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand, CommandError
 from django.core import management
 from datetime import datetime
+logger = logging.getLogger(__name__)
+
 '''
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
@@ -89,7 +91,6 @@ class Command(BaseCommand):
                 'save_system_settings',
                 'add_mapbox_layer',
                 'seed_resource_tile_cache',
-                'update_project_templates',
                 'load_package',
                 'create_package',
                 'update_package',
@@ -168,10 +169,6 @@ class Command(BaseCommand):
             help='Rebuild database')
 
         parser.add_argument(
-            '-ex', '--load_ext_from_prj', action='store', dest='load_project_extensions', default=False,
-            help='Load extensions from the project directory')
-
-        parser.add_argument(
             '-bulk', '--bulk_load', action='store_true', dest='bulk_load',
             help='Bulk load values into the database.  By setting this flag the system will bypass any PreSave \
             functions attached to the resource.')
@@ -189,6 +186,9 @@ class Command(BaseCommand):
         parser.add_argument(
             '-y', '--yes', action='store_true', dest='yes',
             help='used to force a yes answer to any user input "continue? y/n" prompt')
+
+        parser.add_argument('--use_multiprocessing', action='store_true',
+                            help='enables multiprocessing during data import')
 
     def handle(self, *args, **options):
         print('operation: ' + options['operation'])
@@ -239,12 +239,15 @@ class Command(BaseCommand):
             self.export_graphs(options['dest_dir'], options['graphs'])
 
         if options['operation'] == 'import_business_data':
+
             self.import_business_data(
                 options['source'],
                 options['config_file'],
                 options['overwrite'],
                 options['bulk_load'],
-                options['create_concepts'])
+                options['create_concepts'],
+                use_multiprocessing=options['use_multiprocessing'],
+                force=options['yes'])
 
         if options['operation'] == 'import_node_value_data':
             self.import_node_value_data(options['source'], options['overwrite'])
@@ -282,17 +285,13 @@ class Command(BaseCommand):
         if options['operation'] == 'create_mapping_file':
             self.create_mapping_file(options['dest_dir'], options['graphs'])
 
-        if options['operation'] == 'update_project_templates':
-            self.update_project_templates()
-
         if options['operation'] in ['load', 'load_package']:
             self.load_package(
                 options['source'],
                 options['setup_db'],
                 options['overwrite'],
                 options['stage'],
-                options['yes'],
-                options['load_project_extensions'])
+                options['yes'])
 
         if options['operation'] in ['create', 'create_package']:
             self.create_package(options['dest_dir'])
@@ -461,8 +460,24 @@ class Command(BaseCommand):
             self.export_package_settings(dest_dir, 'true')
 
     def load_package(
-            self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep', yes=False,
-            load_project_extensions=False):
+            self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep', yes=False):
+
+        def load_ontology():
+            load_default_ontology = True
+            if settings.ONTOLOGY_BASE_NAME != None:
+                if yes is False:
+                    response = raw_input(
+                        'Would you like to load the {0} ontology? (Y/N): '.format(settings.ONTOLOGY_BASE_NAME))
+                    if response.lower() not in ('t', 'true', 'y', 'yes'):
+                        load_default_ontology = False
+            else:
+                load_default_ontology = False
+
+            if load_default_ontology == True:
+                print('loading the {0} ontology'.format(settings.ONTOLOGY_BASE_NAME))
+                extensions = [os.path.join(settings.ONTOLOGY_PATH, x) for x in settings.ONTOLOGY_EXT]
+                management.call_command('load_ontology', source=os.path.join(settings.ONTOLOGY_PATH, settings.ONTOLOGY_BASE),
+                    version=settings.ONTOLOGY_BASE_VERSION, ontology_name=settings.ONTOLOGY_BASE_NAME, id=settings.ONTOLOGY_BASE_ID, extensions=','.join(extensions), verbosity=0)
 
         def load_system_settings(package_dir):
             update_system_settings = True
@@ -536,9 +551,6 @@ class Command(BaseCommand):
                 print(e)
                 print('Could not connect to db')
 
-        def load_datatypes(package_dir):
-            load_extensions(package_dir, 'datatypes', 'datatype')
-
         def load_graphs(package_dir):
             branches = glob.glob(os.path.join(package_dir, 'graphs', 'branches'))[0]
             resource_models = glob.glob(os.path.join(package_dir, 'graphs', 'resource_models'))[0]
@@ -548,28 +560,39 @@ class Command(BaseCommand):
             self.import_graphs(resource_models, overwrite_graphs=overwrite_graphs)
 
         def load_concepts(package_dir, overwrite, stage):
-            concept_data = glob.glob(os.path.join(
-                package_dir, 'reference_data', 'concepts', '*.xml'))
-            collection_data = glob.glob(os.path.join(
-                package_dir, 'reference_data', 'collections', '*.xml'))
+            file_types = ['*.xml', '*.rdf']
+
+            concept_data = []
+            for file_type in file_types:
+                concept_data.extend(glob.glob(os.path.join(
+                    package_dir, 'reference_data', 'concepts', file_type)))
 
             for path in concept_data:
+                print(path)
                 self.import_reference_data(path, overwrite, stage)
 
+            collection_data = []
+            for file_type in file_types:
+                collection_data.extend(glob.glob(os.path.join(
+                    package_dir, 'reference_data', 'collections', file_type)))
+
             for path in collection_data:
+                print(path)
                 self.import_reference_data(path, overwrite, stage)
 
         def load_mapbox_styles(style_paths, basemap):
             for path in style_paths:
                 style = json.load(open(path))
-                meta = {
-                    "icon": "fa fa-globe",
-                    "name": style["name"]
-                }
-                if os.path.exists(os.path.join(os.path.dirname(path), 'meta.json')):
-                    meta = json.load(open(os.path.join(os.path.dirname(path), 'meta.json')))
-
-                self.add_mapbox_layer(meta["name"], path, meta["icon"], basemap)
+                try:
+                    meta = {
+                        "icon": "fa fa-globe",
+                        "name": style["name"]
+                    }
+                    if os.path.exists(os.path.join(os.path.dirname(path), 'meta.json')):
+                        meta = json.load(open(os.path.join(os.path.dirname(path), 'meta.json')))
+                    self.add_mapbox_layer(meta["name"], path, meta["icon"], basemap)
+                except KeyError as e:
+                    logger.warning("The map layer '{}' was not imported: {} is missing.".format(path, e))
 
         def load_tile_server_layers(paths, basemap):
             for path in paths:
@@ -622,6 +645,7 @@ class Command(BaseCommand):
                     business_data.append(os.path.join(package_dir, 'business_data', f))
             else:
                 business_data += glob.glob(os.path.join(package_dir, 'business_data', '*.json'))
+                business_data += glob.glob(os.path.join(package_dir, 'business_data', '*.jsonl'))
                 business_data += glob.glob(os.path.join(package_dir, 'business_data', '*.csv'))
 
             relations = glob.glob(os.path.join(
@@ -657,27 +681,46 @@ class Command(BaseCommand):
                 components = glob.glob(os.path.join(extension, '*.js'))
 
                 if len(templates) == 1:
-                    if os.path.exists(template_dir) is False:
-                        os.mkdir(template_dir)
-                    shutil.copy(templates[0], template_dir)
+                    dest_path = os.path.join(template_dir, os.path.basename(templates[0]))
+                    if os.path.exists(dest_path) is False:
+                        if os.path.exists(template_dir) is False:
+                            os.mkdir(template_dir)
+                        shutil.copy(templates[0], template_dir)
+                    else:
+                        logger.info('Not loading {0} from package. Extension already exists'.format(templates[0]))
+
                 if len(components) == 1:
-                    if os.path.exists(component_dir) is False:
-                        os.mkdir(component_dir)
-                    shutil.copy(components[0], component_dir)
+                    dest_path = os.path.join(component_dir, os.path.basename(components[0]))
+                    if os.path.exists(dest_path) is False:
+                        if os.path.exists(component_dir) is False:
+                            os.mkdir(component_dir)
+                        shutil.copy(components[0], component_dir)
+                    else:
+                        logger.info('Not loading {0} from package. Extension already exists'.format(components[0]))
 
                 modules = glob.glob(os.path.join(extension, '*.json'))
                 modules.extend(glob.glob(os.path.join(extension, '*.py')))
 
                 if len(modules) > 0:
-                    module = modules[0]
-                    shutil.copy(module, module_dir)
-                    management.call_command(cmd, 'register', source=module)
+                    dest_path = os.path.join(module_dir, os.path.basename(modules[0]))
+                    if os.path.exists(dest_path) is False:
+                        module = modules[0]
+                        shutil.copy(module, module_dir)
+                        management.call_command(cmd, 'register', source=module)
+                    else:
+                        logger.info('Not loading {0} from package. Extension already exists'.format(modules[0]))
+
+        def load_datatypes(package_dir):
+            load_extensions(package_dir, 'datatypes', 'datatype')
 
         def load_widgets(package_dir):
             load_extensions(package_dir, 'widgets', 'widget')
 
         def load_card_components(package_dir):
             load_extensions(package_dir, 'card_components', 'card_component')
+
+        def load_search_components(package_dir):
+            load_extensions(package_dir, 'search', 'search')
 
         def load_plugins(package_dir):
             load_extensions(package_dir, 'plugins', 'plugin')
@@ -734,22 +777,23 @@ class Command(BaseCommand):
 
         if setup_db is not False:
             if setup_db.lower() in ('t', 'true', 'y', 'yes'):
-                self.setup_db(settings.PACKAGE_NAME)
+                management.call_command("setup_db", force=True)
 
-        if load_project_extensions is not False:
-            if load_project_extensions.lower() in ('t', 'true', 'y', 'yes'):
-                load_project_extensions = True
-
+        load_ontology()
         print('loading package_settings.py')
         load_package_settings(package_location)
         print('loading preliminary sql')
         load_preliminary_sql(package_location)
         print('loading system settings')
         load_system_settings(package_location)
+        print('loading project extensions from project')
+        management.call_command('project', 'update')
         print('loading widgets')
         load_widgets(package_location)
         print('loading card components')
         load_card_components(package_location)
+        print('loading search components')
+        load_search_components(package_location)
         print('loading plugins')
         load_plugins(package_location)
         print('loading reports')
@@ -759,8 +803,6 @@ class Command(BaseCommand):
         print('loading datatypes')
         load_datatypes(package_location)
         print('loading concepts')
-        if load_project_extensions:
-            management.call_command('project', 'update')
         load_concepts(package_location, overwrite_concepts, stage_concepts)
         print('loading resource models and branches')
         load_graphs(package_location)
@@ -772,11 +814,11 @@ class Command(BaseCommand):
         load_business_data(package_location)
         print('loading resource views')
         load_resource_views(package_location)
-        print('loading package css')
         print('loading apps')
         load_apps(package_location)
         root = settings.APP_ROOT if settings.APP_ROOT is not None else os.path.join(
             settings.ROOT_DIR, 'app')
+        print('loading package css')
         css_source = os.path.join(package_location, 'extensions', 'css')
         if os.path.exists(css_source):
             css_dest = os.path.join(root, 'media', 'css')
@@ -785,21 +827,7 @@ class Command(BaseCommand):
             css_files = glob.glob(os.path.join(css_source, '*.css'))
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
-
-    def update_project_templates(self):
-        """
-        Moves files from the arches project to the arches-templates directory to
-        ensure that they remain in sync. Adds and comments out settings that are
-        whitelisted into the settings_local.py template
-
-        """
-        files = [
-            {'src': 'arches/app/templates/index.htm',
-                'dst': 'arches/install/arches-templates/project_name/templates/index.htm'},
-            {'src': 'package.json',
-                'dst': 'arches/install/arches-templates/project_name/package.json'}]
-        for f in files:
-            shutil.copyfile(f['src'], f['dst'])
+        print('package load complete')
 
     def setup(self, package_name, es_install_location=None):
         """
@@ -849,28 +877,12 @@ class Command(BaseCommand):
 
         """
 
-        db_settings = settings.DATABASES['default']
-        truncate_path = os.path.join(settings.ROOT_DIR, 'db', 'install', 'truncate_db.sql')
-        db_settings['truncate_path'] = truncate_path
+        management.call_command("setup_db", force=True)
 
-        truncate_db.create_sqlfile(db_settings, truncate_path)
-
-        os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
-
-        self.delete_indexes()
-        self.setup_indexes()
-
-        management.call_command('migrate')
-
-        self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'system_settings',
-                                        'Arches_System_Settings_Model.json'), overwrite_graphs=True)
-        self.import_business_data(os.path.join(settings.ROOT_DIR, 'db',
-                                               'system_settings', 'Arches_System_Settings.json'), overwrite=True)
-
-        local_settings_available = os.path.isfile(os.path.join(settings.SYSTEM_SETTINGS_LOCAL_PATH))
-
-        if local_settings_available is True:
-            self.import_business_data(settings.SYSTEM_SETTINGS_LOCAL_PATH, overwrite=True)
+        print("\n"+"~"*80+"\n"
+              "Warning: This command will be deprecated in Arches 4.5. From now on please use\n\n"
+              "    python manage.py setup_db [--force]\n\nThe --force argument will "
+              "suppress the interactive confirmation prompt.\n"+"~"*80)
 
     def setup_indexes(self):
         management.call_command('es', operation='setup_indexes')
@@ -909,7 +921,7 @@ class Command(BaseCommand):
         for mapping in mappings:
             # print('%s -- %s' % (mapping.entitytypeidfrom_id, mapping.entitytypeidto_id))
             if mapping.entitytypeidfrom_id not in resourcetypes:
-                resourcetypes[mapping.entitytypeidfrom_id] = set([mapping.entitytypeidfrom_id])
+                resourcetypes[mapping.entitytypeidfrom_id] = {mapping.entitytypeidfrom_id}
             for step in mapping_steps.filter(pk=mapping.pk):
                 resourcetypes[mapping.entitytypeidfrom_id].add(step.ruleid.entitytyperange_id)
 
@@ -966,11 +978,29 @@ class Command(BaseCommand):
 
     def import_business_data(
         self, data_source, config_file=None, overwrite=None, bulk_load=False,
-            create_concepts=False):
-
+            create_concepts=False, use_multiprocessing=False, force=False):
         """
         Imports business data from all formats. A config file (mapping file) is required for .csv format.
         """
+
+        # messages about experimental multiprocessing and JSONL support.
+        if data_source.endswith(".jsonl"):
+            print("""
+WARNING: Support for loading JSONL files is still experimental. Be aware that
+the format of logging and console messages has not been updated.""")
+            if use_multiprocessing is True:
+                print("""
+WARNING: Support for multiprocessing files is still experimental. While using
+multiprocessing to import resources, you will not be able to use ctrl+c (etc.)
+to cancel the operation. You will need to manually kill all of the processes
+with or just close the terminal. Also, be aware that print statements
+will be very jumbled.""")
+                if not force:
+                    confirm = raw_input("continue? Y/n ")
+                    if len(confirm) > 0 and not confirm.lower().startswith("y"):
+                        exit()
+        if use_multiprocessing is True and not data_source.endswith(".jsonl"):
+            print("Multiprocessing is only supported with JSONL import files.")
 
         if overwrite == '':
             utils.print_message(
@@ -1002,7 +1032,8 @@ class Command(BaseCommand):
                         overwrite=overwrite,
                         bulk=bulk_load,
                         create_concepts=create_concepts,
-                        create_collections=create_collections)
+                        create_collections=create_collections,
+                        use_multiprocessing=use_multiprocessing)
                 else:
                     utils.print_message('No file found at indicated location: {0}'.format(source))
                     sys.exit()
@@ -1079,12 +1110,14 @@ class Command(BaseCommand):
 
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
+                print(os.path.join(path))
                 with open(path, 'rU') as f:
                     archesfile = JSONDeserializer().deserialize(f)
                     ResourceGraphImporter(archesfile['graph'], overwrite_graphs)
             else:
                 file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith('.json')]
                 for file_path in file_paths:
+                    print(os.path.join(path, file_path))
                     with open(os.path.join(path, file_path), 'rU') as f:
                         archesfile = JSONDeserializer().deserialize(f)
                         ResourceGraphImporter(archesfile['graph'], overwrite_graphs)
@@ -1182,11 +1215,16 @@ class Command(BaseCommand):
                     }
                     try:
                         map_source = models.MapSource(name=layer_name, source=source_dict)
-                        map_layer = models.MapLayer(
-                            name=layer_name, layerdefinitions=layer_list, isoverlay=(not is_basemap), icon=layer_icon)
+                        if len(layer_list) > 0:
+                            map_layer = models.MapLayer(
+                                name=layer_name,
+                                layerdefinitions=layer_list,
+                                isoverlay=(not is_basemap),
+                                icon=layer_icon
+                            )
+                            map_layer.save()
+                            tileserver_layer.map_layer = map_layer
                         map_source.save()
-                        map_layer.save()
-                        tileserver_layer.map_layer = map_layer
                         tileserver_layer.map_source = map_source
                         tileserver_layer.save()
                     except IntegrityError as e:
@@ -1200,7 +1238,7 @@ class Command(BaseCommand):
                     for layer in data['layers']:
                         if 'source' in layer:
                             layer['source'] = layer['source'] + '-' + layer_name
-                    for source_name, source_dict in data['sources'].iteritems():
+                    for source_name, source_dict in data['sources'].items():
                         map_source = models.MapSource.objects.get_or_create(
                             name=source_name + '-' + layer_name, source=source_dict)
                     map_layer = models.MapLayer(
@@ -1227,7 +1265,7 @@ class Command(BaseCommand):
                 return
             all_sources = [i.get('source') for i in mapbox_layer.layerdefinitions]
             # remove duplicates and None
-            sources = set([i for i in all_sources if i])
+            sources = {i for i in all_sources if i}
             with transaction.atomic():
                 for source in sources:
                     src = models.MapSource.objects.get(name=source)

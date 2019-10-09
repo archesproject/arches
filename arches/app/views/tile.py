@@ -23,7 +23,7 @@ import traceback
 import uuid
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
-from arches.app.models.resource import Resource
+from arches.app.models.resource import Resource, ModelInactiveError
 from arches.app.models.tile import Tile, TileValidationError
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse
@@ -46,7 +46,7 @@ logger = logging.getLogger(__name__)
 class TileData(View):
     action = 'update_tile'
 
-    def delete_provisional_edit(self, tile, user, reviewer=None):
+    def delete_provisional_edit(self, tile, user, request):
         provisionaledits = None
         if tile.provisionaledits is not None:
             provisionaledits = tile.provisionaledits
@@ -58,7 +58,11 @@ class TileData(View):
                     tile.provisionaledits = None
                 else:
                     tile.provisionaledits = provisionaledits
-                tile.save(provisional_edit_log_details={"user": reviewer, "action": "delete edit", "edit": edit, "provisional_editor": provisional_editor})
+                tile.save(request=request, provisional_edit_log_details={
+                    "user": request.user,
+                    "action": "delete edit",
+                    "edit": edit,
+                    "provisional_editor": provisional_editor})
 
     def handle_save_error(self, e, tile_id='', title=_('Saving tile failed'), message=None):
         title = title
@@ -97,10 +101,16 @@ class TileData(View):
                     resource = Resource()
                     graphid = models.Node.objects.filter(nodegroup=data['nodegroup_id'])[0].graph_id
                     resource.graph_id = graphid
-                    resource.save(user=request.user)
-                    data['resourceinstance_id'] = resource.pk
-                    resource.index()
+                    try:
+                        resource.save(user=request.user)
+                        data['resourceinstance_id'] = resource.pk
+                        resource.index()
+                    except ModelInactiveError as e:
+                        message = _('Unable to save. Please verify the model status is active')
+                        return JSONResponse({'status': 'false', 'message': [_(e.title), _(str(message))]}, status=500)
                 tile_id = data['tileid']
+                resource_instance = models.ResourceInstance.objects.get(pk=data['resourceinstance_id'])
+                is_active = resource_instance.graph.isactive
                 if tile_id is not None and tile_id != '':
                     try:
                         old_tile = Tile.objects.get(pk=tile_id)
@@ -111,7 +121,7 @@ class TileData(View):
 
                 tile = Tile(data)
 
-                if tile.filter_by_perm(request.user, 'write_nodegroup'):
+                if tile.filter_by_perm(request.user, 'write_nodegroup') and is_active is True:
                     try:
                         with transaction.atomic():
                             try:
@@ -125,6 +135,11 @@ class TileData(View):
                                             Resource.objects.get(pk=tile.resourceinstance_id).delete(request.user)
                                         title = _('Unable to save. Please verify your input is valid')
                                         return self.handle_save_error(e, tile_id, title=title)
+                                    except ModelInactiveError as e:
+                                        message = _('Unable to save. Please verify the model status is active')
+                                        return JSONResponse({
+                                            'status': 'false', 'message': [_(e.title), _(str(message))]
+                                            }, status=500)
                                 else:
                                     if accepted_provisional is not None:
                                         provisional_editor = User.objects.get(pk=accepted_provisional_edit["user"])
@@ -134,7 +149,7 @@ class TileData(View):
                                             "edit": accepted_provisional_edit,
                                             "provisional_editor": provisional_editor
                                             }
-                                    tile.save(provisional_edit_log_details=prov_edit_log_details)
+                                    tile.save(request=request, provisional_edit_log_details=prov_edit_log_details)
 
                                 if tile.provisionaledits is not None and str(request.user.id) in tile.provisionaledits:
                                     tile.data = tile.provisionaledits[str(request.user.id)]['value']
@@ -150,6 +165,9 @@ class TileData(View):
                         return self.handle_save_error(e, tile_id)
 
                     return JSONResponse(tile)
+                elif is_active is False:
+                    response = {'status': 'false', 'message': [_('Request Failed'), _('Unable to Save. Verify model status is active')]}
+                    return JSONResponse(response, status=500)
                 else:
                     response = {'status': 'false', 'message': [_('Request Failed'), _('Permission Denied')]}
                     return JSONResponse(response, status=500)
@@ -179,12 +197,12 @@ class TileData(View):
             is_provisional = tile.is_provisional()
 
             if tileid is not None and user is not None:
-                provisionaledits = self.delete_provisional_edit(tile, user, reviewer=request.user)
+                provisionaledits = self.delete_provisional_edit(tile, user, request)
 
             elif tileid is not None and users is not None:
                 users = jsonparser.loads(users)
                 for user in users:
-                    self.delete_provisional_edit(tile, user, reviewer=request.user)
+                    self.delete_provisional_edit(tile, user, request)
 
             if is_provisional == True:
                 return JSONResponse({'result':'delete'})
@@ -198,6 +216,8 @@ class TileData(View):
         if json != None:
             ret = []
             data = JSONDeserializer().deserialize(json)
+            resource_instance = models.ResourceInstance.objects.get(pk=data['resourceinstance_id'])
+            is_active = resource_instance.graph.isactive
 
             with transaction.atomic():
                 try:
@@ -205,12 +225,12 @@ class TileData(View):
                 except ObjectDoesNotExist:
                     return JSONResponse({'status':'false','message': [_('This tile is no longer available'), _('It was likely already deleted by another user')]}, status=500)
                 user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
-                if user_is_reviewer or tile.is_provisional() == True:
+                if (user_is_reviewer or tile.is_provisional() is True) and is_active is True:
                     if tile.filter_by_perm(request.user, 'delete_nodegroup'):
                         nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
                         clean_resource_cache(tile)
-                        if tile.is_provisional() is True and len(tile.provisionaledits.keys()) == 1:
-                            provisional_editor_id = tile.provisionaledits.keys()[0]
+                        if tile.is_provisional() is True and len(list(tile.provisionaledits.keys())) == 1:
+                            provisional_editor_id = list(tile.provisionaledits.keys())[0]
                             edit = tile.provisionaledits[provisional_editor_id]
                             provisional_editor = User.objects.get(pk=provisional_editor_id)
                             reviewer = request.user
@@ -222,6 +242,9 @@ class TileData(View):
                         return JSONResponse(tile)
                     else:
                         return JSONResponse({'status':'false','message': [_('Request Failed'), _('Permission Denied')]}, status=500)
+                elif is_active is False:
+                    response = {'status': 'false', 'message': [_('Request Failed'), _('Unable to delete. Verify model status is active')]}
+                    return JSONResponse(response, status=500)
                 else:
                     return JSONResponse({'status':'false','message': [_('Request Failed'), _('You do not have permissions to delete a tile with authoritative data.')]}, status=500)
 
@@ -255,7 +278,7 @@ class TileData(View):
             cards = models.CardModel.objects.all().values('name', 'nodegroup_id')
             card_lookup = {str(card['nodegroup_id']): card for card in cards}
             resource_model_lookup = {str(graph['graphid']): graph for graph in resource_models}
-            for k, v in summary.iteritems():
+            for k, v in summary.items():
                 if v['lastedittype'] not in ['accept edit', 'delete edit']:
                     if models.TileModel.objects.filter(pk=k).exists():
                         tile = models.TileModel.objects.get(pk=k)

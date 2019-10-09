@@ -188,6 +188,14 @@ def prepare_search_index(create=False):
                             'provisional': {'type': 'boolean'}
                         }
                     },
+                    'ids': {
+                        'type': 'nested',
+                        'properties': {
+                            'id': {'type': 'keyword'},
+                            'nodegroup_id': {'type': 'keyword'},
+                            'provisional': {'type': 'boolean'}
+                        }
+                    },
                     'domains': {
                         'type': 'nested',
                         'properties': {

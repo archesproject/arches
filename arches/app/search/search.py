@@ -97,7 +97,7 @@ class SearchEngine(object):
         """
 
         kwargs = self._add_prefix(**kwargs)
-        print 'deleting index : %s' % kwargs.get('index')
+        print('deleting index : %s' % kwargs.get('index'))
         return self.es.indices.delete(ignore=[400, 404], **kwargs)
 
     def search(self, **kwargs):
@@ -128,11 +128,43 @@ class SearchEngine(object):
 
         return ret
 
+    def create_mapping(self, index, fieldname='', fieldtype='string', fieldindex=None, body=None):
+        """
+        Creates an Elasticsearch body for a single field given an index name and type name
+
+        """
+
+        index = self._add_prefix(index)
+        if not body:
+            if fieldtype == 'geo_shape':
+                body =  {
+                    '_doc' : {
+                        'properties' : {
+                            fieldname : { 'type' : 'geo_shape', 'tree' : 'geohash', 'precision': '1m' }
+                        }
+                    }
+                }
+            else:
+                fn = { 'type' : fieldtype }
+                if fieldindex:
+                    fn['index'] = fieldindex
+                body =  {
+                    '_doc' : {
+                        'properties' : {
+                            fieldname : fn
+                        }
+                    }
+                }
+
+        self.es.indices.create(index=index, ignore=400)
+        self.es.indices.put_mapping(index=index, doc_type='_doc', body=body)
+        print('creating index : %s' % (index))
+
     def create_index(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
         kwargs['include_type_name'] = True
         self.es.indices.create(ignore=400, **kwargs)
-        print 'creating index : %s' % kwargs.get('index', '')
+        print('creating index : %s' % kwargs.get('index', ''))
 
     def index_data(self, index=None, body=None, idfield=None, id=None, **kwargs):
         """

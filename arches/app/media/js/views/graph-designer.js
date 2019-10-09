@@ -285,8 +285,8 @@ define([
                 rootNodeColor: ko.observable(''),
                 "ontology_namespaces": data.ontology_namespaces,
                 onReset: function() {
-                    var graph = ko.mapping.toJS(viewModel.graphSettingsViewModel.graph);
-                    viewModel.report.configJSON(graph.config);
+                    var graph = koMapping.toJS(viewModel.graphSettingsViewModel.graph);
+                    viewModel.report.resetConfigs(graph.config);
                     viewModel.report.get('template_id')(graph["template_id"]);
                 }
             });
@@ -298,10 +298,12 @@ define([
             }));
 
             viewModel.report.configJSON.subscribe(function(config) {
-                var graph = ko.mapping.toJS(viewModel.graphSettingsViewModel.graph);
-                graph.config = config;
-                ko.mapping.fromJS(graph, viewModel.graphSettingsViewModel.graph);
+                var graph = koMapping.toJS(viewModel.graphSettingsViewModel.graph);
+                graph.config = koMapping.toJS(config);
+                koMapping.fromJS(graph, viewModel.graphSettingsViewModel.graph);
             });
+
+            viewModel.report.configJSON.extend({deferred: true});
 
             viewModel.report.get('template_id').subscribe(function(val) {
                 viewModel.graphSettingsViewModel.graph["template_id"](val);

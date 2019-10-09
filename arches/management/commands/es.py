@@ -111,7 +111,7 @@ class Command(BaseCommand):
         except:
             pass
 
-        os.chmod(os.path.join(install_location, file_name_wo_extention, 'bin', 'elasticsearch'), 0755)
+        os.chmod(os.path.join(install_location, file_name_wo_extention, 'bin', 'elasticsearch'), 0o755)
 
         def change_permissions_recursive(path, mode):
             for root, dirs, files in os.walk(path, topdown=True):
@@ -133,7 +133,7 @@ class Command(BaseCommand):
             f.write('\nhttp.cors.allow-origin: "*"')
             f.write('\n')
 
-        print 'Elasticsearch installed at %s' % os.path.join(install_location, file_name_wo_extention)
+        print('Elasticsearch installed at %s' % os.path.join(install_location, file_name_wo_extention))
 
     # def start(self, install_location=None):
     #     """

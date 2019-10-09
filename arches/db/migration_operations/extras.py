@@ -64,7 +64,7 @@ class CreateFunction(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         sql = """
-        CREATE FUNCTION %(name)s(%(arguments)s)
+        CREATE OR REPLACE FUNCTION %(name)s(%(arguments)s)
             RETURNS %(returntype)s
             LANGUAGE %(language)s
             AS $$

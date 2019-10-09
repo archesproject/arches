@@ -13,8 +13,8 @@ define([
 
             var notifyValueChange = function(value){
                 var val = terms().concat(tags());
-                searchbox.select2('data', val)//.trigger('change');
-            }
+                searchbox.select2('data', val); //.trigger('change');
+            };
 
             terms.subscribe(function (value) {
                 notifyValueChange(value);
@@ -44,7 +44,33 @@ define([
                         // .select2-results li:first-child{
                         //     display:none;
                         // }
-                        var results = [{
+                        var results = [];
+                        searchbox.groups = [];
+                        _.each(data, function(value, searchType) {
+                            if (value.length > 0) {
+                                searchbox.groups.unshift(searchType);
+                            }
+                            _.each(value, function(val) {
+                                val.inverted = ko.observable(false);
+                                results.push(val);
+                            }, this);
+                        }, this);
+                        //res = _.groupBy(results, 'type');
+                        var res = [];
+                        res.push({
+                            inverted: ko.observable(false),
+                            type: 'group',
+                            context: '',
+                            context_label: '',
+                            id: '',
+                            text: searchbox.groups,
+                            value: '',
+                            disabled: true
+                        });
+                        _.each(_.groupBy(results, 'type'), function(value, group){
+                            res = res.concat(value);
+                        });
+                        res.unshift({
                             inverted: ko.observable(false),
                             type: 'string',
                             context: '',
@@ -52,13 +78,9 @@ define([
                             id: value,
                             text: value,
                             value: value
-                        }];
-                        $.each(data, function() {
-                            this.inverted = ko.observable(false);
-                            results.push(this);
-                        }, this);
+                        });
                         return {
-                            results: results
+                            results: res
                         };
                     }
                 },
@@ -67,9 +89,32 @@ define([
                 },
                 formatResult: function(result, container, query, escapeMarkup) {
                     var markup = [];
-                    window.Select2.util.markMatch(result.text, query.term, markup, escapeMarkup);
+                    var indent = result.type === 'concept' || result.type === 'term' ? 'term-search-item indent' : (result.type === 'string' ? 'term-search-item' : 'term-search-group');
+                    if (result.type === 'group') {
+                        _.each(result.text, function(searchType, i){
+                            var label = searchType === 'concepts' ? 'Concepts' : 'Term Matches';
+                            var active = i === 0 ? 'active' : '';
+                            markup.push('<button id="' + searchType + 'group" class="btn search-type-btn term-search-btn ' + active + ' ">' + label + '</button>');
+                        })
+                    } else {
+                        window.Select2.util.markMatch(result.text, query.term, markup, escapeMarkup);
+                    }
                     var context = result.context_label != '' ? '<i class="concept_result_schemaname">(' + _.escape(result.context_label) + ')</i>' : '';
-                    var formatedresult = '<span class="concept_result">' + markup.join("") + '</span>' + context;
+                    var formatedresult = '<span class="' + result.type + '"><span class="' + indent + '">' + markup.join("") + '</span>' + context + '</span>';
+                    container[0].className = container[0].className + ' ' + result.type;
+                    $(container).click(function(event){
+                        var btn = event.target.closest('button');
+                        if(!!btn && btn.id === 'termsgroup') {
+                            $(btn).addClass('active').siblings().removeClass('active');
+                            $('.term').show();
+                            $('.concept').hide();
+                        }
+                        if(!!btn && btn.id === 'conceptsgroup') {
+                            $(btn).addClass('active').siblings().removeClass('active');
+                            $('.concept').show();
+                            $('.term').hide();
+                        }
+                    });
                     return formatedresult;
                 },
                 formatSelection: function(result, container) {
@@ -111,6 +156,15 @@ define([
                 selectedTerm.inverted(!selectedTerm.inverted());
 
                 //terms(terms);
+
+            }).on('select2-loaded', function(e, el) {
+                if (searchbox.groups.length > 0) {
+                    if (searchbox.groups[0] === 'concepts'){
+                        $('.term').hide();
+                    } else {
+                        $('.concept').hide();
+                    }
+                }
 
             });
             searchbox.select2('data', ko.unwrap(terms).concat(ko.unwrap(tags))).trigger('change');

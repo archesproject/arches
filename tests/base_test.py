@@ -19,12 +19,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os
 from django.test import TestCase
 from arches.app.models.graph import Graph
+from arches.app.models.models import Ontology
 from arches.app.search.search import SearchEngine
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
+from tests import test_settings
 from django.core import management
 
 # these tests can be run from the command line via
@@ -55,6 +57,14 @@ class ArchesTestCase(TestCase):
             settings.update_from_db()
 
     @classmethod
+    def loadOntology(cls):
+        ontologies_count = Ontology.objects.exclude(ontologyid__isnull=True).count()
+        if ontologies_count == 0:
+            extensions = [os.path.join(test_settings.ONTOLOGY_PATH, x) for x in test_settings.ONTOLOGY_EXT]
+            management.call_command('load_ontology', source=os.path.join(test_settings.ONTOLOGY_PATH, test_settings.ONTOLOGY_BASE),
+                version=test_settings.ONTOLOGY_BASE_VERSION, ontology_name=test_settings.ONTOLOGY_BASE_NAME, id=test_settings.ONTOLOGY_BASE_ID, extensions=','.join(extensions), verbosity=0)
+
+    @classmethod
     def setUpClass(cls):
         pass
 
@@ -69,6 +79,7 @@ class ArchesTestCase(TestCase):
 
     def setUp(self):
         pass
+
 
     def tearDown(self):
         pass

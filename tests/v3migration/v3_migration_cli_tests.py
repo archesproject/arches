@@ -13,7 +13,7 @@ from arches.app.utils.data_management.resource_graphs.importer import import_gra
 from arches.app.utils.data_management.resources.formats.archesfile import ArchesFileReader
 from arches.app.utils.skos import SKOSReader
 from arches.app.utils import v3utils
-from arches.app.utils.v3migration import v3Importer, v3PreparedResource
+from arches.app.utils.v3migration import v3Importer, v3PreparedResource, DataValueConverter
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 
@@ -25,6 +25,7 @@ class v3MigrationTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.loadOntology()
         management.call_command('packages', operation='import_graphs',
                                 source=os.path.join(cls.pkg_fixture, 'graphs', 'resource_models')
                                 )
@@ -91,7 +92,7 @@ class v3MigrationTests(ArchesTestCase):
         num_rms = len(glob(os.path.join(self.pkg, 'graphs', 'resource_models', '*.json')))
         with open(os.path.join(self.pkg, 'v3data', 'rm_configs.json'), "rb") as conf:
             data = json.loads(conf.read())
-            self.assertEqual(num_rms, len(data.keys()))
+            self.assertEqual(num_rms, len(list(data.keys())))
 
     def test_v3migration_003_generate_lookup_files(self):
         """Test the generation of node lookup files."""
@@ -225,13 +226,14 @@ class v3MigrationTests(ArchesTestCase):
         temp_file = os.path.join(self.pkg, 'business_data', 'single_resource.json')
         management.call_command('v3', 'write-v4-json',
                                 target=self.pkg,
-                                truncate=10,
-                                resource_models=all_models
+                                number=10,
+                                resource_models=all_models,
+                                verbose=True
                                 )
 
         # basic test to make sure the v4 file has been created. No tests on
         # the actual data load operations are performed up to this point.
-        v4_bd = os.path.join(self.pkg, 'business_data', 'Historic Resource.json')
+        v4_bd = os.path.join(self.pkg, 'business_data', 'v3sample-Historic Resource.json')
         self.assertTrue(os.path.isfile(v4_bd))
 
         # return early if the migration data should not actually be loaded
@@ -242,25 +244,26 @@ class v3MigrationTests(ArchesTestCase):
         self.load_v4_reference_data()
 
         # initial checks on the database contents
-        self.assertEqual(ResourceInstance.objects.all().count(), 0)
+        ResourceInstance.objects.all().delete()
         self.assertEqual(Tile.objects.all().count(), 0)
 
         # now do a much more granular set of tests on the import process itself
         v3_bd = os.path.join(self.pkg, 'v3data', 'business_data', 'v3sample.json')
         for rm in all_models:
 
-            print "testing import of "+rm
+            print("testing import of "+rm)
             importer = v3Importer(os.path.join(self.pkg, 'v3data'), rm, v3_bd)
 
             # process and import the v3 resources one at a time and
             # test the value and tile counts during this process.
             for res in importer.v3_resources:
 
-                v3_resource = v3PreparedResource(res['entityid'], importer.v4_graph.graphid, res)
+                v3_resource = v3PreparedResource(res, importer.v4_graph.graphid, importer.node_lookup,
+                                                 importer.v3_mergenodes)
                 v3_value_ct = len(v3_resource.node_list)
 
-                v3_resource.process(importer.v4_nodes, importer.node_lookup)
-                v4_json = v3_resource.get_json()
+                v3_resource.process(importer.v4_nodes)
+                v4_json = v3_resource.get_resource_json()
 
                 out_json = {'business_data': {'resources': [v4_json]}}
                 with open(temp_file, 'wb') as openfile:

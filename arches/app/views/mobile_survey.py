@@ -52,7 +52,7 @@ def get_survey_resources(mobile_survey):
     graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
     resources = []
     all_ordered_card_ids = mobile_survey['cards']
-    active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
+    active_graphs = {unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)}
     for i, graph in enumerate(graphs):
         cards = []
         if i == 0 or unicode(graph.graphid) in active_graphs:
@@ -107,7 +107,7 @@ class MobileSurveyManagerView(BaseManagerView):
             try:
                 mobile_survey_id = JSONDeserializer().deserialize(request.body)['id']
             except Exception as e:
-                print e
+                print(e)
 
             try:
                 connection_error = False
@@ -135,7 +135,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
     def get(self, request, surveyid):
 
         def get_history(survey, history):
-            sync_log_records = models.MobileSyncLog.objects.order_by('-finished').values().filter(survey=survey)
+            sync_log_records = list(models.MobileSyncLog.objects.order_by('-finished').values()).filter(survey=survey)
             resourceedits = models.TileRevisionLog.objects.filter(survey=survey).values('resourceid').annotate(Count('tileid', distinct=True))
             if len(sync_log_records) > 0:
                 lastsync = datetime.strftime(sync_log_records[0]['finished'], '%Y-%m-%d %H:%M:%S')
@@ -148,7 +148,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
                     history['editors'][entry['user']]['edits'] += entry['tilesupdated']
                     if entry['finished'] > history['editors'][entry['user']]['lastsync']:
                         history['editors'][entry['user']]['lastsync'] = entry['finished']
-            for id, editor in iter(history['editors'].items()):
+            for id, editor in iter(list(history['editors'].items())):
                 editor['lastsync'] = datetime.strftime(editor['lastsync'], '%Y-%m-%d %H:%M:%S')
             return history
 
@@ -251,7 +251,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         return HttpResponseNotFound()
 
     def update_identities(self, data, mobile_survey, related_identities, identity_type='users', identity_model=User, xmodel=models.MobileSurveyXUser):
-        mobile_survey_identity_ids = set([u.id for u in related_identities])
+        mobile_survey_identity_ids = {u.id for u in related_identities}
         identities_to_remove = mobile_survey_identity_ids - set(data[identity_type])
         identities_to_add = set(data[identity_type]) - mobile_survey_identity_ids
 
@@ -282,7 +282,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         self.update_identities(data, mobile_survey, mobile_survey.users.all(), 'users', User, models.MobileSurveyXUser)
         self.update_identities(data, mobile_survey, mobile_survey.groups.all(), 'groups', Group, models.MobileSurveyXGroup)
 
-        mobile_survey_card_ids = set([unicode(c.cardid) for c in mobile_survey.cards.all()])
+        mobile_survey_card_ids = {unicode(c.cardid) for c in mobile_survey.cards.all()}
         form_card_ids = set(data['cards'])
         cards_to_remove = mobile_survey_card_ids - form_card_ids
         cards_to_add = form_card_ids - mobile_survey_card_ids
@@ -411,7 +411,7 @@ class MobileSurveyResources(View):
         all_ordered_card_ids = []
         proj = MobileSurvey.objects.get(id=surveyid)
         all_ordered_card_ids = proj.get_ordered_cards()
-        active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
+        active_graphs = {unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)}
         for i, graph in enumerate(graphs):
             cards = []
             if unicode(graph.graphid) in active_graphs:

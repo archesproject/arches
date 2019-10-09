@@ -12,29 +12,22 @@ define([
         this.subtitle = '';
         this.description = '';
         this.complete = ko.observable(false);
+        this.autoAdvance = ko.observable(true);
         this.active = ko.computed(function() {
             return config.workflow.activeStep() === this;
         }, this);
 
-        this.parseUrlParams = function(){
-            //parses params in the current url for the current step
-            var urlparams = new window.URLSearchParams(window.location.search);
-            var res = {};
-            urlparams.forEach(function(v, k){res[k] = v;});
-            return res;
+        this.value = function(){
+            return {};
         };
 
-        this.urlParams = this.parseUrlParams();
-
-        this.getForwardUrlParams = ko.pureComputed(function(){
-            return {};
+        Object.keys(config).forEach(function(prop){
+            if(prop !== 'workflow') {
+                config[prop] = koMapping.fromJS(config[prop]);
+            }
         });
 
-        this.getBackwardUrlParams = ko.pureComputed(function(){
-            return {};
-        });
-
-        _.extend(this, koMapping.fromJS(config));
+        _.extend(this, config);
 
         this.iconClass = ko.computed(function(){
             var ret = '';

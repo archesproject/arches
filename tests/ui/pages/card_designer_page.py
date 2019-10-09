@@ -1,4 +1,4 @@
-from base_widget_page import BaseWidgetPage
+from .base_widget_page import BaseWidgetPage
 
 class CardDesignerPage(BaseWidgetPage):
     """

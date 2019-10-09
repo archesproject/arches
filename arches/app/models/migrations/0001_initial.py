@@ -28,7 +28,7 @@ def forwards_func(apps, schema_editor):
 
     extensions = [os.path.join(settings.ONTOLOGY_PATH, x) for x in settings.ONTOLOGY_EXT]
     management.call_command('load_ontology', source=os.path.join(settings.ONTOLOGY_PATH, settings.ONTOLOGY_BASE),
-        version=settings.ONTOLOGY_BASE_VERSION, ontology_name=settings.ONTOLOGY_BASE_NAME, id=settings.ONTOLOGY_BASE_ID, extensions=','.join(extensions), verbosity=0)
+        version=settings.ONTOLOGY_BASE_VERSION, ontology_name=settings.ONTOLOGY_BASE_NAME, id='e6e8db47-2ccf-11e6-927e-b8f6b115d7dd', extensions=','.join(extensions), verbosity=0)
 
 def reverse_func(apps, schema_editor):
     Ontology = apps.get_model("models", "Ontology")
@@ -771,23 +771,23 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='edge',
-            unique_together=set([('rangenode', 'domainnode')]),
+            unique_together={('rangenode', 'domainnode')},
         ),
         migrations.AlterUniqueTogether(
             name='cardxnodexwidget',
-            unique_together=set([('node', 'card', 'widget')]),
+            unique_together={('node', 'card', 'widget')},
         ),
         migrations.AlterUniqueTogether(
             name='ontologyclass',
-            unique_together=set([('source', 'ontology')]),
+            unique_together={('source', 'ontology')},
         ),
         migrations.AlterUniqueTogether(
             name='relation',
-            unique_together=set([('conceptfrom', 'conceptto', 'relationtype')]),
+            unique_together={('conceptfrom', 'conceptto', 'relationtype')},
         ),
         migrations.AlterUniqueTogether(
             name='functionxgraph',
-            unique_together=set([('function', 'graph')]),
+            unique_together={('function', 'graph')},
         ),
 
         CreateAutoPopulateUUIDField('graphs', ['graphid']),

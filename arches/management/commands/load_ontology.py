@@ -27,9 +27,9 @@ from django.db import transaction
 from arches.app.models import models
 
 from arches.app.models.system_settings import settings
-# from rdflib import *  
+# from rdflib import *
 from rdflib import Graph, RDF, RDFS
-from rdflib.resource import Resource   
+from rdflib.resource import Resource
 from rdflib.namespace import Namespace, NamespaceManager
 
 class Command(BaseCommand):
@@ -61,12 +61,12 @@ class Command(BaseCommand):
             if len(available_ontologies) > 0:
                 selections = []
                 for index, ontology in enumerate(available_ontologies, start=1):
-                    selections.append(('%s. %s (%s)') % (index, ontology.name, ontology.pk))    
+                    selections.append(('%s. %s (%s)') % (index, ontology.name, ontology.pk))
                 selected_ontology = raw_input(message + '\n'.join(selections)+'\n')
                 return available_ontologies[int(selected_ontology)-1]
             else:
                 return None
-            
+
         if options['reload']:
             ontology = None
             if options['source'] is not None:
@@ -74,38 +74,41 @@ class Command(BaseCommand):
                 ontology = models.Ontology.objects.get(parentontology=None, path=path)
             else:
                 ontology = choose_ontology(_('Select the number corresponding to the\nbase ontology which you want to reload.\n'))
-            
+
             if ontology:
                 self.run_loader(data_source=ontology.path.path, name=ontology.name, version=ontology.version, id=ontology.pk, extensions=None, verbosity=options['verbosity'])
             return
 
         if options['version'] is None:
-            print _('You must supply a version number using the -vn/--version argument.')
-            return 
+            print(_('You must supply a version number using the -vn/--version argument.'))
+            return
 
         if options['source'] is not None:
             self.run_loader(data_source=options['source'], name=options['ontology_name'], version=options['version'], id=options['id'], extensions=options['extensions'], verbosity=options['verbosity'])
             return
 
         if options['extensions'] is not None:
-            ontology = choose_ontology(_('Select the number corresponding to the\nbase ontology to which you want to add the extension.\n'))
-            if ontology:
-                for extension in options['extensions'].split(','):
-                    path_to_check = self.get_relative_path(extension)
-                    try:
-                        proposed_path = models.Ontology.objects.get(path=path_to_check).path.path
-                        print ''
-                        print _('It looks like an ontology file has already been loaded with the same name.')
-                        print _('The file currently loaded is located here:')
-                        print '   %s' % proposed_path
-                        print _('If you would simply like to reload the current ontology, you can run this command with the dash r (-r) flag')
-                        print 'eg:    python manage.py load_ontology -r\n'
-                        return
-                    except:
-                        pass
-                self.run_loader(data_source=ontology.path.path, version=options['version'], id=ontology.pk, extensions=options['extensions'], verbosity=options['verbosity'])
+            if os.path.isfile(options['extensions']):
+                ontology = choose_ontology(_('Select the number corresponding to the\nbase ontology to which you want to add the extension.\n'))
+                if ontology:
+                    for extension in options['extensions'].split(','):
+                        path_to_check = self.get_relative_path(extension)
+                        try:
+                            proposed_path = models.Ontology.objects.get(path=path_to_check).path.path
+                            print('')
+                            print(_('It looks like an ontology file has already been loaded with the same name.'))
+                            print(_('The file currently loaded is located here:'))
+                            print('   %s' % proposed_path)
+                            print(_('If you would simply like to reload the current ontology, you can run this command with the dash r (-r) flag'))
+                            print('eg:    python manage.py load_ontology -r\n')
+                            return
+                        except:
+                            pass
+                    self.run_loader(data_source=ontology.path.path, version=options['version'], id=ontology.pk, extensions=options['extensions'], verbosity=options['verbosity'])
+                else:
+                    print(_('You must first define a base ontology (using -s) before loading an extension using the (-x) argument'))
             else:
-                print _('You must first define a base ontology (using -s) before loading an extension using the (-x) argument')
+                print('The File "%s" Not Found' % options['extensions'])
             return
 
     def run_loader(self, data_source=None, version=None, name=None, id=None, extensions=None, verbosity=1):
@@ -120,14 +123,14 @@ class Command(BaseCommand):
         """
 
         if verbosity > 0:
-            print ''
-            print 'Loading Source Ontology: "%s"' % data_source
+            print('')
+            print('Loading Source Ontology: "%s"' % data_source)
 
         if data_source is not None and version is not None:
             self.graph = Graph()
             self.namespace_manager = NamespaceManager(self.graph)
             self.subclass_cache = {}
-            
+
             with transaction.atomic():
                 ontology = self.add_ontology(id=id, data_source=data_source, version=version, name=name)
                 loaded_extensions = [extension.path.path for extension in models.Ontology.objects.filter(parentontology=ontology)]
@@ -139,7 +142,7 @@ class Command(BaseCommand):
 
                 for extension in set(extensions):
                     if verbosity > 0:
-                        print 'Loading Extension: "%s"' % extension
+                        print('Loading Extension: "%s"' % extension)
                     if os.path.isfile(extension):
                         self.add_ontology(data_source=extension, version=version, name=name, parentontology=ontology)
                     else:
@@ -147,9 +150,9 @@ class Command(BaseCommand):
                         models.Ontology.objects.filter(path=self.get_relative_path(extension)).delete()
 
                 models.OntologyClass.objects.filter(ontology=ontology).delete()
-                for ontology_class, data in self.crawl_graph().iteritems():
+                for ontology_class, data in self.crawl_graph().items():
                     models.OntologyClass.objects.update_or_create(source=ontology_class, ontology=ontology, defaults={'target': data})
-                
+
     def add_ontology(self, id=None, data_source=None, version=None, name=None, parentontology=None):
         self.graph.parse(data_source)
 
@@ -159,7 +162,7 @@ class Command(BaseCommand):
             name = os.path.splitext(filename)[0]
 
         if models.get_ontology_storage_system().location in filepath:
-            # if the file we're referencing already exists in the location where we 
+            # if the file we're referencing already exists in the location where we
             # usually store them then leave it there and just save a reference to it
             path = self.get_relative_path(data_source)
         else:
@@ -220,5 +223,5 @@ class Command(BaseCommand):
             try:
                 ret = data_source.path
             except:
-                pass 
+                pass
         return ret

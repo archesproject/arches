@@ -22,6 +22,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseNotFound
 from django.http import HttpResponse
 from django.http import Http404
+from django.http import HttpResponseBadRequest, JsonResponse
+from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -32,7 +34,7 @@ from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
-from arches.app.models.resource import Resource
+from arches.app.models.resource import Resource, ModelInactiveError
 from arches.app.models.system_settings import settings
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.decorators import can_edit_resource_instance
@@ -44,7 +46,11 @@ from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from elasticsearch import Elasticsearch
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
@@ -139,7 +145,7 @@ class NewResourceEditorView(MapBaseManagerView):
                 append_tile = True
                 isfullyprovisional = False
                 if tile.provisionaledits is not None:
-                    if len(tile.provisionaledits.keys()) > 0:
+                    if len(list(tile.provisionaledits.keys())) > 0:
                         if len(tile.data) == 0:
                             isfullyprovisional = True
                         if user_is_reviewer is False:
@@ -222,7 +228,11 @@ class NewResourceEditorView(MapBaseManagerView):
     def delete(self, request, resourceid=None):
         if resourceid is not None:
             ret = Resource.objects.get(pk=resourceid)
-            deleted = ret.delete(user=request.user)
+            try:
+                deleted = ret.delete(user=request.user)
+            except ModelInactiveError as e:
+                message = _('Unable to delete. Please verify the model status is active')
+                return JSONResponse({'status': 'false', 'message': [_(e.title), _(str(message))]}, status=500)
             if deleted is True:
                 return JSONResponse(ret)
             else:
@@ -255,11 +265,6 @@ class ResourceEditorView(MapBaseManagerView):
             resource_instance.graph_id = graphid
 
         if resourceid is not None:
-
-            if request.is_ajax() and request.GET.get('search') == 'true':
-                html = render_to_string('views/search/search-base-manager.htm', {}, request)
-                return HttpResponse(html)
-
             resource_graphs = models.GraphModel.objects.exclude(
                 pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
             graph = Graph.objects.get(graphid=graphid)
@@ -272,7 +277,7 @@ class ResourceEditorView(MapBaseManagerView):
             geocoding_providers = models.Geocoder.objects.all()
             required_widgets = []
 
-            widget_datatypes = [v.datatype for k, v in graph.nodes.iteritems()]
+            widget_datatypes = [v.datatype for k, v in graph.nodes.items()]
             widgets = widgets.filter(datatype__in=widget_datatypes)
 
             if resource_instance_exists == True:
@@ -350,7 +355,7 @@ class ResourceEditLogView(BaseManagerView):
 
     def getEditConceptValue(self, values):
         if values != None:
-            for k, v in values.iteritems():
+            for k, v in values.items():
                 try:
                     uuid.UUID(v)
                     v = models.Value.objects.get(pk=v).value
@@ -371,7 +376,7 @@ class ResourceEditLogView(BaseManagerView):
         if resourceid is None:
             recent_edits = models.EditLog.objects.all().exclude(
                 resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).order_by('-timestamp')[:100]
-            edited_ids = list(set([edit.resourceinstanceid for edit in recent_edits]))
+            edited_ids = list({edit.resourceinstanceid for edit in recent_edits})
             resources = Resource.objects.filter(resourceinstanceid__in=edited_ids)
             edit_type_lookup = {
                 'create': _('Resource Created'),
@@ -449,6 +454,82 @@ class ResourceEditLogView(BaseManagerView):
 
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
+class ResourceActivityStreamPageView(BaseManagerView):
+
+    def get(self, request, page=None):
+        current_page = 1
+        page_size = 100
+        if hasattr(settings, "ACTIVITY_STREAM_PAGE_SIZE"):
+            page_size = int(setting.ACTIVITY_STREAM_PAGE_SIZE)
+        st = 0
+        end = 100
+        if page is not None:
+            try:
+                current_page = int(page)
+                if current_page <= 0:
+                    current_page = 1
+                st = (current_page-1) * page_size
+                end = current_page * page_size
+            except (ValueError, TypeError) as e:
+                return HttpResponseBadRequest()
+
+        totalItems = models.EditLog.objects.all().exclude(
+                resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).count()
+
+        edits = models.EditLog.objects.all().exclude(
+                resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).order_by('timestamp')[st:end]
+
+        # setting last to be same as first, changing later if there are more pages
+        uris = {"root": request.build_absolute_uri(reverse("as_stream_collection")),
+                "this": request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': current_page})),
+                "first": request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': 1})),
+                "last": request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': 1})),
+                }
+
+        if current_page > 1:
+            uris["prev"] = request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': current_page-1}))
+        if end < totalItems:
+            uris["next"] = request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': current_page+1}))
+        if totalItems > page_size:
+            uris["last"] = request.build_absolute_uri(reverse("as_stream_page",
+                                                              kwargs={'page': int(totalItems/page_size)+1})),
+
+        collection = ActivityStreamCollection(uris, totalItems,
+                                              base_uri_for_arches=request.build_absolute_uri("/").rsplit("/", 1)[0])
+
+        collection_page = collection.generate_page(uris, edits)
+        collection_page.startIndex((current_page-1)*page_size)
+
+        return JsonResponse(collection_page.to_obj())
+
+
+@method_decorator(can_edit_resource_instance(), name='dispatch')
+class ResourceActivityStreamCollectionView(BaseManagerView):
+
+    def get(self, request):
+        page_size = 100
+        if hasattr(settings, "ACTIVITY_STREAM_PAGE_SIZE"):
+            page_size = int(setting.ACTIVITY_STREAM_PAGE_SIZE)
+
+        totalItems = models.EditLog.objects.all().exclude(
+                resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).count()
+
+        uris = {"root": request.build_absolute_uri(reverse("as_stream_collection")),
+                "first": request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': 1})),
+                "last": request.build_absolute_uri(reverse("as_stream_page", kwargs={'page': 1})),
+                }
+
+        if totalItems > page_size:
+            uris["last"] = request.build_absolute_uri(reverse("as_stream_page",
+                                                              kwargs={'page': int(totalItems/page_size)+1}))
+
+        collection = ActivityStreamCollection(uris, totalItems,
+                                              base_uri_for_arches=request.build_absolute_uri("/").rsplit("/", 1))
+
+        return JsonResponse(collection.to_obj())
+
+
+@method_decorator(can_edit_resource_instance(), name='dispatch')
 class ResourceData(View):
 
     def get(self, request, resourceid=None, formid=None):
@@ -505,18 +586,21 @@ class ResourceCards(View):
 class ResourceDescriptors(View):
 
     def get(self, request, resourceid=None):
-        if resourceid is not None:
-            se = SearchEngineFactory().create()
-            document = se.search(index='resources', id=resourceid)
-            resource = Resource.objects.get(pk=resourceid)
-            return JSONResponse({
-                'graphid': document['_source']['graph_id'],
-                'graph_name': resource.graph.name,
-                'displaydescription': document['_source']['displaydescription'],
-                'map_popup': document['_source']['map_popup'],
-                'displayname': document['_source']['displayname'],
-                'geometries': document['_source']['geometries'],
-            })
+        if Resource.objects.filter(pk=resourceid).exists():
+            try:
+                resource = Resource.objects.get(pk=resourceid)
+                se = SearchEngineFactory().create()
+                document = se.search(index='resources', id=resourceid)
+                return JSONResponse({
+                    'graphid': document['_source']['graph_id'],
+                    'graph_name': resource.graph.name,
+                    'displaydescription': document['_source']['displaydescription'],
+                    'map_popup': document['_source']['map_popup'],
+                    'displayname': document['_source']['displayname'],
+                    'geometries': document['_source']['geometries'],
+                })
+            except Exception as e:
+                logger.exception(_('Failed to fetch resource instance descriptors'))
 
         return HttpResponseNotFound()
 
@@ -666,7 +750,7 @@ class RelatedResourcesView(BaseManagerView):
         if self.action == 'get_relatable_resources':
             graphid = request.GET.get('graphid', None)
             nodes = models.Node.objects.filter(graph=graphid).exclude(istopnode=False)[0].get_relatable_resources()
-            ret = set([str(node.graph_id) for node in nodes])
+            ret = {str(node.graph_id) for node in nodes}
             return JSONResponse(ret)
 
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
@@ -694,7 +778,7 @@ class RelatedResourcesView(BaseManagerView):
             try:
                 ret = models.ResourceXResource.objects.get(pk=resourcexid).delete()
             except:
-                print 'resource relation does not exist'
+                print('resource relation does not exist')
         start = request.GET.get('start', 0)
         se.es.indices.refresh(index=se._add_prefix("resource_relations"))
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
@@ -754,9 +838,13 @@ class RelatedResourcesView(BaseManagerView):
                     datestarted=datefrom,
                     dateended=dateto
                 )
-                rr.save()
+                try:
+                    rr.save()
+                except ModelInactiveError as e:
+                    message = _('Unable to save. Please verify the model status is active')
+                    return JSONResponse({'status': 'false', 'message': [_(e.title), _(str(message))]}, status=500)
             else:
-                print 'relationship not permitted'
+                print('relationship not permitted')
 
         for relationshipid in relationships_to_update:
             rr = models.ResourceXResource.objects.get(pk=relationshipid)
@@ -764,7 +852,11 @@ class RelatedResourcesView(BaseManagerView):
             rr.relationshiptype = relationship_type
             rr.datestarted = datefrom
             rr.dateended = dateto
-            rr.save()
+            try:
+                rr.save()
+            except ModelInactiveError as e:
+                message = _('Unable to save. Please verify the model status is active')
+                return JSONResponse({'status': 'false', 'message': [_(e.title), _(str(message))]}, status=500)
 
         start = request.GET.get('start', 0)
         se.es.indices.refresh(index=se._add_prefix("resource_relations"))

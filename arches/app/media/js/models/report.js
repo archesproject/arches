@@ -17,6 +17,7 @@ define(['arches',
 
         initialize: function(options) {
             var self = this;
+            this.templateId = ko.observable(self.get('graph').template_id);
             this.cards = options.cards || [];
             this.preview = options.preview;
             this.userisreviewer = options.userisreviewer;
@@ -27,29 +28,32 @@ define(['arches',
 
             this._data = ko.observable('{}');
 
-            this.dirty = ko.computed(function() {
-                return JSON.stringify(_.extend(JSON.parse(self._data()), self.toJSON())) !== self._data();
+            this.configJSON = ko.observable({});
+            this.configState = {};
+            this.configKeys.subscribe(function(val){
+                var config;
+                self.defaultConfig = JSON.parse(reportLookup[self.templateId()].defaultconfig);
+                if (val.length) {
+                    self.configState = {};
+                    config = self.get('config');
+                    _.each(val, function(key) {
+                        if (self.defaultConfig.hasOwnProperty(key)) {
+                            self.configState[key] = ko.unwrap(config[key]);
+                        }
+                    });
+                    self.configState = koMapping.fromJS(self.configState);
+                }
             });
 
-            this.configJSON = ko.computed({
-                read: function() {
-                    var configJSON = {};
-                    var config = this.get('config');
-                    _.each(this.configKeys(), function(key) {
-                        configJSON[key] = ko.unwrap(config[key]);
-                    });
-                    return configJSON;
-                },
-                write: function(value) {
-                    var config = this.get('config');
-                    for (var key in value) {
-                        if (config[key] && config[key]() !== value[key]) {
-                            config[key](value[key]);
+            this.resetConfigs = function(previousConfigs) {
+                this.configKeys().forEach(function(key){
+                    if (self.defaultConfig.hasOwnProperty(key)) {
+                        if (JSON.stringify(self.configState[key]()) !== JSON.stringify(previousConfigs[key])) {
+                            koMapping.fromJS(previousConfigs, self.configState);
                         }
                     }
-                },
-                owner: this
-            });
+                });
+            };
 
             this.graph = options.graph;
             this.parse(options.graph);
@@ -71,13 +75,14 @@ define(['arches',
                     this.get('graphid')(value);
                     break;
                 case 'template_id':
-                    var templateId = ko.observable(value);
+                    self.templateId(value);
                     this.set(key, ko.computed({
                         read: function() {
-                            return templateId();
+                            return self.templateId();
                         },
                         write: function(value) {
                             var key;
+                            var configKeys = [];
                             var defaultConfig = JSON.parse(reportLookup[value].defaultconfig);
                             for (key in defaultConfig) {
                                 defaultConfig[key] = ko.observable(defaultConfig[key]);
@@ -85,9 +90,12 @@ define(['arches',
                             var currentConfig = this.get('config');
                             this.set('config', _.defaults(currentConfig, defaultConfig));
                             for (key in defaultConfig) {
-                                self.configKeys.push(key);
+                                if (_.contains(self.configKeys(), key) === false) {
+                                    configKeys.push(key);
+                                }
                             }
-                            templateId(value);
+                            self.templateId(value);
+                            self.configKeys(self.configKeys().concat(configKeys));
                         },
                         owner: this
                     }));
@@ -97,9 +105,6 @@ define(['arches',
                     var configKeys = [];
                     self.configKeys.removeAll();
                     _.each(value, function(configVal, configKey) {
-                        if (!ko.isObservable(configVal)) {
-                            configVal = ko.observable(configVal);
-                        }
                         config[configKey] = configVal;
                         configKeys.push(configKey);
                     });

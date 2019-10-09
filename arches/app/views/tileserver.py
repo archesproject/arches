@@ -55,13 +55,13 @@ def handle_request(request):
 
         response.content = content
         response.status_code = status_code
-        for header, value in headers.items():
+        for header, value in list(headers.items()):
             response[header] = value
 
         response['Content-length'] = str(len(content))
 
     except Exception as e:
-        print 'No tile data', e, response
+        print('No tile data', e, response)
 
     return response
 
@@ -101,7 +101,7 @@ def clean_resource_cache(tile):
         if datatype.should_cache(node) and datatype.should_manage_cache(node):
             bounds = datatype.get_bounds(tile, node)
             if bounds is not None:
-                zooms = range(20)
+                zooms = list(range(20))
                 config = TileStache.parseConfig(
                     get_tileserver_config(node.nodeid))
                 layer = config.layers[str(node.nodeid)]
@@ -127,7 +127,7 @@ def clean_resource_cache(tile):
 
 def seed_resource_cache():
     datatype_factory = DataTypeFactory()
-    zooms = range(settings.CACHE_SEED_MAX_ZOOM + 1)
+    zooms = list(range(settings.CACHE_SEED_MAX_ZOOM + 1))
     extension = 'pbf'
     try:
         lat1, lon1, lat2, lon2 = settings.CACHE_SEED_BOUNDS
@@ -168,7 +168,7 @@ def seed_resource_cache():
                 rendered = False
 
                 while not rendered:
-                    print '%(offset)d of %(total)d...' % progress,
+                    print('%(offset)d of %(total)d...' % progress)
 
                     try:
                         mimetype, content = TileStache.getTile(
@@ -176,14 +176,14 @@ def seed_resource_cache():
 
                     except:
                         attempts -= 1
-                        print 'Failed %s, will try %s more.' % (progress['tile'], ['no', 'once', 'twice'][attempts])
+                        print('Failed %s, will try %s more.' % (progress['tile'], ['no', 'once', 'twice'][attempts]))
 
                         if attempts == 0:
-                            print 'Failed %(zoom)d/%(column)d/%(row)d, trying next tile.\n' % coord.__dict__
+                            print('Failed %(zoom)d/%(column)d/%(row)d, trying next tile.\n' % coord.__dict__)
                             break
 
                     else:
                         rendered = True
                         progress['size'] = '%dKB' % (len(content) / 1024)
 
-                        print '%(tile)s (%(size)s)' % progress
+                        print('%(tile)s (%(size)s)' % progress)

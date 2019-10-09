@@ -72,7 +72,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     card: card,
                                     tile: null,
                                     loading: self.loading,
-                                    form: self
+                                    form: self,
+                                    pageVm: $root
                                 }
                             } --> <!-- /ko -->
                         </ul>
@@ -112,8 +113,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
             <!--ko if: selection() === 'related-resources' -->
-            <div data-bind="with: relatedResourcesManager">
-                {% include 'views/resource/related-resources/related-resources-manager.htm' %}
+            <div>
+                 <div data-bind="component: {
+                    name: 'related-resources-manager',
+                    params: relatedResourcesManagerObj
+                }"></div>
             </div>
             <!--/ko -->
 
@@ -132,7 +136,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Image -->
                     <div class="img-lg img-circle rr-splash-img-container">
-                        <img class="rr-splash-img" src="../media/img/inspection.png" alt="Resource Editor">
+                        <img class="rr-splash-img" src="{% static "/img/inspection.png" %}" alt="Resource Editor">
                     </div>
 
                     <!-- Splash Title -->
@@ -234,7 +238,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class='msm-locked-warning'>{% trans 'You do not have permission to edit this card.' %}</div>
             <!-- /ko -->
 
-            <div data-bind="component: {
+            <div class="card-component-wrapper-editor" data-bind="component: {
                 name: cardComponentLookup[selectedCard().model.component_id()].componentname,
                 params: {
                     card: selectedCard(),
@@ -242,7 +246,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     provisionalTileViewModel: provisionalTileViewModel,
                     reviewer: reviewer,
                     loading: loading,
-                    form: $data
+                    form: $data,
+                    pageVm: $root
+
                 }
             }"></div>
             <!-- /ko -->

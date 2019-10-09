@@ -11,7 +11,8 @@ from arches.app.utils.date_utils import ExtendedDateFormat
 from django.core.exceptions import ObjectDoesNotExist
 
 # for the RDF graph export helper functions
-from rdflib import Namespace, URIRef, Literal, Graph, BNode
+from rdflib import Namespace, URIRef, Literal, BNode
+from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS, SKOS
 from arches.app.models.concept import ConceptValue
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
@@ -103,10 +104,11 @@ class ConceptDataType(BaseConceptDataType):
         return get_preflabel_from_valueid(nodevalue, lang)['value']
 
     def get_display_value(self, tile, node):
-        if tile.data[str(node.nodeid)] is None or tile.data[str(node.nodeid)].strip() == '':
+        data = self.get_tile_data(tile)
+        if data[str(node.nodeid)] is None or data[str(node.nodeid)].strip() == '':
             return ''
         else:
-            return self.get_value(uuid.UUID(tile.data[str(node.nodeid)])).value
+            return self.get_value(uuid.UUID(data[str(node.nodeid)])).value
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -118,7 +120,7 @@ class ConceptDataType(BaseConceptDataType):
                 else:
                     query.must(match_query)
 
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def to_rdf(self, edge_info, edge):
@@ -270,8 +272,9 @@ class ConceptListDataType(BaseConceptDataType):
 
     def get_display_value(self, tile, node):
         new_values = []
-        if tile.data[str(node.nodeid)]:
-            for val in tile.data[str(node.nodeid)]:
+        data = self.get_tile_data(tile)
+        if data[str(node.nodeid)]:
+            for val in data[str(node.nodeid)]:
                 new_val = self.get_value(uuid.UUID(val))
                 new_values.append(new_val.value)
         return ','.join(new_values)
@@ -286,7 +289,7 @@ class ConceptListDataType(BaseConceptDataType):
                 else:
                     query.must(match_query)
 
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def to_rdf(self, edge_info, edge):

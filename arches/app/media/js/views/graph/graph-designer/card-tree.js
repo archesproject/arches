@@ -132,6 +132,7 @@ define([
                 return true;
             },
             loading: loading,
+            showIds: ko.observable(false),
             cachedFlatTree: cachedFlatTree,
             widgetLookup: createLookup(data.widgets, 'widgetid'),
             cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
@@ -142,6 +143,9 @@ define([
             graph: params.graph,
             graphModel: params.graphModel,
             appliedFunctions: params.appliedFunctions(),
+            toggleIds: function() {
+                self.showIds(!self.showIds());
+            },
             expandAll: function() {
                 toggleAll(true);
             },
@@ -159,40 +163,6 @@ define([
             on: function() {
                 return;
             },
-            topCards: ko.observableArray(_.filter(data.cards, function(card) {
-                var nodegroup = _.find(ko.unwrap(params.graphModel.get('nodegroups')), function(group) {
-                    return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
-                });
-                return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
-            }).map(function(card) {
-                var constraints =  data.constraints.filter(function(ct){return ct.card_id === card.cardid;});
-                if (constraints.length === 0) {
-                    constraints = getBlankConstraint(card);
-                }
-                return new CardViewModel({
-                    card: card,
-                    appliedFunctions: params.appliedFunctions(),
-                    graphModel: params.graphModel,
-                    tile: null,
-                    resourceId: ko.observable(),
-                    displayname: ko.observable(),
-                    handlers: {},
-                    cards: data.cards,
-                    constraints: constraints,
-                    tiles: [],
-                    selection: selection,
-                    hover: hover,
-                    scrollTo: scrollTo,
-                    multiselect: self.multiselect,
-                    loading: loading,
-                    filter: filter,
-                    provisionalTileViewModel: null,
-                    cardwidgets: data.cardwidgets,
-                    userisreviewer: true,
-                    perms: ko.observableArray(),
-                    permsLiteral: ko.observableArray()
-                });
-            })),
             beforeMove: function(e) {
                 e.cancelDrop = (e.sourceParent!==e.targetParent);
             },
@@ -213,6 +183,9 @@ define([
             },
             updateNode: function(parents, node) {
                 var updatedCards = [];
+                if (_.contains(_.keys(self.nodeLookup), node.nodeid) === false) {
+                    self.nodeLookup[node.nodeid] = node;
+                }
                 _.each(ko.unwrap(parents), function(parent) {
                     if (parent.nodegroupid === node.nodegroup_id) {
                         var attributes = parent.model.attributes;
@@ -376,23 +349,67 @@ define([
             isFuncNode: function() {
                 var appFuncs = null, appFuncDesc = false, appFuncName = false, nodegroupId = null;
                 if(params.card && this.appliedFunctions()) {
+                    // console.log(ko.unwrap(params));
                     appFuncs = this.appliedFunctions();
                     nodegroupId = params.card.nodegroup_id;
                     for(var i = 0; i < appFuncs.length; i++) {
-                        if(appFuncs[i]['config']['description']['nodegroup_id']) {
-                            appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
-                        }
-                        if(appFuncs[i]['config']['name']['nodegroup_id']) {
-                            appFuncName = appFuncs[i]['config']['name']['nodegroup_id'];
-                        }
-                        if(nodegroupId === appFuncDesc || nodegroupId === appFuncName) {
-                            return true;
+                        if(appFuncs[i]['function_id'] == "60000000-0000-0000-0000-000000000001") {
+                            if(appFuncs[i]['config']['description']['nodegroup_id']) {
+                                appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
+                            }
+                            if(appFuncs[i]['config']['name']['nodegroup_id']) {
+                                appFuncName = appFuncs[i]['config']['name']['nodegroup_id'];
+                            }
+                            if(nodegroupId === appFuncDesc || nodegroupId === appFuncName) {
+                                return true;
+                            }
                         }
                     }
                 }
                 return false;
             }
         });
+
+        this.topCards = ko.observableArray();
+
+        var tc = _.filter(data.cards, function(card) {
+            var nodegroup = _.find(ko.unwrap(params.graphModel.get('nodegroups')), function(group) {
+                return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
+            });
+            return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
+        });
+        this.topCards(tc.map(function(card) {
+            var constraints =  data.constraints.filter(function(ct){return ct.card_id === card.cardid;});
+            if (constraints.length === 0) {
+                constraints = getBlankConstraint(card);
+            }
+            return new CardViewModel({
+                card: card,
+                appliedFunctions: params.appliedFunctions(),
+                graphModel: params.graphModel,
+                tile: null,
+                resourceId: ko.observable(),
+                displayname: ko.observable(),
+                handlers: {},
+                cards: data.cards,
+                constraints: constraints,
+                tiles: [],
+                selection: selection,
+                hover: hover,
+                scrollTo: scrollTo,
+                multiselect: self.multiselect,
+                loading: loading,
+                filter: filter,
+                provisionalTileViewModel: null,
+                cardwidgets: data.cardwidgets,
+                userisreviewer: true,
+                perms: ko.observableArray(),
+                permsLiteral: ko.observableArray(),
+                topCards: self.topCards
+            });
+        }));
+
+
         var topCard = self.topCards()[0];
         if (topCard != null) {
             if (self.multiselect === true) {

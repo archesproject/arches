@@ -1,0 +1,22 @@
+{% load i18n %}
+
+<div class="workbench-card-wrapper">
+    <div class="workbench-card-sidebar">
+        {% block tabs %}
+        {% endblock tabs %}
+    </div>
+    <!--ko if: activeTab() -->
+    <div class="workbench-card-sidepanel">
+    {% block sidepanel %}
+    {% endblock sidepanel %}
+    </div>
+    <!--/ko -->
+    <div data-bind="css: {
+        'workbench-card-container-sidepanel-active': activeTab()
+    }">
+    {% block content_management %}
+        <div class="workbench-card-container">
+        </div>
+    {% endblock content_management %}
+    </div>
+</div>

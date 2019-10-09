@@ -54,7 +54,7 @@ class HasNumericCharacterValidator:
     """
 
     def validate(self, password, user=None):
-        res = filter(lambda x: x.isdigit() == True, password)
+        res = [x for x in password if x.isdigit() == True]
         if len(res) == 0:
             raise ValidationError(
                 _("Your password must contain at least one number"),
@@ -75,7 +75,7 @@ class HasUpperAndLowerCaseValidator:
     """
 
     def validate(self, password, user=None):
-        res = filter(lambda x: x.isupper() == True, password)
+        res = [x for x in password if x.isupper() == True]
         if len(res) == 0 or len(res) == len(password):
             raise ValidationError(
                 _("Your password must contain both upper and lower case letters"),

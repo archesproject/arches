@@ -205,7 +205,13 @@ a.filtered > span:hover {
 }
 
 .jstree-default .func-node {
-    background: #3acaa1;
+    background: #0ab1fc;
+    color: #fff;
+    border-width: 2px;
+}
+
+.jstree-default .unsaved-edit {
+    background: #ffdb70;
     color: #fff;
     border-width: 2px;
 }

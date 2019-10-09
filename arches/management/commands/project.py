@@ -21,6 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os
 import glob
 import logging
+import shutil
 from django.db import IntegrityError
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
@@ -31,7 +32,7 @@ from arches.management.commands import utils
 
 class Command(BaseCommand):
     """
-    Commands for managing datatypes
+    Commands for managing projects
 
     """
 
@@ -41,6 +42,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if options['operation'] == 'update':
             self.update_extensions()
+        if options['operation'] == 'update_project_templates':
+            self.update_project_templates()
 
     def register(self, extension, cmd):
         modules = glob.glob(os.path.join(settings.APP_ROOT, extension, '*.json'))
@@ -49,17 +52,30 @@ class Command(BaseCommand):
             if os.path.basename(module) != '__init__.py':
                 try:
                     management.call_command(cmd, 'register', source=module)
-                    print('registring', module)
+                    print('registering', module)
                 except IntegrityError as e:
                     management.call_command(cmd, 'update', source=module)
                     print('updating', module)
                     print(e)
 
-
     def update_extensions(self):
         self.register('widgets', 'widget')
         self.register('card_components', 'card_component')
         self.register('functions', 'fn')
+        self.register('search', 'search')
         self.register('plugins', 'plugin')
         self.register('reports', 'report')
         self.register('datatypes', 'datatype')
+
+    def update_project_templates(self):
+        """
+        Moves files from the arches project to the arches-templates directory to
+        ensure that they remain in sync. Adds and comments out settings that are
+        whitelisted into the settings_local.py template
+
+        """
+        files = [
+            {'src': 'arches/app/templates/index.htm',
+                'dst': 'arches/install/arches-templates/project_name/templates/index.htm'}]
+        for f in files:
+            shutil.copyfile(f['src'], f['dst'])

@@ -15,8 +15,6 @@ root_dir = os.path.dirname(here)
 def install():
     if confirm_system_requirements():
 
-        run_virtual_environment()
-
         install_dir = os.path.join(site_packages_dir(), 'arches', 'install')
         django_install_location = os.path.join(site_packages_dir(), 'django')
 
@@ -37,44 +35,15 @@ def site_packages_dir():
 
 def confirm_system_requirements():
     # CHECK PYTHON VERSION
-    if sys.version_info < (2, 7) or sys.version_info >= (3, 0):
-        print('ERROR: Arches requires Python 2.7.x')
-        sys.exit(101)
-    else:
-        pass
-
-    # CHECK POSTGRES VERSION
-    try:
-        postgres_version = subprocess.check_output(["psql", "--version"])
-    except OSError:
-        print('ERROR: Arches requires psql. Please install and then rerun this file again.')
-        sys.exit(101)
+    # TODO: after python upgrade make Python 3.x the min Python version
+    # if sys.version_info < (2, 7) or sys.version_info >= (3, 0):
+    #     print('ERROR: Arches requires Python 2.7.x')
+    #     sys.exit(101)
+    # else:
+    #     pass
 
     return True
 
-def run_virtual_environment(env='ENV'):
-    # is the site running in a virtual environment?
-    if hasattr(sys, 'real_prefix'):
-        pass # we're running in a virtualenv
-    else:
-        # Are we a developer who has access to the included virtual env?
-        # If so, then try to install and activate the virtual env
-        virtualenv_root = os.path.join(root_dir, 'virtualenv')
-        if os.path.exists(os.path.join(virtualenv_root, 'virtualenv.py')):
-            virtualenv_working_dir = os.path.join(virtualenv_root, env)
-            os.system("python %s %s" % (os.path.join(virtualenv_root, 'virtualenv.py'), virtualenv_working_dir))
-            activate_env(virtualenv_working_dir)
-        else:
-            os.system("pip install virtualenv")
-            virtualenv_working_dir = os.path.join(here, 'virtualenv', env)
-            os.system("virtualenv %s" % (virtualenv_working_dir))
-            if os.path.exists(virtualenv_working_dir):
-                activate_env(virtualenv_working_dir)
-            else:
-                raise Exception("""\n
-            ----------------------------------------------------------------------------------------------------------------------
-                ERROR: Arches has to be run within a virtual environment http://virtualenv.readthedocs.org/
-            -----------------------------------------------------------------------------------------------------------------------\n""")
 
 def activate_env(path_to_virtual_env):
     # ACIVATE THE VIRTUAL ENV
@@ -90,7 +59,7 @@ def download_file(url, file_name):
     f = open(file_name, 'wb')
     meta = u.info()
     file_size = int(meta.getheaders("Content-Length")[0])
-    print "Downloading: %s Bytes: %s" % (file_name, file_size)
+    print("Downloading: %s Bytes: %s" % (file_name, file_size))
 
     file_size_dl = 0
     block_sz = 8192
@@ -103,7 +72,7 @@ def download_file(url, file_name):
         f.write(buffer)
         status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
         status = status + chr(8)*(len(status)+1)
-        print status,
+        print(status)
 
     f.close()
 

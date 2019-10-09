@@ -236,6 +236,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                     </div>
                                                                 </div>
                                                             </div>
+
+                                                            <!-- ko if: selection() && selection().isoverlay -->
+                                                            <!-- ko with: selection() -->
+                                                            <div class="form-group">
+                                                                <div style="padding:15px;">
+                                                                    <div class="row" style="padding-bottom: 10px;">
+                                                                        {% trans "Legend content:" %}
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <textarea rows="10" cols="80" data-bind="ckeditor: legend, ckeditorOptions: {},  valueUpdate: 'afterkeydown'"></textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- /ko -->
+                                                            <!-- /ko -->
                                                         </div>
                                                     </div>
                                                 </div>

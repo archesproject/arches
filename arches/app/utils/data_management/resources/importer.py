@@ -10,7 +10,14 @@ from time import time
 from copy import deepcopy
 from optparse import make_option
 from os.path import isfile, join
-from django.db import connection, transaction
+from multiprocessing import Pool, TimeoutError, cpu_count
+import django
+# django.setup() must be called here to prepare for multiprocessing. specifically,
+# it must be called before any models are imported, otherwise things will crash
+# during a resource load that uses multiprocessing.
+# see https://stackoverflow.com/a/49461944/3873885
+django.setup()
+from django.db import connection, connections, transaction
 from django.contrib.auth.models import User
 from django.contrib.gis.gdal import DataSource
 from django.forms.models import model_to_dict
@@ -34,13 +41,25 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.management.commands import utils
 from arches.setup import unzip_file
-from formats.csvfile import CsvReader
-from formats.archesfile import ArchesFileReader
+from .formats.csvfile import CsvReader
+from .formats.archesfile import ArchesFileReader
+
 
 try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
+
+
+def import_one_resource(line):
+    """this single resource import function must be outside of the BusinessDataImporter
+    class in order for it to be called with multiprocessing"""
+
+    connections.close_all()
+    reader = ArchesFileReader()
+    archesresource = JSONDeserializer().deserialize(line)
+    reader.import_business_data({"resources": [archesresource]})
+
 
 class BusinessDataImporter(object):
 
@@ -52,28 +71,28 @@ class BusinessDataImporter(object):
         self.business_data = ''
         self.file_format = ''
         self.relations = ''
-        csv.field_size_limit(sys.maxint)
+        csv.field_size_limit(sys.maxsize)
 
         if not file:
             file = settings.BUSINESS_DATA_FILES
         else:
             file = [file]
-
+        self.file = file
         if mapping_file == None:
             try:
                 mapping_file = [file[0].split('.')[0] + '.mapping']
             except:
-                print '*'*80
-                print "ERROR: Mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your business data file and the extension .mapping"
-                print '*'*80
+                print('*'*80)
+                print("ERROR: Mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your business data file and the extension .mapping")
+                print('*'*80)
                 sys.exit()
         else:
             try:
                 mapping_file = [mapping_file]
             except:
-                print '*'*80
-                print "ERROR: Mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your business data file and the extension .mapping"
-                print '*'*80
+                print('*'*80)
+                print("ERROR: Mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your business data file and the extension .mapping")
+                print('*'*80)
                 sys.exit()
 
         if relations_file == None:
@@ -101,11 +120,11 @@ class BusinessDataImporter(object):
                     if self.file_format == 'json':
                         with open(file[0], 'rU') as f:
                             archesfile = JSONDeserializer().deserialize(f)
-                            if 'graph' in archesfile.keys():
+                            if 'graph' in list(archesfile.keys()):
                                 self.graphs = archesfile['graph']
-                            if 'reference_data' in archesfile.keys():
+                            if 'reference_data' in list(archesfile.keys()):
                                 self.reference_data = archesfile['reference_data']
-                            if 'business_data' in archesfile.keys():
+                            if 'business_data' in list(archesfile.keys()):
                                 self.business_data = archesfile['business_data']
                     elif self.file_format == 'csv':
                         data = unicodecsv.DictReader(open(file[0], 'rU'), encoding='utf-8-sig', restkey='ADDITIONAL', restval='MISSING')
@@ -117,28 +136,30 @@ class BusinessDataImporter(object):
                         unzip_file(path,unzip_dir)
                         shp = [i for i in os.listdir(unzip_dir) if i.endswith(".shp")]
                         if len(shp) == 0:
-                            print '*'*80
-                            print "ERROR: There is no shapefile in this zipfile."
-                            print '*'*80
+                            print('*'*80)
+                            print("ERROR: There is no shapefile in this zipfile.")
+                            print('*'*80)
                             exit()
                         elif len(shp) > 1:
-                            print '*'*80
-                            print "ERROR: There are multiple shapefiles in this zipfile. Please load each individually:"
+                            print('*'*80)
+                            print("ERROR: There are multiple shapefiles in this zipfile. Please load each individually:")
                             for s in shp:
-                                print "\npython manage.py packages -o import_business_data -s {0} -c {1} -ow [append or overwrite]".format(
-                                    os.path.join(unzip_dir,s),mapping_file[0])
-                            print '*'*80
+                                print("\npython manage.py packages -o import_business_data -s {0} -c {1} -ow [append or overwrite]".format(
+                                    os.path.join(unzip_dir,s),mapping_file[0]))
+                            print('*'*80)
                             exit()
                         shp_path = os.path.join(unzip_dir,shp[0])
                         self.business_data = self.shape_to_csv(shp_path)
                     elif self.file_format == 'shp':
                         self.business_data = self.shape_to_csv(path)
                 else:
-                    print str(file) + ' is not a valid file'
+                    print(str(file) + ' is not a valid file')
             else:
-                print path + ' is not a valid path'
+                print(path + ' is not a valid path')
 
-    def import_business_data(self, file_format=None, business_data=None, mapping=None, overwrite='append', bulk=False, create_concepts=False, create_collections=False):
+    def import_business_data(self, file_format=None, business_data=None, mapping=None,
+                             overwrite='append', bulk=False, create_concepts=False,
+                             create_collections=False, use_multiprocessing=False):
         reader = None
         start = time()
         cursor = connection.cursor()
@@ -153,18 +174,31 @@ class BusinessDataImporter(object):
             if file_format == 'json':
                 reader = ArchesFileReader()
                 reader.import_business_data(business_data, mapping)
+            elif file_format == 'jsonl':
+                with open(self.file[0], 'rU') as openf:
+                    lines = openf.readlines()
+                    if use_multiprocessing is True:
+                        pool = Pool(cpu_count())
+                        pool.map(import_one_resource, lines)
+                        connections.close_all()
+                        reader = ArchesFileReader()
+                    else:
+                        reader = ArchesFileReader()
+                        for line in lines:
+                            archesresource = JSONDeserializer().deserialize(line)
+                            reader.import_business_data({"resources": [archesresource]})
             elif file_format == 'csv' or file_format == 'shp' or file_format == 'zip':
                 if mapping != None:
                     reader = CsvReader()
                     reader.import_business_data(business_data=business_data, mapping=mapping, overwrite=overwrite, bulk=bulk, create_concepts=create_concepts, create_collections=create_collections)
                 else:
-                    print '*'*80
-                    print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
-                    print '*'*80
+                    print('*'*80)
+                    print('ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.')
+                    print('*'*80)
                     sys.exit()
 
             elapsed = (time() - start)
-            print 'Time to import_business_data = {0}'.format(datetime.timedelta(seconds=elapsed))
+            print('Time to import_business_data = {0}'.format(datetime.timedelta(seconds=elapsed)))
 
             reader.report_errors()
 

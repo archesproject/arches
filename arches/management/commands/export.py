@@ -59,7 +59,7 @@ class Command(BaseCommand):
                 db = settings.DATABASES['default']
                 if len(row) > 0:
                     os.mkdir(dest)
-                    for geom_type, st_type in geometry_types.iteritems():
+                    for geom_type, st_type in geometry_types.items():
                         cursor.execute("SELECT count(*) FROM {0} WHERE geom_type IN ({1})".format(table, ','.join(st_type)))
                         if cursor.fetchone()[0] > 0:
                             cmd = 'pgsql2shp -f {0}/{1} -P {2} -u {3} -g geom {4}'.format(dest, geom_type, db['PASSWORD'], db['USER'], db['NAME'])
@@ -68,6 +68,6 @@ class Command(BaseCommand):
                             cmd_process.append(sql)
                             subprocess.call(cmd_process)
                 else:
-                    print "No records in table for export"
+                    print("No records in table for export")
         else:
-            print 'Cannot export data. Destination directory, {0} already exists'.format(dest)
+            print('Cannot export data. Destination directory, {0} already exists'.format(dest))

@@ -35,9 +35,9 @@ from arches.app.models.models import GraphModel
 from arches.app.models.system_settings import settings
 from django.core.exceptions import ValidationError
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from format import Writer
-from format import Reader
-from format import ResourceImportReporter
+from .format import Writer
+from .format import Reader
+from .format import ResourceImportReporter
 
 try:
     from cStringIO import StringIO
@@ -58,7 +58,7 @@ class ArchesFileWriter(Writer):
         export = {}
         export['business_data'] = {}
 
-        for resourceinstanceid, tiles in self.resourceinstances.iteritems():
+        for resourceinstanceid, tiles in self.resourceinstances.items():
             resourceinstanceid = uuid.UUID(str(resourceinstanceid))
             resource = {}
             resource['tiles'] = tiles
@@ -92,25 +92,9 @@ class ArchesFileReader(Reader):
 
     def get_function_class_instances(self, tile, graph_id):
         ret = []
-        functions = FunctionXGraph.objects.filter(graph_id=graph_id, config__triggering_nodegroups__contains=[tile['nodegroup_id']])
-        for function in functions:
-            mod_path = function.function.modulename.replace('.py', '')
-            module = None
-            import_success = False
-            import_error = None
-            for function_dir in settings.FUNCTION_LOCATIONS:
-                try:
-                    module = importlib.import_module(function_dir + '.%s' % mod_path)
-                    import_success = True
-                except ImportError as e:
-                    import_error = e
-                if module != None:
-                    break
-            if import_success == False:
-                print 'Failed to import ' + mod_path
-                print import_error
-
-            func = getattr(module, function.function.classname)(function.config, tile['nodegroup_id'])
+        functionXgraphs = FunctionXGraph.objects.filter(graph_id=graph_id, config__triggering_nodegroups__contains=[tile['nodegroup_id']])
+        for functionXgraph in functionXgraphs:
+            func = functionXgraph.function.get_class_module()(functionXgraph.config, tile['nodegroup_id'])
             ret.append(func)
         return ret
 
@@ -142,7 +126,7 @@ class ArchesFileReader(Reader):
     def replace_source_nodeid(self, tiles, mapping):
         for tile in tiles:
             new_data = []
-            for sourcekey in tile['data'].keys():
+            for sourcekey in list(tile['data'].keys()):
                 for row in mapping['nodes']:
                     if row['file_field_name'] == sourcekey:
                         d = {}
@@ -207,15 +191,15 @@ class ArchesFileReader(Reader):
     def get_blank_tile(self, sourcetilegroup, blanktilecache, tiles, resourceinstanceid):
         if len(sourcetilegroup[0]['data']) > 0:
             if sourcetilegroup[0]['data'][0] != {}:
-                if sourcetilegroup[0]['data'][0].keys()[0] not in blanktilecache:
-                    blank_tile = Tile.get_blank_tile(tiles[0]['data'][0].keys()[0], resourceid=resourceinstanceid)
+                if list(sourcetilegroup[0]['data'][0].keys())[0] not in blanktilecache:
+                    blank_tile = Tile.get_blank_tile(list(tiles[0]['data'][0].keys())[0], resourceid=resourceinstanceid)
                     if blank_tile.data != {}:
                         for tile in blank_tile.tiles:
                             if isinstance(tile, Tile):
-                                for key in tile.data.keys():
+                                for key in list(tile.data.keys()):
                                     blanktilecache[key] = blank_tile
                 else:
-                    blank_tile = blanktilecache[tiles[0]['data'][0].keys()[0]]
+                    blank_tile = blanktilecache[list(tiles[0]['data'][0].keys())[0]]
             else:
                 blank_tile = None
         else:
@@ -261,7 +245,7 @@ class ArchesFileReader(Reader):
                                 #deletes nodes that don't have values
                                 if ret is not None:
                                     for tile in ret:
-                                        for key, value in tile['data'].iteritems():
+                                        for key, value in tile['data'].items():
                                             if value == "":
                                                 del tile['data'][key]
                                 return ret
@@ -278,11 +262,11 @@ class ArchesFileReader(Reader):
                                         if target_tile.data != {}:
                                             for source_tile in sourcetilegroup:
                                                 for tiledata in source_tile['data']:
-                                                    for nodeid in tiledata.keys():
+                                                    for nodeid in list(tiledata.keys()):
                                                         if nodeid in target_tile.data:
                                                             if target_tile.data[nodeid] == None:
                                                                 target_tile.data[nodeid] = tiledata[nodeid]
-                                                                for key in tiledata.keys():
+                                                                for key in list(tiledata.keys()):
                                                                     if key == nodeid:
                                                                         del tiledata[nodeid]
                                                 for tiledata in source_tile['data']:
@@ -304,11 +288,11 @@ class ArchesFileReader(Reader):
                                                             prototype_tile_copy = deepcopy(prototype_tile)
 
                                                             for data in source_tile['data']:
-                                                                for nodeid in data.keys():
-                                                                    if nodeid in prototype_tile.data.keys():
+                                                                for nodeid in list(data.keys()):
+                                                                    if nodeid in list(prototype_tile.data.keys()):
                                                                         if prototype_tile.data[nodeid] == None:
                                                                             prototype_tile_copy.data[nodeid] = data[nodeid]
-                                                                            for key in data.keys():
+                                                                            for key in list(data.keys()):
                                                                                 if key == nodeid:
                                                                                     del data[nodeid]
                                                                             if child_tile_cardinality == '1':
@@ -317,7 +301,7 @@ class ArchesFileReader(Reader):
                                                                 if data == {}:
                                                                     source_tile['data'].remove(data)
 
-                                                            for key in prototype_tile_copy.data.keys():
+                                                            for key in list(prototype_tile_copy.data.keys()):
                                                                 if prototype_tile_copy.data[key] != None:
                                                                     childtile_empty = False
                                                             if prototype_tile_copy.data == {} or childtile_empty:
@@ -369,7 +353,7 @@ class ArchesFileReader(Reader):
                         # reporter.update_tiles_saved(tile_saved)
 
         except (KeyError, TypeError) as e:
-            print e
+            print(e)
 
         finally:
             reporter.report_results()
@@ -385,4 +369,4 @@ class ArchesFileReader(Reader):
                 self.import_business_data(self.business_data, self.mapping)
         else:
             for error in errors:
-                print "{0} {1}".format(error[0], error[1])
+                print("{0} {1}".format(error[0], error[1]))

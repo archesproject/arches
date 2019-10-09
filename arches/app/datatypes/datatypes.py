@@ -1,7 +1,6 @@
 import uuid
 import json
 import decimal
-import importlib
 import distutils
 import base64
 import re
@@ -13,6 +12,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.date_utils import ExtendedDateFormat
+from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.core.cache import cache
@@ -30,13 +30,15 @@ from edtf import parse_edtf
 # One benefit of shifting to python3.x would be to use
 # importlib.util.LazyLoader to load rdflib (and other lesser
 # used but memory soaking libs)
-from rdflib import Namespace, URIRef, Literal, Graph, BNode
+from rdflib import Namespace, URIRef, Literal, BNode
+from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
+
 
 class DataTypeFactory(object):
     def __init__(self):
@@ -48,22 +50,8 @@ class DataTypeFactory(object):
         try:
             datatype_instance = self.datatype_instances[d_datatype.classname]
         except:
-            mod_path = d_datatype.modulename.replace('.py', '')
-            module = None
-            import_success = False
-            import_error = None
-            for datatype_dir in settings.DATATYPE_LOCATIONS:
-                try:
-                    module = importlib.import_module(datatype_dir + '.%s' % mod_path)
-                    import_success = True
-                except ImportError as e:
-                    import_error = e
-                if module != None:
-                    break
-            if import_success == False:
-                print 'Failed to import ' + mod_path
-                print import_error
-            datatype_instance = getattr(module, d_datatype.classname)(d_datatype)
+            class_method = get_class_from_modulename(d_datatype.modulename, d_datatype.classname, settings.DATATYPE_LOCATIONS)
+            datatype_instance = class_method(d_datatype)
             self.datatype_instances[d_datatype.classname] = datatype_instance
         return datatype_instance
 
@@ -118,7 +106,7 @@ class StringDataType(BaseDataType):
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
                     query.must(match_query)
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def is_a_literal_in_rdf(self):
@@ -130,7 +118,7 @@ class StringDataType(BaseDataType):
         g = Graph()
         if edge_info['range_tile_data'] is not None:
             g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
-            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(str(edge_info['range_tile_data']))))
+            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(edge_info['range_tile_data'])))
         return g
 
     def from_rdf(self, json_ld_node):
@@ -188,7 +176,7 @@ class NumberDataType(BaseDataType):
                 else:
                     search_query = Match(field='tiles.data.%s' % (str(node.pk)), query=value['val'], type='phrase_prefix')
                 query.must(search_query)
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def is_a_literal_in_rdf(self):
@@ -199,8 +187,9 @@ class NumberDataType(BaseDataType):
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
         rtd = int(edge_info['range_tile_data']) if type(edge_info['range_tile_data']) == float and edge_info['range_tile_data'].is_integer() else edge_info['range_tile_data']
-        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
-        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(rtd)))
+        if rtd is not None:
+            g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(rtd)))
         return g
 
     def from_rdf(self, json_ld_node):
@@ -236,7 +225,7 @@ class BooleanDataType(BaseDataType):
             if value['val'] != '':
                 term = True if value['val'] == 't' else False
                 query.must(Term(field='tiles.data.%s' % (str(node.pk)), term=term))
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def to_rdf(self, edge_info, edge):
@@ -311,7 +300,7 @@ class DateDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value['val'] != '':
+            if value['val'] != '' and value['val'] is not None:
                 date_value = datetime.strptime(value['val'], '%Y-%m-%d').isoformat()
                 if value['op'] != 'eq':
                     operators = {'gte': None, 'lte': None, 'lt': None, 'gt': None}
@@ -320,7 +309,7 @@ class DateDataType(BaseDataType):
                 else:
                     search_query = Match(field='tiles.data.%s' % (str(node.pk)), query=date_value, type='phrase_prefix')
                 query.must(search_query)
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def after_update_all(self):
@@ -338,7 +327,7 @@ class DateDataType(BaseDataType):
         if edge_info['range_tile_data'] is not None:
             g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
             g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
-                   Literal(str(edge_info['range_tile_data']), datatype=XSD.dateTime)))
+                   Literal(edge_info['range_tile_data'], datatype=XSD.dateTime)))
         return g
 
     def from_rdf(self, json_ld_node):
@@ -491,7 +480,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return GeometryCollection(wkt_geoms)
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        document['geometries'].append({'geom':nodevalue, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
+        document['geometries'].append({
+            'geom': nodevalue,
+            'nodegroup_id': tile.nodegroup_id,
+            'provisional': provisional,
+            'tileid': tile.pk
+        })
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:
             minx, miny, maxx, maxy = bounds
@@ -512,7 +506,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             node_data = tile.data[str(node.pk)]
             bounds = self.get_bounds_from_value(node_data)
         except KeyError as e:
-            print e
+            print(e)
         return bounds
 
     def get_bounds_from_value(self, node_data):
@@ -586,7 +580,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
             sql_list.append("""
                 SELECT resourceinstanceid::text,
-                        (row_number() over ())::text as __id__,
+                        tileid::text,
+                        (row_number() over ()) as __id__,
                         1 as total,
                         geom AS __geometry__,
                         '' AS extent
@@ -601,7 +596,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
         try:
             simplification = config['simplification']
-        except KeyError, e:
+        except KeyError as e:
             simplification = 0.3
 
         return {
@@ -655,6 +650,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         layer_icon = node.graph.iconclass
         if not preview and node.config["layerIcon"] != "":
             layer_icon = node.config["layerIcon"]
+
+        layer_legend = node.config["layerLegend"]
 
         if not preview and node.config["advancedStyling"]:
             try:
@@ -715,7 +712,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all",["==", "$type", "Polygon"],["==", "total", 1]],
                     "paint": {
-                        "line-width": %(outlineWeight)s,
+                        "line-width": ["case",
+                            ["boolean", ["feature-state", "hover"], false],
+                            %(expanded_outlineWeight)s,
+                            %(outlineWeight)s
+                        ],
                         "line-color": "%(outlineColor)s"
                     }
                 },
@@ -757,7 +758,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all", ["==", "$type", "LineString"],["==", "total", 1]],
                     "paint": {
-                        "line-width": %(haloWeight)s,
+                        "line-width": ["case",
+                            ["boolean", ["feature-state", "hover"], false],
+                            %(expanded_haloWeight)s,
+                            %(haloWeight)s
+                        ],
                         "line-color": "%(lineHaloColor)s"
                     }
                 },
@@ -771,7 +776,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all",["==", "$type", "LineString"],["==", "total", 1]],
                     "paint": {
-                        "line-width": %(weight)s,
+                        "line-width": ["case",
+                            ["boolean", ["feature-state", "hover"], false],
+                            %(expanded_weight)s,
+                            %(weight)s
+                        ],
                         "line-color": "%(lineColor)s"
                     }
                 },
@@ -871,7 +880,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
                     "paint": {
-                        "circle-radius": %(haloRadius)s,
+                        "circle-radius": ["case",
+                            ["boolean", ["feature-state", "hover"], false],
+                            %(expanded_haloRadius)s,
+                            %(haloRadius)s
+                        ],
                         "circle-color": "%(pointHaloColor)s"
                     }
                 },
@@ -885,7 +898,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
                     "paint": {
-                        "circle-radius": %(radius)s,
+                        "circle-radius": ["case",
+                            ["boolean", ["feature-state", "hover"], false],
+                            %(expanded_radius)s,
+                            %(radius)s
+                        ],
                         "circle-color": "%(pointColor)s"
                     }
                 },
@@ -1020,6 +1037,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "name": layer_name,
             "layer_definitions": layer_def,
             "icon": layer_icon,
+            "legend": layer_legend,
             "addtomap": node.config['addToMap'],
         }
 
@@ -1033,12 +1051,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
 class FileListDataType(BaseDataType):
 
-    def get_previously_saved_data(self, user_is_reviewer, user_id, previously_saved_tile):
-        if user_is_reviewer is False and previously_saved_tile.provisionaledits is not None and user_id in previously_saved_tile.provisionaledits:
-            previously_saved_data = previously_saved_tile.provisionaledits[user_id]['value']
+    def get_tile_data(self, user_is_reviewer, user_id, tile):
+        if user_is_reviewer is False and tile.provisionaledits is not None and user_id in tile.provisionaledits:
+            data = tile.provisionaledits[user_id]['value']
         else:
-            previously_saved_data = previously_saved_tile.data
-        return previously_saved_data
+            data = tile.data
+        return data
 
     def handle_request(self, current_tile, request, node):
         previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
@@ -1046,9 +1064,9 @@ class FileListDataType(BaseDataType):
         if hasattr(request.user, 'userprofile') is not True:
             models.UserProfile.objects.create(user=request.user)
         user_is_reviewer = request.user.userprofile.is_reviewer()
-        current_tile_data = current_tile.data
+        current_tile_data = self.get_tile_data(user_is_reviewer, str(user.id), current_tile)
         if previously_saved_tile.count() == 1:
-            previously_saved_tile_data = self.get_previously_saved_data(user_is_reviewer, str(user.id), previously_saved_tile[0])
+            previously_saved_tile_data = self.get_tile_data(user_is_reviewer, str(user.id), previously_saved_tile[0])
             if previously_saved_tile_data[str(node.pk)] is not None:
                 for previously_saved_file in previously_saved_tile_data[str(node.pk)]:
                     previously_saved_file_has_been_removed = True
@@ -1060,7 +1078,7 @@ class FileListDataType(BaseDataType):
                             deleted_file = models.File.objects.get(pk=previously_saved_file["file_id"])
                             deleted_file.delete()
                         except models.File.DoesNotExist:
-                            print 'file does not exist'
+                            print('file does not exist')
 
         files = request.FILES.getlist('file-list_' + str(node.pk), [])
 
@@ -1085,7 +1103,10 @@ class FileListDataType(BaseDataType):
                     # importing proxy model errors, so cannot use super on the proxy model to save
                     if previously_saved_tile.count() == 1:
                         tile_to_update = previously_saved_tile[0]
-                        tile_to_update.data[str(node.pk)] = updated_file_records
+                        if user_is_reviewer:
+                            tile_to_update.data[str(node.pk)] = updated_file_records
+                        else:
+                            tile_to_update.provisionaledits[str(user.id)]['value'][str(node.pk)] = updated_file_records
                         tile_to_update.save()
 
     def transform_import_values(self, value, nodeid):
@@ -1234,7 +1255,7 @@ class FileListDataType(BaseDataType):
                     file_model.path = file_data
                     file_model.pk = file['file_id']
                     file_model.save()
-                    if file["name"] == file_data.name and 'url' not in file.keys():
+                    if file["name"] == file_data.name and 'url' not in list(file.keys()):
                         file["file_id"] = str(file_model.pk)
                         file["url"] = str(file_model.path.url)
                         file["status"] = 'uploaded'
@@ -1266,8 +1287,9 @@ class DomainDataType(BaseDomainDataType):
 
     def validate(self, value, row_number=None, source=''):
         errors = []
-        if len(models.Node.objects.filter(config__options__contains=[{"id": value}])) < 1:
-            errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value, row_number)})
+        if value is not None:
+            if len(models.Node.objects.filter(config__options__contains=[{"id": value}])) < 1:
+                errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value, row_number)})
         return errors
 
     def get_search_terms(self, nodevalue, nodeid=None):
@@ -1282,7 +1304,7 @@ class DomainDataType(BaseDomainDataType):
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         domain_text = None
         for tile in document['tiles']:
-            for k, v in tile.data.iteritems():
+            for k, v in tile.data.items():
                 if v == nodevalue:
                     node = models.Node.objects.get(nodeid=k)
                     domain_text = self.get_option_text(node, v)
@@ -1291,7 +1313,8 @@ class DomainDataType(BaseDomainDataType):
             document['strings'].append({'string': domain_text, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
 
     def get_display_value(self, tile, node):
-        return self.get_option_text(node, tile.data[str(node.nodeid)])
+        data = self.get_tile_data(tile)
+        return self.get_option_text(node, data[str(node.nodeid)])
 
     def transform_export_values(self, value, *args, **kwargs):
         ret = ''
@@ -1314,7 +1337,7 @@ class DomainDataType(BaseDomainDataType):
                 else:
                     query.must(search_query)
 
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def to_rdf(self, edge_info, edge):
@@ -1324,7 +1347,7 @@ class DomainDataType(BaseDomainDataType):
         if edge_info['range_tile_data'] is not None:
             g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
             g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
-                   Literal(str(self.get_option_text(edge.rangenode, edge_info['range_tile_data'])))))
+                   Literal(self.get_option_text(edge.rangenode, edge_info['range_tile_data']))))
         return g
 
     def from_rdf(self, json_ld_node):
@@ -1365,7 +1388,7 @@ class DomainListDataType(BaseDomainDataType):
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         domain_text_values = set([])
         for tile in document['tiles']:
-            for k, v in tile.data.iteritems():
+            for k, v in tile.data.items():
                 if v == nodevalue:
                     node = models.Node.objects.get(nodeid=k)
                     for value in nodevalue:
@@ -1378,8 +1401,9 @@ class DomainListDataType(BaseDomainDataType):
 
     def get_display_value(self, tile, node):
         new_values = []
-        if tile.data[str(node.nodeid)] is not None:
-            for val in tile.data[str(node.nodeid)]:
+        data = self.get_tile_data(tile)
+        if data[str(node.nodeid)] is not None:
+            for val in data[str(node.nodeid)]:
                 option = self.get_option_text(node, val)
                 new_values.append(option)
         return ','.join(new_values)
@@ -1416,7 +1440,7 @@ class DomainListDataType(BaseDomainDataType):
                 else:
                     query.must(search_query)
 
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def to_rdf(self, edge_info, edge):
@@ -1454,30 +1478,33 @@ class ResourceInstanceDataType(BaseDataType):
                     resource_document = se.search(index='resources', id=resourceid)
                     resource_names.add(resource_document['_source']['displayname'])
                 except:
-                    print 'resource not available'
+                    print('resource not available')
         else:
-            print 'resource not avalable'
+            print('resource not avalable')
         return resource_names
 
     def validate(self, value, row_number=None, source=''):
         errors = []
-        id_list = self.get_id_list(value)
 
-        for resourceid in id_list:
-            try:
-                models.ResourceInstance.objects.get(pk=resourceid)
-            except:
-                errors.append({'type': 'WARNING', 'message': 'The resource id: {0} does not exist in the system. The data for this card will be available in the system once resource {0} is loaded.'.format(resourceid)})
+        if value is not None:
+            id_list = self.get_id_list(value)
+            for resourceid in id_list:
+                try:
+                    models.ResourceInstance.objects.get(pk=resourceid)
+                except:
+                    errors.append({'type': 'WARNING', 'message': 'The resource id: {0} does not exist in the system. The data for this card will be available in the system once resource {0} is loaded.'.format(resourceid)})
         return errors
 
     def get_display_value(self, tile, node):
-        nodevalue = tile.data[str(node.nodeid)]
+        data = self.get_tile_data(tile)
+        nodevalue = data[str(node.nodeid)]
         resource_names = self.get_resource_names(nodevalue)
         return ', '.join(resource_names)
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         resource_names = self.get_resource_names(nodevalue)
         for value in resource_names:
+            document['ids'].append({'id': nodevalue, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
             if value not in document['strings']:
                 document['strings'].append({'string': value, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
 
@@ -1504,7 +1531,7 @@ class ResourceInstanceDataType(BaseDataType):
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
                     query.must(search_query)
-        except KeyError, e:
+        except KeyError as e:
             pass
 
     def to_rdf(self, edge_info, edge):
@@ -1552,7 +1579,8 @@ class NodeValueDataType(BaseDataType):
     def get_display_value(self, tile, node):
         datatype_factory = DataTypeFactory()
         value_node = models.Node.objects.get(nodeid=node.config['nodeid'])
-        tileid = tile.data[str(node.pk)]
+        data = self.get_tile_data(tile)
+        tileid = data[str(node.pk)]
         if tileid:
             value_tile = models.TileModel.objects.get(tileid=tileid)
             datatype = datatype_factory.get_instance(value_node.datatype)

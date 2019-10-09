@@ -252,11 +252,19 @@ class BaseDataType(object):
         """
         return None
 
+    def get_tile_data(self, tile):
+        if tile.data is not None and len(list(tile.data.keys())) > 0:
+            return tile.data
+        elif tile.provisionaledits is not None and len(list(tile.provisionaledits.keys())) == 1:
+            userid = list(tile.provisionaledits.keys())[0]
+            return tile.provisionaledits[userid]['value']
+
     def get_display_value(self, tile, node):
         """
         Returns a list of concept values for a given node
         """
-        return unicode(tile.data[str(node.nodeid)])
+        data = self.get_tile_data(tile)
+        return unicode(data[str(node.nodeid)])
 
     def get_search_terms(self, nodevalue, nodeid=None):
         """
@@ -317,5 +325,5 @@ class BaseDataType(object):
         return g
 
     def from_rdf(self, json_ld_node):
-        print json_ld_node
+        print(json_ld_node)
         raise NotImplementedError

@@ -211,11 +211,13 @@ define([
         }));
 
         this.geocodeProvider.subscribe(function(geocoderid) {
-            var provider = _.findWhere(this.geocodingProviders, {
-                'geocoderid': geocoderid
-            });
-            this.geocodeProviderDetails.api_key(provider.api_key);
-            this.geocodeProviderDetails.component(provider.component);
+            if (geocoderid) {
+                var provider = _.findWhere(this.geocodingProviders, {
+                    'geocoderid': geocoderid
+                });
+                this.geocodeProviderDetails.api_key(provider.api_key);
+                this.geocodeProviderDetails.component(provider.component);
+            }
         }, this);
 
         this.loadGeometriesIntoDrawLayer = function() {
@@ -240,12 +242,14 @@ define([
         };
 
         this.clearGeometries = function(val) {
-            if (self.draw !== undefined && !val) {
-                self.draw.deleteAll();
-            } else if (val && val.features) {
-                if (val.features.length === 0 && self.context === 'search-filter') {
-                    self.searchBuffer(null);
-                    self.updateSearchQueryLayer([]);
+            if (self.map && self.map.getStyle()) {
+                if (self.draw !== undefined && !val) {
+                    self.draw.deleteAll();
+                } else if (val && val.features) {
+                    if (val.features.length === 0 && self.context === 'search-filter') {
+                        self.searchBuffer(null);
+                        self.updateSearchQueryLayer([]);
+                    }
                 }
             }
         };
@@ -273,7 +277,7 @@ define([
                 //    self.map.setStyle(style);
                 // }
 
-                if (self.draw !== undefined) {
+                if (self.draw !== undefined && self.map.getStyle()) {
                     self.draw.changeMode('simple_select');
                     self.loadGeometriesIntoDrawLayer();
                 }
@@ -387,7 +391,7 @@ define([
                         'name': 'Polygon'
                     }
                 };
-                if (features.length > 0) {
+                if (!!features && features.length > 0) {
                     this.queryFeature = features[0];
                     if (this.queryFeature.properties.extent_search === true) {
                         var bounds = new mapboxgl.LngLatBounds(geojsonExtent(this.queryFeature));
@@ -529,6 +533,11 @@ define([
             }, this);
             return initialLayers;
         };
+        var geometryTypes = ko.unwrap(this.geometryTypes);
+        if (geometryTypes) geometryTypes.forEach(function(geometryType) {
+            geometryType.id = ko.unwrap(geometryType.id);
+            geometryType.text = ko.unwrap(geometryType.text);
+        });
 
         this.geometryTypeDetails = {
             Point: {
@@ -655,7 +664,7 @@ define([
             this.map.on('load', function() {
                 if (!self.configForm) {
                     if (self.context === 'report-header') {
-                        map.on('moveend', _.throttle(generatePrintMap, 3000));
+                        setTimeout(generatePrintMap, 3000);
                     }
                     var zoomToGeoJSON = function(data, fly) {
                         var method = fly ? 'flyTo' : 'jumpTo';
@@ -738,6 +747,8 @@ define([
                     }
 
                     if (self.context === 'search-filter') {
+                        self.mouseoverInstanceId = params.mouseoverInstanceId;
+                        self.mapLinkData = params.mapLinkData;
                         self.searchAggregations = params.searchAggregations;
                         var bins = binFeatureCollection(self.searchAggregations);
                         self.searchBuffer.subscribe(function(val){
@@ -795,7 +806,7 @@ define([
                             }
 
                             var features = [];
-                            var mouseoverInstanceId = self.results.mouseoverInstanceId();
+                            var mouseoverInstanceId = self.mouseoverInstanceId();
                             var hoverData = self.hoverData();
                             var clickData = self.clickData();
                             _.each(agg.results, function(result) {
@@ -829,7 +840,7 @@ define([
                         if (self.searchAggregations()) {
                             self.updateSearchResultsLayer();
                         }
-                        self.results.mouseoverInstanceId.subscribe(updateSearchPointsGeoJSON);
+                        self.mouseoverInstanceId.subscribe(updateSearchPointsGeoJSON);
                         self.clickData.subscribe(updateSearchPointsGeoJSON);
                         self.hoverData.subscribe(function(val) {
                             var resultsHoverLayer = self.map.getLayer('search-results-hex-outline-highlighted');
@@ -842,7 +853,7 @@ define([
                             }
                             updateSearchPointsGeoJSON();
                         });
-                        self.results.mapLinkData.subscribe(function(data) {
+                        self.mapLinkData.subscribe(function(data) {
                             zoomToGeoJSON(data, true);
                         });
                     }
@@ -852,9 +863,11 @@ define([
                         data = self.value();
                         source.setData(data);
                         self.value.subscribe(function(value) {
-                            source.setData(value);
-                            if (value.features.length > 0){
-                                zoomToGeoJSON(value);
+                            if (self.map.getStyle()) {
+                                source.setData(value);
+                                if (value.features.length > 0){
+                                    zoomToGeoJSON(value);
+                                }
                             }
                         });
                         _.each(['resource-poly' + self.graphId, 'resource-line' + self.graphId, 'resource-point' + self.graphId], function(layerId) { //clear and add resource layers so that they are on top of map
@@ -1320,7 +1333,9 @@ define([
                             unit: self.bufferUnit()
                         };
                         self.value().features[0] = self.queryFeature;
-                        self.updateSearchQueryLayer([{geometry: JSON.parse(self.searchBuffer())},self.queryFeature]);
+                        if (!!self.searchBuffer()) {
+                            self.updateSearchQueryLayer([{geometry: JSON.parse(self.searchBuffer())},self.queryFeature]);
+                        }
                     } else {
                         self.queryFeature.properties.buffer = {
                             width: 0,
@@ -1761,7 +1776,7 @@ define([
 
             if (self.defaultValueType() && self.defaultValueType() != '' || self.defaultValueType() > 0) {
                 if (self.defaultValueType() == 1){
-                    self.value(self.defaultValue());
+                    koMapping.fromJS(self.defaultValue(), self.value);
                 }
                 this.loadDefaultValue(self.defaultValueType(), true);
             }

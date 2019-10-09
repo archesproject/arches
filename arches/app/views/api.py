@@ -33,6 +33,7 @@ from arches.app.utils.permission_backend import user_can_read_resources
 from arches.app.utils.permission_backend import user_can_edit_resources
 from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.decorators import group_required
+from arches.app.search.components.base import SearchFilterFactory
 from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
@@ -52,8 +53,8 @@ def userCanAccessMobileSurvey(request, surveyid=None):
     if user in ms.users.all():
         allowed = True
     else:
-        users_groups = set([group.id for group in user.groups.all()])
-        ms_groups = set([group.id for group in ms.groups.all()])
+        users_groups = {group.id for group in user.groups.all()}
+        ms_groups = {group.id for group in ms.groups.all()}
         if len(ms_groups.intersection(users_groups)) > 0:
             allowed = True
 
@@ -105,7 +106,7 @@ class APIBase(View):
             }
             if not format and accept in format_values:
                 get_params['format'] = format_values[accept]
-            for key, value in request.META.iteritems():
+            for key, value in request.META.items():
                 if key.startswith('HTTP_X_ARCHES_'):
                     if key.replace('HTTP_X_ARCHES_', '').lower() not in request.GET:
                         get_params[key.replace('HTTP_X_ARCHES_', '').lower()] = value
@@ -124,7 +125,9 @@ class Sync(APIBase):
         can_sync = userCanAccessMobileSurvey(request, surveyid)
         if can_sync:
             try:
+                logger.info("Starting sync for user {0}".format(request.user.username))
                 management.call_command('mobile', operation='sync_survey', id=surveyid, user=request.user.id)
+                logger.info("Sync complete for user {0}".format(request.user.username))
             except Exception:
                 logger.exception(_('Sync Failed'))
 
@@ -136,6 +139,9 @@ class Sync(APIBase):
 class Surveys(APIBase):
 
     def get(self, request, surveyid=None):
+
+        auth_header = request.META.get('HTTP_AUTHORIZATION', None)
+        logger.info("Requesting projects for user: {0}".format(request.user.username))
         try:
             if hasattr(request.user, 'userprofile') is not True:
                 models.UserProfile.objects.create(user=request.user)
@@ -146,7 +152,6 @@ class Surveys(APIBase):
                     get_child_cardids(child_card, cardset)
 
             group_ids = list(request.user.groups.values_list('id', flat=True))
-
             if request.GET.get('status', None) is not None:
                 ret = {}
                 surveys = MobileSurvey.objects.filter(users__in=[request.user]).distinct()
@@ -200,6 +205,52 @@ class Surveys(APIBase):
             logger.exception(_('Unable to fetch collector projects'))
             response = JSONResponse(_('Unable to fetch collector projects'), indent=4)
 
+        logger.info("Returning projects for user: {0}".format(request.user.username))
+        return response
+
+
+class GeoJSON(APIBase):
+    def get(self, request):
+        resourceid = request.GET.get('resourceid', None)
+        nodeid = request.GET.get('nodeid', None)
+        tileid = request.GET.get('tileid', None)
+        if hasattr(request.user, 'userprofile') is not True:
+            models.UserProfile.objects.create(user=request.user)
+        viewable_nodegroups = request.user.userprofile.viewable_nodegroups
+        nodes = models.Node.objects.filter(datatype='geojson-feature-collection', nodegroup_id__in=viewable_nodegroups)
+        if nodeid is not None:
+            nodes = nodes.filter(nodeid=nodeid)
+        features = []
+        i = 1
+        for node in nodes:
+            tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup)
+            if resourceid is not None:
+                # resourceid = resourceid.split(',')
+                tiles = tiles.filter(resourceinstance_id__in=resourceid.split(','))
+            if tileid is not None:
+                tiles = tiles.filter(tileid=tileid)
+            for tile in tiles:
+                data = tile.data
+                try:
+                    for feature_index, feature in enumerate(data[unicode(node.pk)]['features']):
+                        feature['properties']['index'] = feature_index
+                        feature['properties']['resourceinstanceid'] = tile.resourceinstance_id
+                        feature['properties']['tileid'] = tile.pk
+                        feature['properties']['nodeid'] = node.pk
+                        feature['properties']['node'] = node.name
+                        feature['properties']['model'] = node.graph.name
+                        feature['properties']['geojson'] = '%s?tileid=%s&nodeid=%s' % (reverse('geojson'), tile.pk, node.pk)
+                        feature['properties']['featureid'] = feature['id']
+                        feature['id'] = i
+                        i += 1
+                        features.append(feature)
+                except KeyError:
+                    pass
+                except TypeError as e:
+                    print(e)
+                    print(tile.data)
+
+        response = JSONResponse({'type': 'FeatureCollection', 'features': features})
         return response
 
 
@@ -239,8 +290,9 @@ class Resources(APIBase):
             allowed_formats = ['json', 'json-ld']
             format = request.GET.get('format', 'json-ld')
             if format not in allowed_formats:
-                return JSONResponse(status=406, reason='incorrect format specified, only %s formats allowed' % allowed_formats)
-
+                return JSONResponse(
+                    status=406, reason='incorrect format specified, only %s formats allowed' % allowed_formats
+                    )
             try:
                 indent = int(request.GET.get('indent', None))
             except Exception:
@@ -254,10 +306,12 @@ class Resources(APIBase):
                             resourceinstanceids=[resourceid], indent=indent, user=request.user)
                         out = output[0]['outputfile'].getvalue()
                     except models.ResourceInstance.DoesNotExist:
-                        logger.exception()
+                        logger.exception(
+                            _("The specified resource '{0}' does not exist. JSON-LD export failed.".format(
+                                resourceid
+                                ))
+                            )
                         return JSONResponse(status=404)
-                    except Exception as e:
-                        logger.exception()
                 elif format == 'json':
                     out = Resource.objects.get(pk=resourceid)
                     out.load_tiles()
@@ -383,7 +437,7 @@ class Resources(APIBase):
                     reader.read_resource(data, resourceid=resourceid, graphid=graphid)
                     if reader.errors:
                         response = []
-                        for value in reader.errors.itervalues():
+                        for value in reader.errors.values():
                             response.append(value.message)
                         return JSONResponse({"error": response}, indent=indent, status=400)
                     else:
@@ -414,7 +468,7 @@ class Resources(APIBase):
                 reader.read_resource(data, graphid=graphid)
                 if reader.errors:
                     response = []
-                    for value in reader.errors.itervalues():
+                    for value in reader.errors.values():
                         response.append(value.message)
                     return JSONResponse({"error": response}, indent=indent, status=400)
                 else:
@@ -572,7 +626,7 @@ class Card(APIBase):
                 append_tile = True
                 isfullyprovisional = False
                 if tile.provisionaledits is not None:
-                    if len(tile.provisionaledits.keys()) > 0:
+                    if len(list(tile.provisionaledits.keys())) > 0:
                         if len(tile.data) == 0:
                             isfullyprovisional = True
                         if user_is_reviewer is False:
@@ -589,7 +643,7 @@ class Card(APIBase):
                                     # if the tile has authoritaive data and the current user is not the owner,
                                     # we don't send the provisional data of other users back to the client.
                                     tile.provisionaledits = None
-                if append_tile == True:
+                if append_tile is True:
                     provisionaltiles.append(tile)
             tiles = provisionaltiles
 
@@ -615,3 +669,13 @@ class Card(APIBase):
         }
 
         return JSONResponse(context, indent=4)
+
+
+class SearchComponentData(APIBase):
+
+    def get(self, request, componentname):
+        search_filter_factory = SearchFilterFactory(request)
+        search_filter = search_filter_factory.get_filter(componentname)
+        if search_filter:
+            return JSONResponse(search_filter.view_data())
+        return JSONResponse(status=404)
