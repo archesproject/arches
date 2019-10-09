@@ -6,7 +6,7 @@ import subprocess
 import glob
 import uuid
 import sys
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import os
 import logging
 from arches.app.search.mappings import prepare_terms_index, prepare_concepts_index, prepare_resource_relations_index
@@ -757,7 +757,7 @@ class Command(BaseCommand):
 
             try:
                 zip_file = os.path.join(unzip_into_dir, "source_data.zip")
-                urllib.urlretrieve(source, zip_file)
+                urllib.request.urlretrieve(source, zip_file)
                 unzip_file(zip_file, unzip_into_dir)
             except Exception as e:
                 pass

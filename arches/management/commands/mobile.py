@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import os
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import json
 from urlparse import urlparse, urljoin
 from arches.management.commands import utils

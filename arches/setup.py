@@ -2,7 +2,7 @@ import sys
 import os
 import subprocess
 import shutil
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import zipfile
 import datetime
 from arches import settings
@@ -53,7 +53,7 @@ def activate_env(path_to_virtual_env):
 
 # INSTALL ELASTICSEARCH and HEAD plugin
 def download_file(url, file_name):
-    u = urllib2.urlopen(url)
+    u = urllib.request.urlopen(url)
     f = open(file_name, 'wb')
     meta = u.info()
     file_size = int(meta.getheaders("Content-Length")[0])
