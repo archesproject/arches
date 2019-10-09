@@ -1010,7 +1010,7 @@ will be very jumbled.""")
         if data_source == '':
             data_source = settings.BUSINESS_DATA_FILES
 
-        if isinstance(data_source, basestring):
+        if isinstance(data_source, str):
             data_source = [data_source]
 
         create_collections = False
@@ -1054,7 +1054,7 @@ will be very jumbled.""")
                 'No overwrite option indicated. Please rerun command with \'-ow\' parameter.')
             sys.exit()
 
-        if isinstance(data_source, basestring):
+        if isinstance(data_source, str):
             data_source = [data_source]
 
         if len(data_source) > 0:
@@ -1079,7 +1079,7 @@ will be very jumbled.""")
         """
         Imports business data relations
         """
-        if isinstance(data_source, basestring):
+        if isinstance(data_source, str):
             data_source = [data_source]
 
         for path in data_source:
@@ -1105,7 +1105,7 @@ will be very jumbled.""")
         if data_source == '':
             data_source = settings.RESOURCE_GRAPH_LOCATIONS
 
-        if isinstance(data_source, basestring):
+        if isinstance(data_source, str):
             data_source = [data_source]
 
         for path in data_source:
@@ -1287,7 +1287,7 @@ will be very jumbled.""")
             utils.print_message(
                 'No data source indicated. Please rerun command with \'-s\' parameter.')
 
-        if isinstance(source, basestring):
+        if isinstance(source, str):
             source = [source]
 
         for path in source:

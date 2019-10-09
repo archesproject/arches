@@ -50,7 +50,7 @@ class JSONSerializer(object):
         obj = self.serializeToPython(obj, **options)
         # prevent raw strings from begin re-encoded
         # this is especially important when doing bulk operations in elasticsearch
-        if (isinstance(obj, basestring)):
+        if (isinstance(obj, str)):
             return obj
 
         sort_keys = options.pop("sort_keys", True)
@@ -96,7 +96,7 @@ class JSONSerializer(object):
         elif (isinstance(object, int) or
               isinstance(object, float) or
               isinstance(object, long) or
-              isinstance(object, basestring) or
+              isinstance(object, str) or
               isinstance(object, bool) or
               object is None):
             return object
@@ -208,7 +208,7 @@ class JSONDeserializer(object):
         self.selected_fields = options.pop("fields", None)
         self.use_natural_keys = options.pop("use_natural_keys", False)
 
-        if isinstance(stream_or_string, basestring):
+        if isinstance(stream_or_string, str):
             stream = StringIO(smart_unicode(stream_or_string))
         else:
             stream = stream_or_string
@@ -232,7 +232,7 @@ class JSONDeserializer(object):
         elif (isinstance(object, int) or
               isinstance(object, float) or
               isinstance(object, long) or
-              isinstance(object, basestring) or
+              isinstance(object, str) or
               isinstance(object, bool) or
               object is None):
             return object

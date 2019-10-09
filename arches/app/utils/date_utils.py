@@ -124,7 +124,7 @@ class ExtendedDateFormat(SortableDateRange):
         elif (isinstance(object, OneOfASet) or
               isinstance(object, MultipleDates)):
             return self.handle_set(object)
-        elif (isinstance(object, basestring) or
+        elif (isinstance(object, str) or
               object is None):
             if object == 'open':
                 return SortableDateRange()

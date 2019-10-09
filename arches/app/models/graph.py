@@ -103,7 +103,7 @@ class Graph(models.GraphModel):
                 self.populate_null_nodegroups()
 
             else:
-                if (len(args) == 1 and (isinstance(args[0], basestring) or isinstance(args[0], uuid.UUID))):
+                if (len(args) == 1 and (isinstance(args[0], str) or isinstance(args[0], uuid.UUID))):
                     for key, value in models.GraphModel.objects.get(pk=args[0]).__dict__.items():
                         setattr(self, key, value)
 
