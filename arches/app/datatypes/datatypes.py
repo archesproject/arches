@@ -1464,7 +1464,7 @@ class DomainListDataType(BaseDomainDataType):
 class ResourceInstanceDataType(BaseDataType):
     def get_id_list(self, nodevalue):
         id_list = nodevalue
-        if type(nodevalue) is unicode:
+        if type(nodevalue) is str:
             id_list = [nodevalue]
         return id_list
 

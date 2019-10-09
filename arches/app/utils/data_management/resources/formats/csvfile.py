@@ -654,7 +654,7 @@ class CsvReader(Reader):
                 missing_display_values = {}
 
                 for row_number, row in enumerate(business_data):
-                    row_number = 'on line ' + unicode(row_number + 2) #to represent the row in a csv accounting for the header and 0 index
+                    row_number = 'on line ' + str(row_number + 2) #to represent the row in a csv accounting for the header and 0 index
                     if row['ResourceID'] != previous_row_resourceid and previous_row_resourceid is not None:
 
                         save_count = save_count + 1

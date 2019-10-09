@@ -621,7 +621,7 @@ class Graph(models.GraphModel):
         str_forms_config = json.dumps(config)
         for map in maps:
             for k, v in map.items():
-                str_forms_config = str_forms_config.replace(unicode(k), unicode(v))
+                str_forms_config = str_forms_config.replace(str(k), str(v))
         return json.loads(str_forms_config)
 
     def copy_functions(self, other_graph, id_maps=[]):

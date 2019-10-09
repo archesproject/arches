@@ -67,7 +67,7 @@ class Command(BaseCommand):
         try:
             uuid.UUID(details['componentid'])
         except:
-            details['componentid'] = unicode(uuid.uuid4())
+            details['componentid'] = str(uuid.uuid4())
             print("Registering card component with componentid: {}".format(details['componentid']))
 
         instance = models.CardComponent(

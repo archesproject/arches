@@ -395,7 +395,7 @@ class Command(BaseCommand):
                         details = json.load(f)
                         if 'widgetid' not in details:
                             widget_instance = models.Widget.objects.get(name=details['name'])
-                            details['widgetid'] = unicode(widget_instance.widgetid)
+                            details['widgetid'] = str(widget_instance.widgetid)
                             f.close()
                             with open(widget_config_file, 'w') as of:
                                 json.dump(details, of, sort_keys=True, indent=4)

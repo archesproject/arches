@@ -129,10 +129,10 @@ class MobileSurvey(models.MobileSurveyModel):
                     if node['config']['graphid'] is not None:
                         try:
                             graphuuid = uuid.UUID(node['config']['graphid'][0])
-                            graph_id = unicode(graphuuid)
+                            graph_id = str(graphuuid)
                         except ValueError as e:
                             graphuuid = uuid.UUID(node['config']['graphid'])
-                            graph_id = unicode(graphuuid)
+                            graph_id = str(graphuuid)
                         node['config']['options'] = []
                         for resource_instance in Resource.objects.filter(graph_id=graph_id):
                             node['config']['options'].append({'id': str(resource_instance.pk), 'name': resource_instance.displayname})
@@ -227,7 +227,7 @@ class MobileSurvey(models.MobileSurveyModel):
 
     def get_ordered_cards(self):
         ordered_cards = models.MobileSurveyXCard.objects.filter(mobile_survey=self).order_by('sortorder')
-        ordered_card_ids = [unicode(mpc.card_id) for mpc in ordered_cards]
+        ordered_card_ids = [str(mpc.card_id) for mpc in ordered_cards]
         return ordered_card_ids
 
     def handle_reviewer_edits(self, user, tile):
@@ -375,7 +375,7 @@ class MobileSurvey(models.MobileSurveyModel):
                     default_bounds['features'][0]['properties']['inverted'] = False
                     map_filter = json.dumps(default_bounds)
                 else:
-                    map_filter = json.dumps({u'type': u'FeatureCollection', 'features': [
+                    map_filter = json.dumps({'type': 'FeatureCollection', 'features': [
                                             {'geometry': json.loads(self.bounds.json)}]})
                 try:
                     for res_type in resource_types:
