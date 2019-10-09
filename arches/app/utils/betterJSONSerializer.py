@@ -95,7 +95,7 @@ class JSONSerializer(object):
             return ret
         elif (isinstance(object, int) or
               isinstance(object, float) or
-              isinstance(object, long) or
+              isinstance(object, int) or
               isinstance(object, str) or
               isinstance(object, bool) or
               object is None):
@@ -231,7 +231,7 @@ class JSONDeserializer(object):
             return self.handle_list(object)
         elif (isinstance(object, int) or
               isinstance(object, float) or
-              isinstance(object, long) or
+              isinstance(object, int) or
               isinstance(object, str) or
               isinstance(object, bool) or
               object is None):
