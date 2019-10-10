@@ -101,7 +101,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='mobilesurveymodel',
             name='cards',
-            field=models.ManyToManyField(through='models.MobileSurveyXCard', to=b'models.CardModel'),
+            field=models.ManyToManyField(through='models.MobileSurveyXCard', to='models.CardModel'),
         ),
         migrations.AddField(
             model_name='mobilesurveymodel',
@@ -111,7 +111,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='mobilesurveymodel',
             name='groups',
-            field=models.ManyToManyField(through='models.MobileSurveyXGroup', to=b'auth.Group'),
+            field=models.ManyToManyField(through='models.MobileSurveyXGroup', to='auth.Group'),
         ),
         migrations.AddField(
             model_name='mobilesurveymodel',
