@@ -8779,7 +8779,8 @@ table.table.dataTable {
 }
 
 .rr-splash-img-container .fa {
-    font-size: 56px;
+    font-size: 42px;
+    margin: 8px 5px;
     color: steelblue;
 }
 
