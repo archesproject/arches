@@ -9,7 +9,7 @@ from itertools import chain
 from django.db import models, DEFAULT_DB_ALIAS
 from django.db.models import Model
 from django.db.models.query import QuerySet
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_str
 from django.core.serializers.python import Serializer as PythonSerializer
 from django.core.serializers.python import Deserializer as PythonDeserializer
 from django.core.serializers.json import DjangoJSONEncoder
@@ -209,7 +209,7 @@ class JSONDeserializer(object):
         self.use_natural_keys = options.pop("use_natural_keys", False)
 
         if isinstance(stream_or_string, str):
-            stream = StringIO(smart_unicode(stream_or_string))
+            stream = StringIO(smart_str(stream_or_string))
         else:
             stream = stream_or_string
 
