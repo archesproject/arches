@@ -5,9 +5,9 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 class JSONResponse(HttpResponse):
 
     def __init__(self, content=b'', *args, **kwargs):
-    	kwargs['content_type'] = 'application/json'
-
-    	ensure_ascii = kwargs.pop("ensure_ascii", True)
+    	
+        kwargs['content_type'] = 'application/json'
+        ensure_ascii = kwargs.pop("ensure_ascii", True)
         stream = kwargs.pop("stream", None)
         indent = kwargs.pop("indent", None)
         selected_fields = kwargs.pop("fields", None)
@@ -18,17 +18,17 @@ class JSONResponse(HttpResponse):
 
         options = {}
         if ensure_ascii != None:
-        	options['ensure_ascii'] = ensure_ascii
+            options['ensure_ascii'] = ensure_ascii
         if stream != None:
-        	options['stream'] = stream
-    	if indent != None:
-        	options['indent'] = indent
-    	if selected_fields != None:
-        	options['selected_fields'] = selected_fields
-    	if use_natural_keys != None:
-        	options['use_natural_keys'] = use_natural_keys
+            options['stream'] = stream
+        if indent != None:
+            options['indent'] = indent
+        if selected_fields != None:
+            options['selected_fields'] = selected_fields
+        if use_natural_keys != None:
+            options['use_natural_keys'] = use_natural_keys
         if geom_format != None:
-        	options['geom_format'] = geom_format
+            options['geom_format'] = geom_format
 
         # Content is a bytestring. See the `content` property methods.
         self.content = JSONSerializer().serialize(content, **options)

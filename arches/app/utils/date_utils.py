@@ -2,7 +2,7 @@ import calendar
 import datetime
 import dateutil
 from dateutil.relativedelta import relativedelta
-from edtf import parse_edtf, text_to_edtf
+# from edtf import parse_edtf, text_to_edtf
 from edtf.parser.parser_classes import Date, DateAndTime, Interval, Unspecified, \
     UncertainOrApproximate, Level1Interval, LongYear, Season, \
     PartialUncertainOrApproximate, PartialUnspecified, OneOfASet, \
@@ -38,12 +38,14 @@ class ExtendedDateFormat(SortableDateRange):
 
         try:
             self.parse(date)
-        except:
-            try:
-                self.parse(text_to_edtf(self.orig_date))
-            except Exception as err:
-                self.error = err
-                raise err
+        except Exception as err:
+            self.error = err
+            raise err
+            # try:
+            #     self.parse(text_to_edtf(self.orig_date))
+            # except Exception as err:
+            #     self.error = err
+            #     raise err
 
     def parse(self, date=None):
         if date == None:
@@ -66,7 +68,7 @@ class ExtendedDateFormat(SortableDateRange):
         except:
             pass
 
-        self.edtf = parse_edtf(date)
+        # self.edtf = parse_edtf(date)
 
         result = self.handle_object(self.edtf)
         if isinstance(result, list):
