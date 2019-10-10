@@ -85,9 +85,9 @@ def get_graphs_for_export(graphids=None):
             resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(graphid__in=graphids), exclude=["widgets"])
         except:
             # this warning should never get thrown while doing an export from the UI, but maybe it should be moved somewhere else.
-            print '*'*80
-            print '"{0}" contains/is not a valid graphid or option for this command.'.format(','.join(graphids))
-            print '*'*80
+            print('*'*80)
+            print('"{0}" contains/is not a valid graphid or option for this command.'.format(','.join(graphids)))
+            print('*'*80)
             sys.exit()
 
     for resource_graph in resource_graph_query:
