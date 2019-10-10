@@ -17,7 +17,7 @@ class JSONResponse(HttpResponse):
 
         options = {}
         if ensure_ascii != None:
-        	options['ensure_ascii'] = ensure_ascii
+            options['ensure_ascii'] = ensure_ascii
         if stream != None:
         	options['stream'] = stream
         if indent != None:
@@ -27,7 +27,7 @@ class JSONResponse(HttpResponse):
         if use_natural_keys != None:
         	options['use_natural_keys'] = use_natural_keys
         if geom_format != None:
-        	options['geom_format'] = geom_format
+            options['geom_format'] = geom_format
 
         # Content is a bytestring. See the `content` property methods.
         self.content = JSONSerializer().serialize(content, **options)
