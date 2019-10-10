@@ -132,9 +132,9 @@ class Command(BaseCommand):
             '-c', '--config_file', action='store', dest='config_file', default=None,
             help='Usually an export mapping file.')
 
-        parser.add_argument(
-            '-m', '--mapnik_xml_path', action='store', dest='mapnik_xml_path', default=False,
-            help='A path to a mapnik xml file to generate a tileserver layer from.')
+        # parser.add_argument(
+        #     '-m', '--mapnik_xml_path', action='store', dest='mapnik_xml_path', default=False,
+        #     help='A path to a mapnik xml file to generate a tileserver layer from.')
 
         parser.add_argument(
             '-t', '--tile_config_path', action='store', dest='tile_config_path', default=False,
@@ -264,7 +264,7 @@ class Command(BaseCommand):
         if options['operation'] == 'add_tileserver_layer':
             self.add_tileserver_layer(
                 options['layer_name'],
-                options['mapnik_xml_path'],
+                # options['mapnik_xml_path'],
                 options['layer_icon'],
                 options['is_basemap'],
                 options['tile_config_path'])
@@ -608,8 +608,8 @@ class Command(BaseCommand):
                     mapnik_xml_path = False
                     if path.endswith('.json'):
                         tile_config_path = path
-                    if path.endswith('.xml'):
-                        mapnik_xml_path = path
+                    # if path.endswith('.xml'):
+                    #     mapnik_xml_path = path
 
                     self.add_tileserver_layer(
                         meta['name'], mapnik_xml_path, meta['icon'], basemap, tile_config_path)
