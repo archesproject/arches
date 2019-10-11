@@ -36,19 +36,55 @@ define([
                     }
                 };
 
-                options.layers = ko.observable([{
-                    "id": "geojson-search-buffer",
-                    "type": "fill",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "paint": {
-                        "fill-color": "#3bb2d0",
-                        "fill-outline-color": "#3bb2d0",
-                        "fill-opacity": 0.2
-                    },
-                    "source": "geojson-search-buffer-data"
-                }]);
+                options.layers = ko.observable(
+                    [
+                        {
+                            "id": "geojson-search-buffer-outline-base",
+                            "source": "geojson-search-buffer-data",
+                            "type": "line",
+                            "filter": [
+                                "==", "$type", "Polygon"
+                            ],
+                            "layout": {
+                                "line-cap": "round",
+                                "line-join": "round"
+                            },
+                            "paint": {
+                                "line-color": "#fff",
+                                "line-width": 4
+                            }
+                        },
+                        {
+                            "id": "geojson-search-buffer-outline",
+                            "source": "geojson-search-buffer-data",
+                            "type": "line",
+                            "filter": [
+                                "==", "$type", "Polygon"
+                            ],
+                            "layout": {
+                                "line-cap": "round",
+                                "line-join": "round"
+                            },
+                            "paint": {
+                                "line-color": "#3bb2d0",
+                                "line-width": 2
+                            }
+                        },
+                        {
+                        "id": "geojson-search-buffer",
+                        "type": "fill",
+                        "layout": {
+                            "visibility": "visible"
+                        },
+                        "paint": {
+                            "fill-color": "#3bb2d0",
+                            "fill-outline-color": "#3bb2d0",
+                            "fill-opacity": 0.2
+                        },
+                        "source": "geojson-search-buffer-data"
+                        }
+                    ]
+                );
 
                 MapComponentViewModel.apply(this, [options]);
 
