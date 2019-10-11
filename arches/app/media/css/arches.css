@@ -8779,7 +8779,8 @@ table.table.dataTable {
 }
 
 .rr-splash-img-container .fa {
-    font-size: 56px;
+    font-size: 42px;
+    margin: 8px 5px;
     color: steelblue;
 }
 
@@ -10050,7 +10051,7 @@ ul.select2-choices:after {
 .card-component-panel h4 {
     color: #2f527a;
     font-size: 15px;
-    font-weight: 400;
+    font-weight: 550;
 }
 
 .card-component-panel .card-component h4 {
@@ -10386,6 +10387,32 @@ a.jstree-anchor.permissions-widget {
 
 .sidebar-section:last-child {
     border-bottom: none;
+}
+
+.sidebar-single-line-group {
+    margin-bottom: 0px;
+    font-size: 14px;
+}
+
+.sidebar-single-line-type {
+    color: #25476A;
+}
+
+.sidebar-single-line-value {
+    color: #777;
+}
+
+.sidebar-double-line-group {
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.sidebar-double-line-type {
+    color: #25476A;
+}
+
+.sidebar-double-line-value {
+    color: #777;
 }
 
 .tabbed-report-sidepanel-title.consultation-status-title.completed {
