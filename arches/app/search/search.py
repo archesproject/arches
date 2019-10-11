@@ -27,15 +27,15 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 
 class SearchEngine(object):
 
-    def __init__(self, prefix=settings.ELASTICSEARCH_PREFIX):
+    def __init__(self, **kwargs):
         #
         serializer = JSONSerializer()
         serializer.mimetype = 'application/json'
         serializer.dumps = serializer.serialize
         serializer.loads = JSONDeserializer().deserialize
-        self.es = Elasticsearch(hosts=settings.ELASTICSEARCH_HOSTS, serializer=serializer, **settings.ELASTICSEARCH_CONNECTION_OPTIONS)
+        self.prefix = kwargs.pop('prefix', '').lower()
+        self.es = Elasticsearch(serializer=serializer, **kwargs)
         self.logger = logging.getLogger(__name__)
-        self.prefix = prefix.lower()
 
     def _add_prefix(self, *args, **kwargs):
         if args:
