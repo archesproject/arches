@@ -16,6 +16,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.forms.models import model_to_dict
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.files import File
+from pprint import pprint
 
 class UnableToSerializeError(Exception):
     """ Error for not implemented classes """
@@ -210,10 +211,22 @@ class JSONDeserializer(object):
 
         if isinstance(stream_or_string, str):
             stream = StringIO(smart_str(stream_or_string))
+        
+        elif isinstance(stream_or_string, bytes):
+            try:
+                stream = stream_or_string.decode("utf-8")
+                stream = StringIO(smart_str(stream))
+            except Exception as e:
+                print(e)
+                stream = stream_or_string
+        
         else:
             stream = stream_or_string
 
-        ret = self.handle_object(json.load(stream))
+        try:
+            ret = self.handle_object(json.load(stream))
+        except Exception as e:
+            ret = None
 
         return ret
 
