@@ -16,7 +16,6 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.forms.models import model_to_dict
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.files import File
-from pprint import pprint
 
 class UnableToSerializeError(Exception):
     """ Error for not implemented classes """
