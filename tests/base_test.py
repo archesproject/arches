@@ -87,16 +87,8 @@ class ArchesTestCase(TestCase):
 
 class TestSearchEngine(SearchEngine):
 
-    def __init__(self):
-        super(TestSearchEngine, self).__init__(prefix='test')
-        #self.index_prefix = 'test_'
-
-    # def reset_index(self, **kwargs):
-    #     index = kwargs.get('index', None)
-    #     kwargs = self._add_prefix(**kwargs)
-    #     if index:
-    #         kwargs['index'] ='%s%s' % (self.index_prefix, index)
-    #     return kwargs
+    def __init__(self, **kwargs):
+        super(TestSearchEngine, self).__init__(**kwargs)
 
     def delete(self, **kwargs):
         """

@@ -5,9 +5,8 @@ from __future__ import unicode_literals
 from django.db import migrations
 from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.mappings import prepare_terms_index, delete_terms_index, \
-    prepare_concepts_index, delete_concepts_index, prepare_search_index, delete_search_index, \
-    prepare_resource_relations_index, delete_resource_relations_index
+from arches.app.search.mappings import prepare_terms_index, \
+    prepare_concepts_index, prepare_search_index, prepare_resource_relations_index
 
 
 class Migration(migrations.Migration):
@@ -18,8 +17,10 @@ class Migration(migrations.Migration):
 
     def forwards_func(apps, schema_editor):
         se = SearchEngineFactory().create()
+        se_old = SearchEngineFactory().create(hosts=[settings.ELASTICSEARCH_TEMP_HTTP_ENDPOINT])
         prefix = settings.ELASTICSEARCH_PREFIX
-        if (se.es.indices.exists(index="%s_terms" % prefix) is False):
+        if (se.es.indices.exists(index="%s_terms" % prefix) is False and 
+                se_old.es.indices.exists(index="%s_strings" % prefix) is True):
             prepare_terms_index(create=True)
             doc = {
                 "source": {
@@ -36,7 +37,8 @@ class Migration(migrations.Migration):
             }
             se.es.reindex(body=doc)
 
-        if (se.es.indices.exists(index="%s_concepts" % prefix) is False):
+        if (se.es.indices.exists(index="%s_concepts" % prefix) is False and 
+                se_old.es.indices.exists(index="%s_strings" % prefix) is True):
             prepare_concepts_index(create=True)
             doc = {
                 "source": {
@@ -53,7 +55,8 @@ class Migration(migrations.Migration):
             }
             se.es.reindex(body=doc)
 
-        if(se.es.indices.exists(index="%s_resources" % prefix) is False):
+        if(se.es.indices.exists(index="%s_resources" % prefix) is False and 
+                se_old.es.indices.exists(index="%s_resource" % prefix) is True):
             prepare_search_index(create=True)
             doc = {
                 "source": {
@@ -69,7 +72,8 @@ class Migration(migrations.Migration):
             }
             se.es.reindex(body=doc)
 
-        if(se.es.indices.exists(index="%s_resource_relations" % prefix) is False):
+        if(se.es.indices.exists(index="%s_resource_relations" % prefix) is False and 
+                se_old.es.indices.exists(index="%s_resource_relations" % prefix) is True):
             prepare_resource_relations_index(create=True)
             doc = {
                 "source": {
@@ -86,10 +90,7 @@ class Migration(migrations.Migration):
             se.es.reindex(body=doc)
 
     def reverse_func(apps, schema_editor):
-        delete_terms_index()
-        delete_concepts_index()
-        delete_search_index()
-        delete_resource_relations_index()
+        pass
 
     operations = [
         migrations.RunPython(forwards_func, reverse_func),
