@@ -210,10 +210,23 @@ class JSONDeserializer(object):
 
         if isinstance(stream_or_string, str):
             stream = StringIO(smart_str(stream_or_string))
+        
+        elif isinstance(stream_or_string, bytes):
+            try:
+                stream = stream_or_string.decode("utf-8")
+                stream = StringIO(smart_str(stream))
+            except Exception as e:
+                print(e)
+                stream = stream_or_string
+        
         else:
             stream = stream_or_string
 
-        ret = self.handle_object(json.load(stream))
+        try:
+            ret = self.handle_object(json.load(stream))
+        except Exception as e:
+            print(e)
+            ret = None
 
         return ret
 
