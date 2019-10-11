@@ -225,6 +225,7 @@ class JSONDeserializer(object):
         try:
             ret = self.handle_object(json.load(stream))
         except Exception as e:
+            print(e)
             ret = None
 
         return ret
