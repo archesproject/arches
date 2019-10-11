@@ -1,6 +1,6 @@
 Django==1.11.17
 psycopg2-binary==2.7.4
-elasticsearch>=6.0.0,<7.0.0
+elasticsearch>=6.0.0
 rdflib==4.2.2
 unicodecsv==0.14.1
 django-guardian==1.4.9
