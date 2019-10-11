@@ -3,7 +3,7 @@ filter_secrets: false
 sudo: false
 
 env:
-  - ES_VERSION=6.7.1 ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
+  - ES_VERSION=7.0.0 ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz
 
 addons:
   postgresql: 9.6
@@ -32,7 +32,7 @@ before_install:
   - npm install -g wait-on
   - pip install coveralls
   - wget ${ES_DOWNLOAD_URL}
-  - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
+  - tar -xzf elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz
   - "./elasticsearch-${ES_VERSION}/bin/elasticsearch -v &"
 
 cache:

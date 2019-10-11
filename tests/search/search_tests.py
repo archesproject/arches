@@ -32,10 +32,11 @@ class SearchTests(ArchesTestCase):
     def tearDownClass(cls):
         se = SearchEngineFactory().create()
         se.delete_index(index='test')
+        se.delete_index(index='bulk')
 
-    def test_bulk_delete(self):
+    def test_delete_by_query(self):
         """
-        Test bulk deleting of documents in Elasticsearch
+        Test deleting documents by query in Elasticsearch
 
         """
 
@@ -64,4 +65,43 @@ class SearchTests(ArchesTestCase):
         query.delete(index='test', refresh=True)
 
         self.assertEqual(se.count(index='test'), 10)
+
+    def test_bulk_add_documents(self):
+        """
+        Test adding documents to Elasticsearch in bulk
+
+        """
+
+        se = SearchEngineFactory().create()
+        se.create_index(index='test')
+
+        documents = []
+        count_before = se.count(index='test')
+        for i in range(10):
+            doc = {
+                'id': i,
+                'type': 'prefLabel',
+                'value': 'test pref label',
+            }
+            documents.append(se.create_bulk_item(op_type='index', index='test', id=doc['id'], data=doc))
+
+        ret = se.bulk_index(documents, refresh=True)
+        count_after = se.count(index='test')
+        self.assertEqual(count_after-count_before, 10)
+
+    def test_bulk_indexer(self):
+        se = SearchEngineFactory().create()
+        se.create_index(index='bulk')
+
+        with se.BulkIndexer(batch_size=500, refresh=True) as bulk_indexer:
+            for i in range(1001):
+                doc = {
+                    'id': i,
+                    'type': 'prefLabel',
+                    'value': 'test pref label',
+                }
+                bulk_indexer.add(index='bulk', id=doc['id'], data=doc)
+
+        count_after = se.count(index='bulk')
+        self.assertEqual(count_after, 1001)
 

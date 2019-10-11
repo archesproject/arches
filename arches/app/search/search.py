@@ -27,15 +27,15 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 
 class SearchEngine(object):
 
-    def __init__(self, prefix=settings.ELASTICSEARCH_PREFIX):
+    def __init__(self, **kwargs):
         #
         serializer = JSONSerializer()
         serializer.mimetype = 'application/json'
         serializer.dumps = serializer.serialize
         serializer.loads = JSONDeserializer().deserialize
-        self.es = Elasticsearch(hosts=settings.ELASTICSEARCH_HOSTS, serializer=serializer, **settings.ELASTICSEARCH_CONNECTION_OPTIONS)
+        self.prefix = kwargs.pop('prefix', '').lower()
+        self.es = Elasticsearch(serializer=serializer, **kwargs)
         self.logger = logging.getLogger(__name__)
-        self.prefix = prefix.lower()
 
     def _add_prefix(self, *args, **kwargs):
         if args:
@@ -65,7 +65,6 @@ class SearchEngine(object):
         """
 
         kwargs = self._add_prefix(**kwargs)
-        kwargs['doc_type'] = kwargs.pop('doc_type', '_doc')
         body = kwargs.pop('body', None)
         if body != None:
             try:
@@ -110,7 +109,6 @@ class SearchEngine(object):
         """
 
         kwargs = self._add_prefix(**kwargs)
-        kwargs['doc_type'] = kwargs.pop('doc_type', '_doc')
         body = kwargs.get('body', None)
         id = kwargs.get('id', None)
 
@@ -159,11 +157,12 @@ class SearchEngine(object):
                 }
 
         self.es.indices.create(index=index, ignore=400)
-        self.es.indices.put_mapping(index=index, doc_type='_doc', body=body)
+        self.es.indices.put_mapping(index=index, doc_type='_doc', body=body, include_type_name=True)
         print('creating index : %s' % (index))
 
     def create_index(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
+        kwargs['include_type_name'] = True
         self.es.indices.create(ignore=400, **kwargs)
         print('creating index : %s' % kwargs.get('index', ''))
 
