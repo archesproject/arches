@@ -87,16 +87,8 @@ class ArchesTestCase(TestCase):
 
 class TestSearchEngine(SearchEngine):
 
-    def __init__(self):
-        super(TestSearchEngine, self).__init__(prefix='test')
-        #self.index_prefix = 'test_'
-
-    # def reset_index(self, **kwargs):
-    #     index = kwargs.get('index', None)
-    #     kwargs = self._add_prefix(**kwargs)
-    #     if index:
-    #         kwargs['index'] ='%s%s' % (self.index_prefix, index)
-    #     return kwargs
+    def __init__(self, **kwargs):
+        super(TestSearchEngine, self).__init__(**kwargs)
 
     def delete(self, **kwargs):
         """
@@ -128,15 +120,6 @@ class TestSearchEngine(SearchEngine):
 
         #kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).search(**kwargs)
-
-    def create_mapping(self, index, fieldname='', fieldtype='string', fieldindex=None, body=None):
-        """
-        Creates an Elasticsearch body for a single field given an index name and type name
-
-        """
-
-        #index = '%s%s' % (self.index_prefix, index)
-        return super(TestSearchEngine, self).create_mapping(index=index, fieldname=fieldname, fieldtype=fieldtype, fieldindex=fieldindex, body=body)
 
     def create_index(self, **kwargs):
         #kwargs = self.reset_index(**kwargs)

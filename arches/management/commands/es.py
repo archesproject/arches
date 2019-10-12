@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """This module contains commands for building Arches."""
 
 import os
+import platform
 from django.core.management.base import BaseCommand, CommandError
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 from arches.management.commands import utils
@@ -98,7 +99,8 @@ class Command(BaseCommand):
 
         url = get_elasticsearch_download_url(os.path.join(settings.ROOT_DIR, 'install'))
         file_name = url.split('/')[-1]
-        file_name_wo_extention, extention = os.path.splitext(file_name)
+        os_name = platform.system().lower()
+        file_name_wo_extention = file_name.split('-%s' % os_name)[0]
 
         download_elasticsearch(os.path.join(settings.ROOT_DIR, 'install'))
         unzip_file(os.path.join(settings.ROOT_DIR, 'install', file_name), install_location)
@@ -106,7 +108,8 @@ class Command(BaseCommand):
         es_config_directory = os.path.join(install_location, file_name_wo_extention, 'config')
         try:
             os.rename(os.path.join(es_config_directory, 'elasticsearch.yml'), os.path.join(es_config_directory, 'elasticsearch.yml.orig'))
-        except: pass
+        except:
+            pass
 
         os.chmod(os.path.join(install_location, file_name_wo_extention, 'bin', 'elasticsearch'), 0o755)
 

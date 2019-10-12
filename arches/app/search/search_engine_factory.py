@@ -22,12 +22,16 @@ from django.core.exceptions import ImproperlyConfigured
 
 class SearchEngineFactory(object):
 
-    def create(self):
+    def create(self,
+            hosts=settings.ELASTICSEARCH_HOSTS,
+            prefix=settings.ELASTICSEARCH_PREFIX,
+            connection_options=settings.ELASTICSEARCH_CONNECTION_OPTIONS
+        ):
+
         backend = settings.SEARCH_BACKEND
         components = backend.split('.')
         classname = components[len(components)-1]
         modulename = ('.').join(components[0:len(components)-1])
         # _temp = __import__(modulename, globals(), locals(), [classname], -1)
         _temp = __import__(modulename, globals(), locals(), [classname]) # in py3, level must be >= 0
-        # _temp = import_module(modulename,[classname])
-        return getattr(_temp, classname)()
+        return getattr(_temp, classname)(hosts=hosts, prefix=prefix, **connection_options)
