@@ -1348,6 +1348,10 @@ class Graph(models.GraphModel):
         context = self.jsonldcontext
         try:
             context = JSONDeserializer().deserialize(context)
+            if context is None:
+                context = {
+                    "@context": {}
+                }
         except ValueError:
             if context == '':
                 context = {}
