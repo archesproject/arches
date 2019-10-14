@@ -184,9 +184,9 @@ class ArchesFileReader(Reader):
                             for tile in resource['tiles']:
                                 tile['tiles'] = [child for child in resource[
                                     'tiles'] if child['parenttile_id'] == tile['tileid']]
-                            for tile in sorted(resource['tiles'], key=lambda k: k['parenttile_id']):
-                                if not tile['parenttile_id']:
-                                    update_or_create_tile(tile)
+
+                            for tile in [k for k in resource['tiles'] if k['parenttile_id'] is None]:
+                                update_or_create_tile(tile)
 
     def get_blank_tile(self, sourcetilegroup, blanktilecache, tiles, resourceinstanceid):
         if len(sourcetilegroup[0]['data']) > 0:
