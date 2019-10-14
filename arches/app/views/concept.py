@@ -502,10 +502,9 @@ def concept_value(request):
                 value.delete()
                 return JSONResponse(value)
     if request.method == 'GET':
-        valueid = request.GET.get('valueid') # this is somehow returning value
+        valueid = request.GET.get('valueid')
         pprint(request.GET)
         value = request.GET.get('value')
-        print('=======++++++++========')
         value = models.Value.objects.get(pk=valueid)
         try:
             pprint(value)
