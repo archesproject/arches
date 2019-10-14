@@ -328,7 +328,7 @@ def paged_dropdown(request):
     results = Concept().get_child_collections_hierarchically(conceptid, offset=offset, limit=limit, query=query)
     total_count = results[0][3] if len(results) > 0 else 0
     data = [dict(list(zip(['valueto','depth', 'collector'], d))) for d in results]
-    data = [dict(list(zip(['conceptid', 'id', 'type', 'text', 'language'], d['valueto'].values())), depth=d['depth'], collector=d['collector']) for d in data]
+    data = [dict(list(zip(['id', 'text', 'conceptid', 'language', 'type'], d['valueto'].values())), depth=d['depth'], collector=d['collector']) for d in data]
     return JSONResponse({
         'results': data,
         'more': offset+limit < total_count
@@ -502,11 +502,15 @@ def concept_value(request):
                 value.delete()
                 return JSONResponse(value)
     if request.method == 'GET':
-        valueid = request.GET.get('valueid')
+        valueid = request.GET.get('valueid') # this is somehow returning value
+        pprint(request.GET)
+        value = request.GET.get('value')
         print('=======++++++++========')
-        pprint(valueid)
         value = models.Value.objects.get(pk=valueid)
-        pprint(value)
+        try:
+            pprint(value)
+        except Exception as e:
+            print('found: ',e)
         return JSONResponse(value)
 
     return HttpResponseNotFound
