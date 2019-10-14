@@ -503,13 +503,7 @@ def concept_value(request):
                 return JSONResponse(value)
     if request.method == 'GET':
         valueid = request.GET.get('valueid')
-        pprint(request.GET)
-        value = request.GET.get('value')
         value = models.Value.objects.get(pk=valueid)
-        try:
-            pprint(value)
-        except Exception as e:
-            print('found: ',e)
         return JSONResponse(value)
 
     return HttpResponseNotFound
