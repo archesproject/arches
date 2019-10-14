@@ -1178,7 +1178,11 @@ class Graph(models.GraphModel):
                 if not card.name:
                     card.name = self.nodes[card.nodegroup_id].name
                 if not card.description:
-                    card.description = self.nodes[card.nodegroup_id].description
+                    try:
+                        card.description = self.nodes[card.nodegroup_id].description
+                    except KeyError as e:
+                        print('Error: card.description not accessible, nodegroup_id not in self.nodes: ',e)
+
                 is_editable = card.is_editable()
             else:
                 if card.nodegroup.parentnodegroup is None:
