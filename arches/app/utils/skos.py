@@ -239,7 +239,7 @@ class SKOSReader(object):
                         conceptto_id=relation['target'],
                         relationtype_id=relation['type']
                     )
-                
+
                 # need to index after the concepts and relations have been entered into the db
                 # so that the proper context gets indexed with the concept
                 if scheme_node:
@@ -255,7 +255,7 @@ class SKOSReader(object):
                         relationtype_id=relation['type']
                     )
                 except IntegrityError as e:
-                    self.logger.warning(e.message)
+                    self.logger.warning(e)
 
             return scheme_node
         else:
