@@ -1061,6 +1061,3 @@ class Plugin(models.Model):
     class Meta:
         managed = True
         db_table = 'plugins'
-        permissions = (
-            ('view_plugin', 'View plugin'),
-        )
