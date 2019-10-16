@@ -5,7 +5,7 @@ import sys
 import math
 import json
 from django.http import HttpResponse
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from ModestMaps.Core import Coordinate
 from ModestMaps.Geo import Location
 from arches.app.datatypes import datatypes

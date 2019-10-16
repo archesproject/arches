@@ -29,7 +29,7 @@ from django.utils.html import strip_tags
 from django.utils.translation import ugettext as _
 from django.utils.http import urlencode
 from django.core.mail import EmailMultiAlternatives
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required

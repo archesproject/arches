@@ -27,7 +27,7 @@ from django.db.models import Count
 from django.contrib.auth.models import User, Group
 from django.contrib.gis.geos import MultiPolygon
 from django.contrib.gis.geos import Polygon
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpRequest, HttpResponseNotFound
 from django.template.loader import render_to_string
