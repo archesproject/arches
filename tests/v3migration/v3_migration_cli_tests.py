@@ -195,7 +195,7 @@ class v3MigrationTests(ArchesTestCase):
         v4_ct = 0
         with open(v4_relations, 'rb') as openfile:
             reader = csv.reader(openfile)
-            headers = reader.next()
+            headers = next(reader)
             self.assertEqual(headers,
                              ['resourceinstanceidfrom', 'resourceinstanceidto',
                               'relationshiptype', 'datestarted', 'dateended', 'notes'])
@@ -208,7 +208,7 @@ class v3MigrationTests(ArchesTestCase):
         v3_relations = os.path.join(self.pkg, "v3data", "business_data", "v3sample.relations")
         with open(v3_relations, 'rb') as openfile:
             reader = csv.reader(openfile, delimiter="|")
-            headers = reader.next()
+            headers = next(reader)
             for r in reader:
                 v3_ct += 1
 
@@ -296,7 +296,7 @@ class v3MigrationTests(ArchesTestCase):
         v3_relations = os.path.join(self.pkg, "v3data", "business_data", "v3sample.relations")
         with open(v3_relations, 'rb') as openfile:
             reader = csv.reader(openfile, delimiter="|")
-            headers = reader.next()
+            headers = next(reader)
             for r in reader:
                 v3_ct += 1
 

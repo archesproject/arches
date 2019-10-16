@@ -570,7 +570,7 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(len(graph.edges), 5)
         self.assertEqual(len(graph.nodes), 6)
 
-        branch_three_nodeid = iter(list(branch_three.nodes.keys())).next()
+        branch_three_nodeid = next(iter(list(branch_three.nodes.keys())))
         branch_one_rootnodeid = branch_one.root.nodeid
         graph.move_node(branch_three_nodeid, 'http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', branch_one_rootnodeid)
         self.assertEqual(len(graph.edges), 5)
@@ -910,7 +910,7 @@ class GraphTests(ArchesTestCase):
         resource_graph.save()
 
         self.assertEqual(len(resource_graph.cards), 1)
-        the_card = iter(list(resource_graph.cards.values())).next()
+        the_card = next(iter(list(resource_graph.cards.values())))
         for card in resource_graph.get_cards():
             self.assertEqual(card['name'], the_card.name)
             self.assertEqual(card['description'], the_card.description)
