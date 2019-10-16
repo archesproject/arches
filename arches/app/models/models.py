@@ -385,7 +385,7 @@ class GraphModel(models.Model):
         default='50000000-0000-0000-0000-000000000001',
         on_delete=models.SET_DEFAULT
     )
-    config = JSONField(db_column='config', default={})
+    config = JSONField(db_column='config', default=dict)
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
 
     @property
@@ -977,7 +977,7 @@ class MobileSurveyModel(models.Model):
     bounds = models.MultiPolygonField(null=True)
     tilecache = models.TextField(null=True)
     onlinebasemaps = JSONField(blank=True, null=True, db_column='onlinebasemaps')
-    datadownloadconfig = JSONField(blank=True, null=True, default='{"download":false, "count":100, "resources":[], "custom":null}')
+    datadownloadconfig = JSONField(blank=True, null=True, default=lambda: dict(download=False, count=100, resources=[], custom=None))
 
     def __unicode__(self):
         return self.name
