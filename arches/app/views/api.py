@@ -257,6 +257,13 @@ class GeoJSON(APIBase):
 
 class MVT(APIBase):
     def get(self, request, nodeid, zoom, x, y):
+        if hasattr(request.user, 'userprofile') is not True:
+            models.UserProfile.objects.create(user=request.user)
+        viewable_nodegroups = request.user.userprofile.viewable_nodegroups
+        try:
+            node = models.Node.objects.get(nodeid=nodeid, nodegroup_id__in=viewable_nodegroups)
+        except models.Node.DoesNotExist:
+            raise Http404()
         with connection.cursor() as cursor:
             # TODO: when we upgrade to PostGIS 3, we can get feature state
             # working by adding the feature_id_name arg:
