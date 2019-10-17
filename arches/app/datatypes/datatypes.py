@@ -1051,6 +1051,48 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
 class FileListDataType(BaseDataType):
 
+    def validate(self, value, node):
+        config = node.config
+        errors = []
+        limit = config['maxFiles']
+        max_size = config['maxFileSize'] if 'maxFileSize' in config.keys() else None
+
+        
+        def format_bytes(size):
+            # 2**10 = 1024
+            power = 2**10
+            n = 0
+            power_labels = {0 : '', 1: 'kilo', 2: 'mega', 3: 'giga', 4: 'tera'}
+            while size > power:
+                size /= power
+                n += 1
+            return size, power_labels[n]+'bytes'
+
+        
+        try:
+            if value is not None and config['activateMax'] is True and len(value) > limit:
+                errors.append({
+                    'type':'ERROR',
+                    'message':f'This node has a limit of {limit} files. Please reduce files.'
+                })
+            
+            if max_size is not None:
+                formatted_max_size = format_bytes(max_size)
+                for v in value:
+                    if v['size'] > max_size:
+                        errors.append({
+                            'type':'ERROR',
+                            'message':f'This node has a file-size limit of {formatted_max_size}. Please reduce file size or contact your sysadmin.'
+                        })
+        except Exception as e:
+            dt = self.datatype_model.datatype
+            errors.append({
+                'type': 'ERROR',
+                'message': f'datatype: {dt}, value: {value} - {e} .'
+            })
+        return errors
+
+    
     def get_tile_data(self, user_is_reviewer, user_id, tile):
         if user_is_reviewer is False and tile.provisionaledits is not None and user_id in tile.provisionaledits:
             data = tile.provisionaledits[user_id]['value']
@@ -1573,7 +1615,7 @@ class NodeValueDataType(BaseDataType):
             try:
                 models.TileModel.objects.get(tileid=value)
             except:
-                errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid tile id. This data was not imported.'.format(value, row_number)})
+                errors.append({'type': 'ERROR', 'message': f'{value} {row_number} is not a valid tile id. This data was not imported.'})
         return errors
 
     def get_display_value(self, tile, node):

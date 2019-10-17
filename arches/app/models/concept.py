@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import re
 import uuid
 import copy
 from operator import itemgetter
@@ -168,8 +169,8 @@ class Concept(object):
                         subconcept.relationshiptype = relation.relationtype_id
                         self.subconcepts.append(subconcept)
 
-                    self.subconcepts = sorted(self.subconcepts, key=methodcaller(
-                        'get_sortkey', lang=lang), reverse=False)
+                    self.subconcepts = sorted(self.subconcepts, key=lambda concept: 
+                        self.natural_keys(concept.get_sortkey(lang)), reverse=False)
 
             if include_parentconcepts:
                 conceptrealations = models.Relation.objects.filter(
@@ -656,6 +657,23 @@ class Concept(object):
 
         return self.get_preflabel(lang=lang).value
 
+    def natural_keys(self, text):
+        '''
+        alist.sort(key=natural_keys) sorts in human order
+        http://nedbatchelder.com/blog/200712/human_sorting.html
+        (See Toothy's implementation in the comments)
+        float regex comes from https://stackoverflow.com/a/12643073/190597
+        '''
+
+        def atof(text):
+            try:
+                retval = float(text)
+            except ValueError:
+                retval = text
+            return retval
+
+        return [ atof(c) for c in re.split(r'[+-]?([0-9]+(?:[.][0-9]*)?|[.][0-9]+)', str(text))]
+
     def get_preflabel(self, lang=settings.LANGUAGE_CODE):
         score = 0
         ranked_labels = []
@@ -842,8 +860,10 @@ class Concept(object):
                 for relation in conceptrealations:
                     ret.children.append(_findNarrowerConcept(
                         relation.conceptto_id, depth_limit=depth_limit, level=level))
-                ret.children = sorted(
-                    ret.children, key=lambda concept: concept.sortorder if concept.sortorder else concept.label, reverse=False)
+
+                ret.children = sorted(ret.children, key=lambda concept:
+                    self.natural_keys(concept.sortorder if concept.sortorder else concept.label),
+                    reverse=False)
             return ret
 
         def _findBroaderConcept(conceptid, child_concept, depth_limit=None, level=0):
@@ -962,7 +982,7 @@ class Concept(object):
             links.append({'source': self.id, 'target': related.id, 'relationship': 'related'})
 
         # get unique node list and assign unique integer ids for each node (required by d3)
-        nodes = {node['concept_id']: node for node in nodes}.values()
+        nodes = list({node['concept_id']: node for node in nodes}.values())
         for i in range(len(nodes)):
             nodes[i]['id'] = i
             for link in links:

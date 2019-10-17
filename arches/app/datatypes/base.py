@@ -8,7 +8,7 @@ class BaseDataType(object):
     def __init__(self, model=None):
         self.datatype_model = model
 
-    def validate(self, value, row_number=None, source=None):
+    def validate(self, value, row_number=None, source=None, node=None):
         return []
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):

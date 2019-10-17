@@ -10355,6 +10355,31 @@ a.jstree-anchor.permissions-widget {
     height: 500px;
 }
 
+.tabbed-report-mainpanel {
+    top: 25px;
+    width: calc(100% - 50px);
+}
+
+.tabbed-report-mainpanel-content {
+    width: calc(100% - 50px);
+}
+
+.tabbed-report-mainpanel-title {
+    padding: 5px 15px;
+    font-size: 12px;
+    border-bottom: 1px solid #ddd;
+    background-color: rgb(237, 237, 237);
+}
+
+.tabbed-tile-value {
+    padding-left: 0px;
+}
+
+.tabbed-report-tile-title {
+    margin-bottom: 0;
+    padding: 12px 5px 0 0;
+}
+
 .tabbed-report-sidepanel {
     width: 300px;
     margin: 0 25px;
