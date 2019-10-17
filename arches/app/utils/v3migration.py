@@ -693,7 +693,7 @@ class v3SkosConverter:
     def __init__(self, skos_file, name_space="http://localhost:8000/",
                  uuid_lookup={}, verbose=False):
 
-        with open(skos_file, "rb") as incoming_skos:
+        with open(skos_file, "r") as incoming_skos:
             skos = incoming_skos.read()
             skos = skos.replace("http://www.archesproject.org/", name_space)
 

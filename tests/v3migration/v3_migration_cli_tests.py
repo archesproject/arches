@@ -107,7 +107,7 @@ class v3MigrationTests(ArchesTestCase):
         data["Historic Resource"]["v3_entitytypeid"] = "HERITAGE_RESOURCE.E18"
         data["Information Resource"]["v3_entitytypeid"] = "INFORMATION_RESOURCE.E73"
 
-        with open(os.path.join(self.pkg, 'v3data', 'rm_configs.json'), "wb") as conf:
+        with open(os.path.join(self.pkg, 'v3data', 'rm_configs.json'), "w") as conf:
             json.dump(data, conf, indent=4, sort_keys=True)
 
         # copy the v3 graph data into the dummy package, then delete the
