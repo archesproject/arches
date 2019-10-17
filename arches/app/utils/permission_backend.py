@@ -155,7 +155,7 @@ def user_can_read_resources(user):
 
     """
 
-    if user.is_authenticated():
+    if user.is_authenticated:
         return user.is_superuser or len(get_resource_types_by_perm(user, ['models.read_nodegroup'])) > 0
     return False
 
@@ -166,7 +166,7 @@ def user_can_edit_resources(user):
 
     """
 
-    if user.is_authenticated():
+    if user.is_authenticated:
         return user.is_superuser or \
             len(get_editable_resource_types(user)) > 0 or \
             user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists()
@@ -179,6 +179,6 @@ def user_can_read_concepts(user):
 
     """
 
-    if user.is_authenticated():
+    if user.is_authenticated:
         return user.groups.filter(name='RDM Administrator').exists()
     return False
