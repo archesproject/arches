@@ -4,7 +4,6 @@ import decimal
 import distutils
 import base64
 import re
-from pprint import pprint
 from datetime import datetime
 from mimetypes import MimeTypes
 from arches.app.datatypes.base import BaseDataType

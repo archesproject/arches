@@ -11,9 +11,7 @@ define([
             this.maxFiles = ko.observable(params.config.maxFiles());
             this.maxFiles.subscribe(function(val) {
                 var int = parseInt(val);
-                if(int > 0) {
-                    params.config.maxFiles(int);
-                }
+                if(int > 0) { params.config.maxFiles(int); }
             });
             this.activated = params.config.activateMax;
         },
