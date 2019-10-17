@@ -27,7 +27,7 @@ import base64
 from tests import test_settings as settings
 from tests.base_test import ArchesTestCase
 from django.db import connection
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth.models import User, Group, AnonymousUser
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory

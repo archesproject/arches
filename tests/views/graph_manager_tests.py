@@ -23,7 +23,7 @@ from arches.app.models.system_settings import settings
 from tests.base_test import ArchesTestCase
 from django.test import Client
 from django.core import management
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from arches.app.models.graph import Graph
 from arches.app.models.models import Node, NodeGroup, GraphModel, CardModel, Edge
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
