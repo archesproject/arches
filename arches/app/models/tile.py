@@ -254,7 +254,7 @@ class Tile(models.TileModel):
             datatype_factory = DataTypeFactory()
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = datatype_factory.get_instance(node.datatype)
-            error = datatype.validate(value)
+            error = datatype.validate(value, node)
             for error_instance in error:
                 if error_instance['type'] == 'ERROR':
                     raise TileValidationError(_("{0}".format(error_instance["message"])))
