@@ -126,7 +126,7 @@ class BusinessDataImporter(object):
                             if 'business_data' in list(archesfile.keys()):
                                 self.business_data = archesfile['business_data']
                     elif self.file_format == 'csv':
-                        data = csv.DictReader(open(file[0]))
+                        data = csv.DictReader(open(file[0], encoding='utf-8'))
                         self.business_data = list(data)
                     elif self.file_format == 'zip':
                         shp_zipfile = os.path.basename(path)

@@ -19,7 +19,7 @@ class SetAnonymousUser(MiddlewareMixin):
         # for OAuth authentication to work, we can't automatically assign
         # the anonymous user to the request, otherwise the anonymous user is
         # used for all OAuth resourse requests
-        if request.path != reverse('oauth2:authorize') and request.user.is_anonymous():
+        if request.path != reverse('oauth2:authorize') and request.user.is_anonymous:
             try:
                 request.user = User.objects.get(username='anonymous')
             except Exception:

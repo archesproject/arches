@@ -19,7 +19,7 @@ define([
 
     return ko.components.register('file-widget', {
         viewModel: function(params) {
-            params.configKeys = ['acceptedFiles', 'maxFilesize', 'maxFiles'];
+            params.configKeys = ['acceptedFiles', 'maxFilesize'];
             FileWidgetViewModel.apply(this, [params]);
         },
         template: {

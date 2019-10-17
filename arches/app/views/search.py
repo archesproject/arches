@@ -184,6 +184,7 @@ def search_results(request):
                 search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional)
     except Exception as err:
         return JSONResponse(err, status=500)
+
     dsl = search_results_object.pop('query', None)
     dsl.include('graph_id')
     dsl.include('root_ontology_class')

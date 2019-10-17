@@ -152,6 +152,7 @@ urlpatterns = [
     url(r'^cards/(?P<resourceid>%s|())$' % uuid_regex, api.Card.as_view(), name='api_card'),
     url(r'^search_component_data/(?P<componentname>[-\w]+)$', api.SearchComponentData.as_view(), name='api_search_component_data'),
     url(r'^geojson$', api.GeoJSON.as_view(), name='geojson'),
+    url(r'^mvt/(?P<nodeid>%s)/(?P<zoom>[0-9]+|\{z\})/(?P<x>[0-9]+|\{x\})/(?P<y>[0-9]+|\{y\}).pbf$' % uuid_regex, api.MVT.as_view(), name='mvt'),
     url(r'^history/$', ResourceActivityStreamCollectionView.as_view(), name="as_stream_collection"),
     url(r'^history/(?P<page>[0-9]+)$', ResourceActivityStreamPageView.as_view(), name='as_stream_page'),
     url(r'^icons$', IconDataView.as_view(), name='icons'),
@@ -161,10 +162,10 @@ urlpatterns = [
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', admin.site.urls),
-    url(r'^password_reset/$', auth_views.password_reset, name='password_reset', kwargs={"password_reset_form":ArchesPasswordResetForm}),
-    url(r'^password_reset/done/$', auth_views.password_reset_done, name='password_reset_done'),
-    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.password_reset_confirm, name='password_reset_confirm', kwargs={"set_password_form":ArchesSetPasswordForm}),
-    url(r'^reset/done/$', auth_views.password_reset_complete, name='password_reset_complete'),
+    url(r'^password_reset/$', auth_views.PasswordResetView, name='password_reset', kwargs={"password_reset_form":ArchesPasswordResetForm}),
+    url(r'^password_reset/done/$', auth_views.PasswordResetDoneView, name='password_reset_done'),
+    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.PasswordResetConfirmView, name='password_reset_confirm', kwargs={"set_password_form":ArchesSetPasswordForm}),
+    url(r'^reset/done/$', auth_views.PasswordResetCompleteView, name='password_reset_complete'),
 
     url(r'^o/', include('oauth2_provider.urls', namespace='oauth2')),
 ]

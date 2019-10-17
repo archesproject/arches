@@ -114,18 +114,33 @@
         </div>
         <!-- /ko -->
         <div class="rp-report-section-title", data-bind="css: {'tabbed-report-sidepanel-active': tabs()[activeTabIndex()].side_component}">
+            <!-- ko if: tabs()[activeTabIndex()].main_component  -->
+            <div class="tabbed-report-sidepanel-wrapper">
+                <div class="tabbed-report-mainpanel" data-bind="component: {
+                    name: tabs()[activeTabIndex()].main_component,
+                    params: $data
+                }"></div>
+            </div>
+            <!-- /ko -->
+            <!-- ko ifnot: tabs()[activeTabIndex()].main_component  -->
             <!-- ko foreach: { data: activeCards(), as: 'card' } -->
                 <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
                 <div class="rp-card-section">
-                    <!-- ko component: {
-                        name: card.model.cardComponentLookup[card.model.component_id()].componentname,
-                        params: {
-                            state: 'report',
-                            card: card,
-                            pageVm: $root
-                        }
-                    } --> <!-- /ko -->
+                    <!--ko if: card && card.alternateReportComponent -->
+                    <!--/ko -->
+                    <!--ko ifnot: card.model && card.alternateReportComponent -->
+                        <!-- ko component: {
+                            name: card.model.cardComponentLookup[card.model.component_id()].componentname,
+                            params: {
+                                state: 'report',
+                                card: card,
+                                pageVm: $root
+                            }
+                        } -->
+                        <!-- /ko -->
+                    <!-- /ko -->
                 </div>
+                <!-- /ko -->
             <!-- /ko -->
         </div>
     </div>
