@@ -3,7 +3,7 @@ import re
 import json
 import uuid
 import datetime
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from .format import Writer, Reader
 from arches.app.models import models
 from arches.app.models.resource import Resource

@@ -77,7 +77,7 @@ class UserManagerView(BaseManagerView):
 
     def get(self, request):
 
-        if self.request.user.is_authenticated() and self.request.user.username != 'anonymous':
+        if self.request.user.is_authenticated and self.request.user.username != 'anonymous':
             context = self.get_context_data(
                 main_script='views/user-profile-manager',
             )
@@ -103,12 +103,12 @@ class UserManagerView(BaseManagerView):
 
         if self.action == 'get_user_names':
             data = {}
-            if self.request.user.is_authenticated() and request.user.groups.filter(name='Resource Reviewer').exists():
+            if self.request.user.is_authenticated and request.user.groups.filter(name='Resource Reviewer').exists():
                 userids = json.loads(request.POST.get('userids', '[]'))
                 data = {u.id:u.username for u in User.objects.filter(id__in=userids)}
                 return JSONResponse(data)
 
-        if self.request.user.is_authenticated() and self.request.user.username != 'anonymous':
+        if self.request.user.is_authenticated and self.request.user.username != 'anonymous':
 
             user_details = self.get_user_details(request.user)
 

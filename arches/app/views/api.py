@@ -13,7 +13,7 @@ from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.http.request import QueryDict
 from django.core import management
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from revproxy.views import ProxyView

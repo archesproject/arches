@@ -27,7 +27,7 @@ import os
 import json
 import time
 from tests.base_test import ArchesTestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth.models import User, Group
 from django.test.client import Client
 from arches.app.models import models
