@@ -8,8 +8,9 @@ from django.shortcuts import render
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from django.db import transaction
+from django.db import transaction, connection
 from django.db.models import Q
+from django.http import Http404, HttpResponse
 from django.http.request import QueryDict
 from django.core import management
 from django.urls import reverse
@@ -252,6 +253,47 @@ class GeoJSON(APIBase):
 
         response = JSONResponse({'type': 'FeatureCollection', 'features': features})
         return response
+
+
+class MVT(APIBase):
+    def get(self, request, nodeid, zoom, x, y):
+        if hasattr(request.user, 'userprofile') is not True:
+            models.UserProfile.objects.create(user=request.user)
+        viewable_nodegroups = request.user.userprofile.viewable_nodegroups
+        try:
+            node = models.Node.objects.get(nodeid=nodeid, nodegroup_id__in=viewable_nodegroups)
+        except models.Node.DoesNotExist:
+            raise Http404()
+        with connection.cursor() as cursor:
+            # TODO: when we upgrade to PostGIS 3, we can get feature state
+            # working by adding the feature_id_name arg:
+            # https://github.com/postgis/postgis/pull/303
+            cursor.execute("""SELECT ST_AsMVT(tile, %s) FROM (SELECT t.tileid,
+               row_number() over () as id,
+               t.resourceinstanceid,
+               n.nodeid,
+               ST_AsMVTGeom(
+                   ST_SetSRID(
+                       st_geomfromgeojson(
+                           (
+                               json_array_elements(
+                                   t.tiledata::json ->
+                                   n.nodeid::text ->
+                               'features') -> 'geometry'
+                           )::text
+                       ),
+                       4326
+                   ),
+                   TileBBox(%s, %s, %s, 4326)
+               ) AS geom,
+               1 AS total
+              FROM tiles t
+                LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
+                WHERE n.nodeid = %s) AS tile;""", [nodeid, zoom, x, y, nodeid])
+            tile = bytes(cursor.fetchone()[0])
+            if not len(tile):
+                raise Http404()
+        return HttpResponse(tile, content_type="application/x-protobuf")
 
 
 @method_decorator(csrf_exempt, name='dispatch')
