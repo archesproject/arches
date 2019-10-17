@@ -170,7 +170,7 @@ class Command(BaseCommand):
         os.mkdir(os.path.join(v3_dir, 'reference_data'))
         os.mkdir(os.path.join(v3_dir, 'graph_data'))
 
-        with open(os.path.join(full_path, "reference_data", "v3topconcept_lookup.json"), "wb") as openfile:
+        with open(os.path.join(full_path, "reference_data", "v3topconcept_lookup.json"), "w") as openfile:
             json.dump({}, openfile)
 
     def generate_rm_configs(self, pkg_path):
@@ -188,7 +188,7 @@ class Command(BaseCommand):
             }
 
         v3_dir = os.path.join(pkg_path, "v3data")
-        with open(os.path.join(v3_dir, "rm_configs.json"), "wb") as openfile:
+        with open(os.path.join(v3_dir, "rm_configs.json"), "w") as openfile:
             json.dump(configs, openfile, indent=4, sort_keys=True)
 
     def generate_lookups(self, path):
@@ -216,7 +216,7 @@ class Command(BaseCommand):
                 exit()
 
             v3_business_nodes = []
-            with open(csv_file, 'rb') as opencsv:
+            with open(csv_file, 'r') as opencsv:
                 reader = csv.DictReader(opencsv)
                 for row in reader:
                     if row['businesstable'].rstrip() == "":
@@ -228,7 +228,7 @@ class Command(BaseCommand):
             v3_business_nodes.sort()
 
             lookup_file = csv_file.replace("_nodes.csv", "_v4_lookup.csv")
-            with open(lookup_file, "wb") as openfile:
+            with open(lookup_file, "w") as openfile:
                 writer = csv.writer(openfile)
                 writer.writerow(['v3_node', 'v4_node'])
                 for node in v3_business_nodes:
@@ -237,7 +237,7 @@ class Command(BaseCommand):
             config['v3_nodes_csv'] = os.path.basename(csv_file)
             config['v3_v4_node_lookup'] = os.path.basename(lookup_file)
 
-        with open(config_file, "wb") as openfile:
+        with open(config_file, "w") as openfile:
             json.dump(configs, openfile, indent=4, sort_keys=True)
 
     def test_lookups(self, package_dir):
@@ -344,10 +344,10 @@ class Command(BaseCommand):
 
         v4_relations = os.path.join(package_dir, "business_data", "relations", "all.relations")
 
-        with open(v3_relations, "rb") as openv3:
+        with open(v3_relations, "r") as openv3:
             reader = csv.reader(openv3, delimiter="|")
             next(reader)
-            with open(v4_relations, "wb") as openv4:
+            with open(v4_relations, "w") as openv4:
                 writer = csv.writer(openv4)
                 writer.writerow(['resourceinstanceidfrom', 'resourceinstanceidto',
                                 'relationshiptype', 'datestarted', 'dateended', 'notes'])

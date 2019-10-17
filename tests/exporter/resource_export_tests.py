@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import json
-import unicodecsv
+import csv
 from io import BytesIO
 from tests import test_settings
 from operator import itemgetter
@@ -60,12 +60,11 @@ class BusinessDataExportTests(ArchesTestCase):
         export = BusinessDataExporter('csv',
                                       configs='tests/fixtures/data/csv/resource_export_test.mapping',
                                       single_file=True).export()
-        csv_export = filter(lambda export: 'csv' in export['name'],
-                            export)[0]['outputfile'].getvalue().split('\r')
-        csv_output = list(unicodecsv.DictReader(BytesIO(export[0]['outputfile'].getvalue()), encoding='utf-8-sig'))[0]
+        csv_export = [export for export in export if 'csv' in export['name']][0]['outputfile'].getvalue().split('\r')
+        csv_output = list(csv.DictReader(BytesIO(export[0]['outputfile'].getvalue()), encoding='utf-8-sig'))[0]
 
         csvinputfile = 'tests/fixtures/data/csv/resource_export_test.csv'
-        csv_input = list(unicodecsv.DictReader(open(csvinputfile, 'rU'),
+        csv_input = list(csv.DictReader(open(csvinputfile, 'rU'),
                          encoding='utf-8-sig',
                          restkey='ADDITIONAL',
                          restval='MISSING'))[0]
@@ -89,7 +88,7 @@ class BusinessDataExportTests(ArchesTestCase):
                 new_list = []
                 for val in obj:
                     new_list.append(deep_sort(val))
-                _sorted = sorted(new_list)
+                _sorted = new_list
 
             else:
                 _sorted = obj
@@ -100,9 +99,10 @@ class BusinessDataExportTests(ArchesTestCase):
             'tests/fixtures/data/json/resource_export_business_data_truth.json').import_business_data()
 
         export = BusinessDataExporter('json').export('ab74af76-fa0e-11e6-9e3e-026d961c88e6')
+
         json_export = deep_sort(json.loads(export[0]['outputfile'].getvalue()))
 
-        json_truth = deep_sort(json.loads(
-            open('tests/fixtures/data/json/resource_export_business_data_truth.json').read()))
+        json_truth = deep_sort(json.load(
+            open('tests/fixtures/data/json/resource_export_business_data_truth.json')))
 
         self.assertDictEqual(json_export, json_truth)

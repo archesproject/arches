@@ -93,6 +93,8 @@ class JSONSerializer(object):
             for item in object:
                 ret.append(self.handle_object(item, fields, exclude))
             return ret
+        elif isinstance(object, bytes):
+            return object.decode('utf-8')
         elif (isinstance(object, int) or
               isinstance(object, float) or
               isinstance(object, int) or
@@ -207,7 +209,7 @@ class JSONDeserializer(object):
 
         if isinstance(stream_or_string, str):
             stream = StringIO(smart_str(stream_or_string))
-        
+
         elif isinstance(stream_or_string, bytes):
             try:
                 stream = stream_or_string.decode("utf-8")
@@ -215,7 +217,7 @@ class JSONDeserializer(object):
             except Exception as e:
                 print(e)
                 stream = stream_or_string
-        
+
         else:
             stream = stream_or_string
 

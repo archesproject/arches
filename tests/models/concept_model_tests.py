@@ -242,6 +242,6 @@ class ConceptModelTests(ArchesTestCase):
 
         pl = concept.get_preflabel('fr-BE')
 
-        self.assertEquals(pl.type,'prefLabel')
-        self.assertEquals(pl.value,'bier' or 'beer')
-        self.assertEquals(pl.language,'nl' or 'es-SP')
+        self.assertEqual(pl.type,'prefLabel')
+        self.assertEqual(pl.value,'bier' or 'beer')
+        self.assertEqual(pl.language,'nl' or 'es-SP')

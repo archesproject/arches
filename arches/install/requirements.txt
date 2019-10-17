@@ -2,7 +2,6 @@ Django==2.2.6
 psycopg2-binary==2.7.4
 elasticsearch>=7.0.0,<8.0.0
 rdflib==4.2.2
-unicodecsv==0.14.1
 django-guardian==1.4.9
 TileStache==1.51.13
 python-memcached==1.59

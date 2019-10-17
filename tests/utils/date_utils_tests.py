@@ -242,23 +242,23 @@ class SortableDateTests(ArchesTestCase):
         if len(test_case) == 2:
             if f.result_set:
                 for i, item in enumerate(f.result_set):
-                    self.assertEqual(unicode(item.lower), test_case[1][i][0])
-                    self.assertEqual(unicode(item.upper), test_case[1][i][1])
+                    self.assertEqual(str(item.lower), test_case[1][i][0])
+                    self.assertEqual(str(item.upper), test_case[1][i][1])
             else:
-                self.assertEqual(unicode(f.lower), test_case[1])
+                self.assertEqual(str(f.lower), test_case[1])
         elif len(test_case) == 3:
-            self.assertEqual(unicode(f.lower), test_case[1])
-            self.assertEqual(unicode(f.upper), test_case[2])
+            self.assertEqual(str(f.lower), test_case[1])
+            self.assertEqual(str(f.upper), test_case[2])
         elif len(test_case) == 4:
-            self.assertEqual(unicode(f.lower), test_case[1])
-            self.assertEqual(unicode(f.upper), test_case[1])
-            self.assertEqual(unicode(f.lower_fuzzy), test_case[2])
-            self.assertEqual(unicode(f.upper_fuzzy), test_case[3])
+            self.assertEqual(str(f.lower), test_case[1])
+            self.assertEqual(str(f.upper), test_case[1])
+            self.assertEqual(str(f.lower_fuzzy), test_case[2])
+            self.assertEqual(str(f.upper_fuzzy), test_case[3])
         elif len(test_case) == 5:
-            self.assertEqual(unicode(f.lower), test_case[1])
-            self.assertEqual(unicode(f.upper), test_case[2])
-            self.assertEqual(unicode(f.lower_fuzzy), test_case[3])
-            self.assertEqual(unicode(f.upper_fuzzy), test_case[4])
+            self.assertEqual(str(f.lower), test_case[1])
+            self.assertEqual(str(f.upper), test_case[2])
+            self.assertEqual(str(f.lower_fuzzy), test_case[3])
+            self.assertEqual(str(f.upper_fuzzy), test_case[4])
         elif len(test_case) == 1:
             self.assertEqual(f.is_valid(), False)
         else:
