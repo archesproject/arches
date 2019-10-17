@@ -59,7 +59,7 @@ class DataTypeFactory(object):
 
 class StringDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source=None, node=None):
+    def validate(self, value, row_number=None, source=None):
         errors = []
         try:
             if value is not None:
@@ -134,7 +134,7 @@ class StringDataType(BaseDataType):
 
 class NumberDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source='', node=None):
+    def validate(self, value, row_number=None, source=''):
         errors = []
 
         try:
@@ -205,7 +205,7 @@ class NumberDataType(BaseDataType):
 
 class BooleanDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source='', node=None):
+    def validate(self, value, row_number=None, source=''):
         errors = []
 
         try:
@@ -253,7 +253,7 @@ class BooleanDataType(BaseDataType):
 
 class DateDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source='', node=None):
+    def validate(self, value, row_number=None, source=''):
         errors = []
         if value is not None:
             date_formats = ['-%Y','%Y','%Y-%m-%d','%B-%m-%d','%Y-%m-%d %H:%M:%S']
@@ -343,7 +343,7 @@ class DateDataType(BaseDataType):
 
 class EDTFDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source='', node=None):
+    def validate(self, value, row_number=None, source=''):
         errors = []
         if not ExtendedDateFormat(value).is_valid():
             errors.append({'type': 'ERROR', 'message': '{0} {1} is not in the correct Extended Date Time Format, see http://www.loc.gov/standards/datetime/ for supported formats. This data was not imported.'.format(value, row_number)})
@@ -416,7 +416,7 @@ class EDTFDataType(BaseDataType):
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source=None, node=None):
+    def validate(self, value, row_number=None, source=None):
         errors = []
         coord_limit = 1500
         coordinate_count = 0
@@ -1328,7 +1328,7 @@ class BaseDomainDataType(BaseDataType):
 
 class DomainDataType(BaseDomainDataType):
 
-    def validate(self, value, row_number=None, source='', node=None):
+    def validate(self, value, row_number=None, source=''):
         errors = []
         if value is not None:
             if len(models.Node.objects.filter(config__options__contains=[{"id": value}])) < 1:
@@ -1406,7 +1406,7 @@ class DomainDataType(BaseDomainDataType):
 
 
 class DomainListDataType(BaseDomainDataType):
-    def validate(self, value, row_number=None, source='', node=None):
+    def validate(self, value, row_number=None, source=''):
         errors = []
         if value is not None:
             for v in value:
@@ -1526,7 +1526,7 @@ class ResourceInstanceDataType(BaseDataType):
             print('resource not avalable')
         return resource_names
 
-    def validate(self, value, row_number=None, source='', node=None):
+    def validate(self, value, row_number=None, source=''):
         errors = []
 
         if value is not None:
@@ -1610,7 +1610,7 @@ class ResourceInstanceDataType(BaseDataType):
 
 
 class NodeValueDataType(BaseDataType):
-    def validate(self, value, row_number=None, source='', node=None):
+    def validate(self, value, row_number=None, source=''):
         errors = []
         if value:
             try:
