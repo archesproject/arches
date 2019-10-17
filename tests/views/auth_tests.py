@@ -193,7 +193,8 @@ class AuthTests(ArchesTestCase):
     #     self.assertTrue(response.status_code == 200)
 
     def test_get_oauth_token(self):
-        client = Client(HTTP_AUTHORIZATION='Basic %s' % base64.b64encode('%s:%s' % (self.oauth_client_id, self.oauth_client_secret)))
+        key = '{0}:{1}'.format(self.oauth_client_id, self.oauth_client_secret)
+        client = Client(HTTP_AUTHORIZATION='Basic %s' % base64.b64encode(key.encode('UTF-8')).decode('UTF-8'))
 
         # make sure we can POST to the authorize endpoint and get back the proper form
         # response = client.post(reverse('auth'), {'username': 'test', 'password': 'password', 'next': 'oauth2:authorize'})
