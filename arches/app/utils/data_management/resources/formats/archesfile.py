@@ -165,9 +165,9 @@ class ArchesFileReader(Reader):
                                     tileid=uuid.UUID(str(src_tile['tileid'])),
                                     defaults={
                                         'resourceinstance': resourceinstance,
-                                        'parenttile': Tile(uuid.UUID(str(src_tile['parenttile_id'])))
+                                        'parenttile_id': str(src_tile['parenttile_id'])
                                         if src_tile['parenttile_id'] else None,
-                                        'nodegroup': NodeGroup(uuid.UUID(str(src_tile['nodegroup_id'])))
+                                        'nodegroup_id': str(src_tile['nodegroup_id'])
                                         if src_tile['nodegroup_id'] else None,
                                         'data': src_tile['data']
                                     }
