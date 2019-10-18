@@ -13,7 +13,7 @@ addons:
       - libpq-dev
       - openjdk-8-jdk
       - python-dev
-      - postgresql-9.6-postgis-2.3
+      - postgresql-9.6-postgis-2.4
 
 services:
   - postgresql
