@@ -910,21 +910,6 @@ class MapLayer(models.Model):
         db_table = 'map_layers'
 
 
-class TileserverLayer(models.Model):
-    name = models.TextField(primary_key=True, unique=True)
-    path = models.TextField(null=True, blank=True)
-    config = JSONField()
-    map_layer = models.ForeignKey('MapLayer', db_column='map_layerid', null=True, blank=True, on_delete=models.SET_NULL)
-    map_source = models.ForeignKey('MapSource', db_column='map_sourceid', null=True, blank=True, on_delete=models.SET_NULL)
-
-    def __unicode__(self):
-        return self.name
-
-    class Meta:
-        managed = True
-        db_table = 'tileserver_layers'
-
-
 class GraphXMapping(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     graph = models.ForeignKey('GraphModel', db_column='graphid', on_delete=models.CASCADE)
