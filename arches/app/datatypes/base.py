@@ -93,11 +93,9 @@ class BaseDataType(object):
         should be a dictionary including (as in map_sources table):
         name, source (json)
         """
-        tileserver_url = "%s/%s/{z}/{x}/{y}.pbf" % (reverse('tileserver'), node.nodeid)
-        # TODO: we can use the following URL when we migrate to PostGIS 3
-        # tileserver_url = urllib.parse.unquote(
-        #     reverse('mvt', args=(node.nodeid, '{z}', '{x}', '{y}'))
-        # )
+        tileserver_url = urllib.parse.unquote(
+            reverse('mvt', args=(node.nodeid, '{z}', '{x}', '{y}'))
+        )
         if node is None:
             return None
         source_config = {
