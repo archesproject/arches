@@ -12,8 +12,8 @@ def name_to_id(entity_json):
         suffix = 'E32'
     if 'crm_class' in list(entity_json.keys()):
         suffix = entity_json['crm_class']
-    ret = unicode.upper(entity_json['name'])
-    ret = unicode.replace(ret, ' ', '_')
+    ret = str.upper(entity_json['name'])
+    ret = str.replace(ret, ' ', '_')
     return ret + '.' + suffix
 
 def get_type(entity_json):

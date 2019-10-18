@@ -43,7 +43,7 @@ class OntologyModelTests(ArchesTestCase):
     def test_load_ontology(self):
         ontology_class = models.OntologyClass.objects.get(ontology__pk='11111111-0000-0000-0000-000000000000', source='http://www.cidoc-crm.org/cidoc-crm/E53_Place')
 
-        predicted_property_list = set([
+        predicted_property_list = {
             'http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by',
             'http://www.cidoc-crm.org/cidoc-crm/P2_has_type',
             'http://www.cidoc-crm.org/cidoc-crm/P3_has_note',
@@ -80,7 +80,7 @@ class OntologyModelTests(ArchesTestCase):
             'http://www.cidoc-crm.org/cidoc-crm/P161i_is_spatial_projection_of',
             'http://www.cidoc-crm.org/cidoc-crm/P156i_is_occupied_by',
             'http://www.cidoc-crm.org/cidoc-crm/P167i_was_place_at'
-        ])
+        }
         self.assertEqual(len(ontology_class.target['down']), len(predicted_property_list))
         
         result_property_list = set()
@@ -89,7 +89,7 @@ class OntologyModelTests(ArchesTestCase):
         self.assertEqual(result_property_list, predicted_property_list)
 
 
-        predicted_subclass_list = set([
+        predicted_subclass_list = {
             'http://www.cidoc-crm.org/cidoc-crm/E41_Appellation',
             'http://www.cidoc-crm.org/cidoc-crm/E42_Identifier',
             'http://www.cidoc-crm.org/cidoc-crm/E44_Place_Appellation',
@@ -103,7 +103,7 @@ class OntologyModelTests(ArchesTestCase):
             'http://www.cidoc-crm.org/cidoc-crm/E82_Actor_Appellation',
             'http://www.cidoc-crm.org/cidoc-crm/E51_Contact_Point',
             'http://www.cidoc-crm.org/cidoc-crm/E35_Title',
-        ])
+        }
 
         for item in ontology_class.target['down']:
             if item['ontology_classes'] == 'http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by':
