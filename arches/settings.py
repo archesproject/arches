@@ -588,8 +588,7 @@ ALLOWED_POPUP_HOSTS = []
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################
 
-
 try:
-    from settings_local import *
+    from .settings_local import *
 except ImportError:
     pass

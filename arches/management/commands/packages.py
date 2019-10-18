@@ -1,4 +1,3 @@
-import unicodecsv
 import json
 import csv
 import shutil
@@ -1061,8 +1060,7 @@ will be very jumbled.""")
             for source in data_source:
                 path = utils.get_valid_path(source)
                 if path is not None:
-                    data = unicodecsv.DictReader(
-                        open(path, 'rU'), encoding='utf-8-sig', restkey='ADDITIONAL', restval='MISSING')
+                    data = csv.DictReader(open(path, 'r'), encoding='utf-8-sig')
                     business_data = list(data)
                     TileCsvReader(business_data).import_business_data(overwrite=None)
                 else:
@@ -1085,7 +1083,7 @@ will be very jumbled.""")
         for path in data_source:
             if os.path.isabs(path):
                 if os.path.isfile(os.path.join(path)):
-                    relations = csv.DictReader(open(path, 'rU'))
+                    relations = csv.DictReader(open(path, 'r'))
                     RelationImporter().import_relations(relations)
                 else:
                     utils.print_message('No file found at indicated location: {0}'.format(path))

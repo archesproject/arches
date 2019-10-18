@@ -107,7 +107,7 @@ class v3MigrationTests(ArchesTestCase):
         data["Historic Resource"]["v3_entitytypeid"] = "HERITAGE_RESOURCE.E18"
         data["Information Resource"]["v3_entitytypeid"] = "INFORMATION_RESOURCE.E73"
 
-        with open(os.path.join(self.pkg, 'v3data', 'rm_configs.json'), "wb") as conf:
+        with open(os.path.join(self.pkg, 'v3data', 'rm_configs.json'), "w") as conf:
             json.dump(data, conf, indent=4, sort_keys=True)
 
         # copy the v3 graph data into the dummy package, then delete the
@@ -193,9 +193,9 @@ class v3MigrationTests(ArchesTestCase):
         v4_relations = os.path.join(self.pkg, "business_data", "relations", "all.relations")
         self.assertTrue(os.path.isfile(v4_relations))
         v4_ct = 0
-        with open(v4_relations, 'rb') as openfile:
+        with open(v4_relations, 'r') as openfile:
             reader = csv.reader(openfile)
-            headers = reader.next()
+            headers = next(reader)
             self.assertEqual(headers,
                              ['resourceinstanceidfrom', 'resourceinstanceidto',
                               'relationshiptype', 'datestarted', 'dateended', 'notes'])
@@ -206,9 +206,9 @@ class v3MigrationTests(ArchesTestCase):
         # get count of v3 relationships for comparison
         v3_ct = 0
         v3_relations = os.path.join(self.pkg, "v3data", "business_data", "v3sample.relations")
-        with open(v3_relations, 'rb') as openfile:
+        with open(v3_relations, 'r') as openfile:
             reader = csv.reader(openfile, delimiter="|")
-            headers = reader.next()
+            headers = next(reader)
             for r in reader:
                 v3_ct += 1
 
@@ -296,7 +296,7 @@ class v3MigrationTests(ArchesTestCase):
         v3_relations = os.path.join(self.pkg, "v3data", "business_data", "v3sample.relations")
         with open(v3_relations, 'rb') as openfile:
             reader = csv.reader(openfile, delimiter="|")
-            headers = reader.next()
+            headers = next(reader)
             for r in reader:
                 v3_ct += 1
 

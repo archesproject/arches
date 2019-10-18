@@ -2,7 +2,7 @@ import calendar
 import datetime
 import dateutil
 from dateutil.relativedelta import relativedelta
-# from edtf import parse_edtf, text_to_edtf
+from edtf import parse_edtf, text_to_edtf
 from edtf.parser.parser_classes import Date, DateAndTime, Interval, Unspecified, \
     UncertainOrApproximate, Level1Interval, LongYear, Season, \
     PartialUncertainOrApproximate, PartialUnspecified, OneOfASet, \
@@ -26,7 +26,6 @@ class ExtendedDateFormat(SortableDateRange):
         self.result_set = None
         self.sortable_date = None
         self.error = None
-
         self.fuzzy_year_padding = int(fuzzy_year_padding)
         self.fuzzy_month_padding = int(fuzzy_month_padding)
         self.fuzzy_day_padding = int(fuzzy_day_padding)
@@ -38,17 +37,15 @@ class ExtendedDateFormat(SortableDateRange):
 
         try:
             self.parse(date)
-        except Exception as err:
-            self.error = err
-            raise err
-            # try:
-            #     self.parse(text_to_edtf(self.orig_date))
-            # except Exception as err:
-            #     self.error = err
-            #     raise err
+        except Exception as e:
+            try:
+                self.parse(text_to_edtf(self.orig_date))
+            except Exception as err:
+                self.error = err
+                raise err
 
     def parse(self, date=None):
-        if date == None:
+        if date is None:
             return None
 
         self.edtf = None
@@ -65,11 +62,10 @@ class ExtendedDateFormat(SortableDateRange):
                 date = str(int(date)).zfill(5)
             if len(str(abs(int(date)))) > 4 and int(date) != 0:
                 date = 'y' + date
-        except:
+        except Exception:
             pass
 
-        # self.edtf = parse_edtf(date)
-
+        self.edtf = parse_edtf(date)
         result = self.handle_object(self.edtf)
         if isinstance(result, list):
             self.result_set = result
@@ -103,8 +99,6 @@ class ExtendedDateFormat(SortableDateRange):
 
         """
 
-        # print type(object)
-        # print object
         if (isinstance(object, Date) or
             isinstance(object, Season) or
             isinstance(object, Unspecified)):
