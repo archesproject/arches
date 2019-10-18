@@ -1,9 +1,9 @@
-dist: trusty
+dist: xenial
 filter_secrets: false
 sudo: false
 
 env:
-  - ES_VERSION=7.0.0 ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz
+  - ES_VERSION=7.4.0 ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz
 
 addons:
   postgresql: 9.6
@@ -11,9 +11,9 @@ addons:
     packages:
       - libxml2-dev
       - libpq-dev
-      - openjdk-7-jdk
+      - openjdk-8-jdk
       - python-dev
-      - postgresql-9.6-postgis-2.3
+      - postgresql-9.6-postgis-2.4
 
 services:
   - postgresql
@@ -51,7 +51,7 @@ node_js: 10.8
 
 matrix:
   allow_failures:
-    - python: 3.6
+    - python: 3.7
   include:
     - name: "Python - Nose/unittests"
       install: echo "Python dependences installed"
@@ -60,7 +60,7 @@ matrix:
         - python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
     - name: "Python 3 - Nose/unittests"
       install: echo "Python dependences installed"
-      python: 3.6
+      python: 3.7
       script:
         - wait-on http://localhost:9200/
         - python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
