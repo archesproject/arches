@@ -29,7 +29,6 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import can_edit_resource_instance
-from arches.app.views.tileserver import clean_resource_cache
 from django.contrib.auth.models import User
 from django.http import HttpResponseNotFound
 from django.utils.decorators import method_decorator
@@ -114,7 +113,6 @@ class TileData(View):
                 if tile_id is not None and tile_id != '':
                     try:
                         old_tile = Tile.objects.get(pk=tile_id)
-                        clean_resource_cache(old_tile)
                     except ObjectDoesNotExist as e:
                         return self.handle_save_error(e, _('This tile is no longer available'),
                                                       _('It was likely deleted by another user'))
@@ -158,7 +156,6 @@ class TileData(View):
                                 return self.handle_save_error(e, tile_id)
 
                             tile.after_update_all()
-                            clean_resource_cache(tile)
                             update_system_settings_cache(tile)
 
                     except Exception as e:
@@ -228,7 +225,6 @@ class TileData(View):
                 if (user_is_reviewer or tile.is_provisional() is True) and is_active is True:
                     if tile.filter_by_perm(request.user, 'delete_nodegroup'):
                         nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
-                        clean_resource_cache(tile)
                         if tile.is_provisional() is True and len(list(tile.provisionaledits.keys())) == 1:
                             provisional_editor_id = list(tile.provisionaledits.keys())[0]
                             edit = tile.provisionaledits[provisional_editor_id]
