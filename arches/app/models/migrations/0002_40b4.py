@@ -117,7 +117,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='tileserverlayer',
             name='name',
-            field=models.TextField(primary_key=True, serialize=False, unique=True),
+            field=models.TextField(serialize=False, unique=True),
         ),
         migrations.AddField(
             model_name='ddatatype',
