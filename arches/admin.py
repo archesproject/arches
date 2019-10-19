@@ -29,7 +29,6 @@ admin.site.register([
     models.DLanguage,
     models.MapLayer,
     models.MapSource,
-    models.TileserverLayer,
     models.Geocoder,
     models.MapMarker,
     models.DDataType,

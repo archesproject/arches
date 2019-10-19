@@ -522,20 +522,6 @@ CACHE_SEED_BOUNDS = (
 )
 CACHE_SEED_MAX_ZOOM = 5
 
-# configure where the tileserver should store its cache
-TILE_CACHE_CONFIG = {
-    "name": "Disk",
-    "path": os.path.join(ROOT_DIR, 'tileserver', 'cache')
-
-    # to reconfigure to use S3 (recommended for production), use the following
-    # template:
-
-    # "name": "S3",
-    # "bucket": "<bucket name>",
-    # "access": "<access key>",
-    # "secret": "<secret key>"
-}
-
 MAPBOX_API_KEY = '' # Put your Mapbox key here!
 
 # links to sprites and glyphs for use on map

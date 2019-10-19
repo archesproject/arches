@@ -117,13 +117,6 @@ class MapLayerManagerView(MapBaseManagerView):
 
     def delete(self, request, maplayerid):
         map_layer = models.MapLayer.objects.get(pk=maplayerid)
-        try:
-           tileserver_layer = models.TileserverLayer.objects.get(map_layer=map_layer)
-        except models.TileserverLayer.DoesNotExist:
-           tileserver_layer = None
         with transaction.atomic():
-            if tileserver_layer is not None:
-                tileserver_layer.map_source.delete()
-                tileserver_layer.delete()
             map_layer.delete()
         return JSONResponse({'succces':True})

@@ -21,6 +21,7 @@ import importlib
 import datetime
 import json
 import pytz
+import logging
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.db.models import Q
@@ -35,6 +36,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
 from arches.app.datatypes.datatypes import DataTypeFactory
 
+logger = logging.getLogger(__name__)
 
 class Tile(models.TileModel):
     """
@@ -479,18 +481,25 @@ class Tile(models.TileModel):
         return tile
 
     def __preSave(self, request=None):
-        for function in self.__getFunctionClassInstances():
-            try:
-                function.save(self, request)
-            except NotImplementedError:
-                pass
+        try:
+            for function in self.__getFunctionClassInstances():
+                try:
+                    function.save(self, request)
+                except NotImplementedError:
+                    pass
+        except TypeError as e:
+            logger.info(_("No associated functions"))
+
 
     def __preDelete(self, request):
-        for function in self.__getFunctionClassInstances():
-            try:
-                function.delete(self, request)
-            except NotImplementedError:
-                pass
+        try:
+            for function in self.__getFunctionClassInstances():
+                try:
+                    function.delete(self, request)
+                except NotImplementedError:
+                    pass
+        except TypeError as e:
+            logger.info(_("No associated functions"))
 
     def __getFunctionClassInstances(self):
         ret = []

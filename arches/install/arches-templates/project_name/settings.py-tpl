@@ -121,20 +121,6 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 # Unique session cookie ensures that logins are treated separately for each app
 SESSION_COOKIE_NAME = '{{ project_name }}'
 
-
-TILE_CACHE_CONFIG = {
-    "name": "Disk",
-    "path": os.path.join(APP_ROOT, 'tileserver', 'cache')
-
-    # to reconfigure to use S3 (recommended for production), use the following
-    # template:
-
-    # "name": "S3",
-    # "bucket": "<bucket name>",
-    # "access": "<access key>",
-    # "secret": "<secret key>"
-}
-
 CACHES = {
     # 'default': {
     #     'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
