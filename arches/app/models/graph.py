@@ -1227,7 +1227,11 @@ class Graph(models.GraphModel):
         ret['root'] = self.root
 
         if 'relatable_resource_model_ids' not in exclude:
-            ret['relatable_resource_model_ids'] = [str(relatable_node.graph_id) for relatable_node in self.root.get_relatable_resources()]
+            try:
+                ret['relatable_resource_model_ids'] = [str(relatable_node.graph_id) for relatable_node in self.root.get_relatable_resources()]
+            except AttributeError as e:
+                print(e)
+                print('node: ',self.root)
         else:
             ret.pop('relatable_resource_model_ids', None)
 
