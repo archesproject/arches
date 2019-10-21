@@ -5,19 +5,16 @@ import json
 import uuid
 import csv
 import zipfile
+from io import StringIO
+
 from arches.app.models.graph import Graph
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
 from arches.app.models.models import CardXNodeXWidget, Node, Resource2ResourceConstraint, FunctionXGraph, Value
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from pprint import pprint as pp
 from collections import OrderedDict
 from operator import itemgetter
 
-try:
-    from io import StringIO
-except ImportError:
-    from io import StringIO
 
 def export(export_dir):
     """

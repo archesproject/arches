@@ -5,6 +5,7 @@ import json
 import uuid
 import importlib
 import datetime
+from io import StringIO
 from time import time
 from copy import deepcopy
 from optparse import make_option
@@ -44,10 +45,6 @@ from .formats.csvfile import CsvReader
 from .formats.archesfile import ArchesFileReader
 
 
-try:
-    from io import StringIO
-except ImportError:
-    from io import StringIO
 
 
 def import_one_resource(line):

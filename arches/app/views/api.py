@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import uuid
+from io import StringIO
 from django.shortcuts import render
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
@@ -40,11 +41,6 @@ from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
 
 logger = logging.getLogger(__name__)
-
-try:
-    from io import StringIO
-except ImportError:
-    from io import StringIO
 
 
 def userCanAccessMobileSurvey(request, surveyid=None):

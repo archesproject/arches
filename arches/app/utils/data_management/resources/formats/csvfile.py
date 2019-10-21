@@ -7,6 +7,7 @@ import sys
 import uuid
 import traceback
 from copy import deepcopy
+from io import StringIO
 from .format import Writer
 from .format import Reader
 from elasticsearch import TransportError
@@ -20,11 +21,6 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from django.db import transaction
 from django.db.models import Q
 from django.utils.translation import ugettext as _
-
-try:
-    from io import StringIO
-except ImportError:
-    from io import StringIO
 
 
 class MissingConfigException(Exception):
