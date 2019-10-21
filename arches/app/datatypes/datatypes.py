@@ -1329,9 +1329,10 @@ class DomainDataType(BaseDomainDataType):
 
     def validate(self, value, row_number=None, source=''):
         errors = []
+        domain_val_node_query = models.Node.objects.filter(config__contains={"options":[{"id": value}]})
         if value is not None:
-            if len(models.Node.objects.filter(config__options__contains=[{"id": value}])) < 1:
-                errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value, row_number)})
+            if len(domain_val_node_query) < 1:
+                errors.append({'type': 'ERROR', 'message': f'{value} {row_number} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'})
         return errors
 
     def get_search_terms(self, nodevalue, nodeid=None):
