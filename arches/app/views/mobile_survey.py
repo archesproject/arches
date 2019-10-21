@@ -135,7 +135,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
     def get(self, request, surveyid):
 
         def get_history(survey, history):
-            sync_log_records = list(models.MobileSyncLog.objects.order_by('-finished').values()).filter(survey=survey)
+            sync_log_records = models.MobileSyncLog.objects.order_by('-finished').values().filter(survey=survey)
             resourceedits = models.TileRevisionLog.objects.filter(survey=survey).values('resourceid').annotate(Count('tileid', distinct=True))
             if len(sync_log_records) > 0:
                 lastsync = datetime.strftime(sync_log_records[0]['finished'], '%Y-%m-%d %H:%M:%S')
