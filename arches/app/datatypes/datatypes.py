@@ -589,11 +589,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     WHERE nodeid = '%s'
             """ % node.pk)
 
-        else:
-            config = {"cacheTiles": False}
-            for i in range(23):
-                sql_list.append(None)
-
         try:
             simplification = config['simplification']
         except KeyError as e:
@@ -617,22 +612,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             },
             "allowed origin": "*",
             "compress": True,
-            "write cache": config["cacheTiles"]
+            "write cache": False
         }
-
-    def should_cache(self, node=None):
-        if node is None:
-            return False
-        elif node.config is None:
-            return False
-        return node.config["cacheTiles"]
-
-    def should_manage_cache(self, node=None):
-        if node is None:
-            return False
-        elif node.config is None:
-            return False
-        return node.config["autoManageCache"]
 
     def get_map_layer(self, node=None, preview=False):
         if node is None:
@@ -1057,7 +1038,7 @@ class FileListDataType(BaseDataType):
         limit = config['maxFiles']
         max_size = config['maxFileSize'] if 'maxFileSize' in config.keys() else None
 
-        
+
         def format_bytes(size):
             # 2**10 = 1024
             power = 2**10
@@ -1068,14 +1049,14 @@ class FileListDataType(BaseDataType):
                 n += 1
             return size, power_labels[n]+'bytes'
 
-        
+
         try:
             if value is not None and config['activateMax'] is True and len(value) > limit:
                 errors.append({
                     'type':'ERROR',
                     'message':f'This node has a limit of {limit} files. Please reduce files.'
                 })
-            
+
             if max_size is not None:
                 formatted_max_size = format_bytes(max_size)
                 for v in value:
@@ -1092,7 +1073,7 @@ class FileListDataType(BaseDataType):
             })
         return errors
 
-    
+
     def get_tile_data(self, user_is_reviewer, user_id, tile):
         if user_is_reviewer is False and tile.provisionaledits is not None and user_id in tile.provisionaledits:
             data = tile.provisionaledits[user_id]['value']

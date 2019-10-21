@@ -22,6 +22,7 @@ import csv
 import json
 import uuid
 import datetime
+from io import StringIO
 from time import time
 from copy import deepcopy
 from os.path import isfile, join
@@ -39,10 +40,6 @@ from .format import Writer
 from .format import Reader
 from .format import ResourceImportReporter
 
-try:
-    from io import StringIO
-except ImportError:
-    from io import StringIO
 
 class ArchesFileWriter(Writer):
 
