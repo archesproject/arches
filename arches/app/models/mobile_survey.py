@@ -297,9 +297,7 @@ class MobileSurvey(models.MobileSurveyModel):
                         if 'provisional_resource' in row.doc and row.doc['provisional_resource'] == 'true':
                             resourceinstance, created = ResourceInstance.objects.update_or_create(
                                 resourceinstanceid=uuid.UUID(str(row.doc['resourceinstanceid'])),
-                                defaults={
-                                    'graph_id': uuid.UUID(str(row.doc['graph_id']))
-                                }
+                                defaults=dict(graph_id=uuid.UUID(str(row.doc['graph_id'])))
                             )
                             if created is True:
                                 self.save_revision_log(row.doc, synclog, 'create')
