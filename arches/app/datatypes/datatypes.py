@@ -1319,7 +1319,7 @@ class BaseDomainDataType(BaseDataType):
 
     def get_option_id_from_text(self, value):
         # this could be better written with most of the logic in SQL tbh
-        for dnode in models.Node.objects.filter(config__options__contains=[{"text": value}]):
+        for dnode in models.Node.objects.filter(config__contains={"options":[{"text": value}]}):
             for option in dnode.config['options']:
                 if option['text'] == value:
                     yield option['id'], dnode.node_id
@@ -1410,8 +1410,8 @@ class DomainListDataType(BaseDomainDataType):
         errors = []
         if value is not None:
             for v in value:
-                if len(models.Node.objects.filter(config__options__contains=[{"id": v}])) < 1:
-                    errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(v, row_number)})
+                if len(models.Node.objects.filter(config__contains={"options":[{"id": v}]})) < 1:
+                    errors.append({'type': 'ERROR', 'message': f'{v} {row_number} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'})
         return errors
 
     def transform_import_values(self, value, nodeid):
