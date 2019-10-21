@@ -749,11 +749,7 @@ class RelatedResourcesView(BaseManagerView):
 
         if self.action == 'get_relatable_resources':
             graphid = request.GET.get('graphid', None)
-            alt_nodes = models.Node.objects.filter(graph=graphid).exclude(istopnode=False)[0]
-            print(alt_nodes.get_relatable_resources())
             nodes = models.Node.objects.filter(graph=graphid).exclude(istopnode=False)[0].get_relatable_resources()
-            print(nodes)
-            print(len(nodes))
             ret = {str(node.graph_id) for node in nodes}
             return JSONResponse(ret)
 
