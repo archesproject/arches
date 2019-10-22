@@ -32,6 +32,10 @@ from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 
 
+# these tests can be run from the command line via
+# python manage.py test tests/exporter/resource_export_tests.py --settings="tests.test_settings"
+
+
 class BusinessDataExportTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
@@ -60,16 +64,15 @@ class BusinessDataExportTests(ArchesTestCase):
         export = BusinessDataExporter('csv',
                                       configs='tests/fixtures/data/csv/resource_export_test.mapping',
                                       single_file=True).export()
-        csv_export = [export for export in export if 'csv' in export['name']][0]['outputfile'].getvalue().split('\r')
-        csv_output = list(csv.DictReader(BytesIO(export[0]['outputfile'].getvalue()), encoding='utf-8-sig'))[0]
 
+        csv_output = list(csv.DictReader(export[0]['outputfile'].getvalue().split('\r\n')))[0]
+        
         csvinputfile = 'tests/fixtures/data/csv/resource_export_test.csv'
-        csv_input = list(csv.DictReader(open(csvinputfile, 'rU'),
-                         encoding='utf-8-sig',
+        csv_input = list(csv.DictReader(open(csvinputfile, 'rU', encoding="utf-8"),
                          restkey='ADDITIONAL',
                          restval='MISSING'))[0]
 
-        self.assertDictEqual(csv_input, csv_output)
+        self.assertDictEqual(dict(csv_input), dict(csv_output))
 
     def test_json_export(self):
 
