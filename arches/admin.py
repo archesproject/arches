@@ -21,7 +21,7 @@ from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
 
 
-class PluginAdmin(GuardedModelAdmin):
+class GuardedAdmin(GuardedModelAdmin):
     pass
 
 
@@ -38,4 +38,4 @@ admin.site.register([
     models.SearchComponent,
     ])
 
-admin.site.register(models.Plugin, PluginAdmin)
+admin.site.register([models.Plugin, models.NodeGroup], GuardedAdmin)
