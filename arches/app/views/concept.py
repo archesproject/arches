@@ -31,7 +31,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, SimpleQueryString
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.skos import SKOSWriter, SKOSReader
 from arches.app.views.base import BaseManagerView
 
@@ -198,7 +198,7 @@ def concept(request, conceptid):
                     ret = skos.save_concepts_from_skos(rdf, overwrite_options, staging_options)
                     return JSONResponse(ret)
                 except:
-                    return JSONResponse({'message':{'title': _('Unable to Load SKOS File'), 'text': _('There was an issue saving the contents of the file to Arches.')}}, status=500)
+                    return JSONErrorResponse(_('Unable to Load SKOS File'), _('There was an issue saving the contents of the file to Arches.'))
 
         else:
             data = JSONDeserializer().deserialize(request.body)
@@ -235,7 +235,7 @@ def concept(request, conceptid):
                             concept.delete_index(delete_self=delete_self)
                             concept.delete(delete_self=delete_self)
                         else:
-                            return JSONResponse({"in_use": in_use, 'message':{'title': _('Unable to Delete'), 'text': _('This concept or one of it\'s subconcepts is already in use by an existing resource.')}})
+                            return JSONErrorResponse(_('Unable to Delete'), _('This concept or one of it\'s subconcepts is already in use by an existing resource.'), {"in_use": in_use})
 
                 return JSONResponse(concept)
 
@@ -269,9 +269,9 @@ def make_collection(request, conceptid):
     concept = Concept().get(id=conceptid, values=[])
     try:
         collection_concept = concept.make_collection()
-        return JSONResponse({'collection': collection_concept, 'message':{'title': _('Success'), 'text': _('Collection successfully created from the selected concept')}})
+        return JSONResponse({'collection': collection_concept, 'title': _('Success'), 'message': _('Collection successfully created from the selected concept')})
     except:
-        return JSONResponse({'message':{'title': _('Unable to Make Collection'), 'text': _('Unable to make a collection from the selected concept.')}}, status=500)
+        return JSONErrorResponse(_('Unable to Make Collection'), _('Unable to make a collection from the selected concept.'))
 
 @group_required('RDM Administrator')
 def manage_parents(request, conceptid):
