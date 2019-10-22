@@ -46,15 +46,16 @@ language:
   - python
   - node_js
 
-python: 2.7.9
+python: 3.7
 node_js: 10.8
 
 matrix:
   allow_failures:
-    - python: 3.7
+    - python: 2.7.9
   include:
-    - name: "Python - Nose/unittests"
+    - name: "Python 2 - Nose/unittests"
       install: echo "Python dependences installed"
+      python: 2.7.9
       script:
         - wait-on http://localhost:9200/
         - python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
