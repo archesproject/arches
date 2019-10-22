@@ -13,10 +13,11 @@ require([
     'views/rdm/modals/add-collection-form',
     'views/rdm/modals/delete-collection-form',
     'views/base-manager',
-    'viewmodels/alert',
+    'viewmodels/alert-json',
     'jquery-validate',
 ], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, 
-    AddSchemeForm, ExportSchemeForm, DeleteSchemeForm, ImportSchemeForm, AddCollectionForm, DeleteCollectionForm, BaseManagerView, AlertViewModel) {
+    AddSchemeForm, ExportSchemeForm, DeleteSchemeForm, ImportSchemeForm, AddCollectionForm,
+    DeleteCollectionForm, BaseManagerView, JsonErrorAlertViewModel) {
 
         var RDMView = BaseManagerView.extend({
             initialize: function(options){
@@ -198,7 +199,7 @@ require([
                                 conceptReport.render()
 
                             }else{
-                                self.viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message.title, response.responseJSON.message.text)); 
+                                self.viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON)); 
                             }
                         }
                     })

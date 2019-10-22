@@ -4,10 +4,10 @@ define([
     'knockout',
     'knockout-mapping',
     'bindings/color-picker',
-    'viewmodels/alert',
+    'viewmodels/alert-json',
     'arches',
     'bindings/chosen'
-], function($, _, ko, koMapping, colorPicker, AlertViewModel, arches) {
+], function($, _, ko, koMapping, colorPicker, JsonErrorAlertViewModel, arches) {
     var GraphSettingsViewModel = function(params) {
 
         var self = this;
@@ -95,7 +95,7 @@ define([
                     self.rootnode._node(JSON.stringify(self.rootnode));
                 })
                 .fail(function(response) {
-                    self.designerViewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+                    self.designerViewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                 })
                 .always(function(){
                     self.contentLoading(false);

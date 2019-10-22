@@ -14,7 +14,10 @@ define([
     'views/rdm/modals/add-image-form',
     'views/concept-graph',
     'viewmodels/alert',
-], function($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor, RelatedConcept, RelatedMember, ManageParentForm, ImportConcept, AddChildForm, AddImageForm, ConceptGraph, AlertViewModel) {
+    'viewmodels/alert-json',
+], function ($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor,
+    RelatedConcept, RelatedMember, ManageParentForm, ImportConcept, AddChildForm,
+    AddImageForm, ConceptGraph, AlertViewModel, JsonErrorAlertViewModel) {
     return Backbone.View.extend({
         events: {
             'click .concept-report-content *[data-action="viewconcept"]': 'conceptSelected',
@@ -174,11 +177,11 @@ define([
 
         makeCollection: function(e){
             this.model.makeCollection(function(response, status){
-                if(status === 'success'){
+                if (status === 'success') {
                     this.viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));   
                 }
-                if(status === 'error'){
-                    this.viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message.title, response.responseJSON.message.text));   
+                if (status === 'error') {
+                    this.viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));   
                 }
             }, this);
         },    
@@ -246,7 +249,7 @@ define([
                     modal.modal('hide');
                     $('.modal-backdrop.fade.in').remove();  // a hack for now
                     if(!!response.responseJSON.in_use){
-                        self.viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.message.title, response.responseJSON.message.text));   
+                        self.viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));   
                     }
                 }, self);
             }else{
