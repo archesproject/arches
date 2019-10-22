@@ -175,7 +175,7 @@ define([
         makeCollection: function(e){
             this.model.makeCollection(function(response, status){
                 if(status === 'success'){
-                    this.viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.message.title, response.responseJSON.message.text));   
+                    this.viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));   
                 }
                 if(status === 'error'){
                     this.viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message.title, response.responseJSON.message.text));   
