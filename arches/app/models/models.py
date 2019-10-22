@@ -141,7 +141,7 @@ class DDataType(models.Model):
     issearchable = models.NullBooleanField(default=False)
     isgeometric = models.BooleanField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.datatype
 
     class Meta:
@@ -405,7 +405,7 @@ class GraphModel(models.Model):
                 result = True
         return result
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -658,7 +658,7 @@ class SearchComponent(models.Model):
     sortorder = models.IntegerField(blank=True, null=True, default=None)
     enabled = models.BooleanField(default=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -845,7 +845,7 @@ class Widget(models.Model):
         json_string = json.dumps(self.defaultconfig)
         return json_string
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -859,7 +859,7 @@ class Geocoder(models.Model):
     component = models.TextField(unique=True)
     api_key = models.TextField(blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -871,7 +871,7 @@ class MapSource(models.Model):
     name = models.TextField(unique=True)
     source = JSONField(blank=True, null=True, db_column='source')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     @property
@@ -902,7 +902,7 @@ class MapLayer(models.Model):
         json_string = json.dumps(self.layerdefinitions)
         return json_string
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -964,7 +964,7 @@ class MobileSurveyModel(models.Model):
     onlinebasemaps = JSONField(blank=True, null=True, db_column='onlinebasemaps')
     datadownloadconfig = JSONField(blank=True, null=True, default=dict(download=False, count=100, resources=[], custom=None))
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -1022,7 +1022,7 @@ class MapMarker(models.Model):
     name = models.TextField(unique=True)
     url = models.TextField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -1040,7 +1040,7 @@ class Plugin(models.Model):
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:

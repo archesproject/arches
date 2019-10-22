@@ -324,7 +324,13 @@ class MVT(APIBase):
                             ),
                             TileBBox(%s, %s, %s, 3857)
                         ) AS geom,
-                        '' AS extent
+                        ST_AsGeoJSON(
+                            ST_Transform(
+                                ST_SetSRID(
+                                    ST_Extent(geom), 3857
+                                ), 4326
+                            )
+                        ) AS extent
                     FROM clusters
                     WHERE cid IS NOT NULL
                     GROUP BY cid
