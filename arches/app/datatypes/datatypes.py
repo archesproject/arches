@@ -589,11 +589,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     WHERE nodeid = '%s'
             """ % node.pk)
 
-        else:
-            config = {"cacheTiles": False}
-            for i in range(23):
-                sql_list.append(None)
-
         try:
             simplification = config['simplification']
         except KeyError as e:
@@ -617,22 +612,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             },
             "allowed origin": "*",
             "compress": True,
-            "write cache": config["cacheTiles"]
+            "write cache": False
         }
-
-    def should_cache(self, node=None):
-        if node is None:
-            return False
-        elif node.config is None:
-            return False
-        return node.config["cacheTiles"]
-
-    def should_manage_cache(self, node=None):
-        if node is None:
-            return False
-        elif node.config is None:
-            return False
-        return node.config["autoManageCache"]
 
     def get_map_layer(self, node=None, preview=False):
         if node is None:
@@ -1057,7 +1038,7 @@ class FileListDataType(BaseDataType):
         limit = config['maxFiles']
         max_size = config['maxFileSize'] if 'maxFileSize' in config.keys() else None
 
-        
+
         def format_bytes(size):
             # 2**10 = 1024
             power = 2**10
@@ -1068,14 +1049,14 @@ class FileListDataType(BaseDataType):
                 n += 1
             return size, power_labels[n]+'bytes'
 
-        
+
         try:
             if value is not None and config['activateMax'] is True and len(value) > limit:
                 errors.append({
                     'type':'ERROR',
                     'message':f'This node has a limit of {limit} files. Please reduce files.'
                 })
-            
+
             if max_size is not None:
                 formatted_max_size = format_bytes(max_size)
                 for v in value:
@@ -1092,7 +1073,7 @@ class FileListDataType(BaseDataType):
             })
         return errors
 
-    
+
     def get_tile_data(self, user_is_reviewer, user_id, tile):
         if user_is_reviewer is False and tile.provisionaledits is not None and user_id in tile.provisionaledits:
             data = tile.provisionaledits[user_id]['value']
@@ -1319,7 +1300,7 @@ class BaseDomainDataType(BaseDataType):
 
     def get_option_id_from_text(self, value):
         # this could be better written with most of the logic in SQL tbh
-        for dnode in models.Node.objects.filter(config__options__contains=[{"text": value}]):
+        for dnode in models.Node.objects.filter(config__contains={"options":[{"text": value}]}):
             for option in dnode.config['options']:
                 if option['text'] == value:
                     yield option['id'], dnode.node_id
@@ -1329,9 +1310,10 @@ class DomainDataType(BaseDomainDataType):
 
     def validate(self, value, row_number=None, source=''):
         errors = []
+        domain_val_node_query = models.Node.objects.filter(config__contains={"options":[{"id": value}]})
         if value is not None:
-            if len(models.Node.objects.filter(config__options__contains=[{"id": value}])) < 1:
-                errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value, row_number)})
+            if len(domain_val_node_query) < 1:
+                errors.append({'type': 'ERROR', 'message': f'{value} {row_number} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'})
         return errors
 
     def get_search_terms(self, nodevalue, nodeid=None):
@@ -1409,8 +1391,8 @@ class DomainListDataType(BaseDomainDataType):
         errors = []
         if value is not None:
             for v in value:
-                if len(models.Node.objects.filter(config__options__contains=[{"id": v}])) < 1:
-                    errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(v, row_number)})
+                if len(models.Node.objects.filter(config__contains={"options":[{"id": v}]})) < 1:
+                    errors.append({'type': 'ERROR', 'message': f'{v} {row_number} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'})
         return errors
 
     def transform_import_values(self, value, nodeid):

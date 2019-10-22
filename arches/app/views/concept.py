@@ -34,7 +34,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.skos import SKOSWriter, SKOSReader
 from arches.app.views.base import BaseManagerView
-from pprint import pprint
+
 
 @method_decorator(group_required('RDM Administrator'), name='dispatch')
 class RDMView(BaseManagerView):
