@@ -3,7 +3,7 @@ define(['knockout'], function (ko) {
     * A viewmodel used for alert messages from JSON responses
     *
     * @constructor
-    * @name JsonAlertViewModel
+    * @name JsonErrorAlertViewModel
     *
     * @param  {string} type - the CSS class name to use to display alert level
     * @param  {object} responseJSON - The response JSON received from the backend
@@ -35,7 +35,7 @@ define(['knockout'], function (ko) {
         return responseJSON;
     }
 
-    var JsonAlertViewModel = function(type, responseJSON, cancel, ok) {
+    var JsonErrorAlertViewModel = function(type, responseJSON, cancel, ok) {
         var self = this;
         this.active = ko.observable(true);
         this.close = function () {
@@ -62,5 +62,5 @@ define(['knockout'], function (ko) {
             }
         }
     };
-    return JsonAlertViewModel;
+    return JsonErrorAlertViewModel;
 });
