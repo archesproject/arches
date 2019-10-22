@@ -1,4 +1,4 @@
-define(['knockout'], function (ko) {
+define(['knockout', 'arches'], function (ko, arches) {
     /**
     * A viewmodel used for alert messages from JSON responses
     *
@@ -29,8 +29,8 @@ define(['knockout'], function (ko) {
 
     var parseResponseJson = function(responseJSON) {
         responseJSON = initializeResponseJSON(responseJSON);
-        responseJSON.title = getPropertyOrDefaultMessage(responseJSON.title, 'An unknown error occurred.');
-        responseJSON.message = getPropertyOrDefaultMessage(responseJSON.message, 'Please contact your system administrator for more details.');
+        responseJSON.title = getPropertyOrDefaultMessage(responseJSON.title, arches.requestFailed.title);
+        responseJSON.message = getPropertyOrDefaultMessage(responseJSON.message, arches.requestFailed.text);
 
         return responseJSON;
     }
