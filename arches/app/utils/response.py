@@ -34,6 +34,14 @@ class JSONResponse(HttpResponse):
         self.content = JSONSerializer().serialize(content, **options)
 
 
+class JSONErrorResponse(JSONResponse):
+
+    def __init__(self, title, message, *args, **kwargs):
+        content = {'status': 'false', 'success': False,
+                   'title': title, 'message': message}
+
+        super(JSONErrorResponse, self).__init__(content=content, status=500, *args, **kwargs)
+
 class Http401Response(HttpResponse):
     status_code = 401
     
