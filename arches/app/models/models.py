@@ -962,7 +962,7 @@ class MobileSurveyModel(models.Model):
     bounds = models.MultiPolygonField(null=True)
     tilecache = models.TextField(null=True)
     onlinebasemaps = JSONField(blank=True, null=True, db_column='onlinebasemaps')
-    datadownloadconfig = JSONField(blank=True, null=True, default=dict(download=False, count=100, resources=[], custom=None))
+    datadownloadconfig = JSONField(blank=True, null=True, default=lambda: dict(download=False, count=100, resources=[], custom=None))
 
     def __str__(self):
         return self.name
