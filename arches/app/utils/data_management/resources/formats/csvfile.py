@@ -604,7 +604,7 @@ class CsvReader(Reader):
                                     value = concept_lookup.lookup_labelid_from_label(value, collection_id)
                         try:
                             value = datatype_instance.transform_import_values(value, nodeid)
-                            errors = datatype_instance.validate(value, row_number, source)
+                            errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
                         except Exception as e:
                             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(datatype_instance.datatype_model.classname, value, source, str(e) + ' or is not a prefLabel in the given collection.')})
                         if len(errors) > 0:
