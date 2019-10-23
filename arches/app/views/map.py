@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 from django.db import transaction
 from django.shortcuts import render
+from django.http import Http404
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from guardian.shortcuts import get_users_with_perms, get_groups_with_perms
@@ -124,6 +125,10 @@ class MapLayerManagerView(MapBaseManagerView):
         return JSONResponse({'succces':True})
 
 class GeoserverProxyView(ProxyView):
-    if settings.GEOSERVER_URL is None:
-        raise Http404(_("No active report template is available for this resource."))
     upstream = settings.GEOSERVER_URL
+
+    def get_request_headers(self):
+        headers = super(GeoserverProxyView, self).get_request_headers()
+        if settings.GEOSERVER_URL is None:
+            raise Http404(_("Geoserver proxy not configured"))
+        return headers
