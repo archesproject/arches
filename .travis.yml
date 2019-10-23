@@ -52,6 +52,7 @@ node_js: 10.8
 matrix:
   allow_failures:
     - python: 2.7.9
+    - name: "Javascript - Cypress.io tests"
   include:
     - name: "Python 2 - Nose/unittests"
       install: echo "Python dependences installed"
