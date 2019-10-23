@@ -124,6 +124,7 @@ class MapLayerManagerView(MapBaseManagerView):
             map_layer.delete()
         return JSONResponse({'succces':True})
 
+
 class GeoserverProxyView(ProxyView):
     upstream = settings.GEOSERVER_URL
 
