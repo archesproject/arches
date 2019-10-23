@@ -17,10 +17,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 from django.db import transaction
 from django.shortcuts import render
+from django.http import Http404
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from guardian.shortcuts import get_users_with_perms, get_groups_with_perms
+from revproxy.views import ProxyView
 from arches.app.models import models
+from arches.app.models.system_settings import settings
 from arches.app.models.card import Card
 from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -120,3 +123,13 @@ class MapLayerManagerView(MapBaseManagerView):
         with transaction.atomic():
             map_layer.delete()
         return JSONResponse({'succces':True})
+
+
+class GeoserverProxyView(ProxyView):
+    upstream = settings.GEOSERVER_URL
+
+    def get_request_headers(self):
+        headers = super(GeoserverProxyView, self).get_request_headers()
+        if settings.GEOSERVER_URL is None:
+            raise Http404(_("Geoserver proxy not configured"))
+        return headers
