@@ -1,9 +1,9 @@
 import uuid
 import json
 import decimal
-import distutils
 import base64
 import re
+from distutils import util
 from datetime import datetime
 from mimetypes import MimeTypes
 from arches.app.datatypes.base import BaseDataType
@@ -208,7 +208,7 @@ class BooleanDataType(BaseDataType):
         errors = []
 
         try:
-            type(bool(distutils.util.strtobool(str(value)))) is True
+            type(bool(util.strtobool(str(value)))) is True
         except:
             errors.append({
                 'type': 'ERROR',
@@ -218,7 +218,7 @@ class BooleanDataType(BaseDataType):
         return errors
 
     def transform_import_values(self, value, nodeid):
-        return bool(distutils.util.strtobool(str(value)))
+        return bool(util.strtobool(str(value)))
 
     def append_search_filters(self, value, node, query, request):
         try:
