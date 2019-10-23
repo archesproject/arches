@@ -66,7 +66,6 @@ class BusinessDataExportTests(ArchesTestCase):
                                       single_file=True).export()
 
         csv_output = list(csv.DictReader(export[0]['outputfile'].getvalue().split('\r\n')))[0]
-        
         csvinputfile = 'tests/fixtures/data/csv/resource_export_test.csv'
         csv_input = list(csv.DictReader(open(csvinputfile, 'rU', encoding="utf-8"),
                          restkey='ADDITIONAL',

@@ -1446,16 +1446,6 @@ class DomainListDataType(BaseDomainDataType):
         return ','.join(new_values)
 
     def transform_export_values(self, value, *args, **kwargs):
-        ret = ''
-        if kwargs['concept_export_value_type'] == None or kwargs['concept_export_value_type'] == '' or kwargs['concept_export_value_type'] == 'label':
-            ret = self.get_option_text(models.Node.objects.get(nodeid=kwargs['node']), value)
-        elif kwargs['concept_export_value_type'] == 'both':
-            ret = value + '|' + self.get_option_text(models.Node.objects.get(nodeid=kwargs['node']), value)
-        elif kwargs['concept_export_value_type'] == 'id':
-            ret = value
-        return ret
-
-    def transform_export_values(self, value, *args, **kwargs):
         new_values = []
         for val in value:
             if kwargs['concept_export_value_type'] == None or kwargs['concept_export_value_type'] == '' or kwargs['concept_export_value_type'] == 'label':
@@ -1495,7 +1485,6 @@ class DomainListDataType(BaseDomainDataType):
         domtype = DomainDataType()
 
         return [domtype.from_rdf(item) for item in json_ld_node]
-
 
 
 class ResourceInstanceDataType(BaseDataType):
