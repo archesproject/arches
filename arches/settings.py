@@ -571,7 +571,7 @@ HEX_BIN_PRECISION = 4
 
 ALLOWED_POPUP_HOSTS = []
 
-GEOSERVER_URL = None
+TILESERVER_URL = None
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################

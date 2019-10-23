@@ -125,11 +125,11 @@ class MapLayerManagerView(MapBaseManagerView):
         return JSONResponse({'succces':True})
 
 
-class GeoserverProxyView(ProxyView):
-    upstream = settings.GEOSERVER_URL
+class TileserverProxyView(ProxyView):
+    upstream = settings.TILESERVER_URL
 
     def get_request_headers(self):
-        headers = super(GeoserverProxyView, self).get_request_headers()
-        if settings.GEOSERVER_URL is None:
-            raise Http404(_("Geoserver proxy not configured"))
+        headers = super(TileserverProxyView, self).get_request_headers()
+        if settings.TILESERVER_URL is None:
+            raise Http404(_("Tileserver proxy not configured"))
         return headers
