@@ -44,8 +44,21 @@ define([
             this.state = res;
         };
 
+        this.canFinish = ko.pureComputed(function(){
+            var required = false, canFinish = true, tileid = null;
+            for(var i = 0; i < self.steps.length; i++) {
+                required = ko.unwrap(self.steps[i].required);
+                tileid = ko.unwrap(self.steps[i].tileid);
+                if(required && (tileid == "" || !tileid)) {
+                    canFinish = false;
+                    break;
+                }
+            }
+            return canFinish;
+        });
+
         this.finishWorkflow = function() {
-            self.activeStep(self.steps[self.steps.length-1]);
+            if(self.canFinish()){ self.activeStep(self.steps[self.steps.length-1]); }
         };
 
         this.quitWorkflow = function(){
