@@ -8570,11 +8570,12 @@ table.table.dataTable {
 }
 
 #map-popup .hover-feature-footer {
-    position: fixed;
+    position: relative;
     padding-left: 20px;
-    bottom: 0px;
-    left: 449px;
-    border-left: 1px solid #ddd;
+    bottom: 15px;
+    left: 0px;
+    border-left: 0px solid transparent;
+    border-right: 0px solid transparent;
     width: 350px;
     background: #f4f4f4;
     font-size: 14px;
