@@ -149,7 +149,7 @@ SESSION_COOKIE_NAME = 'arches'
 # EMAIL_HOST_PASSWORD = 'xxxxxxx'
 # EMAIL_PORT = 587
 
-POSTGIS_VERSION = (2, 0, 0)
+POSTGIS_VERSION = (2, 5, 3)
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
