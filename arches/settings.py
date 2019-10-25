@@ -184,9 +184,9 @@ USE_TZ = False
 LANGUAGE_CODE = 'en-US'
 
 # the path where your translation strings are stored
-LOCALE_PATHS = (
+LOCALE_PATHS = [
     os.path.join(ROOT_DIR, 'locale'),
-)
+]
 
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale
@@ -312,7 +312,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     #'arches.app.utils.middleware.TokenMiddleware',
-    #'django.middleware.locale.LocaleMiddleware',
+    # 'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'arches.app.utils.middleware.ModifyAuthorizationHeader',

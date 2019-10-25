@@ -172,9 +172,9 @@ import os
 #LANGUAGE_CODE = 'en-US'
 
 
-#LOCALE_PATHS = (
+#LOCALE_PATHS = [
 #    /arches/locale,
-#)
+#]
 
 
 
