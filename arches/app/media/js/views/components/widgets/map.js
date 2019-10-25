@@ -1193,6 +1193,19 @@ define([
                 }
             };
 
+            this.featureBufferUnits = [{
+                name: 'miles',
+                val: 'miles'
+            }];
+            this.featureBuffer = ko.observable(); //used for creating buffered feature
+            this.featureBufferUnit = ko.observable('miles'); //used for creating buffered feature
+            this.bufferFeature = function(feature) {
+                var buffered = turf.buffer(feature, self.featureBuffer(), self.featureBufferUnit());
+                /*self.value(buffered);
+                self.value(self.value());*/
+                return buffered;
+            };
+
             this.saveGeometries = function() {
                 self.drawFeaturesOnMap(self.draw.getAll().features.length > 0);
                 var currentDrawing = self.draw.getAll();
@@ -1201,9 +1214,15 @@ define([
                         self.value.features.pop();
                     });
                     currentDrawing.features.forEach(function(feature) {
+                        if (self.featureBuffer() > 0) {
+                            feature = self.bufferFeature(feature);
+                        };
                         self.value.features.push(feature);
                     });
                 } else {
+                    if (self.featureBuffer() > 0) {
+                        currentDrawing = self.bufferFeature(currentDrawing);
+                    };
                     self.value(currentDrawing);
                 }
                 self.queryFeature = currentDrawing.features[currentDrawing.features.length - 1];

@@ -175,6 +175,17 @@
                                 </div>
                                 <!-- /ko -->
 
+                                <!--ko if: context === 'resource-editor' -->
+                                <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Search Map Extent" %}' data-bind="click: toggleExtentSearch, css:{'active': extentSearch}"><span class="sr-only">{% trans "Search Map Extent" %}</span><i class="fa fa-search"></i></a>
+                                <div class="map-tool-container form-control map-query-tool-input buffer" data-bind="visible: _.contains(drawModes, drawMode()) || xyInput.active()">
+                                    <div class="form-group form-inline">
+                                      <label for="buffer-input">{% trans "Buffer" %}</label>
+                                      <input type="number" min=0.0 id="buffer-input" placeholder="{% trans " buffer " %}" class="buffer" data-bind="textInput: featureBuffer">
+                                      <select class="form-control"  data-bind="options: featureBufferUnits, optionsText:'name', optionsValue:'val', value: featureBufferUnit"></select>
+                                    </div>
+                                </div>
+                                <!-- /ko -->
+
                             </div>
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
