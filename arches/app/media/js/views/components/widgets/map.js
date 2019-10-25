@@ -152,6 +152,14 @@ define([
         ];
         this.buffer = ko.observable('100');
         this.bufferUnit = ko.observable('m');
+
+        this.featureBufferUnits = [{
+            name: 'miles',
+            val: 'miles'
+        }];
+        this.featureBuffer = ko.observable('0'); //used for creating buffered feature
+        this.featureBufferUnit = ko.observable('miles'); //used for creating buffered feature
+
         this.queryFeature;
         this.extentSearch = ko.observable(false);
         this.geojsonString = ko.observable();
@@ -1193,12 +1201,6 @@ define([
                 }
             };
 
-            this.featureBufferUnits = [{
-                name: 'miles',
-                val: 'miles'
-            }];
-            this.featureBuffer = ko.observable('0'); //used for creating buffered feature
-            this.featureBufferUnit = ko.observable('miles'); //used for creating buffered feature
             this.bufferFeature = function(feature) {
                 var buffered = turf.buffer(feature, self.featureBuffer(), self.featureBufferUnit());
                 /*self.value(buffered);
