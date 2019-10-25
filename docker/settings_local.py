@@ -39,7 +39,7 @@ DATABASES = {
         'PASSWORD': get_env_variable('PGPASSWORD'),
         'HOST': get_env_variable('PGHOST'),
         'PORT': get_env_variable('PGPORT'),
-        'POSTGIS_TEMPLATE': 'template_postgis_20',
+        'POSTGIS_TEMPLATE': 'template_postgis',
     }
 }
 
