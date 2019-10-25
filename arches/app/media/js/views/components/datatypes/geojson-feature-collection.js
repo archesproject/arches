@@ -112,9 +112,7 @@ define([
                 this.bearing = ko.observable(0);
 
                 this.serviceURL = window.location.origin +
-                arches.urls.tileserver +
-                '/' + params.nodeid +
-                '/{z}/{x}/{y}.pbf';
+                    arches.urls.mvt(params.nodeid);
 
                 this.map = null;
                 this.setupMap = function(map) {

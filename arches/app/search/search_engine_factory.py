@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from arches.app.models.system_settings import settings
 from django.core.exceptions import ImproperlyConfigured
+# from importlib import import_module
 
 class SearchEngineFactory(object):
 
@@ -31,5 +32,6 @@ class SearchEngineFactory(object):
         components = backend.split('.')
         classname = components[len(components)-1]
         modulename = ('.').join(components[0:len(components)-1])
-        _temp = __import__(modulename, globals(), locals(), [classname], -1)
+        # _temp = __import__(modulename, globals(), locals(), [classname], -1)
+        _temp = __import__(modulename, globals(), locals(), [classname]) # in py3, level must be >= 0
         return getattr(_temp, classname)(hosts=hosts, prefix=prefix, **connection_options)

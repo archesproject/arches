@@ -67,7 +67,7 @@ class Command(BaseCommand):
         try:
             uuid.UUID(details['templateid'])
         except:
-            details['templateid'] = unicode(uuid.uuid4())
+            details['templateid'] = str(uuid.uuid4())
             print("Registering report template with templateid: {}".format(details['templateid']))
 
         instance = models.ReportTemplate(

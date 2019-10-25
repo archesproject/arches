@@ -26,7 +26,6 @@ class ExtendedDateFormat(SortableDateRange):
         self.result_set = None
         self.sortable_date = None
         self.error = None
-
         self.fuzzy_year_padding = int(fuzzy_year_padding)
         self.fuzzy_month_padding = int(fuzzy_month_padding)
         self.fuzzy_day_padding = int(fuzzy_day_padding)
@@ -38,7 +37,7 @@ class ExtendedDateFormat(SortableDateRange):
 
         try:
             self.parse(date)
-        except:
+        except Exception as e:
             try:
                 self.parse(text_to_edtf(self.orig_date))
             except Exception as err:
@@ -46,7 +45,7 @@ class ExtendedDateFormat(SortableDateRange):
                 raise err
 
     def parse(self, date=None):
-        if date == None:
+        if date is None:
             return None
 
         self.edtf = None
@@ -63,11 +62,10 @@ class ExtendedDateFormat(SortableDateRange):
                 date = str(int(date)).zfill(5)
             if len(str(abs(int(date)))) > 4 and int(date) != 0:
                 date = 'y' + date
-        except:
+        except Exception:
             pass
 
         self.edtf = parse_edtf(date)
-
         result = self.handle_object(self.edtf)
         if isinstance(result, list):
             self.result_set = result
@@ -101,8 +99,6 @@ class ExtendedDateFormat(SortableDateRange):
 
         """
 
-        # print type(object)
-        # print object
         if (isinstance(object, Date) or
             isinstance(object, Season) or
             isinstance(object, Unspecified)):
@@ -124,7 +120,7 @@ class ExtendedDateFormat(SortableDateRange):
         elif (isinstance(object, OneOfASet) or
               isinstance(object, MultipleDates)):
             return self.handle_set(object)
-        elif (isinstance(object, basestring) or
+        elif (isinstance(object, str) or
               object is None):
             if object == 'open':
                 return SortableDateRange()

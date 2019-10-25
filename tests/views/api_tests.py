@@ -26,7 +26,7 @@ Replace this with more appropriate tests for your application.
 import os
 from tests import test_settings
 from tests.base_test import ArchesTestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.client import RequestFactory, Client
 from arches.app.views.api import APIBase
 from arches.app.models.graph import Graph

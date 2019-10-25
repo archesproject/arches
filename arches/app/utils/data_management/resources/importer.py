@@ -5,7 +5,7 @@ import json
 import uuid
 import importlib
 import datetime
-import unicodecsv
+from io import StringIO
 from time import time
 from copy import deepcopy
 from optparse import make_option
@@ -45,10 +45,6 @@ from .formats.csvfile import CsvReader
 from .formats.archesfile import ArchesFileReader
 
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 
 def import_one_resource(line):
@@ -127,7 +123,7 @@ class BusinessDataImporter(object):
                             if 'business_data' in list(archesfile.keys()):
                                 self.business_data = archesfile['business_data']
                     elif self.file_format == 'csv':
-                        data = unicodecsv.DictReader(open(file[0], 'rU'), encoding='utf-8-sig', restkey='ADDITIONAL', restval='MISSING')
+                        data = csv.DictReader(open(file[0], encoding='utf-8'))
                         self.business_data = list(data)
                     elif self.file_format == 'zip':
                         shp_zipfile = os.path.basename(path)

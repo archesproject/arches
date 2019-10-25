@@ -1,4 +1,3 @@
-import unicodecsv
 import json
 import csv
 import shutil
@@ -6,13 +5,12 @@ import subprocess
 import glob
 import uuid
 import sys
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import os
 import logging
 from arches.app.search.mappings import prepare_terms_index, prepare_concepts_index, prepare_resource_relations_index
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 from arches.management.commands import utils
-from arches.app.views.tileserver import seed_resource_cache
 from arches.app.utils.skos import SKOSReader
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.system_metadata import system_metadata
@@ -79,8 +77,6 @@ class Command(BaseCommand):
                 'load_concept_scheme',
                 'export_business_data',
                 'export_graphs',
-                'add_tileserver_layer',
-                'delete_tileserver_layer',
                 'delete_mapbox_layer',
                 'create_mapping_file',
                 'import_reference_data',
@@ -90,7 +86,6 @@ class Command(BaseCommand):
                 'import_mapping_file',
                 'save_system_settings',
                 'add_mapbox_layer',
-                'seed_resource_tile_cache',
                 'load_package',
                 'create_package',
                 'update_package',
@@ -133,20 +128,12 @@ class Command(BaseCommand):
             help='Usually an export mapping file.')
 
         parser.add_argument(
-            '-m', '--mapnik_xml_path', action='store', dest='mapnik_xml_path', default=False,
-            help='A path to a mapnik xml file to generate a tileserver layer from.')
-
-        parser.add_argument(
-            '-t', '--tile_config_path', action='store', dest='tile_config_path', default=False,
-            help='A path to a tile config json file to generate a tileserver layer from.')
-
-        parser.add_argument(
             '-j', '--mapbox_json_path', action='store', dest='mapbox_json_path', default=False,
             help='A path to a mapbox json file to generate a layer from.')
 
         parser.add_argument(
             '-n', '--layer_name', action='store', dest='layer_name', default=False,
-            help='The name of the tileserver layer to add or delete.')
+            help='The name of the layer to add or delete.')
 
         parser.add_argument(
             '-ow', '--overwrite', action='store', dest='overwrite', default='',
@@ -158,7 +145,7 @@ class Command(BaseCommand):
 
         parser.add_argument(
             '-i', '--layer_icon', action='store', dest='layer_icon', default='fa fa-globe',
-            help='An icon class to use for a tileserver layer.')
+            help='An icon class to use for a map layer.')
 
         parser.add_argument(
             '-b', '--is_basemap', action='store_true', dest='is_basemap',
@@ -261,23 +248,9 @@ class Command(BaseCommand):
         if options['operation'] == 'save_system_settings':
             self.save_system_settings(options['dest_dir'])
 
-        if options['operation'] == 'add_tileserver_layer':
-            self.add_tileserver_layer(
-                options['layer_name'],
-                options['mapnik_xml_path'],
-                options['layer_icon'],
-                options['is_basemap'],
-                options['tile_config_path'])
-
         if options['operation'] == 'add_mapbox_layer':
             self.add_mapbox_layer(
                 options['layer_name'], options['mapbox_json_path'], options['layer_icon'], options['is_basemap'])
-
-        if options['operation'] == 'seed_resource_tile_cache':
-            self.seed_resource_tile_cache()
-
-        if options['operation'] == 'delete_tileserver_layer':
-            self.delete_tileserver_layer(options['layer_name'])
 
         if options['operation'] == 'delete_mapbox_layer':
             self.delete_mapbox_layer(options['layer_name'])
@@ -347,7 +320,7 @@ class Command(BaseCommand):
                 else:
                     output_file = existing_resource_graphs[graph['graphid']]['path']
                     if force is False:
-                        overwrite = raw_input('"{0}" already exists in this directory. \
+                        overwrite = input('"{0}" already exists in this directory. \
                         Overwrite? (Y/N): '.format(existing_resource_graphs[graph['graphid']]['name']))
                     else:
                         overwrite = 'true'
@@ -362,7 +335,7 @@ class Command(BaseCommand):
         packages_package_settings_file = os.path.join(dest_dir, 'package_settings.py')
         if os.path.exists(projects_package_settings_file):
             if os.path.exists(packages_package_settings_file) and force is False:
-                resp = raw_input('"{0}" already exists in this directory.\
+                resp = input('"{0}" already exists in this directory.\
                     Overwrite? (Y/N): '.format('package_settings.py'))
                 if resp.lower() in ('t', 'true', 'y', 'yes'):
                     overwrite = True
@@ -395,7 +368,7 @@ class Command(BaseCommand):
                         details = json.load(f)
                         if 'widgetid' not in details:
                             widget_instance = models.Widget.objects.get(name=details['name'])
-                            details['widgetid'] = unicode(widget_instance.widgetid)
+                            details['widgetid'] = str(widget_instance.widgetid)
                             f.close()
                             with open(widget_config_file, 'w') as of:
                                 json.dump(details, of, sort_keys=True, indent=4)
@@ -433,8 +406,6 @@ class Command(BaseCommand):
                 'graphs/resource_models',
                 'map_layers/mapbox_spec_json/overlays',
                 'map_layers/mapbox_spec_json/basemaps',
-                'map_layers/tile_server/basemaps',
-                'map_layers/tile_server/overlays',
                 'preliminary_sql',
                 'reference_data/concepts',
                 'reference_data/collections',
@@ -466,7 +437,7 @@ class Command(BaseCommand):
             load_default_ontology = True
             if settings.ONTOLOGY_BASE_NAME != None:
                 if yes is False:
-                    response = raw_input(
+                    response = input(
                         'Would you like to load the {0} ontology? (Y/N): '.format(settings.ONTOLOGY_BASE_NAME))
                     if response.lower() not in ('t', 'true', 'y', 'yes'):
                         load_default_ontology = False
@@ -483,7 +454,7 @@ class Command(BaseCommand):
             update_system_settings = True
             if os.path.exists(settings.SYSTEM_SETTINGS_LOCAL_PATH):
                 if yes is False:
-                    response = raw_input(
+                    response = input(
                         'Overwrite current system settings with package settings? (Y/N): ')
                     if response.lower() in ('t', 'true', 'y', 'yes'):
                         update_system_settings = True
@@ -503,7 +474,7 @@ class Command(BaseCommand):
                 update_package_settings = True
                 if os.path.exists(os.path.join(settings.APP_ROOT, 'package_settings.py')):
                     if yes is False:
-                        response = raw_input('Overwrite current packages_settings.py? (Y/N): ')
+                        response = input('Overwrite current packages_settings.py? (Y/N): ')
                         if response.lower() not in ('t', 'true', 'y', 'yes'):
                             update_package_settings = False
                     if update_package_settings is True \
@@ -594,25 +565,6 @@ class Command(BaseCommand):
                 except KeyError as e:
                     logger.warning("The map layer '{}' was not imported: {} is missing.".format(path, e))
 
-        def load_tile_server_layers(paths, basemap):
-            for path in paths:
-                if os.path.basename(path) != 'meta.json':
-                    meta = {
-                        "icon": "fa fa-globe",
-                        "name": os.path.basename(path)
-                    }
-                    if os.path.exists(os.path.join(os.path.dirname(path), 'meta.json')):
-                        meta = json.load(open(os.path.join(os.path.dirname(path), 'meta.json')))
-
-                    tile_config_path = False
-                    mapnik_xml_path = False
-                    if path.endswith('.json'):
-                        tile_config_path = path
-                    if path.endswith('.xml'):
-                        mapnik_xml_path = path
-
-                    self.add_tileserver_layer(
-                        meta['name'], mapnik_xml_path, meta['icon'], basemap, tile_config_path)
 
         def load_map_layers(package_dir):
             basemap_styles = glob.glob(os.path.join(
@@ -621,17 +573,6 @@ class Command(BaseCommand):
                 package_dir, 'map_layers', 'mapbox_spec_json', 'overlays', '*', '*.json'))
             load_mapbox_styles(basemap_styles, True)
             load_mapbox_styles(overlay_styles, False)
-
-            tile_server_basemaps = glob.glob(os.path.join(
-                package_dir, 'map_layers', 'tile_server', 'basemaps', '*', '*.xml'))
-            tile_server_basemaps += glob.glob(os.path.join(package_dir,
-                                                           'map_layers', 'tile_server', 'basemaps', '*', '*.json'))
-            tile_server_overlays = glob.glob(os.path.join(
-                package_dir, 'map_layers', 'tile_server', 'overlays', '*', '*.xml'))
-            tile_server_overlays += glob.glob(os.path.join(package_dir,
-                                                           'map_layers', 'tile_server', 'overlays', '*', '*.json'))
-            load_tile_server_layers(tile_server_basemaps, True)
-            load_tile_server_layers(tile_server_overlays, False)
 
         def load_business_data(package_dir):
             config_paths = glob.glob(os.path.join(package_dir, 'package_config.json'))
@@ -757,7 +698,7 @@ class Command(BaseCommand):
 
             try:
                 zip_file = os.path.join(unzip_into_dir, "source_data.zip")
-                urllib.urlretrieve(source, zip_file)
+                urllib.request.urlretrieve(source, zip_file)
                 unzip_file(zip_file, unzip_into_dir)
             except Exception as e:
                 pass
@@ -961,8 +902,10 @@ class Command(BaseCommand):
                 sys.exit()
 
             for file in data:
-                with open(os.path.join(data_dest, file['name']), 'wb') as f:
-                    f.write(file['outputfile'].getvalue())
+                with open(os.path.join(data_dest, file['name']), 'w') as f:
+                    bufsize = 16 * 1024
+                    file['outputfile'].seek(0)
+                    shutil.copyfileobj(file['outputfile'], f ,bufsize)
         else:
             utils.print_message(
                 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.')
@@ -996,7 +939,7 @@ to cancel the operation. You will need to manually kill all of the processes
 with or just close the terminal. Also, be aware that print statements
 will be very jumbled.""")
                 if not force:
-                    confirm = raw_input("continue? Y/n ")
+                    confirm = input("continue? Y/n ")
                     if len(confirm) > 0 and not confirm.lower().startswith("y"):
                         exit()
         if use_multiprocessing is True and not data_source.endswith(".jsonl"):
@@ -1010,7 +953,7 @@ will be very jumbled.""")
         if data_source == '':
             data_source = settings.BUSINESS_DATA_FILES
 
-        if isinstance(data_source, basestring):
+        if isinstance(data_source, str):
             data_source = [data_source]
 
         create_collections = False
@@ -1054,15 +997,14 @@ will be very jumbled.""")
                 'No overwrite option indicated. Please rerun command with \'-ow\' parameter.')
             sys.exit()
 
-        if isinstance(data_source, basestring):
+        if isinstance(data_source, str):
             data_source = [data_source]
 
         if len(data_source) > 0:
             for source in data_source:
                 path = utils.get_valid_path(source)
                 if path is not None:
-                    data = unicodecsv.DictReader(
-                        open(path, 'rU'), encoding='utf-8-sig', restkey='ADDITIONAL', restval='MISSING')
+                    data = csv.DictReader(open(path, 'r'), encoding='utf-8-sig')
                     business_data = list(data)
                     TileCsvReader(business_data).import_business_data(overwrite=None)
                 else:
@@ -1079,13 +1021,13 @@ will be very jumbled.""")
         """
         Imports business data relations
         """
-        if isinstance(data_source, basestring):
+        if isinstance(data_source, str):
             data_source = [data_source]
 
         for path in data_source:
             if os.path.isabs(path):
                 if os.path.isfile(os.path.join(path)):
-                    relations = csv.DictReader(open(path, 'rU'))
+                    relations = csv.DictReader(open(path, 'r'))
                     RelationImporter().import_relations(relations)
                 else:
                     utils.print_message('No file found at indicated location: {0}'.format(path))
@@ -1105,7 +1047,7 @@ will be very jumbled.""")
         if data_source == '':
             data_source = settings.RESOURCE_GRAPH_LOCATIONS
 
-        if isinstance(data_source, basestring):
+        if isinstance(data_source, str):
             data_source = [data_source]
 
         for path in data_source:
@@ -1156,80 +1098,6 @@ will be very jumbled.""")
                 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.')
             sys.exit()
 
-    def add_tileserver_layer(
-        self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe', is_basemap=False,
-            tile_config_path=False):
-
-        if layer_name is not False:
-            config = None
-            extension = "png"
-            layer_type = "raster"
-            tile_size = 256
-            if mapnik_xml_path is not False:
-                path = os.path.abspath(mapnik_xml_path),
-                config = {
-                    "provider": {
-                        "name": "mapnik",
-                        "mapfile": os.path.abspath(mapnik_xml_path)
-                    }
-                }
-                layer_list = [{
-                    "id": layer_name,
-                    "type": "raster",
-                    "source": layer_name,
-                    "minzoom": 0,
-                    "maxzoom": 22
-                }]
-            elif tile_config_path is not False:
-                path = os.path.abspath(tile_config_path)
-                with open(path) as content:
-                    config_data = json.load(content)
-                config = config_data["config"]
-                layer_type = config_data["type"]
-                layer_list = config_data["layers"]
-                for layer in layer_list:
-                    layer["source"] = layer_name
-                    if layer_type == "vector":
-                        layer["source-layer"] = layer_name
-                if layer_type == "vector":
-                    extension = "pbf"
-                    tile_size = 512
-            if config is not None:
-                try:
-                    config['provider']['kwargs']['dbinfo']['database'] = settings.DATABASES['default']['NAME']
-                except Exception as e:
-                    pass
-
-                with transaction.atomic():
-                    tileserver_layer = models.TileserverLayer(
-                        name=layer_name,
-                        path=path,
-                        config=config
-                    )
-                    source_dict = {
-                        "type": layer_type,
-                        "tiles": [
-                            ("/tileserver/%s/{z}/{x}/{y}.%s") % (layer_name, extension)
-                        ],
-                        "tileSize": tile_size
-                    }
-                    try:
-                        map_source = models.MapSource(name=layer_name, source=source_dict)
-                        if len(layer_list) > 0:
-                            map_layer = models.MapLayer(
-                                name=layer_name,
-                                layerdefinitions=layer_list,
-                                isoverlay=(not is_basemap),
-                                icon=layer_icon
-                            )
-                            map_layer.save()
-                            tileserver_layer.map_layer = map_layer
-                        map_source.save()
-                        tileserver_layer.map_source = map_source
-                        tileserver_layer.save()
-                    except IntegrityError as e:
-                        print("Cannot save tile server layer: {0} already exists".format(layer_name))
-
     def add_mapbox_layer(self, layer_name=False, mapbox_json_path=False, layer_icon='fa fa-globe', is_basemap=False):
         if layer_name is not False and mapbox_json_path is not False:
             with open(mapbox_json_path) as data_file:
@@ -1247,14 +1115,6 @@ will be very jumbled.""")
                         map_layer.save()
                     except IntegrityError as e:
                         print("Cannot save layer: {0} already exists".format(layer_name))
-
-    def delete_tileserver_layer(self, layer_name=False):
-        if layer_name is not False:
-            with transaction.atomic():
-                tileserver_layer = models.TileserverLayer.objects.get(name=layer_name)
-                tileserver_layer.map_layer.delete()
-                tileserver_layer.map_source.delete()
-                tileserver_layer.delete()
 
     def delete_mapbox_layer(self, layer_name=False):
         if layer_name is not False:
@@ -1287,7 +1147,7 @@ will be very jumbled.""")
             utils.print_message(
                 'No data source indicated. Please rerun command with \'-s\' parameter.')
 
-        if isinstance(source, basestring):
+        if isinstance(source, str):
             source = [source]
 
         for path in source:
@@ -1295,6 +1155,3 @@ will be very jumbled.""")
                 with open(path, 'rU') as f:
                     mapping_file = json.load(f)
                     graph_importer.import_mapping_file(mapping_file)
-
-    def seed_resource_tile_cache(self):
-        seed_resource_cache()

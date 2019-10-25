@@ -54,10 +54,8 @@ class SKOSReader(object):
         # bind the namespaces
         rdf_graph.bind('arches', ARCHES)
 
-        start = time()
         try:
             rdf = rdf_graph.parse(source=path_to_file, format=format)
-            print('time elapsed to parse rdf graph %s s' % (time() - start))
         except:
             raise Exception('Error occurred while parsing the file %s' % path_to_file)
         return rdf
@@ -109,11 +107,11 @@ class SKOSReader(object):
                             if predicate == DCTERMS.title:
                                 concept_scheme.addvalue({'id': val['value_id'], 'value': val[
                                                         'value'], 'language': object.language or default_lang, 'type': 'prefLabel', 'category': value_type.category})
-                                print('Casting dcterms:title to skos:prefLabel')
+                                # print('Casting dcterms:title to skos:prefLabel')
                             elif predicate == DCTERMS.description:
                                 concept_scheme.addvalue({'id': val['value_id'], 'value': val[
                                                         'value'], 'language': object.language or default_lang, 'type': 'scopeNote', 'category': value_type.category})
-                                print('Casting dcterms:description to skos:scopeNote')
+                                # print('Casting dcterms:description to skos:scopeNote')
                             elif predicate == DCTERMS.identifier:
                                 identifier = self.unwrapJsonLiteral(str(object))
                         except:
@@ -209,10 +207,13 @@ class SKOSReader(object):
 
             # insert and index the concpets
             scheme_node = None
+            orphaned_concepts = {}
             with transaction.atomic():
                 for node in self.nodes:
                     if node.nodetype == 'ConceptScheme':
                         scheme_node = node
+                    elif node.nodetype == 'Concept':
+                        orphaned_concepts[str(node.id)] = node
                     if staging_options == 'stage':
                         try:
                             models.Concept.objects.get(pk=node.id)
@@ -239,11 +240,35 @@ class SKOSReader(object):
                         conceptto_id=relation['target'],
                         relationtype_id=relation['type']
                     )
-                
+                    # check for orphaned concepts, every concept except the concept scheme should have an edge pointing to it
+                    if (relation['type'] == 'narrower' or relation['type'] == 'hasTopConcept') and orphaned_concepts.get(relation['target']) is not None:
+                        orphaned_concepts.pop(str(relation['target']))
+
+                if len(orphaned_concepts.keys()) > 0:
+                    if scheme_node:
+                        orphaned_scheme = Concept({
+                            'id': uuid.uuid4(),
+                            'legacyoid': uuid.uuid4(),
+                            'nodetype': 'ConceptScheme'
+                        })
+                        orphaned_scheme_value = None
+                        for value in scheme_node.values:
+                            if value.type == 'prefLabel':
+                                orphaned_scheme.addvalue({'id': uuid.uuid4(), 'value': "ORPHANS - " + value.value, 'language': value.language, 'type': value.type, 'category': value.category})
+                        orphaned_scheme.save()
+                        for orphaned_concept_id, orphaned_concept in orphaned_concepts.items():
+                            models.Relation.objects.create(
+                                conceptfrom_id=str(orphaned_scheme.id),
+                                conceptto_id=orphaned_concept_id,
+                                relationtype_id='narrower'
+                            )
+                    self.logger.warning('The SKOS file appears to have orphaned concepts.')
+
                 # need to index after the concepts and relations have been entered into the db
                 # so that the proper context gets indexed with the concept
                 if scheme_node:
                     scheme_node.bulk_index()
+
 
             # insert the concept collection relations
             # we do this outide a transaction so that we can load incomplete collections
@@ -255,7 +280,8 @@ class SKOSReader(object):
                         relationtype_id=relation['type']
                     )
                 except IntegrityError as e:
-                    self.logger.warning(e.message)
+                    self.logger.warning(e)
+
 
             return scheme_node
         else:

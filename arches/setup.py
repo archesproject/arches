@@ -2,7 +2,7 @@ import sys
 import os
 import subprocess
 import shutil
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import zipfile
 import datetime
 import platform
@@ -55,7 +55,7 @@ def activate_env(path_to_virtual_env):
 
 # INSTALL ELASTICSEARCH and HEAD plugin
 def download_file(url, file_name):
-    u = urllib2.urlopen(url)
+    u = urllib.request.urlopen(url)
     f = open(file_name, 'wb')
     meta = u.info()
     file_size = int(meta.getheaders("Content-Length")[0])
@@ -153,7 +153,7 @@ def get_complete_version(version=None):
 def get_changeset(path_to_file=None):
     import os
     import subprocess
-    from StringIO import StringIO
+    from io import StringIO
     from management.commands.utils import write_to_file
 
     sb = StringIO()

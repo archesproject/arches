@@ -16,8 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import urllib2
-from urlparse import urlparse
+import urllib.request, urllib.error, urllib.parse
+from urllib.parse import urlparse
 from django.shortcuts import render
 from arches.app.models.system_settings import settings
 from django.http import HttpResponseNotFound, HttpResponse
@@ -58,7 +58,7 @@ def feature_popup_content(request):
         try:
             if host in settings.ALLOWED_POPUP_HOSTS:
                 if url is not None:
-                    f = urllib2.urlopen(url)
+                    f = urllib.request.urlopen(url)
                     return HttpResponse(f.read())
             else:
                 raise Exception()

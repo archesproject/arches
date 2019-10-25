@@ -1,5 +1,5 @@
 import csv
-import cPickle
+import pickle
 import datetime
 import json
 import os
@@ -7,6 +7,7 @@ import sys
 import uuid
 import traceback
 from copy import deepcopy
+from io import StringIO
 from .format import Writer
 from .format import Reader
 from elasticsearch import TransportError
@@ -20,11 +21,6 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from django.db import transaction
 from django.db.models import Q
 from django.utils.translation import ugettext as _
-
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 
 class MissingConfigException(Exception):
@@ -126,7 +122,10 @@ class CsvWriter(Writer):
             csv_record['ResourceID'] = resourceinstanceid
             csv_record['populated_node_groups'] = []
 
-            tiles = sorted(tiles, key=lambda k: k.parenttile_id)
+            parents = [p for p in tiles if p.parenttile_id is None]
+            children = [c for c in tiles if c.parenttile_id is not None]
+            tiles = parents + sorted(children, key=lambda k: k.parenttile_id)
+
             for tile in tiles:
                 other_group_record = {}
                 other_group_record['ResourceID'] = resourceinstanceid
@@ -605,7 +604,7 @@ class CsvReader(Reader):
                                     value = concept_lookup.lookup_labelid_from_label(value, collection_id)
                         try:
                             value = datatype_instance.transform_import_values(value, nodeid)
-                            errors = datatype_instance.validate(value, row_number, source)
+                            errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
                         except Exception as e:
                             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(datatype_instance.datatype_model.classname, value, source, str(e) + ' or is not a prefLabel in the given collection.')})
                         if len(errors) > 0:
@@ -632,7 +631,7 @@ class CsvReader(Reader):
                     else:
                         blank_tile = None
                     # return deepcopy(blank_tile)
-                    return cPickle.loads(cPickle.dumps(blank_tile, -1))
+                    return pickle.loads(pickle.dumps(blank_tile, -1))
 
                 def check_required_nodes(tile, parent_tile, required_nodes, all_nodes):
                     # Check that each required node in a tile is populated.
@@ -654,7 +653,7 @@ class CsvReader(Reader):
                 missing_display_values = {}
 
                 for row_number, row in enumerate(business_data):
-                    row_number = 'on line ' + unicode(row_number + 2) #to represent the row in a csv accounting for the header and 0 index
+                    row_number = 'on line ' + str(row_number + 2) #to represent the row in a csv accounting for the header and 0 index
                     if row['ResourceID'] != previous_row_resourceid and previous_row_resourceid is not None:
 
                         save_count = save_count + 1
@@ -747,7 +746,7 @@ class CsvReader(Reader):
                                             child_tile_cardinality = 'n'
 
                                         def populate_child_tiles(source_data):
-                                            prototype_tile_copy = cPickle.loads(cPickle.dumps(childtile, -1))
+                                            prototype_tile_copy = pickle.loads(pickle.dumps(childtile, -1))
                                             tileid = row['TileID'] if 'TileID' in row else uuid.uuid4()
                                             prototype_tile_copy.tileid = tileid
                                             prototype_tile_copy.parenttile = target_tile

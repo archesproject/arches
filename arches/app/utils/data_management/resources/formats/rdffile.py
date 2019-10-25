@@ -3,7 +3,9 @@ import re
 import json
 import uuid
 import datetime
-from django.core.urlresolvers import reverse
+import logging
+from io import StringIO
+from django.urls import reverse
 from .format import Writer, Reader
 from arches.app.models import models
 from arches.app.models.resource import Resource
@@ -18,12 +20,6 @@ from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS
 from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
-
-import logging
 
 class RdfWriter(Writer):
 

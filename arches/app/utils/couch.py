@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import json
 import couchdb
-from urlparse import urlparse, urljoin
+from urllib.parse import urlparse, urljoin
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse

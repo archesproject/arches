@@ -17,15 +17,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import zipfile
+from io import StringIO
 from arches.app.utils import import_class_from_string
 from arches.app.models.system_settings import settings
 from django.http import HttpResponse
 
-
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 class ResourceExporter(object):
 

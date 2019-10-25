@@ -20,7 +20,7 @@ from django.views.decorators.cache import cache_page
 from django.contrib.auth import views as auth_views
 from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from arches.app.views import concept, main, map, search, graph, tileserver, api
+from arches.app.views import concept, main, map, search, graph, api
 from arches.app.views.admin import ReIndexResources
 from arches.app.views.graph import GraphDesignerView, GraphSettingsView, GraphDataView, GraphManagerView, DatatypeTemplateView, CardView, FunctionManagerView, PermissionDataView, IconDataView
 from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceCards, ResourceReportView, RelatedResourcesView, ResourceDescriptors, ResourceEditLogView, ResourceTiles
@@ -30,7 +30,7 @@ from arches.app.views.plugin import PluginView
 from arches.app.views.concept import RDMView
 from arches.app.views.user import UserManagerView
 from arches.app.views.tile import TileData
-from arches.app.views.map import MapLayerManagerView
+from arches.app.views.map import MapLayerManagerView, TileserverProxyView
 from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources, MobileSurveyDesignerView
 from arches.app.views.auth import LoginView, SignupView, ConfirmSignupView, ChangePasswordView, GetTokenView, GetClientIdView, UserProfileView
 from arches.app.models.system_settings import settings
@@ -131,7 +131,6 @@ urlpatterns = [
     url(r'^tiles/tile_history$', TileData.as_view(action='tile_history'), name='tile_history'),
     url(r'^tiles/delete_provisional_tile$', TileData.as_view(action='delete_provisional_tile'), name='delete_provisional_tile'),
     url(r'^templates/(?P<template>[a-zA-Z_\-./]*)', main.templates, name="templates"),
-    url(r'^tileserver/*', tileserver.handle_request, name="tileserver"),
     url(r'^map_layer_manager/(?P<maplayerid>%s)$' % uuid_regex, MapLayerManagerView.as_view(), name='map_layer_update'),
     url(r'^map_layer_manager/*', MapLayerManagerView.as_view(), name="map_layer_manager"),
     url(r'^feature_popup_content$', main.feature_popup_content, name="feature_popup_content"),
@@ -152,6 +151,8 @@ urlpatterns = [
     url(r'^cards/(?P<resourceid>%s|())$' % uuid_regex, api.Card.as_view(), name='api_card'),
     url(r'^search_component_data/(?P<componentname>[-\w]+)$', api.SearchComponentData.as_view(), name='api_search_component_data'),
     url(r'^geojson$', api.GeoJSON.as_view(), name='geojson'),
+    url(r'^mvt/(?P<nodeid>%s)/(?P<zoom>[0-9]+|\{z\})/(?P<x>[0-9]+|\{x\})/(?P<y>[0-9]+|\{y\}).pbf$' % uuid_regex, api.MVT.as_view(), name='mvt'),
+    url(r'^tileserver/(?P<path>.*)$', TileserverProxyView.as_view()),
     url(r'^history/$', ResourceActivityStreamCollectionView.as_view(), name="as_stream_collection"),
     url(r'^history/(?P<page>[0-9]+)$', ResourceActivityStreamPageView.as_view(), name='as_stream_page'),
     url(r'^icons$', IconDataView.as_view(), name='icons'),
@@ -161,10 +162,10 @@ urlpatterns = [
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', admin.site.urls),
-    url(r'^password_reset/$', auth_views.password_reset, name='password_reset', kwargs={"password_reset_form":ArchesPasswordResetForm}),
-    url(r'^password_reset/done/$', auth_views.password_reset_done, name='password_reset_done'),
-    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.password_reset_confirm, name='password_reset_confirm', kwargs={"set_password_form":ArchesSetPasswordForm}),
-    url(r'^reset/done/$', auth_views.password_reset_complete, name='password_reset_complete'),
+    url(r'^password_reset/$', auth_views.PasswordResetView, name='password_reset', kwargs={"password_reset_form":ArchesPasswordResetForm}),
+    url(r'^password_reset/done/$', auth_views.PasswordResetDoneView, name='password_reset_done'),
+    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.PasswordResetConfirmView, name='password_reset_confirm', kwargs={"set_password_form":ArchesSetPasswordForm}),
+    url(r'^reset/done/$', auth_views.PasswordResetCompleteView, name='password_reset_complete'),
 
     url(r'^o/', include('oauth2_provider.urls', namespace='oauth2')),
 ]

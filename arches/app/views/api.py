@@ -4,15 +4,17 @@ import os
 import re
 import sys
 import uuid
+from io import StringIO
 from django.shortcuts import render
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from django.db import transaction
+from django.db import transaction, connection
 from django.db.models import Q
+from django.http import Http404, HttpResponse
 from django.http.request import QueryDict
 from django.core import management
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from revproxy.views import ProxyView
@@ -39,11 +41,6 @@ from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
 
 logger = logging.getLogger(__name__)
-
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 
 def userCanAccessMobileSurvey(request, surveyid=None):
@@ -232,7 +229,7 @@ class GeoJSON(APIBase):
             for tile in tiles:
                 data = tile.data
                 try:
-                    for feature_index, feature in enumerate(data[unicode(node.pk)]['features']):
+                    for feature_index, feature in enumerate(data[str(node.pk)]['features']):
                         feature['properties']['index'] = feature_index
                         feature['properties']['resourceinstanceid'] = tile.resourceinstance_id
                         feature['properties']['tileid'] = tile.pk
@@ -252,6 +249,116 @@ class GeoJSON(APIBase):
 
         response = JSONResponse({'type': 'FeatureCollection', 'features': features})
         return response
+
+
+EARTHCIRCUM = 40075016.6856
+PIXELSPERTILE = 256
+class MVT(APIBase):
+    def get(self, request, nodeid, zoom, x, y):
+        if hasattr(request.user, 'userprofile') is not True:
+            models.UserProfile.objects.create(user=request.user)
+        viewable_nodegroups = request.user.userprofile.viewable_nodegroups
+        try:
+            node = models.Node.objects.get(nodeid=nodeid, nodegroup_id__in=viewable_nodegroups)
+        except models.Node.DoesNotExist:
+            raise Http404()
+        config = node.config
+        with connection.cursor() as cursor:
+            # TODO: when we upgrade to PostGIS 3, we can get feature state
+            # working by adding the feature_id_name arg:
+            # https://github.com/postgis/postgis/pull/303
+            if int(zoom) <= int(config['clusterMaxZoom']):
+                arc = EARTHCIRCUM / ((1 << int(zoom)) * PIXELSPERTILE)
+                distance = arc * int(config['clusterDistance'])
+                min_points = int(config['clusterMinPoints'])
+                cursor.execute("""WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
+                AS (
+                    SELECT m.*,
+                    ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
+                    FROM (
+                        SELECT t.tileid,
+                            t.resourceinstanceid,
+                            n.nodeid,
+                            ST_Transform(ST_SetSRID(
+                                st_geomfromgeojson(
+                                    (
+                                        json_array_elements(
+                                            t.tiledata::json ->
+                                            n.nodeid::text ->
+                                        'features') -> 'geometry'
+                                    )::text
+                                ),
+                                4326
+                            ), 3857) AS geom
+                        FROM tiles t
+                            LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
+                        WHERE n.nodeid = %s
+                    ) m
+                )
+
+                SELECT ST_AsMVT(
+                    tile,
+                    %s
+                ) FROM (
+                    SELECT resourceinstanceid::text,
+                        row_number() over () as id,
+                        1 as total,
+                        ST_AsMVTGeom(
+                            geom,
+                            TileBBox(%s, %s, %s, 3857)
+                        ) AS geom,
+                        '' AS extent
+                    FROM clusters
+                    WHERE cid is NULL
+                    UNION
+                    SELECT NULL as resourceinstanceid,
+                        row_number() over () as id,
+                        count(*) as total,
+                        ST_AsMVTGeom(
+                            ST_Centroid(
+                                ST_Collect(geom)
+                            ),
+                            TileBBox(%s, %s, %s, 3857)
+                        ) AS geom,
+                        ST_AsGeoJSON(
+                            ST_Transform(
+                                ST_SetSRID(
+                                    ST_Extent(geom), 3857
+                                ), 4326
+                            )
+                        ) AS extent
+                    FROM clusters
+                    WHERE cid IS NOT NULL
+                    GROUP BY cid
+                ) as tile;""",
+                [distance, min_points, nodeid, nodeid, zoom, x, y, zoom, x, y])
+            else:
+                cursor.execute("""SELECT ST_AsMVT(tile, %s) FROM (SELECT t.tileid,
+                   row_number() over () as id,
+                   t.resourceinstanceid,
+                   n.nodeid,
+                   ST_AsMVTGeom(
+                       ST_Transform(ST_SetSRID(
+                           st_geomfromgeojson(
+                               (
+                                   json_array_elements(
+                                       t.tiledata::json ->
+                                       n.nodeid::text ->
+                                   'features') -> 'geometry'
+                               )::text
+                           ),
+                           4326
+                       ), 3857),
+                       TileBBox(%s, %s, %s, 3857)
+                   ) AS geom,
+                   1 AS total
+                FROM tiles t
+                    LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
+                WHERE n.nodeid = %s) AS tile;""", [nodeid, zoom, x, y, nodeid])
+            tile = bytes(cursor.fetchone()[0])
+            if not len(tile):
+                raise Http404()
+        return HttpResponse(tile, content_type="application/x-protobuf")
 
 
 @method_decorator(csrf_exempt, name='dispatch')

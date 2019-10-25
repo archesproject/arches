@@ -5,19 +5,16 @@ import json
 import uuid
 import csv
 import zipfile
+from io import StringIO
+
 from arches.app.models.graph import Graph
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
 from arches.app.models.models import CardXNodeXWidget, Node, Resource2ResourceConstraint, FunctionXGraph, Value
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from pprint import pprint as pp
 from collections import OrderedDict
 from operator import itemgetter
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 def export(export_dir):
     """
@@ -85,9 +82,9 @@ def get_graphs_for_export(graphids=None):
             resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(graphid__in=graphids), exclude=["widgets"])
         except:
             # this warning should never get thrown while doing an export from the UI, but maybe it should be moved somewhere else.
-            print '*'*80
-            print '"{0}" contains/is not a valid graphid or option for this command.'.format(','.join(graphids))
-            print '*'*80
+            print('*'*80)
+            print('"{0}" contains/is not a valid graphid or option for this command.'.format(','.join(graphids)))
+            print('*'*80)
             sys.exit()
 
     for resource_graph in resource_graph_query:

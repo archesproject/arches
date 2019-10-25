@@ -77,7 +77,7 @@ class UserManagerView(BaseManagerView):
 
     def get(self, request):
 
-        if self.request.user.is_authenticated() and self.request.user.username != 'anonymous':
+        if self.request.user.is_authenticated and self.request.user.username != 'anonymous':
             context = self.get_context_data(
                 main_script='views/user-profile-manager',
             )
@@ -103,12 +103,12 @@ class UserManagerView(BaseManagerView):
 
         if self.action == 'get_user_names':
             data = {}
-            if self.request.user.is_authenticated() and request.user.groups.filter(name='Resource Reviewer').exists():
+            if self.request.user.is_authenticated and request.user.groups.filter(name='Resource Reviewer').exists():
                 userids = json.loads(request.POST.get('userids', '[]'))
                 data = {u.id:u.username for u in User.objects.filter(id__in=userids)}
                 return JSONResponse(data)
 
-        if self.request.user.is_authenticated() and self.request.user.username != 'anonymous':
+        if self.request.user.is_authenticated and self.request.user.username != 'anonymous':
 
             user_details = self.get_user_details(request.user)
 
@@ -161,11 +161,11 @@ class UserManagerView(BaseManagerView):
             all_ordered_card_ids += mobile_survey_dict['cards']
             mobile_surveys.append(mobile_survey_dict)
 
-        active_graphs = {unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)}
+        active_graphs = {str(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)}
 
         for i, graph in enumerate(graphs):
             cards = []
-            if i == 0 or unicode(graph.graphid) in active_graphs:
+            if i == 0 or str(graph.graphid) in active_graphs:
                 cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
             resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
 

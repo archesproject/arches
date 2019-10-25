@@ -215,9 +215,9 @@ define([
                 self.getPopupData(feature),
                 self.popup._content
             );
-            if (map.getStyle()) map.setFeatureState(feature, { selected: true });
+            if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: true });
             self.popup.on('close', function() {
-                if (map.getStyle()) map.setFeatureState(feature, { selected: false });
+                if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: false });
                 self.popup = undefined;
             });
         };
@@ -240,12 +240,12 @@ define([
                 var hoverFeature;
                 map.on('mousemove', function(e) {
                     var style = map.getStyle();
-                    if (hoverFeature && style) map.setFeatureState(hoverFeature, { hover: false });
+                    if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: false });
                     hoverFeature = _.find(
                         map.queryRenderedFeatures(e.point),
                         self.isFeatureClickable
                     );
-                    if (hoverFeature && style) map.setFeatureState(hoverFeature, { hover: true });
+                    if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: true });
                     map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
                 });
 

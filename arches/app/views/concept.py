@@ -35,6 +35,7 @@ from arches.app.utils.response import JSONResponse
 from arches.app.utils.skos import SKOSWriter, SKOSReader
 from arches.app.views.base import BaseManagerView
 
+
 @method_decorator(group_required('RDM Administrator'), name='dispatch')
 class RDMView(BaseManagerView):
     def get(self, request, conceptid):
@@ -197,8 +198,8 @@ def concept(request, conceptid):
                     rdf = skos.read_file(skosfile)
                     ret = skos.save_concepts_from_skos(rdf, overwrite_options, staging_options)
                     return JSONResponse(ret)
-                except:
-                    return JSONResponse({'message':{'title': _('Unable to Load SKOS File'), 'text': _('There was an issue saving the contents of the file to Arches.')}}, status=500)
+                except Exception as e:
+                    return JSONResponse({'message':{'title': _('Unable to Load SKOS File'), 'text': _('There was an issue saving the contents of the file to Arches.') + str(e)}}, status=500)
 
         else:
             data = JSONDeserializer().deserialize(request.body)
@@ -327,7 +328,7 @@ def paged_dropdown(request):
     results = Concept().get_child_collections_hierarchically(conceptid, offset=offset, limit=limit, query=query)
     total_count = results[0][3] if len(results) > 0 else 0
     data = [dict(list(zip(['valueto','depth', 'collector'], d))) for d in results]
-    data = [dict(list(zip(['conceptid', 'id', 'type', 'text', 'language'], d['valueto'].values())), depth=d['depth'], collector=d['collector']) for d in data]
+    data = [dict(list(zip(['id', 'text', 'conceptid', 'language', 'type'], d['valueto'].values())), depth=d['depth'], collector=d['collector']) for d in data]
     return JSONResponse({
         'results': data,
         'more': offset+limit < total_count
