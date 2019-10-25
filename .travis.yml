@@ -24,8 +24,8 @@ before_install:
   - psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
   - echo "*:*:*:postgres:postgis" >> ~/.pgpass
   - psql -d postgres -c "SET standard_conforming_strings = off;"
-  - psql -c "CREATE DATABASE template_postgis_20;"
-  - psql -d template_postgis_20 -c "CREATE EXTENSION postgis;"
+  - psql -c "CREATE DATABASE template_postgis;"
+  - psql -d template_postgis -c "CREATE EXTENSION postgis;"
   - "pip install -e . --no-binary :all:"
   - pip install -r arches/install/requirements.txt
   - pip install -r arches/install/requirements_dev.txt
