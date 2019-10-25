@@ -350,8 +350,7 @@ class MobileSurvey(models.MobileSurveyModel):
         search_res = JSONDeserializer().deserialize(search_res_json.content)
         try:
             for hit in search_res['results']['hits']['hits']:
-                if hit['_type'] == resource_type_id and len(list(instances.keys())) < int(self.datadownloadconfig['count']):
-                    pprint(hit['_source'])
+                if hit['_type'] == resource_type_id and len(list(instances)) < int(self.datadownloadconfig['count']):
                     instances[hit['_source']['resourceinstanceid']] = hit['_source']
         except Exception as e:
             print(e)
