@@ -903,7 +903,9 @@ class Command(BaseCommand):
 
             for file in data:
                 with open(os.path.join(data_dest, file['name']), 'w') as f:
-                    f.write(file['outputfile'].getvalue())
+                    bufsize = 16 * 1024
+                    file['outputfile'].seek(0)
+                    shutil.copyfileobj(file['outputfile'], f ,bufsize)
         else:
             utils.print_message(
                 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.')

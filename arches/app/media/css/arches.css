@@ -503,6 +503,12 @@ input[type="checkbox"] {
     color: #fff;
 }
 
+.workflow-step-icon.can-advance {
+    border: 1px solid rgb(110, 160, 216);;
+    background-color: rgb(189, 214, 241);
+    color: #fff;
+}
+
 .workflow-step-description-container {
     width: 100%;
     display: flex;

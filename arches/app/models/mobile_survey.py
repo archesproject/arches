@@ -16,6 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import json
 import urllib.parse
+from pprint import pprint
 from datetime import datetime
 from datetime import timedelta
 from copy import copy, deepcopy
@@ -347,9 +348,12 @@ class MobileSurvey(models.MobileSurveyModel):
     def append_to_instances(self, request, instances, resource_type_id):
         search_res_json = search.search_results(request)
         search_res = JSONDeserializer().deserialize(search_res_json.content)
-        for hit in search_res['results']['hits']['hits']:
-            if hit['_type'] == resource_type_id and len(list(instances.keys())) < int(self.datadownloadconfig['count']):
-                instances[hit['_source']['resourceinstanceid']] = hit['_source']
+        try:
+            for hit in search_res['results']['hits']['hits']:
+                if hit['_type'] == resource_type_id and len(list(instances)) < int(self.datadownloadconfig['count']):
+                    instances[hit['_source']['resourceinstanceid']] = hit['_source']
+        except Exception as e:
+            print(e)
 
     def collect_resource_instances_for_couch(self):
         """
@@ -389,8 +393,8 @@ class MobileSurvey(models.MobileSurveyModel):
                             self.append_to_instances(request, instances, res_type)
                         for key, value in instances.items():
                             all_instances[key] = value
-                except KeyError:
-                    print('no instances found in', search_res)
+                except Exception as e:
+                    print(e)
             else:
                 try:
                     instances = {}

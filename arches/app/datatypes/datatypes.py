@@ -58,7 +58,7 @@ class DataTypeFactory(object):
 
 class StringDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source=None):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
         errors = []
         try:
             if value is not None:
@@ -87,7 +87,7 @@ class StringDataType(BaseDataType):
 
     def transform_export_values(self, value, *args, **kwargs):
         if value != None:
-            return value.encode('utf8')
+            return value
 
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
@@ -133,7 +133,7 @@ class StringDataType(BaseDataType):
 
 class NumberDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source=''):
+    def validate(self, value, row_number=None, source='', node=None, nodeid=None):
         errors = []
 
         try:
@@ -204,7 +204,7 @@ class NumberDataType(BaseDataType):
 
 class BooleanDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source=''):
+    def validate(self, value, row_number=None, source='', node=None, nodeid=None):
         errors = []
 
         try:
@@ -252,7 +252,7 @@ class BooleanDataType(BaseDataType):
 
 class DateDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source=''):
+    def validate(self, value, row_number=None, source='', node=None, nodeid=None):
         errors = []
         if value is not None:
             date_formats = ['-%Y','%Y','%Y-%m-%d','%B-%m-%d','%Y-%m-%d %H:%M:%S']
@@ -342,7 +342,7 @@ class DateDataType(BaseDataType):
 
 class EDTFDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source=''):
+    def validate(self, value, row_number=None, source='', node=None, nodeid=None):
         errors = []
         if value is not None:
             if not ExtendedDateFormat(value).is_valid():
@@ -416,7 +416,7 @@ class EDTFDataType(BaseDataType):
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source=None):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
         errors = []
         coord_limit = 1500
         coordinate_count = 0
@@ -1033,7 +1033,20 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
 class FileListDataType(BaseDataType):
 
-    def validate(self, value, node):
+    def __init__(self, model=None):
+        super(FileListDataType, self).__init__(model=model)
+        self.node_lookup = {}
+
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
+        if node:
+            self.node_lookup[str(node.pk)] = node
+        elif nodeid:
+            if str(nodeid) in self.node_lookup:
+                node = self.node_lookup[str(nodeid)]
+            else:
+                node = models.Node.objects.get(nodeid=nodeid)
+                self.node_lookup[str(nodeid)] = node
+
         config = node.config
         errors = []
         limit = config['maxFiles']
@@ -1309,7 +1322,7 @@ class BaseDomainDataType(BaseDataType):
 
 class DomainDataType(BaseDomainDataType):
 
-    def validate(self, value, row_number=None, source=''):
+    def validate(self, value, row_number=None, source='', node=None, nodeid=None):
         errors = []
         domain_val_node_query = models.Node.objects.filter(config__contains={"options":[{"id": value}]})
         if value is not None:
@@ -1388,7 +1401,7 @@ class DomainDataType(BaseDomainDataType):
 
 
 class DomainListDataType(BaseDomainDataType):
-    def validate(self, value, row_number=None, source=''):
+    def validate(self, value, row_number=None, source='', node=None, nodeid=None):
         errors = []
         if value is not None:
             for v in value:
@@ -1434,16 +1447,6 @@ class DomainListDataType(BaseDomainDataType):
         return ','.join(new_values)
 
     def transform_export_values(self, value, *args, **kwargs):
-        ret = ''
-        if kwargs['concept_export_value_type'] == None or kwargs['concept_export_value_type'] == '' or kwargs['concept_export_value_type'] == 'label':
-            ret = self.get_option_text(models.Node.objects.get(nodeid=kwargs['node']), value)
-        elif kwargs['concept_export_value_type'] == 'both':
-            ret = value + '|' + self.get_option_text(models.Node.objects.get(nodeid=kwargs['node']), value)
-        elif kwargs['concept_export_value_type'] == 'id':
-            ret = value
-        return ret
-
-    def transform_export_values(self, value, *args, **kwargs):
         new_values = []
         for val in value:
             if kwargs['concept_export_value_type'] == None or kwargs['concept_export_value_type'] == '' or kwargs['concept_export_value_type'] == 'label':
@@ -1485,7 +1488,6 @@ class DomainListDataType(BaseDomainDataType):
         return [domtype.from_rdf(item) for item in json_ld_node]
 
 
-
 class ResourceInstanceDataType(BaseDataType):
     def get_id_list(self, nodevalue):
         id_list = nodevalue
@@ -1508,7 +1510,7 @@ class ResourceInstanceDataType(BaseDataType):
             print('resource not avalable')
         return resource_names
 
-    def validate(self, value, row_number=None, source=''):
+    def validate(self, value, row_number=None, source='', node=None, nodeid=None):
         errors = []
 
         if value is not None:
@@ -1592,7 +1594,7 @@ class ResourceInstanceDataType(BaseDataType):
 
 
 class NodeValueDataType(BaseDataType):
-    def validate(self, value, row_number=None, source=''):
+    def validate(self, value, row_number=None, source='', node=None, nodeid=None):
         errors = []
         if value:
             try:
