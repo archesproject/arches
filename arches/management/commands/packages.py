@@ -902,7 +902,7 @@ class Command(BaseCommand):
                 sys.exit()
 
             for file in data:
-                with open(os.path.join(data_dest, file['name']), 'wb') as f:
+                with open(os.path.join(data_dest, file['name']), 'w') as f:
                     f.write(file['outputfile'].getvalue())
         else:
             utils.print_message(
