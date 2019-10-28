@@ -7,11 +7,13 @@ define([
         this.classUnvisited = 'workflow-step-icon';
         this.classActive = 'workflow-step-icon active';
         this.classComplete = 'workflow-step-icon complete';
+        this.classCanAdavance = 'workflow-step-icon can-advance';
         this.icon = 'fa-chevron-circle-right';
         this.title = '';
         this.subtitle = '';
         this.description = '';
         this.complete = ko.observable(false);
+        this.required = ko.observable(ko.unwrap(config.required));
         this.autoAdvance = ko.observable(true);
         this.active = ko.computed(function() {
             return config.workflow.activeStep() === this;

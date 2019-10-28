@@ -344,8 +344,9 @@ class EDTFDataType(BaseDataType):
 
     def validate(self, value, row_number=None, source='', node=None, nodeid=None):
         errors = []
-        if not ExtendedDateFormat(value).is_valid():
-            errors.append({'type': 'ERROR', 'message': '{0} {1} is not in the correct Extended Date Time Format, see http://www.loc.gov/standards/datetime/ for supported formats. This data was not imported.'.format(value, row_number)})
+        if value is not None:
+            if not ExtendedDateFormat(value).is_valid():
+                errors.append({'type': 'ERROR', 'message': '{0} {1} is not in the correct Extended Date Time Format, see http://www.loc.gov/standards/datetime/ for supported formats. This data was not imported.'.format(value, row_number)})
 
         return errors
 

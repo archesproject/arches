@@ -16,7 +16,6 @@
 @import url(../packages/datatables.net-bs/css/dataTables.bootstrap.css);
 @import url(../packages/datatables.net-responsive-bs/css/responsive.bootstrap.css);
 @import url(../packages/datatables.net-buttons-bs/css/buttons.bootstrap.min.css);
-@import url(../packages/nvd3/build/nv.d3.min.css);
 @import url(../packages/leaflet/dist/leaflet.css);
 @import url(../packages/leaflet-draw/dist/leaflet.draw.css);
 @import url(../css/tree/tree.css);
@@ -501,6 +500,12 @@ input[type="checkbox"] {
 .workflow-step-icon.complete {
     border: 1px solid #3A74B0;
     background-color: #B4D1F0;
+    color: #fff;
+}
+
+.workflow-step-icon.can-advance {
+    border: 1px solid rgb(110, 160, 216);;
+    background-color: rgb(189, 214, 241);
     color: #fff;
 }
 
