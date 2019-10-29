@@ -989,6 +989,7 @@ ul.tabbed-report-tab-list {
 .workbench-card-sidebar {
     position:absolute;
     right: 0;
+    top: -1px;
     height: 100%;
     width: 75px;
     background-color: #ecf0f5;
@@ -7598,8 +7599,9 @@ a.clear-geojson-button:hover {
 
 #map-popup .mapboxgl-popup-close-button {
     height: 61px !important;
-    width: 60px;
+    width: 61px;
     top: -1px;
+    margin-right: -1px;
     padding-top: 7px;
     border-radius: 0px;
     font-size: 27px;
@@ -7611,6 +7613,34 @@ a.clear-geojson-button:hover {
 
 #map-popup .mapboxgl-popup-close-button:hover {
     background: #f4f4f4;
+}
+
+#map-popup .status-ok .mapboxgl-popup-close-button {
+    background: #C4F267;
+    border-left: 1px solid #7AB503;
+}
+
+#map-popup .status-ok .mapboxgl-popup-close-button:hover {
+    background: #B3ED3F;
+}
+
+#map-popup .status-warning .mapboxgl-popup-close-button {
+    background: #FFFF70;
+    border-left: 1px solid #B9B900;
+}
+
+#map-popup .status-warning .mapboxgl-popup-close-button:hover {
+    background: #D3D300;
+}
+
+#map-popup .status-late .mapboxgl-popup-close-button {
+    background: #DA55A0;
+    border-left: 1px solid #9F005A;
+    color: #fff;
+}
+
+#map-popup .status-late .mapboxgl-popup-close-button:hover {
+    background: #D02F8A;
 }
 
 .mapboxgl-popup-close-button {
@@ -8575,11 +8605,12 @@ table.table.dataTable {
 }
 
 #map-popup .hover-feature-footer {
-    position: fixed;
+    position: relative;
     padding-left: 20px;
-    bottom: 0px;
-    left: 449px;
-    border-left: 1px solid #ddd;
+    bottom: 15px;
+    left: 0px;
+    border-left: 0px solid transparent;
+    border-right: 0px solid transparent;
     width: 350px;
     background: #f4f4f4;
     font-size: 14px;
