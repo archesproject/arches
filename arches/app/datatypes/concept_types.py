@@ -139,7 +139,27 @@ class ConceptDataType(BaseConceptDataType):
             return rangenode
 
         if edge_info['range_tile_data'] is not None:
-            c = ConceptValue(str(edge_info['range_tile_data']))
+            c = ConceptValue(str(edge_info['range_tile_data'])) 
+
+            # FIXME:  This shouldn't test for d_datatype, but use a Datatype Factory
+            # to create an instance, and then call a function to do the below
+            if edge_info['domain_tile_data']:
+                dtd = edge_info['domain_tile_data']
+                if isinstance(dtd, list):
+                    dtd = dtd[0]
+                if edge_info['d_datatype'] == 'resource-instance':
+                    d_uri = URIRef(archesproject['resources/%s'] % dtd)
+                elif edge_info['d_datatype'] == 'concept':
+                    try:
+                        dc = ConceptValue(str(dtd))
+                        d_uri = URIRef(archesproject['concepts/%s' % dc.conceptid])
+                    except:
+                        d_uri = edge_info['d_uri']
+                else:
+                    print(f"Got unknown edge_info[d_datatype]: {edge_info['d_datatype']}")
+                    d_uri = edge_info['d_uri']                    
+            else:
+                d_uri = edge_info['d_uri']
 
             # create a default node
             arches_uri = BNode()
@@ -154,7 +174,7 @@ class ConceptDataType(BaseConceptDataType):
             rangenode = get_rangenode(arches_uri, ext_idents)
 
             g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
-            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), rangenode))
+            g.add((d_uri, URIRef(edge.ontologyproperty), rangenode))
 
             assert c.value is not None, "Null or blank concept value"
             g.add((rangenode, URIRef(RDFS.label), Literal(c.value)))

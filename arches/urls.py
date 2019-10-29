@@ -32,7 +32,7 @@ from arches.app.views.user import UserManagerView
 from arches.app.views.tile import TileData
 from arches.app.views.map import MapLayerManagerView, TileserverProxyView
 from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources, MobileSurveyDesignerView
-from arches.app.views.auth import LoginView, SignupView, ConfirmSignupView, ChangePasswordView, GetTokenView, GetClientIdView, UserProfileView
+from arches.app.views.auth import LoginView, SignupView, ConfirmSignupView, ChangePasswordView, GetClientIdView, UserProfileView
 from arches.app.models.system_settings import settings
 from arches.app.utils.forms import ArchesPasswordResetForm
 from arches.app.utils.forms import ArchesSetPasswordForm
@@ -48,7 +48,6 @@ urlpatterns = [
     url(r'^auth/password$', ChangePasswordView.as_view(), name='change_password'),
     url(r'^auth/signup$', SignupView.as_view(), name='signup'),
     url(r'^auth/confirm_signup$', ConfirmSignupView.as_view(), name='confirm_signup'),
-    url(r'^auth/get_token$', GetTokenView.as_view(), name='get_token'),
     url(r'^auth/get_client_id$', GetClientIdView.as_view(), name='get_client_id'),
     url(r'^auth/user_profile$', UserProfileView.as_view(), name='user_profile'),
     url(r'^auth/', LoginView.as_view(), name='auth'),
@@ -162,10 +161,18 @@ urlpatterns = [
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', admin.site.urls),
-    url(r'^password_reset/$', auth_views.PasswordResetView, name='password_reset', kwargs={"password_reset_form":ArchesPasswordResetForm}),
-    url(r'^password_reset/done/$', auth_views.PasswordResetDoneView, name='password_reset_done'),
-    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.PasswordResetConfirmView, name='password_reset_confirm', kwargs={"set_password_form":ArchesSetPasswordForm}),
-    url(r'^reset/done/$', auth_views.PasswordResetCompleteView, name='password_reset_complete'),
+    url(r'^password_reset/$',
+        auth_views.PasswordResetView.as_view(),
+        name='password_reset',
+        kwargs={"password_reset_form": ArchesPasswordResetForm}
+        ),
+    url(r'^password_reset/done/$', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        auth_views.PasswordResetConfirmView.as_view(),
+        name='password_reset_confirm',
+        kwargs={"set_password_form": ArchesSetPasswordForm}
+        ),
+    url(r'^reset/done/$', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
     url(r'^o/', include('oauth2_provider.urls', namespace='oauth2')),
 ]

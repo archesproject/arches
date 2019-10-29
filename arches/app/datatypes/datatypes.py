@@ -344,8 +344,9 @@ class EDTFDataType(BaseDataType):
 
     def validate(self, value, row_number=None, source='', node=None, nodeid=None):
         errors = []
-        if not ExtendedDateFormat(value).is_valid():
-            errors.append({'type': 'ERROR', 'message': '{0} {1} is not in the correct Extended Date Time Format, see http://www.loc.gov/standards/datetime/ for supported formats. This data was not imported.'.format(value, row_number)})
+        if value is not None:
+            if not ExtendedDateFormat(value).is_valid():
+                errors.append({'type': 'ERROR', 'message': '{0} {1} is not in the correct Extended Date Time Format, see http://www.loc.gov/standards/datetime/ for supported formats. This data was not imported.'.format(value, row_number)})
 
         return errors
 
@@ -530,90 +531,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 bounds = (minx, miny, maxx, maxy)
 
         return bounds
-
-    def get_layer_config(self, node=None):
-        sql_list = []
-        database = settings.DATABASES['default']
-        if node is not None and node.config is not None:
-            config = node.config
-
-            cluster_sql = """
-                WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid) AS (
-                    SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
-                	FROM mv_geojson_geoms m
-                    WHERE nodeid = '%s'
-                )
-
-                SELECT resourceinstanceid::text,
-                		row_number() over () as __id__,
-                		1 as total,
-                		ST_Centroid(geom) AS __geometry__,
-                        '' AS extent
-                	FROM clusters
-                	WHERE cid is NULL
-
-                UNION
-
-                SELECT NULL as resourceinstanceid,
-                		row_number() over () as __id__,
-                		count(*) as total,
-                		ST_Centroid(
-                            ST_Collect(geom)
-                        ) AS __geometry__,
-                        ST_AsGeoJSON(
-                            ST_Transform(
-                                ST_SetSRID(
-                                    ST_Extent(geom), 900913
-                                ), 4326
-                            )
-                        ) AS extent
-                	FROM clusters
-                	WHERE cid IS NOT NULL
-                	GROUP BY cid
-            """
-
-            for i in range(int(config['clusterMaxZoom']) + 1):
-                arc = EARTHCIRCUM / ((1 << i) * PIXELSPERTILE)
-                distance = arc * int(config['clusterDistance'])
-                sql_string = cluster_sql % (distance, int(config['clusterMinPoints']), node.pk)
-                sql_list.append(sql_string)
-
-            sql_list.append("""
-                SELECT resourceinstanceid::text,
-                        tileid::text,
-                        (row_number() over ()) as __id__,
-                        1 as total,
-                        geom AS __geometry__,
-                        '' AS extent
-                    FROM mv_geojson_geoms
-                    WHERE nodeid = '%s'
-            """ % node.pk)
-
-        try:
-            simplification = config['simplification']
-        except KeyError as e:
-            simplification = 0.3
-
-        return {
-            "provider": {
-                "class": "TileStache.Goodies.VecTiles:Provider",
-                "kwargs": {
-                    "dbinfo": {
-                        "host": database["HOST"],
-                        "user": database["USER"],
-                        "password": database["PASSWORD"],
-                        "database": database["NAME"],
-                        "port": database["PORT"]
-                    },
-                    "simplify": simplification,
-                    "clip": False,
-                    "queries": sql_list
-                },
-            },
-            "allowed origin": "*",
-            "compress": True,
-            "write cache": False
-        }
 
     def get_map_layer(self, node=None, preview=False):
         if node is None:

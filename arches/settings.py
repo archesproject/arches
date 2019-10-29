@@ -41,7 +41,7 @@ DATABASES = {
         'PASSWORD': 'postgis',                  # Not used with sqlite3.
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '5432',                      # Set to empty string for default. Not used with sqlite3.
-        'POSTGIS_TEMPLATE': 'template_postgis_20',
+        'POSTGIS_TEMPLATE': 'template_postgis',
     }
 }
 
@@ -149,7 +149,7 @@ SESSION_COOKIE_NAME = 'arches'
 # EMAIL_HOST_PASSWORD = 'xxxxxxx'
 # EMAIL_PORT = 587
 
-POSTGIS_VERSION = (2, 0, 0)
+POSTGIS_VERSION = (2, 5, 3)
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -184,9 +184,9 @@ USE_TZ = False
 LANGUAGE_CODE = 'en-US'
 
 # the path where your translation strings are stored
-LOCALE_PATHS = (
+LOCALE_PATHS = [
     os.path.join(ROOT_DIR, 'locale'),
-)
+]
 
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale
@@ -312,7 +312,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     #'arches.app.utils.middleware.TokenMiddleware',
-    #'django.middleware.locale.LocaleMiddleware',
+    # 'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'arches.app.utils.middleware.ModifyAuthorizationHeader',
@@ -408,6 +408,8 @@ ENABLE_CAPTCHA = True
 # RECAPTCHA_USE_SSL = False
 NOCAPTCHA = True
 # RECAPTCHA_PROXY = 'http://127.0.0.1:8000'
+if DEBUG is True:
+    SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
 
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = 'Crowdsource Editor'

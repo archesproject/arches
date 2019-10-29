@@ -318,11 +318,11 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         mobile_survey.tilecache = data['tilecache']
         polygons = []
 
-        try:
-            data['bounds'].upper()
-            data['bounds'] = json.loads(data['bounds'])
-        except AttributeError as e:
-            print('bounds is not a string')
+        # try:
+        #     data['bounds'].upper()
+        #     data['bounds'] = json.loads(data['bounds'])
+        # except AttributeError as e:
+        #     print('bounds is not a string')
 
         if 'features' in data['bounds']:
             for feature in data['bounds']['features']:
@@ -348,7 +348,8 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         except Exception as e:
             if connection_error is False:
                 error_title = _('Unable to save survey')
-                if 'strerror' in e and e.strerror == 'Connection refused' or 'Connection refused' in e:
+                print(e)
+                if 'strerror' in e or 'Connection refused' in e:
                     error_message = _("Unable to connect to CouchDB")
                 else:
                     error_message = e.message

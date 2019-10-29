@@ -165,7 +165,9 @@ class JsonLdWriter(RdfWriter):
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
         g = self.get_rdf_graph()
-        value = g.serialize(format='nquads')
+        value = g.serialize(format='nquads').decode("utf-8")
+
+        # print(f"Got graph: {value}")
         js = from_rdf(value, {'format': 'application/nquads', 'useNativeTypes': True})
 
         assert len(resourceinstanceids) == 1  # currently, this should be limited to a single top resource
@@ -334,7 +336,7 @@ class JsonLdReader(Reader):
                     keys.append(key)
         except:
             pass
-        self.logger.debug("findOntologyProperties -> {0}".format("\n".join(map(str, keys))))
+        self.logger.debug("    findOntologyProperties -> {0}".format("\n".join(map(str, keys))))
         return keys
 
     def findBranch(self, nodes, ontology_property, jsonld):
@@ -370,7 +372,7 @@ class JsonLdReader(Reader):
                 len(nodes), str(ontology_property)
                 )
             )
-        self.logger.debug(str(jsonld))
+        self.logger.debug("    " + str(jsonld))
 
         if not isinstance(jsonld, list):
             jsonld = [jsonld]
@@ -409,19 +411,19 @@ class JsonLdReader(Reader):
             self.logger.info("Trying to match jsonld_graph fragment:")
             self.logger.debug(str(jsonld_graph))
             for node in nodes:
-                self.logger.debug("Checking {0}".format(node['node'].ontologyclass))
+                self.logger.debug("Checking model class {0}".format(node['node'].ontologyclass))
                 if '@type' in jsonld_graph:
-                    self.logger.debug("node['parent_edge'].ontologyproperty")
-                    self.logger.debug(node['parent_edge'].ontologyproperty)
-                    self.logger.debug("node['parent_edge'].ontologyproperty == ontology_property")
-                    self.logger.debug(node['parent_edge'].ontologyproperty == ontology_property)
-                    self.logger.debug("node['node'].ontologyclass")
-                    self.logger.debug(node['node'].ontologyclass)
-                    self.logger.debug("node['node'].ontologyclass == jsonld_graph['@type'][0]")
-                    self.logger.debug(node['node'].ontologyclass == jsonld_graph['@type'][0])
+                    self.logger.debug("  node['parent_edge'].ontologyproperty: %r" % node['parent_edge'].ontologyproperty)
+                    self.logger.debug("node['parent_edge'].ontologyproperty == ontology_property: %r" % \
+                        node['parent_edge'].ontologyproperty == ontology_property)
+                    self.logger.debug("node['node'].ontologyclass: %r" % node['node'].ontologyclass)
+                    self.logger.debug("node['node'].ontologyclass == jsonld_graph['@type'][0]: %r" % \
+                        node['node'].ontologyclass == jsonld_graph['@type'][0])
 
                 if '@type' in jsonld_graph:
-                    if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == jsonld_graph['@type'][0]:
+                    if node['parent_edge'].ontologyproperty == ontology_property and \
+                      ((type(jsonld_graph['@type']) == list and node['node'].ontologyclass == jsonld_graph['@type'][0]) \
+                      or node['node'].ontologyclass == jsonld_graph['@type']):
                         self.logger.debug("found {0}".format(node['node'].name))
                         nodes_copy.add((node['node'].name, node['node'].pk))
                         found.append(node)
@@ -432,7 +434,7 @@ class JsonLdReader(Reader):
                                 )
                             )
                         invalid_nodes.add((node['node'].name, node['node'].pk))
-                        pass
+
                 if '@value' in jsonld_graph:
                     if node['parent_edge'].ontologyproperty == ontology_property:
                         # print node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == str(RDFS.Literal)
@@ -446,8 +448,7 @@ class JsonLdReader(Reader):
 
             self.logger.debug('found {0} branches'.format(len(found)))
             if len(found) == 0:
-                self.logger.error('branch not found for {0}'.format(str(jsonld_graph)))
-                print('branch not found for %r' % jsonld_graph)
+                self.logger.error(' *** branch not found for {0}'.format(str(jsonld_graph)))
                 raise self.DataDoesNotMatchGraphException()
 
             if len(self.findOntologyProperties(jsonld_graph)) == 0:
@@ -462,6 +463,7 @@ class JsonLdReader(Reader):
                 return len(datatype.validate(value)) == 0
 
             if len(found) > 1:
+                dt_factory = DataTypeFactory()
                 self.logger.info("Iterating through the matched nodes")
                 for found_node in found:
                     # here we follow the algorithm supplied by the Getty
@@ -469,12 +471,11 @@ class JsonLdReader(Reader):
                     # If the range in the model is a number, string, or date, and the incoming data is of the right format, then accept that node.
                     # If the range in the model is a file-list, and the referenced file already exists, then accept that node.
                     # If the range in the model is a concept, then consider if the incoming data is a concept that is part of the collection for the node. If it is, then accept that node. If it is a concept, and not part of the collection, then fail. If it is not a concept, then continue.
-                    self.logger.debug("Checking to see if the node is in a standard datatype: \
-                        domain-value, number, string, date, file-list, concept")
-                    for datatype in ['domain-value', 'number', 'string', 'date', 'file-list', 'concept']:
-                        if found_node['node'].datatype == datatype and json_data_is_valid(found_node['node'], jsonld_graph):
-                            self.logger.debug("Matched {0} and the json fragment is valid".format(datatype))
-                            return found_node
+                    self.logger.debug("Checking to see if the node is in a literal datatype:")
+                    node_dt = dt_factory.get_instance(found_node['node'].datatype)
+                    if node_dt.is_a_literal_in_rdf() and json_data_is_valid(found_node['node'], jsonld_graph):
+                        self.logger.debug("    Matched {0} and the json fragment is valid".format(found_node['node'].datatype))
+                        return found_node
 
                     # If the range is semantic, then check the class of the incoming node is the same
                     # class as the model's node. If it does, then recursively test the edges of the
@@ -636,9 +637,7 @@ class JsonLdReader(Reader):
 
                 if len(ontology_properties) > 0:
                     for ontology_property in ontology_properties:
-                        self.logger.debug("Recursing on %s" % ontology_property)
-                        self.logger.debug(jsonld_node['@type'])
-                        # print ontology_property
+                        self.logger.debug("Recursing on %s -> %s" % (ontology_property, jsonld_node['@type']))
                         self.resolve_node_ids(jsonld_node[ontology_property], ontology_prop=ontology_property,
                                               graph=None, parent_node=branch, tileid=tileid, parent_tileid=parent_tileid, resource=resource)
         return jsonld

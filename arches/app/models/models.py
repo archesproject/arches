@@ -946,6 +946,8 @@ class UserProfile(models.Model):
         managed = True
         db_table = 'user_profile'
 
+def getDataDownloadConfigDefaults():
+    return dict(download=False, count=100, resources=[], custom=None)
 
 class MobileSurveyModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
@@ -962,7 +964,7 @@ class MobileSurveyModel(models.Model):
     bounds = models.MultiPolygonField(null=True)
     tilecache = models.TextField(null=True)
     onlinebasemaps = JSONField(blank=True, null=True, db_column='onlinebasemaps')
-    datadownloadconfig = JSONField(blank=True, null=True, default=lambda: dict(download=False, count=100, resources=[], custom=None))
+    datadownloadconfig = JSONField(blank=True, null=True, default=getDataDownloadConfigDefaults)
 
     def __str__(self):
         return self.name
