@@ -421,7 +421,9 @@ class JsonLdReader(Reader):
                         node['node'].ontologyclass == jsonld_graph['@type'][0])
 
                 if '@type' in jsonld_graph:
-                    if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == jsonld_graph['@type'][0]:
+                    if node['parent_edge'].ontologyproperty == ontology_property and \
+                      ((type(jsonld_graph['@type']) == list and node['node'].ontologyclass == jsonld_graph['@type'][0]) \
+                      or node['node'].ontologyclass == jsonld_graph['@type']):
                         self.logger.debug("found {0}".format(node['node'].name))
                         nodes_copy.add((node['node'].name, node['node'].pk))
                         found.append(node)
@@ -472,7 +474,7 @@ class JsonLdReader(Reader):
                     self.logger.debug("Checking to see if the node is in a literal datatype:")
                     node_dt = dt_factory.get_instance(found_node['node'].datatype)
                     if node_dt.is_a_literal_in_rdf() and json_data_is_valid(found_node['node'], jsonld_graph):
-                        self.logger.debug("    Matched {0} and the json fragment is valid".format(datatype))
+                        self.logger.debug("    Matched {0} and the json fragment is valid".format(found_node['node'].datatype))
                         return found_node
 
                     # If the range is semantic, then check the class of the incoming node is the same
