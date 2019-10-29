@@ -47,12 +47,6 @@ class BaseDataType(object):
         """
         return None
 
-    def get_layer_config(self, node=None):
-        """
-        Gets the layer config to generate a map layer (use if spatial)
-        """
-        return None
-
     def process_mobile_data(self, tile, node, db, couch_doc, node_value):
         """
         Transforms data from a mobile device to an Arches friendly format
