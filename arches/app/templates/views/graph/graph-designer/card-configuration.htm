@@ -73,6 +73,9 @@
                 <!-- Card Visibility -->
                 <div class="pad-top" data-bind="component: { name: 'views/components/simple-switch', params: {value: model.visible, config:{label: '{% trans "Make Card Visible" %}', subtitle: '{% trans "Show this card by default" %}'}}}"></div>
 
+                <!-- Export to Search -->
+                <div class="pad-top" data-bind="component: { name: 'views/components/simple-switch', params: {value: model.config, config:{label: '{% trans "Export to Search" %}', subtitle: '{% trans "A relevant subtitle here" %}'}}}"></div>
+
                 <!-- Set Cardinaltiy -->
                 <div class="pad-top" data-bind="component: { name: 'views/components/simple-switch', params: {value: model.cardinality, config:{on: 'n', off: '1', label: '{% trans "Allow multiple values" %}', subtitle: '{% trans "Let users enter multiple values for this data entry card" %}'}}}"></div>
 
