@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import time
-from jose import jws
 from datetime import datetime, timedelta
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -233,25 +232,6 @@ class UserProfileView(View):
             response = JSONResponse(userDict)
         else:
             response = Http401Response()
-
-        return response
-
-
-@method_decorator(csrf_exempt, name='dispatch')
-class GetTokenView(View):
-
-    def post(self, request):
-        username = request.POST.get('username', None)
-        password = request.POST.get('password', None)
-        user = authenticate(username=username, password=password)
-        if user:
-            expiration = int(time.time()) + timedelta(days=settings.JWT_TOKEN_EXPIRATION).total_seconds()
-            token = jws.sign({'username': user.username, 'expiration': expiration},
-                             settings.JWT_KEY, algorithm=settings.JWT_ALGORITHM)
-
-            response = HttpResponse(token, content_type='text/plain')
-        else:
-            response = Http401Response(www_auth_header='Bearer')
 
         return response
 

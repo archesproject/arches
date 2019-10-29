@@ -1074,7 +1074,7 @@ will be very jumbled.""")
             for graph in ResourceGraphExporter.get_graphs_for_export(graphids=graphs)['graph']:
                 graph_name = graph['name'].replace('/', '-')
                 with open(os.path.join(data_dest, graph_name + '.json'), 'wb') as f:
-                    f.write(JSONSerializer().serialize({'graph': [graph]}, indent=4))
+                    f.write(JSONSerializer().serialize({'graph': [graph]}, indent=4).encode('utf-8'))
         else:
             utils.print_message(
                 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.')
