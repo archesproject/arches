@@ -57,7 +57,7 @@ class JsonLDExportTests(ArchesTestCase):
 
     def test_missing_resource(self):
         # this is from urls.py
-        url = reverse('resources', kwargs={"resourceid": "e6412597-f6b5-11e9-8f09-a4d18cec433a"})
+        url = reverse('resources', kwargs={"resourceid": "00000000-f6b5-11e9-8f09-a4d18cec433a"})
         response = self.client.get(url)
         print(f"test missing on {url} gets {response.status_code}")
         self.assertTrue(response.status_code == 404)

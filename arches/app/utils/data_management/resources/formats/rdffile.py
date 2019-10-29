@@ -165,7 +165,7 @@ class JsonLdWriter(RdfWriter):
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
         g = self.get_rdf_graph()
-        value = g.serialize(format='nquads')
+        value = g.serialize(format='nquads').decode("utf-8")
         js = from_rdf(value, {'format': 'application/nquads', 'useNativeTypes': True})
 
         assert len(resourceinstanceids) == 1  # currently, this should be limited to a single top resource
