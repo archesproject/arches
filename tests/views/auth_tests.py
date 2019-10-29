@@ -24,19 +24,16 @@ Replace this with more appropriate tests for your application.
 """
 
 import base64
-from tests import test_settings as settings
 from tests.base_test import ArchesTestCase
 from django.db import connection
 from django.urls import reverse
 from django.contrib.auth.models import User, Group, AnonymousUser
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory
-from django.test.client import RequestFactory, Client
+from django.test.client import Client
 from arches.app.views.auth import LoginView
 from arches.app.views.concept import RDMView
 from arches.app.utils.middleware import SetAnonymousUser
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.management.commands.packages import Command as PackageCommand
 
 # these tests can be run from the command line via
 # python manage.py test tests/views/auth_tests.py --pattern="*.py" --settings="tests.test_settings"
@@ -54,15 +51,14 @@ class AuthTests(ArchesTestCase):
 
         self.anonymous_user = User.objects.get(username='anonymous')
 
-
         sql = """
             INSERT INTO public.oauth2_provider_application(
-                id,client_id, redirect_uris, client_type, authorization_grant_type, 
-                client_secret, 
+                id,client_id, redirect_uris, client_type, authorization_grant_type,
+                client_secret,
                 name, user_id, skip_authorization, created, updated)
             VALUES (
-                44,'{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials', 
-                '{oauth_client_secret}', 
+                44,'{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
+                '{oauth_client_secret}',
                 'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000');
             INSERT INTO public.oauth2_provider_accesstoken(
                 token, expires, scope, application_id, user_id, created, updated)
@@ -134,7 +130,7 @@ class AuthTests(ArchesTestCase):
         """
 
         view = LoginView.as_view()
-        
+
         request = self.factory.post(reverse('auth'), {'username': 'test', 'password': 'password'})
         request.user = self.user
         apply_middleware(request)
@@ -225,9 +221,8 @@ class AuthTests(ArchesTestCase):
         self.assertTrue(response.status_code == 302)
         self.assertTrue(response.get('location').split('?')[0] == reverse('auth'))
 
-
         # test get a concept
-        request = self.factory.get(reverse('rdm', kwargs={'conceptid':'00000000-0000-0000-0000-000000000001'}))
+        request = self.factory.get(reverse('rdm', kwargs={'conceptid': '00000000-0000-0000-0000-000000000001'}))
         request.user = AnonymousUser()
         apply_middleware(request)
         view = RDMView.as_view()
@@ -236,9 +231,8 @@ class AuthTests(ArchesTestCase):
         self.assertTrue(response.status_code == 302)
         self.assertTrue(response.get('location').split('?')[0] == reverse('auth'))
 
-
         # test update a concept
-        concept ={
+        concept = {
             "id": "00000000-0000-0000-0000-000000000001",
             "legacyoid": "ARCHES",
             "nodetype": "ConceptScheme",
@@ -251,7 +245,7 @@ class AuthTests(ArchesTestCase):
                     "type": "prefLabel",
                     "id": "",
                     "conceptid": ""
-                },{
+                }, {
                     "value": "",
                     "language": "en-US",
                     "category": "note",
@@ -269,7 +263,7 @@ class AuthTests(ArchesTestCase):
             }]
         }
 
-        request = self.factory.post(reverse('rdm', kwargs={'conceptid':'00000000-0000-0000-0000-000000000001'}), concept)
+        request = self.factory.post(reverse('rdm', kwargs={'conceptid': '00000000-0000-0000-0000-000000000001'}), concept)
         request.user = AnonymousUser()
         apply_middleware(request)
         view = RDMView.as_view()
@@ -286,14 +280,17 @@ def apply_middleware(request):
     save_session(request)
     set_anonymous_user(request)
 
+
 def save_session(request):
     middleware = SessionMiddleware()
     middleware.process_request(request)
     request.session.save()
 
+
 def set_anonymous_user(request):
     set_anon_middleware = SetAnonymousUser()
     set_anon_middleware.process_request(request)
+
 
 def strip_response_location(response):
     return response.get('location').replace('http://testserver', '').split('?')[0]
