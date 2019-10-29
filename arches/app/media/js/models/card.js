@@ -49,6 +49,9 @@ define([
             this.constraints = ko.observableArray();
             this.appliedFunctions = attributes.appliedFunctions;
             this.export = ko.observable();
+            this.export.subscribe(function(val){
+                self.configJSON({"export":val});
+            });
 
             this.set('cards', this.cards);
             this.set('nodes', this.nodes);
