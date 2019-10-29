@@ -150,10 +150,8 @@ class JsonLDExportTests(ArchesTestCase):
         self.assertTrue(cl1['http://www.w3.org/2000/01/rdf-schema#label'] == "Test Type A")
 
         self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P2_has_type' in cl1)
-
-
-
-
+        mt1 = cl1['http://www.cidoc-crm.org/cidoc-crm/P2_has_type']
+        self.assertTrue(mt1['@id'] == 'http://localhost:8000/concepts/14c92c17-5e2f-413a-95c2-3c5e41ee87d2')
 
 
 
