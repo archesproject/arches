@@ -1,5 +1,5 @@
 Django==2.2.6
-psycopg2-binary==2.7.4
+psycopg2-binary==2.8.4
 elasticsearch>=7.0.0,<8.0.0
 rdflib==4.2.2
 django-guardian==1.4.9
