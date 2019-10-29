@@ -32,12 +32,11 @@ from django.contrib.auth.models import User, Group, AnonymousUser
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory
 from django.test.client import RequestFactory, Client
-from arches.app.views.auth import LoginView, GetTokenView
+from arches.app.views.auth import LoginView
 from arches.app.views.concept import RDMView
 from arches.app.utils.middleware import SetAnonymousUser
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.management.commands.packages import Command as PackageCommand
-from jose import jwt, jws
 
 # these tests can be run from the command line via
 # python manage.py test tests/views/auth_tests.py --pattern="*.py" --settings="tests.test_settings"
@@ -148,49 +147,6 @@ class AuthTests(ArchesTestCase):
 
         self.assertTrue(response.status_code == 302)
         self.assertTrue(response.get('location') == reverse('auth'))
-
-    def test_get_token(self):
-        """
-        Test to get a JSON Web Token given a valid username and password
-
-        """
-
-        response = self.client.post(reverse('get_token'), {'username': 'test', 'password': 'password'})
-        token = response.content
-        decoded_json = jws.verify(token, settings.JWT_KEY, algorithms=[settings.JWT_ALGORITHM])
-        decoded_dict = JSONDeserializer().deserialize(decoded_json)
-        username = decoded_dict.get('username', None)
-
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue(username == 'test')
-
-    def test_get_token_from_invalid_user(self):
-        """
-        Test that we can't get a JSON Web Token given an invalid username and password
-
-        """
-
-        response = self.client.post(reverse('get_token'), {'username': 'alksjdffd', 'password': 'asdf'})
-
-        self.assertTrue(response.status_code == 401)
-
-    # Can't run this test because we had to remove the TokenMiddleware and JWTAuthenticationMiddleware
-    # def test_use_token_for_access_to_privileged_page(self):
-    #     """
-    #     Test that we can use a valid JSON Web Token to gain access to a page that requires a logged in user
-
-    #     """
-
-    #     response = self.client.get(reverse('rdm', args=['']))
-    #     self.assertTrue(response.status_code == 302)
-    #     self.assertTrue(response.get('location').split('?')[0] == reverse('auth'))
-    #     self.assertTrue(response.get('location').split('?')[0] != reverse('rdm', args=['']))
-
-    #     response = self.client.post(reverse('get_token'), {'username': 'admin', 'password': 'admin'})
-    #     token = response.content
-    #     response = self.client.get(reverse('rdm', args=['']), HTTP_AUTHORIZATION='Bearer %s' % token)
-
-    #     self.assertTrue(response.status_code == 200)
 
     def test_get_oauth_token(self):
         key = '{0}:{1}'.format(self.oauth_client_id, self.oauth_client_secret)

@@ -9,7 +9,6 @@ from django.utils.translation import ugettext as _
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import Http401Response
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from jose import jwt, jws, JWSError
 
 HTTP_HEADER_ENCODING = 'iso-8859-1'
 

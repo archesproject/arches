@@ -8,7 +8,6 @@ python-memcached==1.59
 mapbox-vector-tile==1.2.0
 SPARQLWrapper==1.8.4
 django-recaptcha==2.0.5
-python-jose==2.0.2
 edtf==4.0.1
 couchdb==1.2
 django-revproxy==0.9.15
