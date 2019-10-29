@@ -141,6 +141,7 @@ class JsonLDExportTests(ArchesTestCase):
             "http://localhost:8000/concepts/9b61c995-71d8-4bce-987b-0ffa3da4c71c"])
         self.assertTrue(mat1['@type'] == 'http://www.cidoc-crm.org/cidoc-crm/E57_Material')
 
+        # This is #5136
         # meta concepts
         self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P101_had_as_general_use' in js)
         cl1 = js['http://www.cidoc-crm.org/cidoc-crm/P101_had_as_general_use']
@@ -180,6 +181,8 @@ class JsonLDExportTests(ArchesTestCase):
 
         # res-inst with concept
         # 9c400558-fa8a-11e9-b6e7-3af9d3b32b71
+        # This is #5136 too, applied to a resource-instance
+
         url = reverse('resources', kwargs={"resourceid": "9c400558-fa8a-11e9-b6e7-3af9d3b32b71"})
         response = self.client.get(url, secure=False) 
         self.assertTrue(response.status_code == 200)

@@ -198,7 +198,7 @@ class JsonLDExportTests(ArchesTestCase):
         self.assertTrue('@id' in js)
         self.assertTrue(js['@id'] == "http://localhost:8000/resources/0b4439a8-beca-11e9-b4dc-0242ac160002")
 
-        print(f"GOT JSON: {js}")
+        print(f"Got JSON for test 3: {js}")
 
         types = js["http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by"]["http://www.cidoc-crm.org/cidoc-crm/P2_has_type"]   
         self.assertTrue(type(types) == list)
@@ -232,7 +232,7 @@ class JsonLDExportTests(ArchesTestCase):
         if type(js) == list:
             js = js[0]        
 
-        print(f"GOT JSON: {js}")
+        print(f"Got json for test 4: {js}")
         self.assertTrue('@id' in js)
         self.assertTrue(js['@id'] == 'http://localhost:8000/resources/abcd1234-1234-1129-b6e7-3af9d3b32b71')
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P130_shows_features_of" in js)
@@ -242,3 +242,83 @@ class JsonLDExportTests(ArchesTestCase):
         rids = ["http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71", "http://localhost:8000/resources/24d0d25a-fa75-11e9-b369-3af9d3b32b71"]
         self.assertTrue(feats[0]['@id'] in rids)
         self.assertTrue(feats[1]['@id'] in rids)
+
+
+    def test_5_5098_resinst_branch(self):
+        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_2_instances.json').import_business_data()  
+
+        data = """
+{"@id": "http://localhost:8000/resources/7fffffff-faa1-11e9-84de-3af9d3b32b71", 
+"@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object", 
+"http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by": {
+    "@id": "http://localhost:8000/tile/a4896405-5c73-49f4-abd3-651911e82fde/node/51c3ede8-faa1-11e9-84de-3af9d3b32b71", 
+    "@type": "http://www.cidoc-crm.org/cidoc-crm/E33_Linguistic_Object", 
+    "http://www.cidoc-crm.org/cidoc-crm/P128i_is_carried_by": [{
+        "@id": "http://localhost:8000/resources/24d0d25a-fa75-11e9-b369-3af9d3b32b71", 
+        "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object"}, {
+        "@id": "http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71", 
+        "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object"}]}}
+"""
+
+        # Load up the models and data only once
+        with open(os.path.join('tests/fixtures/jsonld_base/models/5098_b_resinst.json'), 'rU') as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile['graph'])
+
+        url = reverse('resources_graphid', kwargs={"graphid": "40dbcffa-faa1-11e9-84de-3af9d3b32b71", "resourceid": "7fffffff-faa1-11e9-84de-3af9d3b32b71"})
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertTrue(response.status_code == 201)
+        js = response.json()
+        if type(js) == list:
+            js = js[0]        
+
+        print(f"Got json for test 5: {js}")
+        self.assertTrue('@id' in js)
+        self.assertTrue(js['@id'] == 'http://localhost:8000/resources/7fffffff-faa1-11e9-84de-3af9d3b32b71')
+        self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by" in js)
+        feats = js["http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by"]["http://www.cidoc-crm.org/cidoc-crm/P128i_is_carried_by"]
+        self.assertTrue(type(feats) == list)
+        self.assertTrue(len(feats) == 2)
+
+
+    def test_6_5126_collection_filter(self):
+
+        skos = SKOSReader()
+        rdf = skos.read_file('tests/fixtures/jsonld_base/rdm/5126-thesaurus.xml')
+        ret = skos.save_concepts_from_skos(rdf)
+
+        skos = SKOSReader()
+        rdf = skos.read_file('tests/fixtures/jsonld_base/rdm/5126-collections.xml')
+        ret = skos.save_concepts_from_skos(rdf)
+
+        # Load up the models and data only once
+        with open(os.path.join('tests/fixtures/jsonld_base/models/5126_collection_ambiguity.json'), 'rU') as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile['graph'])
+
+        data = """
+{
+        "@id": "http://localhost:8001/resources/69a4af50-c055-11e9-b4dc-0242ac160002", 
+        "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object", 
+        "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": {
+                "@id": "http://vocab.getty.edu/aat/300404216", 
+                "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
+                "http://www.w3.org/2000/01/rdf-schema#label": "aquarelles (paintings)"
+        }
+}
+"""
+        url = reverse('resources_graphid', kwargs={"graphid": "09e3dc8a-c055-11e9-b4dc-0242ac160002", "resourceid": "69a4af50-c055-11e9-b4dc-0242ac160002"})
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertTrue(response.status_code == 201)
+        js = response.json()
+        if type(js) == list:
+            js = js[0] 
+                
+        print(f"Got JSON for test 5: {js}")
+        self.assertTrue('@id' in js)
+        self.assertTrue(js['@id'] == 'http://localhost:8000/resources/69a4af50-c055-11e9-b4dc-0242ac160002')
+
+
+
+
+        
