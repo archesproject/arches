@@ -153,13 +153,42 @@ class JsonLDExportTests(ArchesTestCase):
         mt1 = cl1['http://www.cidoc-crm.org/cidoc-crm/P2_has_type']
         self.assertTrue(mt1['@id'] == 'http://localhost:8000/concepts/14c92c17-5e2f-413a-95c2-3c5e41ee87d2')
 
+    def test_2c_complex_export_resinst(self):
+        # 12bbf5bc-fa85-11e9-91b8-3af9d3b32b71
 
+        # Resource-Instance
+        url = reverse('resources', kwargs={"resourceid": "12bbf5bc-fa85-11e9-91b8-3af9d3b32b71"})
+        response = self.client.get(url, secure=False) 
+        self.assertTrue(response.status_code == 200)
+        js = response.json()        
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P46i_forms_part_of' in js)
+        ri = js['http://www.cidoc-crm.org/cidoc-crm/P46i_forms_part_of']
+        self.assertTrue(type(ri) == dict)
+        self.assertTrue(ri['@id'] == "http://localhost:8000/resources/24d0d25a-fa75-11e9-b369-3af9d3b32b71")
+        self.assertTrue(ri['@type'] == "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object")
 
+        # Resource-Instance-List
+        url = reverse('resources', kwargs={"resourceid": "396dcffa-fa8a-11e9-b6e7-3af9d3b32b71"})
+        response = self.client.get(url, secure=False) 
+        self.assertTrue(response.status_code == 200)
+        js = response.json() 
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P130_shows_features_of' in js)
+        ril = js['http://www.cidoc-crm.org/cidoc-crm/P130_shows_features_of']
+        self.assertTrue(type(ril) == list)
+        self.assertTrue(ril[0]['@id'] in ["http://localhost:8000/resources/24d0d25a-fa75-11e9-b369-3af9d3b32b71", \
+            "http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71"])
 
+        # res-inst with concept
+        # 9c400558-fa8a-11e9-b6e7-3af9d3b32b71
+        url = reverse('resources', kwargs={"resourceid": "9c400558-fa8a-11e9-b6e7-3af9d3b32b71"})
+        response = self.client.get(url, secure=False) 
+        self.assertTrue(response.status_code == 200)
+        js = response.json() 
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P132_overlaps_with' in js)
+        ri = js['http://www.cidoc-crm.org/cidoc-crm/P132_overlaps_with']
+        self.assertTrue(ri['@id'] == "http://localhost:8000/resources/24d0d25a-fa75-11e9-b369-3af9d3b32b71")
 
-
-
-
-
-
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P2_has_type' in ri)
+        rit = ri['http://www.cidoc-crm.org/cidoc-crm/P2_has_type']
+        self.assertTrue(rit['@id'] == "http://localhost:8000/concepts/fb457e76-e018-41e7-9be3-0f986816450a")
 

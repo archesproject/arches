@@ -140,15 +140,24 @@ class ConceptDataType(BaseConceptDataType):
 
         if edge_info['range_tile_data'] is not None:
             c = ConceptValue(str(edge_info['range_tile_data'])) 
+
+            # FIXME:  This shouldn't test for d_datatype, but use a Datatype Factory
+            # to create an instance, and then call a function to do the below
             if edge_info['domain_tile_data']:
                 dtd = edge_info['domain_tile_data']
                 if isinstance(dtd, list):
                     dtd = dtd[0]
-                try:
-                    dc = ConceptValue(str(dtd))
-                    d_uri = URIRef(archesproject['concepts/%s' % dc.conceptid])
-                except:
-                    d_uri = edge_info['d_uri']
+                if edge_info['d_datatype'] == 'resource-instance':
+                    d_uri = URIRef(archesproject['resources/%s'] % dtd)
+                elif edge_info['d_datatype'] == 'concept':
+                    try:
+                        dc = ConceptValue(str(dtd))
+                        d_uri = URIRef(archesproject['concepts/%s' % dc.conceptid])
+                    except:
+                        d_uri = edge_info['d_uri']
+                else:
+                    print(f"Got unknown edge_info[d_datatype]: {edge_info['d_datatype']}")
+                    d_uri = edge_info['d_uri']                    
             else:
                 d_uri = edge_info['d_uri']
 
