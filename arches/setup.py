@@ -12,19 +12,19 @@ from arches import settings
 here = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.dirname(here)
 
+
 def install():
-    if confirm_system_requirements():
+    install_dir = os.path.join(site_packages_dir(), 'arches', 'install')
+    django_install_location = os.path.join(site_packages_dir(), 'django')
 
-        install_dir = os.path.join(site_packages_dir(), 'arches', 'install')
-        django_install_location = os.path.join(site_packages_dir(), 'django')
+    # INSTALL DJANGO, RAWES, SPHINX AND OTHER DEPENDENCIES
+    tmpinstalldir = os.path.join(site_packages_dir(), 'arches', 'tmp')
+    os.system("pip install -b %s setuptools --upgrade" % (tmpinstalldir))
+    os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, 'requirements.txt')))
+    if settings.MODE == 'DEV':
+        os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, 'requirements_dev.txt')))
+    shutil.rmtree(tmpinstalldir, True)
 
-        # INSTALL DJANGO, RAWES, SPHINX AND OTHER DEPENDENCIES
-        tmpinstalldir = os.path.join(site_packages_dir(), 'arches', 'tmp')
-        os.system("pip install -b %s setuptools --upgrade" % (tmpinstalldir))
-        os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, 'requirements.txt')))
-        if settings.MODE == 'DEV':
-            os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, 'requirements_dev.txt')))
-        shutil.rmtree(tmpinstalldir, True)
 
 def site_packages_dir():
     if sys.platform == 'win32':
@@ -32,17 +32,6 @@ def site_packages_dir():
     else:
         py_version = 'python%s.%s' % (sys.version_info[0], sys.version_info[1])
         return os.path.join(sys.prefix, 'lib', py_version, 'site-packages')
-
-def confirm_system_requirements():
-    # CHECK PYTHON VERSION
-    # TODO: after python upgrade make Python 3.x the min Python version
-    # if sys.version_info < (2, 7) or sys.version_info >= (3, 0):
-    #     print('ERROR: Arches requires Python 2.7.x')
-    #     sys.exit(101)
-    # else:
-    #     pass
-
-    return True
 
 
 def activate_env(path_to_virtual_env):
@@ -53,28 +42,6 @@ def activate_env(path_to_virtual_env):
         activate_this = os.path.join(path_to_virtual_env, 'bin', 'activate_this.py')
     execfile(activate_this, dict(__file__=activate_this))
 
-# INSTALL ELASTICSEARCH and HEAD plugin
-def download_file(url, file_name):
-    u = urllib.request.urlopen(url)
-    f = open(file_name, 'wb')
-    meta = u.info()
-    file_size = int(meta.getheaders("Content-Length")[0])
-    print("Downloading: %s Bytes: %s" % (file_name, file_size))
-
-    file_size_dl = 0
-    block_sz = 8192
-    while True:
-        buffer = u.read(block_sz)
-        if not buffer:
-            break
-
-        file_size_dl += len(buffer)
-        f.write(buffer)
-        status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
-        status = status + chr(8)*(len(status)+1)
-        print(status)
-
-    f.close()
 
 def unzip_file(file_name, unzip_location):
     try:
@@ -87,24 +54,6 @@ def unzip_file(file_name, unzip_location):
         with zipfile.ZipFile(file_name, 'r') as myzip:
             myzip.extractall(unzip_location)
 
-def download_elasticsearch(install_dir):
-    url = get_elasticsearch_download_url(install_dir)
-    file_name = url.split('/')[-1]
-    if not os.path.isfile(os.path.join(install_dir, file_name)):
-        download_file(url, os.path.join(install_dir, file_name))
-
-def get_elasticsearch_download_url(install_dir):
-    os_name = platform.system().lower()
-    with open(os.path.join(install_dir, "requirements.txt"), "r") as f:
-        for line in f:
-            if line.startswith('# https://') and os_name in line:
-                return line.replace('# ', '').strip()
-    raise Exception("""\n
-------------------------------------------------------------------------------------------------------
-    ERROR: There was an error getting the url for Elastic search from the requirements.txt file
-    Make sure the requirements.txt file contains a line similar to the following line,\nincluding the pound symbol (#) but not the double quotes (") and where the x.x.x represent the version number:
-        "# https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-x.x.x.zip"
-----------------------------------------------------------------------------------------------------\n""")
 
 def get_version(version=None):
     "Returns a PEP 440-compliant version number from VERSION."
