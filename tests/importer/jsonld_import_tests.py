@@ -143,7 +143,7 @@ class JsonLDExportTests(ArchesTestCase):
     "@id": "http://localhost:8000/concepts/36c8d7a3-32e7-49e4-bd4c-2169a06b240a", 
     "@type": "http://www.cidoc-crm.org/cidoc-crm/E57_Material", 
     "http://www.w3.org/2000/01/rdf-schema#label": "material a"}], 
-"http://www.cidoc-crm.org/cidoc-crm/P57_has_number_of_parts": 10
+"http://www.cidoc-crm.org/cidoc-crm/P57_has_number_of_parts": 12
 }
 """
 
@@ -202,10 +202,43 @@ class JsonLDExportTests(ArchesTestCase):
 
         types = js["http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by"]["http://www.cidoc-crm.org/cidoc-crm/P2_has_type"]   
         self.assertTrue(type(types) == list)
+        self.assertTrue(len(types) == 2)
         cids = ["http://localhost:8001/concepts/c3c4b8a8-39bb-41e7-af45-3a0c60fa4ddf", "http://localhost:8001/concepts/0bb450bc-8fe3-46cb-968e-2b56849e6e96"]
         self.assertTrue(types[0]['@id'] in cids)
         self.assertTrue(types[1]['@id'] in cids)
+        self.assertTrue(types[0]['@id'] != types[1]['@id'])
+
+    def test_4_5098_resinst(self):
 
 
+        data = """
+{"@id": "http://localhost:8000/resources/abcd1234-1234-1129-b6e7-3af9d3b32b71", 
+"@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object", 
+"http://www.cidoc-crm.org/cidoc-crm/P130_shows_features_of": [{
+    "@id": "http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71", 
+    "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object"}, {
+    "@id": "http://localhost:8000/resources/24d0d25a-fa75-11e9-b369-3af9d3b32b71", 
+    "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object"}], 
+"http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "res inst list import"}
+"""
 
+        # Make instances for this new one to reference
+        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_2_instances.json').import_business_data()  
 
+        url = reverse('resources_graphid', kwargs={"graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71", "resourceid": "abcd1234-1234-1129-b6e7-3af9d3b32b71"})
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertTrue(response.status_code == 201)
+        js = response.json()
+        if type(js) == list:
+            js = js[0]        
+
+        print(f"GOT JSON: {js}")
+        self.assertTrue('@id' in js)
+        self.assertTrue(js['@id'] == 'http://localhost:8000/resources/abcd1234-1234-1129-b6e7-3af9d3b32b71')
+        self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P130_shows_features_of" in js)
+        feats = js["http://www.cidoc-crm.org/cidoc-crm/P130_shows_features_of"]
+        self.assertTrue(type(feats) == list)
+        self.assertTrue(len(feats) == 2)
+        rids = ["http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71", "http://localhost:8000/resources/24d0d25a-fa75-11e9-b369-3af9d3b32b71"]
+        self.assertTrue(feats[0]['@id'] in rids)
+        self.assertTrue(feats[1]['@id'] in rids)
