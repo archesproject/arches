@@ -87,6 +87,14 @@ define([
                 }
             };
 
+            this.toggleExportable = function() {
+                var isImmutable = self.checkIfImmutable();
+                if (isImmutable === false) {
+                    console.log("toggle exportable for nodegroup")
+                    // self.node().isrequired(!self.node().isrequired());
+                }
+            };
+
             this.disableDatatype = ko.computed(function() {
                 var isImmutable = false;
                 var node = self.node();

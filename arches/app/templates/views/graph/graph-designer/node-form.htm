@@ -171,6 +171,26 @@
                             </div>
                         </div>
 
+                        <div class="row widget-container graph-settings-switch">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label">
+                                        <span class="switch switch-small arches-switch" data-bind="css: {'on': node().isexportable(), 'disabled': checkIfImmutable()}, click: toggleExportable"><small></small></span>
+                                    </label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <p class="control-label graph-settings-switch-label">
+                                    {% trans "Exportable" %}
+                                    </p>
+                                    <span class="graph-settings-switch-subtitle">
+                                        {% trans "Make this nodegroup exportable to search" %}
+                                    </span>
+
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- ko if: node() && !isResourceTopNode() && displayMakeCard() === true -->
                         <div class="row widget-container graph-settings-switch">
                             <div class="form-group">
@@ -192,15 +212,6 @@
                                         {% trans "Data from this node and downstream nodes will be collected in a single form section" %}
                                         <!-- /ko -->
                                     </span>
-                                </div>
-
-                                <div class="col-xs-12">
-                                    <p class="control-label">
-                                        <span data-bind=text: (node().nodeGroupId() && !node().isCollector() || graphModel.isNodeInChildGroup(node())) ? '{% trans "Export to Search" %}' : '{% trans "Make card" %}'"></span>
-                                    </p>
-                                    <label class="col-xs-12 control-label widget-input-label">
-                                        <span class="switch switch-small arches-switch" data-bind="css: {'on': node().isCollector(), 'disabled': checkIfImmutable()}, click: toggleIsCollector"><small></small></span>
-                                    </label>
                                 </div>
                             </div>
                         </div>
