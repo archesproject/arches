@@ -53,6 +53,12 @@ class JsonLDExportTests(ArchesTestCase):
         ResourceGraphImporter(archesfile2['graph'])
         BusinessDataImporter('tests/fixtures/jsonld_base/data/test_2_instances.json').import_business_data()  
 
+        with open(os.path.join('tests/fixtures/jsonld_base/models/5136_res_inst_plus_res_inst.json'), 'rU') as f:
+            archesfile2 = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile2['graph'])
+        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_3_instances.json').import_business_data()  
+
+
     def setUp(self):
         # This runs every test
         #response = self.client.post(reverse('get_token'), {'username': 'admin', 'password': 'admin'})
@@ -195,3 +201,22 @@ class JsonLDExportTests(ArchesTestCase):
         rit = ri['http://www.cidoc-crm.org/cidoc-crm/P2_has_type']
         self.assertTrue(rit['@id'] == "http://localhost:8000/concepts/fb457e76-e018-41e7-9be3-0f986816450a")
 
+
+    def test_3_5136_meta_resinst(self):
+        # '45fbd100-fb60-11e9-98e3-3af9d3b32b71'
+
+        url = reverse('resources', kwargs={"resourceid": '45fbd100-fb60-11e9-98e3-3af9d3b32b71'})
+        response = self.client.get(url, secure=False)
+        self.assertTrue(response.status_code == 200)
+        js = response.json()
+        self.assertTrue('@id' in js)
+        self.assertTrue(js['@id'] == 'http://localhost:8000/resources/45fbd100-fb60-11e9-98e3-3af9d3b32b71')
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P10i_contains' in js)
+        contained = js['http://www.cidoc-crm.org/cidoc-crm/P10i_contains']
+        self.assertTrue('@id' in contained)
+        self.assertTrue(contained['@id'] == "http://localhost:8000/resources/24d0d25a-fa75-11e9-b369-3af9d3b32b71")
+        # this will fail
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P10i_contains' in contained)
+        meta = contained['http://www.cidoc-crm.org/cidoc-crm/P10i_contains']
+        self.assertTrue('@id' in meta)
+        self.assertTrue(meta['@id'] == "http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71")
