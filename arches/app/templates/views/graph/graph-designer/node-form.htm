@@ -193,6 +193,15 @@
                                         <!-- /ko -->
                                     </span>
                                 </div>
+
+                                <div class="col-xs-12">
+                                    <p class="control-label">
+                                        <span data-bind=text: (node().nodeGroupId() && !node().isCollector() || graphModel.isNodeInChildGroup(node())) ? '{% trans "Export to Search" %}' : '{% trans "Make card" %}'"></span>
+                                    </p>
+                                    <label class="col-xs-12 control-label widget-input-label">
+                                        <span class="switch switch-small arches-switch" data-bind="css: {'on': node().isCollector(), 'disabled': checkIfImmutable()}, click: toggleIsCollector"><small></small></span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         <!-- /ko -->
