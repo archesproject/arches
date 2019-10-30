@@ -295,6 +295,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
+    'django_celery_results',
     'arches',
     'arches.app.models',
     'arches.management',
