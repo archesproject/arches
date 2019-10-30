@@ -328,6 +328,10 @@ class JsonLDExportTests(ArchesTestCase):
         self.assertTrue('@id' in js)
         self.assertTrue(js['@id'] == 'http://localhost:8000/resources/69a4af50-c055-11e9-b4dc-0242ac160002')
 
+        self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P2_has_type" in js)
+        typ = js['http://www.cidoc-crm.org/cidoc-crm/P2_has_type']
+        self.assertTrue(typ['@id'] == "http://vocab.getty.edu/aat/300404216")
+
     def test_7_5121_branches(self):
 
         # Load up the models and data only once
@@ -366,9 +370,12 @@ class JsonLDExportTests(ArchesTestCase):
         self.assertTrue('@id' in js)
         self.assertTrue(js['@id'] == 'http://localhost:8000/resources/87654321-c000-1100-b400-0242ac160002')
 
+        lo = js["http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by"]
+        self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in lo)
+        self.assertTrue(lo["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"] == "Test Content")
+
 
     def test_8_4564_resinst_models(self):
-
         
         with open(os.path.join('tests/fixtures/jsonld_base/models/4564-person.json'), 'rU') as f:
             archesfile = JSONDeserializer().deserialize(f)
@@ -395,10 +402,10 @@ class JsonLDExportTests(ArchesTestCase):
 
         data = """
         {
-                "@id": "http://localhost:8001/resources/940a2c82-bfa8-11e9-bd39-0242ac160002", 
+                "@id": "http://localhost:8000/resources/940a2c82-bfa8-11e9-bd39-0242ac160002", 
                 "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object", 
                 "http://www.cidoc-crm.org/cidoc-crm/P51_has_former_or_current_owner": {
-                        "@id": "http://localhost:8001/resources/923a5fa8-bfa8-11e9-bd39-0242ac160002", 
+                        "@id": "http://localhost:8000/resources/923a5fa8-bfa8-11e9-bd39-0242ac160002", 
                         "@type": "http://www.cidoc-crm.org/cidoc-crm/E74_Group"
                 }
         }
@@ -410,4 +417,14 @@ class JsonLDExportTests(ArchesTestCase):
         print(f"Test 8 response: {response.content}")        
         # this does not currently work
         self.assertTrue(response.status_code == 201)
+        js = response.json()
+        if type(js) == list:
+            js = js[0] 
+                
+        print(f"Got JSON for test 8: {js}")
+        self.assertTrue('@id' in js)
+        self.assertTrue(js['@id'] == 'http://localhost:8000/resources/940a2c82-bfa8-11e9-bd39-0242ac160002')
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P51_has_former_or_current_owner' in js)
+        owner = js['http://www.cidoc-crm.org/cidoc-crm/P51_has_former_or_current_owner']
+        self.assertTrue(owners['@id'] == "http://localhost:8000/resources/923a5fa8-bfa8-11e9-bd39-0242ac160002")
 
