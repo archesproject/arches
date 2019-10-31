@@ -136,7 +136,7 @@ define([
                     }).concat(layers);
                 }
             });
-            layers = layers.concat(self.activeBasemap().layer_definitions.slice(0));
+            layers = self.activeBasemap().layer_definitions.slice(0).concat(layers);
             if (this.additionalLayers) {
                 layers = layers.concat(ko.unwrap(this.additionalLayers));
             }
