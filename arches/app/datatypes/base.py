@@ -279,6 +279,11 @@ class BaseDataType(object):
         """
         return False
 
+    def get_rdf_uri(self, node, data, which="r"):
+        if self.is_a_literal_in_rdf():
+            return None
+        return node
+
     def to_rdf(self, edge_info, edge):
         """
         Outputs an in-memory graph, converting the range tile data JSON into
