@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import zipfile
 import json
 import uuid
+from pprint import pprint
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.db.models import Q
@@ -287,6 +288,13 @@ class GraphDataView(View):
                            c for c in r['ontology_classes']]})
             return JSONResponse(res)
 
+        # elif self.action == 'get_nodegroup_exportable':
+        #     res = []
+        #     nodegroup = models.NodeGroup.objects.get(nodegroupid=nodegroupid)
+        #     exportable = False if nodegroup.exportable is None else nodegroup.exportable
+        #     res.append({'exportable': exportable})
+        #     return JSONResponse(res)
+
         else:
             graph = Graph.objects.get(graphid=graphid)
             if self.action == 'get_related_nodes':
@@ -333,6 +341,11 @@ class GraphDataView(View):
                     node.config = data['config']
                     ret = graph
                     node.save()
+
+                # elif self.action == 'set_nodegroup_exportable':
+                #     nodegroup = models.NodeGroup.objects.get(nodegroupid=nodegroupid)
+                #     nodegroup['exportable'] = data['exportable']
+                #     nodegroup.save()
 
                 elif self.action == 'append_branch':
                     ret = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
@@ -686,3 +699,44 @@ class IconDataView(View):
             'icons': JSONSerializer().serializeToPython(icons)
         }
         return JSONResponse(data)
+
+
+class NodegroupView(View):
+    action = 'exportable'
+    
+    def get(self, request):
+        nodegroupid = None
+        try:
+            nodegroupid = uuid.UUID(str(request.GET.get('nodegroupid')))
+        except Exception as e:
+            print(e)
+        if self.action == 'exportable':
+            res = []
+            if nodegroupid is not None:
+                nodegroup = models.NodeGroup.objects.get(nodegroupid=nodegroupid)
+                exportable = False if nodegroup.exportable is None else nodegroup.exportable
+                res.append({'exportable': exportable})
+                return JSONResponse(res)
+            else:
+                return HttpResponseNotFound()
+
+    
+    def post(self, request):
+        nodegroupid = None
+        try:
+            nodegroupid = uuid.UUID(str(request.POST.get('nodegroupid')))
+        except Exception as e:
+            print(e)
+        if self.action == 'exportable' and nodegroupid is not None:
+            exportable = json.loads(request.POST.get('exportable'))
+
+            nodegroup = models.NodeGroup.objects.select_for_update().filter(nodegroupid=nodegroupid)
+            with transaction.atomic():
+                for ng in nodegroup:
+                    print("OK!")
+                    ng.exportable = exportable
+                    ng.save()
+
+            return JSONResponse({'nodegroup':nodegroupid, 'status':'success' })
+
+        return HttpResponseNotFound()

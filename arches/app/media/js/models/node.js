@@ -86,8 +86,13 @@ define([
             self.config = {};
             self.issearchable = ko.observable(true);
             self.isrequired = ko.observable(true);
-            self.exportable = ko.observable();
+            self.exportable = ko.observable(false);
             self.fieldname = ko.observable();
+
+            // what about save triggered by dirty state?
+            // self.exportable.subscribe(function(val) {
+            //     self.setExportable(self, val);
+            // });
 
             self.parse(options.source);
 
@@ -167,7 +172,7 @@ define([
                     config: config,
                     issearchable: self.issearchable,
                     isrequired: self.isrequired,
-                    // exportable: from nodegroup
+                    exportable: self.exportable,
                     fieldname: self.fieldname
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj));
@@ -241,7 +246,8 @@ define([
             self.parentproperty(source.parentproperty);
             self.issearchable(source.issearchable);
             self.isrequired(source.isrequired);
-            // self.exportable(getFromNodegroup);
+            self.exportable(source.exportable);
+            self.getExportable(self);
             self.fieldname(source.fieldname);
 
             if (source.config) {
@@ -253,6 +259,48 @@ define([
 
             self.set('id', self.nodeid);
             self.set('graph_id', source.graph_id);
+        },
+
+        getExportable: function(context) {
+            var nodegroupid = context.nodeGroupId();
+            $.ajax({
+                type: "GET",
+                url: arches.urls.nodegroup,
+                data: { "nodegroupid": nodegroupid },
+                context: self,
+                success: function(responseText, status, response){
+                    console.log(response.responseJSON);
+                    var exportable = response.responseJSON[0]["exportable"];
+                    context.exportable(exportable);
+                },
+                error: function(response, status, error) {
+                    // if(response.statusText !== 'abort'){
+                    //     // this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, response.responseText));
+                    //     console.log("failed");
+                    // }
+                    console.log("failed get");
+                }
+            });
+        },
+
+        setExportable: function(nodegroupid, exportable) {
+            console.log(exportable);
+            $.ajax({
+                type: "POST",
+                url: arches.urls.nodegroup,
+                data: { "nodegroupid": nodegroupid, "exportable": exportable },
+                context: self,
+                success: function(responseText, status, response){
+                    console.log(response.responseJSON);
+                },
+                error: function(response, status, error) {
+                    // if(response.statusText !== 'abort'){
+                    //     // this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, response.responseText));
+                    //     console.log("failed");
+                    // }
+                    console.log("failed set");
+                }
+            });
         },
 
         setupConfig: function(config) {

@@ -22,7 +22,7 @@ from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from arches.app.views import concept, main, map, search, graph, api
 from arches.app.views.admin import ReIndexResources
-from arches.app.views.graph import GraphDesignerView, GraphSettingsView, GraphDataView, GraphManagerView, DatatypeTemplateView, CardView, FunctionManagerView, PermissionDataView, IconDataView
+from arches.app.views.graph import GraphDesignerView, GraphSettingsView, GraphDataView, GraphManagerView, DatatypeTemplateView, CardView, FunctionManagerView, PermissionDataView, IconDataView, NodegroupView
 from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceCards, ResourceReportView, RelatedResourcesView, ResourceDescriptors, ResourceEditLogView, ResourceTiles
 from arches.app.views.resource import NewResourceEditorView, ResourceActivityStreamPageView, \
                                       ResourceActivityStreamCollectionView
@@ -120,6 +120,7 @@ urlpatterns = [
     url(r'^card/(?P<cardid>%s|())$' % uuid_regex, CardView.as_view(action='update_card'), name='card'),
     url(r'^reorder_cards/', CardView.as_view(action='reorder_cards'), name='reorder_cards'),
     url(r'^node/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='update_node'), name='node'),
+    url(r'^nodegroup/', NodegroupView.as_view(action='exportable'), name='nodegroup'),
     url(r'^node_layer/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='update_node_layer'), name='node_layer'),
     url(r'^widgets/(?P<template>[a-zA-Z_-]*)', main.widget, name="widgets"),
     url(r'^report-templates/(?P<template>[a-zA-Z_-]*)', main.report_templates, name="report-templates"),

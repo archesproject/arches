@@ -90,8 +90,9 @@ define([
             this.toggleExportable = function() {
                 var isImmutable = self.checkIfImmutable();
                 if (isImmutable === false) {
-                    console.log("toggle exportable for nodegroup")
-                    // self.node().isrequired(!self.node().isrequired());
+                    // console.log("toggle exportable for nodegroup")
+                    self.node().exportable(!self.node().exportable());
+                    self.node().setExportable(self.node().nodeGroupId(), self.node().exportable());
                 }
             };
 
