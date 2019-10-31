@@ -11,6 +11,7 @@ from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.graph import Graph as GraphProxy
 from arches.app.models.tile import Tile
+from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -445,6 +446,36 @@ class JsonLdReader(Reader):
                         # print "found %s" % node['node'].name
                         nodes_copy.add((node['node'].name, node['node'].pk))
                         found.append(node)
+
+            # see https://github.com/archesproject/arches/issues/5126
+            # check to see if the found graph nodes are concepts
+            # if all the found graph nodes are concepts then remove any nodes from found where the value
+            # being saved isn't in the nodes concept collection
+            if len(found) > 1:
+                found_nodes_are_concepts = True
+                for found_node in found:
+                    if not(found_node['node'].datatype == 'concept' or found_node['node'].datatype == 'concept-list'):
+                        found_nodes_are_concepts = False
+
+                if found_nodes_are_concepts:
+                    new_found = []
+                    nodes_copy = set()
+                    concept_val = jsonld_graph['http://www.w3.org/2000/01/rdf-schema#label']
+                    if concept_val:
+                        if isinstance(concept_val, list):
+                            concept_val = concept_val[0]['@value']
+                        else:
+                            concept_val = concept_val['@value']
+                    for node in found:
+                        collection = node['node'].config['rdmCollection']
+                        # NOTE: these collections might be cached for better performance?
+                        edges = Concept().get_child_collections(collection, columns='valueto')
+                        concept_labels = [item[0] for item in edges]
+                        if concept_val in concept_labels:
+                            nodes_copy.add((node['node'].name, node['node'].pk))
+                            new_found.append(node)
+
+                    found = new_found
 
             self.logger.debug('found {0} branches'.format(len(found)))
             if len(found) == 0:
