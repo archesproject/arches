@@ -1477,9 +1477,14 @@ class ResourceInstanceDataType(BaseDataType):
         except KeyError as e:
             pass
 
+
+    def get_rdf_uri(self, node, data, which="r"):
+        if type(data) == list:
+            return [URIRef(archesproject[f'resources/{x}']) for x in data]
+        return URIRef(archesproject[f'resources/{data}'])
+
     def to_rdf(self, edge_info, edge):
         g = Graph()
-
         def _add_resource(d, p, r, r_type):
             if r_type is not None:
                 g.add((r, RDF.type, URIRef(r_type)))
@@ -1491,7 +1496,7 @@ class ResourceInstanceDataType(BaseDataType):
                 res_insts = [res_insts]
 
             for res_inst in res_insts:
-                rangenode = URIRef(archesproject['resources/%s' % res_inst])
+                rangenode = self.get_rdf_uri(None, res_inst)
                 # FIXME: should be the class of the Resource Instance, rather than the expected class
                 # from the edge.
                 _add_resource(edge_info['d_uri'], edge.ontologyproperty,

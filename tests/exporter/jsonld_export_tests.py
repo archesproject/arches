@@ -58,6 +58,11 @@ class JsonLDExportTests(ArchesTestCase):
         ResourceGraphImporter(archesfile2['graph'])
         BusinessDataImporter('tests/fixtures/jsonld_base/data/test_3_instances.json').import_business_data()  
 
+        with open(os.path.join('tests/fixtures/jsonld_base/models/nesting_test.json'), 'rU') as f:
+            archesfile2 = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile2['graph'])
+        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_nest_instances.json').import_business_data()  
+
 
     def setUp(self):
         # This runs every test
@@ -220,3 +225,195 @@ class JsonLDExportTests(ArchesTestCase):
         meta = contained['http://www.cidoc-crm.org/cidoc-crm/P10i_contains']
         self.assertTrue('@id' in meta)
         self.assertTrue(meta['@id'] == "http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71")
+
+    def test_nesting_permutations_concept(self):
+        # This tests nesting permutations of concept and concept-list
+
+        url = reverse('resources', kwargs={"resourceid": '6edd753e-fbf0-11e9-9ca4-3af9d3b32b71'})
+        response = self.client.get(url, secure=False)
+        self.assertTrue(response.status_code == 200)
+        js = response.json()
+        self.assertTrue('@id' in js)      
+        self.assertTrue(js['@id'] == "http://localhost:8000/resources/6edd753e-fbf0-11e9-9ca4-3af9d3b32b71")
+
+        # test c->c
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P2_has_type' in js)
+        typ = js['http://www.cidoc-crm.org/cidoc-crm/P2_has_type']
+        self.assertTrue(typ['@id'] == "http://localhost:8000/concepts/fb457e76-e018-41e7-9be3-0f986816450a")
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P127_has_broader_term' in typ)
+        self.assertTrue('http://www.w3.org/2000/01/rdf-schema#label' in typ)
+        self.assertTrue(typ['http://www.w3.org/2000/01/rdf-schema#label'] == "Test Type A")
+        brd = typ['http://www.cidoc-crm.org/cidoc-crm/P127_has_broader_term']
+        self.assertTrue(brd['@id'] == "http://localhost:8000/concepts/14c92c17-5e2f-413a-95c2-3c5e41ee87d2")
+        self.assertTrue('http://www.w3.org/2000/01/rdf-schema#label' in brd)
+        self.assertTrue(brd['http://www.w3.org/2000/01/rdf-schema#label'] == "Meta Type A")
+
+        # test cl -> c
+
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P45_consists_of' in js)
+        self.assertTrue(type(js['http://www.cidoc-crm.org/cidoc-crm/P45_consists_of']) == list)
+        mats = ["http://localhost:8000/concepts/9b61c995-71d8-4bce-987b-0ffa3da4c71c",
+            "http://localhost:8000/concepts/36c8d7a3-32e7-49e4-bd4c-2169a06b240a"]
+        mat1 = js['http://www.cidoc-crm.org/cidoc-crm/P45_consists_of'][0]
+        mat2 = js['http://www.cidoc-crm.org/cidoc-crm/P45_consists_of'][1]
+        self.assertTrue(mat1['@id'] in mats)
+        self.assertTrue(mat2['@id'] in mats and mat1['@id'] != mat2['@id'])
+        metatype = "http://localhost:8000/concepts/6bac5802-a6f8-427c-ba5f-d4b30d5b070e"
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P2_has_type' in mat1)        
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P2_has_type' in mat2)
+        self.assertTrue(mat1['http://www.cidoc-crm.org/cidoc-crm/P2_has_type']['@id'] == metatype) 
+        self.assertTrue(mat2['http://www.cidoc-crm.org/cidoc-crm/P2_has_type']['@id'] == metatype) 
+
+
+        # test cl -> cl
+
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P101_had_as_general_use' in js)
+        self.assertTrue(type(js['http://www.cidoc-crm.org/cidoc-crm/P101_had_as_general_use']) == list)
+        use1 = js['http://www.cidoc-crm.org/cidoc-crm/P101_had_as_general_use'][0]      
+        use2 = js['http://www.cidoc-crm.org/cidoc-crm/P101_had_as_general_use'][1]
+
+        useids = ["http://localhost:8000/concepts/1df7e2d6-08b2-4fc6-9152-30b72931ba0c",
+                "http://localhost:8000/concepts/be4ee3ba-37e4-4e37-b401-069d750734b7"]
+        metaids = ["http://localhost:8000/concepts/5f32de86-d6be-40ac-a7d3-6999471c4e6e",
+                "http://localhost:8000/concepts/babcafca-138f-43e6-b32e-22050d482304"]
+
+        self.assertTrue(use1['@id'] in useids)
+        self.assertTrue(use2['@id'] in useids and use1['@id'] != use2['@id'])
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P2_has_type' in use1)
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P2_has_type' in use2)
+        self.assertTrue(use1['http://www.cidoc-crm.org/cidoc-crm/P2_has_type'][0]['@id'] in metaids)
+        self.assertTrue(use1['http://www.cidoc-crm.org/cidoc-crm/P2_has_type'][1]['@id'] in metaids)
+        self.assertTrue(use2['http://www.cidoc-crm.org/cidoc-crm/P2_has_type'][0]['@id'] in metaids)
+        self.assertTrue(use2['http://www.cidoc-crm.org/cidoc-crm/P2_has_type'][1]['@id'] in metaids)
+
+        # test c -> cl
+
+        url = reverse('resources', kwargs={"resourceid": 'bbc1651a-fbf3-11e9-9ca4-3af9d3b32b71'})
+        response = self.client.get(url, secure=False)
+        self.assertTrue(response.status_code == 200)
+        js = response.json()
+        self.assertTrue('@id' in js)      
+        self.assertTrue(js['@id'] == "http://localhost:8000/resources/bbc1651a-fbf3-11e9-9ca4-3af9d3b32b71")
+
+        p1 = "http://www.cidoc-crm.org/cidoc-crm/P137_exemplifies"
+        p2 = "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"
+
+        tier2ids = ["http://localhost:8000/concepts/14c92c17-5e2f-413a-95c2-3c5e41ee87d2",
+            "http://localhost:8000/concepts/dcd28b8a-0840-4a7f-a0d6-0341438552e6"]
+
+        self.assertTrue(p1 in js)
+        self.assertTrue(type(js[p1]) == dict)
+        self.assertTrue(js[p1]['@id'] == "http://localhost:8000/concepts/fb457e76-e018-41e7-9be3-0f986816450a")
+        self.assertTrue(p2 in js[p1])
+        self.assertTrue(type(js[p1][p2]) == list)
+        self.assertTrue(js[p1][p2][0]['@id'] in tier2ids)
+        self.assertTrue(js[p1][p2][1]['@id'] in tier2ids)
+
+
+    def test_nesting_permutations_res_inst(self):
+
+        # This tests nesting resource-instance and resource-instance-list permutations
+
+        # ri -> ri
+
+        url = reverse('resources', kwargs={"resourceid": 'a16ea9a4-fbf1-11e9-9ca4-3af9d3b32b71'})
+        response = self.client.get(url, secure=False)
+        self.assertTrue(response.status_code == 200)
+        js = response.json()
+        self.assertTrue('@id' in js)      
+        self.assertTrue(js['@id'] == "http://localhost:8000/resources/a16ea9a4-fbf1-11e9-9ca4-3af9d3b32b71")
+
+        p1 = "http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"
+        p2 = "http://www.cidoc-crm.org/cidoc-crm/P10i_contains"
+        self.assertTrue(p1 in js)
+        self.assertTrue(type(js[p1]) == dict)
+        tier1id = "http://localhost:8000/resources/24d0d25a-fa75-11e9-b369-3af9d3b32b71"
+        tier2id = "http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71"
+
+        self.assertTrue(js[p1]['@id'] == tier1id)
+        self.assertTrue(p2 in js[p1])
+        self.assertTrue(js[p1][p2]['@id'] == tier2id)
+
+
+        # ril -> ri
+
+        url = reverse('resources', kwargs={"resourceid": 'd323639a-fbf1-11e9-9ca4-3af9d3b32b71'})
+        response = self.client.get(url, secure=False)
+        self.assertTrue(response.status_code == 200)
+        js = response.json()
+        self.assertTrue('@id' in js)      
+        self.assertTrue(js['@id'] == "http://localhost:8000/resources/d323639a-fbf1-11e9-9ca4-3af9d3b32b71")
+
+        prop = "http://www.cidoc-crm.org/cidoc-crm/P130_shows_features_of"
+        self.assertTrue(prop in js)
+        self.assertTrue(type(js[prop]) == list)
+        tier1ids = ["http://localhost:8000/resources/24d0d25a-fa75-11e9-b369-3af9d3b32b71",
+            "http://localhost:8000/resources/396dcffa-fa8a-11e9-b6e7-3af9d3b32b71"]
+        tier2id = "http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71"
+
+        self.assertTrue(js[prop][0]['@id'] in tier1ids)
+        self.assertTrue(js[prop][1]['@id'] in tier1ids)
+        self.assertTrue(prop in js[prop][0])
+        self.assertTrue(prop in js[prop][1])
+        self.assertTrue(js[prop][0][prop]['@id'] == tier2id)
+        self.assertTrue(js[prop][0][prop]['@id'] == tier2id)
+        self.assertTrue(js[prop][1][prop]['@id'] == tier2id)
+        self.assertTrue(js[prop][1][prop]['@id'] == tier2id)
+
+
+        # ril -> ril
+
+        url = reverse('resources', kwargs={"resourceid": 'b588fae8-fbf1-11e9-9ca4-3af9d3b32b71'})
+        response = self.client.get(url, secure=False)
+        self.assertTrue(response.status_code == 200)
+        js = response.json()
+        self.assertTrue('@id' in js)      
+        self.assertTrue(js['@id'] == "http://localhost:8000/resources/b588fae8-fbf1-11e9-9ca4-3af9d3b32b71")
+
+        prop = "http://www.cidoc-crm.org/cidoc-crm/P133_is_separated_from"
+        self.assertTrue(prop in js)
+        self.assertTrue(type(js[prop]) == list)
+        tier1ids = ["http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71",
+            "http://localhost:8000/resources/24d0d25a-fa75-11e9-b369-3af9d3b32b71"]
+        tier2ids = ["http://localhost:8000/resources/9c400558-fa8a-11e9-b6e7-3af9d3b32b71",
+            "http://localhost:8000/resources/396dcffa-fa8a-11e9-b6e7-3af9d3b32b71"]
+
+        self.assertTrue(js[prop][0]['@id'] in tier1ids)
+        self.assertTrue(js[prop][1]['@id'] in tier1ids)
+        self.assertTrue(prop in js[prop][0])
+        self.assertTrue(prop in js[prop][1])
+        self.assertTrue(js[prop][0][prop][0]['@id'] in tier2ids)
+        self.assertTrue(js[prop][0][prop][1]['@id'] in tier2ids)
+        self.assertTrue(js[prop][1][prop][0]['@id'] in tier2ids)
+        self.assertTrue(js[prop][1][prop][1]['@id'] in tier2ids)
+
+
+    def test_nesting_permutations_res_inst_concept(self):
+
+        # ril -> cl
+        url = reverse('resources', kwargs={"resourceid": 'd1d2ce8e-fbf3-11e9-9ca4-3af9d3b32b71'})
+        response = self.client.get(url, secure=False)
+        self.assertTrue(response.status_code == 200)
+        js = response.json()
+        self.assertTrue('@id' in js)      
+        self.assertTrue(js['@id'] == "http://localhost:8000/resources/d1d2ce8e-fbf3-11e9-9ca4-3af9d3b32b71")
+
+        p1 = "http://www.cidoc-crm.org/cidoc-crm/P62_depicts"
+        p2 = "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"
+        t1ids = ["http://localhost:8000/resources/12345678-abcd-11e9-9cbb-3af9d3b32b71",
+            "http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71"]
+        t2ids = ["http://localhost:8000/concepts/6458c29a-e043-46f7-b89b-bb6f50be9f78",
+            "http://localhost:8000/concepts/fb457e76-e018-41e7-9be3-0f986816450a"]
+
+        self.assertTrue(p1 in js)
+        self.assertTrue(type(js[p1]) == list)
+        self.assertTrue(js[p1][0]['@id'] in t1ids)
+        self.assertTrue(js[p1][1]['@id'] in t1ids)
+        self.assertTrue(p2 in js[p1][0])
+        self.assertTrue(p2 in js[p1][1])
+        self.assertTrue(js[p1][0][p2][0]['@id'] in t2ids)
+        self.assertTrue(js[p1][0][p2][1]['@id'] in t2ids)
+        self.assertTrue(js[p1][1][p2][0]['@id'] in t2ids)
+        self.assertTrue(js[p1][1][p2][1]['@id'] in t2ids)
+
+
