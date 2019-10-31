@@ -121,6 +121,8 @@ class JsonLDExportTests(ArchesTestCase):
 
     def test_2_complex_import_data(self):
 
+        # Note that this tests #5136, as the P101 -> P2 is a concept with a concept
+
         data = """
 {"@id": "http://localhost:8000/resources/12345678-abcd-11e9-9cbb-3af9d3b32b71", 
 "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object", 
@@ -170,6 +172,9 @@ class JsonLDExportTests(ArchesTestCase):
 
     def test_3_5098_concepts(self):
 
+        # 2019-11-01 - This fails due to #5098
+
+
         # Load up the models and data only once
         with open(os.path.join('tests/fixtures/jsonld_base/models/5098_concept_list.json'), 'rU') as f:
             archesfile = JSONDeserializer().deserialize(f)
@@ -214,7 +219,7 @@ class JsonLDExportTests(ArchesTestCase):
         self.assertTrue(types[0]['@id'] != types[1]['@id'])
 
     def test_4_5098_resinst(self):
-
+        # 2019-11-01 - This passes, as the resource instance list as not in a branch
 
         data = """
 {"@id": "http://localhost:8000/resources/abcd1234-1234-1129-b6e7-3af9d3b32b71", 
@@ -252,6 +257,8 @@ class JsonLDExportTests(ArchesTestCase):
 
 
     def test_5_5098_resinst_branch(self):
+        # 2019-11-01 - Conversely this fails, as it is in a branch
+
         BusinessDataImporter('tests/fixtures/jsonld_base/data/test_2_instances.json').import_business_data()  
 
         data = """
@@ -290,6 +297,7 @@ class JsonLDExportTests(ArchesTestCase):
 
 
     def test_6_5126_collection_filter(self):
+        # 2019-11-01 - Fails due to #5126, the concept is not checked against the collection
 
         skos = SKOSReader()
         rdf = skos.read_file('tests/fixtures/jsonld_base/rdm/5126-thesaurus.xml')
@@ -333,6 +341,7 @@ class JsonLDExportTests(ArchesTestCase):
         self.assertTrue(typ['@id'] == "http://vocab.getty.edu/aat/300404216")
 
     def test_7_5121_branches(self):
+        # 2019-11-01 - This fails due to #5121, the presence of content is not used to rule out the resource-instance branch
 
         # Load up the models and data only once
         with open(os.path.join('tests/fixtures/jsonld_base/models/5121_false_ambiguity.json'), 'rU') as f:
@@ -376,7 +385,9 @@ class JsonLDExportTests(ArchesTestCase):
 
 
     def test_8_4564_resinst_models(self):
-        
+        # 2019-11-01 - This fails as the model uses Actor, not Group, per #4564
+        # and the import does not look at the referenced model's class
+
         with open(os.path.join('tests/fixtures/jsonld_base/models/4564-person.json'), 'rU') as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile['graph'])  

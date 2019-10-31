@@ -274,7 +274,6 @@ class ConceptListDataType(BaseConceptDataType):
             pass
 
     def get_rdf_uri(self, node, data, which="r"):
-        print(f"concept-list got rdf uri data: {data}")
         c = ConceptDataType()
         return [c.get_rdf_uri(node, d, which) for d in data]
 
