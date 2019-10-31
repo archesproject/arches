@@ -553,6 +553,7 @@ class JsonLdReader(Reader):
 
     def resolve_node_ids(self, jsonld, ontology_prop=None, graph=None, parent_node=None, tileid=None, parent_tileid=None, resource=None):
         # print "-------------------"
+        self.logger.debug("-------------: %r" % jsonld)
         if not isinstance(jsonld, list):
             jsonld = [jsonld]
 
@@ -627,13 +628,26 @@ class JsonLdReader(Reader):
                         #     import ipdb
                         #     ipdb.set_trace()
                         datatype = self.datatype_factory.get_instance(branch['node'].datatype)
-                        # print 'finding value'
-                        # print jsonld_node
+
                         # print branch['node'].datatype
-                        value = datatype.from_rdf(jsonld_node)
+                        if len(jsonld) == 1:
+                            value = datatype.from_rdf(jsonld_node)
+                        else:
+                            value = []
+                            # this is not very efficient but does fix the problem for ticket #5098
+                            # what we should do is prevent subsequent loops through "jsonld" on line 565 above
+                            for jldnode in jsonld:
+                                self.logger.debug(f'datatype: {datatype}')
+                                value = value + datatype.from_rdf(jldnode)
+                        print ('finding value')
+                        # print (jsonld_node)
+                        print (jsonld)
                         self.logger.debug('value found! : {0}'.format(value))
                         self.tiles[tileid].data[str(branch['node'].nodeid)] = value
-                        ontology_properties = self.findOntologyProperties(jsonld_node)
+                        #ontology_properties = self.findOntologyProperties(jsonld_node)
+
+                        if len(jsonld) > 1:
+                            break
 
                 if len(ontology_properties) > 0:
                     for ontology_property in ontology_properties:
