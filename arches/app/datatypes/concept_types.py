@@ -135,10 +135,11 @@ class ConceptDataType(BaseConceptDataType):
 
     def to_rdf(self, edge_info, edge):
         g = Graph()
-        c = ConceptValue(str(edge_info['range_tile_data']))
-        g.add((edge_info['r_uri'], RDF.type, URIRef(edge.rangenode.ontologyclass)))
-        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), edge_info['r_uri']))
-        g.add((edge_info['r_uri'], URIRef(RDFS.label), Literal(c.value)))
+        if edge_info['r_uri'] == self.get_rdf_uri(None, edge_info['range_tile_data']):
+            c = ConceptValue(str(edge_info['range_tile_data']))
+            g.add((edge_info['r_uri'], RDF.type, URIRef(edge.rangenode.ontologyclass)))
+            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), edge_info['r_uri']))
+            g.add((edge_info['r_uri'], URIRef(RDFS.label), Literal(c.value)))
         return g
 
     def from_rdf(self, json_ld_node):

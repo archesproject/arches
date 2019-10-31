@@ -123,6 +123,10 @@ class RdfWriter(Writer):
 
             # Use the range node's datatype.to_rdf() method to generate an RDF representation of it
             # and add its triples to the core graph
+
+            # FIXME: some datatypes have their URI calculated from _tile_data (e.g. concept)
+            # ... if there is a list of these, then all of the permutations will happen
+            # ... as the matrix below re-processes all URIs against all _tile_data entries :(
             if type(pkg['d_uri']) == list:
                 mpkg = pkg.copy()
                 for d in pkg['d_uri']:
