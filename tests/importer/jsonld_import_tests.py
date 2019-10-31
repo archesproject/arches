@@ -223,6 +223,9 @@ class JsonLDExportTests(ArchesTestCase):
         self.assertTrue(types[0]['@id'] != types[1]['@id'])
 
     def test_4_5098_resinst(self):
+        # Make instances for this new one to reference
+        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_2_instances.json').import_business_data()  
+        
         data = """
             {
                 "@id": "http://localhost:8000/resources/abcd1234-1234-1129-b6e7-3af9d3b32b71",
@@ -240,9 +243,6 @@ class JsonLDExportTests(ArchesTestCase):
                 "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "res inst list import"
             }
         """
-
-        # Make instances for this new one to reference
-        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_2_instances.json').import_business_data()  
 
         url = reverse('resources_graphid', kwargs={"graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71", "resourceid": "abcd1234-1234-1129-b6e7-3af9d3b32b71"})
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f'Bearer {self.token}')

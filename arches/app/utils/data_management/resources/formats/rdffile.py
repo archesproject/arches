@@ -623,10 +623,8 @@ class JsonLdReader(Reader):
                         self.logger.debug("Assigning value to datatype ({0}) from a non-semantic node:".format(
                             branch['node'].datatype)
                         )
-                        # if (branch['node'].datatype == 'number'):
-                        #     print 'number'
-                        #     import ipdb
-                        #     ipdb.set_trace()
+                        # import ipdb
+                        # ipdb.sset_trace()
                         datatype = self.datatype_factory.get_instance(branch['node'].datatype)
 
                         # print branch['node'].datatype
@@ -638,7 +636,11 @@ class JsonLdReader(Reader):
                             # what we should do is prevent subsequent loops through "jsonld" on line 565 above
                             for jldnode in jsonld:
                                 self.logger.debug(f'datatype: {datatype}')
-                                value = value + datatype.from_rdf(jldnode)
+                                raw_val = datatype.from_rdf(jldnode)
+                                if isinstance(raw_val, list):
+                                    value = value + raw_val
+                                else:
+                                    value.append(raw_val)
                         print ('finding value')
                         # print (jsonld_node)
                         print (jsonld)
