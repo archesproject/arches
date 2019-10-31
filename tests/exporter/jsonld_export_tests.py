@@ -63,6 +63,19 @@ class JsonLDExportTests(ArchesTestCase):
         ResourceGraphImporter(archesfile2['graph'])
         BusinessDataImporter('tests/fixtures/jsonld_base/data/test_nest_instances.json').import_business_data()  
 
+        with open(os.path.join('tests/fixtures/jsonld_base/models/4564-person.json'), 'rU') as f:
+            archesfile2 = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile2['graph'])        
+
+        with open(os.path.join('tests/fixtures/jsonld_base/models/4564-group.json'), 'rU') as f:
+            archesfile2 = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile2['graph']) 
+
+        with open(os.path.join('tests/fixtures/jsonld_base/models/4564-referenced.json'), 'rU') as f:
+            archesfile2 = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile2['graph']) 
+        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_4564_group.json').import_business_data()
+        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_4564_reference.json').import_business_data()
 
     def setUp(self):
         # This runs every test
@@ -416,4 +429,32 @@ class JsonLDExportTests(ArchesTestCase):
         self.assertTrue(js[p1][1][p2][0]['@id'] in t2ids)
         self.assertTrue(js[p1][1][p2][1]['@id'] in t2ids)
 
+
+    def test_4564_export(self):
+
+        # test that the class of the referenced resource-instance is used, not the current model's class
+        # for the node.  This is the export side of #4564
+
+        # dc277c1a-fc32-11e9-9201-3af9d3b32b71 references cba81b1a-fc32-11e9-9201-3af9d3b32b71
+
+        url = reverse('resources', kwargs={"resourceid": 'dc277c1a-fc32-11e9-9201-3af9d3b32b71'})
+        response = self.client.get(url, secure=False)
+        self.assertTrue(response.status_code == 200)
+        js = response.json()
+        self.assertTrue('@id' in js)      
+        self.assertTrue(js['@id'] == "http://localhost:8000/resources/dc277c1a-fc32-11e9-9201-3af9d3b32b71")
+        prop = "http://www.cidoc-crm.org/cidoc-crm/P51_has_former_or_current_owner"
+        self.assertTrue(prop in js)
+        ref = js[prop]
+        self.assertTrue(js[prop]['@id'] == "http://localhost:8000/resources/cba81b1a-fc32-11e9-9201-3af9d3b32b71")
+
+        url = reverse('resources', kwargs={"resourceid": 'cba81b1a-fc32-11e9-9201-3af9d3b32b71'})
+        response = self.client.get(url, secure=False)
+        self.assertTrue(response.status_code == 200)
+        js2 = response.json()
+        self.assertTrue('@id' in js2)      
+        self.assertTrue(js2['@id'] == "http://localhost:8000/resources/cba81b1a-fc32-11e9-9201-3af9d3b32b71")
+
+        self.assertTrue(ref['@type'] == "http://www.cidoc-crm.org/cidoc-crm/E74_Group")
+        self.assertTrue(js2['@type'] == ref['@type'])
 
