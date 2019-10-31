@@ -58,6 +58,11 @@ class JsonLDExportTests(ArchesTestCase):
         ResourceGraphImporter(archesfile2['graph'])
         BusinessDataImporter('tests/fixtures/jsonld_base/data/test_3_instances.json').import_business_data()  
 
+        with open(os.path.join('tests/fixtures/jsonld_base/models/nesting_test.json'), 'rU') as f:
+            archesfile2 = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile2['graph'])
+        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_nest_instances.json').import_business_data()  
+
 
     def setUp(self):
         # This runs every test
@@ -220,3 +225,64 @@ class JsonLDExportTests(ArchesTestCase):
         meta = contained['http://www.cidoc-crm.org/cidoc-crm/P10i_contains']
         self.assertTrue('@id' in meta)
         self.assertTrue(meta['@id'] == "http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71")
+
+    def test_nesting_permutations(self):
+        # This tests nesting permutations of concept, concept-list, resource-instance and resource-instance-list
+
+        url = reverse('resources', kwargs={"resourceid": '6edd753e-fbf0-11e9-9ca4-3af9d3b32b71'})
+        response = self.client.get(url, secure=False)
+        self.assertTrue(response.status_code == 200)
+        js = response.json()
+        self.assertTrue('@id' in js)      
+        self.assertTrue(js['@id'] == "http://localhost:8000/resources/6edd753e-fbf0-11e9-9ca4-3af9d3b32b71")
+
+        # test c->c
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P2_has_type' in js)
+        typ = js['http://www.cidoc-crm.org/cidoc-crm/P2_has_type']
+        self.assertTrue(typ['@id'] == "http://localhost:8000/concepts/fb457e76-e018-41e7-9be3-0f986816450a")
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P127_has_broader_term' in typ)
+        self.assertTrue('http://www.w3.org/2000/01/rdf-schema#label' in typ)
+        self.assertTrue(typ['http://www.w3.org/2000/01/rdf-schema#label'] == "Test Type A")
+        brd = typ['http://www.cidoc-crm.org/cidoc-crm/P127_has_broader_term']
+        self.assertTrue(brd['@id'] == "http://localhost:8000/concepts/14c92c17-5e2f-413a-95c2-3c5e41ee87d2")
+        self.assertTrue('http://www.w3.org/2000/01/rdf-schema#label' in brd)
+        self.assertTrue(brd['http://www.w3.org/2000/01/rdf-schema#label'] == "Meta Type A")
+
+        # test cl -> c
+
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P45_consists_of' in js)
+        self.assertTrue(type(js['http://www.cidoc-crm.org/cidoc-crm/P45_consists_of']) == list)
+        mats = ["http://localhost:8000/concepts/9b61c995-71d8-4bce-987b-0ffa3da4c71c",
+            "http://localhost:8000/concepts/36c8d7a3-32e7-49e4-bd4c-2169a06b240a"]
+        mat1 = js['http://www.cidoc-crm.org/cidoc-crm/P45_consists_of'][0]
+        mat2 = js['http://www.cidoc-crm.org/cidoc-crm/P45_consists_of'][1]
+        self.assertTrue(mat1['@id'] in mats)
+        self.assertTrue(mat2['@id'] in mats and mat1['@id'] != mat2['@id'])
+        metatype = "http://localhost:8000/concepts/6bac5802-a6f8-427c-ba5f-d4b30d5b070e"
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P2_has_type' in mat1)        
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P2_has_type' in mat2)
+        self.assertTrue(mat1['http://www.cidoc-crm.org/cidoc-crm/P2_has_type']['@id'] == metatype) 
+        self.assertTrue(mat2['http://www.cidoc-crm.org/cidoc-crm/P2_has_type']['@id'] == metatype) 
+
+
+        # test cl -> cl
+
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P101_had_as_general_use' in js)
+        self.assertTrue(type(js['http://www.cidoc-crm.org/cidoc-crm/P101_had_as_general_use']) == list)
+        use1 = js['http://www.cidoc-crm.org/cidoc-crm/P101_had_as_general_use'][0]      
+        use2 = js['http://www.cidoc-crm.org/cidoc-crm/P101_had_as_general_use'][1]
+
+        useids = ["http://localhost:8000/concepts/1df7e2d6-08b2-4fc6-9152-30b72931ba0c",
+                "http://localhost:8000/concepts/be4ee3ba-37e4-4e37-b401-069d750734b7"]
+        metaids = ["http://localhost:8000/concepts/5f32de86-d6be-40ac-a7d3-6999471c4e6e",
+                "http://localhost:8000/concepts/babcafca-138f-43e6-b32e-22050d482304"]
+
+        self.assertTrue(use1['@id'] in useids)
+        self.assertTrue(use2['@id'] in useids and use1['@id'] != use2['@id'])
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P2_has_type' in use1)
+        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P2_has_type' in use2)
+        self.assertTrue(use1['http://www.cidoc-crm.org/cidoc-crm/P2_has_type'][0]['@id'] in metaids)
+        self.assertTrue(use1['http://www.cidoc-crm.org/cidoc-crm/P2_has_type'][1]['@id'] in metaids)
+        self.assertTrue(use2['http://www.cidoc-crm.org/cidoc-crm/P2_has_type'][0]['@id'] in metaids)
+        self.assertTrue(use2['http://www.cidoc-crm.org/cidoc-crm/P2_has_type'][1]['@id'] in metaids)
+
