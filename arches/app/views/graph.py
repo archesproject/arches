@@ -690,6 +690,7 @@ class IconDataView(View):
 
 class NodegroupView(View):
     action = 'exportable'
+    
     def get(self, request):
         nodegroupid = None
         try:
