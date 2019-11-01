@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import json
 import pyprind
+from pprint import pprint
 from copy import copy, deepcopy
 from django.db import transaction
 from arches.app.models import models
@@ -815,6 +816,8 @@ class Graph(models.GraphModel):
                 edge.rangenode = new_node
                 edge.ontologyproperty = node.get('parentproperty', None)
 
+        if node['fieldname'] is not None:
+            new_node.fieldname = node['fieldname']
         self.populate_null_nodegroups()
 
         # new_node will always have a nodegroup id even it if was set to None becuase populate_null_nodegroups

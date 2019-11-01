@@ -23,6 +23,7 @@ define([
          */
         initialize: function(options) {
             var self = this;
+            // console.log(options);
             self.graph = options.graph;
             self.datatypelookup = options.datatypelookup;
             self.layer = options.layer;
@@ -86,12 +87,12 @@ define([
             self.config = {};
             self.issearchable = ko.observable(true);
             self.isrequired = ko.observable(true);
-            self.exportable = ko.observable(false);
-            self.fieldname = ko.observable();
+            self.exportable = ko.observable();
+            self.getExportable(self, options.source.nodegroup_id)
+            self.fieldname = ko.observable('');
 
-            // what about save triggered by dirty state?
-            // self.exportable.subscribe(function(val) {
-            //     self.setExportable(self, val);
+            // self.fieldname.subscribe(function(val) {
+            //     // console.log("changed: "+val);
             // });
 
             self.parse(options.source);
@@ -163,6 +164,9 @@ define([
                         config[key] = self.config[key]();
                     });
                 }
+                // console.log("in self.json comp");
+                // console.log(self.fieldname());
+                // console.log(self.isrequired);
                 var jsObj = ko.toJS({
                     name: self.name,
                     datatype: self.datatype,
@@ -175,6 +179,7 @@ define([
                     exportable: self.exportable,
                     fieldname: self.fieldname
                 });
+                // console.log(jsObj.fieldname);
                 return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj));
             });
 
@@ -246,8 +251,9 @@ define([
             self.parentproperty(source.parentproperty);
             self.issearchable(source.issearchable);
             self.isrequired(source.isrequired);
-            self.exportable(source.exportable);
-            self.getExportable(self);
+            // self.exportable(source.exportable);
+            // self.getExportable(self, source.nodegroup_id);
+            // console.log("source, "+source.fieldname);
             self.fieldname(source.fieldname);
 
             if (source.config) {
@@ -261,15 +267,14 @@ define([
             self.set('graph_id', source.graph_id);
         },
 
-        getExportable: function(context) {
-            var nodegroupid = context.nodeGroupId();
+        getExportable: function(context, nodegroupid) {
             $.ajax({
                 type: "GET",
                 url: arches.urls.nodegroup,
                 data: { "nodegroupid": nodegroupid },
                 context: self,
                 success: function(responseText, status, response){
-                    console.log(response.responseJSON);
+                    // console.log(response.responseJSON);
                     var exportable = response.responseJSON[0]["exportable"];
                     context.exportable(exportable);
                 },
@@ -284,22 +289,13 @@ define([
         },
 
         setExportable: function(nodegroupid, exportable) {
-            console.log(exportable);
             $.ajax({
                 type: "POST",
                 url: arches.urls.nodegroup,
                 data: { "nodegroupid": nodegroupid, "exportable": exportable },
                 context: self,
-                success: function(responseText, status, response){
-                    console.log(response.responseJSON);
-                },
-                error: function(response, status, error) {
-                    // if(response.statusText !== 'abort'){
-                    //     // this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, response.responseText));
-                    //     console.log("failed");
-                    // }
-                    console.log("failed set");
-                }
+                success: function(responseText, status, response){ console.log(response.responseJSON); },
+                error: function(response, status, error) { console.log("failed set"); }
             });
         },
 
@@ -346,6 +342,10 @@ define([
                     this._node(this.json());
                 }
             };
+            // console.log("toJSON");
+            // console.log((this.toJSON()));
+            // console.log("json");
+            // console.log(this.json());
             this._doRequest({
                 type: method,
                 url: this._getURL(method),

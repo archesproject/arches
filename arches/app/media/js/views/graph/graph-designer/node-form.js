@@ -34,6 +34,7 @@ define([
             });
             this.restrictedNodegroups = options.restrictedNodegroups;
             this.appliedFunctions = options.appliedFunctions;
+            this.nodeFieldName = ko.observable(self.node().fieldname());
 
             this.isFuncNode = function() {
                 var node = self.node();
@@ -90,11 +91,38 @@ define([
             this.toggleExportable = function() {
                 var isImmutable = self.checkIfImmutable();
                 if (isImmutable === false) {
-                    // console.log("toggle exportable for nodegroup")
                     self.node().exportable(!self.node().exportable());
                     self.node().setExportable(self.node().nodeGroupId(), self.node().exportable());
                 }
             };
+
+            this.activated = ko.computed(function() {
+                if(self.node()) { return self.node().exportable() || self.checkIfImmutable(); }
+            });
+
+            this.nodeFieldName.subscribe(function(val) {
+                if(val !== self.node().fieldname()) {
+                    self.node().fieldname(val);
+                }
+            });
+
+            // this.nodeFieldName = ko.computed({
+            //     read: function() {
+            //         if(self.node()) {
+            //             console.log(self.node().fieldname())
+            //             return self.node().fieldname()
+            //         } else {
+            //             return "";
+            //         }
+            //     },
+            //     write: function(val) {
+            //         console.log("writing");
+            //         if(self.node()) {
+            //             self.node().fieldname(val);
+            //             console.log(self.node().fieldname());
+            //         }
+            //     }
+            // }, this);
 
             this.disableDatatype = ko.computed(function() {
                 var isImmutable = false;

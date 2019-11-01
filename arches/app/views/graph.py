@@ -288,13 +288,6 @@ class GraphDataView(View):
                            c for c in r['ontology_classes']]})
             return JSONResponse(res)
 
-        # elif self.action == 'get_nodegroup_exportable':
-        #     res = []
-        #     nodegroup = models.NodeGroup.objects.get(nodegroupid=nodegroupid)
-        #     exportable = False if nodegroup.exportable is None else nodegroup.exportable
-        #     res.append({'exportable': exportable})
-        #     return JSONResponse(res)
-
         else:
             graph = Graph.objects.get(graphid=graphid)
             if self.action == 'get_related_nodes':
@@ -331,6 +324,8 @@ class GraphDataView(View):
 
                 elif self.action == 'update_node':
                     updated_values = graph.update_node(data)
+                    # import ipdb 
+                    # ipdb.sset_trace()
                     graph.save()
                     ret = JSONSerializer().serializeToPython(graph)
                     ret['updated_values'] = updated_values
@@ -341,11 +336,6 @@ class GraphDataView(View):
                     node.config = data['config']
                     ret = graph
                     node.save()
-
-                # elif self.action == 'set_nodegroup_exportable':
-                #     nodegroup = models.NodeGroup.objects.get(nodegroupid=nodegroupid)
-                #     nodegroup['exportable'] = data['exportable']
-                #     nodegroup.save()
 
                 elif self.action == 'append_branch':
                     ret = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
