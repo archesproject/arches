@@ -690,7 +690,6 @@ class IconDataView(View):
 
 class NodegroupView(View):
     action = 'exportable'
-    
     def get(self, request):
         nodegroupid = None
         try:
@@ -707,7 +706,6 @@ class NodegroupView(View):
             else:
                 return HttpResponseNotFound()
 
-    
     def post(self, request):
         nodegroupid = None
         try:
@@ -724,6 +722,6 @@ class NodegroupView(View):
                     ng.exportable = exportable
                     ng.save()
 
-            return JSONResponse({'nodegroup':nodegroupid, 'status':'success' })
+            return JSONResponse({'nodegroup': nodegroupid, 'status': 'success'})
 
         return HttpResponseNotFound()

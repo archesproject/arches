@@ -1,10 +1,11 @@
 define([
+    'jquery',
     'underscore',
     'backbone',
     'knockout',
     'arches',
     'bindings/chosen'
-], function(_, Backbone, ko, arches) {
+], function($, _, Backbone, ko, arches) {
     var NodeFormView = Backbone.View.extend({
         /**
         * A backbone view representing a node form
@@ -188,7 +189,7 @@ define([
                     context.exportable(exportable);
                 },
                 error: function(response, status, error) {
-                    console.log(response.statusText);
+                    console.log(response.statusText, status, error);
                 }
             });
         },

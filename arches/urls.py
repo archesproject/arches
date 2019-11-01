@@ -22,7 +22,8 @@ from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from arches.app.views import concept, main, map, search, graph, api
 from arches.app.views.admin import ReIndexResources
-from arches.app.views.graph import GraphDesignerView, GraphSettingsView, GraphDataView, GraphManagerView, DatatypeTemplateView, CardView, FunctionManagerView, PermissionDataView, IconDataView, NodegroupView
+from arches.app.views.graph import GraphDesignerView, GraphSettingsView, GraphDataView, \
+    GraphManagerView, DatatypeTemplateView, CardView, FunctionManagerView, PermissionDataView, IconDataView, NodegroupView
 from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceCards, ResourceReportView, RelatedResourcesView, ResourceDescriptors, ResourceEditLogView, ResourceTiles
 from arches.app.views.resource import NewResourceEditorView, ResourceActivityStreamPageView, \
                                       ResourceActivityStreamCollectionView
