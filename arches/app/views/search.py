@@ -210,6 +210,7 @@ def search_results(request):
 
         ret['reviewer'] = request.user.groups.filter(name='Resource Reviewer').exists()
         ret['timestamp'] = datetime.now()
+        ret['total_results'] = dsl.count(index='resources')
 
         return JSONResponse(ret)
     else:
