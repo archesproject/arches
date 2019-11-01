@@ -59,10 +59,12 @@ class AuthTests(ArchesTestCase):
             VALUES (
                 44,'{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
                 '{oauth_client_secret}',
-                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000');
+                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000')
+            ON CONFLICT DO NOTHING;
             INSERT INTO public.oauth2_provider_accesstoken(
                 token, expires, scope, application_id, user_id, created, updated)
-                VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018');
+                VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018')
+                ON CONFLICT DO NOTHING;
         """
 
         self.token = 'abc'
