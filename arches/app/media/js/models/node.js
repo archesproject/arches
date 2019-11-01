@@ -86,6 +86,7 @@ define([
             self.config = {};
             self.issearchable = ko.observable(true);
             self.isrequired = ko.observable(true);
+            self.fieldname = ko.observable();
 
             self.parse(options.source);
 
@@ -164,7 +165,8 @@ define([
                     parentproperty: self.parentproperty,
                     config: config,
                     issearchable: self.issearchable,
-                    isrequired: self.isrequired
+                    isrequired: self.isrequired,
+                    fieldname: self.fieldname
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj));
             });
@@ -237,6 +239,7 @@ define([
             self.parentproperty(source.parentproperty);
             self.issearchable(source.issearchable);
             self.isrequired(source.isrequired);
+            self.fieldname(source.fieldname);
 
             if (source.config) {
                 self.setupConfig(source.config);

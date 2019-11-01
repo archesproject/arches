@@ -686,3 +686,43 @@ class IconDataView(View):
             'icons': JSONSerializer().serializeToPython(icons)
         }
         return JSONResponse(data)
+
+
+class NodegroupView(View):
+    action = 'exportable'
+    
+    def get(self, request):
+        nodegroupid = None
+        try:
+            nodegroupid = uuid.UUID(str(request.GET.get('nodegroupid')))
+        except Exception as e:
+            print(e)
+        if self.action == 'exportable':
+            res = []
+            if nodegroupid is not None:
+                nodegroup = models.NodeGroup.objects.get(nodegroupid=nodegroupid)
+                exportable = False if nodegroup.exportable is None else nodegroup.exportable
+                res.append({'exportable': exportable})
+                return JSONResponse(res)
+            else:
+                return HttpResponseNotFound()
+
+    def post(self, request):
+        nodegroupid = None
+        try:
+            nodegroupid = uuid.UUID(str(request.POST.get('nodegroupid')))
+        except Exception as e:
+            print(e)
+        if self.action == 'exportable' and nodegroupid is not None:
+            exportable = json.loads(request.POST.get('exportable'))
+
+            nodegroup = models.NodeGroup.objects.select_for_update().filter(nodegroupid=nodegroupid)
+            with transaction.atomic():
+                for ng in nodegroup:
+                    print("OK!")
+                    ng.exportable = exportable
+                    ng.save()
+
+            return JSONResponse({'nodegroup': nodegroupid, 'status': 'success'})
+
+        return HttpResponseNotFound()

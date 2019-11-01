@@ -815,6 +815,8 @@ class Graph(models.GraphModel):
                 edge.rangenode = new_node
                 edge.ontologyproperty = node.get('parentproperty', None)
 
+        if node['fieldname'] is not None:
+            new_node.fieldname = node['fieldname']
         self.populate_null_nodegroups()
 
         # new_node will always have a nodegroup id even it if was set to None becuase populate_null_nodegroups
