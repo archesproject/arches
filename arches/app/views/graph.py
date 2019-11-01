@@ -19,7 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import zipfile
 import json
 import uuid
-from pprint import pprint
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.db.models import Q
@@ -324,8 +323,6 @@ class GraphDataView(View):
 
                 elif self.action == 'update_node':
                     updated_values = graph.update_node(data)
-                    # import ipdb 
-                    # ipdb.sset_trace()
                     graph.save()
                     ret = JSONSerializer().serializeToPython(graph)
                     ret['updated_values'] = updated_values

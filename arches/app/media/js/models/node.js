@@ -23,7 +23,6 @@ define([
          */
         initialize: function(options) {
             var self = this;
-            // console.log(options);
             self.graph = options.graph;
             self.datatypelookup = options.datatypelookup;
             self.layer = options.layer;
@@ -89,11 +88,7 @@ define([
             self.isrequired = ko.observable(true);
             self.exportable = ko.observable();
             self.getExportable(self, options.source.nodegroup_id)
-            self.fieldname = ko.observable('');
-
-            // self.fieldname.subscribe(function(val) {
-            //     // console.log("changed: "+val);
-            // });
+            self.fieldname = ko.observable();
 
             self.parse(options.source);
 
@@ -164,9 +159,6 @@ define([
                         config[key] = self.config[key]();
                     });
                 }
-                // console.log("in self.json comp");
-                // console.log(self.fieldname());
-                // console.log(self.isrequired);
                 var jsObj = ko.toJS({
                     name: self.name,
                     datatype: self.datatype,
@@ -179,11 +171,14 @@ define([
                     exportable: self.exportable,
                     fieldname: self.fieldname
                 });
-                // console.log(jsObj.fieldname);
                 return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj));
             });
 
             self.dirty = ko.computed(function() {
+                if(self.json() !== self._node()) {
+                    // console.log(self.exportable());
+                    // console.log(JSON.parse(self.json()));
+                }
                 return self.json() !== self._node();
             }).extend({ rateLimit: 100 });
 
@@ -251,9 +246,6 @@ define([
             self.parentproperty(source.parentproperty);
             self.issearchable(source.issearchable);
             self.isrequired(source.isrequired);
-            // self.exportable(source.exportable);
-            // self.getExportable(self, source.nodegroup_id);
-            // console.log("source, "+source.fieldname);
             self.fieldname(source.fieldname);
 
             if (source.config) {
@@ -342,10 +334,6 @@ define([
                     this._node(this.json());
                 }
             };
-            // console.log("toJSON");
-            // console.log((this.toJSON()));
-            // console.log("json");
-            // console.log(this.json());
             this._doRequest({
                 type: method,
                 url: this._getURL(method),

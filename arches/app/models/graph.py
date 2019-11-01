@@ -19,7 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import json
 import pyprind
-from pprint import pprint
 from copy import copy, deepcopy
 from django.db import transaction
 from arches.app.models import models
