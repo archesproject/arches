@@ -86,8 +86,6 @@ define([
             self.config = {};
             self.issearchable = ko.observable(true);
             self.isrequired = ko.observable(true);
-            self.exportable = ko.observable();
-            self.getExportable(self, options.source.nodegroup_id)
             self.fieldname = ko.observable();
 
             self.parse(options.source);
@@ -168,17 +166,12 @@ define([
                     config: config,
                     issearchable: self.issearchable,
                     isrequired: self.isrequired,
-                    exportable: self.exportable,
                     fieldname: self.fieldname
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj));
             });
 
             self.dirty = ko.computed(function() {
-                if(self.json() !== self._node()) {
-                    // console.log(self.exportable());
-                    // console.log(JSON.parse(self.json()));
-                }
                 return self.json() !== self._node();
             }).extend({ rateLimit: 100 });
 
@@ -257,38 +250,6 @@ define([
 
             self.set('id', self.nodeid);
             self.set('graph_id', source.graph_id);
-        },
-
-        getExportable: function(context, nodegroupid) {
-            $.ajax({
-                type: "GET",
-                url: arches.urls.nodegroup,
-                data: { "nodegroupid": nodegroupid },
-                context: self,
-                success: function(responseText, status, response){
-                    // console.log(response.responseJSON);
-                    var exportable = response.responseJSON[0]["exportable"];
-                    context.exportable(exportable);
-                },
-                error: function(response, status, error) {
-                    // if(response.statusText !== 'abort'){
-                    //     // this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, response.responseText));
-                    //     console.log("failed");
-                    // }
-                    console.log("failed get");
-                }
-            });
-        },
-
-        setExportable: function(nodegroupid, exportable) {
-            $.ajax({
-                type: "POST",
-                url: arches.urls.nodegroup,
-                data: { "nodegroupid": nodegroupid, "exportable": exportable },
-                context: self,
-                success: function(responseText, status, response){ console.log(response.responseJSON); },
-                error: function(response, status, error) { console.log("failed set"); }
-            });
         },
 
         setupConfig: function(config) {
