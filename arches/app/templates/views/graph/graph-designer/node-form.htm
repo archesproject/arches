@@ -189,7 +189,7 @@
 
                                 </div>
                                 <div class="col-xs-12 pad-no crud-widget-container">
-                                    <input class="form-control input-md widget-input" placeholder="fieldname for this node" type="text" data-bind="textInput: node().fieldname, disable: !activated()"></input>
+                                    <input class="form-control input-md widget-input" placeholder="fieldname for this node" type="text" data-bind="textInput: node().fieldname, disable: !activated(), css: {'hidden': !exportable()}"></input>
                                 </div>
                             </div>
                         </div>
