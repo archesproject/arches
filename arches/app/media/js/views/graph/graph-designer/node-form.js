@@ -97,7 +97,7 @@ define([
             };
 
             this.activated = ko.computed(function() {
-                if(self.node()) { return self.node().exportable() && self.checkIfImmutable(); }
+                if(self.node()) { return self.node().exportable() && !self.checkIfImmutable(); }
             });
 
             this.disableDatatype = ko.computed(function() {
