@@ -134,7 +134,7 @@ define([
                     }, this);
                     this.viewModel.sharedStateObject.searchResults.timestamp(response.timestamp);
                     this.viewModel.sharedStateObject.userIsReviewer(response.reviewer);
-                    this.viewModel.total(response.results.hits.total.value);
+                    this.viewModel.total(response.total_results);
                     this.viewModel.alert(false);
                 },
                 error: function(response, status, error) {
