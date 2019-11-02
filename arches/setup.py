@@ -14,16 +14,17 @@ root_dir = os.path.dirname(here)
 
 
 def install():
-    install_dir = os.path.join(site_packages_dir(), 'arches', 'install')
-    django_install_location = os.path.join(site_packages_dir(), 'django')
+    if confirm_system_requirements():
+        install_dir = os.path.join(site_packages_dir(), 'arches', 'install')
+        django_install_location = os.path.join(site_packages_dir(), 'django')
 
-    # INSTALL DJANGO, RAWES, SPHINX AND OTHER DEPENDENCIES
-    tmpinstalldir = os.path.join(site_packages_dir(), 'arches', 'tmp')
-    os.system("pip install -b %s setuptools --upgrade" % (tmpinstalldir))
-    os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, 'requirements.txt')))
-    if settings.MODE == 'DEV':
-        os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, 'requirements_dev.txt')))
-    shutil.rmtree(tmpinstalldir, True)
+        # INSTALL DJANGO, RAWES, SPHINX AND OTHER DEPENDENCIES
+        tmpinstalldir = os.path.join(site_packages_dir(), 'arches', 'tmp')
+        os.system("pip install -b %s setuptools --upgrade" % (tmpinstalldir))
+        os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, 'requirements.txt')))
+        if settings.MODE == 'DEV':
+            os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, 'requirements_dev.txt')))
+        shutil.rmtree(tmpinstalldir, True)
 
 
 def site_packages_dir():
@@ -33,6 +34,15 @@ def site_packages_dir():
         py_version = 'python%s.%s' % (sys.version_info[0], sys.version_info[1])
         return os.path.join(sys.prefix, 'lib', py_version, 'site-packages')
 
+def confirm_system_requirements():  
+    # CHECK PYTHON VERSION 
+    if not sys.version_info >= (3, 7):   
+        print('ERROR: Arches requires at least Python 3.7')  
+        sys.exit(101) 
+    else: 
+        pass  
+
+    return True
 
 def activate_env(path_to_virtual_env):
     # ACIVATE THE VIRTUAL ENV
