@@ -719,7 +719,6 @@ class NodegroupView(View):
             nodegroup = models.NodeGroup.objects.select_for_update().filter(nodegroupid=nodegroupid)
             with transaction.atomic():
                 for ng in nodegroup:
-                    print("OK!")
                     ng.exportable = exportable
                     ng.save()
 
