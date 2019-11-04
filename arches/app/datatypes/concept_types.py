@@ -275,6 +275,9 @@ class ConceptListDataType(BaseConceptDataType):
 
     def get_rdf_uri(self, node, data, which="r"):
         c = ConceptDataType()
+        if not data:
+            print(f"concept-list got data without values: {node}, {data}")
+            return []
         return [c.get_rdf_uri(node, d, which) for d in data]
 
     def to_rdf(self, edge_info, edge):
