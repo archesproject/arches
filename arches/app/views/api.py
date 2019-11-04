@@ -123,7 +123,7 @@ class Sync(APIBase):
         if can_sync:
             try:
                 logger.info("Starting sync for user {0}".format(request.user.username))
-                management.call_command('mobile', operation='sync_survey', id=surveyid, user=request.user.id)
+                management.call_command('collector', operation='sync_survey', id=surveyid, user=request.user.id)
                 logger.info("Sync complete for user {0}".format(request.user.username))
             except Exception:
                 logger.exception(_('Sync Failed'))
@@ -196,7 +196,10 @@ class Surveys(APIBase):
                                 card['relative_position'] = ordered_project_cards.index(
                                     card['cardid']) if card['cardid'] in ordered_project_cards else None
                                 cards.append(card)
-                        graph['cards'] = sorted(cards, key=lambda x: x['relative_position'])
+                        unordered_cards = [card for card in cards if card['relative_position'] is None]
+                        ordered_cards = [card for card in cards if card['relative_position'] is not None]
+                        sorted_cards = sorted(ordered_cards, key=lambda x: x['relative_position'])
+                        graph['cards'] = unordered_cards + sorted_cards
                 response = JSONResponse(projects_for_couch, indent=4)
         except Exception:
             logger.exception(_('Unable to fetch collector projects'))
