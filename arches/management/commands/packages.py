@@ -9,7 +9,7 @@ import urllib.request, urllib.parse, urllib.error
 import os
 import logging
 from arches.app.search.mappings import prepare_terms_index, prepare_concepts_index, prepare_resource_relations_index
-from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
+from arches.setup import unzip_file
 from arches.management.commands import utils
 from arches.app.utils.skos import SKOSReader
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -71,8 +71,6 @@ class Command(BaseCommand):
                 'install',
                 'setup_db',
                 'setup_indexes',
-                'start_elasticsearch',
-                'setup_elasticsearch',
                 'build_permissions',
                 'load_concept_scheme',
                 'export_business_data',
@@ -92,11 +90,10 @@ class Command(BaseCommand):
                 'export_package_configs',
                 'import_node_value_data'],
             help='Operation Type; ' +
-            '\'setup\'=Sets up Elasticsearch and core database schema and code' +
+            '\'setup\'=Sets up the database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
             '\'setup_indexes\'=Creates the indexes in Elastic Search needed by the system' +
             '\'install\'=Runs the setup file defined in your package root' +
-            '\'start_elasticsearch\'=Runs the setup file defined in your package root' +
             '\'build_permissions\'=generates "add,update,read,delete" permissions for each entity mapping')
 
         parser.add_argument(
@@ -195,12 +192,6 @@ class Command(BaseCommand):
 
         if options['operation'] == 'delete_indexes':
             self.delete_indexes()
-
-        if options['operation'] == 'start_elasticsearch':
-            self.start_elasticsearch(package_name)
-
-        if options['operation'] == 'setup_elasticsearch':
-            self.setup_elasticsearch(install_location=options['dest_dir'])
 
         if options['operation'] == 'build_permissions':
             self.build_permissions()
@@ -772,12 +763,10 @@ class Command(BaseCommand):
 
     def setup(self, package_name, es_install_location=None):
         """
-        Installs Elasticsearch into the package directory and
-        installs the database into postgres as "arches_<package_name>"
+        Installs the database into postgres as "arches_<package_name>"
 
         """
-        self.setup_elasticsearch(install_location=es_install_location,
-                                 port=settings.ELASTICSEARCH_HTTP_PORT)
+
         self.setup_db(package_name)
 
     def install(self, package_name):
@@ -788,28 +777,6 @@ class Command(BaseCommand):
 
         install = import_string('%s.setup.install' % package_name)
         install()
-
-    def setup_elasticsearch(self, install_location=None, port=9200):
-        management.call_command('es', operation='install', dest_dir=install_location, port=port)
-
-    def start_elasticsearch(self, package_name):
-        """
-        Starts the Elasticsearch process (blocking)
-        WARNING: this will block all subsequent python calls
-
-        """
-
-        es_start = os.path.join(self.get_elasticsearch_install_location(package_name), 'bin')
-
-        # use this instead to start in a non-blocking way
-        if sys.platform == 'win32':
-            import time
-            p = subprocess.Popen(['service.bat', 'install'], cwd=es_start, shell=True)
-            time.sleep(10)
-            p = subprocess.Popen(['service.bat', 'start'], cwd=es_start, shell=True)
-        else:
-            p = subprocess.Popen(es_start + '/elasticsearch', cwd=es_start, shell=False)
-        return p
 
     def setup_db(self, package_name):
         """
@@ -833,18 +800,6 @@ class Command(BaseCommand):
 
     def delete_indexes(self):
         management.call_command('es', operation='delete_indexes')
-
-    def get_elasticsearch_install_location(self, package_name):
-        """
-        Get the path to the Elasticsearch install
-
-        """
-
-        url = get_elasticsearch_download_url(os.path.join(settings.ROOT_DIR, 'install'))
-        file_name = url.split('/')[-1]
-        file_name_wo_extention = file_name[:-4]
-        package_root = settings.PACKAGE_ROOT
-        return os.path.join(package_root, 'elasticsearch', file_name_wo_extention)
 
     def build_permissions(self):
         """

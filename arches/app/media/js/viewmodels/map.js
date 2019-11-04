@@ -127,15 +127,16 @@ define([
 
         this.additionalLayers = params.layers;
         this.layers = ko.pureComputed(function() {
-            var layers = self.activeBasemap().layer_definitions.slice(0);
+            var layers = [];
             self.overlays().forEach(function(layer) {
                 if (layer.onMap()) {
                     var opacity = layer.opacity();
-                    layer.layer_definitions.forEach(function(layer) {
-                        layers.push(updateOpacity(layer, opacity));
-                    });
+                    layers = layer.layer_definitions.map(function(layer) {
+                        return updateOpacity(layer, opacity);
+                    }).concat(layers);
                 }
             });
+            layers = self.activeBasemap().layer_definitions.slice(0).concat(layers);
             if (this.additionalLayers) {
                 layers = layers.concat(ko.unwrap(this.additionalLayers));
             }
