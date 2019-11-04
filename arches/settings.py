@@ -510,20 +510,6 @@ DATATYPE_LOCATIONS = ['arches.app.datatypes',]
 FUNCTION_LOCATIONS = ['arches.app.functions',]
 SEARCH_COMPONENT_LOCATIONS = ['arches.app.search.components',]
 
-# If you are manually managing your resource tile cache, you may want to "seed"
-# the cache (or prerender some tiles) for low zoom levels.  You can do this by
-# running:
-# python manage.py packages -o seed_resource_tile_cache
-#
-# The following settings control the extent and max zoom level to which tiles
-# will be seeded.  Be aware, seeding tiles at high zoom levels (more zoomed in)
-# will take a long time
-CACHE_SEED_BOUNDS = (
-    52.0, -122.0,
-    69.0,  128.0,
-)
-CACHE_SEED_MAX_ZOOM = 5
-
 MAPBOX_API_KEY = '' # Put your Mapbox key here!
 
 # links to sprites and glyphs for use on map

@@ -214,18 +214,22 @@ class GeoJSON(APIBase):
         resourceid = request.GET.get('resourceid', None)
         nodeid = request.GET.get('nodeid', None)
         tileid = request.GET.get('tileid', None)
+        nodegroups = request.GET.get('nodegroups', [])
+        if isinstance(nodegroups, str):
+            nodegroups = nodegroups.split(',')
         if hasattr(request.user, 'userprofile') is not True:
             models.UserProfile.objects.create(user=request.user)
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
+        nodegroups = [i for i in nodegroups if i in viewable_nodegroups]
         nodes = models.Node.objects.filter(datatype='geojson-feature-collection', nodegroup_id__in=viewable_nodegroups)
         if nodeid is not None:
             nodes = nodes.filter(nodeid=nodeid)
         features = []
         i = 1
+        property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups)
         for node in nodes:
             tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup)
             if resourceid is not None:
-                # resourceid = resourceid.split(',')
                 tiles = tiles.filter(resourceinstance_id__in=resourceid.split(','))
             if tileid is not None:
                 tiles = tiles.filter(tileid=tileid)
@@ -233,6 +237,20 @@ class GeoJSON(APIBase):
                 data = tile.data
                 try:
                     for feature_index, feature in enumerate(data[str(node.pk)]['features']):
+                        if len(nodegroups) > 0:
+                            for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id):
+                                for nodeid in pt.data:
+                                    try:
+                                        if type(feature['properties'][nodeid]) is list:
+                                            feature['properties'][nodeid].append(pt.data[nodeid])
+                                        else:
+                                            feature['properties'][nodeid] = [
+                                                feature['properties'][nodeid],
+                                                pt.data[nodeid]
+                                            ]
+                                    except KeyError:
+                                        feature['properties'][nodeid] = pt.data[nodeid]
+                                        pass
                         feature['properties']['index'] = feature_index
                         feature['properties']['resourceinstanceid'] = tile.resourceinstance_id
                         feature['properties']['tileid'] = tile.pk
