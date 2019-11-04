@@ -50,7 +50,7 @@
         "mathjs": "^3.11.4",
         "metismenu": "^2.7.2",
         "moment": ">=2.10.5",
-        "nouislider": "11.0.3",
+        "nouislider": "14.0.3",
         "numeral": "^2.0.6",
         "proj4": "^2.3.15",
         "requirejs": "~2.3.2",
