@@ -236,7 +236,7 @@ class GeoJSON(APIBase):
                     for feature_index, feature in enumerate(data[str(node.pk)]['features']):
                         if len(nodegroups) > 0:
                             for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id):
-                               for nodeid in pt.data:
+                                for nodeid in pt.data:
                                     try:
                                         if type(feature['properties'][nodeid]) is list:
                                             feature['properties'][nodeid].append(pt.data[nodeid])
