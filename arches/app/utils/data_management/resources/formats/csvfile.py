@@ -289,7 +289,8 @@ class TileCsvWriter(Writer):
 
 class CsvReader(Reader):
 
-    def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number, primaryDescriptorsFunctionConfig=None, graph_nodes=None):
+    def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model,
+        bulk, save_count, row_number, primaryDescriptorsFunctionConfig=None, graph_nodes=None):
         # create a resource instance only if there are populated_tiles
         errors = []
         if len(populated_tiles) > 0:
@@ -305,7 +306,10 @@ class CsvReader(Reader):
             if bulk:
                 resources.append(newresourceinstance)
                 if len(resources) >= settings.BULK_IMPORT_BATCH_SIZE:
-                    Resource.bulk_save(resources=resources, primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig, graph_nodes=graph_nodes)
+                    Resource.bulk_save(resources=resources, 
+                        primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig, 
+                        graph_nodes=graph_nodes
+                    )
                     del resources[:]  #clear out the array
             else:
                 try:
@@ -430,7 +434,9 @@ class CsvReader(Reader):
                 concepts_to_create = {}
                 new_concepts = {}
                 required_nodes = {}
-                for node in Node.objects.filter(~Q(datatype='semantic'), isrequired=True, graph_id=graphid).values_list('nodeid', 'name'):
+                for node in Node.objects.filter(~Q(datatype='semantic'),
+                                                isrequired=True,
+                                                graph_id=graphid).values_list('nodeid', 'name'):
                     required_nodes[str(node[0])] = node[1]
 
                 # This code can probably be moved into it's own module.
@@ -660,7 +666,13 @@ class CsvReader(Reader):
                                 if target_k in list(required_nodes.keys()) and target_v is None:
                                     if parent_tile in populated_tiles:
                                         populated_tiles.pop(populated_tiles.index(parent_tile))
-                                    errors.append({'type': 'WARNING', 'message': 'The {0} node is required and must be populated in order to populate the {1} nodes. This data was not imported.'.format(required_nodes[target_k],  ', '.join(all_nodes.filter(nodegroup_id=str(target_tile.nodegroup_id)).values_list('name', flat=True)))})
+                                    errors.append({'type': 'WARNING',
+                                        'message': 'The {0} node is required and must be populated in \
+                                         order to populate the {1} nodes. \
+                                        This data was not imported.'.format(required_nodes[target_k],
+                                            ', '.join(all_nodes.filter(
+                                                    nodegroup_id=str(target_tile.nodegroup_id)
+                                                    ).values_list('name', flat=True)))})
                         elif bool(tile.tiles):
                             for tile in tile.tiles:
                                 check_required_nodes(tile, parent_tile, required_nodes, all_nodes)
@@ -675,7 +687,10 @@ class CsvReader(Reader):
                     if row['ResourceID'] != previous_row_resourceid and previous_row_resourceid is not None:
 
                         save_count = save_count + 1
-                        self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number, primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig, graph_nodes=node_list)
+                        self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources,
+                            target_resource_model, bulk, save_count, row_number,
+                            primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig, graph_nodes=node_list
+                        )
 
                         # reset values for next resource instance
                         populated_tiles = []
@@ -702,7 +717,8 @@ class CsvReader(Reader):
                                 target_resource_model = all_nodes.get(nodeid=list(source_data[0].keys())[0]).graph_id
                             except Exception as e:
                                 print('*'*80)
-                                print('ERROR: No resource model found. Please make sure the resource model this business data is mapped to has been imported into Arches.')
+                                print('ERROR: No resource model found. Please make sure the resource model \
+                                    this business data is mapped to has been imported into Arches.')
                                 print(e)
                                 print('*'*80)
                                 sys.exit()
@@ -833,16 +849,26 @@ class CsvReader(Reader):
                 errors = []
                 for k,v in missing_display_values.items():
                     if len(v) > 0:
-                        errors.append({'type': 'WARNING', 'message': '{0} is null or not mapped on rows {1} and participates in a display value function.'.format(k, ','.join(v))})
+                        errors.append({'type': 'WARNING',
+                            'message': '{0} is null or not mapped on rows {1} and \
+                                participates in a display value function.'.format(
+                                    k, ','.join(v)
+                                )
+                            })
                 if len(errors) > 0:
                     self.errors += errors
 
                 if 'legacyid' in locals():
-                    self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number, primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig, graph_nodes=node_list)
+                    self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources,
+                        target_resource_model, bulk, save_count, row_number,
+                        primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig, graph_nodes=node_list
+                    )
 
                 if bulk:
                     print("Time to create resource and tile objects: %s" % datetime.timedelta(seconds=time()-self.start))
-                    Resource.bulk_save(resources=resources, primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig, graph_nodes=node_list)
+                    Resource.bulk_save(resources=resources, 
+                        primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig, graph_nodes=node_list
+                    )
 
                 print(_('%s total resource saved' % (save_count + 1)))
 
@@ -865,6 +891,8 @@ class TileCsvReader(Reader):
 
     def import_business_data(self, overwrite=None):
         resource_model_id = str(self.business_data[0]['ResourceModelID'])
-        mapping = json.loads(GraphExporter.create_mapping_configuration_file(resource_model_id, include_concepts=False)[0]['outputfile'].getvalue())
+        mapping = json.loads(GraphExporter.create_mapping_configuration_file(
+            resource_model_id, include_concepts=False)[0]['outputfile'].getvalue()
+        )
 
         self.csv_reader.import_business_data(self.business_data, mapping, overwrite=overwrite)

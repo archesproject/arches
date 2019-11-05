@@ -57,7 +57,7 @@ class SKOSReader(object):
         # start = time()
         try:
             rdf = rdf_graph.parse(source=path_to_file, format=format)
-            #print('time elapsed to parse rdf graph %s s' % (time() - start)
+            # print('time elapsed to parse rdf graph %s s' % (time() - start)
         except:
             raise Exception('Error occurred while parsing the file %s' % path_to_file)
         return rdf
@@ -110,7 +110,7 @@ class SKOSReader(object):
                             val = self.unwrapJsonLiteral(object)
                             if predicate == DCTERMS.title:
                                 values.append(models.Value(
-                                    pk=val['value_id'] if (val['value_id'] != '' and val['value_id'] != None) else str(uuid.uuid4()),
+                                    pk=val['value_id'] if (val['value_id'] != '' and val['value_id'] is not None) else str(uuid.uuid4()),
                                     concept_id=concept_scheme.pk,
                                     value=val['value'],
                                     language_id=object.language or default_lang,
@@ -119,7 +119,7 @@ class SKOSReader(object):
                                 # print('Casting dcterms:title to skos:prefLabel')
                             elif predicate == DCTERMS.description:
                                 values.append(models.Value(
-                                    pk=val['value_id'] if (val['value_id'] != '' and val['value_id'] != None) else str(uuid.uuid4()),
+                                    pk=val['value_id'] if (val['value_id'] != '' and val['value_id'] is not None) else str(uuid.uuid4()),
                                     concept_id=concept_scheme.pk,
                                     value=val['value'],
                                     language_id=object.language or default_lang,
@@ -139,7 +139,7 @@ class SKOSReader(object):
                                 {'source': scheme_id, 'type': 'hasTopConcept', 'target': top_concept_id})
 
                 values.append(models.Value(
-                    pk=identifier['value_id'] if (identifier['value_id'] != '' and identifier['value_id'] != None) else str(uuid.uuid4()),
+                    pk=identifier['value_id'] if (identifier['value_id'] != '' and identifier['value_id'] is not None) else str(uuid.uuid4()),
                     concept_id=concept_scheme.pk,
                     value=identifier['value'],
                     language_id=default_lang,
@@ -170,7 +170,7 @@ class SKOSReader(object):
                                 value_type = skos_value_types[relation_or_value_type]
                                 val = self.unwrapJsonLiteral(object)
                                 values.append(models.Value(
-                                    pk=val['value_id'] if (val['value_id'] != '' and val['value_id'] != None) else str(uuid.uuid4()),
+                                    pk=val['value_id'] if (val['value_id'] != '' and val['value_id'] is not None) else str(uuid.uuid4()),
                                     concept_id=concept.pk,
                                     value=val['value'],
                                     language_id=object.language or default_lang,
@@ -190,7 +190,7 @@ class SKOSReader(object):
                             identifier = self.unwrapJsonLiteral(str(object))
 
                     values.append(models.Value(
-                        pk=identifier['value_id'] if (identifier['value_id'] != '' and identifier['value_id'] != None) else str(uuid.uuid4()),
+                        pk=identifier['value_id'] if (identifier['value_id'] != '' and identifier['value_id'] is not None) else str(uuid.uuid4()),
                         concept_id=concept.pk,
                         value=identifier['value'],
                         language_id=default_lang,
@@ -250,7 +250,6 @@ class SKOSReader(object):
                             'legacyoid': str(scheme),
                             'nodetype': 'ConceptScheme'
                         })
-                        
                     elif node.nodetype.nodetype == 'Concept':
                         orphaned_concepts[str(node.conceptid)] = node
                     if staging_options == 'stage':
@@ -260,11 +259,14 @@ class SKOSReader(object):
                             # this is a new concept, so add a reference to it in the Candiates schema
                             if node.nodetype.nodetype != 'ConceptScheme':
                                 self.relations.append(
-                                    {'source': '00000000-0000-0000-0000-000000000006', 'type': 'narrower', 'target': node.conceptid})
+                                    {'source': '00000000-0000-0000-0000-000000000006',
+                                        'type': 'narrower', 'target': node.conceptid
+                                    }
+                                )
 
                     if overwrite_options == 'overwrite':
                         node.save()
-                        #concepts.append(node)
+                        # concepts.append(node)
                     elif overwrite_options == 'ignore':
                         try:
                             # don't do anything if the concept already exists
@@ -272,7 +274,7 @@ class SKOSReader(object):
                         except:
                             # else save it
                             node.save()
-                            #concepts.append(node)
+                            # concepts.append(node)
 
                 # Concept().bulk_save(concepts, None)
 
