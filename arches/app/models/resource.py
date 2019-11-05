@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import importlib
 import datetime
+from pprint import pprint
 from time import time
 from uuid import UUID
 from django.db import transaction
@@ -329,7 +330,7 @@ class Resource(models.ResourceInstance):
         document["points"] = []
         document["numbers"] = []
         document["date_ranges"] = []
-        # document['ids'] = []
+        document["ids"] = []
         document["provisional_resource"] = (
             "true" if sum([len(t.data) for t in tiles]) == 0 else "false"
         )
@@ -349,7 +350,7 @@ class Resource(models.ResourceInstance):
                     datatype_instance = datatype_factory.get_instance(datatype)
                     # timers['timer'] = timers['timer'] + (time()-s)
 
-                    if str(tile.nodegroup_id) in config:
+                    if config is not None and str(tile.nodegroup_id) in config:
                         if "name" in config[tile.nodegroup_id]:
                             node = graph_nodes[nodeid]
                             value = datatype_instance.get_display_value(tile, node)
