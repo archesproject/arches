@@ -295,7 +295,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
-    'django_celery_results',
     'arches',
     'arches.app.models',
     'arches.management',
@@ -304,6 +303,7 @@ INSTALLED_APPS = (
     'revproxy',
     'corsheaders',
     'oauth2_provider',
+    'django_celery_results'
     #'debug_toolbar'
 )
 
@@ -575,6 +575,11 @@ HEX_BIN_PRECISION = 4
 ALLOWED_POPUP_HOSTS = []
 
 TILESERVER_URL = None
+
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_TASK_SERIALIZER = 'json'
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################
