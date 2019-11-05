@@ -266,7 +266,8 @@ class GeoJSON(APIBase):
                         feature['properties']['nodeid'] = node.pk
                         feature['properties']['geojson'] = '%s?tileid=%s&nodeid=%s' % (reverse('geojson'), tile.pk, node.pk)
                         feature['id'] = i
-                        feature['geometry']['coordinates'] = self.set_precision(feature['geometry']['coordinates'], precision)
+                        coordinates = self.set_precision(feature['geometry']['coordinates'], precision)
+                        feature['geometry']['coordinates'] = coordinates
                         i += 1
                         features.append(feature)
                 except KeyError:
