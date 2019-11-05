@@ -296,7 +296,9 @@ class Concept(object):
         return self
 
     def save(self):
-        self.id = self.id if (self.id != "" and self.id is not None) else str(uuid.uuid4())
+        self.id = (
+            self.id if (self.id != "" and self.id is not None) else str(uuid.uuid4())
+        )
         concept, created = models.Concept.objects.get_or_create(
             pk=self.id,
             defaults={
@@ -1561,7 +1563,9 @@ class ConceptValue(object):
     def save(self):
         if self.value.strip() != "":
             self.id = (
-                self.id if (self.id != "" and self.id is not None) else str(uuid.uuid4())
+                self.id
+                if (self.id != "" and self.id is not None)
+                else str(uuid.uuid4())
             )
             value = models.Value()
             value.pk = self.id
