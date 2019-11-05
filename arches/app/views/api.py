@@ -39,6 +39,9 @@ from arches.app.search.components.base import SearchFilterFactory
 from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
+import arches.app.tasks as tasks
+from arches.celery import app
+
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +126,12 @@ class Sync(APIBase):
         if can_sync:
             try:
                 logger.info("Starting sync for user {0}".format(request.user.username))
-                management.call_command('mobile', operation='sync_survey', id=surveyid, user=request.user.id)
+                i = app.control.inspect()
+                celery_worker_running = i.ping()
+                if celery_worker_running is not None:
+                    tasks.sync.delay(surveyid=surveyid, userid=request.user.id)
+                else:
+                    management.call_command('mobile', operation='sync_survey', id=surveyid, user=request.user.id)
                 logger.info("Sync complete for user {0}".format(request.user.username))
             except Exception:
                 logger.exception(_('Sync Failed'))
