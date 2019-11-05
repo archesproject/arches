@@ -205,7 +205,7 @@ class CsvWriter(Writer):
 
         csv_name = os.path.join("{0}.{1}".format(self.file_name, "csv"))
 
-        if self.single_file != True:
+        if self.single_file is not True:
             dest = StringIO()
             csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=csv_header)
             csvwriter.writeheader()

@@ -284,7 +284,7 @@ class Writer(object):
                 alternates = True
                 alternate_entitytypeid = mapping['alternate_entitytypeid']
                 alternate_values = []
-            if entitytypeid.endswith('E55') != True:
+            if entitytypeid.endswith('E55') is not True:
                 for entity in child_entities:
                     if alternate_entitytypeid == entity['entitytypeid']:
                         alternate_values.append(entity['value'])
