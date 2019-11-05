@@ -461,7 +461,7 @@ class Node(models.Model):
     issearchable = models.BooleanField(default=True)
     isrequired = models.BooleanField(default=False)
     sortorder = models.IntegerField(blank=True, null=True, default=0)
-    fieldname = models.TextField()
+    fieldname = models.TextField(blank=True, null=True)
 
     def get_child_nodes_and_edges(self):
         """
