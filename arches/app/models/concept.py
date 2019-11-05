@@ -155,12 +155,12 @@ class Concept(object):
             nodetype = kwargs.pop("nodetype", self.nodetype)
             uplevel = kwargs.pop("uplevel", 0)
             downlevel = kwargs.pop("downlevel", 0)
-            depth_limit = depth_limit if depth_limit == None else int(depth_limit)
+            depth_limit = depth_limit if depth_limit is None else int(depth_limit)
             up_depth_limit = (
-                up_depth_limit if up_depth_limit == None else int(up_depth_limit)
+                up_depth_limit if up_depth_limit is None else int(up_depth_limit)
             )
 
-            if include != None:
+            if include is not None:
                 if len(include) > 0 and len(exclude) > 0:
                     raise Exception(
                         "Only include values for include or exclude, but not both"
@@ -191,8 +191,8 @@ class Concept(object):
                 conceptrealations = models.Relation.objects.filter(
                     Q(conceptfrom=self.id), pathway_filter, ~Q(relationtype="related")
                 )
-                if depth_limit == None or downlevel < depth_limit:
-                    if depth_limit != None:
+                if depth_limit is None or downlevel < depth_limit:
+                    if depth_limit is not None:
                         downlevel = downlevel + 1
                     for relation in conceptrealations:
                         subconcept = (
@@ -233,8 +233,8 @@ class Concept(object):
                 conceptrealations = models.Relation.objects.filter(
                     Q(conceptto=self.id), pathway_filter, ~Q(relationtype="related")
                 )
-                if up_depth_limit == None or uplevel < up_depth_limit:
-                    if up_depth_limit != None:
+                if up_depth_limit is None or uplevel < up_depth_limit:
+                    if up_depth_limit is not None:
                         uplevel = uplevel + 1
                     for relation in conceptrealations:
                         parentconcept = (
@@ -296,7 +296,7 @@ class Concept(object):
         return self
 
     def save(self):
-        self.id = self.id if (self.id != "" and self.id != None) else str(uuid.uuid4())
+        self.id = self.id if (self.id != "" and self.id is not None) else str(uuid.uuid4())
         concept, created = models.Concept.objects.get_or_create(
             pk=self.id,
             defaults={
@@ -881,13 +881,13 @@ class Concept(object):
         if self.id not in _cache:
             _cache.append(self.id)
 
-            if scope == None:
+            if scope is None:
                 ret = func(self, **kwargs)
             else:
                 ret = func(self, scope, **kwargs)
 
             # break out of the traversal if the function returns a value
-            if ret != None:
+            if ret is not None:
                 return ret
 
             if direction == "down":
@@ -895,14 +895,14 @@ class Concept(object):
                     ret = subconcept.traverse(
                         func, direction, scope, _cache=_cache, **kwargs
                     )
-                    if ret != None:
+                    if ret is not None:
                         return ret
             else:
                 for parentconcept in self.parentconcepts:
                     ret = parentconcept.traverse(
                         func, direction, scope, _cache=_cache, **kwargs
                     )
-                    if ret != None:
+                    if ret is not None:
                         return ret
 
     def get_sortkey(self, lang=settings.LANGUAGE_CODE):
@@ -976,7 +976,7 @@ class Concept(object):
 
         """
 
-        if ret == None:
+        if ret is None:
             ret = []
 
         ret.append(self)
@@ -1021,7 +1021,7 @@ class Concept(object):
             raise Exception("Invalid value definition: %s" % (value))
 
     def index(self, scheme=None):
-        if scheme == None:
+        if scheme is None:
             scheme = self.get_context()
         for value in self.values:
             value.index(scheme=scheme)
@@ -1135,13 +1135,13 @@ class Concept(object):
                     Q(relationtype="member") | Q(relationtype="hasCollection"),
                 )
             if (
-                depth_limit != None
+                depth_limit is not None
                 and len(conceptrealations) > 0
                 and level >= depth_limit
             ):
                 ret.load_on_demand = True
             else:
-                if depth_limit != None:
+                if depth_limit is not None:
                     level = level + 1
                 for relation in conceptrealations:
                     ret.children.append(
@@ -1190,7 +1190,7 @@ class Concept(object):
 
         graph = []
         if (
-            self.id == None
+            self.id is None
             or self.id == ""
             or self.id == "None"
             or self.id == top_concept
@@ -1561,7 +1561,7 @@ class ConceptValue(object):
     def save(self):
         if self.value.strip() != "":
             self.id = (
-                self.id if (self.id != "" and self.id != None) else str(uuid.uuid4())
+                self.id if (self.id != "" and self.id is not None) else str(uuid.uuid4())
             )
             value = models.Value()
             value.pk = self.id
@@ -1647,9 +1647,9 @@ class ConceptValue(object):
         if self.category == "label":
             se = SearchEngineFactory().create()
             data = JSONSerializer().serializeToPython(self)
-            if scheme == None:
+            if scheme is None:
                 scheme = self.get_scheme_id()
-            if scheme == None:
+            if scheme is None:
                 raise Exception(
                     "Index of label failed.  Index type (scheme id) could not be derived from the label."
                 )
@@ -1700,10 +1700,10 @@ def get_preflabel_from_conceptid(conceptid, lang):
                 ret = preflabel["_source"]
             if (
                 preflabel["_source"]["language"] == settings.LANGUAGE_CODE
-                and ret == None
+                and ret is None
             ):
                 ret = preflabel["_source"]
-    return default if ret == None else ret
+    return default if ret is None else ret
 
 
 def get_valueids_from_concept_label(label, conceptid=None, lang=None):
