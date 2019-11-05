@@ -40,6 +40,7 @@ from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -207,11 +208,21 @@ class Surveys(APIBase):
 
 
 class GeoJSON(APIBase):
+    def set_precision(self, coordinates, precision):
+        result = []
+        try:
+            return round(coordinates, int(precision))
+        except TypeError:
+            for coordinate in coordinates:
+                result.append(self.set_precision(coordinate, precision))
+        return result
+
     def get(self, request):
         resourceid = request.GET.get('resourceid', None)
         nodeid = request.GET.get('nodeid', None)
         tileid = request.GET.get('tileid', None)
         nodegroups = request.GET.get('nodegroups', [])
+        precision = request.GET.get('precision', 9)
         if isinstance(nodegroups, str):
             nodegroups = nodegroups.split(',')
         if hasattr(request.user, 'userprofile') is not True:
@@ -236,27 +247,23 @@ class GeoJSON(APIBase):
                     for feature_index, feature in enumerate(data[str(node.pk)]['features']):
                         if len(nodegroups) > 0:
                             for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id):
-                                for nodeid in pt.data:
-                                    try:
-                                        if type(feature['properties'][nodeid]) is list:
-                                            feature['properties'][nodeid].append(pt.data[nodeid])
-                                        else:
-                                            feature['properties'][nodeid] = [
-                                                feature['properties'][nodeid],
-                                                pt.data[nodeid]
+                                for key in pt.data:
+                                    if pt.data[key] is not None:
+                                        try:
+                                            feature['properties'][key].append(pt.data[key])
+                                        except KeyError:
+                                            feature['properties'][key] = pt.data[key]
+                                        except TypeError:
+                                            feature['properties'][key] = [
+                                                feature['properties'][key],
+                                                pt.data[key]
                                             ]
-                                    except KeyError:
-                                        feature['properties'][nodeid] = pt.data[nodeid]
-                                        pass
-                        feature['properties']['index'] = feature_index
                         feature['properties']['resourceinstanceid'] = tile.resourceinstance_id
                         feature['properties']['tileid'] = tile.pk
                         feature['properties']['nodeid'] = node.pk
-                        feature['properties']['node'] = node.name
-                        feature['properties']['model'] = node.graph.name
                         feature['properties']['geojson'] = '%s?tileid=%s&nodeid=%s' % (reverse('geojson'), tile.pk, node.pk)
-                        feature['properties']['featureid'] = feature['id']
                         feature['id'] = i
+                        feature['geometry']['coordinates'] = self.set_precision(feature['geometry']['coordinates'], precision)
                         i += 1
                         features.append(feature)
                 except KeyError:
