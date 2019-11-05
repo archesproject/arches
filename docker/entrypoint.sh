@@ -18,10 +18,12 @@ display_help() {
 CUSTOM_SCRIPT_FOLDER=${CUSTOM_SCRIPT_FOLDER:-/docker/entrypoint}
 if [[ -z ${ARCHES_PROJECT} ]]; then
 	APP_FOLDER=${ARCHES_ROOT}
-	PACKAGE_JSON_FOLDER=${ARCHES_ROOT}
+	PACKAGE_JSON_FOLDER=${ARCHES_ROOT}/arches/install
 else
 	APP_FOLDER=${WEB_ROOT}/${ARCHES_PROJECT}
-	PACKAGE_JSON_FOLDER=${APP_FOLDER}/${ARCHES_PROJECT}
+	# due to https://github.com/archesproject/arches/issues/4841, changes were made to yarn install
+	# and module deployment. Using the arches install directory for yarn.
+	PACKAGE_JSON_FOLDER=${ARCHES_ROOT}/arches/install
 fi
 
 # Read modules folder from yarn config file
@@ -93,13 +95,22 @@ setup_arches() {
 
 	echo "5" && sleep 1 && echo "4" && sleep 1 && echo "3" && sleep 1 && echo "2" && sleep 1 &&	echo "1" &&	sleep 1 && echo "0" && echo ""
 
-	echo "Running: python manage.py packages -o setup_db"
-	python manage.py packages -o setup_db
+	echo "Running: python manage.py setup_db --force"
+	python manage.py setup_db --force
+	if [[ $? -ne 0 ]]; then
+		echo "Error during setup - could be connection issue. Waiting 5 seconds and reattempting"
+		sleep 5
+		python manage.py setup_db --force
+		if [[ $? -ne 0 ]]; then
+			echo "Failed to run the setup routine succesfully. Quitting."
+			exit
+		fi
+	fi
 
-    echo "Running: Creating couchdb system databaess"
-    curl -X PUT ${COUCHDB_URL}/_users
-    curl -X PUT ${COUCHDB_URL}/_global_changes
-    curl -X PUT ${COUCHDB_URL}/_replicator
+	echo "Running: Creating couchdb system databases"
+	curl -X PUT ${COUCHDB_URL}/_users
+	curl -X PUT ${COUCHDB_URL}/_global_changes
+	curl -X PUT ${COUCHDB_URL}/_replicator
 
 	if [[ "${INSTALL_DEFAULT_GRAPHS}" == "True" ]]; then
 		# Import graphs
