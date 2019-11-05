@@ -1,6 +1,6 @@
 linters:
-  pep8:
-    python: 2
+  black:
+    python: 3
     max-line-length: 119
     fixer: false
   eslint:
