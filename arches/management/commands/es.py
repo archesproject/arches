@@ -18,12 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains commands for building Arches."""
 
-import os
-import platform
-from django.core.management.base import BaseCommand, CommandError
-from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
-from arches.management.commands import utils
-from arches.app.models import models
+from django.core.management.base import BaseCommand
 from arches.app.models.system_settings import settings
 from arches.app.search.mappings import prepare_terms_index, prepare_concepts_index, delete_terms_index, delete_concepts_index, prepare_search_index, delete_search_index, prepare_resource_relations_index, delete_resource_relations_index
 import arches.app.utils.index_database as index_database
@@ -39,7 +34,6 @@ class Command(BaseCommand):
         parser.add_argument('operation', nargs='?',
             choices=['install', 'setup_indexes', 'delete_indexes', 'index_database', 'index_concepts', 'index_resources', 'index_resource_relations',],
             help='Operation Type; ' +
-            '\'install\'=Install\'s Elasticsearch in the provided location with the provided port' +
             '\'setup_indexes\'=Creates the indexes in Elastic Search needed by the system' +
             '\'delete_indexes\'=Deletes all indexs in Elasticsearch required by the system' +
             '\'index_database\'=Indexes all the data (resources, concepts, and resource relations) found in the database' +
@@ -61,12 +55,6 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
-        if options['operation'] == 'install':
-            self.install(install_location=options['dest_dir'], port=options['port'])
-
-        # if options['operation'] == 'start':
-        #     self.start(install_location=options['dest_dir'])
-
         if options['operation'] == 'setup_indexes':
             self.setup_indexes()
 
@@ -84,76 +72,6 @@ class Command(BaseCommand):
 
         if options['operation'] == 'index_resource_relations':
             index_database.index_resource_relations(clear_index=options['clear_index'], batch_size=options['batch_size'])
-
-    def install(self, install_location=None, port=None):
-        """
-        Installs Elasticsearch into the package directory and
-        adds default settings for running in a test environment
-
-        Change these settings in production
-
-        """
-
-        install_location = os.path.abspath(install_location)
-        utils.ensure_dir(install_location)
-
-        url = get_elasticsearch_download_url(os.path.join(settings.ROOT_DIR, 'install'))
-        file_name = url.split('/')[-1]
-        os_name = platform.system().lower()
-        file_name_wo_extention = file_name.split('-%s' % os_name)[0]
-
-        download_elasticsearch(os.path.join(settings.ROOT_DIR, 'install'))
-        unzip_file(os.path.join(settings.ROOT_DIR, 'install', file_name), install_location)
-
-        es_config_directory = os.path.join(install_location, file_name_wo_extention, 'config')
-        try:
-            os.rename(os.path.join(es_config_directory, 'elasticsearch.yml'), os.path.join(es_config_directory, 'elasticsearch.yml.orig'))
-        except:
-            pass
-
-        os.chmod(os.path.join(install_location, file_name_wo_extention, 'bin', 'elasticsearch'), 0o755)
-
-        def change_permissions_recursive(path, mode):
-            for root, dirs, files in os.walk(path, topdown=True):
-                for dir in [os.path.join(root,d) for d in dirs]:
-                    os.chmod(dir, mode)
-                for file in [os.path.join(root, f) for f in files]:
-                    if '/bin/' in file:
-                        os.chmod(file, mode)
-
-        change_permissions_recursive(os.path.join(install_location, file_name_wo_extention, 'modules', 'x-pack-ml', 'platform'), 0o755)
-
-        with open(os.path.join(es_config_directory, 'elasticsearch.yml'), 'w') as f:
-            f.write('# ----------------- FOR TESTING ONLY -----------------')
-            f.write('\n# - THESE SETTINGS SHOULD BE REVIEWED FOR PRODUCTION -')
-            f.write('\n# -https://www.elastic.co/guide/en/elasticsearch/reference/6.7/important-settings.html - ')
-            f.write('\nhttp.port: %s' % port)
-            f.write('\n\n# for the elasticsearch-head plugin')
-            f.write('\nhttp.cors.enabled: true')
-            f.write('\nhttp.cors.allow-origin: "*"')
-            f.write('\n')
-
-        print('Elasticsearch installed at %s' % os.path.join(install_location, file_name_wo_extention))
-
-    # def start(self, install_location=None):
-    #     """
-    #     Starts the Elasticsearch process (blocking)
-    #     WARNING: this will block all subsequent python calls
-
-    #     """
-
-    #     es_start = os.path.join(install_location, 'bin')
-    #     print es_start
-
-    #     # use this instead to start in a non-blocking way
-    #     if sys.platform == 'win32':
-    #         import time
-    #         p = subprocess.Popen(['service.bat', 'install'], cwd=es_start, shell=True)
-    #         time.sleep(10)
-    #         p = subprocess.Popen(['service.bat', 'start'], cwd=es_start, shell=True)
-    #     else:
-    #         p = subprocess.Popen(es_start + '/elasticsearch', cwd=es_start, shell=False)
-    #     return p
 
     def setup_indexes(self):
         prepare_terms_index(create=True)

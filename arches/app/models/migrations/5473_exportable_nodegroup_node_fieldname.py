@@ -8,20 +8,14 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(
-            sql="""
-            ALTER TABLE nodes
-            ADD fieldname TEXT;
-
-            ALTER TABLE node_groups
-            ADD exportable BOOLEAN;
-            """,
-            reverse_sql="""
-            ALTER TABLE nodes
-            DROP COLUMN fieldname;
-
-            ALTER TABLE node_groups
-            DROP COLUMN exportable;
-            """,
+        migrations.AddField(
+            model_name='node',
+            name='fieldname',
+            field=models.TextField(blank=True, null=True),
+        ),
+        migrations.AddField(
+            model_name='nodegroup',
+            name='exportable',
+            field=models.BooleanField(default=False),
         ),
     ]

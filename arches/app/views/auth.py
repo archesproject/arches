@@ -40,6 +40,9 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.arches_crypto import AESCipher
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class LoginView(View):
@@ -244,7 +247,9 @@ class GetClientIdView(View):
         password = request.POST.get('password', None)
         user = authenticate(username=username, password=password)
         if settings.MOBILE_OAUTH_CLIENT_ID == '':
-            response = HttpResponse('Make sure to set your MOBILE_OAUTH_CLIENT_ID in settings.py', status=500)
+            message = _('Make sure to set your MOBILE_OAUTH_CLIENT_ID in settings.py')
+            response = HttpResponse(message, status=500)
+            logger.warning(message)
         else:
             if user:
                 if hasattr(user, 'userprofile') is not True:
@@ -256,7 +261,4 @@ class GetClientIdView(View):
                 response = JSONResponse({'user': user, 'clientid': settings.MOBILE_OAUTH_CLIENT_ID})
             else:
                 response = Http401Response()
-
         return response
-
-
