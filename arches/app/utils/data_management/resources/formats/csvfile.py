@@ -152,7 +152,10 @@ class CsvWriter(Writer):
             # parents = [p for p in tiles if p.parenttile_id is None]
             # children = [c for c in tiles if c.parenttile_id is not None]
             # tiles = parents + sorted(children, key=lambda k: k.parenttile_id)
-            tiles = sorted(tiles, key=lambda k: k.parenttile_id)
+            try:
+                tiles = sorted(tiles, key=lambda k: k.parenttile_id)
+            except Exception as e:
+                print(e)
 
             for tile in tiles:
                 other_group_record = {}

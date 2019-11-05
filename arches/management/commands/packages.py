@@ -1,4 +1,5 @@
 import json
+import pyprind
 import csv
 import shutil
 import subprocess
@@ -742,9 +743,12 @@ class Command(BaseCommand):
                     )
                 )
 
+            bar = pyprind.ProgBar(len(concept_data),bar_char='█')
             for path in concept_data:
-                print(path)
+                head, tail = os.path.split(path)
+                # print(path)
                 self.import_reference_data(path, overwrite, stage)
+                bar.update(item_id=tail)
 
             collection_data = []
             for file_type in file_types:
