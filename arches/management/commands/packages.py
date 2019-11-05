@@ -33,7 +33,7 @@ from django.utils.module_loading import import_string
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand, CommandError
 from django.core import management
-from datetime import datetime
+from datetime import datetime, timedelta
 logger = logging.getLogger(__name__)
 
 '''
@@ -126,6 +126,14 @@ class Command(BaseCommand):
         parser.add_argument(
             '-c', '--config_file', action='store', dest='config_file', default=None,
             help='Usually an export mapping file.')
+
+        # parser.add_argument(
+        #     '-m', '--mapnik_xml_path', action='store', dest='mapnik_xml_path', default=False,
+        #     help='A path to a mapnik xml file to generate a tileserver layer from.')
+
+        # parser.add_argument(
+        #     '-t', '--tile_config_path', action='store', dest='tile_config_path', default=False,
+        #     help='A path to a tile config json file to generate a tileserver layer from.')
 
         parser.add_argument(
             '-j', '--mapbox_json_path', action='store', dest='mapbox_json_path', default=False,
@@ -533,6 +541,9 @@ class Command(BaseCommand):
         def load_concepts(package_dir, overwrite, stage):
             file_types = ['*.xml', '*.rdf']
 
+            from time import time
+            start = time()
+
             concept_data = []
             for file_type in file_types:
                 concept_data.extend(glob.glob(os.path.join(
@@ -550,6 +561,8 @@ class Command(BaseCommand):
             for path in collection_data:
                 print(path)
                 self.import_reference_data(path, overwrite, stage)
+
+            print('Total time to load concepts: %s s' % (timedelta(seconds=time() - start)))
 
         def load_mapbox_styles(style_paths, basemap):
             for path in style_paths:
@@ -906,6 +919,8 @@ class Command(BaseCommand):
                     bufsize = 16 * 1024
                     file['outputfile'].seek(0)
                     shutil.copyfileobj(file['outputfile'], f ,bufsize)
+                # with open(os.path.join(data_dest, file['name']), 'wb') as f:
+                #     f.write(file['outputfile'].getvalue())
         else:
             utils.print_message(
                 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.')

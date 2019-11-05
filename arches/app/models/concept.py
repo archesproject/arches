@@ -171,6 +171,8 @@ class Concept(object):
 
                     self.subconcepts = sorted(self.subconcepts, key=lambda concept: 
                         self.natural_keys(concept.get_sortkey(lang)), reverse=False)
+                    # self.subconcepts = sorted(self.subconcepts, key=methodcaller(
+                    #     'get_sortkey', lang=lang), reverse=False)
 
             if include_parentconcepts:
                 conceptrealations = models.Relation.objects.filter(
@@ -249,6 +251,23 @@ class Concept(object):
                 child_concepts.traverse(applyRelationship)
 
         return concept
+
+    def bulk_save(self, concepts, relations):
+        concept_models = []
+        values = []
+        for concept in concepts:
+            concept_models.append(models.Concept(
+                conceptid=concept.id, 
+                legacyoid=concept.legacyoid,
+                nodetype_id=concept.nodetype
+            ))
+
+            for value in concept.values:
+                value.conceptid = concept.id
+                values.append(value)
+
+        models.Concept.objects.bulk_create(concept_models)
+        ConceptValue().bulk_save(values)
 
     def delete(self, delete_self=False):
         """
@@ -864,6 +883,8 @@ class Concept(object):
                 ret.children = sorted(ret.children, key=lambda concept:
                     self.natural_keys(concept.sortorder if concept.sortorder else concept.label),
                     reverse=False)
+                # ret.children = sorted(
+                #     ret.children, key=lambda concept: concept.sortorder if concept.sortorder else concept.label, reverse=False)
             return ret
 
         def _findBroaderConcept(conceptid, child_concept, depth_limit=None, level=0):
@@ -1207,6 +1228,33 @@ class ConceptValue(object):
 
             value.save()
             self.category = value.valuetype.category
+
+
+    # def bulk_save(self, concept_values):
+    #     values = []
+    #     for concept_value in concept_values:
+    #         concept_value.id = concept_value.id if (concept_value.id != '' and concept_value.id != None) else str(uuid.uuid4())
+    #         value = models.Value()
+    #         value.pk = concept_value.id
+    #         value.value = concept_value.value
+    #         value.concept_id = concept_value.conceptid  # models.Concept.objects.get(pk=self.conceptid)
+    #         value.valuetype_id = concept_value.type  # models.DValueType.objects.get(pk=self.type)
+
+    #         if concept_value.language != '':
+    #             # need to normalize language ids to the form xx-XX
+    #             lang_parts = concept_value.language.lower().replace('_', '-').split('-')
+    #             try:
+    #                 lang_parts[1] = lang_parts[1].upper()
+    #             except:
+    #                 pass
+    #             concept_value.language = '-'.join(lang_parts)
+    #             value.language_id = concept_value.language  # models.DLanguage.objects.get(pk=self.language)
+    #         else:
+    #             value.language_id = settings.LANGUAGE_CODE
+    #         values.append(value)
+
+    #     models.Value.objects.bulk_create(values)
+
 
     def delete(self):
         if self.id != '':

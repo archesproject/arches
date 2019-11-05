@@ -54,8 +54,10 @@ class SKOSReader(object):
         # bind the namespaces
         rdf_graph.bind('arches', ARCHES)
 
+        # start = time()
         try:
             rdf = rdf_graph.parse(source=path_to_file, format=format)
+            #print('time elapsed to parse rdf graph %s s' % (time() - start)
         except:
             raise Exception('Error occurred while parsing the file %s' % path_to_file)
         return rdf
@@ -70,6 +72,7 @@ class SKOSReader(object):
 
         """
 
+        # start = time()
         baseuuid = uuid.uuid4()
         allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
         default_lang = settings.LANGUAGE_CODE
@@ -83,16 +86,17 @@ class SKOSReader(object):
 
         # if the graph is of the type rdflib.graph.Graph
         if isinstance(graph, Graph):
+            values = []
 
             # Search for ConceptSchemes first
             for scheme, v, o in graph.triples((None, RDF.type, SKOS.ConceptScheme)):
                 identifier = self.unwrapJsonLiteral(str(scheme))
                 scheme_id = self.generate_uuid_from_subject(baseuuid, scheme)
-                concept_scheme = Concept({
-                    'id': scheme_id,
-                    'legacyoid': str(scheme),
-                    'nodetype': 'ConceptScheme'
-                })
+                concept_scheme = models.Concept(
+                    pk=scheme_id,
+                    legacyoid=str(scheme),
+                    nodetype_id='ConceptScheme'
+                )
 
                 for predicate, object in graph.predicate_objects(subject=scheme):
                     if str(DCTERMS) in predicate and predicate.replace(DCTERMS, '') in dcterms_value_types.values_list('valuetype', flat=True):
@@ -105,12 +109,22 @@ class SKOSReader(object):
                             value_type = dcterms_value_types.get(valuetype=predicate.replace(DCTERMS, ''))
                             val = self.unwrapJsonLiteral(object)
                             if predicate == DCTERMS.title:
-                                concept_scheme.addvalue({'id': val['value_id'], 'value': val[
-                                                        'value'], 'language': object.language or default_lang, 'type': 'prefLabel', 'category': value_type.category})
+                                values.append(models.Value(
+                                    pk=val['value_id'] if (val['value_id'] != '' and val['value_id'] != None) else str(uuid.uuid4()),
+                                    concept_id=concept_scheme.pk,
+                                    value=val['value'],
+                                    language_id=object.language or default_lang,
+                                    valuetype_id='prefLabel'
+                                ))
                                 # print('Casting dcterms:title to skos:prefLabel')
                             elif predicate == DCTERMS.description:
-                                concept_scheme.addvalue({'id': val['value_id'], 'value': val[
-                                                        'value'], 'language': object.language or default_lang, 'type': 'scopeNote', 'category': value_type.category})
+                                values.append(models.Value(
+                                    pk=val['value_id'] if (val['value_id'] != '' and val['value_id'] != None) else str(uuid.uuid4()),
+                                    concept_id=concept_scheme.pk,
+                                    value=val['value'],
+                                    language_id=object.language or default_lang,
+                                    valuetype_id='scopeNote'
+                                ))
                                 # print('Casting dcterms:description to skos:scopeNote')
                             elif predicate == DCTERMS.identifier:
                                 identifier = self.unwrapJsonLiteral(str(object))
@@ -124,18 +138,23 @@ class SKOSReader(object):
                             self.relations.append(
                                 {'source': scheme_id, 'type': 'hasTopConcept', 'target': top_concept_id})
 
-                concept_scheme.addvalue({'id': identifier['value_id'], 'value': identifier[
-                                        'value'], 'language': default_lang, 'type': dcterms_identifier_type.valuetype, 'category': dcterms_identifier_type.category})
+                values.append(models.Value(
+                    pk=identifier['value_id'] if (identifier['value_id'] != '' and identifier['value_id'] != None) else str(uuid.uuid4()),
+                    concept_id=concept_scheme.pk,
+                    value=identifier['value'],
+                    language_id=default_lang,
+                    valuetype_id=dcterms_identifier_type.valuetype
+                ))
                 self.nodes.append(concept_scheme)
 
                 # Search for Concepts
                 for s, v, o in graph.triples((None, SKOS.inScheme, scheme)):
                     identifier = self.unwrapJsonLiteral(str(s))
-                    concept = Concept({
-                        'id': self.generate_uuid_from_subject(baseuuid, s),
-                        'legacyoid': str(s),
-                        'nodetype': 'Concept'
-                    })
+                    concept = models.Concept(
+                        pk=self.generate_uuid_from_subject(baseuuid, s),
+                        legacyoid=str(s),
+                        nodetype_id='Concept'
+                    )
 
                     # loop through all the elements within a <skos:Concept> element
                     for predicate, object in graph.predicate_objects(subject=s):
@@ -150,8 +169,13 @@ class SKOSReader(object):
                             if relation_or_value_type in skos_value_types_list:
                                 value_type = skos_value_types[relation_or_value_type]
                                 val = self.unwrapJsonLiteral(object)
-                                concept.addvalue({'id': val['value_id'], 'value': val[
-                                                 'value'], 'language': object.language or default_lang, 'type': value_type.valuetype, 'category': value_type.category})
+                                values.append(models.Value(
+                                    pk=val['value_id'] if (val['value_id'] != '' and val['value_id'] != None) else str(uuid.uuid4()),
+                                    concept_id=concept.pk,
+                                    value=val['value'],
+                                    language_id=object.language or default_lang,
+                                    valuetype_id=value_type.valuetype
+                                ))
                             elif predicate == SKOS.broader:
                                 self.relations.append({'source': self.generate_uuid_from_subject(
                                     baseuuid, object), 'type': 'narrower', 'target': self.generate_uuid_from_subject(baseuuid, s)})
@@ -165,18 +189,23 @@ class SKOSReader(object):
                         elif predicate == DCTERMS.identifier:
                             identifier = self.unwrapJsonLiteral(str(object))
 
-                    concept.addvalue({'id': identifier['value_id'], 'value': identifier[
-                                     'value'], 'language': default_lang, 'type': dcterms_identifier_type.valuetype, 'category': dcterms_identifier_type.category})
+                    values.append(models.Value(
+                        pk=identifier['value_id'] if (identifier['value_id'] != '' and identifier['value_id'] != None) else str(uuid.uuid4()),
+                        concept_id=concept.pk,
+                        value=identifier['value'],
+                        language_id=default_lang,
+                        valuetype_id=dcterms_identifier_type.valuetype
+                    ))
                     self.nodes.append(concept)
 
             # Search for SKOS.Collections
             for s, v, o in graph.triples((None, RDF.type, SKOS.Collection)):
                 # print "%s %s %s " % (s,v,o)
-                concept = Concept({
-                    'id': self.generate_uuid_from_subject(baseuuid, s),
-                    'legacyoid': str(s),
-                    'nodetype': 'Collection'
-                })
+                concept = models.Concept(
+                    pk=self.generate_uuid_from_subject(baseuuid, s),
+                    legacyoid=str(s),
+                    nodetype_id='Collection'
+                )
                 # loop through all the elements within a <skos:Concept> element
                 for predicate, object in graph.predicate_objects(subject=s):
                     if str(SKOS) in predicate or str(ARCHES) in predicate:
@@ -190,13 +219,13 @@ class SKOSReader(object):
                         if relation_or_value_type in skos_value_types_list:
                             value_type = skos_value_types[relation_or_value_type]
                             val = self.unwrapJsonLiteral(object)
-                            concept.addvalue({
-                                'id': val['value_id'],
-                                'value': val['value'],
-                                'language': object.language or default_lang,
-                                'type': value_type.valuetype,
-                                'category': value_type.category
-                            })
+                            values.append(models.Value(
+                                pk=val['value_id'],
+                                concept_id=concept.pk,
+                                value=val['value'],
+                                language_id=object.language or default_lang,
+                                valuetype_id=value_type.valuetype
+                            ))
 
                 self.nodes.append(concept)
 
@@ -208,41 +237,59 @@ class SKOSReader(object):
             # insert and index the concpets
             scheme_node = None
             orphaned_concepts = {}
+            concepts = []
+            # bulk_create() does NOT call the object's save() method, nor pre_save/post_save
+            # TODO: figure out how to ensure functions get called with bulk_create()
             with transaction.atomic():
+                models.Concept.objects.bulk_create(self.nodes, ignore_conflicts=True)
+                models.Value.objects.bulk_create(values, ignore_conflicts=True)
                 for node in self.nodes:
-                    if node.nodetype == 'ConceptScheme':
-                        scheme_node = node
-                    elif node.nodetype == 'Concept':
-                        orphaned_concepts[str(node.id)] = node
+                    if node.nodetype.nodetype == 'ConceptScheme':
+                        scheme_node = Concept({
+                            'id': node.conceptid,
+                            'legacyoid': str(scheme),
+                            'nodetype': 'ConceptScheme'
+                        })
+                        
+                    elif node.nodetype.nodetype == 'Concept':
+                        orphaned_concepts[str(node.conceptid)] = node
                     if staging_options == 'stage':
                         try:
-                            models.Concept.objects.get(pk=node.id)
+                            models.Concept.objects.get(pk=node.conceptid)
                         except:
                             # this is a new concept, so add a reference to it in the Candiates schema
-                            if node.nodetype != 'ConceptScheme':
+                            if node.nodetype.nodetype != 'ConceptScheme':
                                 self.relations.append(
-                                    {'source': '00000000-0000-0000-0000-000000000006', 'type': 'narrower', 'target': node.id})
+                                    {'source': '00000000-0000-0000-0000-000000000006', 'type': 'narrower', 'target': node.conceptid})
 
                     if overwrite_options == 'overwrite':
                         node.save()
+                        #concepts.append(node)
                     elif overwrite_options == 'ignore':
                         try:
                             # don't do anything if the concept already exists
-                            models.Concept.objects.get(pk=node.id)
+                            models.Concept.objects.get(pk=node.conceptid)
                         except:
                             # else save it
                             node.save()
+                            #concepts.append(node)
+
+                # Concept().bulk_save(concepts, None)
 
                 # insert the concept relations
+                # TODO: make sure this still works with code commented out, then remove
+                # relation_objs = []
                 for relation in self.relations:
-                    newrelation = models.Relation.objects.get_or_create(
+                    newrelation, created = models.Relation.objects.get_or_create(
                         conceptfrom_id=relation['source'],
                         conceptto_id=relation['target'],
                         relationtype_id=relation['type']
                     )
+                    # models.Relation.objects.bulk_create(relation_objs)
                     # check for orphaned concepts, every concept except the concept scheme should have an edge pointing to it
                     if (relation['type'] == 'narrower' or relation['type'] == 'hasTopConcept') and orphaned_concepts.get(relation['target']) is not None:
                         orphaned_concepts.pop(str(relation['target']))
+                    # relation_objs.append(newrelation)
 
                 if len(orphaned_concepts.keys()) > 0:
                     if scheme_node:
@@ -272,16 +319,26 @@ class SKOSReader(object):
 
             # insert the concept collection relations
             # we do this outide a transaction so that we can load incomplete collections
+            # relation_objs = []
+            # TODO: debug bulk_create to speed up this section of skos
             for relation in self.member_relations:
                 try:
-                    newrelation = models.Relation.objects.get_or_create(
+                    newrelation, created = models.Relation.objects.get_or_create(
                         conceptfrom_id=relation['source'],
                         conceptto_id=relation['target'],
                         relationtype_id=relation['type']
                     )
+                    # newrelation = models.Relation(
+                    #     conceptfrom_id=relation['source'],
+                    #     conceptto_id=relation['target'],
+                    #     relationtype_id=relation['type']
+                    # )
+                    # relation_objs.append(newrelation)
                 except IntegrityError as e:
-                    self.logger.warning(e)
+                    # self.logger.warning(e)
+                    pass
 
+            # models.Relation.objects.bulk_create(relation_objs, ignore_conflicts=True)
 
             return scheme_node
         else:

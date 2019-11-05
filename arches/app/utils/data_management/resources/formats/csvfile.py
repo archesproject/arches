@@ -6,6 +6,7 @@ import os
 import sys
 import uuid
 import traceback
+from time import time
 from copy import deepcopy
 from io import StringIO
 from .format import Writer
@@ -122,9 +123,10 @@ class CsvWriter(Writer):
             csv_record['ResourceID'] = resourceinstanceid
             csv_record['populated_node_groups'] = []
 
-            parents = [p for p in tiles if p.parenttile_id is None]
-            children = [c for c in tiles if c.parenttile_id is not None]
-            tiles = parents + sorted(children, key=lambda k: k.parenttile_id)
+            # parents = [p for p in tiles if p.parenttile_id is None]
+            # children = [c for c in tiles if c.parenttile_id is not None]
+            # tiles = parents + sorted(children, key=lambda k: k.parenttile_id)
+            tiles = sorted(tiles, key=lambda k: k.parenttile_id)
 
             for tile in tiles:
                 other_group_record = {}
@@ -287,7 +289,7 @@ class TileCsvWriter(Writer):
 
 class CsvReader(Reader):
 
-    def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number):
+    def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number, primaryDescriptorsFunctionConfig=None, graph_nodes=None):
         # create a resource instance only if there are populated_tiles
         errors = []
         if len(populated_tiles) > 0:
@@ -303,7 +305,7 @@ class CsvReader(Reader):
             if bulk:
                 resources.append(newresourceinstance)
                 if len(resources) >= settings.BULK_IMPORT_BATCH_SIZE:
-                    Resource.bulk_save(resources=resources)
+                    Resource.bulk_save(resources=resources, primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig, graph_nodes=graph_nodes)
                     del resources[:]  #clear out the array
             else:
                 try:
@@ -331,6 +333,9 @@ class CsvReader(Reader):
 
     def import_business_data(self, business_data=None, mapping=None, overwrite='append', bulk=False, create_concepts=False, create_collections=False):
         # errors = businessDataValidator(self.business_data)
+
+        print("Starting import of business data")
+        self.start = time()
 
         def get_display_nodes(graphid):
             display_nodeids = []
@@ -397,6 +402,7 @@ class CsvReader(Reader):
                     print('ERROR: No column \'ResourceID\' found in business data file. Please add a \'ResourceID\' column with a unique resource identifier.')
                     print('*'*80)
                     sys.exit()
+                graphid = mapping['resource_model_id']
                 blanktilecache = {}
                 populated_nodegroups = {}
                 populated_nodegroups[resourceinstanceid] = []
@@ -405,13 +411,26 @@ class CsvReader(Reader):
                 target_resource_model = None
                 single_cardinality_nodegroups = [str(nodegroupid) for nodegroupid in NodeGroup.objects.values_list('nodegroupid', flat=True).filter(cardinality = '1')]
                 node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
-                display_nodes = get_display_nodes(mapping['resource_model_id'])
-                all_nodes = Node.objects.all()
+                display_nodes = get_display_nodes(graphid)
+                all_nodes = Node.objects.filter(graph_id=graphid)
+                node_list = {str(node.pk): node for node in all_nodes}
                 datatype_factory = DataTypeFactory()
+                primaryDescriptorsFunctionConfig = {}
+                try:
+                    config = FunctionXGraph.objects.get(
+                        graph_id=graphid, function__functiontype='primarydescriptors').config
+                    for key in ['map_popup', 'name', 'description']:
+                        nodegroup_id = config[key]['nodegroup_id']
+                        if nodegroup_id not in primaryDescriptorsFunctionConfig:
+                            primaryDescriptorsFunctionConfig[nodegroup_id] = {}
+                        primaryDescriptorsFunctionConfig[nodegroup_id][key] = config[key]['string_template']
+                except:
+                    pass
+
                 concepts_to_create = {}
                 new_concepts = {}
                 required_nodes = {}
-                for node in Node.objects.filter(~Q(datatype='semantic'), isrequired=True, graph_id=mapping['resource_model_id']).values_list('nodeid', 'name'):
+                for node in Node.objects.filter(~Q(datatype='semantic'), isrequired=True, graph_id=graphid).values_list('nodeid', 'name'):
                     required_nodes[str(node[0])] = node[1]
 
                 # This code can probably be moved into it's own module.
@@ -431,7 +450,6 @@ class CsvReader(Reader):
                         for node in mapping['nodes']:
                             if node['data_type'] in ['concept', 'concept-list', 'domain-value', 'domain-value-list'] and node['file_field_name'] in list(row.keys()):
 
-                                # print row[node['file_field_name']]
                                 concept = []
                                 for val in csv.reader([row[node['file_field_name']]], delimiter=',', quotechar='"'):
                                     concept.append(val)
@@ -657,7 +675,7 @@ class CsvReader(Reader):
                     if row['ResourceID'] != previous_row_resourceid and previous_row_resourceid is not None:
 
                         save_count = save_count + 1
-                        self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number)
+                        self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number, primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig, graph_nodes=node_list)
 
                         # reset values for next resource instance
                         populated_tiles = []
@@ -682,9 +700,10 @@ class CsvReader(Reader):
                         if list(source_data[0].keys()):
                             try:
                                 target_resource_model = all_nodes.get(nodeid=list(source_data[0].keys())[0]).graph_id
-                            except:
+                            except Exception as e:
                                 print('*'*80)
                                 print('ERROR: No resource model found. Please make sure the resource model this business data is mapped to has been imported into Arches.')
+                                print(e)
                                 print('*'*80)
                                 sys.exit()
 
@@ -763,8 +782,8 @@ class CsvReader(Reader):
                                                                 if prototype_tile_copy.data[source_key] == None:
                                                                     value = transform_value(node_datatypes[source_key], source_column[source_key], row_number, source_key)
                                                                     prototype_tile_copy.data[source_key] = value['value']
-                                                                    # print prototype_tile_copy.data[source_key]
-                                                                    # print '&'*80
+                                                                    # print(prototype_tile_copy.data[source_key]
+                                                                    # print('&'*80
                                                                     # target_tile.request = value['request']
                                                                     del source_column[source_key]
                                                                 else:
@@ -819,10 +838,11 @@ class CsvReader(Reader):
                     self.errors += errors
 
                 if 'legacyid' in locals():
-                    self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number)
+                    self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number, primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig, graph_nodes=node_list)
 
                 if bulk:
-                    Resource.bulk_save(resources=resources)
+                    print("Time to create resource and tile objects: %s" % datetime.timedelta(seconds=time()-self.start))
+                    Resource.bulk_save(resources=resources, primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig, graph_nodes=node_list)
 
                 print(_('%s total resource saved' % (save_count + 1)))
 
