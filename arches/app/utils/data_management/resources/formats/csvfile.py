@@ -289,8 +289,10 @@ class TileCsvWriter(Writer):
 
 class CsvReader(Reader):
 
-    def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model,
-        bulk, save_count, row_number, primaryDescriptorsFunctionConfig=None, graph_nodes=None):
+    def save_resource(
+        self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model,
+        bulk, save_count, row_number, primaryDescriptorsFunctionConfig=None, graph_nodes=None
+    ):
         # create a resource instance only if there are populated_tiles
         errors = []
         if len(populated_tiles) > 0:
@@ -306,8 +308,9 @@ class CsvReader(Reader):
             if bulk:
                 resources.append(newresourceinstance)
                 if len(resources) >= settings.BULK_IMPORT_BATCH_SIZE:
-                    Resource.bulk_save(resources=resources, 
-                        primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig, 
+                    Resource.bulk_save(
+                        resources=resources,
+                        primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig,
                         graph_nodes=graph_nodes
                     )
                     del resources[:]  #clear out the array
@@ -666,13 +669,18 @@ class CsvReader(Reader):
                                 if target_k in list(required_nodes.keys()) and target_v is None:
                                     if parent_tile in populated_tiles:
                                         populated_tiles.pop(populated_tiles.index(parent_tile))
-                                    errors.append({'type': 'WARNING',
-                                        'message': 'The {0} node is required and must be populated in \
-                                         order to populate the {1} nodes. \
-                                        This data was not imported.'.format(required_nodes[target_k],
-                                            ', '.join(all_nodes.filter(
+                                    errors.append(
+                                        {
+                                            'type': 'WARNING',
+                                            'message': 'The {0} node is required and must be populated in \
+                                            order to populate the {1} nodes. \
+                                            This data was not imported.'.format(required_nodes[target_k],
+                                                ', '.join(all_nodes.filter(
                                                     nodegroup_id=str(target_tile.nodegroup_id)
-                                                    ).values_list('name', flat=True)))})
+                                                ).values_list('name', flat=True))
+                                            )
+                                        }
+                                    )
                         elif bool(tile.tiles):
                             for tile in tile.tiles:
                                 check_required_nodes(tile, parent_tile, required_nodes, all_nodes)

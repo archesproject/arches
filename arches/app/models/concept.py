@@ -257,7 +257,7 @@ class Concept(object):
         values = []
         for concept in concepts:
             concept_models.append(models.Concept(
-                conceptid=concept.id, 
+                conceptid=concept.id,
                 legacyoid=concept.legacyoid,
                 nodetype_id=concept.nodetype
             ))
@@ -883,8 +883,6 @@ class Concept(object):
                 ret.children = sorted(ret.children, key=lambda concept:
                     self.natural_keys(concept.sortorder if concept.sortorder else concept.label),
                     reverse=False)
-                # ret.children = sorted(
-                #     ret.children, key=lambda concept: concept.sortorder if concept.sortorder else concept.label, reverse=False)
             return ret
 
         def _findBroaderConcept(conceptid, child_concept, depth_limit=None, level=0):
@@ -1233,7 +1231,9 @@ class ConceptValue(object):
     # def bulk_save(self, concept_values):
     #     values = []
     #     for concept_value in concept_values:
-    #         concept_value.id = concept_value.id if (concept_value.id != '' and concept_value.id != None) else str(uuid.uuid4())
+    #         concept_value.id = concept_value.id if (
+    #                                                   concept_value.id != '' and concept_value.id is not None
+    #                                               ) else str(uuid.uuid4())
     #         value = models.Value()
     #         value.pk = concept_value.id
     #         value.value = concept_value.value

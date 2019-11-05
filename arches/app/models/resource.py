@@ -199,7 +199,10 @@ class Resource(models.ResourceInstance):
         for resource in resources:
             s = time()
             document, terms = resource.get_documents_to_index(
-                fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes, config=primaryDescriptorsFunctionConfig, graph_nodes=graph_nodes)
+                fetchTiles=False, datatype_factory=datatype_factory,
+                node_datatypes=node_datatypes, config=primaryDescriptorsFunctionConfig,
+                graph_nodes=graph_nodes
+            )
             time_to_get_docs = time_to_get_docs + (time()-s)
             # s = time()
             # #document['root_ontology_class'] = resource.get_root_ontology()
@@ -229,17 +232,17 @@ class Resource(models.ResourceInstance):
             for tile in tiles:
                 tile.save_edit(edit_type='tile create', new_value=tile.data)
 
-        #print("time to save tile edits: %s" % datetime.timedelta(seconds=time() - start)
+        # print("time to save tile edits: %s" % datetime.timedelta(seconds=time() - start)
         start = time()
 
-        #print("time to save resources to db:%s" % datetime.timedelta(seconds=time() - start)
+        # print("time to save resources to db:%s" % datetime.timedelta(seconds=time() - start)
         start = time()
         # bulk index the resources, tiles and terms
 
-        #print(documents[0]
+        # print(documents[0]
         se.bulk_index(documents)
         se.bulk_index(term_list)
-        #print("time to index resources:%s" % datetime.timedelta(seconds=time() - start)
+        # print("time to index resources:%s" % datetime.timedelta(seconds=time() - start)
 
     def index(self):
         """
@@ -259,7 +262,8 @@ class Resource(models.ResourceInstance):
             for term in terms:
                 se.index_data('terms', body=term['_source'], id=term['_id'])
 
-    def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None, config=None, graph_nodes=None):
+    def get_documents_to_index(self, fetchTiles=True, datatype_factory=None,
+                                node_datatypes=None, config=None, graph_nodes=None):
         """
         Gets all the documents nessesary to index a single resource
         returns a tuple of a document and list of terms
@@ -322,26 +326,27 @@ class Resource(models.ResourceInstance):
                             value = datatype_instance.get_display_value(tile, node)
                             if document["displaydescription"] is None:
                                 document["displaydescription"] = config[tile.nodegroup_id]['description']
-                            document["displaydescription"] = document["displaydescription"].replace('<%s>' % node.name, value)
+                            document["displaydescription"] = document["displaydescription"].replace(
+                                '<%s>' % node.name, value)
                         if 'map_popup' in config[tile.nodegroup_id]:
                             node = graph_nodes[nodeid]
                             value = datatype_instance.get_display_value(tile, node)
                             if document["map_popup"] is None:
                                 document["map_popup"] = config[tile.nodegroup_id]['map_popup']
                             document["map_popup"] = document["map_popup"].replace('<%s>' % node.name, value)
-                    
                     s = time()
                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
                     # timers['timer1'] = timers['timer1'] + (time()-s)
-                    
                     s = time()
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
                     # timers['timer2'] = timers['timer2'] + (time()-s)
-                    
                     s = time()
                     for index, term in enumerate(node_terms):
-                        terms.append({'_id': str(nodeid)+str(tile.tileid)+str(index), '_source': {'value': term, 'nodeid': nodeid,
-                                                                                                              'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid, 'resourceinstanceid': tile.resourceinstance_id, 'provisional': False}})
+                        terms.append({'_id': str(nodeid)+str(tile.tileid)+str(index),
+                            '_source': {'value': term, 'nodeid': nodeid,
+                            'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid,
+                            'resourceinstanceid': tile.resourceinstance_id, 'provisional': False}
+                        })
                     # timers['timer3'] = timers['timer3'] + (time()-s)
 
             if tile.provisionaledits is not None:
@@ -361,8 +366,11 @@ class Resource(models.ResourceInstance):
                                     node_terms = datatype_instance.get_search_terms(
                                         nodevalue, nodeid)
                                     for index, term in enumerate(node_terms):
-                                        terms.append({'_id': str(nodeid)+str(tile.tileid)+str(index), '_source': {'value': term, 'nodeid': nodeid,
-                                                                                                                              'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid, 'resourceinstanceid': tile.resourceinstance_id, 'provisional': True}})
+                                        terms.append({'_id': str(nodeid)+str(tile.tileid)+str(index),
+                                            '_source': {'value': term, 'nodeid': nodeid,
+                                            'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid,
+                                            'resourceinstanceid': tile.resourceinstance_id, 'provisional': True}
+                                        })
 
         return document, terms
 
