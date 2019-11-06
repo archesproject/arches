@@ -37,6 +37,7 @@ from arches.app.utils.permission_backend import user_can_edit_resources
 from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.decorators import group_required
 from arches.app.search.components.base import SearchFilterFactory
+from arches.app.datatypes.datatypes import DataTypeFactory
 from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
@@ -239,6 +240,7 @@ class GeoJSON(APIBase):
             return _('Unnamed Resource')
 
     def get(self, request):
+        datatype_factory = DataTypeFactory()
         resourceid = request.GET.get('resourceid', None)
         nodeid = request.GET.get('nodeid', None)
         tileid = request.GET.get('tileid', None)
@@ -247,6 +249,7 @@ class GeoJSON(APIBase):
         field_name_length = int(request.GET.get('field_name_length', 0))
         use_uuid_names = bool(request.GET.get('use_uuid_names', False))
         include_primary_name = bool(request.GET.get('include_primary_name', False))
+        use_display_values = bool(request.GET.get('use_display_values', False))
         if isinstance(nodegroups, str):
             nodegroups = nodegroups.split(',')
         if hasattr(request.user, 'userprofile') is not True:
@@ -259,13 +262,14 @@ class GeoJSON(APIBase):
         features = []
         i = 1
         property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups)
-        property_node_name_map = {}
+        property_node_map = {}
         property_nodes = models.Node.objects.filter(nodegroup_id__in=nodegroups)
         for node in property_nodes:
+            property_node_map[str(node.nodeid)] = {'node': node}
             if node.fieldname is not None:
-                property_node_name_map[str(node.nodeid)] = node.fieldname
+                property_node_map[str(node.nodeid)]['name'] = node.fieldname
             else:
-                property_node_name_map[str(node.nodeid)] = slugify(
+                property_node_map[str(node.nodeid)]['name'] = slugify(
                     node.name,
                     max_length=field_name_length,
                     separator="_"
@@ -283,16 +287,21 @@ class GeoJSON(APIBase):
                         if len(nodegroups) > 0:
                             for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id):
                                 for key in pt.data:
-                                    field_name = key if use_uuid_names else property_node_name_map[key]
+                                    field_name = key if use_uuid_names else property_node_map[key]['name']
                                     if pt.data[key] is not None:
+                                        if use_display_values:
+                                            datatype = datatype_factory.get_instance(property_node_map[key]['node'].datatype)
+                                            value = datatype.get_display_value(pt, property_node_map[key]['node'])
+                                        else:
+                                            value = pt.data[key]
                                         try:
-                                            feature['properties'][field_name].append(pt.data[key])
+                                            feature['properties'][field_name].append(value)
                                         except KeyError:
-                                            feature['properties'][field_name] = pt.data[key]
+                                            feature['properties'][field_name] = value
                                         except AttributeError:
                                             feature['properties'][field_name] = [
                                                 feature['properties'][field_name],
-                                                pt.data[key]
+                                                value
                                             ]
                         if include_primary_name:
                             feature['properties']['primary_name'] = self.get_name(tile.resourceinstance)
