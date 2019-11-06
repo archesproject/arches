@@ -23,7 +23,7 @@
         "datatables.net-bs": "~1.10.12",
         "datatables.net-buttons": "^1.5.4",
         "datatables.net-buttons-bs": "^1.5.4",
-        "datatables.net-responsive": "~2.1.0",
+        "datatables.net-responsive": "~2.2.3",
         "datatables.net-responsive-bs": "~2.1.0",
         "dom4": "^2.0.1",
         "dropzone": "3.8.4",
