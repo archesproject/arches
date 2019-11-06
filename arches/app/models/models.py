@@ -428,7 +428,7 @@ class NodeGroup(models.Model):
     legacygroupid = models.TextField(blank=True, null=True)
     cardinality = models.TextField(blank=True, default='1')
     parentnodegroup = models.ForeignKey('self', db_column='parentnodegroupid', blank=True, null=True, on_delete=models.CASCADE)  #Allows nodegroups within nodegroups
-    exportable = models.BooleanField(default=False)
+    exportable = models.BooleanField(default=False, null=True)
 
     class Meta:
         managed = True
