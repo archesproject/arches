@@ -39,6 +39,7 @@ from arches.app.search.components.base import SearchFilterFactory
 from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
+from slugify import slugify
 
 
 logger = logging.getLogger(__name__)
@@ -226,6 +227,8 @@ class GeoJSON(APIBase):
         tileid = request.GET.get('tileid', None)
         nodegroups = request.GET.get('nodegroups', [])
         precision = request.GET.get('precision', 9)
+        field_name_length = int(request.GET.get('field_name_length', 0))
+        use_uuid_names = bool(request.GET.get('use_uuid_names', False))
         if isinstance(nodegroups, str):
             nodegroups = nodegroups.split(',')
         if hasattr(request.user, 'userprofile') is not True:
@@ -238,6 +241,13 @@ class GeoJSON(APIBase):
         features = []
         i = 1
         property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups)
+        property_node_name_map = {}
+        property_nodes = models.Node.objects.filter(nodegroup_id__in=nodegroups)
+        for node in property_nodes:
+            if node.fieldname is not None:
+                property_node_name_map[str(node.nodeid)] = node.fieldname
+            else:
+                property_node_name_map[str(node.nodeid)] = slugify(node.name, max_length=field_name_length, separator="_")
         for node in nodes:
             tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup)
             if resourceid is not None:
@@ -251,14 +261,15 @@ class GeoJSON(APIBase):
                         if len(nodegroups) > 0:
                             for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id):
                                 for key in pt.data:
+                                    field_name = key if use_uuid_names else property_node_name_map[key]
                                     if pt.data[key] is not None:
                                         try:
-                                            feature['properties'][key].append(pt.data[key])
+                                            feature['properties'][field_name].append(pt.data[key])
                                         except KeyError:
-                                            feature['properties'][key] = pt.data[key]
-                                        except TypeError:
-                                            feature['properties'][key] = [
-                                                feature['properties'][key],
+                                            feature['properties'][field_name] = pt.data[key]
+                                        except AttributeError:
+                                            feature['properties'][field_name] = [
+                                                feature['properties'][field_name],
                                                 pt.data[key]
                                             ]
                         feature['properties']['resourceinstanceid'] = tile.resourceinstance_id
