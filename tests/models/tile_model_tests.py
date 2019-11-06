@@ -48,17 +48,17 @@ class TileTests(ArchesTestCase):
         INSERT INTO public.resource_instances(resourceinstanceid, legacyid, graphid, createdtime)
             VALUES ('40000000-0000-0000-0000-000000000000', '40000000-0000-0000-0000-000000000000', '2f7f8e40-adbc-11e6-ac7f-14109fd34195', '1/1/2000');
 
-        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
-            VALUES ('99999999-0000-0000-0000-000000000001', '', 'n');
+        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality, exportable)
+            VALUES ('99999999-0000-0000-0000-000000000001', '', 'n', false);
 
-        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
-            VALUES ('32999999-0000-0000-0000-000000000000', '', 'n');
+        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality, exportable)
+            VALUES ('32999999-0000-0000-0000-000000000000', '', 'n', false);
 
-        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
-            VALUES ('19999999-0000-0000-0000-000000000000', '', 'n');
+        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality, exportable)
+            VALUES ('19999999-0000-0000-0000-000000000000', '', 'n', false);
 
-        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
-            VALUES ('21111111-0000-0000-0000-000000000000', '', 'n');
+        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality, exportable)
+            VALUES ('21111111-0000-0000-0000-000000000000', '', 'n', false);
         """
 
         cursor = connection.cursor()

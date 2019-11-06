@@ -5,6 +5,8 @@ import re
 import sys
 import uuid
 import importlib
+import arches.app.tasks as tasks
+import arches.app.utils.task_management as task_management
 from io import StringIO
 from django.shortcuts import render
 from django.views.generic import View
@@ -42,7 +44,7 @@ from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
 from slugify import slugify
-
+from arches.celery import app
 
 logger = logging.getLogger(__name__)
 
@@ -127,7 +129,11 @@ class Sync(APIBase):
         if can_sync:
             try:
                 logger.info("Starting sync for user {0}".format(request.user.username))
-                management.call_command('mobile', operation='sync_survey', id=surveyid, user=request.user.id)
+                celery_worker_running = task_management.check_if_celery_available()
+                if celery_worker_running is True:
+                    tasks.sync.delay(surveyid=surveyid, userid=request.user.id)
+                else:
+                    management.call_command('mobile', operation='sync_survey', id=surveyid, user=request.user.id)
                 logger.info("Sync complete for user {0}".format(request.user.username))
             except Exception:
                 logger.exception(_('Sync Failed'))
