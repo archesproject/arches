@@ -249,6 +249,7 @@ class GeoJSON(APIBase):
         field_name_length = int(request.GET.get('field_name_length', 0))
         use_uuid_names = bool(request.GET.get('use_uuid_names', False))
         include_primary_name = bool(request.GET.get('include_primary_name', False))
+        include_geojson_link = bool(request.GET.get('include_geojson_link', False))
         use_display_values = bool(request.GET.get('use_display_values', False))
         indent = request.GET.get('indent', None)
         if indent is not None:
@@ -259,14 +260,18 @@ class GeoJSON(APIBase):
             models.UserProfile.objects.create(user=request.user)
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
         nodegroups = [i for i in nodegroups if i in viewable_nodegroups]
-        nodes = models.Node.objects.filter(datatype='geojson-feature-collection', nodegroup_id__in=viewable_nodegroups)
+        nodes = models.Node.objects.filter(
+                datatype='geojson-feature-collection',
+                nodegroup_id__in=viewable_nodegroups
+            )
         if nodeid is not None:
             nodes = nodes.filter(nodeid=nodeid)
+        nodes = nodes.order_by('sortorder')
         features = []
         i = 1
-        property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups)
+        property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups).order_by('sortorder')
         property_node_map = {}
-        property_nodes = models.Node.objects.filter(nodegroup_id__in=nodegroups)
+        property_nodes = models.Node.objects.filter(nodegroup_id__in=nodegroups).order_by('sortorder')
         for node in property_nodes:
             property_node_map[str(node.nodeid)] = {'node': node}
             if node.fieldname is not None:
@@ -278,7 +283,7 @@ class GeoJSON(APIBase):
                     separator="_"
                 )
         for node in nodes:
-            tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup)
+            tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup).order_by('sortorder')
             if resourceid is not None:
                 tiles = tiles.filter(resourceinstance_id__in=resourceid.split(','))
             if tileid is not None:
@@ -313,7 +318,12 @@ class GeoJSON(APIBase):
                         feature['properties']['tileid'] = tile.pk
                         if nodeid is None:
                             feature['properties']['nodeid'] = node.pk
-                        feature['properties']['geojson'] = '%s?tileid=%s&nodeid=%s' % (reverse('geojson'), tile.pk, node.pk)
+                        if include_geojson_link:
+                            feature['properties']['geojson'] = '%s?tileid=%s&nodeid=%s' % (
+                                    reverse('geojson'),
+                                    tile.pk,
+                                    node.pk
+                                )
                         feature['id'] = i
                         coordinates = self.set_precision(feature['geometry']['coordinates'], precision)
                         feature['geometry']['coordinates'] = coordinates
