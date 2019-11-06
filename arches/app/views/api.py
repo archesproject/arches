@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import uuid
+import importlib
 from io import StringIO
 from django.shortcuts import render
 from django.views.generic import View
@@ -211,7 +212,7 @@ class Surveys(APIBase):
         return response
 
 
-import importlib
+
 class GeoJSON(APIBase):
     def set_precision(self, coordinates, precision):
         result = []
@@ -230,7 +231,10 @@ class GeoJSON(APIBase):
         functionConfig = models.FunctionXGraph.objects.filter(
             graph_id=resource.graph_id, function__functiontype='primarydescriptors')
         if len(functionConfig) == 1:
-            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(resource, functionConfig[0].config['name'])
+            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(
+                resource,
+                functionConfig[0].config['name']
+            )
         else:
             return _('Unnamed Resource')
 
