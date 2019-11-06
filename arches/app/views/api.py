@@ -123,7 +123,7 @@ class Sync(APIBase):
         if can_sync:
             try:
                 logger.info("Starting sync for user {0}".format(request.user.username))
-                management.call_command('collector', operation='sync_survey', id=surveyid, user=request.user.id)
+                management.call_command('mobile', operation='sync_survey', id=surveyid, user=request.user.id)
                 logger.info("Sync complete for user {0}".format(request.user.username))
             except Exception:
                 logger.exception(_('Sync Failed'))
