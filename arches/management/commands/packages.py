@@ -328,7 +328,7 @@ class Command(BaseCommand):
 
         if options["operation"] == "import_reference_data":
             self.import_reference_data(
-                options["source"], options["overwrite"], options["stage"]
+                options["source"], options["overwrite"], options["stage"], options["bulk_load"]
             )
 
         if options["operation"] == "import_graphs":
@@ -380,6 +380,7 @@ class Command(BaseCommand):
                 options["source"],
                 options["setup_db"],
                 options["overwrite"],
+                options["bulk_load"],
                 options["stage"],
                 options["yes"],
             )
@@ -579,6 +580,7 @@ class Command(BaseCommand):
         source,
         setup_db=True,
         overwrite_concepts="ignore",
+        bulk_load=False,
         stage_concepts="keep",
         yes=False,
     ):
@@ -743,12 +745,13 @@ class Command(BaseCommand):
                     )
                 )
 
-            bar = pyprind.ProgBar(len(concept_data),bar_char='█')
+            bar1 = pyprind.ProgBar(len(concept_data),bar_char='█') if len(concept_data) > 1 else None
             for path in concept_data:
-                head, tail = os.path.split(path)
                 # print(path)
-                self.import_reference_data(path, overwrite, stage)
-                bar.update(item_id=tail)
+                self.import_reference_data(path, overwrite, stage, bulk_load)
+                if bar1 is not None:
+                    head, tail = os.path.split(path)
+                    bar1.update(item_id=tail)
 
             collection_data = []
             for file_type in file_types:
@@ -760,9 +763,13 @@ class Command(BaseCommand):
                     )
                 )
 
+            bar2 = pyprind.ProgBar(len(collection_data),bar_char='█') if len(collection_data) > 1 else None
             for path in collection_data:
-                print(path)
-                self.import_reference_data(path, overwrite, stage)
+                # print(path)
+                self.import_reference_data(path, overwrite, stage, bulk_load)
+                if bar2 is not None:
+                    head, tail = os.path.split(path)
+                    bar2.update(item_id=tail)
 
             print(
                 "Total time to load concepts: %s s"
@@ -841,9 +848,9 @@ class Command(BaseCommand):
             for path in business_data:
                 if path.endswith("csv"):
                     config_file = path.replace(".csv", ".mapping")
-                    self.import_business_data(path, overwrite=True, bulk_load=True)
+                    self.import_business_data(path, overwrite=True, bulk_load=bulk_load)
                 else:
-                    self.import_business_data(path, overwrite=True)
+                    self.import_business_data(path, overwrite=True, bulk_load=bulk_load)
 
             for relation in relations:
                 self.import_business_data_relations(relation)
@@ -1192,13 +1199,13 @@ class Command(BaseCommand):
             )
             sys.exit()
 
-    def import_reference_data(self, data_source, overwrite="ignore", stage="stage"):
+    def import_reference_data(self, data_source, overwrite="ignore", stage="stage", bulk_load=False):
         if overwrite == "":
             overwrite = "overwrite"
 
         skos = SKOSReader()
         rdf = skos.read_file(data_source)
-        ret = skos.save_concepts_from_skos(rdf, overwrite, stage)
+        ret = skos.save_concepts_from_skos(rdf, overwrite, stage, bulk_load)
 
     def import_business_data(
         self,
