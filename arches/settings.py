@@ -303,6 +303,7 @@ INSTALLED_APPS = (
     'revproxy',
     'corsheaders',
     'oauth2_provider',
+    'django_celery_results',
     #'debug_toolbar'
 )
 
@@ -560,6 +561,11 @@ HEX_BIN_PRECISION = 4
 ALLOWED_POPUP_HOSTS = []
 
 TILESERVER_URL = None
+
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_RESULT_BACKEND = 'django-db'  # Use 'django-cache' if you want to use your cache as your backend
+CELERY_TASK_SERIALIZER = 'json'
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################
