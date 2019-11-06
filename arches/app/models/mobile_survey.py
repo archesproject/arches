@@ -16,6 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import json
 import urllib.parse
+import logging
 from datetime import datetime
 from datetime import timedelta
 from copy import copy, deepcopy
@@ -37,6 +38,7 @@ from arches.app.utils.couch import Couch
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 import arches.app.views.search as search
 
+logger = logging.getLogger(__name__)
 
 
 class MobileSurvey(models.MobileSurveyModel):
@@ -349,7 +351,7 @@ class MobileSurvey(models.MobileSurveyModel):
         search_res = JSONDeserializer().deserialize(search_res_json.content)
         try:
             for hit in search_res['results']['hits']['hits']:
-                if hit['_type'] == resource_type_id and len(list(instances)) < int(self.datadownloadconfig['count']):
+                if hit['_source']['graph_id'] == resource_type_id and len(list(instances)) < int(self.datadownloadconfig['count']):
                     instances[hit['_source']['resourceinstanceid']] = hit['_source']
         except Exception as e:
             print(e)
@@ -364,7 +366,7 @@ class MobileSurvey(models.MobileSurveyModel):
         resource_types = self.datadownloadconfig['resources']
         all_instances = {}
         if query in ('', None) and len(resource_types) == 0:
-            print("No resources or data query defined")
+            logger.info("No resources or data query defined")
         else:
             request = HttpRequest()
             request.user = self.lasteditedby
@@ -383,6 +385,7 @@ class MobileSurvey(models.MobileSurveyModel):
                         instances = {}
                         request.GET['resource-type-filter'] = json.dumps([{'graphid': res_type, 'inverted': False}])
                         request.GET['map-filter'] = map_filter
+                        request.GET['paging-filter'] = '1'
                         request.GET['resourcecount'] = self.datadownloadconfig['count']
                         self.append_to_instances(request, instances, res_type)
                         if len(list(instances.keys())) < int(self.datadownloadconfig['count']):
@@ -393,7 +396,7 @@ class MobileSurvey(models.MobileSurveyModel):
                         for key, value in instances.items():
                             all_instances[key] = value
                 except Exception as e:
-                    print(e)
+                    logger.exception(e)
             else:
                 try:
                     instances = {}
