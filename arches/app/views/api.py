@@ -247,7 +247,11 @@ class GeoJSON(APIBase):
             if node.fieldname is not None:
                 property_node_name_map[str(node.nodeid)] = node.fieldname
             else:
-                property_node_name_map[str(node.nodeid)] = slugify(node.name, max_length=field_name_length, separator="_")
+                property_node_name_map[str(node.nodeid)] = slugify(
+                    node.name,
+                    max_length=field_name_length,
+                    separator="_"
+                )
         for node in nodes:
             tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup)
             if resourceid is not None:
