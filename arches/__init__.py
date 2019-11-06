@@ -1,6 +1,10 @@
 from __future__ import absolute_import
 from arches.setup import get_version
-from .celery import app as celery_app
+
+try:
+    from .celery import app as celery_app
+except ModuleNotFoundError as e:
+    print(e)
 
 VERSION = (5, 0, 0, 'final', 0)
 
