@@ -211,6 +211,7 @@ class Surveys(APIBase):
         return response
 
 
+import importlib
 class GeoJSON(APIBase):
     def set_precision(self, coordinates, precision):
         result = []
@@ -221,6 +222,18 @@ class GeoJSON(APIBase):
                 result.append(self.set_precision(coordinate, precision))
         return result
 
+    def get_name(self, resource):
+        module = importlib.import_module(
+            'arches.app.functions.primary_descriptors')
+        PrimaryDescriptorsFunction = getattr(
+            module, 'PrimaryDescriptorsFunction')()
+        functionConfig = models.FunctionXGraph.objects.filter(
+            graph_id=resource.graph_id, function__functiontype='primarydescriptors')
+        if len(functionConfig) == 1:
+            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(resource, functionConfig[0].config['name'])
+        else:
+            return _('Unnamed Resource')
+
     def get(self, request):
         resourceid = request.GET.get('resourceid', None)
         nodeid = request.GET.get('nodeid', None)
@@ -229,6 +242,7 @@ class GeoJSON(APIBase):
         precision = request.GET.get('precision', 9)
         field_name_length = int(request.GET.get('field_name_length', 0))
         use_uuid_names = bool(request.GET.get('use_uuid_names', False))
+        include_primary_name = bool(request.GET.get('include_primary_name', False))
         if isinstance(nodegroups, str):
             nodegroups = nodegroups.split(',')
         if hasattr(request.user, 'userprofile') is not True:
@@ -276,7 +290,8 @@ class GeoJSON(APIBase):
                                                 feature['properties'][field_name],
                                                 pt.data[key]
                                             ]
-                        feature['properties']['resourceinstanceid'] = tile.resourceinstance_id
+                        if include_primary_name:
+                            feature['properties']['primary_name'] = self.get_name(tile.resourceinstance)
                         feature['properties']['tileid'] = tile.pk
                         feature['properties']['nodeid'] = node.pk
                         feature['properties']['geojson'] = '%s?tileid=%s&nodeid=%s' % (reverse('geojson'), tile.pk, node.pk)
