@@ -1915,10 +1915,10 @@ leaflet-iiif@^1.1.1:
   resolved "https://registry.yarnpkg.com/leaflet-iiif/-/leaflet-iiif-1.2.2.tgz#37a366d256a39e90d45cc4ad023ea60ca05a013f"
   integrity sha1-N6Nm0lajnpDUXMStAj6mDKBaAT8=
 
-leaflet@1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.0.3.tgz#1f401b98b45c8192134c6c8d69686253805007c8"
-  integrity sha1-H0AbmLRcgZITTGyNaWhiU4BQB8g=
+leaflet@1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.5.1.tgz#9afb9d963d66c870066b1342e7a06f92840f46bf"
+  integrity sha512-ekM9KAeG99tYisNBg0IzEywAlp0hYI5XRipsqRXyRTeuU8jcuntilpp+eFf5gaE0xubc9RuSNIVtByEKwqFV0w==
 
 lineclip@^1.1.5:
   version "1.1.5"
