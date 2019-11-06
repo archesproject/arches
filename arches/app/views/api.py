@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import uuid
+import importlib
 import arches.app.tasks as tasks
 import arches.app.utils.task_management as task_management
 from io import StringIO
@@ -38,9 +39,11 @@ from arches.app.utils.permission_backend import user_can_edit_resources
 from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.decorators import group_required
 from arches.app.search.components.base import SearchFilterFactory
+from arches.app.datatypes.datatypes import DataTypeFactory
 from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
+from slugify import slugify
 from arches.celery import app
 
 logger = logging.getLogger(__name__)
@@ -216,26 +219,77 @@ class Surveys(APIBase):
         return response
 
 
+
 class GeoJSON(APIBase):
+    def set_precision(self, coordinates, precision):
+        result = []
+        try:
+            return round(coordinates, int(precision))
+        except TypeError:
+            for coordinate in coordinates:
+                result.append(self.set_precision(coordinate, precision))
+        return result
+
+    def get_name(self, resource):
+        module = importlib.import_module(
+            'arches.app.functions.primary_descriptors')
+        PrimaryDescriptorsFunction = getattr(
+            module, 'PrimaryDescriptorsFunction')()
+        functionConfig = models.FunctionXGraph.objects.filter(
+            graph_id=resource.graph_id, function__functiontype='primarydescriptors')
+        if len(functionConfig) == 1:
+            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(
+                resource,
+                functionConfig[0].config['name']
+            )
+        else:
+            return _('Unnamed Resource')
+
     def get(self, request):
+        datatype_factory = DataTypeFactory()
         resourceid = request.GET.get('resourceid', None)
         nodeid = request.GET.get('nodeid', None)
         tileid = request.GET.get('tileid', None)
         nodegroups = request.GET.get('nodegroups', [])
+        precision = request.GET.get('precision', 9)
+        field_name_length = int(request.GET.get('field_name_length', 0))
+        use_uuid_names = bool(request.GET.get('use_uuid_names', False))
+        include_primary_name = bool(request.GET.get('include_primary_name', False))
+        include_geojson_link = bool(request.GET.get('include_geojson_link', False))
+        use_display_values = bool(request.GET.get('use_display_values', False))
+        indent = request.GET.get('indent', None)
+        if indent is not None:
+            indent = int(indent)
         if isinstance(nodegroups, str):
             nodegroups = nodegroups.split(',')
         if hasattr(request.user, 'userprofile') is not True:
             models.UserProfile.objects.create(user=request.user)
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
         nodegroups = [i for i in nodegroups if i in viewable_nodegroups]
-        nodes = models.Node.objects.filter(datatype='geojson-feature-collection', nodegroup_id__in=viewable_nodegroups)
+        nodes = models.Node.objects.filter(
+                datatype='geojson-feature-collection',
+                nodegroup_id__in=viewable_nodegroups
+            )
         if nodeid is not None:
             nodes = nodes.filter(nodeid=nodeid)
+        nodes = nodes.order_by('sortorder')
         features = []
         i = 1
-        property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups)
+        property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups).order_by('sortorder')
+        property_node_map = {}
+        property_nodes = models.Node.objects.filter(nodegroup_id__in=nodegroups).order_by('sortorder')
+        for node in property_nodes:
+            property_node_map[str(node.nodeid)] = {'node': node}
+            if node.fieldname is not None:
+                property_node_map[str(node.nodeid)]['name'] = node.fieldname
+            else:
+                property_node_map[str(node.nodeid)]['name'] = slugify(
+                    node.name,
+                    max_length=field_name_length,
+                    separator="_"
+                )
         for node in nodes:
-            tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup)
+            tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup).order_by('sortorder')
             if resourceid is not None:
                 tiles = tiles.filter(resourceinstance_id__in=resourceid.split(','))
             if tileid is not None:
@@ -246,27 +300,39 @@ class GeoJSON(APIBase):
                     for feature_index, feature in enumerate(data[str(node.pk)]['features']):
                         if len(nodegroups) > 0:
                             for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id):
-                                for nodeid in pt.data:
-                                    try:
-                                        if type(feature['properties'][nodeid]) is list:
-                                            feature['properties'][nodeid].append(pt.data[nodeid])
+                                for key in pt.data:
+                                    field_name = key if use_uuid_names else property_node_map[key]['name']
+                                    if pt.data[key] is not None:
+                                        if use_display_values:
+                                            property_node = property_node_map[key]['node']
+                                            datatype = datatype_factory.get_instance(property_node.datatype)
+                                            value = datatype.get_display_value(pt, property_node)
                                         else:
-                                            feature['properties'][nodeid] = [
-                                                feature['properties'][nodeid],
-                                                pt.data[nodeid]
+                                            value = pt.data[key]
+                                        try:
+                                            feature['properties'][field_name].append(value)
+                                        except KeyError:
+                                            feature['properties'][field_name] = value
+                                        except AttributeError:
+                                            feature['properties'][field_name] = [
+                                                feature['properties'][field_name],
+                                                value
                                             ]
-                                    except KeyError:
-                                        feature['properties'][nodeid] = pt.data[nodeid]
-                                        pass
-                        feature['properties']['index'] = feature_index
+                        if include_primary_name:
+                            feature['properties']['primary_name'] = self.get_name(tile.resourceinstance)
                         feature['properties']['resourceinstanceid'] = tile.resourceinstance_id
                         feature['properties']['tileid'] = tile.pk
-                        feature['properties']['nodeid'] = node.pk
-                        feature['properties']['node'] = node.name
-                        feature['properties']['model'] = node.graph.name
-                        feature['properties']['geojson'] = '%s?tileid=%s&nodeid=%s' % (reverse('geojson'), tile.pk, node.pk)
-                        feature['properties']['featureid'] = feature['id']
+                        if nodeid is None:
+                            feature['properties']['nodeid'] = node.pk
+                        if include_geojson_link:
+                            feature['properties']['geojson'] = '%s?tileid=%s&nodeid=%s' % (
+                                    reverse('geojson'),
+                                    tile.pk,
+                                    node.pk
+                                )
                         feature['id'] = i
+                        coordinates = self.set_precision(feature['geometry']['coordinates'], precision)
+                        feature['geometry']['coordinates'] = coordinates
                         i += 1
                         features.append(feature)
                 except KeyError:
@@ -275,7 +341,7 @@ class GeoJSON(APIBase):
                     print(e)
                     print(tile.data)
 
-        response = JSONResponse({'type': 'FeatureCollection', 'features': features})
+        response = JSONResponse({'type': 'FeatureCollection', 'features': features}, indent=indent)
         return response
 
 
