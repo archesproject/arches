@@ -290,8 +290,9 @@ class GeoJSON(APIBase):
                                     field_name = key if use_uuid_names else property_node_map[key]['name']
                                     if pt.data[key] is not None:
                                         if use_display_values:
-                                            datatype = datatype_factory.get_instance(property_node_map[key]['node'].datatype)
-                                            value = datatype.get_display_value(pt, property_node_map[key]['node'])
+                                            property_node = property_node_map[key]['node']
+                                            datatype = datatype_factory.get_instance(property_node.datatype)
+                                            value = datatype.get_display_value(pt, property_node)
                                         else:
                                             value = pt.data[key]
                                         try:
