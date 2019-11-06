@@ -157,6 +157,7 @@ urlpatterns = [
     url(r'^history/$', ResourceActivityStreamCollectionView.as_view(), name="as_stream_collection"),
     url(r'^history/(?P<page>[0-9]+)$', ResourceActivityStreamPageView.as_view(), name='as_stream_page'),
     url(r'^icons$', IconDataView.as_view(), name='icons'),
+    url(r'^tiles/(?P<resourceid>%s|())$' % uuid_regex, api.DataForKibana.as_view(), name='api_tiles'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

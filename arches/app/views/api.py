@@ -880,3 +880,111 @@ class SearchComponentData(APIBase):
         if search_filter:
             return JSONResponse(search_filter.view_data())
         return JSONResponse(status=404)
+
+
+class DataForKibana(APIBase):
+
+    def get(self, request, resourceid):
+        from arches.app.datatypes.datatypes import DataTypeFactory
+        from arches.app.search.search_engine_factory import SearchEngineFactory
+        se = SearchEngineFactory().create()
+        tiles = models.TileModel.objects.filter(resourceinstance_id=resourceid)
+        datatype_factory = DataTypeFactory()
+
+        # import ipdb
+        # ipdb.set_trace()
+        tile_objs = []
+        for tile in tiles:
+            data = {}
+            for nodeid, value in tile.data.items():
+                node = models.Node.objects.get(pk=nodeid)
+                datatype = datatype_factory.get_instance(node.datatype)
+                label = ''
+                try:
+                    label = models.CardXNodeXWidget.objects.get(node_id=nodeid).label
+                except:
+                    label = node.name
+                data[label] = datatype.get_display_value(tile, node)
+            tile.data = data
+            tile.cardinality = tile.nodegroup.cardinality
+            tile_obj = JSONSerializer().serializeToPython(tile)
+            card = models.CardModel.objects.get(nodegroup=tile.nodegroup)
+            tile_obj['card_name'] = card.name
+            tile_obj['cardinality'] = tile.nodegroup.cardinality
+            # if tile.nodegroup.cardinality == 'n':
+            #     tile_obj[card.name] = [tile_obj['data']]
+            # else:
+            tile_obj[card.name] = tile_obj['data']
+
+            tile_objs.append(tile_obj)
+
+        tiles = tile_objs #JSONSerializer().serializeToPython(tiles)
+
+        se.index_data(index='resources_for_kibana', body={'tiles': tiles}, id=resourceid)
+
+        lookup = {}
+        for tile in tiles:
+            tile['tiles'] = []
+            lookup[tile['tileid']] = tile
+
+        # ret = {}
+        # for tile in tiles:
+        #     if tile['parenttile_id'] is not None:
+        #         lookup[str(tile['parenttile_id'])]['tiles'].append(tile)
+
+        # import ipdb
+        # ipdb.sset_trace()
+        ret = []
+        ret1 = {}
+        for tile in tiles:
+            if tile['parenttile_id'] is not None:
+                parentTile = lookup[str(tile['parenttile_id'])]
+                parentTile['tiles'].append(tile)
+
+                if tile['cardinality'] == 'n':
+                    try:
+                        parentTile[parentTile['card_name']][tile['card_name']].append(tile[tile['card_name']])
+                    except KeyError:
+                        parentTile[parentTile['card_name']][tile['card_name']] = [tile[tile['card_name']]]
+                else:
+                    parentTile[parentTile['card_name']][tile['card_name']] = tile[tile['card_name']]
+            else:
+                ret.append({tile['card_name']: tile[tile['card_name']]})
+                if tile['cardinality'] == 'n':
+                    try:
+                        ret1[tile['card_name']].append(tile[tile['card_name']])
+                    except KeyError:
+                        ret1[tile['card_name']] = [tile[tile['card_name']]]
+                else:
+                    ret1[tile['card_name']] = tile[tile['card_name']]
+        # ret1 = []
+        # for r in ret:
+        #     ret1.append(r['card_name'])
+
+        def flatten_json(nested_json):
+            """
+                From https://towardsdatascience.com/how-to-flatten-deeply-nested-json-objects-in-non-recursive-elegant-python-55f96533103d
+                Flatten json object with nested keys into a single level.
+                Args:
+                    nested_json: A nested json object.
+                Returns:
+                    The flattened json object if successful, None otherwise.
+            """
+            out = {}
+
+            def flatten(x, name=''):
+                if type(x) is dict:
+                    for a in x:
+                        flatten(x[a], name + a + '_')
+                elif type(x) is list:
+                    i = 0
+                    for a in x:
+                        flatten(a, name + str(i) + '_')
+                        i += 1
+                else:
+                    out[name[:-1]] = x
+
+            flatten(nested_json)
+            return out
+
+        return JSONResponse(flatten_json(ret1), indent=4)

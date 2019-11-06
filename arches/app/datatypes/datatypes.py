@@ -480,6 +480,15 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             wkt_geoms.append(GEOSGeometry(json.dumps(feature['geometry'])))
         return GeometryCollection(wkt_geoms)
 
+    def get_display_value(self, tile, node):
+        value = tile.data[str(node.nodeid)]
+        bounds = self.get_bounds_from_value(value)
+        if bounds is not None:
+            minx, miny, maxx, maxy = bounds
+            centerx = maxx - (maxx - minx) / 2
+            centery = maxy - (maxy - miny) / 2
+        return {"lon": centerx,"lat": centery}
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         document['geometries'].append({
             'geom': nodevalue,
