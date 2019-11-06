@@ -250,6 +250,9 @@ class GeoJSON(APIBase):
         use_uuid_names = bool(request.GET.get('use_uuid_names', False))
         include_primary_name = bool(request.GET.get('include_primary_name', False))
         use_display_values = bool(request.GET.get('use_display_values', False))
+        indent = request.GET.get('indent', None)
+        if indent is not None:
+            indent = int(indent)
         if isinstance(nodegroups, str):
             nodegroups = nodegroups.split(',')
         if hasattr(request.user, 'userprofile') is not True:
@@ -306,8 +309,10 @@ class GeoJSON(APIBase):
                                             ]
                         if include_primary_name:
                             feature['properties']['primary_name'] = self.get_name(tile.resourceinstance)
+                        feature['properties']['resourceinstanceid'] = tile.resourceinstance_id
                         feature['properties']['tileid'] = tile.pk
-                        feature['properties']['nodeid'] = node.pk
+                        if nodeid is None:
+                            feature['properties']['nodeid'] = node.pk
                         feature['properties']['geojson'] = '%s?tileid=%s&nodeid=%s' % (reverse('geojson'), tile.pk, node.pk)
                         feature['id'] = i
                         coordinates = self.set_precision(feature['geometry']['coordinates'], precision)
@@ -320,7 +325,7 @@ class GeoJSON(APIBase):
                     print(e)
                     print(tile.data)
 
-        response = JSONResponse({'type': 'FeatureCollection', 'features': features})
+        response = JSONResponse({'type': 'FeatureCollection', 'features': features}, indent=indent)
         return response
 
 
