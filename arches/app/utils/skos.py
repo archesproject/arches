@@ -60,7 +60,7 @@ class SKOSReader(object):
         return rdf
 
     def save_concepts_from_skos(
-        self, graph, overwrite_options="overwrite", staging_options="keep", bulk_load=False
+        self, graph, overwrite_options="overwrite", staging_options="keep", bulk_load=False, path=""
     ):
         """
         given an RDF graph, tries to save the concpets to the system
@@ -75,7 +75,7 @@ class SKOSReader(object):
         allowed_languages = models.DLanguage.objects.values_list("pk", flat=True)
         default_lang = settings.LANGUAGE_CODE
         if bulk_load is True:
-            self.logger.setLevel(logging.WARNING)
+            self.logger.setLevel(logging.ERROR)
 
         value_types = models.DValueType.objects.all()
         skos_value_types = value_types.filter(
@@ -420,6 +420,9 @@ class SKOSReader(object):
                 if bulk_load is True:
                     models.Concept.objects.bulk_create(self.nodes, ignore_conflicts=True)
                     models.Value.objects.bulk_create(values, ignore_conflicts=True)
+                    self.logger.info(
+                        f"Bulk created: {len(self.nodes)} concepts and {len(values)} values from {path}"
+                    )
                     for node in self.nodes:
                         if node.nodetype.nodetype == "ConceptScheme":
                             scheme_node = Concept(
@@ -536,7 +539,7 @@ class SKOSReader(object):
                                 conceptto_id=orphaned_concept_id,
                                 relationtype_id="narrower",
                             )
-                        self.logger.info(
+                        self.logger.warning(
                             "The SKOS file appears to have orphaned concepts."
                         )
 
@@ -565,7 +568,7 @@ class SKOSReader(object):
                         relationtype_id=relation["type"],
                     )
                 except IntegrityError as e:
-                    self.logger.info(e)
+                    self.logger.warning(e)
                     pass
 
             # if bulk_load is True:

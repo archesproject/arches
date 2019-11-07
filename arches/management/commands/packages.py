@@ -1205,7 +1205,7 @@ class Command(BaseCommand):
 
         skos = SKOSReader()
         rdf = skos.read_file(data_source)
-        ret = skos.save_concepts_from_skos(rdf, overwrite, stage, bulk_load)
+        ret = skos.save_concepts_from_skos(rdf, overwrite, stage, bulk_load, data_source)
 
     def import_business_data(
         self,
