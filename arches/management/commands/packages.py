@@ -747,7 +747,8 @@ class Command(BaseCommand):
 
             bar1 = pyprind.ProgBar(len(concept_data),bar_char='█') if len(concept_data) > 1 else None
             for path in concept_data:
-                # print(path)
+                if bar1 is None:
+                    print(path)
                 self.import_reference_data(path, overwrite, stage, bulk_load)
                 if bar1 is not None:
                     head, tail = os.path.split(path)
@@ -765,7 +766,8 @@ class Command(BaseCommand):
 
             bar2 = pyprind.ProgBar(len(collection_data),bar_char='█') if len(collection_data) > 1 else None
             for path in collection_data:
-                # print(path)
+                if bar2 is None:
+                    print(path)
                 self.import_reference_data(path, overwrite, stage, bulk_load)
                 if bar2 is not None:
                     head, tail = os.path.split(path)

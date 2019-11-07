@@ -192,10 +192,10 @@ class Resource(models.ResourceInstance):
 
         for resource in resources:
             resource.save_edit(edit_type="create")
-            if resource.tiles[0] is not None:
-                resource.tiles[0].save_edit(
-                    note=f"bulk created: {len(tiles)}", edit_type="bulk_create"
-                )
+
+        resources[0].tiles[0].save_edit(
+            note=f"bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create"
+        )
 
         print(
             "time to save resource edits: %s"
