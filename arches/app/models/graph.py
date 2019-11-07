@@ -815,6 +815,8 @@ class Graph(models.GraphModel):
                 edge.rangenode = new_node
                 edge.ontologyproperty = node.get('parentproperty', None)
 
+        if node['exportable'] is not None:
+            new_node.exportable = node['exportable']
         if node['fieldname'] is not None:
             new_node.fieldname = node['fieldname']
         self.populate_null_nodegroups()

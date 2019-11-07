@@ -428,7 +428,6 @@ class NodeGroup(models.Model):
     legacygroupid = models.TextField(blank=True, null=True)
     cardinality = models.TextField(blank=True, default='1')
     parentnodegroup = models.ForeignKey('self', db_column='parentnodegroupid', blank=True, null=True, on_delete=models.CASCADE)  #Allows nodegroups within nodegroups
-    exportable = models.BooleanField(default=False, null=True)
 
     class Meta:
         managed = True
@@ -462,6 +461,7 @@ class Node(models.Model):
     isrequired = models.BooleanField(default=False)
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     fieldname = models.TextField(blank=True, null=True)
+    exportable = models.BooleanField(default=False, null=True)
 
     def get_child_nodes_and_edges(self):
         """
