@@ -174,7 +174,7 @@
                             <div class="form-group">
                                 <div class="relative">
                                     <label class="col-xs-12 control-label widget-input-label">
-                                        <span class="switch switch-small arches-switch" data-bind="css: {'on': node().exportable, 'disabled': checkIfImmutable()}, click: toggleExportable"><small></small></span>
+                                        <span class="switch switch-small arches-switch" data-bind="css: {'on': node().exportable()}, click: function(){node().exportable(!node().exportable())}"><small></small></span>
                                     </label>
                                 </div>
 

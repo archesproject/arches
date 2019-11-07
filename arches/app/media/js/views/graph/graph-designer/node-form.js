@@ -91,13 +91,6 @@ define([
                 }
             };
 
-            this.toggleExportable = function() {
-                var isImmutable = self.checkIfImmutable();
-                if (isImmutable === false) {
-                    self.node().exportable(!self.node().exportable());
-                }
-            };
-
             this.disableDatatype = ko.computed(function() {
                 var isImmutable = false;
                 var node = self.node();
