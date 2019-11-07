@@ -891,9 +891,10 @@ class DataForKibana(APIBase):
         tiles = models.TileModel.objects.filter(resourceinstance_id=resourceid)
         datatype_factory = DataTypeFactory()
 
-        # import ipdb
-        # ipdb.set_trace()
+        # first let's normalize tile.data to use labels instead of node ids
+        # we'll also add on the cardinality and card_names to the tile for use later on
         tile_objs = []
+        lookup = {}
         for tile in tiles:
             data = {}
             for nodeid, value in tile.data.items():
@@ -906,41 +907,27 @@ class DataForKibana(APIBase):
                     label = node.name
                 data[label] = datatype.get_display_value(tile, node)
             tile.data = data
-            tile.cardinality = tile.nodegroup.cardinality
-            tile_obj = JSONSerializer().serializeToPython(tile)
             card = models.CardModel.objects.get(nodegroup=tile.nodegroup)
+
+            tile_obj = JSONSerializer().serializeToPython(tile)
             tile_obj['card_name'] = card.name
             tile_obj['cardinality'] = tile.nodegroup.cardinality
-            # if tile.nodegroup.cardinality == 'n':
-            #     tile_obj[card.name] = [tile_obj['data']]
-            # else:
             tile_obj[card.name] = tile_obj['data']
-
             tile_objs.append(tile_obj)
 
-        tiles = tile_objs #JSONSerializer().serializeToPython(tiles)
+            lookup[tile_obj['tileid']] = tile_obj
 
-        se.index_data(index='resources_for_kibana', body={'tiles': tiles}, id=resourceid)
+        # print(JSONSerializer().serialize(tiles, indent=4))
+        tiles = tile_objs
+        # print(JSONSerializer().serialize(tiles, indent=4))
 
-        lookup = {}
-        for tile in tiles:
-            tile['tiles'] = []
-            lookup[tile['tileid']] = tile
-
-        # ret = {}
-        # for tile in tiles:
-        #     if tile['parenttile_id'] is not None:
-        #         lookup[str(tile['parenttile_id'])]['tiles'].append(tile)
-
-        # import ipdb
-        # ipdb.sset_trace()
-        ret = []
-        ret1 = {}
+        resource_json = {}
+        # ret = []
+        # aggregate tiles into single resource instance objects rolling up tile data in the process
+        # print out "ret" to understand the intermediate structure
         for tile in tiles:
             if tile['parenttile_id'] is not None:
                 parentTile = lookup[str(tile['parenttile_id'])]
-                parentTile['tiles'].append(tile)
-
                 if tile['cardinality'] == 'n':
                     try:
                         parentTile[parentTile['card_name']][tile['card_name']].append(tile[tile['card_name']])
@@ -949,21 +936,21 @@ class DataForKibana(APIBase):
                 else:
                     parentTile[parentTile['card_name']][tile['card_name']] = tile[tile['card_name']]
             else:
-                ret.append({tile['card_name']: tile[tile['card_name']]})
+                # print the following out to understand the intermediate structure
+                # ret.append(tile)
+                # ret.append({tile['card_name']: tile[tile['card_name']]})
                 if tile['cardinality'] == 'n':
                     try:
-                        ret1[tile['card_name']].append(tile[tile['card_name']])
+                        resource_json[tile['card_name']].append(tile[tile['card_name']])
                     except KeyError:
-                        ret1[tile['card_name']] = [tile[tile['card_name']]]
+                        resource_json[tile['card_name']] = [tile[tile['card_name']]]
                 else:
-                    ret1[tile['card_name']] = tile[tile['card_name']]
-        # ret1 = []
-        # for r in ret:
-        #     ret1.append(r['card_name'])
+                    resource_json[tile['card_name']] = tile[tile['card_name']]
 
+        # Flatten the resource json using the function below
+        # From https://towardsdatascience.com/how-to-flatten-deeply-nested-json-objects-in-non-recursive-elegant-python-55f96533103d
         def flatten_json(nested_json):
             """
-                From https://towardsdatascience.com/how-to-flatten-deeply-nested-json-objects-in-non-recursive-elegant-python-55f96533103d
                 Flatten json object with nested keys into a single level.
                 Args:
                     nested_json: A nested json object.
@@ -987,4 +974,5 @@ class DataForKibana(APIBase):
             flatten(nested_json)
             return out
 
-        return JSONResponse(flatten_json(ret1), indent=4)
+        se.index_data(index='resources_for_kibana', body=flatten_json(resource_json), id=resourceid)
+        return JSONResponse(flatten_json(resource_json), indent=4)
