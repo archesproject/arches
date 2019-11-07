@@ -74,6 +74,8 @@ class SKOSReader(object):
         baseuuid = uuid.uuid4()
         allowed_languages = models.DLanguage.objects.values_list("pk", flat=True)
         default_lang = settings.LANGUAGE_CODE
+        if bulk_load is True:
+            self.logger.setLevel(logging.WARNING)
 
         value_types = models.DValueType.objects.all()
         skos_value_types = value_types.filter(
@@ -534,9 +536,9 @@ class SKOSReader(object):
                                 conceptto_id=orphaned_concept_id,
                                 relationtype_id="narrower",
                             )
-                    # self.logger.warning(
-                    #     "The SKOS file appears to have orphaned concepts."
-                    # )
+                        self.logger.info(
+                            "The SKOS file appears to have orphaned concepts."
+                        )
 
                 # need to index after the concepts and relations have been entered into the db
                 # so that the proper context gets indexed with the concept
@@ -563,7 +565,7 @@ class SKOSReader(object):
                         relationtype_id=relation["type"],
                     )
                 except IntegrityError as e:
-                    # self.logger.warning(e)
+                    self.logger.info(e)
                     pass
 
             # if bulk_load is True:

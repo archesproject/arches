@@ -257,7 +257,7 @@ class Command(BaseCommand):
             action="store_true",
             dest="bulk_load",
             help="Bulk load values into the database.  By setting this flag the system will bypass any PreSave \
-            functions attached to the resource.",
+            functions attached to the resource, as well as prevent some logging statements from printing to console.",
         )
 
         parser.add_argument(
