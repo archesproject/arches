@@ -26,27 +26,7 @@ define([
             this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
             this.node = options.node;
             this.isExportable = ko.observable(null);
-            
-            /** if node is initialized, calls fn that makes ajax request to get exportable from NodeGroup
-             * which sets passes value back to this computed, which sets the observable isExportable
-             */
-            this.exportable = ko.computed({
-                read: function() {
-                    if(self.isExportable() != null) {
-                        return self.isExportable();
-                    } else if(self.node()) {
-                        if(self.node().nodeGroupId) {
-                            if(self.node().nodeGroupId()) {
-                                return self.getExportable(self, self.node().nodeGroupId());
-                            }
-                        }
-                    }
-                    return false;
-                },
-                write: function(val) {
-                    self.isExportable(val);
-                }
-            });
+
             this.graph = options.graph;
             this.loading = options.loading || ko.observable(false);
             this.hasOntology = ko.computed(function(){
@@ -111,18 +91,6 @@ define([
                 }
             };
 
-            this.toggleExportable = function() {
-                var isImmutable = self.checkIfImmutable();
-                if (isImmutable === false) {
-                    self.exportable(!self.exportable());
-                    self.setExportable(self.node().nodeGroupId(), self.exportable());
-                }
-            };
-
-            this.activated = ko.computed(function() {
-                if(self.node()) { return self.exportable() && !self.checkIfImmutable(); }
-            });
-
             this.disableDatatype = ko.computed(function() {
                 var isImmutable = false;
                 var node = self.node();
@@ -174,34 +142,6 @@ define([
                     (!isCollector && isInParentGroup && hasDownstreamCollector) ||
                     (isCollector && groupHasNonSemanticNodes && (isInParentGroup || isNodeInChildGroup)) ||
                     (self.graphModel.get('nodes')().length > 1 && node && node.istopnode);
-            });
-        },
-
-        getExportable: function(context, nodegroupid) {
-            $.ajax({
-                type: "GET",
-                url: arches.urls.nodegroup,
-                data: { "nodegroupid": nodegroupid },
-                context: self,
-                success: function(responseText, status, response){
-                    // console.log(response.responseJSON);
-                    var exportable = response.responseJSON[0]["exportable"];
-                    context.exportable(exportable);
-                },
-                error: function(response, status, error) {
-                    console.log(response.statusText, status, error);
-                }
-            });
-        },
-
-        setExportable: function(nodegroupid, exportable) {
-            $.ajax({
-                type: "POST",
-                url: arches.urls.nodegroup,
-                data: { "nodegroupid": nodegroupid, "exportable": exportable },
-                context: self,
-                success: function(responseText, status, response){ console.log(response.responseJSON); },
-                error: function(response, status, error) { console.log("failed set"); }
             });
         },
 
