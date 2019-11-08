@@ -280,14 +280,14 @@ class GeoJSON(APIBase):
         property_nodes = models.Node.objects.filter(nodegroup_id__in=nodegroups).order_by('sortorder')
         for node in property_nodes:
             property_node_map[str(node.nodeid)] = {'node': node}
-            if node.fieldname is not None:
-                property_node_map[str(node.nodeid)]['name'] = node.fieldname
-            else:
+            if node.fieldname is None or node.fieldname == '':
                 property_node_map[str(node.nodeid)]['name'] = slugify(
                     node.name,
                     max_length=field_name_length,
                     separator="_"
                 )
+            else:
+                property_node_map[str(node.nodeid)]['name'] = node.fieldname
         for node in nodes:
             tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup).order_by('sortorder')
             if resourceid is not None:
