@@ -3,8 +3,10 @@ import re
 import json
 import uuid
 import datetime
-from django.core.urlresolvers import reverse
-from format import Writer, Reader
+import logging
+from io import StringIO
+from django.urls import reverse
+from .format import Writer, Reader
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.graph import Graph as GraphProxy
@@ -18,12 +20,6 @@ from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS
 from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
-
-import logging
 
 class RdfWriter(Writer):
 
@@ -451,7 +447,7 @@ class JsonLdReader(Reader):
             self.logger.debug('found {0} branches'.format(len(found)))
             if len(found) == 0:
                 self.logger.error('branch not found for {0}'.format(str(jsonld_graph)))
-                print 'branch not found for %r' % jsonld_graph
+                print('branch not found for %r' % jsonld_graph)
                 raise self.DataDoesNotMatchGraphException()
 
             if len(self.findOntologyProperties(jsonld_graph)) == 0:

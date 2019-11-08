@@ -103,7 +103,7 @@ class Graph(models.GraphModel):
                 self.populate_null_nodegroups()
 
             else:
-                if (len(args) == 1 and (isinstance(args[0], basestring) or isinstance(args[0], uuid.UUID))):
+                if (len(args) == 1 and (isinstance(args[0], str) or isinstance(args[0], uuid.UUID))):
                     for key, value in models.GraphModel.objects.get(pk=args[0]).__dict__.items():
                         setattr(self, key, value)
 
@@ -184,6 +184,8 @@ class Graph(models.GraphModel):
             node.config = nodeobj.get('config', None)
             node.issearchable = nodeobj.get('issearchable', True)
             node.isrequired = nodeobj.get('isrequired', False)
+            node.exportable = nodeobj.get('exportable', False)
+            node.fieldname = nodeobj.get('fieldname', '')
 
             node.nodeid = uuid.UUID(str(node.nodeid))
 
@@ -621,7 +623,7 @@ class Graph(models.GraphModel):
         str_forms_config = json.dumps(config)
         for map in maps:
             for k, v in map.items():
-                str_forms_config = str_forms_config.replace(unicode(k), unicode(v))
+                str_forms_config = str_forms_config.replace(str(k), str(v))
         return json.loads(str_forms_config)
 
     def copy_functions(self, other_graph, id_maps=[]):
@@ -815,6 +817,10 @@ class Graph(models.GraphModel):
                 edge.rangenode = new_node
                 edge.ontologyproperty = node.get('parentproperty', None)
 
+        if node['exportable'] is not None:
+            new_node.exportable = node['exportable']
+        if node['fieldname'] is not None:
+            new_node.fieldname = node['fieldname']
         self.populate_null_nodegroups()
 
         # new_node will always have a nodegroup id even it if was set to None becuase populate_null_nodegroups
@@ -1178,7 +1184,11 @@ class Graph(models.GraphModel):
                 if not card.name:
                     card.name = self.nodes[card.nodegroup_id].name
                 if not card.description:
-                    card.description = self.nodes[card.nodegroup_id].description
+                    try:
+                        card.description = self.nodes[card.nodegroup_id].description
+                    except KeyError as e:
+                        print('Error: card.description not accessible, nodegroup_id not in self.nodes: ',e)
+
                 is_editable = card.is_editable()
             else:
                 if card.nodegroup.parentnodegroup is None:
@@ -1263,7 +1273,7 @@ class Graph(models.GraphModel):
             # if node_tile_count > 0:
             res = None
             pre_diff = self._compare(obj_a, obj_b, ignore_list)
-            diff = filter(lambda x: len(list(x.keys())) > 0, pre_diff)
+            diff = [x for x in pre_diff if len(list(x.keys())) > 0]
             if len(diff) > 0:
                 if obj_type == 'node':
                     tile_count = models.TileModel.objects.filter(nodegroup_id=db_node.nodegroup_id).count()
@@ -1275,7 +1285,7 @@ class Graph(models.GraphModel):
                 unpermitted_edits = []
                 db_nodes = models.Node.objects.filter(graph=self)
                 for db_node in db_nodes:
-                    unpermitted_node_edits = find_unpermitted_edits(db_node, self.nodes[db_node.nodeid], ['name', 'issearchable', 'ontologyclass', 'description', 'isrequired'], 'node')
+                    unpermitted_node_edits = find_unpermitted_edits(db_node, self.nodes[db_node.nodeid], ['name', 'issearchable', 'ontologyclass', 'description', 'isrequired', 'fieldname', 'exportable'], 'node')
                     if unpermitted_node_edits is not None:
                         unpermitted_edits.append(unpermitted_node_edits)
                 db_graph = Graph.objects.get(pk=self.graphid)
@@ -1347,7 +1357,12 @@ class Graph(models.GraphModel):
         # https://www.w3.org/TR/json-ld/#the-context
         context = self.jsonldcontext
         try:
-            context = JSONDeserializer().deserialize(context)
+            if context is None:
+                context = {
+                    "@context": {}
+                }
+            else:
+                context = JSONDeserializer().deserialize(context)
         except ValueError:
             if context == '':
                 context = {}

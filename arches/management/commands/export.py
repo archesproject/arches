@@ -68,6 +68,6 @@ class Command(BaseCommand):
                             cmd_process.append(sql)
                             subprocess.call(cmd_process)
                 else:
-                    print "No records in table for export"
+                    print("No records in table for export")
         else:
-            print 'Cannot export data. Destination directory, {0} already exists'.format(dest)
+            print('Cannot export data. Destination directory, {0} already exists'.format(dest))

@@ -14,7 +14,7 @@ class EmailAuthenticationBackend(object):
         except:
             return None
 
-        print 'in EmailAuthenticationBackend'
+        print('in EmailAuthenticationBackend')
 
     def user_can_authenticate(self, user):
         """

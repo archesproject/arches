@@ -1,9 +1,11 @@
 define([
+    'jquery',
     'underscore',
     'backbone',
     'knockout',
+    'arches',
     'bindings/chosen'
-], function(_, Backbone, ko) {
+], function($, _, Backbone, ko, arches) {
     var NodeFormView = Backbone.View.extend({
         /**
         * A backbone view representing a node form
@@ -23,6 +25,8 @@ define([
             _.extend(this, _.pick(options, 'graphModel'));
             this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
             this.node = options.node;
+            this.isExportable = ko.observable(null);
+
             this.graph = options.graph;
             this.loading = options.loading || ko.observable(false);
             this.hasOntology = ko.computed(function(){

@@ -224,7 +224,7 @@
 
     <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
     <div class="edit-message-container">
-        <span>{% trans 'Currently showing edits by' %}</span>
+        <span>{% trans 'Showing edits by' %}</span>
         <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
         <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
         <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">{% trans 'Return to approved edits' %}</a>

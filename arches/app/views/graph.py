@@ -42,11 +42,7 @@ from arches.app.utils.system_metadata import system_metadata
 from arches.app.views.base import BaseManagerView
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 from rdflib import Graph as RDFGraph
-
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from io import StringIO
 
 
 def get_ontology_namespaces():
@@ -113,7 +109,7 @@ class GraphSettingsView(GraphBaseView):
         try:
             node.datatype = data['graph']['root']['datatype']
         except KeyError as e:
-            print e, 'Cannot find root node datatype'
+            print(e, 'Cannot find root node datatype')
         node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
         node.name = graph.name
         graph.root.name = node.name
@@ -690,3 +686,42 @@ class IconDataView(View):
             'icons': JSONSerializer().serializeToPython(icons)
         }
         return JSONResponse(data)
+
+
+class NodegroupView(View):
+    action = 'exportable'
+    
+    def get(self, request):
+        nodegroupid = None
+        try:
+            nodegroupid = uuid.UUID(str(request.GET.get('nodegroupid')))
+        except Exception as e:
+            print(e)
+        if self.action == 'exportable':
+            res = []
+            if nodegroupid is not None:
+                nodegroup = models.NodeGroup.objects.get(nodegroupid=nodegroupid)
+                exportable = False if nodegroup.exportable is None else nodegroup.exportable
+                res.append({'exportable': exportable})
+                return JSONResponse(res)
+            else:
+                return HttpResponseNotFound()
+
+    def post(self, request):
+        nodegroupid = None
+        try:
+            nodegroupid = uuid.UUID(str(request.POST.get('nodegroupid')))
+        except Exception as e:
+            print(e)
+        if self.action == 'exportable' and nodegroupid is not None:
+            exportable = json.loads(request.POST.get('exportable'))
+
+            nodegroup = models.NodeGroup.objects.select_for_update().filter(nodegroupid=nodegroupid)
+            with transaction.atomic():
+                for ng in nodegroup:
+                    ng.exportable = exportable
+                    ng.save()
+
+            return JSONResponse({'nodegroup': nodegroupid, 'status': 'success'})
+
+        return HttpResponseNotFound()

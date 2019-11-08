@@ -197,7 +197,20 @@ define([
                 "fill-opacity": 0.1
             },
             "source": "geojson-editor-data"
-        }, {
+        },  {
+            "id": "geojson-editor-polygon-stroke-base",
+            "type": "line",
+            "filter": ["==", "$type", "Polygon"],
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round"
+            },
+            "paint": {
+                "line-color": "#fff",
+                "line-width": 4
+            },
+            "source": "geojson-editor-data"
+        },  {
             "id": "geojson-editor-polygon-stroke",
             "type": "line",
             "filter": ["==", "$type", "Polygon"],
@@ -401,10 +414,13 @@ define([
             });
 
             self.form.on('tile-reset', function() {
-                self.draw.set({
-                    type: 'FeatureCollection',
-                    features: getDrawFeatures()
-                });
+                var style = self.map().getStyle();
+                if (style) {
+                    self.draw.set({
+                        type: 'FeatureCollection',
+                        features: getDrawFeatures()
+                    });
+                }
                 _.each(self.featureLookup, function(value) {
                     if (value.selectedTool()) value.selectedTool('');
                 });

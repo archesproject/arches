@@ -9,7 +9,7 @@ from itertools import chain
 from django.db import models, DEFAULT_DB_ALIAS
 from django.db.models import Model
 from django.db.models.query import QuerySet
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_str
 from django.core.serializers.python import Serializer as PythonSerializer
 from django.core.serializers.python import Deserializer as PythonDeserializer
 from django.core.serializers.json import DjangoJSONEncoder
@@ -50,7 +50,7 @@ class JSONSerializer(object):
         obj = self.serializeToPython(obj, **options)
         # prevent raw strings from begin re-encoded
         # this is especially important when doing bulk operations in elasticsearch
-        if (isinstance(obj, basestring)):
+        if (isinstance(obj, str)):
             return obj
 
         sort_keys = options.pop("sort_keys", True)
@@ -93,10 +93,12 @@ class JSONSerializer(object):
             for item in object:
                 ret.append(self.handle_object(item, fields, exclude))
             return ret
+        elif isinstance(object, bytes):
+            return object.decode('utf-8')
         elif (isinstance(object, int) or
               isinstance(object, float) or
-              isinstance(object, long) or
-              isinstance(object, basestring) or
+              isinstance(object, int) or
+              isinstance(object, str) or
               isinstance(object, bool) or
               object is None):
             return object
@@ -166,7 +168,7 @@ class JSONSerializer(object):
             if exclude and property_name in exclude:
                 continue
             data[property_name] = self.handle_object(getattr(instance, property_name))
-        for f in chain(opts.concrete_fields, opts.virtual_fields, opts.many_to_many):
+        for f in chain(opts.concrete_fields, opts.private_fields, opts.many_to_many):
             if not getattr(f, 'editable', False):
                 continue
             if fields and f.name not in fields:
@@ -188,10 +190,7 @@ class JSONSerializer(object):
                 else:
                     # MultipleChoiceWidget needs a list of pks, not object instances.
                     qs = f.value_from_object(instance)
-                    if qs._result_cache is not None:
-                        data[f.name] = [item.pk for item in qs]
-                    else:
-                        data[f.name] = list(qs.values_list('pk', flat=True))
+                    data[f.name] = [item.pk for item in qs]
             else:
                 data[f.name] = self.handle_object(f.value_from_object(instance))
         return data
@@ -208,12 +207,26 @@ class JSONDeserializer(object):
         self.selected_fields = options.pop("fields", None)
         self.use_natural_keys = options.pop("use_natural_keys", False)
 
-        if isinstance(stream_or_string, basestring):
-            stream = StringIO(smart_unicode(stream_or_string))
+        if isinstance(stream_or_string, str):
+            stream = StringIO(smart_str(stream_or_string))
+
+        elif isinstance(stream_or_string, bytes):
+            try:
+                stream = stream_or_string.decode("utf-8")
+                stream = StringIO(smart_str(stream))
+            except Exception as e:
+                print(e)
+                stream = stream_or_string
+
         else:
             stream = stream_or_string
 
-        ret = self.handle_object(json.load(stream))
+        try:
+            ret = self.handle_object(json.load(stream))
+        except TypeError as e:
+            print('=== +++ Error in JSONSerializer +++ ===')
+            print(e)
+            ret = None
 
         return ret
 
@@ -231,8 +244,8 @@ class JSONDeserializer(object):
             return self.handle_list(object)
         elif (isinstance(object, int) or
               isinstance(object, float) or
-              isinstance(object, long) or
-              isinstance(object, basestring) or
+              isinstance(object, int) or
+              isinstance(object, str) or
               isinstance(object, bool) or
               object is None):
             return object

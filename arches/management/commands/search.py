@@ -65,8 +65,8 @@ class Command(BaseCommand):
             try:
                 uuid.UUID(details['searchcomponentid'])
             except:
-                details['searchcomponentid'] = unicode(uuid.uuid4())
-            print "Registering the search component, %s, with componentid: %s" % (details['name'], details['searchcomponentid'])
+                details['searchcomponentid'] = str(uuid.uuid4())
+            print("Registering the search component, %s, with componentid: %s" % (details['name'], details['searchcomponentid']))
 
             instance = models.SearchComponent(
                 searchcomponentid=details['searchcomponentid'],
@@ -105,7 +105,7 @@ class Command(BaseCommand):
             instance = models.SearchComponent.objects.get(componentname=name)
             instance.delete()
         except Exception as e:
-            print e
+            print(e)
 
     def list(self):
         """
@@ -116,6 +116,6 @@ class Command(BaseCommand):
         try:
             instances = models.SearchComponent.objects.all()
             for instance in instances:
-                print instance.name
+                print(instance.name)
         except Exception as e:
-            print e
+            print(e)

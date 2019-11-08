@@ -14,8 +14,8 @@ def get_class_from_modulename(modulename, classname, directory_list):
         if module != None:
             break
     if import_success == False:
-        print 'Failed to import ' + mod_path
-        print import_error
+        print('Failed to import ' + mod_path)
+        print(import_error)
 
     func = getattr(module, classname)
     return func

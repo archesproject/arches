@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import os
 import inspect
@@ -29,39 +29,42 @@ except ImportError:  # unable to import corsheaders prior to installing requirem
 ###          STATIC SETTINGS          ###
 #########################################
 
-MODE = 'PROD' #options are either "PROD" or "DEV" (installing with Dev mode set, gets you extra dependencies)
+STREAMLINE_IMPORT = True
+
+MODE = "PROD"  # options are either "PROD" or "DEV" (installing with Dev mode set, gets you extra dependencies)
 DEBUG = True
-INTERNAL_IPS = ('127.0.0.1',)
+INTERNAL_IPS = ("127.0.0.1",)
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'arches',                      # Or path to database file if using sqlite3.
-        'USER': 'postgres',                      # Not used with sqlite3.
-        'PASSWORD': 'postgis',                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '5432',                      # Set to empty string for default. Not used with sqlite3.
-        'POSTGIS_TEMPLATE': 'template_postgis_20',
+    "default": {
+        "ENGINE": "django.contrib.gis.db.backends.postgis",  # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        "NAME": "arches",  # Or path to database file if using sqlite3.
+        "USER": "postgres",  # Not used with sqlite3.
+        "PASSWORD": "postgis",  # Not used with sqlite3.
+        "HOST": "localhost",  # Set to empty string for localhost. Not used with sqlite3.
+        "PORT": "5432",  # Set to empty string for default. Not used with sqlite3.
+        "POSTGIS_TEMPLATE": "template_postgis",
     }
 }
 
 PG_SUPERUSER = ""
 PG_SUPERUSER_PW = ""
 
-COUCHDB_URL = 'http://admin:admin@localhost:5984' # defaults to localhost:5984
+COUCHDB_URL = "http://admin:admin@localhost:5984"  # defaults to localhost:5984
 
 # from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
 ANONYMOUS_USER_NAME = None
 
-ELASTICSEARCH_HTTP_PORT = 9200 # this should be in increments of 200, eg: 9400, 9600, 9800
-SEARCH_BACKEND = 'arches.app.search.search.SearchEngine'
+ELASTICSEARCH_HTTP_PORT = (
+    9200  # this should be in increments of 200, eg: 9400, 9600, 9800
+)
+ELASTICSEARCH_TEMP_HTTP_ENDPOINT = "http://localhost:9800"
+SEARCH_BACKEND = "arches.app.search.search.SearchEngine"
 # see http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
-ELASTICSEARCH_HOSTS = [
-    {'host': 'localhost', 'port': ELASTICSEARCH_HTTP_PORT}
-]
-ELASTICSEARCH_CONNECTION_OPTIONS = {'timeout': 30}
+ELASTICSEARCH_HOSTS = [{"host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
+ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30}
 # a prefix to append to all elasticsearch indexes, note: must be lower case
-ELASTICSEARCH_PREFIX = 'arches'
+ELASTICSEARCH_PREFIX = "arches"
 
 
 # a list of objects of the form below
@@ -79,32 +82,32 @@ USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
-RESOURCE_IMPORT_LOG = 'arches/logs/resource_import.log'
+RESOURCE_IMPORT_LOG = "arches/logs/resource_import.log"
 
 RESOURCE_FORMATERS = {
-    'csv': 'arches.app.utils.data_management.resources.formats.csvfile.CsvWriter',
-    'json': 'arches.app.utils.data_management.resources.formats.archesfile.ArchesFileWriter',
-    'tilecsv': 'arches.app.utils.data_management.resources.formats.csvfile.TileCsvWriter',
-    'xml': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
-    'pretty-xml': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
-    'json-ld': 'arches.app.utils.data_management.resources.formats.rdffile.JsonLdWriter',
-    'n3': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
-    'nt': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
-    'trix': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter'
+    "csv": "arches.app.utils.data_management.resources.formats.csvfile.CsvWriter",
+    "json": "arches.app.utils.data_management.resources.formats.archesfile.ArchesFileWriter",
+    "tilecsv": "arches.app.utils.data_management.resources.formats.csvfile.TileCsvWriter",
+    "xml": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
+    "pretty-xml": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
+    "json-ld": "arches.app.utils.data_management.resources.formats.rdffile.JsonLdWriter",
+    "n3": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
+    "nt": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
+    "trix": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
 }
 
-ONTOLOGY_PATH = os.path.join(ROOT_DIR, 'db', 'ontologies', 'cidoc_crm')
-ONTOLOGY_BASE = 'cidoc_crm_v6.2.xml'
-ONTOLOGY_BASE_VERSION = '6.2'
-ONTOLOGY_BASE_NAME = 'CIDOC CRM v6.2'
-ONTOLOGY_BASE_ID = 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd'
+ONTOLOGY_PATH = os.path.join(ROOT_DIR, "db", "ontologies", "cidoc_crm")
+ONTOLOGY_BASE = "cidoc_crm_v6.2.xml"
+ONTOLOGY_BASE_VERSION = "6.2"
+ONTOLOGY_BASE_NAME = "CIDOC CRM v6.2"
+ONTOLOGY_BASE_ID = "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd"
 ONTOLOGY_EXT = [
-    'CRMsci_v1.2.3.rdfs.xml',
-    'CRMarchaeo_v1.4.rdfs.xml',
-    'CRMgeo_v1.2.rdfs.xml',
-    'CRMdig_v3.2.1.rdfs.xml',
-    'CRMinf_v0.7.rdfs.xml',
-    'arches_crm_enhancements.xml'
+    "CRMsci_v1.2.3.rdfs.xml",
+    "CRMarchaeo_v1.4.rdfs.xml",
+    "CRMgeo_v1.2.rdfs.xml",
+    "CRMdig_v3.2.1.rdfs.xml",
+    "CRMinf_v0.7.rdfs.xml",
+    "arches_crm_enhancements.xml",
 ]
 
 # Set the ontolgoy namespace prefixes to use in the UI, set the namespace to '' omit a prefix
@@ -112,12 +115,12 @@ ONTOLOGY_EXT = [
 ONTOLOGY_NAMESPACES = {
     #'http://my_namespace_here/': 'some_ns',
     #'http://www.w3.org/1999/02/22-rdf-syntax-ns#': 'RDF' <-- note the all caps
-    'http://www.cidoc-crm.org/cidoc-crm/': '',
-    'http://www.ics.forth.gr/isl/CRMarchaeo/': '',
-    'http://www.ics.forth.gr/isl/CRMdig/': '',
-    'http://www.ics.forth.gr/isl/CRMgeo/': '',
-    'http://www.ics.forth.gr/isl/CRMinf/': '',
-    'http://www.ics.forth.gr/isl/CRMsci/': '',
+    "http://www.cidoc-crm.org/cidoc-crm/": "",
+    "http://www.ics.forth.gr/isl/CRMarchaeo/": "",
+    "http://www.ics.forth.gr/isl/CRMdig/": "",
+    "http://www.ics.forth.gr/isl/CRMgeo/": "",
+    "http://www.ics.forth.gr/isl/CRMinf/": "",
+    "http://www.ics.forth.gr/isl/CRMsci/": "",
 }
 
 # Used in the JSON-LD export for determining which external concept scheme URI
@@ -128,30 +131,30 @@ PREFERRED_CONCEPT_SCHEME = "http://vocab.getty.edu/aat/"
 # This is the namespace to use for export of data (for RDF/XML for example)
 # Ideally this should point to the url where you host your site
 # Make sure to use a trailing slash
-ARCHES_NAMESPACE_FOR_DATA_EXPORT = 'http://localhost:8000/'
+ARCHES_NAMESPACE_FOR_DATA_EXPORT = "http://localhost:8000/"
 
-RDM_JSONLD_CONTEXT = {
-    'arches': ARCHES_NAMESPACE_FOR_DATA_EXPORT
-}
+RDM_JSONLD_CONTEXT = {"arches": ARCHES_NAMESPACE_FOR_DATA_EXPORT}
 
 PREFERRED_COORDINATE_SYSTEMS = (
-    {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True}, #Required
+    {
+        "name": "Geographic",
+        "srid": "4326",
+        "proj4": "+proj=longlat +datum=WGS84 +no_defs",
+        "default": True,
+    },  # Required
 )
 
-ANALYSIS_COORDINATE_SYSTEM_SRID = 3857 #Coord sys units must be meters
+ANALYSIS_COORDINATE_SYSTEM_SRID = 3857  # Coord sys units must be meters
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 MANAGERS = ADMINS
 
-RESOURCE_EDITOR_GROUPS = (
-    'Resource Editor',
-    'Crowdsource Editor'
-)
+RESOURCE_EDITOR_GROUPS = ("Resource Editor", "Crowdsource Editor")
 
 # Unique session cookie ensures that logins are treated separately for each app
-SESSION_COOKIE_NAME = 'arches'
+SESSION_COOKIE_NAME = "arches"
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
 # EMAIL_USE_TLS = True
@@ -160,7 +163,7 @@ SESSION_COOKIE_NAME = 'arches'
 # EMAIL_HOST_PASSWORD = 'xxxxxxx'
 # EMAIL_PORT = 587
 
-POSTGIS_VERSION = (2, 0, 0)
+POSTGIS_VERSION = (2, 5, 3)
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -173,7 +176,7 @@ USE_I18N = True
 # timezone as the operating system.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = "America/Chicago"
 USE_TZ = False
 
 # Default Language code for this installation. All choices can be found here:
@@ -192,12 +195,12 @@ USE_TZ = False
 # run
 # django-admin.py makemessages --ignore=virtualenv/* --local=en --extension=htm,py
 # django-admin.py compilemessages
-LANGUAGE_CODE = 'en-US'
+LANGUAGE_CODE = "en-US"
 
 # the path where your translation strings are stored
-LOCALE_PATHS = (
-    os.path.join(ROOT_DIR, 'locale'),
-)
+LOCALE_PATHS = [
+    os.path.join(ROOT_DIR, "locale"),
+]
 
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale
@@ -211,207 +214,204 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 
 # URL that handles the media served from MEDIA_ROOT, used for managing stored files.
 # It must end in a slash if set to a non-empty value.
-MEDIA_URL = '/files/'
+MEDIA_URL = "/files/"
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = ""
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/media/'
+STATIC_URL = "/media/"
 
 # URL prefix for admin static files -- CSS, JavaScript and images.
 # Make sure to use a trailing slash.
 # Examples: "http://foo.com/static/admin/", "/static/admin/".
-ADMIN_MEDIA_PREFIX = '/media/admin/'
+ADMIN_MEDIA_PREFIX = "/media/admin/"
 
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(ROOT_DIR, 'app', 'media'),
+    os.path.join(ROOT_DIR, "app", "media"),
 )
 
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'c7ky-mc6vdnv+avp0r@(a)8y^51ex=25nogq@+q5$fnc*mxwdi'
+SECRET_KEY = "c7ky-mc6vdnv+avp0r@(a)8y^51ex=25nogq@+q5$fnc*mxwdi"
 JWT_KEY = SECRET_KEY
-JWT_TOKEN_EXPIRATION = 50 #days before the token becomes stale
-JWT_ALGORITHM = 'HS256'
+JWT_TOKEN_EXPIRATION = 50  # days before the token becomes stale
+JWT_ALGORITHM = "HS256"
 
 # OAuth settings
 # https://django-oauth-toolkit.readthedocs.io/en/latest/settings.html
-OAUTH2_PROVIDER = {
-    'ACCESS_TOKEN_EXPIRE_SECONDS': 36000
-}
+OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 36000}
 
 # This is the client id you get when you register a new application
 # see https://arches.readthedocs.io/en/stable/api/#authentication
-MOBILE_OAUTH_CLIENT_ID = ''  #'9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
-MOBILE_DEFAULT_ONLINE_BASEMAP = {'default': 'mapbox://styles/mapbox/streets-v9'}
+MOBILE_OAUTH_CLIENT_ID = ""  #'9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
+MOBILE_DEFAULT_ONLINE_BASEMAP = {"default": "mapbox://styles/mapbox/streets-v9"}
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [
             # insert your TEMPLATE_DIRS here
-            os.path.join(ROOT_DIR, 'app', 'templates'),
+            os.path.join(ROOT_DIR, "app", "templates"),
         ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
                 # Insert your TEMPLATE_CONTEXT_PROCESSORS here or use this
                 # list if you haven't customized them:
-                'django.contrib.auth.context_processors.auth',
-                'django.template.context_processors.debug',
-                'django.template.context_processors.i18n',
-                'django.template.context_processors.media',
-                'django.template.context_processors.static',
-                'django.template.context_processors.tz',
-                'django.template.context_processors.request',
-                'django.contrib.messages.context_processors.messages',
-                'arches.app.utils.context_processors.livereload',
-                'arches.app.utils.context_processors.map_info',
-                'arches.app.utils.context_processors.app_settings',
+                "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.debug",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.media",
+                "django.template.context_processors.static",
+                "django.template.context_processors.tz",
+                "django.template.context_processors.request",
+                "django.contrib.messages.context_processors.messages",
+                "arches.app.utils.context_processors.livereload",
+                "arches.app.utils.context_processors.map_info",
+                "arches.app.utils.context_processors.app_settings",
             ],
-            'debug': DEBUG
+            "debug": DEBUG,
         },
     },
 ]
 
 AUTHENTICATION_BACKENDS = (
-    'arches.app.utils.email_auth_backend.EmailAuthenticationBackend',
-    'oauth2_provider.backends.OAuth2Backend',
-    'django.contrib.auth.backends.ModelBackend', # this is default
-    'guardian.backends.ObjectPermissionBackend',
-    'arches.app.utils.permission_backend.PermissionBackend',
+    "arches.app.utils.email_auth_backend.EmailAuthenticationBackend",
+    "oauth2_provider.backends.OAuth2Backend",
+    "django.contrib.auth.backends.ModelBackend",  # this is default
+    "guardian.backends.ObjectPermissionBackend",
+    "arches.app.utils.permission_backend.PermissionBackend",
 )
 
 INSTALLED_APPS = (
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.gis',
-    'arches',
-    'arches.app.models',
-    'arches.management',
-    'guardian',
-    'captcha',
-    'revproxy',
-    'corsheaders',
-    'oauth2_provider',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.gis",
+    "arches",
+    "arches.app.models",
+    "arches.management",
+    "guardian",
+    "captcha",
+    "revproxy",
+    "corsheaders",
+    "oauth2_provider",
+    "django_celery_results",
     #'debug_toolbar'
 )
 
 MIDDLEWARE = [
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
     #'arches.app.utils.middleware.TokenMiddleware',
-    #'django.middleware.locale.LocaleMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'arches.app.utils.middleware.ModifyAuthorizationHeader',
-    'oauth2_provider.middleware.OAuth2TokenMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'arches.app.utils.middleware.SetAnonymousUser',
+    # 'django.middleware.locale.LocaleMiddleware',
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "arches.app.utils.middleware.ModifyAuthorizationHeader",
+    "oauth2_provider.middleware.OAuth2TokenMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "arches.app.utils.middleware.SetAnonymousUser",
 ]
 
-ROOT_URLCONF = 'arches.urls'
+ROOT_URLCONF = "arches.urls"
 
-WSGI_APPLICATION = 'arches.wsgi.application'
+WSGI_APPLICATION = "arches.wsgi.application"
 
 CORS_ORIGIN_ALLOW_ALL = True
 
 try:
     CORS_ALLOW_HEADERS = list(default_headers) + [
-        'x-authorization',
+        "x-authorization",
     ]
 except Exception as e:
     print(e)
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'console': {
-            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "console": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",},
+    },
+    "handlers": {
+        "file": {
+            "level": "WARNING",  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+            "class": "logging.FileHandler",
+            "filename": os.path.join(ROOT_DIR, "arches.log"),
+            "formatter": "console",
+        },
+        "console": {
+            "level": "WARNING",
+            "class": "logging.StreamHandler",
+            "formatter": "console",
         },
     },
-    'handlers': {
-        'file': {
-            'level': 'WARNING',  # DEBUG, INFO, WARNING, ERROR
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(ROOT_DIR, 'arches.log'),
-            'formatter': 'console'
-        },
-        'console': {
-            'level': 'WARNING',
-            'class': 'logging.StreamHandler',
-            'formatter': 'console'
+    "loggers": {
+        "arches": {
+            "handlers": ["file", "console"],
+            "level": "WARNING",
+            "propagate": True,
         }
     },
-    'loggers': {
-        'arches': {
-            'handlers': ['file', 'console'],
-            'level': 'WARNING',
-            'propagate': True
-        }
-    }
 }
 
-LOGIN_URL = 'auth'
+LOGIN_URL = "auth"
 
-PROFILE_LOG_BASE = os.path.join(ROOT_DIR, 'logs')
+PROFILE_LOG_BASE = os.path.join(ROOT_DIR, "logs")
 
 BULK_IMPORT_BATCH_SIZE = 2000
 
-SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Local.json')
-SYSTEM_SETTINGS_RESOURCE_ID = 'a106c400-260c-11e7-a604-14109fd34195'
+SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(
+    ROOT_DIR, "db", "system_settings", "Arches_System_Settings_Local.json"
+)
+SYSTEM_SETTINGS_RESOURCE_ID = "a106c400-260c-11e7-a604-14109fd34195"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator', #Passwords cannot be entirely numeric
+        "NAME": "arches.app.utils.password_validation.NumericPasswordValidator",  # Passwords cannot be entirely numeric
     },
     {
-        'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator', #Passwords must contain special characters
-        'OPTIONS': {
-            'special_characters': ('!','@','#',')','(','*','&','^','%','$'),
-        }
+        "NAME": "arches.app.utils.password_validation.SpecialCharacterValidator",  # Passwords must contain special characters
+        "OPTIONS": {
+            "special_characters": ("!", "@", "#", ")", "(", "*", "&", "^", "%", "$"),
+        },
     },
     {
-        'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator', #Passwords must contain 1 or more numbers
+        "NAME": "arches.app.utils.password_validation.HasNumericCharacterValidator",  # Passwords must contain 1 or more numbers
     },
     {
-        'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator', #Passwords must contain upper and lower characters
+        "NAME": "arches.app.utils.password_validation.HasUpperAndLowerCaseValidator",  # Passwords must contain upper and lower characters
     },
     {
-        'NAME': 'arches.app.utils.password_validation.MinLengthValidator', #Passwords must meet minimum length requirement
-        'OPTIONS': {
-            'min_length': 9,
-        }
+        "NAME": "arches.app.utils.password_validation.MinLengthValidator",  # Passwords must meet minimum length requirement
+        "OPTIONS": {"min_length": 9,},
     },
 ]
 
 USE_LIVERELOAD = False
-LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for livereload browser extensions
+LIVERELOAD_PORT = 35729  # usually only used in development, 35729 is default for livereload browser extensions
 
 ENABLE_CAPTCHA = True
 # RECAPTCHA_PUBLIC_KEY = ''
@@ -419,14 +419,16 @@ ENABLE_CAPTCHA = True
 # RECAPTCHA_USE_SSL = False
 NOCAPTCHA = True
 # RECAPTCHA_PROXY = 'http://127.0.0.1:8000'
+if DEBUG is True:
+    SILENCED_SYSTEM_CHECKS = ["captcha.recaptcha_test_key_error"]
 
 # group to assign users who self sign up via the web ui
-USER_SIGNUP_GROUP = 'Crowdsource Editor'
+USER_SIGNUP_GROUP = "Crowdsource Editor"
 
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
+    "default": {
+        "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
+        "LOCATION": "127.0.0.1:11211",
     }
 }
 
@@ -448,65 +450,68 @@ CACHES = {
 #   }
 TIMEWHEEL_DATE_TIERS = None
 
-#Identify the usernames and duration (seconds) for which you want to cache the timewheel
-CACHE_BY_USER = {'anonymous': 3600 * 24}
+# Identify the usernames and duration (seconds) for which you want to cache the timewheel
+CACHE_BY_USER = {"anonymous": 3600 * 24}
 
-DATE_IMPORT_EXPORT_FORMAT = '%Y-%m-%d'
+DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d"
 
 API_MAX_PAGE_SIZE = 500
 
-UUID_REGEX = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
+UUID_REGEX = (
+    "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+)
 
-OAUTH2_PROVIDER = {
-    'ACCESS_TOKEN_EXPIRE_SECONDS': 604800  # one week
-}
+OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 604800}  # one week
 
 #######################################
 ###       END STATIC SETTINGS       ###
 #######################################
 
 
-
 ##########################################
 ###   RUN TIME CONFIGURABLE SETTINGS   ###
 ##########################################
 
-PHONE_REGEX = r'^\+\d{8,15}$'
+PHONE_REGEX = r"^\+\d{8,15}$"
 SEARCH_ITEMS_PER_PAGE = 5
 SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
 RELATED_RESOURCES_PER_PAGE = 15
 RELATED_RESOURCES_EXPORT_LIMIT = 10000
 SEARCH_DROPDOWN_LENGTH = 100
-SEARCH_TERM_SENSITIVITY = 3 # a lower number will give more "Fuzzy" matches, recomend between 0-4, see "prefix_length" at https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl-fuzzy-query.html#_parameters_7
-WORDS_PER_SEARCH_TERM = 10 # set to None for unlimited number of words allowed for search terms
-SEARCH_RESULT_LIMIT = 10000 # should be less than or equal to elasticsearch configuration, index.max_result_window (default = 10,000)
+SEARCH_TERM_SENSITIVITY = 3  # a lower number will give more "Fuzzy" matches, recomend between 0-4, see "prefix_length" at https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl-fuzzy-query.html#_parameters_7
+WORDS_PER_SEARCH_TERM = (
+    10  # set to None for unlimited number of words allowed for search terms
+)
+SEARCH_RESULT_LIMIT = 10000  # should be less than or equal to elasticsearch configuration, index.max_result_window (default = 10,000)
 
-ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
+ETL_USERNAME = "ETL"  # override this setting in your packages settings.py file
 
 GOOGLE_ANALYTICS_TRACKING_ID = None
 
 DEFAULT_GEOCODER = "10000000-0000-0000-0000-010000000000"
 
 SPARQL_ENDPOINT_PROVIDERS = (
-    {'SPARQL_ENDPOINT_PROVIDER':'arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider'},
+    {
+        "SPARQL_ENDPOINT_PROVIDER": "arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider"
+    },
 )
 
-APP_NAME = 'Arches'
+APP_NAME = "Arches"
 
-APP_TITLE = 'Arches | Heritage Data Management'
-COPYRIGHT_TEXT = 'All Rights Reserved.'
-COPYRIGHT_YEAR = '2016'
+APP_TITLE = "Arches | Heritage Data Management"
+COPYRIGHT_TEXT = "All Rights Reserved."
+COPYRIGHT_YEAR = "2016"
 
 # Bounding box for geometry data validation. By default set to coordinate system bounding box.
 # NOTE: This is not used by the front end of the application.
-DATA_VALIDATION_BBOX = [(-180,-90), (-180,90), (180,90), (180,-90), (-180,-90)]
+DATA_VALIDATION_BBOX = [(-180, -90), (-180, 90), (180, 90), (180, -90), (-180, -90)]
 
 RESOURCE_GRAPH_LOCATIONS = (
     # Put strings here, like "/home/data/resource_graphs" or "C:/data/resource_graphs".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(ROOT_DIR, 'db', 'graphs', 'branches'),
-    os.path.join(ROOT_DIR, 'db', 'graphs', 'resource_models'),
+    os.path.join(ROOT_DIR, "db", "graphs", "branches"),
+    os.path.join(ROOT_DIR, "db", "graphs", "resource_models"),
 )
 
 BUSINESS_DATA_FILES = (
@@ -515,39 +520,17 @@ BUSINESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
-DATATYPE_LOCATIONS = ['arches.app.datatypes',]
-FUNCTION_LOCATIONS = ['arches.app.functions',]
-SEARCH_COMPONENT_LOCATIONS = ['arches.app.search.components',]
+DATATYPE_LOCATIONS = [
+    "arches.app.datatypes",
+]
+FUNCTION_LOCATIONS = [
+    "arches.app.functions",
+]
+SEARCH_COMPONENT_LOCATIONS = [
+    "arches.app.search.components",
+]
 
-# If you are manually managing your resource tile cache, you may want to "seed"
-# the cache (or prerender some tiles) for low zoom levels.  You can do this by
-# running:
-# python manage.py packages -o seed_resource_tile_cache
-#
-# The following settings control the extent and max zoom level to which tiles
-# will be seeded.  Be aware, seeding tiles at high zoom levels (more zoomed in)
-# will take a long time
-CACHE_SEED_BOUNDS = (
-    52.0, -122.0,
-    69.0,  128.0,
-)
-CACHE_SEED_MAX_ZOOM = 5
-
-# configure where the tileserver should store its cache
-TILE_CACHE_CONFIG = {
-    "name": "Disk",
-    "path": os.path.join(ROOT_DIR, 'tileserver', 'cache')
-
-    # to reconfigure to use S3 (recommended for production), use the following
-    # template:
-
-    # "name": "S3",
-    # "bucket": "<bucket name>",
-    # "access": "<access key>",
-    # "secret": "<secret key>"
-}
-
-MAPBOX_API_KEY = '' # Put your Mapbox key here!
+MAPBOX_API_KEY = ""  # Put your Mapbox key here!
 
 # links to sprites and glyphs for use on map
 MAPBOX_SPRITES = "mapbox://sprites/mapbox/basic-v9"
@@ -568,22 +551,18 @@ OVERRIDE_RESOURCE_MODEL_LOCK = False
 # a smaller bbox will give you less distortion in hexes and better performance
 DEFAULT_BOUNDS = {
     "type": "FeatureCollection",
-    "features": [{
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": [
-                [
-                    [-122, -52],
-                    [128, -52],
-                    [128, 69],
-                    [-122, 69],
-                    [-122, -52]
-                ]
-            ]
-        },
-        "type": "Feature",
-        "properties": {}
-    }]
+    "features": [
+        {
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [[-122, -52], [128, -52], [128, 69], [-122, 69], [-122, -52]]
+                ],
+            },
+            "type": "Feature",
+            "properties": {},
+        }
+    ],
 }
 
 # size to use for hex binning search results on map (in km)
@@ -595,12 +574,18 @@ HEX_BIN_SIZE = 100
 HEX_BIN_PRECISION = 4
 
 ALLOWED_POPUP_HOSTS = []
+
+TILESERVER_URL = None
+
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_RESULT_BACKEND = 'django-db'  # Use 'django-cache' if you want to use your cache as your backend
+CELERY_TASK_SERIALIZER = 'json'
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################
 
-
 try:
-    from settings_local import *
+    from .settings_local import *
 except ImportError:
     pass

@@ -1,9 +1,9 @@
 import uuid
 import json
 import decimal
-import distutils
 import base64
 import re
+from distutils import util
 from datetime import datetime
 from mimetypes import MimeTypes
 from arches.app.datatypes.base import BaseDataType
@@ -58,7 +58,7 @@ class DataTypeFactory(object):
 
 class StringDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source=None):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
         errors = []
         try:
             if value is not None:
@@ -87,7 +87,7 @@ class StringDataType(BaseDataType):
 
     def transform_export_values(self, value, *args, **kwargs):
         if value != None:
-            return value.encode('utf8')
+            return value
 
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
@@ -133,7 +133,7 @@ class StringDataType(BaseDataType):
 
 class NumberDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source=''):
+    def validate(self, value, row_number=None, source='', node=None, nodeid=None):
         errors = []
 
         try:
@@ -204,11 +204,11 @@ class NumberDataType(BaseDataType):
 
 class BooleanDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source=''):
+    def validate(self, value, row_number=None, source='', node=None, nodeid=None):
         errors = []
 
         try:
-            type(bool(distutils.util.strtobool(str(value)))) is True
+            type(bool(util.strtobool(str(value)))) is True
         except:
             errors.append({
                 'type': 'ERROR',
@@ -218,7 +218,7 @@ class BooleanDataType(BaseDataType):
         return errors
 
     def transform_import_values(self, value, nodeid):
-        return bool(distutils.util.strtobool(str(value)))
+        return bool(util.strtobool(str(value)))
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -252,7 +252,7 @@ class BooleanDataType(BaseDataType):
 
 class DateDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source=''):
+    def validate(self, value, row_number=None, source='', node=None, nodeid=None):
         errors = []
         if value is not None:
             date_formats = ['-%Y','%Y','%Y-%m-%d','%B-%m-%d','%Y-%m-%d %H:%M:%S']
@@ -342,10 +342,11 @@ class DateDataType(BaseDataType):
 
 class EDTFDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source=''):
+    def validate(self, value, row_number=None, source='', node=None, nodeid=None):
         errors = []
-        if not ExtendedDateFormat(value).is_valid():
-            errors.append({'type': 'ERROR', 'message': '{0} {1} is not in the correct Extended Date Time Format, see http://www.loc.gov/standards/datetime/ for supported formats. This data was not imported.'.format(value, row_number)})
+        if value is not None:
+            if not ExtendedDateFormat(value).is_valid():
+                errors.append({'type': 'ERROR', 'message': '{0} {1} is not in the correct Extended Date Time Format, see http://www.loc.gov/standards/datetime/ for supported formats. This data was not imported.'.format(value, row_number)})
 
         return errors
 
@@ -415,7 +416,7 @@ class EDTFDataType(BaseDataType):
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source=None):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
         errors = []
         coord_limit = 1500
         coordinate_count = 0
@@ -506,7 +507,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             node_data = tile.data[str(node.pk)]
             bounds = self.get_bounds_from_value(node_data)
         except KeyError as e:
-            print e
+            print(e)
         return bounds
 
     def get_bounds_from_value(self, node_data):
@@ -530,109 +531,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 bounds = (minx, miny, maxx, maxy)
 
         return bounds
-
-    def get_layer_config(self, node=None):
-        sql_list = []
-        database = settings.DATABASES['default']
-        if node is not None and node.config is not None:
-            config = node.config
-
-            cluster_sql = """
-                WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid) AS (
-                    SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
-                	FROM mv_geojson_geoms m
-                    WHERE nodeid = '%s'
-                )
-
-                SELECT resourceinstanceid::text,
-                		row_number() over () as __id__,
-                		1 as total,
-                		ST_Centroid(geom) AS __geometry__,
-                        '' AS extent
-                	FROM clusters
-                	WHERE cid is NULL
-
-                UNION
-
-                SELECT NULL as resourceinstanceid,
-                		row_number() over () as __id__,
-                		count(*) as total,
-                		ST_Centroid(
-                            ST_Collect(geom)
-                        ) AS __geometry__,
-                        ST_AsGeoJSON(
-                            ST_Transform(
-                                ST_SetSRID(
-                                    ST_Extent(geom), 900913
-                                ), 4326
-                            )
-                        ) AS extent
-                	FROM clusters
-                	WHERE cid IS NOT NULL
-                	GROUP BY cid
-            """
-
-            for i in range(int(config['clusterMaxZoom']) + 1):
-                arc = EARTHCIRCUM / ((1 << i) * PIXELSPERTILE)
-                distance = arc * int(config['clusterDistance'])
-                sql_string = cluster_sql % (distance, int(config['clusterMinPoints']), node.pk)
-                sql_list.append(sql_string)
-
-            sql_list.append("""
-                SELECT resourceinstanceid::text,
-                        tileid::text,
-                        (row_number() over ()) as __id__,
-                        1 as total,
-                        geom AS __geometry__,
-                        '' AS extent
-                    FROM mv_geojson_geoms
-                    WHERE nodeid = '%s'
-            """ % node.pk)
-
-        else:
-            config = {"cacheTiles": False}
-            for i in range(23):
-                sql_list.append(None)
-
-        try:
-            simplification = config['simplification']
-        except KeyError as e:
-            simplification = 0.3
-
-        return {
-            "provider": {
-                "class": "TileStache.Goodies.VecTiles:Provider",
-                "kwargs": {
-                    "dbinfo": {
-                        "host": database["HOST"],
-                        "user": database["USER"],
-                        "password": database["PASSWORD"],
-                        "database": database["NAME"],
-                        "port": database["PORT"]
-                    },
-                    "simplify": simplification,
-                    "clip": False,
-                    "queries": sql_list
-                },
-            },
-            "allowed origin": "*",
-            "compress": True,
-            "write cache": config["cacheTiles"]
-        }
-
-    def should_cache(self, node=None):
-        if node is None:
-            return False
-        elif node.config is None:
-            return False
-        return node.config["cacheTiles"]
-
-    def should_manage_cache(self, node=None):
-        if node is None:
-            return False
-        elif node.config is None:
-            return False
-        return node.config["autoManageCache"]
 
     def get_map_layer(self, node=None, preview=False):
         if node is None:
@@ -1041,15 +939,63 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "addtomap": node.config['addToMap'],
         }
 
-    def after_update_all(self):
-        cursor = connection.cursor()
-        sql = """
-            REFRESH MATERIALIZED VIEW mv_geojson_geoms;
-        """
-        cursor.execute(sql)
-
 
 class FileListDataType(BaseDataType):
+
+    def __init__(self, model=None):
+        super(FileListDataType, self).__init__(model=model)
+        self.node_lookup = {}
+
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
+        if node:
+            self.node_lookup[str(node.pk)] = node
+        elif nodeid:
+            if str(nodeid) in self.node_lookup:
+                node = self.node_lookup[str(nodeid)]
+            else:
+                node = models.Node.objects.get(nodeid=nodeid)
+                self.node_lookup[str(nodeid)] = node
+
+        config = node.config
+        errors = []
+        limit = config['maxFiles']
+        max_size = config['maxFileSize'] if 'maxFileSize' in config.keys() else None
+
+
+        def format_bytes(size):
+            # 2**10 = 1024
+            power = 2**10
+            n = 0
+            power_labels = {0 : '', 1: 'kilo', 2: 'mega', 3: 'giga', 4: 'tera'}
+            while size > power:
+                size /= power
+                n += 1
+            return size, power_labels[n]+'bytes'
+
+
+        try:
+            if value is not None and config['activateMax'] is True and len(value) > limit:
+                errors.append({
+                    'type':'ERROR',
+                    'message':f'This node has a limit of {limit} files. Please reduce files.'
+                })
+
+            if max_size is not None:
+                formatted_max_size = format_bytes(max_size)
+                for v in value:
+                    if v['size'] > max_size:
+                        errors.append({
+                            'type':'ERROR',
+                            'message':f'This node has a file-size limit of {formatted_max_size}. Please reduce file size or contact your sysadmin.'
+                        })
+        except Exception as e:
+            dt = self.datatype_model.datatype
+            errors.append({
+                'type': 'ERROR',
+                'message': f'datatype: {dt}, value: {value} - {e} .'
+            })
+        return errors
+
 
     def get_tile_data(self, user_is_reviewer, user_id, tile):
         if user_is_reviewer is False and tile.provisionaledits is not None and user_id in tile.provisionaledits:
@@ -1078,7 +1024,7 @@ class FileListDataType(BaseDataType):
                             deleted_file = models.File.objects.get(pk=previously_saved_file["file_id"])
                             deleted_file.delete()
                         except models.File.DoesNotExist:
-                            print 'file does not exist'
+                            print('file does not exist')
 
         files = request.FILES.getlist('file-list_' + str(node.pk), [])
 
@@ -1277,7 +1223,7 @@ class BaseDomainDataType(BaseDataType):
 
     def get_option_id_from_text(self, value):
         # this could be better written with most of the logic in SQL tbh
-        for dnode in models.Node.objects.filter(config__options__contains=[{"text": value}]):
+        for dnode in models.Node.objects.filter(config__contains={"options":[{"text": value}]}):
             for option in dnode.config['options']:
                 if option['text'] == value:
                     yield option['id'], dnode.node_id
@@ -1285,11 +1231,12 @@ class BaseDomainDataType(BaseDataType):
 
 class DomainDataType(BaseDomainDataType):
 
-    def validate(self, value, row_number=None, source=''):
+    def validate(self, value, row_number=None, source='', node=None, nodeid=None):
         errors = []
+        domain_val_node_query = models.Node.objects.filter(config__contains={"options":[{"id": value}]})
         if value is not None:
-            if len(models.Node.objects.filter(config__options__contains=[{"id": value}])) < 1:
-                errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value, row_number)})
+            if len(domain_val_node_query) < 1:
+                errors.append({'type': 'ERROR', 'message': f'{value} {row_number} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'})
         return errors
 
     def get_search_terms(self, nodevalue, nodeid=None):
@@ -1363,12 +1310,12 @@ class DomainDataType(BaseDomainDataType):
 
 
 class DomainListDataType(BaseDomainDataType):
-    def validate(self, value, row_number=None, source=''):
+    def validate(self, value, row_number=None, source='', node=None, nodeid=None):
         errors = []
         if value is not None:
             for v in value:
-                if len(models.Node.objects.filter(config__options__contains=[{"id": v}])) < 1:
-                    errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(v, row_number)})
+                if len(models.Node.objects.filter(config__contains={"options":[{"id": v}]})) < 1:
+                    errors.append({'type': 'ERROR', 'message': f'{v} {row_number} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'})
         return errors
 
     def transform_import_values(self, value, nodeid):
@@ -1407,16 +1354,6 @@ class DomainListDataType(BaseDomainDataType):
                 option = self.get_option_text(node, val)
                 new_values.append(option)
         return ','.join(new_values)
-
-    def transform_export_values(self, value, *args, **kwargs):
-        ret = ''
-        if kwargs['concept_export_value_type'] == None or kwargs['concept_export_value_type'] == '' or kwargs['concept_export_value_type'] == 'label':
-            ret = self.get_option_text(models.Node.objects.get(nodeid=kwargs['node']), value)
-        elif kwargs['concept_export_value_type'] == 'both':
-            ret = value + '|' + self.get_option_text(models.Node.objects.get(nodeid=kwargs['node']), value)
-        elif kwargs['concept_export_value_type'] == 'id':
-            ret = value
-        return ret
 
     def transform_export_values(self, value, *args, **kwargs):
         new_values = []
@@ -1460,11 +1397,10 @@ class DomainListDataType(BaseDomainDataType):
         return [domtype.from_rdf(item) for item in json_ld_node]
 
 
-
 class ResourceInstanceDataType(BaseDataType):
     def get_id_list(self, nodevalue):
         id_list = nodevalue
-        if type(nodevalue) is unicode:
+        if type(nodevalue) is str:
             id_list = [nodevalue]
         return id_list
 
@@ -1478,12 +1414,12 @@ class ResourceInstanceDataType(BaseDataType):
                     resource_document = se.search(index='resources', id=resourceid)
                     resource_names.add(resource_document['_source']['displayname'])
                 except:
-                    print 'resource not available'
+                    print('resource not available')
         else:
-            print 'resource not avalable'
+            print('resource not avalable')
         return resource_names
 
-    def validate(self, value, row_number=None, source=''):
+    def validate(self, value, row_number=None, source='', node=None, nodeid=None):
         errors = []
 
         if value is not None:
@@ -1514,7 +1450,7 @@ class ResourceInstanceDataType(BaseDataType):
     def transform_export_values(self, value, *args, **kwargs):
         result = value
         try:
-            if not isinstance(value, basestring): #change basestring to str in python3
+            if not isinstance(value, str): #changed from basestring to str for python3 branch
                 result = ",".join(value)
         except:
             pass
@@ -1567,13 +1503,13 @@ class ResourceInstanceDataType(BaseDataType):
 
 
 class NodeValueDataType(BaseDataType):
-    def validate(self, value, row_number=None, source=''):
+    def validate(self, value, row_number=None, source='', node=None, nodeid=None):
         errors = []
         if value:
             try:
                 models.TileModel.objects.get(tileid=value)
             except:
-                errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid tile id. This data was not imported.'.format(value, row_number)})
+                errors.append({'type': 'ERROR', 'message': f'{value} {row_number} is not a valid tile id. This data was not imported.'})
         return errors
 
     def get_display_value(self, tile, node):

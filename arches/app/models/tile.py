@@ -21,6 +21,7 @@ import importlib
 import datetime
 import json
 import pytz
+import logging
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.db.models import Q
@@ -35,6 +36,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
 from arches.app.datatypes.datatypes import DataTypeFactory
 
+logger = logging.getLogger(__name__)
 
 class Tile(models.TileModel):
     """
@@ -147,7 +149,7 @@ class Tile(models.TileModel):
         if self.tile_collects_data() is True and data != {}:
 
             utc_date_format = '%Y-%m-%dT%H:%M:%S.%fZ'
-            timestamp_utc = unicode(datetime.datetime.now(pytz.utc).strftime(utc_date_format))
+            timestamp_utc = str(datetime.datetime.now(pytz.utc).strftime(utc_date_format))
 
             provisionaledit = {
                 "value": data,
@@ -254,7 +256,7 @@ class Tile(models.TileModel):
             datatype_factory = DataTypeFactory()
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = datatype_factory.get_instance(node.datatype)
-            error = datatype.validate(value)
+            error = datatype.validate(value, node=node)
             for error_instance in error:
                 if error_instance['type'] == 'ERROR':
                     raise TileValidationError(_("{0}".format(error_instance["message"])))
@@ -479,25 +481,32 @@ class Tile(models.TileModel):
         return tile
 
     def __preSave(self, request=None):
-        for function in self.__getFunctionClassInstances():
-            try:
-                function.save(self, request)
-            except NotImplementedError:
-                pass
+        try:
+            for function in self.__getFunctionClassInstances():
+                try:
+                    function.save(self, request)
+                except NotImplementedError:
+                    pass
+        except TypeError as e:
+            logger.info(_("No associated functions"))
+
 
     def __preDelete(self, request):
-        for function in self.__getFunctionClassInstances():
-            try:
-                function.delete(self, request)
-            except NotImplementedError:
-                pass
+        try:
+            for function in self.__getFunctionClassInstances():
+                try:
+                    function.delete(self, request)
+                except NotImplementedError:
+                    pass
+        except TypeError as e:
+            logger.info(_("No associated functions"))
 
     def __getFunctionClassInstances(self):
         ret = []
         resource = models.ResourceInstance.objects.get(pk=self.resourceinstance_id)
         functionXgraphs = models.FunctionXGraph.objects.filter(
             Q(graph_id=resource.graph_id),
-            Q(config__triggering_nodegroups__contains=[str(self.nodegroup_id)]) | Q(config__triggering_nodegroups=[]),
+            Q(config__contains={"triggering_nodegroups":[self.nodegroup_id]}) | Q(config__triggering_nodegroups__exact=[]),
             ~Q(function__classname='PrimaryDescriptorsFunction')
         )
         for functionXgraph in functionXgraphs:
@@ -508,7 +517,7 @@ class Tile(models.TileModel):
     def filter_by_perm(self, user, perm):
         if user:
             if self.nodegroup_id is not None and user.has_perm(perm, self.nodegroup):
-                self.tiles = filter(lambda tile: tile.filter_by_perm(user, perm), self.tiles)
+                self.tiles = [tile for tile in self.tiles if tile.filter_by_perm(user, perm)]
             else:
                 return None
         return self

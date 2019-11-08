@@ -97,6 +97,9 @@ class Query(Dsl):
         #print self
         return self.se.search(index=index, body=self.dsl)
 
+    def count(self, index='', **kwargs):
+        return self.se.count(index=index, body=self.dsl)
+
     def delete(self, index='', **kwargs):
         return self.se.delete(index=index, body=self.dsl, **kwargs)
 
@@ -135,6 +138,8 @@ class Bool(Dsl):
         return self._append('must', dsl)
 
     def should(self, dsl):
+        if dsl and 'minimum_should_match' not in self.dsl['bool']:
+            self.dsl['bool']['minimum_should_match'] = 1
         return self._append('should', dsl)
 
     def must_not(self, dsl):

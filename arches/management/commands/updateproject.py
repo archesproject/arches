@@ -2,7 +2,7 @@ import arches
 import json
 import os
 import subprocess
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from arches.management.commands import utils
 from arches.app.models import models
 from arches.app.models.system_settings import settings
@@ -53,7 +53,7 @@ class Command(BaseCommand):
                 If you have not manually modified this file since creating this project,\
                 the answer is probably 'yes'") is True:
             url = "https://raw.githubusercontent.com/archesproject/arches/stable/{0}/package.json".format(version)
-            response = urllib.urlopen(url)
+            response = urllib.request.urlopen(url)
             data = json.loads(response.read())
             with open(packages_path, 'w') as f:
                 json.dump(data, f, indent=4)

@@ -22,6 +22,7 @@ import csv
 import json
 import uuid
 import datetime
+from io import StringIO
 from time import time
 from copy import deepcopy
 from os.path import isfile, join
@@ -35,14 +36,10 @@ from arches.app.models.models import GraphModel
 from arches.app.models.system_settings import settings
 from django.core.exceptions import ValidationError
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from format import Writer
-from format import Reader
-from format import ResourceImportReporter
+from .format import Writer
+from .format import Reader
+from .format import ResourceImportReporter
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 class ArchesFileWriter(Writer):
 
@@ -165,9 +162,9 @@ class ArchesFileReader(Reader):
                                     tileid=uuid.UUID(str(src_tile['tileid'])),
                                     defaults={
                                         'resourceinstance': resourceinstance,
-                                        'parenttile': Tile(uuid.UUID(str(src_tile['parenttile_id'])))
+                                        'parenttile_id': str(src_tile['parenttile_id'])
                                         if src_tile['parenttile_id'] else None,
-                                        'nodegroup': NodeGroup(uuid.UUID(str(src_tile['nodegroup_id'])))
+                                        'nodegroup_id': str(src_tile['nodegroup_id'])
                                         if src_tile['nodegroup_id'] else None,
                                         'data': src_tile['data']
                                     }
@@ -184,9 +181,9 @@ class ArchesFileReader(Reader):
                             for tile in resource['tiles']:
                                 tile['tiles'] = [child for child in resource[
                                     'tiles'] if child['parenttile_id'] == tile['tileid']]
-                            for tile in sorted(resource['tiles'], key=lambda k: k['parenttile_id']):
-                                if not tile['parenttile_id']:
-                                    update_or_create_tile(tile)
+
+                            for tile in [k for k in resource['tiles'] if k['parenttile_id'] is None]:
+                                update_or_create_tile(tile)
 
     def get_blank_tile(self, sourcetilegroup, blanktilecache, tiles, resourceinstanceid):
         if len(sourcetilegroup[0]['data']) > 0:
@@ -353,7 +350,7 @@ class ArchesFileReader(Reader):
                         # reporter.update_tiles_saved(tile_saved)
 
         except (KeyError, TypeError) as e:
-            print e
+            print(e)
 
         finally:
             reporter.report_results()
@@ -369,4 +366,4 @@ class ArchesFileReader(Reader):
                 self.import_business_data(self.business_data, self.mapping)
         else:
             for error in errors:
-                print "{0} {1}".format(error[0], error[1])
+                print("{0} {1}".format(error[0], error[1]))

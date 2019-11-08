@@ -15,7 +15,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import json
-import urlparse
+import urllib.parse
 from datetime import datetime
 from datetime import timedelta
 from copy import copy, deepcopy
@@ -86,7 +86,7 @@ class MobileSurvey(models.MobileSurveyModel):
         try:
             self.couch.delete_db('project_' + str(self.id))
         except Exception as e:
-            print(e), _("Could not delete database in CouchDB")
+            print(e, _("Could not delete database in CouchDB"))
         super(MobileSurvey, self).delete()
 
     def collect_card_widget_node_data(self, graph_obj, graph, parentcard, nodegroupids=[]):
@@ -129,10 +129,10 @@ class MobileSurvey(models.MobileSurveyModel):
                     if node['config']['graphid'] is not None:
                         try:
                             graphuuid = uuid.UUID(node['config']['graphid'][0])
-                            graph_id = unicode(graphuuid)
+                            graph_id = str(graphuuid)
                         except ValueError as e:
                             graphuuid = uuid.UUID(node['config']['graphid'])
-                            graph_id = unicode(graphuuid)
+                            graph_id = str(graphuuid)
                         node['config']['options'] = []
                         for resource_instance in Resource.objects.filter(graph_id=graph_id):
                             node['config']['options'].append({'id': str(resource_instance.pk), 'name': resource_instance.displayname})
@@ -222,12 +222,12 @@ class MobileSurvey(models.MobileSurveyModel):
                 singlepart = GeoUtils().convert_multipart_to_singlepart(bounds)
                 ret['bounds'] = singlepart
         except TypeError as e:
-            print 'Could not parse', ret['bounds'], e
+            print('Could not parse', ret['bounds'], e)
         return ret
 
     def get_ordered_cards(self):
         ordered_cards = models.MobileSurveyXCard.objects.filter(mobile_survey=self).order_by('sortorder')
-        ordered_card_ids = [unicode(mpc.card_id) for mpc in ordered_cards]
+        ordered_card_ids = [str(mpc.card_id) for mpc in ordered_cards]
         return ordered_card_ids
 
     def handle_reviewer_edits(self, user, tile):
@@ -297,9 +297,7 @@ class MobileSurvey(models.MobileSurveyModel):
                         if 'provisional_resource' in row.doc and row.doc['provisional_resource'] == 'true':
                             resourceinstance, created = ResourceInstance.objects.update_or_create(
                                 resourceinstanceid=uuid.UUID(str(row.doc['resourceinstanceid'])),
-                                defaults={
-                                    'graph_id': uuid.UUID(str(row.doc['graph_id']))
-                                }
+                                defaults=dict(graph_id=uuid.UUID(str(row.doc['graph_id'])))
                             )
                             if created is True:
                                 self.save_revision_log(row.doc, synclog, 'create')
@@ -349,9 +347,12 @@ class MobileSurvey(models.MobileSurveyModel):
     def append_to_instances(self, request, instances, resource_type_id):
         search_res_json = search.search_results(request)
         search_res = JSONDeserializer().deserialize(search_res_json.content)
-        for hit in search_res['results']['hits']['hits']:
-            if hit['_type'] == resource_type_id and len(list(instances.keys())) < int(self.datadownloadconfig['count']):
-                instances[hit['_source']['resourceinstanceid']] = hit['_source']
+        try:
+            for hit in search_res['results']['hits']['hits']:
+                if hit['_type'] == resource_type_id and len(list(instances)) < int(self.datadownloadconfig['count']):
+                    instances[hit['_source']['resourceinstanceid']] = hit['_source']
+        except Exception as e:
+            print(e)
 
     def collect_resource_instances_for_couch(self):
         """
@@ -363,7 +364,7 @@ class MobileSurvey(models.MobileSurveyModel):
         resource_types = self.datadownloadconfig['resources']
         all_instances = {}
         if query in ('', None) and len(resource_types) == 0:
-            print "No resources or data query defined"
+            print("No resources or data query defined")
         else:
             request = HttpRequest()
             request.user = self.lasteditedby
@@ -375,7 +376,7 @@ class MobileSurvey(models.MobileSurveyModel):
                     default_bounds['features'][0]['properties']['inverted'] = False
                     map_filter = json.dumps(default_bounds)
                 else:
-                    map_filter = json.dumps({u'type': u'FeatureCollection', 'features': [
+                    map_filter = json.dumps({'type': 'FeatureCollection', 'features': [
                                             {'geometry': json.loads(self.bounds.json)}]})
                 try:
                     for res_type in resource_types:
@@ -391,13 +392,13 @@ class MobileSurvey(models.MobileSurveyModel):
                             self.append_to_instances(request, instances, res_type)
                         for key, value in instances.items():
                             all_instances[key] = value
-                except KeyError:
-                    print 'no instances found in', search_res
+                except Exception as e:
+                    print(e)
             else:
                 try:
                     instances = {}
-                    parsed = urlparse.urlparse(query)
-                    urlparams = urlparse.parse_qs(parsed.query)
+                    parsed = urllib.parse.urlparse(query)
+                    urlparams = urllib.parse.parse_qs(parsed.query)
                     for k, v in urlparams.items():
                         request.GET[k] = v[0]
                     search_res_json = search.search_results(request)
@@ -407,7 +408,7 @@ class MobileSurvey(models.MobileSurveyModel):
                     for key, value in instances.items():
                         all_instances[key] = value
                 except KeyError:
-                    print 'no instances found in', search_res
+                    print('no instances found in', search_res)
         return all_instances
 
     def load_tiles_into_couch(self, instances, nodegroup):
@@ -425,7 +426,7 @@ class MobileSurvey(models.MobileSurveyModel):
                     tile['type'] = 'tile'
                     self.couch.update_doc(db, tile, tile['tileid'])
                 except Exception as e:
-                    print e, tile
+                    print(e, tile)
         nodegroups = models.NodeGroup.objects.filter(parentnodegroup=nodegroup)
         for nodegroup in nodegroups:
             self.load_tiles_into_couch(instances, nodegroup)
@@ -441,7 +442,7 @@ class MobileSurvey(models.MobileSurveyModel):
                 instance['type'] = 'resource'
                 self.couch.update_doc(db, instance, instanceid)
             except Exception as e:
-                print e, instance
+                print(e, instance)
 
     def load_data_into_couch(self):
         """

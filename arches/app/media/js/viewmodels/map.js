@@ -127,15 +127,16 @@ define([
 
         this.additionalLayers = params.layers;
         this.layers = ko.pureComputed(function() {
-            var layers = self.activeBasemap().layer_definitions.slice(0);
+            var layers = [];
             self.overlays().forEach(function(layer) {
                 if (layer.onMap()) {
                     var opacity = layer.opacity();
-                    layer.layer_definitions.forEach(function(layer) {
-                        layers.push(updateOpacity(layer, opacity));
-                    });
+                    layers = layer.layer_definitions.map(function(layer) {
+                        return updateOpacity(layer, opacity);
+                    }).concat(layers);
                 }
             });
+            layers = self.activeBasemap().layer_definitions.slice(0).concat(layers);
             if (this.additionalLayers) {
                 layers = layers.concat(ko.unwrap(this.additionalLayers));
             }
@@ -215,9 +216,9 @@ define([
                 self.getPopupData(feature),
                 self.popup._content
             );
-            if (map.getStyle()) map.setFeatureState(feature, { selected: true });
+            if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: true });
             self.popup.on('close', function() {
-                if (map.getStyle()) map.setFeatureState(feature, { selected: false });
+                if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: false });
                 self.popup = undefined;
             });
         };
@@ -240,12 +241,12 @@ define([
                 var hoverFeature;
                 map.on('mousemove', function(e) {
                     var style = map.getStyle();
-                    if (hoverFeature && style) map.setFeatureState(hoverFeature, { hover: false });
+                    if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: false });
                     hoverFeature = _.find(
                         map.queryRenderedFeatures(e.point),
                         self.isFeatureClickable
                     );
-                    if (hoverFeature && style) map.setFeatureState(hoverFeature, { hover: true });
+                    if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: true });
                     map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
                 });
 

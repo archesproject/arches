@@ -62,7 +62,7 @@ class Command(BaseCommand):
                 selections = []
                 for index, ontology in enumerate(available_ontologies, start=1):
                     selections.append(('%s. %s (%s)') % (index, ontology.name, ontology.pk))
-                selected_ontology = raw_input(message + '\n'.join(selections)+'\n')
+                selected_ontology = input(message + '\n'.join(selections)+'\n')
                 return available_ontologies[int(selected_ontology)-1]
             else:
                 return None
@@ -80,7 +80,7 @@ class Command(BaseCommand):
             return
 
         if options['version'] is None:
-            print _('You must supply a version number using the -vn/--version argument.')
+            print(_('You must supply a version number using the -vn/--version argument.'))
             return
 
         if options['source'] is not None:
@@ -95,20 +95,20 @@ class Command(BaseCommand):
                         path_to_check = self.get_relative_path(extension)
                         try:
                             proposed_path = models.Ontology.objects.get(path=path_to_check).path.path
-                            print ''
-                            print _('It looks like an ontology file has already been loaded with the same name.')
-                            print _('The file currently loaded is located here:')
-                            print '   %s' % proposed_path
-                            print _('If you would simply like to reload the current ontology, you can run this command with the dash r (-r) flag')
-                            print 'eg:    python manage.py load_ontology -r\n'
+                            print('')
+                            print(_('It looks like an ontology file has already been loaded with the same name.'))
+                            print(_('The file currently loaded is located here:'))
+                            print('   %s' % proposed_path)
+                            print(_('If you would simply like to reload the current ontology, you can run this command with the dash r (-r) flag'))
+                            print('eg:    python manage.py load_ontology -r\n')
                             return
                         except:
                             pass
                     self.run_loader(data_source=ontology.path.path, version=options['version'], id=ontology.pk, extensions=options['extensions'], verbosity=options['verbosity'])
                 else:
-                    print _('You must first define a base ontology (using -s) before loading an extension using the (-x) argument')
+                    print(_('You must first define a base ontology (using -s) before loading an extension using the (-x) argument'))
             else:
-                print 'The File "%s" Not Found' % options['extensions']
+                print('The File "%s" Not Found' % options['extensions'])
             return
 
     def run_loader(self, data_source=None, version=None, name=None, id=None, extensions=None, verbosity=1):
@@ -123,8 +123,8 @@ class Command(BaseCommand):
         """
 
         if verbosity > 0:
-            print ''
-            print 'Loading Source Ontology: "%s"' % data_source
+            print('')
+            print('Loading Source Ontology: "%s"' % data_source)
 
         if data_source is not None and version is not None:
             self.graph = Graph()
@@ -142,7 +142,7 @@ class Command(BaseCommand):
 
                 for extension in set(extensions):
                     if verbosity > 0:
-                        print 'Loading Extension: "%s"' % extension
+                        print('Loading Extension: "%s"' % extension)
                     if os.path.isfile(extension):
                         self.add_ontology(data_source=extension, version=version, name=name, parentontology=ontology)
                     else:

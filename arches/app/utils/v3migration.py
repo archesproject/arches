@@ -377,7 +377,7 @@ class v3PreparedResource:
                         print("v3 value: {}".format(dp[1]))
                         print("v4 value: {}".format(value))
                     except UnicodeEncodeError:
-                        print "v3/v4 value: error encoding to ascii for print statement"
+                        print("v3/v4 value: error encoding to ascii for print statement")
 
                 # find the tile that will hold the value
                 for tile in tilegroup_json:
@@ -523,7 +523,7 @@ class v3Importer:
             lookup_path = v3_config["v3_v4_node_lookup"]
 
             new_and_improved = {}
-            with open(lookup_path, 'rb') as openfile:
+            with open(lookup_path, 'r') as openfile:
                 reader = csv.DictReader(openfile)
 
                 for row in reader:
@@ -547,7 +547,7 @@ class v3Importer:
         def get_mergenodes(v3_config):
 
             mergenodes_dict = {}
-            with open(v3_config["v3_nodes_csv"], 'rb') as openfile:
+            with open(v3_config["v3_nodes_csv"], 'r') as openfile:
                 reader = csv.DictReader(openfile)
                 for row in reader:
                     mergenodes_dict[row['Label']] = row['mergenode']
@@ -628,7 +628,7 @@ class v3Importer:
     def write_v4_json(self, dest_path):
 
         out_json = self.get_v4_json()
-        with open(dest_path, 'wb') as openfile:
+        with open(dest_path, 'w') as openfile:
             openfile.write(JSONSerializer().serialize(out_json, indent=4))
 
         return dest_path
@@ -671,7 +671,7 @@ class v3Importer:
                     if ct % 1000 == 0:
                         print(ct)
                     elif ct % 100 == 0:
-                        print("."),
+                        print(".")
                     if ct == self.truncate:
                         break
                 if ct > 0:
@@ -693,7 +693,7 @@ class v3SkosConverter:
     def __init__(self, skos_file, name_space="http://localhost:8000/",
                  uuid_lookup={}, verbose=False):
 
-        with open(skos_file, "rb") as incoming_skos:
+        with open(skos_file, "r") as incoming_skos:
             skos = incoming_skos.read()
             skos = skos.replace("http://www.archesproject.org/", name_space)
 
@@ -818,6 +818,6 @@ class v3SkosConverter:
 
     def write_uuid_lookup(self, filepath):
 
-        with open(filepath, 'wb') as uuid_store:
+        with open(filepath, 'w') as uuid_store:
             uuid_store.write(json.dumps(self.uuid_lookup, indent=4, sort_keys=True))
             uuid_store.close()

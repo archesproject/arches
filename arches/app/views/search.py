@@ -35,12 +35,7 @@ from arches.app.search.components.base import SearchFilterFactory
 from arches.app.views.base import MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
-
-
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from io import StringIO
 
 
 class SearchView(MapBaseManagerView):
@@ -183,7 +178,7 @@ def search_results(request):
             if search_filter:
                 search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional)
     except Exception as err:
-        return JSONResponse(err.message, status=500)
+        return JSONResponse(err, status=500)
 
     dsl = search_results_object.pop('query', None)
     dsl.include('graph_id')
@@ -215,6 +210,7 @@ def search_results(request):
 
         ret['reviewer'] = request.user.groups.filter(name='Resource Reviewer').exists()
         ret['timestamp'] = datetime.now()
+        ret['total_results'] = dsl.count(index='resources')
 
         return JSONResponse(ret)
     else:

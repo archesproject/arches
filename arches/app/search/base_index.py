@@ -104,8 +104,8 @@ class BaseIndex(object):
 
         result_summary['indexed'] = self.se.count(index=self.index_name, body=q.dsl) - count_before
         status = 'Passed' if result_summary['database'] == result_summary['indexed'] else 'Failed'
-        print "Custom Index - %s:" % self.index_name
-        print "    Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(status, graph_name, result_summary['database'], result_summary['indexed'], (datetime.now()-start).seconds)
+        print("Custom Index - %s:" % self.index_name)
+        print("    Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(status, graph_name, result_summary['database'], result_summary['indexed'], (datetime.now()-start).seconds))
 
     def delete_index(self):
         """

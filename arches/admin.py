@@ -16,12 +16,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from app.models import models
+from .app.models import models
 from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
 
 
-class PluginAdmin(GuardedModelAdmin):
+class GuardedAdmin(GuardedModelAdmin):
     pass
 
 
@@ -29,7 +29,6 @@ admin.site.register([
     models.DLanguage,
     models.MapLayer,
     models.MapSource,
-    models.TileserverLayer,
     models.Geocoder,
     models.MapMarker,
     models.DDataType,
@@ -39,4 +38,4 @@ admin.site.register([
     models.SearchComponent,
     ])
 
-admin.site.register(models.Plugin, PluginAdmin)
+admin.site.register([models.Plugin, models.NodeGroup], GuardedAdmin)

@@ -67,8 +67,8 @@ class Command(BaseCommand):
         try:
             uuid.UUID(details['componentid'])
         except:
-            details['componentid'] = unicode(uuid.uuid4())
-            print "Registering card component with componentid:", details['componentid']
+            details['componentid'] = str(uuid.uuid4())
+            print("Registering card component with componentid: {}".format(details['componentid']))
 
         instance = models.CardComponent(
             componentid=details['componentid'],
@@ -110,9 +110,9 @@ class Command(BaseCommand):
             if str(instances[0].componentid) != 'f05e4d3a-53c1-11e8-b0ea-784f435179ea':
                 instances[0].delete()
             else:
-                print 'You cannot unregister the default card component.'
+                print('You cannot unregister the default card component.')
         except Exception as e:
-            print e
+            print(e)
 
     def list(self):
         """
@@ -122,6 +122,6 @@ class Command(BaseCommand):
         try:
             instances = models.CardComponent.objects.all()
             for instance in instances:
-                print instance.name
+                print(instance.name)
         except Exception as e:
-            print e
+            print(e)

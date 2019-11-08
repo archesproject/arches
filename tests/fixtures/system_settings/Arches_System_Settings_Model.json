@@ -1602,8 +1602,6 @@
                         "addToMap": false,
                         "advancedStyle": "",
                         "advancedStyling": false,
-                        "autoManageCache": false,
-                        "cacheTiles": false,
                         "clusterDistance": 20,
                         "clusterMaxZoom": 5,
                         "clusterMinPoints": 3,
@@ -1674,7 +1672,7 @@
             "root": {
                 "config": null,
                 "datatype": "semantic",
-                "description": "", 
+                "description": "",
                 "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                 "is_collector": false,
                 "isrequired": false,

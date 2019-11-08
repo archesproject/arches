@@ -4,15 +4,20 @@ import os
 import re
 import sys
 import uuid
+import importlib
+import arches.app.tasks as tasks
+import arches.app.utils.task_management as task_management
+from io import StringIO
 from django.shortcuts import render
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from django.db import transaction
+from django.db import transaction, connection
 from django.db.models import Q
+from django.http import Http404, HttpResponse
 from django.http.request import QueryDict
 from django.core import management
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from revproxy.views import ProxyView
@@ -34,16 +39,14 @@ from arches.app.utils.permission_backend import user_can_edit_resources
 from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.decorators import group_required
 from arches.app.search.components.base import SearchFilterFactory
+from arches.app.datatypes.datatypes import DataTypeFactory
 from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
+from slugify import slugify
+from arches.celery import app
 
 logger = logging.getLogger(__name__)
-
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 
 def userCanAccessMobileSurvey(request, surveyid=None):
@@ -126,7 +129,11 @@ class Sync(APIBase):
         if can_sync:
             try:
                 logger.info("Starting sync for user {0}".format(request.user.username))
-                management.call_command('mobile', operation='sync_survey', id=surveyid, user=request.user.id)
+                celery_worker_running = task_management.check_if_celery_available()
+                if celery_worker_running is True:
+                    tasks.sync.delay(surveyid=surveyid, userid=request.user.id)
+                else:
+                    management.call_command('mobile', operation='sync_survey', id=surveyid, user=request.user.id)
                 logger.info("Sync complete for user {0}".format(request.user.username))
             except Exception:
                 logger.exception(_('Sync Failed'))
@@ -199,7 +206,10 @@ class Surveys(APIBase):
                                 card['relative_position'] = ordered_project_cards.index(
                                     card['cardid']) if card['cardid'] in ordered_project_cards else None
                                 cards.append(card)
-                        graph['cards'] = sorted(cards, key=lambda x: x['relative_position'])
+                        unordered_cards = [card for card in cards if card['relative_position'] is None]
+                        ordered_cards = [card for card in cards if card['relative_position'] is not None]
+                        sorted_cards = sorted(ordered_cards, key=lambda x: x['relative_position'])
+                        graph['cards'] = unordered_cards + sorted_cards
                 response = JSONResponse(projects_for_couch, indent=4)
         except Exception:
             logger.exception(_('Unable to fetch collector projects'))
@@ -209,39 +219,120 @@ class Surveys(APIBase):
         return response
 
 
+
 class GeoJSON(APIBase):
+    def set_precision(self, coordinates, precision):
+        result = []
+        try:
+            return round(coordinates, int(precision))
+        except TypeError:
+            for coordinate in coordinates:
+                result.append(self.set_precision(coordinate, precision))
+        return result
+
+    def get_name(self, resource):
+        module = importlib.import_module(
+            'arches.app.functions.primary_descriptors')
+        PrimaryDescriptorsFunction = getattr(
+            module, 'PrimaryDescriptorsFunction')()
+        functionConfig = models.FunctionXGraph.objects.filter(
+            graph_id=resource.graph_id, function__functiontype='primarydescriptors')
+        if len(functionConfig) == 1:
+            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(
+                resource,
+                functionConfig[0].config['name']
+            )
+        else:
+            return _('Unnamed Resource')
+
     def get(self, request):
+        datatype_factory = DataTypeFactory()
         resourceid = request.GET.get('resourceid', None)
         nodeid = request.GET.get('nodeid', None)
         tileid = request.GET.get('tileid', None)
+        nodegroups = request.GET.get('nodegroups', [])
+        precision = request.GET.get('precision', 9)
+        field_name_length = int(request.GET.get('field_name_length', 0))
+        use_uuid_names = bool(request.GET.get('use_uuid_names', False))
+        include_primary_name = bool(request.GET.get('include_primary_name', False))
+        include_geojson_link = bool(request.GET.get('include_geojson_link', False))
+        use_display_values = bool(request.GET.get('use_display_values', False))
+        indent = request.GET.get('indent', None)
+        if indent is not None:
+            indent = int(indent)
+        if isinstance(nodegroups, str):
+            nodegroups = nodegroups.split(',')
         if hasattr(request.user, 'userprofile') is not True:
             models.UserProfile.objects.create(user=request.user)
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
-        nodes = models.Node.objects.filter(datatype='geojson-feature-collection', nodegroup_id__in=viewable_nodegroups)
+        nodegroups = [i for i in nodegroups if i in viewable_nodegroups]
+        nodes = models.Node.objects.filter(
+                datatype='geojson-feature-collection',
+                nodegroup_id__in=viewable_nodegroups
+            )
         if nodeid is not None:
             nodes = nodes.filter(nodeid=nodeid)
+        nodes = nodes.order_by('sortorder')
         features = []
         i = 1
+        property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups).order_by('sortorder')
+        property_node_map = {}
+        property_nodes = models.Node.objects.filter(nodegroup_id__in=nodegroups).order_by('sortorder')
+        for node in property_nodes:
+            property_node_map[str(node.nodeid)] = {'node': node}
+            if node.fieldname is None or node.fieldname == '':
+                property_node_map[str(node.nodeid)]['name'] = slugify(
+                    node.name,
+                    max_length=field_name_length,
+                    separator="_"
+                )
+            else:
+                property_node_map[str(node.nodeid)]['name'] = node.fieldname
         for node in nodes:
-            tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup)
+            tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup).order_by('sortorder')
             if resourceid is not None:
-                # resourceid = resourceid.split(',')
                 tiles = tiles.filter(resourceinstance_id__in=resourceid.split(','))
             if tileid is not None:
                 tiles = tiles.filter(tileid=tileid)
             for tile in tiles:
                 data = tile.data
                 try:
-                    for feature_index, feature in enumerate(data[unicode(node.pk)]['features']):
-                        feature['properties']['index'] = feature_index
+                    for feature_index, feature in enumerate(data[str(node.pk)]['features']):
+                        if len(nodegroups) > 0:
+                            for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id):
+                                for key in pt.data:
+                                    field_name = key if use_uuid_names else property_node_map[key]['name']
+                                    if pt.data[key] is not None:
+                                        if use_display_values:
+                                            property_node = property_node_map[key]['node']
+                                            datatype = datatype_factory.get_instance(property_node.datatype)
+                                            value = datatype.get_display_value(pt, property_node)
+                                        else:
+                                            value = pt.data[key]
+                                        try:
+                                            feature['properties'][field_name].append(value)
+                                        except KeyError:
+                                            feature['properties'][field_name] = value
+                                        except AttributeError:
+                                            feature['properties'][field_name] = [
+                                                feature['properties'][field_name],
+                                                value
+                                            ]
+                        if include_primary_name:
+                            feature['properties']['primary_name'] = self.get_name(tile.resourceinstance)
                         feature['properties']['resourceinstanceid'] = tile.resourceinstance_id
                         feature['properties']['tileid'] = tile.pk
-                        feature['properties']['nodeid'] = node.pk
-                        feature['properties']['node'] = node.name
-                        feature['properties']['model'] = node.graph.name
-                        feature['properties']['geojson'] = '%s?tileid=%s&nodeid=%s' % (reverse('geojson'), tile.pk, node.pk)
-                        feature['properties']['featureid'] = feature['id']
+                        if nodeid is None:
+                            feature['properties']['nodeid'] = node.pk
+                        if include_geojson_link:
+                            feature['properties']['geojson'] = '%s?tileid=%s&nodeid=%s' % (
+                                    reverse('geojson'),
+                                    tile.pk,
+                                    node.pk
+                                )
                         feature['id'] = i
+                        coordinates = self.set_precision(feature['geometry']['coordinates'], precision)
+                        feature['geometry']['coordinates'] = coordinates
                         i += 1
                         features.append(feature)
                 except KeyError:
@@ -250,8 +341,118 @@ class GeoJSON(APIBase):
                     print(e)
                     print(tile.data)
 
-        response = JSONResponse({'type': 'FeatureCollection', 'features': features})
+        response = JSONResponse({'type': 'FeatureCollection', 'features': features}, indent=indent)
         return response
+
+
+EARTHCIRCUM = 40075016.6856
+PIXELSPERTILE = 256
+class MVT(APIBase):
+    def get(self, request, nodeid, zoom, x, y):
+        if hasattr(request.user, 'userprofile') is not True:
+            models.UserProfile.objects.create(user=request.user)
+        viewable_nodegroups = request.user.userprofile.viewable_nodegroups
+        try:
+            node = models.Node.objects.get(nodeid=nodeid, nodegroup_id__in=viewable_nodegroups)
+        except models.Node.DoesNotExist:
+            raise Http404()
+        config = node.config
+        with connection.cursor() as cursor:
+            # TODO: when we upgrade to PostGIS 3, we can get feature state
+            # working by adding the feature_id_name arg:
+            # https://github.com/postgis/postgis/pull/303
+            if int(zoom) <= int(config['clusterMaxZoom']):
+                arc = EARTHCIRCUM / ((1 << int(zoom)) * PIXELSPERTILE)
+                distance = arc * int(config['clusterDistance'])
+                min_points = int(config['clusterMinPoints'])
+                cursor.execute("""WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
+                AS (
+                    SELECT m.*,
+                    ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
+                    FROM (
+                        SELECT t.tileid,
+                            t.resourceinstanceid,
+                            n.nodeid,
+                            ST_Transform(ST_SetSRID(
+                                st_geomfromgeojson(
+                                    (
+                                        json_array_elements(
+                                            t.tiledata::json ->
+                                            n.nodeid::text ->
+                                        'features') -> 'geometry'
+                                    )::text
+                                ),
+                                4326
+                            ), 3857) AS geom
+                        FROM tiles t
+                            LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
+                        WHERE n.nodeid = %s
+                    ) m
+                )
+
+                SELECT ST_AsMVT(
+                    tile,
+                    %s
+                ) FROM (
+                    SELECT resourceinstanceid::text,
+                        row_number() over () as id,
+                        1 as total,
+                        ST_AsMVTGeom(
+                            geom,
+                            TileBBox(%s, %s, %s, 3857)
+                        ) AS geom,
+                        '' AS extent
+                    FROM clusters
+                    WHERE cid is NULL
+                    UNION
+                    SELECT NULL as resourceinstanceid,
+                        row_number() over () as id,
+                        count(*) as total,
+                        ST_AsMVTGeom(
+                            ST_Centroid(
+                                ST_Collect(geom)
+                            ),
+                            TileBBox(%s, %s, %s, 3857)
+                        ) AS geom,
+                        ST_AsGeoJSON(
+                            ST_Transform(
+                                ST_SetSRID(
+                                    ST_Extent(geom), 3857
+                                ), 4326
+                            )
+                        ) AS extent
+                    FROM clusters
+                    WHERE cid IS NOT NULL
+                    GROUP BY cid
+                ) as tile;""",
+                [distance, min_points, nodeid, nodeid, zoom, x, y, zoom, x, y])
+            else:
+                cursor.execute("""SELECT ST_AsMVT(tile, %s) FROM (SELECT t.tileid,
+                   row_number() over () as id,
+                   t.resourceinstanceid,
+                   n.nodeid,
+                   ST_AsMVTGeom(
+                       ST_Transform(ST_SetSRID(
+                           st_geomfromgeojson(
+                               (
+                                   json_array_elements(
+                                       t.tiledata::json ->
+                                       n.nodeid::text ->
+                                   'features') -> 'geometry'
+                               )::text
+                           ),
+                           4326
+                       ), 3857),
+                       TileBBox(%s, %s, %s, 3857)
+                   ) AS geom,
+                   1 AS total
+                FROM tiles t
+                    LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
+                WHERE n.nodeid = %s) AS tile;""", [nodeid, zoom, x, y, nodeid])
+            tile = bytes(cursor.fetchone()[0])
+            if not len(tile):
+                raise Http404()
+        return HttpResponse(tile, content_type="application/x-protobuf")
 
 
 @method_decorator(csrf_exempt, name='dispatch')

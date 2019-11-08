@@ -1,5 +1,5 @@
-import json
-from django.core.urlresolvers import reverse
+import json, urllib
+from django.urls import reverse
 from arches.app.models import models
 
 
@@ -8,7 +8,7 @@ class BaseDataType(object):
     def __init__(self, model=None):
         self.datatype_model = model
 
-    def validate(self, value, row_number=None, source=None):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
         return []
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -47,30 +47,11 @@ class BaseDataType(object):
         """
         return None
 
-    def get_layer_config(self, node=None):
-        """
-        Gets the layer config to generate a map layer (use if spatial)
-        """
-        return None
-
     def process_mobile_data(self, tile, node, db, couch_doc, node_value):
         """
         Transforms data from a mobile device to an Arches friendly format
         """
         return None
-
-    def should_cache(self, node=None):
-        """
-        Tells the system if the tileserver should cache for a given node
-        """
-        return False
-
-    def should_manage_cache(self, node=None):
-        """
-        Tells the system if the tileserver should clear cache on edits for a
-        given node
-        """
-        return False
 
     def get_map_layer(self, node=None):
         """
@@ -93,12 +74,14 @@ class BaseDataType(object):
         should be a dictionary including (as in map_sources table):
         name, source (json)
         """
-        tileserver_url = reverse('tileserver')
+        tileserver_url = urllib.parse.unquote(
+            reverse('mvt', args=(node.nodeid, '{z}', '{x}', '{y}'))
+        )
         if node is None:
             return None
         source_config = {
             "type": "vector",
-            "tiles": ["%s/%s/{z}/{x}/{y}.pbf" % (tileserver_url, node.nodeid)]
+            "tiles": [tileserver_url]
         }
         count = None
         if preview == True:
@@ -264,7 +247,7 @@ class BaseDataType(object):
         Returns a list of concept values for a given node
         """
         data = self.get_tile_data(tile)
-        return unicode(data[str(node.nodeid)])
+        return str(data[str(node.nodeid)])
 
     def get_search_terms(self, nodevalue, nodeid=None):
         """
@@ -325,5 +308,5 @@ class BaseDataType(object):
         return g
 
     def from_rdf(self, json_ld_node):
-        print json_ld_node
+        print(json_ld_node)
         raise NotImplementedError

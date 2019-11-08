@@ -16,14 +16,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 from django.utils.translation import ugettext as _
 from arches.app.models.models import DValueType
 from arches.app.models.concept import Concept, ConceptValue
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from SPARQLWrapper import SPARQLWrapper, JSON
-from abstract_provider import Abstract_Provider
+from .abstract_provider import Abstract_Provider
 from rdflib.namespace import SKOS, DCTERMS
 
 class AAT_Provider(Abstract_Provider):
@@ -105,7 +105,7 @@ class AAT_Provider(Abstract_Provider):
         #print query
         #return HttpResponse(self.endpoint + '?' + self._getRequestEncodedParameters(("query", self.queryString)))
 
-        req = urllib2.Request(self.endpoint + '?' + self._getRequestEncodedParameters(("query", self.queryString)))
+        req = urllib.request.Request(self.endpoint + '?' + self._getRequestEncodedParameters(("query", self.queryString)))
         req.add_header("Accept", "application/sparql-results+json")
-        f = urllib2.urlopen(req)
+        f = urllib.request.urlopen(req)
         return JSONDeserializer().deserialize(f.read())
