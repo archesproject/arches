@@ -66,6 +66,18 @@ ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30}
 # a prefix to append to all elasticsearch indexes, note: must be lower case
 ELASTICSEARCH_PREFIX = "arches"
 
+
+# a list of objects of the form below
+# {
+#     'module': dotted path to the Classname within a python module,
+#     'name': name of the custom index  <-- follow ES index naming rules
+# }
+ELASTICSEARCH_CUSTOM_INDEXES = []
+# [{
+#     'module': 'my_project.search_indexes.sample_index.SampleIndex',
+#     'name': 'my_new_custom_index'
+# }]
+
 USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 PACKAGE_ROOT = ROOT_DIR
