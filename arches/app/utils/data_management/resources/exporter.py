@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import zipfile
-from io import StringIO
+from io import BytesIO
 from arches.app.utils import import_class_from_string
 from arches.app.models.system_settings import settings
 from django.http import HttpResponse
@@ -37,7 +37,7 @@ class ResourceExporter(object):
         '''
         Given a list of export file names, zips up all the files with those names and returns and http response.
         '''
-        buffer = StringIO()
+        buffer = BytesIO()
 
         with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip:
             for f in files_for_export:
