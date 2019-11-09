@@ -151,11 +151,10 @@ class CsvWriter(Writer):
             csv_record["ResourceID"] = resourceinstanceid
             csv_record["populated_node_groups"] = []
 
-            # parents = [p for p in tiles if p.parenttile_id is None]
-            # children = [c for c in tiles if c.parenttile_id is not None]
-            # tiles = parents + sorted(children, key=lambda k: k.parenttile_id)
             try:
-                tiles = sorted(tiles, key=lambda k: k.parenttile_id)
+                parents = [p for p in tiles if p.parenttile_id is None]
+                children = [c for c in tiles if c.parenttile_id is not None]
+                tiles = parents + sorted(children, key=lambda k: k.parenttile_id)
             except Exception as e:
                 logger.exception(e)
 
