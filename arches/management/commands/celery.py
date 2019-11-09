@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import subprocess
 from arches.management.commands import utils
@@ -29,14 +29,13 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument('operation', nargs='?',
-        help='operation \'start\' starts a celery worker for your project')
+        parser.add_argument("operation", nargs="?", help="operation 'start' starts a celery worker for your project")
 
     def handle(self, *args, **options):
-        if options['operation'] == 'start':
+        if options["operation"] == "start":
             self.start_worker()
 
     def start_worker(self):
-        cmd = f'celery -A {settings.ELASTICSEARCH_PREFIX} worker -l info'
+        cmd = f"celery -A {settings.ELASTICSEARCH_PREFIX} worker -l info"
         cmd_process = cmd.split()
         subprocess.call(cmd_process)
