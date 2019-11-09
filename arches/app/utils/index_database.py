@@ -6,7 +6,9 @@ from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Term
+from arches.app.search.base_index import get_index
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.utils import import_class_from_string
 from datetime import datetime
 
 
@@ -26,26 +28,27 @@ def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
     index_resource_relations(clear_index=clear_index, batch_size=batch_size)
 
 
-def index_resources(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
+def index_resources(clear_index=True, index_name=None, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
     """
     Indexes all resources from the database
 
     Keyword Arguments:
     clear_index -- set to True to remove all the resources from the index before the reindexing operation
+    index_name -- only applies to custom indexes and if given will try and just refresh the data in that index
     batch_size -- the number of records to index as a group, the larger the number to more memory required
 
     """
 
     se = SearchEngineFactory().create()
-    if clear_index:
+    if clear_index and index_name is None:
         q = Query(se=se)
         q.delete(index='terms')
 
     resource_types = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).values_list('graphid', flat=True)
-    index_resources_by_type(resource_types, clear_index=clear_index, batch_size=batch_size)
+    index_resources_by_type(resource_types, clear_index=clear_index, index_name=index_name, batch_size=batch_size)
 
 
-def index_resources_by_type(resource_types, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
+def index_resources_by_type(resource_types, clear_index=True, index_name=None, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
     """
     Indexes all resources of a given type(s)
 
@@ -54,10 +57,12 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
 
     Keyword Arguments:
     clear_index -- set to True to remove all the resources of the types passed in from the index before the reindexing operation
+    index_name -- only applies to custom indexes and if given will try and just refresh the data in that index
     batch_size -- the number of records to index as a group, the larger the number to more memory required
 
     """
-
+    
+    status = ''
     se = SearchEngineFactory().create()
     datatype_factory = DataTypeFactory()
     node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list('nodeid', 'datatype')}
@@ -68,26 +73,34 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
         resources = Resource.objects.filter(graph_id=str(resource_type))
         graph_name = models.GraphModel.objects.get(graphid=str(resource_type)).name
         print("Indexing resource type '{0}'".format(graph_name))
-        result_summary = {'database': len(resources), 'indexed': 0}
 
-        q = Query(se=se)
-        term = Term(field='graph_id', term=str(resource_type))
-        q.add_query(term)
-        if clear_index:
-            q.delete(index='resources', refresh=True)
+        if index_name is None:
+            q = Query(se=se)
+            term = Term(field='graph_id', term=str(resource_type))
+            q.add_query(term)
+            if clear_index:
+                q.delete(index='resources', refresh=True)
 
-        with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
-            with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
-                for resource in resources:
-                    document, terms = resource.get_documents_to_index(fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
-                    doc_indexer.add(index='resources', id=document['resourceinstanceid'], data=document)
-                    for term in terms:
-                        term_indexer.add(index='terms', id=term['_id'], data=term['_source'])
+            with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
+                with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
+                    for resource in resources:
+                        document, terms = resource.get_documents_to_index(fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
+                        doc_indexer.add(index='resources', id=document['resourceinstanceid'], data=document)
+                        for term in terms:
+                            term_indexer.add(index='terms', id=term['_id'], data=term['_source'])
 
-        result_summary['indexed'] = se.count(index='resources', body=q.dsl)
+            result_summary = {'database': len(resources), 'indexed': se.count(index='resources', body=q.dsl)}
+            status = 'Passed' if result_summary['database'] == result_summary['indexed'] else 'Failed'
+            print("Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(status, graph_name, result_summary['database'], result_summary['indexed'], (datetime.now()-start).seconds))
 
-        status = 'Passed' if result_summary['database'] == result_summary['indexed'] else 'Failed'
-        print("Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(status, graph_name, result_summary['database'], result_summary['indexed'], (datetime.now()-start).seconds))
+            for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
+                es_index = import_class_from_string(index['module'])(index['name'])
+                es_index.bulk_index(resources=resources, resource_type=resource_type, graph_name=graph_name, clear_index=clear_index)
+
+        else:
+            es_index = get_index(index_name)
+            es_index.bulk_index(resources=resources, resource_type=resource_type, graph_name=graph_name, clear_index=clear_index)
+
     return status
 
 

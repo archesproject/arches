@@ -49,7 +49,7 @@ class Command(BaseCommand):
             '\'rebuild_surveys\' rebuilds all surveys that belong to the current arches install')
         parser.add_argument('-id', '--id', dest='id', default=None,
             help='UUID of Survey')
-        parser.add_argument('-user', '--user', dest='user', default=None,
+        parser.add_argument('-u', '--user', dest='user', default=None,
             help='UUID of Survey')
 
     def handle(self, *args, **options):
