@@ -6,6 +6,7 @@ import os
 import sys
 import uuid
 import traceback
+import logging
 from time import time
 from copy import deepcopy
 from io import StringIO
@@ -29,6 +30,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from django.db import transaction
 from django.db.models import Q
 from django.utils.translation import ugettext as _
+logger = logging.getLogger(__name__)
 
 
 class MissingConfigException(Exception):
@@ -149,13 +151,12 @@ class CsvWriter(Writer):
             csv_record["ResourceID"] = resourceinstanceid
             csv_record["populated_node_groups"] = []
 
-            # parents = [p for p in tiles if p.parenttile_id is None]
-            # children = [c for c in tiles if c.parenttile_id is not None]
-            # tiles = parents + sorted(children, key=lambda k: k.parenttile_id)
             try:
-                tiles = sorted(tiles, key=lambda k: k.parenttile_id)
+                parents = [p for p in tiles if p.parenttile_id is None]
+                children = [c for c in tiles if c.parenttile_id is not None]
+                tiles = parents + sorted(children, key=lambda k: k.parenttile_id)
             except Exception as e:
-                print(e)
+                logger.exception(e)
 
             for tile in tiles:
                 other_group_record = {}
