@@ -148,7 +148,7 @@ class Resource(models.ResourceInstance):
         return tiles
 
     @staticmethod
-    def bulk_save(resources, primaryDescriptorsFunctionConfig, graph_nodes):
+    def bulk_save(resources):
         """
         Saves and indexes a list of resources
 
@@ -214,9 +214,7 @@ class Resource(models.ResourceInstance):
             document, terms = resource.get_documents_to_index(
                 fetchTiles=False,
                 datatype_factory=datatype_factory,
-                node_datatypes=node_datatypes,
-                config=primaryDescriptorsFunctionConfig,
-                graph_nodes=graph_nodes,
+                node_datatypes=node_datatypes
             )
             time_to_get_docs = time_to_get_docs + (time() - s)
             # s = time()
@@ -292,9 +290,7 @@ class Resource(models.ResourceInstance):
         self,
         fetchTiles=True,
         datatype_factory=None,
-        node_datatypes=None,
-        config=None,
-        graph_nodes=None,
+        node_datatypes=None
     ):
         """
         Gets all the documents nessesary to index a single resource
@@ -308,7 +304,6 @@ class Resource(models.ResourceInstance):
         """
 
         s = time()
-
         if settings.STREAMLINE_IMPORT:
             document = {}
             document["displaydescription"] = None
@@ -318,6 +313,9 @@ class Resource(models.ResourceInstance):
             document["displayname"] = None
             document["root_ontology_class"] = self.get_root_ontology()
             document["legacyid"] = self.legacyid
+            document["displayname"] = self.displayname
+            document["displaydescription"] = self.displaydescription
+            document["map_popup"] = self.map_popup
         else:
             document = JSONSerializer().serializeToPython(self)
         # timers['timer4'] = timers['timer4'] + (time()-s)
@@ -354,38 +352,6 @@ class Resource(models.ResourceInstance):
                     s = time()
                     datatype_instance = datatype_factory.get_instance(datatype)
                     # timers['timer'] = timers['timer'] + (time()-s)
-
-                    if config is not None and str(tile.nodegroup_id) in config:
-                        if "name" in config[tile.nodegroup_id]:
-                            node = graph_nodes[nodeid]
-                            value = datatype_instance.get_display_value(tile, node)
-                            if document["displayname"] is None:
-                                document["displayname"] = config[tile.nodegroup_id][
-                                    "name"
-                                ]
-                            document["displayname"] = document["displayname"].replace(
-                                "<%s>" % node.name, value
-                            )
-                        if "description" in config[tile.nodegroup_id]:
-                            node = graph_nodes[nodeid]
-                            value = datatype_instance.get_display_value(tile, node)
-                            if document["displaydescription"] is None:
-                                document["displaydescription"] = config[
-                                    tile.nodegroup_id
-                                ]["description"]
-                            document["displaydescription"] = document[
-                                "displaydescription"
-                            ].replace("<%s>" % node.name, value)
-                        if "map_popup" in config[tile.nodegroup_id]:
-                            node = graph_nodes[nodeid]
-                            value = datatype_instance.get_display_value(tile, node)
-                            if document["map_popup"] is None:
-                                document["map_popup"] = config[tile.nodegroup_id][
-                                    "map_popup"
-                                ]
-                            document["map_popup"] = document["map_popup"].replace(
-                                "<%s>" % node.name, value
-                            )
                     s = time()
                     datatype_instance.append_to_document(
                         document, nodevalue, nodeid, tile
