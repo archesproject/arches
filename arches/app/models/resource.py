@@ -171,22 +171,17 @@ class Resource(models.ResourceInstance):
         documents = []
         term_list = []
 
-        start = time()
-
         for resource in resources:
             resource.tiles = resource.get_flattened_tiles()
             tiles.extend(resource.tiles)
-
-        logger.info("time to extend tiles: %s" % datetime.timedelta(seconds=time() - start))
 
         # need to save the models first before getting the documents for index
         start = time()
         Resource.objects.bulk_create(resources)
         TileModel.objects.bulk_create(tiles)
 
-        logger.info(
-            "time to bulk create tiles and resources: %s"
-            % datetime.timedelta(seconds=time() - start)
+        print(
+            f"Time to bulk create tiles and resources: {datetime.timedelta(seconds=time() - start)}"
         )
 
         start = time()
@@ -194,11 +189,11 @@ class Resource(models.ResourceInstance):
             resource.save_edit(edit_type="create")
 
         resources[0].tiles[0].save_edit(
-            note=f"bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create"
+            note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create"
         )
 
-        logger.info(
-            "time to save resource edits: %s"
+        print(
+            "Time to save resource edits: %s"
             % datetime.timedelta(seconds=time() - start)
         )
 
@@ -266,8 +261,6 @@ class Resource(models.ResourceInstance):
 
         """
 
-        s = time()
-
         document = {}
         document["displaydescription"] = None
         document["resourceinstanceid"] = str(self.resourceinstanceid)
@@ -279,13 +272,13 @@ class Resource(models.ResourceInstance):
         document["displayname"] = self.displayname
         document["displaydescription"] = self.displaydescription
         document["map_popup"] = self.map_popup
-        # timers['timer4'] = timers['timer4'] + (time()-s)
 
         tiles = (
             list(models.TileModel.objects.filter(resourceinstance=self))
             if fetchTiles
             else self.tiles
         )
+
         document["tiles"] = tiles
         document["strings"] = []
         document["dates"] = []
@@ -310,18 +303,11 @@ class Resource(models.ResourceInstance):
                     and nodevalue != {}
                     and nodevalue is not None
                 ):
-                    s = time()
                     datatype_instance = datatype_factory.get_instance(datatype)
-                    # timers['timer'] = timers['timer'] + (time()-s)
-                    s = time()
                     datatype_instance.append_to_document(
                         document, nodevalue, nodeid, tile
                     )
-                    # timers['timer1'] = timers['timer1'] + (time()-s)
-                    s = time()
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
-                    # timers['timer2'] = timers['timer2'] + (time()-s)
-                    s = time()
                     for index, term in enumerate(node_terms):
                         terms.append(
                             {
@@ -336,7 +322,6 @@ class Resource(models.ResourceInstance):
                                 },
                             }
                         )
-                    # timers['timer3'] = timers['timer3'] + (time()-s)
 
             if tile.provisionaledits is not None:
                 provisionaledits = tile.provisionaledits
@@ -601,7 +586,7 @@ def is_uuid(value_to_test):
     try:
         UUID(value_to_test)
         return True
-    except:
+    except Exception:
         return False
 
 
