@@ -236,11 +236,17 @@ class BaseDataType(object):
         return None
 
     def get_tile_data(self, tile):
-        if tile.data is not None and len(list(tile.data.keys())) > 0:
-            return tile.data
-        elif tile.provisionaledits is not None and len(list(tile.provisionaledits.keys())) == 1:
-            userid = list(tile.provisionaledits.keys())[0]
-            return tile.provisionaledits[userid]['value']
+        try:
+            data = tile.data
+            provisionaledits = tile.provisionaledits
+        except:
+            data = tile['data']
+            provisionaledits = tile['provisionaledits']
+        if data is not None and len(list(data.keys())) > 0:
+            return data
+        elif provisionaledits is not None and len(list(provisionaledits.keys())) == 1:
+            userid = list(provisionaledits.keys())[0]
+            return provisionaledits[userid]['value']
 
     def get_display_value(self, tile, node):
         """

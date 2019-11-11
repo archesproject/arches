@@ -481,7 +481,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return GeometryCollection(wkt_geoms)
 
     def get_display_value(self, tile, node):
-        value = tile.data[str(node.nodeid)]
+        data = self.get_tile_data(tile)
+        value = data[str(node.nodeid)]
         bounds = self.get_bounds_from_value(value)
         if bounds is not None:
             minx, miny, maxx, maxy = bounds
