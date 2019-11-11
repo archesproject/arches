@@ -3,6 +3,7 @@ import json
 import decimal
 import base64
 import re
+import logging
 from distutils import util
 from datetime import datetime
 from mimetypes import MimeTypes
@@ -38,6 +39,8 @@ cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
+
+logger = logging.getLogger(__name__)
 
 
 class DataTypeFactory(object):
@@ -1414,9 +1417,9 @@ class ResourceInstanceDataType(BaseDataType):
                     resource_document = se.search(index='resources', id=resourceid)
                     resource_names.add(resource_document['_source']['displayname'])
                 except:
-                    print('resource not available')
+                    logger.info(f"Resource {resourceid} not avaiiable. This message may appear during resource load, in which case the problem will be resolved once the related resource is loaded")
         else:
-            print('resource not avalable')
+            logger.warning("No resource relationship available")
         return resource_names
 
     def validate(self, value, row_number=None, source='', node=None, nodeid=None):
