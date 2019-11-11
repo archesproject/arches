@@ -158,8 +158,6 @@ class Resource(models.ResourceInstance):
         """
         start = time()
 
-        print("saving resource to db")
-
         se = SearchEngineFactory().create()
         datatype_factory = DataTypeFactory()
         node_datatypes = {
@@ -247,10 +245,6 @@ class Resource(models.ResourceInstance):
         # print("time to create bulk term docs: %s" % datetime.timedelta(seconds=time_to_create_bulk_term_docs)
         start = time()
 
-        if not settings.STREAMLINE_IMPORT:
-            for tile in tiles:
-                tile.save_edit(edit_type="tile create", new_value=tile.data)
-
         # print("time to save tile edits: %s" % datetime.timedelta(seconds=time() - start)
         start = time()
 
@@ -304,20 +298,18 @@ class Resource(models.ResourceInstance):
         """
 
         s = time()
-        if settings.STREAMLINE_IMPORT:
-            document = {}
-            document["displaydescription"] = None
-            document["resourceinstanceid"] = str(self.resourceinstanceid)
-            document["graph_id"] = str(self.graph.pk)
-            document["map_popup"] = None
-            document["displayname"] = None
-            document["root_ontology_class"] = self.get_root_ontology()
-            document["legacyid"] = self.legacyid
-            document["displayname"] = self.displayname
-            document["displaydescription"] = self.displaydescription
-            document["map_popup"] = self.map_popup
-        else:
-            document = JSONSerializer().serializeToPython(self)
+
+        document = {}
+        document["displaydescription"] = None
+        document["resourceinstanceid"] = str(self.resourceinstanceid)
+        document["graph_id"] = str(self.graph_id)
+        document["map_popup"] = None
+        document["displayname"] = None
+        document["root_ontology_class"] = self.get_root_ontology()
+        document["legacyid"] = self.legacyid
+        document["displayname"] = self.displayname
+        document["displaydescription"] = self.displaydescription
+        document["map_popup"] = self.map_popup
         # timers['timer4'] = timers['timer4'] + (time()-s)
 
         tiles = (
