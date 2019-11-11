@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import importlib
 import datetime
-from pprint import pprint
+import logging
 from time import time
 from uuid import UUID
 from django.db import transaction
@@ -40,6 +40,8 @@ from arches.app.utils.exceptions import (
     MultipleNodesFoundException,
 )
 from arches.app.datatypes.datatypes import DataTypeFactory
+
+logger = logging.getLogger(__name__)
 
 
 class Resource(models.ResourceInstance):
@@ -156,7 +158,6 @@ class Resource(models.ResourceInstance):
         resources -- a list of resource models
 
         """
-        start = time()
 
         se = SearchEngineFactory().create()
         datatype_factory = DataTypeFactory()
@@ -176,19 +177,19 @@ class Resource(models.ResourceInstance):
             resource.tiles = resource.get_flattened_tiles()
             tiles.extend(resource.tiles)
 
-        print("time to extend tiles: %s" % datetime.timedelta(seconds=time() - start))
-        start = time()
+        logger.info("time to extend tiles: %s" % datetime.timedelta(seconds=time() - start))
 
         # need to save the models first before getting the documents for index
+        start = time()
         Resource.objects.bulk_create(resources)
         TileModel.objects.bulk_create(tiles)
 
-        print(
+        logger.info(
             "time to bulk create tiles and resources: %s"
             % datetime.timedelta(seconds=time() - start)
         )
-        start = time()
 
+        start = time()
         for resource in resources:
             resource.save_edit(edit_type="create")
 
@@ -196,66 +197,34 @@ class Resource(models.ResourceInstance):
             note=f"bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create"
         )
 
-        print(
+        logger.info(
             "time to save resource edits: %s"
             % datetime.timedelta(seconds=time() - start)
         )
-        start = time()
 
-        time_to_get_docs = 0
-        time_to_get_root_ontology = 0
-        time_to_create_bulk_docs = 0
-        time_to_create_bulk_term_docs = 0
-        timers = {"timer": 0, "timer1": 0, "timer2": 0, "timer3": 0, "timer4": 0}
         for resource in resources:
-            s = time()
+            start = time()
             document, terms = resource.get_documents_to_index(
                 fetchTiles=False,
                 datatype_factory=datatype_factory,
                 node_datatypes=node_datatypes
             )
-            time_to_get_docs = time_to_get_docs + (time() - s)
-            # s = time()
-            # #document['root_ontology_class'] = resource.get_root_ontology()
-            # time_to_get_root_ontology = time_to_get_root_ontology + (time()-s)
-            s = time()
+
             documents.append(
                 se.create_bulk_item(
                     index="resources", id=document["resourceinstanceid"], data=document
                 )
             )
-            time_to_create_bulk_docs = time_to_create_bulk_docs + (time() - s)
-            s = time()
+
             for term in terms:
                 term_list.append(
                     se.create_bulk_item(
                         index="terms", id=term["_id"], data=term["_source"]
                     )
                 )
-            time_to_create_bulk_term_docs = time_to_create_bulk_term_docs + (time() - s)
 
-        # print("timer: %s" % datetime.timedelta(seconds=timers['timer'])
-        # print("timer1: %s" % datetime.timedelta(seconds=timers['timer1'])
-        # print("timer2: %s" % datetime.timedelta(seconds=timers['timer2'])
-        # print("timer3: %s" % datetime.timedelta(seconds=timers['timer3'])
-        # print("timer4: %s" % datetime.timedelta(seconds=timers['timer4'])
-        # print("time to get documents to index: %s" % datetime.timedelta(seconds=time_to_get_docs)
-        # print("time to get root ontology: %s" % datetime.timedelta(seconds=time_to_get_root_ontology)
-        # print("time to create bulk docs: %s" % datetime.timedelta(seconds=time_to_create_bulk_docs)
-        # print("time to create bulk term docs: %s" % datetime.timedelta(seconds=time_to_create_bulk_term_docs)
-        start = time()
-
-        # print("time to save tile edits: %s" % datetime.timedelta(seconds=time() - start)
-        start = time()
-
-        # print("time to save resources to db:%s" % datetime.timedelta(seconds=time() - start)
-        start = time()
-        # bulk index the resources, tiles and terms
-
-        # print(documents[0]
         se.bulk_index(documents)
         se.bulk_index(term_list)
-        # print("time to index resources:%s" % datetime.timedelta(seconds=time() - start)
 
     def index(self):
         """
