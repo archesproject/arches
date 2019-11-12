@@ -98,9 +98,12 @@ class RdfWriter(Writer):
         def add_edge_to_graph(graph, domainnode, rangenode, edge, tile, graph_info):
             pkg = {}
             pkg['d_datatype'] = graph_info['nodedatatypes'].get(str(edge.domainnode.pk))
+            dom_dt = dt_factory.get_instance(pkg['d_datatype'])
+            # Don't process any further if the domain datatype is a literal
+            if dom_dt.is_a_literal_in_rdf():
+                return
+
             pkg['r_datatype'] = graph_info['nodedatatypes'].get(str(edge.rangenode.pk))
-            pkg['d_uri'] = domainnode
-            pkg['r_uri'] = rangenode
             pkg['range_tile_data'] = None
             pkg['domain_tile_data'] = None
             if str(edge.rangenode_id) in tile.data:
@@ -108,21 +111,45 @@ class RdfWriter(Writer):
             if str(edge.domainnode_id) in tile.data:
                 pkg['domain_tile_data'] = tile.data[str(edge.domainnode_id)]
 
-            # Don't add the type if the domain datatype is a literal
-            dom_dt = dt_factory.get_instance(pkg['d_datatype'])
-            if dom_dt.is_a_literal_in_rdf():
-                # Return to not process any range data of an edge where
-                # the domain will be a Literal in the RDF
-                return
+            rng_dt = dt_factory.get_instance(pkg['r_datatype'])
+            pkg['d_uri'] = dom_dt.get_rdf_uri(domainnode, pkg['domain_tile_data'], 'd')
+            pkg['r_uri'] = rng_dt.get_rdf_uri(rangenode, pkg['range_tile_data'], 'r')
 
-            # Domain node is not a literal value in the RDF representation, so will have a type:
-            graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            # Domain node is NOT a literal value in the RDF representation, so will have a type:
+            if type(pkg['d_uri']) == list:
+                for duri in pkg['d_uri']:
+                    graph.add((duri, RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            else:
+                graph.add((pkg['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
 
             # Use the range node's datatype.to_rdf() method to generate an RDF representation of it
             # and add its triples to the core graph
-            dt = dt_factory.get_instance(pkg['r_datatype'])
-            graph += dt.to_rdf(pkg, edge)
 
+            # FIXME: some datatypes have their URI calculated from _tile_data (e.g. concept)
+            # ... if there is a list of these, then all of the permutations will happen
+            # ... as the matrix below re-processes all URIs against all _tile_data entries :(
+            if type(pkg['d_uri']) == list:
+                mpkg = pkg.copy()
+                for d in pkg['d_uri']:
+                    mpkg['d_uri'] = d
+                    if type(pkg['r_uri']) == list:
+                        npkg = mpkg.copy()
+                        for r in pkg['r_uri']:
+                            # compute matrix of n * m
+                            npkg['r_uri'] = r
+                            graph += rng_dt.to_rdf(npkg, edge)
+                    else:
+                        # iterate loop on m * 1
+                        graph += rng_dt.to_rdf(mpkg, edge)
+            elif type(pkg['r_uri']) == list:
+                npkg = pkg.copy()
+                for r in pkg['r_uri']:
+                    # compute matrix of 1 * m
+                    npkg['r_uri'] = r
+                    graph += rng_dt.to_rdf(npkg, edge)
+            else:   
+                # both are single, 1 * 1
+                graph += rng_dt.to_rdf(pkg, edge)
 
         for resourceinstanceid, tiles in self.resourceinstances.items():
             graph_info = get_graph_parts(self.graph_id)
