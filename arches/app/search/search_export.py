@@ -22,7 +22,7 @@ from arches.app.utils.flatten_dict import flatten_dict
 
 
 def flatten_tiles(tiles, datatype_factory, compact=True):
-    compactd_data = {}
+    compacted_data = {}
 
     # first let's normalize tile.data to use labels instead of node ids
     # we'll also add on the cardinality and card_names to the tile for use later on
@@ -43,10 +43,10 @@ def flatten_tiles(tiles, datatype_factory, compact=True):
                     label = node.name
 
                 if compact:
-                    if label in compactd_data:
-                        compactd_data[label] += ", " + node_value
+                    if label in compacted_data:
+                        compacted_data[label] += ", " + node_value
                     else:
-                        compactd_data[label] = node_value
+                        compacted_data[label] = node_value
                 else:
                     data[label] = node_value
 
@@ -59,7 +59,7 @@ def flatten_tiles(tiles, datatype_factory, compact=True):
             lookup[tile['tileid']] = tile
 
     if compact:
-        return compactd_data
+        return compacted_data
 
     # print(JSONSerializer().serialize(tiles, indent=4))
 
