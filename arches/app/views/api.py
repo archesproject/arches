@@ -90,7 +90,7 @@ class CouchdbProxy(ProtectedResourceView, ProxyView):
         except Exception:
             logger.exception(_('Failed to dispatch Couch proxy'))
 
-        return JSONResponse(_('Sync failed'), status=500)
+        return JSONResponse(_('Failed to dispatch Couch proxy'), status=500)
 
 
 class APIBase(View):
@@ -135,8 +135,8 @@ class Sync(APIBase):
 
             return JSONResponse(_('Sync executed'))
         else:
-            logger.exception(_('Sync Failed, User is not authorized to access this project'))
-            return JSONResponse(_('Sync Failed'), status=403)
+            logger.exception(_("Sync Failed, User, {0} is not authorized to access this project".format(request.user.username)))
+            return JSONResponse(_("Sync Failed, User, {0} is not authorized to access this project".format(request.user.username)), status=403)
 
 
 class Surveys(APIBase):
