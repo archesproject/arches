@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import importlib
 import datetime
-from pprint import pprint
+import logging
 from time import time
 from uuid import UUID
 from django.db import transaction
@@ -40,6 +40,8 @@ from arches.app.utils.exceptions import (
     MultipleNodesFoundException,
 )
 from arches.app.datatypes.datatypes import DataTypeFactory
+
+logger = logging.getLogger(__name__)
 
 
 class Resource(models.ResourceInstance):
@@ -148,7 +150,7 @@ class Resource(models.ResourceInstance):
         return tiles
 
     @staticmethod
-    def bulk_save(resources, primaryDescriptorsFunctionConfig, graph_nodes):
+    def bulk_save(resources):
         """
         Saves and indexes a list of resources
 
@@ -156,9 +158,6 @@ class Resource(models.ResourceInstance):
         resources -- a list of resource models
 
         """
-        start = time()
-
-        print("saving resource to db")
 
         se = SearchEngineFactory().create()
         datatype_factory = DataTypeFactory()
@@ -172,98 +171,55 @@ class Resource(models.ResourceInstance):
         documents = []
         term_list = []
 
-        start = time()
-
         for resource in resources:
             resource.tiles = resource.get_flattened_tiles()
             tiles.extend(resource.tiles)
 
-        print("time to extend tiles: %s" % datetime.timedelta(seconds=time() - start))
-        start = time()
-
         # need to save the models first before getting the documents for index
+        start = time()
         Resource.objects.bulk_create(resources)
         TileModel.objects.bulk_create(tiles)
 
         print(
-            "time to bulk create tiles and resources: %s"
-            % datetime.timedelta(seconds=time() - start)
+            f"Time to bulk create tiles and resources: {datetime.timedelta(seconds=time() - start)}"
         )
-        start = time()
 
+        start = time()
         for resource in resources:
             resource.save_edit(edit_type="create")
 
         resources[0].tiles[0].save_edit(
-            note=f"bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create"
+            note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create"
         )
 
         print(
-            "time to save resource edits: %s"
+            "Time to save resource edits: %s"
             % datetime.timedelta(seconds=time() - start)
         )
-        start = time()
 
-        time_to_get_docs = 0
-        time_to_get_root_ontology = 0
-        time_to_create_bulk_docs = 0
-        time_to_create_bulk_term_docs = 0
-        timers = {"timer": 0, "timer1": 0, "timer2": 0, "timer3": 0, "timer4": 0}
         for resource in resources:
-            s = time()
+            start = time()
             document, terms = resource.get_documents_to_index(
                 fetchTiles=False,
                 datatype_factory=datatype_factory,
-                node_datatypes=node_datatypes,
-                config=primaryDescriptorsFunctionConfig,
-                graph_nodes=graph_nodes,
+                node_datatypes=node_datatypes
             )
-            time_to_get_docs = time_to_get_docs + (time() - s)
-            # s = time()
-            # #document['root_ontology_class'] = resource.get_root_ontology()
-            # time_to_get_root_ontology = time_to_get_root_ontology + (time()-s)
-            s = time()
+
             documents.append(
                 se.create_bulk_item(
                     index="resources", id=document["resourceinstanceid"], data=document
                 )
             )
-            time_to_create_bulk_docs = time_to_create_bulk_docs + (time() - s)
-            s = time()
+
             for term in terms:
                 term_list.append(
                     se.create_bulk_item(
                         index="terms", id=term["_id"], data=term["_source"]
                     )
                 )
-            time_to_create_bulk_term_docs = time_to_create_bulk_term_docs + (time() - s)
 
-        # print("timer: %s" % datetime.timedelta(seconds=timers['timer'])
-        # print("timer1: %s" % datetime.timedelta(seconds=timers['timer1'])
-        # print("timer2: %s" % datetime.timedelta(seconds=timers['timer2'])
-        # print("timer3: %s" % datetime.timedelta(seconds=timers['timer3'])
-        # print("timer4: %s" % datetime.timedelta(seconds=timers['timer4'])
-        # print("time to get documents to index: %s" % datetime.timedelta(seconds=time_to_get_docs)
-        # print("time to get root ontology: %s" % datetime.timedelta(seconds=time_to_get_root_ontology)
-        # print("time to create bulk docs: %s" % datetime.timedelta(seconds=time_to_create_bulk_docs)
-        # print("time to create bulk term docs: %s" % datetime.timedelta(seconds=time_to_create_bulk_term_docs)
-        start = time()
-
-        if not settings.STREAMLINE_IMPORT:
-            for tile in tiles:
-                tile.save_edit(edit_type="tile create", new_value=tile.data)
-
-        # print("time to save tile edits: %s" % datetime.timedelta(seconds=time() - start)
-        start = time()
-
-        # print("time to save resources to db:%s" % datetime.timedelta(seconds=time() - start)
-        start = time()
-        # bulk index the resources, tiles and terms
-
-        # print(documents[0]
         se.bulk_index(documents)
         se.bulk_index(term_list)
-        # print("time to index resources:%s" % datetime.timedelta(seconds=time() - start)
 
     def index(self):
         """
@@ -292,9 +248,7 @@ class Resource(models.ResourceInstance):
         self,
         fetchTiles=True,
         datatype_factory=None,
-        node_datatypes=None,
-        config=None,
-        graph_nodes=None,
+        node_datatypes=None
     ):
         """
         Gets all the documents nessesary to index a single resource
@@ -307,26 +261,24 @@ class Resource(models.ResourceInstance):
 
         """
 
-        s = time()
-
-        if settings.STREAMLINE_IMPORT:
-            document = {}
-            document["displaydescription"] = None
-            document["resourceinstanceid"] = str(self.resourceinstanceid)
-            document["graph_id"] = str(self.graph.pk)
-            document["map_popup"] = None
-            document["displayname"] = None
-            document["root_ontology_class"] = self.get_root_ontology()
-            document["legacyid"] = self.legacyid
-        else:
-            document = JSONSerializer().serializeToPython(self)
-        # timers['timer4'] = timers['timer4'] + (time()-s)
+        document = {}
+        document["displaydescription"] = None
+        document["resourceinstanceid"] = str(self.resourceinstanceid)
+        document["graph_id"] = str(self.graph_id)
+        document["map_popup"] = None
+        document["displayname"] = None
+        document["root_ontology_class"] = self.get_root_ontology()
+        document["legacyid"] = self.legacyid
+        document["displayname"] = self.displayname
+        document["displaydescription"] = self.displaydescription
+        document["map_popup"] = self.map_popup
 
         tiles = (
             list(models.TileModel.objects.filter(resourceinstance=self))
             if fetchTiles
             else self.tiles
         )
+
         document["tiles"] = tiles
         document["strings"] = []
         document["dates"] = []
@@ -351,50 +303,11 @@ class Resource(models.ResourceInstance):
                     and nodevalue != {}
                     and nodevalue is not None
                 ):
-                    s = time()
                     datatype_instance = datatype_factory.get_instance(datatype)
-                    # timers['timer'] = timers['timer'] + (time()-s)
-
-                    if config is not None and str(tile.nodegroup_id) in config:
-                        if "name" in config[tile.nodegroup_id]:
-                            node = graph_nodes[nodeid]
-                            value = datatype_instance.get_display_value(tile, node)
-                            if document["displayname"] is None:
-                                document["displayname"] = config[tile.nodegroup_id][
-                                    "name"
-                                ]
-                            document["displayname"] = document["displayname"].replace(
-                                "<%s>" % node.name, value
-                            )
-                        if "description" in config[tile.nodegroup_id]:
-                            node = graph_nodes[nodeid]
-                            value = datatype_instance.get_display_value(tile, node)
-                            if document["displaydescription"] is None:
-                                document["displaydescription"] = config[
-                                    tile.nodegroup_id
-                                ]["description"]
-                            document["displaydescription"] = document[
-                                "displaydescription"
-                            ].replace("<%s>" % node.name, value)
-                        if "map_popup" in config[tile.nodegroup_id]:
-                            node = graph_nodes[nodeid]
-                            value = datatype_instance.get_display_value(tile, node)
-                            if document["map_popup"] is None:
-                                document["map_popup"] = config[tile.nodegroup_id][
-                                    "map_popup"
-                                ]
-                            document["map_popup"] = document["map_popup"].replace(
-                                "<%s>" % node.name, value
-                            )
-                    s = time()
                     datatype_instance.append_to_document(
                         document, nodevalue, nodeid, tile
                     )
-                    # timers['timer1'] = timers['timer1'] + (time()-s)
-                    s = time()
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
-                    # timers['timer2'] = timers['timer2'] + (time()-s)
-                    s = time()
                     for index, term in enumerate(node_terms):
                         terms.append(
                             {
@@ -409,7 +322,6 @@ class Resource(models.ResourceInstance):
                                 },
                             }
                         )
-                    # timers['timer3'] = timers['timer3'] + (time()-s)
 
             if tile.provisionaledits is not None:
                 provisionaledits = tile.provisionaledits
@@ -674,7 +586,7 @@ def is_uuid(value_to_test):
     try:
         UUID(value_to_test)
         return True
-    except:
+    except Exception:
         return False
 
 

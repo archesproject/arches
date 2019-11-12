@@ -6,6 +6,7 @@ import os
 import sys
 import uuid
 import traceback
+import logging
 from time import time
 from copy import deepcopy
 from io import StringIO
@@ -29,6 +30,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from django.db import transaction
 from django.db.models import Q
 from django.utils.translation import ugettext as _
+logger = logging.getLogger(__name__)
 
 
 class MissingConfigException(Exception):
@@ -149,13 +151,12 @@ class CsvWriter(Writer):
             csv_record["ResourceID"] = resourceinstanceid
             csv_record["populated_node_groups"] = []
 
-            # parents = [p for p in tiles if p.parenttile_id is None]
-            # children = [c for c in tiles if c.parenttile_id is not None]
-            # tiles = parents + sorted(children, key=lambda k: k.parenttile_id)
             try:
-                tiles = sorted(tiles, key=lambda k: k.parenttile_id)
+                parents = [p for p in tiles if p.parenttile_id is None]
+                children = [c for c in tiles if c.parenttile_id is not None]
+                tiles = parents + sorted(children, key=lambda k: k.parenttile_id)
             except Exception as e:
-                print(e)
+                logger.exception(e)
 
             for tile in tiles:
                 other_group_record = {}
@@ -398,9 +399,7 @@ class CsvReader(Reader):
         target_resource_model,
         bulk,
         save_count,
-        row_number,
-        primaryDescriptorsFunctionConfig=None,
-        graph_nodes=None,
+        row_number
     ):
         # create a resource instance only if there are populated_tiles
         errors = []
@@ -418,9 +417,7 @@ class CsvReader(Reader):
                 resources.append(newresourceinstance)
                 if len(resources) >= settings.BULK_IMPORT_BATCH_SIZE:
                     Resource.bulk_save(
-                        resources=resources,
-                        primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig,
-                        graph_nodes=graph_nodes,
+                        resources=resources
                     )
                     del resources[:]  # clear out the array
             else:
@@ -590,21 +587,6 @@ class CsvReader(Reader):
                 all_nodes = Node.objects.filter(graph_id=graphid)
                 node_list = {str(node.pk): node for node in all_nodes}
                 datatype_factory = DataTypeFactory()
-                primaryDescriptorsFunctionConfig = {}
-                try:
-                    config = FunctionXGraph.objects.get(
-                        graph_id=graphid, function__functiontype="primarydescriptors"
-                    ).config
-                    for key in ["map_popup", "name", "description"]:
-                        nodegroup_id = config[key]["nodegroup_id"]
-                        if nodegroup_id not in primaryDescriptorsFunctionConfig:
-                            primaryDescriptorsFunctionConfig[nodegroup_id] = {}
-                        primaryDescriptorsFunctionConfig[nodegroup_id][key] = config[
-                            key
-                        ]["string_template"]
-                except:
-                    pass
-
                 concepts_to_create = {}
                 new_concepts = {}
                 required_nodes = {}
@@ -1028,9 +1010,7 @@ class CsvReader(Reader):
                             target_resource_model,
                             bulk,
                             save_count,
-                            row_number,
-                            primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig,
-                            graph_nodes=node_list,
+                            row_number
                         )
 
                         # reset values for next resource instance
@@ -1330,10 +1310,8 @@ class CsvReader(Reader):
                         target_resource_model,
                         bulk,
                         save_count,
-                        row_number,
-                        primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig,
-                        graph_nodes=node_list,
-                    )
+                        row_number
+                        )
 
                 if bulk:
                     print(
@@ -1341,12 +1319,9 @@ class CsvReader(Reader):
                         % datetime.timedelta(seconds=time() - self.start)
                     )
                     Resource.bulk_save(
-                        resources=resources,
-                        primaryDescriptorsFunctionConfig=primaryDescriptorsFunctionConfig,
-                        graph_nodes=node_list,
+                        resources=resources
                     )
-
-                print(_("%s total resource saved" % (save_count + 1)))
+                print(_(f"Total resources saved: {save_count + 1}"))
 
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
