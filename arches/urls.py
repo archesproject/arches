@@ -74,6 +74,7 @@ urlpatterns = [
     url(r'^search/terms$', search.search_terms, name="search_terms"),
     url(r'^search/resources$', search.search_results, name="search_results"),
     url(r'^search/time_wheel_config$', search.time_wheel_config, name="time_wheel_config"),
+    url(r'^search/export_results$', search.export_results, name="export_results"),
     url(r'^buffer/$', search.buffer, name="buffer"),
     url(r'^settings/', NewResourceEditorView.as_view(), {'resourceid': settings.RESOURCE_INSTANCE_ID, 'view_template': 'views/resource/new-editor.htm', 'main_script': 'views/resource/new-editor', 'nav_menu': False}, name='config'),
     url(r'^graph/new$', GraphDataView.as_view(action='new_graph'), name='new_graph'),
