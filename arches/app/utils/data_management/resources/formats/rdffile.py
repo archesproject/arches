@@ -11,6 +11,7 @@ from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.graph import Graph as GraphProxy
 from arches.app.models.tile import Tile
+from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -473,6 +474,36 @@ class JsonLdReader(Reader):
                         nodes_copy.add((node['node'].name, node['node'].pk))
                         found.append(node)
 
+            # see https://github.com/archesproject/arches/issues/5126
+            # check to see if the found graph nodes are concepts
+            # if all the found graph nodes are concepts then remove any nodes from found where the value
+            # being saved isn't in the nodes concept collection
+            if len(found) > 1:
+                found_nodes_are_concepts = True
+                for found_node in found:
+                    if not(found_node['node'].datatype == 'concept' or found_node['node'].datatype == 'concept-list'):
+                        found_nodes_are_concepts = False
+
+                if found_nodes_are_concepts:
+                    new_found = []
+                    nodes_copy = set()
+                    concept_val = jsonld_graph['http://www.w3.org/2000/01/rdf-schema#label']
+                    if concept_val:
+                        if isinstance(concept_val, list):
+                            concept_val = concept_val[0]['@value']
+                        else:
+                            concept_val = concept_val['@value']
+                    for node in found:
+                        collection = node['node'].config['rdmCollection']
+                        # NOTE: these collections might be cached for better performance?
+                        edges = Concept().get_child_collections(collection, columns='valueto')
+                        concept_labels = [item[0] for item in edges]
+                        if concept_val in concept_labels:
+                            nodes_copy.add((node['node'].name, node['node'].pk))
+                            new_found.append(node)
+
+                    found = new_found
+
             self.logger.debug('found {0} branches'.format(len(found)))
             if len(found) == 0:
                 self.logger.error(' *** branch not found for {0}'.format(str(jsonld_graph)))
@@ -580,6 +611,7 @@ class JsonLdReader(Reader):
 
     def resolve_node_ids(self, jsonld, ontology_prop=None, graph=None, parent_node=None, tileid=None, parent_tileid=None, resource=None):
         # print "-------------------"
+        self.logger.debug("-------------: %r" % jsonld)
         if not isinstance(jsonld, list):
             jsonld = [jsonld]
 
@@ -649,18 +681,33 @@ class JsonLdReader(Reader):
                         self.logger.debug("Assigning value to datatype ({0}) from a non-semantic node:".format(
                             branch['node'].datatype)
                         )
-                        # if (branch['node'].datatype == 'number'):
-                        #     print 'number'
-                        #     import ipdb
-                        #     ipdb.set_trace()
+                        # import ipdb
+                        # ipdb.sset_trace()
                         datatype = self.datatype_factory.get_instance(branch['node'].datatype)
-                        # print 'finding value'
-                        # print jsonld_node
+
                         # print branch['node'].datatype
-                        value = datatype.from_rdf(jsonld_node)
+                        if len(jsonld) == 1:
+                            value = datatype.from_rdf(jsonld_node)
+                        else:
+                            value = []
+                            # this is not very efficient but does fix the problem for ticket #5098
+                            # what we should do is prevent subsequent loops through "jsonld" on line 565 above
+                            for jldnode in jsonld:
+                                self.logger.debug(f'datatype: {datatype}')
+                                raw_val = datatype.from_rdf(jldnode)
+                                if isinstance(raw_val, list):
+                                    value = value + raw_val
+                                else:
+                                    value.append(raw_val)
+                        print ('finding value')
+                        # print (jsonld_node)
+                        print (jsonld)
                         self.logger.debug('value found! : {0}'.format(value))
                         self.tiles[tileid].data[str(branch['node'].nodeid)] = value
-                        ontology_properties = self.findOntologyProperties(jsonld_node)
+                        #ontology_properties = self.findOntologyProperties(jsonld_node)
+
+                        if len(jsonld) > 1:
+                            break
 
                 if len(ontology_properties) > 0:
                     for ontology_property in ontology_properties:
