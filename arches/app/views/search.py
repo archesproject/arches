@@ -162,6 +162,20 @@ def get_resource_model_label(result):
         return ''
 
 
+def export_search(results, compact=False):
+    from arches.app.search.search_export import flatten_tiles
+    from arches.app.datatypes.datatypes import DataTypeFactory
+    instances = results['results']['hits']['hits']
+    datatype_factory = DataTypeFactory()
+
+    flattened_data = []
+    for resource_instance in instances:
+        flattened_data.append(flatten_tiles(resource_instance['_source']['tiles'], datatype_factory, compact=compact))
+
+    print(JSONSerializer().serialize(flattened_data, indent=4))
+    return flattened_data
+
+
 def search_results(request):
     se = SearchEngineFactory().create()
     search_results_object = {
@@ -190,8 +204,8 @@ def search_results(request):
     dsl.include('displaydescription')
     dsl.include('map_popup')
     dsl.include('provisional_resource')
-    if request.GET.get('tiles', None) is not None:
-        dsl.include('tiles')
+    # if request.GET.get('tiles', None) is not None:
+    dsl.include('tiles')
 
     results = dsl.search(index='resources')
 
@@ -211,6 +225,9 @@ def search_results(request):
         ret['reviewer'] = request.user.groups.filter(name='Resource Reviewer').exists()
         ret['timestamp'] = datetime.now()
         ret['total_results'] = dsl.count(index='resources')
+
+
+        print(export_search(ret))
 
         return JSONResponse(ret)
     else:
