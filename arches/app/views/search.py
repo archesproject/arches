@@ -182,6 +182,7 @@ def search_results(request):
         'query': Query(se)
     }
 
+    export_results = request.GET.get('export', False)
     include_provisional = get_provisional_type(request)
     permitted_nodegroups = get_permitted_nodegroups(request.user)
 
@@ -204,8 +205,8 @@ def search_results(request):
     dsl.include('displaydescription')
     dsl.include('map_popup')
     dsl.include('provisional_resource')
-    # if request.GET.get('tiles', None) is not None:
-    dsl.include('tiles')
+    if request.GET.get('tiles', None) is not None or export_results is True:
+        dsl.include('tiles')
 
     results = dsl.search(index='resources')
 
@@ -226,10 +227,10 @@ def search_results(request):
         ret['timestamp'] = datetime.now()
         ret['total_results'] = dsl.count(index='resources')
 
-
-        print(export_search(ret))
-
-        return JSONResponse(ret)
+        if export_results is True:
+            return JSONResponse(export_search(ret))
+        else:
+            return JSONResponse(ret)
     else:
         return HttpResponseNotFound(_("There was an error retrieving the search results"))
 
