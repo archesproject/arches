@@ -1320,9 +1320,20 @@ class Graph(models.GraphModel):
                     raise GraphValidationError(_("If your graph contains more than one node and is not a resource the root must be a collector."), 999)
 
         # validate that nodes have a datatype assigned to them
+        # validate that node.fieldnames are unique and not blank
+        fieldnames = {}
         for node_id, node in self.nodes.items():
             if node.datatype == '':
-                raise GraphValidationError(_("A valid node datatype must be selected"))
+                raise GraphValidationError(_("A valid node datatype must be selected"), 1007)
+            if node.exportable is True:
+                if node.fieldname == "":
+                    raise GraphValidationError(_("Field Name must not be blank."), 1008)
+                try:
+                    x = fieldnames[node.fieldname]
+                    raise GraphValidationError(_("Field Name must be unique to the graph."), 1009)
+                except KeyError as e:
+                    fieldnames[node.fieldname] = True
+
 
         # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
         if self.ontology is not None:
