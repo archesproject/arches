@@ -27,9 +27,11 @@ from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Terms, MaxAgg, Aggregation
+from arches.app.search.search_export import flatten_tiles
 from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.views.base import MapBaseManagerView
@@ -162,9 +164,13 @@ def get_resource_model_label(result):
         return ''
 
 
-def export_search(results, compact=False):
-    from arches.app.search.search_export import flatten_tiles
-    from arches.app.datatypes.datatypes import DataTypeFactory
+def export_results(request):
+    request.GET = request.GET.copy()
+    request.GET['tiles'] = True
+    compact = request.GET.pop('compact', False)
+
+    search_res_json = search_results(request)
+    results = JSONDeserializer().deserialize(search_res_json.content)
     instances = results['results']['hits']['hits']
     datatype_factory = DataTypeFactory()
 
@@ -172,8 +178,7 @@ def export_search(results, compact=False):
     for resource_instance in instances:
         flattened_data.append(flatten_tiles(resource_instance['_source']['tiles'], datatype_factory, compact=compact))
 
-    print(JSONSerializer().serialize(flattened_data, indent=4))
-    return flattened_data
+    return JSONResponse(flattened_data, indent=4)
 
 
 def search_results(request):
@@ -205,7 +210,7 @@ def search_results(request):
     dsl.include('displaydescription')
     dsl.include('map_popup')
     dsl.include('provisional_resource')
-    if request.GET.get('tiles', None) is not None or export_results is True:
+    if request.GET.get('tiles', None) is not None:
         dsl.include('tiles')
 
     results = dsl.search(index='resources')
@@ -227,10 +232,7 @@ def search_results(request):
         ret['timestamp'] = datetime.now()
         ret['total_results'] = dsl.count(index='resources')
 
-        if export_results is True:
-            return JSONResponse(export_search(ret))
-        else:
-            return JSONResponse(ret)
+        return JSONResponse(ret)
     else:
         return HttpResponseNotFound(_("There was an error retrieving the search results"))
 
