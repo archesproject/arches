@@ -24,8 +24,7 @@ from arches.app.utils.data_management.resource_graphs.importer import import_gra
 # these tests can be run from the command line via
 # python manage.py test tests/importer/jsonld_import_tests.py --settings="tests.test_settings"
 
-
-class JsonLDExportTests(ArchesTestCase):
+class JsonLDImportTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         # This runs once per instantiation
