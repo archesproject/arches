@@ -1,0 +1,91 @@
+{% load staticfiles %}
+{% load i18n %}
+{% block header %}
+
+<!-- Title -->
+<span>
+
+    <!--ko with: provisionalHistoryList -->
+
+    <!-- Date Selector -->
+    <div class="provisional-edit-history-filter">
+        <div class="calendar">
+            <select id="" class="resources" placeholder="Select" tabindex="-1" data-bind="value: dateRangeType, chosen:{ width: '100%'}">
+                <!-- <option value="custom">{% trans "Custom date range" %}</option> -->
+                <option value="today">{% trans "Today" %}</option>
+                <option value="last-7">{% trans "Last 7 days" %}</option>
+                <option value="last-30">{% trans "Last 30 days" %}</option>
+                <option value="this-week">{% trans "This week" %}</option>
+                <option value="this-month">{% trans "This month" %}</option>
+                <option value="this-quarter">{% trans "This quarter" %}</option>
+                <option value="this-year">{% trans "This year" %}</option>
+            </select>
+        </div>
+
+        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: sortDescending, config:{ label: '{% trans "Youngest to oldest" %}', subtitle: ''}}}"></div>
+    </div>
+    <!-- /ko -->
+    {% endblock %}
+
+    {% block filter %}
+    {% endblock %}
+</span>
+
+{% block list_wrapper %}
+<div class="list-wrapper">
+    <div class="grid-list provisional-edit-history">
+        <!--ko with: provisionalHistoryList -->
+        <!-- ko if: items().length === 0 -->
+        <div class="new-provisional-edit-history">
+            {% trans 'You have not yet edited any data within the specified time period. Once you edit a resource, your edit history will display here.' %}
+        </div>
+        <!-- /ko -->
+        <!-- ko if: items().length > 0 -->
+        <!-- ko foreach: items -->
+        <div class="new-provisional-edit-history" data-bind="visible: $data.filtered() == false, click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected }">
+            {% block listitem %}
+            <div class='entry'>
+                <!--ko if: $data.resource_deleted == false -->
+                <a class="resource-edit-link" href='' data-bind="text: '{% trans "Edit" %}', click: function(){$parent.editResource($data.resourceinstanceid)}"></a>
+                <div class="entry-label-resource" data-bind="text: $data.resourcedisplayname"></div>
+                <!--/ko-->
+                <!--ko if: $data.resource_deleted == true -->
+                <div><span class="resource-edit-link" data-bind="text: '{% trans 'Resource has been deleted' %}'"></span></div>
+                <!--/ko-->
+            </div>
+
+            <div class='entry'><i data-bind="css: $data.resourcemodel.iconclass" style="padding-right: 4px"></i>
+                <div class='entry-label' data-bind="text: $data.resourcemodel.name"></div>
+            </div>
+
+            <div class='entry'>
+                <div class='entry-label'>{% trans 'Card: ' %}</div>
+                <span data-bind="text: $data.card.name"></span>
+            </div>
+
+            <div class='entry'>
+                <div class='entry-label'>{% trans 'Edited: ' %}</div>
+                <span data-bind="text: $data.displaytime"></span>
+            </div>
+
+            <div class='entry'>
+                <!--ko if: $data.pending -->
+                <span class="provisional-review-pending">{% trans 'pending review' %}</span>
+                <!--/ko-->
+                <!--ko if: $data.lastedittype === 'delete edit' -->
+                <div><span class="provisional-review-declined" data-bind="text: $data.reviewer + ' {% trans 'declined' %}'"></span></div>
+                <!--/ko-->
+                <!--ko if: $data.lastedittype === 'accept edit' -->
+                <div><span class="provisional-review-accepted" data-bind="text: $data.reviewer + ' {% trans 'accepted' %}'"></span></div>
+                <!--/ko-->
+            </div>
+
+            {% endblock %}
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+        <!-- /ko -->
+
+    </div>
+</div>
+{% endblock list_wrapper %}

@@ -925,7 +925,6 @@ class GraphXMapping(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=16, blank=True)
-    tasks = JSONField(blank=True, null=True, default=dict([]))
 
     def is_reviewer(self):
         return self.user.groups.filter(name='Resource Reviewer').exists()
@@ -948,6 +947,21 @@ class UserProfile(models.Model):
     class Meta:
         managed = True
         db_table = 'user_profile'
+
+
+class UserXTask(models.Model):
+    id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    taskid = models.UUIDField(serialize=False, blank=True, null=True)
+    status = models.TextField(null=True, default="PENDING")
+    date_start = models.DateTimeField(blank=True, null=True)
+    date_done = models.DateTimeField(blank=True, null=True)
+    name = models.TextField(blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        managed = True
+        db_table = 'user_x_tasks'
+
 
 def getDataDownloadConfigDefaults():
     return dict(download=False, count=100, resources=[], custom=None)
