@@ -5,6 +5,7 @@ from django.core import management
 import datetime
 from arches.app.models import models
 
+
 @shared_task(bind=True)
 def sync(self, surveyid=None, userid=None):
     create_user_task_record(self.request.id, self.name, userid)
