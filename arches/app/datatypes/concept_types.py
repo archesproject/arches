@@ -33,7 +33,9 @@ class BaseConceptDataType(BaseDataType):
 
     def get_concept_export_value(self, valueid, concept_export_value_type=None):
         ret = ''
-        if concept_export_value_type == None or concept_export_value_type == '' or concept_export_value_type == 'label':
+        if valueid is None or valueid.strip() == '':
+            pass
+        elif concept_export_value_type == None or concept_export_value_type == '' or concept_export_value_type == 'label':
             ret = self.get_value(valueid).value
         elif concept_export_value_type == 'both':
             ret = valueid + '|' + self.get_value(valueid).value
@@ -96,8 +98,7 @@ class ConceptDataType(BaseConceptDataType):
         return value.strip()
 
     def transform_export_values(self, value, *args, **kwargs):
-        if 'concept_export_value_type' in kwargs:
-            concept_export_value_type = kwargs.get('concept_export_value_type')
+        concept_export_value_type = kwargs.get('concept_export_value_type', None)
         return self.get_concept_export_value(value, concept_export_value_type)
 
     def get_pref_label(self, nodevalue, lang='en-US'):
@@ -266,7 +267,7 @@ class ConceptListDataType(BaseConceptDataType):
     def transform_export_values(self, value, *args, **kwargs):
         new_values = []
         for val in value:
-            new_val = self.get_concept_export_value(val, kwargs['concept_export_value_type'])
+            new_val = self.get_concept_export_value(val, kwargs.get('concept_export_value_type', None))
             new_values.append(new_val)
         return ','.join(new_values)
 
