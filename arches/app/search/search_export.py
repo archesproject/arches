@@ -28,27 +28,32 @@ def flatten_tiles(tiles, datatype_factory, compact=True):
     # we'll also add on the cardinality and card_names to the tile for use later on
 
     lookup = {}
+    feature_collections = {}
     for tile in tiles:
         data = {}
         for nodeid, value in tile['data'].items():
             node = models.Node.objects.get(pk=nodeid)
             if node.exportable:
                 datatype = datatype_factory.get_instance(node.datatype)
+                #node_value = datatype.transform_export_values(tile['data'][str(node.nodeid)])
                 node_value = datatype.get_display_value(tile, node)
-
-                label = ''
-                try:
-                    label = node.fieldname
-                except:
-                    label = node.name
+                label = node.fieldname
 
                 if compact:
-                    if label in compacted_data:
-                        compacted_data[label] += ", " + node_value
+                    if node.datatype == 'geojson-feature-collection':
+                        node_value = tile['data'][str(node.nodeid)]
+                        for feature_index, feature in enumerate(node_value['features']):
+                            try:
+                                feature_collections[label]['features'].append(feature)
+                            except:
+                                feature_collections[label] = {'datatype': datatype, 'features': [feature]}
                     else:
-                        compacted_data[label] = node_value
+                        try:
+                            compacted_data[label] += ", " + str(node_value)
+                        except:
+                            compacted_data[label] = str(node_value)
                 else:
-                    data[label] = node_value
+                    data[label] = str(node_value)
 
         if not compact:
             tile['data'] = data
@@ -59,6 +64,8 @@ def flatten_tiles(tiles, datatype_factory, compact=True):
             lookup[tile['tileid']] = tile
 
     if compact:
+        for key, value in feature_collections.items():
+            compacted_data[key] = value['datatype'].transform_export_values(value)
         return compacted_data
 
     # print(JSONSerializer().serialize(tiles, indent=4))
