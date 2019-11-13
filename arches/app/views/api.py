@@ -257,6 +257,7 @@ class GeoJSON(APIBase):
         include_primary_name = bool(request.GET.get('include_primary_name', False))
         include_geojson_link = bool(request.GET.get('include_geojson_link', False))
         use_display_values = bool(request.GET.get('use_display_values', False))
+        geometry_type = request.GET.get('type', None)
         indent = request.GET.get('indent', None)
         if indent is not None:
             indent = int(indent)
@@ -298,43 +299,44 @@ class GeoJSON(APIBase):
                 data = tile.data
                 try:
                     for feature_index, feature in enumerate(data[str(node.pk)]['features']):
-                        if len(nodegroups) > 0:
-                            for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id):
-                                for key in pt.data:
-                                    field_name = key if use_uuid_names else property_node_map[key]['name']
-                                    if pt.data[key] is not None:
-                                        if use_display_values:
-                                            property_node = property_node_map[key]['node']
-                                            datatype = datatype_factory.get_instance(property_node.datatype)
-                                            value = datatype.get_display_value(pt, property_node)
-                                        else:
-                                            value = pt.data[key]
-                                        try:
-                                            feature['properties'][field_name].append(value)
-                                        except KeyError:
-                                            feature['properties'][field_name] = value
-                                        except AttributeError:
-                                            feature['properties'][field_name] = [
-                                                feature['properties'][field_name],
-                                                value
-                                            ]
-                        if include_primary_name:
-                            feature['properties']['primary_name'] = self.get_name(tile.resourceinstance)
-                        feature['properties']['resourceinstanceid'] = tile.resourceinstance_id
-                        feature['properties']['tileid'] = tile.pk
-                        if nodeid is None:
-                            feature['properties']['nodeid'] = node.pk
-                        if include_geojson_link:
-                            feature['properties']['geojson'] = '%s?tileid=%s&nodeid=%s' % (
-                                    reverse('geojson'),
-                                    tile.pk,
-                                    node.pk
-                                )
-                        feature['id'] = i
-                        coordinates = self.set_precision(feature['geometry']['coordinates'], precision)
-                        feature['geometry']['coordinates'] = coordinates
-                        i += 1
-                        features.append(feature)
+                        if geometry_type is None or geometry_type == feature['geometry']['type']:
+                            if len(nodegroups) > 0:
+                                for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id):
+                                    for key in pt.data:
+                                        field_name = key if use_uuid_names else property_node_map[key]['name']
+                                        if pt.data[key] is not None:
+                                            if use_display_values:
+                                                property_node = property_node_map[key]['node']
+                                                datatype = datatype_factory.get_instance(property_node.datatype)
+                                                value = datatype.get_display_value(pt, property_node)
+                                            else:
+                                                value = pt.data[key]
+                                            try:
+                                                feature['properties'][field_name].append(value)
+                                            except KeyError:
+                                                feature['properties'][field_name] = value
+                                            except AttributeError:
+                                                feature['properties'][field_name] = [
+                                                    feature['properties'][field_name],
+                                                    value
+                                                ]
+                            if include_primary_name:
+                                feature['properties']['primary_name'] = self.get_name(tile.resourceinstance)
+                            feature['properties']['resourceinstanceid'] = tile.resourceinstance_id
+                            feature['properties']['tileid'] = tile.pk
+                            if nodeid is None:
+                                feature['properties']['nodeid'] = node.pk
+                            if include_geojson_link:
+                                feature['properties']['geojson'] = '%s?tileid=%s&nodeid=%s' % (
+                                        reverse('geojson'),
+                                        tile.pk,
+                                        node.pk
+                                    )
+                            feature['id'] = i
+                            coordinates = self.set_precision(feature['geometry']['coordinates'], precision)
+                            feature['geometry']['coordinates'] = coordinates
+                            i += 1
+                            features.append(feature)
                 except KeyError:
                     pass
                 except TypeError as e:
