@@ -38,6 +38,7 @@ from arches.app.utils.permission_backend import user_can_read_resources
 from arches.app.utils.permission_backend import user_can_edit_resources
 from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.decorators import group_required
+from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory
 from pyld.jsonld import compact, frame, from_rdf
@@ -221,14 +222,6 @@ class Surveys(APIBase):
 
 
 class GeoJSON(APIBase):
-    def set_precision(self, coordinates, precision):
-        result = []
-        try:
-            return round(coordinates, int(precision))
-        except TypeError:
-            for coordinate in coordinates:
-                result.append(self.set_precision(coordinate, precision))
-        return result
 
     def get_name(self, resource):
         module = importlib.import_module(
@@ -247,6 +240,7 @@ class GeoJSON(APIBase):
 
     def get(self, request):
         datatype_factory = DataTypeFactory()
+        set_precision = GeoUtils().set_precision
         resourceid = request.GET.get('resourceid', None)
         nodeid = request.GET.get('nodeid', None)
         tileid = request.GET.get('tileid', None)
@@ -331,7 +325,7 @@ class GeoJSON(APIBase):
                                     node.pk
                                 )
                         feature['id'] = i
-                        coordinates = self.set_precision(feature['geometry']['coordinates'], precision)
+                        coordinates = set_precision(feature['geometry']['coordinates'], precision)
                         feature['geometry']['coordinates'] = coordinates
                         i += 1
                         features.append(feature)
