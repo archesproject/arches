@@ -182,15 +182,12 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
     dest.write(json.dumps(export_json, indent=4))
     files_for_export.append({'name':file_name, 'outputfile': dest})
 
-
     if data_dir is not None:
         with open(os.path.join(data_dir), 'w') as config_file:
             json.dump(export_json, config_file, indent=4)
 
         file_name = Graph.objects.get(graphid=graphid).name
-
         buffer = StringIO()
-
         with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip:
             for f in files_for_export:
                 f['outputfile'].seek(0)
@@ -200,7 +197,6 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
         buffer.flush()
         zip_stream = buffer.getvalue()
         buffer.close()
-
         with open(os.path.join(data_dir), 'w') as archive:
             archive.write(zip_stream)
     else:

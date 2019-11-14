@@ -1278,7 +1278,11 @@ class DomainDataType(BaseDomainDataType):
 
     def transform_export_values(self, value, *args, **kwargs):
         ret = ''
-        if kwargs['concept_export_value_type'] is None or kwargs['concept_export_value_type'] == '' or kwargs['concept_export_value_type'] == 'label':
+        if (
+            kwargs['concept_export_value_type'] is None
+            or kwargs['concept_export_value_type'] == ''
+            or kwargs['concept_export_value_type'] == 'label'
+        ):
             ret = self.get_option_text(models.Node.objects.get(nodeid=kwargs['node']), value)
         elif kwargs['concept_export_value_type'] == 'both':
             ret = value + '|' + self.get_option_text(models.Node.objects.get(nodeid=kwargs['node']), value)
@@ -1371,7 +1375,11 @@ class DomainListDataType(BaseDomainDataType):
     def transform_export_values(self, value, *args, **kwargs):
         new_values = []
         for val in value:
-            if kwargs['concept_export_value_type'] is None or kwargs['concept_export_value_type'] == '' or kwargs['concept_export_value_type'] == 'label':
+            if (
+                kwargs['concept_export_value_type'] is None
+                or kwargs['concept_export_value_type'] == ''
+                or kwargs['concept_export_value_type'] == 'label'
+            ):
                 new_values.append(self.get_option_text(models.Node.objects.get(nodeid=kwargs['node']), val))
             elif kwargs['concept_export_value_type'] == 'both':
                 new_values.append(val + '|' + self.get_option_text(models.Node.objects.get(nodeid=kwargs['node']), val))
