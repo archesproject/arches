@@ -60,13 +60,9 @@ class Resource(models.ResourceInstance):
     def get_descriptor(self, descriptor):
         module = importlib.import_module("arches.app.functions.primary_descriptors")
         PrimaryDescriptorsFunction = getattr(module, "PrimaryDescriptorsFunction")()
-        functionConfig = models.FunctionXGraph.objects.filter(
-            graph_id=self.graph_id, function__functiontype="primarydescriptors"
-        )
+        functionConfig = models.FunctionXGraph.objects.filter(graph_id=self.graph_id, function__functiontype="primarydescriptors")
         if len(functionConfig) == 1:
-            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(
-                self, functionConfig[0].config[descriptor]
-            )
+            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(self, functionConfig[0].config[descriptor])
         else:
             return "undefined"
 
@@ -126,9 +122,7 @@ class Resource(models.ResourceInstance):
 
         """
         root_ontology_class = None
-        graph_nodes = models.Node.objects.filter(graph_id=self.graph_id).filter(
-            istopnode=True
-        )
+        graph_nodes = models.Node.objects.filter(graph_id=self.graph_id).filter(istopnode=True)
         if len(graph_nodes) > 0:
             root_ontology_class = graph_nodes[0].ontologyclass
 
@@ -161,12 +155,7 @@ class Resource(models.ResourceInstance):
 
         se = SearchEngineFactory().create()
         datatype_factory = DataTypeFactory()
-        node_datatypes = {
-            str(nodeid): datatype
-            for nodeid, datatype in models.Node.objects.values_list(
-                "nodeid", "datatype"
-            )
-        }
+        node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
         tiles = []
         documents = []
         term_list = []
@@ -180,43 +169,26 @@ class Resource(models.ResourceInstance):
         Resource.objects.bulk_create(resources)
         TileModel.objects.bulk_create(tiles)
 
-        print(
-            f"Time to bulk create tiles and resources: {datetime.timedelta(seconds=time() - start)}"
-        )
+        print(f"Time to bulk create tiles and resources: {datetime.timedelta(seconds=time() - start)}")
 
         start = time()
         for resource in resources:
             resource.save_edit(edit_type="create")
 
-        resources[0].tiles[0].save_edit(
-            note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create"
-        )
+        resources[0].tiles[0].save_edit(note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create")
 
-        print(
-            "Time to save resource edits: %s"
-            % datetime.timedelta(seconds=time() - start)
-        )
+        print("Time to save resource edits: %s" % datetime.timedelta(seconds=time() - start))
 
         for resource in resources:
             start = time()
             document, terms = resource.get_documents_to_index(
-                fetchTiles=False,
-                datatype_factory=datatype_factory,
-                node_datatypes=node_datatypes
+                fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
             )
 
-            documents.append(
-                se.create_bulk_item(
-                    index="resources", id=document["resourceinstanceid"], data=document
-                )
-            )
+            documents.append(se.create_bulk_item(index="resources", id=document["resourceinstanceid"], data=document))
 
             for term in terms:
-                term_list.append(
-                    se.create_bulk_item(
-                        index="terms", id=term["_id"], data=term["_source"]
-                    )
-                )
+                term_list.append(se.create_bulk_item(index="terms", id=term["_id"], data=term["_source"]))
 
         se.bulk_index(documents)
         se.bulk_index(term_list)
@@ -229,27 +201,15 @@ class Resource(models.ResourceInstance):
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             se = SearchEngineFactory().create()
             datatype_factory = DataTypeFactory()
-            node_datatypes = {
-                str(nodeid): datatype
-                for nodeid, datatype in models.Node.objects.values_list(
-                    "nodeid", "datatype"
-                )
-            }
-            document, terms = self.get_documents_to_index(
-                datatype_factory=datatype_factory, node_datatypes=node_datatypes
-            )
+            node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+            document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes)
             document["root_ontology_class"] = self.get_root_ontology()
             doc = JSONSerializer().serializeToPython(document)
             se.index_data(index="resources", body=doc, id=self.pk)
             for term in terms:
                 se.index_data("terms", body=term["_source"], id=term["_id"])
 
-    def get_documents_to_index(
-        self,
-        fetchTiles=True,
-        datatype_factory=None,
-        node_datatypes=None
-    ):
+    def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None):
         """
         Gets all the documents nessesary to index a single resource
         returns a tuple of a document and list of terms
@@ -273,11 +233,7 @@ class Resource(models.ResourceInstance):
         document["displaydescription"] = self.displaydescription
         document["map_popup"] = self.map_popup
 
-        tiles = (
-            list(models.TileModel.objects.filter(resourceinstance=self))
-            if fetchTiles
-            else self.tiles
-        )
+        tiles = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
 
         document["tiles"] = tiles
         document["strings"] = []
@@ -288,25 +244,16 @@ class Resource(models.ResourceInstance):
         document["numbers"] = []
         document["date_ranges"] = []
         document["ids"] = []
-        document["provisional_resource"] = (
-            "true" if sum([len(t.data) for t in tiles]) == 0 else "false"
-        )
+        document["provisional_resource"] = "true" if sum([len(t.data) for t in tiles]) == 0 else "false"
 
         terms = []
 
         for tile in document["tiles"]:
             for nodeid, nodevalue in tile.data.items():
                 datatype = node_datatypes[nodeid]
-                if (
-                    nodevalue != ""
-                    and nodevalue != []
-                    and nodevalue != {}
-                    and nodevalue is not None
-                ):
+                if nodevalue != "" and nodevalue != [] and nodevalue != {} and nodevalue is not None:
                     datatype_instance = datatype_factory.get_instance(datatype)
-                    datatype_instance.append_to_document(
-                        document, nodevalue, nodeid, tile
-                    )
+                    datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
                     for index, term in enumerate(node_terms):
                         terms.append(
@@ -332,27 +279,14 @@ class Resource(models.ResourceInstance):
                         if edit["status"] == "review":
                             for nodeid, nodevalue in edit["value"].items():
                                 datatype = node_datatypes[nodeid]
-                                if (
-                                    nodevalue != ""
-                                    and nodevalue != []
-                                    and nodevalue != {}
-                                    and nodevalue is not None
-                                ):
-                                    datatype_instance = datatype_factory.get_instance(
-                                        datatype
-                                    )
-                                    datatype_instance.append_to_document(
-                                        document, nodevalue, nodeid, tile, True
-                                    )
-                                    node_terms = datatype_instance.get_search_terms(
-                                        nodevalue, nodeid
-                                    )
+                                if nodevalue != "" and nodevalue != [] and nodevalue != {} and nodevalue is not None:
+                                    datatype_instance = datatype_factory.get_instance(datatype)
+                                    datatype_instance.append_to_document(document, nodevalue, nodeid, tile, True)
+                                    node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
                                     for index, term in enumerate(node_terms):
                                         terms.append(
                                             {
-                                                "_id": str(nodeid)
-                                                + str(tile.tileid)
-                                                + str(index),
+                                                "_id": str(nodeid) + str(tile.tileid) + str(index),
                                                 "_source": {
                                                     "value": term,
                                                     "nodeid": nodeid,
@@ -381,9 +315,7 @@ class Resource(models.ResourceInstance):
             user_is_reviewer = user.groups.filter(name="Resource Reviewer").exists()
             if user_is_reviewer is False:
                 tiles = list(models.TileModel.objects.filter(resourceinstance=self))
-                resource_is_provisional = (
-                    True if sum([len(t.data) for t in tiles]) == 0 else False
-                )
+                resource_is_provisional = True if sum([len(t.data) for t in tiles]) == 0 else False
                 if resource_is_provisional is True:
                     permit_deletion = True
             else:
@@ -393,16 +325,12 @@ class Resource(models.ResourceInstance):
 
         if permit_deletion is True:
             se = SearchEngineFactory().create()
-            related_resources = self.get_related_resources(
-                lang="en-US", start=0, limit=1000, page=0
-            )
+            related_resources = self.get_related_resources(lang="en-US", start=0, limit=1000, page=0)
             for rr in related_resources["resource_relationships"]:
                 models.ResourceXResource.objects.get(pk=rr["resourcexid"]).delete()
             query = Query(se)
             bool_query = Bool()
-            bool_query.filter(
-                Terms(field="resourceinstanceid", terms=[self.resourceinstanceid])
-            )
+            bool_query.filter(Terms(field="resourceinstanceid", terms=[self.resourceinstanceid]))
             query.add_query(bool_query)
             results = query.search(index="terms")["hits"]["hits"]
             for result in results:
@@ -415,11 +343,7 @@ class Resource(models.ResourceInstance):
         return permit_deletion
 
     def get_related_resources(
-        self,
-        lang="en-US",
-        limit=settings.RELATED_RESOURCES_EXPORT_LIMIT,
-        start=0,
-        page=0,
+        self, lang="en-US", limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0,
     ):
         """
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
@@ -432,12 +356,7 @@ class Resource(models.ResourceInstance):
             .exclude(isactive=False)
         )
         graph_lookup = {
-            str(graph.graphid): {
-                "name": graph.name,
-                "iconclass": graph.iconclass,
-                "fillColor": graph.color,
-            }
-            for graph in graphs
+            str(graph.graphid): {"name": graph.name, "iconclass": graph.iconclass, "fillColor": graph.color,} for graph in graphs
         }
         ret = {
             "resource_instance": self,
@@ -454,12 +373,8 @@ class Resource(models.ResourceInstance):
         def get_relations(resourceinstanceid, start, limit):
             query = Query(se, start=start, limit=limit)
             bool_filter = Bool()
-            bool_filter.should(
-                Terms(field="resourceinstanceidfrom", terms=resourceinstanceid)
-            )
-            bool_filter.should(
-                Terms(field="resourceinstanceidto", terms=resourceinstanceid)
-            )
+            bool_filter.should(Terms(field="resourceinstanceidfrom", terms=resourceinstanceid))
+            bool_filter.should(Terms(field="resourceinstanceidto", terms=resourceinstanceid))
             query.add_query(bool_filter)
             return query.search(index="resource_relations")
 
@@ -469,14 +384,10 @@ class Resource(models.ResourceInstance):
 
         for relation in resource_relations["hits"]["hits"]:
             try:
-                preflabel = get_preflabel_from_valueid(
-                    relation["_source"]["relationshiptype"], lang
-                )
+                preflabel = get_preflabel_from_valueid(relation["_source"]["relationshiptype"], lang)
                 relation["_source"]["relationshiptype_label"] = preflabel["value"]
             except:
-                relation["_source"]["relationshiptype_label"] = relation["_source"][
-                    "relationshiptype"
-                ]
+                relation["_source"]["relationshiptype_label"] = relation["_source"]["relationshiptype"]
 
             ret["resource_relationships"].append(relation["_source"])
             instanceids.add(relation["_source"]["resourceinstanceidto"])
