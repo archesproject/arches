@@ -8,16 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '3098_custom_map_markers'),
+        ("models", "3098_custom_map_markers"),
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='graphmodel',
-            name='color',
-            field=models.TextField(blank=True, null=True),
-        ),
-        migrations.RunSQL("""
+        migrations.AddField(model_name="graphmodel", name="color", field=models.TextField(blank=True, null=True),),
+        migrations.RunSQL(
+            """
             update graphs as g
             set color = n.config->'fillColor'
             from nodes as n
@@ -30,5 +27,6 @@ class Migration(migrations.Migration):
             set config = jsonb_set(config, '{fillColor}', to_jsonb(g.color), true)
             from graphs as g
             where n.graphid = g.graphid and g.isresource = true and n.istopnode = true;
-            """)
-        ]
+            """,
+        ),
+    ]

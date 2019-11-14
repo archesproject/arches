@@ -10,7 +10,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4186_graphmodel_slug'),
+        ("models", "4186_graphmodel_slug"),
     ]
 
     operations = [
@@ -24,5 +24,6 @@ class Migration(migrations.Migration):
             update widgets as w
             set defaultconfig = defaultconfig - 'rerender'
             where w.name in ('map-widget', 'file-widget', 'iiif-widget');
-            """)
-        ]
+            """,
+        )
+    ]

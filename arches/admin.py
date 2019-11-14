@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 from .app.models import models
 from django.contrib import admin
@@ -25,17 +25,19 @@ class GuardedAdmin(GuardedModelAdmin):
     pass
 
 
-admin.site.register([
-    models.DLanguage,
-    models.MapLayer,
-    models.MapSource,
-    models.Geocoder,
-    models.MapMarker,
-    models.DDataType,
-    models.Widget,
-    models.UserProfile,
-    models.GraphModel,
-    models.SearchComponent,
-    ])
+admin.site.register(
+    [
+        models.DLanguage,
+        models.MapLayer,
+        models.MapSource,
+        models.Geocoder,
+        models.MapMarker,
+        models.DDataType,
+        models.Widget,
+        models.UserProfile,
+        models.GraphModel,
+        models.SearchComponent,
+    ]
+)
 
 admin.site.register([models.Plugin, models.NodeGroup], GuardedAdmin)

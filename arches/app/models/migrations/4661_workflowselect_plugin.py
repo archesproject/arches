@@ -9,7 +9,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4375_add_unique_constraint_models'),
+        ("models", "4375_add_unique_constraint_models"),
     ]
 
     operations = [
@@ -33,5 +33,6 @@ class Migration(migrations.Migration):
             """,
             """
             delete from plugins where pluginid = 'f477b613-552f-22f0-0e38-d5c412cbbc0e';
-            """)
-        ]
+            """,
+        )
+    ]

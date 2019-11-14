@@ -1,5 +1,4 @@
 class BaseFunction(object):
-
     def __init__(self, config=None, nodegroup_id=None):
         self.config = config
         self.nodegroup_id = nodegroup_id

@@ -9,7 +9,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4661_workflowselect_plugin'),
+        ("models", "4661_workflowselect_plugin"),
     ]
 
     operations = [
@@ -79,5 +79,6 @@ class Migration(migrations.Migration):
             """,
             """
             delete from report_templates where templateid = '50000000-0000-0000-0000-000000000004';
-            """)
-        ]
+            """,
+        )
+    ]

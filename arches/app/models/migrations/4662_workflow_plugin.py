@@ -10,7 +10,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '2691_ES_upgrade'),
+        ("models", "2691_ES_upgrade"),
     ]
 
     operations = [
@@ -34,5 +34,6 @@ class Migration(migrations.Migration):
             """,
             """
             delete from plugins where pluginid = 'e366a702-441e-11e9-9d27-c4b301baab9f';
-            """)
-        ]
+            """,
+        )
+    ]

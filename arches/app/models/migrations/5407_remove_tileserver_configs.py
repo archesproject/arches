@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '5407_remove_tileserver'),
+        ("models", "5407_remove_tileserver"),
     ]
 
     operations = [
@@ -42,6 +42,6 @@ class Migration(migrations.Migration):
             update nodes
             set config = jsonb_set(config, '{autoManageCache}', 'false')
             where datatype = 'geojson-feature-collection';
-            """
+            """,
         ),
     ]

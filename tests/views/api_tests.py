@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 """
 This file demonstrates writing tests using the unittest module. These will pass
@@ -36,9 +36,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 # python manage.py test tests/views/api_tests.py --pattern="*.py" --settings="tests.test_settings"
 
 
-
 class APITests(ArchesTestCase):
-
     def setUp(self):
         pass
 
@@ -48,19 +46,19 @@ class APITests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         cls.loadOntology()
-        with open(os.path.join('tests/fixtures/resource_graphs/unique_graph_shape.json'), 'rU') as f:
+        with open(os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "rU") as f:
             json = JSONDeserializer().deserialize(f)
-            cls.unique_graph = Graph(json['graph'][0])
+            cls.unique_graph = Graph(json["graph"][0])
             cls.unique_graph.save()
 
-        with open(os.path.join('tests/fixtures/resource_graphs/ambiguous_graph_shape.json'), 'rU') as f:
+        with open(os.path.join("tests/fixtures/resource_graphs/ambiguous_graph_shape.json"), "rU") as f:
             json = JSONDeserializer().deserialize(f)
-            cls.ambiguous_graph = Graph(json['graph'][0])
+            cls.ambiguous_graph = Graph(json["graph"][0])
             cls.ambiguous_graph.save()
 
-        with open(os.path.join('tests/fixtures/resource_graphs/phase_type_assignment.json'), 'rU') as f:
+        with open(os.path.join("tests/fixtures/resource_graphs/phase_type_assignment.json"), "rU") as f:
             json = JSONDeserializer().deserialize(f)
-            cls.phase_type_assignment_graph = Graph(json['graph'][0])
+            cls.phase_type_assignment_graph = Graph(json["graph"][0])
             cls.phase_type_assignment_graph.save()
 
     def test_api_base_view(self):
@@ -69,15 +67,15 @@ class APITests(ArchesTestCase):
 
         """
 
-        factory = RequestFactory(HTTP_X_ARCHES_VER='2.1')
+        factory = RequestFactory(HTTP_X_ARCHES_VER="2.1")
         view = APIBase.as_view()
 
-        request = factory.get(reverse('mobileprojects', kwargs={}), {'ver': '2.0'})
+        request = factory.get(reverse("mobileprojects", kwargs={}), {"ver": "2.0"})
         request.user = None
         response = view(request)
-        self.assertEqual(request.GET.get('ver'), '2.0')
+        self.assertEqual(request.GET.get("ver"), "2.0")
 
-        request = factory.get(reverse('mobileprojects'), kwargs={})
+        request = factory.get(reverse("mobileprojects"), kwargs={})
         request.user = None
         response = view(request)
-        self.assertEqual(request.GET.get('ver'), '2.1')
+        self.assertEqual(request.GET.get("ver"), "2.1")

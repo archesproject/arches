@@ -15,6 +15,7 @@ from rdflib import Namespace, URIRef, Literal, BNode
 from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS, SKOS
 from arches.app.models.concept import ConceptValue
+
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 
@@ -32,12 +33,12 @@ class BaseConceptDataType(BaseDataType):
             return self.value_lookup[valueid]
 
     def get_concept_export_value(self, valueid, concept_export_value_type=None):
-        ret = ''
-        if concept_export_value_type == None or concept_export_value_type == '' or concept_export_value_type == 'label':
+        ret = ""
+        if concept_export_value_type == None or concept_export_value_type == "" or concept_export_value_type == "label":
             ret = self.get_value(valueid).value
-        elif concept_export_value_type == 'both':
-            ret = valueid + '|' + self.get_value(valueid).value
-        elif concept_export_value_type == 'id':
+        elif concept_export_value_type == "both":
+            ret = valueid + "|" + self.get_value(valueid).value
+        elif concept_export_value_type == "id":
             ret = valueid
         return ret
 
@@ -46,32 +47,41 @@ class BaseConceptDataType(BaseDataType):
         date_range = {}
         values = models.Value.objects.filter(concept=concept)
         for value in values:
-            if value.valuetype.valuetype in ('min_year' 'max_year'):
+            if value.valuetype.valuetype in ("min_year" "max_year"):
                 date_range[value.valuetype.valuetype] = value.value
-        if 'min_year' in date_range and 'max_year' in date_range:
+        if "min_year" in date_range and "max_year" in date_range:
             result = date_range
         return result
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         try:
-            assert isinstance(nodevalue, (list, tuple)) #assert nodevalue is an array
+            assert isinstance(nodevalue, (list, tuple))  # assert nodevalue is an array
         except AssertionError:
             nodevalue = [nodevalue]
         for valueid in nodevalue:
             value = self.get_value(valueid)
             date_range = self.get_concept_dates(value.concept)
             if date_range is not None:
-                min_date = ExtendedDateFormat(date_range['min_year']).lower
-                max_date = ExtendedDateFormat(date_range['max_year']).upper
-                if {'gte': min_date, 'lte': max_date} not in document['date_ranges']:
-                    document['date_ranges'].append({'date_range': {'gte': min_date, 'lte': max_date}, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
-            document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
-            document['strings'].append({'string': value.value, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
+                min_date = ExtendedDateFormat(date_range["min_year"]).lower
+                max_date = ExtendedDateFormat(date_range["max_year"]).upper
+                if {"gte": min_date, "lte": max_date} not in document["date_ranges"]:
+                    document["date_ranges"].append(
+                        {"date_range": {"gte": min_date, "lte": max_date}, "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+                    )
+            document["domains"].append(
+                {
+                    "label": value.value,
+                    "conceptid": value.concept_id,
+                    "valueid": valueid,
+                    "nodegroup_id": tile.nodegroup_id,
+                    "provisional": provisional,
+                }
+            )
+            document["strings"].append({"string": value.value, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
 
 
 class ConceptDataType(BaseConceptDataType):
-
-    def validate(self, value, row_number=None, source='', node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
 
         ## first check to see if the validator has been passed a valid UUID,
@@ -81,7 +91,14 @@ class ConceptDataType(BaseConceptDataType):
                 uuid.UUID(str(value))
             except ValueError:
                 message = "This is an invalid concept prefLabel, or an incomplete UUID"
-                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} {3} - {4}. {5}'.format(self.datatype_model.datatype, value, source, row_number, message, 'This data was not imported.')})
+                errors.append(
+                    {
+                        "type": "ERROR",
+                        "message": "datatype: {0} value: {1} {2} {3} - {4}. {5}".format(
+                            self.datatype_model.datatype, value, source, row_number, message, "This data was not imported."
+                        ),
+                    }
+                )
                 return errors
 
             ## if good UUID, test whether it corresponds to an actual Value object
@@ -89,32 +106,39 @@ class ConceptDataType(BaseConceptDataType):
                 models.Value.objects.get(pk=value)
             except ObjectDoesNotExist:
                 message = "This UUID does not correspond to a valid domain value"
-                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} {3} - {4}. {5}'.format(self.datatype_model.datatype, value, source, row_number, message, 'This data was not imported.')})
+                errors.append(
+                    {
+                        "type": "ERROR",
+                        "message": "datatype: {0} value: {1} {2} {3} - {4}. {5}".format(
+                            self.datatype_model.datatype, value, source, row_number, message, "This data was not imported."
+                        ),
+                    }
+                )
         return errors
 
     def transform_import_values(self, value, nodeid):
         return value.strip()
 
     def transform_export_values(self, value, *args, **kwargs):
-        if 'concept_export_value_type' in kwargs:
-            concept_export_value_type = kwargs.get('concept_export_value_type')
+        if "concept_export_value_type" in kwargs:
+            concept_export_value_type = kwargs.get("concept_export_value_type")
         return self.get_concept_export_value(value, concept_export_value_type)
 
-    def get_pref_label(self, nodevalue, lang='en-US'):
-        return get_preflabel_from_valueid(nodevalue, lang)['value']
+    def get_pref_label(self, nodevalue, lang="en-US"):
+        return get_preflabel_from_valueid(nodevalue, lang)["value"]
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
-        if data[str(node.nodeid)] is None or data[str(node.nodeid)].strip() == '':
-            return ''
+        if data[str(node.nodeid)] is None or data[str(node.nodeid)].strip() == "":
+            return ""
         else:
             return self.get_value(uuid.UUID(data[str(node.nodeid)])).value
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value['val'] != '':
-                match_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'])
-                if '!' in value['op']:
+            if value["val"] != "":
+                match_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
+                if "!" in value["op"]:
                     query.must_not(match_query)
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
@@ -138,23 +162,25 @@ class ConceptDataType(BaseConceptDataType):
                     rangenode = URIRef(id_uri)
             return rangenode
 
-        if edge_info['range_tile_data'] is not None:
-            c = ConceptValue(str(edge_info['range_tile_data']))
+        if edge_info["range_tile_data"] is not None:
+            c = ConceptValue(str(edge_info["range_tile_data"]))
 
             # create a default node
             arches_uri = BNode()
             ext_idents = []
             # Use the conceptid URI rather than the pk for the ConceptValue
             if c.conceptid is not None:
-                arches_uri = URIRef(archesproject['concepts/%s' % c.conceptid])
+                arches_uri = URIRef(archesproject["concepts/%s" % c.conceptid])
 
                 # get other identifiers:
-                ext_idents = [ident.value for ident in models.Value.objects.all().filter(
-                        concept_id__exact=c.conceptid, valuetype__category="identifiers")]
+                ext_idents = [
+                    ident.value
+                    for ident in models.Value.objects.all().filter(concept_id__exact=c.conceptid, valuetype__category="identifiers")
+                ]
             rangenode = get_rangenode(arches_uri, ext_idents)
 
             g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
-            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), rangenode))
+            g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), rangenode))
 
             assert c.value is not None, "Null or blank concept value"
             g.add((rangenode, URIRef(RDFS.label), Literal(c.value)))
@@ -176,7 +202,7 @@ class ConceptDataType(BaseConceptDataType):
         except KeyError as e:
             pass
 
-        concept_uri = json_ld_node.get('@id')
+        concept_uri = json_ld_node.get("@id")
         label_node = json_ld_node.get(str(RDFS.label))
 
         # Consume the labels, such that we don't recurse into them
@@ -185,14 +211,14 @@ class ConceptDataType(BaseConceptDataType):
 
         concept_id = lang = None
         import re
+
         p = re.compile(r"(http|https)://(?P<host>[^/]*)/concepts/(?P<concept_id>[A-Fa-f0-9\-]*)/?$")
         m = p.match(concept_uri)
         if m is not None:
             concept_id = m.groupdict().get("concept_id")
         else:
             # could be an external id, rather than an Arches only URI
-            hits = [ident for ident in models.Value.objects.all().filter(value__exact=str(concept_uri),
-                                                                         valuetype__category="identifiers")]
+            hits = [ident for ident in models.Value.objects.all().filter(value__exact=str(concept_uri), valuetype__category="identifiers")]
             # print("Could be external URI - hits from RDM: {0}".format(len(hits)))
             if len(hits) == 1:
                 concept_id = hits[0].concept_id
@@ -234,7 +260,7 @@ class ConceptDataType(BaseConceptDataType):
             # got a concept URI but the label is nonexistant
             # or cannot be resolved in Arches
             value = get_preflabel_from_conceptid(concept_id, lang=lang)
-            return value['id']
+            return value["id"]
 
         if concept_id is None and (label is None or label == ""):
             print("Concept lookup in from_rdf FAILED: No concept id found and no label either")
@@ -245,20 +271,20 @@ class ConceptDataType(BaseConceptDataType):
 
 
 class ConceptListDataType(BaseConceptDataType):
-    def validate(self, value, row_number=None, source='', node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
 
         ## iterate list of values and use the concept validation on each one
         if value != None:
-            validate_concept = DataTypeFactory().get_instance('concept')
+            validate_concept = DataTypeFactory().get_instance("concept")
             for v in value:
                 val = v.strip()
                 errors += validate_concept.validate(val, row_number)
         return errors
 
     def transform_import_values(self, value, nodeid):
-        ret =[]
-        for val in csv.reader([value], delimiter=',', quotechar='"'):
+        ret = []
+        for val in csv.reader([value], delimiter=",", quotechar='"'):
             for v in val:
                 ret.append(v.strip())
         return ret
@@ -266,9 +292,9 @@ class ConceptListDataType(BaseConceptDataType):
     def transform_export_values(self, value, *args, **kwargs):
         new_values = []
         for val in value:
-            new_val = self.get_concept_export_value(val, kwargs['concept_export_value_type'])
+            new_val = self.get_concept_export_value(val, kwargs["concept_export_value_type"])
             new_values.append(new_val)
-        return ','.join(new_values)
+        return ",".join(new_values)
 
     def get_display_value(self, tile, node):
         new_values = []
@@ -277,13 +303,13 @@ class ConceptListDataType(BaseConceptDataType):
             for val in data[str(node.nodeid)]:
                 new_val = self.get_value(uuid.UUID(val))
                 new_values.append(new_val.value)
-        return ','.join(new_values)
+        return ",".join(new_values)
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value['val'] != '':
-                match_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'])
-                if '!' in value['op']:
+            if value["val"] != "":
+                match_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
+                if "!" in value["op"]:
                     query.must_not(match_query)
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
@@ -295,15 +321,15 @@ class ConceptListDataType(BaseConceptDataType):
     def to_rdf(self, edge_info, edge):
         g = Graph()
         c = ConceptDataType()
-        if edge_info['range_tile_data']:
-            for r in edge_info['range_tile_data']:
+        if edge_info["range_tile_data"]:
+            for r in edge_info["range_tile_data"]:
                 concept_info = edge_info.copy()
-                concept_info['range_tile_data'] = r
+                concept_info["range_tile_data"] = r
                 g += c.to_rdf(concept_info, edge)
         return g
 
     def from_rdf(self, json_ld_node):
-                # returns a list of concept ids
+        # returns a list of concept ids
         ctype = ConceptDataType()
         if isinstance(json_ld_node, list):
             return [ctype.from_rdf(item) for item in json_ld_node]

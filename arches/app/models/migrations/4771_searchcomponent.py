@@ -11,40 +11,39 @@ from arches.app.models.system_settings import settings
 
 
 def forwards_func(apps, schema_editor):
-    for root, dirs, files in os.walk(os.path.join(settings.ROOT_DIR, 'app', 'search', 'components')):
+    for root, dirs, files in os.walk(os.path.join(settings.ROOT_DIR, "app", "search", "components")):
         for file in files:
             filename, file_extension = os.path.splitext(file)
-            if file_extension == '.py':
-                management.call_command('search', 'register', source=os.path.join(root, file))
+            if file_extension == ".py":
+                management.call_command("search", "register", source=os.path.join(root, file))
+
 
 def reverse_func(apps, schema_editor):
     pass
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4684_updates_tabbed_report_configs'),
+        ("models", "4684_updates_tabbed_report_configs"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='SearchComponent',
+            name="SearchComponent",
             fields=[
-                ('searchcomponentid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('name', models.TextField()),
-                ('icon', models.TextField(default=None)),
-                ('modulename', models.TextField(blank=True, null=True)),
-                ('classname', models.TextField(blank=True, null=True)),
-                ('type', models.TextField()),
-                ('componentpath', models.TextField(unique=True)),
-                ('componentname', models.TextField(unique=True)),
-                ('sortorder', models.IntegerField(blank=True, default=None, null=True)),
-                ('enabled', models.BooleanField(default=False)),
+                ("searchcomponentid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ("name", models.TextField()),
+                ("icon", models.TextField(default=None)),
+                ("modulename", models.TextField(blank=True, null=True)),
+                ("classname", models.TextField(blank=True, null=True)),
+                ("type", models.TextField()),
+                ("componentpath", models.TextField(unique=True)),
+                ("componentname", models.TextField(unique=True)),
+                ("sortorder", models.IntegerField(blank=True, default=None, null=True)),
+                ("enabled", models.BooleanField(default=False)),
             ],
-            options={
-                'db_table': 'search_component',
-                'managed': True,
-            },
+            options={"db_table": "search_component", "managed": True,},
         ),
-        migrations.RunPython(forwards_func, reverse_func)
+        migrations.RunPython(forwards_func, reverse_func),
     ]

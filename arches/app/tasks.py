@@ -9,7 +9,7 @@ from arches.app.models import models
 @shared_task(bind=True)
 def sync(self, surveyid=None, userid=None):
     create_user_task_record(self.request.id, self.name, userid)
-    management.call_command('mobile', operation='sync_survey', id=surveyid, user=userid)
+    management.call_command("mobile", operation="sync_survey", id=surveyid, user=userid)
     return self.request.id
 
 
@@ -32,11 +32,6 @@ def log_error(request, exc, traceback):
 
 def create_user_task_record(taskid, taskname, userid):
     try:
-        new_task_record = models.UserXTask.objects.create(
-            user_id=userid,
-            taskid=taskid,
-            date_start=datetime.datetime.now(),
-            name=taskname
-        )
+        new_task_record = models.UserXTask.objects.create(user_id=userid, taskid=taskid, date_start=datetime.datetime.now(), name=taskname)
     except Exception as e:
         print("encountered exception in create user")

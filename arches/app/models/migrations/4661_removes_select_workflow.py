@@ -1,12 +1,10 @@
-
-
 from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4670_adds_map_card'),
+        ("models", "4670_adds_map_card"),
     ]
 
     operations = [
@@ -30,5 +28,6 @@ class Migration(migrations.Migration):
                     'workflow-select-plugin',
                     '{}'
             );
-            """)
+            """,
+        )
     ]

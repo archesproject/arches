@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import urllib.request, urllib.parse, urllib.error
 import uuid
@@ -26,14 +26,13 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 
 
 class SearchEngine(object):
-
     def __init__(self, **kwargs):
         #
         serializer = JSONSerializer()
-        serializer.mimetype = 'application/json'
+        serializer.mimetype = "application/json"
         serializer.dumps = serializer.serialize
         serializer.loads = JSONDeserializer().deserialize
-        self.prefix = kwargs.pop('prefix', '').lower()
+        self.prefix = kwargs.pop("prefix", "").lower()
         self.es = Elasticsearch(serializer=serializer, **kwargs)
         self.logger = logging.getLogger(__name__)
 
@@ -41,16 +40,16 @@ class SearchEngine(object):
         if args:
             index = args[0].strip()
         else:
-            index = kwargs.get('index', '').strip()
-        if index is None or index == '':
+            index = kwargs.get("index", "").strip()
+        if index is None or index == "":
             raise NotImplementedError("Elasticsearch index not specified.")
 
-        prefix = '%s_' % self.prefix.strip() if self.prefix and self.prefix.strip() != '' else ''
+        prefix = "%s_" % self.prefix.strip() if self.prefix and self.prefix.strip() != "" else ""
         ret = []
-        for idx in index.split(','):
-            ret.append('%s%s' % (prefix, idx))
+        for idx in index.split(","):
+            ret.append("%s%s" % (prefix, idx))
 
-        index = ','.join(ret)
+        index = ",".join(ret)
         if args:
             return index
         else:
@@ -65,13 +64,13 @@ class SearchEngine(object):
         """
 
         kwargs = self._add_prefix(**kwargs)
-        body = kwargs.pop('body', None)
+        body = kwargs.pop("body", None)
         if body != None:
             try:
                 data = []
-                refresh = kwargs.pop('refresh', False)
+                refresh = kwargs.pop("refresh", False)
                 for hit in helpers.scan(self.es, query=body, **kwargs):
-                    hit['_op_type'] = 'delete'
+                    hit["_op_type"] = "delete"
                     data.append(hit)
 
                 return helpers.bulk(self.es, data, refresh=refresh, **kwargs)
@@ -81,13 +80,15 @@ class SearchEngine(object):
                     if detail.status_code == 404:
                         pass
                 except:
-                    self.logger.warning('%s: WARNING: failed to delete document by query: %s \nException detail: %s\n' % (datetime.now(), body, detail))
+                    self.logger.warning(
+                        "%s: WARNING: failed to delete document by query: %s \nException detail: %s\n" % (datetime.now(), body, detail)
+                    )
                     raise detail
         else:
             try:
                 return self.es.delete(ignore=[404], **kwargs)
             except Exception as detail:
-                self.logger.warning('%s: WARNING: failed to delete document: %s \nException detail: %s\n' % (datetime.now(), body, detail))
+                self.logger.warning("%s: WARNING: failed to delete document: %s \nException detail: %s\n" % (datetime.now(), body, detail))
                 raise detail
 
     def delete_index(self, **kwargs):
@@ -97,7 +98,7 @@ class SearchEngine(object):
         """
 
         kwargs = self._add_prefix(**kwargs)
-        print('deleting index : %s' % kwargs.get('index'))
+        print("deleting index : %s" % kwargs.get("index"))
         return self.es.indices.delete(ignore=[400, 404], **kwargs)
 
     def search(self, **kwargs):
@@ -109,12 +110,12 @@ class SearchEngine(object):
         """
 
         kwargs = self._add_prefix(**kwargs)
-        body = kwargs.get('body', None)
-        id = kwargs.get('id', None)
+        body = kwargs.get("body", None)
+        id = kwargs.get("id", None)
 
         if id:
             if isinstance(id, list):
-                kwargs.setdefault('body', {'ids': kwargs.pop('id')})
+                kwargs.setdefault("body", {"ids": kwargs.pop("id")})
                 return self.es.mget(**kwargs)
             else:
                 return self.es.get(**kwargs)
@@ -123,12 +124,12 @@ class SearchEngine(object):
         try:
             ret = self.es.search(**kwargs)
         except Exception as detail:
-            self.logger.warning('%s: WARNING: search failed for query: %s \nException detail: %s\n' % (datetime.now(), body, detail))
+            self.logger.warning("%s: WARNING: search failed for query: %s \nException detail: %s\n" % (datetime.now(), body, detail))
             pass
 
         return ret
 
-    def create_mapping(self, index, fieldname='', fieldtype='string', fieldindex=None, body=None):
+    def create_mapping(self, index, fieldname="", fieldtype="string", fieldindex=None, body=None):
         """
         Creates an Elasticsearch body for a single field given an index name and type name
 
@@ -136,35 +137,23 @@ class SearchEngine(object):
 
         index = self._add_prefix(index)
         if not body:
-            if fieldtype == 'geo_shape':
-                body =  {
-                    '_doc' : {
-                        'properties' : {
-                            fieldname : { 'type' : 'geo_shape', 'tree' : 'geohash', 'precision': '1m' }
-                        }
-                    }
-                }
+            if fieldtype == "geo_shape":
+                body = {"_doc": {"properties": {fieldname: {"type": "geo_shape", "tree": "geohash", "precision": "1m"}}}}
             else:
-                fn = { 'type' : fieldtype }
+                fn = {"type": fieldtype}
                 if fieldindex:
-                    fn['index'] = fieldindex
-                body =  {
-                    '_doc' : {
-                        'properties' : {
-                            fieldname : fn
-                        }
-                    }
-                }
+                    fn["index"] = fieldindex
+                body = {"_doc": {"properties": {fieldname: fn}}}
 
         self.es.indices.create(index=index, ignore=400)
-        self.es.indices.put_mapping(index=index, doc_type='_doc', body=body, include_type_name=True)
-        print('creating index : %s' % (index))
+        self.es.indices.put_mapping(index=index, doc_type="_doc", body=body, include_type_name=True)
+        print("creating index : %s" % (index))
 
     def create_index(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
-        kwargs['include_type_name'] = True
+        kwargs["include_type_name"] = True
         self.es.indices.create(ignore=400, **kwargs)
-        print('creating index : %s' % kwargs.get('index', ''))
+        print("creating index : %s" % kwargs.get("index", ""))
 
     def index_data(self, index=None, body=None, idfield=None, id=None, **kwargs):
         """
@@ -186,66 +175,54 @@ class SearchEngine(object):
                 if isinstance(document, dict):
                     id = document[idfield]
                 else:
-                    id = getattr(document,idfield)
+                    id = getattr(document, idfield)
 
             try:
-                self.es.index(index=index, doc_type='_doc', body=document, id=id)
+                self.es.index(index=index, doc_type="_doc", body=document, id=id)
             except Exception as detail:
-                self.logger.warning('%s: WARNING: failed to index document: %s \nException detail: %s\n' % (datetime.now(), document, detail))
+                self.logger.warning(
+                    "%s: WARNING: failed to index document: %s \nException detail: %s\n" % (datetime.now(), document, detail)
+                )
                 raise detail
-
 
     def bulk_index(self, data, **kwargs):
         return helpers.bulk(self.es, data, **kwargs)
 
-    def create_bulk_item(self, op_type='index', index=None, id=None, data=None):
-        return {
-            '_op_type': op_type,
-            '_index': self._add_prefix(index),
-            '_type': '_doc',
-            '_id': id,
-            '_source': data
-        }
+    def create_bulk_item(self, op_type="index", index=None, id=None, data=None):
+        return {"_op_type": op_type, "_index": self._add_prefix(index), "_type": "_doc", "_id": id, "_source": data}
 
     def count(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
-        kwargs['doc_type'] = kwargs.pop('doc_type', '_doc')
-        body = kwargs.pop('body', None)
+        kwargs["doc_type"] = kwargs.pop("doc_type", "_doc")
+        body = kwargs.pop("body", None)
 
         # need to only pass in the query key as other keys (eg: _source) are not allowed
         if body:
-            query = body.pop('query', None)
+            query = body.pop("query", None)
             if query:
-                kwargs['body'] = {'query': query}
+                kwargs["body"] = {"query": query}
 
         count = self.es.count(**kwargs)
         if count is not None:
-            return count['count']
+            return count["count"]
         else:
             return None
 
     def BulkIndexer(outer_self, batch_size=500, **kwargs):
-
         class _BulkIndexer(object):
             def __init__(self, **kwargs):
                 self.queue = []
-                self.batch_size = kwargs.pop('batch_size', 500)
+                self.batch_size = kwargs.pop("batch_size", 500)
                 self.kwargs = kwargs
 
-            def add(self, op_type='index', index=None, id=None, data=None):
-                doc = {
-                    '_op_type': op_type,
-                    '_index': outer_self._add_prefix(index),
-                    '_type': '_doc',
-                    '_id': id,
-                    '_source': data
-                }
+            def add(self, op_type="index", index=None, id=None, data=None):
+                doc = {"_op_type": op_type, "_index": outer_self._add_prefix(index), "_type": "_doc", "_id": id, "_source": data}
                 self.queue.append(doc)
 
                 if len(self.queue) >= self.batch_size:
                     outer_self.bulk_index(self.queue, **self.kwargs)
-                    del self.queue[:]  #clear out the array
-            
+                    del self.queue[:]  # clear out the array
+
             def close(self):
                 outer_self.bulk_index(self.queue, **self.kwargs)
 
