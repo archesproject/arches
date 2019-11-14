@@ -8,5 +8,7 @@ files:
   ignore:
     - 'arches/app/media/packages/*'
     - 'node_modules/*'
+review:
+  fail_on_comments: false
 fixers:
   enable: false

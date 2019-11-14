@@ -24,12 +24,10 @@ from tests import test_settings
 
 
 def run_all(argv=None):
-    os.environ["DJANGO_SETTINGS_MODULE"] = "tests.test_settings"
-
+    os.environ['DJANGO_SETTINGS_MODULE'] = "tests.test_settings"
+    
     if argv is None or len(argv[1:]) == 0:
-        argv = [
-            "tests",
-        ]
+        argv = ['tests',]
 
     TestRunner = get_runner(test_settings)
     test_runner = TestRunner([], interactive=True)

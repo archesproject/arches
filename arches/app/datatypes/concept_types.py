@@ -33,8 +33,8 @@ class BaseConceptDataType(BaseDataType):
             return self.value_lookup[valueid]
 
     def get_concept_export_value(self, valueid, concept_export_value_type=None):
-        ret = ""
-        if concept_export_value_type is None or concept_export_value_type == "" or concept_export_value_type == "label":
+        ret = ''
+        if concept_export_value_type is None or concept_export_value_type == '' or concept_export_value_type == 'label':
             ret = self.get_value(valueid).value
         elif concept_export_value_type == "both":
             ret = valueid + "|" + self.get_value(valueid).value
@@ -276,7 +276,7 @@ class ConceptListDataType(BaseConceptDataType):
 
         ## iterate list of values and use the concept validation on each one
         if value is not None:
-            validate_concept = DataTypeFactory().get_instance("concept")
+            validate_concept = DataTypeFactory().get_instance('concept')
             for v in value:
                 val = v.strip()
                 errors += validate_concept.validate(val, row_number)

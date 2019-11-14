@@ -432,7 +432,7 @@ def search(request):
 
     ids = []
     if removechildren is not None:
-        ids = [concept[0] for concept in Concept().get_child_concepts(removechildren, columns="conceptidto::text")]
+        ids =  [concept[0] for concept in Concept().get_child_concepts(removechildren, columns="conceptidto::text")]
         ids.append(removechildren)
 
     newresults = []
@@ -559,14 +559,13 @@ def get_preflabel_from_conceptid(conceptid, lang):
     for preflabel in preflabels:
         default = preflabel["_source"]
         # get the label in the preferred language, otherwise get the label in the default language
-        if preflabel["_source"]["language"] == lang:
-            return preflabel["_source"]
-        if preflabel["_source"]["language"].split("-")[0] == lang.split("-")[0]:
-            ret = preflabel["_source"]
-        if preflabel["_source"]["language"] == settings.LANGUAGE_CODE and ret is None:
-            ret = preflabel["_source"]
+        if preflabel['_source']['language'] == lang:
+            return preflabel['_source']
+        if preflabel['_source']['language'].split('-')[0] == lang.split('-')[0]:
+            ret = preflabel['_source']
+        if preflabel['_source']['language'] == settings.LANGUAGE_CODE and ret is None:
+            ret = preflabel['_source']
     return default if ret is None else ret
-
 
 def concept_value(request):
     if request.method == "DELETE":

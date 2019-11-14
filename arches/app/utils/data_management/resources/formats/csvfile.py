@@ -149,10 +149,16 @@ class CsvWriter(Writer):
                 if tile.data != {}:
                     for k in list(tile.data.keys()):
                         if tile.data[k] != "" and k in mapping and tile.data[k] is not None:
-                            if mapping[k] not in csv_record and tile.nodegroup_id not in csv_record["populated_node_groups"]:
+                            if (
+                                mapping[k] not in csv_record
+                                and tile.nodegroup_id
+                                not in csv_record["populated_node_groups"]
+                            ):
                                 concept_export_value_type = None
                                 if k in concept_export_value_lookup:
-                                    concept_export_value_type = concept_export_value_lookup[k]
+                                    concept_export_value_type = concept_export_value_lookup[
+                                        k
+                                    ]
                                 if tile.data[k] is not None:
                                     value = self.transform_value_for_export(
                                         self.node_datatypes[k], tile.data[k], concept_export_value_type, k,
@@ -211,7 +217,9 @@ class CsvWriter(Writer):
                 csvwriter.writerow({k: str(v) for k, v in list(csv_record.items())})
 
         if self.graph_id is not None:
-            csvs_for_export = csvs_for_export + self.write_resource_relations(file_name=self.file_name)
+            csvs_for_export = csvs_for_export + self.write_resource_relations(
+                file_name=self.file_name
+            )
 
         return csvs_for_export
 
@@ -239,9 +247,15 @@ class CsvWriter(Writer):
                 Q(resourceinstanceidfrom__in=resourceids) | Q(resourceinstanceidto__in=resourceids)
             ).values(*csv_header)
             for relation in relations:
-                relation["datestarted"] = relation["datestarted"] if relation["datestarted"] is not None else ""
-                relation["dateended"] = relation["dateended"] if relation["dateended"] is not None else ""
-                relation["notes"] = relation["notes"] if relation["notes"] is not None else ""
+                relation["datestarted"] = (
+                    relation["datestarted"] if relation["datestarted"] is not None else ""
+                )
+                relation["dateended"] = (
+                    relation["dateended"] if relation["dateended"] is not None else ""
+                )
+                relation["notes"] = (
+                    relation["notes"] if relation["notes"] is not None else ""
+                )
                 csvwriter.writerow({k: str(v) for k, v in list(relation.items())})
 
         return relations_file
@@ -298,7 +312,12 @@ class TileCsvWriter(Writer):
                         if k in concept_export_value_lookup:
                             concept_export_value_type = concept_export_value_lookup[k]
                         if tile.data[k] is not None:
-                            value = self.transform_value_for_export(self.node_datatypes[k], tile.data[k], concept_export_value_type, k,)
+                            value = self.transform_value_for_export(
+                                self.node_datatypes[k],
+                                tile.data[k],
+                                concept_export_value_type,
+                                k,
+                            )
                             csv_record[mapping[k]] = value
                         del tile.data[k]
                     else:
@@ -616,7 +635,9 @@ class CsvReader(Reader):
                                     collection.save()
 
                             if collection is not None:
-                                topconcept_legacyoid = node.name + "_" + str(node.graph_id)
+                                topconcept_legacyoid = (
+                                    node.name + "_" + str(node.graph_id)
+                                )
                                 # Check if top concept already exists, if not create it and add to candidates scheme
                                 try:
                                     topconcept = Concept().get(legacyoid=topconcept_legacyoid)
@@ -727,9 +748,13 @@ class CsvReader(Reader):
                                 if datatype in ["domain-value", "domain-value-list"]:
                                     collection_id = nodeid
                                 else:
-                                    collection_id = Node.objects.get(nodeid=nodeid).config["rdmCollection"]
+                                    collection_id = Node.objects.get(
+                                        nodeid=nodeid
+                                    ).config["rdmCollection"]
                                 if collection_id is not None:
-                                    value = concept_lookup.lookup_labelid_from_label(value, collection_id)
+                                    value = concept_lookup.lookup_labelid_from_label(
+                                        value, collection_id
+                                    )
                         try:
                             value = datatype_instance.transform_import_values(value, nodeid)
                             errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid,)
@@ -938,13 +963,38 @@ class CsvReader(Reader):
                                                                     populate_child_tiles(source_data)
 
                                             if prototype_tile_copy.data != {}:
-                                                if len([item for item in list(prototype_tile_copy.data.values()) if item is not None]) > 0:
-                                                    if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
-                                                        populated_child_tiles.append(prototype_tile_copy)
+                                                if (
+                                                    len(
+                                                        [
+                                                            item
+                                                            for item in list(
+                                                                prototype_tile_copy.data.values()
+                                                            )
+                                                            if item is not None
+                                                        ]
+                                                    )
+                                                    > 0
+                                                ):
+                                                    if (
+                                                        str(
+                                                            prototype_tile_copy.nodegroup_id
+                                                        )
+                                                        not in populated_child_nodegroups
+                                                    ):
+                                                        populated_child_tiles.append(
+                                                            prototype_tile_copy
+                                                        )
 
                                             if prototype_tile_copy is not None:
-                                                if child_tile_cardinality == "1" and "NodeGroupID" not in row:
-                                                    populated_child_nodegroups.append(str(prototype_tile_copy.nodegroup_id))
+                                                if (
+                                                    child_tile_cardinality == "1"
+                                                    and "NodeGroupID" not in row
+                                                ):
+                                                    populated_child_nodegroups.append(
+                                                        str(
+                                                            prototype_tile_copy.nodegroup_id
+                                                        )
+                                                    )
 
                                             source_data[:] = [item for item in source_data if item != {}]
 
