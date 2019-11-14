@@ -75,6 +75,10 @@ class JsonLDExportTests(ArchesTestCase):
         BusinessDataImporter('tests/fixtures/jsonld_base/data/test_4564_group.json').import_business_data()
         BusinessDataImporter('tests/fixtures/jsonld_base/data/test_4564_reference.json').import_business_data()
 
+        management.call_command('datatype', 'register', source='tests/fixtures/datatypes/color.py')
+        management.call_command('datatype', 'register', source='tests/fixtures/datatypes/semantic_like.py')
+
+
     def setUp(self):
         # This runs every test
         #response = self.client.post(reverse('get_token'), {'username': 'admin', 'password': 'admin'})

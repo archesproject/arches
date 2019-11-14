@@ -102,6 +102,8 @@ ONTOLOGY_EXT = [
     'arches_crm_enhancements.xml'
 ]
 
+DATATYPE_LOCATIONS.append('tests.fixtures.datatypes')
+
 try:
     from settings_local import *
 except ImportError:

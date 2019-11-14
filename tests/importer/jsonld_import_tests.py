@@ -101,6 +101,9 @@ class JsonLDImportTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile['graph'])
 
+        management.call_command('datatype', 'register', source='tests/fixtures/datatypes/color.py')
+        management.call_command('datatype', 'register', source='tests/fixtures/datatypes/semantic_like.py')
+
     def setUp(self):
         pass
 
