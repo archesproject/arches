@@ -515,3 +515,62 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(prodjs[note] == "Production")
         self.assertTrue(note in js)
         self.assertTrue(js[note] == "#ff00ff")
+
+
+
+    def test_a_5299_complex(self):
+
+        url = reverse('resources_graphid', kwargs={"graphid": "f348bbda-0721-11ea-b628-acde48001122", 
+            "resourceid": "deadface-0000-11e9-bd39-0242ac160002"})
+
+        data = """
+{"@id": "http://localhost:8000/resources/deadface-0000-11ea-b628-acde48001122",
+ "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
+  "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by":
+   {"@id": "http://localhost:8000/tile/caced9b0-f717-4557-9c64-ef87f646c9c1/node/fdbc4f50-0721-11ea-b628-acde48001122", 
+   "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production", 
+   "http://www.cidoc-crm.org/cidoc-crm/P10i_contains": 
+   [
+   {"@id": "http://localhost:8000/tile/caced9b0-f717-4557-9c64-ef87f646c9c1/node/222d5c4e-0722-11ea-b628-acde48001122", 
+   "@type": "http://www.cidoc-crm.org/cidoc-crm/E4_Period", 
+   "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "Import Note"
+   }, 
+   {
+   "@id": "http://localhost:8000/tile/caced9b0-f717-4557-9c64-ef87f646c9c1/node/080d16b0-0722-11ea-b628-acde48001122", 
+   "@type": "http://www.cidoc-crm.org/cidoc-crm/E4_Period", 
+   "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": 
+   {"@id": "http://localhost:8000/tile/caced9b0-f717-4557-9c64-ef87f646c9c1/node/3d38c276-0722-11ea-b628-acde48001122",
+    "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
+    "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": 
+    {"@type": "http://www.w3.org/2001/XMLSchema#dateTime", 
+    "@value": "2018-01-01"}}}]}}
+"""
+
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        print(f"Test 9 response: {response.content}")
+        self.assertTrue(response.status_code == 201)
+        js = response.json()
+        if type(js) == list:
+            js = js[0]
+
+        self.assertTrue('@id' in js)
+        self.assertTrue(js['@id'] == "http://localhost:8000/resources/deadface-0000-11e9-bd39-0242ac160002")
+
+        prod = "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by"
+        note = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
+        conts = "http://www.cidoc-crm.org/cidoc-crm/P10i_contains"
+        ts = "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span"
+        botb = "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin"
+        prodjs = js[prod]
+        contl = prodjs[conts]
+
+        self.assertTrue(len(contl) == 2)
+        if note in contl[0]:
+            print(f"note data: {contl[0]}")
+            self.assertTrue(contl[0][note] == "Import Note")
+            tsjs = contl[1][ts]
+        else:
+            print(f"note data: {contl[1]}")
+            self.assertTrue(contl[1][note] == "Import Note")
+            jsts = contl[0][ts]
+        self.assertTrue(ts[botb]['@value'] == '2018-01-01')

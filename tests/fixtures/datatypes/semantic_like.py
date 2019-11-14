@@ -34,6 +34,5 @@ class SemanticLikeDataType(BaseDataType):
     #    return g
 
     def from_rdf(self, json_ld_node):
-        print(f"incoming to from_rdf: {json_ld_node}")
-        return {}
-        return json_ld_node['@id']
+        # print(f"incoming to from_rdf: {json_ld_node}")
+        return None
