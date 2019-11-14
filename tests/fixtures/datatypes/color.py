@@ -23,7 +23,7 @@ details = {
 
 class ColorDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source=None):
+    def validate(self, value, row_number=None, source=None, node=None):
         errors = []
         try:
             value.upper()
@@ -45,7 +45,6 @@ class ColorDataType(BaseDataType):
 
     def from_rdf(self, json_ld_node):
         # returns the string value only
-        # FIXME: Language?
         value = get_value_from_jsonld(json_ld_node)
         try:
             return value[0]
