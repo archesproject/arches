@@ -586,7 +586,7 @@ class Command(BaseCommand):
     ):
         def load_ontology():
             load_default_ontology = True
-            if settings.ONTOLOGY_BASE_NAME != None:
+            if settings.ONTOLOGY_BASE_NAME is not None:
                 if yes is False:
                     response = input(
                         "Would you like to load the {0} ontology? (Y/N): ".format(

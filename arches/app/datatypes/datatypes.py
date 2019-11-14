@@ -89,7 +89,7 @@ class StringDataType(BaseDataType):
         document['strings'].append(val)
 
     def transform_export_values(self, value, *args, **kwargs):
-        if value != None:
+        if value is not None:
             return value
 
     def get_search_terms(self, nodevalue, nodeid=None):
@@ -1269,7 +1269,7 @@ class DomainDataType(BaseDomainDataType):
                     node = models.Node.objects.get(nodeid=k)
                     domain_text = self.get_option_text(node, v)
 
-        if domain_text not in document['strings'] and domain_text != None:
+        if domain_text not in document['strings'] and domain_text is not None:
             document['strings'].append({'string': domain_text, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
 
     def get_display_value(self, tile, node):

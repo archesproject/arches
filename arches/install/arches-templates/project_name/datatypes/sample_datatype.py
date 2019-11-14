@@ -30,7 +30,7 @@ class SampleDataType(BaseDataType):
         document['strings'].append({'string': nodevalue, 'nodegroup_id': tile.nodegroup_id})
 
     def transform_export_values(self, value, *args, **kwargs):
-        if value != None:
+        if value is not None:
             return value.encode('utf8')
 
     def get_search_terms(self, nodevalue, nodeid=None):

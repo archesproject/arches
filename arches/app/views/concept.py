@@ -278,7 +278,7 @@ def make_collection(request, conceptid):
 def manage_parents(request, conceptid):
     if request.method == 'POST':
         json = request.body
-        if json != None:
+        if json is not None:
             data = JSONDeserializer().deserialize(json)
 
             with transaction.atomic():
@@ -349,7 +349,7 @@ def search(request):
     results = query.search(index='concepts')
 
     ids = []
-    if removechildren != None:
+    if removechildren is not None:
         ids =  [concept[0] for concept in Concept().get_child_concepts(removechildren, columns="conceptidto::text")]
         ids.append(removechildren)
 
@@ -414,7 +414,7 @@ def search(request):
 def add_concepts_from_sparql_endpoint(request, conceptid):
     if request.method == 'POST':
         json = request.body
-        if json != None:
+        if json is not None:
             data = JSONDeserializer().deserialize(json)
 
             parentconcept = Concept({

@@ -181,7 +181,7 @@ class ExtendedDateFormat(SortableDateRange):
         return day
 
     def is_season(self, date):
-        return hasattr(date, 'season') and date.season != None
+        return hasattr(date, 'season') and date.season is not None
 
     def handle_set(self, l):
         """Called to handle a list of dates"""

@@ -143,7 +143,7 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
 
                 if node.datatype in ['concept', 'concept-list', 'domain-value', 'domain-value-list']:
                     if node.datatype in ['concept', 'concept-list']:
-                        if node.config['rdmCollection'] != None:
+                        if node.config['rdmCollection'] is not None:
                             rdmCollection = node.config['rdmCollection']
                         try:
                             concept = Concept().get(node.config['rdmCollection'], include_subconcepts=True, semantic=False)
@@ -183,7 +183,7 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
     files_for_export.append({'name':file_name, 'outputfile': dest})
 
 
-    if data_dir != None:
+    if data_dir is not None:
         with open(os.path.join(data_dir), 'w') as config_file:
             json.dump(export_json, config_file, indent=4)
 

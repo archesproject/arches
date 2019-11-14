@@ -145,7 +145,7 @@ class Reader(object):
             if relation["dateended"] == "" or relation["dateended"] == "None":
                 relation["dateended"] = None
 
-            if resourceinstancefrom != None and resourceinstanceto != None:
+            if resourceinstancefrom is not None and resourceinstanceto is not None:
                 relation = ResourceXResource(
                     resourceinstanceidfrom=Resource(resourceinstancefrom),
                     resourceinstanceidto=Resource(resourceinstanceto),
