@@ -1,12 +1,10 @@
-
-
 from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4989_related_resources_map_card'),
+        ("models", "4989_related_resources_map_card"),
     ]
 
     operations = [

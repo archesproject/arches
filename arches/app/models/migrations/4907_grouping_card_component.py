@@ -8,18 +8,20 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4661_removes_select_workflow'),
+        ("models", "4661_removes_select_workflow"),
     ]
 
     operations = [
-        migrations.RunSQL("""
+        migrations.RunSQL(
+            """
             INSERT INTO card_components(componentid, name, description, component, componentname, defaultconfig)
                 VALUES ('2f9054d8-de57-45cd-8a9c-58bbb1619030', 'Grouping Card', 'A card component that groups sibling cards together into one form.', 'views/components/cards/grouping', 'grouping-card-component', '{"groupedCardIds": [], "sortedWidgetIds": []}');
         """,
-        """
+            """
             UPDATE public.cards
                 SET componentid='f05e4d3a-53c1-11e8-b0ea-784f435179ea'
                 WHERE componentid='2f9054d8-de57-45cd-8a9c-58bbb1619030';
             DELETE FROM card_components WHERE componentid = '2f9054d8-de57-45cd-8a9c-58bbb1619030';
-        """),
+        """,
+        ),
     ]

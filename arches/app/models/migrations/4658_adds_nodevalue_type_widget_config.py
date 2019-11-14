@@ -10,7 +10,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4352_format_config_number_widget'),
+        ("models", "4352_format_config_number_widget"),
     ]
 
     operations = [
@@ -32,5 +32,6 @@ class Migration(migrations.Migration):
             update cards_x_nodes_x_widgets as c
             set config = config - 'displayOnlySelectedNode'
             where c.widgetid = 'f5d6b190-bbf0-4dc9-b991-1debab8cb4a9';
-            """)
-        ]
+            """,
+        )
+    ]
