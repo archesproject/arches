@@ -1,4 +1,9 @@
 linters:
+  pep8:
+    python: 3
+    ignore: 'W503'
+    max-line-length: 140
+    fixer: false
   black:
     config: ./pyproject.toml
     fixer: false
