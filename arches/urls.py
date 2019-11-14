@@ -32,6 +32,7 @@ from arches.app.views.plugin import PluginView
 from arches.app.views.concept import RDMView
 from arches.app.views.user import UserManagerView
 from arches.app.views.tile import TileData
+from arches.app.views.user_tasks import UserTaskView
 from arches.app.views.map import MapLayerManagerView, TileserverProxyView
 from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources, MobileSurveyDesignerView
 from arches.app.views.auth import LoginView, SignupView, ConfirmSignupView, ChangePasswordView, GetClientIdView, UserProfileView
@@ -138,6 +139,8 @@ urlpatterns = [
     url(r'^feature_popup_content$', main.feature_popup_content, name="feature_popup_content"),
     url(r'^user$', UserManagerView.as_view(), name="user_profile_manager"),
     url(r'^user/get_user_names$', UserManagerView.as_view(action='get_user_names'), name="get_user_names"),
+    url(r'^user_tasks$', UserTaskView.as_view(), name="get_user_tasks"),
+    url(r'^user_tasks$', UserTaskView.as_view(action="get_all"), name="get_all_tasks"),
     url(r'^collector_manager/*', MobileSurveyManagerView.as_view(), name="collector_manager"),
     url(r'^collector_designer/(?P<surveyid>%s)$' % uuid_regex, MobileSurveyDesignerView.as_view(), name='collector_designer'),
     url(r'^mobile_survey_resources/(?P<surveyid>%s)/resources$' % uuid_regex, MobileSurveyResources.as_view(), name='mobile_survey_resources'),

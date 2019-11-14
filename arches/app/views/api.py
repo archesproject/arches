@@ -131,7 +131,11 @@ class Sync(APIBase):
                 logger.info("Starting sync for user {0}".format(request.user.username))
                 celery_worker_running = task_management.check_if_celery_available()
                 if celery_worker_running is True:
-                    tasks.sync.delay(surveyid=surveyid, userid=request.user.id)
+                    res = tasks.sync.apply_async(
+                        (surveyid, request.user.id),
+                        link=tasks.update_user_task_record.s(),
+                        link_error=tasks.log_error.s()
+                    )
                 else:
                     management.call_command('mobile', operation='sync_survey', id=surveyid, user=request.user.id)
                 logger.info("Sync complete for user {0}".format(request.user.username))
