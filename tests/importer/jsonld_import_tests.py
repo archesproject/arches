@@ -104,6 +104,13 @@ class JsonLDImportTests(ArchesTestCase):
         management.call_command('datatype', 'register', source='tests/fixtures/datatypes/color.py')
         management.call_command('datatype', 'register', source='tests/fixtures/datatypes/semantic_like.py')
 
+        with open(os.path.join('tests/fixtures/jsonld_base/models/5299-basic.json'), 'rU') as f:
+            archesfile2 = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile2['graph']) 
+        with open(os.path.join('tests/fixtures/jsonld_base/models/5299_complex.json'), 'rU') as f:
+            archesfile2 = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile2['graph']) 
+
     def setUp(self):
         pass
 
@@ -469,3 +476,42 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P51_has_former_or_current_owner' in js)
         owner = js['http://www.cidoc-crm.org/cidoc-crm/P51_has_former_or_current_owner']
         self.assertTrue(owners['@id'] == "http://localhost:8000/resources/923a5fa8-bfa8-11e9-bd39-0242ac160002")
+
+
+
+    def test_9_5299_basic(self):
+
+        url = reverse('resources_graphid', kwargs={"graphid": "0cadd978-071a-11ea-8d9a-acde48001122", 
+            "resourceid": "faceb004-dead-11e9-bd39-0242ac160002"})
+
+
+        data = """
+        {
+          "@id": "http://localhost:8000/resources/faceb004-dead-11e9-bd39-0242ac160002", 
+          "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object", 
+          "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by": {
+            "@id": "http://localhost:8000/tile/1580cf8b-1ead-42b7-a22a-cc92bff0aafb/node/1ae420ba-071a-11ea-8d9a-acde48001122", 
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production", 
+            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "Production"}, 
+          "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "#ff00ff"
+        }
+        """
+
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        print(f"Test 9 response: {response.content}")
+        self.assertTrue(response.status_code == 201)
+        js = response.json()
+        if type(js) == list:
+            js = js[0]
+
+        prod = "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by"
+        note = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
+
+        self.assertTrue('@id' in js)
+        self.assertTrue(js['@id'] == "http://localhost:8000/resources/faceb004-dead-11e9-bd39-0242ac160002")
+        self.assertTrue(prod in js)
+        prodjs = js[prod]
+        self.assertTrue(note in prodjs)
+        self.assertTrue(prodjs[note] == "Production")
+        self.assertTrue(note in js)
+        self.assertTrue(js[note] == "#ff00ff")

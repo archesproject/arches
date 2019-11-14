@@ -83,6 +83,11 @@ class JsonLDExportTests(ArchesTestCase):
         ResourceGraphImporter(archesfile2['graph']) 
         BusinessDataImporter('tests/fixtures/jsonld_base/data/test_5299_instances.json').import_business_data()        
 
+        with open(os.path.join('tests/fixtures/jsonld_base/models/5299_complex.json'), 'rU') as f:
+            archesfile2 = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile2['graph']) 
+        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_5299_complex.json').import_business_data()       
+
 
     def setUp(self):
         # This runs every test
@@ -482,4 +487,36 @@ class JsonLDExportTests(ArchesTestCase):
         self.assertTrue(note in js)
         self.assertTrue(js[note] == "#ff00ff")
 
+    def test_5299_complex(self):
+        # 7f90ff58-0722-11ea-b628-acde48001122
+
+        url = reverse('resources', kwargs={"resourceid": '7f90ff58-0722-11ea-b628-acde48001122'})
+        response = self.client.get(url, secure=False)
+        self.assertTrue(response.status_code == 200)
+        js = response.json()
+        self.assertTrue('@id' in js)      
+        self.assertTrue(js['@id'] == "http://localhost:8000/resources/7f90ff58-0722-11ea-b628-acde48001122")
+        prop = "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by"
+        self.assertTrue(prop in js)
+        ref = js[prop]
+        p2 = "http://www.cidoc-crm.org/cidoc-crm/P10i_contains"
+        conts = ref[p2]
+
+        self.assertTrue(len(conts) == 2)
+        self.assertTrue(conts[0]['@type'] == "http://www.cidoc-crm.org/cidoc-crm/E4_Period")
+        self.assertTrue(conts[1]['@type'] == "http://www.cidoc-crm.org/cidoc-crm/E4_Period")        
+
+        note = 'http://www.cidoc-crm.org/cidoc-crm/P3_has_note'
+        ts = 'http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span'
+        if note in conts[0]:
+            self.assertTrue(conts[0][note] == "Note")
+            self.assertTrue(ts in conts[1])
+            tsdata = conts[1][ts]
+        else:
+            self.assertTrue(conts[1][note] == "Note")
+            self.assertTrue(ts in conts[0])
+            tsdata = conts[0][ts]
+
+        botb = 'http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin'
+        self.assertTrue(tsdata[botb]['@value'] == "2019-11-01")
 
