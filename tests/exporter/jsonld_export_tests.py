@@ -78,6 +78,11 @@ class JsonLDExportTests(ArchesTestCase):
         management.call_command('datatype', 'register', source='tests/fixtures/datatypes/color.py')
         management.call_command('datatype', 'register', source='tests/fixtures/datatypes/semantic_like.py')
 
+        with open(os.path.join('tests/fixtures/jsonld_base/models/5299-basic.json'), 'rU') as f:
+            archesfile2 = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile2['graph']) 
+        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_5299_instances.json').import_business_data()        
+
 
     def setUp(self):
         # This runs every test
@@ -459,4 +464,22 @@ class JsonLDExportTests(ArchesTestCase):
 
         self.assertTrue(ref['@type'] == "http://www.cidoc-crm.org/cidoc-crm/E74_Group")
         self.assertTrue(js2['@type'] == ref['@type'])
+
+    def test_5299_basic(self):
+
+        url = reverse('resources', kwargs={"resourceid": 'c76f74ba-071a-11ea-8c2d-acde48001122'})
+        response = self.client.get(url, secure=False)
+        self.assertTrue(response.status_code == 200)
+        js = response.json()
+        self.assertTrue('@id' in js)      
+        self.assertTrue(js['@id'] == "http://localhost:8000/resources/c76f74ba-071a-11ea-8c2d-acde48001122")
+        prop = "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by"
+        self.assertTrue(prop in js)
+        ref = js[prop]
+        note = 'http://www.cidoc-crm.org/cidoc-crm/P3_has_note'
+        self.assertTrue(note in ref)
+        self.assertTrue(ref[note] == "Production")
+        self.assertTrue(note in js)
+        self.assertTrue(js[note] == "#ff00ff")
+
 

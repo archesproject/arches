@@ -11,7 +11,7 @@ details = {
     'datatype': 'semantic-like-datatype',
     'iconclass': 'fas fa-palette',
     'modulename': 'semantic_like.py',
-    'classname': 'SemancticLikeDataType',
+    'classname': 'SemanticLikeDataType',
     'defaultwidget': None,
     'defaultconfig': {},
     'configcomponent': '',
@@ -19,7 +19,7 @@ details = {
     'isgeometric': False
     }
 
-class SemancticLikeDataType(BaseDataType):
+class SemanticLikeDataType(BaseDataType):
 
     def validate(self, value, row_number=None, source=None):
         return True

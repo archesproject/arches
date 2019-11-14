@@ -111,7 +111,7 @@ class Command(BaseCommand):
         instance.configcomponent = details['configcomponent']
         instance.configname = details['configname']
         instance.isgeometric = details['isgeometric']
-        instance.issearchable = details['issearchable']
+        # instance.issearchable = details['issearchable']
 
         instance.save()
 
