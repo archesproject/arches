@@ -19,81 +19,120 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from arches.app.models import models
 from arches.app.utils.flatten_dict import flatten_dict
+from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.utils.geo_utils import GeoUtils
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
-def flatten_tiles(tiles, datatype_factory, compact=True):
-    compacted_data = {}
+class SearchResultsExporter(object):
+    def __init__(self, search_request=None):
+        if search_request is None:
+            raise Exception("Need to pass in a search request")
+        search_request.GET = search_request.GET.copy()
+        search_request.GET['tiles'] = True
+        
+        self.compact = search_request.GET.pop('compact', True)
+        self.precision = search_request.GET.pop('precision', 5)
+        self.search_request = search_request
+        self.datatype_factory = DataTypeFactory()
+        self.node_lookup = {}
+        self.output = {}
+        self.set_precision = GeoUtils().set_precision
 
-    # first let's normalize tile.data to use labels instead of node ids
-    # we'll also add on the cardinality and card_names to the tile for use later on
+    def export(self):
+        from arches.app.views.search import search_results
+        search_res_json = search_results(self.search_request)
+        results = JSONDeserializer().deserialize(search_res_json.content)
+        instances = results['results']['hits']['hits']
+        output = []
+        flattened_data = []
 
-    lookup = {}
-    feature_collections = {}
-    for tile in tiles:
-        data = {}
-        for nodeid, value in tile['data'].items():
-            node = models.Node.objects.get(pk=nodeid)
-            if node.exportable:
-                datatype = datatype_factory.get_instance(node.datatype)
-                #node_value = datatype.transform_export_values(tile['data'][str(node.nodeid)])
-                node_value = datatype.get_display_value(tile, node)
-                label = node.fieldname
+        for resource_instance in instances:
+            flattened_data.append(self.flatten_tiles(resource_instance['_source']['tiles'], self.datatype_factory, compact=self.compact))
 
-                if compact:
-                    if node.datatype == 'geojson-feature-collection':
-                        node_value = tile['data'][str(node.nodeid)]
-                        for feature_index, feature in enumerate(node_value['features']):
+        return flattened_data
+
+    def get_node(self, nodeid):
+        nodeid = str(nodeid)
+        try:
+            return self.node_lookup[nodeid]
+        except:
+            self.node_lookup[nodeid] = models.Node.objects.get(pk=nodeid)
+            return self.node_lookup[nodeid]
+
+    def flatten_tiles(self, tiles, datatype_factory, compact=True):
+        compacted_data = {}
+        lookup = {}
+        feature_collections = {}
+
+        # first let's normalize tile.data to use labels instead of node ids
+        for tile in tiles:
+            data = {}
+            for nodeid, value in tile['data'].items():
+                node = self.get_node(nodeid)
+                if node.exportable:
+                    datatype = datatype_factory.get_instance(node.datatype)
+                    #node_value = datatype.transform_export_values(tile['data'][str(node.nodeid)])
+                    node_value = datatype.get_display_value(tile, node)
+                    label = node.fieldname
+
+                    if compact:
+                        if node.datatype == 'geojson-feature-collection':
+                            node_value = tile['data'][str(node.nodeid)]
+                            for feature_index, feature in enumerate(node_value['features']):
+                                feature['geometry']['coordinates'] = self.set_precision(feature['geometry']['coordinates'], self.precision)
+                                try:
+                                    feature_collections[label]['features'].append(feature)
+                                except:
+                                    feature_collections[label] = {'datatype': datatype, 'features': [feature]}
+                        else:
                             try:
-                                feature_collections[label]['features'].append(feature)
+                                compacted_data[label] += ", " + str(node_value)
                             except:
-                                feature_collections[label] = {'datatype': datatype, 'features': [feature]}
+                                compacted_data[label] = str(node_value)
                     else:
-                        try:
-                            compacted_data[label] += ", " + str(node_value)
-                        except:
-                            compacted_data[label] = str(node_value)
+                        data[label] = str(node_value)
+
+            if not compact:
+                # add on the cardinality and card_names to the tile for use later on
+                tile['data'] = data
+                card = models.CardModel.objects.get(nodegroup=tile['nodegroup_id'])
+                tile['card_name'] = card.name
+                tile['cardinality'] = node.nodegroup.cardinality
+                tile[card.name] = tile['data']
+                lookup[tile['tileid']] = tile
+
+        if compact:
+            for key, value in feature_collections.items():
+                compacted_data[key] = value['datatype'].transform_export_values(value)
+            return compacted_data
+
+        # print(JSONSerializer().serialize(tiles, indent=4))
+
+        resource_json = {}
+        # ret = []
+        # aggregate tiles into single resource instance objects rolling up tile data in the process
+        # print out "ret" to understand the intermediate structure
+        for tile in tiles:
+            if tile['parenttile_id'] is not None:
+                parentTile = lookup[str(tile['parenttile_id'])]
+                if tile['cardinality'] == 'n':
+                    try:
+                        parentTile[parentTile['card_name']][tile['card_name']].append(tile[tile['card_name']])
+                    except KeyError:
+                        parentTile[parentTile['card_name']][tile['card_name']] = [tile[tile['card_name']]]
                 else:
-                    data[label] = str(node_value)
-
-        if not compact:
-            tile['data'] = data
-            card = models.CardModel.objects.get(nodegroup=tile['nodegroup_id'])
-            tile['card_name'] = card.name
-            tile['cardinality'] = node.nodegroup.cardinality
-            tile[card.name] = tile['data']
-            lookup[tile['tileid']] = tile
-
-    if compact:
-        for key, value in feature_collections.items():
-            compacted_data[key] = value['datatype'].transform_export_values(value)
-        return compacted_data
-
-    # print(JSONSerializer().serialize(tiles, indent=4))
-
-    resource_json = {}
-    # ret = []
-    # aggregate tiles into single resource instance objects rolling up tile data in the process
-    # print out "ret" to understand the intermediate structure
-    for tile in tiles:
-        if tile['parenttile_id'] is not None:
-            parentTile = lookup[str(tile['parenttile_id'])]
-            if tile['cardinality'] == 'n':
-                try:
-                    parentTile[parentTile['card_name']][tile['card_name']].append(tile[tile['card_name']])
-                except KeyError:
-                    parentTile[parentTile['card_name']][tile['card_name']] = [tile[tile['card_name']]]
+                    parentTile[parentTile['card_name']][tile['card_name']] = tile[tile['card_name']]
             else:
-                parentTile[parentTile['card_name']][tile['card_name']] = tile[tile['card_name']]
-        else:
-            # print the following out to understand the intermediate structure
-            # ret.append(tile)
-            # ret.append({tile['card_name']: tile[tile['card_name']]})
-            if tile['cardinality'] == 'n':
-                try:
-                    resource_json[tile['card_name']].append(tile[tile['card_name']])
-                except KeyError:
-                    resource_json[tile['card_name']] = [tile[tile['card_name']]]
-            else:
-                resource_json[tile['card_name']] = tile[tile['card_name']]
+                # print the following out to understand the intermediate structure
+                # ret.append(tile)
+                # ret.append({tile['card_name']: tile[tile['card_name']]})
+                if tile['cardinality'] == 'n':
+                    try:
+                        resource_json[tile['card_name']].append(tile[tile['card_name']])
+                    except KeyError:
+                        resource_json[tile['card_name']] = [tile[tile['card_name']]]
+                else:
+                    resource_json[tile['card_name']] = tile[tile['card_name']]
 
-    return flatten_dict(resource_json)
+        return flatten_dict(resource_json)
