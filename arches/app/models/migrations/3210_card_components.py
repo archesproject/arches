@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 ("componentname", models.TextField()),
                 ("defaultconfig", django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column="defaultconfig", null=True)),
             ],
-            options={"db_table": "card_components", "managed": True,},
+            options={"db_table": "card_components", "managed": True},
         ),
         migrations.RunSQL(
             """

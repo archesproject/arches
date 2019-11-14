@@ -121,7 +121,7 @@ class CardXNodeXWidget(models.Model):
     class Meta:
         managed = True
         db_table = "cards_x_nodes_x_widgets"
-        unique_together = (("node", "card", "widget"),)
+        unique_together = (("node", "card", "widget"))
 
 
 class Concept(models.Model):
@@ -207,7 +207,7 @@ class Edge(models.Model):
     class Meta:
         managed = True
         db_table = "edges"
-        unique_together = (("rangenode", "domainnode"),)
+        unique_together = (("rangenode", "domainnode"))
 
 
 class EditLog(models.Model):
@@ -587,7 +587,7 @@ class OntologyClass(models.Model):
     class Meta:
         managed = True
         db_table = "ontologyclasses"
-        unique_together = (("source", "ontology"),)
+        unique_together = (("source", "ontology"))
 
 
 class Relation(models.Model):
@@ -599,7 +599,7 @@ class Relation(models.Model):
     class Meta:
         managed = True
         db_table = "relations"
-        unique_together = (("conceptfrom", "conceptto", "relationtype"),)
+        unique_together = (("conceptfrom", "conceptto", "relationtype"))
 
 
 class ReportTemplate(models.Model):

@@ -24,6 +24,6 @@ class Migration(migrations.Migration):
                 ("componentname", models.TextField()),
                 ("config", django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column="config", null=True)),
             ],
-            options={"db_table": "plugins", "managed": True,},
+            options={"db_table": "plugins", "managed": True},
         ),
     ]

@@ -369,15 +369,15 @@ class Writer(object):
                         sorted_geoms["polys"].append(feat)
             if len(sorted_geoms["points"]) > 0:
                 result.append(
-                    {"type": "Feature", "geometry": MultiPoint(sorted_geoms["points"]), "properties": properties,}
+                    {"type": "Feature", "geometry": MultiPoint(sorted_geoms["points"]), "properties": properties}
                 )
             if len(sorted_geoms["lines"]) > 0:
                 result.append(
-                    {"type": "Feature", "geometry": MultiLineString(sorted_geoms["lines"]), "properties": properties,}
+                    {"type": "Feature", "geometry": MultiLineString(sorted_geoms["lines"]), "properties": properties}
                 )
             if len(sorted_geoms["polys"]) > 0:
                 result.append(
-                    {"type": "Feature", "geometry": MultiPolygon(sorted_geoms["polys"]), "properties": properties,}
+                    {"type": "Feature", "geometry": MultiPolygon(sorted_geoms["polys"]), "properties": properties}
                 )
 
         return result

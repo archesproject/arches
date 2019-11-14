@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.DeleteModel(name="IIIFManifest",),
+        migrations.DeleteModel(name="IIIFManifest"),
         migrations.RunSQL(
             """
             DELETE FROM widgets WHERE datatype IN ('iiif-drawing', 'csv-chart-json');

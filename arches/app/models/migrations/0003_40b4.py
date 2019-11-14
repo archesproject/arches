@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RenameField(model_name="editlog", old_name="attributenodeid", new_name="nodegroupid",),
+        migrations.RenameField(model_name="editlog", old_name="attributenodeid", new_name="nodegroupid"),
         migrations.AlterField(
             model_name="editlog",
             name="newvalue",
@@ -60,11 +60,11 @@ class Migration(migrations.Migration):
                 ("component", models.TextField()),
                 ("api_key", models.TextField(blank=True, null=True)),
             ],
-            options={"db_table": "geocoders", "managed": True,},
+            options={"db_table": "geocoders", "managed": True},
         ),
-        migrations.RemoveField(model_name="graphmodel", name="mapfeaturecolor",),
-        migrations.RemoveField(model_name="graphmodel", name="maplinewidth",),
-        migrations.RemoveField(model_name="graphmodel", name="mappointsize",),
+        migrations.RemoveField(model_name="graphmodel", name="mapfeaturecolor"),
+        migrations.RemoveField(model_name="graphmodel", name="maplinewidth"),
+        migrations.RemoveField(model_name="graphmodel", name="mappointsize"),
         migrations.RunSQL(
             """
             UPDATE d_data_types

@@ -12,5 +12,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.DeleteModel(name="TileserverLayer",),
+        migrations.DeleteModel(name="TileserverLayer"),
     ]

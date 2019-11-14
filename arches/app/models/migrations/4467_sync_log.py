@@ -30,6 +30,6 @@ class Migration(migrations.Migration):
                 ("survey", models.ForeignKey(on_delete=models.SET_NULL, related_name="surveyid", to="models.MobileSurveyModel")),
                 ("user", models.ForeignKey(on_delete=models.SET_NULL, related_name="syncedby", to=settings.AUTH_USER_MODEL)),
             ],
-            options={"db_table": "mobile_sync_log", "managed": True,},
+            options={"db_table": "mobile_sync_log", "managed": True},
         )
     ]

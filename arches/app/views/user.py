@@ -106,7 +106,7 @@ class UserManagerView(BaseManagerView):
     def get(self, request):
 
         if self.request.user.is_authenticated and self.request.user.username != "anonymous":
-            context = self.get_context_data(main_script="views/user-profile-manager",)
+            context = self.get_context_data(main_script="views/user-profile-manager")
 
             user_details = self.get_user_details(request.user)
 
@@ -138,7 +138,7 @@ class UserManagerView(BaseManagerView):
 
             user_details = self.get_user_details(request.user)
 
-            context = self.get_context_data(main_script="views/user-profile-manager",)
+            context = self.get_context_data(main_script="views/user-profile-manager")
             context["errors"] = []
             context["nav"]["icon"] = "fa fa-user"
             context["nav"]["title"] = _("Profile Manager")

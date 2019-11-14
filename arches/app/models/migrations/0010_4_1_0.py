@@ -39,9 +39,9 @@ class Migration(migrations.Migration):
                 ("phone", models.CharField(blank=True, max_length=16)),
                 ("user", models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
-            options={"db_table": "user_profile", "managed": True,},
+            options={"db_table": "user_profile", "managed": True},
         ),
-        migrations.RunPython(code=forwards_func, reverse_code=reverse_func,),
+        migrations.RunPython(code=forwards_func, reverse_code=reverse_func),
         migrations.CreateModel(
             name="MobileSurveyModel",
             fields=[
@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                 ("enddate", models.DateField(blank=True, null=True)),
                 ("description", models.TextField(null=True)),
             ],
-            options={"db_table": "mobile_surveys", "managed": True,},
+            options={"db_table": "mobile_surveys", "managed": True},
         ),
         migrations.CreateModel(
             name="MobileSurveyXCard",
@@ -62,7 +62,7 @@ class Migration(migrations.Migration):
                 ("card", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="models.CardModel")),
                 ("mobile_survey", models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to="models.MobileSurveyModel")),
             ],
-            options={"db_table": "mobile_surveys_x_cards", "managed": True,},
+            options={"db_table": "mobile_surveys_x_cards", "managed": True},
         ),
         migrations.CreateModel(
             name="MobileSurveyXGroup",
@@ -71,7 +71,7 @@ class Migration(migrations.Migration):
                 ("group", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="auth.Group")),
                 ("mobile_survey", models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to="models.MobileSurveyModel")),
             ],
-            options={"db_table": "mobile_surveys_x_groups", "managed": True,},
+            options={"db_table": "mobile_surveys_x_groups", "managed": True},
         ),
         migrations.CreateModel(
             name="MobileSurveyXUser",
@@ -80,7 +80,7 @@ class Migration(migrations.Migration):
                 ("mobile_survey", models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to="models.MobileSurveyModel")),
                 ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
-            options={"db_table": "mobile_surveys_x_users", "managed": True,},
+            options={"db_table": "mobile_surveys_x_users", "managed": True},
         ),
         migrations.AddField(
             model_name="mobilesurveymodel",
@@ -108,11 +108,11 @@ class Migration(migrations.Migration):
             field=models.ManyToManyField(through="models.MobileSurveyXUser", to=settings.AUTH_USER_MODEL),
         ),
         migrations.CreateModel(
-            name="MobileSurvey", fields=[], options={"proxy": True, "indexes": [],}, bases=("models.mobilesurveymodel",),
+            name="MobileSurvey", fields=[], options={"proxy": True, "indexes": []}, bases=("models.mobilesurveymodel"),
         ),
-        migrations.AlterUniqueTogether(name="mobilesurveyxuser", unique_together={("mobile_survey", "user")},),
-        migrations.AlterUniqueTogether(name="mobilesurveyxgroup", unique_together={("mobile_survey", "group")},),
-        migrations.AlterUniqueTogether(name="mobilesurveyxcard", unique_together={("mobile_survey", "card")},),
+        migrations.AlterUniqueTogether(name="mobilesurveyxuser", unique_together={("mobile_survey", "user")}),
+        migrations.AlterUniqueTogether(name="mobilesurveyxgroup", unique_together={("mobile_survey", "group")}),
+        migrations.AlterUniqueTogether(name="mobilesurveyxcard", unique_together={("mobile_survey", "card")}),
         migrations.RunSQL(
             sql="\n                    update widgets\n                    \tset defaultconfig = (SELECT defaultconfig || jsonb_build_object('defaultValue', '') FROM widgets WHERE name = 'text-widget')\n                    \tWHERE name = 'text-widget';\n                    update cards_x_nodes_x_widgets\n                    \tset config = (SELECT config || jsonb_build_object('defaultValue', '') FROM widgets WHERE name = 'text-widget')\n                    \tWHERE widgetid in (SELECT widgetid FROM widgets WHERE name = 'text-widget');\n\n\n                ",
             reverse_sql="\n                    update widgets\n                    \tset defaultconfig = defaultconfig - 'defaultValue'\n                    \tWHERE name = 'text-widget';\n                    update cards_x_nodes_x_widgets\n                    \tset config = config - 'defaultValue'\n                    \tWHERE widgetid in (SELECT widgetid FROM widgets WHERE name = 'text-widget');\n                ",
@@ -165,7 +165,7 @@ class Migration(migrations.Migration):
             sql="\n                    update widgets\n                    \tset defaultconfig = (SELECT defaultconfig || jsonb_build_object('defaultValue', '') FROM widgets WHERE name = 'datepicker-widget')\n                    \tWHERE name = 'datepicker-widget';\n                    update cards_x_nodes_x_widgets\n                    \tset config = (SELECT config || jsonb_build_object('defaultValue', '') FROM widgets WHERE name = 'datepicker-widget')\n                    \tWHERE widgetid in (SELECT widgetid FROM widgets WHERE name = 'datepicker-widget');\n\n\n                ",
             reverse_sql="\n                    update widgets\n                    \tset defaultconfig = defaultconfig - 'defaultValue'\n                    \tWHERE name = 'datepicker-widget';\n                    update cards_x_nodes_x_widgets\n                    \tset config = config - 'defaultValue'\n                    \tWHERE widgetid in (SELECT widgetid FROM widgets WHERE name = 'datepicker-widget');\n                ",
         ),
-        migrations.AddField(model_name="mobilesurveymodel", name="datadownload", field=models.BooleanField(default=False),),
+        migrations.AddField(model_name="mobilesurveymodel", name="datadownload", field=models.BooleanField(default=False)),
         migrations.RunSQL(
             sql="\n              update widgets set defaultconfig = '{\"max\":\"\",\"defaultValue\":\"\",\"placeholder\":\"Enter number\",\"width\":\"100%\",\"min\":\"\", \"step\":\"\", \"precision\":\"\", \"prefix\":\"\", \"suffix\":\"\"}'  where name = 'number-widget';\n\n              update cards_x_nodes_x_widgets\n                    set config = (SELECT config || jsonb_build_object('step', '') FROM widgets WHERE name = 'number-widget')\n                    WHERE widgetid in (SELECT widgetid FROM widgets WHERE name = 'number-widget');\n              update cards_x_nodes_x_widgets\n                    set config = (SELECT config || jsonb_build_object('precision', '') FROM widgets WHERE name = 'number-widget')\n                    WHERE widgetid in (SELECT widgetid FROM widgets WHERE name = 'number-widget');\n              update cards_x_nodes_x_widgets\n                    set config = (SELECT config || jsonb_build_object('prefix', '') FROM widgets WHERE name = 'number-widget')\n                    WHERE widgetid in (SELECT widgetid FROM widgets WHERE name = 'number-widget');\n              update cards_x_nodes_x_widgets\n                    set config = (SELECT config || jsonb_build_object('suffix', '') FROM widgets WHERE name = 'number-widget')\n                    WHERE widgetid in (SELECT widgetid FROM widgets WHERE name = 'number-widget');\n              ",
             reverse_sql="\n                  update widgets set defaultconfig = defaultconfig - 'step' WHERE name = 'number-widget';\n                  update widgets set defaultconfig = defaultconfig - 'precision' WHERE name = 'number-widget';\n                  update widgets set defaultconfig = defaultconfig - 'prefix' WHERE name = 'number-widget';\n                  update widgets set defaultconfig = defaultconfig - 'suffix' WHERE name = 'number-widget';\n                  update cards_x_nodes_x_widgets set config = config - 'step' WHERE widgetid in (SELECT widgetid FROM widgets WHERE name = 'number-widget');\n                  update cards_x_nodes_x_widgets set config = config - 'precision' WHERE widgetid in (SELECT widgetid FROM widgets WHERE name = 'number-widget');\n                  update cards_x_nodes_x_widgets set config = config - 'prefix' WHERE widgetid in (SELECT widgetid FROM widgets WHERE name = 'number-widget');\n                  update cards_x_nodes_x_widgets set config = config - 'suffix' WHERE widgetid in (SELECT widgetid FROM widgets WHERE name = 'number-widget');\n              ",
@@ -187,7 +187,7 @@ class Migration(migrations.Migration):
             name="bounds",
             field=django.contrib.gis.db.models.fields.MultiPolygonField(null=True, srid=4326),
         ),
-        migrations.AddField(model_name="mobilesurveymodel", name="tilecache", field=models.TextField(null=True),),
+        migrations.AddField(model_name="mobilesurveymodel", name="tilecache", field=models.TextField(null=True)),
         migrations.AddField(
             model_name="mobilesurveymodel",
             name="datadownloadconfig",
@@ -195,7 +195,7 @@ class Migration(migrations.Migration):
                 blank=True, default=lambda: dict(download=False, count=1000, resources=[], custom=None), null=True
             ),
         ),
-        migrations.RemoveField(model_name="mobilesurveymodel", name="datadownload",),
+        migrations.RemoveField(model_name="mobilesurveymodel", name="datadownload"),
         migrations.RunSQL(
             sql="\n                INSERT INTO d_data_types(\n                    datatype, iconclass, modulename,\n                    classname, defaultconfig, configcomponent,\n                    configname, isgeometric, defaultwidget,\n                    issearchable\n                ) VALUES (\n                    'node-value',\n                    'fa fa-external-link-square',\n                    'datatypes.py',\n                    'NodeValueDataType',\n                    '{\n                        \"nodeid\": null,\n                        \"property\": null\n                    }',\n                    'views/components/datatypes/node-value',\n                    'node-value-datatype-config',\n                    FALSE,\n                    'f5d6b190-bbf0-4dc9-b991-1debab8cb4a9',\n                    FALSE\n                );\n\n                INSERT INTO widgets(\n                    widgetid,\n                    name,\n                    component,\n                    datatype,\n                    defaultconfig\n                ) VALUES (\n                    'f5d6b190-bbf0-4dc9-b991-1debab8cb4a9',\n                    'node-value-select',\n                    'views/components/widgets/node-value-select',\n                    'node-value',\n                    '{\n                        \"placeholder\": \"\"\n                    }'\n                );\n                ",
             reverse_sql="\n                DELETE FROM d_data_types\n                    WHERE datatype = 'node-value';\n\n                DELETE from widgets\n                    WHERE widgetid = 'f5d6b190-bbf0-4dc9-b991-1debab8cb4a9';\n                ",

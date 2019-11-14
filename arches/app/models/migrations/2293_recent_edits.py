@@ -12,8 +12,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(model_name="editlog", name="resourcedisplayname", field=models.TextField(blank=True, null=True),),
-        migrations.AddField(model_name="editlog", name="user_username", field=models.TextField(blank=True, null=True),),
+        migrations.AddField(model_name="editlog", name="resourcedisplayname", field=models.TextField(blank=True, null=True)),
+        migrations.AddField(model_name="editlog", name="user_username", field=models.TextField(blank=True, null=True)),
         migrations.RunSQL(
             """
                 UPDATE edit_log SET resourcedisplayname = note WHERE note IS NOT NULL;

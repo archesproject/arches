@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ("constraintid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ("card", models.ForeignKey(db_column="cardid", on_delete=django.db.models.deletion.CASCADE, to="models.CardModel")),
             ],
-            options={"db_table": "card_constraints", "managed": True,},
+            options={"db_table": "card_constraints", "managed": True},
         ),
         migrations.CreateModel(
             name="ConstraintXNode",
@@ -32,10 +32,10 @@ class Migration(migrations.Migration):
                 ),
                 ("node", models.ForeignKey(db_column="nodeid", on_delete=django.db.models.deletion.CASCADE, to="models.Node")),
             ],
-            options={"db_table": "constraints_x_nodes", "managed": True,},
+            options={"db_table": "constraints_x_nodes", "managed": True},
         ),
         migrations.AddField(
             model_name="constraintmodel", name="nodes", field=models.ManyToManyField(through="models.ConstraintXNode", to="models.Node"),
         ),
-        migrations.AddField(model_name="constraintmodel", name="uniquetoallinstances", field=models.BooleanField(default=False),),
+        migrations.AddField(model_name="constraintmodel", name="uniquetoallinstances", field=models.BooleanField(default=False)),
     ]

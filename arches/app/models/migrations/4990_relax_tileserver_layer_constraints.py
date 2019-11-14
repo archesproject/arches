@@ -27,5 +27,5 @@ class Migration(migrations.Migration):
                 db_column="map_sourceid", null=True, blank=True, on_delete=django.db.models.deletion.CASCADE, to="models.MapSource"
             ),
         ),
-        migrations.AlterField(model_name="tileserverlayer", name="path", field=models.TextField(null=True, blank=True),),
+        migrations.AlterField(model_name="tileserverlayer", name="path", field=models.TextField(null=True, blank=True)),
     ]

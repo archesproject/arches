@@ -8,6 +8,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(model_name="node", name="fieldname", field=models.TextField(blank=True, null=True),),
-        migrations.AddField(model_name="nodegroup", name="exportable", field=models.BooleanField(default=False, null=True),),
+        migrations.AddField(model_name="node", name="fieldname", field=models.TextField(blank=True, null=True)),
+        migrations.AddField(model_name="nodegroup", name="exportable", field=models.BooleanField(default=False, null=True)),
     ]

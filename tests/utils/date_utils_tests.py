@@ -210,7 +210,7 @@ NON_EDTF_DATES = (
 
 INVALID_EDTF_DATES = (
     # test long year
-    ("al;ksdjf",),
+    ("al;ksdjf"),
 )
 
 

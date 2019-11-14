@@ -110,7 +110,7 @@ class SignupView(View):
             admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
             email_context = {
                 "button_text": _("Signup for Arches"),
-                "link": request.build_absolute_uri(reverse("confirm_signup") + "?" + url_encrypted_userinfo,),
+                "link": request.build_absolute_uri(reverse("confirm_signup") + "?" + url_encrypted_userinfo),
                 "greeting": _(
                     "Thanks for your interest in Arches. Click on link below to confirm your email address! Use your email address to login."
                 ),

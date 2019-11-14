@@ -265,7 +265,7 @@ class MobileSurvey(models.MobileSurveyModel):
 
     def save_revision_log(self, doc, synclog, action):
         if doc["type"] == "resource":
-            revisionlog = models.ResourceRevisionLog(resourceid=doc["resourceinstanceid"],)
+            revisionlog = models.ResourceRevisionLog(resourceid=doc["resourceinstanceid"])
         elif doc["type"] == "tile":
             revisionlog = models.TileRevisionLog(tileid=doc["tileid"], resourceid=doc["resourceinstance_id"])
         revisionlog.survey = self

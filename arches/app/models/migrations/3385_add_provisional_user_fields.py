@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(model_name="editlog", name="provisional_edittype", field=models.TextField(blank=True, null=True),),
-        migrations.AddField(model_name="editlog", name="provisional_user_username", field=models.TextField(blank=True, null=True),),
-        migrations.AddField(model_name="editlog", name="provisional_userid", field=models.TextField(blank=True, null=True),),
+        migrations.AddField(model_name="editlog", name="provisional_edittype", field=models.TextField(blank=True, null=True)),
+        migrations.AddField(model_name="editlog", name="provisional_user_username", field=models.TextField(blank=True, null=True)),
+        migrations.AddField(model_name="editlog", name="provisional_userid", field=models.TextField(blank=True, null=True)),
     ]

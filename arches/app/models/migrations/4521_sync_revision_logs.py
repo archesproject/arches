@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"db_table": "resource_revision_log", "managed": True,},
+            options={"db_table": "resource_revision_log", "managed": True},
         ),
         migrations.CreateModel(
             name="TileRevisionLog",
@@ -45,14 +45,14 @@ class Migration(migrations.Migration):
                     models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="survey_id", to="models.MobileSurveyModel"),
                 ),
             ],
-            options={"db_table": "tile_revision_log", "managed": True,},
+            options={"db_table": "tile_revision_log", "managed": True},
         ),
         migrations.AlterField(
             model_name="mobilesynclog",
             name="survey",
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="surveyid", to="models.MobileSurveyModel"),
         ),
-        migrations.AlterField(model_name="mobilesynclog", name="user", field=models.IntegerField(null=True),),
+        migrations.AlterField(model_name="mobilesynclog", name="user", field=models.IntegerField(null=True)),
         migrations.AddField(
             model_name="tilerevisionlog",
             name="synclog",

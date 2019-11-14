@@ -11,6 +11,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="nodegroup", name="exportable",),
-        migrations.AddField(model_name="node", name="exportable", field=models.BooleanField(default=False, null=True),),
+        migrations.RemoveField(model_name="nodegroup", name="exportable"),
+        migrations.AddField(model_name="node", name="exportable", field=models.BooleanField(default=False, null=True)),
     ]

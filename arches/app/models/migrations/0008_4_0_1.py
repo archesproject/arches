@@ -12,5 +12,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(model_name="node", name="isrequired", field=models.BooleanField(default=False),),
+        migrations.AddField(model_name="node", name="isrequired", field=models.BooleanField(default=False)),
     ]

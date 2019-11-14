@@ -165,7 +165,7 @@ class SKOSReader(object):
                         if predicate == SKOS.hasTopConcept:
                             top_concept_id = self.generate_uuid_from_subject(baseuuid, object)
                             self.relations.append(
-                                {"source": scheme_id, "type": "hasTopConcept", "target": top_concept_id,}
+                                {"source": scheme_id, "type": "hasTopConcept", "target": top_concept_id}
                             )
 
                 if bulk_load is True:
@@ -196,7 +196,7 @@ class SKOSReader(object):
                 for s, v, o in graph.triples((None, SKOS.inScheme, scheme)):
                     identifier = self.unwrapJsonLiteral(str(s))
                     if bulk_load is True:
-                        concept = models.Concept(pk=self.generate_uuid_from_subject(baseuuid, s), legacyoid=str(s), nodetype_id="Concept",)
+                        concept = models.Concept(pk=self.generate_uuid_from_subject(baseuuid, s), legacyoid=str(s), nodetype_id="Concept")
                     else:
                         concept = Concept({"id": self.generate_uuid_from_subject(baseuuid, s), "legacyoid": str(s), "nodetype": "Concept"})
 
@@ -291,7 +291,7 @@ class SKOSReader(object):
             for s, v, o in graph.triples((None, RDF.type, SKOS.Collection)):
                 # print "%s %s %s " % (s,v,o)
                 if bulk_load is True:
-                    concept = models.Concept(pk=self.generate_uuid_from_subject(baseuuid, s), legacyoid=str(s), nodetype_id="Collection",)
+                    concept = models.Concept(pk=self.generate_uuid_from_subject(baseuuid, s), legacyoid=str(s), nodetype_id="Collection")
                 else:
                     concept = Concept({"id": self.generate_uuid_from_subject(baseuuid, s), "legacyoid": str(s), "nodetype": "Collection"})
                 # loop through all the elements within a <skos:Concept> element
@@ -353,7 +353,7 @@ class SKOSReader(object):
                     self.logger.info(f"Bulk created: {len(self.nodes)} concepts and {len(values)} values from {path}")
                     for node in self.nodes:
                         if node.nodetype.nodetype == "ConceptScheme":
-                            scheme_node = Concept({"id": node.conceptid, "legacyoid": str(scheme), "nodetype": "ConceptScheme",})
+                            scheme_node = Concept({"id": node.conceptid, "legacyoid": str(scheme), "nodetype": "ConceptScheme"})
                         elif node.nodetype.nodetype == "Concept":
                             orphaned_concepts[str(node.conceptid)] = node
                         if staging_options == "stage":
@@ -363,7 +363,7 @@ class SKOSReader(object):
                                 # this is a new concept, so add a reference to it in the Candiates schema
                                 if node.nodetype.nodetype != "ConceptScheme":
                                     self.relations.append(
-                                        {"source": "00000000-0000-0000-0000-000000000006", "type": "narrower", "target": node.conceptid,}
+                                        {"source": "00000000-0000-0000-0000-000000000006", "type": "narrower", "target": node.conceptid}
                                     )
 
                         if overwrite_options == "overwrite":
@@ -422,7 +422,7 @@ class SKOSReader(object):
 
                 if len(orphaned_concepts.keys()) > 0:
                     if scheme_node:
-                        orphaned_scheme = Concept({"id": uuid.uuid4(), "legacyoid": uuid.uuid4(), "nodetype": "ConceptScheme",})
+                        orphaned_scheme = Concept({"id": uuid.uuid4(), "legacyoid": uuid.uuid4(), "nodetype": "ConceptScheme"})
                         orphaned_scheme_value = None
                         for value in scheme_node.values:
                             if value.type == "prefLabel":
@@ -436,7 +436,7 @@ class SKOSReader(object):
                                     }
                                 )
                         orphaned_scheme.save()
-                        for (orphaned_concept_id, orphaned_concept,) in orphaned_concepts.items():
+                        for (orphaned_concept_id, orphaned_concept) in orphaned_concepts.items():
                             models.Relation.objects.create(
                                 conceptfrom_id=str(orphaned_scheme.id), conceptto_id=orphaned_concept_id, relationtype_id="narrower",
                             )
@@ -548,10 +548,10 @@ class SKOSWriter(object):
                         rdf_graph.add((ARCHES[node.id], SKOS.inScheme, ARCHES[scheme_id]))
 
                     for subconcept in node.subconcepts:
-                        rdf_graph.add((ARCHES[node.id], SKOS[subconcept.relationshiptype], ARCHES[subconcept.id],))
+                        rdf_graph.add((ARCHES[node.id], SKOS[subconcept.relationshiptype], ARCHES[subconcept.id]))
 
                     for relatedconcept in node.relatedconcepts:
-                        rdf_graph.add((ARCHES[node.id], SKOS[relatedconcept.relationshiptype], ARCHES[relatedconcept.id],))
+                        rdf_graph.add((ARCHES[node.id], SKOS[relatedconcept.relationshiptype], ARCHES[relatedconcept.id]))
 
                     for value in node.values:
                         jsonLiteralValue = serializer.serialize({"value": value.value, "id": value.id})
@@ -561,16 +561,16 @@ class SKOSWriter(object):
                                     # TODO: remove lowercasing of value.language once the pyld module
                                     # can accept mixedcase language tags
                                     rdf_graph.add(
-                                        (ARCHES[node.id], DCTERMS.title, Literal(jsonLiteralValue, lang=value.language.lower(),),)
+                                        (ARCHES[node.id], DCTERMS.title, Literal(jsonLiteralValue, lang=value.language.lower()))
                                     )
                                 elif value.type == "scopeNote":
                                     rdf_graph.add(
-                                        (ARCHES[node.id], DCTERMS.description, Literal(jsonLiteralValue, lang=value.language.lower(),),)
+                                        (ARCHES[node.id], DCTERMS.description, Literal(jsonLiteralValue, lang=value.language.lower()))
                                     )
                             else:
-                                rdf_graph.add((ARCHES[node.id], SKOS[value.type], Literal(jsonLiteralValue, lang=value.language.lower(),),))
+                                rdf_graph.add((ARCHES[node.id], SKOS[value.type], Literal(jsonLiteralValue, lang=value.language.lower())))
                         elif value.type == "identifier":
-                            rdf_graph.add((ARCHES[node.id], DCTERMS.identifier, Literal(jsonLiteralValue, lang=value.language.lower()),))
+                            rdf_graph.add((ARCHES[node.id], DCTERMS.identifier, Literal(jsonLiteralValue, lang=value.language.lower())))
                         else:
                             rdf_graph.add(
                                 (
@@ -589,14 +589,14 @@ class SKOSWriter(object):
 
                 def build_skos(node):
                     for subconcept in node.subconcepts:
-                        rdf_graph.add((ARCHES[node.id], SKOS[subconcept.relationshiptype], ARCHES[subconcept.id],))
+                        rdf_graph.add((ARCHES[node.id], SKOS[subconcept.relationshiptype], ARCHES[subconcept.id]))
 
                     rdf_graph.add((ARCHES[node.id], RDF.type, SKOS[node.nodetype]))
                     if node.nodetype == "Collection":
                         for value in node.values:
                             if value.category == "label" or value.category == "note":
                                 jsonLiteralValue = serializer.serialize({"value": value.value, "id": value.id})
-                                rdf_graph.add((ARCHES[node.id], SKOS[value.type], Literal(jsonLiteralValue, lang=value.language.lower(),),))
+                                rdf_graph.add((ARCHES[node.id], SKOS[value.type], Literal(jsonLiteralValue, lang=value.language.lower())))
 
                 concept_graph.traverse(build_skos)
             else:

@@ -12,5 +12,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(model_name="graphmodel", name="jsonldcontext", field=models.TextField(blank=True, null=True),),
+        migrations.AddField(model_name="graphmodel", name="jsonldcontext", field=models.TextField(blank=True, null=True)),
     ]
