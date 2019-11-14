@@ -55,7 +55,8 @@ class ArchesUserCreationForm(UserCreationForm):
                     "email",
                     forms.ValidationError(
                         _(
-                            'This email address has already been regisitered with the system. If you forgot your password, click the "exit" link below and go to the login page to reset your password.'
+                            "This email address has already been regisitered with the system. \
+                            If you forgot your password, click the 'exit' link below and go to the login page to reset your password."
                         ),
                         code="unique",
                     ),

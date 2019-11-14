@@ -119,7 +119,8 @@ class Command(BaseCommand):
                             print("   %s" % proposed_path)
                             print(
                                 _(
-                                    "If you would simply like to reload the current ontology, you can run this command with the dash r (-r) flag"
+                                    "If you would simply like to reload the current ontology, \
+                                    you can run this command with the dash r (-r) flag"
                                 )
                             )
                             print("eg:    python manage.py load_ontology -r\n")

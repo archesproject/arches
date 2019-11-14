@@ -112,10 +112,12 @@ class SignupView(View):
                 "button_text": _("Signup for Arches"),
                 "link": request.build_absolute_uri(reverse("confirm_signup") + "?" + url_encrypted_userinfo, ),
                 "greeting": _(
-                    "Thanks for your interest in Arches. Click on link below to confirm your email address! Use your email address to login."
+                    "Thanks for your interest in Arches. Click on link below \
+                    to confirm your email address! Use your email address to login."
                 ),
                 "closing": _(
-                    "This link expires in 24 hours.  If you can't get to it before then, don't worry, you can always try again with the same email address."
+                    "This link expires in 24 hours.  If you can't get to it before then, \
+                    don't worry, you can always try again with the same email address."
                 ),
             }
 

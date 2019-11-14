@@ -880,7 +880,7 @@ class RelatedResourcesView(BaseManagerView):
             relatable_from = get_relatable_resources(resource_instance_from.graph_id)
             relatable_to_is_valid = str(resource_instance_to.graph_id) in relatable_from
             relatable_from_is_valid = str(resource_instance_from.graph_id) in relatable_to
-            return relatable_to_is_valid == True and relatable_from_is_valid == True
+            return relatable_to_is_valid is True and relatable_from_is_valid is True
 
         for instanceid in instances_to_relate:
             permitted = confirm_relationship_permitted(instanceid, root_resourceinstanceid[0])

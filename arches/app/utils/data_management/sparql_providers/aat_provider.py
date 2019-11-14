@@ -87,7 +87,10 @@ class AAT_Provider(Abstract_Provider):
             else:
                 raise Exception(
                     _(
-                        "<strong>Error in SPARQL query:</strong><br>Test this query directly by pasting the query below into the Getty's own SPARQL endpoint at <a href='http://vocab.getty.edu/sparql' target='_blank'>http://vocab.getty.edu/sparql</a><i><pre>%s</pre></i>Query returned 0 results, please check the query for errors.  You may need to add the appropriate languages into the database for this query to work<br><br>"
+                        "<strong>Error in SPARQL query:</strong><br>Test this query directly by pasting the query below into the Getty's \
+                        own SPARQL endpoint at <a href='http://vocab.getty.edu/sparql' target='_blank'>http://vocab.getty.edu/sparql</a> \
+                        <i><pre>%s</pre></i>Query returned 0 results, please check the query for errors.  \
+                        You may need to add the appropriate languages into the database for this query to work<br><br>"
                     )
                     % (query.replace("<", "&lt").replace(">", "&gt"))
                 )

@@ -67,7 +67,8 @@ class AuthTests(ArchesTestCase):
 
         self.token = "abc"
         self.oauth_client_id = "AAac4uRQSqybRiO6hu7sHT50C4wmDp9fAmsPlCj9"
-        self.oauth_client_secret = "7fos0s7qIhFqUmalDI1QiiYj0rAtEdVMY4hYQDQjOxltbRCBW3dIydOeMD4MytDM9ogCPiYFiMBW6o6ye5bMh5dkeU7pg1cH86wF6Bap9Ke2aaAZaeMPejzafPSj96ID"
+        self.oauth_client_secret = "7fos0s7qIhFqUmalDI1QiiYj0rAtEdVMY4hYQDQjOxltbRCBW3dIydOeMD4MytDM9ogCPiYFiMBW6o6ye5bMh5dkeU7pg1cH86wF6B\
+            ap9Ke2aaAZaeMPejzafPSj96ID"
 
         sql = sql.format(
             token=self.token, user_id=self.user.pk, oauth_client_id=self.oauth_client_id, oauth_client_secret=self.oauth_client_secret

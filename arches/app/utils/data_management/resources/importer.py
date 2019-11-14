@@ -78,7 +78,8 @@ class BusinessDataImporter(object):
             except:
                 print("*" * 80)
                 print(
-                    "ERROR: Mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your business data file and the extension .mapping"
+                    "ERROR: Mapping file is missing or improperly named. Make sure you have \
+                    mapping file with the same basename as your business data file and the extension .mapping"
                 )
                 print("*" * 80)
                 sys.exit()
@@ -88,7 +89,8 @@ class BusinessDataImporter(object):
             except:
                 print("*" * 80)
                 print(
-                    "ERROR: Mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your business data file and the extension .mapping"
+                    "ERROR: Mapping file is missing or improperly named. Make sure you have \
+                    mapping file with the same basename as your business data file and the extension .mapping"
                 )
                 print("*" * 80)
                 sys.exit()
@@ -210,7 +212,8 @@ class BusinessDataImporter(object):
                 else:
                     print("*" * 80)
                     print(
-                        "ERROR: No mapping file detected. Please indicate one with the '-c' paramater or place one in the same directory as your business data."
+                        "ERROR: No mapping file detected. Please indicate one \
+                        with the '-c' paramater or place one in the same directory as your business data."
                     )
                     print("*" * 80)
                     sys.exit()

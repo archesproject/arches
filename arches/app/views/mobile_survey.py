@@ -400,9 +400,10 @@ class MobileSurveyDesignerView(MapBaseManagerView):
             "button_text": _("Logon to {app_name}".format(app_name=settings.APP_NAME)),
             "link": request.build_absolute_uri(reverse("home")),
             "greeting": _(
-                "Welcome to Arches!  You've just been added to a Mobile Survey.  Please take a moment to review the mobile_survey description and mobile_survey start and end dates."
+                "Welcome to Arches!  You've just been added to a Mobile Survey.  \
+                Please take a moment to review the mobile_survey description and mobile_survey start and end dates."
             ),
-            "closing": _("If you have any qustions contact the site administrator at {admin_email}.".format(admin_email=admin_email)),
+            "closing": _(f"If you have any qustions contact the site administrator at {admin_email}."),
         }
 
         html_content = render_to_string("email/general_notification.htm", email_context)
@@ -425,9 +426,10 @@ class MobileSurveyDesignerView(MapBaseManagerView):
             "button_text": _("Logon to {app_name}".format(app_name=settings.APP_NAME)),
             "link": request.build_absolute_uri(reverse("home")),
             "greeting": _(
-                "Hi!  The Mobile Survey you were part of has ended or is temporarily suspended.  Please permform a final sync of your local dataset as soon as possible."
+                "Hi!  The Mobile Survey you were part of has ended or is temporarily suspended. \
+                Please permform a final sync of your local dataset as soon as possible."
             ),
-            "closing": _("If you have any qustions contact the site administrator at {admin_email}.".format(admin_email=admin_email)),
+            "closing": _(f"If you have any qustions contact the site administrator at {admin_email}."),
         }
 
         html_content = render_to_string("email/general_notification.htm", email_context)

@@ -1470,7 +1470,9 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
             return {"query": {"constant_score": {"filter": {"terms": {"value": [val]}}}}}
         else:
             return {
-                "query": {"constant_score": {"filter": {"bool": {"must": [{"term": {"value": val}}, {"term": {"conceptid": conceptid}}, ]}}}}
+                "query": {
+                    "constant_score": {"filter": {"bool": {"must": [{"term": {"value": val}}, {"term": {"conceptid": conceptid}}, ]}}}
+                }
             }
 
     concept_label_results = se.search(index="concepts", body=exact_val_match(label, conceptid))

@@ -387,7 +387,8 @@ def confirm_delete(request, conceptid):
     concepts_to_delete = [
         concept.get_preflabel(lang=lang).value for key, concept in Concept.gather_concepts_to_delete(concept, lang=lang).items()
     ]
-    # return HttpResponse('<div>Showing only 50 of %s concepts</div><ul><li>%s</ul>' % (len(concepts_to_delete), '<li>'.join(concepts_to_delete[:50]) + ''))
+    # return HttpResponse('<div>Showing only 50 of 
+    # %s concepts</div><ul><li>%s</ul>' % (len(concepts_to_delete), '<li>'.join(concepts_to_delete[:50]) + ''))
     return HttpResponse("<ul><li>%s</ul>" % ("<li>".join(concepts_to_delete) + ""))
 
 

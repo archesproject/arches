@@ -163,7 +163,9 @@ class CsvWriter(Writer):
                                 concept_export_value_type = None
                                 if k in concept_export_value_lookup:
                                     concept_export_value_type = concept_export_value_lookup[k]
-                                value = self.transform_value_for_export(self.node_datatypes[k], tile.data[k], concept_export_value_type, k, )
+                                value = self.transform_value_for_export(
+                                    self.node_datatypes[k], tile.data[k], concept_export_value_type, k,
+                                )
                                 other_group_record[mapping[k]] = value
                         else:
                             del tile.data[k]

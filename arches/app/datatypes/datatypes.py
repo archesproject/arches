@@ -269,9 +269,8 @@ class DateDataType(BaseDataType):
                 errors.append(
                     {
                         "type": "ERROR",
-                        "message": "{0} {1} is not in the correct format, make sure it is in this format: {2} or set the date format in settings.DATE_IMPORT_EXPORT_FORMAT. This data was not imported.".format(
-                            value, row_number, date_format
-                        ),
+                        "message": f"{value} {row_number} is not in the correct format, make sure it is in this format: \
+                            {date_format} or set the date format in settings.DATE_IMPORT_EXPORT_FORMAT. This data was not imported.",
                     }
                 )
 
@@ -352,9 +351,8 @@ class EDTFDataType(BaseDataType):
                 errors.append(
                     {
                         "type": "ERROR",
-                        "message": "{0} {1} is not in the correct Extended Date Time Format, see http://www.loc.gov/standards/datetime/ for supported formats. This data was not imported.".format(
-                            value, row_number
-                        ),
+                        "message": f"{value} {row_number} is not in the correct Extended Date Time Format, \
+                            see http://www.loc.gov/standards/datetime/ for supported formats. This data was not imported.",
                     }
                 )
 
@@ -409,7 +407,8 @@ class EDTFDataType(BaseDataType):
                     if edtf.lower != edtf.upper:
                         raise Exception(
                             _(
-                                'Only dates that specify an exact year, month, and day can be used with the ">", "<", ">=", and "<=" operators'
+                                'Only dates that specify an exact year, month, \
+                                    and day can be used with the ">", "<", ">=", and "<=" operators'
                             )
                         )
 
@@ -441,9 +440,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 coordinate_count += geom.num_coords
                 bbox = Polygon(settings.DATA_VALIDATION_BBOX)
                 if coordinate_count > coord_limit:
-                    message = "Geometry has too many coordinates for Elasticsearch ({0}), Please limit to less then {1} coordinates of 5 digits of precision or less.".format(
-                        coordinate_count, coord_limit
-                    )
+                    message = f"Geometry has too many coordinates for Elasticsearch ({coordinate_count}), \
+                        Please limit to less then {coord_limit} coordinates of 5 digits of precision or less."
                     errors.append(
                         {
                             "type": "ERROR",
@@ -454,7 +452,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     )
 
                 if bbox.contains(geom) == False:
-                    message = "Geometry does not fall within the bounding box of the selected coordinate system. Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property."
+                    message = "Geometry does not fall within the bounding box of the selected coordinate system. \
+                         Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property."
                     errors.append(
                         {
                             "type": "ERROR",
@@ -1027,7 +1026,8 @@ class FileListDataType(BaseDataType):
                         errors.append(
                             {
                                 "type": "ERROR",
-                                "message": f"This node has a file-size limit of {formatted_max_size}. Please reduce file size or contact your sysadmin.",
+                                "message": f"This node has a file-size limit of {formatted_max_size}. \
+                                    Please reduce file size or contact your sysadmin.",
                             }
                         )
         except Exception as e:
@@ -1278,7 +1278,8 @@ class DomainDataType(BaseDomainDataType):
                 errors.append(
                     {
                         "type": "ERROR",
-                        "message": f"{value} {row_number} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.",
+                        "message": f"{value} {row_number} is not a valid domain id. Please check the node this value \
+                            is mapped to for a list of valid domain ids. This data was not imported.",
                     }
                 )
         return errors
@@ -1371,7 +1372,8 @@ class DomainListDataType(BaseDomainDataType):
                     errors.append(
                         {
                             "type": "ERROR",
-                            "message": f"{v} {row_number} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.",
+                            "message": f"{v} {row_number} is not a valid domain id. Please check the node this value \
+                                is mapped to for a list of valid domain ids. This data was not imported.",
                         }
                     )
         return errors
@@ -1477,7 +1479,8 @@ class ResourceInstanceDataType(BaseDataType):
                     resource_names.add(resource_document["_source"]["displayname"])
                 except:
                     logger.info(
-                        f"Resource {resourceid} not avaiiable. This message may appear during resource load, in which case the problem will be resolved once the related resource is loaded"
+                        f"Resource {resourceid} not avaiiable. This message may appear during resource load, \
+                            in which case the problem will be resolved once the related resource is loaded"
                     )
         else:
             logger.warning("No resource relationship available")
@@ -1495,9 +1498,8 @@ class ResourceInstanceDataType(BaseDataType):
                     errors.append(
                         {
                             "type": "WARNING",
-                            "message": "The resource id: {0} does not exist in the system. The data for this card will be available in the system once resource {0} is loaded.".format(
-                                resourceid
-                            ),
+                            "message": f"The resource id: {resourceid} does not exist in the system. The data for this card will \
+                                be available in the system once resource {resourceid} is loaded.",
                         }
                     )
         return errors

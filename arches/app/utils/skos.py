@@ -568,7 +568,9 @@ class SKOSWriter(object):
                                         (ARCHES[node.id], DCTERMS.description, Literal(jsonLiteralValue, lang=value.language.lower(), ), )
                                     )
                             else:
-                                rdf_graph.add((ARCHES[node.id], SKOS[value.type], Literal(jsonLiteralValue, lang=value.language.lower(), ), ))
+                                rdf_graph.add(
+                                    (ARCHES[node.id], SKOS[value.type], Literal(jsonLiteralValue, lang=value.language.lower(), ), )
+                                )
                         elif value.type == "identifier":
                             rdf_graph.add((ARCHES[node.id], DCTERMS.identifier, Literal(jsonLiteralValue, lang=value.language.lower()), ))
                         else:
@@ -596,7 +598,9 @@ class SKOSWriter(object):
                         for value in node.values:
                             if value.category == "label" or value.category == "note":
                                 jsonLiteralValue = serializer.serialize({"value": value.value, "id": value.id})
-                                rdf_graph.add((ARCHES[node.id], SKOS[value.type], Literal(jsonLiteralValue, lang=value.language.lower(), ), ))
+                                rdf_graph.add(
+                                    (ARCHES[node.id], SKOS[value.type], Literal(jsonLiteralValue, lang=value.language.lower(), ), )
+                                )
 
                 concept_graph.traverse(build_skos)
             else:

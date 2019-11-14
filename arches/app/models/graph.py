@@ -810,9 +810,8 @@ class Graph(models.GraphModel):
             if self.is_editable() is False and tile_count > 0:
                 raise GraphValidationError(
                     _(
-                        "Your resource model: {0}, already has instances saved. You cannot delete nodes from a Resource Model with instances.".format(
-                            self.name
-                        )
+                        f"Your resource model: {self.name}, already has instances saved. \
+                            You cannot delete nodes from a Resource Model with instances."
                     ),
                     1006,
                 )
@@ -1278,9 +1277,8 @@ class Graph(models.GraphModel):
                 if len(unpermitted_edits) > 0:
                     raise GraphValidationError(
                         _(
-                            "Your resource model: {0}, already has instances saved. You cannot modify a Resource Model with instances.".format(
-                                self.name
-                            )
+                            f"Your resource model: {self.name}, already has instances saved. \
+                                You cannot modify a Resource Model with instances."
                         ),
                         1006,
                     )
@@ -1303,9 +1301,8 @@ class Graph(models.GraphModel):
             if self.root.is_collector is True:
                 raise GraphValidationError(
                     _(
-                        "The top node of your resource graph: {0} needs to be a collector. Hint: check that nodegroup_id of your resource node(s) are not null.".format(
-                            self.root.name
-                        )
+                        f"The top node of your resource graph: {self.root.name} needs to be a collector. \
+                            Hint: check that nodegroup_id of your resource node(s) are not null."
                     ),
                     997,
                 )
@@ -1350,8 +1347,10 @@ class Graph(models.GraphModel):
                 if edge.ontologyproperty is None:
                     raise GraphValidationError(
                         _(
-                            "You must specify an ontology property. Your graph isn't semantically valid. Entity domain '{0}' and Entity range '{1}' can not be related via Property '{2}'."
-                        ).format(edge.domainnode.ontologyclass, edge.rangenode.ontologyclass, edge.ontologyproperty),
+                            f"You must specify an ontology property. Your graph isn't semantically valid. \
+                                Entity domain '{edge.domainnode.ontologyclass}' and \
+                                Entity range '{edge.rangenode.ontologyclass}' can not be related via Property '{edge.ontologyproperty}'."
+                        ),
                         1002,
                     )
                 property_found = False
@@ -1362,8 +1361,10 @@ class Graph(models.GraphModel):
                         if edge.rangenode.ontologyclass not in classes["ontology_classes"]:
                             raise GraphValidationError(
                                 _(
-                                    "Your graph isn't semantically valid. Entity domain '{0}' and Entity range '{1}' can not be related via Property '{2}'."
-                                ).format(edge.domainnode.ontologyclass, edge.rangenode.ontologyclass, edge.ontologyproperty),
+                                    f"Your graph isn't semantically valid. Entity domain '{edge.domainnode.ontologyclass}' and \
+                                        Entity range '{edge.rangenode.ontologyclass}' cannot \
+                                        be related via Property '{edge.ontologyproperty}'."
+                                ),
                                 1003,
                             )
 
