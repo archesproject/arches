@@ -54,7 +54,7 @@ class Command(BaseCommand):
         """
         # resource_remover.delete_resources(load_id)
         if not force:
-            if graphid == None:
+            if graphid is None:
                 if not utils.get_yn_input("all resources will be removed. continue?"):
                     return
             else:
@@ -64,7 +64,7 @@ class Command(BaseCommand):
                 ):
                     return
 
-        if graphid == None:
+        if graphid is None:
             resource_remover.clear_resources()
         else:
             graph = Graph.objects.get(graphid=graphid)

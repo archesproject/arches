@@ -196,7 +196,7 @@ class ArchesFileReader(Reader):
     def import_business_data(self, business_data, mapping=None):
         reporter = ResourceImportReporter(business_data)
         try:
-            if mapping == None or mapping == "":
+            if mapping is None or mapping == "":
                 self.import_business_data_without_mapping(business_data, reporter)
             else:
                 blanktilecache = {}
@@ -251,7 +251,7 @@ class ArchesFileReader(Reader):
                                                 for tiledata in source_tile["data"]:
                                                     for nodeid in list(tiledata.keys()):
                                                         if nodeid in target_tile.data:
-                                                            if target_tile.data[nodeid] == None:
+                                                            if target_tile.data[nodeid] is None:
                                                                 target_tile.data[nodeid] = tiledata[nodeid]
                                                                 for key in list(tiledata.keys()):
                                                                     if key == nodeid:
@@ -277,7 +277,7 @@ class ArchesFileReader(Reader):
                                                             for data in source_tile["data"]:
                                                                 for nodeid in list(data.keys()):
                                                                     if nodeid in list(prototype_tile.data.keys()):
-                                                                        if prototype_tile.data[nodeid] == None:
+                                                                        if prototype_tile.data[nodeid] is None:
                                                                             prototype_tile_copy.data[nodeid] = data[nodeid]
                                                                             for key in list(data.keys()):
                                                                                 if key == nodeid:

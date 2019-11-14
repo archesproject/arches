@@ -34,7 +34,7 @@ class BaseConceptDataType(BaseDataType):
 
     def get_concept_export_value(self, valueid, concept_export_value_type=None):
         ret = ""
-        if concept_export_value_type == None or concept_export_value_type == "" or concept_export_value_type == "label":
+        if concept_export_value_type is None or concept_export_value_type == "" or concept_export_value_type == "label":
             ret = self.get_value(valueid).value
         elif concept_export_value_type == "both":
             ret = valueid + "|" + self.get_value(valueid).value

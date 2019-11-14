@@ -883,7 +883,7 @@ class CsvReader(Reader):
                                             for source_key in list(source_tile.keys()):
                                                 # Check for source and target key match.
                                                 if source_key == target_key:
-                                                    if target_tile.data[source_key] == None:
+                                                    if target_tile.data[source_key] is None:
                                                         # If match populate target_tile node with transformed value.
                                                         value = transform_value(
                                                             node_datatypes[source_key], source_tile[source_key], row_number, source_key,
@@ -922,7 +922,7 @@ class CsvReader(Reader):
                                                     for source_column in source_data:
                                                         for source_key in list(source_column.keys()):
                                                             if source_key == target_key:
-                                                                if prototype_tile_copy.data[source_key] == None:
+                                                                if prototype_tile_copy.data[source_key] is None:
                                                                     value = transform_value(
                                                                         node_datatypes[source_key],
                                                                         source_column[source_key],

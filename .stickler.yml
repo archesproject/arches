@@ -1,5 +1,5 @@
 linters:
-  pep8:
+  black:
     python: 3
     max-line-length: 140
     fixer: false

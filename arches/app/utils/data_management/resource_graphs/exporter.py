@@ -77,7 +77,7 @@ def get_function_x_graph_data_for_export(functionids, graphid):
 def get_graphs_for_export(graphids=None):
     graphs = {}
     graphs["graph"] = []
-    if graphids == None or graphids[0] == "all" or graphids == [""]:
+    if graphids is None or graphids[0] == "all" or graphids == [""]:
         resource_graph_query = JSONSerializer().serializeToPython(
             Graph.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID), exclude=["widgets"]
         )
@@ -119,7 +119,7 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
     values = {}
     export_json = OrderedDict()
     if graphid != False:
-        if graphid == None or graphid == "all" or graphid == [""]:
+        if graphid is None or graphid == "all" or graphid == [""]:
             node_query = (
                 Node.objects.filter(graph_id__isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).order_by("name")
             )

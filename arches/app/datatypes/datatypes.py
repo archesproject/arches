@@ -92,7 +92,7 @@ class StringDataType(BaseDataType):
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
         if nodevalue is not None:
-            if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+            if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
                 terms.append(nodevalue)
         return terms
 
@@ -419,7 +419,7 @@ class EDTFDataType(BaseDataType):
                     query.should(Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators))
                     query.should(Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators))
                 except RangeDSLException:
-                    if edtf.lower == None and edtf.upper == None:
+                    if edtf.lower is None and edtf.upper is None:
                         raise Exception(_("Invalid date specified."))
 
         edtf = ExtendedDateFormat(value["val"])
@@ -1138,7 +1138,7 @@ class FileListDataType(BaseDataType):
             # tile_file['width'] =  1280
             # tile_file['accepted'] =  True
             tile_file["type"] = mime.guess_type(file_path)[0]
-            tile_file["type"] = "" if tile_file["type"] == None else tile_file["type"]
+            tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
             tile_data.append(tile_file)
             file_path = "uploadedfiles/" + str(tile_file["name"])
             fileid = tile_file["file_id"]
@@ -1288,7 +1288,7 @@ class DomainDataType(BaseDomainDataType):
         node = models.Node.objects.get(nodeid=nodeid)
         domain_text = self.get_option_text(node, nodevalue)
         if domain_text is not None:
-            if settings.WORDS_PER_SEARCH_TERM == None or (len(domain_text.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+            if settings.WORDS_PER_SEARCH_TERM is None or (len(domain_text.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
                 terms.append(domain_text)
         return terms
 
@@ -1310,7 +1310,7 @@ class DomainDataType(BaseDomainDataType):
     def transform_export_values(self, value, *args, **kwargs):
         ret = ""
         if (
-            kwargs["concept_export_value_type"] == None
+            kwargs["concept_export_value_type"] is None
             or kwargs["concept_export_value_type"] == ""
             or kwargs["concept_export_value_type"] == "label"
         ):
@@ -1385,7 +1385,7 @@ class DomainListDataType(BaseDomainDataType):
         for val in nodevalue:
             domain_text = self.get_option_text(node, val)
             if domain_text is not None:
-                if settings.WORDS_PER_SEARCH_TERM == None or (len(domain_text.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                if settings.WORDS_PER_SEARCH_TERM is None or (len(domain_text.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
                     terms.append(domain_text)
 
         return terms
@@ -1417,7 +1417,7 @@ class DomainListDataType(BaseDomainDataType):
         new_values = []
         for val in value:
             if (
-                kwargs["concept_export_value_type"] == None
+                kwargs["concept_export_value_type"] is None
                 or kwargs["concept_export_value_type"] == ""
                 or kwargs["concept_export_value_type"] == "label"
             ):
@@ -1495,9 +1495,9 @@ class ResourceInstanceDataType(BaseDataType):
                     errors.append(
                         {
                             "type": "WARNING",
-                            "message": "The resource id: {0} does not exist in the system. The data for this card will be available in the system once resource {0} is loaded.".format(
-                                resourceid
-                            ),
+                            "message": "The resource id: {0} does not exist in the system. \
+                            The data for this card will be available in the system once resource {0} \
+                            is loaded.".format(resourceid),
                         }
                     )
         return errors

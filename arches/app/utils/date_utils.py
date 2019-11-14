@@ -179,7 +179,7 @@ class ExtendedDateFormat(SortableDateRange):
             day = upper_fuzzy.day
 
             # we need to recaculate the day under special circumstances
-            if date.day == None and not self.is_season(date) and (date.precision == PRECISION_YEAR or date.precision == PRECISION_MONTH):
+            if date.day is None and not self.is_season(date) and (date.precision == PRECISION_YEAR or date.precision == PRECISION_MONTH):
                 day = self.calculate_upper_day(fuzzy_year, upper_fuzzy.month)
             if date.day >= 29 and upper_fuzzy.month == 2:
                 day = self.calculate_upper_day(fuzzy_year, upper_fuzzy.month)
