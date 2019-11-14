@@ -553,7 +553,7 @@ class Command(BaseCommand):
             if len(config_paths) > 0:
                 configs = json.load(open(config_paths[0]))
                 for relationship in configs["permitted_resource_relationships"]:
-                    (obj, created,) = models.Resource2ResourceConstraint.objects.update_or_create(
+                    (obj, created, ) = models.Resource2ResourceConstraint.objects.update_or_create(
                         resourceclassfrom_id=uuid.UUID(relationship["resourceclassfrom_id"]),
                         resourceclassto_id=uuid.UUID(relationship["resourceclassto_id"]),
                         resource2resourceid=uuid.UUID(relationship["resource2resourceid"]),
@@ -639,8 +639,8 @@ class Command(BaseCommand):
                     logger.warning("The map layer '{}' was not imported: {} is missing.".format(path, e))
 
         def load_map_layers(package_dir):
-            basemap_styles = glob.glob(os.path.join(package_dir, "map_layers", "mapbox_spec_json", "basemaps", "*", "*.json",))
-            overlay_styles = glob.glob(os.path.join(package_dir, "map_layers", "mapbox_spec_json", "overlays", "*", "*.json",))
+            basemap_styles = glob.glob(os.path.join(package_dir, "map_layers", "mapbox_spec_json", "basemaps", "*", "*.json", ))
+            overlay_styles = glob.glob(os.path.join(package_dir, "map_layers", "mapbox_spec_json", "overlays", "*", "*.json", ))
             load_mapbox_styles(basemap_styles, True)
             load_mapbox_styles(overlay_styles, False)
 

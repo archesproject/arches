@@ -12,5 +12,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(model_name="plugin", name="sortorder", field=models.IntegerField(blank=True, default=None, null=True),),
+        migrations.AddField(model_name="plugin", name="sortorder", field=models.IntegerField(blank=True, default=None, null=True), ),
     ]

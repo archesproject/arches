@@ -41,7 +41,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "operation",
             nargs="?",
-            choices=["list_surveys", "delete_surveys", "delete_unassociated_surveys", "sync_survey", "rebuild_surveys",],
+            choices=["list_surveys", "delete_surveys", "delete_unassociated_surveys", "sync_survey", "rebuild_surveys", ],
             help="Operation Type; "
             + "'delete_surveys' deletes all surveys that belong to the current arches install"
             + "'delete_unassociated_surveys' deletes all surveys that do not belong to the current arches install"

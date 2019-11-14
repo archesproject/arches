@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(model_name="graphmodel", name="color", field=models.TextField(blank=True, null=True),),
+        migrations.AddField(model_name="graphmodel", name="color", field=models.TextField(blank=True, null=True), ),
         migrations.RunSQL(
             """
             update graphs as g

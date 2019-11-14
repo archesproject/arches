@@ -138,7 +138,7 @@ class GraphManagerView(GraphBaseView):
     def get(self, request, graphid):
         if graphid is None or graphid == "":
             root_nodes = models.Node.objects.filter(istopnode=True)
-            context = self.get_context_data(main_script="views/graph", root_nodes=JSONSerializer().serialize(root_nodes),)
+            context = self.get_context_data(main_script="views/graph", root_nodes=JSONSerializer().serialize(root_nodes), )
             context["graph_models"] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             context["graphs"] = JSONSerializer().serialize(context["graph_models"], exclude=["functions"])
             context["nav"]["title"] = "Arches Designer"

@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(model_name="resourcexresource", name="relationshiptype", field=models.TextField(blank=True, null=True),),
+        migrations.AlterField(model_name="resourcexresource", name="relationshiptype", field=models.TextField(blank=True, null=True), ),
         migrations.AddField(
             model_name="resourcexresource",
             name="modified",
@@ -26,9 +26,9 @@ class Migration(migrations.Migration):
             field=models.DateTimeField(default=datetime.datetime.now()),
             preserve_default=False,
         ),
-        migrations.AlterField(model_name="function", name="component", field=models.TextField(blank=True, null=True, unique=True),),
-        migrations.AlterField(model_name="geocoder", name="component", field=models.TextField(unique=True),),
-        migrations.AlterField(model_name="geocoder", name="name", field=models.TextField(unique=True),),
-        migrations.AlterField(model_name="widget", name="component", field=models.TextField(unique=True),),
-        migrations.AlterField(model_name="widget", name="name", field=models.TextField(unique=True),),
+        migrations.AlterField(model_name="function", name="component", field=models.TextField(blank=True, null=True, unique=True), ),
+        migrations.AlterField(model_name="geocoder", name="component", field=models.TextField(unique=True), ),
+        migrations.AlterField(model_name="geocoder", name="name", field=models.TextField(unique=True), ),
+        migrations.AlterField(model_name="widget", name="component", field=models.TextField(unique=True), ),
+        migrations.AlterField(model_name="widget", name="name", field=models.TextField(unique=True), ),
     ]

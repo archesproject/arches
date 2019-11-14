@@ -36,7 +36,7 @@ class ArchesUserCreationForm(UserCreationForm):
         self.enable_captcha = kwargs.pop("enable_captcha", False)
         super(ArchesUserCreationForm, self).__init__(*args, **kwargs)
         if self.enable_captcha:
-            self.fields["captcha"] = ReCaptchaField(attrs={"theme": "clean",})
+            self.fields["captcha"] = ReCaptchaField(attrs={"theme": "clean", })
 
     first_name = forms.CharField()
     last_name = forms.CharField()

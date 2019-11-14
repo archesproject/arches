@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
                 ("sortorder", models.IntegerField(blank=True, default=None, null=True)),
                 ("enabled", models.BooleanField(default=False)),
             ],
-            options={"db_table": "search_component", "managed": True,},
+            options={"db_table": "search_component", "managed": True, },
         ),
         migrations.RunPython(forwards_func, reverse_func),
     ]

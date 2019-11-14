@@ -34,7 +34,7 @@ LOAD_V3_DATA_DURING_TESTS = False
 
 SEARCH_BACKEND = "tests.base_test.TestSearchEngine"
 
-RESOURCE_GRAPH_LOCATIONS = (os.path.join(TEST_ROOT, "fixtures", "resource_graphs"),)
+RESOURCE_GRAPH_LOCATIONS = (os.path.join(TEST_ROOT, "fixtures", "resource_graphs"), )
 
 ONTOLOGY_FIXTURES = os.path.join(TEST_ROOT, "fixtures", "ontologies")
 
@@ -84,7 +84,7 @@ NOSE_ARGS = [
     "--cover-erase",
 ]
 
-INSTALLED_APPS = INSTALLED_APPS + ("django_nose",)
+INSTALLED_APPS = INSTALLED_APPS + ("django_nose", )
 
 ONTOLOGY_PATH = os.path.join(ROOT_DIR, "db", "ontologies", "cidoc_crm")
 ONTOLOGY_BASE = "cidoc_crm_v6.2.xml"

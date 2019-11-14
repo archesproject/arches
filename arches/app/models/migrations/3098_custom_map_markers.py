@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
                 ("name", models.TextField(unique=True)),
                 ("url", models.TextField()),
             ],
-            options={"db_table": "map_markers", "managed": True,},
+            options={"db_table": "map_markers", "managed": True, },
         ),
     ]

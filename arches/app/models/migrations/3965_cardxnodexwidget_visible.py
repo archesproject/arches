@@ -12,5 +12,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(model_name="cardxnodexwidget", name="visible", field=models.BooleanField(default=True),),
+        migrations.AddField(model_name="cardxnodexwidget", name="visible", field=models.BooleanField(default=True), ),
     ]

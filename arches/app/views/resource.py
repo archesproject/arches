@@ -56,7 +56,7 @@ logger = logging.getLogger(__name__)
 @method_decorator(can_edit_resource_instance(), name="dispatch")
 class ResourceListView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
-        context = self.get_context_data(main_script="views/resource",)
+        context = self.get_context_data(main_script="views/resource", )
 
         context["nav"]["icon"] = "fa fa-bookmark"
         context["nav"]["title"] = _("Resource Manager")
@@ -535,7 +535,7 @@ class ResourceActivityStreamPageView(BaseManagerView):
         if end < totalItems:
             uris["next"] = request.build_absolute_uri(reverse("as_stream_page", kwargs={"page": current_page + 1}))
         if totalItems > page_size:
-            uris["last"] = (request.build_absolute_uri(reverse("as_stream_page", kwargs={"page": int(totalItems / page_size) + 1})),)
+            uris["last"] = (request.build_absolute_uri(reverse("as_stream_page", kwargs={"page": int(totalItems / page_size) + 1})), )
 
         collection = ActivityStreamCollection(uris, totalItems, base_uri_for_arches=request.build_absolute_uri("/").rsplit("/", 1)[0])
 

@@ -12,11 +12,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="form", name="graph",),
-        migrations.RemoveField(model_name="formxcard", name="card",),
-        migrations.RemoveField(model_name="formxcard", name="form",),
-        migrations.RemoveField(model_name="report", name="formsconfig",),
-        migrations.AlterField(model_name="node", name="sortorder", field=models.IntegerField(blank=True, default=0, null=True),),
-        migrations.DeleteModel(name="Form",),
-        migrations.DeleteModel(name="FormXCard",),
+        migrations.RemoveField(model_name="form", name="graph", ),
+        migrations.RemoveField(model_name="formxcard", name="card", ),
+        migrations.RemoveField(model_name="formxcard", name="form", ),
+        migrations.RemoveField(model_name="report", name="formsconfig", ),
+        migrations.AlterField(model_name="node", name="sortorder", field=models.IntegerField(blank=True, default=0, null=True), ),
+        migrations.DeleteModel(name="Form", ),
+        migrations.DeleteModel(name="FormXCard", ),
     ]
