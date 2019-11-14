@@ -1,7 +1,7 @@
 linters:
   pep8:
     python: 3
-    max-line-length: 119
+    max-line-length: 140
     fixer: false
   eslint:
     config: './.eslintrc.js'
