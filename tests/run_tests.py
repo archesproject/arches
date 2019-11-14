@@ -25,7 +25,7 @@ from tests import test_settings
 def run_all(argv=None):
     os.environ['DJANGO_SETTINGS_MODULE'] = "tests.test_settings"
     
-    if argv == None or len(argv[1:]) == 0:
+    if argv is None or len(argv[1:]) == 0:
         argv = ['tests',]
 
     TestRunner = get_runner(test_settings)

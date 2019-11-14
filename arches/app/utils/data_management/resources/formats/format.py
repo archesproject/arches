@@ -118,7 +118,7 @@ class Reader(object):
                 # If resourceinstancefrom is None then either:
                 # 1.) a legacyid was passed in and get_resourceid_from_legacyid could not find a resource or found multiple resources with the indicated legacyid or
                 # 2.) a uuid was passed in and it is not associated with a resource instance
-                if newresourceinstanceid == None:
+                if newresourceinstanceid is None:
                     errors = []
                     # self.errors.append({'datatype':'legacyid', 'value':relation[key], 'source':'', 'message':'either multiple resources or no resource have this legacyid\n'})
                     errors.append(

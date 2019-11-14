@@ -48,14 +48,14 @@ class Command(BaseCommand):
         """
         # resource_remover.delete_resources(load_id)
         if not force:
-            if graphid == None:
+            if graphid is None:
                 if not utils.get_yn_input("all resources will be removed. continue?"):
                     return
             else:
                 if not utils.get_yn_input("All resources associated with the '%s' Resource Model will be removed. continue?" % Graph.objects.get(graphid=graphid).name ):
                     return
 
-        if graphid == None:
+        if graphid is None:
             resource_remover.clear_resources()
         else:
             graph = Graph.objects.get(graphid=graphid)

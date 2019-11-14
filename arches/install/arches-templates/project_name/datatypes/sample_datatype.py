@@ -36,7 +36,7 @@ class SampleDataType(BaseDataType):
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
         if nodevalue is not None:
-            if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
+            if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
                 terms.append(nodevalue)
         return terms
 
