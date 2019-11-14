@@ -117,7 +117,7 @@ class Concept(object):
         lang=settings.LANGUAGE_CODE,
         semantic=True,
         pathway_filter=None,
-        **kwargs
+        **kwargs,
     ):
 
         if id != "":

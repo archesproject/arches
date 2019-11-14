@@ -36,19 +36,19 @@ def map_info(request):
         hex_bin_bounds = (0, 0, 1, 1)
         default_center = {"coordinates": [6.602384, 0.245926]}  # an island off the coast of Africa
     return {
-        'map_info': {
-            'x': default_center['coordinates'][0],
-            'y': default_center['coordinates'][1],
-            'zoom': settings.DEFAULT_MAP_ZOOM,
-            'map_min_zoom': settings.MAP_MIN_ZOOM,
-            'map_max_zoom': settings.MAP_MAX_ZOOM,
-            'mapbox_api_key': settings.MAPBOX_API_KEY,
-            'hex_bin_size': settings.HEX_BIN_SIZE if settings.HEX_BIN_SIZE is not None else 100,
-            'mapbox_sprites': settings.MAPBOX_SPRITES,
-            'mapbox_glyphs': settings.MAPBOX_GLYPHS,
-            'hex_bin_bounds': json.dumps(hex_bin_bounds),
-            'geocoder_default': settings.DEFAULT_GEOCODER,
-            'preferred_coordinate_systems': JSONSerializer().serialize(settings.PREFERRED_COORDINATE_SYSTEMS)
+        "map_info": {
+            "x": default_center["coordinates"][0],
+            "y": default_center["coordinates"][1],
+            "zoom": settings.DEFAULT_MAP_ZOOM,
+            "map_min_zoom": settings.MAP_MIN_ZOOM,
+            "map_max_zoom": settings.MAP_MAX_ZOOM,
+            "mapbox_api_key": settings.MAPBOX_API_KEY,
+            "hex_bin_size": settings.HEX_BIN_SIZE if settings.HEX_BIN_SIZE is not None else 100,
+            "mapbox_sprites": settings.MAPBOX_SPRITES,
+            "mapbox_glyphs": settings.MAPBOX_GLYPHS,
+            "hex_bin_bounds": json.dumps(hex_bin_bounds),
+            "geocoder_default": settings.DEFAULT_GEOCODER,
+            "preferred_coordinate_systems": JSONSerializer().serialize(settings.PREFERRED_COORDINATE_SYSTEMS),
         }
     }
 

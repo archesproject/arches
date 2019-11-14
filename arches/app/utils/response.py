@@ -17,17 +17,17 @@ class JSONResponse(HttpResponse):
 
         options = {}
         if ensure_ascii is not None:
-            options['ensure_ascii'] = ensure_ascii
+            options["ensure_ascii"] = ensure_ascii
         if stream is not None:
-        	options['stream'] = stream
+            options["stream"] = stream
         if indent is not None:
-        	options['indent'] = indent
+            options["indent"] = indent
         if selected_fields is not None:
-        	options['selected_fields'] = selected_fields
+            options["selected_fields"] = selected_fields
         if use_natural_keys is not None:
-        	options['use_natural_keys'] = use_natural_keys
+            options["use_natural_keys"] = use_natural_keys
         if geom_format is not None:
-            options['geom_format'] = geom_format
+            options["geom_format"] = geom_format
 
         # Content is a bytestring. See the `content` property methods.
         self.content = JSONSerializer().serialize(content, **options)

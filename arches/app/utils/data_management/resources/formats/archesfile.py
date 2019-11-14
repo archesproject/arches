@@ -196,7 +196,7 @@ class ArchesFileReader(Reader):
     def import_business_data(self, business_data, mapping=None):
         reporter = ResourceImportReporter(business_data)
         try:
-            if mapping is None or mapping == '':
+            if mapping is None or mapping == "":
                 self.import_business_data_without_mapping(business_data, reporter)
             else:
                 blanktilecache = {}
@@ -217,9 +217,9 @@ class ArchesFileReader(Reader):
                         if tile["data"] != {}:
 
                             def get_tiles(tile):
-                                if tile['parenttile_id'] is not None:
-                                    if tile['parenttile_id'] not in parenttileids:
-                                        parenttileids.append(tile['parenttile_id'])
+                                if tile["parenttile_id"] is not None:
+                                    if tile["parenttile_id"] not in parenttileids:
+                                        parenttileids.append(tile["parenttile_id"])
                                         ret = []
                                         for sibling_tile in resource["tiles"]:
                                             if sibling_tile["parenttile_id"] == tile["parenttile_id"]:
@@ -316,7 +316,10 @@ class ArchesFileReader(Reader):
 
                                         if need_new_tile:
                                             if self.get_blank_tile(sourcetilegroup, blanktilecache, tiles, resourceinstanceid) is not None:
-                                                populate_tile(sourcetilegroup, self.get_blank_tile(sourcetilegroup, blanktilecache, tiles, resourceinstanceid))
+                                                populate_tile(
+                                                    sourcetilegroup,
+                                                    self.get_blank_tile(sourcetilegroup, blanktilecache, tiles, resourceinstanceid),
+                                                )
 
                                         if target_tile_cardinality == "1":
                                             populated_nodegroups.append(str(target_tile.nodegroup_id))
