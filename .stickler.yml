@@ -10,6 +10,6 @@ files:
     - 'arches/app/media/packages/*'
     - 'node_modules/*'
 review:
-  fail_on_comments: false
+  fail_on_comments: true
 fixers:
   enable: false
