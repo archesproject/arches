@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 
 from arches.app.models import models
@@ -30,13 +30,13 @@ def flatten_tiles(tiles, datatype_factory, compact=True):
     lookup = {}
     for tile in tiles:
         data = {}
-        for nodeid, value in tile['data'].items():
+        for nodeid, value in tile["data"].items():
             node = models.Node.objects.get(pk=nodeid)
             if node.exportable:
                 datatype = datatype_factory.get_instance(node.datatype)
                 node_value = datatype.get_display_value(tile, node)
 
-                label = ''
+                label = ""
                 try:
                     label = node.fieldname
                 except:
@@ -51,12 +51,12 @@ def flatten_tiles(tiles, datatype_factory, compact=True):
                     data[label] = node_value
 
         if not compact:
-            tile['data'] = data
-            card = models.CardModel.objects.get(nodegroup=tile['nodegroup_id'])
-            tile['card_name'] = card.name
-            tile['cardinality'] = node.nodegroup.cardinality
-            tile[card.name] = tile['data']
-            lookup[tile['tileid']] = tile
+            tile["data"] = data
+            card = models.CardModel.objects.get(nodegroup=tile["nodegroup_id"])
+            tile["card_name"] = card.name
+            tile["cardinality"] = node.nodegroup.cardinality
+            tile[card.name] = tile["data"]
+            lookup[tile["tileid"]] = tile
 
     if compact:
         return compacted_data
@@ -68,25 +68,25 @@ def flatten_tiles(tiles, datatype_factory, compact=True):
     # aggregate tiles into single resource instance objects rolling up tile data in the process
     # print out "ret" to understand the intermediate structure
     for tile in tiles:
-        if tile['parenttile_id'] is not None:
-            parentTile = lookup[str(tile['parenttile_id'])]
-            if tile['cardinality'] == 'n':
+        if tile["parenttile_id"] is not None:
+            parentTile = lookup[str(tile["parenttile_id"])]
+            if tile["cardinality"] == "n":
                 try:
-                    parentTile[parentTile['card_name']][tile['card_name']].append(tile[tile['card_name']])
+                    parentTile[parentTile["card_name"]][tile["card_name"]].append(tile[tile["card_name"]])
                 except KeyError:
-                    parentTile[parentTile['card_name']][tile['card_name']] = [tile[tile['card_name']]]
+                    parentTile[parentTile["card_name"]][tile["card_name"]] = [tile[tile["card_name"]]]
             else:
-                parentTile[parentTile['card_name']][tile['card_name']] = tile[tile['card_name']]
+                parentTile[parentTile["card_name"]][tile["card_name"]] = tile[tile["card_name"]]
         else:
             # print the following out to understand the intermediate structure
             # ret.append(tile)
             # ret.append({tile['card_name']: tile[tile['card_name']]})
-            if tile['cardinality'] == 'n':
+            if tile["cardinality"] == "n":
                 try:
-                    resource_json[tile['card_name']].append(tile[tile['card_name']])
+                    resource_json[tile["card_name"]].append(tile[tile["card_name"]])
                 except KeyError:
-                    resource_json[tile['card_name']] = [tile[tile['card_name']]]
+                    resource_json[tile["card_name"]] = [tile[tile["card_name"]]]
             else:
-                resource_json[tile['card_name']] = tile[tile['card_name']]
+                resource_json[tile["card_name"]] = tile[tile["card_name"]]
 
     return flatten_dict(resource_json)

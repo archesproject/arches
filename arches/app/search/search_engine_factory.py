@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,24 +14,26 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 from arches.app.models.system_settings import settings
 from django.core.exceptions import ImproperlyConfigured
+
 # from importlib import import_module
 
-class SearchEngineFactory(object):
 
-    def create(self,
-            hosts=settings.ELASTICSEARCH_HOSTS,
-            prefix=settings.ELASTICSEARCH_PREFIX,
-            connection_options=settings.ELASTICSEARCH_CONNECTION_OPTIONS
-        ):
+class SearchEngineFactory(object):
+    def create(
+        self,
+        hosts=settings.ELASTICSEARCH_HOSTS,
+        prefix=settings.ELASTICSEARCH_PREFIX,
+        connection_options=settings.ELASTICSEARCH_CONNECTION_OPTIONS,
+    ):
 
         backend = settings.SEARCH_BACKEND
-        components = backend.split('.')
-        classname = components[len(components)-1]
-        modulename = ('.').join(components[0:len(components)-1])
+        components = backend.split(".")
+        classname = components[len(components) - 1]
+        modulename = (".").join(components[0 : len(components) - 1])
         # _temp = __import__(modulename, globals(), locals(), [classname], -1)
-        _temp = __import__(modulename, globals(), locals(), [classname]) # in py3, level must be >= 0
+        _temp = __import__(modulename, globals(), locals(), [classname])  # in py3, level must be >= 0
         return getattr(_temp, classname)(hosts=hosts, prefix=prefix, **connection_options)
