@@ -1,7 +1,6 @@
 linters:
   black:
-    python: 3
-    max-line-length: 140
+    config: ./pyproject.toml
     fixer: false
   eslint:
     config: './.eslintrc.js'
