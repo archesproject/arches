@@ -71,7 +71,7 @@ def get_function_x_graph_data_for_export(functionids, graphid):
 def get_graphs_for_export(graphids=None):
     graphs = {}
     graphs['graph'] = []
-    if graphids == None or graphids[0] == 'all' or graphids == ['']:
+    if graphids is None or graphids[0] == 'all' or graphids == ['']:
         resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID), exclude=["widgets"])
     elif graphids[0] == 'resource_models':
         resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID), exclude=["widgets"])
@@ -106,7 +106,7 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
     values = {}
     export_json = OrderedDict()
     if graphid != False:
-        if graphid == None or graphid == 'all' or graphid == ['']:
+        if graphid is None or graphid == 'all' or graphid == ['']:
             node_query = Node.objects.filter(graph_id__isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).order_by('name')
         else:
             node_query = Node.objects.filter(graph_id=graphid).exclude(datatype='semantic').order_by('name')
@@ -143,7 +143,7 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
 
                 if node.datatype in ['concept', 'concept-list', 'domain-value', 'domain-value-list']:
                     if node.datatype in ['concept', 'concept-list']:
-                        if node.config['rdmCollection'] != None:
+                        if node.config['rdmCollection'] is not None:
                             rdmCollection = node.config['rdmCollection']
                         try:
                             concept = Concept().get(node.config['rdmCollection'], include_subconcepts=True, semantic=False)
@@ -182,15 +182,12 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
     dest.write(json.dumps(export_json, indent=4))
     files_for_export.append({'name':file_name, 'outputfile': dest})
 
-
-    if data_dir != None:
+    if data_dir is not None:
         with open(os.path.join(data_dir), 'w') as config_file:
             json.dump(export_json, config_file, indent=4)
 
         file_name = Graph.objects.get(graphid=graphid).name
-
         buffer = StringIO()
-
         with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip:
             for f in files_for_export:
                 f['outputfile'].seek(0)
@@ -200,7 +197,6 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
         buffer.flush()
         zip_stream = buffer.getvalue()
         buffer.close()
-
         with open(os.path.join(data_dir), 'w') as archive:
             archive.write(zip_stream)
     else:

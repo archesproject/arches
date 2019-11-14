@@ -386,7 +386,7 @@ class GraphTests(ArchesTestCase):
             self.assertNotEqual(node.pk, node_copy.pk)
             self.assertNotEqual(id(node), id(node_copy))
             self.assertEqual(node.is_collector, node_copy.is_collector)
-            if node.nodegroup != None:
+            if node.nodegroup is not None:
                 self.assertNotEqual(node.nodegroup, node_copy.nodegroup)
 
         for card in list(graph.cards.values()):

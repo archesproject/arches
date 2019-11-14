@@ -163,7 +163,7 @@ class CsvWriter(Writer):
                 other_group_record["ResourceID"] = resourceinstanceid
                 if tile.data != {}:
                     for k in list(tile.data.keys()):
-                        if tile.data[k] != "" and k in mapping and tile.data[k] != None:
+                        if tile.data[k] != "" and k in mapping and tile.data[k] is not None:
                             if (
                                 mapping[k] not in csv_record
                                 and tile.nodegroup_id
@@ -174,7 +174,7 @@ class CsvWriter(Writer):
                                     concept_export_value_type = concept_export_value_lookup[
                                         k
                                     ]
-                                if tile.data[k] != None:
+                                if tile.data[k] is not None:
                                     value = self.transform_value_for_export(
                                         self.node_datatypes[k],
                                         tile.data[k],
@@ -246,7 +246,7 @@ class CsvWriter(Writer):
                     del csv_record["populated_node_groups"]
                 csvwriter.writerow({k: str(v) for k, v in list(csv_record.items())})
 
-        if self.graph_id != None:
+        if self.graph_id is not None:
             csvs_for_export = csvs_for_export + self.write_resource_relations(
                 file_name=self.file_name
             )
@@ -279,13 +279,13 @@ class CsvWriter(Writer):
             ).values(*csv_header)
             for relation in relations:
                 relation["datestarted"] = (
-                    relation["datestarted"] if relation["datestarted"] != None else ""
+                    relation["datestarted"] if relation["datestarted"] is not None else ""
                 )
                 relation["dateended"] = (
-                    relation["dateended"] if relation["dateended"] != None else ""
+                    relation["dateended"] if relation["dateended"] is not None else ""
                 )
                 relation["notes"] = (
-                    relation["notes"] if relation["notes"] != None else ""
+                    relation["notes"] if relation["notes"] is not None else ""
                 )
                 csvwriter.writerow({k: str(v) for k, v in list(relation.items())})
 
@@ -353,11 +353,11 @@ class TileCsvWriter(Writer):
                         if resource_instance.legacyid is not None
                         else str(resource_instance.resourceinstanceid)
                     )
-                    if tile.data[k] != "" and tile.data[k] != None:
+                    if tile.data[k] != "" and tile.data[k] is not None:
                         concept_export_value_type = "label"
                         if k in concept_export_value_lookup:
                             concept_export_value_type = concept_export_value_lookup[k]
-                        if tile.data[k] != None:
+                        if tile.data[k] is not None:
                             value = self.transform_value_for_export(
                                 self.node_datatypes[k],
                                 tile.data[k],
@@ -383,7 +383,7 @@ class TileCsvWriter(Writer):
 
         csv_name = os.path.join("{0}.{1}".format(self.file_name, "csv"))
         csvs_for_export.append({"name": csv_name, "outputfile": dest})
-        if self.graph_id != None:
+        if self.graph_id is not None:
             csvs_for_export = csvs_for_export
 
         return csvs_for_export
@@ -673,7 +673,7 @@ class CsvReader(Reader):
                                     node.name + "_" + str(node.graph_id) + "_import"
                                 )
                                 # check to see that there is not already a collection for this node
-                                if node.config["rdmCollection"] != None:
+                                if node.config["rdmCollection"] is not None:
                                     errors.append(
                                         {
                                             "type": "WARNING",
@@ -753,7 +753,7 @@ class CsvReader(Reader):
                                     node.save()
                                     collection.save()
 
-                            if collection != None:
+                            if collection is not None:
                                 topconcept_legacyoid = (
                                     node.name + "_" + str(node.graph_id)
                                 )
@@ -897,7 +897,7 @@ class CsvReader(Reader):
                                     collection_id = Node.objects.get(
                                         nodeid=nodeid
                                     ).config["rdmCollection"]
-                                if collection_id != None:
+                                if collection_id is not None:
                                     value = concept_lookup.lookup_labelid_from_label(
                                         value, collection_id
                                     )
@@ -1104,10 +1104,7 @@ class CsvReader(Reader):
                                             for source_key in list(source_tile.keys()):
                                                 # Check for source and target key match.
                                                 if source_key == target_key:
-                                                    if (
-                                                        target_tile.data[source_key]
-                                                        == None
-                                                    ):
+                                                    if target_tile.data[source_key] is None:
                                                         # If match populate target_tile node with transformed value.
                                                         value = transform_value(
                                                             node_datatypes[source_key],
@@ -1127,7 +1124,7 @@ class CsvReader(Reader):
                                     ]
 
                                 # Check if we are populating a child tile(s) by inspecting the target_tiles.tiles array.
-                                elif target_tile.tiles != None:
+                                elif target_tile.tiles is not None:
                                     populated_child_tiles = []
                                     populated_child_nodegroups = []
                                     for childtile in target_tile.tiles:
@@ -1178,12 +1175,7 @@ class CsvReader(Reader):
                                                             source_column.keys()
                                                         ):
                                                             if source_key == target_key:
-                                                                if (
-                                                                    prototype_tile_copy.data[
-                                                                        source_key
-                                                                    ]
-                                                                    == None
-                                                                ):
+                                                                if prototype_tile_copy.data[source_key] is None:
                                                                     value = transform_value(
                                                                         node_datatypes[
                                                                             source_key
@@ -1218,7 +1210,7 @@ class CsvReader(Reader):
                                                             for item in list(
                                                                 prototype_tile_copy.data.values()
                                                             )
-                                                            if item != None
+                                                            if item is not None
                                                         ]
                                                     )
                                                     > 0
@@ -1233,7 +1225,7 @@ class CsvReader(Reader):
                                                             prototype_tile_copy
                                                         )
 
-                                            if prototype_tile_copy != None:
+                                            if prototype_tile_copy is not None:
                                                 if (
                                                     child_tile_cardinality == "1"
                                                     and "NodeGroupID" not in row
@@ -1270,12 +1262,12 @@ class CsvReader(Reader):
 
                                 if need_new_tile:
                                     new_tile = get_blank_tile(source_data)
-                                    if new_tile != None:
+                                    if new_tile is not None:
                                         populate_tile(source_data, new_tile)
 
                         # mock_request_object = HttpRequest()
 
-                        if target_tile != None and len(source_data) > 0:
+                        if target_tile is not None and len(source_data) > 0:
                             populate_tile(source_data, target_tile)
                             # Check that required nodes are populated. If not remove tile from populated_tiles array.
                             check_required_nodes(

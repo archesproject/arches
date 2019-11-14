@@ -206,7 +206,7 @@ class ArchesFileReader(Reader):
     def import_business_data(self, business_data, mapping=None):
         reporter = ResourceImportReporter(business_data)
         try:
-            if mapping == None or mapping == '':
+            if mapping is None or mapping == '':
                 self.import_business_data_without_mapping(business_data, reporter)
             else:
                 blanktilecache = {}
@@ -227,7 +227,7 @@ class ArchesFileReader(Reader):
                         if tile['data'] != {}:
 
                             def get_tiles(tile):
-                                if tile['parenttile_id'] != None:
+                                if tile['parenttile_id'] is not None:
                                     if tile['parenttile_id'] not in parenttileids:
                                         parenttileids.append(tile['parenttile_id'])
                                         ret = []
@@ -261,7 +261,7 @@ class ArchesFileReader(Reader):
                                                 for tiledata in source_tile['data']:
                                                     for nodeid in list(tiledata.keys()):
                                                         if nodeid in target_tile.data:
-                                                            if target_tile.data[nodeid] == None:
+                                                            if target_tile.data[nodeid] is None:
                                                                 target_tile.data[nodeid] = tiledata[nodeid]
                                                                 for key in list(tiledata.keys()):
                                                                     if key == nodeid:
@@ -270,7 +270,7 @@ class ArchesFileReader(Reader):
                                                     if tiledata == {}:
                                                         source_tile['data'].remove(tiledata)
 
-                                        elif target_tile.tiles != None:
+                                        elif target_tile.tiles is not None:
                                             populated_child_tiles = []
                                             populated_child_nodegroups = []
                                             for childtile in target_tile.tiles:
@@ -287,7 +287,7 @@ class ArchesFileReader(Reader):
                                                             for data in source_tile['data']:
                                                                 for nodeid in list(data.keys()):
                                                                     if nodeid in list(prototype_tile.data.keys()):
-                                                                        if prototype_tile.data[nodeid] == None:
+                                                                        if prototype_tile.data[nodeid] is None:
                                                                             prototype_tile_copy.data[nodeid] = data[nodeid]
                                                                             for key in list(data.keys()):
                                                                                 if key == nodeid:
@@ -299,7 +299,7 @@ class ArchesFileReader(Reader):
                                                                     source_tile['data'].remove(data)
 
                                                             for key in list(prototype_tile_copy.data.keys()):
-                                                                if prototype_tile_copy.data[key] != None:
+                                                                if prototype_tile_copy.data[key] is not None:
                                                                     childtile_empty = False
                                                             if prototype_tile_copy.data == {} or childtile_empty:
                                                                 prototype_tile_copy = None
@@ -323,7 +323,7 @@ class ArchesFileReader(Reader):
                                                         need_new_tile = True
 
                                         if need_new_tile:
-                                            if self.get_blank_tile(sourcetilegroup, blanktilecache, tiles, resourceinstanceid) != None:
+                                            if self.get_blank_tile(sourcetilegroup, blanktilecache, tiles, resourceinstanceid) is not None:
                                                 populate_tile(sourcetilegroup, self.get_blank_tile(sourcetilegroup, blanktilecache, tiles, resourceinstanceid))
 
                                         if target_tile_cardinality == '1':
@@ -331,7 +331,7 @@ class ArchesFileReader(Reader):
                                     else:
                                         target_tile = None
 
-                                if blank_tile != None:
+                                if blank_tile is not None:
                                     populate_tile(mapped_tiles, blank_tile)
 
                     newresourceinstance = ResourceInstance.objects.create(

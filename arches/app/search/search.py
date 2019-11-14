@@ -66,7 +66,7 @@ class SearchEngine(object):
 
         kwargs = self._add_prefix(**kwargs)
         body = kwargs.pop('body', None)
-        if body != None:
+        if body is not None:
             try:
                 data = []
                 refresh = kwargs.pop('refresh', False)

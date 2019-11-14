@@ -203,7 +203,7 @@ class ChangePasswordView(View):
             except ValidationError as val_err:
                 messages['password_validations'] = val_err.messages
 
-            if messages["invalid_password"] == None and messages["password_validations"] == None and messages["mismatched"] == None:
+            if messages["invalid_password"] is None and messages["password_validations"] is None and messages["mismatched"] is None:
                 user.set_password(new_password)
                 user.save()
                 authenticated_user = authenticate(username=user.username, password=new_password)

@@ -74,7 +74,7 @@ class BusinessDataImporter(object):
         else:
             file = [file]
         self.file = file
-        if mapping_file == None:
+        if mapping_file is None:
             try:
                 mapping_file = [file[0].split('.')[0] + '.mapping']
             except:
@@ -91,7 +91,7 @@ class BusinessDataImporter(object):
                 print('*'*80)
                 sys.exit()
 
-        if relations_file == None:
+        if relations_file is None:
             try:
                 relations_file = [file[0].split('.')[0] + '.relations']
             except:
@@ -161,11 +161,11 @@ class BusinessDataImporter(object):
         cursor = connection.cursor()
 
         try:
-            if file_format == None:
+            if file_format is None:
                 file_format = self.file_format
-            if business_data == None:
+            if business_data is None:
                 business_data = self.business_data
-            if mapping == None:
+            if mapping is None:
                 mapping = self.mapping
             if file_format == 'json':
                 reader = ArchesFileReader()
@@ -184,7 +184,7 @@ class BusinessDataImporter(object):
                             archesresource = JSONDeserializer().deserialize(line)
                             reader.import_business_data({"resources": [archesresource]})
             elif file_format == 'csv' or file_format == 'shp' or file_format == 'zip':
-                if mapping != None:
+                if mapping is not None:
                     reader = CsvReader()
                     reader.import_business_data(business_data=business_data, mapping=mapping, overwrite=overwrite, bulk=bulk, create_concepts=create_concepts, create_collections=create_collections)
                 else:

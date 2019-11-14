@@ -11,7 +11,7 @@ def get_class_from_modulename(modulename, classname, directory_list):
             import_success = True
         except ImportError as e:
             import_error = e
-        if module != None:
+        if module is not None:
             break
     if import_success == False:
         print('Failed to import ' + mod_path)
