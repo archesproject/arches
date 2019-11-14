@@ -197,7 +197,7 @@ class BusinessDataImporter(object):
                             archesresource = JSONDeserializer().deserialize(line)
                             reader.import_business_data({"resources": [archesresource]})
             elif file_format == "csv" or file_format == "shp" or file_format == "zip":
-                if mapping != None:
+                if mapping is not None:
                     reader = CsvReader()
                     reader.import_business_data(
                         business_data=business_data,

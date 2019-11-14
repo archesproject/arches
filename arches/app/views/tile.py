@@ -210,7 +210,7 @@ class TileData(View):
 
     def delete(self, request):
         json = request.body
-        if json != None:
+        if json is not None:
             ret = []
             data = JSONDeserializer().deserialize(json)
             resource_instance = models.ResourceInstance.objects.get(pk=data["resourceinstance_id"])

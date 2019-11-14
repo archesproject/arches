@@ -16,17 +16,17 @@ class JSONResponse(HttpResponse):
         super(HttpResponse, self).__init__(*args, **kwargs)
 
         options = {}
-        if ensure_ascii != None:
+        if ensure_ascii is not None:
             options["ensure_ascii"] = ensure_ascii
-        if stream != None:
+        if stream is not None:
             options["stream"] = stream
-        if indent != None:
+        if indent is not None:
             options["indent"] = indent
-        if selected_fields != None:
+        if selected_fields is not None:
             options["selected_fields"] = selected_fields
-        if use_natural_keys != None:
+        if use_natural_keys is not None:
             options["use_natural_keys"] = use_natural_keys
-        if geom_format != None:
+        if geom_format is not None:
             options["geom_format"] = geom_format
 
         # Content is a bytestring. See the `content` property methods.

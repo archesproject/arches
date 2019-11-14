@@ -86,7 +86,7 @@ class ConceptDataType(BaseConceptDataType):
 
         ## first check to see if the validator has been passed a valid UUID,
         ## which should be the case at this point. return error if not.
-        if value != None:
+        if value is not None:
             try:
                 uuid.UUID(str(value))
             except ValueError:
@@ -275,7 +275,7 @@ class ConceptListDataType(BaseConceptDataType):
         errors = []
 
         ## iterate list of values and use the concept validation on each one
-        if value != None:
+        if value is not None:
             validate_concept = DataTypeFactory().get_instance("concept")
             for v in value:
                 val = v.strip()

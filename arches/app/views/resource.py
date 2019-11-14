@@ -398,7 +398,7 @@ class ResourceEditorView(MapBaseManagerView):
 @method_decorator(can_edit_resource_instance(), name="dispatch")
 class ResourceEditLogView(BaseManagerView):
     def getEditConceptValue(self, values):
-        if values != None:
+        if values is not None:
             for k, v in values.items():
                 try:
                     uuid.UUID(v)
@@ -458,12 +458,12 @@ class ResourceEditLogView(BaseManagerView):
             edits = models.EditLog.objects.filter(resourceinstanceid=resourceid)
             permitted_edits = []
             for edit in edits:
-                if edit.nodegroupid != None:
+                if edit.nodegroupid is not None:
                     nodegroup = models.NodeGroup.objects.get(pk=edit.nodegroupid)
                     if request.user.has_perm("read_nodegroup", edit.nodegroupid):
-                        if edit.newvalue != None:
+                        if edit.newvalue is not None:
                             self.getEditConceptValue(edit.newvalue)
-                        if edit.oldvalue != None:
+                        if edit.oldvalue is not None:
                             self.getEditConceptValue(edit.oldvalue)
                         permitted_edits.append(edit)
                 else:
@@ -612,7 +612,7 @@ class ResourceTiles(View):
 class ResourceCards(View):
     def get(self, request, resourceid=None):
         cards = []
-        if resourceid != None:
+        if resourceid is not None:
             graph = models.GraphModel.objects.get(graphid=resourceid)
             cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
         return JSONResponse({"success": True, "cards": cards})
