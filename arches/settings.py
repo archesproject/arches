@@ -55,9 +55,7 @@ COUCHDB_URL = "http://admin:admin@localhost:5984"  # defaults to localhost:5984
 # from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
 ANONYMOUS_USER_NAME = None
 
-ELASTICSEARCH_HTTP_PORT = (
-    9200  # this should be in increments of 200, eg: 9400, 9600, 9800
-)
+ELASTICSEARCH_HTTP_PORT = 9200  # this should be in increments of 200, eg: 9400, 9600, 9800
 ELASTICSEARCH_TEMP_HTTP_ENDPOINT = "http://localhost:9800"
 SEARCH_BACKEND = "arches.app.search.search.SearchEngine"
 # see http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
@@ -136,12 +134,7 @@ ARCHES_NAMESPACE_FOR_DATA_EXPORT = "http://localhost:8000/"
 RDM_JSONLD_CONTEXT = {"arches": ARCHES_NAMESPACE_FOR_DATA_EXPORT}
 
 PREFERRED_COORDINATE_SYSTEMS = (
-    {
-        "name": "Geographic",
-        "srid": "4326",
-        "proj4": "+proj=longlat +datum=WGS84 +no_defs",
-        "default": True,
-    },  # Required
+    {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True,},  # Required
 )
 
 ANALYSIS_COORDINATE_SYSTEM_SRID = 3857  # Coord sys units must be meters
@@ -352,9 +345,7 @@ except Exception as e:
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {
-        "console": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",},
-    },
+    "formatters": {"console": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",},},
     "handlers": {
         "file": {
             "level": "WARNING",  # DEBUG, INFO, WARNING, ERROR, CRITICAL
@@ -362,19 +353,9 @@ LOGGING = {
             "filename": os.path.join(ROOT_DIR, "arches.log"),
             "formatter": "console",
         },
-        "console": {
-            "level": "WARNING",
-            "class": "logging.StreamHandler",
-            "formatter": "console",
-        },
+        "console": {"level": "WARNING", "class": "logging.StreamHandler", "formatter": "console",},
     },
-    "loggers": {
-        "arches": {
-            "handlers": ["file", "console"],
-            "level": "WARNING",
-            "propagate": True,
-        }
-    },
+    "loggers": {"arches": {"handlers": ["file", "console"], "level": "WARNING", "propagate": True,}},
 }
 
 LOGIN_URL = "auth"
@@ -383,27 +364,17 @@ PROFILE_LOG_BASE = os.path.join(ROOT_DIR, "logs")
 
 BULK_IMPORT_BATCH_SIZE = 2000
 
-SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(
-    ROOT_DIR, "db", "system_settings", "Arches_System_Settings_Local.json"
-)
+SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, "db", "system_settings", "Arches_System_Settings_Local.json")
 SYSTEM_SETTINGS_RESOURCE_ID = "a106c400-260c-11e7-a604-14109fd34195"
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "arches.app.utils.password_validation.NumericPasswordValidator",  # Passwords cannot be entirely numeric
-    },
+    {"NAME": "arches.app.utils.password_validation.NumericPasswordValidator",},  # Passwords cannot be entirely numeric
     {
         "NAME": "arches.app.utils.password_validation.SpecialCharacterValidator",  # Passwords must contain special characters
-        "OPTIONS": {
-            "special_characters": ("!", "@", "#", ")", "(", "*", "&", "^", "%", "$"),
-        },
+        "OPTIONS": {"special_characters": ("!", "@", "#", ")", "(", "*", "&", "^", "%", "$"),},
     },
-    {
-        "NAME": "arches.app.utils.password_validation.HasNumericCharacterValidator",  # Passwords must contain 1 or more numbers
-    },
-    {
-        "NAME": "arches.app.utils.password_validation.HasUpperAndLowerCaseValidator",  # Passwords must contain upper and lower characters
-    },
+    {"NAME": "arches.app.utils.password_validation.HasNumericCharacterValidator",},  # Passwords must contain 1 or more numbers
+    {"NAME": "arches.app.utils.password_validation.HasUpperAndLowerCaseValidator",},  # Passwords must contain upper and lower characters
     {
         "NAME": "arches.app.utils.password_validation.MinLengthValidator",  # Passwords must meet minimum length requirement
         "OPTIONS": {"min_length": 9,},
@@ -425,12 +396,7 @@ if DEBUG is True:
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = "Crowdsource Editor"
 
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
-        "LOCATION": "127.0.0.1:11211",
-    }
-}
+CACHES = {"default": {"BACKEND": "django.core.cache.backends.memcached.MemcachedCache", "LOCATION": "127.0.0.1:11211",}}
 
 # Example of a custom time wheel configuration:
 # TIMEWHEEL_DATE_TIERS = {
@@ -457,9 +423,7 @@ DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d"
 
 API_MAX_PAGE_SIZE = 500
 
-UUID_REGEX = (
-    "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
-)
+UUID_REGEX = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 
 OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 604800}  # one week
 
@@ -479,9 +443,7 @@ RELATED_RESOURCES_PER_PAGE = 15
 RELATED_RESOURCES_EXPORT_LIMIT = 10000
 SEARCH_DROPDOWN_LENGTH = 100
 SEARCH_TERM_SENSITIVITY = 3  # a lower number will give more "Fuzzy" matches, recomend between 0-4, see "prefix_length" at https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl-fuzzy-query.html#_parameters_7
-WORDS_PER_SEARCH_TERM = (
-    10  # set to None for unlimited number of words allowed for search terms
-)
+WORDS_PER_SEARCH_TERM = 10  # set to None for unlimited number of words allowed for search terms
 SEARCH_RESULT_LIMIT = 10000  # should be less than or equal to elasticsearch configuration, index.max_result_window (default = 10,000)
 
 ETL_USERNAME = "ETL"  # override this setting in your packages settings.py file
@@ -490,11 +452,7 @@ GOOGLE_ANALYTICS_TRACKING_ID = None
 
 DEFAULT_GEOCODER = "10000000-0000-0000-0000-010000000000"
 
-SPARQL_ENDPOINT_PROVIDERS = (
-    {
-        "SPARQL_ENDPOINT_PROVIDER": "arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider"
-    },
-)
+SPARQL_ENDPOINT_PROVIDERS = ({"SPARQL_ENDPOINT_PROVIDER": "arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider"},)
 
 APP_NAME = "Arches"
 
@@ -553,12 +511,7 @@ DEFAULT_BOUNDS = {
     "type": "FeatureCollection",
     "features": [
         {
-            "geometry": {
-                "type": "Polygon",
-                "coordinates": [
-                    [[-122, -52], [128, -52], [128, 69], [-122, 69], [-122, -52]]
-                ],
-            },
+            "geometry": {"type": "Polygon", "coordinates": [[[-122, -52], [128, -52], [128, 69], [-122, 69], [-122, -52]]],},
             "type": "Feature",
             "properties": {},
         }
@@ -577,10 +530,10 @@ ALLOWED_POPUP_HOSTS = []
 
 TILESERVER_URL = None
 
-CELERY_BROKER_URL = 'amqp://guest:guest@localhost'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_RESULT_BACKEND = 'django-db'  # Use 'django-cache' if you want to use your cache as your backend
-CELERY_TASK_SERIALIZER = 'json'
+CELERY_BROKER_URL = "amqp://guest:guest@localhost"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_RESULT_BACKEND = "django-db"  # Use 'django-cache' if you want to use your cache as your backend
+CELERY_TASK_SERIALIZER = "json"
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################
