@@ -94,10 +94,7 @@ class MapLayerManagerView(MapBaseManagerView):
 
         context["nav"]["title"] = _("Map Layer Manager")
         context["nav"]["icon"] = "fa-server"
-        context["nav"]["help"] = {
-            "title": _("Map Layer Manager"),
-            "template": "map-manager-help",
-        }
+        context["nav"]["help"] = {"title": _("Map Layer Manager"), "template": "map-manager-help"}
 
         return render(request, "views/map-layer-manager.htm", context)
 

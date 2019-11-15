@@ -33,7 +33,7 @@ STREAMLINE_IMPORT = True
 
 MODE = "PROD"  # options are either "PROD" or "DEV" (installing with Dev mode set, gets you extra dependencies)
 DEBUG = True
-INTERNAL_IPS = ("127.0.0.1", )
+INTERNAL_IPS = ("127.0.0.1",)
 
 DATABASES = {
     "default": {
@@ -134,7 +134,7 @@ ARCHES_NAMESPACE_FOR_DATA_EXPORT = "http://localhost:8000/"
 RDM_JSONLD_CONTEXT = {"arches": ARCHES_NAMESPACE_FOR_DATA_EXPORT}
 
 PREFERRED_COORDINATE_SYSTEMS = (
-    {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True, },  # Required
+    {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True},  # Required
 )
 
 ANALYSIS_COORDINATE_SYSTEM_SRID = 3857  # Coord sys units must be meters
@@ -353,9 +353,9 @@ LOGGING = {
             "filename": os.path.join(ROOT_DIR, "arches.log"),
             "formatter": "console",
         },
-        "console": {"level": "WARNING", "class": "logging.StreamHandler", "formatter": "console", },
+        "console": {"level": "WARNING", "class": "logging.StreamHandler", "formatter": "console"},
     },
-    "loggers": {"arches": {"handlers": ["file", "console"], "level": "WARNING", "propagate": True, }},
+    "loggers": {"arches": {"handlers": ["file", "console"], "level": "WARNING", "propagate": True}},
 }
 
 LOGIN_URL = "auth"
@@ -368,16 +368,16 @@ SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, "db", "system_settings", "Ar
 SYSTEM_SETTINGS_RESOURCE_ID = "a106c400-260c-11e7-a604-14109fd34195"
 
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "arches.app.utils.password_validation.NumericPasswordValidator", },  # Passwords cannot be entirely numeric
+    {"NAME": "arches.app.utils.password_validation.NumericPasswordValidator"},  # Passwords cannot be entirely numeric
     {
         "NAME": "arches.app.utils.password_validation.SpecialCharacterValidator",  # Passwords must contain special characters
-        "OPTIONS": {"special_characters": ("!", "@", "#", ")", "(", "*", "&", "^", "%", "$"), },
+        "OPTIONS": {"special_characters": ("!", "@", "#", ")", "(", "*", "&", "^", "%", "$")},
     },
-    {"NAME": "arches.app.utils.password_validation.HasNumericCharacterValidator", },  # Passwords must contain 1 or more numbers
-    {"NAME": "arches.app.utils.password_validation.HasUpperAndLowerCaseValidator", },  # Passwords must contain upper and lower characters
+    {"NAME": "arches.app.utils.password_validation.HasNumericCharacterValidator"},  # Passwords must contain 1 or more numbers
+    {"NAME": "arches.app.utils.password_validation.HasUpperAndLowerCaseValidator"},  # Passwords must contain upper and lower characters
     {
         "NAME": "arches.app.utils.password_validation.MinLengthValidator",  # Passwords must meet minimum length requirement
-        "OPTIONS": {"min_length": 9, },
+        "OPTIONS": {"min_length": 9},
     },
 ]
 
@@ -396,7 +396,7 @@ if DEBUG is True:
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = "Crowdsource Editor"
 
-CACHES = {"default": {"BACKEND": "django.core.cache.backends.memcached.MemcachedCache", "LOCATION": "127.0.0.1:11211", }}
+CACHES = {"default": {"BACKEND": "django.core.cache.backends.memcached.MemcachedCache", "LOCATION": "127.0.0.1:11211"}}
 
 # Example of a custom time wheel configuration:
 # TIMEWHEEL_DATE_TIERS = {
@@ -452,7 +452,7 @@ GOOGLE_ANALYTICS_TRACKING_ID = None
 
 DEFAULT_GEOCODER = "10000000-0000-0000-0000-010000000000"
 
-SPARQL_ENDPOINT_PROVIDERS = ({"SPARQL_ENDPOINT_PROVIDER": "arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider"}, )
+SPARQL_ENDPOINT_PROVIDERS = ({"SPARQL_ENDPOINT_PROVIDER": "arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider"},)
 
 APP_NAME = "Arches"
 
@@ -511,7 +511,7 @@ DEFAULT_BOUNDS = {
     "type": "FeatureCollection",
     "features": [
         {
-            "geometry": {"type": "Polygon", "coordinates": [[[-122, -52], [128, -52], [128, 69], [-122, 69], [-122, -52]]], },
+            "geometry": {"type": "Polygon", "coordinates": [[[-122, -52], [128, -52], [128, 69], [-122, 69], [-122, -52]]]},
             "type": "Feature",
             "properties": {},
         }

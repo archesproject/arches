@@ -155,7 +155,7 @@ class CsvWriter(Writer):
                                     concept_export_value_type = concept_export_value_lookup[k]
                                 if tile.data[k] is not None:
                                     value = self.transform_value_for_export(
-                                        self.node_datatypes[k], tile.data[k], concept_export_value_type, k,
+                                        self.node_datatypes[k], tile.data[k], concept_export_value_type, k
                                     )
                                     csv_record[mapping[k]] = value
                                 del tile.data[k]
@@ -274,9 +274,7 @@ class TileCsvWriter(Writer):
         nodes = Node.objects.filter(graph_id=self.graph_id)
         for node in nodes:
             mapping[str(node.nodeid)] = node.name
-        csv_header = ["ResourceID", "ResourceLegacyID", "ResourceModelID", "TileID", "ParentTileID", "NodeGroupID", ] + list(
-            mapping.values()
-        )
+        csv_header = ["ResourceID", "ResourceLegacyID", "ResourceModelID", "TileID", "ParentTileID", "NodeGroupID"] + list(mapping.values())
         csvs_for_export = []
 
         for resourceinstanceid, tiles in self.resourceinstances.items():
@@ -300,7 +298,7 @@ class TileCsvWriter(Writer):
                         if k in concept_export_value_lookup:
                             concept_export_value_type = concept_export_value_lookup[k]
                         if tile.data[k] is not None:
-                            value = self.transform_value_for_export(self.node_datatypes[k], tile.data[k], concept_export_value_type, k, )
+                            value = self.transform_value_for_export(self.node_datatypes[k], tile.data[k], concept_export_value_type, k)
                             csv_record[mapping[k]] = value
                         del tile.data[k]
                     else:
@@ -387,7 +385,7 @@ class CsvReader(Reader):
             print("%s resources processed" % str(save_count))
 
     def import_business_data(
-        self, business_data=None, mapping=None, overwrite="append", bulk=False, create_concepts=False, create_collections=False,
+        self, business_data=None, mapping=None, overwrite="append", bulk=False, create_concepts=False, create_collections=False
     ):
         # errors = businessDataValidator(self.business_data)
 
@@ -508,12 +506,12 @@ class CsvReader(Reader):
 
                     if create_concepts == True:
                         for node in mapping["nodes"]:
-                            if node["data_type"] in ["concept", "concept-list", "domain-value", "domain-value-list", ] and node[
+                            if node["data_type"] in ["concept", "concept-list", "domain-value", "domain-value-list"] and node[
                                 "file_field_name"
                             ] in list(row.keys()):
 
                                 concept = []
-                                for val in csv.reader([row[node["file_field_name"]]], delimiter=",", quotechar='"', ):
+                                for val in csv.reader([row[node["file_field_name"]]], delimiter=",", quotechar='"'):
                                     concept.append(val)
                                 concept = concept[0]
 
@@ -580,7 +578,7 @@ class CsvReader(Reader):
                                             self.errors += errors
                                     except:
                                         collection = Concept(
-                                            {"id": collectionid, "legacyoid": collection_legacyoid, "nodetype": "Collection", }
+                                            {"id": collectionid, "legacyoid": collection_legacyoid, "nodetype": "Collection"}
                                         )
                                         collection.addvalue(
                                             {
@@ -623,7 +621,7 @@ class CsvReader(Reader):
                                 try:
                                     topconcept = Concept().get(legacyoid=topconcept_legacyoid)
                                 except:
-                                    topconcept = Concept({"id": topconceptid, "legacyoid": topconcept_legacyoid, "nodetype": "Concept", })
+                                    topconcept = Concept({"id": topconceptid, "legacyoid": topconcept_legacyoid, "nodetype": "Concept"})
                                     topconcept.addvalue(
                                         {
                                             "id": str(uuid.uuid4()),
@@ -645,7 +643,7 @@ class CsvReader(Reader):
                                         ][0][0]
                                         concept = Concept().get(id=conceptid)
                                     except:
-                                        concept = Concept({"id": conceptid, "legacyoid": concept_legacyoid, "nodetype": "Concept", })
+                                        concept = Concept({"id": conceptid, "legacyoid": concept_legacyoid, "nodetype": "Concept"})
                                         concept.addvalue(
                                             {
                                                 "id": str(uuid.uuid4()),
@@ -695,7 +693,7 @@ class CsvReader(Reader):
                             {
                                 "type": "WARNING",
                                 "message": "No resource created for ResourceID {0}. Line {1} has additional or missing columns.".format(
-                                    row["ResourceID"], str(int(row_number.split("on line ")[1])),
+                                    row["ResourceID"], str(int(row_number.split("on line ")[1]))
                                 ),
                             }
                         )
@@ -734,7 +732,7 @@ class CsvReader(Reader):
                                     value = concept_lookup.lookup_labelid_from_label(value, collection_id)
                         try:
                             value = datatype_instance.transform_import_values(value, nodeid)
-                            errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid, )
+                            errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
                         except Exception as e:
                             errors.append(
                                 {
@@ -888,7 +886,7 @@ class CsvReader(Reader):
                                                     if target_tile.data[source_key] is None:
                                                         # If match populate target_tile node with transformed value.
                                                         value = transform_value(
-                                                            node_datatypes[source_key], source_tile[source_key], row_number, source_key,
+                                                            node_datatypes[source_key], source_tile[source_key], row_number, source_key
                                                         )
                                                         target_tile.data[source_key] = value["value"]
                                                         # target_tile.request = value['request']

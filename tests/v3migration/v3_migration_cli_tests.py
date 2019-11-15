@@ -126,9 +126,7 @@ class v3MigrationTests(ArchesTestCase):
 
         # run the test-lookups cli command. this tests the command, but NOT
         # the actual configs. that is done in the next section.
-        management.call_command(
-            "v3", "test-lookups", target=self.pkg,
-        )
+        management.call_command("v3", "test-lookups", target=self.pkg)
 
         # now run the function that is used to test the filled out resource
         # configs. This actually tests the configs.

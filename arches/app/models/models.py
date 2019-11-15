@@ -121,7 +121,7 @@ class CardXNodeXWidget(models.Model):
     class Meta:
         managed = True
         db_table = "cards_x_nodes_x_widgets"
-        unique_together = (("node", "card", "widget"), )
+        unique_together = (("node", "card", "widget"),)
 
 
 class Concept(models.Model):
@@ -207,7 +207,7 @@ class Edge(models.Model):
     class Meta:
         managed = True
         db_table = "edges"
-        unique_together = (("rangenode", "domainnode"), )
+        unique_together = (("rangenode", "domainnode"),)
 
 
 class EditLog(models.Model):
@@ -368,10 +368,7 @@ class FunctionXGraph(models.Model):
     class Meta:
         managed = True
         db_table = "functions_x_graphs"
-        unique_together = (
-            "function",
-            "graph",
-        )
+        unique_together = ("function", "graph")
 
 
 class GraphModel(models.Model):
@@ -587,7 +584,7 @@ class OntologyClass(models.Model):
     class Meta:
         managed = True
         db_table = "ontologyclasses"
-        unique_together = (("source", "ontology"), )
+        unique_together = (("source", "ontology"),)
 
 
 class Relation(models.Model):
@@ -599,7 +596,7 @@ class Relation(models.Model):
     class Meta:
         managed = True
         db_table = "relations"
-        unique_together = (("conceptfrom", "conceptto", "relationtype"), )
+        unique_together = (("conceptfrom", "conceptto", "relationtype"),)
 
 
 class ReportTemplate(models.Model):
@@ -1067,10 +1064,7 @@ class MobileSurveyXUser(models.Model):
     class Meta:
         managed = True
         db_table = "mobile_surveys_x_users"
-        unique_together = (
-            "mobile_survey",
-            "user",
-        )
+        unique_together = ("mobile_survey", "user")
 
 
 class MobileSurveyXGroup(models.Model):
@@ -1081,10 +1075,7 @@ class MobileSurveyXGroup(models.Model):
     class Meta:
         managed = True
         db_table = "mobile_surveys_x_groups"
-        unique_together = (
-            "mobile_survey",
-            "group",
-        )
+        unique_together = ("mobile_survey", "group")
 
 
 class MobileSurveyXCard(models.Model):
@@ -1096,10 +1087,7 @@ class MobileSurveyXCard(models.Model):
     class Meta:
         managed = True
         db_table = "mobile_surveys_x_cards"
-        unique_together = (
-            "mobile_survey",
-            "card",
-        )
+        unique_together = ("mobile_survey", "card")
 
 
 class MapMarker(models.Model):

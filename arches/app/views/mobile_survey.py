@@ -89,15 +89,12 @@ class MobileSurveyManagerView(BaseManagerView):
             mobile_surveys.append(serialized_survey)
 
         context = self.get_context_data(
-            mobile_surveys=serializer.serialize(mobile_surveys, sort_keys=False), main_script="views/mobile-survey-manager",
+            mobile_surveys=serializer.serialize(mobile_surveys, sort_keys=False), main_script="views/mobile-survey-manager"
         )
 
         context["nav"]["title"] = _("Arches Collector Manager")
         context["nav"]["icon"] = "fa-server"
-        context["nav"]["help"] = {
-            "title": _("Arches Collector Manager"),
-            "template": "arches-collector-manager-help",
-        }
+        context["nav"]["help"] = {"title": _("Arches Collector Manager"), "template": "arches-collector-manager-help"}
 
         return render(request, "views/mobile-survey-manager.htm", context)
 
@@ -248,10 +245,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         context["nav"]["menu"] = True
         context["nav"]["title"] = _("Arches Collector Manager")
         context["nav"]["icon"] = "fa-server"
-        context["nav"]["help"] = {
-            "title": _("Arches Collector Manager"),
-            "template": "arches-collector-manager-help",
-        }
+        context["nav"]["help"] = {"title": _("Arches Collector Manager"), "template": "arches-collector-manager-help"}
 
         return render(request, "views/mobile-survey-designer.htm", context)
 

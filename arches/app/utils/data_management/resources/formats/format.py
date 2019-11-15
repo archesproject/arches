@@ -60,7 +60,7 @@ class ResourceImportReporter:
             result = "Resources for Import: {0}, Resources Saved: {1}, Tiles for Import: {2}, Tiles Saved: {3}, Relations for Import: {4}, Relations Saved: {5}"
             print(
                 result.format(
-                    self.resources, self.resources_saved, self.total_tiles, self.tiles_saved, self.relations, self.relations_saved,
+                    self.resources, self.resources_saved, self.total_tiles, self.tiles_saved, self.relations, self.relations_saved
                 )
             )
 

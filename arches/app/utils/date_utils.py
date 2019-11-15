@@ -227,7 +227,7 @@ class ExtendedDateFormat(SortableDateRange):
         try:
             # support for edtf.ExponentialYear
             num_length = len(str(object._precise_year()))
-            sig_digits = str(object._precise_year())[0: int(object.precision)]
+            sig_digits = str(object._precise_year())[0 : int(object.precision)]
             padding = num_length - int(object.precision)
             dr.lower = dr.lower_fuzzy = self.to_sortable_date(year=(sig_digits + ("0" * padding)))
             dr.upper = dr.upper_fuzzy = self.to_sortable_date(year=(sig_digits + ("9" * padding)), month=12, day=31)
