@@ -29,7 +29,6 @@ class SearchEngineFactory(object):
         prefix=settings.ELASTICSEARCH_PREFIX,
         connection_options=settings.ELASTICSEARCH_CONNECTION_OPTIONS,
     ):
-
         backend = settings.SEARCH_BACKEND
         components = backend.split(".")
         classname = components[len(components) - 1]
