@@ -522,7 +522,7 @@ class CsvReader(Reader):
                                     concept.append(val)
                                 concept = concept[0]
 
-                                # check if collection is in concepts_to_create, 
+                                # check if collection is in concepts_to_create,
                                 # add collection to concepts_to_create if it's not and add first child concept
                                 if node["arches_nodeid"] not in concepts_to_create:
                                     concepts_to_create[node["arches_nodeid"]] = {}
@@ -670,11 +670,7 @@ class CsvReader(Reader):
                             for domainid, value in new_concepts[arches_nodeid].items():
                                 # check if value already exists in domain
                                 if value not in [t["text"] for t in node.config["options"]]:
-                                    domainvalue = {
-                                        "text": value,
-                                        "selected": False,
-                                        "id": domainid,
-                                    }
+                                    domainvalue = {"text": value, "selected": False, "id": domainid}
                                     node.config["options"].append(domainvalue)
                                     node.save()
 
@@ -724,12 +720,7 @@ class CsvReader(Reader):
                     if datatype != "":
                         errors = []
                         datatype_instance = datatype_factory.get_instance(datatype)
-                        if datatype in [
-                            "concept",
-                            "domain-value",
-                            "concept-list",
-                            "domain-value-list",
-                        ]:
+                        if datatype in ["concept", "domain-value", "concept-list", "domain-value-list"]:
                             try:
                                 uuid.UUID(value)
                             except:
