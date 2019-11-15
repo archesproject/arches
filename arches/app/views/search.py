@@ -92,7 +92,7 @@ class SearchView(MapBaseManagerView):
 
 
 def home_page(request):
-    return render(request, "views/search.htm", {"main_script": "views/search", })
+    return render(request, "views/search.htm", {"main_script": "views/search",})
 
 
 def search_terms(request):
