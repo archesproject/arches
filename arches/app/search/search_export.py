@@ -16,7 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
+import csv
+from io import StringIO
 from arches.app.models import models
 from arches.app.utils.flatten_dict import flatten_dict
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -30,9 +31,10 @@ class SearchResultsExporter(object):
             raise Exception("Need to pass in a search request")
         search_request.GET = search_request.GET.copy()
         search_request.GET['tiles'] = True
+        search_request.GET['export'] = True
         
-        self.compact = search_request.GET.pop('compact', True)
-        self.precision = search_request.GET.pop('precision', 5)
+        self.compact = search_request.GET.get('compact', True)
+        self.precision = int(search_request.GET.get('precision', 5))
         self.search_request = search_request
         self.datatype_factory = DataTypeFactory()
         self.node_lookup = {}
@@ -44,13 +46,23 @@ class SearchResultsExporter(object):
         search_res_json = search_results(self.search_request)
         results = JSONDeserializer().deserialize(search_res_json.content)
         instances = results['results']['hits']['hits']
-        output = []
-        flattened_data = []
+        output = {}
+        ret = []
 
         for resource_instance in instances:
-            flattened_data.append(self.flatten_tiles(resource_instance['_source']['tiles'], self.datatype_factory, compact=self.compact))
+            resource_obj = self.flatten_tiles(resource_instance['_source']['tiles'], self.datatype_factory, compact=self.compact)
+            try:
+                output[resource_instance['_source']['graph_id']]['output'].append(resource_obj)
+            except KeyError as e:
+                output[resource_instance['_source']['graph_id']] = {'output': []}
+                output[resource_instance['_source']['graph_id']]['output'].append(resource_obj)
 
-        return flattened_data
+        for graph_id, resources in output.items():
+            graph = models.GraphModel.objects.get(pk=graph_id)
+            headers = list(graph.node_set.filter(exportable=True).values_list('fieldname', flat=True))
+            ret.append(self.to_csv(resources['output'], headers=headers, name=graph.name))
+            # output[graph_id]['csv'] = self.to_csv(resources['output'])
+        return ret
 
     def get_node(self, nodeid):
         nodeid = str(nodeid)
@@ -136,3 +148,14 @@ class SearchResultsExporter(object):
                     resource_json[tile['card_name']] = tile[tile['card_name']]
 
         return flatten_dict(resource_json)
+
+    def to_csv(self, instances, headers, name):
+        dest = StringIO()
+        csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=headers)
+        csvwriter.writeheader()
+        # csvs_for_export.append({"name": csv_name, "outputfile": dest})
+        print(f"{name} = {len(instances)}")
+        for instance in instances:
+            csvwriter.writerow({k: str(v) for k, v in list(instance.items())})
+        return {"name": f"{name}.csv", "outputfile": dest}
+

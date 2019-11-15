@@ -37,6 +37,7 @@ from arches.app.search.components.base import SearchFilterFactory
 from arches.app.views.base import MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
+from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from io import StringIO
 
 
@@ -166,6 +167,8 @@ def get_resource_model_label(result):
 
 def export_results(request):
     exporter = SearchResultsExporter(search_request=request)
+    resourceexporter = ResourceExporter(format='tilecsv')
+    return resourceexporter.zip_response(exporter.export(), zip_file_name="temp.zip")
     return JSONResponse(exporter.export(), indent=4)
 
 
@@ -218,6 +221,7 @@ def search_results(request):
         ret['reviewer'] = request.user.groups.filter(name='Resource Reviewer').exists()
         ret['timestamp'] = datetime.now()
         ret['total_results'] = dsl.count(index='resources')
+        print(ret['total_results'])
 
         return JSONResponse(ret)
     else:
