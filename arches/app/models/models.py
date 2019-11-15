@@ -1014,6 +1014,18 @@ class UserXTask(models.Model):
         db_table = "user_x_tasks"
 
 
+class Notification(models.Model):
+    id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    is_read = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True, null=False)
+    message = models.TextField(blank=True, null=True)
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        managed = True
+        db_table = "notifications"
+
+
 def getDataDownloadConfigDefaults():
     return dict(download=False, count=100, resources=[], custom=None)
 
