@@ -6,7 +6,7 @@ linters:
     fixer: false
   black:
     config: ./pyproject.toml
-    fixer: false
+    fixer: true
   eslint:
     config: './.eslintrc.js'
 files:
