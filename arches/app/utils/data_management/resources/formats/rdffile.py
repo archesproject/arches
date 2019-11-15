@@ -350,8 +350,6 @@ class JsonLdReader(Reader):
             jsonld = [jsonld]
 
         for jsonld_graph in jsonld:
-            # print ""
-            # print ""
             if "@type" in jsonld_graph:
                 self.logger.debug(
                     "searching for branch %s --> %s" % (ontology_property.split("/")[-1], jsonld_graph["@type"][0].split("/")[-1])
@@ -363,18 +361,11 @@ class JsonLdReader(Reader):
             # print jsonld_graph
             # try:
             #     nodeid = jsonld_graph['@archesNodeId']
-            #     print "-------"
-            #     print nodeid
-            #     # import ipdb
-            #     # ipdb.set_trace()
             #     for node in nodes:
-            #         print str(node['node'].pk)
+            #         print(str(node['node'].pk))
             #         if str(node['node'].pk) == nodeid:
             #             valid_nodes = set([(node['node'].name, node['node'].pk)])
-            #             print 'made it'
-
-            # except KeyError:
-
+            # except KeyError as e:
             # try to find a node in the graph among a bunch of sibling nodes that has the same incoming edge (propertyclass) as
             # the edge/node combination we're searching for from the json-ld graph
 
@@ -408,12 +399,6 @@ class JsonLdReader(Reader):
                         pass
                 if "@value" in jsonld_graph:
                     if node["parent_edge"].ontologyproperty == ontology_property:
-                        # print node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == str(RDFS.Literal)
-                        # print node['node'].name
-                        # print node['node'].ontologyclass
-                        # print node['parent_edge'].ontologyproperty
-                        # print ontology_property
-                        # print "found %s" % node['node'].name
                         nodes_copy.add((node["node"].name, node["node"].pk))
                         found.append(node)
 
@@ -424,14 +409,12 @@ class JsonLdReader(Reader):
                 raise self.DataDoesNotMatchGraphException()
 
             if len(self.findOntologyProperties(jsonld_graph)) == 0:
-                # print 'at a leaf -- unwinding'
+                # print('at a leaf -- unwinding')
                 self.logger.debug("No further ontology properties found in this fragment; leaf of tree. Unwinding")
 
             def json_data_is_valid(node, json_ld_node):
                 datatype = self.datatype_factory.get_instance(node.datatype)
                 value = datatype.from_rdf(json_ld_node)
-                # print 'in json_data_is_valid'
-                # print datatype.validate(value)
                 return len(datatype.validate(value)) == 0
 
             if len(found) > 1:
@@ -476,8 +459,6 @@ class JsonLdReader(Reader):
                                 # Not sure this will be called, given the structure of this code
                                 # Adding a debug logger just in case it might
                                 self.logger.debug("AmbiguousGraphException thrown while iterating through semantic node children.")
-                                # print 'threw AmbiguousGraphException'
-                                # print nodes_copy
                                 pass
 
                     # If the range in the model is a resource-instance, then check that the incoming
@@ -493,7 +474,7 @@ class JsonLdReader(Reader):
                             self.logger.error("Incoming node class for resource instance datatype != match Model")
                             self.logger.debug(found_node["node"].ontologyclass)
 
-            # ORIGINAL CODE - this is probably more flexable to have this here as this allows for non-semantic nodes to have child nodes
+            # ORIGINAL CODE - this is probably more flexible to have this here as this allows for non-semantic nodes to have child nodes
             # for ontology_prop in self.findOntologyProperties(jsonld_graph):
             #     for found_node in found:
             #         try:
@@ -513,8 +494,6 @@ class JsonLdReader(Reader):
             )
             self.logger.debug("Valid Node names/pk: {0}".format(valid_nodes))
             if len(valid_nodes) == 1:
-                # print 'branch found'
-                # print valid_nodes
                 valid_node = valid_nodes.pop()
                 for node in nodes:
                     if node["node"].pk == valid_node[1]:
@@ -526,19 +505,15 @@ class JsonLdReader(Reader):
                 raise self.DataDoesNotMatchGraphException()
 
     def resolve_node_ids(self, jsonld, ontology_prop=None, graph=None, parent_node=None, tileid=None, parent_tileid=None, resource=None):
-        # print "-------------------"
         if not isinstance(jsonld, list):
             jsonld = [jsonld]
 
-        # print "-------"
         self.logger.debug("INCOMING TO resolve_node_ids: %r" % jsonld)
         parent_tileid = tileid
         for jsonld_node in jsonld:
             if parent_node is not None:
                 try:
-                    # print 'find branch'
-                    # print jsonld_node
-
+                    # print(jsonld_node)
                     branch = None
                     if self.use_ids:
                         try:
@@ -596,13 +571,10 @@ class JsonLdReader(Reader):
                     if branch["node"].datatype != "semantic":
                         self.logger.debug("Assigning value to datatype ({0}) from a non-semantic node:".format(branch["node"].datatype))
                         # if (branch['node'].datatype == 'number'):
-                        #     print 'number'
-                        #     import ipdb
-                        #     ipdb.set_trace()
                         datatype = self.datatype_factory.get_instance(branch["node"].datatype)
-                        # print 'finding value'
-                        # print jsonld_node
-                        # print branch['node'].datatype
+                        # print('finding value')
+                        # print(jsonld_node)
+                        # print(branch['node'].datatype)
                         value = datatype.from_rdf(jsonld_node)
                         self.logger.debug("value found! : {0}".format(value))
                         self.tiles[tileid].data[str(branch["node"].nodeid)] = value
@@ -612,7 +584,6 @@ class JsonLdReader(Reader):
                     for ontology_property in ontology_properties:
                         self.logger.debug("Recursing on %s" % ontology_property)
                         self.logger.debug(jsonld_node["@type"])
-                        # print ontology_property
                         self.resolve_node_ids(
                             jsonld_node[ontology_property],
                             ontology_prop=ontology_property,
