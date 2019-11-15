@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 """This module contains commands for building Arches."""
 
@@ -31,25 +31,23 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument('operation', nargs='?')
+        parser.add_argument("operation", nargs="?")
 
-        parser.add_argument('-s', '--source', action='store', dest='dt_source', default='',
-            help='Datatype file to be loaded')
+        parser.add_argument("-s", "--source", action="store", dest="dt_source", default="", help="Datatype file to be loaded")
 
-        parser.add_argument('-d', '--datatype', action='store', dest='datatype', default='',
-            help='The name of the datatype to unregister')
+        parser.add_argument("-d", "--datatype", action="store", dest="datatype", default="", help="The name of the datatype to unregister")
 
     def handle(self, *args, **options):
-        if options['operation'] == 'register':
-            self.register(source=options['dt_source'])
+        if options["operation"] == "register":
+            self.register(source=options["dt_source"])
 
-        if options['operation'] == 'update':
-            self.update(source=options['dt_source'])
+        if options["operation"] == "update":
+            self.update(source=options["dt_source"])
 
-        if options['operation'] == 'unregister':
-            self.unregister(datatype=options['datatype'])
+        if options["operation"] == "unregister":
+            self.unregister(datatype=options["datatype"])
 
-        if options['operation'] == 'list':
+        if options["operation"] == "list":
             self.list()
 
     def register(self, source):
@@ -59,21 +57,21 @@ class Command(BaseCommand):
         """
 
         import imp
-        dt_source = imp.load_source('', source)
+
+        dt_source = imp.load_source("", source)
         details = dt_source.details
 
         dt = models.DDataType(
-            datatype=details['datatype'],
-            iconclass=details['iconclass'],
+            datatype=details["datatype"],
+            iconclass=details["iconclass"],
             modulename=os.path.basename(source),
-            classname=details['classname'],
-            defaultwidget=details['defaultwidget'],
-            defaultconfig=details['defaultconfig'],
-            configcomponent=details['configcomponent'],
-            configname=details['configname'],
-            isgeometric=details['isgeometric']
-            )
-
+            classname=details["classname"],
+            defaultwidget=details["defaultwidget"],
+            defaultconfig=details["defaultconfig"],
+            configcomponent=details["configcomponent"],
+            configname=details["configname"],
+            isgeometric=details["isgeometric"],
+        )
 
         if len(models.DDataType.objects.filter(datatype=dt.datatype)) == 0:
             dt.save()
@@ -99,19 +97,20 @@ class Command(BaseCommand):
         """
 
         import imp
-        dt_source = imp.load_source('', source)
+
+        dt_source = imp.load_source("", source)
         details = dt_source.details
 
         instance = models.DDataType.objects.get(datatype=details["datatype"])
-        instance.iconclass = details['iconclass']
+        instance.iconclass = details["iconclass"]
         instance.modulename = os.path.basename(source)
-        instance.classname = details['classname']
+        instance.classname = details["classname"]
         instance.defaultwidget = details["defaultwidget"]
-        instance.defaultconfig = details['defaultconfig']
-        instance.configcomponent = details['configcomponent']
-        instance.configname = details['configname']
-        instance.isgeometric = details['isgeometric']
-        instance.issearchable = details['issearchable']
+        instance.defaultconfig = details["defaultconfig"]
+        instance.configcomponent = details["configcomponent"]
+        instance.configname = details["configname"]
+        instance.isgeometric = details["isgeometric"]
+        instance.issearchable = details["issearchable"]
 
         instance.save()
 

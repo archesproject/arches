@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import os
 import uuid
@@ -25,10 +25,10 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 def get_reference_data_for_export(conceptids=None):
     reference_data_dict = {}
     reference_data = []
-    if conceptids is None or conceptids[0] == 'all' or conceptids == ['']:
-        reference_data.append(Concept().get('00000000-0000-0000-0000-000000000001', include_subconcepts=True, semantic=True))
+    if conceptids is None or conceptids[0] == "all" or conceptids == [""]:
+        reference_data.append(Concept().get("00000000-0000-0000-0000-000000000001", include_subconcepts=True, semantic=True))
     else:
         for conceptid in conceptids:
             reference_data.append(Concept().get(uuid.UUID(str(conceptid)), include_subconcepts=True, semantic=True))
-    reference_data_dict['reference_data'] = reference_data
+    reference_data_dict["reference_data"] = reference_data
     return reference_data_dict

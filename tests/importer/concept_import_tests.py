@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import os
 from operator import itemgetter
@@ -34,16 +34,15 @@ class conceptImportTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         se = SearchEngineFactory().create()
-        se.delete_index(index='terms,concepts')
-        se.create_index(index='terms,concepts')
+        se.delete_index(index="terms,concepts")
+        se.create_index(index="terms,concepts")
         # management.call_command('packages', operation='import_graphs', source='tests/fixtures/resource_graphs/archesv4_resource.json')
 
     @classmethod
     def tearDownClass(cls):
         se = SearchEngineFactory().create()
-        se.delete_index(index='terms,concepts')
-        se.create_index(index='terms,concepts')
-
+        se.delete_index(index="terms,concepts")
+        se.create_index(index="terms,concepts")
 
     # def test_hierarchical_relationships(self):
     #   result = JSONDeserializer().deserialize(JSONSerializer().serialize(Concept().get(id='09bf4b42-51a8-4ff2-9210-c4e4ae0e6755', include_subconcepts=True, depth_limit=1)))

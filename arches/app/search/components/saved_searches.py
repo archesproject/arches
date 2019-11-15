@@ -12,13 +12,13 @@ details = {
     "componentpath": "views/components/search/saved-searches",
     "componentname": "saved-searches",
     "sortorder": "2",
-    "enabled": True
+    "enabled": True,
 }
 
-class SavedSearches(BaseSearchFilter):
 
+class SavedSearches(BaseSearchFilter):
     def view_data(self):
         ret = {}
-        ret['saved_searches'] = settings.SAVED_SEARCHES
+        ret["saved_searches"] = settings.SAVED_SEARCHES
 
         return ret

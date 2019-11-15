@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 """This module contains commands for building Arches."""
 
@@ -22,17 +22,23 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core import management
 from arches.app.models.system_settings import settings
 
+
 class Command(BaseCommand):
     """A general command used in compiling all the required static data files and js file in Arches."""
-    
+
     def add_arguments(self, parser):
-        parser.add_argument('-o', '--operation', action='store', dest='operation', 
-            default='collectstatic',choices=['collectstatic'],
-            help='Operation Type; collectstatic=Alias for the collectstatic command provided by django')
-    
-    
+        parser.add_argument(
+            "-o",
+            "--operation",
+            action="store",
+            dest="operation",
+            default="collectstatic",
+            choices=["collectstatic"],
+            help="Operation Type; collectstatic=Alias for the collectstatic command provided by django",
+        )
+
     def handle(self, *args, **options):
-        print('operation: '+ options['operation'])
-        if options['operation'] == 'collectstatic':
-            if settings.STATIC_ROOT != '':
-                management.call_command('collectstatic', interactive=False)
+        print("operation: " + options["operation"])
+        if options["operation"] == "collectstatic":
+            if settings.STATIC_ROOT != "":
+                management.call_command("collectstatic", interactive=False)

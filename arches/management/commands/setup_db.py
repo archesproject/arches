@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,10 +14,11 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import os
 import psycopg2
+
 # import the basic django settings here, don't use the Arches system_settings module
 # because it makes database calls that don't necessarily work at this stage
 from django.apps import apps
@@ -37,8 +38,9 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
 
-        parser.add_argument('--force', action='store_true', default=False,
-                            help='used to force a yes answer to any user input "continue? y/n" prompt')
+        parser.add_argument(
+            "--force", action="store_true", default=False, help='used to force a yes answer to any user input "continue? y/n" prompt'
+        )
 
     def handle(self, *args, **options):
 
@@ -54,7 +56,7 @@ class Command(BaseCommand):
         separate PG_SUPERUSER and PG_SUPERUSER_PW credentials, and if they are not
         provided then it falls back on the default credentials in DATABASES."""
 
-        db = settings.DATABASES['default']
+        db = settings.DATABASES["default"]
 
         # Attempt to use extra credentials from settings. If these don't exist
         # or are blank, revert to the default user/password credentials.
@@ -63,15 +65,13 @@ class Command(BaseCommand):
                 username = settings.PG_SUPERUSER
                 password = settings.PG_SUPERUSER_PW
             else:
-                username = db['USER']
-                password = db['PASSWORD']
+                username = db["USER"]
+                password = db["PASSWORD"]
         except AttributeError:
-            username = db['USER']
-            password = db['PASSWORD']
+            username = db["USER"]
+            password = db["PASSWORD"]
 
-        conn_string = "dbname={} user={} password={} host={} port={}".format(
-            username, username, password, db['HOST'], db['PORT']
-        )
+        conn_string = "dbname={} user={} password={} host={} port={}".format(username, username, password, db["HOST"], db["PORT"])
 
         try:
             # Connect directly to the user's database. This should work in most
@@ -83,17 +83,19 @@ class Command(BaseCommand):
             # already been created.
             try:
                 # print conn_string
-                conn_string = conn_string.replace("dbname="+username, "dbname="+db['NAME'])
+                conn_string = conn_string.replace("dbname=" + username, "dbname=" + db["NAME"])
                 conn = psycopg2.connect(conn_string)
             except psycopg2.OperationalError as e:
                 # If that connection fails, this is probably a non-superuser
                 # whose database has not yet been created.
                 safestr = " ".join([i for i in conn_string.split(" ") if not i.startswith("password")])
                 print(str(e))
-                print("Error connecting to db with these settings: "+safestr)
-                print("\nHave you created the database yet? The quickest way to do so is to supply Postgres "
-                      "superuser credentials in the PG_SUPERUSER and PG_SUPERUSER_PW settings, and then "
-                      "re-run this same command.")
+                print("Error connecting to db with these settings: " + safestr)
+                print(
+                    "\nHave you created the database yet? The quickest way to do so is to supply Postgres "
+                    "superuser credentials in the PG_SUPERUSER and PG_SUPERUSER_PW settings, and then "
+                    "re-run this same command."
+                )
                 exit()
 
         cursor = conn.cursor()
@@ -116,24 +118,28 @@ class Command(BaseCommand):
         management.call_command("migrate", fake=True, app_label="models", migration_name="zero")
 
         # get the table names for all Arches models and then drop these tables
-        arches_models = apps.get_app_config('models').get_models()
+        arches_models = apps.get_app_config("models").get_models()
         table_names = [i._meta.db_table for i in arches_models]
         for t in table_names:
             cursor.execute("DROP TABLE IF EXISTS {} CASCADE".format(t))
 
     def drop_and_recreate_db(self, cursor):
 
-        arches_db = settings.DATABASES['default']
+        arches_db = settings.DATABASES["default"]
 
         print("Drop and recreate the database...")
         terminate_sql = """
 SELECT pg_terminate_backend(pid) FROM pg_stat_activity
-    WHERE datname IN ('{}', '{}');""".format(arches_db['NAME'], arches_db['POSTGIS_TEMPLATE'])
+    WHERE datname IN ('{}', '{}');""".format(
+            arches_db["NAME"], arches_db["POSTGIS_TEMPLATE"]
+        )
         print(terminate_sql)
         cursor.execute(terminate_sql)
 
         drop_query = """
-DROP DATABASE IF EXISTS {0};""".format(arches_db['NAME'])
+DROP DATABASE IF EXISTS {0};""".format(
+            arches_db["NAME"]
+        )
         print(drop_query)
         cursor.execute(drop_query)
 
@@ -142,8 +148,10 @@ CREATE DATABASE {}
     WITH OWNER = {}
         ENCODING = 'UTF8'
         CONNECTION LIMIT=-1
-        TEMPLATE = {};""".format(arches_db['NAME'], arches_db['USER'], arches_db['POSTGIS_TEMPLATE'])
-        print(create_query+"\n")
+        TEMPLATE = {};""".format(
+            arches_db["NAME"], arches_db["USER"], arches_db["POSTGIS_TEMPLATE"]
+        )
+        print(create_query + "\n")
 
         try:
             cursor.execute(create_query)
@@ -157,7 +165,9 @@ To create it, use:
 
     psql -U {0} -c "CREATE DATABASE {1};"
     psql -U {0} -d {1} -c "CREATE EXTENSION postgis;"
-""".format(arches_db['USER'], arches_db['POSTGIS_TEMPLATE'])
+""".format(
+                    arches_db["USER"], arches_db["POSTGIS_TEMPLATE"]
+                )
                 print(msg)
             exit()
 
@@ -168,8 +178,8 @@ To create it, use:
         """
 
         conninfo = self.get_connection()
-        conn = conninfo['connection']
-        can_create_db = conninfo['can_create_db']
+        conn = conninfo["connection"]
+        can_create_db = conninfo["can_create_db"]
 
         cursor = conn.cursor()
         if can_create_db is True:
@@ -178,21 +188,20 @@ To create it, use:
             self.reset_db(cursor)
 
         # delete and setup initial Elasticsearch indexes
-        management.call_command('es', operation='delete_indexes')
-        management.call_command('es', operation='setup_indexes')
+        management.call_command("es", operation="delete_indexes")
+        management.call_command("es", operation="setup_indexes")
 
         # run all migrations
-        management.call_command('migrate')
+        management.call_command("migrate")
 
         # import system settings graph and any saved system settings data
-        settings_graph = os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Model.json')
+        settings_graph = os.path.join(settings.ROOT_DIR, "db", "system_settings", "Arches_System_Settings_Model.json")
         management.call_command("packages", operation="import_graphs", source=settings_graph)
 
-        settings_data = os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings.json')
+        settings_data = os.path.join(settings.ROOT_DIR, "db", "system_settings", "Arches_System_Settings.json")
         management.call_command("packages", operation="import_business_data", source=settings_data, overwrite=True)
 
         settings_data_local = settings.SYSTEM_SETTINGS_LOCAL_PATH
 
         if os.path.isfile(settings_data_local):
-            management.call_command("packages", operation="import_business_data", source=settings_data_local,
-                                    overwrite=True)
+            management.call_command("packages", operation="import_business_data", source=settings_data_local, overwrite=True)

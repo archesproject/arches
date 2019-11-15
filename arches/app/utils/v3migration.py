@@ -19,14 +19,14 @@ from arches.app.models.system_settings import settings
 ARCHES = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 
 
-class DataValueConverter():
-
+class DataValueConverter:
     def __init__(self, skip_file_check=False):
 
         self.skip_file_check = skip_file_check
-        db = settings.DATABASES['default']
+        db = settings.DATABASES["default"]
         db_conn = "dbname = {} user = {} host = {} password = {} port = {}".format(
-            db['POSTGIS_TEMPLATE'], db['USER'], db['HOST'], db['PASSWORD'], db['PORT'])
+            db["POSTGIS_TEMPLATE"], db["USER"], db["HOST"], db["PASSWORD"], db["PORT"]
+        )
         conn = psycopg2.connect(db_conn)
         self.dbcursor = conn.cursor()
 
@@ -34,7 +34,7 @@ class DataValueConverter():
         """in some cases, the v3 data must be modified before it can be saved
         into a v4 tile. this conversion is based on the v4 node datatype."""
 
-        datatype = v4nodeinfo['v4_datatype']
+        datatype = v4nodeinfo["v4_datatype"]
 
         # replace the bad characters here
         if datatype == "string":
@@ -46,9 +46,11 @@ class DataValueConverter():
 
             # create and execute SQL statement to force a valid direction on
             # coordinates in polygons and remove any repeated points
-            sql = '''
+            sql = """
             SELECT ST_AsGeoJSON(ST_RemoveRepeatedPoints(ST_Reverse(ST_ForceRHR('{0}'))));
-            '''.format(value)
+            """.format(
+                value
+            )
             self.dbcursor.execute(sql)
             rows = self.dbcursor.fetchall()
 
@@ -56,14 +58,7 @@ class DataValueConverter():
             geojson = json.loads(rows[0][0])
             value = {
                 "type": "FeatureCollection",
-                "features": [
-                    {
-                        "type": "Feature",
-                        "id": str(uuid.uuid4()),
-                        "geometry": geojson,
-                        "properties": {}
-                    }
-                ]
+                "features": [{"type": "Feature", "id": str(uuid.uuid4()), "geometry": geojson, "properties": {}}],
             }
 
         # sanitize number input
@@ -83,14 +78,14 @@ class DataValueConverter():
         elif datatype == "file-list":
 
             filename = os.path.basename(value)
-            fullpath = os.path.join(settings.MEDIA_ROOT, 'uploadedfiles', filename)
+            fullpath = os.path.join(settings.MEDIA_ROOT, "uploadedfiles", filename)
 
             # handle the fact that file names could be too long, > 100 characters.
             # a bit more complicated that you would expect, in order to accommodate
             # iterative development.
             shortenedpath = ""
             if len(filename) > 100:
-                shortname = os.path.splitext(filename)[0][:96]+os.path.splitext(filename)[1]
+                shortname = os.path.splitext(filename)[0][:96] + os.path.splitext(filename)[1]
                 shortenedpath = fullpath.replace(filename, shortname)
 
             if not self.skip_file_check:
@@ -125,20 +120,22 @@ class DataValueConverter():
                 lastModified = None
                 size = None
             ftype = MimeTypes().guess_type(fullpath)[0]
-            value = [{
-                "name": filename,
-                "file_id": str(file_obj.pk),
-                "url": str(file_obj.path.url).replace("files/", "files/uploadedfiles/"),
-                "status": 'uploaded',
-                "index": 0,
-                "lastModified": lastModified,
-                "height": None,
-                "width": None,
-                "type": ftype,
-                "size": size,
-                # "content":"blob:http://localhost:8000/24dd8daa-da29-49ec-805a-3dd8a683162c",
-                "accepted": True
-            }]
+            value = [
+                {
+                    "name": filename,
+                    "file_id": str(file_obj.pk),
+                    "url": str(file_obj.path.url).replace("files/", "files/uploadedfiles/"),
+                    "status": "uploaded",
+                    "index": 0,
+                    "lastModified": lastModified,
+                    "height": None,
+                    "width": None,
+                    "type": ftype,
+                    "size": size,
+                    # "content":"blob:http://localhost:8000/24dd8daa-da29-49ec-805a-3dd8a683162c",
+                    "accepted": True,
+                }
+            ]
 
         return value
 
@@ -147,10 +144,9 @@ class v3PreparedResource:
     """ Used to convert data for a single v3 resource into corresponding set
     of v4 json. """
 
-    def __init__(self, data, graph_id, node_lookup, mergenodes, verbose=False,
-                 dt_converter=DataValueConverter()):
+    def __init__(self, data, graph_id, node_lookup, mergenodes, verbose=False, dt_converter=DataValueConverter()):
 
-        self.resourceid = str(data['entityid'])
+        self.resourceid = str(data["entityid"])
         self.graphid = str(graph_id)
         self.v3_json = data
         self.mergenodes = mergenodes
@@ -173,11 +169,11 @@ class v3PreparedResource:
             and convert to a flat list of tuples: [(v3 node name, v3 node value)]"""
 
             # disregard semantic and empty nodes
-            if entity['businesstablename'] != "" and entity['value'].rstrip() != "":
-                processed.append((entity['entitytypeid'], entity['value']))
+            if entity["businesstablename"] != "" and entity["value"].rstrip() != "":
+                processed.append((entity["entitytypeid"], entity["value"]))
 
             # iterate and process all children of this entity
-            for child in entity['child_entities']:
+            for child in entity["child_entities"]:
                 process_group(child, processed)
 
             return processed
@@ -185,11 +181,10 @@ class v3PreparedResource:
         def get_group_branches(entity, outgroups=[]):
             """ get the group branches from the entity based on v3 mergenodes """
 
-            look_further = any([child['entitytypeid'] in self.mergenodes for
-                               child in entity['child_entities']])
+            look_further = any([child["entitytypeid"] in self.mergenodes for child in entity["child_entities"]])
 
-            if look_further or entity['entitytypeid'] in self.mergenodes:
-                for child in entity['child_entities']:
+            if look_further or entity["entitytypeid"] in self.mergenodes:
+                for child in entity["child_entities"]:
                     get_group_branches(child, outgroups=outgroups)
             else:
                 outgroups.append(entity)
@@ -210,21 +205,21 @@ class v3PreparedResource:
             branch_data = process_group(group, processed=[])
 
             if self.verbose:
-                print("{} - datapoints: {}".format(group['entitytypeid'], len(branch_data)))
+                print("{} - datapoints: {}".format(group["entitytypeid"], len(branch_data)))
             for node in branch_data:
-                outlist.append(node+(branch_num,))
+                outlist.append(node + (branch_num,))
 
         # The following code block can be very helpful while developing and debugging
         # the way v3 json is parsed.
 
         # with open(self.v3_json['entityid']+"-v3.json", "wb") as f:
-            # json.dump(self.v3_json, f, indent=1)
+        # json.dump(self.v3_json, f, indent=1)
 
         # with open(self.v3_json['entityid']+"-nodelist.csv", "wb") as f:
-            # writer = csv.writer(f)
-            # writer.writerow(["entitytypeid", "value", "branch_num"])
-            # for i in outlist:
-                # writer.writerow(i)
+        # writer = csv.writer(f)
+        # writer.writerow(["entitytypeid", "value", "branch_num"])
+        # for i in outlist:
+        # writer.writerow(i)
 
         # exit()
 
@@ -234,12 +229,8 @@ class v3PreparedResource:
         """ returns the skeleton of v4 json for this resource. """
 
         res = {
-            "resourceinstance": {
-                "graph_id": self.graphid,
-                "resourceinstanceid": self.resourceid,
-                "legacyid": self.resourceid
-            },
-            "tiles": []
+            "resourceinstance": {"graph_id": self.graphid, "resourceinstanceid": self.resourceid, "legacyid": self.resourceid},
+            "tiles": [],
         }
 
         return res
@@ -249,8 +240,8 @@ class v3PreparedResource:
         not have a value """
 
         for tile in self.tiles:
-            data = dict([(k, v) for k, v in list(tile['data'].items()) if v is not None])
-            tile['data'] = data
+            data = dict([(k, v) for k, v in list(tile["data"].items()) if v is not None])
+            tile["data"] = data
 
     def reorder_tiles_by_value(self, nodeid=None, valueid=None):
         """ this method can ensure that the Primary name is placed at the end of
@@ -260,7 +251,7 @@ class v3PreparedResource:
         p_name_index = None
         for index, tile in enumerate(self.tiles):
             try:
-                node_value = tile['data'][nodeid]
+                node_value = tile["data"][nodeid]
                 if node_value == valueid:
                     p_name_index = index
                     break
@@ -297,20 +288,19 @@ class v3PreparedResource:
                 print("\nSTARTING WHILE LOOP")
                 print("###################")
                 print("resource_data current length: {}".format(len(resource_data)))
-                print("first in line: {} {}".format(fp, self.node_lookup[fp]['v4_uuid']))
+                print("first in line: {} {}".format(fp, self.node_lookup[fp]["v4_uuid"]))
                 print("group number of first in line: {}".format(resource_data[0][2]))
 
             # get the v4 name of the first node in the resource list
-            v4_name = self.node_lookup[resource_data[0][0]]['v4_name']
+            v4_name = self.node_lookup[resource_data[0][0]]["v4_name"]
 
             # obtain a blank tile for the nodegroup that contains the corresponding
-            tilegroup_json = v3utils.get_nodegroup_tilegroup(v4_name, v4_nodes, self.resourceid,
-                                                             verbose=self.verbose)
+            tilegroup_json = v3utils.get_nodegroup_tilegroup(v4_name, v4_nodes, self.resourceid, verbose=self.verbose)
 
             # get a list of all the node UUIDs in this tile and its children
             all_node_options = []
             for t in tilegroup_json:
-                all_node_options += list(t['data'].keys())
+                all_node_options += list(t["data"].keys())
 
             if self.verbose:
                 print("number of tiles in tilegroup: {}".format(len(tilegroup_json)))
@@ -331,13 +321,13 @@ class v3PreparedResource:
                     print("\n-- {} group {} --".format(dp[0], group_num))
 
                 v4nodeinfo = self.node_lookup[dp[0]]
-                dt = self.node_lookup[dp[0]]['v4_datatype']
+                dt = self.node_lookup[dp[0]]["v4_datatype"]
 
                 # first fix the data value
                 value = self.dt_converter.fix_v3_value(dp[1], v4nodeinfo)
 
                 # now get the UUID of the v4 target node
-                v4_uuid = self.node_lookup[dp[0]]['v4_uuid']
+                v4_uuid = self.node_lookup[dp[0]]["v4_uuid"]
 
                 # break the for loop (and subsequently, restart the while loop)
                 # if this node is not in the current tile group
@@ -357,7 +347,7 @@ class v3PreparedResource:
                     # in some (but not all) cases the first tile in line represents the parent
                     # (and therefore has no parent itself).
                     single_parent = False
-                    last_ng = NodeGroup.objects.get(nodegroupid=tilegroup_json[-1]['nodegroup_id'])
+                    last_ng = NodeGroup.objects.get(nodegroupid=tilegroup_json[-1]["nodegroup_id"])
                     if last_ng.parentnodegroup_id is not None:
                         parent_ng = NodeGroup.objects.get(nodegroupid=last_ng.parentnodegroup_id)
                         if parent_ng.cardinality == "1":
@@ -383,18 +373,18 @@ class v3PreparedResource:
                 for tile in tilegroup_json:
 
                     # skip if the node is not in this tile
-                    if v4_uuid not in list(tile['data'].keys()):
+                    if v4_uuid not in list(tile["data"].keys()):
                         continue
 
                     if self.verbose:
-                        print("matched to: {} {}".format(self.node_lookup[dp[0]]['v4_name'], v4_uuid))
+                        print("matched to: {} {}".format(self.node_lookup[dp[0]]["v4_name"], v4_uuid))
 
-                    tileid_used = tile['tileid']
+                    tileid_used = tile["tileid"]
                     make_duplicate = False
 
                     # if there is no data in the tile where this new value should be placed,
                     # then enter the value. this is where the majority of the action takes place
-                    if tile['data'][v4_uuid] is None:
+                    if tile["data"][v4_uuid] is None:
                         v3utils.set_tile_data(tile, v4_uuid, dt, value)
                         if self.verbose:
                             print("action: placing value in empty tile")
@@ -415,7 +405,7 @@ class v3PreparedResource:
                             # otherwise, duplicate the tile if cardinality allows
                             else:
 
-                                ng = NodeGroup.objects.get(nodegroupid=tile['nodegroup_id'])
+                                ng = NodeGroup.objects.get(nodegroupid=tile["nodegroup_id"])
                                 if ng.cardinality == "n":
                                     make_duplicate = True
 
@@ -424,9 +414,11 @@ class v3PreparedResource:
                                 else:
                                     print(self.resourceid)
                                     print(dp[0])
-                                    print("WARNING: A new tile should be added here, but the cardinality of 1 "
-                                          "does not allow it. This data will be lost. You may want to review "
-                                          "your v4 graph.")
+                                    print(
+                                        "WARNING: A new tile should be added here, but the cardinality of 1 "
+                                        "does not allow it. This data will be lost. You may want to review "
+                                        "your v4 graph."
+                                    )
 
                         # if this was in a different group in v3 (but has passed the single parent test above)
                         # then a new tile should be made and appended to this group.
@@ -437,7 +429,7 @@ class v3PreparedResource:
                         newtile = v3utils.duplicate_tile_json(tile)
                         newtile = v3utils.set_tile_data(newtile, v4_uuid, dt, value)
                         tilegroup_json.insert(0, newtile)
-                        tileid_used = newtile['tileid']
+                        tileid_used = newtile["tileid"]
                         if self.verbose:
                             print("action: adding a new tile to the same group (cardinality = n)")
 
@@ -481,7 +473,7 @@ class v3PreparedResource:
         empty. """
 
         v4_json = self.get_empty_resource()
-        v4_json['tiles'] = self.tiles
+        v4_json["tiles"] = self.tiles
 
         return v4_json
 
@@ -496,13 +488,20 @@ class v3Importer:
     with the rm_configs content itself). An optional truncate argument can be
     used to limit the number of resources that are loaded from the v3 json. """
 
-    def __init__(self, v3_data_dir, v4_graph_name, v3_resource_file=None,
-                 truncate=None, exclude=[], only=[], verbose=False,
-                 dt_converter=DataValueConverter()):
+    def __init__(
+        self,
+        v3_data_dir,
+        v4_graph_name,
+        v3_resource_file=None,
+        truncate=None,
+        exclude=[],
+        only=[],
+        verbose=False,
+        dt_converter=DataValueConverter(),
+    ):
 
         if v3_resource_file is not None and not os.path.isfile(v3_resource_file):
-            raise Exception("v3 business data file {} does not exist".format(
-                v3_resource_file))
+            raise Exception("v3 business data file {} does not exist".format(v3_resource_file))
 
         self.source_file = v3_resource_file
 
@@ -523,21 +522,15 @@ class v3Importer:
             lookup_path = v3_config["v3_v4_node_lookup"]
 
             new_and_improved = {}
-            with open(lookup_path, 'r') as openfile:
+            with open(lookup_path, "r") as openfile:
                 reader = csv.DictReader(openfile)
 
                 for row in reader:
                     try:
-                        n = self.v4_nodes.get(name=row['v4_node'])
+                        n = self.v4_nodes.get(name=row["v4_node"])
                     except Node.DoesNotExist:
-                        raise Exception("{} in {} lookup csv is not matched "
-                                        "with a valid v4 node.".format(row['v3_node'],
-                                                                       lookup_path))
-                    new_and_improved[row['v3_node']] = {
-                        'v4_name': row['v4_node'],
-                        'v4_uuid': str(n.nodeid),
-                        'v4_datatype': n.datatype
-                    }
+                        raise Exception("{} in {} lookup csv is not matched " "with a valid v4 node.".format(row["v3_node"], lookup_path))
+                    new_and_improved[row["v3_node"]] = {"v4_name": row["v4_node"], "v4_uuid": str(n.nodeid), "v4_datatype": n.datatype}
 
             return new_and_improved
 
@@ -547,10 +540,10 @@ class v3Importer:
         def get_mergenodes(v3_config):
 
             mergenodes_dict = {}
-            with open(v3_config["v3_nodes_csv"], 'r') as openfile:
+            with open(v3_config["v3_nodes_csv"], "r") as openfile:
                 reader = csv.DictReader(openfile)
                 for row in reader:
-                    mergenodes_dict[row['Label']] = row['mergenode']
+                    mergenodes_dict[row["Label"]] = row["mergenode"]
             return list(set(mergenodes_dict.values()))
 
         # gather mergenode information for all v3 node names.
@@ -574,34 +567,34 @@ class v3Importer:
         """ loads the data that is in the v3 export file. limits to the number
         in truncate, if truncate is not none."""
 
-        with open(self.source_file, 'rb') as openfile:
+        with open(self.source_file, "rb") as openfile:
             v3_json = json.loads(openfile.read())
 
         # get all the resources matching this resource graph name
-        v3_resources = [r for r in v3_json['resources'] if r['entitytypeid'] == self.v3_graph_name]
+        v3_resources = [r for r in v3_json["resources"] if r["entitytypeid"] == self.v3_graph_name]
 
         # filter out any empty resources
-        v3_resources = [r for r in v3_resources if len(r['child_entities']) != 0]
+        v3_resources = [r for r in v3_resources if len(r["child_entities"]) != 0]
 
         # filter out any that are explicitly excluded
-        self.v3_resources = [r for r in v3_resources if r['entityid'] not in self.exclude]
+        self.v3_resources = [r for r in v3_resources if r["entityid"] not in self.exclude]
 
         # filter out all but the ones specified in the only argument
         if len(self.only) > 0:
-            self.v3_resources = [r for r in self.v3_resources if r['entityid'] in only]
+            self.v3_resources = [r for r in self.v3_resources if r["entityid"] in only]
 
         # if the list should be truncated, only take that many resources from the front of the list
         if self.truncate:
-            self.v3_resources = self.v3_resources[:self.truncate]
+            self.v3_resources = self.v3_resources[: self.truncate]
 
         return self.v3_resources
 
     def process_one_resource(self, v3_json):
         """ changes a single v3 json resource into a v4 json resource """
 
-        v3_resource = v3PreparedResource(v3_json, self.v4_graph.graphid, self.node_lookup,
-                                         self.v3_mergenodes, verbose=self.verbose,
-                                         dt_converter=self.dt_converter)
+        v3_resource = v3PreparedResource(
+            v3_json, self.v4_graph.graphid, self.node_lookup, self.v3_mergenodes, verbose=self.verbose, dt_converter=self.dt_converter
+        )
 
         v3_resource.process(self.v4_nodes)
         return v3_resource.get_resource_json()
@@ -621,14 +614,14 @@ class v3Importer:
     def get_v4_json(self):
 
         resources = self.convert_v3_data()
-        v4_json = {'business_data': {'resources': resources}}
+        v4_json = {"business_data": {"resources": resources}}
 
         return v4_json
 
     def write_v4_json(self, dest_path):
 
         out_json = self.get_v4_json()
-        with open(dest_path, 'w') as openfile:
+        with open(dest_path, "w") as openfile:
             openfile.write(JSONSerializer().serialize(out_json, indent=4))
 
         return dest_path
@@ -647,9 +640,9 @@ class v3Importer:
                     # in the load_v3_data method that is used for JSON.
                     if v3_json["entitytypeid"] != self.v3_graph_name:
                         continue
-                    if len(v3_json['child_entities']) == 0:
+                    if len(v3_json["child_entities"]) == 0:
                         continue
-                    resid = v3_json['entityid']
+                    resid = v3_json["entityid"]
                     if self.truncate:
                         if n - 2 == self.truncate:
                             break
@@ -662,7 +655,7 @@ class v3Importer:
                     v4_json = self.process_one_resource(v3_json)
                     v4_line = JSONSerializer().serialize(v4_json)
 
-                    openv4.write(v4_line+"\n")
+                    openv4.write(v4_line + "\n")
                     ct += 1
 
                     # simple progress printing
@@ -690,8 +683,7 @@ class v3SkosConverter:
     an Arches 4 thesaurus file and collections file for import
     """
 
-    def __init__(self, skos_file, name_space="http://localhost:8000/",
-                 uuid_lookup={}, verbose=False):
+    def __init__(self, skos_file, name_space="http://localhost:8000/", uuid_lookup={}, verbose=False):
 
         with open(skos_file, "r") as incoming_skos:
             skos = incoming_skos.read()
@@ -718,11 +710,11 @@ class v3SkosConverter:
 
     def add_children_to_collection(self, source_graph, out_graph, parent_id, topconcept_id):
 
-        children = [i for i in source_graph.triples((topconcept_id, SKOS['narrower'], None))]
+        children = [i for i in source_graph.triples((topconcept_id, SKOS["narrower"], None))]
 
         for child in children:
-            out_graph.add((ARCHES[parent_id], SKOS['member'], child[2]))
-            out_graph.add((child[2], RDF.type, SKOS['Concept']))
+            out_graph.add((ARCHES[parent_id], SKOS["member"], child[2]))
+            out_graph.add((child[2], RDF.type, SKOS["Concept"]))
             self.add_children_to_collection(source_graph, out_graph, child[2], child[2])
 
         return out_graph
@@ -734,11 +726,7 @@ class v3SkosConverter:
         v3graph.parse(data=self.v3_skos)
 
         # create the namespace manager
-        namespaces = (
-            ("arches", ARCHES),
-            ("skos", SKOS),
-            ("dcterms", DCTERMS)
-        )
+        namespaces = (("arches", ARCHES), ("skos", SKOS), ("dcterms", DCTERMS))
         nsmanager = NamespaceManager(RDFGraph())
         for ns in namespaces:
             nsmanager.bind(ns[0], ns[1])
@@ -748,22 +736,22 @@ class v3SkosConverter:
         v4collections = RDFGraph(namespace_manager=nsmanager)
 
         # add the concept schemes to the thesaurus
-        concept_schemes = [i for i in v3graph.triples((None, RDF.type, SKOS['ConceptScheme']))]
+        concept_schemes = [i for i in v3graph.triples((None, RDF.type, SKOS["ConceptScheme"]))]
         for cs in concept_schemes:
             v4thesaurus.add(cs)
 
         # iterate the concepts and make collections for them.
-        topconcepts = [i for i in v3graph.triples((None, SKOS['hasTopConcept'], None))]
+        topconcepts = [i for i in v3graph.triples((None, SKOS["hasTopConcept"], None))]
         for tc in topconcepts:
 
             # get the top concept name and if convert it to a Literal object
-            tc_name_literal = v3graph.value(subject=tc[2], predicate=SKOS['prefLabel'])
+            tc_name_literal = v3graph.value(subject=tc[2], predicate=SKOS["prefLabel"])
 
             # get the value from the JSON formatted Literal content
             # if the Literal content is NOT JSON, then this reference data was
             # exported from v3 with the wrong command and will not work.
             try:
-                tc_name = json.loads(tc_name_literal.value)['value']
+                tc_name = json.loads(tc_name_literal.value)["value"]
                 collection_id = self.new_or_existing_uuid(tc_name)
             except ValueError:
                 docs = "https://arches.readthedocs.io/en/stable/v3-to-v4-migration/"
@@ -771,53 +759,52 @@ class v3SkosConverter:
                 exit()
 
             if self.verbose:
-                children = [i for i in v3graph.triples((tc[2], SKOS['narrower'], None))]
+                children = [i for i in v3graph.triples((tc[2], SKOS["narrower"], None))]
                 print("{}: {} immediate child concepts".format(tc_name, len(children)))
-                print("    collection uuid: "+collection_id)
+                print("    collection uuid: " + collection_id)
 
             # create a new collection for each top concept
             v4thesaurus.add(tc)
-            v4collections.add((ARCHES[collection_id], RDF.type, SKOS['Collection']))
+            v4collections.add((ARCHES[collection_id], RDF.type, SKOS["Collection"]))
 
             # add the preflabel for the collection, if it's not the r2r types collection
             # which already has a label in Arches by default.
             if tc_name != "Resource To Resource Relationship Types":
                 simple_tc_name = Literal(tc_name, lang="en-US")
-                v4collections.add((ARCHES[collection_id], SKOS['prefLabel'], simple_tc_name))
+                v4collections.add((ARCHES[collection_id], SKOS["prefLabel"], simple_tc_name))
 
             # recursively add all of the concept children to the collection for this
             # top concept.
-            v4collections = self.add_children_to_collection(v3graph, v4collections,
-                                                            collection_id, tc[2])
+            v4collections = self.add_children_to_collection(v3graph, v4collections, collection_id, tc[2])
 
         # add ALL concepts from the v3 graph to the thesaurus. this pulls along all
         # child/parent relationships into the thesaurus, as well as all extra info
         # for each concept, like sortorder, prefLabel, etc.
-        for concept in v3graph.triples((None, RDF.type, SKOS['Concept'])):
+        for concept in v3graph.triples((None, RDF.type, SKOS["Concept"])):
             v4thesaurus.add(concept)
 
             # this is the extra info related to each concept, like prefLabel, sortorder, etc.
             for s, p, o in v3graph.triples((concept[0], None, None)):
                 # skip the label of the resource to resource relationship type concept
                 # as it's already in Arches and this would duplicate it.
-                if s.endswith("000004") and p == SKOS['prefLabel']:
+                if s.endswith("000004") and p == SKOS["prefLabel"]:
                     continue
                 v4thesaurus.add((s, p, o))
 
         # export the thesaurus and collections to predetermined locations within the
         # package file structure.
-        thesaurus_file = os.path.join(directory, 'concepts', 'thesaurus.xml')
+        thesaurus_file = os.path.join(directory, "concepts", "thesaurus.xml")
         if self.verbose:
-            print("writing thesaurus to: "+thesaurus_file)
+            print("writing thesaurus to: " + thesaurus_file)
         v4thesaurus.serialize(destination=thesaurus_file, format="pretty-xml")
 
-        collections_file = os.path.join(directory, 'collections', 'collections.xml')
+        collections_file = os.path.join(directory, "collections", "collections.xml")
         if self.verbose:
-            print("writing collections to: "+collections_file)
+            print("writing collections to: " + collections_file)
         v4collections.serialize(destination=collections_file, format="pretty-xml")
 
     def write_uuid_lookup(self, filepath):
 
-        with open(filepath, 'w') as uuid_store:
+        with open(filepath, "w") as uuid_store:
             uuid_store.write(json.dumps(self.uuid_lookup, indent=4, sort_keys=True))
             uuid_store.close()

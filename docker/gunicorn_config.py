@@ -27,11 +27,11 @@ def get_optional_env_variable(var_name):
 #       range.
 #
 
-django_port = get_optional_env_variable('DJANGO_PORT')
-listen_port = django_port or '8000'
-bind = '0.0.0.0:' + listen_port
+django_port = get_optional_env_variable("DJANGO_PORT")
+listen_port = django_port or "8000"
+bind = "0.0.0.0:" + listen_port
 
-backlog = get_optional_env_variable('GUNICORN_BACKLOG') or 2048
+backlog = get_optional_env_variable("GUNICORN_BACKLOG") or 2048
 
 #
 # Worker processes
@@ -77,11 +77,11 @@ backlog = get_optional_env_variable('GUNICORN_BACKLOG') or 2048
 #       A positive integer. Generally set in the 1-5 seconds range.
 #
 
-workers = get_optional_env_variable('GUNICORN_WORKERS') or 2
-worker_class = get_optional_env_variable('GUNICORN_WORKER_CLASS') or 'sync'
-worker_connections = get_optional_env_variable('GUNICORN_WORKER_CONNECTIONS') or 1000
-timeout = get_optional_env_variable('GUNICORN_WORKER_TIMEOUT') or 30
-keepalive = get_optional_env_variable('GUNICORN_KEEPALIVE') or 2
+workers = get_optional_env_variable("GUNICORN_WORKERS") or 2
+worker_class = get_optional_env_variable("GUNICORN_WORKER_CLASS") or "sync"
+worker_connections = get_optional_env_variable("GUNICORN_WORKER_CONNECTIONS") or 1000
+timeout = get_optional_env_variable("GUNICORN_WORKER_TIMEOUT") or 30
+keepalive = get_optional_env_variable("GUNICORN_KEEPALIVE") or 2
 
 #
 #   spew - Install a trace function that spews every line of Python
@@ -91,7 +91,7 @@ keepalive = get_optional_env_variable('GUNICORN_KEEPALIVE') or 2
 #       True or False
 #
 
-spew = get_optional_env_variable('GUNICORN_SPEW') or False
+spew = get_optional_env_variable("GUNICORN_SPEW") or False
 
 #
 # Server mechanics
@@ -134,13 +134,13 @@ spew = get_optional_env_variable('GUNICORN_SPEW') or False
 #       None to signal that Python should choose one on its own.
 #
 
-daemon = get_optional_env_variable('GUNICORN_DAEMON') or False
-raw_env = get_optional_env_variable('GUNICORN_RAW_ENV') or []
-pidfile = get_optional_env_variable('GUNICORN_PIDFILE') or None
-umask = get_optional_env_variable('GUNICORN_UMASK') or 0
-user = get_optional_env_variable('GUNICORN_USER') or None
-group = get_optional_env_variable('GUNICORN_GROUP') or None
-tmp_upload_dir = get_optional_env_variable('GUNICORN_TMP_UPLOAD_DIR') or None
+daemon = get_optional_env_variable("GUNICORN_DAEMON") or False
+raw_env = get_optional_env_variable("GUNICORN_RAW_ENV") or []
+pidfile = get_optional_env_variable("GUNICORN_PIDFILE") or None
+umask = get_optional_env_variable("GUNICORN_UMASK") or 0
+user = get_optional_env_variable("GUNICORN_USER") or None
+group = get_optional_env_variable("GUNICORN_GROUP") or None
+tmp_upload_dir = get_optional_env_variable("GUNICORN_TMP_UPLOAD_DIR") or None
 
 #
 #   Logging
@@ -154,10 +154,10 @@ tmp_upload_dir = get_optional_env_variable('GUNICORN_TMP_UPLOAD_DIR') or None
 #       A string of "debug", "info", "warning", "error", "critical"
 #
 
-errorlog = get_optional_env_variable('GUNICORN_ERRORLOG') or '-'
-loglevel = get_optional_env_variable('GUNICORN_LOGLEVEL') or 'info'
-accesslog = get_optional_env_variable('GUNICORN_ACCESSLOG') or '-'
-access_log_format = get_optional_env_variable('GUNICORN_ACCESS_LOG_FORMAT') or '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
+errorlog = get_optional_env_variable("GUNICORN_ERRORLOG") or "-"
+loglevel = get_optional_env_variable("GUNICORN_LOGLEVEL") or "info"
+accesslog = get_optional_env_variable("GUNICORN_ACCESSLOG") or "-"
+access_log_format = get_optional_env_variable("GUNICORN_ACCESS_LOG_FORMAT") or '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
 
 #
 # Process naming
@@ -172,7 +172,7 @@ access_log_format = get_optional_env_variable('GUNICORN_ACCESS_LOG_FORMAT') or '
 #       A string or None to choose a default of something like 'gunicorn'.
 #
 
-proc_name = get_optional_env_variable('GUNICORN_PROC_NAME') or None
+proc_name = get_optional_env_variable("GUNICORN_PROC_NAME") or None
 
 #
 # Server hooks
@@ -216,14 +216,13 @@ def worker_int(worker):
     import threading
     import sys
     import traceback
+
     id2name = {th.ident: th.name for th in threading.enumerate()}
     code = []
     for threadId, stack in list(sys._current_frames().items()):
-        code.append("\n# Thread: %s(%d)" % (id2name.get(threadId, ""),
-                                            threadId))
+        code.append("\n# Thread: %s(%d)" % (id2name.get(threadId, ""), threadId))
         for filename, lineno, name, line in traceback.extract_stack(stack):
-            code.append('File: "%s", line %d, in %s' % (filename,
-                                                        lineno, name))
+            code.append('File: "%s", line %d, in %s' % (filename, lineno, name))
             if line:
                 code.append("  %s" % (line.strip()))
     worker.log.debug("\n".join(code))

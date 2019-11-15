@@ -9,8 +9,8 @@ from arches.app.search.elasticsearch_dsl_builder import Query, Term
 
 class BaseIndex(object):
     def __init__(self, index_name=None):
-        if index_name is None or index_name is '':
-            raise SearchIndexError('Index name is not defined')
+        if index_name is None or index_name is "":
+            raise SearchIndexError("Index name is not defined")
 
         self.se = SearchEngineFactory().create()
         self.index_metadata = None
@@ -32,7 +32,7 @@ class BaseIndex(object):
         if self.index_metadata is not None:
             self.se.create_index(index=self.index_name, body=self.index_metadata)
         else:
-            raise SearchIndexError('No index metadata defined.')
+            raise SearchIndexError("No index metadata defined.")
 
     def get_documents_to_index(self, resourceinstance, tiles):
         """
@@ -87,14 +87,14 @@ class BaseIndex(object):
         start = datetime.now()
         q = Query(se=self.se)
         if clear_index:
-            term = Term(field='graph_id', term=str(resource_type))
+            term = Term(field="graph_id", term=str(resource_type))
             q.add_query(term)
             q.delete(index=self.index_name, refresh=True)
 
         q = Query(se=self.se)
         count_before = self.se.count(index=self.index_name, body=q.dsl)
 
-        result_summary = {'database': len(resources), 'indexed': 0}
+        result_summary = {"database": len(resources), "indexed": 0}
         with self.se.BulkIndexer(batch_size=settings.BULK_IMPORT_BATCH_SIZE, refresh=True) as indexer:
             for resource in resources:
                 tiles = list(models.TileModel.objects.filter(resourceinstance=resource))
@@ -102,10 +102,14 @@ class BaseIndex(object):
                 if document is not None and id is not None:
                     indexer.add(index=self.index_name, id=doc_id, data=document)
 
-        result_summary['indexed'] = self.se.count(index=self.index_name, body=q.dsl) - count_before
-        status = 'Passed' if result_summary['database'] == result_summary['indexed'] else 'Failed'
+        result_summary["indexed"] = self.se.count(index=self.index_name, body=q.dsl) - count_before
+        status = "Passed" if result_summary["database"] == result_summary["indexed"] else "Failed"
         print("Custom Index - %s:" % self.index_name)
-        print("    Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(status, graph_name, result_summary['database'], result_summary['indexed'], (datetime.now()-start).seconds))
+        print(
+            "    Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(
+                status, graph_name, result_summary["database"], result_summary["indexed"], (datetime.now() - start).seconds
+            )
+        )
 
     def delete_index(self):
         """
@@ -125,14 +129,14 @@ class BaseIndex(object):
 
 def get_index(name):
     for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
-        if index['name'] == name:
-            return import_class_from_string(index['module'])(name)
+        if index["name"] == name:
+            return import_class_from_string(index["module"])(name)
     raise SearchIndexNotDefinedError(name=name)
 
 
 class SearchIndexError(Exception):
     def __init__(self, message, code=None):
-        self.title = _('Search Index Error:')
+        self.title = _("Search Index Error:")
         self.message = message
         self.code = code
 
@@ -142,7 +146,7 @@ class SearchIndexError(Exception):
 
 class SearchIndexNotDefinedError(Exception):
     def __init__(self, name=None):
-        self.title = _('Search Index Not Defined Error:')
+        self.title = _("Search Index Not Defined Error:")
         self.message = _('The index "%s" is not defined in settings.ELASTICSEARCH_CUSTOM_INDEXES' % name)
 
     def __str__(self):

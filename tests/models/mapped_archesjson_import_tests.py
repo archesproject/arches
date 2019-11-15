@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import os
 from operator import itemgetter
@@ -33,163 +33,207 @@ from arches.app.utils.data_management.resources.importer import BusinessDataImpo
 
 
 class mappedArchesJSONImportTests(ArchesTestCase):
-	@classmethod
-	def setUpClass(cls):
-		pass
+    @classmethod
+    def setUpClass(cls):
+        pass
 
-	def setUp(self):
-		ResourceInstance.objects.all().delete()
-		with open(os.path.join('tests/fixtures/data/json/cardinality_test_data/target.json'), 'rU') as f:
-			archesfile = JSONDeserializer().deserialize(f)
-		ResourceGraphImporter(archesfile['graph'])
+    def setUp(self):
+        ResourceInstance.objects.all().delete()
+        with open(os.path.join("tests/fixtures/data/json/cardinality_test_data/target.json"), "rU") as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile["graph"])
 
-	@classmethod
-	def tearDownClass(cls):
-		pass
+    @classmethod
+    def tearDownClass(cls):
+        pass
 
-	def test_single_1(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json', 'tests/fixtures/data/json/cardinality_test_data/single-1.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 1)
+    def test_single_1(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/single-1.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 1)
 
-	def test_single_n(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/single-n.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 3)
+    def test_single_n(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/single-n.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 3)
 
-	def test_single_n_1(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/single-n_1.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 1)
+    def test_single_n_1(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json",
+            "tests/fixtures/data/json/cardinality_test_data/single-n_1.mapping",
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 1)
 
-	def test_single_n_n(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/single-n_n.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 3)
+    def test_single_n_n(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json",
+            "tests/fixtures/data/json/cardinality_test_data/single-n_n.mapping",
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 3)
 
-	def test_1_1_1_1(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/1_1_1_1.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 2)
+    def test_1_1_1_1(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/1_1_1_1.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 2)
 
-	def test_1_1_n_1(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/1_1_n_1.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 2)
+    def test_1_1_n_1(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/1_1_n_1.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 2)
 
-	def test_1_1_1_n(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/1_1_1_n.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 2)
+    def test_1_1_1_n(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/1_1_1_n.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 2)
 
-	def test_1_1_n_n(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/1_1_n_n.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 2)
+    def test_1_1_n_n(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/1_1_n_n.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 2)
 
-	def test_n_1_n_1(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/n_1_n_1.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 6)
+    def test_n_1_n_1(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/n_1_n_1.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 6)
 
-	def test_n_1_n_n(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/n_1_n_n.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 6)
+    def test_n_1_n_n(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/n_1_n_n.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 6)
 
-	def test_1_n_1_n(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/1_n_1_n.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 5)
+    def test_1_n_1_n(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/1_n_1_n.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 5)
 
-	def test_1_n_n_n(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/1_n_n_n.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 5)
+    def test_1_n_n_n(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/1_n_n_n.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 5)
 
-	def test_n_n_n_n(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/n_n_n_n.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 12)
+    def test_n_n_n_n(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/n_n_n_n.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 12)
 
-	def test_n_n_1_n(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/n_n_1_n.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 4)
+    def test_n_n_1_n(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/n_n_1_n.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 4)
 
-	def test_n_1_1_1(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/n_1_1_1.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 2)
+    def test_n_1_1_1(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/n_1_1_1.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 2)
 
-	def test_n_1_1_n(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/n_1_1_n.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 2)
+    def test_n_1_1_n(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/n_1_1_n.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 2)
 
-	def test_n_n_1_1(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/n_1_1_1.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 2)
+    def test_n_n_1_1(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/n_1_1_1.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 2)
 
-	def test_1_n_1_1(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/1_n_1_1.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 2)
+    def test_1_n_1_1(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/1_n_1_1.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 2)
 
-	def test_1_n_n_1(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/1_n_n_1.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 2)
+    def test_1_n_n_1(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/1_n_n_1.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 2)
 
-	def test_n_n_1_1(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/n_n_1_1.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 2)
+    def test_n_n_1_1(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/n_n_1_1.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 2)
 
-	def test_n_n_n_1(self):
-		og_tile_count = TileModel.objects.count()
-		ArchesFileImporter('tests/fixtures/data/json/cardinality_test_data/source.json','tests/fixtures/data/json/cardinality_test_data/n_n_n_1.mapping').import_business_data()
-		new_tile_count = TileModel.objects.count()
-		tile_difference = new_tile_count - og_tile_count
-		self.assertEqual(tile_difference, 6)
+    def test_n_n_n_1(self):
+        og_tile_count = TileModel.objects.count()
+        ArchesFileImporter(
+            "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/n_n_n_1.mapping"
+        ).import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 6)
