@@ -393,7 +393,8 @@ class JsonLdReader(Reader):
                     self.logger.debug(node["node"].ontologyclass == jsonld_graph["@type"][0])
 
                 if "@type" in jsonld_graph:
-                    if node["parent_edge"].ontologyproperty == ontology_property and node["node"].ontologyclass == jsonld_graph["@type"][0]:
+                    parent_edge_ontology = node["parent_edge"].ontologyproperty
+                    if parent_edge_ontology == ontology_property and node["node"].ontologyclass == jsonld_graph["@type"][0]:
                         self.logger.debug("found {0}".format(node["node"].name))
                         nodes_copy.add((node["node"].name, node["node"].pk))
                         found.append(node)
