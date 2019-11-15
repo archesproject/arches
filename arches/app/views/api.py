@@ -214,7 +214,6 @@ class Surveys(APIBase):
 
 
 class GeoJSON(APIBase):
-
     def get_name(self, resource):
         module = importlib.import_module("arches.app.functions.primary_descriptors")
         PrimaryDescriptorsFunction = getattr(module, "PrimaryDescriptorsFunction")()
@@ -227,17 +226,18 @@ class GeoJSON(APIBase):
     def get(self, request):
         datatype_factory = DataTypeFactory()
         set_precision = GeoUtils().set_precision
-        resourceid = request.GET.get('resourceid', None)
-        nodeid = request.GET.get('nodeid', None)
-        tileid = request.GET.get('tileid', None)
-        nodegroups = request.GET.get('nodegroups', [])
-        precision = request.GET.get('precision', 9)
-        field_name_length = int(request.GET.get('field_name_length', 0))
-        use_uuid_names = bool(request.GET.get('use_uuid_names', False))
-        include_primary_name = bool(request.GET.get('include_primary_name', False))
-        include_geojson_link = bool(request.GET.get('include_geojson_link', False))
-        use_display_values = bool(request.GET.get('use_display_values', False))
-        indent = request.GET.get('indent', None)
+        resourceid = request.GET.get("resourceid", None)
+        nodeid = request.GET.get("nodeid", None)
+        tileid = request.GET.get("tileid", None)
+        nodegroups = request.GET.get("nodegroups", [])
+        precision = request.GET.get("precision", 9)
+        field_name_length = int(request.GET.get("field_name_length", 0))
+        use_uuid_names = bool(request.GET.get("use_uuid_names", False))
+        include_primary_name = bool(request.GET.get("include_primary_name", False))
+        include_geojson_link = bool(request.GET.get("include_geojson_link", False))
+        use_display_values = bool(request.GET.get("use_display_values", False))
+        geometry_type = request.GET.get("type", None)
+        indent = request.GET.get("indent", None)
         if indent is not None:
             indent = int(indent)
         if isinstance(nodegroups, str):
