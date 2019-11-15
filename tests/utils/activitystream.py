@@ -38,18 +38,9 @@ ARCHES_NS = Namespace("https://arches.getty.edu/")
 CIDOC_NS = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 COL_NS = Namespace(ARCHES_NS["history/"])
 
-base_uris = {
-    "root": COL_NS,
-    "first": COL_NS["1"],
-    "last": COL_NS["20"],
-}
+base_uris = {"root": COL_NS, "first": COL_NS["1"], "last": COL_NS["20"]}
 
-page_1_uris = {
-    "next": COL_NS["4"],
-    "prev": COL_NS["2"],
-    "root": COL_NS,
-    "this": COL_NS["3"],
-}
+page_1_uris = {"next": COL_NS["4"], "prev": COL_NS["2"], "root": COL_NS, "this": COL_NS["3"]}
 
 totalItems = 1000
 

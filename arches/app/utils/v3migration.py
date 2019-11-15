@@ -207,7 +207,7 @@ class v3PreparedResource:
             if self.verbose:
                 print("{} - datapoints: {}".format(group["entitytypeid"], len(branch_data)))
             for node in branch_data:
-                outlist.append(node + (branch_num, ))
+                outlist.append(node + (branch_num,))
 
         # The following code block can be very helpful while developing and debugging
         # the way v3 json is parsed.

@@ -356,14 +356,9 @@ class Resource(models.ResourceInstance):
             .exclude(isactive=False)
         )
         graph_lookup = {
-            str(graph.graphid): {"name": graph.name, "iconclass": graph.iconclass, "fillColor": graph.color, } for graph in graphs
+            str(graph.graphid): {"name": graph.name, "iconclass": graph.iconclass, "fillColor": graph.color} for graph in graphs
         }
-        ret = {
-            "resource_instance": self,
-            "resource_relationships": [],
-            "related_resources": [],
-            "node_config_lookup": graph_lookup,
-        }
+        ret = {"resource_instance": self, "resource_relationships": [], "related_resources": [], "node_config_lookup": graph_lookup}
         se = SearchEngineFactory().create()
 
         if page > 0:

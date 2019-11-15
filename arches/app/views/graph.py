@@ -138,16 +138,13 @@ class GraphManagerView(GraphBaseView):
     def get(self, request, graphid):
         if graphid is None or graphid == "":
             root_nodes = models.Node.objects.filter(istopnode=True)
-            context = self.get_context_data(main_script="views/graph", root_nodes=JSONSerializer().serialize(root_nodes), )
+            context = self.get_context_data(main_script="views/graph", root_nodes=JSONSerializer().serialize(root_nodes))
             context["graph_models"] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             context["graphs"] = JSONSerializer().serialize(context["graph_models"], exclude=["functions"])
             context["nav"]["title"] = "Arches Designer"
             context["nav"]["icon"] = "fa-bookmark"
 
-            context["nav"]["help"] = {
-                "title": _("Using the Arches Designer"),
-                "template": "arches-designer-help",
-            }
+            context["nav"]["help"] = {"title": _("Using the Arches Designer"), "template": "arches-designer-help"}
             return render(request, "views/graph.htm", context)
 
 
@@ -226,10 +223,7 @@ class GraphDesignerView(GraphBaseView):
         if not self.graph.isresource:
             help_title = _("Designing a Branch")
 
-        context["nav"]["help"] = {
-            "title": help_title,
-            "template": "graph-tab-help",
-        }
+        context["nav"]["help"] = {"title": help_title, "template": "graph-tab-help"}
         context["constraints"] = JSONSerializer().serialize(constraints)
 
         return render(request, "views/graph-designer.htm", context)
@@ -476,10 +470,7 @@ class CardView(GraphBaseView):
 
         context["nav"]["title"] = self.graph.name
         context["nav"]["menu"] = True
-        context["nav"]["help"] = {
-            "title": _("Configuring Cards and Widgets"),
-            "template": "card-designer-help",
-        }
+        context["nav"]["help"] = {"title": _("Configuring Cards and Widgets"), "template": "card-designer-help"}
 
         return render(request, "views/graph/card-configuration-manager.htm", context)
 
@@ -528,10 +519,7 @@ class FunctionManagerView(GraphBaseView):
             )
             context["nav"]["title"] = self.graph.name
             context["nav"]["menu"] = True
-            context["nav"]["help"] = {
-                "title": _("Managing Functions"),
-                "template": "function-help",
-            }
+            context["nav"]["help"] = {"title": _("Managing Functions"), "template": "function-help"}
 
             return render(request, "views/graph/function-manager.htm", context)
         else:

@@ -130,7 +130,7 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-d", "--dest_dir", action="store", dest="dest_dir", default=".", help="Directory where you want to save exported files.",
+            "-d", "--dest_dir", action="store", dest="dest_dir", default=".", help="Directory where you want to save exported files."
         )
 
         parser.add_argument(
@@ -173,7 +173,7 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-n", "--layer_name", action="store", dest="layer_name", default=False, help="The name of the layer to add or delete.",
+            "-n", "--layer_name", action="store", dest="layer_name", default=False, help="The name of the layer to add or delete."
         )
 
         parser.add_argument(
@@ -195,16 +195,12 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-i", "--layer_icon", action="store", dest="layer_icon", default="fa fa-globe", help="An icon class to use for a map layer.",
+            "-i", "--layer_icon", action="store", dest="layer_icon", default="fa fa-globe", help="An icon class to use for a map layer."
         )
 
-        parser.add_argument(
-            "-b", "--is_basemap", action="store_true", dest="is_basemap", help="Add to make the layer a basemap.",
-        )
+        parser.add_argument("-b", "--is_basemap", action="store_true", dest="is_basemap", help="Add to make the layer a basemap.")
 
-        parser.add_argument(
-            "-db", "--setup_db", action="store", dest="setup_db", default=False, help="Rebuild database",
-        )
+        parser.add_argument("-db", "--setup_db", action="store", dest="setup_db", default=False, help="Rebuild database")
 
         parser.add_argument(
             "-bulk",
@@ -234,12 +230,10 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-y", "--yes", action="store_true", dest="yes", help='used to force a yes answer to any user input "continue? y/n" prompt',
+            "-y", "--yes", action="store_true", dest="yes", help='used to force a yes answer to any user input "continue? y/n" prompt'
         )
 
-        parser.add_argument(
-            "--use_multiprocessing", action="store_true", help="enables multiprocessing during data import",
-        )
+        parser.add_argument("--use_multiprocessing", action="store_true", help="enables multiprocessing during data import")
 
     def handle(self, *args, **options):
         print("operation: " + options["operation"])
@@ -268,7 +262,7 @@ class Command(BaseCommand):
 
         if options["operation"] == "export_business_data":
             self.export_business_data(
-                options["dest_dir"], options["format"], options["config_file"], options["graphs"], options["single_file"],
+                options["dest_dir"], options["format"], options["config_file"], options["graphs"], options["single_file"]
             )
 
         if options["operation"] == "import_reference_data":
@@ -317,7 +311,7 @@ class Command(BaseCommand):
 
         if options["operation"] in ["load", "load_package"]:
             self.load_package(
-                options["source"], options["setup_db"], options["overwrite"], options["bulk_load"], options["stage"], options["yes"],
+                options["source"], options["setup_db"], options["overwrite"], options["bulk_load"], options["stage"], options["yes"]
             )
 
         if options["operation"] in ["create", "create_package"]:
@@ -553,7 +547,7 @@ class Command(BaseCommand):
             if len(config_paths) > 0:
                 configs = json.load(open(config_paths[0]))
                 for relationship in configs["permitted_resource_relationships"]:
-                    (obj, created, ) = models.Resource2ResourceConstraint.objects.update_or_create(
+                    (obj, created) = models.Resource2ResourceConstraint.objects.update_or_create(
                         resourceclassfrom_id=uuid.UUID(relationship["resourceclassfrom_id"]),
                         resourceclassto_id=uuid.UUID(relationship["resourceclassto_id"]),
                         resource2resourceid=uuid.UUID(relationship["resource2resourceid"]),
@@ -639,8 +633,8 @@ class Command(BaseCommand):
                     logger.warning("The map layer '{}' was not imported: {} is missing.".format(path, e))
 
         def load_map_layers(package_dir):
-            basemap_styles = glob.glob(os.path.join(package_dir, "map_layers", "mapbox_spec_json", "basemaps", "*", "*.json", ))
-            overlay_styles = glob.glob(os.path.join(package_dir, "map_layers", "mapbox_spec_json", "overlays", "*", "*.json", ))
+            basemap_styles = glob.glob(os.path.join(package_dir, "map_layers", "mapbox_spec_json", "basemaps", "*", "*.json"))
+            overlay_styles = glob.glob(os.path.join(package_dir, "map_layers", "mapbox_spec_json", "overlays", "*", "*.json"))
             load_mapbox_styles(basemap_styles, True)
             load_mapbox_styles(overlay_styles, False)
 
@@ -969,7 +963,7 @@ class Command(BaseCommand):
         ret = skos.save_concepts_from_skos(rdf, overwrite, stage, bulk_load, data_source)
 
     def import_business_data(
-        self, data_source, config_file=None, overwrite=None, bulk_load=False, create_concepts=False, use_multiprocessing=False, force=False,
+        self, data_source, config_file=None, overwrite=None, bulk_load=False, create_concepts=False, use_multiprocessing=False, force=False
     ):
         """
         Imports business data from all formats. A config file (mapping file) is required for .csv format.
@@ -1168,7 +1162,7 @@ will be very jumbled."""
                     for source_name, source_dict in data["sources"].items():
                         map_source = models.MapSource.objects.get_or_create(name=source_name + "-" + layer_name, source=source_dict)
                     map_layer = models.MapLayer(
-                        name=layer_name, layerdefinitions=data["layers"], isoverlay=(not is_basemap), icon=layer_icon,
+                        name=layer_name, layerdefinitions=data["layers"], isoverlay=(not is_basemap), icon=layer_icon
                     )
                     try:
                         map_layer.save()

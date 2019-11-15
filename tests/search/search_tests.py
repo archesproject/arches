@@ -42,17 +42,9 @@ class SearchTests(ArchesTestCase):
         se = SearchEngineFactory().create()
 
         for i in range(10):
-            x = {
-                "id": i,
-                "type": "prefLabel",
-                "value": "test pref label",
-            }
+            x = {"id": i, "type": "prefLabel", "value": "test pref label"}
             se.index_data(index="test", body=x, idfield="id", refresh=True)
-            y = {
-                "id": i + 100,
-                "type": "altLabel",
-                "value": "test alt label",
-            }
+            y = {"id": i + 100, "type": "altLabel", "value": "test alt label"}
             se.index_data(index="test", body=y, idfield="id", refresh=True)
 
         time.sleep(1)
@@ -94,11 +86,7 @@ class SearchTests(ArchesTestCase):
 
         with se.BulkIndexer(batch_size=500, refresh=True) as bulk_indexer:
             for i in range(1001):
-                doc = {
-                    "id": i,
-                    "type": "prefLabel",
-                    "value": "test pref label",
-                }
+                doc = {"id": i, "type": "prefLabel", "value": "test pref label"}
                 bulk_indexer.add(index="bulk", id=doc["id"], data=doc)
 
         count_after = se.count(index="bulk")

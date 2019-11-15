@@ -32,7 +32,7 @@ class SearchEngineFactory(object):
         backend = settings.SEARCH_BACKEND
         components = backend.split(".")
         classname = components[len(components) - 1]
-        modulename = (".").join(components[0: len(components) - 1])
+        modulename = (".").join(components[0 : len(components) - 1])
         # _temp = __import__(modulename, globals(), locals(), [classname], -1)
         _temp = __import__(modulename, globals(), locals(), [classname])  # in py3, level must be >= 0
         return getattr(_temp, classname)(hosts=hosts, prefix=prefix, **connection_options)
