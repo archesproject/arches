@@ -1019,7 +1019,7 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, null=False)
     message = models.TextField(blank=True, null=True)
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE)
+    recipient_id = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
         managed = True
