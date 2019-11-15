@@ -5,16 +5,14 @@ import os
 from django.db import migrations, models
 from django.core import management
 
-
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "0010_4_1_0"),
+        ('models', '0010_4_1_0'),
     ]
 
     operations = [
-        migrations.RunSQL(
-            """
+            migrations.RunSQL("""
                 CREATE OR REPLACE FUNCTION public.__arches_check_dup_relations(
                 	p_conceptid1 uuid,
                 	p_conceptid2 uuid,
@@ -66,7 +64,8 @@ class Migration(migrations.Migration):
                     WHERE (select * from __arches_check_dup_relations(new.conceptidfrom,new.conceptidto,new.relationtype)) = 'duplicate'
                     DO INSTEAD NOTHING;
                 """,
-            """
+
+                """
                     DROP RULE relations_check_insert ON relations;
 
                     DROP rule relations_check_update ON relations;
@@ -75,6 +74,5 @@ class Migration(migrations.Migration):
                 	p_conceptid1 uuid,
                 	p_conceptid2 uuid,
                 	p_relationtype text);
-                """,
-        ),
+                """),
     ]

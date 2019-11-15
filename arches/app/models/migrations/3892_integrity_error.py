@@ -4,7 +4,6 @@
 
 from django.db import migrations, models
 
-
 def forwards_func(apps, schema_editor):
     # We get the model from the versioned app registry;
     # if we directly import it, it'll be the wrong version
@@ -16,7 +15,6 @@ def forwards_func(apps, schema_editor):
         for item in cnw:
             item.delete()
 
-
 def reverse_func(apps, schema_editor):
     # there is no way to reverse this
     pass
@@ -25,7 +23,7 @@ def reverse_func(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "3965_cardxnodexwidget_visible"),
+        ('models', '3965_cardxnodexwidget_visible'),
     ]
 
     operations = [

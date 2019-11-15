@@ -1,10 +1,12 @@
+
+
 from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "3725_cardmodel_cssclass"),
+        ('models', '3725_cardmodel_cssclass'),
     ]
 
     operations = [
@@ -12,6 +14,6 @@ class Migration(migrations.Migration):
             """
                 update cards set config='{}';
             """,
-            "",
+            ""
         ),
     ]

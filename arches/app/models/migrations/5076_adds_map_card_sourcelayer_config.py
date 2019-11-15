@@ -1,10 +1,12 @@
+
+
 from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "5076_adds_map_card_configs"),
+        ('models', '5076_adds_map_card_configs'),
     ]
 
     operations = [

@@ -1,3 +1,5 @@
+
+
 import django.contrib.postgres.fields.jsonb
 from django.db import migrations, models
 import django.db.models.deletion
@@ -6,7 +8,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "3724_report_manager"),
+        ('models', '3724_report_manager'),
     ]
 
     operations = [
@@ -20,7 +22,9 @@ class Migration(migrations.Migration):
                 set templateid = r.templateid, config = r.config
                 from reports r where r.graphid = graphs.graphid and r.active = true;
             """,
-            "",
+            ""
         ),
-        migrations.DeleteModel(name="Report", ),
+        migrations.DeleteModel(
+            name='Report',
+        ),
     ]

@@ -1,10 +1,12 @@
+
+
 from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "3713_unload_ontolgy"),
+        ('models', '3713_unload_ontolgy'),
     ]
 
     operations = [

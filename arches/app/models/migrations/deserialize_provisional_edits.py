@@ -15,7 +15,6 @@ def forwards_func(apps, schema_editor):
             tile.provisionaledits = JSONDeserializer().deserialize(tile.provisionaledits)
             tile.save()
 
-
 def reverse_func(apps, schema_editor):
     # We get the model from the versioned app registry;
     # if we directly import it, it'll be the wrong version
@@ -26,11 +25,10 @@ def reverse_func(apps, schema_editor):
             tile.provisionaledits = JSONSerializer().serialize(tile.provisionaledits)
             tile.save()
 
-
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "3201_second_removal_of_node_nodetype_branch"),
+        ('models', '3201_second_removal_of_node_nodetype_branch'),
     ]
 
     operations = [

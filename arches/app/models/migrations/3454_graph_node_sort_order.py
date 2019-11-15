@@ -8,9 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "3385_add_provisional_user_fields"),
+        ('models', '3385_add_provisional_user_fields'),
     ]
 
     operations = [
-        migrations.AddField(model_name="node", name="sortorder", field=models.IntegerField(blank=True, null=True), ),
+        migrations.AddField(
+            model_name='node',
+            name='sortorder',
+            field=models.IntegerField(blank=True, null=True),
+        ),
     ]
