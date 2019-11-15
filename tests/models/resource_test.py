@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import json
 import os
@@ -28,9 +28,16 @@ from guardian.shortcuts import assign_perm
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
-from arches.app.search.mappings import prepare_terms_index, delete_terms_index, \
-    prepare_concepts_index, delete_concepts_index, prepare_search_index, delete_search_index, \
-    prepare_resource_relations_index, delete_resource_relations_index
+from arches.app.search.mappings import (
+    prepare_terms_index,
+    delete_terms_index,
+    prepare_concepts_index,
+    delete_concepts_index,
+    prepare_search_index,
+    delete_search_index,
+    prepare_resource_relations_index,
+    delete_resource_relations_index,
+)
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resource_graph_importer
 from arches.app.utils.exceptions import InvalidNodeNameException, MultipleNodesFoundException
@@ -55,27 +62,27 @@ class ResourceTests(ArchesTestCase):
         prepare_resource_relations_index(create=True)
 
         cls.client = Client()
-        cls.client.login(username='admin', password='admin')
+        cls.client.login(username="admin", password="admin")
 
         models.ResourceInstance.objects.all().delete()
-        with open(os.path.join('tests/fixtures/resource_graphs/Resource Test Model.json'), 'rU') as f:
+        with open(os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
-        resource_graph_importer(archesfile['graph'])
+        resource_graph_importer(archesfile["graph"])
 
-        cls.search_model_graphid = 'e503a445-fa5f-11e6-afa8-14109fd34195'
-        cls.search_model_cultural_period_nodeid = '7a182580-fa60-11e6-96d1-14109fd34195'
-        cls.search_model_creation_date_nodeid = '1c1d05f5-fa60-11e6-887f-14109fd34195'
-        cls.search_model_destruction_date_nodeid = 'e771b8a1-65fe-11e7-9163-14109fd34195'
-        cls.search_model_name_nodeid = '2fe14de3-fa61-11e6-897b-14109fd34195'
-        cls.search_model_sensitive_info_nodeid = '57446fae-65ff-11e7-b63a-14109fd34195'
-        cls.search_model_geom_nodeid = '3ebc6785-fa61-11e6-8c85-14109fd34195'
+        cls.search_model_graphid = "e503a445-fa5f-11e6-afa8-14109fd34195"
+        cls.search_model_cultural_period_nodeid = "7a182580-fa60-11e6-96d1-14109fd34195"
+        cls.search_model_creation_date_nodeid = "1c1d05f5-fa60-11e6-887f-14109fd34195"
+        cls.search_model_destruction_date_nodeid = "e771b8a1-65fe-11e7-9163-14109fd34195"
+        cls.search_model_name_nodeid = "2fe14de3-fa61-11e6-897b-14109fd34195"
+        cls.search_model_sensitive_info_nodeid = "57446fae-65ff-11e7-b63a-14109fd34195"
+        cls.search_model_geom_nodeid = "3ebc6785-fa61-11e6-8c85-14109fd34195"
 
-        cls.user = User.objects.create_user('test', 'test@archesproject.org', 'test')
+        cls.user = User.objects.create_user("test", "test@archesproject.org", "test")
         cls.user.save()
-        cls.user.groups.add(Group.objects.get(name='Guest'))
+        cls.user.groups.add(Group.objects.get(name="Guest"))
 
         nodegroup = models.NodeGroup.objects.get(pk=cls.search_model_destruction_date_nodeid)
-        assign_perm('no_access_to_nodegroup', cls.user, nodegroup)
+        assign_perm("no_access_to_nodegroup", cls.user, nodegroup)
 
         # Add a concept that defines a min and max date
         concept = {
@@ -86,30 +93,9 @@ class ResourceTests(ArchesTestCase):
             "subconcepts": [
                 {
                     "values": [
-                        {
-                            "value": "Mock concept",
-                            "language": "en-US",
-                            "category": "label",
-                            "type": "prefLabel",
-                            "id": "",
-                            "conceptid": ""
-                        },
-                        {
-                            "value": "1950",
-                            "language": "en-US",
-                            "category": "note",
-                            "type": "min_year",
-                            "id": "",
-                            "conceptid": ""
-                        },
-                        {
-                            "value": "1980",
-                            "language": "en-US",
-                            "category": "note",
-                            "type": "max_year",
-                            "id": "",
-                            "conceptid": ""
-                        }
+                        {"value": "Mock concept", "language": "en-US", "category": "label", "type": "prefLabel", "id": "", "conceptid": ""},
+                        {"value": "1950", "language": "en-US", "category": "note", "type": "min_year", "id": "", "conceptid": ""},
+                        {"value": "1980", "language": "en-US", "category": "note", "type": "max_year", "id": "", "conceptid": ""},
                     ],
                     "relationshiptype": "hasTopConcept",
                     "nodetype": "Concept",
@@ -117,47 +103,39 @@ class ResourceTests(ArchesTestCase):
                     "legacyoid": "",
                     "subconcepts": [],
                     "parentconcepts": [],
-                    "relatedconcepts": []
+                    "relatedconcepts": [],
                 }
-            ]
+            ],
         }
 
         post_data = JSONSerializer().serialize(concept)
-        content_type = 'application/x-www-form-urlencoded'
-        response = cls.client.post(reverse('concept', kwargs={'conceptid': '00000000-0000-0000-0000-000000000001'}),
-                                   post_data, content_type)
+        content_type = "application/x-www-form-urlencoded"
+        response = cls.client.post(
+            reverse("concept", kwargs={"conceptid": "00000000-0000-0000-0000-000000000001"}), post_data, content_type
+        )
         response_json = json.loads(response.content)
-        valueid = response_json['subconcepts'][0]['values'][0]['id']
-        cls.conceptid = response_json['subconcepts'][0]['id']
+        valueid = response_json["subconcepts"][0]["values"][0]["id"]
+        cls.conceptid = response_json["subconcepts"][0]["id"]
 
         # Add resource with Name, Cultural Period, Creation Date and Geometry
         cls.test_resource = Resource(graph_id=cls.search_model_graphid)
 
         # Add Name
-        tile = Tile(data={cls.search_model_name_nodeid: 'Test Name 1'}, nodegroup_id=cls.search_model_name_nodeid)
+        tile = Tile(data={cls.search_model_name_nodeid: "Test Name 1"}, nodegroup_id=cls.search_model_name_nodeid)
         cls.test_resource.tiles.append(tile)
 
         # Add Cultural Period
-        tile = Tile(data={cls.search_model_cultural_period_nodeid: [valueid]},
-                    nodegroup_id=cls.search_model_cultural_period_nodeid)
+        tile = Tile(data={cls.search_model_cultural_period_nodeid: [valueid]}, nodegroup_id=cls.search_model_cultural_period_nodeid)
         cls.test_resource.tiles.append(tile)
 
         # Add Creation Date
-        tile = Tile(data={cls.search_model_creation_date_nodeid: '1941-01-01'},
-                    nodegroup_id=cls.search_model_creation_date_nodeid)
+        tile = Tile(data={cls.search_model_creation_date_nodeid: "1941-01-01"}, nodegroup_id=cls.search_model_creation_date_nodeid)
         cls.test_resource.tiles.append(tile)
 
         # Add Gometry
         cls.geom = {
             "type": "FeatureCollection",
-            "features": [{
-                "geometry": {
-                    "type": "Point",
-                    "coordinates": [0, 0]
-                },
-                "type": "Feature",
-                "properties": {}
-            }]
+            "features": [{"geometry": {"type": "Point", "coordinates": [0, 0]}, "type": "Feature", "properties": {}}],
         }
         tile = Tile(data={cls.search_model_geom_nodeid: cls.geom}, nodegroup_id=cls.search_model_geom_nodeid)
         cls.test_resource.tiles.append(tile)
@@ -181,7 +159,7 @@ class ResourceTests(ArchesTestCase):
         """
         node_name = "Name"
         result = self.test_resource.get_node_values(node_name)
-        self.assertEqual('Test Name 1', result[0])
+        self.assertEqual("Test Name 1", result[0])
 
     def test_get_node_value_date(self):
         """
@@ -189,7 +167,7 @@ class ResourceTests(ArchesTestCase):
         """
         node_name = "Creation Date"
         result = self.test_resource.get_node_values(node_name)
-        self.assertEqual('1941-01-01', result[0])
+        self.assertEqual("1941-01-01", result[0])
 
     def test_get_node_value_concept(self):
         """
@@ -197,7 +175,7 @@ class ResourceTests(ArchesTestCase):
         """
         node_name = "Cultural Period Concept"
         result = self.test_resource.get_node_values(node_name)
-        self.assertEqual('Mock concept', result[0])
+        self.assertEqual("Mock concept", result[0])
 
     def test_get_not_existing_value_from_concept(self):
         """
@@ -205,8 +183,7 @@ class ResourceTests(ArchesTestCase):
         """
 
         test_resource_no_value = Resource(graph_id=self.search_model_graphid)
-        tile = Tile(data={self.search_model_cultural_period_nodeid: ''},
-                    nodegroup_id=self.search_model_cultural_period_nodeid)
+        tile = Tile(data={self.search_model_cultural_period_nodeid: ""}, nodegroup_id=self.search_model_cultural_period_nodeid)
         test_resource_no_value.tiles.append(tile)
         test_resource_no_value.save()
 
@@ -245,4 +222,4 @@ class ResourceTests(ArchesTestCase):
         """
 
         result = index_resources_by_type([self.search_model_graphid], clear_index=True, batch_size=4000)
-        self.assertEqual(result, 'Passed')
+        self.assertEqual(result, "Passed")

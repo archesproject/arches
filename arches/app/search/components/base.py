@@ -17,7 +17,7 @@ details = {}
 # }
 
 
-class BaseSearchFilter():
+class BaseSearchFilter:
     def __init__(self, request=None):
         self.request = request
 
@@ -59,7 +59,9 @@ class SearchFilterFactory(object):
                 filter_instance = self.search_filters_instances[search_filter.componentname]
             except:
                 filter_instance = None
-                class_method = get_class_from_modulename(search_filter.modulename, search_filter.classname, settings.SEARCH_COMPONENT_LOCATIONS)
+                class_method = get_class_from_modulename(
+                    search_filter.modulename, search_filter.classname, settings.SEARCH_COMPONENT_LOCATIONS
+                )
                 if class_method:
                     filter_instance = class_method(self.request)
                 self.search_filters_instances[search_filter.componentname] = filter_instance

@@ -14,6 +14,7 @@ addons:
       - openjdk-8-jdk
       - python-dev
       - postgresql-9.6-postgis-2.4
+      - libgconf2-4
 
 services:
   - postgresql

@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, PasswordResetForm, SetPasswordForm
@@ -25,6 +25,7 @@ from django.utils.translation import ugettext as _
 from arches.app.models import models
 from captcha.fields import ReCaptchaField
 
+
 class ArchesUserCreationForm(UserCreationForm):
     """
     A form that creates a user, with no privileges, from the given username and
@@ -32,12 +33,10 @@ class ArchesUserCreationForm(UserCreationForm):
     """
 
     def __init__(self, *args, **kwargs):
-        self.enable_captcha = kwargs.pop('enable_captcha', False)
+        self.enable_captcha = kwargs.pop("enable_captcha", False)
         super(ArchesUserCreationForm, self).__init__(*args, **kwargs)
         if self.enable_captcha:
-            self.fields['captcha'] = ReCaptchaField(attrs={
-                'theme' : 'clean',
-            })
+            self.fields["captcha"] = ReCaptchaField(attrs={"theme": "clean"})
 
     first_name = forms.CharField()
     last_name = forms.CharField()
@@ -46,16 +45,23 @@ class ArchesUserCreationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('email','username','first_name','last_name', 'ts')
+        fields = ("email", "username", "first_name", "last_name", "ts")
 
     def clean(self):
         cleaned_data = super(ArchesUserCreationForm, self).clean()
-        if 'email' in cleaned_data:
-            if User.objects.filter(email=cleaned_data['email']).count() > 0:
-                self.add_error('email', forms.ValidationError(
-                    _('This email address has already been regisitered with the system. If you forgot your password, click the "exit" link below and go to the login page to reset your password.'),
-                    code='unique',
-                ))
+        if "email" in cleaned_data:
+            if User.objects.filter(email=cleaned_data["email"]).count() > 0:
+                self.add_error(
+                    "email",
+                    forms.ValidationError(
+                        _(
+                            "This email address has already been regisitered with the system. \
+                            If you forgot your password, click the 'exit' link below and go to the login page to reset your password."
+                        ),
+                        code="unique",
+                    ),
+                )
+
 
 class ArchesUserProfileForm(ArchesUserCreationForm):
     """
@@ -74,7 +80,7 @@ class ArchesUserProfileForm(ArchesUserCreationForm):
 
     class Meta:
         model = User
-        fields = ('email','username','first_name','last_name', 'id')
+        fields = ("email", "username", "first_name", "last_name", "id")
 
     def clean(self):
         pass
@@ -82,19 +88,23 @@ class ArchesUserProfileForm(ArchesUserCreationForm):
     def save(self):
         user = User.objects.get(username=self.instance.username)
         with transaction.atomic():
-            user.first_name = self.cleaned_data['first_name']
-            user.last_name = self.cleaned_data['last_name']
-            user.email = self.cleaned_data['email']
+            user.first_name = self.cleaned_data["first_name"]
+            user.last_name = self.cleaned_data["last_name"]
+            user.email = self.cleaned_data["email"]
             if models.UserProfile.objects.filter(user=user).count() == 0:
                 models.UserProfile.objects.create(user=user)
-            user.userprofile.phone = self.cleaned_data['phone']
+            user.userprofile.phone = self.cleaned_data["phone"]
             user.userprofile.save()
             user.save()
         return user
 
+
 class ArchesPasswordResetForm(PasswordResetForm):
-    email = forms.CharField(widget=forms.EmailInput(attrs={'placeholder': 'Email', 'class': 'form-control input-lg'}))
+    email = forms.CharField(widget=forms.EmailInput(attrs={"placeholder": "Email", "class": "form-control input-lg"}))
+
 
 class ArchesSetPasswordForm(SetPasswordForm):
-    new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': _('New password'), 'class': 'form-control input-lg'}))
-    new_password2 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder':_('Re-enter new password'), 'class': 'form-control input-lg'}))
+    new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={"placeholder": _("New password"), "class": "form-control input-lg"}))
+    new_password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={"placeholder": _("Re-enter new password"), "class": "form-control input-lg"})
+    )
