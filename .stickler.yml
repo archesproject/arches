@@ -16,4 +16,4 @@ files:
 review:
   fail_on_comments: true
 fixers:
-  enable: false
+  enable: true
