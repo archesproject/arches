@@ -22,20 +22,14 @@ from arches.app.utils.skos import SKOSReader
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.system_metadata import system_metadata
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
-from arches.app.utils.data_management.resource_graphs import (
-    exporter as ResourceGraphExporter,
-)
+from arches.app.utils.data_management.resource_graphs import exporter as ResourceGraphExporter
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resources.formats.csvfile import (
     MissingConfigException,
     TileCsvReader,
 )
-from arches.app.utils.data_management.resources.formats.format import (
-    MissingGraphException,
-)
-from arches.app.utils.data_management.resources.formats.format import (
-    Reader as RelationImporter,
-)
+from arches.app.utils.data_management.resources.formats.format import MissingGraphException
+from arches.app.utils.data_management.resources.formats.format import Reader as RelationImporter
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.models.system_settings import settings
 from arches.app.models import models
@@ -120,21 +114,11 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-s",
-            "--source",
-            action="store",
-            dest="source",
-            default="",
-            help="Directory or file for processing",
+            "-s", "--source", action="store", dest="source", default="", help="Directory or file for processing",
         )
 
         parser.add_argument(
-            "-f",
-            "--format",
-            action="store",
-            dest="format",
-            default="arches",
-            help="Format: shp or arches",
+            "-f", "--format", action="store", dest="format", default="arches", help="Format: shp or arches",
         )
 
         parser.add_argument(
@@ -146,12 +130,7 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-d",
-            "--dest_dir",
-            action="store",
-            dest="dest_dir",
-            default=".",
-            help="Directory where you want to save exported files.",
+            "-d", "--dest_dir", action="store", dest="dest_dir", default=".", help="Directory where you want to save exported files."
         )
 
         parser.add_argument(
@@ -173,12 +152,7 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-c",
-            "--config_file",
-            action="store",
-            dest="config_file",
-            default=None,
-            help="Usually an export mapping file.",
+            "-c", "--config_file", action="store", dest="config_file", default=None, help="Usually an export mapping file.",
         )
 
         # parser.add_argument(
@@ -199,12 +173,7 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-n",
-            "--layer_name",
-            action="store",
-            dest="layer_name",
-            default=False,
-            help="The name of the layer to add or delete.",
+            "-n", "--layer_name", action="store", dest="layer_name", default=False, help="The name of the layer to add or delete."
         )
 
         parser.add_argument(
@@ -226,30 +195,12 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-i",
-            "--layer_icon",
-            action="store",
-            dest="layer_icon",
-            default="fa fa-globe",
-            help="An icon class to use for a map layer.",
+            "-i", "--layer_icon", action="store", dest="layer_icon", default="fa fa-globe", help="An icon class to use for a map layer."
         )
 
-        parser.add_argument(
-            "-b",
-            "--is_basemap",
-            action="store_true",
-            dest="is_basemap",
-            help="Add to make the layer a basemap.",
-        )
+        parser.add_argument("-b", "--is_basemap", action="store_true", dest="is_basemap", help="Add to make the layer a basemap.")
 
-        parser.add_argument(
-            "-db",
-            "--setup_db",
-            action="store",
-            dest="setup_db",
-            default=False,
-            help="Rebuild database",
-        )
+        parser.add_argument("-db", "--setup_db", action="store", dest="setup_db", default=False, help="Rebuild database")
 
         parser.add_argument(
             "-bulk",
@@ -279,18 +230,10 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-y",
-            "--yes",
-            action="store_true",
-            dest="yes",
-            help='used to force a yes answer to any user input "continue? y/n" prompt',
+            "-y", "--yes", action="store_true", dest="yes", help='used to force a yes answer to any user input "continue? y/n" prompt'
         )
 
-        parser.add_argument(
-            "--use_multiprocessing",
-            action="store_true",
-            help="enables multiprocessing during data import",
-        )
+        parser.add_argument("--use_multiprocessing", action="store_true", help="enables multiprocessing during data import")
 
     def handle(self, *args, **options):
         print("operation: " + options["operation"])
@@ -319,17 +262,11 @@ class Command(BaseCommand):
 
         if options["operation"] == "export_business_data":
             self.export_business_data(
-                options["dest_dir"],
-                options["format"],
-                options["config_file"],
-                options["graphs"],
-                options["single_file"],
+                options["dest_dir"], options["format"], options["config_file"], options["graphs"], options["single_file"]
             )
 
         if options["operation"] == "import_reference_data":
-            self.import_reference_data(
-                options["source"], options["overwrite"], options["stage"], options["bulk_load"]
-            )
+            self.import_reference_data(options["source"], options["overwrite"], options["stage"], options["bulk_load"])
 
         if options["operation"] == "import_graphs":
             self.import_graphs(options["source"])
@@ -363,10 +300,7 @@ class Command(BaseCommand):
 
         if options["operation"] == "add_mapbox_layer":
             self.add_mapbox_layer(
-                options["layer_name"],
-                options["mapbox_json_path"],
-                options["layer_icon"],
-                options["is_basemap"],
+                options["layer_name"], options["mapbox_json_path"], options["layer_icon"], options["is_basemap"],
             )
 
         if options["operation"] == "delete_mapbox_layer":
@@ -377,12 +311,7 @@ class Command(BaseCommand):
 
         if options["operation"] in ["load", "load_package"]:
             self.load_package(
-                options["source"],
-                options["setup_db"],
-                options["overwrite"],
-                options["bulk_load"],
-                options["stage"],
-                options["yes"],
+                options["source"], options["setup_db"], options["overwrite"], options["bulk_load"], options["stage"], options["yes"]
             )
 
         if options["operation"] in ["create", "create_package"]:
@@ -424,9 +353,7 @@ class Command(BaseCommand):
                     "path": existing_graph_file,
                 }
 
-        resource_graphs = ResourceGraphExporter.get_graphs_for_export(
-            ["resource_models"]
-        )
+        resource_graphs = ResourceGraphExporter.get_graphs_for_export(["resource_models"])
         if "graph" in resource_graphs:
             for graph in resource_graphs["graph"]:
                 output_graph = {"graph": [graph], "metadata": system_metadata()}
@@ -454,9 +381,7 @@ class Command(BaseCommand):
 
     def export_package_settings(self, dest_dir, force=False):
         overwrite = True
-        projects_package_settings_file = os.path.join(
-            settings.APP_ROOT, "package_settings.py"
-        )
+        projects_package_settings_file = os.path.join(settings.APP_ROOT, "package_settings.py")
         packages_package_settings_file = os.path.join(dest_dir, "package_settings.py")
         if os.path.exists(projects_package_settings_file):
             if os.path.exists(packages_package_settings_file) and force is False:
@@ -475,24 +400,16 @@ class Command(BaseCommand):
 
     def export_widgets(self, dest_dir, force=False):
         overwrite = True
-        widget_path = os.path.join(
-            settings.APP_ROOT, "media", "js", "views", "components", "widgets"
-        )
-        widget_template_path = os.path.join(
-            settings.APP_ROOT, "templates", "views", "components", "widgets"
-        )
+        widget_path = os.path.join(settings.APP_ROOT, "media", "js", "views", "components", "widgets")
+        widget_template_path = os.path.join(settings.APP_ROOT, "templates", "views", "components", "widgets")
         widget_config_path = os.path.join(settings.APP_ROOT, "widgets")
         if os.path.exists(widget_path):
             widgets = glob.glob(os.path.join(widget_path, "*.js"))
             for widget in widgets:
                 widget_basename = os.path.splitext(os.path.basename(widget))[0]
                 widget_dir = os.path.join(dest_dir, widget_basename)
-                widget_config_file = os.path.join(
-                    widget_config_path, widget_basename + ".json"
-                )
-                widget_template_file = os.path.join(
-                    widget_template_path, widget_basename + ".htm"
-                )
+                widget_config_file = os.path.join(widget_config_path, widget_basename + ".json")
+                widget_template_file = os.path.join(widget_template_path, widget_basename + ".htm")
                 if os.path.exists(widget_dir) is False:
                     os.makedirs(widget_dir)
                 shutil.copy(widget, widget_dir)
@@ -502,9 +419,7 @@ class Command(BaseCommand):
                     with open(widget_config_file) as f:
                         details = json.load(f)
                         if "widgetid" not in details:
-                            widget_instance = models.Widget.objects.get(
-                                name=details["name"]
-                            )
+                            widget_instance = models.Widget.objects.get(name=details["name"])
                             details["widgetid"] = str(widget_instance.widgetid)
                             f.close()
                             with open(widget_config_file, "w") as of:
@@ -516,9 +431,7 @@ class Command(BaseCommand):
             print("Updating Widgets")
             self.export_widgets(os.path.join(dest_dir, "extensions", "widgets"))
             print("Updating Resource Models")
-            self.export_resource_graphs(
-                os.path.join(dest_dir, "graphs", "resource_models"), yes
-            )
+            self.export_resource_graphs(os.path.join(dest_dir, "graphs", "resource_models"), yes)
         else:
             print(
                 "Could not update package. This directory does not have a package_config.json file. \
@@ -561,38 +474,24 @@ class Command(BaseCommand):
                         print("added", os.path.join(dest_dir, directory, ".gitkeep"))
 
             self.export_package_configs(dest_dir)
-            self.export_resource_graphs(
-                os.path.join(dest_dir, "graphs", "resource_models"), "true"
-            )
+            self.export_resource_graphs(os.path.join(dest_dir, "graphs", "resource_models"), "true")
             self.export_widgets(os.path.join(dest_dir, "extensions", "widgets"))
 
             try:
-                self.save_system_settings(
-                    data_dest=os.path.join(dest_dir, "system_settings")
-                )
+                self.save_system_settings(data_dest=os.path.join(dest_dir, "system_settings"))
             except Exception as e:
                 print(e)
                 print("Could not save system settings")
             self.export_package_settings(dest_dir, "true")
 
     def load_package(
-        self,
-        source,
-        setup_db=True,
-        overwrite_concepts="ignore",
-        bulk_load=False,
-        stage_concepts="keep",
-        yes=False,
+        self, source, setup_db=True, overwrite_concepts="ignore", bulk_load=False, stage_concepts="keep", yes=False,
     ):
         def load_ontology():
             load_default_ontology = True
             if settings.ONTOLOGY_BASE_NAME is not None:
                 if yes is False:
-                    response = input(
-                        "Would you like to load the {0} ontology? (Y/N): ".format(
-                            settings.ONTOLOGY_BASE_NAME
-                        )
-                    )
+                    response = input("Would you like to load the {0} ontology? (Y/N): ".format(settings.ONTOLOGY_BASE_NAME))
                     if response.lower() not in ("t", "true", "y", "yes"):
                         load_default_ontology = False
             else:
@@ -600,10 +499,7 @@ class Command(BaseCommand):
 
             if load_default_ontology == True:
                 print("loading the {0} ontology".format(settings.ONTOLOGY_BASE_NAME))
-                extensions = [
-                    os.path.join(settings.ONTOLOGY_PATH, x)
-                    for x in settings.ONTOLOGY_EXT
-                ]
+                extensions = [os.path.join(settings.ONTOLOGY_PATH, x) for x in settings.ONTOLOGY_EXT]
                 management.call_command(
                     "load_ontology",
                     source=os.path.join(settings.ONTOLOGY_PATH, settings.ONTOLOGY_BASE),
@@ -618,9 +514,7 @@ class Command(BaseCommand):
             update_system_settings = True
             if os.path.exists(settings.SYSTEM_SETTINGS_LOCAL_PATH):
                 if yes is False:
-                    response = input(
-                        "Overwrite current system settings with package settings? (Y/N): "
-                    )
+                    response = input("Overwrite current system settings with package settings? (Y/N): ")
                     if response.lower() in ("t", "true", "y", "yes"):
                         update_system_settings = True
                         print("Using package system settings")
@@ -628,42 +522,21 @@ class Command(BaseCommand):
                         update_system_settings = False
 
             if update_system_settings is True:
-                if (
-                    len(
-                        glob.glob(
-                            os.path.join(
-                                package_dir, "system_settings", "System_Settings.json"
-                            )
-                        )
-                    )
-                    > 0
-                ):
-                    system_settings = os.path.join(
-                        package_dir, "system_settings", "System_Settings.json"
-                    )
+                if len(glob.glob(os.path.join(package_dir, "system_settings", "System_Settings.json"))) > 0:
+                    system_settings = os.path.join(package_dir, "system_settings", "System_Settings.json")
                     shutil.copy(system_settings, settings.SYSTEM_SETTINGS_LOCAL_PATH)
-                    self.import_business_data(
-                        settings.SYSTEM_SETTINGS_LOCAL_PATH, overwrite=True
-                    )
+                    self.import_business_data(settings.SYSTEM_SETTINGS_LOCAL_PATH, overwrite=True)
 
         def load_package_settings(package_dir):
             if os.path.exists(os.path.join(package_dir, "package_settings.py")) is True:
                 update_package_settings = True
-                if os.path.exists(
-                    os.path.join(settings.APP_ROOT, "package_settings.py")
-                ):
+                if os.path.exists(os.path.join(settings.APP_ROOT, "package_settings.py")):
                     if yes is False:
-                        response = input(
-                            "Overwrite current packages_settings.py? (Y/N): "
-                        )
+                        response = input("Overwrite current packages_settings.py? (Y/N): ")
                         if response.lower() not in ("t", "true", "y", "yes"):
                             update_package_settings = False
-                    if update_package_settings is True and os.path.exists(
-                        os.path.join(package_dir, "package_settings.py")
-                    ):
-                        package_settings = os.path.join(
-                            package_dir, "package_settings.py"
-                        )
+                    if update_package_settings is True and os.path.exists(os.path.join(package_dir, "package_settings.py")):
+                        package_settings = os.path.join(package_dir, "package_settings.py")
                         shutil.copy(package_settings, settings.APP_ROOT)
                 elif os.path.exists(os.path.join(package_dir, "package_settings.py")):
                     package_settings = os.path.join(package_dir, "package_settings.py")
@@ -674,26 +547,15 @@ class Command(BaseCommand):
             if len(config_paths) > 0:
                 configs = json.load(open(config_paths[0]))
                 for relationship in configs["permitted_resource_relationships"]:
-                    (
-                        obj,
-                        created,
-                    ) = models.Resource2ResourceConstraint.objects.update_or_create(
-                        resourceclassfrom_id=uuid.UUID(
-                            relationship["resourceclassfrom_id"]
-                        ),
-                        resourceclassto_id=uuid.UUID(
-                            relationship["resourceclassto_id"]
-                        ),
-                        resource2resourceid=uuid.UUID(
-                            relationship["resource2resourceid"]
-                        ),
+                    (obj, created) = models.Resource2ResourceConstraint.objects.update_or_create(
+                        resourceclassfrom_id=uuid.UUID(relationship["resourceclassfrom_id"]),
+                        resourceclassto_id=uuid.UUID(relationship["resourceclassto_id"]),
+                        resource2resourceid=uuid.UUID(relationship["resource2resourceid"]),
                     )
 
         @transaction.atomic
         def load_preliminary_sql(package_dir):
-            resource_views = glob.glob(
-                os.path.join(package_dir, "preliminary_sql", "*.sql")
-            )
+            resource_views = glob.glob(os.path.join(package_dir, "preliminary_sql", "*.sql"))
             try:
                 with connection.cursor() as cursor:
                     for view in resource_views:
@@ -705,9 +567,7 @@ class Command(BaseCommand):
                 print("Could not connect to db")
 
         def load_resource_views(package_dir):
-            resource_views = glob.glob(
-                os.path.join(package_dir, "business_data", "resource_views", "*.sql")
-            )
+            resource_views = glob.glob(os.path.join(package_dir, "business_data", "resource_views", "*.sql"))
             try:
                 with connection.cursor() as cursor:
                     for view in resource_views:
@@ -720,9 +580,7 @@ class Command(BaseCommand):
 
         def load_graphs(package_dir):
             branches = glob.glob(os.path.join(package_dir, "graphs", "branches"))[0]
-            resource_models = glob.glob(
-                os.path.join(package_dir, "graphs", "resource_models")
-            )[0]
+            resource_models = glob.glob(os.path.join(package_dir, "graphs", "resource_models"))[0]
             # self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'graphs','branches'), overwrite_graphs=False)
             overwrite_graphs = True if yes is True else False
             self.import_graphs(branches, overwrite_graphs=overwrite_graphs)
@@ -737,15 +595,9 @@ class Command(BaseCommand):
 
             concept_data = []
             for file_type in file_types:
-                concept_data.extend(
-                    glob.glob(
-                        os.path.join(
-                            package_dir, "reference_data", "concepts", file_type
-                        )
-                    )
-                )
+                concept_data.extend(glob.glob(os.path.join(package_dir, "reference_data", "concepts", file_type)))
 
-            bar1 = pyprind.ProgBar(len(concept_data),bar_char='█') if len(concept_data) > 1 else None
+            bar1 = pyprind.ProgBar(len(concept_data), bar_char="█") if len(concept_data) > 1 else None
             for path in concept_data:
                 if bar1 is None:
                     print(path)
@@ -756,15 +608,9 @@ class Command(BaseCommand):
 
             collection_data = []
             for file_type in file_types:
-                collection_data.extend(
-                    glob.glob(
-                        os.path.join(
-                            package_dir, "reference_data", "collections", file_type
-                        )
-                    )
-                )
+                collection_data.extend(glob.glob(os.path.join(package_dir, "reference_data", "collections", file_type)))
 
-            bar2 = pyprind.ProgBar(len(collection_data),bar_char='█') if len(collection_data) > 1 else None
+            bar2 = pyprind.ProgBar(len(collection_data), bar_char="█") if len(collection_data) > 1 else None
             for path in collection_data:
                 if bar2 is None:
                     print(path)
@@ -773,10 +619,7 @@ class Command(BaseCommand):
                     head, tail = os.path.split(path)
                     bar2.update(item_id=tail)
 
-            print(
-                "Total time to load concepts: %s s"
-                % (timedelta(seconds=time() - start))
-            )
+            print("Total time to load concepts: %s s" % (timedelta(seconds=time() - start)))
 
         def load_mapbox_styles(style_paths, basemap):
             for path in style_paths:
@@ -784,38 +627,14 @@ class Command(BaseCommand):
                 try:
                     meta = {"icon": "fa fa-globe", "name": style["name"]}
                     if os.path.exists(os.path.join(os.path.dirname(path), "meta.json")):
-                        meta = json.load(
-                            open(os.path.join(os.path.dirname(path), "meta.json"))
-                        )
+                        meta = json.load(open(os.path.join(os.path.dirname(path), "meta.json")))
                     self.add_mapbox_layer(meta["name"], path, meta["icon"], basemap)
                 except KeyError as e:
-                    logger.warning(
-                        "The map layer '{}' was not imported: {} is missing.".format(
-                            path, e
-                        )
-                    )
+                    logger.warning("The map layer '{}' was not imported: {} is missing.".format(path, e))
 
         def load_map_layers(package_dir):
-            basemap_styles = glob.glob(
-                os.path.join(
-                    package_dir,
-                    "map_layers",
-                    "mapbox_spec_json",
-                    "basemaps",
-                    "*",
-                    "*.json",
-                )
-            )
-            overlay_styles = glob.glob(
-                os.path.join(
-                    package_dir,
-                    "map_layers",
-                    "mapbox_spec_json",
-                    "overlays",
-                    "*",
-                    "*.json",
-                )
-            )
+            basemap_styles = glob.glob(os.path.join(package_dir, "map_layers", "mapbox_spec_json", "basemaps", "*", "*.json"))
+            overlay_styles = glob.glob(os.path.join(package_dir, "map_layers", "mapbox_spec_json", "overlays", "*", "*.json"))
             load_mapbox_styles(basemap_styles, True)
             load_mapbox_styles(overlay_styles, False)
 
@@ -826,26 +645,15 @@ class Command(BaseCommand):
                 configs = json.load(open(config_paths[0]))
 
             business_data = []
-            if (
-                "business_data_load_order" in configs
-                and len(configs["business_data_load_order"]) > 0
-            ):
+            if "business_data_load_order" in configs and len(configs["business_data_load_order"]) > 0:
                 for f in configs["business_data_load_order"]:
                     business_data.append(os.path.join(package_dir, "business_data", f))
             else:
-                business_data += glob.glob(
-                    os.path.join(package_dir, "business_data", "*.json")
-                )
-                business_data += glob.glob(
-                    os.path.join(package_dir, "business_data", "*.jsonl")
-                )
-                business_data += glob.glob(
-                    os.path.join(package_dir, "business_data", "*.csv")
-                )
+                business_data += glob.glob(os.path.join(package_dir, "business_data", "*.json"))
+                business_data += glob.glob(os.path.join(package_dir, "business_data", "*.jsonl"))
+                business_data += glob.glob(os.path.join(package_dir, "business_data", "*.csv"))
 
-            relations = glob.glob(
-                os.path.join(package_dir, "business_data", "relations", "*.relations")
-            )
+            relations = glob.glob(os.path.join(package_dir, "business_data", "relations", "*.relations"))
 
             for path in business_data:
                 if path.endswith("csv"):
@@ -857,9 +665,7 @@ class Command(BaseCommand):
             for relation in relations:
                 self.import_business_data_relations(relation)
 
-            uploaded_files = glob.glob(
-                os.path.join(package_dir, "business_data", "files", "*")
-            )
+            uploaded_files = glob.glob(os.path.join(package_dir, "business_data", "files", "*"))
             dest_files_dir = os.path.join(settings.MEDIA_ROOT, "uploadedfiles")
             if os.path.exists(dest_files_dir) is False:
                 os.makedirs(dest_files_dir)
@@ -867,55 +673,33 @@ class Command(BaseCommand):
                 shutil.copy(f, dest_files_dir)
 
         def load_extensions(package_dir, ext_type, cmd):
-            extensions = glob.glob(
-                os.path.join(package_dir, "extensions", ext_type, "*")
-            )
-            root = (
-                settings.APP_ROOT
-                if settings.APP_ROOT is not None
-                else os.path.join(settings.ROOT_DIR, "app")
-            )
-            component_dir = os.path.join(
-                root, "media", "js", "views", "components", ext_type
-            )
+            extensions = glob.glob(os.path.join(package_dir, "extensions", ext_type, "*"))
+            root = settings.APP_ROOT if settings.APP_ROOT is not None else os.path.join(settings.ROOT_DIR, "app")
+            component_dir = os.path.join(root, "media", "js", "views", "components", ext_type)
             module_dir = os.path.join(root, ext_type)
-            template_dir = os.path.join(
-                root, "templates", "views", "components", ext_type
-            )
+            template_dir = os.path.join(root, "templates", "views", "components", ext_type)
 
             for extension in extensions:
                 templates = glob.glob(os.path.join(extension, "*.htm"))
                 components = glob.glob(os.path.join(extension, "*.js"))
 
                 if len(templates) == 1:
-                    dest_path = os.path.join(
-                        template_dir, os.path.basename(templates[0])
-                    )
+                    dest_path = os.path.join(template_dir, os.path.basename(templates[0]))
                     if os.path.exists(dest_path) is False:
                         if os.path.exists(template_dir) is False:
                             os.mkdir(template_dir)
                         shutil.copy(templates[0], template_dir)
                     else:
-                        logger.info(
-                            "Not loading {0} from package. Extension already exists".format(
-                                templates[0]
-                            )
-                        )
+                        logger.info("Not loading {0} from package. Extension already exists".format(templates[0]))
 
                 if len(components) == 1:
-                    dest_path = os.path.join(
-                        component_dir, os.path.basename(components[0])
-                    )
+                    dest_path = os.path.join(component_dir, os.path.basename(components[0]))
                     if os.path.exists(dest_path) is False:
                         if os.path.exists(component_dir) is False:
                             os.mkdir(component_dir)
                         shutil.copy(components[0], component_dir)
                     else:
-                        logger.info(
-                            "Not loading {0} from package. Extension already exists".format(
-                                components[0]
-                            )
-                        )
+                        logger.info("Not loading {0} from package. Extension already exists".format(components[0]))
 
                 modules = glob.glob(os.path.join(extension, "*.json"))
                 modules.extend(glob.glob(os.path.join(extension, "*.py")))
@@ -927,23 +711,18 @@ class Command(BaseCommand):
                         shutil.copy(module, module_dir)
                         management.call_command(cmd, "register", source=module)
                     else:
-                        logger.info(
-                            "Not loading {0} from package. Extension already exists".format(
-                                modules[0]
-                            )
-                        )
+                        logger.info("Not loading {0} from package. Extension already exists".format(modules[0]))
 
         def load_indexes(package_dir):
-            index_files = glob.glob(os.path.join(package_dir, 'search_indexes', '*.py'))
-            root = settings.APP_ROOT if settings.APP_ROOT is not None else os.path.join(
-                settings.ROOT_DIR, 'app')
-            dest_dir = os.path.join(root, 'search_indexes')
+            index_files = glob.glob(os.path.join(package_dir, "search_indexes", "*.py"))
+            root = settings.APP_ROOT if settings.APP_ROOT is not None else os.path.join(settings.ROOT_DIR, "app")
+            dest_dir = os.path.join(root, "search_indexes")
 
             for index_file in index_files:
                 shutil.copy(index_file, dest_dir)
-                package_settings = imp.load_source('', os.path.join(settings.APP_ROOT, 'package_settings.py'))
+                package_settings = imp.load_source("", os.path.join(settings.APP_ROOT, "package_settings.py"))
                 for index in package_settings.ELASTICSEARCH_CUSTOM_INDEXES:
-                    es_index = import_class_from_string(index['module'])(index['name'])
+                    es_index = import_class_from_string(index["module"])(index["name"])
                     es_index.prepare_index()
 
         def load_datatypes(package_dir):
@@ -973,9 +752,7 @@ class Command(BaseCommand):
                 try:
                     app_name = os.path.basename(app)
                     management.call_command("startapp", "--template", app, app_name)
-                    management.call_command(
-                        "makemigrations", app_name, interactive=False
-                    )
+                    management.call_command("makemigrations", app_name, interactive=False)
                     management.call_command("migrate", new_name, interactive=False)
                 except CommandError as e:
                     print(e)
@@ -986,9 +763,7 @@ class Command(BaseCommand):
 
             package_dir = False
 
-            unzip_into_dir = os.path.join(
-                os.getcwd(), "_pkg_" + datetime.now().strftime("%y%m%d_%H%M%S")
-            )
+            unzip_into_dir = os.path.join(os.getcwd(), "_pkg_" + datetime.now().strftime("%y%m%d_%H%M%S"))
             os.mkdir(unzip_into_dir)
 
             if source.endswith(".zip") and os.path.isfile(source):
@@ -1057,11 +832,7 @@ class Command(BaseCommand):
         load_resource_views(package_location)
         print("loading apps")
         load_apps(package_location)
-        root = (
-            settings.APP_ROOT
-            if settings.APP_ROOT is not None
-            else os.path.join(settings.ROOT_DIR, "app")
-        )
+        root = settings.APP_ROOT if settings.APP_ROOT is not None else os.path.join(settings.ROOT_DIR, "app")
         print("loading package css")
         css_source = os.path.join(package_location, "extensions", "css")
         if os.path.exists(css_source):
@@ -1131,75 +902,44 @@ class Command(BaseCommand):
         for mapping in mappings:
             # print('%s -- %s' % (mapping.entitytypeidfrom_id, mapping.entitytypeidto_id))
             if mapping.entitytypeidfrom_id not in resourcetypes:
-                resourcetypes[mapping.entitytypeidfrom_id] = {
-                    mapping.entitytypeidfrom_id
-                }
+                resourcetypes[mapping.entitytypeidfrom_id] = {mapping.entitytypeidfrom_id}
             for step in mapping_steps.filter(pk=mapping.pk):
-                resourcetypes[mapping.entitytypeidfrom_id].add(
-                    step.ruleid.entitytyperange_id
-                )
+                resourcetypes[mapping.entitytypeidfrom_id].add(step.ruleid.entitytyperange_id)
 
         for resourcetype in resourcetypes:
             for entitytype in resourcetypes[resourcetype]:
-                content_type = ContentType.objects.get_or_create(
-                    app_label=resourcetype, model=entitytype
+                content_type = ContentType.objects.get_or_create(app_label=resourcetype, model=entitytype)
+                Permission.objects.create(
+                    codename="add_%s" % entitytype, name="%s - add" % entitytype, content_type=content_type[0],
                 )
                 Permission.objects.create(
-                    codename="add_%s" % entitytype,
-                    name="%s - add" % entitytype,
-                    content_type=content_type[0],
+                    codename="update_%s" % entitytype, name="%s - update" % entitytype, content_type=content_type[0],
                 )
                 Permission.objects.create(
-                    codename="update_%s" % entitytype,
-                    name="%s - update" % entitytype,
-                    content_type=content_type[0],
+                    codename="read_%s" % entitytype, name="%s - read" % entitytype, content_type=content_type[0],
                 )
                 Permission.objects.create(
-                    codename="read_%s" % entitytype,
-                    name="%s - read" % entitytype,
-                    content_type=content_type[0],
-                )
-                Permission.objects.create(
-                    codename="delete_%s" % entitytype,
-                    name="%s - delete" % entitytype,
-                    content_type=content_type[0],
+                    codename="delete_%s" % entitytype, name="%s - delete" % entitytype, content_type=content_type[0],
                 )
 
     def export_business_data(
-        self,
-        data_dest=None,
-        file_format=None,
-        config_file=None,
-        graph=None,
-        single_file=False,
+        self, data_dest=None, file_format=None, config_file=None, graph=None, single_file=False,
     ):
         try:
-            resource_exporter = ResourceExporter(
-                file_format, configs=config_file, single_file=single_file
-            )
+            resource_exporter = ResourceExporter(file_format, configs=config_file, single_file=single_file)
         except KeyError as e:
-            utils.print_message(
-                "{0} is not a valid export file format.".format(file_format)
-            )
+            utils.print_message("{0} is not a valid export file format.".format(file_format))
             sys.exit()
         except MissingConfigException as e:
-            utils.print_message(
-                "No mapping file specified. Please rerun this command with the '-c' parameter populated."
-            )
+            utils.print_message("No mapping file specified. Please rerun this command with the '-c' parameter populated.")
             sys.exit()
 
         if data_dest != "":
             try:
-                data = resource_exporter.export(
-                    graph_id=graph, resourceinstanceids=None
-                )
+                data = resource_exporter.export(graph_id=graph, resourceinstanceids=None)
             except MissingGraphException as e:
 
-                print(
-                    utils.print_message(
-                        "No resource graph specified. Please rerun this command with the '-g' parameter populated."
-                    )
-                )
+                print(utils.print_message("No resource graph specified. Please rerun this command with the '-g' parameter populated."))
 
                 sys.exit()
 
@@ -1211,9 +951,7 @@ class Command(BaseCommand):
                 # with open(os.path.join(data_dest, file['name']), 'wb') as f:
                 #     f.write(file['outputfile'].getvalue())
         else:
-            utils.print_message(
-                "No destination directory specified. Please rerun this command with the '-d' parameter populated."
-            )
+            utils.print_message("No destination directory specified. Please rerun this command with the '-d' parameter populated.")
             sys.exit()
 
     def import_reference_data(self, data_source, overwrite="ignore", stage="stage", bulk_load=False):
@@ -1225,14 +963,7 @@ class Command(BaseCommand):
         ret = skos.save_concepts_from_skos(rdf, overwrite, stage, bulk_load, data_source)
 
     def import_business_data(
-        self,
-        data_source,
-        config_file=None,
-        overwrite=None,
-        bulk_load=False,
-        create_concepts=False,
-        use_multiprocessing=False,
-        force=False,
+        self, data_source, config_file=None, overwrite=None, bulk_load=False, create_concepts=False, use_multiprocessing=False, force=False
     ):
         """
         Imports business data from all formats. A config file (mapping file) is required for .csv format.
@@ -1262,9 +993,7 @@ will be very jumbled."""
             print("Multiprocessing is only supported with JSONL import files.")
 
         if overwrite == "":
-            utils.print_message(
-                "No overwrite option indicated. Please rerun command with '-ow' parameter."
-            )
+            utils.print_message("No overwrite option indicated. Please rerun command with '-ow' parameter.")
             sys.exit()
 
         if data_source == "":
@@ -1296,9 +1025,7 @@ will be very jumbled."""
                         use_multiprocessing=use_multiprocessing,
                     )
                 else:
-                    utils.print_message(
-                        "No file found at indicated location: {0}".format(source)
-                    )
+                    utils.print_message("No file found at indicated location: {0}".format(source))
                     sys.exit()
         else:
             utils.print_message(
@@ -1314,9 +1041,7 @@ will be very jumbled."""
         """
 
         if overwrite == "":
-            utils.print_message(
-                "No overwrite option indicated. Please rerun command with '-ow' parameter."
-            )
+            utils.print_message("No overwrite option indicated. Please rerun command with '-ow' parameter.")
             sys.exit()
 
         if isinstance(data_source, str):
@@ -1330,9 +1055,7 @@ will be very jumbled."""
                     business_data = list(data)
                     TileCsvReader(business_data).import_business_data(overwrite=None)
                 else:
-                    utils.print_message(
-                        "No file found at indicated location: {0}".format(source)
-                    )
+                    utils.print_message("No file found at indicated location: {0}".format(source))
                     sys.exit()
         else:
             utils.print_message(
@@ -1355,9 +1078,7 @@ will be very jumbled."""
                     relations = csv.DictReader(open(path, "r"))
                     RelationImporter().import_relations(relations)
                 else:
-                    utils.print_message(
-                        "No file found at indicated location: {0}".format(path)
-                    )
+                    utils.print_message("No file found at indicated location: {0}".format(path))
                     sys.exit()
             else:
                 utils.print_message(
@@ -1385,11 +1106,7 @@ will be very jumbled."""
                     archesfile = JSONDeserializer().deserialize(f)
                     ResourceGraphImporter(archesfile["graph"], overwrite_graphs)
             else:
-                file_paths = [
-                    file_path
-                    for file_path in os.listdir(path)
-                    if file_path.endswith(".json")
-                ]
+                file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith(".json")]
                 for file_path in file_paths:
                     print(os.path.join(path, file_path))
                     with open(os.path.join(path, file_path), "rU") as f:
@@ -1403,20 +1120,12 @@ will be very jumbled."""
         """
         if data_dest != "":
             graphs = [graph.strip() for graph in graphs.split(",")]
-            for graph in ResourceGraphExporter.get_graphs_for_export(graphids=graphs)[
-                "graph"
-            ]:
+            for graph in ResourceGraphExporter.get_graphs_for_export(graphids=graphs)["graph"]:
                 graph_name = graph["name"].replace("/", "-")
                 with open(os.path.join(data_dest, graph_name + ".json"), "wb") as f:
-                    f.write(
-                        JSONSerializer()
-                        .serialize({"graph": [graph]}, indent=4)
-                        .encode("utf-8")
-                    )
+                    f.write(JSONSerializer().serialize({"graph": [graph]}, indent=4).encode("utf-8"))
         else:
-            utils.print_message(
-                "No destination directory specified. Please rerun this command with the '-d' parameter populated."
-            )
+            utils.print_message("No destination directory specified. Please rerun this command with the '-d' parameter populated.")
             sys.exit()
 
     def save_system_settings(
@@ -1428,9 +1137,7 @@ will be very jumbled."""
         single_file=False,
     ):
 
-        resource_exporter = ResourceExporter(
-            file_format, configs=config_file, single_file=single_file
-        )
+        resource_exporter = ResourceExporter(file_format, configs=config_file, single_file=single_file)
         if data_dest == ".":
             data_dest = os.path.dirname(settings.SYSTEM_SETTINGS_LOCAL_PATH)
         if data_dest != "":
@@ -1439,17 +1146,11 @@ will be very jumbled."""
                 with open(os.path.join(data_dest, file["name"]), "wb") as f:
                     f.write(file["outputfile"].getvalue())
         else:
-            utils.print_message(
-                "No destination directory specified. Please rerun this command with the '-d' parameter populated."
-            )
+            utils.print_message("No destination directory specified. Please rerun this command with the '-d' parameter populated.")
             sys.exit()
 
     def add_mapbox_layer(
-        self,
-        layer_name=False,
-        mapbox_json_path=False,
-        layer_icon="fa fa-globe",
-        is_basemap=False,
+        self, layer_name=False, mapbox_json_path=False, layer_icon="fa fa-globe", is_basemap=False,
     ):
         if layer_name is not False and mapbox_json_path is not False:
             with open(mapbox_json_path) as data_file:
@@ -1459,21 +1160,14 @@ will be very jumbled."""
                         if "source" in layer:
                             layer["source"] = layer["source"] + "-" + layer_name
                     for source_name, source_dict in data["sources"].items():
-                        map_source = models.MapSource.objects.get_or_create(
-                            name=source_name + "-" + layer_name, source=source_dict
-                        )
+                        map_source = models.MapSource.objects.get_or_create(name=source_name + "-" + layer_name, source=source_dict)
                     map_layer = models.MapLayer(
-                        name=layer_name,
-                        layerdefinitions=data["layers"],
-                        isoverlay=(not is_basemap),
-                        icon=layer_icon,
+                        name=layer_name, layerdefinitions=data["layers"], isoverlay=(not is_basemap), icon=layer_icon
                     )
                     try:
                         map_layer.save()
                     except IntegrityError as e:
-                        print(
-                            "Cannot save layer: {0} already exists".format(layer_name)
-                        )
+                        print("Cannot save layer: {0} already exists".format(layer_name))
 
     def delete_mapbox_layer(self, layer_name=False):
         if layer_name is not False:
@@ -1496,18 +1190,14 @@ will be very jumbled."""
             graph = [x.strip(" ") for x in graphs.split(",")]
         include_concepts = True
 
-        graph_exporter.create_mapping_configuration_file(
-            graphs, include_concepts, dest_dir
-        )
+        graph_exporter.create_mapping_configuration_file(graphs, include_concepts, dest_dir)
 
     def import_mapping_file(self, source=None):
         """
         Imports export mapping files for resource models.
         """
         if source == "":
-            utils.print_message(
-                "No data source indicated. Please rerun command with '-s' parameter."
-            )
+            utils.print_message("No data source indicated. Please rerun command with '-s' parameter.")
 
         if isinstance(source, str):
             source = [source]

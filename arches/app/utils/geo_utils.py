@@ -4,11 +4,10 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 
 
 class GeoUtils(object):
-
     def create_geom_collection_from_geojson(self, geojson):
         geoms = []
-        for feature in geojson['features']:
-            geoms.append(GEOSGeometry(JSONSerializer().serialize(feature['geometry'])))
+        for feature in geojson["features"]:
+            geoms.append(GEOSGeometry(JSONSerializer().serialize(feature["geometry"])))
         return GeometryCollection(geoms)
 
     def get_bounds_from_geojson(self, geojson):
@@ -35,14 +34,8 @@ class GeoUtils(object):
         if geom is not None:
             multipart = geom
             fc = {"type": "FeatureCollection", "features": []}
-            for coords in multipart['coordinates']:
-                geom = { "type": "Feature",
-                            "geometry": {
-                                "type": "Polygon",
-                                "coordinates": coords
-                            },
-                            "properties": {}
-                        };
-                fc['features'].append(geom)
+            for coords in multipart["coordinates"]:
+                geom = {"type": "Feature", "geometry": {"type": "Polygon", "coordinates": coords}, "properties": {}}
+                fc["features"].append(geom)
             result = fc
         return result

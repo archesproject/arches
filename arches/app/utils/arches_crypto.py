@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,16 +14,16 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import base64
 import hashlib
 from Crypto.Cipher import AES
 from Crypto import Random
 
-class AESCipher(object):
 
-    def __init__(self, key): 
+class AESCipher(object):
+    def __init__(self, key):
         self.bs = AES.block_size
         self.key = hashlib.sha256(key.encode()).digest()
 
@@ -35,9 +35,9 @@ class AESCipher(object):
 
     def decrypt(self, enc):
         enc = base64.b64decode(enc)
-        iv = enc[:AES.block_size]
+        iv = enc[: AES.block_size]
         cipher = AES.new(self.key, AES.MODE_CBC, iv)
-        return self._unpad(cipher.decrypt(enc[AES.block_size:])).decode('utf-8')
+        return self._unpad(cipher.decrypt(enc[AES.block_size :])).decode("utf-8")
 
     def _pad(self, s):
         s = s.encode()
@@ -46,4 +46,4 @@ class AESCipher(object):
 
     @staticmethod
     def _unpad(s):
-        return s[:-ord(s[len(s)-1:])]
+        return s[: -ord(s[len(s) - 1:])]

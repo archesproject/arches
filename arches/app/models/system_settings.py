@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 from django.conf import LazySettings
 from django.db import ProgrammingError, OperationalError
@@ -37,12 +37,12 @@ class SystemSettings(LazySettings):
 
     """
 
-    SYSTEM_SETTINGS_RESOURCE_MODEL_ID = 'ff623370-fa12-11e6-b98b-6c4008b05c4c'
-    RESOURCE_INSTANCE_ID = 'a106c400-260c-11e7-a604-14109fd34195'
+    SYSTEM_SETTINGS_RESOURCE_MODEL_ID = "ff623370-fa12-11e6-b98b-6c4008b05c4c"
+    RESOURCE_INSTANCE_ID = "a106c400-260c-11e7-a604-14109fd34195"
 
     def __init__(self, *args, **kwargs):
         super(SystemSettings, self).__init__(*args, **kwargs)
-        #print self
+        # print self
 
     def __str__(self):
         ret = []
@@ -50,7 +50,7 @@ class SystemSettings(LazySettings):
             if setting.isupper():
                 setting_value = getattr(self, setting)
                 ret.append("%s = %s" % (setting, setting_value))
-        return '\n'.join(ret)
+        return "\n".join(ret)
 
     def __getattr__(self, name):
         """
@@ -67,7 +67,7 @@ class SystemSettings(LazySettings):
             return super(SystemSettings, self).__getattr__(name)
         except:
             self.update_from_db()
-            return super(SystemSettings, self).__getattr__(name) #getattr(self, name, True)
+            return super(SystemSettings, self).__getattr__(name)  # getattr(self, name, True)
 
     def update_from_db(self, **kwargs):
         """
@@ -80,14 +80,14 @@ class SystemSettings(LazySettings):
 
             def setup_node(node, parent_node=None):
                 if node.is_collector:
-                    if node.nodegroup.cardinality == '1':
+                    if node.nodegroup.cardinality == "1":
                         obj = {}
                         for decendant_node in self.get_direct_decendent_nodes(node):
                             obj[decendant_node.name] = setup_node(decendant_node, node)
 
                         setattr(self, node.name, obj)
 
-                    if node.nodegroup.cardinality == 'n':
+                    if node.nodegroup.cardinality == "n":
                         setattr(self, node.name, [])
                     return getattr(self, node.name)
 
@@ -98,23 +98,23 @@ class SystemSettings(LazySettings):
 
         # set any values saved in the instance of the Arches System Settings Graph
         for tile in models.TileModel.objects.filter(resourceinstance__graph_id=self.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
-            if tile.nodegroup.cardinality == '1':
+            if tile.nodegroup.cardinality == "1":
                 for node in tile.nodegroup.node_set.all():
-                    if node.datatype != 'semantic':
+                    if node.datatype != "semantic":
                         try:
                             val = tile.data[str(node.nodeid)]
                             setattr(self, node.name, val)
                         except:
                             pass
 
-            if tile.nodegroup.cardinality == 'n':
+            if tile.nodegroup.cardinality == "n":
                 obj = {}
-                collector_nodename = ''
+                collector_nodename = ""
                 for node in tile.nodegroup.node_set.all():
                     # print "%s: %s" % (node.name,node.is_collector)
                     if node.is_collector:
                         collector_nodename = node.name
-                    if node.datatype != 'semantic':
+                    if node.datatype != "semantic":
                         obj[node.name] = tile.data[str(node.nodeid)]
 
                 # print collector_nodename
@@ -124,7 +124,7 @@ class SystemSettings(LazySettings):
                 val.append(obj)
                 setattr(self, collector_nodename, val)
 
-        #print self
+        # print self
 
     def get_direct_decendent_nodes(self, node):
         nodes = []

@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 
 # From https://towardsdatascience.com/how-to-flatten-deeply-nested-json-objects-in-non-recursive-elegant-python-55f96533103d
@@ -29,7 +29,7 @@ def flatten_dict(nested_dict, separator="_"):
     """
     out = {}
 
-    def flatten(x, name=''):
+    def flatten(x, name=""):
         if type(x) is dict:
             for a in x:
                 flatten(x[a], name + a + separator)

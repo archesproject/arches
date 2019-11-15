@@ -4,7 +4,6 @@ from arches.app.models import models
 
 
 class BaseDataType(object):
-
     def __init__(self, model=None):
         self.datatype_model = model
 
@@ -65,7 +64,7 @@ class BaseDataType(object):
         """
         Converts '' values to null when saving a tile.
         """
-        if tile.data[nodeid] == '':
+        if tile.data[nodeid] == "":
             tile.data[nodeid] = None
 
     def get_map_source(self, node=None, preview=False):
@@ -74,15 +73,10 @@ class BaseDataType(object):
         should be a dictionary including (as in map_sources table):
         name, source (json)
         """
-        tileserver_url = urllib.parse.unquote(
-            reverse('mvt', args=(node.nodeid, '{z}', '{x}', '{y}'))
-        )
+        tileserver_url = urllib.parse.unquote(reverse("mvt", args=(node.nodeid, "{z}", "{x}", "{y}")))
         if node is None:
             return None
-        source_config = {
-            "type": "vector",
-            "tiles": [tileserver_url]
-        }
+        source_config = {"type": "vector", "tiles": [tileserver_url]}
         count = None
         if preview == True:
             count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
@@ -94,140 +88,65 @@ class BaseDataType(object):
                         "features": [
                             {
                                 "type": "Feature",
-                                "properties": {
-                                    "total": 1
-                                },
-                                "geometry": {
-                                    "type": "Point",
-                                    "coordinates": [
-                                        -122.4810791015625,
-                                        37.93553306183642
-                                    ]
-                                }
+                                "properties": {"total": 1},
+                                "geometry": {"type": "Point", "coordinates": [-122.4810791015625, 37.93553306183642]},
                             },
                             {
                                 "type": "Feature",
-                                "properties": {
-                                    "total": 100
-                                },
-                                "geometry": {
-                                    "type": "Point",
-                                    "coordinates": [
-                                        -58.30078125,
-                                        -18.075412438417395
-                                    ]
-                                }
+                                "properties": {"total": 100},
+                                "geometry": {"type": "Point", "coordinates": [-58.30078125, -18.075412438417395]},
                             },
                             {
                                 "type": "Feature",
-                                "properties": {
-                                    "total": 1
-                                },
+                                "properties": {"total": 1},
                                 "geometry": {
                                     "type": "LineString",
                                     "coordinates": [
-                                        [
-                                            -179.82421875,
-                                            44.213709909702054
-                                        ],
-                                        [
-                                            -154.16015625,
-                                            32.69486597787505
-                                        ],
-                                        [
-                                            -171.5625,
-                                            18.812717856407776
-                                        ],
-                                        [
-                                            -145.72265625,
-                                            2.986927393334876
-                                        ],
-                                        [
-                                            -158.37890625,
-                                            -30.145127183376115
-                                        ]
-                                    ]
-                                }
+                                        [-179.82421875, 44.213709909702054],
+                                        [-154.16015625, 32.69486597787505],
+                                        [-171.5625, 18.812717856407776],
+                                        [-145.72265625, 2.986927393334876],
+                                        [-158.37890625, -30.145127183376115],
+                                    ],
+                                },
                             },
                             {
                                 "type": "Feature",
-                                "properties": {
-                                    "total": 1
-                                },
+                                "properties": {"total": 1},
                                 "geometry": {
                                     "type": "Polygon",
                                     "coordinates": [
                                         [
-                                            [
-                                                -50.9765625,
-                                                22.59372606392931
-                                            ],
-                                            [
-                                                -23.37890625,
-                                                22.59372606392931
-                                            ],
-                                            [
-                                                -23.37890625,
-                                                42.94033923363181
-                                            ],
-                                            [
-                                                -50.9765625,
-                                                42.94033923363181
-                                            ],
-                                            [
-                                                -50.9765625,
-                                                22.59372606392931
-                                            ]
+                                            [-50.9765625, 22.59372606392931],
+                                            [-23.37890625, 22.59372606392931],
+                                            [-23.37890625, 42.94033923363181],
+                                            [-50.9765625, 42.94033923363181],
+                                            [-50.9765625, 22.59372606392931],
                                         ]
-                                    ]
-                                }
+                                    ],
+                                },
                             },
                             {
                                 "type": "Feature",
-                                "properties": {
-                                    "total": 1
-                                },
+                                "properties": {"total": 1},
                                 "geometry": {
                                     "type": "Polygon",
                                     "coordinates": [
                                         [
-                                            [
-                                                -27.59765625,
-                                                -14.434680215297268
-                                            ],
-                                            [
-                                                -24.43359375,
-                                                -32.10118973232094
-                                            ],
-                                            [
-                                                0.87890625,
-                                                -31.653381399663985
-                                            ],
-                                            [
-                                                2.28515625,
-                                                -12.554563528593656
-                                            ],
-                                            [
-                                                -14.23828125,
-                                                -0.3515602939922709
-                                            ],
-                                            [
-                                                -27.59765625,
-                                                -14.434680215297268
-                                            ]
+                                            [-27.59765625, -14.434680215297268],
+                                            [-24.43359375, -32.10118973232094],
+                                            [0.87890625, -31.653381399663985],
+                                            [2.28515625, -12.554563528593656],
+                                            [-14.23828125, -0.3515602939922709],
+                                            [-27.59765625, -14.434680215297268],
                                         ]
-                                    ]
-                                }
-                            }
-                        ]
-                    }
+                                    ],
+                                },
+                            },
+                        ],
+                    },
                 }
-        return {
-            "nodeid": node.nodeid,
-            "name": "resources-%s" % node.nodeid,
-            "source": json.dumps(source_config),
-            "count": count
-        }
+        return {"nodeid": node.nodeid, "name": "resources-%s" % node.nodeid, "source": json.dumps(source_config), "count": count}
 
     def get_pref_label(self, nodevalue):
         """
@@ -240,13 +159,13 @@ class BaseDataType(object):
             data = tile.data
             provisionaledits = tile.provisionaledits
         except:
-            data = tile['data']
-            provisionaledits = tile['provisionaledits']
+            data = tile["data"]
+            provisionaledits = tile["provisionaledits"]
         if data is not None and len(list(data.keys())) > 0:
             return data
         elif provisionaledits is not None and len(list(provisionaledits.keys())) == 1:
             userid = list(provisionaledits.keys())[0]
-            return provisionaledits[userid]['value']
+            return provisionaledits[userid]["value"]
 
     def get_display_value(self, tile, node):
         """
@@ -300,16 +219,16 @@ class BaseDataType(object):
 
         g = Graph()
 
-        g.add((edge_info['r_uri'], RDF.type, URIRef(edge.rangenode.ontologyclass)))
+        g.add((edge_info["r_uri"], RDF.type, URIRef(edge.rangenode.ontologyclass)))
 
-        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), edge_info['r_uri']))
-        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+        g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), edge_info["r_uri"]))
+        g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
 
-        if edge_info['domain_tile_data'] is not None:
-            g.add((edge_info['d_uri'], RDF.value, Literal(JSONSerializer().serialize(edge_info['domain_tile_data']))))
+        if edge_info["domain_tile_data"] is not None:
+            g.add((edge_info["d_uri"], RDF.value, Literal(JSONSerializer().serialize(edge_info["domain_tile_data"]))))
 
-        if edge_info['range_tile_data'] is not None:
-            g.add((edge_info['r_uri'], RDF.value, Literal(JSONSerializer().serialize(edge_info['range_tile_data']))))
+        if edge_info["range_tile_data"] is not None:
+            g.add((edge_info["r_uri"], RDF.value, Literal(JSONSerializer().serialize(edge_info["range_tile_data"]))))
 
         return g
 

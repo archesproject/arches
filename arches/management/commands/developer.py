@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import os
 from arches.management.commands import utils
@@ -30,18 +30,18 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument('operation', nargs='?',
-        help='operation \'livereload\' starts livereload for this project on port 35729')
+        parser.add_argument("operation", nargs="?", help="operation 'livereload' starts livereload for this project on port 35729")
 
     def handle(self, *args, **options):
-        if options['operation'] == 'livereload':
+        if options["operation"] == "livereload":
             self.start_livereload()
 
     def start_livereload(self):
         from livereload import Server
+
         server = Server()
         for path in settings.STATICFILES_DIRS:
             server.watch(path)
-        for path in settings.TEMPLATES[0]['DIRS']:
+        for path in settings.TEMPLATES[0]["DIRS"]:
             server.watch(path)
         server.serve(port=settings.LIVERELOAD_PORT)

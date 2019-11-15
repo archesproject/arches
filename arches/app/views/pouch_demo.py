@@ -6,28 +6,30 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.response import JSONResponse
 from revproxy.views import ProxyView
 
+
 class CouchdbProxy(ProxyView):
-    #check user credentials here
+    # check user credentials here
     upstream = settings.COUCHDB_URL
+
 
 def index(request):
     # import ipdb
     # ipdb.set_trace()
-    projects = models.MobileSurveyModel.objects.all().order_by('name')
-    context = {
-        "projects": projects
-    }
+    projects = models.MobileSurveyModel.objects.all().order_by("name")
+    context = {"projects": projects}
 
-    return render(request, 'pouch_demo.htm', context)
+    return render(request, "pouch_demo.htm", context)
+
 
 def myProjects(request):
     projects = models.MobileSurveyModel.objects.all()
     response = JSONResponse(projects, indent=4)
-    response['Access-Control-Allow-Origin'] = '*'
+    response["Access-Control-Allow-Origin"] = "*"
     return response
 
+
 def push_edits_to_db(request):
-    project_id = request.GET.get('project_id', None)
+    project_id = request.GET.get("project_id", None)
     # read all docs that have changes
     # save back to postgres db
     project = Project.objects.get(pk=project_id)

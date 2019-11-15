@@ -1,4 +1,3 @@
-
 from django.views.generic import View
 from arches.app.utils.response import JSONResponse
 from django.http import HttpResponseNotFound

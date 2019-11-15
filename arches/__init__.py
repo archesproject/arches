@@ -6,10 +6,10 @@ try:
 except ModuleNotFoundError as e:
     print(e)
 
-VERSION = (5, 0, 0, 'final', 0)
+VERSION = (5, 0, 0, "final", 0)
 
 __version__ = get_version(VERSION)
 
 # This will make sure the app is always imported when
 # Django starts so that shared_task will use this app.
-__all__ = ('celery_app',)
+__all__ = ("celery_app",)
