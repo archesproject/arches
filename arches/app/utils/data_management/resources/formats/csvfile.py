@@ -274,7 +274,14 @@ class TileCsvWriter(Writer):
         nodes = Node.objects.filter(graph_id=self.graph_id)
         for node in nodes:
             mapping[str(node.nodeid)] = node.name
-        csv_header = ["ResourceID", "ResourceLegacyID", "ResourceModelID", "TileID", "ParentTileID", "NodeGroupID"] + list(mapping.values())
+        csv_header = [
+            "ResourceID",
+            "ResourceLegacyID",
+            "ResourceModelID",
+            "TileID",
+            "ParentTileID",
+            "NodeGroupID"
+        ] + list(mapping.values())
         csvs_for_export = []
 
         for resourceinstanceid, tiles in self.resourceinstances.items():
@@ -372,9 +379,8 @@ class CsvReader(Reader):
             errors.append(
                 {
                     "type": "WARNING",
-                    "message": "No resource created for legacyid: {0}. Make sure there is data to be imported for this resource and it is mapped properly in your mapping file.".format(
-                        legacyid
-                    ),
+                    "message": f"No resource created for legacyid: {legacyid}. Make sure there is data to be imported \
+                    for this resource and it is mapped properly in your mapping file.",
                 }
             )
 
@@ -461,7 +467,8 @@ class CsvReader(Reader):
                 except KeyError:
                     print("*" * 80)
                     print(
-                        "ERROR: No column 'ResourceID' found in business data file. Please add a 'ResourceID' column with a unique resource identifier."
+                        "ERROR: No column 'ResourceID' found in business data file. \
+                        Please add a 'ResourceID' column with a unique resource identifier."
                     )
                     print("*" * 80)
                     sys.exit()
@@ -515,7 +522,8 @@ class CsvReader(Reader):
                                     concept.append(val)
                                 concept = concept[0]
 
-                                # check if collection is in concepts_to_create, add collection to concepts_to_create if it's not and add first child concept
+                                # check if collection is in concepts_to_create, 
+                                # add collection to concepts_to_create if it's not and add first child concept
                                 if node["arches_nodeid"] not in concepts_to_create:
                                     concepts_to_create[node["arches_nodeid"]] = {}
                                     for concept_value in concept:
@@ -530,7 +538,8 @@ class CsvReader(Reader):
                     for non_contiguous_resource_id in non_contiguous_resource_ids:
                         print("ResourceID: " + non_contiguous_resource_id)
                     print(
-                        "ERROR: The preceding ResourceIDs are non-contiguous in your csv file. Please sort your csv file by ResourceID and try import again."
+                        "ERROR: The preceding ResourceIDs are non-contiguous in your csv file. \
+                        Please sort your csv file by ResourceID and try import again."
                     )
                     print("*" * 80)
                     sys.exit()
@@ -553,9 +562,8 @@ class CsvReader(Reader):
                                     errors.append(
                                         {
                                             "type": "WARNING",
-                                            "message": "A collection already exists for the {0} node. Use the add option to add concepts to this collection.".format(
-                                                node.name
-                                            ),
+                                            "message": f"A collection already exists for the {node.name} node. \
+                                            Use the add option to add concepts to this collection.",
                                         }
                                     )
                                     if len(errors) > 0:
@@ -592,7 +600,8 @@ class CsvReader(Reader):
                                         node.save()
                                         collection.save()
                             else:
-                                # if create collection = add check that there is a collection associated with node, if no collection associated with node create a collection and associated with the node
+                                # if create collection = add check that there is a collection associated with node,
+                                # if no collection associated with node create a collection and associated with the node
                                 try:
                                     collection = Concept().get(id=node.config["rdmCollection"])
                                 except:
@@ -877,7 +886,8 @@ class CsvReader(Reader):
                                 # Check if we are populating a parent tile by inspecting the target_tile.data array.
                                 if target_tile.data != {}:
                                     # Iterate through the target_tile nodes and begin populating by iterating througth source_data array.
-                                    # The idea is to populate as much of the target_tile as possible, before moving on to the next target_tile.
+                                    # The idea is to populate as much of the target_tile as possible,
+                                    # before moving on to the next target_tile.
                                     for target_key in list(target_tile.data.keys()):
                                         for source_tile in source_data:
                                             for source_key in list(source_tile.keys()):
@@ -890,7 +900,8 @@ class CsvReader(Reader):
                                                         )
                                                         target_tile.data[source_key] = value["value"]
                                                         # target_tile.request = value['request']
-                                                        # Delete key from source_tile so we do not populate another tile based on the same data.
+                                                        # Delete key from source_tile so
+                                                        # we do not populate another tile based on the same data.
                                                         del source_tile[source_key]
                                     # Cleanup source_data array to remove source_tiles that are now '{}' from the code above.
                                     source_data[:] = [item for item in source_data if item != {}]
