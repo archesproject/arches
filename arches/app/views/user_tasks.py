@@ -8,12 +8,11 @@ class UserTaskView(View):
     action = ""
 
     def get(self, request):
-
         if request.user.is_authenticated:
             if request.GET.get("action", None) == "get_all":
                 tasks = models.UserXTask.objects.all()
             else:
                 tasks = models.UserXTask.objects.filter(user_id=request.user.id)
-            return JSONResponse({"tasks": tasks})
+            return JSONResponse({"success": True, "tasks": tasks}, status=200)
 
-        return HttpResponseNotFound()
+        return JSONResponse({"error": "User not authenticated. Access denied."}, status=401)
