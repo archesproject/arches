@@ -611,7 +611,7 @@ class ResourceCards(View):
 
 class ResourceDescriptors(View):
     def get(self, request, resourceid=None):
-        if Resource.objects.filter(pk=resourceid).exists():
+        if Resource.objects.filter(pk=resourceid).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID).exists():
             try:
                 resource = Resource.objects.get(pk=resourceid)
                 se = SearchEngineFactory().create()
