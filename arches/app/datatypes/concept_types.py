@@ -36,7 +36,7 @@ class BaseConceptDataType(BaseDataType):
         ret = ""
         if valueid is None or valueid.strip() == "":
             pass
-        elif concept_export_value_type == None or concept_export_value_type == "" or concept_export_value_type == "label":
+        elif concept_export_value_type is None or concept_export_value_type == "" or concept_export_value_type == "label":
             ret = self.get_value(valueid).value
         elif concept_export_value_type == "both":
             ret = valueid + "|" + self.get_value(valueid).value
@@ -88,7 +88,7 @@ class ConceptDataType(BaseConceptDataType):
 
         # first check to see if the validator has been passed a valid UUID,
         # which should be the case at this point. return error if not.
-        if value != None:
+        if value is not None:
             try:
                 uuid.UUID(str(value))
             except ValueError:
@@ -276,7 +276,7 @@ class ConceptListDataType(BaseConceptDataType):
         errors = []
 
         # iterate list of values and use the concept validation on each one
-        if value != None:
+        if value is not None:
             validate_concept = DataTypeFactory().get_instance("concept")
             for v in value:
                 val = v.strip()
