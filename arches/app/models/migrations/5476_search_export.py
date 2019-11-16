@@ -6,9 +6,7 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ("models", "5560_notifications"),
-    ]
+    dependencies = [("models", "5560_notifications")]
 
     def forwards_func(apps, schema_editor):
         TileModel = apps.get_model("models", "TileModel")
@@ -26,6 +24,4 @@ class Migration(migrations.Migration):
     def reverse_func(apps, schema_editor):
         pass
 
-    operations = [
-        migrations.RunPython(forwards_func, reverse_func),
-    ]
+    operations = [migrations.RunPython(forwards_func, reverse_func)]

@@ -179,7 +179,7 @@ def get_resource_model_label(result):
 
 def export_results(request):
     exporter = SearchResultsExporter(search_request=request)
-    resourceexporter = ResourceExporter(format='tilecsv')
+    resourceexporter = ResourceExporter(format="tilecsv")
     return resourceexporter.zip_response(exporter.export(), zip_file_name="temp.zip")
     return JSONResponse(exporter.export(), indent=4)
 
