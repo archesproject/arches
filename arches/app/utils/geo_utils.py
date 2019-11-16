@@ -4,7 +4,6 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 
 
 class GeoUtils(object):
-
     def set_precision(self, coordinates, precision):
         """
         returns the passed in coordinates with the specified precision

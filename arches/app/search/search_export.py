@@ -30,11 +30,11 @@ class SearchResultsExporter(object):
         if search_request is None:
             raise Exception("Need to pass in a search request")
         search_request.GET = search_request.GET.copy()
-        search_request.GET['tiles'] = True
-        search_request.GET['export'] = True
-        
-        self.compact = search_request.GET.get('compact', True)
-        self.precision = int(search_request.GET.get('precision', 5))
+        search_request.GET["tiles"] = True
+        search_request.GET["export"] = True
+
+        self.compact = search_request.GET.get("compact", True)
+        self.precision = int(search_request.GET.get("precision", 5))
         self.search_request = search_request
         self.datatype_factory = DataTypeFactory()
         self.node_lookup = {}
@@ -43,24 +43,25 @@ class SearchResultsExporter(object):
 
     def export(self):
         from arches.app.views.search import search_results
+
         search_res_json = search_results(self.search_request)
         results = JSONDeserializer().deserialize(search_res_json.content)
-        instances = results['results']['hits']['hits']
+        instances = results["results"]["hits"]["hits"]
         output = {}
         ret = []
 
         for resource_instance in instances:
-            resource_obj = self.flatten_tiles(resource_instance['_source']['tiles'], self.datatype_factory, compact=self.compact)
+            resource_obj = self.flatten_tiles(resource_instance["_source"]["tiles"], self.datatype_factory, compact=self.compact)
             try:
-                output[resource_instance['_source']['graph_id']]['output'].append(resource_obj)
+                output[resource_instance["_source"]["graph_id"]]["output"].append(resource_obj)
             except KeyError as e:
-                output[resource_instance['_source']['graph_id']] = {'output': []}
-                output[resource_instance['_source']['graph_id']]['output'].append(resource_obj)
+                output[resource_instance["_source"]["graph_id"]] = {"output": []}
+                output[resource_instance["_source"]["graph_id"]]["output"].append(resource_obj)
 
         for graph_id, resources in output.items():
             graph = models.GraphModel.objects.get(pk=graph_id)
-            headers = list(graph.node_set.filter(exportable=True).values_list('fieldname', flat=True))
-            ret.append(self.to_csv(resources['output'], headers=headers, name=graph.name))
+            headers = list(graph.node_set.filter(exportable=True).values_list("fieldname", flat=True))
+            ret.append(self.to_csv(resources["output"], headers=headers, name=graph.name))
             # output[graph_id]['csv'] = self.to_csv(resources['output'])
         return ret
 
@@ -80,23 +81,23 @@ class SearchResultsExporter(object):
         # first let's normalize tile.data to use labels instead of node ids
         for tile in tiles:
             data = {}
-            for nodeid, value in tile['data'].items():
+            for nodeid, value in tile["data"].items():
                 node = self.get_node(nodeid)
                 if node.exportable:
                     datatype = datatype_factory.get_instance(node.datatype)
-                    #node_value = datatype.transform_export_values(tile['data'][str(node.nodeid)])
+                    # node_value = datatype.transform_export_values(tile['data'][str(node.nodeid)])
                     node_value = datatype.get_display_value(tile, node)
                     label = node.fieldname
 
                     if compact:
-                        if node.datatype == 'geojson-feature-collection':
-                            node_value = tile['data'][str(node.nodeid)]
-                            for feature_index, feature in enumerate(node_value['features']):
-                                feature['geometry']['coordinates'] = self.set_precision(feature['geometry']['coordinates'], self.precision)
+                        if node.datatype == "geojson-feature-collection":
+                            node_value = tile["data"][str(node.nodeid)]
+                            for feature_index, feature in enumerate(node_value["features"]):
+                                feature["geometry"]["coordinates"] = self.set_precision(feature["geometry"]["coordinates"], self.precision)
                                 try:
-                                    feature_collections[label]['features'].append(feature)
+                                    feature_collections[label]["features"].append(feature)
                                 except:
-                                    feature_collections[label] = {'datatype': datatype, 'features': [feature]}
+                                    feature_collections[label] = {"datatype": datatype, "features": [feature]}
                         else:
                             try:
                                 compacted_data[label] += ", " + str(node_value)
@@ -107,16 +108,16 @@ class SearchResultsExporter(object):
 
             if not compact:
                 # add on the cardinality and card_names to the tile for use later on
-                tile['data'] = data
-                card = models.CardModel.objects.get(nodegroup=tile['nodegroup_id'])
-                tile['card_name'] = card.name
-                tile['cardinality'] = node.nodegroup.cardinality
-                tile[card.name] = tile['data']
-                lookup[tile['tileid']] = tile
+                tile["data"] = data
+                card = models.CardModel.objects.get(nodegroup=tile["nodegroup_id"])
+                tile["card_name"] = card.name
+                tile["cardinality"] = node.nodegroup.cardinality
+                tile[card.name] = tile["data"]
+                lookup[tile["tileid"]] = tile
 
         if compact:
             for key, value in feature_collections.items():
-                compacted_data[key] = value['datatype'].transform_export_values(value)
+                compacted_data[key] = value["datatype"].transform_export_values(value)
             return compacted_data
 
         # print(JSONSerializer().serialize(tiles, indent=4))
@@ -126,26 +127,26 @@ class SearchResultsExporter(object):
         # aggregate tiles into single resource instance objects rolling up tile data in the process
         # print out "ret" to understand the intermediate structure
         for tile in tiles:
-            if tile['parenttile_id'] is not None:
-                parentTile = lookup[str(tile['parenttile_id'])]
-                if tile['cardinality'] == 'n':
+            if tile["parenttile_id"] is not None:
+                parentTile = lookup[str(tile["parenttile_id"])]
+                if tile["cardinality"] == "n":
                     try:
-                        parentTile[parentTile['card_name']][tile['card_name']].append(tile[tile['card_name']])
+                        parentTile[parentTile["card_name"]][tile["card_name"]].append(tile[tile["card_name"]])
                     except KeyError:
-                        parentTile[parentTile['card_name']][tile['card_name']] = [tile[tile['card_name']]]
+                        parentTile[parentTile["card_name"]][tile["card_name"]] = [tile[tile["card_name"]]]
                 else:
-                    parentTile[parentTile['card_name']][tile['card_name']] = tile[tile['card_name']]
+                    parentTile[parentTile["card_name"]][tile["card_name"]] = tile[tile["card_name"]]
             else:
                 # print the following out to understand the intermediate structure
                 # ret.append(tile)
                 # ret.append({tile['card_name']: tile[tile['card_name']]})
-                if tile['cardinality'] == 'n':
+                if tile["cardinality"] == "n":
                     try:
-                        resource_json[tile['card_name']].append(tile[tile['card_name']])
+                        resource_json[tile["card_name"]].append(tile[tile["card_name"]])
                     except KeyError:
-                        resource_json[tile['card_name']] = [tile[tile['card_name']]]
+                        resource_json[tile["card_name"]] = [tile[tile["card_name"]]]
                 else:
-                    resource_json[tile['card_name']] = tile[tile['card_name']]
+                    resource_json[tile["card_name"]] = tile[tile["card_name"]]
 
         return flatten_dict(resource_json)
 
