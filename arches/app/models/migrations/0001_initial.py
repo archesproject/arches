@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 import os
 import uuid
@@ -244,7 +244,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CardXNodeXWidget',
             fields=[
-                ('card', models.ForeignKey(to='models.CardModel', db_column='cardid')),
+                ('card', models.ForeignKey(to='models.CardModel', db_column='cardid', on_delete=models.CASCADE)),
                 ('id', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('config', JSONField(blank=True, db_column='config', null=True)),
                 ('label', models.TextField(blank=True, null=True)),
@@ -339,7 +339,7 @@ class Migration(migrations.Migration):
                 ('name', models.TextField(blank=True, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
                 ('ontologyproperty', models.TextField(blank=True, null=True)),
-                ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.GraphModel')),
+                ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.GraphModel', on_delete=models.CASCADE)),
             ],
             options={
                 'db_table': 'edges',
@@ -399,8 +399,8 @@ class Migration(migrations.Migration):
             name='FormXCard',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('card', models.ForeignKey(to='models.CardModel', db_column='cardid')),
-                ('form', models.ForeignKey(to='models.Form', db_column='formid')),
+                ('card', models.ForeignKey(to='models.CardModel', db_column='cardid', on_delete=models.CASCADE)),
+                ('form', models.ForeignKey(to='models.Form', db_column='formid', on_delete=models.CASCADE)),
                 ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
             ],
             options={
@@ -429,8 +429,8 @@ class Migration(migrations.Migration):
             name='FunctionXGraph',
             fields=[
                 ('id', models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
-                ('function', models.ForeignKey(to='models.Function', db_column='functionid')),
-                ('graph', models.ForeignKey(to='models.GraphModel', db_column='graphid')),
+                ('function', models.ForeignKey(to='models.Function', db_column='functionid', on_delete=models.CASCADE)),
+                ('graph', models.ForeignKey(to='models.GraphModel', db_column='graphid', on_delete=models.CASCADE)),
                 ('config', JSONField(blank=True, null=True, db_column='config')),
             ],
             options={
@@ -459,7 +459,7 @@ class Migration(migrations.Migration):
                 ('istopnode', models.BooleanField()),
                 ('ontologyclass', models.TextField(blank=True, null=True)),
                 ('datatype', models.TextField()),
-                ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.GraphModel')),
+                ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.GraphModel', on_delete=models.CASCADE)),
                 ('config', JSONField(blank=True, db_column='config', null=True)),
             ],
             options={
@@ -473,7 +473,7 @@ class Migration(migrations.Migration):
                 ('nodegroupid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('legacygroupid', models.TextField(blank=True, null=True)),
                 ('cardinality', models.TextField(blank=True, default='1')),
-                ('parentnodegroup', models.ForeignKey(blank=True, db_column='parentnodegroupid', null=True, to='models.NodeGroup')),
+                ('parentnodegroup', models.ForeignKey(blank=True, db_column='parentnodegroupid', null=True, to='models.NodeGroup', on_delete=models.CASCADE)),
             ],
             options={
                 'db_table': 'node_groups',
@@ -494,7 +494,7 @@ class Migration(migrations.Migration):
                 ('name', models.TextField()),
                 ('version', models.TextField()),
                 ('path', models.FileField(storage=get_ontology_storage_system())),
-                ('parentontology', models.ForeignKey(to='models.Ontology', db_column='parentontologyid', related_name='extensions', null=True, blank=True)),
+                ('parentontology', models.ForeignKey(to='models.Ontology', db_column='parentontologyid', related_name='extensions', null=True, blank=True, on_delete=models.CASCADE)),
             ],
             options={
                 'db_table': 'ontologies',
@@ -507,7 +507,7 @@ class Migration(migrations.Migration):
                 ('ontologyclassid', models.UUIDField(default=uuid.uuid1, primary_key=True)),
                 ('source', models.TextField()),
                 ('target', JSONField(null=True)),
-                ('ontology', models.ForeignKey(to='models.Ontology', db_column='ontologyid', related_name='ontologyclasses')),
+                ('ontology', models.ForeignKey(to='models.Ontology', db_column='ontologyid', related_name='ontologyclasses', on_delete=models.CASCADE)),
             ],
             options={
                 'db_table': 'ontologyclasses',
@@ -518,9 +518,9 @@ class Migration(migrations.Migration):
             name='Relation',
             fields=[
                 ('relationid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('conceptfrom', models.ForeignKey(db_column='conceptidfrom', related_name='relation_concepts_from', to='models.Concept')),
-                ('conceptto', models.ForeignKey(db_column='conceptidto', related_name='relation_concepts_to', to='models.Concept')),
-                ('relationtype', models.ForeignKey(db_column='relationtype', to='models.DRelationType')),
+                ('conceptfrom', models.ForeignKey(db_column='conceptidfrom', related_name='relation_concepts_from', to='models.Concept', on_delete=models.CASCADE)),
+                ('conceptto', models.ForeignKey(db_column='conceptidto', related_name='relation_concepts_to', to='models.Concept', on_delete=models.CASCADE)),
+                ('relationtype', models.ForeignKey(db_column='relationtype', to='models.DRelationType', on_delete=models.CASCADE)),
             ],
             options={
                 'db_table': 'relations',
@@ -547,8 +547,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('reportid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('name', models.TextField(null=True, blank=True)),
-                ('template', models.ForeignKey(db_column='templateid', to='models.ReportTemplate')),
-                ('graph', models.ForeignKey(db_column='graphid', to='models.GraphModel')),
+                ('template', models.ForeignKey(db_column='templateid', to='models.ReportTemplate', on_delete=models.CASCADE)),
+                ('graph', models.ForeignKey(db_column='graphid', to='models.GraphModel', on_delete=models.CASCADE)),
                 ('config', JSONField(blank=True, db_column='config', null=True)),
                 ('formsconfig', JSONField(blank=True, db_column='formsconfig', null=True)),
                 ('active', models.BooleanField(default=False)),
@@ -562,8 +562,8 @@ class Migration(migrations.Migration):
             name='Resource2ResourceConstraint',
             fields=[
                 ('resource2resourceid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('resourceclassfrom', models.ForeignKey(blank=True, db_column='resourceclassfrom', null=True, related_name='resxres_contstraint_classes_from', to='models.Node')),
-                ('resourceclassto', models.ForeignKey(blank=True, db_column='resourceclassto', null=True, related_name='resxres_contstraint_classes_to', to='models.Node')),
+                ('resourceclassfrom', models.ForeignKey(blank=True, db_column='resourceclassfrom', null=True, related_name='resxres_contstraint_classes_from', to='models.Node', on_delete=models.SET_NULL)),
+                ('resourceclassto', models.ForeignKey(blank=True, db_column='resourceclassto', null=True, related_name='resxres_contstraint_classes_to', to='models.Node', on_delete=models.SET_NULL)),
             ],
             options={
                 'db_table': 'resource_2_resource_constraints',
@@ -575,7 +575,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('resourceinstanceid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('legacyid', models.TextField(blank=True, unique=True, null=True)),
-                ('graph', models.ForeignKey(db_column='graphid', to='models.GraphModel')),
+                ('graph', models.ForeignKey(db_column='graphid', to='models.GraphModel', on_delete=models.CASCADE)),
                 ('createdtime', models.DateTimeField(auto_now_add=True)),
             ],
             options={
@@ -601,9 +601,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('tileid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('data', JSONField(blank=True, db_column='tiledata', null=True)),
-                ('nodegroup', models.ForeignKey(db_column='nodegroupid', to='models.NodeGroup')),
-                ('parenttile', models.ForeignKey(blank=True, db_column='parenttileid', null=True, to='models.TileModel')),
-                ('resourceinstance', models.ForeignKey(db_column='resourceinstanceid', to='models.ResourceInstance')),
+                ('nodegroup', models.ForeignKey(db_column='nodegroupid', to='models.NodeGroup', on_delete=models.CASCADE)),
+                ('parenttile', models.ForeignKey(blank=True, db_column='parenttileid', null=True, to='models.TileModel', on_delete=models.CASCADE)),
+                ('resourceinstance', models.ForeignKey(db_column='resourceinstanceid', to='models.ResourceInstance', on_delete=models.CASCADE)),
                 ('sortorder', models.IntegerField(blank=True, null=True, default=0)),
             ],
             options={
@@ -616,9 +616,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('valueid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('value', models.TextField()),
-                ('concept', models.ForeignKey(db_column='conceptid', to='models.Concept')),
-                ('language', models.ForeignKey(blank=True, db_column='languageid', null=True, to='models.DLanguage')),
-                ('valuetype', models.ForeignKey(db_column='valuetype', to='models.DValueType')),
+                ('concept', models.ForeignKey(db_column='conceptid', to='models.Concept', on_delete=models.CASCADE)),
+                ('language', models.ForeignKey(blank=True, db_column='languageid', null=True, to='models.DLanguage', on_delete=models.CASCADE)),
+                ('valuetype', models.ForeignKey(db_column='valuetype', to='models.DValueType', on_delete=models.CASCADE)),
             ],
             options={
                 'db_table': 'values',
@@ -674,8 +674,8 @@ class Migration(migrations.Migration):
                 ('name', models.TextField(unique=True)),
                 ('path', models.TextField()),
                 ('config', JSONField(db_column='config')),
-                ('map_layer', models.ForeignKey(db_column='map_layerid', to='models.MapLayer')),
-                ('map_source', models.ForeignKey(db_column='map_sourceid', to='models.MapSource')),
+                ('map_layer', models.ForeignKey(db_column='map_layerid', to='models.MapLayer', on_delete=models.CASCADE)),
+                ('map_source', models.ForeignKey(db_column='map_sourceid', to='models.MapSource', on_delete=models.CASCADE)),
             ],
             options={
                 'db_table': 'tileserver_layers',
@@ -686,7 +686,7 @@ class Migration(migrations.Migration):
             name='GraphXMapping',
             fields=[
                 ('id', models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
-                ('graph', models.ForeignKey(to='models.GraphModel', db_column='graphid')),
+                ('graph', models.ForeignKey(to='models.GraphModel', db_column='graphid', on_delete=models.CASCADE)),
                 ('mapping', JSONField(blank=True, db_column='mapping')),
             ],
             options={
@@ -697,67 +697,67 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='ddatatype',
             name='defaultwidget',
-            field=models.ForeignKey(db_column='defaultwidget', to='models.Widget', null=True),
+            field=models.ForeignKey(db_column='defaultwidget', to='models.Widget', null=True, on_delete=models.SET_NULL),
         ),
         migrations.AddField(
             model_name='resourcexresource',
             name='relationshiptype',
-            field=models.ForeignKey(db_column='relationshiptype', to='models.Value'),
+            field=models.ForeignKey(db_column='relationshiptype', to='models.Value', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='resourcexresource',
             name='resourceinstanceidfrom',
-            field=models.ForeignKey(blank=True, db_column='resourceinstanceidfrom', null=True, related_name='resxres_resource_instance_ids_from', to='models.ResourceInstance'),
+            field=models.ForeignKey(blank=True, db_column='resourceinstanceidfrom', null=True, related_name='resxres_resource_instance_ids_from', to='models.ResourceInstance', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='resourcexresource',
             name='resourceinstanceidto',
-            field=models.ForeignKey(blank=True, db_column='resourceinstanceidto', null=True, related_name='resxres_resource_instance_ids_to', to='models.ResourceInstance'),
+            field=models.ForeignKey(blank=True, db_column='resourceinstanceidto', null=True, related_name='resxres_resource_instance_ids_to', to='models.ResourceInstance', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='node',
             name='nodegroup',
-            field=models.ForeignKey(blank=True, db_column='nodegroupid', null=True, to='models.NodeGroup'),
+            field=models.ForeignKey(blank=True, db_column='nodegroupid', null=True, to='models.NodeGroup', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='edge',
             name='domainnode',
-            field=models.ForeignKey(db_column='domainnodeid', related_name='edge_domains', to='models.Node'),
+            field=models.ForeignKey(db_column='domainnodeid', related_name='edge_domains', to='models.Node', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='edge',
             name='rangenode',
-            field=models.ForeignKey(db_column='rangenodeid', related_name='edge_ranges', to='models.Node'),
+            field=models.ForeignKey(db_column='rangenodeid', related_name='edge_ranges', to='models.Node', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='concept',
             name='nodetype',
-            field=models.ForeignKey(db_column='nodetype', to='models.DNodeType'),
+            field=models.ForeignKey(db_column='nodetype', to='models.DNodeType', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='cardxnodexwidget',
             name='node',
-            field=models.ForeignKey(db_column='nodeid', to='models.Node'),
+            field=models.ForeignKey(db_column='nodeid', to='models.Node', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='cardxnodexwidget',
             name='widget',
-            field=models.ForeignKey(db_column='widgetid', to='models.Widget'),
+            field=models.ForeignKey(db_column='widgetid', to='models.Widget', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='cardmodel',
             name='nodegroup',
-            field=models.ForeignKey(db_column='nodegroupid', to='models.NodeGroup'),
+            field=models.ForeignKey(db_column='nodegroupid', to='models.NodeGroup', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='cardmodel',
             name='graph',
-            field=models.ForeignKey(db_column='graphid', to='models.GraphModel'),
+            field=models.ForeignKey(db_column='graphid', to='models.GraphModel', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='form',
             name='graph',
-            field=models.ForeignKey(to='models.GraphModel', db_column='graphid', related_name='forms', null=False, blank=False),
+            field=models.ForeignKey(to='models.GraphModel', db_column='graphid', related_name='forms', null=False, blank=False, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='graphmodel',
@@ -767,7 +767,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='graphmodel',
             name='ontology',
-            field=models.ForeignKey(to='models.Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True),
+            field=models.ForeignKey(to='models.Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True, on_delete=models.SET_NULL),
         ),
         migrations.AlterUniqueTogether(
             name='edge',

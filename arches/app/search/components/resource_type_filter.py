@@ -12,24 +12,23 @@ details = {
     "componentpath": "views/components/search/resource-type-filter",
     "componentname": "resource-type-filter",
     "sortorder": "0",
-    "enabled": True
+    "enabled": True,
 }
 
 
 class ResourceTypeFilter(BaseSearchFilter):
-
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         search_query = Bool()
-        querysting_params = self.request.GET.get(details['componentname'], '')
+        querysting_params = self.request.GET.get(details["componentname"], "")
 
         graph_ids = []
         for resouceTypeFilter in JSONDeserializer().deserialize(querysting_params):
-            graph_ids.append(str(resouceTypeFilter['graphid']))
-            
-        terms = Terms(field='graph_id', terms=graph_ids)
-        if resouceTypeFilter['inverted'] is True:
+            graph_ids.append(str(resouceTypeFilter["graphid"]))
+
+        terms = Terms(field="graph_id", terms=graph_ids)
+        if resouceTypeFilter["inverted"] is True:
             search_query.must_not(terms)
         else:
             search_query.filter(terms)
 
-        search_results_object['query'].add_query(search_query)
+        search_results_object["query"].add_query(search_query)

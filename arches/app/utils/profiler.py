@@ -43,4 +43,5 @@ def profile(log_file):
             return ret
 
         return _inner
+
     return _outer

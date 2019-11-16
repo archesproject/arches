@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import warnings
 import functools
@@ -30,25 +30,31 @@ from django.contrib.auth.decorators import user_passes_test
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
+
 def deprecated(func):
-    '''This is a decorator which can be used to mark functions
+    """This is a decorator which can be used to mark functions
     as deprecated. It will result in a warning being emitted
     when the function is used.
-    '''
+    """
 
     @functools.wraps(func)
     def new_func(*args, **kwargs):
-        warnings.simplefilter('always', DeprecationWarning) #turn off filter
+        warnings.simplefilter("always", DeprecationWarning)  # turn off filter
         warnings.warn_explicit(
             "Call to deprecated function {}.".format(func.__name__),
             category=DeprecationWarning,
-            filename=func.func_code.co_filename,
-            lineno=func.func_code.co_firstlineno + 1
+            filename=func.__code__.co_filename,
+            lineno=func.__code__.co_firstlineno + 1,
         )
-        warnings.simplefilter('default', DeprecationWarning) #reset filter
-        logger.warn("%s - DeprecationWarning: Call to deprecated function %s. %s:%s" % (datetime.datetime.now(), func.__name__, func.func_code.co_filename, func.func_code.co_firstlineno + 1))
+        warnings.simplefilter("default", DeprecationWarning)  # reset filter
+        logger.warn(
+            "%s - DeprecationWarning: Call to deprecated function %s. %s:%s"
+            % (datetime.datetime.now(), func.__name__, func.__code__.co_filename, func.__code__.co_firstlineno + 1)
+        )
         return func(*args, **kwargs)
+
     return new_func
+
 
 def group_required(*group_names):
     """
@@ -57,11 +63,13 @@ def group_required(*group_names):
     """
 
     def in_groups(u):
-        if u.is_authenticated():
+        if u.is_authenticated:
             if u.is_superuser or bool(u.groups.filter(name__in=group_names)):
                 return True
         return False
+
     return user_passes_test(in_groups)
+
 
 def can_edit_resource_instance():
     """
@@ -71,6 +79,7 @@ def can_edit_resource_instance():
 
     return user_passes_test(user_can_edit_resources)
 
+
 def can_read_resource_instance():
     """
     Requires that a user be able to edit or delete a single nodegroup of a resource
@@ -78,6 +87,7 @@ def can_read_resource_instance():
     """
 
     return user_passes_test(user_can_read_resources)
+
 
 def can_read_concept():
     """

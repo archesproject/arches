@@ -34,7 +34,6 @@
                                     <!-- /ko -->
                                     <label class="col-xs-12 control-label widget-input-label">
                                         {% trans "Node Name" %}
-
                                     </label>
                                 </div>
 
@@ -167,6 +166,35 @@
                                         {% trans "Activate to require that data be collected for this node when a card value is edited" %}
                                     </span>
 
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row widget-container graph-settings-switch">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label">
+                                        <span class="switch switch-small arches-switch" data-bind="css: {'on': node().exportable()}, click: function(){node().exportable(!node().exportable())}"><small></small></span>
+                                    </label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <p class="control-label graph-settings-switch-label">
+                                    {% trans "Exportable" %}
+                                    </p>
+                                    <span class="graph-settings-switch-subtitle">
+                                        {% trans "Allow this node to participate in search export" %}
+                                    </span>
+
+                                </div>
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label">
+                                        {% trans "Field Name" %}
+                                    </label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <input class="form-control input-md widget-input" placeholder="fieldname for this node" type="text" data-bind="textInput: node().fieldname, disable: !node().exportable(), css: {'disabled': !node().exportable()}"></input>
                                 </div>
                             </div>
                         </div>

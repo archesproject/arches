@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 """This module contains commands for building Arches."""
 
@@ -37,35 +37,35 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument('operation', nargs='?')
+        parser.add_argument("operation", nargs="?")
 
     def handle(self, *args, **options):
-        if options['operation'] == 'update':
+        if options["operation"] == "update":
             self.update_extensions()
-        if options['operation'] == 'update_project_templates':
+        if options["operation"] == "update_project_templates":
             self.update_project_templates()
 
     def register(self, extension, cmd):
-        modules = glob.glob(os.path.join(settings.APP_ROOT, extension, '*.json'))
-        modules.extend(glob.glob(os.path.join(settings.APP_ROOT, extension, '*.py')))
+        modules = glob.glob(os.path.join(settings.APP_ROOT, extension, "*.json"))
+        modules.extend(glob.glob(os.path.join(settings.APP_ROOT, extension, "*.py")))
         for module in modules:
-            if os.path.basename(module) != '__init__.py':
+            if os.path.basename(module) != "__init__.py":
                 try:
-                    management.call_command(cmd, 'register', source=module)
-                    print('registering', module)
+                    management.call_command(cmd, "register", source=module)
+                    print("registering", module)
                 except IntegrityError as e:
-                    management.call_command(cmd, 'update', source=module)
-                    print('updating', module)
+                    management.call_command(cmd, "update", source=module)
+                    print("updating", module)
                     print(e)
 
     def update_extensions(self):
-        self.register('widgets', 'widget')
-        self.register('card_components', 'card_component')
-        self.register('functions', 'fn')
-        self.register('search', 'search')
-        self.register('plugins', 'plugin')
-        self.register('reports', 'report')
-        self.register('datatypes', 'datatype')
+        self.register("widgets", "widget")
+        self.register("card_components", "card_component")
+        self.register("functions", "fn")
+        self.register("search", "search")
+        self.register("plugins", "plugin")
+        self.register("reports", "report")
+        self.register("datatypes", "datatype")
 
     def update_project_templates(self):
         """
@@ -74,8 +74,6 @@ class Command(BaseCommand):
         whitelisted into the settings_local.py template
 
         """
-        files = [
-            {'src': 'arches/app/templates/index.htm',
-                'dst': 'arches/install/arches-templates/project_name/templates/index.htm'}]
+        files = [{"src": "arches/app/templates/index.htm", "dst": "arches/install/arches-templates/project_name/templates/index.htm"}]
         for f in files:
-            shutil.copyfile(f['src'], f['dst'])
+            shutil.copyfile(f["src"], f["dst"])

@@ -16,7 +16,6 @@
 @import url(../packages/datatables.net-bs/css/dataTables.bootstrap.css);
 @import url(../packages/datatables.net-responsive-bs/css/responsive.bootstrap.css);
 @import url(../packages/datatables.net-buttons-bs/css/buttons.bootstrap.min.css);
-@import url(../packages/nvd3/build/nv.d3.min.css);
 @import url(../packages/leaflet/dist/leaflet.css);
 @import url(../packages/leaflet-draw/dist/leaflet.draw.css);
 @import url(../css/tree/tree.css);
@@ -504,6 +503,12 @@ input[type="checkbox"] {
     color: #fff;
 }
 
+.workflow-step-icon.can-advance {
+    border: 1px solid rgb(110, 160, 216);;
+    background-color: rgb(189, 214, 241);
+    color: #fff;
+}
+
 .workflow-step-description-container {
     width: 100%;
     display: flex;
@@ -984,6 +989,7 @@ ul.tabbed-report-tab-list {
 .workbench-card-sidebar {
     position:absolute;
     right: 0;
+    top: -1px;
     height: 100%;
     width: 75px;
     background-color: #ecf0f5;
@@ -7593,8 +7599,9 @@ a.clear-geojson-button:hover {
 
 #map-popup .mapboxgl-popup-close-button {
     height: 61px !important;
-    width: 60px;
+    width: 61px;
     top: -1px;
+    margin-right: -1px;
     padding-top: 7px;
     border-radius: 0px;
     font-size: 27px;
@@ -7606,6 +7613,34 @@ a.clear-geojson-button:hover {
 
 #map-popup .mapboxgl-popup-close-button:hover {
     background: #f4f4f4;
+}
+
+#map-popup .status-ok .mapboxgl-popup-close-button {
+    background: #C4F267;
+    border-left: 1px solid #7AB503;
+}
+
+#map-popup .status-ok .mapboxgl-popup-close-button:hover {
+    background: #B3ED3F;
+}
+
+#map-popup .status-warning .mapboxgl-popup-close-button {
+    background: #FFFF70;
+    border-left: 1px solid #B9B900;
+}
+
+#map-popup .status-warning .mapboxgl-popup-close-button:hover {
+    background: #D3D300;
+}
+
+#map-popup .status-late .mapboxgl-popup-close-button {
+    background: #DA55A0;
+    border-left: 1px solid #9F005A;
+    color: #fff;
+}
+
+#map-popup .status-late .mapboxgl-popup-close-button:hover {
+    background: #D02F8A;
 }
 
 .mapboxgl-popup-close-button {
@@ -8570,11 +8605,12 @@ table.table.dataTable {
 }
 
 #map-popup .hover-feature-footer {
-    position: fixed;
+    position: relative;
     padding-left: 20px;
-    bottom: 0px;
-    left: 449px;
-    border-left: 1px solid #ddd;
+    bottom: 15px;
+    left: 0px;
+    border-left: 0px solid transparent;
+    border-right: 0px solid transparent;
     width: 350px;
     background: #f4f4f4;
     font-size: 14px;
@@ -10353,6 +10389,31 @@ a.jstree-anchor.permissions-widget {
 
 .tabbed-report-header .workbench-card-wrapper {
     height: 500px;
+}
+
+.tabbed-report-mainpanel {
+    top: 25px;
+    width: calc(100% - 50px);
+}
+
+.tabbed-report-mainpanel-content {
+    width: calc(100% - 50px);
+}
+
+.tabbed-report-mainpanel-title {
+    padding: 5px 15px;
+    font-size: 12px;
+    border-bottom: 1px solid #ddd;
+    background-color: rgb(237, 237, 237);
+}
+
+.tabbed-tile-value {
+    padding-left: 0px;
+}
+
+.tabbed-report-tile-title {
+    margin-bottom: 0;
+    padding: 12px 5px 0 0;
 }
 
 .tabbed-report-sidepanel {

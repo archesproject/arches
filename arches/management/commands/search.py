@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import os
 import uuid
@@ -30,26 +30,26 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument('operation', nargs='?')
+        parser.add_argument("operation", nargs="?")
 
-        parser.add_argument('-s', '--source', action='store', dest='source', default='',
-                            help='Search Component json file or string to be loaded')
+        parser.add_argument(
+            "-s", "--source", action="store", dest="source", default="", help="Search Component json file or string to be loaded"
+        )
 
-        parser.add_argument('-n', '--name', action='store', dest='name', default='',
-                            help='The js component name of the search component')
+        parser.add_argument("-n", "--name", action="store", dest="name", default="", help="The js component name of the search component")
 
     def handle(self, *args, **options):
-        if options['operation'] == 'register':
-            self.register(source=options['source'])
+        if options["operation"] == "register":
+            self.register(source=options["source"])
 
-        if options['operation'] == 'unregister':
-            self.unregister(name=options['name'])
+        if options["operation"] == "unregister":
+            self.unregister(name=options["name"])
 
-        if options['operation'] == 'list':
+        if options["operation"] == "list":
             self.list()
 
-        if options['operation'] == 'update':
-            self.update(source=options['source'])
+        if options["operation"] == "update":
+            self.update(source=options["source"])
 
     def register(self, source):
         """
@@ -57,28 +57,28 @@ class Command(BaseCommand):
 
         """
 
-        dt_source = imp.load_source('', source)
+        dt_source = imp.load_source("", source)
 
-        if getattr(dt_source, 'details', None):
+        if getattr(dt_source, "details", None):
             details = dt_source.details
 
             try:
-                uuid.UUID(details['searchcomponentid'])
+                uuid.UUID(details["searchcomponentid"])
             except:
-                details['searchcomponentid'] = unicode(uuid.uuid4())
-            print("Registering the search component, %s, with componentid: %s" % (details['name'], details['searchcomponentid']))
+                details["searchcomponentid"] = str(uuid.uuid4())
+            print("Registering the search component, %s, with componentid: %s" % (details["name"], details["searchcomponentid"]))
 
             instance = models.SearchComponent(
-                searchcomponentid=details['searchcomponentid'],
-                name=details['name'],
-                icon=details['icon'],
-                modulename=details['modulename'],
-                classname=details['classname'],
-                type=details['type'],
-                componentpath=details['componentpath'],
-                componentname=details['componentname'],
-                sortorder=details['sortorder'],
-                enabled=details['enabled']
+                searchcomponentid=details["searchcomponentid"],
+                name=details["name"],
+                icon=details["icon"],
+                modulename=details["modulename"],
+                classname=details["classname"],
+                type=details["type"],
+                componentpath=details["componentpath"],
+                componentname=details["componentname"],
+                sortorder=details["sortorder"],
+                enabled=details["enabled"],
             )
 
             instance.save()
@@ -89,8 +89,8 @@ class Command(BaseCommand):
 
         """
 
-        dt_source = imp.load_source('', source)
-        name = dt_source.details['componentname']
+        dt_source = imp.load_source("", source)
+        name = dt_source.details["componentname"]
 
         self.unregister(name)
         self.register(source)
@@ -100,7 +100,7 @@ class Command(BaseCommand):
         Removes the search component from the system
 
         """
-        
+
         try:
             instance = models.SearchComponent.objects.get(componentname=name)
             instance.delete()

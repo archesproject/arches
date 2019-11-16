@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,9 +14,9 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 from django.utils.translation import ugettext as _
 from arches.app.models.models import DValueType
 from arches.app.models.concept import Concept, ConceptValue
@@ -26,29 +26,29 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 from .abstract_provider import Abstract_Provider
 from rdflib.namespace import SKOS, DCTERMS
 
+
 class AAT_Provider(Abstract_Provider):
-
     def __init__(self, **kwargs):
-        super(AAT_Provider, self).__init__('http://vocab.getty.edu/sparql.json', **kwargs)
-        
-        self.name = _('Getty AAT')        
-        self.setReturnFormat(JSON)     
+        super(AAT_Provider, self).__init__("http://vocab.getty.edu/sparql.json", **kwargs)
 
-    def get_concepts(self, uris):  
+        self.name = _("Getty AAT")
+        self.setReturnFormat(JSON)
+
+    def get_concepts(self, uris):
         """
         Get a list of concepts given a list of AAT uris like http://vocab.getty.edu/aat/300380087
 
-        """  
+        """
 
         default_lang = settings.LANGUAGE_CODE
-        dcterms_identifier_type = DValueType.objects.get(valuetype=str(DCTERMS.identifier).replace(str(DCTERMS), ''), namespace = 'dcterms')
+        dcterms_identifier_type = DValueType.objects.get(valuetype=str(DCTERMS.identifier).replace(str(DCTERMS), ""), namespace="dcterms")
 
-        concepts = []    
-        langs = []   
+        concepts = []
+        langs = []
         for lang in self.allowed_languages:
             # the AAT expects language codes to be all lower case
-            langs.append('\"%s\"' % (lang.lower()))
-        for uri in uris.split(','):
+            langs.append('"%s"' % (lang.lower()))
+        for uri in uris.split(","):
             query = """
                 SELECT ?value ?type WHERE {
                   {
@@ -61,22 +61,39 @@ class AAT_Provider(Abstract_Provider):
                     BIND('scopeNote' AS ?type)
                   }
                   FILTER (lang(?value) in (%s)) 
-                }""" % (uri, uri, ','.join(langs))
+                }""" % (
+                uri,
+                uri,
+                ",".join(langs),
+            )
             results = self.perform_sparql_query(query)
 
-            if len(results["results"]["bindings"]) > 0 :
+            if len(results["results"]["bindings"]) > 0:
                 concept = Concept()
-                concept.nodetype = 'Concept'
+                concept.nodetype = "Concept"
                 for result in results["results"]["bindings"]:
-                    concept.addvalue({
-                        'type': result["type"]["value"],
-                        'value': result["value"]["value"],
-                        'language': result["value"]["xml:lang"]
-                    }) 
-                concept.addvalue({'value':uri, 'language': settings.LANGUAGE_CODE, 'type': dcterms_identifier_type.valuetype, 'category': dcterms_identifier_type.category})
+                    concept.addvalue(
+                        {"type": result["type"]["value"], "value": result["value"]["value"], "language": result["value"]["xml:lang"]}
+                    )
+                concept.addvalue(
+                    {
+                        "value": uri,
+                        "language": settings.LANGUAGE_CODE,
+                        "type": dcterms_identifier_type.valuetype,
+                        "category": dcterms_identifier_type.category,
+                    }
+                )
                 concepts.append(concept)
             else:
-                raise Exception(_("<strong>Error in SPARQL query:</strong><br>Test this query directly by pasting the query below into the Getty's own SPARQL endpoint at <a href='http://vocab.getty.edu/sparql' target='_blank'>http://vocab.getty.edu/sparql</a><i><pre>%s</pre></i>Query returned 0 results, please check the query for errors.  You may need to add the appropriate languages into the database for this query to work<br><br>") % (query.replace('<', '&lt').replace('>', '&gt')))
+                raise Exception(
+                    _(
+                        "<strong>Error in SPARQL query:</strong><br>Test this query directly by pasting the query below into the Getty's \
+                        own SPARQL endpoint at <a href='http://vocab.getty.edu/sparql' target='_blank'>http://vocab.getty.edu/sparql</a> \
+                        <i><pre>%s</pre></i>Query returned 0 results, please check the query for errors.  \
+                        You may need to add the appropriate languages into the database for this query to work<br><br>"
+                    )
+                    % (query.replace("<", "&lt").replace(">", "&gt"))
+                )
 
         return concepts
 
@@ -94,7 +111,9 @@ class AAT_Provider(Abstract_Provider):
                 #?typ rdfs:subClassOf gvp:Subject; rdfs:label ?Type.
                 optional {?Subject (gvp:prefLabelGVP | skos:prefLabel) [skosxl:literalForm ?Term]}
                 #optional {?Subject gvp:parentStringAbbrev ?Parents}
-                optional {?Subject skos:scopeNote [dct:language gvp_lang:en; rdf:value ?ScopeNote]}}""" % (terms)
+                optional {?Subject skos:scopeNote [dct:language gvp_lang:en; rdf:value ?ScopeNote]}}""" % (
+            terms
+        )
 
         results = self.perform_sparql_query(query)
         return results
@@ -102,10 +121,10 @@ class AAT_Provider(Abstract_Provider):
     def perform_sparql_query(self, query):
         self.setQuery(query)
 
-        #print query
-        #return HttpResponse(self.endpoint + '?' + self._getRequestEncodedParameters(("query", self.queryString)))
+        # print query
+        # return HttpResponse(self.endpoint + '?' + self._getRequestEncodedParameters(("query", self.queryString)))
 
-        req = urllib2.Request(self.endpoint + '?' + self._getRequestEncodedParameters(("query", self.queryString)))
+        req = urllib.request.Request(self.endpoint + "?" + self._getRequestEncodedParameters(("query", self.queryString)))
         req.add_header("Accept", "application/sparql-results+json")
-        f = urllib2.urlopen(req)
+        f = urllib.request.urlopen(req)
         return JSONDeserializer().deserialize(f.read())

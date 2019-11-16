@@ -21,6 +21,8 @@ TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'functions', 'templates'))
 TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'widgets', 'templates'))
 TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))
 
+LOCALE_PATHS.append(os.path.join(APP_ROOT, 'locale'))
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '{{ secret_key }}'
 
@@ -31,6 +33,12 @@ ROOT_URLCONF = '{{ project_name }}.urls'
 
 # a prefix to append to all elasticsearch indexes, note: must be lower case
 ELASTICSEARCH_PREFIX = '{{ project_name }}'
+
+ELASTICSEARCH_CUSTOM_INDEXES = []
+# [{
+#     'module': '{{ project_name }}.search_indexes.sample_index.SampleIndex',
+#     'name': 'my_new_custom_index' <-- follow ES index naming rules
+# }]
 
 DATABASES = {
     "default": {
@@ -43,7 +51,7 @@ DATABASES = {
         "OPTIONS": {},
         "PASSWORD": "postgis",
         "PORT": "5432",
-        "POSTGIS_TEMPLATE": "template_postgis_20",
+        "POSTGIS_TEMPLATE": "template_postgis",
         "TEST": {
             "CHARSET": None,
             "COLLATION": None,
@@ -71,6 +79,7 @@ INSTALLED_APPS = (
     'revproxy',
     'corsheaders',
     'oauth2_provider',
+    'django_celery_results',
     '{{ project_name }}',
 )
 
@@ -121,20 +130,6 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 # Unique session cookie ensures that logins are treated separately for each app
 SESSION_COOKIE_NAME = '{{ project_name }}'
 
-
-TILE_CACHE_CONFIG = {
-    "name": "Disk",
-    "path": os.path.join(APP_ROOT, 'tileserver', 'cache')
-
-    # to reconfigure to use S3 (recommended for production), use the following
-    # template:
-
-    # "name": "S3",
-    # "bucket": "<bucket name>",
-    # "access": "<access key>",
-    # "secret": "<secret key>"
-}
-
 CACHES = {
     # 'default': {
     #     'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
@@ -159,12 +154,17 @@ APP_TITLE = 'Arches | Heritage Data Management'
 COPYRIGHT_TEXT = 'All Rights Reserved.'
 COPYRIGHT_YEAR = '2019'
 
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_RESULT_BACKEND = 'django-db' # Use 'django-cache' if you want to use your cache as your backend
+CELERY_TASK_SERIALIZER = 'json'
+
 try:
-    from package_settings import *
+    from .package_settings import *
 except ImportError:
     pass
 
 try:
-    from settings_local import *
+    from .settings_local import *
 except ImportError:
     pass

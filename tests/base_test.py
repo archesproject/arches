@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import os
 from django.test import TestCase
@@ -39,21 +39,20 @@ def setUpModule():
 
 def tearDownModule():
     se = SearchEngineFactory().create()
-    se.delete_index(index='terms,concepts')
-    se.delete_index(index='resources')
-    se.delete_index(index='resource_relations')
+    se.delete_index(index="terms,concepts")
+    se.delete_index(index="resources")
+    se.delete_index(index="resource_relations")
 
 
 class ArchesTestCase(TestCase):
-
     def __init__(self, *args, **kwargs):
         super(ArchesTestCase, self).__init__(*args, **kwargs)
-        if settings.DEFAULT_BOUNDS == None:
-            management.call_command('migrate')
-            with open(os.path.join('tests/fixtures/system_settings/Arches_System_Settings_Model.json'), 'rU') as f:
+        if settings.DEFAULT_BOUNDS is None:
+            management.call_command("migrate")
+            with open(os.path.join("tests/fixtures/system_settings/Arches_System_Settings_Model.json"), "rU") as f:
                 archesfile = JSONDeserializer().deserialize(f)
-            ResourceGraphImporter(archesfile['graph'], True)
-            BusinessDataImporter('tests/fixtures/system_settings/Arches_System_Settings_Local.json').import_business_data()
+            ResourceGraphImporter(archesfile["graph"], True)
+            BusinessDataImporter("tests/fixtures/system_settings/Arches_System_Settings_Local.json").import_business_data()
             settings.update_from_db()
 
     @classmethod
@@ -61,8 +60,15 @@ class ArchesTestCase(TestCase):
         ontologies_count = Ontology.objects.exclude(ontologyid__isnull=True).count()
         if ontologies_count == 0:
             extensions = [os.path.join(test_settings.ONTOLOGY_PATH, x) for x in test_settings.ONTOLOGY_EXT]
-            management.call_command('load_ontology', source=os.path.join(test_settings.ONTOLOGY_PATH, test_settings.ONTOLOGY_BASE),
-                version=test_settings.ONTOLOGY_BASE_VERSION, ontology_name=test_settings.ONTOLOGY_BASE_NAME, id=test_settings.ONTOLOGY_BASE_ID, extensions=','.join(extensions), verbosity=0)
+            management.call_command(
+                "load_ontology",
+                source=os.path.join(test_settings.ONTOLOGY_PATH, test_settings.ONTOLOGY_BASE),
+                version=test_settings.ONTOLOGY_BASE_VERSION,
+                ontology_name=test_settings.ONTOLOGY_BASE_NAME,
+                id=test_settings.ONTOLOGY_BASE_ID,
+                extensions=",".join(extensions),
+                verbosity=0,
+            )
 
     @classmethod
     def setUpClass(cls):
@@ -80,13 +86,11 @@ class ArchesTestCase(TestCase):
     def setUp(self):
         pass
 
-
     def tearDown(self):
         pass
 
 
 class TestSearchEngine(SearchEngine):
-
     def __init__(self, **kwargs):
         super(TestSearchEngine, self).__init__(**kwargs)
 
@@ -98,7 +102,7 @@ class TestSearchEngine(SearchEngine):
 
         """
 
-        #kwargs = self.reset_index(**kwargs)
+        # kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).delete(**kwargs)
 
     def delete_index(self, **kwargs):
@@ -107,7 +111,7 @@ class TestSearchEngine(SearchEngine):
 
         """
 
-        #kwargs = self.reset_index(**kwargs)
+        # kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).delete_index(**kwargs)
 
     def search(self, **kwargs):
@@ -118,11 +122,11 @@ class TestSearchEngine(SearchEngine):
 
         """
 
-        #kwargs = self.reset_index(**kwargs)
+        # kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).search(**kwargs)
 
     def create_index(self, **kwargs):
-        #kwargs = self.reset_index(**kwargs)
+        # kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).create_index(**kwargs)
 
     def index_data(self, index=None, body=None, idfield=None, id=None, **kwargs):
@@ -136,22 +140,22 @@ class TestSearchEngine(SearchEngine):
 
         """
 
-        kwargs['index'] = index
-        kwargs['body'] = body
-        kwargs['idfield'] = idfield
-        kwargs['id'] = id
-        #kwargs = self.reset_index(**kwargs)
+        kwargs["index"] = index
+        kwargs["body"] = body
+        kwargs["idfield"] = idfield
+        kwargs["id"] = id
+        # kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).index_data(**kwargs)
 
     def bulk_index(self, data, **kwargs):
-        kwargs['data'] = data
-        #kwargs = self.reset_index(**kwargs)
+        kwargs["data"] = data
+        # kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).bulk_index(**kwargs)
 
     def create_bulk_item(self, **kwargs):
-        #kwargs = self.reset_index(**kwargs)
+        # kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).create_bulk_item(**kwargs)
 
     def count(self, **kwargs):
-        #kwargs = self.reset_index(**kwargs)
+        # kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).count(**kwargs)

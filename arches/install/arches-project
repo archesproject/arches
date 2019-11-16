@@ -142,7 +142,7 @@ def main(argv=None):
     try:
         COMMANDS[args.command](args)
     except CommandError as e:
-        print str(e)
+        print(str(e))
         sys.exit(1)
 
 
