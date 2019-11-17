@@ -31,12 +31,13 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Terms, MaxAgg, Aggregation
-from arches.app.search.search_export import flatten_tiles
+from arches.app.search.search_export import SearchResultsExporter
 from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.views.base import MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
+from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from io import StringIO
 
 
@@ -177,27 +178,16 @@ def get_resource_model_label(result):
 
 
 def export_results(request):
-    request.GET = request.GET.copy()
-    request.GET["tiles"] = True
-    compact = request.GET.pop("compact", False)
-
-    search_res_json = search_results(request)
-    results = JSONDeserializer().deserialize(search_res_json.content)
-    instances = results["results"]["hits"]["hits"]
-    datatype_factory = DataTypeFactory()
-
-    flattened_data = []
-    for resource_instance in instances:
-        flattened_data.append(flatten_tiles(resource_instance["_source"]["tiles"], datatype_factory, compact=compact))
-
-    return JSONResponse(flattened_data, indent=4)
+    exporter = SearchResultsExporter(search_request=request)
+    resourceexporter = ResourceExporter(format="tilecsv")
+    return resourceexporter.zip_response(exporter.export(), zip_file_name="temp.zip")
+    return JSONResponse(exporter.export(), indent=4)
 
 
 def search_results(request):
     se = SearchEngineFactory().create()
     search_results_object = {"query": Query(se)}
 
-    export_results = request.GET.get("export", False)
     include_provisional = get_provisional_type(request)
     permitted_nodegroups = get_permitted_nodegroups(request.user)
 
