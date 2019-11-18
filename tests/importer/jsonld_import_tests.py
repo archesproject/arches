@@ -1,5 +1,3 @@
-
-
 import os
 import json
 import csv
@@ -24,6 +22,7 @@ from arches.app.utils.data_management.resource_graphs.importer import import_gra
 # these tests can be run from the command line via
 # python manage.py test tests/importer/jsonld_import_tests.py --settings="tests.test_settings"
 
+
 class JsonLDImportTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
@@ -47,69 +46,66 @@ class JsonLDImportTests(ArchesTestCase):
                 ON CONFLICT DO NOTHING;
         """
 
-        cls.token = 'abc'
-        cls.oauth_client_id = 'AAac4uRQSqybRiO6hu7sHT50C4wmDp9fAmsPlCj9'
-        cls.oauth_client_secret = '7fos0s7qIhFqUmalDI1QiiYj0rAtEdVMY4hYQDQjOxltbRCBW3dIydOeMD4MytDM9ogCPiYFiMBW6o6ye5bMh5dkeU7pg1cH86wF6Bap9Ke2aaAZaeMPejzafPSj96ID'
+        cls.token = "abc"
+        cls.oauth_client_id = "AAac4uRQSqybRiO6hu7sHT50C4wmDp9fAmsPlCj9"
+        cls.oauth_client_secret = "7fos0s7qIhFqUmalDI1QiiYj0rAtEdVMY4hYQDQjOxltbRCBW3dIydOeMD4MytDM9ogCPiYFiMBW6o6ye5bMh5dkeU7pg1cH86wF6Bap9Ke2aaAZaeMPejzafPSj96ID"
 
         sql = sql.format(
-            token=cls.token,
-            user_id=1,  # admin is 1
-            oauth_client_id=cls.oauth_client_id,
-            oauth_client_secret=cls.oauth_client_secret
+            token=cls.token, user_id=1, oauth_client_id=cls.oauth_client_id, oauth_client_secret=cls.oauth_client_secret  # admin is 1
         )
 
         cursor = connection.cursor()
         cursor.execute(sql)
 
-        key = '{0}:{1}'.format(cls.oauth_client_id, cls.oauth_client_secret)
-        cls.client = Client(HTTP_AUTHORIZATION='Bearer %s' % cls.token)
+        key = "{0}:{1}".format(cls.oauth_client_id, cls.oauth_client_secret)
+        cls.client = Client(HTTP_AUTHORIZATION="Bearer %s" % cls.token)
 
         skos = SKOSReader()
-        rdf = skos.read_file('tests/fixtures/jsonld_base/rdm/jsonld_test_thesaurus.xml')
+        rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/jsonld_test_thesaurus.xml")
         ret = skos.save_concepts_from_skos(rdf)
 
         skos = SKOSReader()
-        rdf = skos.read_file('tests/fixtures/jsonld_base/rdm/jsonld_test_collections.xml')
+        rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/jsonld_test_collections.xml")
         ret = skos.save_concepts_from_skos(rdf)
 
         skos = SKOSReader()
-        rdf = skos.read_file('tests/fixtures/jsonld_base/rdm/5098-thesaurus.xml')
+        rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/5098-thesaurus.xml")
         ret = skos.save_concepts_from_skos(rdf)
 
         skos = SKOSReader()
-        rdf = skos.read_file('tests/fixtures/jsonld_base/rdm/5098-collections.xml')
+        rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/5098-collections.xml")
         ret = skos.save_concepts_from_skos(rdf)
 
         # Load up the models and data only once
-        with open(os.path.join('tests/fixtures/jsonld_base/models/test_1_basic_object.json'), 'rU') as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/test_1_basic_object.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile['graph'])
+        ResourceGraphImporter(archesfile["graph"])
 
-        with open(os.path.join('tests/fixtures/jsonld_base/models/test_2_complex_object.json'), 'rU') as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/test_2_complex_object.json"), "rU") as f:
             archesfile2 = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile2['graph'])
+        ResourceGraphImporter(archesfile2["graph"])
 
         skos = SKOSReader()
-        rdf = skos.read_file('tests/fixtures/jsonld_base/rdm/5098-thesaurus.xml')
+        rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/5098-thesaurus.xml")
         ret = skos.save_concepts_from_skos(rdf)
 
         skos = SKOSReader()
-        rdf = skos.read_file('tests/fixtures/jsonld_base/rdm/5098-collections.xml')
+        rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/5098-collections.xml")
         ret = skos.save_concepts_from_skos(rdf)
 
-        with open(os.path.join('tests/fixtures/jsonld_base/models/5098_concept_list.json'), 'rU') as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/5098_concept_list.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile['graph'])
+        ResourceGraphImporter(archesfile["graph"])
 
-        management.call_command('datatype', 'register', source='tests/fixtures/datatypes/color.py')
-        management.call_command('datatype', 'register', source='tests/fixtures/datatypes/semantic_like.py')
+        management.call_command("datatype", "register", source="tests/fixtures/datatypes/color.py")
+        management.call_command("datatype", "register", source="tests/fixtures/datatypes/semantic_like.py")
 
-        with open(os.path.join('tests/fixtures/jsonld_base/models/5299-basic.json'), 'rU') as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/5299-basic.json"), "rU") as f:
             archesfile2 = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile2['graph']) 
-        with open(os.path.join('tests/fixtures/jsonld_base/models/5299_complex.json'), 'rU') as f:
+        ResourceGraphImporter(archesfile2["graph"])
+        with open(os.path.join("tests/fixtures/jsonld_base/models/5299_complex.json"), "rU") as f:
             archesfile2 = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile2['graph']) 
+        ResourceGraphImporter(archesfile2["graph"])
 
     def setUp(self):
         pass
@@ -128,18 +124,20 @@ class JsonLDImportTests(ArchesTestCase):
             "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "test!"
             }"""
 
-        url = reverse('resources_graphid', kwargs={"graphid": "bf734b4e-f6b5-11e9-8f09-a4d18cec433a", 
-            "resourceid": "221d1154-fa8e-11e9-9cbb-3af9d3b32b71"})
-        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "bf734b4e-f6b5-11e9-8f09-a4d18cec433a", "resourceid": "221d1154-fa8e-11e9-9cbb-3af9d3b32b71"},
+        )
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         self.assertEqual(response.status_code, 201)
         js = response.json()
         if type(js) == list:
             js = js[0]
 
-        self.assertTrue('@id' in js)
-        self.assertTrue(js['@id'] == "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71")
-        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P3_has_note' in js)
-        self.assertTrue(js['http://www.cidoc-crm.org/cidoc-crm/P3_has_note'] == 'test!')
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71")
+        self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in js)
+        self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"] == "test!")
 
     def test_2_complex_import_data(self):
 
@@ -190,16 +188,18 @@ class JsonLDImportTests(ArchesTestCase):
             }
         """
 
-        url = reverse('resources_graphid', kwargs={"graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71", 
-            "resourceid": "12345678-abcd-11e9-9cbb-3af9d3b32b71"})
-        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71", "resourceid": "12345678-abcd-11e9-9cbb-3af9d3b32b71"},
+        )
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         self.assertEqual(response.status_code, 201)
         js = response.json()
         if type(js) == list:
             js = js[0]
 
-        self.assertTrue('@id' in js)
-        self.assertTrue(js['@id'] == "http://localhost:8000/resources/12345678-abcd-11e9-9cbb-3af9d3b32b71")
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/12345678-abcd-11e9-9cbb-3af9d3b32b71")
 
     def test_3_5098_concepts(self):
         data = """
@@ -225,30 +225,34 @@ class JsonLDImportTests(ArchesTestCase):
             }
         """
 
-
-        url = reverse('resources_graphid', kwargs={"graphid": "92ccf5aa-bec9-11e9-bd39-0242ac160002", 
-            "resourceid": '0b4439a8-beca-11e9-b4dc-0242ac160002'})
-        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "92ccf5aa-bec9-11e9-bd39-0242ac160002", "resourceid": "0b4439a8-beca-11e9-b4dc-0242ac160002"},
+        )
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         self.assertEqual(response.status_code, 201)
         js = response.json()
         if type(js) == list:
             js = js[0]
 
-        self.assertTrue('@id' in js)
-        self.assertTrue(js['@id'] == "http://localhost:8000/resources/0b4439a8-beca-11e9-b4dc-0242ac160002")
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/0b4439a8-beca-11e9-b4dc-0242ac160002")
 
         print(f"Got JSON for test 3: {js}")
-        types = js["http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by"]["http://www.cidoc-crm.org/cidoc-crm/P2_has_type"]   
+        types = js["http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by"]["http://www.cidoc-crm.org/cidoc-crm/P2_has_type"]
         self.assertTrue(type(types) == list)
         self.assertTrue(len(types) == 2)
-        cids = ["http://localhost:8000/concepts/c3c4b8a8-39bb-41e7-af45-3a0c60fa4ddf", "http://localhost:8000/concepts/0bb450bc-8fe3-46cb-968e-2b56849e6e96"]
-        self.assertTrue(types[0]['@id'] in cids)
-        self.assertTrue(types[1]['@id'] in cids)
-        self.assertTrue(types[0]['@id'] != types[1]['@id'])
+        cids = [
+            "http://localhost:8000/concepts/c3c4b8a8-39bb-41e7-af45-3a0c60fa4ddf",
+            "http://localhost:8000/concepts/0bb450bc-8fe3-46cb-968e-2b56849e6e96",
+        ]
+        self.assertTrue(types[0]["@id"] in cids)
+        self.assertTrue(types[1]["@id"] in cids)
+        self.assertTrue(types[0]["@id"] != types[1]["@id"])
 
     def test_4_5098_resinst(self):
         # Make instances for this new one to reference
-        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_2_instances.json').import_business_data()   
+        BusinessDataImporter("tests/fixtures/jsonld_base/data/test_2_instances.json").import_business_data()
         data = """
             {
                 "@id": "http://localhost:8000/resources/abcd1234-1234-1129-b6e7-3af9d3b32b71",
@@ -267,30 +271,34 @@ class JsonLDImportTests(ArchesTestCase):
             }
         """
 
-        url = reverse('resources_graphid', kwargs={"graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71", 
-            "resourceid": "abcd1234-1234-1129-b6e7-3af9d3b32b71"})
-        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71", "resourceid": "abcd1234-1234-1129-b6e7-3af9d3b32b71"},
+        )
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         self.assertEqual(response.status_code, 201)
         js = response.json()
         if type(js) == list:
-            js = js[0]        
+            js = js[0]
 
         print(f"Got json for test 4: {js}")
-        self.assertTrue('@id' in js)
-        self.assertTrue(js['@id'] == 'http://localhost:8000/resources/abcd1234-1234-1129-b6e7-3af9d3b32b71')
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/abcd1234-1234-1129-b6e7-3af9d3b32b71")
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P130_shows_features_of" in js)
         feats = js["http://www.cidoc-crm.org/cidoc-crm/P130_shows_features_of"]
         self.assertTrue(type(feats) == list)
         self.assertTrue(len(feats) == 2)
-        rids = ["http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71", 
-            "http://localhost:8000/resources/24d0d25a-fa75-11e9-b369-3af9d3b32b71"]
-        self.assertTrue(feats[0]['@id'] in rids)
-        self.assertTrue(feats[1]['@id'] in rids)
+        rids = [
+            "http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71",
+            "http://localhost:8000/resources/24d0d25a-fa75-11e9-b369-3af9d3b32b71",
+        ]
+        self.assertTrue(feats[0]["@id"] in rids)
+        self.assertTrue(feats[1]["@id"] in rids)
 
     def test_5_5098_resinst_branch(self):
         # 2019-11-01 - Conversely this fails, as it is in a branch
 
-        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_2_instances.json').import_business_data()  
+        BusinessDataImporter("tests/fixtures/jsonld_base/data/test_2_instances.json").import_business_data()
 
         data = """
             {
@@ -314,21 +322,23 @@ class JsonLDImportTests(ArchesTestCase):
         """
 
         # Load up the models and data only once
-        with open(os.path.join('tests/fixtures/jsonld_base/models/5098_b_resinst.json'), 'rU') as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/5098_b_resinst.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile['graph'])
+        ResourceGraphImporter(archesfile["graph"])
 
-        url = reverse('resources_graphid', kwargs={"graphid": "40dbcffa-faa1-11e9-84de-3af9d3b32b71", 
-            "resourceid": "7fffffff-faa1-11e9-84de-3af9d3b32b71"})
-        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "40dbcffa-faa1-11e9-84de-3af9d3b32b71", "resourceid": "7fffffff-faa1-11e9-84de-3af9d3b32b71"},
+        )
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         self.assertEqual(response.status_code, 201)
         js = response.json()
         if type(js) == list:
             js = js[0]
 
         print(f"Got json for test 5: {js}")
-        self.assertTrue('@id' in js)
-        self.assertTrue(js['@id'] == 'http://localhost:8000/resources/7fffffff-faa1-11e9-84de-3af9d3b32b71')
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/7fffffff-faa1-11e9-84de-3af9d3b32b71")
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by" in js)
         feats = js["http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by"]["http://www.cidoc-crm.org/cidoc-crm/P128i_is_carried_by"]
         self.assertTrue(type(feats) == list)
@@ -338,20 +348,20 @@ class JsonLDImportTests(ArchesTestCase):
         # 2019-11-01 - Fails due to #5126, the concept is not checked against the collection
 
         skos = SKOSReader()
-        rdf = skos.read_file('tests/fixtures/jsonld_base/rdm/5126-thesaurus.xml')
+        rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/5126-thesaurus.xml")
         ret = skos.save_concepts_from_skos(rdf)
 
         skos = SKOSReader()
-        rdf = skos.read_file('tests/fixtures/jsonld_base/rdm/5126-collections.xml')
+        rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/5126-collections.xml")
         ret = skos.save_concepts_from_skos(rdf)
 
         # Load up the models and data only once
-        with open(os.path.join('tests/fixtures/jsonld_base/models/5126_collection_ambiguity.json'), 'rU') as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/5126_collection_ambiguity.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile['graph'])
+        ResourceGraphImporter(archesfile["graph"])
 
         data = """
-             {
+            {
                 "@id": "http://localhost:8000/resources/69a4af50-c055-11e9-b4dc-0242ac160002",
                 "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
                 "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": {
@@ -361,143 +371,154 @@ class JsonLDImportTests(ArchesTestCase):
                 }
             }
         """
-        url = reverse('resources_graphid', kwargs={"graphid": "09e3dc8a-c055-11e9-b4dc-0242ac160002", 
-            "resourceid": "69a4af50-c055-11e9-b4dc-0242ac160002"})
-        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "09e3dc8a-c055-11e9-b4dc-0242ac160002", "resourceid": "69a4af50-c055-11e9-b4dc-0242ac160002"},
+        )
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         print(f"Test 6 response: {response.content}")
         self.assertTrue(response.status_code == 201)
         js = response.json()
         if type(js) == list:
-            js = js[0] 
-                
+            js = js[0]
+
         print(f"Got JSON for test 6: {js}")
-        self.assertTrue('@id' in js)
-        self.assertTrue(js['@id'] == 'http://localhost:8000/resources/69a4af50-c055-11e9-b4dc-0242ac160002')
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/69a4af50-c055-11e9-b4dc-0242ac160002")
 
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P2_has_type" in js)
-        typ = js['http://www.cidoc-crm.org/cidoc-crm/P2_has_type']
-        self.assertTrue(typ['@id'] == "http://vocab.getty.edu/aat/300404216")
+        typ = js["http://www.cidoc-crm.org/cidoc-crm/P2_has_type"]
+        self.assertTrue(typ["@id"] == "http://vocab.getty.edu/aat/300404216")
 
     def test_7_5121_branches(self):
         # 2019-11-01 - This fails due to #5121, the presence of content is not used to rule out the resource-instance branch
 
         # Load up the models and data only once
-        with open(os.path.join('tests/fixtures/jsonld_base/models/5121_false_ambiguity.json'), 'rU') as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/5121_false_ambiguity.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile['graph'])
+        ResourceGraphImporter(archesfile["graph"])
 
-        with open(os.path.join('tests/fixtures/jsonld_base/models/5121_external_model.json'), 'rU') as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/5121_external_model.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile['graph'])
+        ResourceGraphImporter(archesfile["graph"])
 
         data = """
-{"@id": "http://localhost:8000/resources/87654321-c000-1100-b400-0242ac160002", 
- "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person", 
- "http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by": 
-   { "@id": "http://localhost:8000/tile/17fa1306-d48f-434e-ad37-fc4c9b09d979/node/d1af9e9e-bf96-11e9-b4dc-0242ac160002", 
-     "@type": "http://www.cidoc-crm.org/cidoc-crm/E33_Linguistic_Object", 
-     "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": 
-       { "@id": "http://localhost:8000/concepts/0bb450bc-8fe3-46cb-968e-2b56849e6e96", 
-         "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
-         "http://www.w3.org/2000/01/rdf-schema#label": "Concept 1"}, 
-   "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "Test Content"}
-}        
+            {
+                "@id": "http://localhost:8000/resources/87654321-c000-1100-b400-0242ac160002",
+                "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person",
+                "http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by": {
+                    "@id": "http://localhost:8000/tile/17fa1306-d48f-434e-ad37-fc4c9b09d979/node/d1af9e9e-bf96-11e9-b4dc-0242ac160002",
+                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E33_Linguistic_Object",
+                    "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": {
+                        "@id": "http://localhost:8000/concepts/0bb450bc-8fe3-46cb-968e-2b56849e6e96",
+                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
+                        "http://www.w3.org/2000/01/rdf-schema#label": "Concept 1"
+                    },
+                    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "Test Content"
+                }
+            }     
         """
 
-        url = reverse('resources_graphid', kwargs={"graphid": "9f716aa2-bf96-11e9-bd39-0242ac160002", 
-            "resourceid": "87654321-c000-1100-b400-0242ac160002"})
-        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "9f716aa2-bf96-11e9-bd39-0242ac160002", "resourceid": "87654321-c000-1100-b400-0242ac160002"},
+        )
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         print(f"Test 7 response: {response.content}")
         self.assertTrue(response.status_code == 201)
         js = response.json()
         if type(js) == list:
-            js = js[0] 
-                
+            js = js[0]
+
         print(f"Got JSON for test 6: {js}")
-        self.assertTrue('@id' in js)
-        self.assertTrue(js['@id'] == 'http://localhost:8000/resources/87654321-c000-1100-b400-0242ac160002')
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/87654321-c000-1100-b400-0242ac160002")
 
         lo = js["http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by"]
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in lo)
         self.assertTrue(lo["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"] == "Test Content")
 
-
     def test_8_4564_resinst_models(self):
         # 2019-11-01 - This fails as the model uses Actor, not Group, per #4564
         # and the import does not look at the referenced model's class
 
-        with open(os.path.join('tests/fixtures/jsonld_base/models/4564-person.json'), 'rU') as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/4564-person.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile['graph'])  
-        with open(os.path.join('tests/fixtures/jsonld_base/models/4564-group.json'), 'rU') as f:
+        ResourceGraphImporter(archesfile["graph"])
+        with open(os.path.join("tests/fixtures/jsonld_base/models/4564-group.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile['graph'])  
-        with open(os.path.join('tests/fixtures/jsonld_base/models/4564-referenced.json'), 'rU') as f:
+        ResourceGraphImporter(archesfile["graph"])
+        with open(os.path.join("tests/fixtures/jsonld_base/models/4564-referenced.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile['graph'])
+        ResourceGraphImporter(archesfile["graph"])
 
         aux_data = """
-        {
+            {
                 "@id": "http://localhost:8000/resources/923a5fa8-bfa8-11e9-bd39-0242ac160002", 
                 "@type": "http://www.cidoc-crm.org/cidoc-crm/E74_Group", 
-                "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "Test Group"}
+                "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "Test Group"
+            }
         """
 
-        url = reverse('resources_graphid', kwargs={"graphid": "2c03ddcc-bfa8-11e9-b4dc-0242ac160002", 
-            "resourceid": "923a5fa8-bfa8-11e9-bd39-0242ac160002"})
-        response = self.client.put(url, data=aux_data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "2c03ddcc-bfa8-11e9-b4dc-0242ac160002", "resourceid": "923a5fa8-bfa8-11e9-bd39-0242ac160002"},
+        )
+        response = self.client.put(url, data=aux_data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         # this should have worked
         self.assertTrue(response.status_code == 201)
 
         data = """
-        {
+            {
                 "@id": "http://localhost:8000/resources/940a2c82-bfa8-11e9-bd39-0242ac160002", 
                 "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object", 
                 "http://www.cidoc-crm.org/cidoc-crm/P51_has_former_or_current_owner": {
                         "@id": "http://localhost:8000/resources/923a5fa8-bfa8-11e9-bd39-0242ac160002", 
                         "@type": "http://www.cidoc-crm.org/cidoc-crm/E74_Group"
                 }
-        }
+            }
         """
 
-        url = reverse('resources_graphid', kwargs={"graphid": "e3d4505e-bfa7-11e9-b4dc-0242ac160002", 
-            "resourceid": "940a2c82-bfa8-11e9-bd39-0242ac160002"})
-        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
-        print(f"Test 8 response: {response.content}")        
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "e3d4505e-bfa7-11e9-b4dc-0242ac160002", "resourceid": "940a2c82-bfa8-11e9-bd39-0242ac160002"},
+        )
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        print(f"Test 8 response: {response.content}")
         # this does not currently work
         self.assertTrue(response.status_code == 201)
         js = response.json()
         if type(js) == list:
-            js = js[0] 
-                
+            js = js[0]
+
         print(f"Got JSON for test 8: {js}")
-        self.assertTrue('@id' in js)
-        self.assertTrue(js['@id'] == 'http://localhost:8000/resources/940a2c82-bfa8-11e9-bd39-0242ac160002')
-        self.assertTrue('http://www.cidoc-crm.org/cidoc-crm/P51_has_former_or_current_owner' in js)
-        owner = js['http://www.cidoc-crm.org/cidoc-crm/P51_has_former_or_current_owner']
-        self.assertTrue(owners['@id'] == "http://localhost:8000/resources/923a5fa8-bfa8-11e9-bd39-0242ac160002")
-
-
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/940a2c82-bfa8-11e9-bd39-0242ac160002")
+        self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P51_has_former_or_current_owner" in js)
+        owner = js["http://www.cidoc-crm.org/cidoc-crm/P51_has_former_or_current_owner"]
+        self.assertTrue(owners["@id"] == "http://localhost:8000/resources/923a5fa8-bfa8-11e9-bd39-0242ac160002")
 
     def test_9_5299_basic(self):
 
-        url = reverse('resources_graphid', kwargs={"graphid": "0cadd978-071a-11ea-8d9a-acde48001122", 
-            "resourceid": "faceb004-dead-11e9-bd39-0242ac160002"})
-
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "0cadd978-071a-11ea-8d9a-acde48001122", "resourceid": "faceb004-dead-11e9-bd39-0242ac160002"},
+        )
 
         data = """
-        {
-          "@id": "http://localhost:8000/resources/faceb004-dead-11e9-bd39-0242ac160002", 
-          "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object", 
-          "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by": {
-            "@id": "http://localhost:8000/tile/1580cf8b-1ead-42b7-a22a-cc92bff0aafb/node/1ae420ba-071a-11ea-8d9a-acde48001122", 
-            "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production", 
-            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "Production"}, 
-          "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "#ff00ff"
-        }
+            {
+                "@id": "http://localhost:8000/resources/faceb004-dead-11e9-bd39-0242ac160002",
+                "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
+                "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by": {
+                    "@id": "http://localhost:8000/tile/1580cf8b-1ead-42b7-a22a-cc92bff0aafb/node/1ae420ba-071a-11ea-8d9a-acde48001122",
+                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
+                    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "Production"
+                },
+                "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "#ff00ff"
+            }
         """
 
-        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         print(f"Test 9 response: {response.content}")
         self.assertTrue(response.status_code == 201)
         js = response.json()
@@ -507,8 +528,8 @@ class JsonLDImportTests(ArchesTestCase):
         prod = "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by"
         note = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
 
-        self.assertTrue('@id' in js)
-        self.assertTrue(js['@id'] == "http://localhost:8000/resources/faceb004-dead-11e9-bd39-0242ac160002")
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/faceb004-dead-11e9-bd39-0242ac160002")
         self.assertTrue(prod in js)
         prodjs = js[prod]
         self.assertTrue(note in prodjs)
@@ -516,45 +537,52 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(note in js)
         self.assertTrue(js[note] == "#ff00ff")
 
-
-
     def test_a_5299_complex(self):
 
-        url = reverse('resources_graphid', kwargs={"graphid": "f348bbda-0721-11ea-b628-acde48001122", 
-            "resourceid": "deadface-0000-11e9-bd39-0242ac160002"})
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "f348bbda-0721-11ea-b628-acde48001122", "resourceid": "deadface-0000-11e9-bd39-0242ac160002"},
+        )
 
         data = """
-{"@id": "http://localhost:8000/resources/deadface-0000-11ea-b628-acde48001122",
- "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
-  "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by":
-   {"@id": "http://localhost:8000/tile/caced9b0-f717-4557-9c64-ef87f646c9c1/node/fdbc4f50-0721-11ea-b628-acde48001122", 
-   "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production", 
-   "http://www.cidoc-crm.org/cidoc-crm/P10i_contains": 
-   [
-   {"@id": "http://localhost:8000/tile/caced9b0-f717-4557-9c64-ef87f646c9c1/node/222d5c4e-0722-11ea-b628-acde48001122", 
-   "@type": "http://www.cidoc-crm.org/cidoc-crm/E4_Period", 
-   "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "Import Note"
-   }, 
-   {
-   "@id": "http://localhost:8000/tile/caced9b0-f717-4557-9c64-ef87f646c9c1/node/080d16b0-0722-11ea-b628-acde48001122", 
-   "@type": "http://www.cidoc-crm.org/cidoc-crm/E4_Period", 
-   "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": 
-   {"@id": "http://localhost:8000/tile/caced9b0-f717-4557-9c64-ef87f646c9c1/node/3d38c276-0722-11ea-b628-acde48001122",
-    "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
-    "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": 
-    {"@type": "http://www.w3.org/2001/XMLSchema#dateTime", 
-    "@value": "2018-01-01"}}}]}}
-"""
+            {
+                "@id": "http://localhost:8000/resources/deadface-0000-11ea-b628-acde48001122",
+                "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
+                "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by": {
+                    "@id": "http://localhost:8000/tile/caced9b0-f717-4557-9c64-ef87f646c9c1/node/fdbc4f50-0721-11ea-b628-acde48001122",
+                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
+                    "http://www.cidoc-crm.org/cidoc-crm/P10i_contains": [
+                        {
+                            "@id": "http://localhost:8000/tile/caced9b0-f717-4557-9c64-ef87f646c9c1/node/222d5c4e-0722-11ea-b628-acde48001122",
+                            "@type": "http://www.cidoc-crm.org/cidoc-crm/E4_Period",
+                            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "Import Note"
+                        },
+                        {
+                            "@id": "http://localhost:8000/tile/caced9b0-f717-4557-9c64-ef87f646c9c1/node/080d16b0-0722-11ea-b628-acde48001122",
+                            "@type": "http://www.cidoc-crm.org/cidoc-crm/E4_Period",
+                            "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": {
+                                "@id": "http://localhost:8000/tile/caced9b0-f717-4557-9c64-ef87f646c9c1/node/3d38c276-0722-11ea-b628-acde48001122",
+                                "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span",
+                                "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
+                                    "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+                                    "@value": "2018-01-01"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        """
 
-        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         print(f"Test 9 response: {response.content}")
         self.assertTrue(response.status_code == 201)
         js = response.json()
         if type(js) == list:
             js = js[0]
 
-        self.assertTrue('@id' in js)
-        self.assertTrue(js['@id'] == "http://localhost:8000/resources/deadface-0000-11e9-bd39-0242ac160002")
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/deadface-0000-11e9-bd39-0242ac160002")
 
         prod = "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by"
         note = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
@@ -573,4 +601,4 @@ class JsonLDImportTests(ArchesTestCase):
             print(f"note data: {contl[1]}")
             self.assertTrue(contl[1][note] == "Import Note")
             jsts = contl[0][ts]
-        self.assertTrue(ts[botb]['@value'] == '2018-01-01')
+        self.assertTrue(ts[botb]["@value"] == "2018-01-01")
