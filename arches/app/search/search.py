@@ -186,7 +186,10 @@ class SearchEngine(object):
                 raise detail
 
     def bulk_index(self, data, **kwargs):
-        return helpers.bulk(self.es, data, **kwargs)
+        try:
+            helpers.bulk(self.es, data, **kwargs)
+        except Exception as detail:
+            self.logger.warning("%s: WARNING: failed to bulk index documents, \nException detail: %s\n" % (datetime.now(), detail))
 
     def create_bulk_item(self, op_type="index", index=None, id=None, data=None):
         return {"_op_type": op_type, "_index": self._add_prefix(index), "_type": "_doc", "_id": id, "_source": data}
