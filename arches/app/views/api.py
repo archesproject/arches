@@ -369,7 +369,10 @@ class MVT(APIBase):
 
                 SELECT ST_AsMVT(
                     tile,
-                    %s
+                    %s,
+                    4096,
+                    'geom',
+                    'id'
                 ) FROM (
                     SELECT resourceinstanceid::text,
                         row_number() over () as id,
@@ -406,7 +409,7 @@ class MVT(APIBase):
                 )
             else:
                 cursor.execute(
-                    """SELECT ST_AsMVT(tile, %s) FROM (SELECT t.tileid,
+                    """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT t.tileid,
                    row_number() over () as id,
                    t.resourceinstanceid,
                    n.nodeid,
