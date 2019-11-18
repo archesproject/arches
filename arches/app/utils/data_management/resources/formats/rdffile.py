@@ -231,6 +231,7 @@ class JsonLdWriter(RdfWriter):
 
 class JsonLdReader(Reader):
     def __init__(self):
+        super(JsonLdReader, self).__init__()
         self.tiles = {}
         self.errors = {}
         self.resources = []

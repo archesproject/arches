@@ -321,6 +321,9 @@ class TileCsvWriter(Writer):
 
 
 class CsvReader(Reader):
+    def __init__(self):
+        super(CsvReader, self).__init__()
+
     def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number):
         # create a resource instance only if there are populated_tiles
         errors = []
@@ -1006,6 +1009,7 @@ class CsvReader(Reader):
 
 class TileCsvReader(Reader):
     def __init__(self, business_data):
+        super(TileCsvReader, self).__init__()
         self.csv_reader = CsvReader()
         self.business_data = business_data
 
