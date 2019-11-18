@@ -4,6 +4,20 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 
 
 class GeoUtils(object):
+    def set_precision(self, coordinates, precision):
+        """
+        returns the passed in coordinates with the specified precision
+
+        """
+
+        result = []
+        try:
+            return round(coordinates, int(precision))
+        except TypeError:
+            for coordinate in coordinates:
+                result.append(self.set_precision(coordinate, precision))
+        return result
+
     def create_geom_collection_from_geojson(self, geojson):
         geoms = []
         for feature in geojson["features"]:

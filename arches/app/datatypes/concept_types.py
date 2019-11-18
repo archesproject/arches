@@ -34,7 +34,9 @@ class BaseConceptDataType(BaseDataType):
 
     def get_concept_export_value(self, valueid, concept_export_value_type=None):
         ret = ""
-        if concept_export_value_type is None or concept_export_value_type == "" or concept_export_value_type == "label":
+        if valueid is None or valueid.strip() == "":
+            pass
+        elif concept_export_value_type is None or concept_export_value_type == "" or concept_export_value_type == "label":
             ret = self.get_value(valueid).value
         elif concept_export_value_type == "both":
             ret = valueid + "|" + self.get_value(valueid).value
@@ -84,8 +86,8 @@ class ConceptDataType(BaseConceptDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
 
-        ## first check to see if the validator has been passed a valid UUID,
-        ## which should be the case at this point. return error if not.
+        # first check to see if the validator has been passed a valid UUID,
+        # which should be the case at this point. return error if not.
         if value is not None:
             try:
                 uuid.UUID(str(value))
@@ -101,7 +103,7 @@ class ConceptDataType(BaseConceptDataType):
                 )
                 return errors
 
-            ## if good UUID, test whether it corresponds to an actual Value object
+            # if good UUID, test whether it corresponds to an actual Value object
             try:
                 models.Value.objects.get(pk=value)
             except ObjectDoesNotExist:
@@ -120,8 +122,7 @@ class ConceptDataType(BaseConceptDataType):
         return value.strip()
 
     def transform_export_values(self, value, *args, **kwargs):
-        if "concept_export_value_type" in kwargs:
-            concept_export_value_type = kwargs.get("concept_export_value_type")
+        concept_export_value_type = kwargs.get("concept_export_value_type", None)
         return self.get_concept_export_value(value, concept_export_value_type)
 
     def get_pref_label(self, nodevalue, lang="en-US"):
@@ -274,7 +275,7 @@ class ConceptListDataType(BaseConceptDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
 
-        ## iterate list of values and use the concept validation on each one
+        # iterate list of values and use the concept validation on each one
         if value is not None:
             validate_concept = DataTypeFactory().get_instance("concept")
             for v in value:
@@ -292,7 +293,7 @@ class ConceptListDataType(BaseConceptDataType):
     def transform_export_values(self, value, *args, **kwargs):
         new_values = []
         for val in value:
-            new_val = self.get_concept_export_value(val, kwargs["concept_export_value_type"])
+            new_val = self.get_concept_export_value(val, kwargs.get("concept_export_value_type", None))
             new_values.append(new_val)
         return ",".join(new_values)
 

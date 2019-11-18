@@ -1,8 +1,8 @@
-# Create your tasks here
 from __future__ import absolute_import, unicode_literals
 from celery import shared_task
 from django.core import management
 import datetime
+import logging
 from arches.app.models import models
 
 
@@ -23,7 +23,8 @@ def update_user_task_record(taskid):
 
 @shared_task
 def log_error(request, exc, traceback):
-    print(exc)
+    logger = logging.getLogger(__name__)
+    logger.warn(exc)
     task_obj = models.UserXTask.objects.get(taskid=request.id)
     task_obj.status = "FAILED"
     task_obj.date_done = datetime.datetime.now()
@@ -34,4 +35,5 @@ def create_user_task_record(taskid, taskname, userid):
     try:
         new_task_record = models.UserXTask.objects.create(user_id=userid, taskid=taskid, date_start=datetime.datetime.now(), name=taskname)
     except Exception as e:
-        print("encountered exception in create user")
+        logger = logging.getLogger(__name__)
+        logger.warn(e)
