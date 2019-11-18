@@ -6,18 +6,18 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('models', '5476_search_export'),
-    ]
+    dependencies = [("models", "5476_search_export")]
 
     operations = [
-        migrations.AlterModelOptions(
-            name='plugin',
-            options={'managed': True},
-        ),
+        migrations.AlterModelOptions(name="plugin", options={"managed": True}),
         migrations.AlterField(
-            model_name='graphmodel',
-            name='template',
-            field=models.ForeignKey(db_column='templateid', default='50000000-0000-0000-0000-000000000001', on_delete=django.db.models.deletion.SET_DEFAULT, to='models.ReportTemplate'),
+            model_name="graphmodel",
+            name="template",
+            field=models.ForeignKey(
+                db_column="templateid",
+                default="50000000-0000-0000-0000-000000000001",
+                on_delete=django.db.models.deletion.SET_DEFAULT,
+                to="models.ReportTemplate",
+            ),
         ),
     ]
