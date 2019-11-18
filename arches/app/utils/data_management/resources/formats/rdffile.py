@@ -44,7 +44,6 @@ class RdfWriter(Writer):
         self.logger.debug("Using `{0}` for Arches URI namespace".format(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT))
         self.logger.debug("Using `{0}` for Graph URI".format(graph_uri))
 
-        dt_factory = DataTypeFactory()
         g = Graph()
         g.bind("archesproject", archesproject, False)
         graph_cache = {}
@@ -94,7 +93,7 @@ class RdfWriter(Writer):
         def add_edge_to_graph(graph, domainnode, rangenode, edge, tile, graph_info):
             pkg = {}
             pkg["d_datatype"] = graph_info["nodedatatypes"].get(str(edge.domainnode.pk))
-            dom_dt = dt_factory.get_instance(pkg["d_datatype"])
+            dom_dt = self.datatype_factory.get_instance(pkg["d_datatype"])
             # Don't process any further if the domain datatype is a literal
             if dom_dt.is_a_literal_in_rdf():
                 return
@@ -107,7 +106,7 @@ class RdfWriter(Writer):
             if str(edge.domainnode_id) in tile.data:
                 pkg["domain_tile_data"] = tile.data[str(edge.domainnode_id)]
 
-            rng_dt = dt_factory.get_instance(pkg["r_datatype"])
+            rng_dt = self.datatype_factory.get_instance(pkg["r_datatype"])
             pkg["d_uri"] = dom_dt.get_rdf_uri(domainnode, pkg["domain_tile_data"], "d")
             pkg["r_uri"] = rng_dt.get_rdf_uri(rangenode, pkg["range_tile_data"], "r")
 
@@ -236,7 +235,6 @@ class JsonLdReader(Reader):
         self.errors = {}
         self.resources = []
         self.use_ids = False
-        self.datatype_factory = DataTypeFactory()
         self.resource_model_root_classes = set()
         self.non_unique_classes = set()
         self.graph_id_lookup = {}
@@ -488,7 +486,6 @@ class JsonLdReader(Reader):
                 return len(datatype.validate(value)) == 0
 
             if len(found) > 1:
-                dt_factory = DataTypeFactory()
                 self.logger.info("Iterating through the matched nodes")
                 for found_node in found:
                     # here we follow the algorithm supplied by the Getty
@@ -497,7 +494,7 @@ class JsonLdReader(Reader):
                     # If the range in the model is a file-list, and the referenced file already exists, then accept that node.
                     # If the range in the model is a concept, then consider if the incoming data is a concept that is part of the collection for the node. If it is, then accept that node. If it is a concept, and not part of the collection, then fail. If it is not a concept, then continue.
                     self.logger.debug("Checking to see if the node is in a literal datatype:")
-                    node_dt = dt_factory.get_instance(found_node["node"].datatype)
+                    node_dt = self.datatype_factory.get_instance(found_node["node"].datatype)
                     if node_dt.is_a_literal_in_rdf() and json_data_is_valid(found_node["node"], jsonld_graph):
                         self.logger.debug("    Matched {0} and the json fragment is valid".format(found_node["node"].datatype))
                         return found_node

@@ -9,6 +9,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
+from arches.app.datatypes.datatypes import DataTypeFactory
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import MultiPoint
@@ -68,6 +69,7 @@ class ResourceImportReporter:
 class Reader(object):
     def __init__(self):
         self.errors = []
+        self.datatype_factory = DataTypeFactory()
 
     def validate_datatypes(self, record):
         pass
@@ -203,6 +205,7 @@ class Writer(object):
         self.tiles = []
         self.graph_id = None
         self.graph_model = None
+        self.datatype_factory = DataTypeFactory()
 
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         """
@@ -369,15 +372,15 @@ class Writer(object):
                         sorted_geoms["polys"].append(feat)
             if len(sorted_geoms["points"]) > 0:
                 result.append(
-                    {"type": "Feature", "geometry": MultiPoint(sorted_geoms["points"]), "properties": properties, }
+                    {"type": "Feature", "geometry": MultiPoint(sorted_geoms["points"]), "properties": properties,}
                 )
             if len(sorted_geoms["lines"]) > 0:
                 result.append(
-                    {"type": "Feature", "geometry": MultiLineString(sorted_geoms["lines"]), "properties": properties, }
+                    {"type": "Feature", "geometry": MultiLineString(sorted_geoms["lines"]), "properties": properties,}
                 )
             if len(sorted_geoms["polys"]) > 0:
                 result.append(
-                    {"type": "Feature", "geometry": MultiPolygon(sorted_geoms["polys"]), "properties": properties, }
+                    {"type": "Feature", "geometry": MultiPolygon(sorted_geoms["polys"]), "properties": properties,}
                 )
 
         return result
