@@ -35,7 +35,6 @@ function($, ko, arches) {
                     window.setTimeout(function(){
                         self.downloadStarted(false);
                     }, 9000);
-                    console.log(response);
                     self.result(response.length);
                 });
             };
