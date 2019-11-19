@@ -9,9 +9,7 @@ from django.conf import settings
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ("models", "5345_report_template_on_delete"),
-    ]
+    dependencies = [("models", "5345_report_template_on_delete")]
 
     operations = [
         migrations.RunSQL(
@@ -41,5 +39,5 @@ class Migration(migrations.Migration):
             """
             delete from search_component where searchcomponentid = '9c6a5a9c-a7ec-48d2-8a25-501b55b8eff6';
             """,
-        ),
+        )
     ]
