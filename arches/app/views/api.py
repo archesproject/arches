@@ -265,8 +265,7 @@ class GeoJSON(APIBase):
                 property_node_map[str(node.nodeid)]["name"] = slugify(node.name, max_length=field_name_length, separator="_")
             else:
                 property_node_map[str(node.nodeid)]["name"] = node.fieldname
-
-        tiles = models.TileModel.objects.filter(nodegroup__in=[node.nodegroup for node in nodes]).order_by("sortorder")
+        tiles = models.TileModel.objects.filter(nodegroup__in=[node.nodegroup for node in nodes])
         last_page = None
         if resourceid is not None:
             tiles = tiles.filter(resourceinstance_id__in=resourceid.split(","))
@@ -278,7 +277,7 @@ class GeoJSON(APIBase):
             tile_count = tiles.count()
             last_page = tiles.count() < end
             tiles = tiles[start:end]
-        for tile in tiles:
+        for tile in tiles.order_by("sortorder"):
             data = tile.data
             for node in nodes:
                 try:
