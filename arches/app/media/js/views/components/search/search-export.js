@@ -48,8 +48,8 @@ function($, ko, arches) {
                 });
             };
 
-            this.executeExport = function(){
-                if (this.total() > 6) {
+            this.executeExport = function(limit){
+                if (this.total() > limit) {
                     this.getExportData();
                 } else {
                     window.open(this.url());

@@ -34,7 +34,10 @@
         </div>
     </div>
     <div class="search-export download">
-        <button class="btn btn-primary btn-active-primary" type="button" aria-expanded="true" data-bind="click: executeExport"> {% trans "Download" %}
+        <button class="btn btn-primary btn-active-primary"
+            type="button"
+            aria-expanded="true"
+            data-bind="click: function(){executeExport( {{app_settings.SEARCH_EXPORT_ITEMS_PER_PAGE}} )}"> {% trans "Download" %}
         </button>
     </div>
     <div data-bind="text: result, fadeVisible: downloadStarted, delay:0, fade: 250">
