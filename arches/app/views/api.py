@@ -271,13 +271,14 @@ class GeoJSON(APIBase):
             tiles = tiles.filter(resourceinstance_id__in=resourceid.split(","))
         if tileid is not None:
             tiles = tiles.filter(tileid=tileid)
+        tiles = tiles.order_by("sortorder")
         if limit is not None:
             start = (page - 1) * limit
             end = start + limit
             tile_count = tiles.count()
             last_page = tiles.count() < end
             tiles = tiles[start:end]
-        for tile in tiles.order_by("sortorder"):
+        for tile in tiles:
             data = tile.data
             for node in nodes:
                 try:
