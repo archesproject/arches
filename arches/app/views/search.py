@@ -180,6 +180,7 @@ def get_resource_model_label(result):
 
 def export_results(request):
     total = int(request.GET.get("total", 0))
+    format = request.GET.get("format", "csv")
     download_limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE
     if total > download_limit:
         celery_worker_running = task_management.check_if_celery_available()
@@ -188,7 +189,7 @@ def export_results(request):
         if celery_worker_running:
             exporter = SearchResultsExporter(search_request=request)
             resourceexporter = ResourceExporter(format="tilecsv")
-            result = resourceexporter.write_zip_file(exporter.export())
+            result = resourceexporter.write_zip_file(exporter.export(format))
             if os.path.exists(result):
                 message = _(
                     f"{total} instances have been submitted for export. \
@@ -201,7 +202,7 @@ def export_results(request):
     else:
         exporter = SearchResultsExporter(search_request=request)
         resourceexporter = ResourceExporter(format="tilecsv")
-        return resourceexporter.zip_response(exporter.export(), zip_file_name=f"{settings.APP_NAME}_export.zip")
+        return resourceexporter.zip_response(exporter.export(format), zip_file_name=f"{settings.APP_NAME}_export.zip")
 
 
 def search_results(request):

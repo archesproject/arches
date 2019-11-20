@@ -41,7 +41,7 @@ class SearchResultsExporter(object):
         self.output = {}
         self.set_precision = GeoUtils().set_precision
 
-    def export(self):
+    def export(self, format):
         from arches.app.views.search import search_results
 
         search_res_json = search_results(self.search_request)
@@ -61,7 +61,10 @@ class SearchResultsExporter(object):
         for graph_id, resources in output.items():
             graph = models.GraphModel.objects.get(pk=graph_id)
             headers = list(graph.node_set.filter(exportable=True).values_list("fieldname", flat=True))
-            ret.append(self.to_csv(resources["output"], headers=headers, name=graph.name))
+            if format == "csv":
+                ret.append(self.to_csv(resources["output"], headers=headers, name=graph.name))
+            if format == "shp":
+                ret.append(self.to_csv(resources["output"], headers=headers, name=graph.name))
             # output[graph_id]['csv'] = self.to_csv(resources['output'])
         return ret
 
@@ -160,3 +163,5 @@ class SearchResultsExporter(object):
             csvwriter.writerow({k: str(v) for k, v in list(instance.items())})
         return {"name": f"{name}.csv", "outputfile": dest}
 
+    def to_shp(self, instances, headers, name):
+        pass
