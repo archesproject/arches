@@ -239,16 +239,23 @@ class Tile(models.TileModel):
     def check_for_missing_nodes(self, request):
         missing_nodes = []
         for nodeid, value in self.data.items():
-            datatype_factory = DataTypeFactory()
-            node = models.Node.objects.get(nodeid=nodeid)
-            datatype = datatype_factory.get_instance(node.datatype)
-            datatype.clean(self, nodeid)
-            if request is not None:
-                if self.data[nodeid] is None and node.isrequired is True:
-                    if len(node.cardxnodexwidget_set.all()) > 0:
-                        missing_nodes.append(node.cardxnodexwidget_set.all()[0].label)
-                    else:
-                        missing_nodes.append(node.name)
+            try:
+                datatype_factory = DataTypeFactory()
+                node = models.Node.objects.get(nodeid=nodeid)
+                datatype = datatype_factory.get_instance(node.datatype)
+                datatype.clean(self, nodeid)
+                if request is not None:
+                    if self.data[nodeid] is None and node.isrequired is True:
+                        if len(node.cardxnodexwidget_set.all()) > 0:
+                            missing_nodes.append(node.cardxnodexwidget_set.all()[0].label)
+                        else:
+                            missing_nodes.append(node.name)
+            except Exception as e:
+                warning = _(
+                    f"Error checking for missing node. Nodeid: {nodeid} with value: {value}, not in nodes. \
+                    You may have a node in your business data that no longer exists in any graphs."
+                )
+                logger.warning(warning)
         if missing_nodes != []:
             message = _("This card requires values for the following: ")
             message += (", ").join(missing_nodes)

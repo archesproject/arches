@@ -8765,10 +8765,14 @@ table.table.dataTable {
     right: 5px;
 }
 
+.popup-panel-row {
+    display: inline-flex;
+    margin-right: -5px;
+}
+
 .search-type-btn-popup {
     height: 50px;
     width: 50px;
-    margin-right: -5px;
     padding: 0px;
     font-size: 12px;
     font-weight: 600;
@@ -8779,6 +8783,23 @@ table.table.dataTable {
     border-right: none;
     background: #F7F9FB;
     z-index: 1000;
+}
+
+.search-export .parameters {
+    display: inline-flex;
+    justify-content: space-around;
+}
+
+.search-export .precision {
+    width: 75px;
+}
+
+.search-export .format {
+    width: 100px;
+}
+
+.search-export.download {
+    padding: 12px;
 }
 
 .search-type-btn-popup.relative:hover {

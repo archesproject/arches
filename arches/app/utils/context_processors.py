@@ -60,5 +60,6 @@ def app_settings(request):
             "APP_NAME": settings.APP_NAME,
             "GOOGLE_ANALYTICS_TRACKING_ID": settings.GOOGLE_ANALYTICS_TRACKING_ID,
             "USE_SEMANTIC_RESOURCE_RELATIONSHIPS": settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS,
+            "SEARCH_EXPORT_ITEMS_PER_PAGE": settings.SEARCH_EXPORT_ITEMS_PER_PAGE,
         }
     }
