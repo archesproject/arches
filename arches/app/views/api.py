@@ -230,7 +230,7 @@ class GeoJSON(APIBase):
         nodeid = request.GET.get("nodeid", None)
         tileid = request.GET.get("tileid", None)
         nodegroups = request.GET.get("nodegroups", [])
-        precision = request.GET.get("precision", 9)
+        precision = request.GET.get("precision", None)
         field_name_length = int(request.GET.get("field_name_length", 0))
         use_uuid_names = bool(request.GET.get("use_uuid_names", False))
         include_primary_name = bool(request.GET.get("include_primary_name", False))
@@ -238,6 +238,10 @@ class GeoJSON(APIBase):
         use_display_values = bool(request.GET.get("use_display_values", False))
         geometry_type = request.GET.get("type", None)
         indent = request.GET.get("indent", None)
+        limit = request.GET.get("limit", None)
+        page = int(request.GET.get("page", 1))
+        if limit is not None:
+            limit = int(limit)
         if indent is not None:
             indent = int(indent)
         if isinstance(nodegroups, str):
@@ -261,14 +265,22 @@ class GeoJSON(APIBase):
                 property_node_map[str(node.nodeid)]["name"] = slugify(node.name, max_length=field_name_length, separator="_")
             else:
                 property_node_map[str(node.nodeid)]["name"] = node.fieldname
-        for node in nodes:
-            tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup).order_by("sortorder")
-            if resourceid is not None:
-                tiles = tiles.filter(resourceinstance_id__in=resourceid.split(","))
-            if tileid is not None:
-                tiles = tiles.filter(tileid=tileid)
-            for tile in tiles:
-                data = tile.data
+
+        tiles = models.TileModel.objects.filter(nodegroup__in=[node.nodegroup for node in nodes]).order_by("sortorder")
+        last_page = None
+        if resourceid is not None:
+            tiles = tiles.filter(resourceinstance_id__in=resourceid.split(","))
+        if tileid is not None:
+            tiles = tiles.filter(tileid=tileid)
+        if limit is not None:
+            start = (page - 1) * limit
+            end = start + limit
+            tile_count = tiles.count()
+            last_page = tiles.count() < end
+            tiles = tiles[start:end]
+        for tile in tiles:
+            data = tile.data
+            for node in nodes:
                 try:
                     for feature_index, feature in enumerate(data[str(node.pk)]["features"]):
                         if geometry_type is None or geometry_type == feature["geometry"]["type"]:
@@ -298,8 +310,9 @@ class GeoJSON(APIBase):
                             if include_geojson_link:
                                 feature["properties"]["geojson"] = "%s?tileid=%s&nodeid=%s" % (reverse("geojson"), tile.pk, node.pk)
                             feature["id"] = i
-                            coordinates = set_precision(feature["geometry"]["coordinates"], precision)
-                            feature["geometry"]["coordinates"] = coordinates
+                            if precision is not None:
+                                coordinates = set_precision(feature["geometry"]["coordinates"], precision)
+                                feature["geometry"]["coordinates"] = coordinates
                             i += 1
                             features.append(feature)
                 except KeyError:
@@ -307,8 +320,12 @@ class GeoJSON(APIBase):
                 except TypeError as e:
                     print(e)
                     print(tile.data)
+        feature_collection = {"type": "FeatureCollection", "features": features}
+        if last_page is not None:
+            feature_collection["_page"] = page
+            feature_collection["_lastPage"] = last_page
 
-        response = JSONResponse({"type": "FeatureCollection", "features": features}, indent=indent)
+        response = JSONResponse(feature_collection, indent=indent)
         return response
 
 
