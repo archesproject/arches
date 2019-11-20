@@ -29,7 +29,7 @@ define([
                     type: 'GET',
                     url: arches.urls.get_notifications
                 }).done(function(data) {
-                    var dismissed;
+                    var dismissed, item;
                     self.helploading(false);
                     if (self.items().length == 0) {
                         self.items(_.filter(data.notifications, function(notif) {
@@ -55,7 +55,7 @@ define([
                     type: 'POST',
                     url: arches.urls.dismiss_notifications,
                     data: {"dismissals": JSON.stringify(notifs)},
-                }).done(function(data) {
+                }).done(function() {
                     self.updateList();
                 });
             };
