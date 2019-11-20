@@ -26,11 +26,9 @@ class NotificationView(View):
                 dismissals.append(dismiss_notifs)
             else:
                 dismissals = dismiss_notifs
-
             notifs = models.Notification.objects.filter(pk__in=dismissals)
             for n in notifs:
                 n.is_read = True
-
             resp = models.Notification.objects.bulk_update(notifs, ["is_read"])
 
             return JSONResponse({"status": "success", "response": resp}, status=200)
