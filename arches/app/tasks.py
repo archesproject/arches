@@ -48,5 +48,6 @@ def create_user_task_record(taskid, taskname, userid):
         logger = logging.getLogger(__name__)
         logger.warn(e)
 
+
 def notify_completion(notif, user):
     models.Notification.objects.create(message=notif, recipient_id=user)
