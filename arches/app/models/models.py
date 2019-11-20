@@ -1018,6 +1018,7 @@ class Notification(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     is_read = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, null=False)
+    created.editable = True
     message = models.TextField(blank=True, null=True)
     recipient_id = models.ForeignKey(User, on_delete=models.CASCADE)
 

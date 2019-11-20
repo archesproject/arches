@@ -190,6 +190,8 @@
                 graph: "{% url 'graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 graph_designer: function(graphid){return "{% url 'graph_designer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 graph_settings: function(graphid){return "{% url 'graph_settings' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                get_notifications: "{% url 'get_notifications' %}",
+                dismiss_notifications: "{% url 'dismiss_notifications' %}",
                 card: "{% url 'card' '' %}",
                 reorder_cards: "{% url 'reorder_cards'%}",
                 resource: "{% url 'resource' %}",

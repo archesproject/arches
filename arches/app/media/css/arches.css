@@ -2765,6 +2765,27 @@ div.dropdown-menu.open {
     background: #fefefe;
 }
 
+.ep-notifs {
+    position: absolute;
+    top: 0px;
+    display: table;
+    right: 0;
+    width: 500px;
+    height: 100vh;
+    border-left: 1px solid #ddd;
+    z-index: 3900;
+    background: #fefefe;
+}
+
+#circle {
+    width: 8px;
+    height: 8px;
+    background: red;
+    border-radius: 50%;
+    z-index: 10;
+    position: absolute;
+  }
+
 .ep-edits-header {
     border: none;
     display: table-row;
