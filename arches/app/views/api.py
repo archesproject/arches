@@ -256,7 +256,7 @@ class GeoJSON(APIBase):
         nodes = nodes.order_by("sortorder")
         features = []
         i = 1
-        property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups).order_by("sortorder")
+        property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups)
         property_node_map = {}
         property_nodes = models.Node.objects.filter(nodegroup_id__in=nodegroups).order_by("sortorder")
         for node in property_nodes:
@@ -285,7 +285,7 @@ class GeoJSON(APIBase):
                     for feature_index, feature in enumerate(data[str(node.pk)]["features"]):
                         if geometry_type is None or geometry_type == feature["geometry"]["type"]:
                             if len(nodegroups) > 0:
-                                for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id):
+                                for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id).order_by("sortorder"):
                                     for key in pt.data:
                                         field_name = key if use_uuid_names else property_node_map[key]["name"]
                                         if pt.data[key] is not None:
