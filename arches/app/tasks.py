@@ -20,7 +20,10 @@ def update_user_task_record(taskid, **kwargs):
     task_obj.date_done = datetime.datetime.now()
     task_obj.save()
     if "notif" in kwargs.keys():
-        notify_completion(kwargs["notif"], task_obj.user)
+        notif = kwargs["notif"]
+    else:
+        notif = task_obj.status + ": " + task_obj.name
+    notify_completion(notif, task_obj.user)
 
 
 @shared_task
@@ -32,7 +35,10 @@ def log_error(request, exc, traceback, **kwargs):
     task_obj.date_done = datetime.datetime.now()
     task_obj.save()
     if "notif" in kwargs.keys():
-        notify_completion(kwargs["notif"], task_obj.user)
+        notif = kwargs["notif"]
+    else:
+        notif = task_obj.status + ": " + task_obj.name
+    notify_completion(notif, task_obj.user)
 
 
 def create_user_task_record(taskid, taskname, userid):
