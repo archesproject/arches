@@ -5,9 +5,9 @@ define(['jquery',
 function($, ko, arches) {
     var componentName = 'search-export';
     return ko.components.register(componentName, {
-        viewModel: function() {
+        viewModel: function(params) {
             var self = this;
-
+            this.total = params.total;
             this.downloadStarted = ko.observable(false);
             this.format = ko.observable('csv');
             this.precision = ko.observable(6);
@@ -22,10 +22,19 @@ function($, ko, arches) {
                 return (res);
             };
 
+            this.url = ko.pureComputed(function() {
+                var url = arches.urls.export_results;
+                var urlparams = self.getSearchParamsFromUrl();
+                urlparams.format = self.format();
+                urlparams.precision = self.precision();
+                return url + '?' + $.param(urlparams);
+            });
+
             this.getExportData = function(){
                 var payload = this.getSearchParamsFromUrl();
                 payload.format = this.format();
                 payload.precision = this.precision();
+                payload.total = this.total();
                 $.ajax({
                     type: "GET",
                     url: arches.urls.export_results,
@@ -35,8 +44,16 @@ function($, ko, arches) {
                     window.setTimeout(function(){
                         self.downloadStarted(false);
                     }, 9000);
-                    self.result(response.length);
+                    self.result(response.message);
                 });
+            };
+
+            this.executeExport = function(){
+                if (this.total() > 6) {
+                    this.getExportData();
+                } else {
+                    window.open(this.url());
+                }
             };
 
         },
