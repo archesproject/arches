@@ -15,8 +15,9 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
-
+import os
 import zipfile
+import datetime
 from io import BytesIO
 from arches.app.utils import import_class_from_string
 from arches.app.models.system_settings import settings
@@ -32,12 +33,11 @@ class ResourceExporter(object):
         resources = self.writer.write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
         return resources
 
-    def zip_response(self, files_for_export, zip_file_name=None, file_type=None):
+    def create_zip_file(self, files_for_export):
         """
         Given a list of export file names, zips up all the files with those names and returns and http response.
         """
         buffer = BytesIO()
-
         with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zip:
             for f in files_for_export:
                 f["outputfile"].seek(0)
@@ -47,10 +47,24 @@ class ResourceExporter(object):
         buffer.flush()
         zip_stream = buffer.getvalue()
         buffer.close()
+        return zip_stream
 
+    def zip_response(self, files_for_export, zip_file_name=None):
+        """
+        Given a list of export file names, zips up all the files with those names and returns and http response.
+        """
+        zip_stream = self.create_zip_file(files_for_export)
         response = HttpResponse()
         response["Content-Disposition"] = "attachment; filename=" + zip_file_name
         response["Content-length"] = str(len(zip_stream))
         response["Content-Type"] = "application/zip"
         response.write(zip_stream)
         return response
+
+    def write_zip_file(self, files_for_export, download_path="/"):
+        buffer = self.create_zip_file(files_for_export)
+        today = datetime.datetime.now().isoformat()
+        location = os.path.join(settings.MEDIA_ROOT, "uploadedfiles", f"{settings.APP_NAME}_{today}.zip")
+        with open(location, "wb") as f:  # use `wb` mode
+            f.write(buffer)
+        return location

@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-
+import os
 from datetime import datetime
 from django.shortcuts import render
 from django.contrib.gis.geos import GEOSGeometry
@@ -38,6 +38,7 @@ from arches.app.views.base import MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
+import arches.app.utils.task_management as task_management
 from io import StringIO
 
 
@@ -178,10 +179,30 @@ def get_resource_model_label(result):
 
 
 def export_results(request):
-    exporter = SearchResultsExporter(search_request=request)
-    resourceexporter = ResourceExporter(format="tilecsv")
-    return resourceexporter.zip_response(exporter.export(), zip_file_name="temp.zip")
-    return JSONResponse(exporter.export(), indent=4)
+    total = int(request.GET.get("total", 0))
+    format = request.GET.get("format", "csv")
+    download_limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE
+    if total > download_limit:
+        celery_worker_running = task_management.check_if_celery_available()
+        # celery_worker_running = task_management.check_if_celery_available()
+        celery_worker_running = True
+        if celery_worker_running:
+            exporter = SearchResultsExporter(search_request=request)
+            resourceexporter = ResourceExporter(format="tilecsv")
+            result = resourceexporter.write_zip_file(exporter.export(format))
+            if os.path.exists(result):
+                message = _(
+                    f"{total} instances have been submitted for export. \
+                    You will receive a notification once your export is completed and ready for download"
+                )
+            return JSONResponse({"success": True, "message": message})
+        else:
+            message = _(f"Your search exceeds the {download_limit} instance download limit. Please refine your search")
+            return JSONResponse({"success": False, "message": message})
+    else:
+        exporter = SearchResultsExporter(search_request=request)
+        resourceexporter = ResourceExporter(format="tilecsv")
+        return resourceexporter.zip_response(exporter.export(format), zip_file_name=f"{settings.APP_NAME}_export.zip")
 
 
 def search_results(request):
@@ -289,7 +310,7 @@ def _buffer(geojson, width=0, unit="ft"):
 
     try:
         width = float(width)
-    except:
+    except Exception:
         width = 0
 
     if width > 0:

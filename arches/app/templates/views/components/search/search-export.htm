@@ -34,11 +34,12 @@
         </div>
     </div>
     <div class="search-export download">
-        <button class="btn btn-primary btn-active-primary" type="button" aria-expanded="true" data-bind="click: getExportData"> {% trans "Download" %}
+        <button class="btn btn-primary btn-active-primary"
+            type="button"
+            aria-expanded="true"
+            data-bind="click: function(){executeExport( {{app_settings.SEARCH_EXPORT_ITEMS_PER_PAGE}} )}"> {% trans "Download" %}
         </button>
     </div>
-    <div data-bind="fadeVisible: downloadStarted, delay:0, fade: 250">
-        <span data-bind="text: result"></span>
-        {% trans " instances have been submitted for export. You will receive a notification once your export is completed and ready for download" %}
+    <div data-bind="text: result, fadeVisible: downloadStarted, delay:0, fade: 250">
     </div>
 </div>
