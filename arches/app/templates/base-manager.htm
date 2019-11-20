@@ -119,6 +119,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </a>
                         {% endif %}
 
+                        <!-- Notifications -->
+                        {% if nav.notifs %}
+                        <a href="" class="ep-tools ep-notifs-toggle ep-tools-right" data-bind="click: function() {getNotifications();}">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" aria-expanded="true" data-original-title="{% trans 'Notifications' %}">
+                                <div >
+                                    <div data-bind="visible: unreadNotifs()" id="circle"></div>
+                                    <i class="fa fa-bell"></i>
+                                </div>
+                            </div>
+                        </a>
+                        {% endif %}
+
                         <!-- Search Bar -->
                         {% if nav.search %}
                         <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
@@ -163,7 +175,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% endif %}
                     </div>
 
-                    <!-- Help Panel -->
+                    <!-- Notifications Panel -->
+                    <div id="ep-notifs-panel" class="ep-notifs" style="display:none;">
+                            <div class="" style="padding-right:0px">
+                                <div class="ep-help-title">
+                                    <span>{% trans 'Notifications' %}</span>
+                                </div>
+                                <a href="javascript:void(0);" data-bind="click: function() {getNotifications();}" class="ep-notifs-toggle ep-notifs-close ep-tools ep-tools-right" style="border:none;">
+                                    <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close" %}'>
+                                      <i class="fa fa-times-circle fa-lg"></i>
+                                    </div>
+                                </a>
+                            </div>
+    
+                            <div class="ep-edits-body provisional-edit-history" style="float:left" data-bind="css: {'loading-mask': helploading()}">
+                                <div class="ep-edits-content">
+                                    {% include 'views/notifications-list.htm' %}
+                                </div>
+                            </div>
+                        </div>
+                    
+                    <!-- Edits Panel -->
                     <div id="ep-edits-panel" class="ep-edits" style="display:none;">
                         <div class="ep-edits-header" style="padding-right:0px">
                             <div class="ep-edits-title">
@@ -181,9 +213,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 {% include 'views/provisional-history-list.htm' %}
                             </div>
                         </div>
-
-
-
                     </div>
 
                     <!-- Help Panel -->
