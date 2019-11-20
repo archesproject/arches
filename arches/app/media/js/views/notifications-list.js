@@ -46,7 +46,7 @@ define([
                 });
             };
 
-            this.dismiss = function(notifId=false) {
+            this.dismiss = function(notifId) {
                 var notifs;
                 if (!notifId) {
                     notifs = self.items().map(function(notif) { return notif.id; });
