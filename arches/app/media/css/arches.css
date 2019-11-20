@@ -2765,6 +2765,27 @@ div.dropdown-menu.open {
     background: #fefefe;
 }
 
+.ep-notifs {
+    position: absolute;
+    top: 0px;
+    display: table;
+    right: 0;
+    width: 500px;
+    height: 100vh;
+    border-left: 1px solid #ddd;
+    z-index: 3900;
+    background: #fefefe;
+}
+
+#circle {
+    width: 8px;
+    height: 8px;
+    background: red;
+    border-radius: 50%;
+    z-index: 10;
+    position: absolute;
+  }
+
 .ep-edits-header {
     border: none;
     display: table-row;
@@ -4935,6 +4956,14 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-top: -10px;
 }
 
+.notifications-container {
+    display: flex;
+    flex-direction: row;
+    border-bottom: solid #e4e4e4 1px;
+    padding: 8px 25px 15px 25px;
+    background-color: #fcfcfc;
+}
+
 .ep-edits-body.provisional-edit-history {
     overflow: visible;
 }
@@ -4953,16 +4982,16 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     background-color: #fcfcfc;
 }
 
-.new-provisional-edit-history.selected-card {
+.new-provisional-edit-history.selected-card, .notifications-container.selected-card {
     color: #454545;
     background-color: #f0f0f0;
 }
 
-.new-provisional-edit-history:hover {
+.new-provisional-edit-history:hover, .notifications-container:hover {
     background-color: #f0f0f0;
 }
 
-.new-provisional-edit-history .entry {
+.new-provisional-edit-history .entry, .notifications-container .entry {
     flex-direction: row;
     display: flex;
     color: #6494cc;
@@ -4971,7 +5000,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     width: 400px;
 }
 
-.new-provisional-edit-history .entry-label {
+.new-provisional-edit-history .entry-label, .notifications-container .entry-label {
     padding-right: 5px;
     font-weight: 600;
     font-size:13px;
