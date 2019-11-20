@@ -33,18 +33,17 @@ define([
                     self.helploading(false);
                     if (self.items().length == 0) {
                         self.items(_.filter(data.notifications, function(notif) {
-                            // notif.displaytime = moment(notif.created).format('DD-MM-YYYY hh:mm a');
+                            notif.displaytime = moment(notif.created).format('DD-MM-YYYY hh:mm a');
                             return notif.is_read === false;
                         }));
-                        self.items().forEach(function(item) {
-                            item.displaytime = moment(item.created).format('DD-MM-YYYY hh:mm a');
-                        });
+                        console.log(self.items());
                     } else {
                         dismissed = data.notifications.filter(function(n) { return n.is_read === true; });
                         dismissed.forEach(function(notif){
                             item = self.items().find(function(it) { return it.id === notif.id; });
                             self.items.remove(item);
                         });
+                        console.log(self.items());
                     }
                 });
             };

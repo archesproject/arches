@@ -26,16 +26,19 @@
         <!-- /ko -->
         <!-- ko if: items().length > 0 -->
         <!-- ko foreach: items -->
-        <div class="new-provisional-edit-history" data-bind="click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected }">
+        <div class="notifications-container" data-bind="click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected }">
             {% block listitem %}
 
-            <div class='entry'><i data-bind="" style="padding-right: 4px"></i>
-                <div class='entry-label' data-bind="text: $data.displaytime"></div>
-            </div>
+            <div>
+                <div class='entry'><i data-bind="" style="padding-right: 4px"></i>
+                    <div class='entry-label'>{% trans 'Received at: ' %}</div>
+                    <span data-bind="text: $data.displaytime" ></span>
+                </div>
 
-            <div class='entry'>
-                <div class='entry-label'>{% trans 'Message text: ' %}</div>
-                <span data-bind="text: $data.message"></span>
+                <div class='entry'>
+                    <div class='entry-label'>{% trans 'Message text: ' %}</div>
+                    <span data-bind="text: $data.message"></span>
+                </div>
             </div>
 
             <div class='entry'>
