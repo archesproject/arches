@@ -4,6 +4,8 @@ from django.core import management
 import datetime
 import logging
 from arches.app.models import models
+from arches.app.search.search_export import SearchResultsExporter
+from arches.app.utils.data_management.resources.exporter import ResourceExporter
 
 
 @shared_task(bind=True)
@@ -11,6 +13,15 @@ def sync(self, surveyid=None, userid=None):
     create_user_task_record(self.request.id, self.name, userid)
     management.call_command("mobile", operation="sync_survey", id=surveyid, user=userid)
     return self.request.id
+
+
+@shared_task(bind=True)
+def export_search_results(self, request, format):
+    create_user_task_record(self.request.id, self.name, request.user)
+    exporter = SearchResultsExporter(search_request=request)
+    resource_exporter = ResourceExporter(format="tilecsv")
+    result = resource_exporter.write_zip_file(exporter.export(format))
+    return result
 
 
 @shared_task

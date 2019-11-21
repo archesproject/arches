@@ -38,6 +38,7 @@ from arches.app.views.base import MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
+import arches.app.tasks as tasks
 import arches.app.utils.task_management as task_management
 from io import StringIO
 
@@ -190,6 +191,9 @@ def export_results(request):
             exporter = SearchResultsExporter(search_request=request)
             resourceexporter = ResourceExporter(format="tilecsv")
             result = resourceexporter.write_zip_file(exporter.export(format))
+            # res = tasks.export_search_results.apply_async(
+            #     (surveyid, request.user.id), link=tasks.update_user_task_record.s(notif=), link_error=tasks.log_error.s()
+            # )
             if os.path.exists(result):
                 message = _(
                     f"{total} instances have been submitted for export. \
