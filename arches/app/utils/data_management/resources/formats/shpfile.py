@@ -6,9 +6,6 @@ from django.contrib.gis.geos import GeometryCollection
 from .format import Writer
 import datetime
 import shapefile
-import codecs
-
-from io import StringIO
 from io import BytesIO
 
 
@@ -17,6 +14,7 @@ class ShpWriter(Writer):
         super(ShpWriter, self).__init__(**kwargs)
 
     def convert_geom(self, geos_geom):
+        """Coverts GEOS geometries to shapefile geometries"""
         if geos_geom.geom_type == "Point":
             multi_geom = MultiPoint(geos_geom)
             shp_geom = [[c for c in multi_geom.coords]]
@@ -37,8 +35,8 @@ class ShpWriter(Writer):
 
     def process_feature_geoms(self, resource, geom_field):
         """
-        Reduces an instances geometries from a geometry collection that potentially has any number of points, lines
-        and polygons down to a list containing a MultiPoint and/or a MultiLine, and/or a MultiPolygon object.
+        Reduces an instances geometries from a geometry collection, that potentially has any number of points, lines
+        and polygons, down to a list containing a MultiPoint and/or a MultiLine, and/or a MultiPolygon object.
         """
         result = []
         sorted_geoms = {"points": [], "lines": [], "polys": []}
@@ -68,21 +66,22 @@ class ShpWriter(Writer):
 
         return result
 
-    def create_shapefiles(self, instances, headers, name):
+    def get_geometry_fieldname(self, instance):
         """
-        Takes a geojson-like (geojson-like because it has a geos geometry rather than a geojson geometry, allowing us to modify the
-        geometry to be a centroid or hull if necessary.) feature collection, groups the data by resource type and creates a shapefile
-        for each resource. Returns a .zip file with each of the shapefiles. An arches export configuration file is needed to map shapefile
-        fields to resorce entitytypeids and specify the shapefile column datatypes (fiona schema).
+        Finds GeometryCollection field in a flattened resource intance to use as the geometry of each shapefile record.
         """
         geometry_field = None
-        if len(instances) > 0:
-            for k, v in instances[0].items():
-                if isinstance(v, GeometryCollection):
-                    geometry_field = k
-        else:
-            return []
+        for k, v in instance.items():
+            if isinstance(v, GeometryCollection):
+                geometry_field = k
+        return geometry_field
 
+    def sort_by_geometry_type(self, instances, geometry_field):
+        """
+        Sorts flattend resource instances by their geometry type (multipoint=4, multipolyline==5, multipolygon==6).
+        If an instance has more than one geometry type, it is assigned to the respective geometry type once
+        for each of its geometries.
+        """
         features_by_geom_type = {"point": [], "line": [], "poly": []}
         for instance in instances:
             feature_geoms = self.process_feature_geoms(instance, geometry_field)
@@ -94,14 +93,28 @@ class ShpWriter(Writer):
                 elif geometry.geom_typeid == 5:
                     features_by_geom_type["line"].append(instance)
 
-                elif geometry.geom_typeid == (6):
+                elif geometry.geom_typeid == 6:
                     features_by_geom_type["poly"].append(instance)
 
+        return features_by_geom_type
+
+    def create_shapefiles(self, instances, headers, name):
+        """
+        Takes an array of flattened resource instances. If one of the resource fields contains a GeometryCollection,
+        the instances will be grouped by geometry type and a shapefile file-like object will be returned for each
+        geometry type.
+        """
+
+        if len(instances) > 0:
+            geometry_field = self.get_geometry_fieldname(instances[0])
+        else:
+            return []
+
+        features_by_geom_type = self.sort_by_geometry_type(instances, geometry_field)
         shapefiles_for_export = []
         geos_datatypes_to_pyshp_types = {"str": "C", "datetime": "D", "float": "F"}
         for geom_type, features in features_by_geom_type.items():
             if len(features) > 0:
-
                 shp = BytesIO()
                 shx = BytesIO()
                 dbf = BytesIO()
@@ -118,28 +131,25 @@ class ShpWriter(Writer):
                     if header != geometry_field:
                         writer.field(header, "C", 255)
 
-                for r in features:
-                    shp_geom = self.convert_geom(r[geometry_field])
+                for feature in features:
+                    shp_geom = self.convert_geom(feature[geometry_field])
                     if geom_type in ["point", "line"]:
                         writer.line(shp_geom)
                     elif geom_type == "poly":
                         writer.poly(shp_geom)
-                    # instance.pop(geometry_field)
-                    writer.record(**instance)
+                    writer.record(**feature)
 
                 prj.write(
-                    b'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]'
+                    b'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],\
+                    PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]'
                 )
-                # writer.saveShp(shp)
-                # writer.saveShx(shx)
-                # writer.saveDbf(dbf)
+
                 writer.close()
-                print("writer saved", name, geom_type, shp)
                 shapefiles_for_export += [
-                    {"name": name + geom_type + ".shp", "outputfile": shp},
-                    {"name": name + geom_type + ".dbf", "outputfile": dbf},
-                    {"name": name + geom_type + ".shx", "outputfile": shx},
-                    {"name": name + geom_type + ".prj", "outputfile": prj},
+                    {"name": f"{name}_{geom_type}.shp", "outputfile": shp},
+                    {"name": f"{name}_{geom_type}.dbf", "outputfile": dbf},
+                    {"name": f"{name}_{geom_type}.shx", "outputfile": shx},
+                    {"name": f"{name}_{geom_type}.prj", "outputfile": prj},
                 ]
-        print(shapefiles_for_export)
+
         return shapefiles_for_export
