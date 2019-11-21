@@ -66,6 +66,7 @@ class SearchResultsExporter(object):
         for graph_id, resources in output.items():
             graph = models.GraphModel.objects.get(pk=graph_id)
             headers = list(graph.node_set.filter(exportable=True).values_list("fieldname", flat=True))
+            headers.append("resourceid")
             if format == "tilecsv":
                 ret.append(self.to_csv(resources["output"], headers=headers, name=graph.name))
             if format == "shp":
@@ -117,8 +118,9 @@ class SearchResultsExporter(object):
         compacted_data = {}
         lookup = {}
         has_geometry = False
+
         for tile in tiles:  # normalize tile.data to use labels instead of node ids
-            data = {}
+            compacted_data["resourceid"] = tile["resourceinstance_id"]
             for nodeid, value in tile["data"].items():
                 node = self.get_node(nodeid)
                 if node.exportable:
