@@ -1,0 +1,60 @@
+{% load staticfiles %}
+{% load i18n %}
+{% block header %}
+
+<!-- Title -->
+<span>
+    <!--ko with: notifsList -->
+    <div>
+        <button class="btn btn-lg btn-mint" data-bind="click:function(){$data.dismiss();}" >{% trans 'Dismiss All' %}</button>
+    </div>
+    <!-- /ko -->
+    {% endblock %}
+
+    {% block filter %}
+    {% endblock %}
+</span>
+
+{% block list_wrapper %}
+<div class="list-wrapper">
+    <div class="grid-list provisional-edit-history">
+        <!--ko with: notifsList -->
+        <!-- ko if: items().length === 0 -->
+        <div class="new-provisional-edit-history">
+            {% trans 'You do not have any notifications within the specified time period. Once you trigger a notification, it will display here.' %}
+        </div>
+        <!-- /ko -->
+        <!-- ko if: items().length > 0 -->
+        <!-- ko foreach: items -->
+        <div class="notifications-container" data-bind="click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected }">
+            {% block listitem %}
+
+            <div>
+                <div class='entry'><i data-bind="" style="padding-right: 4px"></i>
+                    <div class='entry-label'>{% trans 'Received at: ' %}</div>
+                    <span data-bind="text: $data.displaytime" ></span>
+                </div>
+
+                <div class='entry'>
+                    <div class='entry-label'>{% trans 'Message text: ' %}</div>
+                    <span data-bind="text: $data.message"></span>
+                </div>
+            </div>
+
+            <div class='entry'>
+                <a href="javascript:void(0);" data-bind="click: function(){$parent.dismiss($data.id);}" class="ep-notifs-toggle ep-notifs-close ep-tools ep-tools-right" style="border:none;">
+                    <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Dismiss" %}'>
+                        <i class="fa fa-times-circle fa-sm"></i>
+                    </div>
+                </a>
+            </div>
+
+            {% endblock %}
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+        <!-- /ko -->
+
+    </div>
+</div>
+{% endblock list_wrapper %}

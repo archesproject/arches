@@ -7,11 +7,12 @@ define([
     'arches',
     'viewmodels/alert',
     'views/provisional-history-list',
+    'views/notifications-list',
     'view-data',
     'bindings/scrollTo',
     'bootstrap',
     'bindings/slide'
-], function($, _, Backbone, ko, moment, arches,  AlertViewModel, ProvisionalHistoryList, viewData) {
+], function($, _, Backbone, ko, moment, arches,  AlertViewModel, ProvisionalHistoryList, NotificationsList, viewData) {
     /**
     * A backbone view representing a basic page in arches.  It sets up the
     * viewModel defaults, optionally accepts additional view model data and
@@ -45,6 +46,10 @@ define([
                 items: ko.observableArray(),
                 helploading: this.viewModel.helploading
             });
+            this.viewModel.notifsList = new NotificationsList({
+                items: ko.observableArray(),
+                helploading: this.viewModel.helploading
+            });
 
             _.defaults(this.viewModel, {
                 helpTemplate: ko.observable(viewData.help),
@@ -54,6 +59,7 @@ define([
                 tabsActive: ko.observable(false),
                 menuActive: ko.observable(false),
                 recentsActive: ko.observable(false),
+                unreadNotifs: ko.observable(false),
                 dirty: ko.observable(false),
                 showConfirmNav: ko.observable(false),
                 navDestination: ko.observable(''),
@@ -102,7 +108,13 @@ define([
                 },
                 getProvisionalHistory: function() {
                     self.viewModel.provisionalHistoryList.updateList();
+                },
+                getNotifications: function() {
+                    self.viewModel.notifsList.updateList();
                 }
+            });
+            self.viewModel.notifsList.items.subscribe(function(list) {
+                self.viewModel.unreadNotifs((list.length > 0));
             });
 
             window.addEventListener('beforeunload', function() {
@@ -115,10 +127,15 @@ define([
 
         initialize: function() {
             ko.applyBindings(this.viewModel);
+            this.viewModel.getNotifications();
             $('[data-toggle="tooltip"]').tooltip();
 
             $('.ep-edits-toggle').click(function(){
                 $('#ep-edits-panel').toggle('slide', { direction: 'right' });
+            });
+
+            $('.ep-notifs-toggle').click(function(){
+                $('#ep-notifs-panel').toggle('slide', { direction: 'right' });
             });
         }
     });
