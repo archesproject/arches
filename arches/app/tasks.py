@@ -14,21 +14,31 @@ def sync(self, surveyid=None, userid=None):
 
 
 @shared_task
-def update_user_task_record(taskid):
+def update_user_task_record(taskid, **kwargs):
     task_obj = models.UserXTask.objects.get(taskid=taskid)
     task_obj.status = "SUCCESS"
     task_obj.date_done = datetime.datetime.now()
     task_obj.save()
+    if "notif" in kwargs.keys():
+        notif = kwargs["notif"]
+    else:
+        notif = task_obj.status + ": " + task_obj.name
+    notify_completion(notif, task_obj.user)
 
 
 @shared_task
-def log_error(request, exc, traceback):
+def log_error(request, exc, traceback, **kwargs):
     logger = logging.getLogger(__name__)
     logger.warn(exc)
     task_obj = models.UserXTask.objects.get(taskid=request.id)
     task_obj.status = "FAILED"
     task_obj.date_done = datetime.datetime.now()
     task_obj.save()
+    if "notif" in kwargs.keys():
+        notif = kwargs["notif"]
+    else:
+        notif = task_obj.status + ": " + task_obj.name
+    notify_completion(notif, task_obj.user)
 
 
 def create_user_task_record(taskid, taskname, userid):
@@ -37,3 +47,7 @@ def create_user_task_record(taskid, taskname, userid):
     except Exception as e:
         logger = logging.getLogger(__name__)
         logger.warn(e)
+
+
+def notify_completion(notif, user):
+    models.Notification.objects.create(message=notif, recipient_id=user)
