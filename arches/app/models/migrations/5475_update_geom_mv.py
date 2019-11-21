@@ -11,7 +11,6 @@ class Migration(migrations.Migration):
             drop MATERIALIZED VIEW mv_geojson_geoms;
             CREATE MATERIALIZED VIEW mv_geojson_geoms AS
                 SELECT t.tileid,
-                    row_number() over () as id,
                     t.resourceinstanceid,
                     n.nodeid,
                     ST_Transform(ST_SetSRID(
