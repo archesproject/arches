@@ -69,7 +69,7 @@ class SearchResultsExporter(object):
             if format == "tilecsv":
                 ret.append(self.to_csv(resources["output"], headers=headers, name=graph.name))
             if format == "shp":
-                ret.append(self.to_shp(resources["output"], headers=headers, name=graph.name))
+                ret += self.to_shp(resources["output"], headers=headers, name=graph.name)
         return ret
 
     def get_node(self, nodeid):
@@ -173,5 +173,5 @@ class SearchResultsExporter(object):
     def to_shp(self, instances, headers, name):
         print(f"{name} = {len(instances)}")
         shape_exporter = ResourceExporter(format="shp")
-        f = shape_exporter.writer.create_shapefiles(instances, headers, name)
-        return {"name": f"{name}.shp", "outputfile": dest}
+        dest = shape_exporter.writer.create_shapefiles(instances, headers, name)
+        return dest
