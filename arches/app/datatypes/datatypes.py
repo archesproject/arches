@@ -974,6 +974,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "addtomap": node.config["addToMap"],
         }
 
+    def after_update_all(self):
+        if settings.AUTO_REFRESH_GEOM_VIEW:
+            cursor = connection.cursor()
+            sql = """
+                REFRESH MATERIALIZED VIEW mv_geojson_geoms;
+            """
+            cursor.execute(sql)
+
 
 class FileListDataType(BaseDataType):
     def __init__(self, model=None):
