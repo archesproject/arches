@@ -25,29 +25,25 @@ def export_search_results(self, request, format):
 
 
 @shared_task
-def update_user_task_record(taskid, **kwargs):
+def update_user_task_record(taskid, notif=None):
     task_obj = models.UserXTask.objects.get(taskid=taskid)
     task_obj.status = "SUCCESS"
     task_obj.date_done = datetime.datetime.now()
     task_obj.save()
-    if "notif" in kwargs.keys():
-        notif = kwargs["notif"]
-    else:
+    if notif is None:
         notif = task_obj.status + ": " + task_obj.name
     notify_completion(notif, task_obj.user)
 
 
 @shared_task
-def log_error(request, exc, traceback, **kwargs):
+def log_error(request, exc, traceback, notif=None):
     logger = logging.getLogger(__name__)
     logger.warn(exc)
     task_obj = models.UserXTask.objects.get(taskid=request.id)
     task_obj.status = "FAILED"
     task_obj.date_done = datetime.datetime.now()
     task_obj.save()
-    if "notif" in kwargs.keys():
-        notif = kwargs["notif"]
-    else:
+    if notif is None:
         notif = task_obj.status + ": " + task_obj.name
     notify_completion(notif, task_obj.user)
 
