@@ -352,66 +352,66 @@ class MVT(APIBase):
                 min_points = int(config["clusterMinPoints"])
                 cursor.execute(
                     """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
-                AS (
-                    SELECT m.*,
-                    ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
-                    FROM (
-                        SELECT tileid,
-                            row_number() over () as id,
-                            resourceinstanceid,
-                            nodeid,
-                            geom
-                        FROM mv_geojson_geoms
-                        WHERE nodeid = %s
-                    ) m
-                )
+                    AS (
+                        SELECT m.*,
+                        ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
+                        FROM (
+                            SELECT tileid,
+                                row_number() over () as id,
+                                resourceinstanceid,
+                                nodeid,
+                                geom
+                            FROM mv_geojson_geoms
+                            WHERE nodeid = %s
+                        ) m
+                    )
 
-                SELECT ST_AsMVT(
-                    tile,
-                    %s
-                ) FROM (
-                    SELECT resourceinstanceid::text,
-                        row_number() over () as id,
-                        1 as total,
-                        ST_AsMVTGeom(
-                            geom,
-                            TileBBox(%s, %s, %s, 3857)
-                        ) AS geom,
-                        '' AS extent
-                    FROM clusters
-                    WHERE cid is NULL
-                    UNION
-                    SELECT NULL as resourceinstanceid,
-                        row_number() over () as id,
-                        count(*) as total,
-                        ST_AsMVTGeom(
-                            ST_Centroid(
-                                ST_Collect(geom)
-                            ),
-                            TileBBox(%s, %s, %s, 3857)
-                        ) AS geom,
-                        ST_AsGeoJSON(
-                            ST_Extent(geom)
-                        ) AS extent
-                    FROM clusters
-                    WHERE cid IS NOT NULL
-                    GROUP BY cid
-                ) as tile;""",
+                    SELECT ST_AsMVT(
+                        tile,
+                        %s
+                    ) FROM (
+                        SELECT resourceinstanceid::text,
+                            row_number() over () as id,
+                            1 as total,
+                            ST_AsMVTGeom(
+                                geom,
+                                TileBBox(%s, %s, %s, 3857)
+                            ) AS geom,
+                            '' AS extent
+                        FROM clusters
+                        WHERE cid is NULL
+                        UNION
+                        SELECT NULL as resourceinstanceid,
+                            row_number() over () as id,
+                            count(*) as total,
+                            ST_AsMVTGeom(
+                                ST_Centroid(
+                                    ST_Collect(geom)
+                                ),
+                                TileBBox(%s, %s, %s, 3857)
+                            ) AS geom,
+                            ST_AsGeoJSON(
+                                ST_Extent(geom)
+                            ) AS extent
+                        FROM clusters
+                        WHERE cid IS NOT NULL
+                        GROUP BY cid
+                    ) as tile;""",
                     [distance, min_points, nodeid, nodeid, zoom, x, y, zoom, x, y],
                 )
             else:
                 cursor.execute(
                     """SELECT ST_AsMVT(tile, %s) FROM (SELECT tileid,
-                    row_number() over () as id,
-                    resourceinstanceid,
-                    nodeid,
-                    ST_AsMVTGeom(
-                        geom,
-                        TileBBox(%s, %s, %s, 3857)
-                    ) AS geom,
-                    1 AS total
-                FROM mv_geojson_geoms
-                WHERE nodeid = %s) AS tile;""",
+                        row_number() over () as id,
+                        resourceinstanceid,
+                        nodeid,
+                        ST_AsMVTGeom(
+                            geom,
+                            TileBBox(%s, %s, %s, 3857)
+                        ) AS geom,
+                        1 AS total
+                    FROM mv_geojson_geoms
+                    WHERE nodeid = %s) AS tile;""",
                     [nodeid, zoom, x, y, nodeid],
                 )
             tile = bytes(cursor.fetchone()[0])
