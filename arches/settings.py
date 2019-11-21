@@ -82,10 +82,11 @@ PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
 RESOURCE_IMPORT_LOG = "arches/logs/resource_import.log"
 
-RESOURCE_FORMATERS = {
+RESOURCE_FORMATTERS = {
     "csv": "arches.app.utils.data_management.resources.formats.csvfile.CsvWriter",
     "json": "arches.app.utils.data_management.resources.formats.archesfile.ArchesFileWriter",
     "tilecsv": "arches.app.utils.data_management.resources.formats.csvfile.TileCsvWriter",
+    "shp": "arches.app.utils.data_management.resources.formats.shpfile.ShpWriter",
     "xml": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
     "pretty-xml": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
     "json-ld": "arches.app.utils.data_management.resources.formats.rdffile.JsonLdWriter",
@@ -345,7 +346,7 @@ except Exception as e:
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {"console": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s", }, },
+    "formatters": {"console": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",},},
     "handlers": {
         "file": {
             "level": "WARNING",  # DEBUG, INFO, WARNING, ERROR, CRITICAL
@@ -442,9 +443,7 @@ SEARCH_EXPORT_ITEMS_PER_PAGE = 1000
 RELATED_RESOURCES_PER_PAGE = 15
 RELATED_RESOURCES_EXPORT_LIMIT = 10000
 SEARCH_DROPDOWN_LENGTH = 100
-SEARCH_TERM_SENSITIVITY = (
-    3
-)  # a lower number will give more "Fuzzy" matches, recomend between 0-4, see "prefix_length" at https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl-fuzzy-query.html#_parameters_7
+SEARCH_TERM_SENSITIVITY = 3  # a lower number will give more "Fuzzy" matches, recomend between 0-4, see "prefix_length" at https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl-fuzzy-query.html#_parameters_7
 WORDS_PER_SEARCH_TERM = 10  # set to None for unlimited number of words allowed for search terms
 SEARCH_RESULT_LIMIT = 10000  # should be less than or equal to elasticsearch configuration, index.max_result_window (default = 10,000)
 
