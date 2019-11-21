@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             """
-            drop MATERIALIZED VIEW mv_geojson_geoms;
+            DROP MATERIALIZED VIEW mv_geojson_geoms;
             CREATE MATERIALIZED VIEW mv_geojson_geoms AS
                 SELECT t.tileid,
                     t.resourceinstanceid,
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                            )::text
                        ),
                        4326
-                   ), 3857) as geom
+                   ), 3857) AS geom
                 FROM tiles t
                 LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
                 WHERE n.datatype = 'geojson-feature-collection'::text;
@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
             CREATE INDEX mv_geojson_geoms_gix ON mv_geojson_geoms USING GIST (geom);
             """,
             """
-            drop MATERIALIZED VIEW mv_geojson_geoms;
+            DROP MATERIALIZED VIEW mv_geojson_geoms;
             CREATE MATERIALIZED VIEW mv_geojson_geoms AS
                 SELECT t.tileid,
                     t.resourceinstanceid,
