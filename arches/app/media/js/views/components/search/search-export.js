@@ -9,7 +9,7 @@ function($, ko, arches) {
             var self = this;
             this.total = params.total;
             this.downloadStarted = ko.observable(false);
-            this.format = ko.observable('csv');
+            this.format = ko.observable('tilecsv');
             this.precision = ko.observable(6);
             this.result = ko.observable();
 

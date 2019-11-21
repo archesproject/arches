@@ -37,8 +37,7 @@ from arches.app.search.components.base import SearchFilterFactory
 from arches.app.views.base import MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
-from arches.app.utils.data_management.resources.exporter import ResourceExporter
-import arches.app.tasks as tasks
+import arches.app.utils.data_management.zip as zip_utils
 import arches.app.utils.task_management as task_management
 from io import StringIO
 
@@ -181,19 +180,14 @@ def get_resource_model_label(result):
 
 def export_results(request):
     total = int(request.GET.get("total", 0))
-    format = request.GET.get("format", "csv")
+    format = request.GET.get("format", "tilecsv")
     download_limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE
     if total > download_limit:
         celery_worker_running = task_management.check_if_celery_available()
-        # celery_worker_running = task_management.check_if_celery_available()
         celery_worker_running = True
         if celery_worker_running:
             exporter = SearchResultsExporter(search_request=request)
-            resourceexporter = ResourceExporter(format="tilecsv")
-            result = resourceexporter.write_zip_file(exporter.export(format))
-            # res = tasks.export_search_results.apply_async(
-            #     (surveyid, request.user.id), link=tasks.update_user_task_record.s(notif=), link_error=tasks.log_error.s()
-            # )
+            result = zip_utils.write_zip_file(exporter.export(format))
             if os.path.exists(result):
                 message = _(
                     f"{total} instances have been submitted for export. \
@@ -205,8 +199,8 @@ def export_results(request):
             return JSONResponse({"success": False, "message": message})
     else:
         exporter = SearchResultsExporter(search_request=request)
-        resourceexporter = ResourceExporter(format="tilecsv")
-        return resourceexporter.zip_response(exporter.export(format), zip_file_name=f"{settings.APP_NAME}_export.zip")
+        export_files = exporter.export(format)
+        return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
 
 
 def search_results(request):
