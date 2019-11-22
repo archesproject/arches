@@ -59,6 +59,8 @@ def write_zip_file(files_for_export, download_path="uploadedfiles"):
     """
     buffer = create_zip_file(files_for_export)
     today = datetime.datetime.now().isoformat()
+    print(settings.MEDIA_ROOT)
+    print(download_path)
     location = os.path.join(settings.MEDIA_ROOT, download_path, f"{settings.APP_NAME}_{today}.zip")
     with open(location, "wb") as f:  # use `wb` mode
         f.write(buffer)

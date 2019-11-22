@@ -181,31 +181,22 @@ def get_resource_model_label(result):
 
 
 def export_results(request):
-    from arches.app.utils.betterJSONSerializer import JSONSerializer
 
     total = int(request.GET.get("total", 0))
     format = request.GET.get("format", "tilecsv")
     download_limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE
-    print("limit is "+str(download_limit))
-    print("total is "+str(total))
     if total > download_limit:
         celery_worker_running = task_management.check_if_celery_available()
-        # celery_worker_running = True
         if celery_worker_running:
-            pprint(request)
             req_dict = dict(request.GET)
-            pprint(req_dict)
-            # exporter = SearchResultsExporter(search_request=request)
-            # result = zip_utils.write_zip_file(exporter.export(format))
             result = tasks.export_search_results.apply_async(
                 (request.user.id, req_dict, format), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
             )
-            message = "None"
-            if os.path.exists("result"):
-                message = _(
-                    f"{total} instances have been submitted for export. \
-                    You will receive a notification once your export is completed and ready for download"
-                )
+            # if os.path.exists("result"): # this might not exist until after write_zip_file in task is done ?
+            message = _(
+                f"{total} instances have been submitted for export. \
+                You will receive a notification once your export is completed and ready for download"
+            )
             return JSONResponse({"success": True, "message": message})
         else:
             message = _(f"Your search exceeds the {download_limit} instance download limit. Please refine your search")
