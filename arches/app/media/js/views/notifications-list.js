@@ -38,7 +38,7 @@ define([
             };
 
             this.dismiss = function(notifId) {
-                var notifs;
+                var notifs, item;
                 if (!notifId) { // i.e. dismissAll
                     notifs = self.items().map(function(notif) { return notif.id; });
                     self.items.removeAll();
