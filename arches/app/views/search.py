@@ -181,10 +181,9 @@ def get_resource_model_label(result):
 def export_results(request):
     total = int(request.GET.get("total", 0))
     format = request.GET.get("format", "tilecsv")
-    download_limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE
+    download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
     if total > download_limit:
         celery_worker_running = task_management.check_if_celery_available()
-        celery_worker_running = True
         if celery_worker_running:
             exporter = SearchResultsExporter(search_request=request)
             result = zip_utils.write_zip_file(exporter.export(format))
