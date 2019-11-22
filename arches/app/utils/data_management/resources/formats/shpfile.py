@@ -7,6 +7,7 @@ from .format import Writer
 import datetime
 import shapefile
 from io import BytesIO
+import copy
 
 
 class ShpWriter(Writer):
@@ -86,15 +87,16 @@ class ShpWriter(Writer):
         for instance in instances:
             feature_geoms = self.process_feature_geoms(instance, geometry_field)
             for geometry in feature_geoms:
-                instance[geometry_field] = geometry
+                feature = copy.copy(instance)
+                feature[geometry_field] = geometry
                 if geometry.geom_typeid == 4:
-                    features_by_geom_type["point"].append(instance)
+                    features_by_geom_type["point"].append(feature)
 
                 elif geometry.geom_typeid == 5:
-                    features_by_geom_type["line"].append(instance)
+                    features_by_geom_type["line"].append(feature)
 
                 elif geometry.geom_typeid == 6:
-                    features_by_geom_type["poly"].append(instance)
+                    features_by_geom_type["poly"].append(feature)
 
         return features_by_geom_type
 
