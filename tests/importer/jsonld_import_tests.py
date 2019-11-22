@@ -416,7 +416,7 @@ class JsonLDImportTests(ArchesTestCase):
                     },
                     "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "Test Content"
                 }
-            }     
+            }
         """
 
         url = reverse(
@@ -454,8 +454,8 @@ class JsonLDImportTests(ArchesTestCase):
 
         aux_data = """
             {
-                "@id": "http://localhost:8000/resources/923a5fa8-bfa8-11e9-bd39-0242ac160002", 
-                "@type": "http://www.cidoc-crm.org/cidoc-crm/E74_Group", 
+                "@id": "http://localhost:8000/resources/923a5fa8-bfa8-11e9-bd39-0242ac160002",
+                "@type": "http://www.cidoc-crm.org/cidoc-crm/E74_Group",
                 "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "Test Group"
             }
         """
@@ -470,10 +470,10 @@ class JsonLDImportTests(ArchesTestCase):
 
         data = """
             {
-                "@id": "http://localhost:8000/resources/940a2c82-bfa8-11e9-bd39-0242ac160002", 
-                "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object", 
+                "@id": "http://localhost:8000/resources/940a2c82-bfa8-11e9-bd39-0242ac160002",
+                "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
                 "http://www.cidoc-crm.org/cidoc-crm/P51_has_former_or_current_owner": {
-                        "@id": "http://localhost:8000/resources/923a5fa8-bfa8-11e9-bd39-0242ac160002", 
+                        "@id": "http://localhost:8000/resources/923a5fa8-bfa8-11e9-bd39-0242ac160002",
                         "@type": "http://www.cidoc-crm.org/cidoc-crm/E74_Group"
                 }
             }
@@ -596,9 +596,9 @@ class JsonLDImportTests(ArchesTestCase):
         if note in contl[0]:
             print(f"note data: {contl[0]}")
             self.assertTrue(contl[0][note] == "Import Note")
-            tsjs = contl[1][ts]
+            jsts = contl[1][ts]
         else:
             print(f"note data: {contl[1]}")
             self.assertTrue(contl[1][note] == "Import Note")
             jsts = contl[0][ts]
-        self.assertTrue(ts[botb]["@value"] == "2018-01-01")
+        self.assertTrue(jsts[botb]["@value"] == "2018-01-01")
