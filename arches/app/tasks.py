@@ -7,8 +7,6 @@ import logging
 from arches.app.models import models
 from arches.app.search.search_export import SearchResultsExporter
 import arches.app.utils.data_management.zip as zip_utils
-from arches.app.utils.betterJSONSerializer import JSONSerializer
-from pprint import pprint
 from django.http import HttpRequest
 
 
@@ -22,7 +20,6 @@ def sync(self, surveyid=None, userid=None):
 
 @shared_task(bind=True)
 def export_search_results(self, userid, request_dict, format):
-    print("in export task")
     create_user_task_record(self.request.id, self.name, userid)
     _user = User.objects.get(id=userid)
     new_req = HttpRequest()
