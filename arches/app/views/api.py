@@ -17,6 +17,7 @@ from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.http.request import QueryDict
 from django.core import management
+from django.core.cache import cache
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -342,81 +343,85 @@ class MVT(APIBase):
         except models.Node.DoesNotExist:
             raise Http404()
         config = node.config
-        with connection.cursor() as cursor:
-            # TODO: when we upgrade to PostGIS 3, we can get feature state
-            # working by adding the feature_id_name arg:
-            # https://github.com/postgis/postgis/pull/303
-            if int(zoom) <= int(config["clusterMaxZoom"]):
-                arc = self.EARTHCIRCUM / ((1 << int(zoom)) * self.PIXELSPERTILE)
-                distance = arc * int(config["clusterDistance"])
-                min_points = int(config["clusterMinPoints"])
-                cursor.execute(
-                    """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
-                    AS (
-                        SELECT m.*,
-                        ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
-                        FROM (
-                            SELECT tileid,
-                                row_number() over () as id,
-                                resourceinstanceid,
-                                nodeid,
-                                geom
-                            FROM mv_geojson_geoms
-                            WHERE nodeid = %s
-                        ) m
-                    )
+        cache_key = f"mvt_{nodeid}_{zoom}_{x}_{y}"
+        tile = cache.get(cache_key)
+        if tile is None:
+            with connection.cursor() as cursor:
+                # TODO: when we upgrade to PostGIS 3, we can get feature state
+                # working by adding the feature_id_name arg:
+                # https://github.com/postgis/postgis/pull/303
+                if int(zoom) <= int(config["clusterMaxZoom"]):
+                    arc = self.EARTHCIRCUM / ((1 << int(zoom)) * self.PIXELSPERTILE)
+                    distance = arc * int(config["clusterDistance"])
+                    min_points = int(config["clusterMinPoints"])
+                    cursor.execute(
+                        """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
+                        AS (
+                            SELECT m.*,
+                            ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
+                            FROM (
+                                SELECT tileid,
+                                    row_number() over () as id,
+                                    resourceinstanceid,
+                                    nodeid,
+                                    geom
+                                FROM mv_geojson_geoms
+                                WHERE nodeid = %s
+                            ) m
+                        )
 
-                    SELECT ST_AsMVT(
-                        tile,
-                        %s
-                    ) FROM (
-                        SELECT resourceinstanceid::text,
+                        SELECT ST_AsMVT(
+                            tile,
+                            %s
+                        ) FROM (
+                            SELECT resourceinstanceid::text,
+                                row_number() over () as id,
+                                1 as total,
+                                ST_AsMVTGeom(
+                                    geom,
+                                    TileBBox(%s, %s, %s, 3857)
+                                ) AS geom,
+                                '' AS extent
+                            FROM clusters
+                            WHERE cid is NULL
+                            UNION
+                            SELECT NULL as resourceinstanceid,
+                                row_number() over () as id,
+                                count(*) as total,
+                                ST_AsMVTGeom(
+                                    ST_Centroid(
+                                        ST_Collect(geom)
+                                    ),
+                                    TileBBox(%s, %s, %s, 3857)
+                                ) AS geom,
+                                ST_AsGeoJSON(
+                                    ST_Extent(geom)
+                                ) AS extent
+                            FROM clusters
+                            WHERE cid IS NOT NULL
+                            GROUP BY cid
+                        ) as tile;""",
+                        [distance, min_points, nodeid, nodeid, zoom, x, y, zoom, x, y],
+                    )
+                else:
+                    cursor.execute(
+                        """SELECT ST_AsMVT(tile, %s) FROM (SELECT tileid,
                             row_number() over () as id,
-                            1 as total,
+                            resourceinstanceid,
+                            nodeid,
                             ST_AsMVTGeom(
                                 geom,
                                 TileBBox(%s, %s, %s, 3857)
                             ) AS geom,
-                            '' AS extent
-                        FROM clusters
-                        WHERE cid is NULL
-                        UNION
-                        SELECT NULL as resourceinstanceid,
-                            row_number() over () as id,
-                            count(*) as total,
-                            ST_AsMVTGeom(
-                                ST_Centroid(
-                                    ST_Collect(geom)
-                                ),
-                                TileBBox(%s, %s, %s, 3857)
-                            ) AS geom,
-                            ST_AsGeoJSON(
-                                ST_Extent(geom)
-                            ) AS extent
-                        FROM clusters
-                        WHERE cid IS NOT NULL
-                        GROUP BY cid
-                    ) as tile;""",
-                    [distance, min_points, nodeid, nodeid, zoom, x, y, zoom, x, y],
-                )
-            else:
-                cursor.execute(
-                    """SELECT ST_AsMVT(tile, %s) FROM (SELECT tileid,
-                        row_number() over () as id,
-                        resourceinstanceid,
-                        nodeid,
-                        ST_AsMVTGeom(
-                            geom,
-                            TileBBox(%s, %s, %s, 3857)
-                        ) AS geom,
-                        1 AS total
-                    FROM mv_geojson_geoms
-                    WHERE nodeid = %s) AS tile;""",
-                    [nodeid, zoom, x, y, nodeid],
-                )
-            tile = bytes(cursor.fetchone()[0])
-            if not len(tile):
-                raise Http404()
+                            1 AS total
+                        FROM mv_geojson_geoms
+                        WHERE nodeid = %s) AS tile;""",
+                        [nodeid, zoom, x, y, nodeid],
+                    )
+                tile = bytes(cursor.fetchone()[0])
+                cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
+        if not len(tile):
+            raise Http404()
         return HttpResponse(tile, content_type="application/x-protobuf")
 
 
