@@ -39,7 +39,9 @@ from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
 import arches.app.utils.data_management.zip as zip_utils
 import arches.app.utils.task_management as task_management
+import arches.app.tasks as tasks
 from io import StringIO
+from pprint import pprint
 
 
 class SearchView(MapBaseManagerView):
@@ -179,16 +181,27 @@ def get_resource_model_label(result):
 
 
 def export_results(request):
+    from arches.app.utils.betterJSONSerializer import JSONSerializer
+
     total = int(request.GET.get("total", 0))
     format = request.GET.get("format", "tilecsv")
     download_limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE
+    print("limit is "+str(download_limit))
+    print("total is "+str(total))
     if total > download_limit:
         celery_worker_running = task_management.check_if_celery_available()
-        celery_worker_running = True
+        # celery_worker_running = True
         if celery_worker_running:
-            exporter = SearchResultsExporter(search_request=request)
-            result = zip_utils.write_zip_file(exporter.export(format))
-            if os.path.exists(result):
+            pprint(request)
+            req_dict = dict(request.GET)
+            pprint(req_dict)
+            # exporter = SearchResultsExporter(search_request=request)
+            # result = zip_utils.write_zip_file(exporter.export(format))
+            result = tasks.export_search_results.apply_async(
+                (request.user.id, req_dict, format), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
+            )
+            message = "None"
+            if os.path.exists("result"):
                 message = _(
                     f"{total} instances have been submitted for export. \
                     You will receive a notification once your export is completed and ready for download"

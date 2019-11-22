@@ -1,31 +1,49 @@
 from __future__ import absolute_import, unicode_literals
 from celery import shared_task
 from django.core import management
+from django.contrib.auth.models import User
 import datetime
 import logging
 from arches.app.models import models
 from arches.app.search.search_export import SearchResultsExporter
-from arches.app.utils.data_management.resources.exporter import ResourceExporter
+import arches.app.utils.data_management.zip as zip_utils
+from arches.app.utils.betterJSONSerializer import JSONSerializer
+from pprint import pprint
+from django.http import HttpRequest
 
 
 @shared_task(bind=True)
 def sync(self, surveyid=None, userid=None):
     create_user_task_record(self.request.id, self.name, userid)
     management.call_command("mobile", operation="sync_survey", id=surveyid, user=userid)
-    return self.request.id
+    response = {"taskid": self.request.id}
+    return response
 
 
 @shared_task(bind=True)
-def export_search_results(self, request, format):
-    create_user_task_record(self.request.id, self.name, request.user)
-    exporter = SearchResultsExporter(search_request=request)
-    resource_exporter = ResourceExporter(format="tilecsv")
-    result = resource_exporter.write_zip_file(exporter.export(format))
-    return result
+def export_search_results(self, userid, request_dict, format):
+    print("in export task")
+    create_user_task_record(self.request.id, self.name, userid)
+    _user = User.objects.get(id=userid)
+    new_req = HttpRequest()
+    new_req.method = "GET"
+    new_req.user = _user
+    for k, v in request_dict.items():
+        new_req.GET.__setitem__(k, v[0])
+
+    exporter = SearchResultsExporter(search_request=new_req)
+    url = zip_utils.write_zip_file(exporter.export(format))
+    notif = "download link here: " + url
+    # The result needs to be saved to some local director and the url send to the notification message as a link
+    response = {"taskid": self.request.id, "notif": notif}
+
+    return response
 
 
 @shared_task
-def update_user_task_record(taskid, notif=None):
+def update_user_task_record(arg_dict={}):
+    taskid = arg_dict["taskid"]
+    notif = arg_dict["notif"]
     task_obj = models.UserXTask.objects.get(taskid=taskid)
     task_obj.status = "SUCCESS"
     task_obj.date_done = datetime.datetime.now()
@@ -39,6 +57,8 @@ def update_user_task_record(taskid, notif=None):
 def log_error(request, exc, traceback, notif=None):
     logger = logging.getLogger(__name__)
     logger.warn(exc)
+    print("in log_error task")
+    print(exc)
     task_obj = models.UserXTask.objects.get(taskid=request.id)
     task_obj.status = "FAILED"
     task_obj.date_done = datetime.datetime.now()
