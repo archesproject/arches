@@ -6,7 +6,8 @@
 <span>
     <!--ko with: notifsList -->
     <div>
-        <button class="btn btn-lg btn-mint" data-bind="click:function(){$data.dismiss();}" >{% trans 'Dismiss All' %}</button>
+        <button class="btn btn-lg btn-notifs-dismiss-all" 
+            data-bind="click:function(){$data.dismiss();}, css: {disabled: $data.items().length === 0}" >{% trans 'Dismiss All' %}</button>
     </div>
     <!-- /ko -->
     {% endblock %}
@@ -26,7 +27,7 @@
         <!-- /ko -->
         <!-- ko if: items().length > 0 -->
         <!-- ko foreach: items -->
-        <div class="notifications-container" data-bind="click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected }">
+        <div class="notifications-container" >
             {% block listitem %}
 
             <div>
@@ -37,7 +38,7 @@
 
                 <div class='entry'>
                     <div class='entry-label'>{% trans 'Message text: ' %}</div>
-                    <span data-bind="text: $data.message"></span>
+                    <div data-bind="html: $data.message"></div>
                 </div>
             </div>
 

@@ -5,7 +5,6 @@ import re
 import sys
 import uuid
 import importlib
-import arches.app.tasks as tasks
 import arches.app.utils.task_management as task_management
 from io import StringIO
 from django.shortcuts import render
@@ -124,6 +123,7 @@ class APIBase(View):
 
 
 class Sync(APIBase):
+    import arches.app.tasks as tasks
     def get(self, request, surveyid=None):
         can_sync = userCanAccessMobileSurvey(request, surveyid)
         if can_sync:
