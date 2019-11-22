@@ -25,7 +25,7 @@ class ShpWriter(Writer):
             multi_geom = MultiPolygon(geos_geom)
             shp_geom = [c[0] for c in multi_geom.coords]
         if geos_geom.geom_type == "MultiPoint":
-            shp_geom = [[c for c in geos_geom.coords]]
+            shp_geom = [c for c in geos_geom.coords]
         if geos_geom.geom_type == "MultiLineString":
             shp_geom = [c for c in geos_geom.coords]
         if geos_geom.geom_type == "MultiPolygon":
@@ -133,7 +133,9 @@ class ShpWriter(Writer):
 
                 for feature in features:
                     shp_geom = self.convert_geom(feature[geometry_field])
-                    if geom_type in ["point", "line"]:
+                    if geom_type == "point":
+                        writer.multipoint(shp_geom)
+                    if geom_type == "line":
                         writer.line(shp_geom)
                     elif geom_type == "poly":
                         writer.poly(shp_geom)
