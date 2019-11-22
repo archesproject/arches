@@ -542,6 +542,7 @@ CELERY_RESULT_BACKEND = "django-db"  # Use 'django-cache' if you want to use you
 CELERY_TASK_SERIALIZER = "json"
 
 AUTO_REFRESH_GEOM_VIEW = True
+TILE_CACHE_TIMEOUT = 600
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################
