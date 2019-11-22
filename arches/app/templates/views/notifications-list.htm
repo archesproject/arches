@@ -26,7 +26,7 @@
         <!-- /ko -->
         <!-- ko if: items().length > 0 -->
         <!-- ko foreach: items -->
-        <div class="notifications-container" data-bind="click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected }">
+        <div class="notifications-container" >
             {% block listitem %}
 
             <div>

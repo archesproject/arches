@@ -29,11 +29,8 @@ def export_search_results(self, userid, request_dict, format):
         new_req.GET.__setitem__(k, v[0])
 
     exporter = SearchResultsExporter(search_request=new_req)
-    url = zip_utils.write_zip_file(exporter.export(format))
-    local_link = "download link here"
-    if "Users" in url:  # this is just for testing
-        local_link = "copy and paste this into browser: " + url
-    notif = "<a href='" + url + "' download>" + local_link + "</a>"
+    url = zip_utils.write_zip_file(exporter.export(format), return_relative_url=True)
+    notif = f"<a download href='{url}'><button class='btn btn-success btn-shim btn-labeled btn-sm fa fa-download'>Download File</button></a>"
     response = {"taskid": self.request.id, "notif": notif}
 
     return response
