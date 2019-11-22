@@ -2777,6 +2777,20 @@ div.dropdown-menu.open {
     background: #fefefe;
 }
 
+.btn-notifs-download {
+    color: #6494cc;
+    background-color: transparent;
+}
+
+.btn-notifs-dismiss-all {
+    width: 100%;
+    color: #6494cc;
+    background-color: transparent;
+}
+.btn-notifs-dismiss-all:hover {
+    background-color: #f4f4f4;
+}
+
 #circle {
     width: 8px;
     height: 8px;

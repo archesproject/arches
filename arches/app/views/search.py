@@ -41,7 +41,6 @@ import arches.app.utils.data_management.zip as zip_utils
 import arches.app.utils.task_management as task_management
 import arches.app.tasks as tasks
 from io import StringIO
-from pprint import pprint
 
 
 class SearchView(MapBaseManagerView):
@@ -195,7 +194,7 @@ def export_results(request):
             # if os.path.exists("result"): # this might not exist until after write_zip_file in task is done ?
             message = _(
                 f"{total} instances have been submitted for export. \
-                You will receive a notification once your export is completed and ready for download"
+                Click the bell icon to check for a notification once your export is completed and ready for download"
             )
             return JSONResponse({"success": True, "message": message})
         else:

@@ -6,7 +6,8 @@
 <span>
     <!--ko with: notifsList -->
     <div>
-        <button class="btn btn-lg btn-mint" data-bind="click:function(){$data.dismiss();}" >{% trans 'Dismiss All' %}</button>
+        <button class="btn btn-lg btn-notifs-dismiss-all" 
+            data-bind="click:function(){$data.dismiss();}, css: {disabled: $data.items().length === 0}" >{% trans 'Dismiss All' %}</button>
     </div>
     <!-- /ko -->
     {% endblock %}

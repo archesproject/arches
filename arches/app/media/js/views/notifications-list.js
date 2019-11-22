@@ -11,7 +11,7 @@ define([
 ], function($, _, moment, ko, arches, ListView) {
     var NotificationsList = ListView.extend({
         /**
-        * A backbone view to manage a list of graph nodes
+        * A backbone view to manage a list of notification records
         * @augments ListView
         * @constructor
         * @name NotificationsList
@@ -29,34 +29,28 @@ define([
                     type: 'GET',
                     url: arches.urls.get_notifications
                 }).done(function(data) {
-                    var dismissed, item;
+                    self.items(_.filter(data.notifications, function(notif) {
+                        notif.displaytime = moment(notif.created).format('DD-MM-YYYY hh:mm a');
+                        return notif.is_read === false;
+                    }));
                     self.helploading(false);
-                    if (self.items().length == 0) {
-                        self.items(_.filter(data.notifications, function(notif) {
-                            notif.displaytime = moment(notif.created).format('DD-MM-YYYY hh:mm a');
-                            return notif.is_read === false;
-                        }));
-                    } else {
-                        dismissed = data.notifications.filter(function(n) { return n.is_read === true; });
-                        dismissed.forEach(function(notif){
-                            item = self.items().find(function(it) { return it.id === notif.id; });
-                            self.items.remove(item);
-                        });
-                    }
                 });
             };
 
             this.dismiss = function(notifId) {
                 var notifs;
-                if (!notifId) {
+                if (!notifId) { // i.e. dismissAll
                     notifs = self.items().map(function(notif) { return notif.id; });
-                } else { notifs = [notifId]; }
+                    self.items.removeAll();
+                } else { 
+                    notifs = [notifId];
+                    item = self.items().find(function(it) { return it.id === notifId; });
+                    self.items.remove(item);
+                }
                 $.ajax({
                     type: 'POST',
                     url: arches.urls.dismiss_notifications,
                     data: {"dismissals": JSON.stringify(notifs)},
-                }).done(function() {
-                    self.updateList();
                 });
             };
 
