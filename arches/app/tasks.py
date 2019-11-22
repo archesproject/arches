@@ -30,7 +30,9 @@ def export_search_results(self, userid, request_dict, format):
 
     exporter = SearchResultsExporter(search_request=new_req)
     url = zip_utils.write_zip_file(exporter.export(format), return_relative_url=True)
-    notif = f"<a download href='{url}'><button class='btn btn-success btn-shim btn-labeled btn-sm fa fa-download'>Download File</button></a>"
+    notif = (
+        f"<a download href='{url}'><button class='btn btn-success btn-shim btn-labeled btn-sm fa fa-download'>Download File</button></a>"
+    )
     response = {"taskid": self.request.id, "notif": notif}
 
     return response
