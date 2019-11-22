@@ -7,6 +7,7 @@ from .format import Writer
 import datetime
 import shapefile
 from io import BytesIO
+import copy
 
 
 class ShpWriter(Writer):
@@ -25,7 +26,7 @@ class ShpWriter(Writer):
             multi_geom = MultiPolygon(geos_geom)
             shp_geom = [c[0] for c in multi_geom.coords]
         if geos_geom.geom_type == "MultiPoint":
-            shp_geom = [[c for c in geos_geom.coords]]
+            shp_geom = [c for c in geos_geom.coords]
         if geos_geom.geom_type == "MultiLineString":
             shp_geom = [c for c in geos_geom.coords]
         if geos_geom.geom_type == "MultiPolygon":
@@ -66,15 +67,15 @@ class ShpWriter(Writer):
 
         return result
 
-    def get_geometry_fieldname(self, instance):
+    def get_geometry_fieldnames(self, instance):
         """
         Finds GeometryCollection field in a flattened resource intance to use as the geometry of each shapefile record.
         """
-        geometry_field = None
+        geometry_fields = []
         for k, v in instance.items():
             if isinstance(v, GeometryCollection):
-                geometry_field = k
-        return geometry_field
+                geometry_fields.append(k)
+        return geometry_fields
 
     def sort_by_geometry_type(self, instances, geometry_field):
         """
@@ -86,15 +87,16 @@ class ShpWriter(Writer):
         for instance in instances:
             feature_geoms = self.process_feature_geoms(instance, geometry_field)
             for geometry in feature_geoms:
-                instance[geometry_field] = geometry
+                feature = copy.copy(instance)
+                feature[geometry_field] = geometry
                 if geometry.geom_typeid == 4:
-                    features_by_geom_type["point"].append(instance)
+                    features_by_geom_type["point"].append(feature)
 
                 elif geometry.geom_typeid == 5:
-                    features_by_geom_type["line"].append(instance)
+                    features_by_geom_type["line"].append(feature)
 
                 elif geometry.geom_typeid == 6:
-                    features_by_geom_type["poly"].append(instance)
+                    features_by_geom_type["poly"].append(feature)
 
         return features_by_geom_type
 
@@ -106,50 +108,54 @@ class ShpWriter(Writer):
         """
 
         if len(instances) > 0:
-            geometry_field = self.get_geometry_fieldname(instances[0])
+            geometry_fields = self.get_geometry_fieldnames(instances[0])
         else:
             return []
 
-        features_by_geom_type = self.sort_by_geometry_type(instances, geometry_field)
         shapefiles_for_export = []
         geos_datatypes_to_pyshp_types = {"str": "C", "datetime": "D", "float": "F"}
-        for geom_type, features in features_by_geom_type.items():
-            if len(features) > 0:
-                shp = BytesIO()
-                shx = BytesIO()
-                dbf = BytesIO()
-                prj = BytesIO()
 
-                if geom_type == "point":
-                    writer = shapefile.Writer(shp=shp, shx=shx, dbf=dbf, shapeType=shapefile.MULTIPOINT)
-                elif geom_type == "line":
-                    writer = shapefile.Writer(shp=shp, shx=shx, dbf=dbf, shapeType=shapefile.POLYLINE)
-                elif geom_type == "poly":
-                    writer = shapefile.Writer(shp=shp, shx=shx, dbf=dbf, shapeType=shapefile.POLYGON)
+        for geometry_field in geometry_fields:
+            features_by_geom_type = self.sort_by_geometry_type(instances, geometry_field)
+            for geom_type, features in features_by_geom_type.items():
+                if len(features) > 0:
+                    shp = BytesIO()
+                    shx = BytesIO()
+                    dbf = BytesIO()
+                    prj = BytesIO()
 
-                for header in headers:
-                    if header != geometry_field:
-                        writer.field(header, "C", 255)
-
-                for feature in features:
-                    shp_geom = self.convert_geom(feature[geometry_field])
-                    if geom_type in ["point", "line"]:
-                        writer.line(shp_geom)
+                    if geom_type == "point":
+                        writer = shapefile.Writer(shp=shp, shx=shx, dbf=dbf, shapeType=shapefile.MULTIPOINT)
+                    elif geom_type == "line":
+                        writer = shapefile.Writer(shp=shp, shx=shx, dbf=dbf, shapeType=shapefile.POLYLINE)
                     elif geom_type == "poly":
-                        writer.poly(shp_geom)
-                    writer.record(**feature)
+                        writer = shapefile.Writer(shp=shp, shx=shx, dbf=dbf, shapeType=shapefile.POLYGON)
 
-                prj.write(
-                    b'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],\
-                    PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]'
-                )
+                    for header in headers:
+                        if header != geometry_field:
+                            writer.field(header, "C", 255)
 
-                writer.close()
-                shapefiles_for_export += [
-                    {"name": f"{name}_{geom_type}.shp", "outputfile": shp},
-                    {"name": f"{name}_{geom_type}.dbf", "outputfile": dbf},
-                    {"name": f"{name}_{geom_type}.shx", "outputfile": shx},
-                    {"name": f"{name}_{geom_type}.prj", "outputfile": prj},
-                ]
+                    for feature in features:
+                        shp_geom = self.convert_geom(feature[geometry_field])
+                        if geom_type == "point":
+                            writer.multipoint(shp_geom)
+                        if geom_type == "line":
+                            writer.line(shp_geom)
+                        elif geom_type == "poly":
+                            writer.poly(shp_geom)
+                        writer.record(**feature)
+
+                    prj.write(
+                        b'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],\
+                        PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]'
+                    )
+
+                    writer.close()
+                    shapefiles_for_export += [
+                        {"name": f"{name}_{geometry_field}_{geom_type}.shp", "outputfile": shp},
+                        {"name": f"{name}_{geometry_field}_{geom_type}.dbf", "outputfile": dbf},
+                        {"name": f"{name}_{geometry_field}_{geom_type}.shx", "outputfile": shx},
+                        {"name": f"{name}_{geometry_field}_{geom_type}.prj", "outputfile": prj},
+                    ]
 
         return shapefiles_for_export
