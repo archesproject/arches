@@ -31,9 +31,9 @@ def export_search_results(self, userid, request_dict, format):
     exporter = SearchResultsExporter(search_request=new_req)
     url = zip_utils.write_zip_file(exporter.export(format))
     local_link = "download link here"
-    if "Users" in url: # this is just for testing
+    if "Users" in url:  # this is just for testing
         local_link = "copy and paste this into browser: " + url
-    notif = "<a href='"+url+"' download>"+local_link+"</a>"
+    notif = "<a href='" + url + "' download>" + local_link + "</a>"
     response = {"taskid": self.request.id, "notif": notif}
 
     return response
