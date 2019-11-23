@@ -756,7 +756,7 @@ class RelatedResourcesView(BaseManagerView):
     action = None
 
     def paginate_related_resources(self, related_resources, page, request):
-        total = related_resources["total"]
+        total = related_resources["total"]["value"]
         paginator, pages = get_paginator(request, related_resources, total, page, settings.RELATED_RESOURCES_PER_PAGE)
         page = paginator.page(page)
 
@@ -823,8 +823,8 @@ class RelatedResourcesView(BaseManagerView):
         for resourcexid in ids_to_delete:
             try:
                 ret = models.ResourceXResource.objects.get(pk=resourcexid).delete()
-            except:
-                print("resource relation does not exist")
+            except ObjectDoesNotExist:
+                logger.exception(_("Unable to delete. Relationship does not exist"))
         start = request.GET.get("start", 0)
         se.es.indices.refresh(index=se._add_prefix("resource_relations"))
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
@@ -875,7 +875,7 @@ class RelatedResourcesView(BaseManagerView):
 
         for instanceid in instances_to_relate:
             permitted = confirm_relationship_permitted(instanceid, root_resourceinstanceid[0])
-            if permitted == True:
+            if permitted is True:
                 rr = models.ResourceXResource(
                     resourceinstanceidfrom=Resource(root_resourceinstanceid[0]),
                     resourceinstanceidto=Resource(instanceid),
