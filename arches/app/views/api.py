@@ -361,7 +361,6 @@ class MVT(APIBase):
                             ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
                             FROM (
                                 SELECT tileid,
-                                    row_number() over () as id,
                                     resourceinstanceid,
                                     nodeid,
                                     geom
