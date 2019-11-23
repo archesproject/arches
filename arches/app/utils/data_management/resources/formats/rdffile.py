@@ -111,6 +111,8 @@ class RdfWriter(Writer):
             pkg["d_uri"] = dom_dt.get_rdf_uri(domainnode, pkg["domain_tile_data"], "d")
             pkg["r_uri"] = rng_dt.get_rdf_uri(rangenode, pkg["range_tile_data"], "r")
 
+            # FIXME:  Why is this not in datatype.to_rdf()
+
             # Domain node is NOT a literal value in the RDF representation, so will have a type:
             if type(pkg["d_uri"]) == list:
                 for duri in pkg["d_uri"]:
@@ -254,7 +256,7 @@ class JsonLdReader(Reader):
         self.logger.info("Initialized JsonLdReader")
         self.logger.debug("Found {0} Non-unique root classes".format(len(self.non_unique_classes)))
         self.logger.debug("Found {0} Resource Model Root classes".format(len(self.resource_model_root_classes)))
-        self.logger.debug("Resource Model Root classes: {0}".format("\n".join(list(map(str, self.resource_model_root_classes)))))
+        # self.logger.debug("Resource Model Root classes: {0}".format("\n".join(list(map(str, self.resource_model_root_classes)))))
 
     def get_graph_id(self, root_ontologyclass):
         if root_ontologyclass in self.resource_model_root_classes:
@@ -272,17 +274,18 @@ class JsonLdReader(Reader):
         #         return match.group('graphid')
         return None
 
-    def get_resource_id(self, strs_to_test):
-        if not isinstance(strs_to_test, list):
-            strs_to_test = [strs_to_test]
-        for str_to_test in strs_to_test:
-            match = re.match(
-                r".*?%sresources/(?P<resourceid>%s)" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), str_to_test
-            )
+    def get_resource_id(self, value):
+        # Allow local URI or urn:uuid:UUID
+        print("In get_resource_id")
+        match = re.match(r".*?%sresources/(?P<resourceid>%s)" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), value)
+        if match:
+            return match.group("resourceid")
+        else:
+            match = re.match(r"urn:uuid:(%s)" % settings.UUID_REGEX, value)
             if match:
-                return match.group("resourceid")
+                return match.groups()[0]
             else:
-                self.logger.debug("Valid resourceid not found within `{0}`".format(str_to_test))
+                self.logger.debug("Valid resourceid not found within `{0}`".format(value))
         return None
 
     def read_resource(self, data, use_ids=False, resourceid=None, graphid=None):
@@ -404,24 +407,17 @@ class JsonLdReader(Reader):
             self.logger.debug(str(jsonld_graph))
             for node in nodes:
                 self.logger.debug("Checking model class {0}".format(node["node"].ontologyclass))
-                if "@type" in jsonld_graph:
-                    self.logger.debug("  node['parent_edge'].ontologyproperty: %r" % node["parent_edge"].ontologyproperty)
-                    self.logger.debug(
-                        "node['parent_edge'].ontologyproperty == ontology_property: %r" % node["parent_edge"].ontologyproperty
-                        == ontology_property
-                    )
-                    self.logger.debug("node['node'].ontologyclass: %r" % node["node"].ontologyclass)
-                    self.logger.debug(
-                        "node['node'].ontologyclass == jsonld_graph['@type'][0]: %r" % node["node"].ontologyclass
-                        == jsonld_graph["@type"][0]
-                    )
 
                 if "@type" in jsonld_graph:
+
+                    self.logger.debug(f"  checking {node['parent_edge'].ontologyproperty} vs {ontology_property}")
+                    self.logger.debug(f"  checking {node['node'].ontologyclass} vs {jsonld_graph['@type'][0]}")
+
                     if node["parent_edge"].ontologyproperty == ontology_property and (
                         (type(jsonld_graph["@type"]) == list and node["node"].ontologyclass == jsonld_graph["@type"][0])
                         or node["node"].ontologyclass == jsonld_graph["@type"]
                     ):
-                        self.logger.debug("found {0}".format(node["node"].name))
+                        self.logger.debug(" *** Found Matching Branch {0}".format(node["node"].name))
                         nodes_copy.add((node["node"].name, node["node"].pk))
                         found.append(node)
                     else:
@@ -658,26 +654,23 @@ class JsonLdReader(Reader):
                                     value = value + raw_val
                                 else:
                                     value.append(raw_val)
-                        print("finding value")
-                        # print (jsonld_node)
-                        print(jsonld)
-                        self.logger.debug("value found! : {0}".format(value))
+                        self.logger.debug(f"Found value {value} for {jsonld}")
                         self.tiles[tileid].data[str(branch["node"].nodeid)] = value
                         # ontology_properties = self.findOntologyProperties(jsonld_node)
-
                         if len(jsonld) > 1:
                             break
 
                 if len(ontology_properties) > 0:
                     for ontology_property in ontology_properties:
-                        self.logger.debug("Recursing on %s -> %s" % (ontology_property, jsonld_node["@type"]))
-                        self.resolve_node_ids(
-                            jsonld_node[ontology_property],
-                            ontology_prop=ontology_property,
-                            graph=None,
-                            parent_node=branch,
-                            tileid=tileid,
-                            parent_tileid=parent_tileid,
-                            resource=resource,
-                        )
+                        if ontology_property in jsonld_node: 
+                            self.logger.debug("Recursing on %s -> %s" % (ontology_property, jsonld_node["@type"]))
+                            self.resolve_node_ids(
+                                jsonld_node[ontology_property],
+                                ontology_prop=ontology_property,
+                                graph=None,
+                                parent_node=branch,
+                                tileid=tileid,
+                                parent_tileid=parent_tileid,
+                                resource=resource,
+                            )
         return jsonld
