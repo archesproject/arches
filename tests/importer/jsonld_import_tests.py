@@ -573,21 +573,21 @@ class JsonLDImportTests(ArchesTestCase):
             print(f"note data: {contl[1]}")
             self.assertTrue(contl[1][note] == "Import Note")
             jsts = contl[0][ts]
-        self.assertTrue(ts[botb]['@value'] == '2018-01-01')
+        self.assertTrue(ts[botb]["@value"] == "2018-01-01")
 
     def test_b_5600_concept_label(self):
 
         skos = SKOSReader()
-        rdf = skos.read_file('tests/fixtures/jsonld_base/rdm/5600-external-thesaurus.xml')
+        rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/5600-external-thesaurus.xml")
         ret = skos.save_concepts_from_skos(rdf)
 
         skos = SKOSReader()
-        rdf = skos.read_file('tests/fixtures/jsonld_base/rdm/5600-external-collections.xml')
+        rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/5600-external-collections.xml")
         ret = skos.save_concepts_from_skos(rdf)
 
-        with open(os.path.join('tests/fixtures/jsonld_base/models/5600-external-label.json'), 'rU') as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/5600-external-label.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile['graph']) 
+        ResourceGraphImporter(archesfile["graph"])
 
         data = """
 {"@id": "http://localhost:8000/resources/61787e78-0e3f-11ea-b4f1-acde48001122", 
@@ -607,10 +607,11 @@ class JsonLDImportTests(ArchesTestCase):
  "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "visual work of madonna bla bla"}       
 """
 
-        url = reverse('resources_graphid', kwargs={"graphid": "9d2c2ca0-0e3d-11ea-b4f1-acde48001122", 
-            "resourceid": "61787e78-0e3f-11ea-b4f1-acde48001122"})
-        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
-
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "9d2c2ca0-0e3d-11ea-b4f1-acde48001122", "resourceid": "61787e78-0e3f-11ea-b4f1-acde48001122"},
+        )
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
 
         print(f"\n\n\nTest b response: {response.content}")
         self.assertTrue(response.status_code == 201)
@@ -618,5 +619,5 @@ class JsonLDImportTests(ArchesTestCase):
         if type(js) == list:
             js = js[0]
 
-        self.assertTrue('@id' in js)
-        self.assertTrue(js['@id'] == "http://localhost:8000/resources/61787e78-0e3f-11ea-b4f1-acde48001122")
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/61787e78-0e3f-11ea-b4f1-acde48001122")

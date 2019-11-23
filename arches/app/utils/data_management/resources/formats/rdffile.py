@@ -662,7 +662,7 @@ class JsonLdReader(Reader):
 
                 if len(ontology_properties) > 0:
                     for ontology_property in ontology_properties:
-                        if ontology_property in jsonld_node: 
+                        if ontology_property in jsonld_node:
                             self.logger.debug("Recursing on %s -> %s" % (ontology_property, jsonld_node["@type"]))
                             self.resolve_node_ids(
                                 jsonld_node[ontology_property],
