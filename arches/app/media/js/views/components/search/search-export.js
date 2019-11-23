@@ -8,6 +8,7 @@ function($, ko, arches) {
         viewModel: function(params) {
             var self = this;
             this.total = params.total;
+            this.query = params.query;
             this.downloadStarted = ko.observable(false);
             this.format = ko.observable('tilecsv');
             this.precision = ko.observable(6);
@@ -22,9 +23,10 @@ function($, ko, arches) {
                 return (res);
             };
 
-            this.url = ko.pureComputed(function() {
+            this.url = ko.computed(function() {
                 var url = arches.urls.export_results;
                 var urlparams = self.getSearchParamsFromUrl();
+                var query = self.query();
                 urlparams.format = self.format();
                 urlparams.precision = self.precision();
                 return url + '?' + $.param(urlparams);
