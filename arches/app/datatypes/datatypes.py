@@ -1266,7 +1266,7 @@ class BaseDomainDataType(BaseDataType):
         for dnode in models.Node.objects.filter(config__contains={"options": [{"text": value}]}):
             for option in dnode.config["options"]:
                 if option["text"] == value:
-                    yield option["id"], dnode.node_id
+                    yield option["id"], dnode.nodeid
 
 
 class DomainDataType(BaseDomainDataType):
@@ -1358,7 +1358,7 @@ class DomainDataType(BaseDomainDataType):
         # via models.Node.objects.filter(config__options__contains=[{"text": value}])
         value = get_value_from_jsonld(json_ld_node)
         try:
-            return [{"id": v_id, "n_id": node_id} for v_id, n_id in self.get_option_id_from_text(value[0])]
+            return [str(v_id) for v_id, n_id in self.get_option_id_from_text(value[0])][0]
         except (AttributeError, KeyError, TypeError) as e:
             print(e)
 
@@ -1543,14 +1543,14 @@ class ResourceInstanceDataType(BaseDataType):
         except KeyError as e:
             pass
 
-
     def get_rdf_uri(self, node, data, which="r"):
         if type(data) == list:
-            return [URIRef(archesproject[f'resources/{x}']) for x in data]
-        return URIRef(archesproject[f'resources/{data}'])
+            return [URIRef(archesproject[f"resources/{x}"]) for x in data]
+        return URIRef(archesproject[f"resources/{data}"])
 
     def to_rdf(self, edge_info, edge):
         g = Graph()
+
         def _add_resource(d, p, r, r_type):
             if r_type is not None:
                 g.add((r, RDF.type, URIRef(r_type)))
