@@ -46,11 +46,13 @@ class SearchResultsExporter(object):
         self.set_precision = GeoUtils().set_precision
 
     def export(self, format):
+        ret = []
         search_res_json = SearchView.search_results(self.search_request)
+        if search_res_json.status_code == 500:
+            return ret
         results = JSONDeserializer().deserialize(search_res_json.content)
         instances = results["results"]["hits"]["hits"]
         output = {}
-        ret = []
 
         for resource_instance in instances:
             resource_obj = self.flatten_tiles(resource_instance["_source"]["tiles"], self.datatype_factory, compact=self.compact)
