@@ -236,7 +236,7 @@ def search_results(request):
         dsl.include("tiles")
 
     results = dsl.search(index="resources")
-
+    ret = {}
     if results is not None:
         # allow filters to modify the results
         for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
@@ -244,7 +244,6 @@ def search_results(request):
             if search_filter:
                 search_filter.post_search_hook(search_results_object, results, permitted_nodegroups)
 
-        ret = {}
         ret["results"] = results
 
         for key, value in list(search_results_object.items()):
@@ -255,8 +254,10 @@ def search_results(request):
         ret["total_results"] = dsl.count(index="resources")
 
         return JSONResponse(ret)
+
     else:
-        return HttpResponseNotFound(_("There was an error retrieving the search results"))
+        ret = {"message": _("There was an error retrieving the search results")}
+        return JSONResponse(ret, status=500)
 
 
 def get_provisional_type(request):

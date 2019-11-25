@@ -23,6 +23,7 @@ import uuid
 import logging
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers
+from elasticsearch.exceptions import RequestError
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
@@ -125,9 +126,8 @@ class SearchEngine(object):
         ret = None
         try:
             ret = self.es.search(**kwargs)
-        except Exception as detail:
-            self.logger.warning("%s: WARNING: search failed for query: %s \nException detail: %s\n" % (datetime.now(), body, detail))
-            pass
+        except RequestError as detail:
+            self.logger.exception("%s: WARNING: search failed for query: %s \nException detail: %s\n" % (datetime.now(), body, detail))
 
         return ret
 
