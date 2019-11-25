@@ -21,9 +21,13 @@ class Migration(migrations.Migration):
     def reverse_func(apps, schema_editor):
         extensions = [os.path.join(settings.ONTOLOGY_PATH, x) for x in settings.ONTOLOGY_EXT]
         try:
-            management.call_command('load_ontology', source=os.path.join(settings.ONTOLOGY_PATH, settings.ONTOLOGY_BASE),
-            version=settings.ONTOLOGY_BASE_VERSION, ontology_name=settings.ONTOLOGY_BASE_NAME, id='e6e8db47-2ccf-11e6-927e-b8f6b115d7dd',
-            extensions=','.join(extensions), verbosity=0)
+            management.call_command('load_ontology',
+                                    source=os.path.join(settings.ONTOLOGY_PATH, settings.ONTOLOGY_BASE),
+                                    version=settings.ONTOLOGY_BASE_VERSION,
+                                    ontology_name=settings.ONTOLOGY_BASE_NAME,
+                                    id='e6e8db47-2ccf-11e6-927e-b8f6b115d7dd',
+                                    extensions=','.join(extensions),
+                                    verbosity=0)
         except:
             print("Failed to Reload the Ontology")
 
