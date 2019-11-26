@@ -606,12 +606,11 @@ class JsonLdReader(Reader):
                         found_graph_paths.append(graph_path)
 
             if len(found_graph_paths) > 1:
-                new_found_graph_paths = []
+                graph_paths_to_remove = set()
                 for i, jsonld_node in enumerate(jsonld_path):
                     if i % 2 == 0:
                         if str(RDFS.label) in jsonld_node["jsonld_node"] and "@value" in jsonld_node["jsonld_node"][str(RDFS.label)][0]:
-                            new_found_graph_paths = []
-                            for found_graph_path in found_graph_paths:
+                            for path_id, found_graph_path in enumerate(found_graph_paths):
                                 if (
                                     found_graph_path[i]["node"]["node"].datatype == "concept"
                                     or found_graph_path[i]["node"]["node"].datatype == "concept-list"
@@ -626,10 +625,11 @@ class JsonLdReader(Reader):
                                         if concept_val["@value"] not in concept_labels:
                                             all_values_found = False
 
-                                    if all_values_found:
-                                        new_found_graph_paths.append(found_graph_path)
+                                    if not all_values_found:
+                                        graph_paths_to_remove.add(path_id)
 
-                found_graph_paths = new_found_graph_paths
+                for i in sorted(graph_paths_to_remove, reverse=True):
+                    del found_graph_paths[i]
 
             if len(found_graph_paths) == 0:
                 raise self.DataDoesNotMatchGraphException()
