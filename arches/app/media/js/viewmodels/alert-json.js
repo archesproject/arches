@@ -1,4 +1,4 @@
-define(['knockout', 'arches'], function (ko, arches) {
+define(['knockout', 'arches'], function(ko, arches) {
     /**
     * A viewmodel used for alert messages from JSON responses
     *
@@ -18,14 +18,14 @@ define(['knockout', 'arches'], function (ko, arches) {
         else {
             return property;
         }
-    }
+    };
 
     var initializeResponseJSON = function(responseJSON) {
         if (typeof responseJSON === 'undefined') {
             responseJSON = {};
         }
         return responseJSON;
-    }
+    };
 
     var parseResponseJson = function(responseJSON) {
         responseJSON = initializeResponseJSON(responseJSON);
@@ -33,17 +33,17 @@ define(['knockout', 'arches'], function (ko, arches) {
         responseJSON.message = getPropertyOrDefaultMessage(responseJSON.message, arches.requestFailed.text);
 
         return responseJSON;
-    }
+    };
 
     var JsonErrorAlertViewModel = function(type, responseJSON, cancel, ok) {
         var self = this;
         this.active = ko.observable(true);
-        this.close = function () {
+        this.close = function() {
             self.active(false);
         };
 
         responseJSON = parseResponseJson(responseJSON);
-        
+
         this.type = ko.observable(type);
         this.title = ko.observable(responseJSON.title);
         this.text = ko.observable(responseJSON.message);
@@ -53,13 +53,13 @@ define(['knockout', 'arches'], function (ko, arches) {
             this.ok = function() {
                 self.close();
                 ok();
-            }
+            };
         }
         if (typeof cancel === 'function') {
             this.cancel = function() {
                 self.close();
                 cancel();
-            }
+            };
         }
     };
     return JsonErrorAlertViewModel;
