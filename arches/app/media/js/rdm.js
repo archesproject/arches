@@ -21,7 +21,6 @@ require([
 
     var RDMView = BaseManagerView.extend({
         initialize: function(options){
-            var self = this;
             var mode = 'semantic';
 
             // Models and views
@@ -146,7 +145,6 @@ require([
             });
 
             $('a[data-toggle="#add-scheme-form"]').on( "click", function(){
-                var self = this;
                 var form = new AddSchemeForm({
                     el: $('#add-scheme-form')
                 });
@@ -161,7 +159,6 @@ require([
             });
 
             $('a[data-toggle="#export-scheme-form"]').on( "click", function(){
-                var self = this;
                 var form = new ExportSchemeForm({
                     el: $('#export-scheme-form')
                 });
@@ -169,7 +166,6 @@ require([
             });
 
             $('a[data-toggle="#delete-scheme-form"]').on( "click", function(){
-                var self = this;
                 var form = new DeleteSchemeForm({
                     el: $('#delete-scheme-form'),
                     model: null,
@@ -206,7 +202,6 @@ require([
             }.bind(this));
 
             $('a[data-toggle="#add-collection-form"]').on( "click", function(){
-                var self = this;
                 var form = new AddCollectionForm({
                     el: $('#add-collection-form')
                 });
@@ -217,11 +212,10 @@ require([
                         concept.set('id', newCollection.id);
                         conceptReport.render();
                     }
-                })
+                });
             });
 
             $('a[data-toggle="#delete-collection-form"]').on( "click", function(){
-                var self = this;
                 var form = new DeleteCollectionForm({
                     el: $('#delete-collection-form'),
                     model: null
