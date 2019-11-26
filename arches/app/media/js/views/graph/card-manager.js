@@ -6,11 +6,11 @@ require([
     'models/graph',
     'views/graph/graph-page-view',
     'views/list',
-    'viewmodels/alert',
+    'viewmodels/alert-json',
     'graph-cards-data',
     'arches',
     'bindings/dragDrop'
-], function($, _, ko, koMapping, GraphModel, PageView, ListView, AlertViewModel, data, arches) {
+], function($, _, ko, koMapping, GraphModel, PageView, ListView, JsonErrorAlertViewModel, data, arches) {
 
     /**
     * a PageView representing the graph cards page
@@ -51,8 +51,8 @@ require([
         items: viewModel.availableGraphs
     });
 
-    var alertFailure = function () {
-        pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
+    var alertFailure = function (responseJSON) {
+        pageView.viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', responseJSON));
     };
 
     viewModel.addCard = function(data){

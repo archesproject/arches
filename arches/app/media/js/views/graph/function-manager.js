@@ -4,7 +4,7 @@ require([
     'knockout',
     'arches',
     'views/graph/graph-page-view',
-    'viewmodels/alert',
+    'viewmodels/alert-json',
     'views/graph/function-manager/function-list',
     'views/graph/function-manager/applied-function-list',
     'models/function',
@@ -13,7 +13,7 @@ require([
     'graph-functions-data',
     'function-templates',
     'component-templates'
-], function($, _, ko, arches, GraphPageView, AlertViewModel, FunctionList, AppliedFunctionList, FunctionModel, FunctionXGraphModel, baseData, data) {
+], function($, _, ko, arches, GraphPageView, JsonErrorAlertViewModel, FunctionList, AppliedFunctionList, FunctionModel, FunctionXGraphModel, baseData, data) {
     /**
     * set up the page view model with the graph model and related sub views
     */
@@ -86,7 +86,7 @@ require([
     });
 
     var alertFailure = function(responseJSON) {
-        graphPageView.viewModel.alert(new AlertViewModel('ep-alert-red', responseJSON.title, responseJSON.message));
+        graphPageView.viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', responseJSON));
     };
 
     viewModel.save = function(){

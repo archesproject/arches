@@ -30,7 +30,7 @@ from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
@@ -130,7 +130,7 @@ class GraphSettingsView(GraphBaseView):
             )
 
         except GraphValidationError as e:
-            return JSONResponse({"status": "false", "message": e.message, "title": e.title}, status=500)
+            return JSONErrorResponse(e.title, e.message)
 
 
 @method_decorator(group_required("Graph Editor"), name="dispatch")
@@ -366,7 +366,7 @@ class GraphDataView(View):
 
             return JSONResponse(ret)
         except GraphValidationError as e:
-            return JSONResponse({"status": "false", "success": False, "message": e.message, "title": e.title}, status=500)
+            return JSONErrorResponse(e.title, e.message)
 
     @method_decorator(group_required("Graph Editor"), name="dispatch")
     def delete(self, request, graphid):
@@ -377,7 +377,7 @@ class GraphDataView(View):
                 graph.delete_node(node=data.get("nodeid", None))
                 return JSONResponse({})
             except GraphValidationError as e:
-                return JSONResponse({"status": "false", "message": e.message, "title": e.title}, status=500)
+                return JSONErrorResponse(e.title, e.message)
         elif self.action == "delete_instances":
             try:
                 graph = Graph.objects.get(graphid=graphid)
@@ -390,7 +390,7 @@ class GraphDataView(View):
                     }
                 )
             except GraphValidationError as e:
-                return JSONResponse({"status": "false", "message": e.message, "title": e.title}, status=500)
+                return JSONErrorResponse(e.title, e.message)
         elif self.action == "delete_graph":
             try:
                 graph = Graph.objects.get(graphid=graphid)
@@ -401,7 +401,7 @@ class GraphDataView(View):
                 graph.delete()
                 return JSONResponse({"success": True})
             except GraphValidationError as e:
-                return JSONResponse({"status": "false", "message": e.message, "title": e.title}, status=500)
+                return JSONErrorResponse(e.title, e.message)
 
         return HttpResponseNotFound()
 

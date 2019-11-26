@@ -36,7 +36,7 @@ from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.decorators import group_required
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.couch import Couch
@@ -264,7 +264,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
                     error_message = _("Unable to connect to CouchDB")
                 else:
                     error_message = e.message
-                connection_error = JSONResponse({"success": False, "message": error_message, "title": error_title}, status=500)
+                connection_error = JSONErrorResponse(error_title, error_message)
             return connection_error
 
         return HttpResponseNotFound()
@@ -375,7 +375,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
                     error_message = _("Unable to connect to CouchDB")
                 else:
                     error_message = e.message
-                connection_error = JSONResponse({"success": False, "message": error_message, "title": error_title}, status=500)
+                connection_error = JSONErrorResponse(error_title, error_message)
             return connection_error
 
         return JSONResponse({"success": True, "mobile_survey": mobile_survey})

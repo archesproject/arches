@@ -40,7 +40,7 @@ from arches.app.utils.pagination import get_paginator
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.views.base import BaseManagerView, MapBaseManagerView
@@ -236,15 +236,7 @@ class NewResourceEditorView(MapBaseManagerView):
             if deleted is True:
                 return JSONResponse(ret)
             else:
-                return JSONResponse(
-                    {
-                        "status": "false",
-                        "success": False,
-                        "message": "Provisional users cannot delete resources with authoritative data",
-                        "title": "Unable to Delete Resource",
-                    },
-                    status=500,
-                )
+                return JSONErrorResponse('Unable to Delete Resource', 'Provisional users cannot delete resources with authoritative data')
         return HttpResponseNotFound()
 
     def copy(self, request, resourceid=None):
