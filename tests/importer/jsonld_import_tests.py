@@ -107,6 +107,14 @@ class JsonLDImportTests(ArchesTestCase):
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2["graph"])
 
+        skos = SKOSReader()
+        rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/5600-external-thesaurus.xml")
+        ret = skos.save_concepts_from_skos(rdf)
+
+        skos = SKOSReader()
+        rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/5600-external-collections.xml")
+        ret = skos.save_concepts_from_skos(rdf)
+
     def setUp(self):
         pass
 
@@ -605,14 +613,6 @@ class JsonLDImportTests(ArchesTestCase):
 
     def test_b_5600_concept_label(self):
 
-        skos = SKOSReader()
-        rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/5600-external-thesaurus.xml")
-        ret = skos.save_concepts_from_skos(rdf)
-
-        skos = SKOSReader()
-        rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/5600-external-collections.xml")
-        ret = skos.save_concepts_from_skos(rdf)
-
         with open(os.path.join("tests/fixtures/jsonld_base/models/5600-external-label.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
@@ -654,3 +654,52 @@ class JsonLDImportTests(ArchesTestCase):
 
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/61787e78-0e3f-11ea-b4f1-acde48001122")
+
+
+
+    def test_c_string_to_path(self):
+
+        with open(os.path.join("tests/fixtures/jsonld_base/models/string_to_path_basic.json"), "rU") as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile["graph"])
+
+        data = """
+{"@id": "http://localhost:8000/resources/5683f462-107d-11ea-b7e9-acde48001122", 
+"@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person", 
+"http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by": [
+    {
+    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
+    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "le veuve remy"}, 
+    {
+    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
+    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy pour M de montvale"}, 
+    {
+    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
+    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy pour la russie"}, 
+    {
+    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
+    "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": {
+                    "@id": "http://vocab.getty.edu/aat/300033898",
+                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
+                    "http://www.w3.org/2000/01/rdf-schema#label": "History"
+        }, 
+    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy"}, 
+    {
+    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
+    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "Remy p le Duc de Praslin"}], 
+"http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy"}
+"""
+
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "d5456066-107c-11ea-b7e9-acde48001122", "resourceid": "5683f462-107d-11ea-b7e9-acde48001122"},
+        )
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        print(f"\n\n\nTest b response: {response.content}")
+        self.assertTrue(response.status_code == 201)
+        js = response.json()
+        if type(js) == list:
+            js = js[0]
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/5683f462-107d-11ea-b7e9-acde48001122")
+
