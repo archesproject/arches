@@ -127,7 +127,7 @@
                 }, 
                 {
                     "config": {
-                        "graphid": null
+                        "graphid": ["29a5d064-bf97-11e9-bd39-0242ac160002"]
                     }, 
                     "datatype": "resource-instance", 
                     "description": null, 
