@@ -316,9 +316,17 @@ class JsonLdReader(Reader):
                 # print(self.get_paths(self.graphtree))
                 # print(self.get_jsonld_paths(jsonld))
                 # self.find_node(self.graphtree, jsonld)
-                self.resolve_jsonld_doc(resource)
-                # self.resolve_node_ids(jsonld, graph=self.graphtree, resource=resource)
-                self.resources.append(resource)
+                try:
+                    self.resolve_jsonld_doc(resource)
+                    self.resources.append(resource)
+                except self.DataDoesNotMatchGraphException as e:
+                    self.logger.error("Mismatch when trying to match the JSON LD section with a relevant Arches Branch")
+                    self.logger.debug(e.message)
+                    self.errors["DataDoesNotMatchGraphException"] = e
+                except self.AmbiguousGraphException as e:
+                    self.logger.error("Ambiguous Graph exception thrown")
+                    self.logger.debug(e.message)
+                    self.errors["AmbiguousGraphException"] = e
 
         return data
 
@@ -569,11 +577,6 @@ class JsonLdReader(Reader):
     #             raise self.DataDoesNotMatchGraphException()
 
     def resolve_jsonld_doc(self, resource):
-        # 1. find all the json ld paths that contain the given json ld node
-        # 2. for each of the found json ld paths find corresponding graph path matches (if there are none then retrun DataDoesNotMatchGraphException)
-        # 3. take the depth of the json ld node and traverse down the path of each graph path to that depth
-        #    if the sequence of nodes down to that depth is the same for each graph path, then that node in the graph path is the node to return, if it's not the same return AmbiguousGraphException
-
         def path_to_string(pathlists):
             ret = []
             for pathlist in pathlists:
@@ -583,15 +586,10 @@ class JsonLdReader(Reader):
                 ret.append(",".join(pathstr))
             return ret
 
-        # import ipdb
-
-        # ipdb.sset_trace()
         graph_paths = self.get_paths(self.graphtree)
-        print(path_to_string(graph_paths))
-
         jsonld_paths = self.get_jsonld_paths(self.jsonld_doc)
-        print(path_to_string(jsonld_paths))
-        # print(f"IN FIND NODE -------- {jsonld}")
+        self.logger.debug(f"Graph Paths: path_to_string(graph_paths)")
+        self.logger.debug(f"path_to_string(jsonld_paths)")
 
         depth = None  # how deeply nested is the jsonld node in jsonld document
         found_jsonld_paths = []
@@ -606,6 +604,9 @@ class JsonLdReader(Reader):
                         found_graph_paths.append(graph_path)
 
             if len(found_graph_paths) > 1:
+                self.logger.debug(
+                    f"Found more then 1 path in the graph that matche a path in the json ld document. {path_to_string(found_graph_paths)} -- Now trying to differentiate paths based on concept nodes."
+                )
                 graph_paths_to_remove = set()
                 for i, jsonld_node in enumerate(jsonld_path):
                     if i % 2 == 0:
@@ -636,22 +637,15 @@ class JsonLdReader(Reader):
 
             if len(found_graph_paths) == 1:
                 # we've found our path in the graph, now we just need to populate the tiles
+                self.logger.debug(
+                    f"Found a path in the graph ({path_to_string(found_graph_paths)[0]}) that matches a path in the json ld document ({path_to_string([jsonld_path])})"
+                )
                 self.assign_tiles(found_graph_paths[0], jsonld_path, resource)
 
             if len(found_graph_paths) > 1:
                 raise self.AmbiguousGraphException()
 
-        print("-" * 200)
-        # print(jsonld_paths)
-        print(JSONSerializer().serialize(self.tiles))
-        print("-" * 200)
-
-        # if the nodes found at this depth are the same nodes then we're done
-        # if they are not the same nodes but are all concept nodes then can they be
-        # differentiated by the supplied concept being saved?
-        # if they can't be differentiated then we neet to raise an AmbiguousGraphException
-        # make sure we check node ids
-
+        # print(JSONSerializer().serialize(self.tiles))
         return None
 
     # def resolve_node_ids(self, jsonld, ontology_prop=None, graph=None, parent_node=None, tileid=None, parent_tileid=None, resource=None):
