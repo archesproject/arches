@@ -312,10 +312,6 @@ class JsonLdReader(Reader):
                     resource.pk = resourceid
 
                 self.add_node_ids(jsonld)
-                print(jsonld)
-                # print(self.get_paths(self.graphtree))
-                # print(self.get_jsonld_paths(jsonld))
-                # self.find_node(self.graphtree, jsonld)
                 try:
                     self.resolve_jsonld_doc(resource)
                     self.resources.append(resource)
@@ -346,250 +342,14 @@ class JsonLdReader(Reader):
                     keys.append(key)
         except:
             pass
-        # self.logger.debug("    findOntologyProperties -> {0}".format("\n".join(map(str, keys))))
+        self.logger.debug("    findOntologyProperties -> {0}".format("\n".join(map(str, keys))))
         return keys
 
-    # def findBranch(self, nodes, ontology_property, jsonld):
-    #     """
-    #         EXAMPLE JSONLD GRAPH:
-    #         --------------------
-    #         {
-    #             "@id": "http://localhost:8000/tile/eed92cf9-b9cd-4e99-9e88-8fb34a0be257/node/e456023d-fa36-11e6-9e3e-026d961c88e6",
-    #             "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
-    #             "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as": [
-    #                 {
-    #                     "@id": "http://localhost:8000/tile/9fcd9141-930c-4303-b176-78480efbd3d9/node/e4560237-fa36-11e6-9e3e-026d961c88e6",
-    #                     "@type": "http://www.cidoc-crm.org/cidoc-crm/E17_Type_Assignment",
-    #                     "http://www.cidoc-crm.org/cidoc-crm/P42_assigned": [
-    #                         {
-    #                             "@id": "http://localhost:8000/tile/9fcd9141-930c-4303-b176-78480efbd3d9/node/e456024f-fa36-11e6-9e3e-026d961c88e6",
-    #                             "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
-    #                             "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": "[u'dfc1fa9b-e3c8-459d-a3fa-d65e1443b9e7']"
-    #                         },
-    #                         {
-    #                             "@id": "http://localhost:8000/tile/9fcd9141-930c-4303-b176-78480efbd3d9/node/e4560246-fa36-11e6-9e3e-026d961c88e6",
-    #                             "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
-    #                             "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": "a18ed9a3-4924-4cf0-a9a7-82d8c3aefbe0"
-    #                         }
-    #                     ],
-    #                 }
-    #             ]
-    #         }
-    #     """
-
-    #     self.logger.debug(
-    #         "entered 'findBranch' with {0} nodes, ontology_property='{1}' and jsonld_fragment:".format(len(nodes), str(ontology_property))
-    #     )
-    #     self.logger.debug("    " + str(jsonld))
-
-    #     if not isinstance(jsonld, list):
-    #         jsonld = [jsonld]
-
-    #     for jsonld_graph in jsonld:
-    #         if "@type" in jsonld_graph:
-    #             self.logger.debug(
-    #                 "searching for branch %s --> %s" % (ontology_property.split("/")[-1], jsonld_graph["@type"][0].split("/")[-1])
-    #             )
-    #         found = []
-    #         nodes_copy = set()
-    #         invalid_nodes = set()
-
-    #         # print jsonld_graph
-    #         # try:
-    #         #     nodeid = jsonld_graph['@archesNodeId']
-    #         #     for node in nodes:
-    #         #         print(str(node['node'].pk))
-    #         #         if str(node['node'].pk) == nodeid:
-    #         #             valid_nodes = set([(node['node'].name, node['node'].pk)])
-    #         # except KeyError as e:
-    #         # try to find a node in the graph among a bunch of sibling nodes that has the same incoming edge (propertyclass) as
-    #         # the edge/node combination we're searching for from the json-ld graph
-
-    #         self.logger.info("Trying to match jsonld_graph fragment:")
-    #         self.logger.debug(str(jsonld_graph))
-    #         for node in nodes:
-    #             self.logger.debug("Checking model class {0}".format(node["node"].ontologyclass))
-    #             if "@type" in jsonld_graph:
-    #                 self.logger.debug("  node['parent_edge'].ontologyproperty: %r" % node["parent_edge"].ontologyproperty)
-    #                 self.logger.debug(
-    #                     "node['parent_edge'].ontologyproperty == ontology_property: %r" % node["parent_edge"].ontologyproperty
-    #                     == ontology_property
-    #                 )
-    #                 self.logger.debug("node['node'].ontologyclass: %r" % node["node"].ontologyclass)
-    #                 self.logger.debug(
-    #                     "node['node'].ontologyclass == jsonld_graph['@type'][0]: %r" % node["node"].ontologyclass
-    #                     == jsonld_graph["@type"][0]
-    #                 )
-
-    #             if "@type" in jsonld_graph:
-    #                 if node["parent_edge"].ontologyproperty == ontology_property and (
-    #                     (type(jsonld_graph["@type"]) == list and node["node"].ontologyclass == jsonld_graph["@type"][0])
-    #                     or node["node"].ontologyclass == jsonld_graph["@type"]
-    #                 ):
-    #                     self.logger.debug("found {0}".format(node["node"].name))
-    #                     nodes_copy.add((node["node"].name, node["node"].pk))
-    #                     found.append(node)
-    #                 else:
-    #                     self.logger.debug(
-    #                         "Node type ontologyclass and property {0}, {1} is not a match".format(
-    #                             node["node"].ontologyclass, node["parent_edge"].ontologyproperty
-    #                         )
-    #                     )
-    #                     invalid_nodes.add((node["node"].name, node["node"].pk))
-
-    #             if "@value" in jsonld_graph:
-    #                 if node["parent_edge"].ontologyproperty == ontology_property:
-    #                     # print node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == str(RDFS.Literal)
-    #                     # print node['node'].name
-    #                     # print node['node'].ontologyclass
-    #                     # print node['parent_edge'].ontologyproperty
-    #                     # print ontology_property
-    #                     # print "found %s" % node['node'].name
-    #                     nodes_copy.add((node["node"].name, node["node"].pk))
-    #                     found.append(node)
-
-    #         # see https://github.com/archesproject/arches/issues/5126
-    #         # check to see if the found graph nodes are concepts
-    #         # if all the found graph nodes are concepts then remove any nodes from found where the value
-    #         # being saved isn't in the nodes concept collection
-    #         if len(found) > 1:
-    #             found_nodes_are_concepts = True
-    #             for found_node in found:
-    #                 if not (found_node["node"].datatype == "concept" or found_node["node"].datatype == "concept-list"):
-    #                     found_nodes_are_concepts = False
-
-    #             if found_nodes_are_concepts:
-    #                 new_found = []
-    #                 nodes_copy = set()
-    #                 concept_val = jsonld_graph["http://www.w3.org/2000/01/rdf-schema#label"]
-    #                 if concept_val:
-    #                     if isinstance(concept_val, list):
-    #                         concept_val = concept_val[0]["@value"]
-    #                     else:
-    #                         concept_val = concept_val["@value"]
-    #                 for node in found:
-    #                     collection = node["node"].config["rdmCollection"]
-    #                     # NOTE: these collections might be cached for better performance?
-    #                     edges = Concept().get_child_collections(collection, columns="valueto")
-    #                     concept_labels = [item[0] for item in edges]
-    #                     if concept_val in concept_labels:
-    #                         nodes_copy.add((node["node"].name, node["node"].pk))
-    #                         new_found.append(node)
-
-    #                 found = new_found
-
-    #         self.logger.debug("found {0} branches".format(len(found)))
-    #         if len(found) == 0:
-    #             self.logger.error(" *** branch not found for {0}".format(str(jsonld_graph)))
-    #             raise self.DataDoesNotMatchGraphException()
-
-    #         if len(self.findOntologyProperties(jsonld_graph)) == 0:
-    #             # print('at a leaf -- unwinding')
-    #             self.logger.debug("No further ontology properties found in this fragment; leaf of tree. Unwinding")
-
-    #         def json_data_is_valid(node, json_ld_node):
-    #             datatype = self.datatype_factory.get_instance(node.datatype)
-    #             value = datatype.from_rdf(json_ld_node)
-    #             return len(datatype.validate(value)) == 0
-
-    #         if len(found) > 1:
-    #             self.logger.info("Iterating through the matched nodes")
-    #             for found_node in found:
-    #                 # here we follow the algorithm supplied by the Getty
-    #                 # If the range in the model is a domain-value, and the incoming data is of the right format and part of the domain-value's enumeration, then accept that node.
-    #                 # If the range in the model is a number, string, or date, and the incoming data is of the right format, then accept that node.
-    #                 # If the range in the model is a file-list, and the referenced file already exists, then accept that node.
-    #                 # If the range in the model is a concept, then consider if the incoming data is a concept that is part of the collection for the node. If it is, then accept that node. If it is a concept, and not part of the collection, then fail. If it is not a concept, then continue.
-    #                 self.logger.debug("Checking to see if the node is in a literal datatype:")
-    #                 node_dt = self.datatype_factory.get_instance(found_node["node"].datatype)
-    #                 if node_dt.is_a_literal_in_rdf() and json_data_is_valid(found_node["node"], jsonld_graph):
-    #                     self.logger.debug("    Matched {0} and the json fragment is valid".format(found_node["node"].datatype))
-    #                     return found_node
-
-    #                 # If the range is semantic, then check the class of the incoming node is the same
-    #                 # class as the model's node. If it does, then recursively test the edges of the
-    #                 # semantic node to determine if it is a candidate (peek-ahead). Remove from the
-    #                 # candidate list if it is not.
-    #                 self.logger.debug("Checking to see if the node is a semantic node?")
-    #                 if found_node["node"].datatype == "semantic":
-    #                     self.logger.debug(
-    #                         "Node is semantic node. \
-    #                         Recursively search for the children of this node and match to branch."
-    #                     )
-    #                     self.logger.debug(
-    #                         "now searching children of {0} node UUID {1}".format(found_node["node"].name, found_node["node"].pk)
-    #                     )
-    #                     for ontology_prop in self.findOntologyProperties(jsonld_graph):
-    #                         try:
-    #                             self.logger.debug("Matches {0}?".format(ontology_prop))
-    #                             branch = self.findBranch(found_node["children"], ontology_prop, jsonld_graph[ontology_prop])
-    #                         except self.DataDoesNotMatchGraphException as e:
-    #                             self.logger.error("Data supplied does not match")
-    #                             found_node["remove"] = True
-    #                             invalid_nodes.add((found_node["node"].name, found_node["node"].pk))
-    #                         except self.AmbiguousGraphException as e:
-    #                             # Not sure this will be called, given the structure of this code
-    #                             # Adding a debug logger just in case it might
-    #                             self.logger.debug("AmbiguousGraphException thrown while iterating through semantic node children.")
-    #                             pass
-
-    #                 # If the range in the model is a resource-instance, then check that the incoming
-    #                 # node has the same class as the top node of any of the referenced models. If more
-    #                 # than one model has the same top level class, then fail as the model is ambiguous.
-    #                 # If there is exactly one possible model, then accept that node.
-    #                 if found_node["node"].datatype == "resource-instance":
-    #                     self.logger.debug("Resource Instance datatype, check for model in Arches that matches:")
-    #                     if found_node["node"].ontologyclass in self.resource_model_root_classes:
-    #                         self.logger.debug("Resource instance <=> Model match found")
-    #                         return found_node
-    #                     else:
-    #                         self.logger.error("Incoming node class for resource instance datatype != match Model")
-    #                         self.logger.debug(found_node["node"].ontologyclass)
-
-    #         # ORIGINAL CODE - this is probably more flexible to have this here as this allows for non-semantic nodes to have child nodes
-    #         # for ontology_prop in self.findOntologyProperties(jsonld_graph):
-    #         #     for found_node in found:
-    #         #         try:
-    #         #             # print 'now searching children of %s node' % found_node['node'].name
-    #         #             branch = self.findBranch(found_node['children'], ontology_prop, jsonld_graph[ontology_prop])
-    #         #         except self.DataDoesNotMatchGraphException as e:
-    #         #             found_node['remove'] = True
-    #         #             invalid_nodes.add((found_node['node'].name, found_node['node'].pk))
-    #         #         except self.AmbiguousGraphException as e:
-    #         #             # print 'threw AmbiguousGraphException'
-    #         #             # print nodes_copy
-    #         #             pass
-
-    #         valid_nodes = nodes_copy.difference(invalid_nodes)
-    #         self.logger.debug(
-    #             "After walking the node tree, {0} valid nodes found, {1} invalid discarded".format(len(valid_nodes), len(invalid_nodes))
-    #         )
-    #         self.logger.debug("Valid Node names/pk: {0}".format(valid_nodes))
-    #         if len(valid_nodes) == 1:
-    #             valid_node = valid_nodes.pop()
-    #             for node in nodes:
-    #                 if node["node"].pk == valid_node[1]:
-    #                     self.logger.info("Matching Branch found: {0}".format(node["node"].name))
-    #                     return node
-    #         elif len(valid_nodes) > 1:
-    #             raise self.AmbiguousGraphException()
-    #         else:
-    #             raise self.DataDoesNotMatchGraphException()
-
     def resolve_jsonld_doc(self, resource):
-        def path_to_string(pathlists):
-            ret = []
-            for pathlist in pathlists:
-                pathstr = []
-                for path in pathlist:
-                    pathstr.append(path["label"].split("/")[-1])
-                ret.append(",".join(pathstr))
-            return ret
-
         graph_paths = self.get_paths(self.graphtree)
         jsonld_paths = self.get_jsonld_paths(self.jsonld_doc)
-        self.logger.debug(f"Graph Paths: path_to_string(graph_paths)")
-        self.logger.debug(f"path_to_string(jsonld_paths)")
+        self.logger.debug(f"Graph Paths: self.path_to_string(graph_paths)")
+        self.logger.debug(f"self.path_to_string(jsonld_paths)")
 
         depth = None  # how deeply nested is the jsonld node in jsonld document
         found_jsonld_paths = []
@@ -598,14 +358,14 @@ class JsonLdReader(Reader):
             found_graph_paths = []
             # here we find the graph paths that share the same pattern as the jsonld paths identified above
             # the found graph path don't take into consideration the node ids (only ontologyclass and ontologyproperty sequence)
-            for jsonld_path_str in path_to_string([jsonld_path]):
+            for jsonld_path_str in self.path_to_string([jsonld_path]):
                 for graph_path in graph_paths:
-                    if path_to_string([graph_path])[0].startswith(jsonld_path_str):
+                    if self.path_to_string([graph_path])[0].startswith(jsonld_path_str):
                         found_graph_paths.append(graph_path)
 
             if len(found_graph_paths) > 1:
                 self.logger.debug(
-                    f"Found more then 1 path in the graph that matche a path in the json ld document. {path_to_string(found_graph_paths)} -- Now trying to differentiate paths based on concept nodes."
+                    f"Found more then 1 path in the graph that matche a path in the json ld document. {self.path_to_string(found_graph_paths)} -- Now trying to differentiate paths based on concept nodes."
                 )
                 graph_paths_to_remove = set()
                 for i, jsonld_node in enumerate(jsonld_path):
@@ -638,7 +398,7 @@ class JsonLdReader(Reader):
             if len(found_graph_paths) == 1:
                 # we've found our path in the graph, now we just need to populate the tiles
                 self.logger.debug(
-                    f"Found a path in the graph ({path_to_string(found_graph_paths)[0]}) that matches a path in the json ld document ({path_to_string([jsonld_path])})"
+                    f"Found a path in the graph ({self.path_to_string(found_graph_paths)[0]}) that matches a path in the json ld document ({self.path_to_string([jsonld_path])})"
                 )
                 self.assign_tiles(found_graph_paths[0], jsonld_path, resource)
 
@@ -647,119 +407,6 @@ class JsonLdReader(Reader):
 
         # print(JSONSerializer().serialize(self.tiles))
         return None
-
-    # def resolve_node_ids(self, jsonld, ontology_prop=None, graph=None, parent_node=None, tileid=None, parent_tileid=None, resource=None):
-    #     # print "-------------------"
-    #     self.logger.debug("-------------: %r" % jsonld)
-    #     if not isinstance(jsonld, list):
-    #         jsonld = [jsonld]
-
-    #     self.logger.debug("INCOMING TO resolve_node_ids: %r" % jsonld)
-    #     parent_tileid = tileid
-    #     for jsonld_node in jsonld:
-    #         if parent_node is not None:
-    #             try:
-    #                 # print(jsonld_node)
-    #                 branch = None
-    #                 if self.use_ids:
-    #                     try:
-    #                         match = re.match(
-    #                             r".*?/tile/(?P<tileid>%s)/node/(?P<nodeid>%s)" % (settings.UUID_REGEX, settings.UUID_REGEX),
-    #                             str(jsonld_node["@id"]),
-    #                         )
-    #                         if match:
-    #                             tileid = match.group("tileid")
-    #                             self.logger.debug("Found matching tile id `{0}` from the tile/node URI".format(tileid))
-    #                             for node in parent_node["children"]:
-    #                                 if str(node["node"].pk) == match.group("nodeid"):
-    #                                     branch = node
-    #                     except:
-    #                         pass
-
-    #                 if branch is None:
-    #                     found_node = self.find_node(jsonld_node)
-    #                     branch = self.findBranch(parent_node["children"], ontology_prop, jsonld_node)
-    #                     print(f"FOUND NODE = {found_node}")
-    #                     print(f"BRANCH = {branch}")
-    #                     print(f"----------- NODE MATCH: {found_node==branch} --------")
-    #                     if branch["node"].nodegroup != parent_node["node"].nodegroup:
-    #                         tileid = uuid.uuid4()
-
-    #             except self.DataDoesNotMatchGraphException as e:
-    #                 self.logger.error("Mismatch when trying to match the JSON LD section with a relevant Arches Branch")
-    #                 self.logger.debug(jsonld_node)
-    #                 self.errors["DataDoesNotMatchGraphException"] = e
-    #                 branch = None
-
-    #             except self.AmbiguousGraphException as e:
-    #                 self.logger.error("Ambiguous Graph exception thrown")
-    #                 self.logger.debug(e.message)
-    #                 self.logger.debug(jsonld_node)
-    #                 self.errors["AmbiguousGraphException"] = e
-    #                 branch = None
-    #         else:
-    #             branch = graph
-
-    #         ontology_properties = self.findOntologyProperties(jsonld_node)
-
-    #         if branch is not None:
-    #             if branch != graph:
-    #                 # jsonld_node['@archesid'] = '%stile/%s/node/%s' % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, tileid, branch['node'].nodeid)
-
-    #                 if tileid not in self.tiles:
-    #                     self.logger.debug("Target tileid does not exist - creating {0}".format(tileid))
-    #                     self.tiles[tileid] = Tile(
-    #                         tileid=tileid, parenttile_id=parent_tileid, nodegroup_id=branch["node"].nodegroup_id, data={}
-    #                     )
-    #                     if parent_tileid is None:
-    #                         self.logger.debug("Tile does not have a parent_tileid - adding to resource.tiles list")
-    #                         resource.tiles.append(self.tiles[tileid])
-    #                     else:
-    #                         self.logger.debug("Tile does has {0} as parent_tileid".format(parent_tileid))
-    #                         self.tiles[parent_tileid].tiles.append(self.tiles[tileid])
-
-    #                 if branch["node"].datatype != "semantic":
-    #                     self.logger.debug("Assigning value to datatype ({0}) from a non-semantic node:".format(branch["node"].datatype))
-    #                     # import ipdb
-    #                     # ipdb.sset_trace()
-    #                     datatype = self.datatype_factory.get_instance(branch["node"].datatype)
-
-    #                     # print branch['node'].datatype
-    #                     if len(jsonld) == 1:
-    #                         value = datatype.from_rdf(jsonld_node)
-    #                     else:
-    #                         value = []
-    #                         # this is not very efficient but does fix the problem for ticket #5098
-    #                         # what we should do is prevent subsequent loops through "jsonld" on line 565 above
-    #                         for jldnode in jsonld:
-    #                             self.logger.debug(f"datatype: {datatype}")
-    #                             raw_val = datatype.from_rdf(jldnode)
-    #                             if isinstance(raw_val, list):
-    #                                 value = value + raw_val
-    #                             else:
-    #                                 value.append(raw_val)
-    #                     # print("finding value")
-    #                     # print (jsonld_node)
-    #                     self.logger.debug("value found! : {0}".format(value))
-    #                     self.tiles[tileid].data[str(branch["node"].nodeid)] = value
-    #                     # ontology_properties = self.findOntologyProperties(jsonld_node)
-
-    #                     if len(jsonld) > 1:
-    #                         break
-
-    #             if len(ontology_properties) > 0:
-    #                 for ontology_property in ontology_properties:
-    #                     self.logger.debug("Recursing on %s -> %s" % (ontology_property, jsonld_node["@type"]))
-    #                     self.resolve_node_ids(
-    #                         jsonld_node[ontology_property],
-    #                         ontology_prop=ontology_property,
-    #                         graph=None,
-    #                         parent_node=branch,
-    #                         tileid=tileid,
-    #                         parent_tileid=parent_tileid,
-    #                         resource=resource,
-    #                     )
-    #     return jsonld
 
     def add_node_ids(self, jsonld_graph):
         from random import random
@@ -841,7 +488,7 @@ class JsonLdReader(Reader):
         return tileid
 
     def get_paths(self, graphtree):
-        def graph_to_paths(current_node, path=[], path_list=[], _cache=[]):
+        def graph_to_paths(current_node, path=[], path_list=[]):
             if len(path) == 0:
                 current_path = []
             else:
@@ -854,52 +501,28 @@ class JsonLdReader(Reader):
             else:
                 current_path.append({"label": current_node["node"].ontologyclass, "node": current_node},)
 
-            if len(current_node["children"]) == 0 or current_node["node"].nodeid in _cache:
+            if len(current_node["children"]) == 0:
                 path_list.append(current_path[:])
             else:
-                _cache.append(current_node["node"].nodeid)
                 for node in current_node["children"]:
                     if node["node"].datatype == "resource-instance":
                         for graphid in node["node"].config["graphid"]:
                             node["node"].ontologyclass = self.root_ontologyclass_lookup[graphid]
-                            ret = graph_to_paths(node, current_path, path_list, _cache)
+                            ret = graph_to_paths(node, current_path, path_list)
                     else:
-                        ret = graph_to_paths(node, current_path, path_list, _cache)
+                        ret = graph_to_paths(node, current_path, path_list)
 
             return path_list
 
         return graph_to_paths(graphtree)
 
     def get_jsonld_paths(self, jsonld):
-        def path_to_string(pathlists):
-            ret = []
-            for pathlist in pathlists:
-                pathstr = []
-                for path in pathlist:
-                    pathstr.append(path["label"])
-                ret.append(",".join(pathstr))
-            return ret
-
-        path_list = []
-
-        # import ipdb
-
-        # ipdb.sset_trace()
-
-        def graph_to_paths(jsonld_node, path=[], ontologyclass=None, property_class=None, previous_node=None, depth=0):
-            # print(len(path))
-
-            # if len(path) == 0:
-            #     print(" HERE ------------------------------------------------")
-            #     current_path = []
-            # else:
+        def graph_to_paths(jsonld_node, path=[], ontologyclass=None, property_class=None, previous_node=None, path_list=[]):
             current_path = path[:]
             if ontologyclass is not None:
                 current_path.append({"label": ontologyclass, "_id": previous_node["_id"], "jsonld_node": previous_node},)
             if property_class is not None:
                 current_path.append({"label": property_class},)
-
-            # print(path_to_string([current_path]))
 
             property_classes = self.findOntologyProperties(jsonld_node)
             if "@type" in jsonld_node:
@@ -907,19 +530,11 @@ class JsonLdReader(Reader):
             else:
                 ontologyclass = str(RDFS.Literal)
 
-            # print(len(property_classes))
             if len(property_classes) > 0:
                 for property_class in property_classes:
-                    # print(f"{depth*'-'}{property_class}")
                     if isinstance(jsonld_node[property_class], list):
                         for node in jsonld_node[property_class]:
-                            # print("heres----")
-                            ret = graph_to_paths(node, current_path, ontologyclass, property_class, jsonld_node, depth + 2)
-                        # if isinstance(jsonld_node[property_class], dict):
-                        #     for node in [jsonld_node[property_class]]:
-                        #         ret = graph_to_paths(node, current_path, path_list, _cache)
-                        # if isinstance(jsonld_node[property_class], str):
-                        #     pass
+                            ret = graph_to_paths(node, current_path, ontologyclass, property_class, jsonld_node, path_list)
             else:
                 current_path.append({"label": ontologyclass, "_id": jsonld_node["_id"], "jsonld_node": jsonld_node},)
                 path_list.append(current_path[:])
@@ -927,3 +542,12 @@ class JsonLdReader(Reader):
             return path_list
 
         return graph_to_paths(jsonld)
+
+    def path_to_string(self, pathlists):
+        ret = []
+        for pathlist in pathlists:
+            pathstr = []
+            for path in pathlist:
+                pathstr.append(path["label"].split("/")[-1])
+            ret.append(",".join(pathstr))
+        return ret
