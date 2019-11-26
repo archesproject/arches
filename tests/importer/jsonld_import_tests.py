@@ -667,12 +667,6 @@ class JsonLDImportTests(ArchesTestCase):
 "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by": [
     {
     "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
-    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "le veuve remy"}, 
-    {
-    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
-    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy pour M de montvale"}, 
-    {
-    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
     "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy pour la russie"}, 
     {
     "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
@@ -681,10 +675,7 @@ class JsonLDImportTests(ArchesTestCase):
                     "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
                     "http://www.w3.org/2000/01/rdf-schema#label": "History"
         }, 
-    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy"}, 
-    {
-    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
-    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "Remy p le Duc de Praslin"}], 
+    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy"}], 
 "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy"}
 """
 
@@ -693,7 +684,7 @@ class JsonLDImportTests(ArchesTestCase):
             kwargs={"graphid": "d5456066-107c-11ea-b7e9-acde48001122", "resourceid": "5683f462-107d-11ea-b7e9-acde48001122"},
         )
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
-        print(f"\n\n\nTest b response: {response.content}")
+        print(f"\n\n\nTest c response: {response.content}")
         self.assertTrue(response.status_code == 201)
         js = response.json()
         if type(js) == list:
