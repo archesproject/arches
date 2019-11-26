@@ -215,44 +215,61 @@ class JsonLDImportTests(ArchesTestCase):
 
     def test_2b_complex_multiple(self):
         data = """
-{"@id": "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122", 
-"@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object", 
-"http://www.cidoc-crm.org/cidoc-crm/P101_had_as_general_use": {
+{
+  "@id": "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122", 
+  "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object", 
+  "http://www.cidoc-crm.org/cidoc-crm/P101_had_as_general_use": {
     "@id": "http://localhost:8000/concepts/fb457e76-e018-41e7-9be3-0f986816450a", 
     "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
     "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": {
         "@id": "http://localhost:8000/concepts/dcd28b8a-0840-4a7f-a0d6-0341438552e6", 
         "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
-        "http://www.w3.org/2000/01/rdf-schema#label": "Meta Type B"}, 
-    "http://www.w3.org/2000/01/rdf-schema#label": "Test Type A"}, 
-"http://www.cidoc-crm.org/cidoc-crm/P160_has_temporal_projection": [
-    {"@id": "http://localhost:8000/tile/7e0371da-c62f-46c1-899b-d1e9419a76d5/node/127193ea-fa6d-11e9-b369-3af9d3b32b71", 
-    "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
-    "http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by": "example 2"}, 
-    {"@id": "http://localhost:8000/tile/8cc347a4-265d-4a06-8327-e198e1d1d0c5/node/127193ea-fa6d-11e9-b369-3af9d3b32b71", 
-    "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
-    "http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by": "example", 
-    "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
+        "http://www.w3.org/2000/01/rdf-schema#label": "Meta Type B"
+    }, 
+    "http://www.w3.org/2000/01/rdf-schema#label": "Test Type A"
+  }, 
+  "http://www.cidoc-crm.org/cidoc-crm/P160_has_temporal_projection": [
+    {
+      "@id": "http://localhost:8000/tile/7e0371da-c62f-46c1-899b-d1e9419a76d5/node/127193ea-fa6d-11e9-b369-3af9d3b32b71", 
+      "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
+      "http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by": "example 2"
+    }, 
+    {
+      "@id": "http://localhost:8000/tile/8cc347a4-265d-4a06-8327-e198e1d1d0c5/node/127193ea-fa6d-11e9-b369-3af9d3b32b71", 
+      "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
+      "http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by": "example", 
+      "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
         "@type": "http://www.w3.org/2001/XMLSchema#dateTime", 
-        "@value": "2019-10-28"}}, 
-    {"@id": "http://localhost:8000/tile/6011c512-47e9-46c3-b6f3-034dcc6f2a9d/node/127193ea-fa6d-11e9-b369-3af9d3b32b71", 
-    "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
-    "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
+        "@value": "2019-10-28"
+      }
+    }, 
+    {
+      "@id": "http://localhost:8000/tile/6011c512-47e9-46c3-b6f3-034dcc6f2a9d/node/127193ea-fa6d-11e9-b369-3af9d3b32b71", 
+      "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
+      "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
         "@type": "http://www.w3.org/2001/XMLSchema#dateTime", 
-        "@value": "2019-11-15"}}, 
-    {@id": "http://localhost:8000/tile/7d42af30-4d00-434f-95d4-7a3b3f9bfec8/node/127193ea-fa6d-11e9-b369-3af9d3b32b71", 
-    "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
-    "http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by": "example"}], 
-"http://www.cidoc-crm.org/cidoc-crm/P2_has_type": {
+        "@value": "2019-11-15"
+      }
+    }, 
+    {
+      "@id": "http://localhost:8000/tile/7d42af30-4d00-434f-95d4-7a3b3f9bfec8/node/127193ea-fa6d-11e9-b369-3af9d3b32b71", 
+      "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
+      "http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by": "example"
+    }
+  ], 
+  "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": {
     "@id": "http://localhost:8000/concepts/6bac5802-a6f8-427c-ba5f-d4b30d5b070e", 
     "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
-    "http://www.w3.org/2000/01/rdf-schema#label": "Single Type A"}, 
-"http://www.cidoc-crm.org/cidoc-crm/P3_has_note": ["asdfasdfa", "aasdf"], 
-"http://www.cidoc-crm.org/cidoc-crm/P45_consists_of": {
+    "http://www.w3.org/2000/01/rdf-schema#label": "Single Type A"
+  }, 
+  "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": ["asdfasdfa", "aasdf"], 
+  "http://www.cidoc-crm.org/cidoc-crm/P45_consists_of": {
     "@id": "http://localhost:8000/concepts/36c8d7a3-32e7-49e4-bd4c-2169a06b240a", 
     "@type": "http://www.cidoc-crm.org/cidoc-crm/E57_Material", 
-    "http://www.w3.org/2000/01/rdf-schema#label": "material a"}, 
-"http://www.cidoc-crm.org/cidoc-crm/P57_has_number_of_parts": [2, 1]}        
+    "http://www.w3.org/2000/01/rdf-schema#label": "material a"
+  }, 
+  "http://www.cidoc-crm.org/cidoc-crm/P57_has_number_of_parts": [2, 1]
+}        
 """
 
         url = reverse(
