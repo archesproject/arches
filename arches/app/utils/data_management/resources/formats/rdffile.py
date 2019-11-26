@@ -110,6 +110,8 @@ class RdfWriter(Writer):
             pkg["d_uri"] = dom_dt.get_rdf_uri(domainnode, pkg["domain_tile_data"], "d")
             pkg["r_uri"] = rng_dt.get_rdf_uri(rangenode, pkg["range_tile_data"], "r")
 
+            # FIXME:  Why is this not in datatype.to_rdf()
+
             # Domain node is NOT a literal value in the RDF representation, so will have a type:
             if type(pkg["d_uri"]) == list:
                 for duri in pkg["d_uri"]:
@@ -257,7 +259,7 @@ class JsonLdReader(Reader):
         self.logger.info("Initialized JsonLdReader")
         self.logger.debug("Found {0} Non-unique root classes".format(len(self.non_unique_classes)))
         self.logger.debug("Found {0} Resource Model Root classes".format(len(self.resource_model_root_classes)))
-        self.logger.debug("Resource Model Root classes: {0}".format("\n".join(list(map(str, self.resource_model_root_classes)))))
+        # self.logger.debug("Resource Model Root classes: {0}".format("\n".join(list(map(str, self.resource_model_root_classes)))))
 
     def get_graph_id(self, root_ontologyclass):
         if root_ontologyclass in self.resource_model_root_classes:
@@ -268,17 +270,18 @@ class JsonLdReader(Reader):
             )
         return None
 
-    def get_resource_id(self, strs_to_test):
-        if not isinstance(strs_to_test, list):
-            strs_to_test = [strs_to_test]
-        for str_to_test in strs_to_test:
-            match = re.match(
-                r".*?%sresources/(?P<resourceid>%s)" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), str_to_test
-            )
+    def get_resource_id(self, value):
+        # Allow local URI or urn:uuid:UUID
+        print("In get_resource_id")
+        match = re.match(r".*?%sresources/(?P<resourceid>%s)" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), value)
+        if match:
+            return match.group("resourceid")
+        else:
+            match = re.match(r"urn:uuid:(%s)" % settings.UUID_REGEX, value)
             if match:
-                return match.group("resourceid")
+                return match.groups()[0]
             else:
-                self.logger.debug("Valid resourceid not found within `{0}`".format(str_to_test))
+                self.logger.debug("Valid resourceid not found within `{0}`".format(value))
         return None
 
     def read_resource(self, data, use_ids=False, resourceid=None, graphid=None):

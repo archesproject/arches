@@ -602,3 +602,55 @@ class JsonLDImportTests(ArchesTestCase):
             self.assertTrue(contl[1][note] == "Import Note")
             jsts = contl[0][ts]
         self.assertTrue(jsts[botb]["@value"] == "2018-01-01")
+
+    def test_b_5600_concept_label(self):
+
+        skos = SKOSReader()
+        rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/5600-external-thesaurus.xml")
+        ret = skos.save_concepts_from_skos(rdf)
+
+        skos = SKOSReader()
+        rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/5600-external-collections.xml")
+        ret = skos.save_concepts_from_skos(rdf)
+
+        with open(os.path.join("tests/fixtures/jsonld_base/models/5600-external-label.json"), "rU") as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile["graph"])
+
+        data = """
+            {
+                "@id": "http://localhost:8000/resources/61787e78-0e3f-11ea-b4f1-acde48001122",
+                "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
+                "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by": {
+                    "@id": "http://localhost:8000/tile/f1ebfcc1-eb02-4f47-8ef1-e0a66a0a87cc/node/2ec7c360-0e41-11ea-b4f1-acde48001122",
+                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E42_Identifier",
+                    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "madonna bla bla",
+                    "http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by": {
+                        "@id": "http://localhost:8000/tile/f1ebfcc1-eb02-4f47-8ef1-e0a66a0a87cc/node/4f71d2c2-0e41-11ea-b4f1-acde48001122",
+                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E33_Linguistic_Object",
+                        "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "sale bla bla"
+                    }
+                },
+                "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": {
+                    "@id": "http://vocab.getty.edu/aat/300033898",
+                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
+                    "http://www.w3.org/2000/01/rdf-schema#label": "History"
+                },
+                "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "visual work of madonna bla bla"
+            }     
+        """
+
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "9d2c2ca0-0e3d-11ea-b4f1-acde48001122", "resourceid": "61787e78-0e3f-11ea-b4f1-acde48001122"},
+        )
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
+
+        print(f"\n\n\nTest b response: {response.content}")
+        self.assertTrue(response.status_code == 201)
+        js = response.json()
+        if type(js) == list:
+            js = js[0]
+
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/61787e78-0e3f-11ea-b4f1-acde48001122")
