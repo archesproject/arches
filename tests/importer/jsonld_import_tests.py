@@ -209,7 +209,6 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/12345678-abcd-11e9-9cbb-3af9d3b32b71")
 
-
     def test_2b_complex_multiple(self):
         data = """
 {"@id": "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122", 
@@ -741,5 +740,3 @@ class JsonLDImportTests(ArchesTestCase):
             js = js[0]
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/5683f462-107d-11ea-b7e9-acde48001122")
-
-
