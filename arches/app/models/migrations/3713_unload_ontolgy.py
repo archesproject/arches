@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                                     id='e6e8db47-2ccf-11e6-927e-b8f6b115d7dd',
                                     extensions=','.join(extensions),
                                     verbosity=0)
-        except:
+        except Exception:
             print("Failed to Reload the Ontology")
 
     operations = [
