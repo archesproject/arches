@@ -210,6 +210,9 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/12345678-abcd-11e9-9cbb-3af9d3b32b71")
 
 
+
+
+
     def test_2b_complex_multiple(self):
         data = """
 {"@id": "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122", 
@@ -237,7 +240,7 @@ class JsonLDImportTests(ArchesTestCase):
     "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
         "@type": "http://www.w3.org/2001/XMLSchema#dateTime", 
         "@value": "2019-11-15"}}, 
-    @id": "http://localhost:8000/tile/7d42af30-4d00-434f-95d4-7a3b3f9bfec8/node/127193ea-fa6d-11e9-b369-3af9d3b32b71", 
+    {@id": "http://localhost:8000/tile/7d42af30-4d00-434f-95d4-7a3b3f9bfec8/node/127193ea-fa6d-11e9-b369-3af9d3b32b71", 
     "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
     "http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by": "example"}], 
 "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": {
