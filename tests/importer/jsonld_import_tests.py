@@ -124,8 +124,6 @@ class JsonLDImportTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
-
-
     def setUp(self):
         pass
 
@@ -567,7 +565,6 @@ class JsonLDImportTests(ArchesTestCase):
         js = response.json()
         if type(js) == list:
             js = js[0]
-
 
     def test_8_4564_resinst_models(self):
         # 2019-11-01 - This fails as the model uses Actor, not Group, per #4564
