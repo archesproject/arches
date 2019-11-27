@@ -1563,8 +1563,13 @@ class ResourceInstanceDataType(BaseDataType):
 
             for res_inst in res_insts:
                 rangenode = self.get_rdf_uri(None, res_inst)
-                res_inst_obj = models.ResourceInstance.objects.get(pk=res_inst)
-                r_type = res_inst_obj.graph.node_set.get(istopnode=True).ontologyclass
+                try:
+                    res_inst_obj = models.ResourceInstance.objects.get(pk=res_inst)
+                    r_type = res_inst_obj.graph.node_set.get(istopnode=True).ontologyclass
+                except models.ResourceInstance.DoesNotExist:
+                    # This should never happen excpet if trying to export when the
+                    # referenced resource hasn't been saved to the database yet
+                    r_type = edge.rangenode.ontologyclass
                 _add_resource(edge_info["d_uri"], edge.ontologyproperty, rangenode, r_type)
         return g
 
