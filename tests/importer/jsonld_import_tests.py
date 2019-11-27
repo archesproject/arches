@@ -785,8 +785,6 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122")
 
-
-
     def test_e_same_prop_diff_branch(self):
 
         with open(os.path.join("tests/fixtures/jsonld_base/models/same_prop_diff_branch.json"), "rU") as f:
@@ -826,5 +824,3 @@ class JsonLDImportTests(ArchesTestCase):
 
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/18a17522-10ad-11ea-a9a2-acde48001122")
-
-
