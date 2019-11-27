@@ -1563,9 +1563,9 @@ class ResourceInstanceDataType(BaseDataType):
 
             for res_inst in res_insts:
                 rangenode = self.get_rdf_uri(None, res_inst)
-                # FIXME: should be the class of the Resource Instance, rather than the expected class
-                # from the edge.
-                _add_resource(edge_info["d_uri"], edge.ontologyproperty, rangenode, edge.rangenode.ontologyclass)
+                res_inst_obj = models.ResourceInstance.objects.get(pk=res_inst)
+                r_type = res_inst_obj.graph.node_set.get(istopnode=True).ontologyclass
+                _add_resource(edge_info["d_uri"], edge.ontologyproperty, rangenode, r_type)
         return g
 
     def from_rdf(self, json_ld_node):
