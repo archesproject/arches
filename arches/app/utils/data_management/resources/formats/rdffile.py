@@ -350,7 +350,7 @@ class JsonLdReader(Reader):
                     keys.append(key)
         except:
             pass
-        self.logger.debug("    findOntologyProperties -> {0}".format("\n".join(map(str, keys))))
+        #self.logger.debug("    findOntologyProperties -> {0}".format("\n".join(map(str, keys))))
         return keys
 
     def resolve_jsonld_doc(self, resource):
@@ -361,6 +361,11 @@ class JsonLdReader(Reader):
 
         depth = None  # how deeply nested is the jsonld node in jsonld document
         found_jsonld_paths = []
+
+        def fgp_to_str(fgp):
+            return '/'.join([x['label'][x['label'].rfind('/')+1:] for x in fgp])
+
+
         for jsonld_path in jsonld_paths:
 
             found_graph_paths = []
@@ -373,17 +378,18 @@ class JsonLdReader(Reader):
 
             if len(found_graph_paths) > 1:
                 self.logger.debug(
-                    f"Found more then 1 path in the graph that matche a path in the json ld document. {self.path_to_string(found_graph_paths)} -- Now trying to differentiate paths based on concept nodes."
+                    f"More than one path in graph: {self.path_to_string(found_graph_paths)}\
+                    -- Now trying to differentiate"
                 )
                 graph_paths_to_remove = set()
                 for i, jsonld_node in enumerate(jsonld_path):
                     if i % 2 == 0:
                         # if str(RDFS.label) in jsonld_node["jsonld_node"] and "@value" in jsonld_node["jsonld_node"][str(RDFS.label)][0]:
-                        self.logger.debug(f"Testing for concept: {jsonld_node['jsonld_node']['@id']}")
                         if "@id" in jsonld_node["jsonld_node"] and (
                             jsonld_node["jsonld_node"]["@id"].startswith(settings.PREFERRED_CONCEPT_SCHEME)
                             or jsonld_node["jsonld_node"]["@id"].startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "concepts/")
                         ):
+                            self.logger.debug(f"Testing for concept: {jsonld_node['jsonld_node']['@id']}")
                             for path_id, found_graph_path in enumerate(found_graph_paths):
                                 if (
                                     found_graph_path[i]["node"]["node"].datatype == "concept"
@@ -401,21 +407,35 @@ class JsonLdReader(Reader):
 
                                     if not all_values_found:
                                         graph_paths_to_remove.add(path_id)
+                        elif "@id" in jsonld_node['jsonld_node'] and \
+                            jsonld_node["jsonld_node"]["@id"].startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "resources/") \
+                            and '@id' in self.jsonld_doc and jsonld_node['jsonld_node']['@id'] != self.jsonld_doc['@id']:
+
+                            # This can only be the top node, a resource-instance or resource-instance-list
+                            self.logger.debug(f"Testing for resource-instance: {jsonld_node}")
+                            okay = False
+                            for path_id, found_graph_path in enumerate(found_graph_paths):
+                                # print(f"found_graph_path:\n{found_graph_path}\njsonld_node:\n{jsonld_node}")
+                                if found_graph_path[i]['node']['node'].datatype in ["resource-instance", 'resource-instance-list']:
+                                    self.logger.debug(f"Found res-inst path: {found_graph_path[i]['node']}")
+                                    okay = True
+                                else:
+                                    self.logger.debug(f"Removing path: {fgp_to_str(found_graph_path)}")
+                                    graph_paths_to_remove.add(path_id)
 
                 for i in sorted(graph_paths_to_remove, reverse=True):
                     del found_graph_paths[i]
 
             if len(found_graph_paths) == 0:
                 raise self.DataDoesNotMatchGraphException()
-
-            if len(found_graph_paths) == 1:
+            elif len(found_graph_paths) == 1:
                 # we've found our path in the graph, now we just need to populate the tiles
                 self.logger.debug(
                     f"Found a path in the graph ({self.path_to_string(found_graph_paths)[0]}) that matches a path in the json ld document ({self.path_to_string([jsonld_path])})"
                 )
                 self.assign_tiles(found_graph_paths[0], jsonld_path, resource)
-
-            if len(found_graph_paths) > 1:
+            elif len(found_graph_paths) > 1:
+                self.logger.debug(f"Found matches: {[self.path_to_string(x) for x in found_graph_paths]}")
                 raise self.AmbiguousGraphException()
 
         # print(JSONSerializer().serialize(self.tiles))
