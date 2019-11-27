@@ -412,15 +412,13 @@ class JsonLdReader(Reader):
                             and "@id" in self.jsonld_doc
                             and jsonld_node["jsonld_node"]["@id"] != self.jsonld_doc["@id"]
                         ):
-
                             # This can only be the top node, a resource-instance or resource-instance-list
-                            self.logger.debug(f"Testing for resource-instance: {jsonld_node}")
-                            okay = False
+                            # self.logger.debug(f"Testing for resource-instance: {jsonld_node}")
                             for path_id, found_graph_path in enumerate(found_graph_paths):
                                 # print(f"found_graph_path:\n{found_graph_path}\njsonld_node:\n{jsonld_node}")
                                 if found_graph_path[i]["node"]["node"].datatype in ["resource-instance", "resource-instance-list"]:
                                     self.logger.debug(f"Found res-inst path: {found_graph_path[i]['node']}")
-                                    okay = True
+                                    pass
                                 else:
                                     self.logger.debug(f"Removing path: {fgp_to_str(found_graph_path)}")
                                     graph_paths_to_remove.add(path_id)
