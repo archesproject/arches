@@ -763,3 +763,25 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/5683f462-107d-11ea-b7e9-acde48001122")
 
 
+    def test_d_string_to_path_2(self):
+        data = """
+{
+  "@id": "http://localhost:8000/resources/10000000-109b-11ea-957a-acde48001122", 
+  "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object", 
+  "http://www.cidoc-crm.org/cidoc-crm/P57_has_number_of_parts": [2, 1]
+}        
+"""
+
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71", "resourceid": "10000000-109b-11ea-957a-acde48001122"},
+        )
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        self.assertEqual(response.status_code, 201)
+        js = response.json()
+        if type(js) == list:
+            js = js[0]
+
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122")
+
