@@ -2805,8 +2805,9 @@ div.dropdown-menu.open {
   }
 
 .ep-edits-header {
-    border: none;
-    display: table-row;
+    display: inline-flex;
+    width: 100%;
+    justify-content: space-between;
     height: 50px;
 }
 
