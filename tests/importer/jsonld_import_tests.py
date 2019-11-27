@@ -829,7 +829,6 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122")
 
-
     def test_e_path_with_array_resinst(self):
         # 2019-11-27 - Passing with extra @id checks in rdffile
 
@@ -848,7 +847,6 @@ class JsonLDImportTests(ArchesTestCase):
 }
 """
 
-
         url = reverse(
             "resources_graphid",
             kwargs={"graphid": "9f716aa2-bf96-11e9-bd39-0242ac160002", "resourceid": "8e870000-114e-11ea-8de7-acde48001122"},
@@ -861,4 +859,3 @@ class JsonLDImportTests(ArchesTestCase):
 
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/8e870000-114e-11ea-8de7-acde48001122")
-

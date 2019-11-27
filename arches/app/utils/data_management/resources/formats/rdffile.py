@@ -350,7 +350,7 @@ class JsonLdReader(Reader):
                     keys.append(key)
         except:
             pass
-        #self.logger.debug("    findOntologyProperties -> {0}".format("\n".join(map(str, keys))))
+        # self.logger.debug("    findOntologyProperties -> {0}".format("\n".join(map(str, keys))))
         return keys
 
     def resolve_jsonld_doc(self, resource):
@@ -363,8 +363,7 @@ class JsonLdReader(Reader):
         found_jsonld_paths = []
 
         def fgp_to_str(fgp):
-            return '/'.join([x['label'][x['label'].rfind('/')+1:] for x in fgp])
-
+            return "/".join([x["label"][x["label"].rfind("/") + 1 :] for x in fgp])
 
         for jsonld_path in jsonld_paths:
 
@@ -407,16 +406,19 @@ class JsonLdReader(Reader):
 
                                     if not all_values_found:
                                         graph_paths_to_remove.add(path_id)
-                        elif "@id" in jsonld_node['jsonld_node'] and \
-                            jsonld_node["jsonld_node"]["@id"].startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "resources/") \
-                            and '@id' in self.jsonld_doc and jsonld_node['jsonld_node']['@id'] != self.jsonld_doc['@id']:
+                        elif (
+                            "@id" in jsonld_node["jsonld_node"]
+                            and jsonld_node["jsonld_node"]["@id"].startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "resources/")
+                            and "@id" in self.jsonld_doc
+                            and jsonld_node["jsonld_node"]["@id"] != self.jsonld_doc["@id"]
+                        ):
 
                             # This can only be the top node, a resource-instance or resource-instance-list
                             self.logger.debug(f"Testing for resource-instance: {jsonld_node}")
                             okay = False
                             for path_id, found_graph_path in enumerate(found_graph_paths):
                                 # print(f"found_graph_path:\n{found_graph_path}\njsonld_node:\n{jsonld_node}")
-                                if found_graph_path[i]['node']['node'].datatype in ["resource-instance", 'resource-instance-list']:
+                                if found_graph_path[i]["node"]["node"].datatype in ["resource-instance", "resource-instance-list"]:
                                     self.logger.debug(f"Found res-inst path: {found_graph_path[i]['node']}")
                                     okay = True
                                 else:
