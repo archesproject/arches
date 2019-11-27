@@ -14,26 +14,17 @@ function($, ko, arches) {
             this.precision = ko.observable(6);
             this.result = ko.observable();
 
-            this.getSearchParamsFromUrl = function(){
-                var urlparams = new window.URLSearchParams(window.location.search);
-                var res = {};
-                urlparams.forEach(function(v, k){
-                    res[k] = v;
-                });
-                return (res);
-            };
-
             this.url = ko.computed(function() {
                 var url = arches.urls.export_results;
-                var urlparams = self.getSearchParamsFromUrl();
-                var query = self.query();
+                var urlparams = ko.unwrap(self.query);
                 urlparams.format = self.format();
                 urlparams.precision = self.precision();
-                return url + '?' + $.param(urlparams);
+                url = url + '?' + $.param(urlparams);
+                return url;
             });
 
             this.getExportData = function(){
-                var payload = this.getSearchParamsFromUrl();
+                var payload = ko.unwrap(this.query);
                 payload.format = this.format();
                 payload.precision = this.precision();
                 payload.total = this.total();
