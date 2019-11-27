@@ -110,6 +110,11 @@ class RdfWriter(Writer):
             pkg["d_uri"] = dom_dt.get_rdf_uri(domainnode, pkg["domain_tile_data"], "d")
             pkg["r_uri"] = rng_dt.get_rdf_uri(rangenode, pkg["range_tile_data"], "r")
 
+            # Concept on a node that is not required, but not present
+            # Nothing to do here
+            if pkg["r_uri"] is None and pkg["range_tile_data"] is None:
+                return
+
             # FIXME:  Why is this not in datatype.to_rdf()
 
             # Domain node is NOT a literal value in the RDF representation, so will have a type:
@@ -373,7 +378,12 @@ class JsonLdReader(Reader):
                 graph_paths_to_remove = set()
                 for i, jsonld_node in enumerate(jsonld_path):
                     if i % 2 == 0:
-                        if str(RDFS.label) in jsonld_node["jsonld_node"] and "@value" in jsonld_node["jsonld_node"][str(RDFS.label)][0]:
+                        # if str(RDFS.label) in jsonld_node["jsonld_node"] and "@value" in jsonld_node["jsonld_node"][str(RDFS.label)][0]:
+                        self.logger.debug(f"Testing for concept: {jsonld_node['jsonld_node']['@id']}")
+                        if "@id" in jsonld_node["jsonld_node"] and (
+                            jsonld_node["jsonld_node"]["@id"].startswith(settings.PREFERRED_CONCEPT_SCHEME)
+                            or jsonld_node["jsonld_node"]["@id"].startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "concepts/")
+                        ):
                             for path_id, found_graph_path in enumerate(found_graph_paths):
                                 if (
                                     found_graph_path[i]["node"]["node"].datatype == "concept"
