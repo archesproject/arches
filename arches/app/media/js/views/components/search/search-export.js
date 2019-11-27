@@ -19,6 +19,7 @@ function($, ko, arches) {
                 var urlparams = ko.unwrap(self.query);
                 urlparams.format = self.format();
                 urlparams.precision = self.precision();
+                urlparams.total = self.total();
                 url = url + '?' + $.param(urlparams);
                 return url;
             });
