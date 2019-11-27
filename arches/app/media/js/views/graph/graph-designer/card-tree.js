@@ -132,6 +132,7 @@ define([
                 return true;
             },
             loading: loading,
+            showIds: ko.observable(false),
             cachedFlatTree: cachedFlatTree,
             widgetLookup: createLookup(data.widgets, 'widgetid'),
             cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
@@ -142,6 +143,9 @@ define([
             graph: params.graph,
             graphModel: params.graphModel,
             appliedFunctions: params.appliedFunctions(),
+            toggleIds: function() {
+                self.showIds(!self.showIds());
+            },
             expandAll: function() {
                 toggleAll(true);
             },
@@ -179,6 +183,9 @@ define([
             },
             updateNode: function(parents, node) {
                 var updatedCards = [];
+                if (_.contains(_.keys(self.nodeLookup), node.nodeid) === false) {
+                    self.nodeLookup[node.nodeid] = node;
+                }
                 _.each(ko.unwrap(parents), function(parent) {
                     if (parent.nodegroupid === node.nodegroup_id) {
                         var attributes = parent.model.attributes;
@@ -342,17 +349,20 @@ define([
             isFuncNode: function() {
                 var appFuncs = null, appFuncDesc = false, appFuncName = false, nodegroupId = null;
                 if(params.card && this.appliedFunctions()) {
+                    // console.log(ko.unwrap(params));
                     appFuncs = this.appliedFunctions();
                     nodegroupId = params.card.nodegroup_id;
                     for(var i = 0; i < appFuncs.length; i++) {
-                        if(appFuncs[i]['config']['description']['nodegroup_id']) {
-                            appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
-                        }
-                        if(appFuncs[i]['config']['name']['nodegroup_id']) {
-                            appFuncName = appFuncs[i]['config']['name']['nodegroup_id'];
-                        }
-                        if(nodegroupId === appFuncDesc || nodegroupId === appFuncName) {
-                            return true;
+                        if(appFuncs[i]['function_id'] == "60000000-0000-0000-0000-000000000001") {
+                            if(appFuncs[i]['config']['description']['nodegroup_id']) {
+                                appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
+                            }
+                            if(appFuncs[i]['config']['name']['nodegroup_id']) {
+                                appFuncName = appFuncs[i]['config']['name']['nodegroup_id'];
+                            }
+                            if(nodegroupId === appFuncDesc || nodegroupId === appFuncName) {
+                                return true;
+                            }
                         }
                     }
                 }

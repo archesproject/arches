@@ -6,24 +6,24 @@ from arches.app.models.tile import Tile
 import json
 
 details = {
-    'name': 'Sample Function',
-    'type': 'node',
-    'description': 'Just a sample demonstrating node group selection',
-    'defaultconfig': {"selected_nodegroup":""},
-    'classname': 'SampleFunction',
-    'component': 'views/components/functions/sample-function'
+    "name": "Sample Function",
+    "type": "node",
+    "description": "Just a sample demonstrating node group selection",
+    "defaultconfig": {"selected_nodegroup": ""},
+    "classname": "SampleFunction",
+    "component": "views/components/functions/sample-function",
 }
 
-class SampleFunction(BaseFunction):
 
+class SampleFunction(BaseFunction):
     def save(self):
-        print 'calling save'
+        print("calling save")
 
     def on_import(self):
-        print 'calling on import'
+        print("calling on import")
 
     def get(self):
-        print 'calling get'
+        print("calling get")
 
     def delete(self):
-        print 'calling delete'
+        print("calling delete")

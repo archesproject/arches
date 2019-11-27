@@ -23,34 +23,28 @@
         <!-- /ko -->
     </a>
     <ul class="jstree-children" aria-expanded="true">
-        <!-- ko foreach: {data: groupedCards, as: 'card'} -->
-        <div data-bind="sortable: {
-            data: card.tiles,
-            options: {
-                start: self.startDrag
-            },
-            beforeMove: self.beforeMove,
-            afterMove: card.reorderTiles
-        }">
-            <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}, event: {'dragstart': function () { console.log('dragging...') }}">
+        <!-- ko foreach: {data: sortedWidgetIds, as: 'widgetid'} -->
+        <!-- ko let: $parent.getDataForDisplay(widgetid) --> 
+        <!-- the let statement above returns an object of the form {widget: null, tile: null: tileData: null, card: null} -->
+            <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.cards.length > 0 && expanded), 'jstree-closed' : (card.cards.length > 0 && !expanded()), 'jstree-leaf': card.cards.length === 0}">
                 <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
-                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { $parent.selectGroupCard()}, css:{'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight()}">
-                    <i class="fa fa-file" role="presentation" data-bind="css:{'has-provisional-edits': doesChildHaveProvisionalEdits() || $data.hasprovisionaledits()}"></i>
+                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { $parent.selectGroupCard()}, css:{'jstree-clicked': card.selected, 'child-selected': card.selected(), 'filtered-leaf': card.highlight()}">
+                    <i class="fa fa-file" role="presentation" data-bind="css:{'has-provisional-edits': tile.hasprovisionaledits()}"></i>
                     <strong style="margin-right: 10px;">
                         {% block editor_tree_node_content %}
                         <!-- ko if: card.widgets().length > 0 && card.widgets()[0].visible -->
                         <span data-bind="text: card.widgets()[0].label || card.model.name"></span>:
                         <div style="display: inline;" data-bind="component: {
-                            name: self.form.widgetLookup[card.widgets()[0].widget_id()].name,
+                            name: self.form.widgetLookup[widget.widget_id()].name,
                             params: {
-                                tile: $data,
-                                node: self.form.nodeLookup[card.widgets()[0].node_id()],
-                                config: self.form.widgetLookup[card.widgets()[0].widget_id()].config,
-                                label: self.form.widgetLookup[card.widgets()[0].widget_id()].label,
-                                value: $data.data[card.widgets()[0].node_id()],
+                                tile: tile,
+                                node: self.form.nodeLookup[widget.node_id()],
+                                config: widget.config,
+                                label: widget.label(),
+                                value: tile.data[widget.node_id()],
                                 type: 'resource-editor',
                                 state: 'display_value',
-                                disabled: !card.isWritable && !self.preview
+                                disabled: !self.card.isWritable && !self.preview
                             }
                         }"></div>
                         <!-- /ko -->
@@ -60,9 +54,9 @@
                         {% endblock editor_tree_node_content %}
                     </strong>
                 </a>
-                <!-- ko if: cards.length > 0 -->
+                <!-- ko if: card.cards.length > 0 -->
                 <ul class="jstree-children" aria-expanded="true" data-bind="foreach: {
-                        data: cards,
+                        data: card.cards,
                         as: 'card'
                     }">
                     <!-- ko component: {
@@ -79,7 +73,7 @@
                 </ul>
                 <!-- /ko -->
             </li>
-        </div>
+        <!-- /ko -->
         <!-- /ko -->
     </ul>
 </li>
@@ -93,15 +87,16 @@
         <i class="fa fa-file-o" role="presentation"></i>
         <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
     </a>
+
     <!-- ko if: card.cards().length > 0 || card.widgets().length > 0 -->
-<!-- ko foreach: {data: groupedCards, as: 'card'} -->
-    <ul class="jstree-children card-designer-tree" aria-expanded="true">
-        <div data-bind="sortable: {
-                data: card.widgets,
-                as: 'widget',
+    <ul data-bind="sortable: {
+                data: sortedWidgetIds,
+                as: 'widgetId',
                 beforeMove: self.beforeMove,
-                afterMove: function() { card.model.save() }
-            }">
+                afterMove: self.afterMove
+            }" class="jstree-children card-designer-tree" aria-expanded="true">
+        <div>
+            <!-- ko let: {widget:$parent.widgetLookup[widgetId]} -->
             <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
                     'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0
                 }">
@@ -113,10 +108,10 @@
                     </strong>
                 </a>
             </li>
+            <!-- /ko -->
         </div>
        
     </ul>
-<!-- /ko -->
     <!-- /ko -->
 </li>
 {% endblock designer_tree %}
@@ -127,7 +122,7 @@
 
     <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
     <div class="edit-message-container">
-        <span>{% trans 'Currently showing edits by' %}</span>
+        <span>{% trans 'Showing edits by' %}</span>
         <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
         <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
         <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">{% trans 'Return to approved edits' %}</a>
@@ -188,10 +183,10 @@
             {% endblock form_header %}
             <!-- ko if: card.widgets().length > 0 -->
             {% block form_widgets %}
-            <div data-bind="foreach: {data: groupedCards, as: 'card'}">
+            <div data-bind="foreach: {data: sortedWidgetIds, as: 'widgetid'}">
                 <form class="widgets" style="margin-bottom: 20px;">
                     <div data-bind="foreach: {
-                            data:card.widgets, as: 'widget'
+                            data:$parent.widgetLookup[widgetid], as: 'widget'
                         }">
                         <div data-bind='component: {
                             name: self.form.widgetLookup[widget.widget_id()].name,
@@ -310,37 +305,34 @@
     <!-- ko if: showHeaderLine--><hr class="rp-tile-separator"><!-- /ko -->
     <div class="rp-card-section" data-bind="css: card.model.cssclass, visible: card.fullyProvisional() !== 'fullyprovisional'">
             <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
-            <!-- ko if: card.tiles().length > 0 -->
+            <!-- ko if: hasTiles -->
             <i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': reportExpanded(), 'fa-angle-right': !reportExpanded()}, click: function () { reportExpanded(!reportExpanded()) }"></i>
             <!-- ko if: reportExpanded() -->
-            <!-- ko foreach: { data: groupedCards, as: 'card' } -->
-            <!-- ko foreach: { data: self.preview ? [card.newTile] : card.tiles, as: 'tile' } -->
+            <!-- ko foreach: { data: sortedWidgetIds, as: 'widgetid' } -->
+            <!-- ko let: $parent.getDataForDisplay(widgetid) --> 
+            <!-- the let statement above returns an object of the form {widget: null, tile: null: tileData: null, card: null} -->
                 <div class="rp-card-section" data-bind="css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}">
-                    <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
+
                     {% block report_widgets %}
-                    <!-- ko if: card.model.get('widgets')().length > 0 -->
                         <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
                             <!-- ko if: ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false -->
                             <div class="report-card-provisional-flag">{% trans 'These data are provisional and pending review' %}</div>
                             <!-- /ko-->
                             <dl class="dl-horizontal" data-bind="css: {'provisional': ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false}">
-                                <!-- ko foreach: { data: card.model.get('widgets'), as: 'widget' } -->
-                                    <!-- ko if: widget.visible -->
-                                    <!-- ko component: {
-                                        name: widget.widgetLookup[widget.get("widget_id")()].name,
-                                        params: {
-                                            config: configJSON,
-                                            label: widget.get("label")(),
-                                            node: widget.node,
-                                            value: tile.data[widget.node.nodeid],
-                                            state: "report"
-                                        }
-                                    } --><!-- /ko -->
-                                    <!-- /ko -->
+                                <!-- ko if: widget.visible -->
+                                <!-- ko component: {
+                                    name: widget.widgetLookup[widget.get("widget_id")()].name,
+                                    params: {
+                                        config: widget.configJSON,
+                                        label: widget.get("label")(),
+                                        node: widget.node,
+                                        value: tile.data[widget.node.nodeid],
+                                        state: "report"
+                                    }
+                                } --><!-- /ko -->
                                 <!-- /ko -->
                             </dl>
                         </div>
-                    <!-- /ko -->
                     {% endblock report_widgets %}
 
                     {% block report_cards %}
@@ -365,7 +357,7 @@
             <!-- /ko -->
             <!-- /ko -->
 
-        <!-- ko if: card.tiles().length === 0 && !self.preview -->
+        <!-- ko if: !hasTiles && !self.preview -->
         <div class="row rp-report-tile rp-no-data">
             <!-- ko ifnot: card.model.get('cardid') -->
             {% trans "Sorry, you don't have access to this information" %}

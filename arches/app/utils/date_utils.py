@@ -3,11 +3,27 @@ import datetime
 import dateutil
 from dateutil.relativedelta import relativedelta
 from edtf import parse_edtf, text_to_edtf
-from edtf.parser.parser_classes import Date, DateAndTime, Interval, Unspecified, \
-    UncertainOrApproximate, Level1Interval, LongYear, Season, \
-    PartialUncertainOrApproximate, PartialUnspecified, OneOfASet, \
-    MultipleDates, Level2Interval, ExponentialYear, \
-    PRECISION_YEAR, PRECISION_MONTH, PRECISION_DAY, EARLIEST, LATEST
+from edtf.parser.parser_classes import (
+    Date,
+    DateAndTime,
+    Interval,
+    Unspecified,
+    UncertainOrApproximate,
+    Level1Interval,
+    LongYear,
+    Season,
+    PartialUncertainOrApproximate,
+    PartialUnspecified,
+    OneOfASet,
+    MultipleDates,
+    Level2Interval,
+    ExponentialYear,
+    PRECISION_YEAR,
+    PRECISION_MONTH,
+    PRECISION_DAY,
+    EARLIEST,
+    LATEST,
+)
 
 
 class SortableDateRange(object):
@@ -17,16 +33,25 @@ class SortableDateRange(object):
         self.lower_fuzzy = None
         self.upper_fuzzy = None
 
+
 class ExtendedDateFormat(SortableDateRange):
-    def __init__(self, date=None, fuzzy_year_padding=1, fuzzy_month_padding=1, fuzzy_day_padding=1,
-        fuzzy_season_padding=12, multiplier_if_uncertain=1, multiplier_if_approximate=1, multiplier_if_both=1):
+    def __init__(
+        self,
+        date=None,
+        fuzzy_year_padding=1,
+        fuzzy_month_padding=1,
+        fuzzy_day_padding=1,
+        fuzzy_season_padding=12,
+        multiplier_if_uncertain=1,
+        multiplier_if_approximate=1,
+        multiplier_if_both=1,
+    ):
         super(ExtendedDateFormat, self).__init__()
         self.orig_date = None
         self.edtf = None
         self.result_set = None
         self.sortable_date = None
         self.error = None
-
         self.fuzzy_year_padding = int(fuzzy_year_padding)
         self.fuzzy_month_padding = int(fuzzy_month_padding)
         self.fuzzy_day_padding = int(fuzzy_day_padding)
@@ -38,7 +63,7 @@ class ExtendedDateFormat(SortableDateRange):
 
         try:
             self.parse(date)
-        except:
+        except Exception as e:
             try:
                 self.parse(text_to_edtf(self.orig_date))
             except Exception as err:
@@ -46,7 +71,7 @@ class ExtendedDateFormat(SortableDateRange):
                 raise err
 
     def parse(self, date=None):
-        if date == None:
+        if date is None:
             return None
 
         self.edtf = None
@@ -62,12 +87,11 @@ class ExtendedDateFormat(SortableDateRange):
             else:
                 date = str(int(date)).zfill(5)
             if len(str(abs(int(date)))) > 4 and int(date) != 0:
-                date = 'y' + date
-        except:
+                date = "y" + date
+        except Exception:
             pass
 
         self.edtf = parse_edtf(date)
-
         result = self.handle_object(self.edtf)
         if isinstance(result, list):
             self.result_set = result
@@ -90,8 +114,8 @@ class ExtendedDateFormat(SortableDateRange):
             year = int(year) * 10000
             month = str(month).zfill(2)
             day = str(day).zfill(2)
-            #return int("%s%s%s" % (self.year,month,day))
-            return year + int("%s%s" % (month,day))
+            # return int("%s%s%s" % (self.year,month,day))
+            return year + int("%s%s" % (month, day))
         except:
             return None
 
@@ -101,32 +125,22 @@ class ExtendedDateFormat(SortableDateRange):
 
         """
 
-        # print type(object)
-        # print object
-        if (isinstance(object, Date) or
-            isinstance(object, Season) or
-            isinstance(object, Unspecified)):
-            if (isinstance(object, PartialUncertainOrApproximate)):
+        if isinstance(object, Date) or isinstance(object, Season) or isinstance(object, Unspecified):
+            if isinstance(object, PartialUncertainOrApproximate):
                 fuzzy_padding = self.get_fuzzy_padding(object)
             return self.handle_date(object, fuzzy_padding)
-        elif (isinstance(object, UncertainOrApproximate)):
+        elif isinstance(object, UncertainOrApproximate):
             return self.handle_object(object.date, self.get_fuzzy_padding(object))
-        elif (isinstance(object, DateAndTime) or
-              isinstance(object, PartialUnspecified)):
+        elif isinstance(object, DateAndTime) or isinstance(object, PartialUnspecified):
             return self.handle_object(object.date)
-        elif (isinstance(object, Interval) or
-              isinstance(object, Level1Interval) or
-              isinstance(object, Level2Interval)):
+        elif isinstance(object, Interval) or isinstance(object, Level1Interval) or isinstance(object, Level2Interval):
             return self.handle_interval(object)
-        elif (isinstance(object, LongYear) or
-              isinstance(object, ExponentialYear)):
+        elif isinstance(object, LongYear) or isinstance(object, ExponentialYear):
             return self.handle_yearonly(object)
-        elif (isinstance(object, OneOfASet) or
-              isinstance(object, MultipleDates)):
+        elif isinstance(object, OneOfASet) or isinstance(object, MultipleDates):
             return self.handle_set(object)
-        elif (isinstance(object, basestring) or
-              object is None):
-            if object == 'open':
+        elif isinstance(object, str) or object is None:
+            if object == "open":
                 return SortableDateRange()
             else:
                 dr = SortableDateRange()
@@ -165,7 +179,7 @@ class ExtendedDateFormat(SortableDateRange):
             day = upper_fuzzy.day
 
             # we need to recaculate the day under special circumstances
-            if date.day == None and not self.is_season(date) and (date.precision == PRECISION_YEAR or date.precision == PRECISION_MONTH):
+            if date.day is None and not self.is_season(date) and (date.precision == PRECISION_YEAR or date.precision == PRECISION_MONTH):
                 day = self.calculate_upper_day(fuzzy_year, upper_fuzzy.month)
             if date.day >= 29 and upper_fuzzy.month == 2:
                 day = self.calculate_upper_day(fuzzy_year, upper_fuzzy.month)
@@ -185,7 +199,7 @@ class ExtendedDateFormat(SortableDateRange):
         return day
 
     def is_season(self, date):
-        return hasattr(date, 'season') and date.season != None
+        return hasattr(date, "season") and date.season is not None
 
     def handle_set(self, l):
         """Called to handle a list of dates"""
@@ -213,10 +227,10 @@ class ExtendedDateFormat(SortableDateRange):
         try:
             # support for edtf.ExponentialYear
             num_length = len(str(object._precise_year()))
-            sig_digits = str(object._precise_year())[0:int(object.precision)]
+            sig_digits = str(object._precise_year())[0 : int(object.precision)]
             padding = num_length - int(object.precision)
-            dr.lower = dr.lower_fuzzy = self.to_sortable_date(year=(sig_digits + ('0' * padding)))
-            dr.upper = dr.upper_fuzzy = self.to_sortable_date(year=(sig_digits + ('9' * padding)), month=12, day=31)
+            dr.lower = dr.lower_fuzzy = self.to_sortable_date(year=(sig_digits + ("0" * padding)))
+            dr.upper = dr.upper_fuzzy = self.to_sortable_date(year=(sig_digits + ("9" * padding)), month=12, day=31)
         except:
             # support for edtf.LongYear
             dr.lower = dr.lower_fuzzy = self.to_sortable_date(year=object._precise_year())
@@ -240,7 +254,7 @@ class ExtendedDateFormat(SortableDateRange):
                 result = multiplier * padding_day_precision
             elif object.date.precision == PRECISION_MONTH:
                 result = multiplier * padding_month_precision
-            elif object.date.precision ==PRECISION_YEAR:
+            elif object.date.precision == PRECISION_YEAR:
                 result = multiplier * padding_year_precision
             return result
 
@@ -281,6 +295,7 @@ class ExtendedDateFormat(SortableDateRange):
             return result
 
         return None
+
 
 class UnhandledEDTFException(Exception):
     pass

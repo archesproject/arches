@@ -25,13 +25,10 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 options.name = 'Search Results';
                 BaseFilter.prototype.initialize.call(this, options);
 
-                this.total = ko.observable();
                 this.results = ko.observableArray();
                 this.showRelationships = ko.observable();
-                this.mouseoverInstanceId = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
                 this.selectedResourceId = ko.observable(null);
-                this.userIsReviewer = ko.observable(false);
 
                 this.showRelationships.subscribe(function(res) {
                     this.selectedResourceId(res.resourceinstanceid);
@@ -77,10 +74,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 var data = $('div[name="search-result-data"]').data();
 
                 if (!!this.searchResults.results){
-                    this.total(this.searchResults.results.hits.total);
                     this.results.removeAll();
                     this.selectedResourceId(null);
-                    this.userIsReviewer(this.searchResults.reviewer);
                     this.searchResults.results.hits.hits.forEach(function(result){
                         var graphdata = _.find(viewdata.graphs, function(graphdata){
                             return result._source.graph_id === graphdata.graphid;
@@ -89,15 +84,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                         if (result._source.points.length > 0) {
                             point = result._source.points[0].point;
                         }
-                        var mapData = result._source.geometries.reduce(function(fc1, fc2) {
-                            fc1.geom.features = fc1.geom.features.concat(fc2.geom.features);
-                            return fc1;
-                        }, {
-                            "geom": {
-                                "type": "FeatureCollection",
-                                "features": []
-                            }
-                        });
                         this.results.push({
                             displayname: result._source.displayname,
                             resourceinstanceid: result._source.resourceinstanceid,
@@ -117,7 +103,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                                 if (self.selectedTab() !== 'map-filter') {
                                     self.selectedTab('map-filter');
                                 }
-                                self.mapLinkData(mapData.geom);
+                                self.mapLinkData({'properties':result._source});
                             },
                             selected: ko.computed(function() {
                                 return result._source.resourceinstanceid === ko.unwrap(self.selectedResourceId);

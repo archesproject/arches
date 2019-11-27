@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 from django.views.generic import View
 from django.utils.decorators import method_decorator
@@ -23,9 +23,10 @@ from arches.app.utils.index_database import index_resources_by_type
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
-@method_decorator(group_required('Graph Editor'), name='dispatch')
+
+@method_decorator(group_required("Graph Editor"), name="dispatch")
 class ReIndexResources(View):
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
-        index_resources_by_type(data['graphids'], clear_index=False, batch_size=4000)
+        index_resources_by_type(data["graphids"], clear_index=False, batch_size=4000)
         return JSONResponse(data)

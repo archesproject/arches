@@ -60,6 +60,7 @@ define([
         this.query = ko.observable(getQueryObject());
         this.mouseoverInstanceId = ko.observable();
         this.mapLinkData = ko.observable(null);
+        this.userIsReviewer = ko.observable(false);
         this.searchResults = {'timestamp': ko.observable()};
         this.selectPopup = function(componentname) {
             if(this.selectedPopup() !== '' && componentname === this.selectedPopup()) {
@@ -91,8 +92,9 @@ define([
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
             this.viewModel.sharedStateObject = new CommonSearchViewModel();
+            this.viewModel.total = ko.observable();
             _.extend(this, this.viewModel.sharedStateObject);
-
+            this.viewModel.sharedStateObject.total = this.viewModel.total;
             this.queryString = ko.computed(function() {
                 return JSON.stringify(this.query());
             }, this);
@@ -102,7 +104,7 @@ define([
             }, this);
 
             BaseManagerView.prototype.initialize.call(this, options);
-            
+
             this.doQuery();
         },
 
@@ -120,12 +122,19 @@ define([
                 data: queryString,
                 context: this,
                 success: function(response) {
+                    _.each(this.viewModel.sharedStateObject.searchResults, function(value, key, results) {
+                        if (key !== 'timestamp') {
+                            delete this.viewModel.sharedStateObject.searchResults[key];
+                        }
+                    }, this);
                     _.each(response, function(value, key, response) {
                         if (key !== 'timestamp') {
                             this.viewModel.sharedStateObject.searchResults[key] = value;
                         }
                     }, this);
                     this.viewModel.sharedStateObject.searchResults.timestamp(response.timestamp);
+                    this.viewModel.sharedStateObject.userIsReviewer(response.reviewer);
+                    this.viewModel.total(response.total_results);
                     this.viewModel.alert(false);
                 },
                 error: function(response, status, error) {

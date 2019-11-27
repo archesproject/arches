@@ -14,32 +14,33 @@ details = {
     "componentpath": "views/components/search/map-filter",
     "componentname": "map-filter",
     "sortorder": "0",
-    "enabled": True
+    "enabled": True,
 }
 
 
 class MapFilter(BaseSearchFilter):
-
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         search_query = Bool()
-        querysting_params = self.request.GET.get(details['componentname'], '')
+        querysting_params = self.request.GET.get(details["componentname"], "")
         spatial_filter = JSONDeserializer().deserialize(querysting_params)
-        if 'features' in spatial_filter:
-            if len(spatial_filter['features']) > 0:
-                feature_geom = spatial_filter['features'][0]['geometry']
+        if "features" in spatial_filter:
+            if len(spatial_filter["features"]) > 0:
+                feature_geom = spatial_filter["features"][0]["geometry"]
                 feature_properties = {}
-                if 'properties' in spatial_filter['features'][0]:
-                    feature_properties = spatial_filter['features'][0]['properties']
-                buffer = {'width': 0, 'unit': 'ft'}
-                if 'buffer' in feature_properties:
-                    buffer = feature_properties['buffer']
-                search_buffer = _buffer(feature_geom, buffer['width'], buffer['unit'])
-                feature_geom = JSONDeserializer().deserialize(search_buffer.json)
-                geoshape = GeoShape(field='geometries.geom.features.geometry', type=feature_geom['type'], coordinates=feature_geom['coordinates'])
+                if "properties" in spatial_filter["features"][0]:
+                    feature_properties = spatial_filter["features"][0]["properties"]
+                buffer = {"width": 0, "unit": "ft"}
+                if "buffer" in feature_properties:
+                    buffer = feature_properties["buffer"]
+                search_buffer = _buffer(feature_geom, buffer["width"], buffer["unit"])
+                feature_geom = JSONDeserializer().deserialize(search_buffer.geojson)
+                geoshape = GeoShape(
+                    field="geometries.geom.features.geometry", type=feature_geom["type"], coordinates=feature_geom["coordinates"]
+                )
 
                 invert_spatial_search = False
-                if 'inverted' in feature_properties:
-                    invert_spatial_search = feature_properties['inverted']
+                if "inverted" in feature_properties:
+                    invert_spatial_search = feature_properties["inverted"]
 
                 spatial_query = Bool()
                 if invert_spatial_search is True:
@@ -48,24 +49,24 @@ class MapFilter(BaseSearchFilter):
                     spatial_query.filter(geoshape)
 
                 # get the nodegroup_ids that the user has permission to search
-                spatial_query.filter(Terms(field='geometries.nodegroup_id', terms=permitted_nodegroups))
+                spatial_query.filter(Terms(field="geometries.nodegroup_id", terms=permitted_nodegroups))
 
                 if include_provisional is False:
-                    spatial_query.filter(Terms(field='geometries.provisional', terms=['false']))
+                    spatial_query.filter(Terms(field="geometries.provisional", terms=["false"]))
 
-                elif include_provisional == 'only provisional':
-                    spatial_query.filter(Terms(field='geometries.provisional', terms=['true']))
+                elif include_provisional == "only provisional":
+                    spatial_query.filter(Terms(field="geometries.provisional", terms=["true"]))
 
-                search_query.filter(Nested(path='geometries', query=spatial_query))
+                search_query.filter(Nested(path="geometries", query=spatial_query))
 
-        search_results_object['query'].add_query(search_query)
+        search_results_object["query"].add_query(search_query)
 
-        if details['componentname'] not in search_results_object:
-            search_results_object[details['componentname']] = {}
-        search_results_object[details['componentname']]['search_buffer'] = search_buffer.geojson
+        if details["componentname"] not in search_results_object:
+            search_results_object[details["componentname"]] = {}
+        search_results_object[details["componentname"]]["search_buffer"] = feature_geom
 
 
-def _buffer(geojson, width=0, unit='ft'):
+def _buffer(geojson, width=0, unit="ft"):
     geojson = JSONSerializer().serialize(geojson)
     geom = GEOSGeometry(geojson, srid=4326)
 
@@ -75,8 +76,8 @@ def _buffer(geojson, width=0, unit='ft'):
         width = 0
 
     if width > 0:
-        if unit == 'ft':
-            width = width/3.28084
+        if unit == "ft":
+            width = width / 3.28084
 
         geom.transform(settings.ANALYSIS_COORDINATE_SYSTEM_SRID)
         geom = geom.buffer(width)

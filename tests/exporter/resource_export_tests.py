@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,11 +14,11 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import os
 import json
-import unicodecsv
+import csv
 from io import BytesIO
 from tests import test_settings
 from operator import itemgetter
@@ -32,48 +32,44 @@ from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 
 
+# these tests can be run from the command line via
+# python manage.py test tests/exporter/resource_export_tests.py --settings="tests.test_settings"
+
+
 class BusinessDataExportTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
-        pass
+        cls.loadOntology()
 
     def setUp(self):
         skos = SKOSReader()
-        rdf = skos.read_file('tests/fixtures/data/concept_label_test_scheme.xml')
+        rdf = skos.read_file("tests/fixtures/data/concept_label_test_scheme.xml")
         ret = skos.save_concepts_from_skos(rdf)
 
         skos = SKOSReader()
-        rdf = skos.read_file('tests/fixtures/data/concept_label_test_collection.xml')
+        rdf = skos.read_file("tests/fixtures/data/concept_label_test_collection.xml")
         ret = skos.save_concepts_from_skos(rdf)
 
-        with open(os.path.join('tests/fixtures/resource_graphs/resource_export_test.json'), 'rU') as f:
+        with open(os.path.join("tests/fixtures/resource_graphs/resource_export_test.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile['graph'])
+        ResourceGraphImporter(archesfile["graph"])
 
     @classmethod
     def tearDownClass(cls):
         pass
 
     def test_csv_export(self):
-        BusinessDataImporter('tests/fixtures/data/csv/resource_export_test.csv').import_business_data()
+        BusinessDataImporter("tests/fixtures/data/csv/resource_export_test.csv").import_business_data()
 
-        export = BusinessDataExporter('csv',
-                                      configs='tests/fixtures/data/csv/resource_export_test.mapping',
-                                      single_file=True).export()
-        csv_export = filter(lambda export: 'csv' in export['name'],
-                            export)[0]['outputfile'].getvalue().split('\r')
-        csv_output = list(unicodecsv.DictReader(BytesIO(export[0]['outputfile'].getvalue()), encoding='utf-8-sig'))[0]
+        export = BusinessDataExporter("csv", configs="tests/fixtures/data/csv/resource_export_test.mapping", single_file=True).export()
 
-        csvinputfile = 'tests/fixtures/data/csv/resource_export_test.csv'
-        csv_input = list(unicodecsv.DictReader(open(csvinputfile, 'rU'),
-                         encoding='utf-8-sig',
-                         restkey='ADDITIONAL',
-                         restval='MISSING'))[0]
+        csv_output = list(csv.DictReader(export[0]["outputfile"].getvalue().split("\r\n")))[0]
+        csvinputfile = "tests/fixtures/data/csv/resource_export_test.csv"
+        csv_input = list(csv.DictReader(open(csvinputfile, "rU", encoding="utf-8"), restkey="ADDITIONAL", restval="MISSING"))[0]
 
-        self.assertDictEqual(csv_input, csv_output)
+        self.assertDictEqual(dict(csv_input), dict(csv_output))
 
     def test_json_export(self):
-
         def deep_sort(obj):
             """
             Recursively sort list or dict nested lists. Taken from
@@ -89,20 +85,19 @@ class BusinessDataExportTests(ArchesTestCase):
                 new_list = []
                 for val in obj:
                     new_list.append(deep_sort(val))
-                _sorted = sorted(new_list)
+                _sorted = new_list
 
             else:
                 _sorted = obj
 
             return _sorted
 
-        BusinessDataImporter(
-            'tests/fixtures/data/json/resource_export_business_data_truth.json').import_business_data()
+        BusinessDataImporter("tests/fixtures/data/json/resource_export_business_data_truth.json").import_business_data()
 
-        export = BusinessDataExporter('json').export('ab74af76-fa0e-11e6-9e3e-026d961c88e6')
-        json_export = deep_sort(json.loads(export[0]['outputfile'].getvalue()))
+        export = BusinessDataExporter("json").export("ab74af76-fa0e-11e6-9e3e-026d961c88e6")
 
-        json_truth = deep_sort(json.loads(
-            open('tests/fixtures/data/json/resource_export_business_data_truth.json').read()))
+        json_export = deep_sort(json.loads(export[0]["outputfile"].getvalue()))
+
+        json_truth = deep_sort(json.load(open("tests/fixtures/data/json/resource_export_business_data_truth.json")))
 
         self.assertDictEqual(json_export, json_truth)

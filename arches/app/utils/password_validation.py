@@ -9,18 +9,16 @@ class MinLengthValidator(MinimumLengthValidator):
         super(MinLengthValidator, self).__init__(min_length)
 
     def get_help_text(self):
-        return _(
-            "Be longer than {0} characters".format(self.min_length)
-        )
+        return _("Be longer than {0} characters".format(self.min_length))
+
 
 class NumericPasswordValidator(NumericPasswordValidator):
     def __init__(self):
         super(NumericPasswordValidator, self).__init__()
 
     def get_help_text(self):
-        return _(
-            "Have at least 1 letter"
-        )
+        return _("Have at least 1 letter")
+
 
 class SpecialCharacterValidator:
     """
@@ -29,7 +27,7 @@ class SpecialCharacterValidator:
 
     """
 
-    def __init__(self, special_characters=('!','@','#')):
+    def __init__(self, special_characters=("!", "@", "#")):
         self.special_characters = special_characters
 
     def validate(self, password, user=None):
@@ -37,14 +35,12 @@ class SpecialCharacterValidator:
         if len(res) == 0:
             raise ValidationError(
                 _("Your password must contain at least one special character"),
-                code='missing special characters',
-                params={'special_characters': self.special_characters},
+                code="missing special characters",
+                params={"special_characters": self.special_characters},
             )
 
     def get_help_text(self):
-        return _(
-            "Have at least 1 special character"
-        )
+        return _("Have at least 1 special character")
 
 
 class HasNumericCharacterValidator:
@@ -54,17 +50,14 @@ class HasNumericCharacterValidator:
     """
 
     def validate(self, password, user=None):
-        res = filter(lambda x: x.isdigit() == True, password)
+        res = [x for x in password if x.isdigit() == True]
         if len(res) == 0:
             raise ValidationError(
-                _("Your password must contain at least one number"),
-                code='missing number',
+                _("Your password must contain at least one number"), code="missing number",
             )
 
     def get_help_text(self):
-        return _(
-            "Have at least 1 number"
-        )
+        return _("Have at least 1 number")
 
 
 class HasUpperAndLowerCaseValidator:
@@ -75,14 +68,11 @@ class HasUpperAndLowerCaseValidator:
     """
 
     def validate(self, password, user=None):
-        res = filter(lambda x: x.isupper() == True, password)
+        res = [x for x in password if x.isupper() == True]
         if len(res) == 0 or len(res) == len(password):
             raise ValidationError(
-                _("Your password must contain both upper and lower case letters"),
-                code='case error',
+                _("Your password must contain both upper and lower case letters"), code="case error",
             )
 
     def get_help_text(self):
-        return _(
-            "Have least 1 upper and lower case character"
-        )
+        return _("Have least 1 upper and lower case character")

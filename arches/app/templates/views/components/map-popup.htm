@@ -12,19 +12,23 @@
 <div class="hover-feature-title-bar">
     {% block title %}
     <div class="hover-feature-title">
+        <!-- Add nav to support accessing content for multiple features with overlapping geometry -->
+        <span class="hover-feature-nav-left disabled"><i class="fa fa-angle-left"></i></span>
         <span class="" data-bind="text: displayname"></span>
+        <span class="hover-feature-nav-right disabled"><i class="fa fa-angle-right"></i></span>
     </div>
     {% endblock title %}
 </div>
 <div class="hover-feature-body">
     {% block body %}
-    <div class="hover-feature-metadata">
-        {% trans "Resource ID:" %}
-        <span data-bind="text: resourceinstanceid"></span>
-    </div>
+    <div class="hover-feature" data-bind="html: map_popup"></div>
     <div class="hover-feature-metadata">
         {% trans "Resource Model:" %}
         <span data-bind="text: graph_name"></span>
+    </div>
+    <div class="hover-feature-metadata">
+        {% trans "ID:" %}
+        <span data-bind="text: resourceinstanceid"></span>
     </div>
     {% endblock body %}
 </div>

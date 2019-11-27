@@ -3,13 +3,18 @@
 }
 
 div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
-    margin-right: 40px;
+    margin-right: 10px;
+    margin-top: 5px;
 }
 
 .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
     padding: 0px 0px 0px;
     z-index: 100;
     margin-top: 20px;
+}
+
+#intro-cons {
+    margin-top: -165px;
 }
 
 .disco-caption {
@@ -23,29 +28,38 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
 
 }
 
-.disco-caption h2 {
+.disco-caption h2 a {
     color: #CAFF00;
+    font-size: 24px;
     font-weight: 500;
     display: inline-flex;
-    margin-bottom: 22px;
+    margin-bottom: 12px;
+}
+
+.disco-caption h2 a:hover {
+    color: #5CE900;
 }
 
 .disco-caption p {
     color: white;
-    font-weight: 500;
-    font-size: 18px;
+    font-weight: 400;
+    font-size: 17px;
     display: inline-flex;
     white-space: normal;
     word-wrap: break-word;
     margin-bottom: 22px;
+    margin-top: -15px;
 }
 
 .disco-caption a {
-    color: #03B7D7;
-    font-weight: 550;
+    color: #25476A;
+    font-weight: 500;
     font-size: 20px;
     display: inline-flex;
-    text-shadow: 0 1px white;
+}
+
+.disco-caption a:hover {
+    color: #041B33;
 }
 
 .splash-nav {
@@ -74,11 +88,11 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
 }
 
 ul.splash-list > li > a:focus, ul.splash-list > li > a:hover {
-    background-color: rgba(0, 0, 0, 0.274);
+    background-color: rgba(0, 0, 0, 0.174);
 }
 
 ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
-    background-color: rgba(0, 0, 0, 0.274);
+    background-color: rgba(0, 0, 0, 0.174);
 }
 
 .navbar-brand-disco {
@@ -92,13 +106,15 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .navbar-brand-disco span {
     font-size: 16px;
     display: block;
-    font-family: "Open Sans",Arial,sans-serif;
+    /*font-family: "Open Sans",Arial,sans-serif;*/
 }
 
 .navbar-brand-disco h2 {
     margin-bottom: 8px;
-    font-size: 42px;
-    color: #594b4b;
+    margin-top: 0px;
+    margin-left: -12px;
+    font-size: 28px;
+    color: #25476A;
     display: inline-block;
 }
 
@@ -106,23 +122,26 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     padding: 12px 24px 20px 24px;
 }
 
-.navbar-brand-disco-icon {
-    background-color: rgba(0, 0, 0, 0); 
-    width: 80px; 
-    height: 80px; 
-    border-radius: 100%;
+.navbar-brand-disco-icon-container {
+    height: 60px; 
+    width: 60px; 
+    border-radius: 50%; 
+    border: 1px solid #ff0000; 
+    background: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.cons-splash-nav 
-
-.splash-nav #auth-link:focus, .splash-nav #auth-link:hover {
-    background-color: transparent;
+.navbar-brand-disco-icon {
+    height: 30px; 
+    width: 30px; 
+    text-align: center; 
+    margin-top: -5px
 }
 
-.cons-splash-nav #auth-link:focus, .cons-splash-nav #auth-link:hover {
+
+.splash-nav #auth-link:focus, .splash-nav #auth-link:hover {
     background-color: transparent;
 }
 
@@ -143,10 +162,23 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .cons-splash-nav ul > li > a {
     text-transform: none;
-    font-size: 20px;
-    font-weight: 750;
-    font-family: "Open Sans",Arial,sans-serif;
+    font-size: 19px;
+    font-weight: 300;
     color: #493b3c;
+    margin-right: 5px;
+}
+
+.cons-splash-nav ul > li > .application-login {
+    color: #fff;
+    background: #25476A;
+    border: 1px solid #041B33;
+    padding: 15px 30px;
+    height: 50px;
+}
+
+.cons-splash-nav ul > li > .application-login:hover {
+    color: #fff;
+    background: #416284;
 }
 
 .splash-nav .auth-welcome {
@@ -165,6 +197,102 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+}
+
+.image-gradient {
+    position: absolute; 
+    top: 60%; 
+    width: 100%; 
+    height: 40%; 
+    background-image: linear-gradient(transparent, rgba(0,0,0,.45));
+}
+
+.image-attribution {
+    position: absolute; 
+    top: 94%; 
+    right: 15px; 
+    color: #bbb; 
+    padding: 10px; 
+    background: rgba(0,0,0,.5);
+}
+
+.app-info-block {
+    min-height: 700px;
+    padding: 70px 100px;
+    background: #fff;
+    border-top: 1px solid #ddd;
+}
+
+.app-info-block:nth-child(even) {
+    background: #f8f8f8;
+}
+
+.app-info-block h2 {
+    font-size: 32px;
+    font-weight: 300;
+    color: #25476A;
+}
+
+.app-footer {
+    background: #0F2E4F;
+    color: #fff;
+}
+
+.app-footer-content-container {
+    display: flex;
+    flex-direction: row;
+    min-height: 500px
+}
+
+.app-footer-branding {
+    width: 33%;
+    max-width: 600px;
+    min-width: 300px;
+    padding: 40px 80px;
+}
+
+.app-footer-info {
+    width: 66%;
+    padding: 40px;
+}
+
+.app-footer-heading {
+    font-size: 23px;
+    font-weight: 200;
+    color: #dcdcdc;
+    margin-top: 27px;
+}
+
+.app-footer-image {
+    height: 50px;
+    margin-top: 20px;
+}
+
+.organization-address {
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.5;
+    margin-top: 20px;
+}
+
+.copyright-container {
+    height: 80px;
+    background: #041B33;
+    color: #fff;
+    padding: 30px 80px;
+}
+
+.app-footer-links {
+    font-size: 15px;
+    color: ; #041B33;
+}
+
+.link-spacing {
+    margin-right: 20px;
+}
+
+.app-footer-arches-link {
+    float: right;
 }
 
 @media (min-width: 768px) {

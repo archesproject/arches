@@ -151,8 +151,8 @@
                                 </div>
                                 <!--/ko-->
                                 <!-- ko foreach: geometryTypes -->
-                                <a class="" href="#" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, attr: {'class': self.geometryTypeDetails[$data.id].class, 'title': self.geometryTypeDetails[$data.id].title}, css: {'active': self.geometryTypeDetails[$data.id].active}">
-                                        <span class="sr-only" data-bind="text: self.geometryTypeDetails[$data.id].title"></span>
+                                <a class="" href="#" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[ko.unwrap($data.id)].name)}, attr: {'class': self.geometryTypeDetails[ko.unwrap($data.id)].class, 'title': self.geometryTypeDetails[ko.unwrap($data.id)].title}, css: {'active': self.geometryTypeDetails[ko.unwrap($data.id)].active}">
+                                        <span class="sr-only" data-bind="text: self.geometryTypeDetails[ko.unwrap($data.id)].title"></span>
                                 </a>
                                 <!-- /ko -->
 

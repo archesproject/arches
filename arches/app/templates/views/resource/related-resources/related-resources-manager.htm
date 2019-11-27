@@ -1,3 +1,4 @@
+{% load staticfiles %}
 {% load i18n %}
 {% load template_tags %}
 <div id="related-resources-drag-panel" style="height: calc(100vh - 102px);" class="search-container related-resources-container">
@@ -48,7 +49,7 @@
         <!-- Resource Node Search/Listing -->
         <div class="related-resources-nodes form-list">
 
-            <div data-bind="with: fdgNodeListView">
+            <div class="header" data-bind="with: fdgNodeListView">
 
                 <div class="layer-list search">
 
@@ -340,7 +341,7 @@
 
             <!-- Image -->
             <div class="img-lg img-circle rr-splash-img-container">
-                <img class="rr-splash-img" src="../media/img/Workflow.png" alt="Resource Editor">
+                <img class="rr-splash-img" src="{% static "/img/Workflow.png" %}" alt="Resource Editor">
             </div>
 
             <!-- Splash Title -->
@@ -361,19 +362,19 @@
         <!--/ko-->
 
         <!--ko if: resourceEditorContext === undefined && !currentResource() -->
-        <div id="rr-splash" class="rr-splash" style="margin: 0px 274px 0px 0px;">
+        <div id="rr-splash" class="rr-splash" style="margin: 0px 310px 0px 40px;">
             <!-- Image -->
             <div class="img-lg img-circle rr-splash-img-container">
-                <img class="rr-splash-img" src="../media/img/Workflow.png" alt="Saved Search">
+                <img class="rr-splash-img" src="{% static "/img/Workflow.png" %}" alt="Saved Search">
             </div>
 
             <!-- Splash Title -->
             <div class="rr-splash-title">{% trans "Related Resources" %}</div>
 
             <!-- Splash Instructions -->
-            <div class="rr-splash-description">{% trans "Here we explain how to create a related resource." %}</div>
-            <div class="rr-splash-description">{% trans "Other text here describing related resources" %}</div>
-            <div class="rr-splash-description">{% trans "Blah Blah" %}</div>
+            <div class="rr-splash-description">{% trans 'Arches keeps track of how resources are related. Click the "related resources" link' %}</div>
+            <div class="rr-splash-description">{% trans 'on a search result from the list on the left' %}</div>
+            <div class="rr-splash-description">{% trans "to see its relatives displayed in an interactive graph" %}</div>
         </div>
         <!--/ko-->
     </div>

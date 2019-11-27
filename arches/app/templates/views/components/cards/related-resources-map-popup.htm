@@ -1,0 +1,14 @@
+{% extends "views/components/map-popup.htm" %}
+{% load i18n %}
+
+{% block footer %}
+<!-- ko foreach: {data: mapCard.widgets, as: 'widget'} -->
+<a href="javascript:void(0)" data-bind="if: $parent.mapCard.isSelectable($parent.feature), click: function() {
+    $parent.mapCard.relateResource($parent, widget);
+}">
+    <i class="ion-ios-refresh-empty"></i>
+    <span data-bind="text: 'Relate ' + widget.label()"></span>
+</a>
+<!-- /ko -->
+{{ block.super }}
+{% endblock footer %}

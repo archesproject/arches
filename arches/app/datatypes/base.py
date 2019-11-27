@@ -1,14 +1,13 @@
-import json
-from django.core.urlresolvers import reverse
+import json, urllib
+from django.urls import reverse
 from arches.app.models import models
 
 
 class BaseDataType(object):
-
     def __init__(self, model=None):
         self.datatype_model = model
 
-    def validate(self, value, row_number=None, source=None):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
         return []
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -47,30 +46,11 @@ class BaseDataType(object):
         """
         return None
 
-    def get_layer_config(self, node=None):
-        """
-        Gets the layer config to generate a map layer (use if spatial)
-        """
-        return None
-
     def process_mobile_data(self, tile, node, db, couch_doc, node_value):
         """
         Transforms data from a mobile device to an Arches friendly format
         """
         return None
-
-    def should_cache(self, node=None):
-        """
-        Tells the system if the tileserver should cache for a given node
-        """
-        return False
-
-    def should_manage_cache(self, node=None):
-        """
-        Tells the system if the tileserver should clear cache on edits for a
-        given node
-        """
-        return False
 
     def get_map_layer(self, node=None):
         """
@@ -84,7 +64,7 @@ class BaseDataType(object):
         """
         Converts '' values to null when saving a tile.
         """
-        if tile.data[nodeid] == '':
+        if tile.data[nodeid] == "":
             tile.data[nodeid] = None
 
     def get_map_source(self, node=None, preview=False):
@@ -93,13 +73,10 @@ class BaseDataType(object):
         should be a dictionary including (as in map_sources table):
         name, source (json)
         """
-        tileserver_url = reverse('tileserver')
+        tileserver_url = urllib.parse.unquote(reverse("mvt", args=(node.nodeid, "{z}", "{x}", "{y}")))
         if node is None:
             return None
-        source_config = {
-            "type": "vector",
-            "tiles": ["%s/%s/{z}/{x}/{y}.pbf" % (tileserver_url, node.nodeid)]
-        }
+        source_config = {"type": "vector", "tiles": [tileserver_url]}
         count = None
         if preview == True:
             count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
@@ -111,140 +88,65 @@ class BaseDataType(object):
                         "features": [
                             {
                                 "type": "Feature",
-                                "properties": {
-                                    "total": 1
-                                },
-                                "geometry": {
-                                    "type": "Point",
-                                    "coordinates": [
-                                        -122.4810791015625,
-                                        37.93553306183642
-                                    ]
-                                }
+                                "properties": {"total": 1},
+                                "geometry": {"type": "Point", "coordinates": [-122.4810791015625, 37.93553306183642]},
                             },
                             {
                                 "type": "Feature",
-                                "properties": {
-                                    "total": 100
-                                },
-                                "geometry": {
-                                    "type": "Point",
-                                    "coordinates": [
-                                        -58.30078125,
-                                        -18.075412438417395
-                                    ]
-                                }
+                                "properties": {"total": 100},
+                                "geometry": {"type": "Point", "coordinates": [-58.30078125, -18.075412438417395]},
                             },
                             {
                                 "type": "Feature",
-                                "properties": {
-                                    "total": 1
-                                },
+                                "properties": {"total": 1},
                                 "geometry": {
                                     "type": "LineString",
                                     "coordinates": [
-                                        [
-                                            -179.82421875,
-                                            44.213709909702054
-                                        ],
-                                        [
-                                            -154.16015625,
-                                            32.69486597787505
-                                        ],
-                                        [
-                                            -171.5625,
-                                            18.812717856407776
-                                        ],
-                                        [
-                                            -145.72265625,
-                                            2.986927393334876
-                                        ],
-                                        [
-                                            -158.37890625,
-                                            -30.145127183376115
-                                        ]
-                                    ]
-                                }
+                                        [-179.82421875, 44.213709909702054],
+                                        [-154.16015625, 32.69486597787505],
+                                        [-171.5625, 18.812717856407776],
+                                        [-145.72265625, 2.986927393334876],
+                                        [-158.37890625, -30.145127183376115],
+                                    ],
+                                },
                             },
                             {
                                 "type": "Feature",
-                                "properties": {
-                                    "total": 1
-                                },
+                                "properties": {"total": 1},
                                 "geometry": {
                                     "type": "Polygon",
                                     "coordinates": [
                                         [
-                                            [
-                                                -50.9765625,
-                                                22.59372606392931
-                                            ],
-                                            [
-                                                -23.37890625,
-                                                22.59372606392931
-                                            ],
-                                            [
-                                                -23.37890625,
-                                                42.94033923363181
-                                            ],
-                                            [
-                                                -50.9765625,
-                                                42.94033923363181
-                                            ],
-                                            [
-                                                -50.9765625,
-                                                22.59372606392931
-                                            ]
+                                            [-50.9765625, 22.59372606392931],
+                                            [-23.37890625, 22.59372606392931],
+                                            [-23.37890625, 42.94033923363181],
+                                            [-50.9765625, 42.94033923363181],
+                                            [-50.9765625, 22.59372606392931],
                                         ]
-                                    ]
-                                }
+                                    ],
+                                },
                             },
                             {
                                 "type": "Feature",
-                                "properties": {
-                                    "total": 1
-                                },
+                                "properties": {"total": 1},
                                 "geometry": {
                                     "type": "Polygon",
                                     "coordinates": [
                                         [
-                                            [
-                                                -27.59765625,
-                                                -14.434680215297268
-                                            ],
-                                            [
-                                                -24.43359375,
-                                                -32.10118973232094
-                                            ],
-                                            [
-                                                0.87890625,
-                                                -31.653381399663985
-                                            ],
-                                            [
-                                                2.28515625,
-                                                -12.554563528593656
-                                            ],
-                                            [
-                                                -14.23828125,
-                                                -0.3515602939922709
-                                            ],
-                                            [
-                                                -27.59765625,
-                                                -14.434680215297268
-                                            ]
+                                            [-27.59765625, -14.434680215297268],
+                                            [-24.43359375, -32.10118973232094],
+                                            [0.87890625, -31.653381399663985],
+                                            [2.28515625, -12.554563528593656],
+                                            [-14.23828125, -0.3515602939922709],
+                                            [-27.59765625, -14.434680215297268],
                                         ]
-                                    ]
-                                }
-                            }
-                        ]
-                    }
+                                    ],
+                                },
+                            },
+                        ],
+                    },
                 }
-        return {
-            "nodeid": node.nodeid,
-            "name": "resources-%s" % node.nodeid,
-            "source": json.dumps(source_config),
-            "count": count
-        }
+        return {"nodeid": node.nodeid, "name": "resources-%s" % node.nodeid, "source": json.dumps(source_config), "count": count}
 
     def get_pref_label(self, nodevalue):
         """
@@ -253,18 +155,24 @@ class BaseDataType(object):
         return None
 
     def get_tile_data(self, tile):
-        if tile.data is not None and len(tile.data.keys()) > 0:
-            return tile.data
-        elif tile.provisionaledits is not None and len(tile.provisionaledits.keys()) == 1:
-            userid = tile.provisionaledits.keys()[0]
-            return tile.provisionaledits[userid]['value']
+        try:
+            data = tile.data
+            provisionaledits = tile.provisionaledits
+        except:
+            data = tile["data"]
+            provisionaledits = tile["provisionaledits"]
+        if data is not None and len(list(data.keys())) > 0:
+            return data
+        elif provisionaledits is not None and len(list(provisionaledits.keys())) == 1:
+            userid = list(provisionaledits.keys())[0]
+            return provisionaledits[userid]["value"]
 
     def get_display_value(self, tile, node):
         """
         Returns a list of concept values for a given node
         """
         data = self.get_tile_data(tile)
-        return unicode(data[str(node.nodeid)])
+        return str(data[str(node.nodeid)])
 
     def get_search_terms(self, nodevalue, nodeid=None):
         """
@@ -311,19 +219,19 @@ class BaseDataType(object):
 
         g = Graph()
 
-        g.add((edge_info['r_uri'], RDF.type, URIRef(edge.rangenode.ontologyclass)))
+        g.add((edge_info["r_uri"], RDF.type, URIRef(edge.rangenode.ontologyclass)))
 
-        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), edge_info['r_uri']))
-        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+        g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), edge_info["r_uri"]))
+        g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
 
-        if edge_info['domain_tile_data'] is not None:
-            g.add((edge_info['d_uri'], RDF.value, Literal(JSONSerializer().serialize(edge_info['domain_tile_data']))))
+        if edge_info["domain_tile_data"] is not None:
+            g.add((edge_info["d_uri"], RDF.value, Literal(JSONSerializer().serialize(edge_info["domain_tile_data"]))))
 
-        if edge_info['range_tile_data'] is not None:
-            g.add((edge_info['r_uri'], RDF.value, Literal(JSONSerializer().serialize(edge_info['range_tile_data']))))
+        if edge_info["range_tile_data"] is not None:
+            g.add((edge_info["r_uri"], RDF.value, Literal(JSONSerializer().serialize(edge_info["range_tile_data"]))))
 
         return g
 
     def from_rdf(self, json_ld_node):
-        print json_ld_node
+        print(json_ld_node)
         raise NotImplementedError

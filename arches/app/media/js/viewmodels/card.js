@@ -38,6 +38,13 @@ define([
         return childSelected;
     };
 
+    var isDirty = function(){
+        if(self.tile) {
+            return true;
+        }
+        return false;
+    };
+
     var doesChildHaveProvisionalEdits = function(parent) {
         var hasEdits = false;
         var childrenKey = 'tileid' in parent ? 'cards': 'tiles';
@@ -317,7 +324,7 @@ define([
                 });
             },
             getNewTile: function() {
-                return new TileViewModel({
+                if (!this.newTile) this.newTile = new TileViewModel({
                     tile: {
                         tileid: '',
                         resourceinstance_id: ko.unwrap(params.resourceId),
@@ -343,22 +350,25 @@ define([
                     loading: loading,
                     cardwidgets: params.cardwidgets,
                 });
+                return this.newTile;
             },
             isFuncNode: function() {
                 var appFuncDesc = false, appFuncName = false, nodegroupId = null;
                 if(params.appliedFunctions && params.card) {
                     for(var i=0; i < self.appliedFunctions.length; i++) {
-                        if(self.appliedFunctions[i]['config']['description']['nodegroup_id']) {
-                            appFuncDesc = self.appliedFunctions[i]['config']['description']['nodegroup_id'];
-                        }
-                        if(self.appliedFunctions[i]['config']['name']['nodegroup_id']) {
-                            appFuncName = self.appliedFunctions[i]['config']['name']['nodegroup_id'];
-                        }
-                        nodegroupId = params.card.nodegroup_id;
-                        if(nodegroupId === appFuncDesc) {
-                            return "(This card data will define the resource description.)";
-                        } else if(nodegroupId === appFuncName) {
-                            return "(This card data will define the resource name.)";
+                        if(self.appliedFunctions[i]['function_id'] == "60000000-0000-0000-0000-000000000001") {
+                            if(self.appliedFunctions[i]['config']['description']['nodegroup_id']) {
+                                appFuncDesc = self.appliedFunctions[i]['config']['description']['nodegroup_id'];
+                            }
+                            if(self.appliedFunctions[i]['config']['name']['nodegroup_id']) {
+                                appFuncName = self.appliedFunctions[i]['config']['name']['nodegroup_id'];
+                            }
+                            nodegroupId = params.card.nodegroup_id;
+                            if(nodegroupId === appFuncDesc) {
+                                return "(This card data will define the resource description.)";
+                            } else if(nodegroupId === appFuncName) {
+                                return "(This card data will define the resource name.)";
+                            }
                         }
                     }
                 }
@@ -385,6 +395,13 @@ define([
                 item.parent.expanded(true);
                 expandParents(item.parent);
             }
+        };
+
+       this.isDirty = function(){
+            if(self.newTile) {
+                if(self.newTile.dirty()) { return true; }
+            }
+            return false;
         };
 
         this.selectChildCards = function(value) {

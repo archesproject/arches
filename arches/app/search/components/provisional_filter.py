@@ -11,12 +11,11 @@ details = {
     "componentpath": "views/components/search/provisional-filter",
     "componentname": "provisional-filter",
     "sortorder": "0",
-    "enabled": True
+    "enabled": True,
 }
 
 
 class ProvisionalFilter(BaseSearchFilter):
-
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         search_query = Bool()
 
@@ -24,10 +23,10 @@ class ProvisionalFilter(BaseSearchFilter):
             provisional_resource_filter = Bool()
 
             if include_provisional is False:
-                provisional_resource_filter.filter(Terms(field='provisional_resource', terms=['false', 'partial']))
+                provisional_resource_filter.filter(Terms(field="provisional_resource", terms=["false", "partial"]))
 
-            elif include_provisional == 'only provisional':
-                provisional_resource_filter.filter(Terms(field='provisional_resource', terms=['true', 'partial']))
+            elif include_provisional == "only provisional":
+                provisional_resource_filter.filter(Terms(field="provisional_resource", terms=["true", "partial"]))
 
             search_query.must(provisional_resource_filter)
-            search_results_object['query'].add_query(search_query)
+            search_results_object["query"].add_query(search_query)

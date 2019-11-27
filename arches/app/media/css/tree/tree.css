@@ -210,6 +210,12 @@ a.filtered > span:hover {
     border-width: 2px;
 }
 
+.jstree-default .unsaved-edit {
+    background: #ffdb70;
+    color: #fff;
+    border-width: 2px;
+}
+
 .jstree-default .child-selected.filtered {
     background: #3acaa1;
     color: #fff;

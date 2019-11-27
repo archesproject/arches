@@ -6,11 +6,11 @@ require([
     'models/graph',
     'views/graph/graph-page-view',
     'views/list',
-    'viewmodels/alert',
+    'viewmodels/alert-json',
     'graph-cards-data',
     'arches',
     'bindings/dragDrop'
-], function($, _, ko, koMapping, GraphModel, PageView, ListView, AlertViewModel, data, arches) {
+], function($, _, ko, koMapping, GraphModel, PageView, ListView, JsonErrorAlertViewModel, data, arches) {
 
     /**
     * a PageView representing the graph cards page
@@ -36,23 +36,23 @@ require([
     var findCard = function(branch, nodegroupid){
         return _.find(branch.cards, function(card){
             return card.nodegroup_id === nodegroupid;
-        })
+        });
     };
     data.branches.forEach(function(branch){
         branch.nodegroups.forEach(function(nodegroup){
             if (!(nodegroup.parentnodegroup_id)){
-                branch.card = findCard(branch, nodegroup.nodegroupid);;
+                branch.card = findCard(branch, nodegroup.nodegroupid);
                 viewModel.availableGraphs.push(branch);
             }
-        })
+        });
     });
 
     viewModel.cardList = new ListView({
         items: viewModel.availableGraphs
     });
 
-    var alertFailure = function () {
-        pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
+    var alertFailure = function(responseJSON) {
+        pageView.viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', responseJSON));
     };
 
     viewModel.addCard = function(data){
@@ -65,12 +65,12 @@ require([
             var success = (status === 'success');
             this.loading(false);
             if (!success) alertFailure();
-        }, this)
+        }, this);
     };
 
-    viewModel.deleteCard = function (card) {
+    viewModel.deleteCard = function(card) {
         if (card.is_editable === true) {
-            var self = this
+            var self = this;
             var node = _.find(this.graphModel.get('nodes')(), function(node) {
                 return node.nodeid === card.nodegroup_id;
             });
@@ -85,7 +85,7 @@ require([
         }
     };
 
-    viewModel.openCard = function (cardId) {
+    viewModel.openCard = function(cardId) {
         pageView.viewModel.navigate(arches.urls.card + cardId);
     };
 
@@ -95,12 +95,12 @@ require([
         }
     });
 
-    viewModel.graphCardOptions = ko.computed(function () {
+    viewModel.graphCardOptions = ko.computed(function() {
         var options = [{
             name: null,
             graphId: null,
             disabled: true
-        }]
+        }];
         return options.concat(viewModel.graphModel.graphCards());
     });
 

@@ -14,13 +14,20 @@ define([
         this.disable = params.disable || function() {
             return false;
         };
+        this.graphids = params.node ? ko.unwrap(params.node.config.graphid) : [params.graphid];
+        this.graphids = this.graphids || [];
+        this.graphNames = {};
+        this.graphids.forEach(function(graphid){
+            self.graphNames[graphid] = arches.resources.find(function(resource){
+                return resource.graphid === graphid;
+            });
+        });
+
         this.disableMessage = params.disableMessage || '';
 
         WidgetViewModel.apply(this, [params]);
-
         var displayName = ko.observable('');
         self.newTileStep = ko.observable();
-
         this.valueList = ko.computed(function() {
             var valueList = self.value();
             displayName();
@@ -32,9 +39,31 @@ define([
             }
             return [];
         });
+        this.displayValue = displayName;
+
+        this.removeGraphIdsFromValue = function(value) {
+            if (Array.isArray(value)) {
+                self.graphids.forEach(function(graphid){
+                    var graphindex = self.value().indexOf(graphid);
+                    if (graphindex > -1) {
+                        self.value().splice(graphindex, 1);
+                    }
+                });
+                return ko.unwrap(value).length > 0 ? ko.unwrap(value) : null;
+            } else if (self.graphids.indexOf(value) !== -1) {
+                return null;
+            } else {
+                return value;
+            }
+        };
+
+        this.close = function(){
+            var cleanval = self.removeGraphIdsFromValue(this.value());
+            this.value(cleanval);
+            this.newTileStep(null);
+        };
 
         this.valueObjects = ko.computed(function() {
-            displayName();
             return self.valueList().map(function(value) {
                 return {
                     id: value,
@@ -65,25 +94,12 @@ define([
                 }
             });
         };
-        this.value.subscribe(updateName);
 
-        this.displayValue = ko.computed(function() {
-            var val = self.value();
-            var name = displayName();
-            var displayVal = null;
-
-            if (val) {
-                displayVal = name;
-            }
-
-            return displayVal;
-        });
         updateName();
 
         var relatedResourceModels = ko.computed(function() {
             var res = [];
             if (params.node) {
-                // var res = [];
                 var ids = ko.unwrap(params.node.config.graphid);
                 if (ids) {
                     res = arches.resources.filter(function(graph) {
@@ -96,7 +112,6 @@ define([
                         };
                     });
                 }
-                // return res;
             }
             return res;
         }, this);
@@ -130,9 +145,8 @@ define([
                     } else {
                         url(arches.urls.search_results);
                         var graphid = params.node ? ko.unwrap(params.node.config.graphid) : undefined;
-                        var data = {
-                            'paging-filter': page
-                        };
+                        if(!!params.graphid) { graphid = [ko.unwrap(params.graphid)]; }
+                        var data = { 'paging-filter': page };
                         if (graphid && graphid.length > 0) {
                             data['resource-type-filter'] = JSON.stringify(
                                 graphid.map(function(id) {
@@ -216,7 +230,9 @@ define([
                         callback(valueData);
                     }
                 };
+
                 valueList.forEach(function(value) {
+                    var names = [];
                     if (value) {
                         var modelIds = relatedResourceModels().map(function(model) {
                             return model._id;
@@ -229,6 +245,8 @@ define([
                                     dataType: "json"
                                 }).done(function(data) {
                                     nameLookup[value] = data.displayname;
+                                    names.push(data.displayname);
+                                    displayName(names.join(', '));
                                     setSelectionData();
                                 });
                             }
@@ -241,8 +259,14 @@ define([
                             };
                             self.newTileStep(params);
                             params.complete.subscribe(function() {
-                                self.value(params.resourceid());
+                                var result = params.resourceid();
+                                if (self.multiple) {
+                                    self.valueList().push(params.resourceid());
+                                    result = self.valueList();
+                                }
+                                result = self.removeGraphIdsFromValue(result);
                                 self.newTileStep(null);
+                                self.value(result);
                             });
                         }
                     }

@@ -9,22 +9,20 @@ from django.contrib.auth.models import User, Group, Permission
 
 
 class PermissionBackend(ObjectPermissionBackend):
-
     def has_perm(self, user_obj, perm, obj=None):
         # check if user_obj and object are supported (pulled directly from guardian)
         support, user_obj = check_support(user_obj, obj)
         if not support:
             return False
 
-        if '.' in perm:
-            app_label, perm = perm.split('.')
+        if "." in perm:
+            app_label, perm = perm.split(".")
             if app_label != obj._meta.app_label:
-                raise WrongAppError("Passed perm has app label of '%s' and "
-                                    "given obj has '%s'" % (app_label, obj._meta.app_label))
+                raise WrongAppError("Passed perm has app label of '%s' and " "given obj has '%s'" % (app_label, obj._meta.app_label))
 
         explicitly_defined_perms = get_perms(user_obj, obj)
         if len(explicitly_defined_perms) > 0:
-            if 'no_access_to_nodegroup' in explicitly_defined_perms:
+            if "no_access_to_nodegroup" in explicitly_defined_perms:
                 return False
             else:
                 return perm in explicitly_defined_perms
@@ -50,7 +48,7 @@ def get_groups_for_object(perm, obj):
     def has_group_perm(group, perm, obj):
         explicitly_defined_perms = get_perms(group, obj)
         if len(explicitly_defined_perms) > 0:
-            if 'no_access_to_nodegroup' in explicitly_defined_perms:
+            if "no_access_to_nodegroup" in explicitly_defined_perms:
                 return False
             else:
                 return perm in explicitly_defined_perms
@@ -96,12 +94,14 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
 
     """
 
-    A = set(get_objects_for_user(user, [
-        'models.read_nodegroup',
-        'models.write_nodegroup',
-        'models.delete_nodegroup',
-        'models.no_access_to_nodegroup'
-    ], accept_global_perms=False, any_perm=True))
+    A = set(
+        get_objects_for_user(
+            user,
+            ["models.read_nodegroup", "models.write_nodegroup", "models.delete_nodegroup", "models.no_access_to_nodegroup"],
+            accept_global_perms=False,
+            any_perm=True,
+        )
+    )
     B = set(get_objects_for_user(user, perms, accept_global_perms=False, any_perm=any_perm))
     C = set(get_objects_for_user(user, perms, accept_global_perms=True, any_perm=any_perm))
     return list(C - A | B)
@@ -116,7 +116,7 @@ def get_editable_resource_types(user):
 
     """
 
-    return get_resource_types_by_perm(user, ['models.write_nodegroup', 'models.delete_nodegroup'])
+    return get_resource_types_by_perm(user, ["models.write_nodegroup", "models.delete_nodegroup"])
 
 
 def get_createable_resource_types(user):
@@ -128,7 +128,7 @@ def get_createable_resource_types(user):
 
     """
 
-    return get_resource_types_by_perm(user, 'models.write_nodegroup')
+    return get_resource_types_by_perm(user, "models.write_nodegroup")
 
 
 def get_resource_types_by_perm(user, perms):
@@ -143,7 +143,7 @@ def get_resource_types_by_perm(user, perms):
 
     graphs = set()
     nodegroups = get_nodegroups_by_perm(user, perms)
-    for node in Node.objects.filter(nodegroup__in=nodegroups).select_related('graph'):
+    for node in Node.objects.filter(nodegroup__in=nodegroups).select_related("graph"):
         if node.graph.isresource and str(node.graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
             graphs.add(node.graph)
     return list(graphs)
@@ -155,8 +155,8 @@ def user_can_read_resources(user):
 
     """
 
-    if user.is_authenticated():
-        return user.is_superuser or len(get_resource_types_by_perm(user, ['models.read_nodegroup'])) > 0
+    if user.is_authenticated:
+        return user.is_superuser or len(get_resource_types_by_perm(user, ["models.read_nodegroup"])) > 0
     return False
 
 
@@ -166,10 +166,12 @@ def user_can_edit_resources(user):
 
     """
 
-    if user.is_authenticated():
-        return user.is_superuser or \
-            len(get_editable_resource_types(user)) > 0 or \
-            user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists()
+    if user.is_authenticated:
+        return (
+            user.is_superuser
+            or len(get_editable_resource_types(user)) > 0
+            or user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists()
+        )
     return False
 
 
@@ -179,6 +181,6 @@ def user_can_read_concepts(user):
 
     """
 
-    if user.is_authenticated():
-        return user.groups.filter(name='RDM Administrator').exists()
+    if user.is_authenticated:
+        return user.groups.filter(name="RDM Administrator").exists()
     return False

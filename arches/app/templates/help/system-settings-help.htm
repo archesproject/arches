@@ -42,7 +42,7 @@
                 {% trans "<strong>Mapbox Glyphs</strong> - Path to Mapbox glyphs (use default)." %}<br>
             </p>
             <h4>{% trans "Project Extent" %}</h4>
-            <p>{% trans "Draw a polygon representing your project's extent. These bounds will serve as the default for the cache seed bounds, search result grid bounds, and map bounds in search, cards, and reports." %}</p>
+            <p>{% trans "Draw a polygon representing your project's extent. These bounds will serve as the default for the search result grid bounds, and map bounds in search, cards, and reports." %}</p>
             <h4>{% trans "Map Zoom" %}</h4>
             <p>{% trans "You can define the zoom behavior of your map. Zoom level 0 shows the whole world (and is the absolute minimum zoom level) and zoom level 20 is the maximum level that most map services support." %}</p>
             <p>
@@ -66,8 +66,8 @@
             {% blocktrans %}
             <p>
                 <strong>Number of search results per page</strong> - Set the number of search results shown per page. Note this also defines the number of search result markers that are shown on the map.<br>
-                <strong>Number of search hints per dropdown</strong> - Set the number of search hints that will appear under the search bar as you type in search terms.<!--<br>
-                <strong>Max number of search results to export</strong> - Set the maximum number of resources to be exported from the search results.-->
+                <strong>Number of search hints per dropdown</strong> - Set the number of search hints that will appear under the search bar as you type in search terms.<br>
+                <strong>Max number of search results to export</strong> - Set the maximum number of resources to be exported from the search results.  This is restricted and should be in sync with the Elasticsearch setting which defaults to 10,000.<br>See "index.max_result_window" setting <a href='https://www.elastic.co/guide/en/elasticsearch/reference/7.4/index-modules.html#dynamic-index-settings' target="_blank"><strong>here.</strong></a>
             </p>
             {% endblocktrans %}
         </div>

@@ -22,19 +22,20 @@ from django.core.exceptions import ObjectDoesNotExist
 #         except ObjectDoesNotExist:
 #             print 'Entity does not exist. Nothing to delete'
 
+
 def clear_resources():
     """Removes all resource instances from your db and elasticsearch resource index"""
     se = SearchEngineFactory().create()
     match_all_query = Query(se)
-    match_all_query.delete(index='terms')
-    match_all_query.delete(index='resources')
-    match_all_query.delete(index='resource_relations')
+    match_all_query.delete(index="terms")
+    match_all_query.delete(index="resources")
+    match_all_query.delete(index="resource_relations")
 
-    print 'deleting', Resource.objects.exclude(resourceinstanceid=settings.RESOURCE_INSTANCE_ID).count(), 'resources'
+    print("deleting", Resource.objects.exclude(resourceinstanceid=settings.RESOURCE_INSTANCE_ID).count(), "resources")
     Resource.objects.exclude(resourceinstanceid=settings.RESOURCE_INSTANCE_ID).delete()
-    print Resource.objects.exclude(resourceinstanceid=settings.RESOURCE_INSTANCE_ID).count(), 'resources remaining'
+    print(Resource.objects.exclude(resourceinstanceid=settings.RESOURCE_INSTANCE_ID).count(), "resources remaining")
 
-    print 'deleting', models.ResourceXResource.objects.count(), 'resource relationships'
+    print("deleting", models.ResourceXResource.objects.count(), "resource relationships")
     cursor = connection.cursor()
-    cursor.execute("TRUNCATE public.resource_x_resource CASCADE;" )
-    print models.ResourceXResource.objects.count(), 'resource relationships remaining'
+    cursor.execute("TRUNCATE public.resource_x_resource CASCADE;")
+    print(models.ResourceXResource.objects.count(), "resource relationships remaining")

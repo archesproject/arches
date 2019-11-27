@@ -482,11 +482,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <span class="toggle-container">
                                     <!--ko ifnot: locked-->
                                     <span class="switch switch-small" data-bind="css: {'on': mobilesurvey.datadownloadconfig.download()}, click: function(){
-                                        mobilesurvey.datadownloadconfig.download(!mobilesurvey.datadownloadconfig.download());
-                                    }"><small></small></span>
+                                        mobilesurvey.datadownloadconfig.download(!mobilesurvey.datadownloadconfig.download());}"><small></small></span>
                                     <!--/ko-->
                                     <!--ko if: locked-->
-                                    <span class="switch switch-small disabled" data-bind="css: {'on': mobilesurvey.datadownloadconfig.download()"><small></small></span>
+                                    <span class="switch switch-small disabled" data-bind="css: {'on': mobilesurvey.datadownloadconfig.download()}"><small></small></span>
                                     <!--/ko-->
                                 </span>
                             </div>
@@ -556,7 +555,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </div>
                             </div>
                         </div>
-                        <!-- /ko -->
+                        <!--/ko -->
                         <!--/ko-->
 
                         <!--ko if: activePage() === 'people'-->
@@ -591,8 +590,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!--/ko-->
 
                         <!--ko if: activePage() === 'identity'-->
-                        <!-- Account Page -->
-                        <div class='msm-locked-warning' data-bind="visible: locked">{% trans 'These options cannot be modified because users have already synced with this project.' %}</div>
+                        <div class='msm-locked-warning' data-bind="visible: locked">{% trans "These options cannot be modified because users have already synced with this project." %}</div>
                         <div id="models-card">
                             <div class="mpm-card-content group-page">
                                 <div style="display: flex">
@@ -603,7 +601,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <div class="mpm-group-panel-header" style="">
 
                                             <div class="msm-group-label">
-                                                {% trans 'Accounts in this group' %}
+                                                {% trans "Accounts in this group" %}
                                             </div>
 
                                             <!-- User filter panel -->
@@ -682,7 +680,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     {% trans 'Assigned Groups' %}
                                                 </div>
 
-                                                <!--/ko-->
 
                                                 <!-- Last Synch -->
                                                  <div class="msm-stat-user-panel">

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import migrations, models
 import json
@@ -14,7 +14,7 @@ def forwards_func(apps, schema_editor):
     for config in required_node_configs:
         d = json.loads(json.dumps(config.config))
         rn = json.loads(d['required_nodes'])
-        for k, v in rn.iteritems():
+        for k, v in rn.items():
             for nodeid in v:
                 node = Node.objects.get(pk=uuid.UUID(nodeid))
                 node.isrequired = True
@@ -37,10 +37,10 @@ def reverse_func(apps, schema_editor):
         node.isrequired = False
         node.save()
 
-    for graph_id, required_nodes in graphs.iteritems():
+    for graph_id, required_nodes in graphs.items():
         function_config = {
             "required_nodes": JSONSerializer().serialize(required_nodes),
-            "triggering_nodegroups": required_nodes.keys()
+            "triggering_nodegroups": list(required_nodes.keys())
         }
         FunctionXGraph.objects.create(function=required_nodes_function, graph_id=graph_id, config=function_config)
 

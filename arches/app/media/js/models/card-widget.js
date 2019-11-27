@@ -1,10 +1,12 @@
 define([
     'underscore',
     'knockout',
+    'arches',
+    'knockout-mapping',
     'models/abstract',
     'widgets',
     'utils/dispose'
-], function(_, ko, AbstractModel, widgets, dispose) {
+], function(_, ko, arches, koMapping, AbstractModel, widgets, dispose) {
     return AbstractModel.extend({
         /**
         * A backbone model to manage cards_x_nodes_x_widgets records
@@ -68,19 +70,21 @@ define([
                     var configJSON = {};
                     var config = this.get('config');
                     _.each(this.configKeys(), function(key) {
-                        configJSON[key] = config[key]();
+                        configJSON[key] = ko.unwrap(config[key]);
                     });
                     configJSON.label = this.get('label')();
                     return configJSON;
                 },
                 write: function(value) {
-                    var config = this.get('config');
-                    for (var key in value) {
-                        if (key === 'label') {
-                            this.get('label')(value[key]);
-                        }
-                        if (config[key] && config[key]() !== value[key]) {
-                            config[key](value[key]);
+                    if (window.location.pathname.includes(arches.urls.graph_designer(this.card.get('graph_id')))){
+                        var config = this.get('config');
+                        for (var key in value) {
+                            if (key === 'label') {
+                                this.get('label')(value[key]);
+                            }
+                            if (config[key] && config[key]() !== value[key]) {
+                                config[key](value[key]);
+                            }
                         }
                     }
                 },
@@ -114,10 +118,9 @@ define([
                     var configKeys = [];
                     _.each(value, function(configVal, configKey) {
                         if (!ko.isObservable(configVal)) {
-                            value[configKey] = ko.observable(configVal);
-                        } else {
-                            value[configKey] = configVal;
+                            configVal = koMapping.fromJS(configVal);
                         }
+                        value[configKey] = configVal;
                         configKeys.push(configKey);
                     });
                     this.set(key, value);

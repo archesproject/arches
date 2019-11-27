@@ -5,11 +5,12 @@ define([
     'uuid',
     'views/base-manager',
     'viewmodels/alert',
+    'viewmodels/alert-json',
     'mobile-survey-manager-data',
     'arches',
     'moment',
     'bindings/datepicker',
-], function($, _, ko, uuid, BaseManagerView, AlertViewModel, data, arches, moment) {
+], function(_, ko, BaseManagerView, MobileSurveyManagerViewModel, AlertViewModel, JsonErrorAlertViewModel, MobileSurveyModel, data, arches, moment) {
 
     var MobileSurveysViewModel = function(params) {
         var self = this;

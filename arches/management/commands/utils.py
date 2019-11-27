@@ -3,27 +3,27 @@ import codecs
 
 
 def get_yn_input(msg="are you sure you want to continue?", default="Y"):
-    '''
+    """
     function can be passed a custom message and will use that prompt to get
     a y/n response. default defines what will happen if enter is hit with no
     input.
-    '''
+    """
 
     if default not in ["Y", "N"]:
         raise Exception("function must be called with default = 'Y' or 'N'")
 
     if default == "Y":
-        o = raw_input(msg + " [Y/n] ")
+        o = input(msg + " [Y/n] ")
         if o.lower().startswith("y") or o == "":
             ret = True
         else:
-            print "operation cancelled."
+            print("operation cancelled.")
             ret = False
 
     if default == "N":
-        o = raw_input(msg + " [y/N] ")
+        o = input(msg + " [y/N] ")
         if o.lower().startswith("n") or o == "":
-            print "operation cancelled."
+            print("operation cancelled.")
             ret = False
         else:
             ret = True
@@ -31,7 +31,7 @@ def get_yn_input(msg="are you sure you want to continue?", default="Y"):
     return ret
 
 
-def write_to_file(fileName, contents, mode='w', encoding='utf-8', **kwargs):
+def write_to_file(fileName, contents, mode="w", encoding="utf-8", **kwargs):
     ensure_dir(fileName)
     file = codecs.open(fileName, mode=mode, encoding=encoding, **kwargs)
     file.write(contents)
@@ -45,10 +45,10 @@ def ensure_dir(f):
 
 
 def get_valid_path(path):
-    '''
+    """
     Takes a relative or absolute path and returns either an absolute path or
     None if the path is invalid.
-    '''
+    """
     result = None
     if os.path.exists(path) and os.path.isabs(path):
         result = path
@@ -58,5 +58,5 @@ def get_valid_path(path):
 
 
 def print_message(message):
-    border = '*' * 80
-    print '{1}\n{0}\n{1}'.format(message, border)
+    border = "*" * 80
+    print("{1}\n{0}\n{1}".format(message, border))
