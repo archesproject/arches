@@ -177,7 +177,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Notifications Panel -->
                     <div id="ep-notifs-panel" class="ep-notifs" style="display:none;">
-                            <div class="" style="padding-right:0px">
+                            <div class="ep-edits-header">
                                 <div class="ep-help-title">
                                     <span>{% trans 'Notifications' %}</span>
                                 </div>
@@ -187,17 +187,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     </div>
                                 </a>
                             </div>
-    
+
                             <div class="ep-edits-body provisional-edit-history" style="float:left" data-bind="css: {'loading-mask': helploading()}">
                                 <div class="ep-edits-content">
                                     {% include 'views/notifications-list.htm' %}
                                 </div>
                             </div>
                         </div>
-                    
+
                     <!-- Edits Panel -->
                     <div id="ep-edits-panel" class="ep-edits" style="display:none;">
-                        <div class="ep-edits-header" style="padding-right:0px">
+                        <div class="ep-edits-header">
                             <div class="ep-edits-title">
                                 <span>{% trans 'My Edit History' %}</span>
                             </div>
@@ -217,7 +217,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Help Panel -->
                     <div id="ep-help-panel" class="ep-help" style="display: none" data-bind="slide: helpOpen, duration: 400, direction: {direction: 'right'}, easing: 'slide'">
-                        <div class="ep-help-header" style="padding-right:0px">
+                        <div class="ep-edits-header">
                             <div class="ep-help-title">
                                 <span>{% trans nav.help.title %}</span>
                             </div>
