@@ -769,7 +769,7 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/61787e78-0e3f-11ea-b4f1-acde48001122")
 
-    def test_c_string_to_path(self):
+    def test_c_path_with_array(self):
 
         with open(os.path.join("tests/fixtures/jsonld_base/models/string_to_path_basic.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
@@ -807,7 +807,7 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/5683f462-107d-11ea-b7e9-acde48001122")
 
 
-    def test_d_string_to_path_2(self):
+    def test_d_path_with_array_2(self):
         data = """
 {
   "@id": "http://localhost:8000/resources/10000000-109b-11ea-957a-acde48001122", 
@@ -829,3 +829,33 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122")
 
+    def test_e_path_with_array_resinst(self):
+        # 2019-11-27 - Passing with extra @id checks in rdffile
+
+        data = """
+{
+    "@id": "http://localhost:8000/resources/8e870000-114e-11ea-8de7-acde48001122", 
+    "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person", 
+    "http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by": [
+        { 
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E33_Linguistic_Object",
+            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "test 1"}, 
+        {
+            "@id": "http://localhost:8000/resources/2a615f66-114d-11ea-8de7-acde48001122", 
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E33_Linguistic_Object"}
+    ]
+}
+"""
+
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "9f716aa2-bf96-11e9-bd39-0242ac160002", "resourceid": "8e870000-114e-11ea-8de7-acde48001122"},
+        )
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        self.assertEqual(response.status_code, 201)
+        js = response.json()
+        if type(js) == list:
+            js = js[0]
+
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/8e870000-114e-11ea-8de7-acde48001122")
