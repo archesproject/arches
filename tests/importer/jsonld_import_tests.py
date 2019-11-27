@@ -785,3 +785,46 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122")
 
+
+
+    def test_e_same_prop_diff_branch(self):
+
+        with open(os.path.join("tests/fixtures/jsonld_base/models/same_prop_diff_branch.json"), "rU") as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile["graph"])
+
+        data = """
+{
+    "@id": "http://localhost:8000/resources/18a17522-10ad-11ea-a9a2-acde48001122", 
+    "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object", 
+    "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by": [
+        {
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E42_Identifier", 
+            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "2"}, 
+        {
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
+            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "a"}, 
+        {
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E42_Identifier", 
+            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "1"}, 
+        {
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
+            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "b"}
+    ]
+}
+"""
+
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "63e1cbbe-10ac-11ea-a9a2-acde48001122", "resourceid": "18a17522-10ad-11ea-a9a2-acde48001122"},
+        )
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        self.assertEqual(response.status_code, 201)
+        js = response.json()
+        if type(js) == list:
+            js = js[0]
+
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/18a17522-10ad-11ea-a9a2-acde48001122")
+
+
