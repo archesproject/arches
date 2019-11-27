@@ -209,6 +209,82 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/12345678-abcd-11e9-9cbb-3af9d3b32b71")
 
+
+
+
+
+    def test_2b_complex_multiple(self):
+        data = """
+{
+  "@id": "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122", 
+  "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object", 
+  "http://www.cidoc-crm.org/cidoc-crm/P101_had_as_general_use": {
+    "@id": "http://localhost:8000/concepts/fb457e76-e018-41e7-9be3-0f986816450a", 
+    "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
+    "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": {
+        "@id": "http://localhost:8000/concepts/dcd28b8a-0840-4a7f-a0d6-0341438552e6", 
+        "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
+        "http://www.w3.org/2000/01/rdf-schema#label": "Meta Type B"
+    }, 
+    "http://www.w3.org/2000/01/rdf-schema#label": "Test Type A"
+  }, 
+  "http://www.cidoc-crm.org/cidoc-crm/P160_has_temporal_projection": [
+    {
+      "@id": "http://localhost:8000/tile/7e0371da-c62f-46c1-899b-d1e9419a76d5/node/127193ea-fa6d-11e9-b369-3af9d3b32b71", 
+      "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
+      "http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by": "example 2"
+    }, 
+    {
+      "@id": "http://localhost:8000/tile/8cc347a4-265d-4a06-8327-e198e1d1d0c5/node/127193ea-fa6d-11e9-b369-3af9d3b32b71", 
+      "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
+      "http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by": "example", 
+      "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
+        "@type": "http://www.w3.org/2001/XMLSchema#dateTime", 
+        "@value": "2019-10-28"
+      }
+    }, 
+    {
+      "@id": "http://localhost:8000/tile/6011c512-47e9-46c3-b6f3-034dcc6f2a9d/node/127193ea-fa6d-11e9-b369-3af9d3b32b71", 
+      "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
+      "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
+        "@type": "http://www.w3.org/2001/XMLSchema#dateTime", 
+        "@value": "2019-11-15"
+      }
+    }, 
+    {
+      "@id": "http://localhost:8000/tile/7d42af30-4d00-434f-95d4-7a3b3f9bfec8/node/127193ea-fa6d-11e9-b369-3af9d3b32b71", 
+      "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
+      "http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by": "example"
+    }
+  ], 
+  "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": {
+    "@id": "http://localhost:8000/concepts/6bac5802-a6f8-427c-ba5f-d4b30d5b070e", 
+    "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
+    "http://www.w3.org/2000/01/rdf-schema#label": "Single Type A"
+  }, 
+  "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": ["asdfasdfa", "aasdf"], 
+  "http://www.cidoc-crm.org/cidoc-crm/P45_consists_of": {
+    "@id": "http://localhost:8000/concepts/36c8d7a3-32e7-49e4-bd4c-2169a06b240a", 
+    "@type": "http://www.cidoc-crm.org/cidoc-crm/E57_Material", 
+    "http://www.w3.org/2000/01/rdf-schema#label": "material a"
+  }, 
+  "http://www.cidoc-crm.org/cidoc-crm/P57_has_number_of_parts": [2, 1]
+}        
+"""
+
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71", "resourceid": "5e9baff0-109b-11ea-957a-acde48001122"},
+        )
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        self.assertEqual(response.status_code, 201)
+        js = response.json()
+        if type(js) == list:
+            js = js[0]
+
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122")
+
     def test_3_5098_concepts(self):
         data = """
             {
@@ -557,19 +633,15 @@ class JsonLDImportTests(ArchesTestCase):
                 "@id": "http://localhost:8000/resources/deadface-0000-11ea-b628-acde48001122",
                 "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
                 "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by": {
-                    "@id": "http://localhost:8000/tile/caced9b0-f717-4557-9c64-ef87f646c9c1/node/fdbc4f50-0721-11ea-b628-acde48001122",
                     "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
                     "http://www.cidoc-crm.org/cidoc-crm/P10i_contains": [
                         {
-                            "@id": "http://localhost:8000/tile/caced9b0-f717-4557-9c64-ef87f646c9c1/node/222d5c4e-0722-11ea-b628-acde48001122",
                             "@type": "http://www.cidoc-crm.org/cidoc-crm/E4_Period",
                             "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "Import Note"
                         },
                         {
-                            "@id": "http://localhost:8000/tile/caced9b0-f717-4557-9c64-ef87f646c9c1/node/080d16b0-0722-11ea-b628-acde48001122",
                             "@type": "http://www.cidoc-crm.org/cidoc-crm/E4_Period",
                             "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": {
-                                "@id": "http://localhost:8000/tile/caced9b0-f717-4557-9c64-ef87f646c9c1/node/3d38c276-0722-11ea-b628-acde48001122",
                                 "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span",
                                 "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
                                     "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
@@ -622,11 +694,9 @@ class JsonLDImportTests(ArchesTestCase):
                 "@id": "http://localhost:8000/resources/61787e78-0e3f-11ea-b4f1-acde48001122",
                 "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
                 "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by": {
-                    "@id": "http://localhost:8000/tile/f1ebfcc1-eb02-4f47-8ef1-e0a66a0a87cc/node/2ec7c360-0e41-11ea-b4f1-acde48001122",
                     "@type": "http://www.cidoc-crm.org/cidoc-crm/E42_Identifier",
                     "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "madonna bla bla",
                     "http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by": {
-                        "@id": "http://localhost:8000/tile/f1ebfcc1-eb02-4f47-8ef1-e0a66a0a87cc/node/4f71d2c2-0e41-11ea-b4f1-acde48001122",
                         "@type": "http://www.cidoc-crm.org/cidoc-crm/E33_Linguistic_Object",
                         "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "sale bla bla"
                     }
@@ -667,12 +737,6 @@ class JsonLDImportTests(ArchesTestCase):
 "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by": [
     {
     "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
-    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "le veuve remy"}, 
-    {
-    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
-    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy pour M de montvale"}, 
-    {
-    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
     "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy pour la russie"}, 
     {
     "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
@@ -681,10 +745,7 @@ class JsonLDImportTests(ArchesTestCase):
                     "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
                     "http://www.w3.org/2000/01/rdf-schema#label": "History"
         }, 
-    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy"}, 
-    {
-    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
-    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "Remy p le Duc de Praslin"}], 
+    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy"}], 
 "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy"}
 """
 
@@ -693,10 +754,12 @@ class JsonLDImportTests(ArchesTestCase):
             kwargs={"graphid": "d5456066-107c-11ea-b7e9-acde48001122", "resourceid": "5683f462-107d-11ea-b7e9-acde48001122"},
         )
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
-        print(f"\n\n\nTest b response: {response.content}")
+        print(f"\n\n\nTest c response: {response.content}")
         self.assertTrue(response.status_code == 201)
         js = response.json()
         if type(js) == list:
             js = js[0]
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/5683f462-107d-11ea-b7e9-acde48001122")
+
+
