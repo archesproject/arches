@@ -44,7 +44,7 @@ from arches.management.commands import utils
 from arches.setup import unzip_file
 from .formats.csvfile import CsvReader
 from .formats.archesfile import ArchesFileReader
-
+import ctypes
 
 def import_one_resource(line):
     """this single resource import function must be outside of the BusinessDataImporter
@@ -65,7 +65,7 @@ class BusinessDataImporter(object):
         self.business_data = ""
         self.file_format = ""
         self.relations = ""
-        csv.field_size_limit(sys.maxsize)
+        csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
 
         if not file:
             file = settings.BUSINESS_DATA_FILES
