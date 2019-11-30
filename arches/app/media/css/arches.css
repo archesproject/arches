@@ -8810,12 +8810,11 @@ table.table.dataTable {
     display: inline-block;
     flex-direction: row;
     position: absolute;
-    right: 5px;
+    right: 0px;
 }
 
 .popup-panel-row {
     display: inline-flex;
-    margin-right: -5px;
 }
 
 .search-type-btn-popup {
