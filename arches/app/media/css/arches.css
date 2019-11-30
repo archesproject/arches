@@ -989,11 +989,11 @@ ul.tabbed-report-tab-list {
 .workbench-card-sidebar {
     position:absolute;
     right: 0;
-    top: -1px;
+    top: 0px;
     height: 100%;
     width: 75px;
-    background-color: #ecf0f5;
-    border-left: 1px solid rgb(216, 216, 216);
+    background-color: #f1f1f1;
+    border-left: 1px solid #ddd;
 }
 
 .workbench-card-sidebar-tab {
