@@ -218,10 +218,6 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/12345678-abcd-11e9-9cbb-3af9d3b32b71")
 
-
-
-
-
     def test_2b_complex_multiple(self):
         data = """
 {
@@ -485,7 +481,6 @@ class JsonLDImportTests(ArchesTestCase):
 
     def test_7_5121_branches(self):
         # 2019-11-01 - This fails due to #5121, the presence of content is not used to rule out the resource-instance branch
-
 
         data = """
             {
@@ -776,22 +771,27 @@ class JsonLDImportTests(ArchesTestCase):
         ResourceGraphImporter(archesfile["graph"])
 
         data = """
-{"@id": "http://localhost:8000/resources/5683f462-107d-11ea-b7e9-acde48001122", 
-"@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person", 
-"http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by": [
-    {
-    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
-    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy pour la russie"}, 
-    {
-    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
-    "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": {
-                    "@id": "http://vocab.getty.edu/aat/300033898",
-                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
-                    "http://www.w3.org/2000/01/rdf-schema#label": "History"
-        }, 
-    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy"}], 
-"http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy"}
-"""
+            {
+                "@id": "http://localhost:8000/resources/5683f462-107d-11ea-b7e9-acde48001122",
+                "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person",
+                "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by": [
+                    {
+                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation",
+                        "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy pour la russie"
+                    },
+                    {
+                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation",
+                        "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": {
+                            "@id": "http://vocab.getty.edu/aat/300033898",
+                            "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
+                            "http://www.w3.org/2000/01/rdf-schema#label": "History"
+                        },
+                        "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy"
+                    }
+                ],
+                "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy"
+            }
+        """
 
         url = reverse(
             "resources_graphid",
@@ -806,15 +806,17 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/5683f462-107d-11ea-b7e9-acde48001122")
 
-
     def test_d_path_with_array_2(self):
         data = """
-{
-  "@id": "http://localhost:8000/resources/10000000-109b-11ea-957a-acde48001122", 
-  "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object", 
-  "http://www.cidoc-crm.org/cidoc-crm/P57_has_number_of_parts": [2, 1]
-}        
-"""
+            {
+                "@id": "http://localhost:8000/resources/10000000-109b-11ea-957a-acde48001122",
+                "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
+                "http://www.cidoc-crm.org/cidoc-crm/P57_has_number_of_parts": [
+                    2,
+                    1
+                ]
+            }     
+        """
 
         url = reverse(
             "resources_graphid",
@@ -833,19 +835,21 @@ class JsonLDImportTests(ArchesTestCase):
         # 2019-11-27 - Passing with extra @id checks in rdffile
 
         data = """
-{
-    "@id": "http://localhost:8000/resources/8e870000-114e-11ea-8de7-acde48001122", 
-    "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person", 
-    "http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by": [
-        { 
-            "@type": "http://www.cidoc-crm.org/cidoc-crm/E33_Linguistic_Object",
-            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "test 1"}, 
-        {
-            "@id": "http://localhost:8000/resources/2a615f66-114d-11ea-8de7-acde48001122", 
-            "@type": "http://www.cidoc-crm.org/cidoc-crm/E33_Linguistic_Object"}
-    ]
-}
-"""
+            {
+                "@id": "http://localhost:8000/resources/8e870000-114e-11ea-8de7-acde48001122",
+                "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person",
+                "http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by": [
+                    {
+                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E33_Linguistic_Object",
+                        "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "test 1"
+                    },
+                    {
+                        "@id": "http://localhost:8000/resources/2a615f66-114d-11ea-8de7-acde48001122",
+                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E33_Linguistic_Object"
+                    }
+                ]
+            }
+        """
 
         url = reverse(
             "resources_graphid",
