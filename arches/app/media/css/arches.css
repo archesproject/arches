@@ -8832,6 +8832,10 @@ table.table.dataTable {
     z-index: 1000;
 }
 
+.search-export {
+    padding: 5px 15px;
+}
+
 .search-export .parameters {
     display: inline-flex;
     justify-content: space-around;
@@ -8841,12 +8845,35 @@ table.table.dataTable {
     width: 75px;
 }
 
-.search-export .format {
-    width: 100px;
+.search-export .instruction {
+    font-size: 15px;
+}
+
+.search-export .instruction h2 {
+    font-size: 15px;
+    margin-top: 5px;
+}
+
+.search-export .instruction h4 {
+    font-size: 13px;
+    padding-left: 15px;
+    color: #888;
+    font-weight: 400;
+    margin-top: -5px;
+}
+
+.search-export .parameter {
+    padding: 0px 15px;
+    margin-bottom: 20px;
 }
 
 .search-export.download {
     padding: 12px;
+}
+
+.download-message {
+    padding: 0px 15px;
+    font-size: 14px;
 }
 
 .search-type-btn-popup.relative:hover {

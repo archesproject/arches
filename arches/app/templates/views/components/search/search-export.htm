@@ -3,43 +3,52 @@
     <div class="time-wheel-title">{% trans "Export Search Results" %}
     </div>
     <hr class="title-underline">
-    <div class="row widget-container search-export">
-        <div class="parameters">
-            <div class="format">
+    
+    <div class="search-export">
+        <div class="instruction">
+            <h2 class=""> {% trans "1. Format" %} </h2>
+            <h4 class=""> {% trans "Select the format you'd like for your export data" %} </h4>
+        </div>
+        <div class="parameter">
             <div>
-                <label class="control-label widget-input-label"> {% trans "Format" %} </label>
+                <label data-bind="css: { 'active': format() === 'tilecsv' }, click: function () { format('tilecsv') }" class="form-radio form-normal form-text">
+                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'tilecsv'" value="true"> {% trans "csv" %}
+                </label>
+                <label data-bind="css: { 'active': format() === 'shp' }, click: function () { format('shp') }" class="form-radio form-normal form-text">
+                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'shp'" value="false"> {% trans "shapefile" %}
+                </label>
+                <label data-bind="css: { 'active': format() === 'json' }, click: function () { format('json') }" class="form-radio form-normal form-text">
+                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'json'" value="false"> {% trans "geojson" %}
+                </label>
             </div>
-            <div>
-                <div>
-                    <label data-bind="css: { 'active': format() === 'tilecsv' }, click: function () { format('tilecsv') }" class="form-radio form-normal form-text">
-                        <input type="radio" name="stat-w-label" data-bind="checked: format() === 'tilecsv'" value="true"> {% trans "csv" %}
-                    </label>
-                    <label data-bind="css: { 'active': format() === 'shp' }, click: function () { format('shp') }" class="form-radio form-normal form-text">
-                        <input type="radio" name="stat-w-label" data-bind="checked: format() === 'shp'" value="false"> {% trans "shapefile" %}
-                    </label>
-                    <label data-bind="css: { 'active': format() === 'json' }, click: function () { format('json') }" class="form-radio form-normal form-text">
-                        <input type="radio" name="stat-w-label" data-bind="checked: format() === 'json'" value="false"> {% trans "geojson" %}
-                    </label>
-                </div>
+        </div>
+          
+        <div class="instruction">
+                <h2 class=""> {% trans "2. Coordinate Precision" %} </h2>
+                <h4 class=""> {% trans "Tell us how many decimal places of precision you'd like for geo-data results" %} </h4>
+        </div>
+        <div class="parameter">
+            <input type="number" class="form-control input-md widget-input precision" data-bind="textInput: precision"></input>
+        </div>
+
+        <div class="">
+            <div class="instruction">
+                    <h2 class=""> {% trans "3. Email Address" %} </h2>
+                    <h4 class=""> {% trans "This download will take some time.  Tell us where to email your results" %} </h4>
             </div>
-            </div>
-            <div>
-            <div>
-                <label class="control-label widget-input-label"> {% trans "Coordinate Precision" %} </label>
-            </div>
-            <div>
-                <input type="number" class="form-control input-md widget-input precision" data-bind="textInput: precision"></input>
-            </div>
+            <div class="parameter">
+                <input type="" class="form-control input-md widget-input" placeholder="john.doe@domain.com"></input>
             </div>
         </div>
     </div>
+
     <div class="search-export download">
-        <button class="btn btn-primary btn-active-primary"
+        <button class="btn btn-lg btn-primary btn-active-primary"
             type="button"
             aria-expanded="true"
             data-bind="click: function(){executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} )}"> {% trans "Download" %}
         </button>
     </div>
-    <div data-bind="text: result, fadeVisible: downloadStarted, delay:0, fade: 200">
+    <div class="download-message" data-bind="text: result, fadeVisible: downloadStarted, delay:0, fade: 600">
     </div>
 </div>
