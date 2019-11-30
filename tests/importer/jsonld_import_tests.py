@@ -829,7 +829,7 @@ class JsonLDImportTests(ArchesTestCase):
             js = js[0]
 
         self.assertTrue("@id" in js)
-        self.assertTrue(js["@id"] == "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122")
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/10000000-109b-11ea-957a-acde48001122")
 
     def test_e_path_with_array_resinst(self):
         # 2019-11-27 - Passing with extra @id checks in rdffile
