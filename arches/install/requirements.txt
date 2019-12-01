@@ -12,7 +12,7 @@ django-recaptcha==2.0.5
 edtf==4.0.1
 couchdb==1.2
 django-revproxy==0.9.15
-django-cors-headers==3.1.1
+django-cors-headers==3.2.0
 django-oauth-toolkit==1.2.0
 python-docx==0.8.10
 PyLD[requests]==1.0.5
