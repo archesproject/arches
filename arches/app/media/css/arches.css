@@ -2388,8 +2388,6 @@ ul.nav.nav-tabs.nav-justified {
     padding: 5px 0px;
 }
 
-
-
 .graph-settings-panel-body .widgets .widget-container div div > input {
     max-width: 500px;
     min-width: 500px;
@@ -2603,7 +2601,6 @@ div.dropdown-menu.open {
     z-index: 100000001;
 }
 
-
 .loading-mask-string {
     font-size: 22px;
     padding-top: 5%;
@@ -2644,7 +2641,6 @@ div.dropdown-menu.open {
     transform: translate(0, 0);
     z-index: 100000001;
 }
-
 
 .card-form-preview-container.loading-mask {
     position: relative;
@@ -2709,7 +2705,6 @@ div.dropdown-menu.open {
     right: 0;
     z-index: 100000000;
 }
-
 
 .ep-edits {
     position: absolute;
@@ -2856,8 +2851,6 @@ div.dropdown-menu.open {
     padding-left: 3px;
 }
 
-
-
 .list-divider-dark {
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
 }
@@ -2903,6 +2896,14 @@ ul .collapse li:last-of-type {
     background: #ebeef0;
 }
 
+.graph-btn {
+    display: none;
+}
+
+.resource-grid-item:hover .graph-btn {
+    display: block;
+}
+
 .report-image-grid .resource-grid-item:last-of-type .resource-grid-tools-container .btn-group ul {
     margin-top: -331px;
 }
@@ -2931,8 +2932,6 @@ ul .collapse li:last-of-type {
     border-color: #ddd;
     border-width: 1px;
 }
-
-
 
 .report-card-provisional-flag {
     background-color: #f8f8f8;
@@ -3001,7 +3000,11 @@ ul .collapse li:last-of-type {
 .resource-grid-tools-container {
     position: absolute;
     right: 20px;
-    top: 22px;
+    top: 48px;
+}
+
+.resource-grid-item:hover .resource-grid-tools-container {
+    top: 20px;
 }
 
 .report-image-grid .resource-grid-item:last-of-type .resource-grid-tools-container .btn-group .manage-menu {
