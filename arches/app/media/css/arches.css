@@ -3787,6 +3787,18 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     cursor: pointer;
 }
 
+.node-current-selected {
+    fill: #dcecfa;
+    stroke: #454545;
+    stroke-width: 2px;
+}
+
+.node-current-neighbor {
+    fill: #dcecfa;
+    stroke: #454545;
+    stroke-width: 4px;
+}
+
 .node-current-label {
     stroke: #999;
     font-size: 21px;
@@ -3821,6 +3833,12 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     opacity: 1.;
     stroke-width: 1px;
     cursor: pointer;
+}
+
+.node-ancestor-neighbor {
+    stroke-width: 4px;
+    stroke: #454545;
+    fill: #dcecfa;
 }
 
 .node-ancestor-label {
