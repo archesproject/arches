@@ -1,7 +1,7 @@
 {% load i18n %}
 <div class="search-container time-search-container">
 
-    <div class="time-wheel-title">{% trans "Date Interval" %}
+    <div class="filter-title">{% trans "Date Interval" %}
         <div class="pull-right">
             <div class="btn-group">
                 <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true" data-bind="click: function () { clear(); }"> <i class="fa fa-close"></i> {% trans "Clear" %}
@@ -64,7 +64,7 @@
         </div>
     </div>
 
-    <div class="time-wheel-title">{% trans "Time Wheel" %}</div>
+    <h3 class="time-wheel-title">{% trans "Time Wheel" %}</h3>
     <div class="time-wheel-instructions">{% trans "(Click on a block to set a filter, double-click to zoom in, double-click center to zoom out)" %}</div>
     <hr class="title-underline">
     

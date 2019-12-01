@@ -8304,22 +8304,29 @@ ul.pagination {
     width: 100%;
 }
 
-.time-wheel-title {
+.filter-title {
     font-size: 17px;
     margin-top: 30px;
 }
 
-.time-search-container .time-wheel-title:first-child {
+.time-search-container .filter-title:first-child {
     margin-top: 3px;
+    margin-bottom: 15px;
 }
 
-.time-wheel-title .pull-right {
-    margin-top: -15px;
+.filter-title .pull-right {
+    margin-top: -7px;
 }
 
 .title-underline {
     margin: 3px 0px;
     background: #ddd;
+}
+
+.time-wheel-title {
+    margin-top: 20px;
+    font-size: 17px;
+    font-weight: 400;
 }
 
 .time-wheel-instructions {
