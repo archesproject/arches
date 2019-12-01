@@ -2382,7 +2382,7 @@ ul.nav.nav-tabs.nav-justified {
     font-size: 11px;
     position: relative;
     top: -5px;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .exportable-field-name {
@@ -4443,6 +4443,17 @@ ul.jqtree_common li.jqtree-folder {
     bottom: 0;
     width: 100%;
     height: 50px;
+}
+
+#menu-control {
+    background: #9490EE;
+    color: #eee;
+}
+
+#menu-control:hover {
+    color: #fff;
+    border-left: 1px solid #9490EE;
+    border-bottom: 1px solid #9490EE;
 }
 
 .ep-tools {
