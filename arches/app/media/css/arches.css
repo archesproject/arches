@@ -2788,11 +2788,17 @@ div.dropdown-menu.open {
 
 .btn-notifs-dismiss-all {
     width: 100%;
-    color: #6494cc;
-    background-color: transparent;
+    color: #fff;
+    background-color: #579DDB;
 }
+
+.btn-notifs-dismiss-all .disabled {
+    background-color: #B0D4F5;
+}
+
 .btn-notifs-dismiss-all:hover {
-    background-color: #f4f4f4;
+    cursor: pointer;
+    color: #fff
 }
 
 #circle {
@@ -4503,6 +4509,7 @@ ul.jqtree_common li.jqtree-folder {
     transform: translate(0px, 0px);
     color: #666;
     background: #f4f4f4;
+    border: 1px solid #ddd;
 }
 
 .ep-content {
