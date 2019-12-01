@@ -2382,6 +2382,11 @@ ul.nav.nav-tabs.nav-justified {
     font-size: 11px;
     position: relative;
     top: -5px;
+    font-size: 12px;
+}
+
+.exportable-field-name {
+    padding-left: 40px;
 }
 
 .graph-settings-panel-body {
