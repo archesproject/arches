@@ -148,6 +148,8 @@ class ConceptDataType(BaseConceptDataType):
             pass
 
     def get_rdf_uri(self, node, data, which="r"):
+        if not data:
+            return None
         c = ConceptValue(str(data)) 
         assert c.value is not None, "Null or blank concept value"
         ext_ids = [ident.value for ident in models.Value.objects.all().filter(
