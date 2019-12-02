@@ -219,7 +219,27 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/12345678-abcd-11e9-9cbb-3af9d3b32b71")
 
 
+        hagu = "http://www.cidoc-crm.org/cidoc-crm/P101_had_as_general_use"
+        p2 = "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"
+        temp = "http://www.cidoc-crm.org/cidoc-crm/P160_has_temporal_projection"
+        qual = "http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by"
+        note = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
+        pts = "http://www.cidoc-crm.org/cidoc-crm/P57_has_number_of_parts"
 
+        self.assertTrue(hagu in js)
+        use = js[hagu]
+        self.assertTrue('@id' in use)
+        self.assertTrue(use['@id'] == "http://localhost:8000/concepts/fb457e76-e018-41e7-9be3-0f986816450a")
+        self.assertTrue(p2 in use)
+        self.assertTrue(use[p2]['@id'] == "http://localhost:8000/concepts/14c92c17-5e2f-413a-95c2-3c5e41ee87d2")
+        self.assertTrue(temp in js)
+        proj = js[temp]
+        self.assertTrue(qual in proj)
+        self.assertTrue(proj[qual] == "example")
+        self.assertTrue(note in js)
+        self.assertTrue(js[note] == "Test Data")
+        self.assertTrue(pts in js)
+        self.assertTrue(js[pts] == 12)
 
 
     def test_2b_complex_multiple(self):
@@ -293,6 +313,26 @@ class JsonLDImportTests(ArchesTestCase):
 
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122")
+
+        pts = "http://www.cidoc-crm.org/cidoc-crm/P57_has_number_of_parts"
+        note = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
+        temp = "http://www.cidoc-crm.org/cidoc-crm/P160_has_temporal_projection"
+        qual = "http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by"
+        botb = "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin"
+
+        self.assertTrue(pts in js)
+        self.assertTrue(set(js[pts]) == set([1,2]))
+        self.assertTrue(note in js)
+        self.assertTrue(set(js[note]) == set(["asdfasdfa", "aasdf"]))
+        self.assertTrue(temp in js)
+        temps = js[temp]
+        self.assertTrue(len(temps) == 4)
+        for t in temps:
+            if qual in t:
+                self.assertTrue(t[qual] in ["example", "example 2"])
+            if botb in t:
+                self.assertTrue(t[botb]['@value'] in ["2019-11-15", "2019-10-28"])
+
 
     def test_3_5098_concepts(self):
         data = """
@@ -566,6 +606,19 @@ class JsonLDImportTests(ArchesTestCase):
         if type(js) == list:
             js = js[0]
 
+        rtb = "http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by"
+        note = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
+
+        self.assertTrue(rtb in js)
+        self.assertTrue(len(js[rtb]) == 3)
+
+        for r in js[rtb]:
+            hasnote = note in r
+            isres = r['@id'].startswith('http://localhost:8000/resources/')
+            self.assertTrue((hasnote and not isres) or (isres and not hasnote))
+            self.assertTrue(not (hasnote and isres))
+
+
     def test_8_4564_resinst_models(self):
         # 2019-11-01 - This fails as the model uses Actor, not Group, per #4564
         # and the import does not look at the referenced model's class
@@ -769,6 +822,7 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/61787e78-0e3f-11ea-b4f1-acde48001122")
 
+
     def test_c_path_with_array(self):
 
         with open(os.path.join("tests/fixtures/jsonld_base/models/string_to_path_basic.json"), "rU") as f:
@@ -780,16 +834,17 @@ class JsonLDImportTests(ArchesTestCase):
 "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person", 
 "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by": [
     {
-    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
-    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy pour la russie"}, 
+        "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
+        "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy pour la russie"}, 
     {
-    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
-    "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": {
+        "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
+        "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": {
                     "@id": "http://vocab.getty.edu/aat/300033898",
                     "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
                     "http://www.w3.org/2000/01/rdf-schema#label": "History"
-        }, 
-    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy"}], 
+            }, 
+        "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy"}
+    ], 
 "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "remy"}
 """
 
@@ -806,6 +861,9 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/5683f462-107d-11ea-b7e9-acde48001122")
 
+        idby = "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by" 
+        self.assertTrue(idby in js)       
+        self.assertTrue(len(js[idby]) == 2)
 
     def test_d_path_with_array_2(self):
         data = """
@@ -828,6 +886,10 @@ class JsonLDImportTests(ArchesTestCase):
 
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122")
+        pts = "http://www.cidoc-crm.org/cidoc-crm/P57_has_number_of_parts"
+        self.assertTrue(pts in js)
+        self.assertTrue(set(js[pts]) == set([1,2]))
+
 
     def test_e_path_with_array_resinst(self):
         # 2019-11-27 - Passing with extra @id checks in rdffile
@@ -860,6 +922,16 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/8e870000-114e-11ea-8de7-acde48001122")
 
+        rtb = "http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by" 
+        note = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
+        self.assertTrue(rtb in js)
+        self.assertTrue(len(js[rtb]) == 2)
+        rtb1 = js[rtb][0]
+        rtb2 = js[rtb][1]
+        if note in rtb1:
+            self.assertTrue(rtb2['@id'].startswith('http://localhost:8000/resources'))
+        else:
+            self.assertTrue(rtb1['@id'].startswith('http://localhost:8000/resources'))
 
     def test_f_big_nest_mess(self):
 
@@ -954,5 +1026,5 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/8e870000-114e-11ea-8de7-acde48001122")
 
-
+        # TODO - more asserts to make sure data is saved correctly
 
