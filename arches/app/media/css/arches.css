@@ -2298,7 +2298,7 @@ ul.nav.nav-tabs.nav-justified {
 
 .settings-panel-heading {
     height: 50px;
-    background: #f4f4f4;
+    background: #25476a;
     margin-top: -10px;
     margin-bottom: 20px;
     margin-left: -25px;
@@ -2309,7 +2309,7 @@ ul.nav.nav-tabs.nav-justified {
 .graph-crm-class,
 .graph-type {
     font-size: 15px;
-    color: #888;
+    color: #eee;
     padding-left: 10px;
 }
 
@@ -2330,7 +2330,7 @@ ul.nav.nav-tabs.nav-justified {
     font-weight: 500;
     margin-top: 0;
     margin-bottom: 5px;
-    color: #555;
+    color: #fff;
     padding: 10px 0 5px 0px;
     display: flex;
     flex-direction:row;
@@ -2995,7 +2995,7 @@ ul .collapse li:last-of-type {
     padding-left: 69px;
     margin-top: -20px;
     color: #999;
-    font-size: 11px;
+    font-size: 12px;
     width: 500px;
     white-space: nowrap;
     overflow: hidden;
@@ -4563,8 +4563,8 @@ ul.jqtree_common li.jqtree-folder {
     align-items: center;
     width: 100%;
     min-height: 55px;
-    background: #fafafa;
-    border-bottom: 1px solid #e9e9e9;
+    background: #f6f6f6;
+    border-bottom: 1px solid #ddd;
 }
 
 .ep-form-toolbar div:nth-last-child(2) {
@@ -4606,7 +4606,7 @@ ul.jqtree_common li.jqtree-folder {
 
 .resource-toolbar {
     min-height: 60px;
-    background: #f4f4f4;
+    background: #f6f6f6;
     border-bottom: 1px solid #e4e4e4;
 }
 
@@ -5358,7 +5358,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .resource-status {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 600;
     color: #123;
     margin-top: 3px;
@@ -5367,7 +5367,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .resource-status-label {
     font-size: 11px;
     float: right;
-    color: #888;
+    color: #555;
     margin-top: 3px;
 }
 
@@ -9538,7 +9538,7 @@ a.filter-tools:hover {
 }
 
 .graph-designer-tab-container {
-    background: #e7e7e7;
+    background: #C9D4E1;
     font-weight: 600;
     min-width: 400px;
 }
