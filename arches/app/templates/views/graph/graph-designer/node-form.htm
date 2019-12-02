@@ -183,18 +183,11 @@
                                     {% trans "Exportable" %}
                                     </p>
                                     <span class="graph-settings-switch-subtitle">
-                                        {% trans "Allow this node to participate in search export" %}
+                                        {% trans "Field name in export file. " %} <strong>{% trans "Name must be shorter than 10 characters to support Shapefile export." %}</strong>
                                     </span>
-
-                                </div>
-                                <div class="relative">
-                                    <label class="col-xs-12 control-label widget-input-label">
-                                        {% trans "Field Name" %}
-                                    </label>
-                                </div>
-
-                                <div class="col-xs-12">
-                                    <input class="form-control input-md widget-input" placeholder="fieldname for this node" type="text" data-bind="textInput: node().fieldname, disable: !node().exportable(), css: {'disabled': !node().exportable()}"></input>
+                                    <div class="exportable-field-name">
+                                        <input class="form-control input-md widget-input" placeholder="fieldname for this node" type="text" data-bind="textInput: node().fieldname, disable: !node().exportable(), css: {'disabled': !node().exportable()}"></input>
+                                    </div>
                                 </div>
                             </div>
                         </div>

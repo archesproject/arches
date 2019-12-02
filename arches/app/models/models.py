@@ -400,7 +400,7 @@ class GraphModel(models.Model):
         if not self.isresource:
             return _("Only resource models may be edited - branches are not editable")
         if not self.isactive:
-            return _("Set resource model status to Active in Graph Designer")
+            return _("This Model is Inactive and not available for editing")
         return False
 
     def is_editable(self):
