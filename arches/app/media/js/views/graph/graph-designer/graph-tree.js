@@ -58,6 +58,7 @@ define([
         * @param {boolean} options.graphModel - a reference to the selected {@link GraphModel}
         */
         initialize: function(options) {
+            var self = this;
             this.graphModel = options.graphModel;
             this.graphSettings = options.graphSettings;
             this.cardTree = options.cardTree;
@@ -67,6 +68,10 @@ define([
             this.branchListVisible = ko.observable(false);
             this.scrollTo = ko.observable();
             this.restrictedNodegroups = options.restrictedNodegroups;
+            this.showIds = ko.observable(false);
+            this.toggleIds = function() {
+                self.showIds(!self.showIds());
+            }
             TreeView.prototype.initialize.apply(this, arguments);
         },
 
