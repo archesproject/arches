@@ -71,7 +71,7 @@ define([
             this.showIds = ko.observable(false);
             this.toggleIds = function() {
                 self.showIds(!self.showIds());
-            }
+            };
             TreeView.prototype.initialize.apply(this, arguments);
         },
 
