@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ("email_notify", models.BooleanField(default=False)),
                 ("web_notify", models.BooleanField(default=False)),
             ],
-            options={"db_table": "notification_types", "managed": True,},
+            options={"db_table": "notification_types", "managed": True},
         ),
         migrations.CreateModel(
             name="UserXNotificationType",
@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
                 ("notification_type", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="models.NotificationType")),
                 ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
-            options={"db_table": "user_x_notification_types", "managed": True,},
+            options={"db_table": "user_x_notification_types", "managed": True},
         ),
         migrations.AddField(
             model_name="notification",
