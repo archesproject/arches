@@ -2425,14 +2425,14 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .function-node-alert {
-    background: #0ab1fc;
+    background: #72D3C9;
     padding: 15px 10px;
     margin-top: -15px;
     margin-left: -5px;
     margin-bottom: 15px;
     font-size: 14px;
     font-weight: 400;
-    color: #fff;
+    color: #01766A;
 }
 
 .edtf-input {
@@ -4536,7 +4536,7 @@ ul.jqtree_common li.jqtree-folder {
 
 .ep-graph-title {
     font-size: 1.6em;
-    padding-left: 15px;
+    padding-left: 5px;
     padding-top: 5px;
 }
 
@@ -10243,8 +10243,8 @@ ul.select2-choices:after {
 
 .card-component-panel .card-component .is-function-node {
     display: inline-block;
-    background: #0ab1fc;
-    color: #fff;
+    background: #72D3C9;
+    color: #01766A;
     padding: 10px 15px;
     margin-bottom: 15px;
     font-size: 13px;
