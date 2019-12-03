@@ -208,9 +208,9 @@ class NumberDataType(BaseDataType):
 class BooleanDataType(BaseDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
-
         try:
-            type(bool(util.strtobool(str(value)))) is True
+            if value is not None:
+                type(bool(util.strtobool(str(value)))) is True
         except Exception:
             errors.append({"type": "ERROR", "message": "{0} is not of type boolean. This data was not imported.".format(value)})
 
