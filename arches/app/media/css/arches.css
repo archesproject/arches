@@ -10232,6 +10232,7 @@ ul.select2-choices:after {
     flex: 1 0 250px;
     width: 250px;
     background-color: white;
+    z-index: 10;
 }
 
 .card-component-panel h3 {
