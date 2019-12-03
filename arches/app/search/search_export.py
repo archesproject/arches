@@ -24,7 +24,7 @@ from arches.app.utils.flatten_dict import flatten_dict
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.geo_utils import GeoUtils
-import arches.app.views.search as SearchView
+from arches.app.views import search as SearchView
 
 
 class SearchResultsExporter(object):
