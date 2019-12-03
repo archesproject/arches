@@ -10,7 +10,7 @@ define([
     'arches',
     'moment',
     'bindings/datepicker',
-], function(_, ko, BaseManagerView, MobileSurveyManagerViewModel, AlertViewModel, JsonErrorAlertViewModel, MobileSurveyModel, data, arches, moment) {
+], function($, _, ko, uuid, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, data, arches, moment) {
 
     var MobileSurveysViewModel = function(params) {
         var self = this;
