@@ -1253,6 +1253,9 @@ class FileListDataType(BaseDataType):
             pass
         return node_value
 
+    def collects_multiple_values(self):
+        return True
+
 
 class BaseDomainDataType(BaseDataType):
     def get_option_text(self, node, option_id):
@@ -1460,6 +1463,9 @@ class DomainListDataType(BaseDomainDataType):
 
         return [domtype.from_rdf(item) for item in json_ld_node]
 
+    def collects_multiple_values(self):
+        return True
+
 
 class ResourceInstanceDataType(BaseDataType):
     def get_id_list(self, nodevalue):
@@ -1582,6 +1588,9 @@ class ResourceInstanceDataType(BaseDataType):
         m = p.search(res_inst_uri)
         if m is not None:
             return m.groupdict()["r"]
+
+    def collects_multiple_values(self):
+        return True
 
 
 class NodeValueDataType(BaseDataType):

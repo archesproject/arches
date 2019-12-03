@@ -150,22 +150,23 @@ class ConceptDataType(BaseConceptDataType):
     def get_rdf_uri(self, node, data, which="r"):
         if not data:
             return None
-        c = ConceptValue(str(data)) 
+        c = ConceptValue(str(data))
         assert c.value is not None, "Null or blank concept value"
-        ext_ids = [ident.value for ident in models.Value.objects.all().filter(
-            concept_id__exact=c.conceptid, valuetype__category="identifiers")]
+        ext_ids = [
+            ident.value for ident in models.Value.objects.all().filter(concept_id__exact=c.conceptid, valuetype__category="identifiers")
+        ]
         for id_uri in ext_ids:
-            if str(id_uri).startswith(settings.PREFERRED_CONCEPT_SCHEME):        
+            if str(id_uri).startswith(settings.PREFERRED_CONCEPT_SCHEME):
                 return URIRef(id_uri)
-        return URIRef(archesproject[f'concepts/{c.conceptid}'])
+        return URIRef(archesproject[f"concepts/{c.conceptid}"])
 
     def to_rdf(self, edge_info, edge):
         g = Graph()
-        if edge_info['r_uri'] == self.get_rdf_uri(None, edge_info['range_tile_data']):
-            c = ConceptValue(str(edge_info['range_tile_data']))
-            g.add((edge_info['r_uri'], RDF.type, URIRef(edge.rangenode.ontologyclass)))
-            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), edge_info['r_uri']))
-            g.add((edge_info['r_uri'], URIRef(RDFS.label), Literal(c.value)))
+        if edge_info["r_uri"] == self.get_rdf_uri(None, edge_info["range_tile_data"]):
+            c = ConceptValue(str(edge_info["range_tile_data"]))
+            g.add((edge_info["r_uri"], RDF.type, URIRef(edge.rangenode.ontologyclass)))
+            g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), edge_info["r_uri"]))
+            g.add((edge_info["r_uri"], URIRef(RDFS.label), Literal(c.value)))
         return g
 
     def from_rdf(self, json_ld_node):
@@ -323,3 +324,6 @@ class ConceptListDataType(BaseConceptDataType):
             return [ctype.from_rdf(item) for item in json_ld_node]
         else:
             return [ctype.from_rdf(json_ld_node)]
+
+    def collects_multiple_values(self):
+        return True

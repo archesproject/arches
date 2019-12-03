@@ -240,3 +240,6 @@ class BaseDataType(object):
     def from_rdf(self, json_ld_node):
         print(json_ld_node)
         raise NotImplementedError
+
+    def collects_multiple_values(self):
+        return False
