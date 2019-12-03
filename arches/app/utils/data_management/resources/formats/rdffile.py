@@ -356,8 +356,8 @@ class JsonLdReader(Reader):
     def resolve_jsonld_doc(self, resource):
         graph_paths = self.get_paths(self.graphtree)
         jsonld_paths = self.get_jsonld_paths(self.jsonld_doc)
-        self.logger.debug(f"Graph Paths: self.path_to_string(graph_paths)")
-        self.logger.debug(f"self.path_to_string(jsonld_paths)")
+        self.logger.debug(f"Graph Paths: {self.path_to_string(graph_paths)}")
+        self.logger.debug(f"JSONLD Doc Paths: {self.path_to_string(jsonld_paths)}")
 
         depth = None  # how deeply nested is the jsonld node in jsonld document
         found_jsonld_paths = []
@@ -458,6 +458,10 @@ class JsonLdReader(Reader):
 
     def assign_tiles(self, graph_path, jsonld_path, resource):
         # we've found our path in the graph, now we just need to populate the tiles
+
+        # import ipdb
+
+        # ipdb.sset_trace()
         for i, jsonld_node in enumerate(jsonld_path):
             if i % 2 == 0:
                 # jsonld_node["node"] = graph_path[i]["node"]["node"].name
@@ -466,7 +470,27 @@ class JsonLdReader(Reader):
                     self.add_tile(jsonld_node, graph_path[i]["node"], parent_node, resource)
 
     def add_tile(self, jsonld_node, current_node, parent_node, resource):
+        datatype = self.datatype_factory.get_instance(current_node["node"].datatype)
         tileid = current_node.get("tileid", None)
+        # if the node already has data attached to it then we need to make a new tile
+        # if the card allows it (cardinality == "n")
+        # it would be nice to know if a datatype supported lists of things
+        # if tileid and self.tiles[tileid].data[str(current_node["node"].nodeid)] and current_node["node"].nodegroup.cardinality == "n":
+        #     tileid = None
+        existing_value = None
+        if tileid is not None and str(current_node["node"].nodeid) in self.tiles[tileid].data:
+            existing_value = self.tiles[tileid].data[str(current_node["node"].nodeid)]
+        if (
+            datatype.collects_multiple_values() is False
+            and existing_value is not None
+            and current_node["node"].nodegroup.cardinality == "n"
+        ):
+            tileid = None
+        # else:
+        #     # if we get here something is wrong
+        #     raise Exception("Uh oh!")
+        #     pass
+
         if self.use_ids:
             try:
                 match = re.match(
@@ -492,6 +516,8 @@ class JsonLdReader(Reader):
 
         if tileid not in self.tiles:
             self.logger.debug("Target tileid does not exist - creating {0}".format(tileid))
+
+            # !! this might be wrong the way we calculate the parent tile id---
             self.tiles[tileid] = Tile(
                 tileid=tileid, parenttile_id=parent_node["tileid"], nodegroup_id=current_node["node"].nodegroup_id, data={}
             )
@@ -504,19 +530,27 @@ class JsonLdReader(Reader):
 
         if self.datatype_factory.datatypes[current_node["node"].datatype].defaultwidget is not None:
             self.logger.debug("Assigning value to datatype ({0}) from a non-semantic node:".format(current_node["node"].datatype))
-            datatype = self.datatype_factory.get_instance(current_node["node"].datatype)
             value = datatype.from_rdf(jsonld_node["jsonld_node"])
 
             self.logger.debug("value found! : {0}".format(value))
+
+            # if the tile already has a value for the given nodeid
             if str(current_node["node"].nodeid) in self.tiles[tileid].data:
+                # import ipdb
+
+                # ipdb.sset_trace()
                 existing_value = self.tiles[tileid].data[str(current_node["node"].nodeid)]
+                # if current_node["node"].nodegroup.cardinality == "n":
+                #     self.add_tile(jsonld_node, graph_path[i]["node"], parent_node, resource)
+                # else:
                 if not isinstance(existing_value, list):
                     existing_value = [existing_value]
                 if not isinstance(value, list):
                     value = [value]
                 value = value + existing_value
-
-            self.tiles[tileid].data[str(current_node["node"].nodeid)] = value
+                self.tiles[tileid].data[str(current_node["node"].nodeid)] = value
+            else:
+                self.tiles[tileid].data[str(current_node["node"].nodeid)] = value
 
         return tileid
 
