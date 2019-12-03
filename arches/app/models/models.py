@@ -1014,13 +1014,26 @@ class UserXTask(models.Model):
         db_table = "user_x_tasks"
 
 
+class NotificationType(models.Model):
+    typeid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    name = models.TextField(blank=True, null=True)
+    email_template = models.TextField(blank=True, null=True)
+    email_notify = models.BooleanField(default=False)
+    web_notify = models.BooleanField(default=False)
+
+    class Meta:
+        managed = True
+        db_table = "notification_types"
+
+
 class Notification(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     is_read = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, null=False)
-    created.editable = True
+    # created.editable = True # must comment this out when running makemigrations, then uncomment after migration made
     message = models.TextField(blank=True, null=True)
     recipient_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    notif_type = models.ForeignKey(NotificationType, on_delete=models.CASCADE, null=True)
 
     class Meta:
         managed = True
@@ -1029,6 +1042,18 @@ class Notification(models.Model):
 
 def getDataDownloadConfigDefaults():
     return dict(download=False, count=100, resources=[], custom=None)
+
+
+class UserXNotificationType(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    notification_type = models.ForeignKey(NotificationType, on_delete=models.CASCADE)
+    email_notify = models.BooleanField(default=False)
+    web_notify = models.BooleanField(default=False)
+
+    class Meta:
+        managed = True
+        db_table = "user_x_notification_types"
 
 
 class MobileSurveyModel(models.Model):
