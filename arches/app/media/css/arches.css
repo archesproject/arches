@@ -476,11 +476,13 @@ input[type="checkbox"] {
     display: block;
     margin: 0 auto;
     height: 45px;
-    line-height: 45px;
+    line-height: 43px;
     text-align: center;
     width: 45px;
-    font-size: 21px;
-    color: #ccc;
+    font-size: 17px;
+    color: #bbb;
+    border: 1px solid #ddd;
+    background: #f4f4f4;
 }
 
 .selectable .workflow-step-icon {
@@ -775,15 +777,22 @@ ul.tabbed-report-tab-list {
 
 .report-tab:hover {
     cursor: pointer;
+    background: #BADAF7;
+    border: 1px solid #1E6FB7;
 }
 
 .report-tab i {
     color: #bbbbbb;
-    font-size: 21px;
+    font-size: 19px;
+    line-height: 23px;
     display: block;
-    margin: 0 3px;
+    margin: 0 4px;
     text-align: center;
     padding: 13px;
+}
+
+.report-tab i:hover {
+    color: #fff;
 }
 
 .report-tab.active {
@@ -2378,7 +2387,7 @@ ul.nav.nav-tabs.nav-justified {
     margin-left: 40px;
     margin-top: -5px;
     display: inline-block;
-    color: #8ba2b9;
+    color: #5F7D9A;
     font-size: 11px;
     position: relative;
     top: -5px;
@@ -2425,14 +2434,14 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .function-node-alert {
-    background: #0ab1fc;
+    background: #72D3C9;
     padding: 15px 10px;
     margin-top: -15px;
     margin-left: -5px;
     margin-bottom: 15px;
     font-size: 14px;
     font-weight: 400;
-    color: #fff;
+    color: #01766A;
 }
 
 .edtf-input {
@@ -4458,7 +4467,7 @@ ul.jqtree_common li.jqtree-folder {
 
 .ep-tools {
     cursor: pointer;
-    border-right: 1px solid #ddd;
+    border-right: 1px solid #514CCA;
     border-bottom: 1px solid transparent;
     height: 50px;
     display: -ms-flexbox;
@@ -4536,7 +4545,7 @@ ul.jqtree_common li.jqtree-folder {
 
 .ep-graph-title {
     font-size: 1.6em;
-    padding-left: 15px;
+    padding-left: 5px;
     padding-top: 5px;
 }
 
@@ -5591,8 +5600,8 @@ ul .card-tree-list a .node-subname {
 .arches-toggle-subtitle {
     margin-left: 40px;
     display: inline-block;
-    color: #8ba2b9;
-    font-size: 10px;
+    color: #5F7D9A;
+    font-size: 12px;
     padding-right: 10px;
 }
 
@@ -5904,7 +5913,7 @@ a.list-group-item:not(.active):hover, div .switch label:hover, #demo-dt-selectio
     align-items: center;
     border-top: 1px solid #ddd;
     padding-left: 10px;
-    padding: 12px 15px;
+    padding: 15px 15px;
 }
 
 .file-select {
@@ -10223,6 +10232,7 @@ ul.select2-choices:after {
     flex: 1 0 250px;
     width: 250px;
     background-color: white;
+    z-index: 10;
 }
 
 .card-component-panel h3 {
@@ -10243,8 +10253,8 @@ ul.select2-choices:after {
 
 .card-component-panel .card-component .is-function-node {
     display: inline-block;
-    background: #0ab1fc;
-    color: #fff;
+    background: #72D3C9;
+    color: #01766A;
     padding: 10px 15px;
     margin-bottom: 15px;
     font-size: 13px;
@@ -10262,6 +10272,7 @@ ul.select2-choices:after {
     color: #999;
     margin-top: -8px;
     margin-bottom: 5px;
+    font-size: 13px;
 }
 
 .card-component-wrapper-editor {
