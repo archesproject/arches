@@ -476,11 +476,13 @@ input[type="checkbox"] {
     display: block;
     margin: 0 auto;
     height: 45px;
-    line-height: 45px;
+    line-height: 43px;
     text-align: center;
     width: 45px;
-    font-size: 21px;
-    color: #ccc;
+    font-size: 17px;
+    color: #bbb;
+    border: 1px solid #ddd;
+    background: #f4f4f4;
 }
 
 .selectable .workflow-step-icon {
@@ -775,15 +777,22 @@ ul.tabbed-report-tab-list {
 
 .report-tab:hover {
     cursor: pointer;
+    background: #BADAF7;
+    border: 1px solid #1E6FB7;
 }
 
 .report-tab i {
     color: #bbbbbb;
-    font-size: 21px;
+    font-size: 19px;
+    line-height: 23px;
     display: block;
-    margin: 0 3px;
+    margin: 0 4px;
     text-align: center;
     padding: 13px;
+}
+
+.report-tab i:hover {
+    color: #fff;
 }
 
 .report-tab.active {
