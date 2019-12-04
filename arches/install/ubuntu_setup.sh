@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-# For Ubuntu 16.04 (xenial) and 18.04 (bionic)
+# For Ubuntu 18.04 (bionic)
 
-# Use the yes command if you would like to include java, postgis and node by default
+# Use the yes command if you would like to install postgres/postgis, couchdb,
+# node/yarn, and elasticsearch.
 # Example:
 # yes | sudo ./ubuntu_setup.sh
 
@@ -10,30 +11,29 @@ function install_postgres {
   sudo add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main"
   wget --quiet -O - http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | sudo apt-key add -
   sudo apt-get update
-  sudo apt-get install postgresql-9.6 postgresql-contrib-9.6 -y
-  sudo apt-get install postgresql-9.6-postgis-2.4 -y
+  sudo apt-get install postgresql-12 postgresql-contrib-12 -y
+  sudo apt-get install postgresql-12-postgis-3 -y
   sudo -u postgres psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
   sudo echo "*:*:*:postgres:postgis" >> ~/.pgpass
   sudo chmod 600 ~/.pgpass
-  sudo chmod 666 /etc/postgresql/9.6/main/postgresql.conf
-  sudo chmod 666 /etc/postgresql/9.6/main/pg_hba.conf
-  sudo echo "standard_conforming_strings = off" >> /etc/postgresql/9.6/main/postgresql.conf
-  sudo echo "listen_addresses = '*'" >> /etc/postgresql/9.6/main/postgresql.conf
-  sudo echo "#TYPE   DATABASE  USER  CIDR-ADDRESS  METHOD" > /etc/postgresql/9.6/main/pg_hba.conf
-  sudo echo "local   all       all                 trust" >> /etc/postgresql/9.6/main/pg_hba.conf
-  sudo echo "host    all       all   127.0.0.1/32  trust" >> /etc/postgresql/9.6/main/pg_hba.conf
-  sudo echo "host    all       all   ::1/128       trust" >> /etc/postgresql/9.6/main/pg_hba.conf
-  sudo echo "host    all       all   0.0.0.0/0     md5" >> /etc/postgresql/9.6/main/pg_hba.conf
+  sudo chmod 666 /etc/postgresql/12/main/postgresql.conf
+  sudo chmod 666 /etc/postgresql/12/main/pg_hba.conf
+  sudo echo "standard_conforming_strings = off" >> /etc/postgresql/12/main/postgresql.conf
+  sudo echo "listen_addresses = '*'" >> /etc/postgresql/12/main/postgresql.conf
+  sudo echo "#TYPE   DATABASE  USER  CIDR-ADDRESS  METHOD" > /etc/postgresql/12/main/pg_hba.conf
+  sudo echo "local   all       all                 trust" >> /etc/postgresql/12/main/pg_hba.conf
+  sudo echo "host    all       all   127.0.0.1/32  trust" >> /etc/postgresql/12/main/pg_hba.conf
+  sudo echo "host    all       all   ::1/128       trust" >> /etc/postgresql/12/main/pg_hba.conf
+  sudo echo "host    all       all   0.0.0.0/0     md5" >> /etc/postgresql/12/main/pg_hba.conf
   sudo service postgresql restart
 
-  sudo -u postgres psql -d postgres -c "CREATE EXTENSION postgis;"
   sudo -u postgres createdb -E UTF8 -T template0 --locale=en_US.utf8 template_postgis
   sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='template_postgis'"
   sudo -u postgres psql -d template_postgis -c "CREATE EXTENSION postgis;"
+  sudo -u postgres psql -d template_postgis -c "CREATE EXTENSION \"uuid-ossp\";"
   sudo -u postgres psql -d template_postgis -c "GRANT ALL ON geometry_columns TO PUBLIC;"
   sudo -u postgres psql -d template_postgis -c "GRANT ALL ON geography_columns TO PUBLIC;"
   sudo -u postgres psql -d template_postgis -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
-  sudo -u postgres createdb training -T template_postgis
 }
 
 function install_couchdb {
@@ -50,8 +50,16 @@ function install_yarn {
   sudo npm install -g yarn
 }
 
-function install_java {
+function install_elasticsearch {
   sudo apt-get install openjdk-8-jre-headless -y
+  sudo apt-get install apt-transport-https
+  wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+  sudo sh -c 'echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" > /etc/apt/sources.list.d/elastic-7.x.list'
+  sudo apt-get update
+  sudo apt-get install elasticsearch
+  sudo /bin/systemctl enable elasticsearch.service
+  sudo systemctl enable elasticsearch.service
+  sudo systemctl start elasticsearch.service
 }
 
 function main {
@@ -70,43 +78,42 @@ function main {
   sudo apt-get install -y libgdal-dev
   sudo apt-get install -y libpq-dev
 
-  sudo apt-get install python-pip -y
-  pip install virtualenv==13.1.2
+  sudo apt-get install python3-venv
 
-  echo -n "Would you like to install openjdk-8-jre? (y/n)? "
+  echo -n "Would you like to install elasticsearch? (y/N)? "
   read answer
   if echo "$answer" | grep -iq "^y" ;then
-    echo Yes, installing Java 8
-    install_java
+    echo Yes, installing Elasticsearch
+    install_elasticsearch
   else
-    echo Skipping Java installation
+    echo Skipping Elasticsearch installation
   fi
 
-  echo -n "Would you like to install and configure postgres/postgis? (y/n)? "
+  echo -n "Would you like to install and configure postgres/postgis? (y/N)? "
   read answer
   if echo "$answer" | grep -iq "^y" ;then
-    echo Yes, Installing postgis
+    echo Yes, Installing Postgres/PostGIS
     install_postgres
   else
-    echo Skipping postgres/postgis installation
+    echo Skipping Postgres/PostGIS installation
   fi
 
-  echo -n "Would you like to install and configure couchdb? (y/n)? "
+  echo -n "Would you like to install and configure couchdb? (y/N)? "
   read answer
   if echo "$answer" | grep -iq "^y" ;then
-    echo Yes, Installing couchdb
+    echo Yes, Installing CouchDB
     install_couchdb
   else
-    echo Skipping couch installation
+    echo Skipping CouchDB installation
   fi
 
-  echo -n "Would you like to install and nodejs/npm/and yarn (y/n)? "
+  echo -n "Would you like to install and nodejs/npm/and yarn (y/N)? "
   read answer
   if echo "$answer" | grep -iq "^y" ;then
     echo Yes, installing Node/Yarn
     install_yarn
   else
-    echo Skipping node/npm/yarn installation
+    echo Skipping Node/Yarn installation
   fi
 }
 
