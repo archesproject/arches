@@ -34,7 +34,12 @@ from django.conf import settings
 
 
 def get_ontology_storage_system():
-    return FileSystemStorage(location=os.path.join(settings.APP_ROOT, "ontologies"))
+    try:
+        location = os.path.join(settings.APP_ROOT, "ontologies")
+    except AttributeError:
+        location = os.path.join(settings.ROOT_DIR, "db", "ontologies")
+
+    return FileSystemStorage(location=location)
 
 
 class CardModel(models.Model):
