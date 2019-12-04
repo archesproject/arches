@@ -85,7 +85,6 @@ class Command(BaseCommand):
                 "setup",
                 "install",
                 "setup_indexes",
-                "build_permissions",
                 "load_concept_scheme",
                 "export_business_data",
                 "export_graphs",
@@ -107,8 +106,7 @@ class Command(BaseCommand):
             help="Operation Type; "
             + "'setup'=Sets up the database schema and code"
             + "'setup_indexes'=Creates the indexes in Elastic Search needed by the system"
-            + "'install'=Runs the setup file defined in your package root"
-            + "'build_permissions'=generates \"add,update,read,delete\" permissions for each entity mapping",
+            + "'install'=Runs the setup file defined in your package root",
         )
 
         parser.add_argument(
@@ -240,9 +238,6 @@ class Command(BaseCommand):
 
         if options["operation"] == "delete_indexes":
             self.delete_indexes()
-
-        if options["operation"] == "build_permissions":
-            self.build_permissions()
 
         if options["operation"] == "load_concept_scheme":
             self.load_concept_scheme(package_name, options["source"])
@@ -894,42 +889,6 @@ class Command(BaseCommand):
 
     def delete_indexes(self):
         management.call_command("es", operation="delete_indexes")
-
-    def build_permissions(self):
-        """
-        Creates permissions based on all the installed resource types
-
-        """
-
-        from arches.app.models import models
-        from django.contrib.auth.models import Permission, ContentType
-
-        resourcetypes = {}
-        mappings = models.Mappings.objects.all()
-        mapping_steps = models.MappingSteps.objects.all()
-        rules = models.Rules.objects.all()
-        for mapping in mappings:
-            # print('%s -- %s' % (mapping.entitytypeidfrom_id, mapping.entitytypeidto_id))
-            if mapping.entitytypeidfrom_id not in resourcetypes:
-                resourcetypes[mapping.entitytypeidfrom_id] = {mapping.entitytypeidfrom_id}
-            for step in mapping_steps.filter(pk=mapping.pk):
-                resourcetypes[mapping.entitytypeidfrom_id].add(step.ruleid.entitytyperange_id)
-
-        for resourcetype in resourcetypes:
-            for entitytype in resourcetypes[resourcetype]:
-                content_type = ContentType.objects.get_or_create(app_label=resourcetype, model=entitytype)
-                Permission.objects.create(
-                    codename="add_%s" % entitytype, name="%s - add" % entitytype, content_type=content_type[0],
-                )
-                Permission.objects.create(
-                    codename="update_%s" % entitytype, name="%s - update" % entitytype, content_type=content_type[0],
-                )
-                Permission.objects.create(
-                    codename="read_%s" % entitytype, name="%s - read" % entitytype, content_type=content_type[0],
-                )
-                Permission.objects.create(
-                    codename="delete_%s" % entitytype, name="%s - delete" % entitytype, content_type=content_type[0],
-                )
 
     def export_business_data(
         self, data_dest=None, file_format=None, config_file=None, graph=None, single_file=False,
