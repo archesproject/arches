@@ -153,14 +153,6 @@ class Command(BaseCommand):
             "-c", "--config_file", action="store", dest="config_file", default=None, help="Usually an export mapping file.",
         )
 
-        # parser.add_argument(
-        #     '-m', '--mapnik_xml_path', action='store', dest='mapnik_xml_path', default=False,
-        #     help='A path to a mapnik xml file to generate a tileserver layer from.')
-
-        # parser.add_argument(
-        #     '-t', '--tile_config_path', action='store', dest='tile_config_path', default=False,
-        #     help='A path to a tile config json file to generate a tileserver layer from.')
-
         parser.add_argument(
             "-j",
             "--mapbox_json_path",
