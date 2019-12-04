@@ -1043,27 +1043,35 @@ class Notification(models.Model):
         db_table = "notifications"
 
 
+# class UserXNotification(models.Model):
+#     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+#     isread = models.BooleanField(default=False)
+#     created = models.DateTimeField(auto_now_add=True)
+#     recipient = models.ForeignKey(User, on_delete=models.CASCADE)
+
+#     class Meta:
+#         managed = True
+#         db_table = "user_x_notifications"
+
+
 @receiver(post_save, sender=Notification)
 def send_email_on_save(sender, instance, **kwargs):
     """Checks if a notification type needs to send an email, does so if server running
     """
     
-    if sender.notif_type is not None and sender.is_read is False:
-        notif_type = NotificationType.objects.get(sender.notif_type)
-        if notif_type.email_notify is True and settings.EMAIL_BACKEND is not None:
+    if instance.notif_type is not None and instance.is_read is False:
+        if instance.notif_type.email_notify is True and settings.EMAIL_BACKEND is not None:
             dl_link = ""
             text_content = "This is an important message."
-            html_template = get_template(notif_type.email_template)
-            ctx = Context({"link": dl_link, "button_text": "Download", "greeting": "Hello", "closing": "adios"})
+            html_template = get_template(instance.notif_type.email_template)
+            ctx = {"link": dl_link, "button_text": "Download", "greeting": "Hello", "closing": "adios"}
             html_content = html_template.render(ctx)
             subject, from_email, to = "Download Ready", "from@example.com", "to@example.com"
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
-            sender.is_read = True
-            sender.save()
-        else:
-            print("Email backend is None")
+            instance.is_read = True
+            instance.save()
     
     return False
 
