@@ -84,7 +84,6 @@ class Command(BaseCommand):
             choices=[
                 "setup",
                 "install",
-                "setup_db",
                 "setup_indexes",
                 "build_permissions",
                 "load_concept_scheme",
@@ -107,7 +106,6 @@ class Command(BaseCommand):
             ],
             help="Operation Type; "
             + "'setup'=Sets up the database schema and code"
-            + "'setup_db'=Truncate the entire arches based db and re-installs the base schema"
             + "'setup_indexes'=Creates the indexes in Elastic Search needed by the system"
             + "'install'=Runs the setup file defined in your package root"
             + "'build_permissions'=generates \"add,update,read,delete\" permissions for each entity mapping",
@@ -244,9 +242,6 @@ class Command(BaseCommand):
 
         if options["operation"] == "install":
             self.install(package_name)
-
-        if options["operation"] == "setup_db":
-            self.setup_db(package_name)
 
         if options["operation"] == "setup_indexes":
             self.setup_indexes()
@@ -898,13 +893,6 @@ class Command(BaseCommand):
         """
 
         management.call_command("setup_db", force=True)
-
-        print(
-            "\n" + "~" * 80 + "\n"
-            "Warning: This command will be deprecated in Arches 4.5. From now on please use\n\n"
-            "    python manage.py setup_db [--force]\n\nThe --force argument will "
-            "suppress the interactive confirmation prompt.\n" + "~" * 80
-        )
 
     def setup_indexes(self):
         management.call_command("es", operation="setup_indexes")
