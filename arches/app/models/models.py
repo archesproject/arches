@@ -19,9 +19,12 @@ from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
 from django.core.files.storage import FileSystemStorage
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import get_template
+from django.template import Context
 from django.core.validators import RegexValidator
 from django.db.models import Q, Max
-from django.db.models.signals import post_delete, pre_save
+from django.db.models.signals import post_delete, pre_save, post_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
@@ -1032,12 +1035,37 @@ class Notification(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=False)
     created.editable = True  # must comment this out when running makemigrations, then uncomment after migration made
     message = models.TextField(blank=True, null=True)
-    recipient_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    recipient_id = models.ForeignKey(User, on_delete=models.CASCADE) # should this be null=True? How handle a 1-many notif?
     notif_type = models.ForeignKey(NotificationType, on_delete=models.CASCADE, null=True)
 
     class Meta:
         managed = True
         db_table = "notifications"
+
+
+@receiver(post_save, sender=Notification)
+def send_email_on_save(sender, instance, **kwargs):
+    """Checks if a notification type needs to send an email, does so if server running
+    """
+    
+    if sender.notif_type is not None and sender.is_read is False:
+        notif_type = NotificationType.objects.get(sender.notif_type)
+        if notif_type.email_notify is True and settings.EMAIL_BACKEND is not None:
+            dl_link = ""
+            text_content = "This is an important message."
+            html_template = get_template(notif_type.email_template)
+            ctx = Context({"link": dl_link, "button_text": "Download", "greeting": "Hello", "closing": "adios"})
+            html_content = html_template.render(ctx)
+            subject, from_email, to = "Download Ready", "from@example.com", "to@example.com"
+            msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            sender.is_read = True
+            sender.save()
+        else:
+            print("Email backend is None")
+    
+    return False
 
 
 def getDataDownloadConfigDefaults():
