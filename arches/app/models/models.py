@@ -1060,7 +1060,7 @@ class UserXNotification(models.Model):
 class UserXNotificationType(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    notificationtype = models.ForeignKey(NotificationType, on_delete=models.CASCADE)
+    notiftype = models.ForeignKey(NotificationType, on_delete=models.CASCADE)
     emailnotify = models.BooleanField(default=False)
     webnotify = models.BooleanField(default=False)
 
@@ -1079,8 +1079,8 @@ def send_email_on_save(sender, instance, **kwargs):
             dl_link = instance.notif.message
             text_content = "This is an important message."
             html_template = get_template(instance.notif.notiftype.emailtemplate)
-            ctx = {"link": dl_link, "button_text": "Download", "greeting": "Hello", "closing": "Thank you"}
-            html_content = html_template.render(ctx)
+            context = {"link": dl_link, "button_text": "Download", "greeting": "Hello", "closing": "Thank you"}
+            html_content = html_template.render(context)
             subject, from_email, to = "Download Ready", "from@example.com", "to@example.com"
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
             msg.attach_alternative(html_content, "text/html")

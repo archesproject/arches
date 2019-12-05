@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                 ("id", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ("emailnotify", models.BooleanField(default=False)),
                 ("webnotify", models.BooleanField(default=False)),
-                ("notificationtype", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="models.NotificationType")),
+                ("notiftype", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="models.NotificationType")),
                 ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={"db_table": "user_x_notification_types", "managed": True},
