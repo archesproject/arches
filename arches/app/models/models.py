@@ -37,7 +37,12 @@ from django.conf import settings
 
 
 def get_ontology_storage_system():
-    return FileSystemStorage(location=os.path.join(settings.ROOT_DIR, "db", "ontologies"))
+    try:
+        location = os.path.join(settings.APP_ROOT, "ontologies")
+    except AttributeError:
+        location = os.path.join(settings.ROOT_DIR, "db", "ontologies")
+
+    return FileSystemStorage(location=location)
 
 
 class CardModel(models.Model):
@@ -63,7 +68,7 @@ class CardModel(models.Model):
         result = True
         tiles = TileModel.objects.filter(nodegroup=self.nodegroup).count()
         result = False if tiles > 0 else True
-        if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
+        if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
             result = True
         return result
 
