@@ -1007,8 +1007,8 @@ class UserXTask(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     taskid = models.UUIDField(serialize=False, blank=True, null=True)
     status = models.TextField(null=True, default="PENDING")
-    date_start = models.DateTimeField(blank=True, null=True)
-    date_done = models.DateTimeField(blank=True, null=True)
+    datestart = models.DateTimeField(blank=True, null=True)
+    datedone = models.DateTimeField(blank=True, null=True)
     name = models.TextField(blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -1020,9 +1020,9 @@ class UserXTask(models.Model):
 class NotificationType(models.Model):
     typeid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     name = models.TextField(blank=True, null=True)
-    email_template = models.TextField(blank=True, null=True)
-    email_notify = models.BooleanField(default=False)
-    web_notify = models.BooleanField(default=False)
+    emailtemplate = models.TextField(blank=True, null=True)
+    emailnotify = models.BooleanField(default=False)
+    webnotify = models.BooleanField(default=False)
 
     class Meta:
         managed = True
@@ -1031,65 +1031,65 @@ class NotificationType(models.Model):
 
 class Notification(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
-    is_read = models.BooleanField(default=False)
-    created = models.DateTimeField(auto_now_add=True, null=False)
-    created.editable = True  # must comment this out when running makemigrations, then uncomment after migration made
+    created = models.DateTimeField(auto_now_add=True)
+    # created.editable = True  # must comment this out when running makemigrations, then uncomment after migration made
     message = models.TextField(blank=True, null=True)
-    recipient_id = models.ForeignKey(User, on_delete=models.CASCADE) # should this be null=True? How handle a 1-many notif?
-    notif_type = models.ForeignKey(NotificationType, on_delete=models.CASCADE, null=True)
+    notiftype = models.ForeignKey(NotificationType, on_delete=models.CASCADE, null=True)
 
     class Meta:
         managed = True
         db_table = "notifications"
 
 
-# class UserXNotification(models.Model):
-#     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
-#     isread = models.BooleanField(default=False)
-#     created = models.DateTimeField(auto_now_add=True)
-#     recipient = models.ForeignKey(User, on_delete=models.CASCADE)
+class UserXNotification(models.Model):
+    id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    created = models.DateTimeField(auto_now_add=True)
+    notif = models.ForeignKey(Notification, on_delete=models.CASCADE)
+    isread = models.BooleanField(default=False)
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE)
 
-#     class Meta:
-#         managed = True
-#         db_table = "user_x_notifications"
+    class Meta:
+        managed = True
+        db_table = "user_x_notifications"
 
 
-@receiver(post_save, sender=Notification)
+class UserXNotificationType(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    notificationtype = models.ForeignKey(NotificationType, on_delete=models.CASCADE)
+    emailnotify = models.BooleanField(default=False)
+    webnotify = models.BooleanField(default=False)
+
+    class Meta:
+        managed = True
+        db_table = "user_x_notification_types"
+
+
+@receiver(post_save, sender=UserXNotification)
 def send_email_on_save(sender, instance, **kwargs):
     """Checks if a notification type needs to send an email, does so if server running
     """
-    
-    if instance.notif_type is not None and instance.is_read is False:
-        if instance.notif_type.email_notify is True and settings.EMAIL_BACKEND is not None:
+
+    if instance.notif.notiftype is not None and instance.isread is False:
+        if instance.notif.notiftype.emailnotify is True and settings.EMAIL_BACKEND is not None:
             dl_link = ""
             text_content = "This is an important message."
-            html_template = get_template(instance.notif_type.email_template)
+            html_template = get_template(instance.notif.notiftype.emailtemplate)
             ctx = {"link": dl_link, "button_text": "Download", "greeting": "Hello", "closing": "adios"}
             html_content = html_template.render(ctx)
             subject, from_email, to = "Download Ready", "from@example.com", "to@example.com"
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
-            instance.is_read = True
-            instance.save()
+            if instance.notif.notiftype.webnotify is not True:
+                instance.isread = True
+                instance.save()
     
     return False
 
 
 def getDataDownloadConfigDefaults():
     return dict(download=False, count=100, resources=[], custom=None)
-
-
-class UserXNotificationType(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    notification_type = models.ForeignKey(NotificationType, on_delete=models.CASCADE)
-    email_notify = models.BooleanField(default=False)
-    web_notify = models.BooleanField(default=False)
-
-    class Meta:
-        managed = True
-        db_table = "user_x_notification_types"
 
 
 class MobileSurveyModel(models.Model):

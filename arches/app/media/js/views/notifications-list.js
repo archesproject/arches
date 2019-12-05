@@ -29,9 +29,10 @@ define([
                     type: 'GET',
                     url: arches.urls.get_notifications
                 }).done(function(data) {
+                    console.log(data);
                     self.items(_.filter(data.notifications, function(notif) {
                         notif.displaytime = moment(notif.created).format('DD-MM-YYYY hh:mm a');
-                        return notif.is_read === false;
+                        return notif.isread === false;
                     }));
                     self.helploading(false);
                 });

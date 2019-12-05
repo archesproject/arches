@@ -13,8 +13,14 @@ class NotificationView(View):
 
     def get(self, request):
         if request.user.is_authenticated:
-            notifs = models.Notification.objects.filter(recipient_id=request.user.id).order_by("created").reverse()
-            return JSONResponse({"success": True, "notifications": notifs}, status=200)
+            notifs = models.UserXNotification.objects.filter(recipient=request.user).order_by("created").reverse()
+            notif_dict_list = []
+            for n in notifs:
+                notif = n.__dict__
+                notif["message"] = n.notif.message
+                notif_dict_list.append(notif)
+
+            return JSONResponse({"success": True, "notifications": notif_dict_list}, status=200)
 
         return JSONResponse({"error": "User not authenticated. Access denied."}, status=401)
 
@@ -26,10 +32,10 @@ class NotificationView(View):
                 dismissals.append(dismiss_notifs)
             else:
                 dismissals = dismiss_notifs
-            notifs = models.Notification.objects.filter(pk__in=dismissals)
+            notifs = models.UserXNotification.objects.filter(pk__in=dismissals)
             for n in notifs:
-                n.is_read = True
-            resp = models.Notification.objects.bulk_update(notifs, ["is_read"])
+                n.isread = True
+            resp = models.Notification.objects.bulk_update(notifs, ["isread"])
 
             return JSONResponse({"status": "success", "response": resp}, status=200)
         return JSONResponse({"status": "failed", "response": None}, status=500)
