@@ -19,9 +19,12 @@ from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
 from django.core.files.storage import FileSystemStorage
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import get_template
+from django.template import Context
 from django.core.validators import RegexValidator
 from django.db.models import Q, Max
-from django.db.models.signals import post_delete, pre_save
+from django.db.models.signals import post_delete, pre_save, post_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
@@ -1004,8 +1007,8 @@ class UserXTask(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     taskid = models.UUIDField(serialize=False, blank=True, null=True)
     status = models.TextField(null=True, default="PENDING")
-    date_start = models.DateTimeField(blank=True, null=True)
-    date_done = models.DateTimeField(blank=True, null=True)
+    datestart = models.DateTimeField(blank=True, null=True)
+    datedone = models.DateTimeField(blank=True, null=True)
     name = models.TextField(blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -1017,9 +1020,9 @@ class UserXTask(models.Model):
 class NotificationType(models.Model):
     typeid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     name = models.TextField(blank=True, null=True)
-    email_template = models.TextField(blank=True, null=True)
-    email_notify = models.BooleanField(default=False)
-    web_notify = models.BooleanField(default=False)
+    emailtemplate = models.TextField(blank=True, null=True)
+    emailnotify = models.BooleanField(default=False)
+    webnotify = models.BooleanField(default=False)
 
     class Meta:
         managed = True
@@ -1028,32 +1031,64 @@ class NotificationType(models.Model):
 
 class Notification(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
-    is_read = models.BooleanField(default=False)
-    created = models.DateTimeField(auto_now_add=True, null=False)
-    created.editable = True  # must comment this out when running makemigrations, then uncomment after migration made
+    created = models.DateTimeField(auto_now_add=True)
+    # created.editable = True  # must comment this out when running makemigrations, then uncomment after migration made
     message = models.TextField(blank=True, null=True)
-    recipient_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    notif_type = models.ForeignKey(NotificationType, on_delete=models.CASCADE, null=True)
+    notiftype = models.ForeignKey(NotificationType, on_delete=models.CASCADE, null=True)
 
     class Meta:
         managed = True
         db_table = "notifications"
 
 
-def getDataDownloadConfigDefaults():
-    return dict(download=False, count=100, resources=[], custom=None)
+class UserXNotification(models.Model):
+    id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    notif = models.ForeignKey(Notification, on_delete=models.CASCADE)
+    isread = models.BooleanField(default=False)
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        managed = True
+        db_table = "user_x_notifications"
 
 
 class UserXNotificationType(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    notification_type = models.ForeignKey(NotificationType, on_delete=models.CASCADE)
-    email_notify = models.BooleanField(default=False)
-    web_notify = models.BooleanField(default=False)
+    notificationtype = models.ForeignKey(NotificationType, on_delete=models.CASCADE)
+    emailnotify = models.BooleanField(default=False)
+    webnotify = models.BooleanField(default=False)
 
     class Meta:
         managed = True
         db_table = "user_x_notification_types"
+
+
+@receiver(post_save, sender=UserXNotification)
+def send_email_on_save(sender, instance, **kwargs):
+    """Checks if a notification type needs to send an email, does so if email server running
+    """
+
+    if instance.notif.notiftype is not None and instance.isread is False:
+        if instance.notif.notiftype.emailnotify is True and (settings.EMAIL_BACKEND is not None or settings.EMAIL_HOST is not None):
+            dl_link = instance.notif.message
+            text_content = "This is an important message."
+            html_template = get_template(instance.notif.notiftype.emailtemplate)
+            ctx = {"link": dl_link, "button_text": "Download", "greeting": "Hello", "closing": "Thank you"}
+            html_content = html_template.render(ctx)
+            subject, from_email, to = "Download Ready", "from@example.com", "to@example.com"
+            msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            if instance.notif.notiftype.webnotify is not True:
+                instance.isread = True
+                instance.save()
+
+    return False
+
+
+def getDataDownloadConfigDefaults():
+    return dict(download=False, count=100, resources=[], custom=None)
 
 
 class MobileSurveyModel(models.Model):

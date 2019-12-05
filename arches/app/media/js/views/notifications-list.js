@@ -27,11 +27,13 @@ define([
                 self.helploading(true);
                 $.ajax({
                     type: 'GET',
-                    url: arches.urls.get_notifications
+                    url: arches.urls.get_notifications,
+                    data: {"unread_only": true}
                 }).done(function(data) {
                     self.items(_.filter(data.notifications, function(notif) {
                         notif.displaytime = moment(notif.created).format('DD-MM-YYYY hh:mm a');
-                        return notif.is_read === false;
+                        notif.message = ("<a download href="+notif.message+"><button class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'>Download File</button></a>");
+                        return notif.isread === false;
                     }));
                     self.helploading(false);
                 });
