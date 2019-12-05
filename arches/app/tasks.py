@@ -29,8 +29,8 @@ def export_search_results(self, userid, request_dict, format):
         new_req.GET.__setitem__(k, v[0])
 
     exporter = SearchResultsExporter(search_request=new_req)
-    url = zip_utils.write_zip_file(exporter.export(format), return_relative_url=True)
-    msg = f"<a download href='{url}'><button class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'>Download File</button></a>"
+    # prod instances of arches should exclude the return_relative_url kwarg (default=False)
+    msg = zip_utils.write_zip_file(exporter.export(format), return_relative_url=True)
     response = {"taskid": self.request.id, "msg": msg}
 
     return response

@@ -35,7 +35,7 @@ class NotificationView(View):
             notifs = models.UserXNotification.objects.filter(pk__in=dismissals)
             for n in notifs:
                 n.isread = True
-            resp = models.Notification.objects.bulk_update(notifs, ["isread"])
+            resp = models.UserXNotification.objects.bulk_update(notifs, ["isread"])
 
             return JSONResponse({"status": "success", "response": resp}, status=200)
         return JSONResponse({"status": "failed", "response": None}, status=500)

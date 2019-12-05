@@ -1071,8 +1071,8 @@ def send_email_on_save(sender, instance, **kwargs):
     """
 
     if instance.notif.notiftype is not None and instance.isread is False:
-        if instance.notif.notiftype.emailnotify is True and settings.EMAIL_BACKEND is not None:
-            dl_link = ""
+        if instance.notif.notiftype.emailnotify is True and (settings.EMAIL_BACKEND is not None or settings.EMAIL_HOST is not None):
+            dl_link = instance.notif.message
             text_content = "This is an important message."
             html_template = get_template(instance.notif.notiftype.emailtemplate)
             ctx = {"link": dl_link, "button_text": "Download", "greeting": "Hello", "closing": "adios"}
