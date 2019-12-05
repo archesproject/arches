@@ -13,23 +13,33 @@ class NotificationView(View):
 
     def get(self, request):
         if request.user.is_authenticated:
-            notifs = models.Notification.objects.filter(recipient_id=request.user.id).order_by("created").reverse()
-            return JSONResponse({"success": True, "notifications": notifs}, status=200)
+            if json.loads(request.GET.get("unread_only")) is True:
+                notifs = models.UserXNotification.objects.filter(recipient=request.user, isread=False).order_by("notif__created").reverse()
+            else:
+                notifs = models.UserXNotification.objects.filter(recipient=request.user).order_by("notif__created").reverse()
+            notif_dict_list = []
+            for n in notifs:
+                notif = n.__dict__
+                notif["message"] = n.notif.message
+                notif["created"] = n.notif.created
+                notif_dict_list.append(notif)
+
+            return JSONResponse({"success": True, "notifications": notif_dict_list}, status=200)
 
         return JSONResponse({"error": "User not authenticated. Access denied."}, status=401)
 
     def post(self, request):
         if request.user.is_authenticated:
             dismiss_notifs = json.loads(request.POST.get("dismissals"))
-            if isinstance(dismiss_notifs, str):
+            if isinstance(dismiss_notifs, str):  # check if single notif id
                 dismissals = []
                 dismissals.append(dismiss_notifs)
-            else:
+            else:  # if already list
                 dismissals = dismiss_notifs
-            notifs = models.Notification.objects.filter(pk__in=dismissals)
+            notifs = models.UserXNotification.objects.filter(pk__in=dismissals)
             for n in notifs:
-                n.is_read = True
-            resp = models.Notification.objects.bulk_update(notifs, ["is_read"])
+                n.isread = True
+            resp = models.UserXNotification.objects.bulk_update(notifs, ["isread"])
 
             return JSONResponse({"status": "success", "response": resp}, status=200)
         return JSONResponse({"status": "failed", "response": None}, status=500)

@@ -54,7 +54,7 @@ class BaseManagerView(TemplateView):
                 "author",
             ],
         )
-        context["notifications"] = models.Notification.objects.filter(recipient_id=self.request.user, is_read=False)
+        context["notifications"] = models.UserXNotification.objects.filter(recipient=self.request.user, isread=False)
         context["nav"] = {
             "icon": "fa fa-chevron-circle-right",
             "title": "",

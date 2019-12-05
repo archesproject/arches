@@ -12,6 +12,12 @@
         <div class="tree-display-tools-panel">
             <a class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
             <a class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
+            <!--ko ifnot: graphTree.showIds -->
+            <a class="tree-display-tool" data-bind="click: graphTree.toggleIds"><i class="ion-information-circled"></i>{% trans ' Show IDs' %}</a>
+            <!--/ko-->
+            <!--ko if: graphTree.showIds -->
+            <a class="tree-display-tool" data-bind="click: graphTree.toggleIds"><i class="ion-information-circled"></i>{% trans ' Hide IDs' %}</a>
+            <!--/ko-->
         </div>
     </div>
     <div class="left-panel-overflow graph-designer-node-tree">
@@ -33,7 +39,10 @@
         <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){node.expanded(!node.expanded())}"></i>
         <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: graphTree.selectItem.bind(graphTree), css:{'jstree-clicked': node.selected, 'child-selected': graphTree.isChildSelected(node), 'func-node': graphTree.isFuncNode(node), 'filtered': graphTree.filter().length > 0 && !node.filtered()}">
             <i data-bind="css: 'node.iconclass'" role="presentation"></i>
-            <span style="padding-right: 10px;" data-bind="text: graphTree.getDisplayName(node)"></span>
+            <span data-bind="{text: graphTree.getDisplayName(node), style: { 'padding-right': graphTree.showIds() == true ? '0px' : '10px' }}"></span>
+            <!-- ko if: graphTree.showIds -->
+            <span style="font-weight:bold; padding-right: 10px;" data-bind="text: ': ' + node.nodeid"></span>
+            <!-- /ko -->
             <!--ko if: _.contains(graphTree.restrictedNodegroups, node.nodeGroupId()) === false -->
             <i class="jstree-node-action-icon fa fa-plus-circle" role="presentation" data-bind="click: graphTree.addChildNode.bind(graphTree)" data-toggle="tooltip" data-original-title="{% trans "Add Child Node" %}"></i>
             <i class="jstree-node-action-icon ion-merge" role="presentation" data-bind="click: graphTree.toggleBranchList.bind(graphTree)" data-toggle="tooltip" data-original-title="{% trans "Add Branch" %}"></i>

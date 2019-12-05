@@ -15,10 +15,8 @@ class Migration(migrations.Migration):
             name="Notification",
             fields=[
                 ("id", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ("is_read", models.BooleanField(default=False)),
                 ("created", models.DateTimeField(auto_now_add=True, editable=True)),
                 ("message", models.TextField(blank=True, null=True)),
-                ("recipient_id", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={"db_table": "notifications", "managed": True},
         )
