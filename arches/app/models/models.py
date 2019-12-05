@@ -1055,7 +1055,7 @@ class UserXNotification(models.Model):
 class UserXNotificationType(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    notificationtype = models.ForeignKey(NotificationType, on_delete=models.CASCADE)
+    notiftype = models.ForeignKey(NotificationType, on_delete=models.CASCADE)
     emailnotify = models.BooleanField(default=False)
     webnotify = models.BooleanField(default=False)
 
