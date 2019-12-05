@@ -21,6 +21,11 @@ define([
             self.viewModel.invalidPassword = ko.observable();
             self.viewModel.mismatchedPasswords = ko.observable();
             self.viewModel.changePasswordSuccess = ko.observable();
+            self.viewModel.toggleSyncEmailNotifs = ko.observable(false);
+            self.viewModel.toggleSyncWebNotifs = ko.observable(false);
+            self.viewModel.toggleSearchExportEmailNotifs = ko.observable(true);
+            self.viewModel.toggleSearchExportWebNotifs = ko.observable(true);
+            console.log(ko.unwrap(self));
 
             self.viewModel.toggleChangePasswordForm = function() {
                 this.showChangePasswordForm(!this.showChangePasswordForm());

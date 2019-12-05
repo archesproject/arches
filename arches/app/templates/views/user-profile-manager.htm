@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <div>
 
     <!-- Main Editor -->
-    <div>
+    <div id="">
 
         <!-- Title Bar -->
         <div id="" class="relative fade in" style="display: block;">
@@ -54,8 +54,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- My Account Info -->
                 <section id="" class="profile-list">
                     <div class="account-wrapper">
-
-
                         <div class="row relative">
 
                             <!-- Section Title -->
@@ -66,56 +64,55 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </div>
 
                             <div class="col-sm-9">
-
-                                    <!-- ko if: showEditUserForm() === false -->
-                                    <div class="row">
-                                        <div class="col-sm-5">
-                                            <div class="relative">
-                                                <h4 class="text-main" style="font-weight: 500;">{{ user.username }}</h4>
-                                                <p class="profile-label-shim">{% trans 'User name' %}</p>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-sm-5">
-                                            <h4 class="text-main">********</h4>
-                                            <button class="btn btn-default btn-active-success btn-profile-password add-popover" data-bind='click: toggleChangePasswordForm'>
-                                            {% trans 'Change password' %}</button>
-                                            <div class="password-success" data-bind="text:changePasswordSuccess"></div>
-                                            <div class="change-password-form bottom fade in popover" data-bind='visible: showChangePasswordForm()'>
-                                                <div class="arrow" style="left: 50%;"></div>
-                                                {% include 'change_password.htm' %}
-                                            </div>
-                                        </div>
-
-                                        <div class="col-sm-2">
-                                            <div>
-                                                <button class="btn btn-primary btn-active-purple btn-profile" data-bind='click: toggleEditUserForm'>{% trans 'Edit' %}</button>
-                                            </div>
+                                <!-- ko if: showEditUserForm() === false -->
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="relative">
+                                            <h4 class="text-main" style="font-weight: 500;">{{ user.username }}</h4>
+                                            <p class="profile-label-shim">{% trans 'User name' %}</p>
                                         </div>
                                     </div>
 
-                                        <div class="row">
-                                            <div class="col-sm-5">
-                                                <div class="relative">
-                                                    <h4 class="text-main" style="font-weight: 500;">{{ user.email }}</h4>
-                                                    <p class="profile-label-shim">{% trans 'Contact email' %}</p>
-                                                </div>
-                                            </div>
+                                    <div class="col-sm-5">
+                                        <h4 class="text-main">********</h4>
+                                        <button class="btn btn-default btn-active-success btn-profile-password add-popover" data-bind='click: toggleChangePasswordForm'>
+                                        {% trans 'Change password' %}</button>
+                                        <div class="password-success" data-bind="text:changePasswordSuccess"></div>
+                                        <div class="change-password-form bottom fade in popover" data-bind='visible: showChangePasswordForm()'>
+                                            <div class="arrow" style="left: 50%;"></div>
+                                            {% include 'change_password.htm' %}
                                         </div>
+                                    </div>
 
-                                        <div class="row">
-                                            <div class="col-sm-5">
-                                                <div class="relative">
-                                                    <h4 class="text-main" style="font-weight: 500;">{{ user.userprofile.phone }}</h4>
-                                                    <p class="profile-label-shim">{% trans 'Phone' %}</p>
-                                                </div>
-                                            </div>
+                                    <div class="col-sm-2">
+                                        <div>
+                                            <button class="btn btn-primary btn-active-purple btn-profile" data-bind='click: toggleEditUserForm'>{% trans 'Edit' %}</button>
                                         </div>
-                                    <!-- /ko -->
+                                    </div>
+                                </div>
 
-                                    <!-- ko if: showEditUserForm() === true -->
-                                    <form method="post">
-                                        {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="relative">
+                                            <h4 class="text-main" style="font-weight: 500;">{{ user.email }}</h4>
+                                            <p class="profile-label-shim">{% trans 'Contact email' %}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="relative">
+                                            <h4 class="text-main" style="font-weight: 500;">{{ user.userprofile.phone }}</h4>
+                                            <p class="profile-label-shim">{% trans 'Phone' %}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /ko -->
+
+                                <!-- ko if: showEditUserForm() === true -->
+                                <form method="post">
+                                    {% csrf_token %}
                                     <div class="row">
 
                                         <div class="col-sm-5">
@@ -289,19 +286,57 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
 -->
 
-                <!-- My Surveys -->
-                <div class="profile-list profile-projects">
-                    <div class="profile-header">
-                        {% trans 'My Collector Projects' %}
+                <!-- Notification Settings -->
+                <section>
+                    <div class="profile-list">
+                        <div class="profile-header">
+                            {% trans 'Notification Settings' %}
+                        </div>
+                        <div>
+                            <table>
+                                <tr>
+                                    <td>{% trans 'Sync to Mobile' %}</td>
+                                    <td>
+                                        <p class="control-label">{% trans 'Email Notification' %}</p>
+                                        <label class="col-xs-12 control-label widget-input-label">
+                                            <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSyncEmailNotifs()}, click: function(){toggleSyncEmailNotifs(!toggleSyncEmailNotifs())}"><small></small></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <p class="control-label">{% trans 'Web Notification' %}</p>
+                                        <label class="col-xs-12 control-label widget-input-label">
+                                            <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSyncWebNotifs()}, click: function(){toggleSyncWebNotifs(!toggleSyncWebNotifs())}"><small></small></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{% trans 'Exporting Search Results' %}</td>
+                                    <td>
+                                        <p class="control-label">{% trans 'Email Notification' %}</p>
+                                        <label class="col-xs-12 control-label widget-input-label">
+                                            <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportEmailNotifs()}, click: function(){toggleSearchExportEmailNotifs(!toggleSearchExportEmailNotifs())}"><small></small></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <p class="control-label">{% trans 'Web Notification' %}</p>
+                                        <label class="col-xs-12 control-label widget-input-label">
+                                            <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportWebNotifs()}, click: function(){toggleSearchExportWebNotifs(!toggleSearchExportWebNotifs())}"><small></small></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
+                </section>
 
-                    <!--ko ifnot: mobilesurveys.length -->
+                <section>
+                    <!--ko if: mobilesurveys.length === 0 -->
                     <div id="default-mobile-projects" class="profile-default-message-panel">
                         {% trans "Sorry, but you haven't been invited to a project yet..." %}
                     </div>
                     <!--/ko-->
 
-                    <!--ko if: mobilesurveys.length -->
+                    <!--ko if: mobilesurveys.length > 0 -->
                     <!-- Survey Invitations List -->
                     <div id="mobile-projects-list" class="profile-default-message-panel">
                         <div class="row">
@@ -388,34 +423,33 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     {% trans 'Models and Data Entry Cards' %}
                                                 </p>
 
-                                                    <ul class="mpm-node-detail-metadata">
-                                                        <!--ko foreach: {data: vm.resources, as: 'resource'} -->
-                                                        <li class="">
-                                                            <div data-bind="text: resource.name + ' (' + resource.cards.length + ' data entry cards)'"></div>
-                                                            <!--ko foreach: {data: resource.cards, as: 'card'} -->
-                                                            <ul class="mpm-node-detail-metadata">
-                                                                <li data-bind="text: card.name"></li>
-                                                            </ul>
-                                                            <!--/ko-->
-                                                        </li>
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <!--ko foreach: {data: vm.resources, as: 'resource'} -->
+                                                    <li class="">
+                                                        <div data-bind="text: resource.name + ' (' + resource.cards.length + ' data entry cards)'"></div>
+                                                        <!--ko foreach: {data: resource.cards, as: 'card'} -->
+                                                        <ul class="mpm-node-detail-metadata">
+                                                            <li data-bind="text: card.name"></li>
+                                                        </ul>
                                                         <!--/ko-->
-                                                    </ul>
+                                                    </li>
+                                                    <!--/ko-->
+                                                </ul>
                                             </div>
 
                                         </div>
-
+                                    </div>
+                                    <!-- /ko -->
                                 </div>
-                                <!--/ko-->
                             </div>
                         </div>
                     </div>
-
-                </div>
-                <!--/ko-->
+                    <!--/ko-->
+                </section>
             </div>
 
         </div>
-        <!-- Editor Content -->
+        <!-- END Profile Summary -->
 
     </div>
     <!--END  Main Editor -->
