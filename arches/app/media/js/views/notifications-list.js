@@ -27,7 +27,8 @@ define([
                 self.helploading(true);
                 $.ajax({
                     type: 'GET',
-                    url: arches.urls.get_notifications
+                    url: arches.urls.get_notifications,
+                    data: {"unread_only": true}
                 }).done(function(data) {
                     self.items(_.filter(data.notifications, function(notif) {
                         notif.displaytime = moment(notif.created).format('DD-MM-YYYY hh:mm a');

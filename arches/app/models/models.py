@@ -1043,7 +1043,6 @@ class Notification(models.Model):
 
 class UserXNotification(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
-    created = models.DateTimeField(auto_now_add=True)
     notif = models.ForeignKey(Notification, on_delete=models.CASCADE)
     isread = models.BooleanField(default=False)
     recipient = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -1067,7 +1066,7 @@ class UserXNotificationType(models.Model):
 
 @receiver(post_save, sender=UserXNotification)
 def send_email_on_save(sender, instance, **kwargs):
-    """Checks if a notification type needs to send an email, does so if server running
+    """Checks if a notification type needs to send an email, does so if email server running
     """
 
     if instance.notif.notiftype is not None and instance.isread is False:
@@ -1075,7 +1074,7 @@ def send_email_on_save(sender, instance, **kwargs):
             dl_link = instance.notif.message
             text_content = "This is an important message."
             html_template = get_template(instance.notif.notiftype.emailtemplate)
-            ctx = {"link": dl_link, "button_text": "Download", "greeting": "Hello", "closing": "adios"}
+            ctx = {"link": dl_link, "button_text": "Download", "greeting": "Hello", "closing": "Thank you"}
             html_content = html_template.render(ctx)
             subject, from_email, to = "Download Ready", "from@example.com", "to@example.com"
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to])

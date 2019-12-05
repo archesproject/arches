@@ -47,7 +47,6 @@ class Migration(migrations.Migration):
             name="UserXNotification",
             fields=[
                 ("id", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ("created", models.DateTimeField(auto_now_add=True, editable=True)),
                 ("isread", models.BooleanField(default=False)),
                 ("notif", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="models.Notification")),
                 ("recipient", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),

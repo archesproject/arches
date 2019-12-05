@@ -13,11 +13,15 @@ class NotificationView(View):
 
     def get(self, request):
         if request.user.is_authenticated:
-            notifs = models.UserXNotification.objects.filter(recipient=request.user).order_by("created").reverse()
+            if request.GET.get("unread_only") is True:
+                notifs = models.UserXNotification.objects.filter(recipient=request.user, isread=False).order_by("notif__created").reverse()
+            else:
+                notifs = models.UserXNotification.objects.filter(recipient=request.user).order_by("notif__created").reverse()
             notif_dict_list = []
             for n in notifs:
                 notif = n.__dict__
                 notif["message"] = n.notif.message
+                notif["created"] = n.notif.created
                 notif_dict_list.append(notif)
 
             return JSONResponse({"success": True, "notifications": notif_dict_list}, status=200)
@@ -27,10 +31,10 @@ class NotificationView(View):
     def post(self, request):
         if request.user.is_authenticated:
             dismiss_notifs = json.loads(request.POST.get("dismissals"))
-            if isinstance(dismiss_notifs, str):
+            if isinstance(dismiss_notifs, str): # check if single notif id
                 dismissals = []
                 dismissals.append(dismiss_notifs)
-            else:
+            else: # if already list
                 dismissals = dismiss_notifs
             notifs = models.UserXNotification.objects.filter(pk__in=dismissals)
             for n in notifs:
