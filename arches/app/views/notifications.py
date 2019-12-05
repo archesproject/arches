@@ -31,10 +31,10 @@ class NotificationView(View):
     def post(self, request):
         if request.user.is_authenticated:
             dismiss_notifs = json.loads(request.POST.get("dismissals"))
-            if isinstance(dismiss_notifs, str): # check if single notif id
+            if isinstance(dismiss_notifs, str):  # check if single notif id
                 dismissals = []
                 dismissals.append(dismiss_notifs)
-            else: # if already list
+            else:  # if already list
                 dismissals = dismiss_notifs
             notifs = models.UserXNotification.objects.filter(pk__in=dismissals)
             for n in notifs:
