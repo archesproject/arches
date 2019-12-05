@@ -15,41 +15,6 @@ from rdflib import Graph, RDF, RDFS
 def forwards_func(apps, schema_editor):
     # We get the model from the versioned app registry;
     # if we directly import it, it'll be the wrong version
-    # extensions = [os.path.join(settings.ONTOLOGY_PATH, x) for x in settings.ONTOLOGY_EXT]
-    # management.call_command('load_ontology', source=os.path.join(settings.ONTOLOGY_PATH, settings.ONTOLOGY_BASE),
-    #     version=settings.ONTOLOGY_BASE_VERSION, ontology_name=settings.ONTOLOGY_BASE_NAME, id='e6e8db47-2ccf-11e6-927e-b8f6b115d7dd', extensions=','.join(extensions), verbosity=0)
-
-    Ontology = apps.get_model("models", "Ontology")
-    Node = apps.get_model("models", "Node")
-    Edge = apps.get_model("models", "Edge")
-
-    for ontology in Ontology.objects.filter(parentontology=None):
-        g = Graph()
-        g.parse(ontology.path.path)
-        for extension in Ontology.objects.filter(parentontology=ontology):
-            g.parse(extension.path.path)
-
-        ontology_classes = set()
-        ontology_properties = set()
-        for ontology_property, p, o in g.triples((None, None, RDF.Property)):
-            ontology_properties.add(ontology_property)
-            for s, p, domain_class in g.triples((ontology_property, RDFS.domain, None)):
-                ontology_classes.add(domain_class)
-            for s, p, range_class in g.triples((ontology_property, RDFS.range, None)):
-                ontology_classes.add(range_class)
-
-        for ontology_class, p, o in g.triples((None, None, RDFS.Class)):
-            ontology_classes.add(ontology_class)
-
-        for ontology_class in ontology_classes:
-            for node in Node.objects.filter(ontologyclass=str(ontology_class).split("/")[-1], graph__in=ontology.graphs.all()):
-                node.ontologyclass = ontology_class
-                node.save()
-
-        for ontology_property in ontology_properties:
-            for edge in Edge.objects.filter(ontologyproperty=str(ontology_property).split("/")[-1], graph__in=ontology.graphs.all()):
-                edge.ontologyproperty = ontology_property
-                edge.save()
 
     # index base Arches concept
     arches_concept = Concept().get(id="00000000-0000-0000-0000-000000000001", include=["label"])
@@ -60,9 +25,6 @@ def forwards_func(apps, schema_editor):
 
 
 def reverse_func(apps, schema_editor):
-    # extensions = [os.path.join(settings.ONTOLOGY_PATH, x) for x in settings.ONTOLOGY_EXT]
-    # management.call_command('load_ontology', source=os.path.join(settings.ONTOLOGY_PATH, settings.ONTOLOGY_BASE),
-    #     version=settings.ONTOLOGY_BASE_VERSION, ontology_name=settings.ONTOLOGY_BASE_NAME, id='e6e8db47-2ccf-11e6-927e-b8f6b115d7dd', extensions=','.join(extensions), verbosity=0)
 
     Node = apps.get_model("models", "Node")
     Edge = apps.get_model("models", "Edge")
@@ -84,7 +46,7 @@ def reverse_func(apps, schema_editor):
     try:
         DValueType = apps.get_model("models", "DValueType")
         DValueType.objects.get(valuetype="identifier").delete()
-    except:
+    except Exception:
         pass
 
 

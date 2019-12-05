@@ -28,15 +28,11 @@ def forwards_func(apps, schema_editor):
     # We get the model from the versioned app registry;
     # if we directly import it, it'll be the wrong version
     pass
-    # extensions = [os.path.join(settings.ONTOLOGY_PATH, x) for x in settings.ONTOLOGY_EXT]
-    # management.call_command('load_ontology', source=os.path.join(settings.ONTOLOGY_PATH, settings.ONTOLOGY_BASE),
-    #     version=settings.ONTOLOGY_BASE_VERSION, ontology_name=settings.ONTOLOGY_BASE_NAME, id='e6e8db47-2ccf-11e6-927e-b8f6b115d7dd', extensions=','.join(extensions), verbosity=0)
 
 
 def reverse_func(apps, schema_editor):
-    pass
-    # Ontology = apps.get_model("models", "Ontology")
-    # Ontology.objects.filter(version='6.2').delete()
+    Ontology = apps.get_model("models", "Ontology")
+    Ontology.objects.filter(version="6.2").delete()
 
 
 # a work around for not being able to create permissions during an initial migration
