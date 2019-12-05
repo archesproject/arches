@@ -484,7 +484,7 @@ class Command(BaseCommand):
 
         def load_ontologies(package_dir):
             ontologies = glob.glob(os.path.join(package_dir, "ontologies/*"))
-            if len(ontologies) > 0 or import_system_ontology is True:
+            if len(ontologies) > 0 or settings.LOAD_DEFAULT_ONTOLOGY is True:
                 print("loading ontologies")
 
             if settings.LOAD_DEFAULT_ONTOLOGY is True:
