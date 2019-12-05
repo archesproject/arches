@@ -109,8 +109,8 @@ ONTOLOGY_EXT = [
     "arches_crm_enhancements.xml",
 ]
 
-LOAD_DEFAULT_ONTOLOGY = False
-LOAD_PACKAGE_ONTOLOGIES = True
+LOAD_DEFAULT_ONTOLOGY = True
+LOAD_PACKAGE_ONTOLOGIES = False
 
 # Set the ontolgoy namespace prefixes to use in the UI, set the namespace to '' omit a prefix
 # Users can also override existing namespaces as well if you like
