@@ -470,34 +470,24 @@ class Command(BaseCommand):
         self, source, setup_db=True, overwrite_concepts="ignore", bulk_load=False, stage_concepts="keep", yes=False,
     ):
         def load_ontology(base, base_name, base_version, base_id, extensions, path):
-            load_default_ontology = True
-            if base_name is not None:
-                if yes is False:
-                    response = input("Would you like to load the {0} ontology? (Y/N): ".format(base_name))
-                    if response.lower() not in ("t", "true", "y", "yes"):
-                        load_default_ontology = False
-            else:
-                load_default_ontology = False
-
-            if load_default_ontology is True:
-                print("loading the {0} ontology".format(base_name))
-                extension_paths = [os.path.join(path, x) for x in extensions]
-                management.call_command(
-                    "load_ontology",
-                    source=os.path.join(path, base),
-                    version=base_version,
-                    ontology_name=base_name,
-                    id=base_id,
-                    extensions=",".join(extension_paths),
-                    verbosity=0,
-                )
+            print("loading the {0} ontology".format(base_name))
+            extension_paths = [os.path.join(path, ext) for ext in extensions]
+            management.call_command(
+                "load_ontology",
+                source=os.path.join(path, base),
+                version=base_version,
+                ontology_name=base_name,
+                id=base_id,
+                extensions=",".join(extension_paths),
+                verbosity=0,
+            )
 
         def load_ontologies(package_dir):
             ontologies = glob.glob(os.path.join(package_dir, "ontologies/*"))
-            import_system_ontology = False
             if len(ontologies) > 0 or import_system_ontology is True:
                 print("loading ontologies")
-            if import_system_ontology is True:
+
+            if settings.LOAD_DEFAULT_ONTOLOGY is True:
                 load_ontology(
                     settings.ONTOLOGY_BASE,
                     settings.ONTOLOGY_BASE_NAME,
@@ -506,20 +496,22 @@ class Command(BaseCommand):
                     settings.ONTOLOGY_EXT,
                     settings.ONTOLOGY_PATH,
                 )
-            for ontology in ontologies:
-                if os.path.exists(os.path.join(ontology, "ontology_config.json")):
-                    with open(os.path.join(ontology, "ontology_config.json"), "r") as f:
-                        configs = json.load(f)
-                        load_ontology(
-                            configs["base"],
-                            configs["base_name"],
-                            configs["base_version"],
-                            configs["base_id"],
-                            configs["extensions"],
-                            ontology,
-                        )
-                else:
-                    print(_("No ontology_config.json file. Cannot import"), ontology)
+
+            if settings.LOAD_PACKAGE_ONTOLOGIES is True:
+                for ontology in ontologies:
+                    if os.path.exists(os.path.join(ontology, "ontology_config.json")):
+                        with open(os.path.join(ontology, "ontology_config.json"), "r") as f:
+                            configs = json.load(f)
+                            load_ontology(
+                                configs["base"],
+                                configs["base_name"],
+                                configs["base_version"],
+                                configs["base_id"],
+                                configs["extensions"],
+                                ontology,
+                            )
+                    else:
+                        print(_("No ontology_config.json file. Cannot import"), ontology)
 
         def load_system_settings(package_dir):
             update_system_settings = True
