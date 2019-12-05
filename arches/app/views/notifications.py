@@ -13,7 +13,7 @@ class NotificationView(View):
 
     def get(self, request):
         if request.user.is_authenticated:
-            if request.GET.get("unread_only") is True:
+            if json.loads(request.GET.get("unread_only")) is True:
                 notifs = models.UserXNotification.objects.filter(recipient=request.user, isread=False).order_by("notif__created").reverse()
             else:
                 notifs = models.UserXNotification.objects.filter(recipient=request.user).order_by("notif__created").reverse()

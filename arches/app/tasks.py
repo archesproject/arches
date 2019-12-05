@@ -74,6 +74,14 @@ def create_user_task_record(taskid, taskname, userid):
 
 
 def notify_completion(msg, user):
-    notif_type = models.NotificationType.objects.get(name="test_email_notification")
+    notif_type, created = models.NotificationType.objects.get_or_create(
+        name="test_email_notification",
+        defaults=dict(
+            name="test_email_notification",
+            emailtemplate="email/test_email_notification.htm",
+            emailnotify=True,
+            webnotify=True,
+        )
+    )
     notif = models.Notification.objects.create(notiftype=notif_type, message=msg)
     models.UserXNotification.objects.create(notif=notif, recipient=user)
