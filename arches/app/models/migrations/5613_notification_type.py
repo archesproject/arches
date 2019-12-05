@@ -41,8 +41,8 @@ class Migration(migrations.Migration):
             name="notiftype",
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to="models.NotificationType"),
         ),
-        migrations.RenameField(model_name="userxtask", old_name="date_done", new_name="datedone",),
-        migrations.RenameField(model_name="userxtask", old_name="date_start", new_name="datestart",),
+        migrations.RenameField(model_name="userxtask", old_name="date_done", new_name="datedone"),
+        migrations.RenameField(model_name="userxtask", old_name="date_start", new_name="datestart"),
         migrations.CreateModel(
             name="UserXNotification",
             fields=[
@@ -52,6 +52,6 @@ class Migration(migrations.Migration):
                 ("notif", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="models.Notification")),
                 ("recipient", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
-            options={"db_table": "user_x_notifications", "managed": True,},
+            options={"db_table": "user_x_notifications", "managed": True},
         ),
     ]
