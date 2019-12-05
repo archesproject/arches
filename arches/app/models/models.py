@@ -1084,7 +1084,7 @@ def send_email_on_save(sender, instance, **kwargs):
             if instance.notif.notiftype.webnotify is not True:
                 instance.isread = True
                 instance.save()
-    
+
     return False
 
 

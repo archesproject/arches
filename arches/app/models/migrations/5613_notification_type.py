@@ -41,28 +41,17 @@ class Migration(migrations.Migration):
             name="notiftype",
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to="models.NotificationType"),
         ),
-        migrations.RenameField(
-            model_name='userxtask',
-            old_name='date_done',
-            new_name='datedone',
-        ),
-        migrations.RenameField(
-            model_name='userxtask',
-            old_name='date_start',
-            new_name='datestart',
-        ),
+        migrations.RenameField(model_name="userxtask", old_name="date_done", new_name="datedone",),
+        migrations.RenameField(model_name="userxtask", old_name="date_start", new_name="datestart",),
         migrations.CreateModel(
-            name='UserXNotification',
+            name="UserXNotification",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('created', models.DateTimeField(auto_now_add=True, editable=True)),
-                ('isread', models.BooleanField(default=False)),
-                ('notif', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='models.Notification')),
-                ('recipient', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ("id", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ("created", models.DateTimeField(auto_now_add=True, editable=True)),
+                ("isread", models.BooleanField(default=False)),
+                ("notif", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="models.Notification")),
+                ("recipient", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
-            options={
-                'db_table': 'user_x_notifications',
-                'managed': True,
-            },
+            options={"db_table": "user_x_notifications", "managed": True,},
         ),
     ]
