@@ -251,6 +251,9 @@ class ConceptDataType(BaseConceptDataType):
             # amongst the current Arches ConceptValues
             pass
 
+    def ignore_keys(self):
+        return ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]
+
 
 class ConceptListDataType(BaseConceptDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
@@ -327,3 +330,6 @@ class ConceptListDataType(BaseConceptDataType):
 
     def collects_multiple_values(self):
         return True
+
+    def ignore_keys(self):
+        return ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]
