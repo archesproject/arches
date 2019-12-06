@@ -1023,6 +1023,9 @@ class UserXTask(models.Model):
 
 
 class NotificationType(models.Model):
+    """
+    Creates a 'type' of notification that would be associated with a specific trigger, e.g. Search Export Complete or Consultation Complete
+    """
     typeid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     name = models.TextField(blank=True, null=True)
     emailtemplate = models.TextField(blank=True, null=True)
@@ -1037,7 +1040,7 @@ class NotificationType(models.Model):
 class Notification(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     created = models.DateTimeField(auto_now_add=True)
-    # created.editable = True  # must comment this out when running makemigrations, then uncomment after migration made
+    # created.editable = True
     message = models.TextField(blank=True, null=True)
     notiftype = models.ForeignKey(NotificationType, on_delete=models.CASCADE, null=True)
 
@@ -1047,6 +1050,9 @@ class Notification(models.Model):
 
 
 class UserXNotification(models.Model):
+    """
+    1 Notification instance (and its optional 1 NotificationType instance) can spawn N UserXNotification instances
+    """
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     notif = models.ForeignKey(Notification, on_delete=models.CASCADE)
     isread = models.BooleanField(default=False)
@@ -1058,6 +1064,10 @@ class UserXNotification(models.Model):
 
 
 class UserXNotificationType(models.Model):
+    """
+    Creates a user-setting to override existing default notification settings (emailnotify, webnotify, etc.)
+    for specific a NotificationType instance
+    """
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     notiftype = models.ForeignKey(NotificationType, on_delete=models.CASCADE)
@@ -1071,7 +1081,7 @@ class UserXNotificationType(models.Model):
 
 @receiver(post_save, sender=UserXNotification)
 def send_email_on_save(sender, instance, **kwargs):
-    """Checks if a notification type needs to send an email, does so if email server running
+    """Checks if a notification type needs to send an email, does so if email server exists
     """
 
     if instance.notif.notiftype is not None and instance.isread is False:

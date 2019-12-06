@@ -21,11 +21,7 @@ define([
             self.viewModel.invalidPassword = ko.observable();
             self.viewModel.mismatchedPasswords = ko.observable();
             self.viewModel.changePasswordSuccess = ko.observable();
-            self.viewModel.toggleSyncEmailNotifs = ko.observable(false);
-            self.viewModel.toggleSyncWebNotifs = ko.observable(false);
-            self.viewModel.toggleSearchExportEmailNotifs = ko.observable(true);
-            self.viewModel.toggleSearchExportWebNotifs = ko.observable(true);
-            console.log(ko.unwrap(self));
+            self.viewModel.notifTypeObservables = ko.observableArray();
 
             self.viewModel.toggleChangePasswordForm = function() {
                 this.showChangePasswordForm(!this.showChangePasswordForm());
@@ -40,20 +36,54 @@ define([
                 this.showEditUserForm(!this.showEditUserForm());
             };
 
+            self.viewModel.getNotifTypes = function() {
+                self.viewModel.notifTypeObservables.removeAll();
+                $.ajax({
+                    url: arches.urls.get_notification_types,
+                    method: "GET"
+                }).done(function(data) {
+                    data.types.forEach(function(type) {
+                        koType = ko.mapping.fromJS(type);
+                        self.viewModel.notifTypeObservables.push(koType);
+                    });
+                });
+            };
+            self.viewModel.getNotifTypes();
+
+            self.viewModel.updateNotifTypes = function() {
+                var updatedTypes = self.viewModel.notifTypeObservables().map(function(type) {
+                    modified = ko.mapping.toJS(type);
+                    delete modified._state;
+                    return modified;
+                });
+                $.ajax({
+                    url: arches.urls.update_notification_types,
+                    method: "POST",
+                    data: {"types": JSON.stringify(updatedTypes)}
+                });
+            };
+
+            self.jsonNotifTypes = ko.computed(function() {
+                return ko.mapping.toJS(self.viewModel.notifTypeObservables);
+            });
+            self.jsonNotifTypes.subscribe(function(val) {
+                if(val && !self.viewModel.loading() && self.viewModel.notifTypeObservables().length > 0) {
+                    self.viewModel.updateNotifTypes();
+                }
+            });
 
             this.identityList = new IdentityList({
                 items: ko.observableArray(data.identities)
             });
 
-            this.viewModel.mobilesurveys =
-                data.mobilesurveys.map(function(mobilesurvey) {
-                    return new MobileSurveyViewModel({
-                        resources: data.resources,
-                        mobilesurvey: mobilesurvey,
-                        identities: data.identities,
-                        context: 'userprofile'
-                    });
+            this.viewModel.mobilesurveys = data.mobilesurveys.map(function(mobilesurvey) {
+                return new MobileSurveyViewModel({
+                    resources: data.resources,
+                    mobilesurvey: mobilesurvey,
+                    identities: data.identities,
+                    context: 'userprofile'
                 });
+            });
 
             this.viewModel.mobileSurveyFilter = ko.observable('');
 
