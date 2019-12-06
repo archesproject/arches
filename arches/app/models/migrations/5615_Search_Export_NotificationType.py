@@ -1,5 +1,6 @@
 from django.db import migrations
 
+
 class Migration(migrations.Migration):
 
     dependencies = [("models", "5613_notification_type")]
@@ -13,6 +14,6 @@ class Migration(migrations.Migration):
             """
             DELETE FROM notification_types
                 WHERE typeid in ('3789b120-0ct4-21ea-913e-784g4833r92a');
-            """
+            """,
         )
     ]

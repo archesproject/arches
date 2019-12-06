@@ -14,18 +14,20 @@ class NotificationView(View):
                 default_types = list(models.NotificationType.objects.all())
                 user_types = models.UserXNotificationType.objects.filter(user=request.user, notiftype__in=default_types)
                 for user_type in user_types:
-                    if user_type.notiftype in default_types: # find an overridden default_type and copy notify settings from user_type
+                    if user_type.notiftype in default_types:  # find an overridden default_type and copy notify settings from user_type
                         i = default_types.index(user_type.notiftype)
                         el = default_types[i]
                         el.webnotify = user_type.webnotify
                         el.emailnotify = user_type.emailnotify
-                
-                notiftype_dict_list = [ _type.__dict__ for _type in default_types ]
+
+                notiftype_dict_list = [_type.__dict__ for _type in default_types]
                 return JSONResponse({"success": True, "types": notiftype_dict_list}, status=200)
-                
+
             else:
                 if json.loads(request.GET.get("unread_only")) is True:
-                    notifs = models.UserXNotification.objects.filter(recipient=request.user, isread=False).order_by("notif__created").reverse()
+                    notifs = (
+                        models.UserXNotification.objects.filter(recipient=request.user, isread=False).order_by("notif__created").reverse()
+                    )
                 else:
                     notifs = models.UserXNotification.objects.filter(recipient=request.user).order_by("notif__created").reverse()
                 notif_dict_list = []
@@ -47,10 +49,9 @@ class NotificationView(View):
                 for _type in types:
                     notif_type = models.NotificationType.objects.get(typeid=_type["typeid"])
                     user_type, created = models.UserXNotificationType.objects.update_or_create(
-                        user=request.user, notiftype=notif_type, defaults=dict(
-                            webnotify=_type["webnotify"],
-                            emailnotify=_type["emailnotify"]
-                        )
+                        user=request.user,
+                        notiftype=notif_type,
+                        defaults=dict(webnotify=_type["webnotify"], emailnotify=_type["emailnotify"]),
                     )
                 return JSONResponse({"status": "success"}, status=200)
             else:
