@@ -243,6 +243,7 @@ class JsonLdReader(Reader):
         self.tiles = {}
         self.errors = {}
         self.resources = []
+        self.resource = None
         self.use_ids = False
         self.resource_model_root_classes = set()
         self.non_unique_classes = set()
@@ -269,7 +270,6 @@ class JsonLdReader(Reader):
         self.IGNORE_KEYS = ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]
         self.PREF_CONCEPT_SCHEME = "http://vocab.getty.edu/aat/"
         self.LITERAL_DATATYPES = ["date", "number", "string", "domain-value", "domain-value-list", "color-datatype"]
-
 
     def validate_concept_in_collection(self, value, collection):
         edges = []
@@ -339,6 +339,20 @@ class JsonLdReader(Reader):
         # print(json.dumps(root_node, indent=4))
         return root_node
 
+    def get_resource_id(self, value):
+        # Allow local URI or urn:uuid:UUID
+        print("In get_resource_id")
+        match = re.match(r".*?%sresources/(?P<resourceid>%s)" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), value)
+        if match:
+            return match.group("resourceid")
+        else:
+            match = re.match(r"urn:uuid:(%s)" % settings.UUID_REGEX, value)
+            if match:
+                return match.groups()[0]
+            else:
+                self.logger.debug("Valid resourceid not found within `{0}`".format(value))
+        return None
+
     def read_resource(self, data, use_ids=False, resourceid=None, graphid=None):
         self.use_ids = use_ids
         if not isinstance(data, list):
@@ -352,6 +366,20 @@ class JsonLdReader(Reader):
             if graphid is None:
                 graphid = self.get_graph_id(jsonld_document["@type"][0])
                 self.logger.debug("graphid is not set. Using the @type value instead: {0}".format(jsonld_document["@type"][0]))
+            if graphid:
+                if use_ids == True:
+                    resourceinstanceid = self.get_resource_id(jsonld["@id"])
+                    if resourceinstanceid is None:
+                        self.logger.error("The @id of the resource was not supplied, was null or URI was not correctly formatted")
+                        raise Exception("The @id of the resource was not supplied, was null or URI was not correctly formatted")
+                    self.logger.debug("Resource instance ID found: {0}".format(resourceinstanceid))
+                    self.resource = Resource.objects.get(pk=resourceinstanceid)
+                else:
+                    self.logger.debug("`use_ids` setting is set to False, creating new Resource Instance IDs on import")
+                    self.resource = Resource()
+                    self.resource.graph_id = graphid
+                    self.resource.pk = resourceid
+                self.resources.append(self.resource)
 
             tree = self.process_graph(graphid)
 
@@ -363,7 +391,8 @@ class JsonLdReader(Reader):
 
             result = {"data": [jsonld_document["@id"]]}
             self.data_walk(jsonld_document, tree, result)
-            print(json.dumps(result, indent=4))
+
+            # print(JSONSerializer().serialize(result, indent=4))
 
     def is_semantic_node(self, graph_node):
         return self.datatype_factory.datatypes[graph_node["datatype_type"]].defaultwidget is None
@@ -451,10 +480,17 @@ class JsonLdReader(Reader):
                     else:
                         branch = possible[0]
 
+                    if not self.is_semantic_node(branch[0]):
+                        graph_node = branch[0]
+                        # import ipdb
+                        # ipdb.sset_trace()
+                        node_value = graph_node["datatype"].from_rdf(vi)
+                        print(node_value)
+
                     # We know now that it can go into the branch
                     # Determine if we can collapse the data into a -list or not
                     bnodeid = branch[0]["node_id"]
-                    bnodeid = f"{branch[0]['node_id']}/{branch[0]['name']}"
+                    # bnodeid = f"{branch[0]['node_id']}/{branch[0]['name']}"
                     create_new_tile = False
                     from random import random
 
@@ -463,7 +499,10 @@ class JsonLdReader(Reader):
                     bnode = {"data": []}
                     bnode = {"data": [], "nodegroup_id": branch[0]["nodegroup_id"], "cardinality": branch[0]["cardinality"]}
                     if create_new_tile:
-                        tile = {"tileid": random(), "tile": {"data": {}}}
+                        # tile = {"tileid": random(), "tile": {"data": {}}}
+                        parenttile_id = tile.tileid if tile else None
+                        tile = Tile(tileid=uuid.uuid4(), parenttile_id=parenttile_id, nodegroup_id=branch[0]["nodegroup_id"], data={})
+                        self.resource.tiles.append(tile)
 
                     bnode["tile"] = tile
 
@@ -473,20 +512,20 @@ class JsonLdReader(Reader):
                             bnode = result[bnodeid][0]
                             bnode["data"].append(branch[1])
                             if not self.is_semantic_node(branch[0]):
-                                bnode["tile"]["tile"]["data"][bnodeid].append(branch[1])
+                                bnode["tile"].data[bnodeid] + node_value
                         elif branch[0]["cardinality"] != "n":
                             raise ValueError("Attempt to add a value to cardinality 1, non-list node")
                         else:
                             bnode["data"].append(branch[1])
                             if not self.is_semantic_node(branch[0]):
-                                tile["tile"]["data"][bnodeid] = branch[1]
+                                tile.data[bnodeid] = node_value
                             result[bnodeid].append(bnode)
                     else:
                         if not self.is_semantic_node(branch[0]):
                             if branch[0]["datatype"].collects_multiple_values() and tile is not None:
-                                tile["tile"]["data"][bnodeid] = [branch[1]]
+                                tile.data[bnodeid] = node_value
                             else:
-                                tile["tile"]["data"][bnodeid] = branch[1]
+                                tile.data[bnodeid] = node_value
                         bnode["data"].append(branch[1])
                         result[bnodeid] = [bnode]
 
@@ -497,7 +536,7 @@ class JsonLdReader(Reader):
         # Finally, after processing all of the branches for this node, check required nodes are present
         for path in tree_node["children"].values():
             for kid in path:
-                if kid["required"] and not f"{kid['node_id']}/{kid['name']}" in result:
+                if kid["required"] and not f"{kid['node_id']}" in result:
                     raise ValueError("Required field not present")
 
 
