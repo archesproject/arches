@@ -1271,20 +1271,40 @@ class BaseDomainDataType(BaseDataType):
                 if option["text"] == value:
                     yield option["id"], dnode.nodeid
 
+    def is_a_literal_in_rdf(self):
+        return True
+
 
 class DomainDataType(BaseDomainDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
-        domain_val_node_query = models.Node.objects.filter(config__contains={"options": [{"id": value}]})
+        key = "id"
         if value is not None:
-            if len(domain_val_node_query) < 1:
-                errors.append(
-                    {
-                        "type": "ERROR",
-                        "message": f"{value} {row_number} is not a valid domain id. Please check the node this value \
+            try:
+                uuid.UUID(str(value))
+            except ValueError as e:
+                key = "text"
+
+            domain_val_node_query = models.Node.objects.filter(config__contains={"options": [{key: value}]})
+
+            if len(domain_val_node_query) != 1:
+                row_number = row_number if row_number else ""
+                if len(domain_val_node_query) == 0:
+                    errors.append(
+                        {
+                            "type": "ERROR",
+                            "message": f"{value} {row_number} is not a valid domain id. Please check the node this value \
                             is mapped to for a list of valid domain ids. This data was not imported.",
-                    }
-                )
+                        }
+                    )
+                elif len(domain_val_node_query) > 1:
+                    errors.append(
+                        {
+                            "type": "ERROR",
+                            "message": f"Multiple domain values were found for '{value}' {row_number}.  \
+                        Please use an explicit id instead of a domain string value. This data was not imported.",
+                        }
+                    )
         return errors
 
     def get_search_terms(self, nodevalue, nodeid=None):
@@ -1367,18 +1387,14 @@ class DomainDataType(BaseDomainDataType):
 
 
 class DomainListDataType(BaseDomainDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, values, row_number=None, source="", node=None, nodeid=None):
+        domainDataType = DomainDataType()
         errors = []
-        if value is not None:
-            for v in value:
-                if len(models.Node.objects.filter(config__contains={"options": [{"id": v}]})) < 1:
-                    errors.append(
-                        {
-                            "type": "ERROR",
-                            "message": f"{v} {row_number} is not a valid domain id. Please check the node this value \
-                                is mapped to for a list of valid domain ids. This data was not imported.",
-                        }
-                    )
+        if values is not None:
+            if not isinstance(values, list):
+                values = [values]
+            for value in values:
+                errors = errors + domainDataType.validate(value, row_number)
         return errors
 
     def transform_import_values(self, value, nodeid):
@@ -1591,6 +1607,9 @@ class ResourceInstanceDataType(BaseDataType):
 
     def collects_multiple_values(self):
         return True
+
+    def ignore_keys(self):
+        return ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]
 
 
 class NodeValueDataType(BaseDataType):
