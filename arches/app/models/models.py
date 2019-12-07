@@ -983,7 +983,12 @@ class UserProfile(models.Model):
     phone = models.CharField(max_length=16, blank=True)
 
     def is_reviewer(self):
-        return self.user.groups.filter(name="Resource Reviewer").exists()
+        """ DEPRECATED Use new pattern:
+
+            from arches.app.utils.permission_backend import user_is_resource_reviewer
+            is_reviewer = user_is_resource_reviewer(user)
+        """
+        pass
 
     @property
     def viewable_nodegroups(self):
