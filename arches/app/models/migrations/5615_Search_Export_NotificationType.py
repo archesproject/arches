@@ -8,8 +8,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='notification',
-            name='context',
+            model_name="notification",
+            name="context",
             field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default={}, null=True),
         ),
         migrations.RunSQL(
@@ -27,5 +27,5 @@ class Migration(migrations.Migration):
             DELETE FROM notification_types
                 WHERE typeid in ('3789b120-0ct4-21ea-913e-784g4833r92a');
             """,
-        )
+        ),
     ]

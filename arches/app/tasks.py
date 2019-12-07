@@ -26,7 +26,7 @@ def export_search_results(self, userid, request_dict, format):
     new_req.method = "GET"
     new_req.user = _user
     for k, v in request_dict.items():
-        new_req.GET.__setitem__(k, v[0]) # copies k,v pairs from old req to new_req
+        new_req.GET.__setitem__(k, v[0])  # copies k,v pairs from old req to new_req
 
     exporter = SearchResultsExporter(search_request=new_req)
     # prod instances of arches should exclude the return_relative_url kwarg (default=False)
@@ -35,7 +35,7 @@ def export_search_results(self, userid, request_dict, format):
         greeting="Hello,\nYour request to download a set of search results is now ready.",
         link=msg,
         button_text="Download Now",
-        closing="Thank you" 
+        closing="Thank you",
     )
     response = {"taskid": self.request.id, "msg": msg, "notiftype_name": "Search Export Download Ready", "context": context}
 
