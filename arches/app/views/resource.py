@@ -39,6 +39,7 @@ from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.response import JSONResponse
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.views.base import BaseManagerView, MapBaseManagerView
@@ -118,7 +119,7 @@ class NewResourceEditorView(MapBaseManagerView):
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
         datatypes = models.DDataType.objects.all()
-        user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
+        user_is_reviewer = user_is_resource_reviewer(request.user.userprofile)
         is_system_settings = False
 
         if resource_instance is None:
@@ -310,7 +311,7 @@ class ResourceEditorView(MapBaseManagerView):
                     'description', 'ontologyclass', 'isrequired', 'issearchable', 'istopnode']),
                 saved_searches=JSONSerializer().serialize(settings.SAVED_SEARCHES),
                 resource_instance_exists=resource_instance_exists,
-                user_is_reviewer=json.dumps(request.user.groups.filter(name='Resource Reviewer').exists()),
+                user_is_reviewer=json.dumps(user_is_resource_reviewer(request.user)),
                 userid=request.user.id
             )
 

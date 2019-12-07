@@ -42,6 +42,7 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.arches_crypto import AESCipher
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 
 logger = logging.getLogger(__name__)
 
@@ -230,7 +231,7 @@ class UserProfileView(View):
                 models.UserProfile.objects.create(user=user)
             userDict = JSONSerializer().serializeToPython(user)
             userDict['password'] = None
-            userDict['is_reviewer'] = user.userprofile.is_reviewer()
+            userDict['is_reviewer'] = user_is_resource_reviewer(user)
             userDict['viewable_nodegroups'] = user.userprofile.viewable_nodegroups
             userDict['editable_nodegroups'] = user.userprofile.editable_nodegroups
             userDict['deletable_nodegroups'] = user.userprofile.deletable_nodegroups
@@ -276,7 +277,7 @@ class GetClientIdView(View):
                 if user:
                     if hasattr(user, 'userprofile') is not True:
                         models.UserProfile.objects.create(user=user)
-                    is_reviewer = user.userprofile.is_reviewer()
+                    is_reviewer = user_is_resource_reviewer(user)
                     user = JSONSerializer().serializeToPython(user)
                     user['password'] = None
                     user['is_reviewer'] = is_reviewer

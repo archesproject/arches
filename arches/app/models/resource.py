@@ -32,6 +32,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.exceptions import InvalidNodeNameException, MultipleNodesFoundException
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.datatypes.datatypes import DataTypeFactory
 
 
@@ -269,7 +270,7 @@ class Resource(models.ResourceInstance):
 
         permit_deletion = False
         if user != {}:
-            user_is_reviewer = user.groups.filter(name='Resource Reviewer').exists()
+            user_is_reviewer = user_is_resource_reviewer(user)
             if user_is_reviewer is False:
                 tiles = list(models.TileModel.objects.filter(resourceinstance=self))
                 resource_is_provisional = True if sum([len(t.data) for t in tiles]) == 0 else False

@@ -14,6 +14,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.date_utils import ExtendedDateFormat
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.core.cache import cache
@@ -1047,7 +1048,7 @@ class FileListDataType(BaseDataType):
         user = request.user
         if hasattr(request.user, 'userprofile') is not True:
             models.UserProfile.objects.create(user=request.user)
-        user_is_reviewer = request.user.userprofile.is_reviewer()
+        user_is_reviewer = user_is_resource_reviewer(request.user)
         current_tile_data = self.get_tile_data(user_is_reviewer, str(user.id), current_tile)
         if previously_saved_tile.count() == 1:
             previously_saved_tile_data = self.get_tile_data(user_is_reviewer, str(user.id), previously_saved_tile[0])
