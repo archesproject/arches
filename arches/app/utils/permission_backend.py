@@ -185,6 +185,7 @@ def user_can_read_concepts(user):
         return user.groups.filter(name="RDM Administrator").exists()
     return False
 
+
 def user_is_resource_reviewer(user):
     """
     Single test for whether a user is in the Resource Reviewer group
