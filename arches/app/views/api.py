@@ -37,6 +37,7 @@ from arches.app.utils.data_management.resources.formats.rdffile import JsonLdRea
 from arches.app.utils.permission_backend import user_can_read_resources
 from arches.app.utils.permission_backend import user_can_edit_resources
 from arches.app.utils.permission_backend import user_can_read_concepts
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
@@ -770,7 +771,7 @@ class Card(APIBase):
             widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in cards] for widget in widgets
         ]
         datatypes = models.DDataType.objects.all()
-        user_is_reviewer = request.user.groups.filter(name="Resource Reviewer").exists()
+        user_is_reviewer = user_is_resource_reviewer(request.user)
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
 
