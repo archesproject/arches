@@ -1,4 +1,5 @@
 from django.db import migrations
+import django.contrib.postgres.fields.jsonb
 
 
 class Migration(migrations.Migration):
@@ -6,6 +7,11 @@ class Migration(migrations.Migration):
     dependencies = [("models", "5613_notification_type")]
 
     operations = [
+        migrations.AddField(
+            model_name='notification',
+            name='context',
+            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default={}, null=True),
+        ),
         migrations.RunSQL(
             """
             INSERT INTO notification_types (typeid, name, emailtemplate, emailnotify, webnotify)

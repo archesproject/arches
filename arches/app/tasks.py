@@ -32,10 +32,10 @@ def export_search_results(self, userid, request_dict, format):
     # prod instances of arches should exclude the return_relative_url kwarg (default=False)
     msg = zip_utils.write_zip_file(exporter.export(format), return_relative_url=True)
     context = dict(
-        "greeting": "Hello,\nYour request to download a set of search results is now ready.",
-        "link": msg,
-        "button_text": "Download Now",
-        "closing": "Thank you" 
+        greeting="Hello,\nYour request to download a set of search results is now ready.",
+        link=msg,
+        button_text="Download Now",
+        closing="Thank you" 
     )
     response = {"taskid": self.request.id, "msg": msg, "notiftype_name": "Search Export Download Ready", "context": context}
 
@@ -85,7 +85,7 @@ def create_user_task_record(taskid, taskname, userid):
         logger.warn(e)
 
 
-def notify_completion(msg, user, notiftype_name, context):
+def notify_completion(msg, user, notiftype_name=None, context=None):
     if notiftype_name is not None:
         notif_type = models.NotificationType.objects.get(name=notiftype_name)
     else:
