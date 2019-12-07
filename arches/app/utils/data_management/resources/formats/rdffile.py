@@ -414,28 +414,11 @@ class JsonLdReader(Reader):
                         elif not is_literal and not o["datatype"].is_a_literal_in_rdf():
                             if self.is_concept_node(uri):
                                 collid = "http://localhost:8000/" + o["config"]["collection_id"]
-                                # import ipdb
-
-                                # ipdb.sset_trace()
                                 if self.validate_concept_in_collection(uri.split("/")[-1], o["config"]["collection_id"]):
                                     possible.append([o, uri])
                                 else:
                                     raise ValueError(f"Unknown collection: {collid}")
-                                # # Check value-space of concept here
-                                # collid = "http://localhost:8000/" + o["config"]["collection_id"]
-                                # if not collid in rdm_collections:
-                                #     # WTF? Blow up
-                                #     raise ValueError(f"Unknown collection: {collid}")
-                                # elif not uri in rdm_collections[collid]:
-                                #     # referenced URI not in node, thus not possible
-                                #     pass
-                                # else:
-                                #     possible.append([o, uri])
-
                             elif self.is_resource_instance_node(o, uri):
-                                # elif uri.startswith("http://localhost:8000/resources/") and o["datatype"].datatype.startswith(
-                                #     "resource-instance"
-                                # ):
                                 possible.append([o, uri])
                             elif self.is_semantic_node(o):
                                 possible.append([o, ""])
