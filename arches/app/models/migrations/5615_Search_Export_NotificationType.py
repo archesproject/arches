@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             """
             INSERT INTO notification_types (typeid, name, emailtemplate, emailnotify, webnotify)
             VALUES (
-                uuid('3789b120-0ct4-21ea-913e-784g4833r92a'),
+                '441e6ed4-188d-11ea-a35b-784f435179ea',
                 'Search Export Download Ready',
                 'email/download_ready_email_notification.htm',
                 true,
@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
             """,
             """
             DELETE FROM notification_types
-                WHERE typeid in ('3789b120-0ct4-21ea-913e-784g4833r92a');
+                WHERE typeid in ('441e6ed4-188d-11ea-a35b-784f435179ea');
             """,
         ),
     ]
