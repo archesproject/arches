@@ -12,9 +12,16 @@
 
         <!-- Help/Instructions -->
         <div class="permissions-instructions-panel">
-            <p class="mpm-instruction">
-                To set permissions: <strong>Select one or more cards</strong> from the card tree, then select a Group or User Account from the dropdown below. Click <strong>Apply Permissions</strong> to set your changes.  You'll see your selections reflected by the icons in the card tree.
-            </p>
+            <span class="mpm-instruction-title">{% trans "To set permissions: " %} </span>
+            <div class="mpm-instruction">
+                <strong> {% trans "1. Select one or more cards" %}</strong> from the card tree
+            </div>
+            <div class="mpm-instruction">
+                <strong> {% trans "2. Select a Group or User Account" %}</strong> from the dropdown below.
+            </div> 
+            <div class="mpm-instruction">
+                <strong> {% trans "3. Apply Permissions" %}</strong> to set your changes.  You'll see your selections reflected by the icons in the card tree.
+            </div>
         </div>
 
         <!-- Group/Account Selector -->

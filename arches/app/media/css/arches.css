@@ -1935,6 +1935,18 @@ a.select2-search-choice-close {
     background: #fbfbfb;
 }
 
+.mpm-instruction-title {
+    font-size: 15px;
+}
+
+.mpm-instruction {
+    padding: 2px 15px;
+}
+
+.settings-panel-heading + .permissions-instructions-panel {
+    margin-top: 55px;
+}
+
 .permission-manager.panel-body {
     display: flex;
     background-color: white;
@@ -2306,13 +2318,21 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .settings-panel-heading {
+    position: fixed;
+    top: 115px;
     height: 50px;
+    width: 100%;
     background: #25476a;
     margin-top: -10px;
     margin-bottom: 20px;
     margin-left: -25px;
     margin-right: -20px;
     padding-left: 25px;
+    z-index: 10;
+}
+
+.settings-panel-heading + div {
+    margin-top: 13px;
 }
 
 .graph-crm-class,
@@ -2434,9 +2454,10 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .function-node-alert {
+    display: inline-block;
     background: #72D3C9;
-    padding: 15px 10px;
-    margin-top: -15px;
+    padding: 15px 30px;
+    margin-top: -10px;
     margin-left: -5px;
     margin-bottom: 15px;
     font-size: 14px;
@@ -10259,7 +10280,7 @@ ul.select2-choices:after {
     margin-bottom: 15px;
     font-size: 13px;
     font-weight: 600;
-    margin-top: 0px;
+    margin-top: 5px;
     margin-bottom: 15px;
     border-radius: 2px;
 }
