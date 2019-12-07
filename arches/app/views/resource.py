@@ -119,7 +119,7 @@ class NewResourceEditorView(MapBaseManagerView):
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
         datatypes = models.DDataType.objects.all()
-        user_is_reviewer = user_is_resource_reviewer(request.user.userprofile)
+        user_is_reviewer = user_is_resource_reviewer(request.user)
         is_system_settings = False
 
         if resource_instance is None:
