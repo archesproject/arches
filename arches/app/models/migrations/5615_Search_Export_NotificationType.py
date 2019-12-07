@@ -15,7 +15,13 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             """
             INSERT INTO notification_types (typeid, name, emailtemplate, emailnotify, webnotify)
-            VALUES (uuid('3789b120-0ct4-21ea-913e-784g4833r92a'),'Search Export Download Ready','email/download_ready_email_notification.htm',true,true);
+            VALUES (
+                uuid('3789b120-0ct4-21ea-913e-784g4833r92a'),
+                'Search Export Download Ready',
+                'email/download_ready_email_notification.htm',
+                true,
+                true
+            );
             """,
             """
             DELETE FROM notification_types

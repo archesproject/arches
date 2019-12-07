@@ -42,6 +42,7 @@ define([
                     url: arches.urls.get_notification_types,
                     method: "GET"
                 }).done(function(data) {
+                    var koType;
                     data.types.forEach(function(type) {
                         koType = ko.mapping.fromJS(type);
                         self.viewModel.notifTypeObservables.push(koType);
@@ -51,6 +52,7 @@ define([
             self.viewModel.getNotifTypes();
 
             self.viewModel.updateNotifTypes = function() {
+                var modified;
                 var updatedTypes = self.viewModel.notifTypeObservables().map(function(type) {
                     modified = ko.mapping.toJS(type);
                     delete modified._state;
