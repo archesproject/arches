@@ -236,6 +236,7 @@ class JsonLdWriter(RdfWriter):
         full_file_name = os.path.join("{0}.{1}".format(self.file_name, "jsonld"))
         return [{"name": full_file_name, "outputfile": dest}]
 
+
 class JsonLdReader(Reader):
     def __init__(self):
         super(JsonLdReader, self).__init__()
@@ -264,19 +265,13 @@ class JsonLdReader(Reader):
         self.logger.info("Initialized JsonLdReader")
         self.logger.debug("Found {0} Non-unique root classes".format(len(self.non_unique_classes)))
         self.logger.debug("Found {0} Resource Model Root classes".format(len(self.resource_model_root_classes)))
-        
+
         self.IGNORE_KEYS = ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]
         self.PREF_CONCEPT_SCHEME = "http://vocab.getty.edu/aat/"
         self.LITERAL_DATATYPES = ["date", "number", "string", "domain-value", "domain-value-list", "color-datatype"]
-    
-    def validate(self, dt, val):
-        return True
+
 
     def validate_concept_in_collection(self, value, collection):
-        import ipdb
-        ipdb.sset_trace()
-        # print(value)
-        # print(collection)
         edges = []
         try:
             conceptid = uuid.UUID(str(value))
@@ -288,50 +283,43 @@ class JsonLdReader(Reader):
         return str(value) in concept_labels
 
     def process_graph(self, graphid):
+        root_node = None
+        nodes = {}
+        graph = GraphProxy.objects.get(graphid=graphid)
+        for nodeid, n in graph.nodes.items():
+            node = {}
+            if n.istopnode:
+                root_node = node
+            node["datatype"] = self.datatype_factory.get_instance(n.datatype)
+            node["datatype_type"] = n.datatype
+            node["extra_class"] = []
+            if n.datatype in ["resource-instance", "resource-instance-list"]:
+                if "graphid" in n.config:
+                    graph_ids = n.config["graphid"]
+                    for gid in graph_ids:
+                        node["extra_class"].append(self.root_ontologyclass_lookup[gid])
 
-        def process_model(model):
-            nodes = {}
-            cardinalities = {n["nodegroupid"]: n["cardinality"] for n in model["nodegroups"]}
+            # In real implementation datatype would just be a reference to the datatype class or instance thereof
+            # In order to manage the values in the above dict as functions on the class
 
-            for n in model["nodes"]:
-                node = {}
-                node["datatype"] = {"type": n["datatype"], "literal": n["datatype"] in self.LITERAL_DATATYPES, "list": n["datatype"].endswith("-list")}
-                if n["datatype"] in ["concept", "concept-list", "resource-instance", "resource-instance-list"]:
-                    node["datatype"]["ignore_keys"] = self.IGNORE_KEYS
-                else:
-                    node["datatype"]["ignore_keys"] = []
+            node["config"] = {}
+            if n.config and "rdmCollection" in n.config:
+                node["config"]["collection_id"] = str(n.config["rdmCollection"])
+            node["required"] = n.isrequired
+            node["node_id"] = str(n.nodeid)
+            node["name"] = n.name
+            node["class"] = n.ontologyclass
+            node["nodegroup_id"] = str(n.nodegroup_id)
+            node["cardinality"] = n.nodegroup.cardinality if n.nodegroup else None
+            node["out_edges"] = []
+            node["children"] = {}
+            nodes[str(n.nodeid)] = node
 
-                node["extra_class"] = []
-                if n["datatype"] in ["resource-instance", "resource-instance-list"]:
-                    if "graphid" in n["config"]:
-                        graph_ids = n["config"]["graphid"]
-                        for gid in graph_ids:
-                            node["extra_class"].append(self.root_ontologyclass_lookup[gid])
-
-                # In real implementation datatype would just be a reference to the datatype class or instance thereof
-                # In order to manage the values in the above dict as functions on the class
-
-                node["config"] = {}
-                if n["config"] and "rdmCollection" in n["config"]:
-                    node["config"]["collection_id"] = n["config"]["rdmCollection"]
-                node["required"] = n["isrequired"]
-                node["node_id"] = n["nodeid"]
-                node["name"] = n["name"]
-                node["class"] = n["ontologyclass"]
-                node["nodegroup_id"] = n["nodegroup_id"]
-                node["cardinality"] = cardinalities.get(n["nodegroup_id"], False)
-                node["out_edges"] = []
-                node["children"] = {}
-                nodes[n["nodeid"]] = node
-
-            for e in model["edges"]:
-                dn = e["domainnode_id"]
-                rng = e["rangenode_id"]
-                prop = e["ontologyproperty"]
-                nodes[dn]["out_edges"].append({"range": rng, "prop": prop})
-
-            return nodes
-
+        for edegid, e in graph.edges.items():
+            dn = e.domainnode_id
+            rng = e.rangenode_id
+            prop = e.ontologyproperty
+            nodes[str(dn)]["out_edges"].append({"range": str(rng), "prop": str(prop)})
 
         def model_walk(node, nodes):
             for e in node["out_edges"]:
@@ -345,14 +333,11 @@ class JsonLdReader(Reader):
                 model_walk(rng, nodes)
             del node["out_edges"]
 
-        graph = get_graphs_for_export([graphid])
-        graph = JSONSerializer().serializeToPython(graph)["graph"][0]
-        nodes = process_model(graph)
-        tree = nodes[graph["root"]["nodeid"]]
-        model_walk(tree, nodes)
-        return tree
+        model_walk(root_node, nodes)
+
         # tree now represents a concise description of the structure of the model
-        # print(json.dumps(tree, indent=4))
+        # print(json.dumps(root_node, indent=4))
+        return root_node
 
     def read_resource(self, data, use_ids=False, resourceid=None, graphid=None):
         self.use_ids = use_ids
@@ -367,7 +352,7 @@ class JsonLdReader(Reader):
             if graphid is None:
                 graphid = self.get_graph_id(jsonld_document["@type"][0])
                 self.logger.debug("graphid is not set. Using the @type value instead: {0}".format(jsonld_document["@type"][0]))
-            
+
             tree = self.process_graph(graphid)
 
             ### --- Process Instance ---
@@ -379,6 +364,15 @@ class JsonLdReader(Reader):
             result = {"data": [jsonld_document["@id"]]}
             self.data_walk(jsonld_document, tree, result)
             print(json.dumps(result, indent=4))
+
+    def is_semantic_node(self, graph_node):
+        return self.datatype_factory.datatypes[graph_node["datatype_type"]].defaultwidget is None
+
+    def is_resource_instance_node(self, graph_node, uri):
+        return uri.startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "resources/") and not self.is_semantic_node(graph_node)
+
+    def is_concept_node(self, uri):
+        return uri.startswith(settings.PREFERRED_CONCEPT_SCHEME) or uri.startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "concepts/")
 
     def data_walk(self, data_node, tree_node, result, tile=None):
         for k, v in data_node.items():
@@ -402,7 +396,7 @@ class JsonLdReader(Reader):
 
                 # Find precomputed possible branches by prop/class combination
                 key = f"{k} {clss}"
-                if key in tree_node["datatype"]["ignore_keys"]:
+                if key in tree_node["datatype"].ignore_keys():
                     # these are handled by the datatype itself
                     continue
                 elif not key in tree_node["children"]:
@@ -414,17 +408,15 @@ class JsonLdReader(Reader):
                     print(f"\nConsidering {len(options)} options ...")
                     for o in options:
                         print(f"Considering:\n  {vi}\n  {o}")
-
-                        if is_literal and o["datatype"]["literal"]:
-                            if self.validate(o["datatype"]["type"], value):
+                        if is_literal and o["datatype"].is_a_literal_in_rdf():
+                            if len(o["datatype"].validate(value)) == 0:
                                 possible.append([o, value])
-                        elif not is_literal and not o["datatype"]["literal"]:
-                            if (uri.startswith("http://localhost:8000/concepts/") or uri.startswith(self.PREF_CONCEPT_SCHEME)) and o["datatype"][
-                                "type"
-                            ].startswith("concept"):
+                        elif not is_literal and not o["datatype"].is_a_literal_in_rdf():
+                            if self.is_concept_node(uri):
                                 collid = "http://localhost:8000/" + o["config"]["collection_id"]
-                                import ipdb
-                                ipdb.sset_trace()
+                                # import ipdb
+
+                                # ipdb.sset_trace()
                                 if self.validate_concept_in_collection(uri.split("/")[-1], o["config"]["collection_id"]):
                                     possible.append([o, uri])
                                 else:
@@ -439,9 +431,13 @@ class JsonLdReader(Reader):
                                 #     pass
                                 # else:
                                 #     possible.append([o, uri])
-                            elif uri.startswith("http://localhost:8000/resources/") and o["datatype"]["type"].startswith("resource-instance"):
+
+                            elif self.is_resource_instance_node(o, uri):
+                                # elif uri.startswith("http://localhost:8000/resources/") and o["datatype"].datatype.startswith(
+                                #     "resource-instance"
+                                # ):
                                 possible.append([o, uri])
-                            elif o["datatype"]["type"] in ["semantic", "semantic-like-datatype"]:
+                            elif self.is_semantic_node(o):
                                 possible.append([o, ""])
                             else:
                                 # This is when the current option doesn't match, but could be
@@ -478,32 +474,33 @@ class JsonLdReader(Reader):
                     bnodeid = f"{branch[0]['node_id']}/{branch[0]['name']}"
                     create_new_tile = False
                     from random import random
-                    if branch[0]['node_id'] == branch[0]["nodegroup_id"]:
+
+                    if branch[0]["node_id"] == branch[0]["nodegroup_id"]:
                         create_new_tile = True
                     bnode = {"data": []}
                     bnode = {"data": [], "nodegroup_id": branch[0]["nodegroup_id"], "cardinality": branch[0]["cardinality"]}
                     if create_new_tile:
-                        tile = {"tileid": random(), "tile": {"data":{}}}
-                        
+                        tile = {"tileid": random(), "tile": {"data": {}}}
+
                     bnode["tile"] = tile
 
                     if bnodeid in result:
-                        if branch[0]["datatype"]["list"]:
+                        if branch[0]["datatype"].collects_multiple_values():
                             # append to previous tile
                             bnode = result[bnodeid][0]
                             bnode["data"].append(branch[1])
-                            if branch[0]["datatype"]["type"] != "semantic" and branch[0]["datatype"]["type"] != "semantic-like-datatype":
-                                bnode['tile']['tile']['data'][bnodeid].append(branch[1]) 
+                            if not self.is_semantic_node(branch[0]):
+                                bnode["tile"]["tile"]["data"][bnodeid].append(branch[1])
                         elif branch[0]["cardinality"] != "n":
                             raise ValueError("Attempt to add a value to cardinality 1, non-list node")
                         else:
                             bnode["data"].append(branch[1])
-                            if branch[0]["datatype"]["type"] != "semantic" and branch[0]["datatype"]["type"] != "semantic-like-datatype":
+                            if not self.is_semantic_node(branch[0]):
                                 tile["tile"]["data"][bnodeid] = branch[1]
                             result[bnodeid].append(bnode)
                     else:
-                        if branch[0]["datatype"]["type"] != "semantic" and branch[0]["datatype"]["type"] != "semantic-like-datatype":
-                            if branch[0]["datatype"]["list"] and tile is not None:
+                        if not self.is_semantic_node(branch[0]):
+                            if branch[0]["datatype"].collects_multiple_values() and tile is not None:
                                 tile["tile"]["data"][bnodeid] = [branch[1]]
                             else:
                                 tile["tile"]["data"][bnodeid] = branch[1]
@@ -939,4 +936,3 @@ class JsonLdReader(Reader):
 #                 pathstr.append(path["label"].split("/")[-1])
 #             ret.append(",".join(pathstr))
 #         return ret
-
