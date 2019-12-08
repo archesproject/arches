@@ -9757,7 +9757,7 @@ a.filter-tools:hover {
 }
 
 .mpm-manager .btn-rr {
-    margin: 0;
+    margin: -2px 0px 0px 0px;
 }
 
 .library-card.inactive {
