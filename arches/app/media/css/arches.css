@@ -2038,31 +2038,37 @@ a.select2-search-choice-close {
     float: right;
     padding-right: 10px;
     font-size: 11px;
-    color: #777;
+    font-weight: 600;
+    color: #454545;
+    padding-top: 10px;
+    margin-top: -10px;
+    margin-bottom: -10px;
+    padding-left: 10px;
 }
 
 .permissions-node {
     font-size: 13px;
-    color: #777;
+    color: #555;
 }
 
 .no-cards-selected {
-    padding: 5px;
+    padding: 10px;
     font-size: 13px;
 }
 
 .permissions-node-row {
     display: inline-flex;
     background: #fff;
-    padding-top: 6px;
-    padding-bottom: 6px;
+    border-bottom: 1px solid #D3E5F4;
+    padding-top: 10px;
+    padding-bottom: 10px;
     padding-left: 10px;
     margin-right: 0px;
     justify-content: space-between;
 }
 
 .permissions-node-row:nth-child(even) {
-    background: #f9f9f9;
+    background: #F5FAFE;
 }
 
 .permissions-title {
@@ -2318,7 +2324,7 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .settings-panel {
-    padding: 10px 20px 25px 25px;
+    padding: 10px 20px 55px 25px;
 }
 
 .settings-panel-heading {
