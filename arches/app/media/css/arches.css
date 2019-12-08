@@ -1334,6 +1334,11 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     border-radius: 2px;
 }
 
+.widget-file {
+    margin-left: 38px;
+    width: 100px;
+}
+
 .date .form-control {
     height: 36px;
 }
@@ -2408,10 +2413,10 @@ ul.nav.nav-tabs.nav-justified {
     margin-top: -5px;
     display: inline-block;
     color: #5F7D9A;
-    font-size: 11px;
     position: relative;
     top: -5px;
     font-size: 13px;
+    font-weight: 400;
 }
 
 .exportable-field-name {
@@ -4007,6 +4012,14 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 
 .widget-container {
     padding: 10px 15px 25px;
+}
+
+.widget-container.data-type {
+    padding-bottom: 5px;
+}
+
+.widget-container.data-type-config {
+    padding-bottom: 0px;
 }
 
 a.selected {
