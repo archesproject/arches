@@ -2112,6 +2112,7 @@ a.select2-search-choice-close {
 .permissions-selected {
     display: flex;
     flex-direction: column;
+    margin-top: 5px;
     list-style: none;
     color: #666;
     line-height: 1.2;
