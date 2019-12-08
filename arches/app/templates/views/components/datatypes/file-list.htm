@@ -4,14 +4,10 @@
     <div class="form-group">
         <div class="relative">
             <label class="col-xs-12 control-label widget-input-label">
-                <span class="switch switch-small arches-switch" data-bind="css: {'on': activated}, click: function () { activated(!activated()); }"><small></small></span>
-                <p class="control-label graph-settings-switch-label" style="font-size: 13px; font-weight: 400;">
-                    {% trans "Uploading Files" %}
+                <p class="control-label node-widget-label">
+                    {% trans "Maximum Number of Files" %}
                 </p>
-                <span class="graph-settings-switch-subtitle">
-                    {% trans "Set the maximum number of files to upload" %}
-                </span>
-                <input class="form-control input-md widget-input widget-file" placeholder="10" type="number" data-bind="textInput: maxFiles, disable: !activated()"></input>
+                <input class="form-control input-md widget-input widget-file" placeholder="1" type="number" data-bind="textInput: maxFiles"></input>
             </label>
         </div>
     </div>
