@@ -32,7 +32,12 @@ class NotificationView(View):
                     notifs = models.UserXNotification.objects.filter(recipient=request.user).order_by("notif__created").reverse()
                 notif_dict_list = []
                 for n in notifs:
-                    if models.UserXNotificationType.objects.filter(user=request.user, notiftype=n.notif.notiftype, webnotify=False).exists() is False:
+                    if (
+                        models.UserXNotificationType.objects.filter(
+                            user=request.user, notiftype=n.notif.notiftype, webnotify=False
+                        ).exists()
+                        is False
+                    ):
                         notif = n.__dict__
                         notif["message"] = n.notif.message
                         notif["created"] = n.notif.created
