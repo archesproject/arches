@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains commands for building Arches."""
 
+import json
 import os
 import uuid
 from django.utils.translation import ugettext as _
@@ -53,6 +54,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "-x", "--extensions", action="store", dest="extensions", default=None, help="Extensions to append to the base ontology"
         )
+        parser.add_argument("-o", "--ontology", action="store", dest="ontology_dir", default=None, help="Ontology configuration file")
 
     def handle(self, *args, **options):
         def choose_ontology(message):
@@ -68,6 +70,18 @@ class Command(BaseCommand):
                 return available_ontologies[int(selected_ontology) - 1]
             else:
                 return None
+
+        if options["ontology_dir"]:
+            ontology_dir = options["ontology_dir"]
+            config_file = os.path.join(ontology_dir, "ontology_config.json")
+            if os.path.exists(config_file):
+                with open(config_file, "r") as f:
+                    configs = json.load(f)
+                    options["source"] = os.path.join(ontology_dir, configs["base"])
+                    options["id"] = configs["base_id"]
+                    options["ontology_name"] = configs["base_name"]
+                    options["version"] = configs["base_version"]
+                    options["extensions"] = configs["extensions"]
 
         if options["reload"]:
             ontology = None
@@ -167,7 +181,10 @@ class Command(BaseCommand):
                 if extensions is None:
                     extensions = loaded_extensions
                 else:
-                    extensions = extensions.split(",") + loaded_extensions
+                    try:
+                        extensions = extensions.split(",") + loaded_extensions
+                    except AttributeError:
+                        extensions = extensions + loaded_extensions
 
                 for extension in set(extensions):
                     if verbosity > 0:
