@@ -1334,6 +1334,10 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     border-radius: 2px;
 }
 
+.widget-file {
+    width: 100px;
+}
+
 .date .form-control {
     height: 36px;
 }
@@ -1935,6 +1939,18 @@ a.select2-search-choice-close {
     background: #fbfbfb;
 }
 
+.mpm-instruction-title {
+    font-size: 15px;
+}
+
+.mpm-instruction {
+    padding: 2px 15px;
+}
+
+.settings-panel-heading + .permissions-instructions-panel {
+    margin-top: 55px;
+}
+
 .permission-manager.panel-body {
     display: flex;
     background-color: white;
@@ -2022,31 +2038,37 @@ a.select2-search-choice-close {
     float: right;
     padding-right: 10px;
     font-size: 11px;
-    color: #777;
+    font-weight: 600;
+    color: #454545;
+    padding-top: 10px;
+    margin-top: -10px;
+    margin-bottom: -10px;
+    padding-left: 10px;
 }
 
 .permissions-node {
     font-size: 13px;
-    color: #777;
+    color: #555;
 }
 
 .no-cards-selected {
-    padding: 5px;
+    padding: 10px;
     font-size: 13px;
 }
 
 .permissions-node-row {
     display: inline-flex;
     background: #fff;
-    padding-top: 6px;
-    padding-bottom: 6px;
+    border-bottom: 1px solid #D3E5F4;
+    padding-top: 10px;
+    padding-bottom: 10px;
     padding-left: 10px;
     margin-right: 0px;
     justify-content: space-between;
 }
 
 .permissions-node-row:nth-child(even) {
-    background: #f9f9f9;
+    background: #F5FAFE;
 }
 
 .permissions-title {
@@ -2090,6 +2112,7 @@ a.select2-search-choice-close {
 .permissions-selected {
     display: flex;
     flex-direction: column;
+    margin-top: 5px;
     list-style: none;
     color: #666;
     line-height: 1.2;
@@ -2302,17 +2325,25 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .settings-panel {
-    padding: 10px 20px 25px 25px;
+    padding: 10px 20px 55px 25px;
 }
 
 .settings-panel-heading {
+    position: fixed;
+    top: 115px;
     height: 50px;
+    width: 100%;
     background: #25476a;
     margin-top: -10px;
     margin-bottom: 20px;
     margin-left: -25px;
     margin-right: -20px;
     padding-left: 25px;
+    z-index: 10;
+}
+
+.settings-panel-heading + div {
+    margin-top: 13px;
 }
 
 .graph-crm-class,
@@ -2388,10 +2419,10 @@ ul.nav.nav-tabs.nav-justified {
     margin-top: -5px;
     display: inline-block;
     color: #5F7D9A;
-    font-size: 11px;
     position: relative;
     top: -5px;
     font-size: 13px;
+    font-weight: 400;
 }
 
 .exportable-field-name {
@@ -2434,9 +2465,10 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .function-node-alert {
+    display: inline-block;
     background: #72D3C9;
-    padding: 15px 10px;
-    margin-top: -15px;
+    padding: 15px 30px;
+    margin-top: -10px;
     margin-left: -5px;
     margin-bottom: 15px;
     font-size: 14px;
@@ -3986,6 +4018,14 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 
 .widget-container {
     padding: 10px 15px 25px;
+}
+
+.widget-container.data-type {
+    padding-bottom: 5px;
+}
+
+.widget-container.data-type-config {
+    padding-bottom: 0px;
 }
 
 a.selected {
@@ -9738,7 +9778,7 @@ a.filter-tools:hover {
 }
 
 .mpm-manager .btn-rr {
-    margin: 0;
+    margin: -2px 0px 0px 0px;
 }
 
 .library-card.inactive {
@@ -10273,7 +10313,7 @@ ul.select2-choices:after {
     margin-bottom: 15px;
     font-size: 13px;
     font-weight: 600;
-    margin-top: 0px;
+    margin-top: 5px;
     margin-bottom: 15px;
     border-radius: 2px;
 }
