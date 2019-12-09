@@ -986,6 +986,10 @@ ul.tabbed-report-tab-list {
     border-top: 1px solid #041B33;
 }
 
+.card-component-wrapper-editor .widgets .workbench-card-wrapper {
+    border: 1px solid #a8a8a8;
+}
+
 .widgets .workbench-card-wrapper {
     height: 500px;
 }

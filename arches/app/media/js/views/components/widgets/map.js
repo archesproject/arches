@@ -2,14 +2,16 @@ define([
     'arches',
     'underscore',
     'knockout',
+    'knockout-mapping',
     'viewmodels/widget',
     'viewmodels/map-editor',
     'bindings/chosen',
     'bindings/codemirror',
     'codemirror/mode/javascript/javascript'
-], function(arches, _, ko, WidgetViewModel, MapEditorViewModel) {
+], function(arches, _, ko, koMapping, WidgetViewModel, MapEditorViewModel) {
     var viewModel = function(params) {
         this.context = params.type;
+        this.summaryDetails = [];
         this.zoomConfigOpen = ko.observable(false);
         this.positionConfigOpen = ko.observable(false);
         this.geocoderConfigOpen = ko.observable(false);
@@ -60,6 +62,14 @@ define([
 
         WidgetViewModel.apply(this, [params]);
 
+        this.displayValue = ko.computed(function() {
+            var value = koMapping.toJS(this.value);
+            if (!value || !value.features) {
+                return 0;
+            }
+            return value.features.length;
+        }, this);
+
         if (!this.geocodeProvider()) {
             this.geocodeProvider(arches.geocoderDefault);
         }
@@ -79,6 +89,10 @@ define([
         }, this);
 
         if (params.widget) params.widgets = [params.widget];
+
+        if (ko.unwrap(this.value) !== null) {
+            this.summaryDetails = koMapping.toJS(this.value).features || [];
+        }
 
         MapEditorViewModel.apply(this, [params]);
     };
