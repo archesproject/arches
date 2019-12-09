@@ -203,7 +203,9 @@ urlpatterns = [
     url(r"^user_tasks$", UserTaskView.as_view(), name="get_user_tasks"),
     url(r"^user_tasks$", UserTaskView.as_view(action="get_all"), name="get_all_tasks"),
     url(r"^notifications$", NotificationView.as_view(), name="get_notifications"),
-    url(r"^notifications$", NotificationView.as_view(action="dismiss"), name="dismiss_notifications"),
+    url(r"^notifications/dismiss$", NotificationView.as_view(action="dismiss"), name="dismiss_notifications"),
+    url(r"^notifications/get_types$", NotificationView.as_view(action="get_types"), name="get_notification_types"),
+    url(r"^notifications/update_types$", NotificationView.as_view(action="update_types"), name="update_notification_types"),
     url(r"^collector_manager/*", MobileSurveyManagerView.as_view(), name="collector_manager"),
     url(r"^collector_designer/(?P<surveyid>%s)$" % uuid_regex, MobileSurveyDesignerView.as_view(), name="collector_designer"),
     url(

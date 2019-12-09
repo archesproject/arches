@@ -4225,6 +4225,20 @@ ul.jqtree_common li.jqtree-folder {
     min-height: 650px;
 }
 
+div.profile-notif-settings {
+    padding-top: 12px;
+}
+
+.profile-notif-settings td {
+    border: 1px solid gray;
+    font-size: 18px;
+    padding: 4px 6px 4px 6px;
+}
+
+.profile-notif-settings th {
+    padding: 4px 6px 4px 6px;
+}
+
 .profile-projects {
     height: 100vh;
 }
