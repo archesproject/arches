@@ -484,34 +484,23 @@ class Command(BaseCommand):
 
         def load_ontologies(package_dir):
             ontologies = glob.glob(os.path.join(package_dir, "ontologies/*"))
-            if len(ontologies) > 0 or settings.LOAD_DEFAULT_ONTOLOGY is True:
+            if len(ontologies) > 0:
                 print("loading ontologies")
 
-            if settings.LOAD_DEFAULT_ONTOLOGY is True:
-                load_ontology(
-                    settings.ONTOLOGY_BASE,
-                    settings.ONTOLOGY_BASE_NAME,
-                    settings.ONTOLOGY_BASE_VERSION,
-                    settings.ONTOLOGY_BASE_ID,
-                    settings.ONTOLOGY_EXT,
-                    settings.ONTOLOGY_PATH,
-                )
-
-            if settings.LOAD_PACKAGE_ONTOLOGIES is True:
-                for ontology in ontologies:
-                    if os.path.exists(os.path.join(ontology, "ontology_config.json")):
-                        with open(os.path.join(ontology, "ontology_config.json"), "r") as f:
-                            configs = json.load(f)
-                            load_ontology(
-                                configs["base"],
-                                configs["base_name"],
-                                configs["base_version"],
-                                configs["base_id"],
-                                configs["extensions"],
-                                ontology,
-                            )
-                    else:
-                        print(_("No ontology_config.json file. Cannot import"), ontology)
+            for ontology in ontologies:
+                if os.path.exists(os.path.join(ontology, "ontology_config.json")):
+                    with open(os.path.join(ontology, "ontology_config.json"), "r") as f:
+                        configs = json.load(f)
+                        load_ontology(
+                            configs["base"],
+                            configs["base_name"],
+                            configs["base_version"],
+                            configs["base_id"],
+                            configs["extensions"],
+                            ontology,
+                        )
+                else:
+                    print(_("No ontology_config.json file. Cannot import"), ontology)
 
         def load_system_settings(package_dir):
             update_system_settings = True
