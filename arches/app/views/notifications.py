@@ -16,9 +16,9 @@ class NotificationView(View):
                 for user_type in user_types:
                     if user_type.notiftype in default_types:  # find an overridden default_type and copy notify settings from user_type
                         i = default_types.index(user_type.notiftype)
-                        el = default_types[i]
-                        el.webnotify = user_type.webnotify
-                        el.emailnotify = user_type.emailnotify
+                        default_type = default_types[i]
+                        default_type.webnotify = user_type.webnotify
+                        default_type.emailnotify = user_type.emailnotify
 
                 notiftype_dict_list = [_type.__dict__ for _type in default_types]
                 return JSONResponse({"success": True, "types": notiftype_dict_list}, status=200)
@@ -32,10 +32,11 @@ class NotificationView(View):
                     notifs = models.UserXNotification.objects.filter(recipient=request.user).order_by("notif__created").reverse()
                 notif_dict_list = []
                 for n in notifs:
-                    notif = n.__dict__
-                    notif["message"] = n.notif.message
-                    notif["created"] = n.notif.created
-                    notif_dict_list.append(notif)
+                    if models.UserXNotificationType.objects.filter(user=request.user, notiftype=n.notif.notiftype, webnotify=False).exists() is False:
+                        notif = n.__dict__
+                        notif["message"] = n.notif.message
+                        notif["created"] = n.notif.created
+                        notif_dict_list.append(notif)
 
                 return JSONResponse({"success": True, "notifications": notif_dict_list}, status=200)
 
