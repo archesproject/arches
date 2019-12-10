@@ -7,7 +7,14 @@ define([
     'viewmodels/map-editor',
     'bindings/chosen',
     'bindings/codemirror',
-    'codemirror/mode/javascript/javascript'
+    'codemirror/mode/javascript/javascript',
+    'select2',
+    'bindings/select2v4',
+    'bindings/fadeVisible',
+    'bindings/mapbox-gl',
+    'bindings/chosen',
+    'bindings/color-picker',
+    'geocoder-templates'
 ], function(arches, _, ko, koMapping, WidgetViewModel, MapEditorViewModel) {
     var viewModel = function(params) {
         this.context = params.type;
@@ -61,6 +68,23 @@ define([
         ];
 
         WidgetViewModel.apply(this, [params]);
+
+        this.geometryTypeList = ko.computed({
+            read: function() {
+                return this.geometryTypes().map(function(type) {
+                    return ko.unwrap(type.id);
+                });
+            },
+            write: function(value) {
+                this.geometryTypes(value.map(function(type) {
+                    return {
+                        id: type,
+                        text: type
+                    };
+                }));
+            },
+            owner: this
+        });
 
         this.displayValue = ko.computed(function() {
             var value = koMapping.toJS(this.value);

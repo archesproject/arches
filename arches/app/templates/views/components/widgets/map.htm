@@ -192,10 +192,28 @@
 
                 <div class="control-label">{% trans "Available Geometry Types" %}</div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input id="select2Input2" data-bind="
-                      select2v4Data: geometryTypes,
-                      select2v4: geomTypeSelectSetup" style="width: 100%">
-                    </input>
+
+                    <input style="display:inline-block;"
+                        data-bind="select2Query: {
+                            select2Config: {
+                                clickBubble: true,
+                                value: geometryTypeList,
+                                multiple: true,
+                                allowClear: true,
+                                minimumInputLength: 0,
+                                placeholder: 'Available Geometry Types',
+                                data: [{
+                                    text: 'Point',
+                                    id: 'Point'
+                                }, {
+                                    text: 'Line',
+                                    id: 'Line'
+                                }, {
+                                    text: 'Polygon',
+                                    id: 'Polygon'
+                                }]
+                            }
+                        }">
                 </div>
             </div>
         </div>
