@@ -277,8 +277,8 @@ class JsonLdReader(Reader):
         for c in cdata:
             cids = [x.value for x in models.Value.objects.all().filter(concept_id__exact=c[0], valuetype__category="identifiers")]
             ids.extend(cids)
-        if value.startswith('http://localhost:8000/'):
-            value = value.rsplit('/', 1)[-1]
+        if value.startswith("http://localhost:8000/"):
+            value = value.rsplit("/", 1)[-1]
         return str(value) in ids
 
     def process_graph(self, graphid):
@@ -293,7 +293,7 @@ class JsonLdReader(Reader):
             node["datatype_type"] = n.datatype
             node["extra_class"] = []
             if n.datatype in ["resource-instance", "resource-instance-list"]:
-                if "graphid" in n.config and n.config['graphid']:
+                if "graphid" in n.config and n.config["graphid"]:
                     graph_ids = n.config["graphid"]
                     for gid in graph_ids:
                         node["extra_class"].append(self.root_ontologyclass_lookup[gid])
@@ -424,12 +424,12 @@ class JsonLdReader(Reader):
                 if key in tree_node["datatype"].ignore_keys():
                     # these are handled by the datatype itself
                     continue
-                elif not key in tree_node['children'] and is_literal:
+                elif not key in tree_node["children"] and is_literal:
                     # grumble grumble
                     # model has xsd:string, default is rdfs:Literal
                     key = f"{k} http://www.w3.org/2001/XMLSchema#string"
-                    if not key in tree_node['children']:
-                        raise ValueError(f"property/class combination does not exist in model: {k} {clss}")                 
+                    if not key in tree_node["children"]:
+                        raise ValueError(f"property/class combination does not exist in model: {k} {clss}")
                 elif not key in tree_node["children"]:
                     raise ValueError(f"property/class combination does not exist in model: {k} {clss}")
 
