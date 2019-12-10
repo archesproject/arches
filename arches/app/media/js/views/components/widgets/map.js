@@ -19,11 +19,6 @@ define([
     var viewModel = function(params) {
         this.context = params.type;
         this.summaryDetails = [];
-        this.zoomConfigOpen = ko.observable(false);
-        this.positionConfigOpen = ko.observable(false);
-        this.geocoderConfigOpen = ko.observable(false);
-        this.resourcePropertiesConfigOpen = ko.observable(false);
-        this.defaultValueConfigOpen = ko.observable(false);
         this.geocodingProviders = arches.geocodingProviders;
         this.defaultValueOptions = [
             {
