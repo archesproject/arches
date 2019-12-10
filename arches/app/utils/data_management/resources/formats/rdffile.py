@@ -272,15 +272,14 @@ class JsonLdReader(Reader):
         self.LITERAL_DATATYPES = ["date", "number", "string", "domain-value", "domain-value-list", "color-datatype"]
 
     def validate_concept_in_collection(self, value, collection):
-        edges = []
-        try:
-            conceptid = uuid.UUID(str(value))
-            edges = Concept().get_child_collections(collection, columns="conceptidto")
-        except ValueError as e:
-            edges = Concept().get_child_collections(collection, columns="valueto")
-
-        concept_labels = [str(item[0]) for item in edges]
-        return str(value) in concept_labels
+        cdata = Concept().get_child_collections(collection, columns="conceptidto")
+        ids = [str(x[0]) for x in cdata]
+        for c in cdata:
+            cids = [x.value for x in models.Value.objects.all().filter(concept_id__exact=c[0], valuetype__category="identifiers")]
+            ids.extend(cids)
+        if value.startswith('http://localhost:8000/'):
+            value = value.rsplit('/', 1)[-1]
+        return str(value) in ids
 
     def process_graph(self, graphid):
         root_node = None
@@ -294,13 +293,10 @@ class JsonLdReader(Reader):
             node["datatype_type"] = n.datatype
             node["extra_class"] = []
             if n.datatype in ["resource-instance", "resource-instance-list"]:
-                if "graphid" in n.config:
+                if "graphid" in n.config and n.config['graphid']:
                     graph_ids = n.config["graphid"]
                     for gid in graph_ids:
                         node["extra_class"].append(self.root_ontologyclass_lookup[gid])
-
-            # In real implementation datatype would just be a reference to the datatype class or instance thereof
-            # In order to manage the values in the above dict as functions on the class
 
             node["config"] = {}
             if n.config and "rdmCollection" in n.config:
@@ -392,7 +388,7 @@ class JsonLdReader(Reader):
             result = {"data": [jsonld_document["@id"]]}
             self.data_walk(jsonld_document, tree, result)
 
-            # print(JSONSerializer().serialize(result, indent=4))
+            print(JSONSerializer().serialize(result, indent=4))
 
     def is_semantic_node(self, graph_node):
         return self.datatype_factory.datatypes[graph_node["datatype_type"]].defaultwidget is None
@@ -428,110 +424,116 @@ class JsonLdReader(Reader):
                 if key in tree_node["datatype"].ignore_keys():
                     # these are handled by the datatype itself
                     continue
+                elif not key in tree_node['children'] and is_literal:
+                    # grumble grumble
+                    # model has xsd:string, default is rdfs:Literal
+                    key = f"{k} http://www.w3.org/2001/XMLSchema#string"
+                    if not key in tree_node['children']:
+                        raise ValueError(f"property/class combination does not exist in model: {k} {clss}")                 
                 elif not key in tree_node["children"]:
                     raise ValueError(f"property/class combination does not exist in model: {k} {clss}")
-                else:
-                    options = tree_node["children"][key]
-                    possible = []
-                    ignore = []
-                    print(f"\nConsidering {len(options)} options ...")
-                    for o in options:
-                        print(f"Considering:\n  {vi}\n  {o}")
-                        if is_literal and o["datatype"].is_a_literal_in_rdf():
-                            if len(o["datatype"].validate(value)) == 0:
-                                possible.append([o, value])
-                        elif not is_literal and not o["datatype"].is_a_literal_in_rdf():
-                            if self.is_concept_node(uri):
-                                collid = "http://localhost:8000/" + o["config"]["collection_id"]
-                                if self.validate_concept_in_collection(uri.split("/")[-1], o["config"]["collection_id"]):
-                                    possible.append([o, uri])
-                                else:
-                                    raise ValueError(f"Unknown collection: {collid}")
-                            elif self.is_resource_instance_node(o, uri):
+
+                options = tree_node["children"][key]
+                possible = []
+                ignore = []
+                print(f"\nConsidering {len(options)} options ...")
+                for o in options:
+                    print(f"Considering:\n  {vi}\n  {o}")
+                    if is_literal and o["datatype"].is_a_literal_in_rdf():
+                        if len(o["datatype"].validate(value)) == 0:
+                            possible.append([o, value])
+                    elif not is_literal and not o["datatype"].is_a_literal_in_rdf():
+                        if self.is_concept_node(uri):
+                            collid = o["config"]["collection_id"]
+                            if self.validate_concept_in_collection(uri, collid):
                                 possible.append([o, uri])
-                            elif self.is_semantic_node(o):
-                                possible.append([o, ""])
                             else:
-                                # This is when the current option doesn't match, but could be
-                                # non-ambiguous resource-instance vs semantic node
-                                continue
+                                raise ValueError(f"Concept URI {uri} not in Collection {collid}")
+                        elif self.is_resource_instance_node(o, uri):
+                            possible.append([o, uri])
+                        elif self.is_semantic_node(o):
+                            possible.append([o, ""])
                         else:
-                            raise ValueError("No possible match?")
-
-                    if not possible:
-                        raise ValueError("Data does not match any actual node, despite prop/class combination")
-                    elif len(possible) > 1:
-                        # descend into data to check if there are further clarifying features
-                        possible2 = []
-                        for p in possible:
-                            try:
-                                # Don't really create data, so pass anonymous result dict
-                                self.data_walk(vi, p[0], {}, tile)
-                                possible2.append(p)
-                            except:
-                                # Not an option
-                                pass
-                        if not possible2:
-                            raise ValueError("Considering branches, data does not match any node, despite a prop/class combination")
-                        elif len(possible2) > 1:
-                            raise ValueError("Even after considering branches, data still matches more than one node")
-                        else:
-                            branch = possible2[0]
+                            # This is when the current option doesn't match, but could be
+                            # non-ambiguous resource-instance vs semantic node
+                            continue
                     else:
-                        branch = possible[0]
+                        raise ValueError("No possible match?")
 
-                    if not self.is_semantic_node(branch[0]):
-                        graph_node = branch[0]
-                        # import ipdb
-                        # ipdb.sset_trace()
-                        node_value = graph_node["datatype"].from_rdf(vi)
-                        print(node_value)
-
-                    # We know now that it can go into the branch
-                    # Determine if we can collapse the data into a -list or not
-                    bnodeid = branch[0]["node_id"]
-                    # bnodeid = f"{branch[0]['node_id']}/{branch[0]['name']}"
-                    create_new_tile = False
-                    from random import random
-
-                    if branch[0]["node_id"] == branch[0]["nodegroup_id"]:
-                        create_new_tile = True
-                    bnode = {"data": []}
-                    bnode = {"data": [], "nodegroup_id": branch[0]["nodegroup_id"], "cardinality": branch[0]["cardinality"]}
-                    if create_new_tile:
-                        # tile = {"tileid": random(), "tile": {"data": {}}}
-                        parenttile_id = tile.tileid if tile else None
-                        tile = Tile(tileid=uuid.uuid4(), parenttile_id=parenttile_id, nodegroup_id=branch[0]["nodegroup_id"], data={})
-                        self.resource.tiles.append(tile)
-
-                    bnode["tile"] = tile
-
-                    if bnodeid in result:
-                        if branch[0]["datatype"].collects_multiple_values():
-                            # append to previous tile
-                            bnode = result[bnodeid][0]
-                            bnode["data"].append(branch[1])
-                            if not self.is_semantic_node(branch[0]):
-                                bnode["tile"].data[bnodeid] + node_value
-                        elif branch[0]["cardinality"] != "n":
-                            raise ValueError("Attempt to add a value to cardinality 1, non-list node")
-                        else:
-                            bnode["data"].append(branch[1])
-                            if not self.is_semantic_node(branch[0]):
-                                tile.data[bnodeid] = node_value
-                            result[bnodeid].append(bnode)
+                if not possible:
+                    raise ValueError("Data does not match any actual node, despite prop/class combination")
+                elif len(possible) > 1:
+                    # descend into data to check if there are further clarifying features
+                    possible2 = []
+                    for p in possible:
+                        try:
+                            # Don't really create data, so pass anonymous result dict
+                            self.data_walk(vi, p[0], {}, tile)
+                            possible2.append(p)
+                        except:
+                            # Not an option
+                            pass
+                    if not possible2:
+                        raise ValueError("Considering branches, data does not match any node, despite a prop/class combination")
+                    elif len(possible2) > 1:
+                        raise ValueError("Even after considering branches, data still matches more than one node")
                     else:
-                        if not self.is_semantic_node(branch[0]):
-                            if branch[0]["datatype"].collects_multiple_values() and tile is not None:
-                                tile.data[bnodeid] = node_value
-                            else:
-                                tile.data[bnodeid] = node_value
+                        branch = possible2[0]
+                else:
+                    branch = possible[0]
+
+                if not self.is_semantic_node(branch[0]):
+                    graph_node = branch[0]
+                    # import ipdb
+                    # ipdb.sset_trace()
+                    node_value = graph_node["datatype"].from_rdf(vi)
+                    print(node_value)
+
+                # We know now that it can go into the branch
+                # Determine if we can collapse the data into a -list or not
+                bnodeid = branch[0]["node_id"]
+                # bnodeid = f"{branch[0]['node_id']}/{branch[0]['name']}"
+                create_new_tile = False
+                from random import random
+
+                if branch[0]["node_id"] == branch[0]["nodegroup_id"]:
+                    create_new_tile = True
+                bnode = {"data": []}
+                bnode = {"data": [], "nodegroup_id": branch[0]["nodegroup_id"], "cardinality": branch[0]["cardinality"]}
+                if create_new_tile:
+                    # tile = {"tileid": random(), "tile": {"data": {}}}
+                    parenttile_id = tile.tileid if tile else None
+                    tile = Tile(tileid=uuid.uuid4(), parenttile_id=parenttile_id, nodegroup_id=branch[0]["nodegroup_id"], data={})
+                    self.resource.tiles.append(tile)
+
+                bnode["tile"] = tile
+
+                if bnodeid in result:
+                    if branch[0]["datatype"].collects_multiple_values():
+                        # append to previous tile
+                        bnode = result[bnodeid][0]
                         bnode["data"].append(branch[1])
-                        result[bnodeid] = [bnode]
+                        if not self.is_semantic_node(branch[0]):
+                            bnode["tile"].data[bnodeid] + node_value
+                    elif branch[0]["cardinality"] != "n":
+                        raise ValueError("Attempt to add a value to cardinality 1, non-list node")
+                    else:
+                        bnode["data"].append(branch[1])
+                        if not self.is_semantic_node(branch[0]):
+                            tile.data[bnodeid] = node_value
+                        result[bnodeid].append(bnode)
+                else:
+                    if not self.is_semantic_node(branch[0]):
+                        if branch[0]["datatype"].collects_multiple_values() and tile is not None:
+                            tile.data[bnodeid] = node_value
+                        else:
+                            tile.data[bnodeid] = node_value
+                    bnode["data"].append(branch[1])
+                    result[bnodeid] = [bnode]
 
-                    if not is_literal:
-                        # Walk down non-literal branches in the data
-                        self.data_walk(vi, branch[0], bnode, tile)
+                if not is_literal:
+                    # Walk down non-literal branches in the data
+                    self.data_walk(vi, branch[0], bnode, tile)
 
         # Finally, after processing all of the branches for this node, check required nodes are present
         for path in tree_node["children"].values():
