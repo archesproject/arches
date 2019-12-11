@@ -70,7 +70,7 @@ define([
                     var configJSON = {};
                     var config = this.get('config');
                     _.each(this.configKeys(), function(key) {
-                        configJSON[key] = ko.unwrap(config[key]);
+                        configJSON[key] = koMapping.toJS(config[key]);
                     });
                     configJSON.label = this.get('label')();
                     return configJSON;
@@ -82,8 +82,13 @@ define([
                             if (key === 'label') {
                                 this.get('label')(value[key]);
                             }
-                            if (config[key] && config[key]() !== value[key]) {
-                                config[key](value[key]);
+                            var oldJSON = koMapping.toJSON(config[key]);
+                            var newJSON = koMapping.toJSON(value[key]);
+                            if (config[key] && oldJSON !== newJSON) {
+                                koMapping.fromJSON(
+                                    newJSON,
+                                    config[key]
+                                );
                             }
                         }
                     }
@@ -117,7 +122,7 @@ define([
                     }
                     var configKeys = [];
                     _.each(value, function(configVal, configKey) {
-                        if (!ko.isObservable(configVal)) {
+                        if (configVal === null || configVal === undefined || !configVal.__ko_mapping__) {
                             configVal = koMapping.fromJS(configVal);
                         }
                         value[configKey] = configVal;
