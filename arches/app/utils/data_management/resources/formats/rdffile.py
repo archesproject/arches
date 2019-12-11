@@ -26,15 +26,13 @@ from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand, set_document_l
 
 try:
     # If we have a context file in our working directory, load it
-    fh = open('linked-art.json')
+    fh = open("linked-art.json")
     context_data = fh.read()
     fh.close()
+
     def cached_context(url):
-        return {
-            'contextUrl': None,
-            'documentUrl': "https://linked.art/ns/v1/linked-art.json",
-            'document': context_data
-        }
+        return {"contextUrl": None, "documentUrl": "https://linked.art/ns/v1/linked-art.json", "document": context_data}
+
     set_document_loader(cached_context)
 except:
     #  Guess we don't...
@@ -413,7 +411,9 @@ class JsonLdReader(Reader):
         return self.datatype_factory.datatypes[graph_node["datatype_type"]].defaultwidget is None
 
     def is_resource_instance_node(self, graph_node, uri):
-        return (uri.startswith('urn:uuid:') or uri.startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "resources/")) and not self.is_semantic_node(graph_node)
+        return (
+            uri.startswith("urn:uuid:") or uri.startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "resources/")
+        ) and not self.is_semantic_node(graph_node)
 
     def is_concept_node(self, uri):
         return uri.startswith(settings.PREFERRED_CONCEPT_SCHEME) or uri.startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "concepts/")
@@ -537,12 +537,12 @@ class JsonLdReader(Reader):
                         bnode["data"].append(branch[1])
                         if not self.is_semantic_node(branch[0]):
                             try:
-                                n = bnode['tile'].data[bnodeid]
+                                n = bnode["tile"].data[bnodeid]
                             except:
                                 n = []
-                                bnode['tile'].data[bnodeid] = n
+                                bnode["tile"].data[bnodeid] = n
                             if type(n) != list:
-                                bnode['tile'].data[bnodeid] = [n]
+                                bnode["tile"].data[bnodeid] = [n]
                             bnode["tile"].data[bnodeid].extend(node_value)
                     elif branch[0]["cardinality"] != "n":
                         raise ValueError("Attempt to add a value to cardinality 1, non-list node")
