@@ -894,7 +894,7 @@ class JsonLDImportTests(ArchesTestCase):
             js = js[0]
 
         self.assertTrue("@id" in js)
-        self.assertTrue(js["@id"] == "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122")
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/10000000-109b-11ea-957a-acde48001122")
         pts = "http://www.cidoc-crm.org/cidoc-crm/P57_has_number_of_parts"
         self.assertTrue(pts in js)
         self.assertTrue(set(js[pts]) == set([1, 2]))
@@ -1034,6 +1034,6 @@ class JsonLDImportTests(ArchesTestCase):
             js = js[0]
 
         self.assertTrue("@id" in js)
-        self.assertTrue(js["@id"] == "http://localhost:8000/resources/8e870000-114e-11ea-8de7-acde48001122")
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/c3b693cc-1542-11ea-b353-acde48001122")
 
         # TODO - more asserts to make sure data is saved correctly

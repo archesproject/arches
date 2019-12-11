@@ -24,17 +24,21 @@ from rdflib.namespace import RDF, RDFS
 from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand, set_document_loader
 
 
-# Hard code our context to experiment
-fh = open('linked-art.json')
-context_data = fh.read()
-fh.close()
-def cached_context(url):
-    return {
-        'contextUrl': None,
-        'documentUrl': "https://linked.art/ns/v1/linked-art.json",
-        'document': context_data
-    }
-set_document_loader(cached_context)
+try:
+    # If we have a context file in our working directory, load it
+    fh = open('linked-art.json')
+    context_data = fh.read()
+    fh.close()
+    def cached_context(url):
+        return {
+            'contextUrl': None,
+            'documentUrl': "https://linked.art/ns/v1/linked-art.json",
+            'document': context_data
+        }
+    set_document_loader(cached_context)
+except:
+    #  Guess we don't...
+    pass
 
 
 class RdfWriter(Writer):
@@ -422,7 +426,6 @@ class JsonLdReader(Reader):
             for vi in v:
                 if "@value" in vi:
                     # We're a literal value
-                    assert not "@id" in vi
                     value = vi["@value"]
                     clss = vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal")
                     uri = None
@@ -469,7 +472,7 @@ class JsonLdReader(Reader):
                             if self.validate_concept_in_collection(uri, collid):
                                 possible.append([o, uri])
                             else:
-                                raise ValueError(f"Concept URI {uri} not in Collection {collid}")
+                                print(f"Concept URI {uri} not in Collection {collid}")
                         elif self.is_resource_instance_node(o, uri):
                             possible.append([o, uri])
                         elif self.is_semantic_node(o):
@@ -514,14 +517,11 @@ class JsonLdReader(Reader):
                 bnodeid = branch[0]["node_id"]
                 # bnodeid = f"{branch[0]['node_id']}/{branch[0]['name']}"
                 create_new_tile = False
-                from random import random
 
                 if branch[0]["node_id"] == branch[0]["nodegroup_id"]:
                     create_new_tile = True
-                bnode = {"data": []}
                 bnode = {"data": [], "nodegroup_id": branch[0]["nodegroup_id"], "cardinality": branch[0]["cardinality"]}
                 if create_new_tile:
-                    # tile = {"tileid": random(), "tile": {"data": {}}}
                     parenttile_id = tile.tileid if tile else None
                     tile = Tile(tileid=uuid.uuid4(), parenttile_id=parenttile_id, nodegroup_id=branch[0]["nodegroup_id"], data={})
                     self.resource.tiles.append(tile)
@@ -531,19 +531,30 @@ class JsonLdReader(Reader):
                 if bnodeid in result:
                     if branch[0]["datatype"].collects_multiple_values():
                         # append to previous tile
+                        if type(node_value) != list:
+                            node_value = [node_value]
                         bnode = result[bnodeid][0]
                         bnode["data"].append(branch[1])
                         if not self.is_semantic_node(branch[0]):
-                            bnode["tile"].data[bnodeid] + node_value
+                            try:
+                                n = bnode['tile'].data[bnodeid]
+                            except:
+                                n = []
+                                bnode['tile'].data[bnodeid] = n
+                            if type(n) != list:
+                                bnode['tile'].data[bnodeid] = [n]
+                            bnode["tile"].data[bnodeid].extend(node_value)
                     elif branch[0]["cardinality"] != "n":
                         raise ValueError("Attempt to add a value to cardinality 1, non-list node")
                     else:
                         bnode["data"].append(branch[1])
                         if not self.is_semantic_node(branch[0]):
+                            print(f"Adding to existing (n): {node_value}")
                             tile.data[bnodeid] = node_value
                         result[bnodeid].append(bnode)
                 else:
                     if not self.is_semantic_node(branch[0]):
+                        # FIXME: This is clearly broken
                         if branch[0]["datatype"].collects_multiple_values() and tile is not None:
                             tile.data[bnodeid] = node_value
                         else:
