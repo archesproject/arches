@@ -2,6 +2,7 @@ import os
 import re
 import json
 import uuid
+import time
 import datetime
 import logging
 from io import StringIO
@@ -20,7 +21,20 @@ from rdflib import Namespace
 from rdflib import URIRef, Literal
 from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS
-from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand
+from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand, set_document_loader
+
+
+# Hard code our context to experiment
+fh = open('linked-art.json')
+context_data = fh.read()
+fh.close()
+def cached_context(url):
+    return {
+        'contextUrl': None,
+        'documentUrl': "https://linked.art/ns/v1/linked-art.json",
+        'document': context_data
+    }
+set_document_loader(cached_context)
 
 
 class RdfWriter(Writer):
@@ -337,7 +351,7 @@ class JsonLdReader(Reader):
 
     def get_resource_id(self, value):
         # Allow local URI or urn:uuid:UUID
-        print("In get_resource_id")
+        # print("In get_resource_id")
         match = re.match(r".*?%sresources/(?P<resourceid>%s)" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), value)
         if match:
             return match.group("resourceid")
@@ -350,13 +364,13 @@ class JsonLdReader(Reader):
         return None
 
     def read_resource(self, data, use_ids=False, resourceid=None, graphid=None):
+        start = time.time()
         self.use_ids = use_ids
         if not isinstance(data, list):
             data = [data]
 
         for jsonld_document in data:
             self.errors = {}
-            # FIXME: This should use a cache of the context
             jsonld_document = expand(jsonld_document)[0]
             # print(jsonld_document)
             if graphid is None:
@@ -387,14 +401,15 @@ class JsonLdReader(Reader):
 
             result = {"data": [jsonld_document["@id"]]}
             self.data_walk(jsonld_document, tree, result)
-
-            print(JSONSerializer().serialize(result, indent=4))
+            end = time.time()
+            print(f"walk time: {end-start}")
+            # print(JSONSerializer().serialize(result, indent=4))
 
     def is_semantic_node(self, graph_node):
         return self.datatype_factory.datatypes[graph_node["datatype_type"]].defaultwidget is None
 
     def is_resource_instance_node(self, graph_node, uri):
-        return uri.startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "resources/") and not self.is_semantic_node(graph_node)
+        return (uri.startswith('urn:uuid:') or uri.startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "resources/")) and not self.is_semantic_node(graph_node)
 
     def is_concept_node(self, uri):
         return uri.startswith(settings.PREFERRED_CONCEPT_SCHEME) or uri.startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "concepts/")
@@ -415,7 +430,11 @@ class JsonLdReader(Reader):
                 else:
                     # We're an entity
                     uri = vi.get("@id", "")
-                    clss = vi["@type"][0]
+                    try:
+                        clss = vi["@type"][0]
+                    except:
+                        raise ValueError(f"Data does not have a class: {vi}")
+
                     value = None
                     is_literal = False
 
@@ -436,12 +455,14 @@ class JsonLdReader(Reader):
                 options = tree_node["children"][key]
                 possible = []
                 ignore = []
-                print(f"\nConsidering {len(options)} options ...")
+                # print(f"\nConsidering {len(options)} options ...")
                 for o in options:
-                    print(f"Considering:\n  {vi}\n  {o}")
+                    # print(f"Considering:\n  {vi}\n  {o}")
                     if is_literal and o["datatype"].is_a_literal_in_rdf():
                         if len(o["datatype"].validate(value)) == 0:
                             possible.append([o, value])
+                        else:
+                            print(f"Could not validate {value} as a {o['datatype']}")
                     elif not is_literal and not o["datatype"].is_a_literal_in_rdf():
                         if self.is_concept_node(uri):
                             collid = o["config"]["collection_id"]
@@ -461,7 +482,7 @@ class JsonLdReader(Reader):
                         raise ValueError("No possible match?")
 
                 if not possible:
-                    raise ValueError("Data does not match any actual node, despite prop/class combination")
+                    raise ValueError(f"Data does not match any actual node, despite prop/class combination {k} {clss}:\n{vi}")
                 elif len(possible) > 1:
                     # descend into data to check if there are further clarifying features
                     possible2 = []
@@ -487,7 +508,6 @@ class JsonLdReader(Reader):
                     # import ipdb
                     # ipdb.sset_trace()
                     node_value = graph_node["datatype"].from_rdf(vi)
-                    print(node_value)
 
                 # We know now that it can go into the branch
                 # Determine if we can collapse the data into a -list or not
