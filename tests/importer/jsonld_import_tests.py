@@ -157,7 +157,6 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"] == "test!")
 
     def test_2_complex_import_data(self):
-
         # Note that this tests #5136, as the P101 -> P2 is a concept with a concept
 
         data = """
@@ -269,7 +268,7 @@ class JsonLDImportTests(ArchesTestCase):
                         "http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by": "example",
                         "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
                             "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
-                            "@value": "2019-10-28"
+                            "@value": "1903-10-28"
                         }
                     },
                     {
@@ -293,7 +292,7 @@ class JsonLDImportTests(ArchesTestCase):
                 },
                 "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": [
                     "asdfasdfa",
-                    "aasdf"
+                    "1903-10-21"
                 ],
                 "http://www.cidoc-crm.org/cidoc-crm/P45_consists_of": {
                     "@id": "http://localhost:8000/concepts/36c8d7a3-32e7-49e4-bd4c-2169a06b240a",
@@ -329,7 +328,7 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(pts in js)
         self.assertTrue(set(js[pts]) == set([1, 2]))
         self.assertTrue(note in js)
-        self.assertTrue(set(js[note]) == set(["asdfasdfa", "aasdf"]))
+        self.assertTrue(set(js[note]) == set(["asdfasdfa", "1903-10-21"]))
         self.assertTrue(temp in js)
         temps = js[temp]
         self.assertTrue(len(temps) == 4)
@@ -337,7 +336,7 @@ class JsonLDImportTests(ArchesTestCase):
             if qual in t:
                 self.assertTrue(t[qual] in ["example", "example 2"])
             if botb in t:
-                self.assertTrue(t[botb]["@value"] in ["2019-11-15", "2019-10-28"])
+                self.assertTrue(t[botb]["@value"] in ["2019-11-15", "1903-10-28"])
 
     def test_3_5098_concepts(self):
         data = """
@@ -373,10 +372,11 @@ class JsonLDImportTests(ArchesTestCase):
         if type(js) == list:
             js = js[0]
 
+        print(f"Got JSON for test 3: {js}")
+
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/0b4439a8-beca-11e9-b4dc-0242ac160002")
 
-        print(f"Got JSON for test 3: {js}")
         types = js["http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by"]["http://www.cidoc-crm.org/cidoc-crm/P2_has_type"]
         self.assertTrue(type(types) == list)
         self.assertTrue(len(types) == 2)
@@ -894,7 +894,7 @@ class JsonLDImportTests(ArchesTestCase):
             js = js[0]
 
         self.assertTrue("@id" in js)
-        self.assertTrue(js["@id"] == "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122")
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/10000000-109b-11ea-957a-acde48001122")
         pts = "http://www.cidoc-crm.org/cidoc-crm/P57_has_number_of_parts"
         self.assertTrue(pts in js)
         self.assertTrue(set(js[pts]) == set([1, 2]))
@@ -1034,6 +1034,6 @@ class JsonLDImportTests(ArchesTestCase):
             js = js[0]
 
         self.assertTrue("@id" in js)
-        self.assertTrue(js["@id"] == "http://localhost:8000/resources/8e870000-114e-11ea-8de7-acde48001122")
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/c3b693cc-1542-11ea-b353-acde48001122")
 
         # TODO - more asserts to make sure data is saved correctly
