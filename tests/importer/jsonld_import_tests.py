@@ -157,7 +157,6 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"] == "test!")
 
     def test_2_complex_import_data(self):
-
         # Note that this tests #5136, as the P101 -> P2 is a concept with a concept
 
         data = """
@@ -330,10 +329,11 @@ class JsonLDImportTests(ArchesTestCase):
         if type(js) == list:
             js = js[0]
 
+        print(f"Got JSON for test 3: {js}")
+
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/0b4439a8-beca-11e9-b4dc-0242ac160002")
 
-        print(f"Got JSON for test 3: {js}")
         types = js["http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by"]["http://www.cidoc-crm.org/cidoc-crm/P2_has_type"]
         self.assertTrue(type(types) == list)
         self.assertTrue(len(types) == 2)
