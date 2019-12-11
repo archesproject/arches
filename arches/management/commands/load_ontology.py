@@ -119,9 +119,6 @@ class Command(BaseCommand):
                         print('Loading Extension: "%s"' % extension)
                     if os.path.isfile(extension):
                         self.add_ontology(data_source=extension, version=version, name=name, parentontology=ontology)
-                    else:
-                        # delete references to ontology files that don't exist on disk
-                        models.Ontology.objects.filter(path=os.path.basename(extension)).filter(parentontology=ontology).delete()
 
                 models.OntologyClass.objects.filter(ontology=ontology).delete()
                 for ontology_class, data in self.crawl_graph().items():
