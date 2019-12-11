@@ -20,6 +20,7 @@ import os
 import zipfile
 import json
 import uuid
+import logging
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.db.models import Q
@@ -43,6 +44,8 @@ from arches.app.utils.system_metadata import system_metadata
 from arches.app.views.base import BaseManagerView
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 from io import BytesIO
+
+logger = logging.getLogger(__name__)
 
 
 class GraphBaseView(BaseManagerView):
@@ -142,10 +145,19 @@ class GraphDesignerView(GraphBaseView):
     def get_ontology_namespaces(self):
         ontology_namespaces = settings.ONTOLOGY_NAMESPACES
         for ontology in models.Ontology.objects.all():
-            namespace_keys = ontology.namespaces.keys()
-            for k in namespace_keys:
-                if k not in ontology_namespaces:
-                    ontology_namespaces[k] = ontology.namespaces[k]
+            try:
+                namespace_keys = ontology.namespaces.keys()
+                for k in namespace_keys:
+                    if k not in ontology_namespaces:
+                        ontology_namespaces[k] = ontology.namespaces[k]
+            except AttributeError as e:
+                logger.info(
+                    _(
+                        f"No namespaces appear to be associated with {ontology.ontologyid} in the ontologies table."
+                        " This is not a problem as long as all necessary namespaces are included in the"
+                        " ONTOLOGY_NAMESPACES setting."
+                    )
+                )
         return ontology_namespaces
 
     def get(self, request, graphid):
