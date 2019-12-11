@@ -36,7 +36,8 @@ SEARCH_BACKEND = "tests.base_test.TestSearchEngine"
 
 RESOURCE_GRAPH_LOCATIONS = (os.path.join(TEST_ROOT, "fixtures", "resource_graphs"),)
 
-ONTOLOGY_FIXTURES = os.path.join(TEST_ROOT, "fixtures", "ontologies")
+ONTOLOGY_FIXTURES = os.path.join(TEST_ROOT, "fixtures", "ontologies", "test_ontology")
+ONTOLOGY_PATH = os.path.join(TEST_ROOT, "fixtures", "ontologies", "cidoc_crm")
 
 BUSISNESS_DATA_FILES = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -80,19 +81,6 @@ NOSE_ARGS = ["--with-coverage", "--nologcapture", "--cover-package=arches", "--v
 
 INSTALLED_APPS = INSTALLED_APPS + ("django_nose",)
 
-ONTOLOGY_PATH = os.path.join(ROOT_DIR, "db", "ontologies", "cidoc_crm")
-ONTOLOGY_BASE = "cidoc_crm_v6.2.xml"
-ONTOLOGY_BASE_VERSION = "6.2"
-ONTOLOGY_BASE_NAME = "CIDOC CRM v6.2"
-ONTOLOGY_BASE_ID = "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd"
-ONTOLOGY_EXT = [
-    "CRMsci_v1.2.3.rdfs.xml",
-    "CRMarchaeo_v1.4.rdfs.xml",
-    "CRMgeo_v1.2.rdfs.xml",
-    "CRMdig_v3.2.1.rdfs.xml",
-    "CRMinf_v0.7.rdfs.xml",
-    "arches_crm_enhancements.xml",
-]
 
 DATATYPE_LOCATIONS.append('tests.fixtures.datatypes')
 

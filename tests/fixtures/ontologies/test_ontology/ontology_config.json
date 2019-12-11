@@ -1,0 +1,7 @@
+{
+  "base": "cidoc_crm_v6.2.test.xml",
+  "base_name": "CIDOC CRM v6.2",
+  "extensions": [],
+  "base_version": "6.2",
+  "base_id": "11111111-0000-0000-0000-000000000000"
+}

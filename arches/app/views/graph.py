@@ -16,9 +16,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import os
 import zipfile
 import json
 import uuid
+import logging
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.db.models import Q
@@ -41,19 +43,9 @@ from arches.app.utils.data_management.resource_graphs import importer as GraphIm
 from arches.app.utils.system_metadata import system_metadata
 from arches.app.views.base import BaseManagerView
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
-from rdflib import Graph as RDFGraph
 from io import BytesIO
 
-
-def get_ontology_namespaces():
-    ontology_namespaces = settings.ONTOLOGY_NAMESPACES
-    g = RDFGraph()
-    for ontology in models.Ontology.objects.all():
-        g.parse(ontology.path.path)
-    for namespace in g.namespaces():
-        if str(namespace[1]) not in ontology_namespaces:
-            ontology_namespaces[str(namespace[1])] = str(namespace[0])
-    return ontology_namespaces
+logger = logging.getLogger(__name__)
 
 
 class GraphBaseView(BaseManagerView):
@@ -64,7 +56,7 @@ class GraphBaseView(BaseManagerView):
             context["graph"] = JSONSerializer().serializeToPython(self.graph)
             context["graph_json"] = JSONSerializer().serialize(self.graph)
             context["root_node"] = self.graph.node_set.get(istopnode=True)
-        except:
+        except Exception:
             pass
         return context
 
@@ -150,6 +142,24 @@ class GraphManagerView(GraphBaseView):
 
 @method_decorator(group_required("Graph Editor"), name="dispatch")
 class GraphDesignerView(GraphBaseView):
+    def get_ontology_namespaces(self):
+        ontology_namespaces = settings.ONTOLOGY_NAMESPACES
+        for ontology in models.Ontology.objects.all():
+            try:
+                namespace_keys = ontology.namespaces.keys()
+                for k in namespace_keys:
+                    if k not in ontology_namespaces:
+                        ontology_namespaces[k] = ontology.namespaces[k]
+            except AttributeError as e:
+                logger.info(
+                    _(
+                        f"No namespaces appear to be associated with {ontology.ontologyid} in the ontologies table."
+                        " This is not a problem as long as all necessary namespaces are included in the"
+                        " ONTOLOGY_NAMESPACES setting."
+                    )
+                )
+        return ontology_namespaces
+
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
         ontologies = models.Ontology.objects.filter(parentontology=None)
@@ -190,7 +200,7 @@ class GraphDesignerView(GraphBaseView):
             main_script="views/graph-designer",
             datatypes_json=datatypes_json,
             datatypes=datatypes,
-            ontology_namespaces=get_ontology_namespaces(),
+            ontology_namespaces=self.get_ontology_namespaces(),
             branches=JSONSerializer().serialize(
                 branch_graphs, exclude=["cards", "domain_connections", "functions", "cards", "deploymentfile", "deploymentdate"]
             ),
