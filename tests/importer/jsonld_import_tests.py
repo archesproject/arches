@@ -268,7 +268,7 @@ class JsonLDImportTests(ArchesTestCase):
                         "http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by": "example",
                         "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
                             "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
-                            "@value": "2019-10-28"
+                            "@value": "1903-10-28"
                         }
                     },
                     {
@@ -292,7 +292,7 @@ class JsonLDImportTests(ArchesTestCase):
                 },
                 "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": [
                     "asdfasdfa",
-                    "aasdf"
+                    "1903-10-21"
                 ],
                 "http://www.cidoc-crm.org/cidoc-crm/P45_consists_of": {
                     "@id": "http://localhost:8000/concepts/36c8d7a3-32e7-49e4-bd4c-2169a06b240a",
@@ -336,7 +336,7 @@ class JsonLDImportTests(ArchesTestCase):
             if qual in t:
                 self.assertTrue(t[qual] in ["example", "example 2"])
             if botb in t:
-                self.assertTrue(t[botb]["@value"] in ["2019-11-15", "2019-10-28"])
+                self.assertTrue(t[botb]["@value"] in ["2019-11-15", "1903-10-28"])
 
     def test_3_5098_concepts(self):
         data = """
