@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "5615_search_export_notification_type"),
+        ("models", "5613_notification_type"),
     ]
 
     def forwards_func(apps, schema_editor):
