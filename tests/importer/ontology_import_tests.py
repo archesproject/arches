@@ -36,7 +36,6 @@ class OntologyModelTests(ArchesTestCase):
     @classmethod
     def tearDownClass(cls):
         ontology = models.Ontology.objects.get(pk="11111111-0000-0000-0000-000000000000")
-        ontology.path.delete()
         ontology.delete()
 
     def test_load_ontology(self):
