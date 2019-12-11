@@ -14,7 +14,10 @@ define([
     'views/rdm/modals/add-image-form',
     'views/concept-graph',
     'viewmodels/alert',
-], function($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor, RelatedConcept, RelatedMember, ManageParentForm, ImportConcept, AddChildForm, AddImageForm, ConceptGraph, AlertViewModel) {
+    'viewmodels/alert-json',
+], function($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor,
+    RelatedConcept, RelatedMember, ManageParentForm, ImportConcept, AddChildForm,
+    AddImageForm, ConceptGraph, AlertViewModel, JsonErrorAlertViewModel) {
     return Backbone.View.extend({
         events: {
             'click .concept-report-content *[data-action="viewconcept"]': 'conceptSelected',
@@ -66,7 +69,7 @@ define([
 
                     if (self.model.get('id')) {
                         if (self.$el.find(".concept-graph").length > 0) {
-                            //Toggle Concept Heirarchy.  
+                            //Toggle Concept Heirarchy.
                             self.$el.find(".graph-toggle").click(function(){
                                 self.$el.find(".concept-tree").toggle(300);
                                 self.$el.find(".concept-graph").toggle(300);
@@ -100,7 +103,7 @@ define([
 
             this.confirm_delete_modal.find('.modal-title').text($(e.target).attr('title'));
             this.confirm_delete_modal.find('.modal-body [name="warning-text"]').text(data.message);
-            this.confirm_delete_modal.find('.modal-body [name="additional-info"]').text('');            
+            this.confirm_delete_modal.find('.modal-body [name="additional-info"]').text('');
             this.confirm_delete_modal.modal('show');
 
             if (data.action === 'delete-concept'){
@@ -111,7 +114,7 @@ define([
                         self.confirm_delete_modal_yes.removeAttr('disabled');
                         self.confirm_delete_modal.find('.modal-body [name="additional-info"]').html(response);
                     }
-                });                
+                });
             }
 
         },
@@ -158,7 +161,7 @@ define([
             var self = this;
             var parentmodel = new ConceptParentModel();
             parentmodel.set('id', this.model.get('id'));
-            
+
             var modal = new ManageParentForm({
                 el: $('#manage-parent-form')[0],
                 model: parentmodel
@@ -170,18 +173,18 @@ define([
                     self.trigger('parentsChanged');
                 }
             });
-        },    
+        },
 
         makeCollection: function(e){
             this.model.makeCollection(function(response, status){
-                if(status === 'success'){
-                    this.viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.message.title, response.responseJSON.message.text));   
+                if (status === 'success') {
+                    this.viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
                 }
-                if(status === 'error'){
-                    this.viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message.title, response.responseJSON.message.text));   
+                if (status === 'error') {
+                    this.viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                 }
             }, this);
-        },    
+        },
 
         importConcept: function(e){
             var self = this;
@@ -197,7 +200,7 @@ define([
                     self.trigger('conceptsImported');
                 }
             });
-        },    
+        },
 
         addImageClicked: function (e) {
             this.model.reset();
@@ -207,7 +210,7 @@ define([
                 model: this.model
             });
 
-            form.on('dataChanged', function () {
+            form.on('dataChanged', function() {
                 self.render();
             });
         },
@@ -215,9 +218,9 @@ define([
         editValueClicked: function(e) {
             this.model.reset();
             var data = $.extend({
-                    conceptid: this.model.get('id')
-                }, 
-                $(e.target).data()
+                conceptid: this.model.get('id')
+            },
+            $(e.target).data()
             );
             this.model.set('values', [new ValueModel(data)]);
             var editor = new ValueEditor({
@@ -235,9 +238,9 @@ define([
 
             if (data.action === 'delete-concept') {
                 modal.find('h4').text(' ' + title);
-                modal.find('.modal-title').addClass('loading');    
-                            
-                model = new ConceptModel(data)
+                modal.find('.modal-title').addClass('loading');
+
+                var model = new ConceptModel(data);
                 self.model.set('subconcepts', [model]);
 
                 self.model.delete(function(response, status){
@@ -246,7 +249,7 @@ define([
                     modal.modal('hide');
                     $('.modal-backdrop.fade.in').remove();  // a hack for now
                     if(!!response.responseJSON.in_use){
-                        self.viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.message.title, response.responseJSON.message.text));   
+                        self.viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
                     }
                 }, self);
             }else{
@@ -264,8 +267,8 @@ define([
                     }
 
                 });
-                modal.modal('hide');                
-            }            
+                modal.modal('hide');
+            }
         }
     });
 });

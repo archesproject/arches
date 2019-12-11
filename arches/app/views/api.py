@@ -5,7 +5,6 @@ import re
 import sys
 import uuid
 import importlib
-import arches.app.tasks as tasks
 import arches.app.utils.task_management as task_management
 from io import StringIO
 from django.shortcuts import render
@@ -17,6 +16,7 @@ from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.http.request import QueryDict
 from django.core import management
+from django.core.cache import cache
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -38,6 +38,7 @@ from arches.app.utils.permission_backend import user_can_read_resources
 from arches.app.utils.permission_backend import user_can_edit_resources
 from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.decorators import group_required
+from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory
 from pyld.jsonld import compact, frame, from_rdf
@@ -122,6 +123,7 @@ class APIBase(View):
 
 
 class Sync(APIBase):
+    import arches.app.tasks as tasks
     def get(self, request, surveyid=None):
         can_sync = userCanAccessMobileSurvey(request, surveyid)
         if can_sync:
@@ -213,15 +215,6 @@ class Surveys(APIBase):
 
 
 class GeoJSON(APIBase):
-    def set_precision(self, coordinates, precision):
-        result = []
-        try:
-            return round(coordinates, int(precision))
-        except TypeError:
-            for coordinate in coordinates:
-                result.append(self.set_precision(coordinate, precision))
-        return result
-
     def get_name(self, resource):
         module = importlib.import_module("arches.app.functions.primary_descriptors")
         PrimaryDescriptorsFunction = getattr(module, "PrimaryDescriptorsFunction")()
@@ -233,11 +226,12 @@ class GeoJSON(APIBase):
 
     def get(self, request):
         datatype_factory = DataTypeFactory()
+        set_precision = GeoUtils().set_precision
         resourceid = request.GET.get("resourceid", None)
         nodeid = request.GET.get("nodeid", None)
         tileid = request.GET.get("tileid", None)
         nodegroups = request.GET.get("nodegroups", [])
-        precision = request.GET.get("precision", 9)
+        precision = request.GET.get("precision", None)
         field_name_length = int(request.GET.get("field_name_length", 0))
         use_uuid_names = bool(request.GET.get("use_uuid_names", False))
         include_primary_name = bool(request.GET.get("include_primary_name", False))
@@ -245,6 +239,10 @@ class GeoJSON(APIBase):
         use_display_values = bool(request.GET.get("use_display_values", False))
         geometry_type = request.GET.get("type", None)
         indent = request.GET.get("indent", None)
+        limit = request.GET.get("limit", None)
+        page = int(request.GET.get("page", 1))
+        if limit is not None:
+            limit = int(limit)
         if indent is not None:
             indent = int(indent)
         if isinstance(nodegroups, str):
@@ -259,7 +257,7 @@ class GeoJSON(APIBase):
         nodes = nodes.order_by("sortorder")
         features = []
         i = 1
-        property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups).order_by("sortorder")
+        property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups)
         property_node_map = {}
         property_nodes = models.Node.objects.filter(nodegroup_id__in=nodegroups).order_by("sortorder")
         for node in property_nodes:
@@ -268,19 +266,27 @@ class GeoJSON(APIBase):
                 property_node_map[str(node.nodeid)]["name"] = slugify(node.name, max_length=field_name_length, separator="_")
             else:
                 property_node_map[str(node.nodeid)]["name"] = node.fieldname
-        for node in nodes:
-            tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup).order_by("sortorder")
-            if resourceid is not None:
-                tiles = tiles.filter(resourceinstance_id__in=resourceid.split(","))
-            if tileid is not None:
-                tiles = tiles.filter(tileid=tileid)
-            for tile in tiles:
-                data = tile.data
+        tiles = models.TileModel.objects.filter(nodegroup__in=[node.nodegroup for node in nodes])
+        last_page = None
+        if resourceid is not None:
+            tiles = tiles.filter(resourceinstance_id__in=resourceid.split(","))
+        if tileid is not None:
+            tiles = tiles.filter(tileid=tileid)
+        tiles = tiles.order_by("sortorder")
+        if limit is not None:
+            start = (page - 1) * limit
+            end = start + limit
+            tile_count = tiles.count()
+            last_page = tiles.count() < end
+            tiles = tiles[start:end]
+        for tile in tiles:
+            data = tile.data
+            for node in nodes:
                 try:
                     for feature_index, feature in enumerate(data[str(node.pk)]["features"]):
                         if geometry_type is None or geometry_type == feature["geometry"]["type"]:
                             if len(nodegroups) > 0:
-                                for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id):
+                                for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id).order_by("sortorder"):
                                     for key in pt.data:
                                         field_name = key if use_uuid_names else property_node_map[key]["name"]
                                         if pt.data[key] is not None:
@@ -305,8 +311,9 @@ class GeoJSON(APIBase):
                             if include_geojson_link:
                                 feature["properties"]["geojson"] = "%s?tileid=%s&nodeid=%s" % (reverse("geojson"), tile.pk, node.pk)
                             feature["id"] = i
-                            coordinates = self.set_precision(feature["geometry"]["coordinates"], precision)
-                            feature["geometry"]["coordinates"] = coordinates
+                            if precision is not None:
+                                coordinates = set_precision(feature["geometry"]["coordinates"], precision)
+                                feature["geometry"]["coordinates"] = coordinates
                             i += 1
                             features.append(feature)
                 except KeyError:
@@ -314,16 +321,19 @@ class GeoJSON(APIBase):
                 except TypeError as e:
                     print(e)
                     print(tile.data)
+        feature_collection = {"type": "FeatureCollection", "features": features}
+        if last_page is not None:
+            feature_collection["_page"] = page
+            feature_collection["_lastPage"] = last_page
 
-        response = JSONResponse({"type": "FeatureCollection", "features": features}, indent=indent)
+        response = JSONResponse(feature_collection, indent=indent)
         return response
 
 
-EARTHCIRCUM = 40075016.6856
-PIXELSPERTILE = 256
-
-
 class MVT(APIBase):
+    EARTHCIRCUM = 40075016.6856
+    PIXELSPERTILE = 256
+
     def get(self, request, nodeid, zoom, x, y):
         if hasattr(request.user, "userprofile") is not True:
             models.UserProfile.objects.create(user=request.user)
@@ -333,106 +343,84 @@ class MVT(APIBase):
         except models.Node.DoesNotExist:
             raise Http404()
         config = node.config
-        with connection.cursor() as cursor:
-            # TODO: when we upgrade to PostGIS 3, we can get feature state
-            # working by adding the feature_id_name arg:
-            # https://github.com/postgis/postgis/pull/303
-            if int(zoom) <= int(config["clusterMaxZoom"]):
-                arc = EARTHCIRCUM / ((1 << int(zoom)) * PIXELSPERTILE)
-                distance = arc * int(config["clusterDistance"])
-                min_points = int(config["clusterMinPoints"])
-                cursor.execute(
-                    """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
-                AS (
-                    SELECT m.*,
-                    ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
-                    FROM (
-                        SELECT t.tileid,
-                            t.resourceinstanceid,
-                            n.nodeid,
-                            ST_Transform(ST_SetSRID(
-                                st_geomfromgeojson(
-                                    (
-                                        json_array_elements(
-                                            t.tiledata::json ->
-                                            n.nodeid::text ->
-                                        'features') -> 'geometry'
-                                    )::text
-                                ),
-                                4326
-                            ), 3857) AS geom
-                        FROM tiles t
-                            LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
-                        WHERE n.nodeid = %s
-                    ) m
-                )
+        cache_key = f"mvt_{nodeid}_{zoom}_{x}_{y}"
+        tile = cache.get(cache_key)
+        if tile is None:
+            with connection.cursor() as cursor:
+                # TODO: when we upgrade to PostGIS 3, we can get feature state
+                # working by adding the feature_id_name arg:
+                # https://github.com/postgis/postgis/pull/303
+                if int(zoom) <= int(config["clusterMaxZoom"]):
+                    arc = self.EARTHCIRCUM / ((1 << int(zoom)) * self.PIXELSPERTILE)
+                    distance = arc * int(config["clusterDistance"])
+                    min_points = int(config["clusterMinPoints"])
+                    cursor.execute(
+                        """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
+                        AS (
+                            SELECT m.*,
+                            ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
+                            FROM (
+                                SELECT tileid,
+                                    resourceinstanceid,
+                                    nodeid,
+                                    geom
+                                FROM mv_geojson_geoms
+                                WHERE nodeid = %s
+                            ) m
+                        )
 
-                SELECT ST_AsMVT(
-                    tile,
-                    %s
-                ) FROM (
-                    SELECT resourceinstanceid::text,
-                        row_number() over () as id,
-                        1 as total,
-                        ST_AsMVTGeom(
-                            geom,
-                            TileBBox(%s, %s, %s, 3857)
-                        ) AS geom,
-                        '' AS extent
-                    FROM clusters
-                    WHERE cid is NULL
-                    UNION
-                    SELECT NULL as resourceinstanceid,
-                        row_number() over () as id,
-                        count(*) as total,
-                        ST_AsMVTGeom(
-                            ST_Centroid(
-                                ST_Collect(geom)
-                            ),
-                            TileBBox(%s, %s, %s, 3857)
-                        ) AS geom,
-                        ST_AsGeoJSON(
-                            ST_Transform(
-                                ST_SetSRID(
-                                    ST_Extent(geom), 3857
-                                ), 4326
-                            )
-                        ) AS extent
-                    FROM clusters
-                    WHERE cid IS NOT NULL
-                    GROUP BY cid
-                ) as tile;""",
-                    [distance, min_points, nodeid, nodeid, zoom, x, y, zoom, x, y],
-                )
-            else:
-                cursor.execute(
-                    """SELECT ST_AsMVT(tile, %s) FROM (SELECT t.tileid,
-                   row_number() over () as id,
-                   t.resourceinstanceid,
-                   n.nodeid,
-                   ST_AsMVTGeom(
-                       ST_Transform(ST_SetSRID(
-                           st_geomfromgeojson(
-                               (
-                                   json_array_elements(
-                                       t.tiledata::json ->
-                                       n.nodeid::text ->
-                                   'features') -> 'geometry'
-                               )::text
-                           ),
-                           4326
-                       ), 3857),
-                       TileBBox(%s, %s, %s, 3857)
-                   ) AS geom,
-                   1 AS total
-                FROM tiles t
-                    LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
-                WHERE n.nodeid = %s) AS tile;""",
-                    [nodeid, zoom, x, y, nodeid],
-                )
-            tile = bytes(cursor.fetchone()[0])
-            if not len(tile):
-                raise Http404()
+                        SELECT ST_AsMVT(
+                            tile,
+                            %s
+                        ) FROM (
+                            SELECT resourceinstanceid::text,
+                                row_number() over () as id,
+                                1 as total,
+                                ST_AsMVTGeom(
+                                    geom,
+                                    TileBBox(%s, %s, %s, 3857)
+                                ) AS geom,
+                                '' AS extent
+                            FROM clusters
+                            WHERE cid is NULL
+                            UNION
+                            SELECT NULL as resourceinstanceid,
+                                row_number() over () as id,
+                                count(*) as total,
+                                ST_AsMVTGeom(
+                                    ST_Centroid(
+                                        ST_Collect(geom)
+                                    ),
+                                    TileBBox(%s, %s, %s, 3857)
+                                ) AS geom,
+                                ST_AsGeoJSON(
+                                    ST_Extent(geom)
+                                ) AS extent
+                            FROM clusters
+                            WHERE cid IS NOT NULL
+                            GROUP BY cid
+                        ) as tile;""",
+                        [distance, min_points, nodeid, nodeid, zoom, x, y, zoom, x, y],
+                    )
+                else:
+                    cursor.execute(
+                        """SELECT ST_AsMVT(tile, %s) FROM (SELECT tileid,
+                            row_number() over () as id,
+                            resourceinstanceid,
+                            nodeid,
+                            ST_AsMVTGeom(
+                                geom,
+                                TileBBox(%s, %s, %s, 3857)
+                            ) AS geom,
+                            1 AS total
+                        FROM mv_geojson_geoms
+                        WHERE nodeid = %s) AS tile;""",
+                        [nodeid, zoom, x, y, nodeid],
+                    )
+                tile = bytes(cursor.fetchone()[0])
+                cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
+        if not len(tile):
+            raise Http404()
         return HttpResponse(tile, content_type="application/x-protobuf")
 
 

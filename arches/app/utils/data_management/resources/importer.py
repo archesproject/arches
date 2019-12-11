@@ -44,6 +44,7 @@ from arches.management.commands import utils
 from arches.setup import unzip_file
 from .formats.csvfile import CsvReader
 from .formats.archesfile import ArchesFileReader
+import ctypes
 
 
 def import_one_resource(line):
@@ -65,7 +66,10 @@ class BusinessDataImporter(object):
         self.business_data = ""
         self.file_format = ""
         self.relations = ""
-        csv.field_size_limit(sys.maxsize)
+        try:
+            csv.field_size_limit(sys.maxsize)
+        except:
+            csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
 
         if not file:
             file = settings.BUSINESS_DATA_FILES
@@ -74,7 +78,8 @@ class BusinessDataImporter(object):
         self.file = file
         if mapping_file is None:
             try:
-                mapping_file = [file[0].split(".")[0] + ".mapping"]
+                mapping_file_base = os.path.splitext(file[0])[0]
+                mapping_file = [f"{mapping_file_base}.mapping"]
             except:
                 print("*" * 80)
                 print(
@@ -97,7 +102,8 @@ class BusinessDataImporter(object):
 
         if relations_file is None:
             try:
-                relations_file = [file[0].split(".")[0] + ".relations"]
+                relations_file_base = os.path.splitext(file[0])[0]
+                relations_file = [f"{relations_file_base}.relations"]
             except:
                 pass
 
@@ -116,7 +122,7 @@ class BusinessDataImporter(object):
         for path in file:
             if os.path.exists(path):
                 if isfile(join(path)):
-                    self.file_format = file[0].split(".")[-1]
+                    self.file_format = os.path.splitext(file[0])[1].strip(".")
                     if self.file_format == "json":
                         with open(file[0], "rU") as f:
                             archesfile = JSONDeserializer().deserialize(f)

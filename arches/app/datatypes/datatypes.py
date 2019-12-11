@@ -23,9 +23,11 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import fromstr
 from django.contrib.gis.geos import Polygon
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction
 from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import NotFoundError
 from edtf import parse_edtf
 
 # One benefit of shifting to python3.x would be to use
@@ -157,7 +159,7 @@ class NumberDataType(BaseDataType):
         try:
             tile.data[nodeid].upper()
             tile.data[nodeid] = float(tile.data[nodeid])
-        except:
+        except Exception:
             pass
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -206,10 +208,10 @@ class NumberDataType(BaseDataType):
 class BooleanDataType(BaseDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
-
         try:
-            type(bool(util.strtobool(str(value)))) is True
-        except:
+            if value is not None:
+                type(bool(util.strtobool(str(value)))) is True
+        except Exception:
             errors.append({"type": "ERROR", "message": "{0} is not of type boolean. This data was not imported.".format(value)})
 
         return errors
@@ -462,7 +464,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                             ),
                         }
                     )
-            except:
+            except Exception:
                 message = "Not a properly formatted geometry"
                 errors.append(
                     {
@@ -478,8 +480,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 try:
                     geom = GEOSGeometry(JSONSerializer().serialize(feature["geometry"]))
                     validate_geom(geom, coordinate_count)
-                except:
-                    message = "It was not possible to serialize some feaures in your geometry."
+                except Exception:
+                    message = _("It was not possible to serialize some feaures in your geometry.")
                     errors.append(
                         {
                             "type": "ERROR",
@@ -524,16 +526,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         for feature in value["features"]:
             wkt_geoms.append(GEOSGeometry(json.dumps(feature["geometry"])))
         return GeometryCollection(wkt_geoms)
-
-    def get_display_value(self, tile, node):
-        data = self.get_tile_data(tile)
-        value = data[str(node.nodeid)]
-        bounds = self.get_bounds_from_value(value)
-        if bounds is not None:
-            minx, miny, maxx, maxy = bounds
-            centerx = maxx - (maxx - minx) / 2
-            centery = maxy - (maxy - miny) / 2
-        return {"lon": centerx, "lat": centery}
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         document["geometries"].append({"geom": nodevalue, "nodegroup_id": tile.nodegroup_id, "provisional": provisional, "tileid": tile.pk})
@@ -984,6 +976,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "addtomap": node.config["addToMap"],
         }
 
+    def after_update_all(self):
+        if settings.AUTO_REFRESH_GEOM_VIEW:
+            cursor = connection.cursor()
+            sql = """
+                REFRESH MATERIALIZED VIEW mv_geojson_geoms;
+            """
+            cursor.execute(sql)
+
 
 class FileListDataType(BaseDataType):
     def __init__(self, model=None):
@@ -1062,7 +1062,7 @@ class FileListDataType(BaseDataType):
                             deleted_file = models.File.objects.get(pk=previously_saved_file["file_id"])
                             deleted_file.delete()
                         except models.File.DoesNotExist:
-                            print("file does not exist")
+                            logger.exception(_("File does not exist"))
 
         files = request.FILES.getlist("file-list_" + str(node.pk), [])
 
@@ -1125,7 +1125,7 @@ class FileListDataType(BaseDataType):
                 file_stats = os.stat(file_path)
                 tile_file["lastModified"] = file_stats.st_mtime
                 tile_file["size"] = file_stats.st_size
-            except:
+            except Exception as e:
                 pass
             tile_file = {}
             tile_file["file_id"] = str(uuid.uuid4())
@@ -1459,7 +1459,6 @@ class DomainListDataType(BaseDomainDataType):
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
                     query.must(search_query)
-
         except KeyError as e:
             pass
 
@@ -1499,24 +1498,23 @@ class ResourceInstanceDataType(BaseDataType):
                 try:
                     resource_document = se.search(index="resources", id=resourceid)
                     resource_names.add(resource_document["_source"]["displayname"])
-                except:
+                except NotFoundError as e:
                     logger.info(
-                        f"Resource {resourceid} not avaiiable. This message may appear during resource load, \
+                        f"Resource {resourceid} not available. This message may appear during resource load, \
                             in which case the problem will be resolved once the related resource is loaded"
                     )
         else:
-            logger.warning("No resource relationship available")
+            logger.warning(_("No resource relationship available"))
         return resource_names
 
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
-
         if value is not None:
             id_list = self.get_id_list(value)
             for resourceid in id_list:
                 try:
                     models.ResourceInstance.objects.get(pk=resourceid)
-                except:
+                except ObjectDoesNotExist:
                     errors.append(
                         {
                             "type": "WARNING",
@@ -1547,7 +1545,7 @@ class ResourceInstanceDataType(BaseDataType):
         try:
             if not isinstance(value, str):  # changed from basestring to str for python3 branch
                 result = ",".join(value)
-        except:
+        except Exception:
             pass
 
         return result
@@ -1618,7 +1616,7 @@ class NodeValueDataType(BaseDataType):
         if value:
             try:
                 models.TileModel.objects.get(tileid=value)
-            except:
+            except ObjectDoesNotExist:
                 errors.append({"type": "ERROR", "message": f"{value} {row_number} is not a valid tile id. This data was not imported."})
         return errors
 

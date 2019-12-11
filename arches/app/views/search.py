@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-
+import os
 from datetime import datetime
 from django.shortcuts import render
 from django.contrib.gis.geos import GEOSGeometry
@@ -26,17 +26,20 @@ from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Terms, MaxAgg, Aggregation
-from arches.app.search.search_export import flatten_tiles
+from arches.app.search.search_export import SearchResultsExporter
 from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.views.base import MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
+import arches.app.utils.data_management.zip as zip_utils
+import arches.app.utils.task_management as task_management
+import arches.app.tasks as tasks
 from io import StringIO
 
 
@@ -92,7 +95,7 @@ class SearchView(MapBaseManagerView):
 
 
 def home_page(request):
-    return render(request, "views/search.htm", {"main_script": "views/search", })
+    return render(request, "views/search.htm", {"main_script": "views/search",})
 
 
 def search_terms(request):
@@ -177,27 +180,36 @@ def get_resource_model_label(result):
 
 
 def export_results(request):
-    request.GET = request.GET.copy()
-    request.GET["tiles"] = True
-    compact = request.GET.pop("compact", False)
 
-    search_res_json = search_results(request)
-    results = JSONDeserializer().deserialize(search_res_json.content)
-    instances = results["results"]["hits"]["hits"]
-    datatype_factory = DataTypeFactory()
-
-    flattened_data = []
-    for resource_instance in instances:
-        flattened_data.append(flatten_tiles(resource_instance["_source"]["tiles"], datatype_factory, compact=compact))
-
-    return JSONResponse(flattened_data, indent=4)
+    total = int(request.GET.get("total", 0))
+    format = request.GET.get("format", "tilecsv")
+    download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
+    if total > download_limit:
+        celery_worker_running = task_management.check_if_celery_available()
+        if celery_worker_running:
+            req_dict = dict(request.GET)
+            result = tasks.export_search_results.apply_async(
+                (request.user.id, req_dict, format), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
+            )
+            # if os.path.exists("result"): # this might not exist until after write_zip_file in task is done ?
+            message = _(
+                f"{total} instances have been submitted for export. \
+                Click the bell icon to check for a notification once your export is completed and ready for download"
+            )
+            return JSONResponse({"success": True, "message": message})
+        else:
+            message = _(f"Your search exceeds the {download_limit} instance download limit. Please refine your search")
+            return JSONResponse({"success": False, "message": message})
+    else:
+        exporter = SearchResultsExporter(search_request=request)
+        export_files = exporter.export(format)
+        return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
 
 
 def search_results(request):
     se = SearchEngineFactory().create()
     search_results_object = {"query": Query(se)}
 
-    export_results = request.GET.get("export", False)
     include_provisional = get_provisional_type(request)
     permitted_nodegroups = get_permitted_nodegroups(request.user)
 
@@ -208,7 +220,7 @@ def search_results(request):
             if search_filter:
                 search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional)
     except Exception as err:
-        return JSONResponse(err, status=500)
+        return JSONErrorResponse(message=err.message)
 
     dsl = search_results_object.pop("query", None)
     dsl.include("graph_id")
@@ -224,7 +236,7 @@ def search_results(request):
         dsl.include("tiles")
 
     results = dsl.search(index="resources")
-
+    ret = {}
     if results is not None:
         # allow filters to modify the results
         for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
@@ -232,7 +244,6 @@ def search_results(request):
             if search_filter:
                 search_filter.post_search_hook(search_results_object, results, permitted_nodegroups)
 
-        ret = {}
         ret["results"] = results
 
         for key, value in list(search_results_object.items()):
@@ -243,8 +254,10 @@ def search_results(request):
         ret["total_results"] = dsl.count(index="resources")
 
         return JSONResponse(ret)
+
     else:
-        return HttpResponseNotFound(_("There was an error retrieving the search results"))
+        ret = {"message": _("There was an error retrieving the search results")}
+        return JSONResponse(ret, status=500)
 
 
 def get_provisional_type(request):
@@ -299,7 +312,7 @@ def _buffer(geojson, width=0, unit="ft"):
 
     try:
         width = float(width)
-    except:
+    except Exception:
         width = 0
 
     if width > 0:

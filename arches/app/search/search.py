@@ -16,11 +16,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 import uuid
 import logging
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers
+from elasticsearch.exceptions import RequestError
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
@@ -123,9 +126,8 @@ class SearchEngine(object):
         ret = None
         try:
             ret = self.es.search(**kwargs)
-        except Exception as detail:
-            self.logger.warning("%s: WARNING: search failed for query: %s \nException detail: %s\n" % (datetime.now(), body, detail))
-            pass
+        except RequestError as detail:
+            self.logger.exception("%s: WARNING: search failed for query: %s \nException detail: %s\n" % (datetime.now(), body, detail))
 
         return ret
 
@@ -186,7 +188,10 @@ class SearchEngine(object):
                 raise detail
 
     def bulk_index(self, data, **kwargs):
-        return helpers.bulk(self.es, data, **kwargs)
+        try:
+            helpers.bulk(self.es, data, **kwargs)
+        except Exception as detail:
+            self.logger.warning("%s: WARNING: failed to bulk index documents, \nException detail: %s\n" % (datetime.now(), detail))
 
     def create_bulk_item(self, op_type="index", index=None, id=None, data=None):
         return {"_op_type": op_type, "_index": self._add_prefix(index), "_type": "_doc", "_id": id, "_source": data}

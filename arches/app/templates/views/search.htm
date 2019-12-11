@@ -40,14 +40,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             name: 'resource-type-filter',
                             params: sharedStateObject
                     }"></div>
-                    
+
                     <!--ko if: sharedStateObject.userIsReviewer-->
                     <div class="qa-filter" data-bind="component: {
                         name: 'provisional-filter',
                         params: sharedStateObject
                     }"></div>
                     <!--/ko-->
-                    
+
                 </div>
             </div>
 
@@ -89,9 +89,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     {% endif %}
                     <!-- /ko -->
                 </div>
-                
+
                 <div class="search-type-btn-popup-panel">
-                    <div class="" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
+                    <div class="popup-panel-row" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                         <!-- ko if: filter.type === 'popup' && filter.enabled -->
                         {% if user|can_read_resource_instance %}
                         <button class="saved-search-container search-type-btn-popup relative" style="" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, click: function(){$parent.sharedStateObject.selectPopup(filter.componentname)}">

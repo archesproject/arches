@@ -5,6 +5,7 @@ define([
     'knockout-mapping',
     'views/base-manager',
     'viewmodels/alert',
+    'viewmodels/alert-json',
     'models/graph',
     'models/report',
     'views/graph/graph-manager/graph',
@@ -22,7 +23,7 @@ define([
     'bindings/resizable-sidepanel',
     'datatype-config-components',
     'views/components/simple-switch'
-], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, ReportModel, GraphView, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, data, arches, GraphSettingsViewModel, CardViewModel, viewData, reportLookup) {
+], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, GraphView, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, data, arches, GraphSettingsViewModel, CardViewModel, viewData, reportLookup) {
     var GraphDesignerView = BaseManagerView.extend({
         initialize: function(options) {
             var viewModel = options.viewModel;
@@ -80,7 +81,7 @@ define([
                             if (status === 'success') {
                                 window.location = arches.urls.graph;
                             } else {
-                                viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+                                viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                             }
                         }
                     });
@@ -136,7 +137,7 @@ define([
                             if (status === 'success') {
                                 viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
                             } else {
-                                viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+                                viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                             }
                         }
                     });
@@ -175,19 +176,12 @@ define([
                 viewModel.alert(null);
                 viewModel.loading(false);
                 if (response.status !== 200) {
-                    var errorMessageTitle = arches.requestFailed.title;
-                    var errorMessageText = arches.requestFailed.text;
-                    viewModel.alert(null);
-                    if (response.responseJSON) {
-                        errorMessageTitle = response.responseJSON.title;
-                        errorMessageText = response.responseJSON.message;
-                    }
-                    viewModel.alert(new AlertViewModel('ep-alert-red', errorMessageTitle, errorMessageText));
+                    viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                 }
             });
 
             viewModel.graphModel.on('error', function(response) {
-                viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+                viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
             });
 
             viewModel.selectedNode = viewModel.graphModel.get('selectedNode');
@@ -197,7 +191,7 @@ define([
                     viewModel.loading(true);
                     node.save(function(data) {
                         if (data.responseJSON.success === false || data.status === 500) {
-                            viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
+                            viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', data.responseJSON));
                         }
                         else {
                             viewModel.cardTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);

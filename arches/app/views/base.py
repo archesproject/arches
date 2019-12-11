@@ -54,6 +54,7 @@ class BaseManagerView(TemplateView):
                 "author",
             ],
         )
+        context["notifications"] = models.UserXNotification.objects.filter(recipient=self.request.user, isread=False)
         context["nav"] = {
             "icon": "fa fa-chevron-circle-right",
             "title": "",
@@ -62,6 +63,7 @@ class BaseManagerView(TemplateView):
             },
             "menu": False,
             "search": True,
+            "notifs": True,
             "res_edit": False,
             "login": True,
             "print": False,

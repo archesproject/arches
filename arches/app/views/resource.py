@@ -40,7 +40,7 @@ from arches.app.utils.pagination import get_paginator
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.views.base import BaseManagerView, MapBaseManagerView
@@ -236,15 +236,7 @@ class NewResourceEditorView(MapBaseManagerView):
             if deleted is True:
                 return JSONResponse(ret)
             else:
-                return JSONResponse(
-                    {
-                        "status": "false",
-                        "success": False,
-                        "message": "Provisional users cannot delete resources with authoritative data",
-                        "title": "Unable to Delete Resource",
-                    },
-                    status=500,
-                )
+                return JSONErrorResponse('Unable to Delete Resource', 'Provisional users cannot delete resources with authoritative data')
         return HttpResponseNotFound()
 
     def copy(self, request, resourceid=None):
@@ -611,7 +603,7 @@ class ResourceCards(View):
 
 class ResourceDescriptors(View):
     def get(self, request, resourceid=None):
-        if Resource.objects.filter(pk=resourceid).exists():
+        if Resource.objects.filter(pk=resourceid).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID).exists():
             try:
                 resource = Resource.objects.get(pk=resourceid)
                 se = SearchEngineFactory().create()
@@ -756,7 +748,7 @@ class RelatedResourcesView(BaseManagerView):
     action = None
 
     def paginate_related_resources(self, related_resources, page, request):
-        total = related_resources["total"]
+        total = related_resources["total"]["value"]
         paginator, pages = get_paginator(request, related_resources, total, page, settings.RELATED_RESOURCES_PER_PAGE)
         page = paginator.page(page)
 
@@ -823,8 +815,8 @@ class RelatedResourcesView(BaseManagerView):
         for resourcexid in ids_to_delete:
             try:
                 ret = models.ResourceXResource.objects.get(pk=resourcexid).delete()
-            except:
-                print("resource relation does not exist")
+            except ObjectDoesNotExist:
+                logger.exception(_("Unable to delete. Relationship does not exist"))
         start = request.GET.get("start", 0)
         se.es.indices.refresh(index=se._add_prefix("resource_relations"))
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
@@ -875,7 +867,7 @@ class RelatedResourcesView(BaseManagerView):
 
         for instanceid in instances_to_relate:
             permitted = confirm_relationship_permitted(instanceid, root_resourceinstanceid[0])
-            if permitted == True:
+            if permitted is True:
                 rr = models.ResourceXResource(
                     resourceinstanceidfrom=Resource(root_resourceinstanceid[0]),
                     resourceinstanceidto=Resource(instanceid),

@@ -82,10 +82,11 @@ PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
 RESOURCE_IMPORT_LOG = "arches/logs/resource_import.log"
 
-RESOURCE_FORMATERS = {
+RESOURCE_FORMATTERS = {
     "csv": "arches.app.utils.data_management.resources.formats.csvfile.CsvWriter",
     "json": "arches.app.utils.data_management.resources.formats.archesfile.ArchesFileWriter",
     "tilecsv": "arches.app.utils.data_management.resources.formats.csvfile.TileCsvWriter",
+    "shp": "arches.app.utils.data_management.resources.formats.shpfile.ShpWriter",
     "xml": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
     "pretty-xml": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
     "json-ld": "arches.app.utils.data_management.resources.formats.rdffile.JsonLdWriter",
@@ -107,6 +108,9 @@ ONTOLOGY_EXT = [
     "CRMinf_v0.7.rdfs.xml",
     "arches_crm_enhancements.xml",
 ]
+
+LOAD_DEFAULT_ONTOLOGY = True
+LOAD_PACKAGE_ONTOLOGIES = False
 
 # Set the ontolgoy namespace prefixes to use in the UI, set the namespace to '' omit a prefix
 # Users can also override existing namespaces as well if you like
@@ -345,7 +349,7 @@ except Exception as e:
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {"console": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s", }, },
+    "formatters": {"console": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",},},
     "handlers": {
         "file": {
             "level": "WARNING",  # DEBUG, INFO, WARNING, ERROR, CRITICAL
@@ -438,11 +442,16 @@ OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 604800}  # one week
 
 PHONE_REGEX = r"^\+\d{8,15}$"
 SEARCH_ITEMS_PER_PAGE = 5
-SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
+SEARCH_EXPORT_ITEMS_PER_PAGE = 2000
+SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD = 2000  # The maximum number of instances a user can download from search export without celery
 RELATED_RESOURCES_PER_PAGE = 15
 RELATED_RESOURCES_EXPORT_LIMIT = 10000
 SEARCH_DROPDOWN_LENGTH = 100
-SEARCH_TERM_SENSITIVITY = 3  # a lower number will give more "Fuzzy" matches, recomend between 0-4, see "prefix_length" at https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl-fuzzy-query.html#_parameters_7
+
+# a lower number will give more "Fuzzy" matches, recomend between 0-4,
+# see "prefix_length" at https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl-fuzzy-query.html#_parameters_7
+SEARCH_TERM_SENSITIVITY = 3
+
 WORDS_PER_SEARCH_TERM = 10  # set to None for unlimited number of words allowed for search terms
 SEARCH_RESULT_LIMIT = 10000  # should be less than or equal to elasticsearch configuration, index.max_result_window (default = 10,000)
 
@@ -534,6 +543,9 @@ CELERY_BROKER_URL = "amqp://guest:guest@localhost"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_RESULT_BACKEND = "django-db"  # Use 'django-cache' if you want to use your cache as your backend
 CELERY_TASK_SERIALIZER = "json"
+
+AUTO_REFRESH_GEOM_VIEW = True
+TILE_CACHE_TIMEOUT = 600
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################
