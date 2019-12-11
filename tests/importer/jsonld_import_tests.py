@@ -328,7 +328,7 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(pts in js)
         self.assertTrue(set(js[pts]) == set([1, 2]))
         self.assertTrue(note in js)
-        self.assertTrue(set(js[note]) == set(["asdfasdfa", "aasdf"]))
+        self.assertTrue(set(js[note]) == set(["asdfasdfa", "1903-10-21"]))
         self.assertTrue(temp in js)
         temps = js[temp]
         self.assertTrue(len(temps) == 4)
