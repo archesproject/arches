@@ -2,7 +2,6 @@ import os
 import re
 import json
 import uuid
-import time
 import datetime
 import logging
 from io import StringIO
@@ -283,10 +282,6 @@ class JsonLdReader(Reader):
         self.logger.debug("Found {0} Non-unique root classes".format(len(self.non_unique_classes)))
         self.logger.debug("Found {0} Resource Model Root classes".format(len(self.resource_model_root_classes)))
 
-        self.IGNORE_KEYS = ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]
-        self.PREF_CONCEPT_SCHEME = "http://vocab.getty.edu/aat/"
-        self.LITERAL_DATATYPES = ["date", "number", "string", "domain-value", "domain-value-list", "color-datatype"]
-
     def validate_concept_in_collection(self, value, collection):
         cdata = Concept().get_child_collections(collection, columns="conceptidto")
         ids = [str(x[0]) for x in cdata]
@@ -366,7 +361,6 @@ class JsonLdReader(Reader):
         return None
 
     def read_resource(self, data, use_ids=False, resourceid=None, graphid=None):
-        start = time.time()
         self.use_ids = use_ids
         if not isinstance(data, list):
             data = [data]
@@ -403,8 +397,6 @@ class JsonLdReader(Reader):
 
             result = {"data": [jsonld_document["@id"]]}
             self.data_walk(jsonld_document, tree, result)
-            end = time.time()
-            print(f"walk time: {end-start}")
             # print(JSONSerializer().serialize(result, indent=4))
 
     def is_semantic_node(self, graph_node):
@@ -416,7 +408,12 @@ class JsonLdReader(Reader):
         ) and not self.is_semantic_node(graph_node)
 
     def is_concept_node(self, uri):
-        return uri.startswith(settings.PREFERRED_CONCEPT_SCHEME) or uri.startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "concepts/")
+        pcs = settings.PREFERRED_CONCEPT_SCHEMES[:]
+        pcs.append(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "concepts/")
+        for p in pcs:
+            if uri.startswith(p):
+                return True
+        return False        
 
     def data_walk(self, data_node, tree_node, result, tile=None):
         for k, v in data_node.items():
@@ -436,7 +433,17 @@ class JsonLdReader(Reader):
                     try:
                         clss = vi["@type"][0]
                     except:
-                        raise ValueError(f"Data does not have a class: {vi}")
+                        # {"@id": "http://something/.../"}
+                        # with no @type. This is typically an external concept URI
+                        # Look for it in the children of current node
+                        possible_cls = []
+                        for tn in tree_node['children']:
+                            if tn.startswith(k):
+                                possible_cls.append(tn.replace(k, '')[1:])
+                        if len(possible_cls) == 1:
+                            clss = possible_cls[0]
+                        else:
+                            raise ValueError(f"Multiple possible branches and no @type given: {vi}")
 
                     value = None
                     is_literal = False
