@@ -95,23 +95,6 @@ RESOURCE_FORMATTERS = {
     "trix": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
 }
 
-ONTOLOGY_PATH = os.path.join(ROOT_DIR, "db", "ontologies", "cidoc_crm")
-ONTOLOGY_BASE = "cidoc_crm_v6.2.xml"
-ONTOLOGY_BASE_VERSION = "6.2"
-ONTOLOGY_BASE_NAME = "CIDOC CRM v6.2"
-ONTOLOGY_BASE_ID = "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd"
-ONTOLOGY_EXT = [
-    "CRMsci_v1.2.3.rdfs.xml",
-    "CRMarchaeo_v1.4.rdfs.xml",
-    "CRMgeo_v1.2.rdfs.xml",
-    "CRMdig_v3.2.1.rdfs.xml",
-    "CRMinf_v0.7.rdfs.xml",
-    "arches_crm_enhancements.xml",
-]
-
-LOAD_DEFAULT_ONTOLOGY = True
-LOAD_PACKAGE_ONTOLOGIES = False
-
 # Set the ontolgoy namespace prefixes to use in the UI, set the namespace to '' omit a prefix
 # Users can also override existing namespaces as well if you like
 ONTOLOGY_NAMESPACES = {
@@ -124,6 +107,9 @@ ONTOLOGY_NAMESPACES = {
     "http://www.ics.forth.gr/isl/CRMinf/": "",
     "http://www.ics.forth.gr/isl/CRMsci/": "",
 }
+
+ONTOLOGY_DIR = os.path.join(ROOT_DIR, "ontologies")
+
 
 # Used in the JSON-LD export for determining which external concept scheme URI
 # to use in preference for the URI of a concept. If there is no match, the default
