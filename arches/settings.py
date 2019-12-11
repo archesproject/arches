@@ -108,6 +108,9 @@ ONTOLOGY_NAMESPACES = {
     "http://www.ics.forth.gr/isl/CRMsci/": "",
 }
 
+ONTOLOGY_DIR = os.path.join(ROOT_DIR, "ontologies")
+
+
 # Used in the JSON-LD export for determining which external concept scheme URI
 # to use in preference for the URI of a concept. If there is no match, the default
 # Arches host URI will be used (eg http://localhost/concepts/123f323f-...)

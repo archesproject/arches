@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+CRMarchaeo 1.4 Encoded in RDFS
+
+RDFS updated by FORTH-ICS April 14, 2016
+
+Encoding Rules:
+1. The RDF spelling rules do not allow blanks. Hence we have replaced them by underscores.
+   The blank between the concept identifier and concept name is replaced by underscore too.
+   For instance "A1_Excavation_Process_Unit" or "AP1_produced".
+
+2. RDF does not allow to instantiate properties beginning from a range value.
+   Therefore, each CRMarchaeo property is represented as two RDFS properties.
+   For instance "AP1_produced (was_produced_by)" is represented as:
+   "AP1_produced" for the domain to range direction and "AP1i_was_produced_by" for the range to domain direction.
+
+-->
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" 
+xml:base="http://www.ics.forth.gr/isl/CRMarchaeo/" xml:lang="en">
+
+
+<rdfs:Class rdf:about="A1_Excavation_Process_Unit">
+	<rdfs:subClassOf rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S1_Matter_Removal"/>
+</rdfs:Class>
+
+<rdfs:Class  rdf:about="A2_Stratigraphic_Volume_Unit">
+	<rdfs:subClassOf rdf:resource="A8_Stratigraphic_Unit"/>
+</rdfs:Class>
+
+<rdfs:Class  rdf:about="A3_Stratigraphic_Interface">
+	<rdfs:subClassOf rdf:resource="A8_Stratigraphic_Unit"/>
+</rdfs:Class>
+
+<rdfs:Class  rdf:about="A4_Stratigraphic_Genesis">
+	<rdfs:subClassOf rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S17_Physical_Genesis"/>
+	<rdfs:subClassOf rdf:resource="A5_Stratigraphic_Modification"/>
+</rdfs:Class>
+
+<rdfs:Class  rdf:about="A5_Stratigraphic_Modification">
+	<rdfs:subClassOf rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S18_Alteration"/>
+</rdfs:Class>
+
+<rdfs:Class  rdf:about="A6_Group_Declaration_Event">
+	<rdfs:subClassOf rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S5_Inference_Making"/>
+	<rdfs:subClassOf rdf:resource="http://www.ics.forth.gr/isl/CRMinf/I5_Inference_Making"/>
+</rdfs:Class>
+
+<rdfs:Class  rdf:about="A7_Embedding">
+	<rdfs:subClassOf rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S16_State"/>
+</rdfs:Class>
+
+<rdfs:Class  rdf:about="A8_Stratigraphic_Unit">
+	<rdfs:subClassOf rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S20_Physical_Feature"/>
+</rdfs:Class>
+
+<rdfs:Class  rdf:about="A9_Archaeological_Excavation">
+	<rdfs:subClassOf rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S1_Matter_Removal"/>
+	<rdfs:subClassOf rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S4_Observasion"/>
+</rdfs:Class>
+
+<rdf:Property rdf:about="AP1_produced">
+	<rdfs:domain rdf:resource="A1_Excavation_Process_Unit"/>
+	<rdfs:range rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S11_Amount_of_Matter"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP1i_was_produced_by">
+	<rdfs:domain rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S11_Amount_of_Matter"/>
+	<rdfs:range rdf:resource="A1_Excavation_Process_Unit"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP2_discarded_into">
+	<rdfs:domain rdf:resource="A1_Excavation_Process_Unit"/>
+	<rdfs:range rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S11_Amount_of_Matter"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP2i_was_discarded_by">
+	<rdfs:domain rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S11_Amount_of_Matter"/>
+	<rdfs:range rdf:resource="A1_Excavation_Process_Unit"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP3_excavated">
+	<rdfs:domain rdf:resource="A1_Excavation_Process_Unit"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP3i_was_excavated_by">
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+	<rdfs:range rdf:resource="A1_Excavation_Process_Unit"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP4_produced_surface">
+	<rdfs:domain rdf:resource="A1_Excavation_Process_Unit"/>
+	<rdfs:range rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S20_Physical_Feature"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP4i_was_surface_produced_by">
+	<rdfs:domain rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S20_Physical_Feature"/>
+	<rdfs:range rdf:resource="A1_Excavation_Process_Unit"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP5_removed_part_or_all_of">
+	<rdfs:domain rdf:resource="A1_Excavation_Process_Unit"/>
+	<rdfs:range rdf:resource="A8_Stratigraphic_Unit"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP5i_was_partially_or_totally_removed_by">
+	<rdfs:domain rdf:resource="A8_Stratigraphic_Unit"/>
+	<rdfs:range rdf:resource="A1_Excavation_Process_Unit"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP6_intended_to_approximate">
+	<rdfs:domain rdf:resource="A1_Excavation_Process_Unit"/>
+	<rdfs:range rdf:resource="A3_Stratigraphic_Interface"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.ics.forth.gr/isl/CRMsci/O8_observed"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP6i_was_approximated_by">
+	<rdfs:domain rdf:resource="A3_Stratigraphic_Interface"/>
+	<rdfs:range rdf:resource="A1_Excavation_Process_Unit"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.ics.forth.gr/isl/CRMsci/O8i_was_observed_by"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP7_produced">
+	<rdfs:domain rdf:resource="A4_Stratigraphic_Genesis"/>
+	<rdfs:range rdf:resource="A3_Stratigraphic_Interface"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.ics.forth.gr/isl/CRMsci/O17_generated"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP7i_was_produced_by">
+	<rdfs:domain rdf:resource="A3_Stratigraphic_Interface"/>
+	<rdfs:range rdf:resource="A4_Stratigraphic_Genesis"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.ics.forth.gr/isl/CRMsci/O17i_was_generated_by"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP8_disturbed">
+	<rdfs:domain rdf:resource="A4_Stratigraphic_Genesis"/>
+	<rdfs:range rdf:resource="A3_Stratigraphic_Interface"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP8i_was_disturbed_by">
+	<rdfs:domain rdf:resource="A3_Stratigraphic_Interface"/>
+	<rdfs:range rdf:resource="A4_Stratigraphic_Genesis"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP9_took_matter_from">
+	<rdfs:domain rdf:resource="A4_Stratigraphic_Genesis"/>
+	<rdfs:range rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S10_Material_Substantial"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP9i_provided_matter_to">
+	<rdfs:domain rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S10_Material_Substantial"/>
+	<rdfs:range rdf:resource="A4_Stratigraphic_Genesis"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP10_destroyed">
+	<rdfs:domain rdf:resource="A1_Excavation_Process_Unit"/>
+	<rdfs:range rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S22_Segment_of_Matter"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P13_destroyed"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP10i_was_destroyed_by">
+	<rdfs:domain rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S22_Segment_of_Matter"/>
+	<rdfs:range rdf:resource="A1_Excavation_Process_Unit"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P13i_was_destroyed_by"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP11_has_physioical_relation">
+	<rdfs:domain rdf:resource="A8_Stratigraphic_Unit"/>
+	<rdfs:range rdf:resource="A8_Stratigraphic_Unit"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP11i_is_physical_relation_of">
+	<rdfs:domain rdf:resource="A8_Stratigraphic_Unit"/>
+	<rdfs:range rdf:resource="A8_Stratigraphic_Unit"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP13_has_stratigraphic_relation">
+	<rdfs:domain rdf:resource="A8_Stratigraphic_Unit"/>
+	<rdfs:range rdf:resource="A8_Stratigraphic_Unit"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP13i_is_stratigraphic_relation_of">
+	<rdfs:domain rdf:resource="A8_Stratigraphic_Unit"/>
+	<rdfs:range rdf:resource="A8_Stratigraphic_Unit"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP15_is_or_contains_remains_of">
+	<rdfs:domain rdf:resource="A8_Stratigraphic_Unit"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP15i_is_or_has_remains_contained_in">
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
+	<rdfs:range rdf:resource="A8_Stratigraphic_Unit"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP16_assigned_attribute_to">
+	<rdfs:domain rdf:resource="A6_Group_Declaration_Event"/>
+	<rdfs:range rdf:resource="A8_Stratigraphic_Unit"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P140_assigned_attribute_to"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP16i_was_attributed_by">
+	<rdfs:domain rdf:resource="A8_Stratigraphic_Unit"/>
+	<rdfs:range rdf:resource="A6_Group_Declaration_Event"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P140i_was_attributed_by"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP17_is_found_by">
+	<rdfs:domain rdf:resource="A7_Embedding"/>
+	<rdfs:range rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S19_Encounter_Event"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP17i_found">
+	<rdfs:domain rdf:resource="http://www.ics.forth.gr/isl/CRMsci/S19_Encounter_Event"/>
+	<rdfs:range rdf:resource="A7_Embedding"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP18_is_embedding_of">
+	<rdfs:domain rdf:resource="A7_Embedding"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP18i_is_embedded">
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
+	<rdfs:range rdf:resource="A7_Embedding"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP19_is_embedding_in">
+	<rdfs:domain rdf:resource="A7_Embedding"/>
+	<rdfs:range rdf:resource="A2_Stratigraphic_Volume_Unit"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP19i_contains_embedding">
+	<rdfs:domain rdf:resource="A2_Stratigraphic_Volume_Unit"/>
+	<rdfs:range rdf:resource="A7_Embedding"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP20_is_embedding_at">
+	<rdfs:domain rdf:resource="A7_Embedding"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="AP20i_contains">
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+	<rdfs:range rdf:resource="A7_Embedding"/>
+</rdf:Property>
+</rdf:RDF>

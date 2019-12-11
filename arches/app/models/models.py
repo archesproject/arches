@@ -36,15 +36,6 @@ from django.core.validators import validate_slug
 from django.conf import settings
 
 
-def get_ontology_storage_system():
-    try:
-        location = os.path.join(settings.APP_ROOT, "ontologies")
-    except AttributeError:
-        location = os.path.join(settings.ROOT_DIR, "db", "ontologies")
-
-    return FileSystemStorage(location=location)
-
-
 class CardModel(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField(blank=True, null=True)
@@ -537,7 +528,8 @@ class Ontology(models.Model):
     ontologyid = models.UUIDField(default=uuid.uuid1, primary_key=True)
     name = models.TextField()
     version = models.TextField()
-    path = models.FileField(storage=get_ontology_storage_system())
+    path = models.TextField()
+    namespaces = JSONField(null=True, blank=True)
     parentontology = models.ForeignKey(
         "Ontology", db_column="parentontologyid", related_name="extensions", null=True, blank=True, on_delete=models.CASCADE
     )

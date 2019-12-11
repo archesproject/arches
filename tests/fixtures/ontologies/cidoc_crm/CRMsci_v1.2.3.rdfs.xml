@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+CRMsci 1.2.3 Encoded in RDFS
+RDFS updated by FORTH <maria@ics.forth.gr> April 14, 2016
+
+RDFS updated by SednaSoft <info@sedna-soft.de> Thursday, April 02, 2015
+Changes:
+- fixed mistyped references to S19 Observable Entity [sic] in O12 has dimension (is dimension of)
+
+RDFS updated by FORTH <maria@ics.forth.gr> Friday, May 8, 2015
+Changes:
+- S7_Simulation-Prediction changed to S7_Simulation_or_Prediction
+- reversed the domain and range of O9i_property_type_was_observed_by 
+
+No other changes found to be relevant for RDFS since CRMsci 1.2
+
+
+Encoding Rules:
+1. The RDF spelling rules do not allow blanks. Hence we have replaced them by underscores.
+   The blank between the concept identifier and concept name is replaced by underscore too.
+   For instance "S1_Matter_Removal" or "O3_sampled_from".
+
+2. RDF does not allow to instantiate properties beginning from a range value.
+   Therefore, each CRMdig property is represented as two RDFS properties.
+   For instance "O3_sampled_from (was_sample_by)" is represented as:
+   "O3_sampled_from" for the domain to range direction and "O3i_was_sample_by" for the range to domain direction.
+
+-->
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+        xml:base="http://www.ics.forth.gr/isl/CRMsci/" xml:lang="en">
+
+    <rdfs:Class rdf:about="S1_Matter_Removal">
+        <rdfs:comment>
+            This class comprises the activities that result in an instance of S10 Material Substantial being decreased by the removal of an amount of matter.
+Typical scenarios include the removal of a component or piece of a physical object, removal of an archaeological or geological layer, taking a tissue sample from a body or a sample of fluid from a body of water. The removed matter may acquire a persistent identity of different nature beyond the act of its removal, such as becoming a physical object in the narrower sense. Such cases should be modeled by using multiple instantiation with adequate concepts of creating the respective items.
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E7_Activity"/>
+    </rdfs:Class>
+
+    <rdfs:Class  rdf:about="http://www.cidoc-crm.org/cidoc-crm/E80_Part_Removal">
+        <rdfs:subClassOf rdf:resource="S1_Matter_Removal"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S2_Sample_Taking">
+        <rdfs:comment>
+            This class comprises the activity that results in taking an amount of matter as sample for further analysis from a material substantial such as a body of water, a geological formation or an archaeological object. The removed matter may acquire a persistent identity of different nature beyond the act of its removal, such as becoming a physical object in the narrower sense. The sample is typically removed from a physical feature which is used as a frame of reference, the place of sampling. In case of non-rigid Material Substantials, the source of sampling may regarded not to be modified by the activity of sample taking.
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="S1_Matter_Removal"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S3_Measurement_by_Sampling">
+        <rdfs:comment>
+            This class comprises activities of taking a sample and measuring or analyzing it as one managerial unit of activity, in which the sample may not be identified and preserved beyond the context of this activity. Instances of this class are constrained to describe the taking of exactly one sample, in general not further identified, and the dimensions observed by the respective measurement are implicitly understood to describe this particular sample as representative of the place on the instance of S10 Material Substantial from which the sample was taken. Therefore the class S3 Measurement by Sampling inherits the properties of S2 Sample Taking.O3 sampled from: S10 Material Substantial and O4 sampled at: E53 Place, and the properties of S21(E16) Measurement.P40 observed dimension: E54 Dimension, due to multiple inheritance, whereas it needs not instantiate the properties O5 removed: S13 Sample and O24 measured: S15 Observable Entity, if the sample is not documented beyond the context of the activity.
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="S2_Sample_Taking"/>
+        <rdfs:subClassOf rdf:resource="S21_Measurement"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S4_Observation">
+        <rdfs:comment>
+            This class comprises the activity of gaining scientific knowledge about particular states of physical reality gained by empirical evidence, experiments and by measurements. We define observation in the sense of natural sciences, as a kind of human activity: at some Place and within some Time-Span, certain Physical Things and their behavior and interactions are observed, either directly by human sensory impression, or enhanced with tools and measurement devices. The output of the internal processes of measurement devices that do not require additional human interaction are in general regarded as part of the observation and not as additional inference. Manual recordings may serve as additional evidence. Measurements and witnessing of events are special cases of observations. Observations result in a belief about certain propositions. In this model, the degree of confidence in the observed properties is regarded to be “true” per default, but could be described differently by adding a property P3 has note to an instance of S4 Observation, or by reification of the property O16 observed value. Primary data from measurement devices are regarded in this model to be results of observation and can be interpreted as propositions believed to be true within the (known) tolerances and degree of reliability of the device. Observations represent the transition between reality and propositions in the form of instances of a formal ontology, and can be subject to data evaluation from this point on.
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E13_Attribute_Assignment"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S5_Inference_Making">
+        <rdfs:comment>
+            This class comprises the action of concluding propositions on a respective reality from observational data by making evaluations based on mathematical inference rules and calculations using established hypotheses, such as the calculation of an earthquake epicenter. S6 Data Evaluation is not defined as S21/E16 Measurement; Secondary derivations of dimensions of an object from data measured by different processes are regarded as S6 Data Evaluation and not determining instances of Measurement in its own right. For instance, the volume of a statue concluded from a 3D model is an instance of S6 Data Evaluation and not of Measurement.
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E13_Attribute_Assignment"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S6_Data_Evaluation">
+        <rdfs:comment>
+            This class comprises the action of concluding propositions on a respective reality from observational data by making evaluations based on mathematical inference rules and calculations using established hypotheses, such as the calculation of an earthquake epicenter. S6 Data Evaluation is not defined as S21/E16 Measurement; Secondary derivations of dimensions of an object from data measured by different processes are regarded as S6 Data Evaluation and not determining instances of Measurement in its own right. For instance, the volume of a statue concluded from a 3D model is an instance of S6 Data Evaluation and not of Measurement.
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="S5_Inference_Making"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S7_Simulation_or_Prediction">
+        <rdfs:comment>
+            This class comprises activities of executing algorithms or software for simulating the behavior and the properties of a system of interacting components that form part of reality or not by using a mathematical model of the respective interactions. In particular it implies making predictions about the future behaviors of a system of interacting components of reality by starting simulation from an actually observed state, such as weather forecasts. Simulations may also be used to understand the effects of a theory, to compare theoretical predictions with reality, or to show differences with another theory.
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="S5_Inference_Making"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S8_Categorical_Hypothesis_Building">
+        <rdfs:comment>
+            This class comprises the action of making categorical hypotheses based on inference rules and theories; By categorical hypotheses we mean assumptions about the kinds of interactions and related kinds of structures of a domain that have the character of “laws” of nature or human behavior, be it necessary or probabilistic. Categorical hypotheses are developed by “induction” from finite numbers of observation and the absence of observations of particular kinds. As such, categorical hypotheses are always subject to falsification by new evidence. Instances of S8 Categorical Hypothesis Building include making and questioning categorical hypotheses.
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="S5_Inference_Making"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S9_Property_Type">
+        <rdfs:comment>
+            This class comprises types of properties. Typically, instances of S9 Property Type would be taken from an ontology or terminological system. In particular, instances of this class can be used to describe in a parametric way what kind of properties the values in scientific data sets are about. By virtue of such descriptions, numeric data can be interpreted as sets of propositions in terms of a formal ontology, such as “concentration of nitrate”, observed in the ground water from a certain borehole.
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E55_Type"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S10_Material_Substantial">
+        <rdfs:comment>
+            This class comprises constellations of matter with a relative stability of any form sufficient to associate them with a persistent identity, such as being confined to certain extent, having a relative stability of form or structure, or containing a fixed amount of matter. In particular, it comprises physical things in the narrower sense and fluid bodies. It is an abstraction of physical substance for solid and non-solid things of matter.
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E70_Thing"/>
+    </rdfs:Class>
+
+    <rdfs:Class  rdf:about="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing">
+        <rdfs:subClassOf rdf:resource="S10_Material_Substantial"/>
+    </rdfs:Class>
+
+
+    <rdfs:Class rdf:about="S11_Amount_of_Matter">
+        <rdfs:comment>
+            This class comprises fixed amounts of matter specified as some air, some water, some soil, etc., defined by the total and integrity of their material content.
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="S10_Material_Substantial"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S12_Amount_of_Fluid">
+        <rdfs:comment>
+            This class comprises fixed amounts of fluid defined by the total of its material content, typically molecules. They frequently acquire identity in laboratory practice by the fact of being kept or handled together within some adequate containers.
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="S11_Amount_of_Matter"/>
+        <rdfs:subClassOf rdf:resource="S14_Fluid_Body"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S13_Sample">
+        <rdfs:comment>
+            This class comprises instances of S11 Amount of Matter taken from some instance of S10 Material Substantial with the intention to be representative for some material qualities of the instance of S10 Material Substantial or part of it was taken from for further analysis. We typically regard a sample as ceasing to exist when the respective representative qualities become corrupted, such as the purity of a water sample or the layering of a bore core.
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="S11_Amount_of_Matter"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S14_Fluid_Body">
+        <rdfs:comment>
+            This class comprises a mass of matter in fluid form environmentally constraint in some persistent form allowing for identifying it for the management or research of material phenomena, such as a part of the sea, a river, the atmosphere or the milk in a bottle. Fluids are generally defined by the continuity criterion which is characteristic of their substance: their amorphous matter is continuous and tends to flow. Therefore, contiguous amounts of matter within a fluid body may stay contiguous or at least be locally spatially confined for a sufficiently long time in order to be temporarily identified and traced. This is a much weaker concept of stability of form than the one we would apply to what one would call a physical object. In general, an instance of Fluid Body may gain or lose matter over time through so-called sources or sinks in its surface, in contrast to physical things, which may lose or gain matter by exchange of pieces such as spare parts or corrosion.
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="S10_Material_Substantial"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S15_Observable_Entity">
+        <rdfs:comment>
+            This class comprises instances of E2 Temporal Entity or E77 Persistent Item, i.e. items or phenomena that can be observed, either directly by human sensory impression, or enhanced with tools and measurement devices, such as physical things, their behavior, states and interactions or events.
+Conceptual objects can be present in events by their carriers such as books, digital media, or even human memory. By virtue of this presence, properties of conceptual objects, such as number of words can be observed on their carriers. If the respective properties between carriers differ, either they carry different instances of conceptual objects or the difference can be attributed to accidental deficiencies in one of the carriers. In that sense even immaterial objects are observable. By this model we give credit to the fact that frequently, the actually observed carriers of conceptual objects are not explicitly identified in documentation, i.e., the actual carrier is assumed having existed but is unknown as an individual.
+
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>
+    </rdfs:Class>
+
+    <rdfs:Class  rdf:about="http://www.cidoc-crm.org/cidoc-crm/E2_Temporal_Entity">
+        <rdfs:subClassOf rdf:resource="S15_Observable_Entity"/>
+    </rdfs:Class>
+
+    <rdfs:Class  rdf:about="http://www.cidoc-crm.org/cidoc-crm/E77_Persistent_Item">
+        <rdfs:subClassOf rdf:resource="S15_Observable_Entity"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S16_State">
+        <rdfs:comment>
+            This class comprises the persistence of a particular value range of the properties of a particular thing or things over a time-span.
+
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E2_Temporal_Entity"/>
+    </rdfs:Class>
+
+    <rdfs:Class  rdf:about="http://www.cidoc-crm.org/cidoc-crm/E3_Condition_State">
+        <rdfs:subClassOf rdf:resource="S16_State"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S17_Physical_Genesis">
+        <rdfs:comment>
+            This class comprises events or processes that result in (generate) physical things, man-made or natural, coming into being in the form by which they are later identified. The creation of a new physical item, at the same time, can be a result of an alteration (modification) – it can become a new thing due to an alteration activity.
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E63_Beginning_of_Existence"/>
+        <rdfs:subClassOf rdf:resource="S18_Alteration"/>
+    </rdfs:Class>
+
+    <rdfs:Class  rdf:about="http://www.cidoc-crm.org/cidoc-crm/E12_Production">
+        <rdfs:subClassOf rdf:resource="S17_Physical_Genesis"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S18_Alteration">
+        <rdfs:comment>
+            This class comprises natural events or man-made processes that create, alter or change physical things, by affecting permanently their form or consistency without changing their identity. Examples include alterations on depositional features-layers by natural factors or disturbance by roots or insects, organic alterations, petrification, etc.
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
+    </rdfs:Class>
+
+    <rdfs:Class  rdf:about="http://www.cidoc-crm.org/cidoc-crm/E11_Modification">
+        <rdfs:subClassOf rdf:resource="S18_Alteration"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S19_Encounter_Event">
+        <rdfs:comment>
+            This class comprises activities of S4 Observation (substance) where an E39 Actor encounters an instance of E18 Physical Thing of a kind relevant for the mission of the observation or regarded as potentially relevant for some community (identity). This observation produces knowledge about the existence of the respective thing at a particular place in or on surrounding matter. This knowledge may be new to the group of people the actor belongs to. In that case we would talk about a discovery. The observer may recognize or assign an individual identity of the thing encountered or regard only the type as noteworthy in the associated documentation or report.
+In archaeology there is a particular interest if an object is found “in situ”, i.e. if its embedding in the surrounding matter supports the assumption that the object was not moved since the archaeologically relevant deposition event. The surrounding matter with the relative position of the object in it as well as the absolute position and time of the observation may be recorded in order to enable inferences about the history of the E18 Physical Thing.
+In Biology, additional parameters may be recorded like the kind of ecosystem, if the biological individual survives the observation, what detection or catching devices have been used or if the encounter event supported the detection of a new biological kind (“taxon”).
+
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="S4_Observation"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S20_Physical_Feature">
+        <rdfs:comment>
+            This class comprises identifiable features that are physically attached in an integral way to particular physical objects. An instance of S20 Physical Feature also represents the place it occupies with respect to the surrounding matter. More precisely, it is the maximal real volume in space that an instance of S20 Physical Feature is occupying during its lifetime with respect to the default reference space relative to which the feature is at rest. In cases of features on or in the surface of earth, the default reference is typically fixed to the closer environment of the tectonic plate or sea floor. In cases of features on mobile objects, the reference space is typically fixed to the geometry of the bearing object.
+Instances of E26 Physical Feature share many of the attributes of instances of E19 Physical Object. They may have a one-, two- or three-dimensional geometric extent, but there are no natural borders that separate them completely in an objective way from the carrier objects. For example, a doorway is a feature but the door itself, being attached by hinges, is not.
+Instances of E26 Physical Feature can be features in a narrower sense, such as scratches, holes, reliefs, surface colors, reflection zones in an opal crystal or a density change in a piece of wood. In the wider sense, they are portions of particular objects with partially imaginary borders, such as the core of the Earth, an area of property on the surface of the Earth, a landscape or the head of a contiguous marble statue. They can be measured and dated, and it is sometimes possible to state who or what is or was responsible for them. They cannot be separated from the carrier object, but a segment of the carrier object may be identified (or sometimes removed) carrying the complete feature.
+This definition coincides with the definition of "fiat objects" (Smith and Varzi, 2000, pp.401-420), with the exception of aggregates of “bona fide objects”.
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+    </rdfs:Class>
+
+    <rdfs:Class  rdf:about="http://www.cidoc-crm.org/cidoc-crm/E27_Site">
+        <rdfs:subClassOf rdf:resource="S20_Physical_Feature"/>
+    </rdfs:Class>
+
+    <rdfs:Class  rdf:about="http://www.cidoc-crm.org/cidoc-crm/E25_Man-Made_Feature">
+        <rdfs:subClassOf rdf:resource="S20_Physical_Feature"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S21_Measurement">
+        <rdfs:comment>
+            This class comprises actions measuring instances of E2 Temporal Entity or E77 Persistent Items, properties of physical things, or phenomena, states and interactions or events, that can be determined by a systematic procedure. Primary data from measurement devices are regarded to be results of an observation process.
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="S4_Observation"/>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E16_Measurement"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="S22_Segment_of_Matter">
+        <rdfs:comment>
+            This class comprises physical material in a relative stability of form (substance) within a specific spacetime volume (unity, extend). The spatial extend of a S22 Segment of Matter is defined by humans usually because the constellation is subject to a specific interest for and investigations of the geometric arrangement of physical features or parts of them on or within the specified S22 Segment of Matter. It comes into existence as being an object of discourse through S4 Observation or declaration and is restricted to the time span starting after the last change through an S18 Alteration before the S4 Observation or declaration and ending with the next S18 Alteration Event (identity). A S22 Segment of Matter exists as long as there is no modification of the geometric arrangement of its particles. Therefore the temporal boundaries of the defining Spacetime Volume are given by two S18 Alteration events.
+            The history of a S22 Segment of Matter started with the first S17 Physical Genesis event that deposited still existing matter within the defined spatial extend. The collection of all S18 Alteration events represent its history. Some of the events will not leave any physical material within the S22 Segment of Matter.
+            (to be elaborated further)
+        </rdfs:comment>
+        <rdfs:subClassOf rdf:resource="S20_Physical_Feature"/>
+    </rdfs:Class>
+
+    <rdf:Property rdf:about="O1_diminished">
+        <rdfs:domain rdf:resource="S1_Matter_Removal"/>
+        <rdfs:range rdf:resource="S10_Material_Substantial"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O1i_was_diminished_by">
+        <rdfs:domain rdf:resource="S10_Material_Substantial"/>
+        <rdfs:range rdf:resource="S1_Matter_Removal"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O2_removed">
+        <rdfs:domain rdf:resource="S1_Matter_Removal"/>
+        <rdfs:range rdf:resource="S11_Amount_of_Matter"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O2i_was_removed_by">
+        <rdfs:domain rdf:resource="S11_Amount_of_Matter"/>
+        <rdfs:range rdf:resource="S1_Matter_Removal"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O3_sampled_from">
+        <rdfs:domain rdf:resource="S2_Sample_Taking"/>
+        <rdfs:range rdf:resource="S10_Material_Substantial"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O3i_was_sample_by">
+        <rdfs:domain rdf:resource="S10_Material_Substantial"/>
+        <rdfs:range rdf:resource="S2_Sample_Taking"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O4_sampled_at">
+        <rdfs:domain rdf:resource="S2_Sample_Taking"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O4i_was_sampling_location_of">
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+        <rdfs:range rdf:resource="S2_Sample_Taking"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O5_removed">
+        <rdfs:domain rdf:resource="S2_Sample_Taking"/>
+        <rdfs:range rdf:resource="S13_Sample"/>
+        <rdfs:subPropertyOf rdf:resource="O2_removed"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O5i_was_removed_by">
+        <rdfs:domain rdf:resource="S13_Sample"/>
+        <rdfs:range rdf:resource="S2_Sample_Taking"/>
+        <rdfs:subPropertyOf rdf:resource="O2i_was_removed_by"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O6_forms_former_or_current_part_of">
+        <rdfs:domain rdf:resource="S12_Amount_of_Fluid"/>
+        <rdfs:range rdf:resource="S14_Fluid_Body"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O6i_has_former_or_current_part">
+        <rdfs:domain rdf:resource="S14_Fluid_Body"/>
+        <rdfs:range rdf:resource="S12_Amount_of_Fluid"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O7_contains_or_confines">
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O7i_is_contained_or_confined">
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O8_observed">
+        <rdfs:domain rdf:resource="S4_Observation"/>
+        <rdfs:range rdf:resource="S15_Observable_Entity"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P140_assigned_attribute_to"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O8i_was_observed_by">
+        <rdfs:domain rdf:resource="S15_Observable_Entity"/>
+        <rdfs:range rdf:resource="S4_Observation"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P140i_was_attributed_by"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O9_observed_property_type">
+        <rdfs:domain rdf:resource="S4_Observation"/>
+        <rdfs:range rdf:resource="S9_Property_Type"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O9i_property_type_was_observed_by">
+        <rdfs:domain rdf:resource="S9_Property_Type"/>
+        <rdfs:range rdf:resource="S4_Observation"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O10_assigned_dimension">
+        <rdfs:domain rdf:resource="S6_Data_Evaluation"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E54_Dimension"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O10i_dimension_was_assigned_by">
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E54_Dimension"/>
+        <rdfs:range rdf:resource="S6_Data_Evaluation"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O11_described">
+        <rdfs:domain rdf:resource="S6_Data_Evaluation"/>
+        <rdfs:range rdf:resource="S15_Observable_Entity"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O11i_was_described_by">
+        <rdfs:domain rdf:resource="S15_Observable_Entity"/>
+        <rdfs:range rdf:resource="S6_Data_Evaluation"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O12_has_dimension">
+        <rdfs:domain rdf:resource="S15_Observable_Entity"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E54_Dimension"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O12i_is_dimension_of">
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E54_Dimension"/>
+        <rdfs:range rdf:resource="S15_Observable_Entity"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O13_triggers">
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O13i_is_triggered_by">
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O14_initializes">
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
+        <rdfs:range rdf:resource="S16_State"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O14i_is_initialized_by">
+        <rdfs:domain rdf:resource="S16_State"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O15_occupied">
+        <rdfs:domain rdf:resource="S10_Material_Substantial"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O15i_was_occupied_by">
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+        <rdfs:range rdf:resource="S10_Material_Substantial"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O16_observed_value">
+        <rdfs:domain rdf:resource="S4_Observation"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P141_assigned"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O16i_value_was_observed_by">
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>
+        <rdfs:range rdf:resource="S4_Observation"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P141i_was_assigned_by"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O17_generated">
+        <rdfs:domain rdf:resource="S17_Physical_Genesis"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O17i_was_generated_by">
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
+        <rdfs:range rdf:resource="S17_Physical_Genesis"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="http://www.cidoc-crm.org/cidoc-crm/P108_has_produced">
+        <rdfs:subPropertyOf rdf:resource="O17_generated"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by">
+        <rdfs:subPropertyOf rdf:resource="O17i_was_generated_by"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O18_altered">
+        <rdfs:domain rdf:resource="S18_Alteration"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O18i_was_altered_by">
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
+        <rdfs:range rdf:resource="S18_Alteration"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="http://www.cidoc-crm.org/cidoc-crm/P31_has_modified">
+        <rdfs:subPropertyOf rdf:resource="O18_altered"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="http://www.cidoc-crm.org/cidoc-crm/P31i_was_modified_by">
+        <rdfs:subPropertyOf rdf:resource="O18i_was_altered_by"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O19_has_found_object">
+        <rdfs:domain rdf:resource="S19_Encounter_Event"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O19i_was_object_found_by">
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
+        <rdfs:range rdf:resource="S19_Encounter_Event"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O20_sampled_from_type_of_part">
+        <rdfs:domain rdf:resource="S2_Sample_Taking"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E55_Type"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O20i_type_of_part_was_sampled_by">
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E55_Type"/>
+        <rdfs:range rdf:resource="S2_Sample_Taking"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O21_has_found_at">
+        <rdfs:domain rdf:resource="S19_Encounter_Event"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O21i_witnessed">
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+        <rdfs:range rdf:resource="S19_Encounter_Event"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O22_partly_or_completely_contains">
+        <rdfs:domain rdf:resource="S22_Segment_of_Matter"/>
+        <rdfs:range rdf:resource="S20_Physical_Feature"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O22i_is_part_of">
+        <rdfs:domain rdf:resource="S20_Physical_Feature"/>
+        <rdfs:range rdf:resource="S22_Segment_of_Matter"/>
+    </rdf:Property>
+    <rdf:Property rdf:about="O23_is_defined_by">
+        <rdfs:domain rdf:resource="S22_Segment_of_Matter"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E92_Spacetime_Volume"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O23i_defines">
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E92_Spacetime_Volume"/>
+        <rdfs:range rdf:resource="S22_Segment_of_Matter"/>
+    </rdf:Property>
+    <rdf:Property rdf:about="O24_measured">
+        <rdfs:domain rdf:resource="S21_Measurement"/>
+        <rdfs:range rdf:resource="S15_Observable_Entity"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="O24i_was_measured_by">
+        <rdfs:domain rdf:resource="S15_Observable_Entity"/>
+        <rdfs:range rdf:resource="S21_Measurement"/>
+    </rdf:Property>
+
+</rdf:RDF>

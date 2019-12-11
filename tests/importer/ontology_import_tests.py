@@ -31,13 +31,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 class OntologyModelTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
-        management.call_command(
-            "load_ontology",
-            source=os.path.join(test_settings.ONTOLOGY_FIXTURES, "cidoc_crm_v6.2.test.xml"),
-            version="6.2",
-            id="11111111-0000-0000-0000-000000000000",
-            extensions=None,
-        )
+        management.call_command("load_ontology", source=test_settings.ONTOLOGY_FIXTURES)
 
     @classmethod
     def tearDownClass(cls):
