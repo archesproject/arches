@@ -413,7 +413,7 @@ class JsonLdReader(Reader):
         for p in pcs:
             if uri.startswith(p):
                 return True
-        return False        
+        return False
 
     def data_walk(self, data_node, tree_node, result, tile=None):
         for k, v in data_node.items():
@@ -437,9 +437,9 @@ class JsonLdReader(Reader):
                         # with no @type. This is typically an external concept URI
                         # Look for it in the children of current node
                         possible_cls = []
-                        for tn in tree_node['children']:
+                        for tn in tree_node["children"]:
                             if tn.startswith(k):
-                                possible_cls.append(tn.replace(k, '')[1:])
+                                possible_cls.append(tn.replace(k, "")[1:])
                         if len(possible_cls) == 1:
                             clss = possible_cls[0]
                         else:
