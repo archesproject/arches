@@ -728,7 +728,7 @@ class Concepts(APIBase):
             try:
                 skos = SKOSWriter()
                 value = skos.write(ret, format="nt")
-                js = from_rdf(str(value), options={format: "application/nquads"})
+                js = from_rdf(value.decode("utf-8"), options={format: "application/nquads"})
 
                 context = [{"@context": {"skos": SKOS, "dcterms": DCTERMS, "rdf": str(RDF)}}, {"@context": settings.RDM_JSONLD_CONTEXT}]
 
