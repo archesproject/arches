@@ -360,6 +360,14 @@ class EDTFDataType(BaseDataType):
 
         return errors
 
+    
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(tile)
+        value = data[str(node.pk)]["value"]
+
+        return value
+    
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         def add_date_to_doc(document, edtf):
             if edtf.lower == edtf.upper:
