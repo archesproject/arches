@@ -56,10 +56,6 @@ class RDFExportUnitTests(ArchesTestCase):
             with open(os.path.join("tests/fixtures/resource_graphs/rdf_export_{0}.json".format(model_name)), "rU") as f:
                 archesfile = JSONDeserializer().deserialize(f)
             ResourceGraphImporter(archesfile["graph"])
-        # Fixture Instance Data for tests
-        # for instance_name in ['document', 'object']:
-        #     BusinessDataImporter(
-        #             'tests/fixtures/data/rdf_export_{0}.json'.format(instance_name)).import_business_data()
 
     def setUp(self):
         # for RDF/JSON-LD export tests
@@ -152,30 +148,48 @@ class RDFExportUnitTests(ArchesTestCase):
             self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, Literal(item)) in graph)
         self.assertFalse((edge_info["d_uri"], edge.ontologyproperty, Literal("Not Domain Text")) in graph)
 
-    # def test_rdf_concept(self):
-    #     dt = self.DT.get_instance("concept")
-    #     # d75977c1-635b-41d5-b53d-1c82d2237b67 should be the ConceptValue for "junk sculpture"
-    #     # Main concept should be 0ad97528-0fb0-43bf-afee-0fb9dde78b99
-    #     # should also have an identifier of http://vocab.getty.edu/aat/300047196
-    #     edge_info, edge = mock_edge(
-    #         1, CIDOC_NS["some_value"], None, "", "d75977c1-635b-41d5-b53d-1c82d2237b67", o_type_str=CIDOC_NS["E55_Type"]
-    #     )
-    #     graph = dt.to_rdf(edge_info, edge)
-    #     self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, URIRef("http://vocab.getty.edu/aat/300047196")) in graph)
-    #     self.assertTrue((URIRef("http://vocab.getty.edu/aat/300047196"), RDFS.label, Literal("junk sculpture")) in graph)
+    def test_rdf_concept(self):
+        dt = self.DT.get_instance("concept")
+        # d75977c1-635b-41d5-b53d-1c82d2237b67 should be the ConceptValue for "junk sculpture"
+        # Main concept should be 0ad97528-0fb0-43bf-afee-0fb9dde78b99
+        # should also have an identifier of http://vocab.getty.edu/aat/300047196
 
-    # def test_rdf_concept_list(self):
-    #     dt = self.DT.get_instance("concept-list")
-    #     concept_list = [
-    #         "d75977c1-635b-41d5-b53d-1c82d2237b67",  # junk sculpture@en, has aat identifier
-    #         "4beb7055-8a6e-45a3-9bfb-32984b6f82e0",  # "example document type"@en-us, no ext id}
-    #     ]
-    #     edge_info, edge = mock_edge(1, CIDOC_NS["some_value"], None, "", concept_list, o_type_str=CIDOC_NS["E55_Type"])
-    #     graph = dt.to_rdf(edge_info, edge)
-    #     self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, URIRef("http://vocab.getty.edu/aat/300047196")) in graph)
-    #     self.assertTrue((URIRef("http://vocab.getty.edu/aat/300047196"), RDFS.label, Literal("junk sculpture")) in graph)
-    #     self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"]) in graph)
-    #     self.assertTrue((ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"], RDFS.label, Literal("example document type")) in graph)
+        edge_info = {}
+        edge_info["range_tile_data"] = "d75977c1-635b-41d5-b53d-1c82d2237b67"
+        edge_info["r_uri"] = URIRef("http://vocab.getty.edu/aat/300047196")
+        edge_info["d_uri"] = URIRef("test")
+        edge = Mock()
+        edge.ontologyproperty = CIDOC_NS["P2_has_type"]
+        edge.rangenode.ontologyclass = CIDOC_NS["E55_Type"]
+
+        graph = dt.to_rdf(edge_info, edge)
+        print(graph.serialize(format="ttl"))
+        self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, URIRef("http://vocab.getty.edu/aat/300047196")) in graph)
+        self.assertTrue((URIRef("http://vocab.getty.edu/aat/300047196"), RDFS.label, Literal("junk sculpture")) in graph)
+
+    def test_rdf_concept_list(self):
+        dt = self.DT.get_instance("concept-list")
+        concept_list = [
+            "d75977c1-635b-41d5-b53d-1c82d2237b67",  # junk sculpture@en, has aat identifier
+            "4beb7055-8a6e-45a3-9bfb-32984b6f82e0",  # "example document type"@en-us, no ext id}
+        ]
+
+        edge_info = {}
+        edge_info["range_tile_data"] = concept_list
+        edge_info["r_uri"] = URIRef("http://vocab.getty.edu/aat/300047196")
+        edge_info["d_uri"] = URIRef("test")
+        edge = Mock()
+        edge.ontologyproperty = CIDOC_NS["P2_has_type"]
+        edge.rangenode.ontologyclass = CIDOC_NS["E55_Type"]
+        graph = dt.to_rdf(edge_info, edge)
+
+        edge_info["r_uri"] = ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"]
+        graph += dt.to_rdf(edge_info, edge)
+
+        self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, URIRef("http://vocab.getty.edu/aat/300047196")) in graph)
+        self.assertTrue((URIRef("http://vocab.getty.edu/aat/300047196"), RDFS.label, Literal("junk sculpture")) in graph)
+        self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"]) in graph)
+        self.assertTrue((ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"], RDFS.label, Literal("example document type")) in graph)
 
 
 def append_domain_config_to_node(node):
@@ -208,6 +222,8 @@ def mock_edge(
     edge.domainnode_id = edge.domainnode.pk = s_id
     edge_info["d_uri"] = ARCHES_NS["{0}/{1}".format(s_pref, s_id)]
     edge_info["r_uri"] = None
+    edge_info["d_datatype"] = None
+    edge_info["r_datatype"] = None
     edge.rangenode_id = edge.rangenode.pk = o_id
     if o_id:
         edge_info["r_uri"] = ARCHES_NS["{0}/{1}".format(o_pref, o_id)]
