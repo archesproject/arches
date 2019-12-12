@@ -24,7 +24,7 @@ Replace this with more appropriate tests for your application.
 """
 
 import base64
-from tests.base_test import ArchesTestCase
+from tests.base_test import ArchesTestCase, TOKEN_TEST_USER, OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET
 from django.db import connection
 from django.urls import reverse
 from django.contrib.auth.models import User, Group, AnonymousUser
@@ -40,44 +40,19 @@ from arches.app.utils.middleware import SetAnonymousUser
 
 
 class AuthTests(ArchesTestCase):
-    def setUp(self):
-        self.factory = RequestFactory()
-        self.client = Client()
-        self.user = User.objects.create_user("test", "test@archesproject.org", "password")
-        self.user.save()
+    @classmethod
+    def setUpClass(cls):
+        cls.factory = RequestFactory()
+        cls.client = Client()
+        cls.user = User.objects.get(username="test")
 
         rdm_admin_group = Group.objects.get(name="RDM Administrator")
-        self.user.groups.add(rdm_admin_group)
+        cls.user.groups.add(rdm_admin_group)
+        cls.anonymous_user = User.objects.get(username="anonymous")
 
-        self.anonymous_user = User.objects.get(username="anonymous")
-
-        sql = """
-            INSERT INTO public.oauth2_provider_application(
-                id,client_id, redirect_uris, client_type, authorization_grant_type,
-                client_secret,
-                name, user_id, skip_authorization, created, updated)
-            VALUES (
-                44,'{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
-                '{oauth_client_secret}',
-                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000')
-            ON CONFLICT DO NOTHING;
-            INSERT INTO public.oauth2_provider_accesstoken(
-                token, expires, scope, application_id, user_id, created, updated)
-                VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018')
-                ON CONFLICT DO NOTHING;
-        """
-
-        self.token = "abc"
-        self.oauth_client_id = "AAac4uRQSqybRiO6hu7sHT50C4wmDp9fAmsPlCj9"
-        self.oauth_client_secret = "7fos0s7qIhFqUmalDI1QiiYj0rAtEdVMY4hYQDQjOxltbRCBW3dIydOeMD4MytDM9ogCPiYFiMBW6o6ye5bMh5dkeU7pg1cH86wF6B\
-            ap9Ke2aaAZaeMPejzafPSj96ID"
-
-        sql = sql.format(
-            token=self.token, user_id=self.user.pk, oauth_client_id=self.oauth_client_id, oauth_client_secret=self.oauth_client_secret
-        )
-
-        cursor = connection.cursor()
-        cursor.execute(sql)
+        cls.token = TOKEN_TEST_USER
+        cls.oauth_client_id = OAUTH_CLIENT_ID
+        cls.oauth_client_secret = OAUTH_CLIENT_SECRET
 
     def test_login(self):
         """
@@ -144,37 +119,37 @@ class AuthTests(ArchesTestCase):
         self.assertTrue(response.status_code == 302)
         self.assertTrue(response.get("location") == reverse("auth"))
 
-    # def test_get_oauth_token(self):
-    #     key = "{0}:{1}".format(self.oauth_client_id, self.oauth_client_secret)
-    #     client = Client(HTTP_AUTHORIZATION="Basic %s" % base64.b64encode(key.encode("UTF-8")).decode("UTF-8"))
+    def test_get_oauth_token(self):
+        key = "{0}:{1}".format(self.oauth_client_id, self.oauth_client_secret)
+        client = Client(HTTP_AUTHORIZATION="Basic %s" % base64.b64encode(key.encode("UTF-8")).decode("UTF-8"))
 
-    #     # make sure we can POST to the authorize endpoint and get back the proper form
-    #     # response = client.post(reverse('auth'), {'username': 'test', 'password': 'password', 'next': 'oauth2:authorize'})
-    #     # response = client.get(reverse('oauth2:authorize'), {
-    #     #     'client_id': self.oauth_client_id,
-    #     #     'state': 'random_state_string',
-    #     #     'response_type': 'code'
-    #     # }, follow=True)
-    #     # form = response.context['form']
-    #     # data = form.cleaned_data
-    #     # self.assertTrue(response.status_code == 200)
-    #     # self.assertTrue(data['client_id']  == self.oauth_client_id)
+        # make sure we can POST to the authorize endpoint and get back the proper form
+        # response = client.post(reverse('auth'), {'username': 'test', 'password': 'password', 'next': 'oauth2:authorize'})
+        # response = client.get(reverse('oauth2:authorize'), {
+        #     'client_id': self.oauth_client_id,
+        #     'state': 'random_state_string',
+        #     'response_type': 'code'
+        # }, follow=True)
+        # form = response.context['form']
+        # data = form.cleaned_data
+        # self.assertTrue(response.status_code == 200)
+        # self.assertTrue(data['client_id']  == self.oauth_client_id)
 
-    #     # response = self.client.post(reverse('oauth2:token'), {
-    #     #     'grant_type': 'password',
-    #     #     'username': 'test',
-    #     #     'password': 'password',
-    #     #     'scope': 'read write',
-    #     # })
+        # response = self.client.post(reverse('oauth2:token'), {
+        #     'grant_type': 'password',
+        #     'username': 'test',
+        #     'password': 'password',
+        #     'scope': 'read write',
+        # })
 
-    #     response = client.post(
-    #         reverse("oauth2:token"), {"grant_type": "client_credentials", "scope": "read write", "client_id": self.oauth_client_id}
-    #     )
+        response = client.post(
+            reverse("oauth2:token"), {"grant_type": "client_credentials", "scope": "read write", "client_id": self.oauth_client_id}
+        )
 
-    #     # print response
-    #     # {"access_token": "ZzVGlb8SLLeCOaogtyhRpBoFbKcuqI", "token_type": "Bearer", "expires_in": 36000, "scope": "read write"}
-    #     self.assertTrue(response.status_code == 200)
-    #     self.assertTrue(response.json()["token_type"] == "Bearer")
+        # print response
+        # {"access_token": "ZzVGlb8SLLeCOaogtyhRpBoFbKcuqI", "token_type": "Bearer", "expires_in": 36000, "scope": "read write"}
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(response.json()["token_type"] == "Bearer")
 
     def test_use_oauth_token_for_access_to_privileged_page(self):
         """
@@ -260,9 +235,6 @@ class AuthTests(ArchesTestCase):
 
         self.assertTrue(response.status_code == 302)
         self.assertTrue(response.get("location").split("?")[0] == reverse("auth"))
-
-    def tearDown(self):
-        self.user.delete()
 
 
 def apply_middleware(request):

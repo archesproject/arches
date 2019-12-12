@@ -77,8 +77,7 @@ class ResourceTests(ArchesTestCase):
         cls.search_model_sensitive_info_nodeid = "57446fae-65ff-11e7-b63a-14109fd34195"
         cls.search_model_geom_nodeid = "3ebc6785-fa61-11e6-8c85-14109fd34195"
 
-        cls.user = User.objects.create_user("test", "test@archesproject.org", "test")
-        cls.user.save()
+        cls.user = User.objects.get(username="test")
         cls.user.groups.add(Group.objects.get(name="Guest"))
 
         nodegroup = models.NodeGroup.objects.get(pk=cls.search_model_destruction_date_nodeid)
@@ -147,7 +146,6 @@ class ResourceTests(ArchesTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.user.delete()
         delete_terms_index()
         delete_concepts_index()
         delete_search_index()
