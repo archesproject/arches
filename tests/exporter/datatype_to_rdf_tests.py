@@ -155,15 +155,15 @@ class RDFExportUnitTests(ArchesTestCase):
         # should also have an identifier of http://vocab.getty.edu/aat/300047196
 
         edge_info = {}
-        edge_info['range_tile_data'] = "d75977c1-635b-41d5-b53d-1c82d2237b67"
-        edge_info['r_uri'] = URIRef("http://vocab.getty.edu/aat/300047196")
-        edge_info['d_uri'] = URIRef("test")
+        edge_info["range_tile_data"] = "d75977c1-635b-41d5-b53d-1c82d2237b67"
+        edge_info["r_uri"] = URIRef("http://vocab.getty.edu/aat/300047196")
+        edge_info["d_uri"] = URIRef("test")
         edge = Mock()
         edge.ontologyproperty = CIDOC_NS["P2_has_type"]
         edge.rangenode.ontologyclass = CIDOC_NS["E55_Type"]
 
         graph = dt.to_rdf(edge_info, edge)
-        print(graph.serialize(format='ttl'))
+        print(graph.serialize(format="ttl"))
         self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, URIRef("http://vocab.getty.edu/aat/300047196")) in graph)
         self.assertTrue((URIRef("http://vocab.getty.edu/aat/300047196"), RDFS.label, Literal("junk sculpture")) in graph)
 
@@ -175,16 +175,15 @@ class RDFExportUnitTests(ArchesTestCase):
         ]
 
         edge_info = {}
-        edge_info['range_tile_data'] = concept_list
-        edge_info['r_uri'] = URIRef("http://vocab.getty.edu/aat/300047196")
-        edge_info['d_uri'] = URIRef("test")
+        edge_info["range_tile_data"] = concept_list
+        edge_info["r_uri"] = URIRef("http://vocab.getty.edu/aat/300047196")
+        edge_info["d_uri"] = URIRef("test")
         edge = Mock()
         edge.ontologyproperty = CIDOC_NS["P2_has_type"]
         edge.rangenode.ontologyclass = CIDOC_NS["E55_Type"]
         graph = dt.to_rdf(edge_info, edge)
 
-
-        edge_info['r_uri'] = ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"]
+        edge_info["r_uri"] = ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"]
         graph += dt.to_rdf(edge_info, edge)
 
         self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, URIRef("http://vocab.getty.edu/aat/300047196")) in graph)
@@ -223,8 +222,8 @@ def mock_edge(
     edge.domainnode_id = edge.domainnode.pk = s_id
     edge_info["d_uri"] = ARCHES_NS["{0}/{1}".format(s_pref, s_id)]
     edge_info["r_uri"] = None
-    edge_info['d_datatype'] = None
-    edge_info['r_datatype'] = None
+    edge_info["d_datatype"] = None
+    edge_info["r_datatype"] = None
     edge.rangenode_id = edge.rangenode.pk = o_id
     if o_id:
         edge_info["r_uri"] = ARCHES_NS["{0}/{1}".format(o_pref, o_id)]

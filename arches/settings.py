@@ -114,10 +114,7 @@ ONTOLOGY_DIR = os.path.join(ROOT_DIR, "ontologies")
 # Used in the JSON-LD export for determining which external concept scheme URI
 # to use in preference for the URI of a concept. If there is no match, the default
 # Arches host URI will be used (eg http://localhost/concepts/123f323f-...)
-PREFERRED_CONCEPT_SCHEMES = [
-    "http://vocab.getty.edu/aat/",
-    "http://www.cidoc-crm.org/cidoc-crm/"
-]
+PREFERRED_CONCEPT_SCHEMES = ["http://vocab.getty.edu/aat/", "http://www.cidoc-crm.org/cidoc-crm/"]
 
 # This is the namespace to use for export of data (for RDF/XML for example)
 # Ideally this should point to the url where you host your site
