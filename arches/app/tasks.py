@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.core import management
 from django.http import HttpRequest
 
+
 @shared_task
 def delete_file():
     now = datetime.timestamp(datetime.now())
@@ -19,12 +20,13 @@ def delete_file():
     with os.scandir(settings.CELERY_SEARCH_EXPORT_DIR) as current_files:
         for file in current_files:
             file_stat = os.stat(os.path.join(settings.CELERY_SEARCH_EXPORT_DIR, file))
-            if now-file_stat.st_ctime > settings.CELERY_SEARCH_EXPORT_EXPIRES:
+            if now - file_stat.st_ctime > settings.CELERY_SEARCH_EXPORT_EXPIRES:
                 file_list.append(file.name)
     for file in file_list:
-        os.remove(os.path.join(settings.CELERY_SEARCH_EXPORT_DIR,file))
+        os.remove(os.path.join(settings.CELERY_SEARCH_EXPORT_DIR, file))
         counter += 1
     return "{} files deleted".format(counter)
+
 
 @shared_task
 def message(arg):

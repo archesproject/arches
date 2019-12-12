@@ -544,19 +544,12 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_RESULT_BACKEND = "django-db"  # Use 'django-cache' if you want to use your cache as your backend
 CELERY_TASK_SERIALIZER = "json"
 CELERY_SEARCH_EXPORT_DIR = os.path.join(MEDIA_ROOT, "uploadedfiles")
-CELERY_SEARCH_EXPORT_EXPIRES = 24 * 3600 # seconds
-CELERY_SEARCH_EXPORT_CHECK = 3600 # seconds
+CELERY_SEARCH_EXPORT_EXPIRES = 24 * 3600  # seconds
+CELERY_SEARCH_EXPORT_CHECK = 3600  # seconds
 
 CELERY_BEAT_SCHEDULE = {
-    'delete-expired-search-export': {
-       'task': 'arches.app.tasks.delete_file',
-       'schedule': CELERY_SEARCH_EXPORT_CHECK,
-    },
-    'notification': {
-       'task': 'arches.app.tasks.message',
-       'schedule': CELERY_SEARCH_EXPORT_CHECK,
-       'args': ('Celery Beat is Running',),
-    },
+    "delete-expired-search-export": {"task": "arches.app.tasks.delete_file", "schedule": CELERY_SEARCH_EXPORT_CHECK,},
+    "notification": {"task": "arches.app.tasks.message", "schedule": CELERY_SEARCH_EXPORT_CHECK, "args": ("Celery Beat is Running",),},
 }
 
 AUTO_REFRESH_GEOM_VIEW = True
