@@ -360,6 +360,12 @@ class EDTFDataType(BaseDataType):
 
         return errors
 
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(tile)
+        value = data[str(node.pk)]["value"]
+
+        return value
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         def add_date_to_doc(document, edtf):
             if edtf.lower == edtf.upper:
@@ -1035,12 +1041,23 @@ class FileListDataType(BaseDataType):
             errors.append({"type": "ERROR", "message": f"datatype: {dt}, value: {value} - {e} ."})
         return errors
 
-    def get_tile_data(self, user_is_reviewer, user_id, tile):
+    def get_tile_data(self, user_is_reviewer=False, user_id=None, tile=None):
         if user_is_reviewer is False and tile.provisionaledits is not None and user_id in tile.provisionaledits:
             data = tile.provisionaledits[user_id]["value"]
         else:
-            data = tile.data
+            data = tile["data"]
         return data
+
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(user_is_reviewer=True, tile=tile)
+        # if search_export is permission-bound, user_is_reviewer=True should be okay
+        # else, search_export would circumvent permissions
+        files = data[str(node.pk)]
+        file_list_str = ""
+        for f in files:
+            file_list_str = file_list_str + f["name"] + "|"
+
+        return file_list_str
 
     def handle_request(self, current_tile, request, node):
         previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
@@ -1048,9 +1065,11 @@ class FileListDataType(BaseDataType):
         if hasattr(request.user, "userprofile") is not True:
             models.UserProfile.objects.create(user=request.user)
         user_is_reviewer = request.user.userprofile.is_reviewer()
-        current_tile_data = self.get_tile_data(user_is_reviewer, str(user.id), current_tile)
+        current_tile_data = self.get_tile_data(user_is_reviewer=user_is_reviewer, user_id=str(user.id), tile=current_tile)
         if previously_saved_tile.count() == 1:
-            previously_saved_tile_data = self.get_tile_data(user_is_reviewer, str(user.id), previously_saved_tile[0])
+            previously_saved_tile_data = self.get_tile_data(
+                user_is_reviewer=user_is_reviewer, user_id=str(user.id), tile=previously_saved_tile[0]
+            )
             if previously_saved_tile_data[str(node.pk)] is not None:
                 for previously_saved_file in previously_saved_tile_data[str(node.pk)]:
                     previously_saved_file_has_been_removed = True
