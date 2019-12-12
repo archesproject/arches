@@ -10,7 +10,7 @@ from django.test.client import RequestFactory, Client
 from django.contrib.auth.models import User, Group, AnonymousUser
 from django.urls import reverse
 from django.db import connection
-from tests.base_test import ArchesTestCase, TOKEN_ADMIN_USER
+from tests.base_test import ArchesTestCase, CREATE_TOKEN_SQL
 from arches.app.utils.skos import SKOSReader
 from arches.app.models.models import TileModel, ResourceInstance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -29,8 +29,12 @@ class JsonLDImportTests(ArchesTestCase):
         # This runs once per instantiation
         cls.loadOntology()
         cls.factory = RequestFactory()
-        cls.token = TOKEN_ADMIN_USER
+        cls.token = "abc123"
         cls.client = Client(HTTP_AUTHORIZATION="Bearer %s" % cls.token)
+
+        sql_str = CREATE_TOKEN_SQL.format(token=cls.token, user_id=1)
+        cursor = connection.cursor()
+        cursor.execute(sql_str)
 
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/jsonld_test_thesaurus.xml")

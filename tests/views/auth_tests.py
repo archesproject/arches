@@ -24,7 +24,7 @@ Replace this with more appropriate tests for your application.
 """
 
 import base64
-from tests.base_test import ArchesTestCase, TOKEN_TEST_USER, OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET
+from tests.base_test import ArchesTestCase, OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, CREATE_TOKEN_SQL
 from django.db import connection
 from django.urls import reverse
 from django.contrib.auth.models import User, Group, AnonymousUser
@@ -44,15 +44,23 @@ class AuthTests(ArchesTestCase):
     def setUpClass(cls):
         cls.factory = RequestFactory()
         cls.client = Client()
-        cls.user = User.objects.get(username="test")
+        cls.user = User.objects.create_user("test", "test@archesproject.org", "password")
 
         rdm_admin_group = Group.objects.get(name="RDM Administrator")
         cls.user.groups.add(rdm_admin_group)
         cls.anonymous_user = User.objects.get(username="anonymous")
 
-        cls.token = TOKEN_TEST_USER
+        cls.token = "abc"
         cls.oauth_client_id = OAUTH_CLIENT_ID
         cls.oauth_client_secret = OAUTH_CLIENT_SECRET
+
+        sql_str = CREATE_TOKEN_SQL.format(token=cls.token, user_id=cls.user.pk)
+        cursor = connection.cursor()
+        cursor.execute(sql_str)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.user.delete()
 
     def test_login(self):
         """

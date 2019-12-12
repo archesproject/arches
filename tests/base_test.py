@@ -34,11 +34,14 @@ from django.core import management
 # these tests can be run from the command line via
 # python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
 
-TOKEN_TEST_USER = "abc"
-TOKEN_ADMIN_USER = "abc123"
 OAUTH_CLIENT_ID = "AAac4uRQSqybRiO6hu7sHT50C4wmDp9fAmsPlCj9"
 OAUTH_CLIENT_SECRET = "7fos0s7qIhFqUmalDI1QiiYj0rAtEdVMY4hYQDQjOxltbRCBW3dIydOeMD4MytDM9ogCPiYFiMBW6o6ye5bMh5dkeU7pg1cH86wF6B\
         ap9Ke2aaAZaeMPejzafPSj96ID"
+CREATE_TOKEN_SQL = """
+        INSERT INTO public.oauth2_provider_accesstoken(
+            token, expires, scope, application_id, user_id, created, updated)
+            VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018');
+    """
 
 
 def setUpTestPackage():
@@ -47,9 +50,7 @@ def setUpTestPackage():
     this is called from __init__.py
     """
 
-    user = User.objects.create_user("test", "test@archesproject.org", "password")
-    user.save()
-
+    cursor = connection.cursor()
     sql = """
         INSERT INTO public.oauth2_provider_application(
             id,client_id, redirect_uris, client_type, authorization_grant_type,
@@ -61,42 +62,26 @@ def setUpTestPackage():
             'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000');
     """
 
-    sql = sql.format(token=TOKEN_TEST_USER, user_id=user.pk, oauth_client_id=OAUTH_CLIENT_ID, oauth_client_secret=OAUTH_CLIENT_SECRET)
-    cursor = connection.cursor()
+    sql = sql.format(user_id=1, oauth_client_id=OAUTH_CLIENT_ID, oauth_client_secret=OAUTH_CLIENT_SECRET)
     cursor.execute(sql)
 
-    sql = """
-        INSERT INTO public.oauth2_provider_accesstoken(
-            token, expires, scope, application_id, user_id, created, updated)
-            VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018');
+
+def tearDownTestPackage():
+    """
+    see https://nose.readthedocs.io/en/latest/writing_tests.html#test-packages
+    this is called from __init__.py
     """
 
-    sql = sql.format(token=TOKEN_TEST_USER, user_id=user.pk, oauth_client_id=OAUTH_CLIENT_ID, oauth_client_secret=OAUTH_CLIENT_SECRET)
-    cursor = connection.cursor()
-    cursor.execute(sql)
-
-    sql = """
-        INSERT INTO public.oauth2_provider_accesstoken(
-            token, expires, scope, application_id, user_id, created, updated)
-            VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018');
-    """
-
-    sql = sql.format(token=TOKEN_ADMIN_USER, user_id=1, oauth_client_id=OAUTH_CLIENT_ID, oauth_client_secret=OAUTH_CLIENT_SECRET)
-    cursor = connection.cursor()
-    cursor.execute(sql)
+    se = SearchEngineFactory().create()
+    se.delete_index(index="terms,concepts")
+    se.delete_index(index="resources")
+    se.delete_index(index="resource_relations")
 
 
 def setUpModule():
     # This doesn't appear to be called because ArchesTestCase is never called directly
     # See setUpTestPackage above
     pass
-
-
-def tearDownTestPackage():
-    se = SearchEngineFactory().create()
-    se.delete_index(index="terms,concepts")
-    se.delete_index(index="resources")
-    se.delete_index(index="resource_relations")
 
 
 def tearDownModule():
