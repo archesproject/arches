@@ -288,7 +288,7 @@ class JsonLdReader(Reader):
         for c in cdata:
             cids = [x.value for x in models.Value.objects.all().filter(concept_id__exact=c[0], valuetype__category="identifiers")]
             ids.extend(cids)
-        if value.startswith("http://localhost:8000/"):
+        if value.startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT):
             value = value.rsplit("/", 1)[-1]
         return str(value) in ids
 
