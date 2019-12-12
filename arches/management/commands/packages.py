@@ -440,6 +440,7 @@ class Command(BaseCommand):
                 "extensions/plugins",
                 "graphs/branches",
                 "graphs/resource_models",
+                "ontologies",
                 "map_layers/mapbox_spec_json/overlays",
                 "map_layers/mapbox_spec_json/basemaps",
                 "preliminary_sql",
