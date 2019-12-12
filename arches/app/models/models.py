@@ -1076,7 +1076,6 @@ class UserXNotificationType(models.Model):
 def send_email_on_save(sender, instance, **kwargs):
     """Checks if a notification type needs to send an email, does so if email server exists
     """
-    from pprint import pprint
 
     if instance.notif.notiftype is not None and instance.isread is False:
         if UserXNotificationType.objects.filter(user=instance.recipient, notiftype=instance.notif.notiftype, emailnotify=False).exists():
