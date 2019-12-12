@@ -1,13 +1,34 @@
 from __future__ import absolute_import, unicode_literals
 from celery import shared_task
-from django.core import management
-from django.contrib.auth.models import User
-import datetime
+from datetime import datetime
 import logging
+import os
 from arches.app.models import models
 from arches.app.search.search_export import SearchResultsExporter
 import arches.app.utils.data_management.zip as zip_utils
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core import management
 from django.http import HttpRequest
+
+@shared_task
+def delete_file():
+    now = datetime.timestamp(datetime.now())
+    file_list = []
+    counter = 0
+    with os.scandir(settings.CELERY_SEARCH_EXPORT_DIR) as current_files:
+        for file in current_files:
+            file_stat = os.stat(os.path.join(settings.CELERY_SEARCH_EXPORT_DIR, file))
+            if now-file_stat.st_ctime > settings.CELERY_SEARCH_EXPORT_EXPIRES:
+                file_list.append(file.name)
+    for file in file_list:
+        os.remove(os.path.join(settings.CELERY_SEARCH_EXPORT_DIR,file))
+        counter += 1
+    return "{} files deleted".format(counter)
+
+@shared_task
+def message(arg):
+    return arg
 
 
 @shared_task(bind=True)
@@ -56,7 +77,7 @@ def update_user_task_record(arg_dict={}):
         context = None
     task_obj = models.UserXTask.objects.get(taskid=taskid)
     task_obj.status = "SUCCESS"
-    task_obj.datedone = datetime.datetime.now()
+    task_obj.datedone = datetime.now()
     task_obj.save()
     if msg is None:
         msg = task_obj.status + ": " + task_obj.name
@@ -69,7 +90,7 @@ def log_error(request, exc, traceback, msg=None):
     logger.warn(exc)
     task_obj = models.UserXTask.objects.get(taskid=request.id)
     task_obj.status = "FAILED"
-    task_obj.date_done = datetime.datetime.now()
+    task_obj.date_done = datetime.now()
     task_obj.save()
     if msg is None:
         msg = task_obj.status + ": " + task_obj.name
@@ -79,7 +100,7 @@ def log_error(request, exc, traceback, msg=None):
 def create_user_task_record(taskid, taskname, userid):
     try:
         user = User.objects.get(id=userid)
-        new_task_record = models.UserXTask.objects.create(user=user, taskid=taskid, datestart=datetime.datetime.now(), name=taskname)
+        new_task_record = models.UserXTask.objects.create(user=user, taskid=taskid, datestart=datetime.now(), name=taskname)
     except Exception as e:
         logger = logging.getLogger(__name__)
         logger.warn(e)
