@@ -360,13 +360,11 @@ class EDTFDataType(BaseDataType):
 
         return errors
 
-    
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
         value = data[str(node.pk)]["value"]
 
         return value
-    
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         def add_date_to_doc(document, edtf):
@@ -1050,7 +1048,6 @@ class FileListDataType(BaseDataType):
             data = tile["data"]
         return data
 
-    
     def get_display_value(self, tile, node):
         data = self.get_tile_data(user_is_reviewer=True, tile=tile)
         # if search_export is permission-bound, user_is_reviewer=True should be okay
@@ -1058,11 +1055,10 @@ class FileListDataType(BaseDataType):
         files = data[str(node.pk)]
         file_list_str = ""
         for f in files:
-            file_list_str = file_list_str + f["name"] +"|"
+            file_list_str = file_list_str + f["name"] + "|"
 
         return file_list_str
-    
-    
+
     def handle_request(self, current_tile, request, node):
         previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
         user = request.user
@@ -1071,7 +1067,9 @@ class FileListDataType(BaseDataType):
         user_is_reviewer = request.user.userprofile.is_reviewer()
         current_tile_data = self.get_tile_data(user_is_reviewer=user_is_reviewer, user_id=str(user.id), tile=current_tile)
         if previously_saved_tile.count() == 1:
-            previously_saved_tile_data = self.get_tile_data(user_is_reviewer=user_is_reviewer, user_id=str(user.id), tile=previously_saved_tile[0])
+            previously_saved_tile_data = self.get_tile_data(
+                user_is_reviewer=user_is_reviewer, user_id=str(user.id), tile=previously_saved_tile[0]
+            )
             if previously_saved_tile_data[str(node.pk)] is not None:
                 for previously_saved_file in previously_saved_tile_data[str(node.pk)]:
                     previously_saved_file_has_been_removed = True
