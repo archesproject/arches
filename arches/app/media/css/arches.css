@@ -1287,6 +1287,7 @@ ul.tabbed-report-tab-list {
 .scroll-y {
     height: 100vh;
     overflow-y: auto;
+    background: #fff;
 }
 
 .scroll-y-hidden {
@@ -2357,7 +2358,7 @@ ul.nav.nav-tabs.nav-justified {
 .graph-crm-class,
 .graph-type {
     font-size: 15px;
-    color: #eee;
+    color: #777;
     padding-left: 10px;
 }
 
@@ -2833,21 +2834,28 @@ div.dropdown-menu.open {
 .btn-notifs-download {
     color: #6494cc;
     background-color: transparent;
+    border: 1px solid #ddd;
+    margin-top: 5px;
 }
 
 .btn-notifs-dismiss-all {
     width: 100%;
+    height: 50px;
     color: #fff;
     background-color: #579DDB;
+    border: 1px solid #2A24C2;
 }
 
-.btn-notifs-dismiss-all .disabled {
+.btn-notifs-dismiss-all.disabled {
     background-color: #B0D4F5;
+    color: #6D69D5;
+    border: 1px solid #6D69D5;
 }
 
 .btn-notifs-dismiss-all:hover {
     cursor: pointer;
-    color: #fff
+    color: #fff;
+    background: #3685CB;
 }
 
 #circle {
@@ -4250,11 +4258,11 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .profile-report {
-    height: 250px;
-    background: #f2f2f2;
+    height: 150px;
+    background: #A43741;
     width: 100%;
     padding: 40px 150px 0px 150px;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #520008;
 }
 
 .profile-list {
@@ -4273,10 +4281,37 @@ div.profile-notif-settings {
     padding-top: 12px;
 }
 
+.notif-table {
+    width: 100%;
+    margin-top: -40px;
+}
+
+.notif-table th {
+    font-size: 1.05em;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+    color: #4d627b;
+}
+
+th.notif-type {
+    width: 150px;
+}
+
+.widget-input-label-notif {
+    padding-left: 20px;
+    font-size: 12px;
+    margin-top: 2px;
+    font-weight: 500;
+    color: #666;
+}
+
+.widget-input-label-notif .arches-switch {
+    margin-right: 5px;
+}
+
 .profile-notif-settings td {
-    border: 1px solid gray;
-    font-size: 18px;
-    padding: 4px 6px 4px 6px;
+    padding: 8px 10px;
+    color: #666;
 }
 
 .profile-notif-settings th {
@@ -4295,7 +4330,7 @@ div.profile-notif-settings {
     position: absolute;
     color: #fff;
     font-size: 2.6em;
-    top: 140px;
+    top: 35px;
     left: 100px;
 }
 
@@ -4303,9 +4338,9 @@ div.profile-notif-settings {
     position: absolute;
     color: #fff;
     font-size: 16px;
-    top: 180px;
+    top: 80px;
     left: 100px;
-    color: #aaa;
+    color: #ddd;
     font-weight: 500;
 }
 
@@ -4411,7 +4446,7 @@ div.profile-notif-settings {
 
 .project-search-widget {
     position: absolute;
-    top: -45px;
+    top: -40px;
     width: 250px;
 }
 
@@ -4543,7 +4578,7 @@ div.profile-notif-settings {
 }
 
 .ep-tools:hover {
-    background: #f8f8f8;
+    background: #f2f2f2;
     border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
 }
@@ -4573,7 +4608,9 @@ div.profile-notif-settings {
 
 .ep-tools-right {
     border-right: none;
+    border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
+    background: #fafafa;
     font-size: 17px;
     padding-left: 16px;
     padding-right: 20px;
@@ -5098,6 +5135,22 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     background-color: #fcfcfc;
 }
 
+.ep-notifs-close {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    font-size: 17px;
+}
+
+.entry .ep-notifs-close {
+    right: -10px;
+}
+
+.ep-notifs-close:hover {
+    color: #1B3974;
+}
+
+
 .ep-edits-body.provisional-edit-history {
     overflow: visible;
 }
@@ -5122,7 +5175,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .new-provisional-edit-history:hover, .notifications-container:hover {
-    background-color: #f0f0f0;
+    background-color: #fff;
 }
 
 .new-provisional-edit-history .entry, .notifications-container .entry {
@@ -9504,7 +9557,7 @@ a.filter-tools:hover {
 }
 
 .account-wrapper {
-    padding-top: 20px;
+    padding-top: 0px;
 }
 
 .msm-data-selection .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn) {

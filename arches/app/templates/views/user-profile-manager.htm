@@ -21,29 +21,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <!-- Main Editor -->
     <div id="">
 
-        <!-- Title Bar -->
-        <div id="" class="relative fade in" style="display: block;">
-
-            <!-- Title Block -->
-            <div class="profile-toolbar">
-                <h4 class="report-toolbar-title">{% trans 'My Account' %}</h4>
-            </div>
-        </div>
-
         <!-- Profile Summary -->
         <div class="profile-summary-page">
 
             <div class="profile-report relative">
 
-                <!-- Profile Top Panel Image -->
+                <!-- Profile Top Panel Image 
                 <img class="widget-bg img-responsive" src='{{ STATIC_URL }}img/user/profile_background.png'>
+                -->
 
                 <div class="">
                     <div class="profile-full-name">
-                        {{user.first_name}}
+                        {{user.first_name}} {{user.last_name}}
                     </div>
                     <div class="profile-e-mail">
-                        {{user.username}}
+                        User name: {{user.username}}
                     </div>
                 </div>
             </div>
@@ -292,46 +284,49 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class="profile-header">
                             {% trans 'Notification Settings' %}
                         </div>
-                        <div class="profile-notif-settings">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>{% trans 'Trigger' %}</th>
-                                        <th>{% trans 'Email Notification' %}</th>
-                                        <th>{% trans 'Web Notification' %}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- ko foreach: notifTypeObservables -->
-                                    <tr>
-                                        <td data-bind="text:name"></td>
-                                        <td>
-                                            <label class="control-label widget-input-label">
-                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': emailnotify()}, click: function(){emailnotify(!emailnotify())}"><small></small></span>
-                                            </label>
-                                        </td>
-                                        <td>
-                                            <label class="control-label widget-input-label">
-                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': webnotify()}, click: function(){webnotify(!webnotify())}"><small></small></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                    <!-- <tr>
-                                        <td>{% trans 'Exporting Search Results' %}</td>
-                                        <td>
-                                            <label class="control-label widget-input-label">
-                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportEmailNotifs()}, click: function(){toggleSearchExportEmailNotifs(!toggleSearchExportEmailNotifs())}"><small></small></span>
-                                            </label>
-                                        </td>
-                                        <td>
-                                            <label class="control-label widget-input-label">
-                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportWebNotifs()}, click: function(){toggleSearchExportWebNotifs(!toggleSearchExportWebNotifs())}"><small></small></span>
-                                            </label>
-                                        </td>
-                                    </tr> -->
-                                    <!-- /ko -->
-                                </tbody>
-                            </table>
+
+                        <div class="row">
+                            <div class="col-sm-9 col-sm-offset-3 profile-notif-settings">
+                                <table class="notif-table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>{% trans 'Trigger' %}</th>
+                                            <th class="notif-type">{% trans 'Email Notification' %}</th>
+                                            <th class="notif-type">{% trans 'Web Notification' %}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- ko foreach: notifTypeObservables -->
+                                        <tr>
+                                            <td data-bind="text:name"></td>
+                                            <td>
+                                                <label class="control-label widget-input-label-notif">
+                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': emailnotify()}, click: function(){emailnotify(!emailnotify())}"><small></small></span>{% trans 'Enable' %}
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <label class="control-label widget-input-label-notif">
+                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': webnotify()}, click: function(){webnotify(!webnotify())}"><small></small></span>{% trans 'Enable' %}
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <!-- <tr>
+                                            <td>{% trans 'Exporting Search Results' %}</td>
+                                            <td>
+                                                <label class="control-label widget-input-label">
+                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportEmailNotifs()}, click: function(){toggleSearchExportEmailNotifs(!toggleSearchExportEmailNotifs())}"><small></small></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <label class="control-label widget-input-label">
+                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportWebNotifs()}, click: function(){toggleSearchExportWebNotifs(!toggleSearchExportWebNotifs())}"><small></small></span>
+                                                </label>
+                                            </td>
+                                        </tr> -->
+                                        <!-- /ko -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </section>
