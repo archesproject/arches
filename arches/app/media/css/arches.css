@@ -1287,6 +1287,7 @@ ul.tabbed-report-tab-list {
 .scroll-y {
     height: 100vh;
     overflow-y: auto;
+    background: #fff;
 }
 
 .scroll-y-hidden {
@@ -4257,11 +4258,11 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .profile-report {
-    height: 250px;
-    background: #f2f2f2;
+    height: 150px;
+    background: #A43741;
     width: 100%;
     padding: 40px 150px 0px 150px;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #520008;
 }
 
 .profile-list {
@@ -4297,7 +4298,7 @@ th.notif-type {
 }
 
 .widget-input-label-notif {
-    padding-left: 30px;
+    padding-left: 20px;
     font-size: 12px;
     margin-top: 2px;
     font-weight: 500;
@@ -4329,7 +4330,7 @@ th.notif-type {
     position: absolute;
     color: #fff;
     font-size: 2.6em;
-    top: 140px;
+    top: 35px;
     left: 100px;
 }
 
@@ -4337,9 +4338,9 @@ th.notif-type {
     position: absolute;
     color: #fff;
     font-size: 16px;
-    top: 180px;
+    top: 80px;
     left: 100px;
-    color: #aaa;
+    color: #ddd;
     font-weight: 500;
 }
 
@@ -9556,7 +9557,7 @@ a.filter-tools:hover {
 }
 
 .account-wrapper {
-    padding-top: 20px;
+    padding-top: 0px;
 }
 
 .msm-data-selection .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn) {

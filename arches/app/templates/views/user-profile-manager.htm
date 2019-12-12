@@ -21,29 +21,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <!-- Main Editor -->
     <div id="">
 
-        <!-- Title Bar -->
-        <div id="" class="relative fade in" style="display: block;">
-
-            <!-- Title Block -->
-            <div class="profile-toolbar">
-                <h4 class="report-toolbar-title">{% trans 'My Account' %}</h4>
-            </div>
-        </div>
+        
 
         <!-- Profile Summary -->
         <div class="profile-summary-page">
 
             <div class="profile-report relative">
 
-                <!-- Profile Top Panel Image -->
+                <!-- Profile Top Panel Image 
                 <img class="widget-bg img-responsive" src='{{ STATIC_URL }}img/user/profile_background.png'>
+                -->
 
                 <div class="">
                     <div class="profile-full-name">
-                        {{user.first_name}}
+                        {{user.first_name}} {{user.last_name}}
                     </div>
                     <div class="profile-e-mail">
-                        {{user.username}}
+                        User name: {{user.username}}
                     </div>
                 </div>
             </div>
