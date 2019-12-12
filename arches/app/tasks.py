@@ -3,13 +3,13 @@ from celery import shared_task
 from datetime import datetime
 import logging
 import os
-from arches.app.models import models
-from arches.app.search.search_export import SearchResultsExporter
-import arches.app.utils.data_management.zip as zip_utils
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import management
 from django.http import HttpRequest
+from arches.app.models import models
+from arches.app.search.search_export import SearchResultsExporter
+import arches.app.utils.data_management.zip as zip_utils
 
 
 @shared_task
@@ -25,7 +25,7 @@ def delete_file():
     for file in file_list:
         os.remove(os.path.join(settings.CELERY_SEARCH_EXPORT_DIR, file))
         counter += 1
-    return "{} files deleted".format(counter)
+    return f"{counter} files deleted"
 
 
 @shared_task
