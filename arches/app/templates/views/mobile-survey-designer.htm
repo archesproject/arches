@@ -370,6 +370,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     node: null,
                                     value: mobilesurvey.bounds,
                                     state: 'form',
+                                    tile: {
+                                        data: {
+                                            surveyextent: mobilesurvey.bounds
+                                        }
+                                    },
+                                    widget: {
+                                        node_id: ko.observable('surveyextent'),
+                                        config:{
+                                            geometryTypes: [{'id':'Polygon','text':'Polygon'}]
+                                        }
+                                    },
                                     config: {
                                         basemap: basemap.name,
                                         bearing: 0,

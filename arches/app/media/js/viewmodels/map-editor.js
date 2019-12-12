@@ -76,7 +76,7 @@ define([
         };
 
         self.widgets.forEach(function(widget) {
-            var id = widget.node_id();
+            var id = ko.unwrap(widget.node_id);
             self.featureLookup[id] = {
                 features: ko.computed(function() {
                     var value = koMapping.toJS(self.tile.data[id]);
@@ -122,7 +122,7 @@ define([
                 value.selectedTool(null);
             });
             self.widgets.forEach(function(widget) {
-                var id = widget.node_id();
+                var id = ko.unwrap(widget.node_id);
                 var features = [];
                 featureCollection.features.forEach(function(feature){
                     if (feature.properties.nodeId === id) features.push(feature);
@@ -141,7 +141,7 @@ define([
         var getDrawFeatures = function() {
             var drawFeatures = [];
             self.widgets.forEach(function(widget) {
-                var id = widget.node_id();
+                var id = ko.unwrap(widget.node_id);
                 var featureCollection = koMapping.toJS(self.tile.data[id]);
                 if (featureCollection) {
                     featureCollection.features.forEach(function(feature) {
@@ -399,7 +399,7 @@ define([
                 self.setSelectLayersVisibility(false);
             });
 
-            self.form.on('tile-reset', function() {
+            if (self.form) self.form.on('tile-reset', function() {
                 var style = self.map().getStyle();
                 if (style) {
                     self.draw.set({
@@ -426,24 +426,26 @@ define([
                         value: '',
                         text: ''
                     }];
-                    options = options.concat(widget.config.geometryTypes().map(function(type) {
-                        var option = {};
-                        switch (ko.unwrap(type.id)) {
-                        case 'Point':
-                            option.value = 'draw_point';
-                            option.text = 'Add point';
-                            break;
-                        case 'Line':
-                            option.value = 'draw_line_string';
-                            option.text = 'Add line';
-                            break;
-                        case 'Polygon':
-                            option.value = 'draw_polygon';
-                            option.text = 'Add polygon';
-                            break;
-                        }
-                        return option;
-                    }));
+                    options = options.concat(
+                        ko.unwrap(widget.config.geometryTypes).map(function(type) {
+                            var option = {};
+                            switch (ko.unwrap(type.id)) {
+                            case 'Point':
+                                option.value = 'draw_point';
+                                option.text = 'Add point';
+                                break;
+                            case 'Line':
+                                option.value = 'draw_line_string';
+                                option.text = 'Add line';
+                                break;
+                            case 'Polygon':
+                                option.value = 'draw_polygon';
+                                option.text = 'Add polygon';
+                                break;
+                            }
+                            return option;
+                        })
+                    );
                     if (self.selectSource()) {
                         options.push({
                             value: "select_feature",

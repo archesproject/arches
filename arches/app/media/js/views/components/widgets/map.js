@@ -19,6 +19,11 @@ define([
     var viewModel = function(params) {
         this.context = params.type;
         this.summaryDetails = [];
+        this.zoomConfigOpen = ko.observable(false);
+        this.positionConfigOpen = ko.observable(false);
+        this.geocoderConfigOpen = ko.observable(false);
+        this.resourcePropertiesConfigOpen = ko.observable(false);
+        this.defaultValueConfigOpen = ko.observable(false);
         this.geocodingProviders = arches.geocodingProviders;
         this.defaultValueOptions = [
             {
@@ -66,7 +71,8 @@ define([
 
         this.geometryTypeList = ko.computed({
             read: function() {
-                return this.geometryTypes().map(function(type) {
+                var geometryTypes = this.geometryTypes() || [];
+                return geometryTypes.map(function(type) {
                     return ko.unwrap(type.id);
                 });
             },
