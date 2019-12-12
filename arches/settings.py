@@ -548,7 +548,6 @@ CELERY_SEARCH_EXPORT_EXPIRES = 24 * 3600  # seconds
 CELERY_SEARCH_EXPORT_CHECK = 3600  # seconds
 
 CELERY_BEAT_SCHEDULE = {
-<<<<<<< HEAD
     'delete-expired-search-export': {
         'task': 'arches.app.tasks.delete_file',
         'schedule': CELERY_SEARCH_EXPORT_CHECK,
@@ -558,10 +557,6 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': CELERY_SEARCH_EXPORT_CHECK,
         'args': ('Celery Beat is Running', ),
     },
-=======
-    "delete-expired-search-export": {"task": "arches.app.tasks.delete_file", "schedule": CELERY_SEARCH_EXPORT_CHECK,},
-    "notification": {"task": "arches.app.tasks.message", "schedule": CELERY_SEARCH_EXPORT_CHECK, "args": ("Celery Beat is Running",),},
->>>>>>> e9df0644805bb867291bb6f9e416fd59dfddc0a8
 }
 
 AUTO_REFRESH_GEOM_VIEW = True
