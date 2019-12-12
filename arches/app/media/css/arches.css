@@ -2357,7 +2357,7 @@ ul.nav.nav-tabs.nav-justified {
 .graph-crm-class,
 .graph-type {
     font-size: 15px;
-    color: #eee;
+    color: #777;
     padding-left: 10px;
 }
 
@@ -2837,17 +2837,22 @@ div.dropdown-menu.open {
 
 .btn-notifs-dismiss-all {
     width: 100%;
+    height: 50px;
     color: #fff;
     background-color: #579DDB;
+    border: 1px solid #2A24C2;
 }
 
-.btn-notifs-dismiss-all .disabled {
+.btn-notifs-dismiss-all.disabled {
     background-color: #B0D4F5;
+    color: #6D69D5;
+    border: 1px solid #6D69D5;
 }
 
 .btn-notifs-dismiss-all:hover {
     cursor: pointer;
-    color: #fff
+    color: #fff;
+    background: #3685CB;
 }
 
 #circle {
@@ -5122,7 +5127,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .new-provisional-edit-history:hover, .notifications-container:hover {
-    background-color: #f0f0f0;
+    background-color: #fff;
 }
 
 .new-provisional-edit-history .entry, .notifications-container .entry {
