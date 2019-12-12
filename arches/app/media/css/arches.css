@@ -2833,6 +2833,8 @@ div.dropdown-menu.open {
 .btn-notifs-download {
     color: #6494cc;
     background-color: transparent;
+    border: 1px solid #ddd;
+    margin-top: 5px;
 }
 
 .btn-notifs-dismiss-all {
@@ -4548,7 +4550,7 @@ div.profile-notif-settings {
 }
 
 .ep-tools:hover {
-    background: #f8f8f8;
+    background: #f2f2f2;
     border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
 }
@@ -4578,7 +4580,9 @@ div.profile-notif-settings {
 
 .ep-tools-right {
     border-right: none;
+    border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
+    background: #fafafa;
     font-size: 17px;
     padding-left: 16px;
     padding-right: 20px;
@@ -5102,6 +5106,18 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     padding: 8px 25px 15px 25px;
     background-color: #fcfcfc;
 }
+
+.ep-notifs-close {
+    position: absolute;
+    top: 0px;
+    right: -10px;
+    font-size: 17px;
+}
+
+.ep-notifs-close:hover {
+    color: #1B3974;
+}
+
 
 .ep-edits-body.provisional-edit-history {
     overflow: visible;

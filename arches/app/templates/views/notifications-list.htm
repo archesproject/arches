@@ -31,19 +31,18 @@
             {% block listitem %}
 
             <div>
-                <div class='entry'><i data-bind="" style="padding-right: 4px"></i>
-                    <div class='entry-label'>{% trans 'Received at: ' %}</div>
+                <div class='entry'><i data-bind=""></i>
+                    <div class='entry-label'>{% trans 'Message: ' %}</div>
                     <span data-bind="text: $data.displaytime" ></span>
                 </div>
 
                 <div class='entry'>
-                    <div class='entry-label'>{% trans 'Message text: ' %}</div>
                     <div data-bind="html: $data.message"></div>
                 </div>
             </div>
 
-            <div class='entry'>
-                <a href="javascript:void(0);" data-bind="click: function(){$parent.dismiss($data.id);}" class="ep-notifs-toggle ep-notifs-close ep-tools ep-tools-right" style="border:none;">
+            <div class='entry relative'>
+                <a href="javascript:void(0);" data-bind="click: function(){$parent.dismiss($data.id);}" class="ep-notifs-toggle ep-notifs-close">
                     <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Dismiss" %}'>
                         <i class="fa fa-times-circle fa-sm"></i>
                     </div>
