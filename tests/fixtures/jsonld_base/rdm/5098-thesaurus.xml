@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+>
+  <skos:Concept rdf:about="http://localhost:8000/c3c4b8a8-39bb-41e7-af45-3a0c60fa4ddf">
+    <skos:inScheme>
+      <skos:ConceptScheme rdf:about="http://localhost:8000/77d9d36e-054a-47a3-96c0-4165872a2d5d">
+        <dcterms:title xml:lang="en-us">{"id": "d5123af1-9972-49c7-b365-aa503d8aec1d", "value": "Test Thesaurus"}</dcterms:title>
+        <skos:hasTopConcept rdf:resource="http://localhost:8000/467f6269-1f04-410e-b4f6-5a46a1ed0bf8"/>
+      </skos:ConceptScheme>
+    </skos:inScheme>
+    <skos:prefLabel xml:lang="en-us">{"id": "9a94ce98-4d76-4405-89df-b9ddeaddfae1", "value": "Concept 2"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/467f6269-1f04-410e-b4f6-5a46a1ed0bf8">
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/83791203-b82e-4e73-9f86-72c98c9d2b60">
+        <skos:narrower rdf:resource="http://localhost:8000/0bb450bc-8fe3-46cb-968e-2b56849e6e96"/>
+        <skos:inScheme rdf:resource="http://localhost:8000/77d9d36e-054a-47a3-96c0-4165872a2d5d"/>
+        <skos:narrower rdf:resource="http://localhost:8000/c3c4b8a8-39bb-41e7-af45-3a0c60fa4ddf"/>
+        <skos:prefLabel xml:lang="en-us">{"id": "3300a2fc-625d-4fcb-b5f0-e31493317d46", "value": "5098 Concepts"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:prefLabel xml:lang="en-us">{"id": "6ccd7838-38ee-4e69-904e-9ba6da7f200f", "value": "Top"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://localhost:8000/77d9d36e-054a-47a3-96c0-4165872a2d5d"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/0bb450bc-8fe3-46cb-968e-2b56849e6e96">
+    <skos:inScheme rdf:resource="http://localhost:8000/77d9d36e-054a-47a3-96c0-4165872a2d5d"/>
+    <skos:prefLabel xml:lang="en-us">{"id": "ac1d498c-9c61-4573-bfe8-1653641c028a", "value": "Concept 1"}</skos:prefLabel>
+  </skos:Concept>
+</rdf:RDF>

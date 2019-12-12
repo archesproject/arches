@@ -148,44 +148,26 @@ class ConceptDataType(BaseConceptDataType):
         except KeyError as e:
             pass
 
+    def get_rdf_uri(self, node, data, which="r"):
+        if not data:
+            return None
+        c = ConceptValue(str(data))
+        assert c.value is not None, "Null or blank concept value"
+        ext_ids = [
+            ident.value for ident in models.Value.objects.all().filter(concept_id__exact=c.conceptid, valuetype__category="identifiers")
+        ]
+        for id_uri in ext_ids:
+            if str(id_uri).startswith(settings.PREFERRED_CONCEPT_SCHEME):
+                return URIRef(id_uri)
+        return URIRef(archesproject[f"concepts/{c.conceptid}"])
+
     def to_rdf(self, edge_info, edge):
         g = Graph()
-        # logic: No data -> empty graph
-        #        concept_id, but no value -> node linked to class of Concept, no label
-        #        value but no concept_id -> node linked to BNode, labelled
-        #        concept_id + value -> normal expected functionality
-
-        def get_rangenode(arches_uri, ext_ids):
-            rangenode = arches_uri
-
-            for id_uri in ext_ids:
-                if str(id_uri).startswith(settings.PREFERRED_CONCEPT_SCHEME):
-                    rangenode = URIRef(id_uri)
-            return rangenode
-
-        if edge_info["range_tile_data"] is not None:
+        if edge_info["r_uri"] == self.get_rdf_uri(None, edge_info["range_tile_data"]):
             c = ConceptValue(str(edge_info["range_tile_data"]))
-
-            # create a default node
-            arches_uri = BNode()
-            ext_idents = []
-            # Use the conceptid URI rather than the pk for the ConceptValue
-            if c.conceptid is not None:
-                arches_uri = URIRef(archesproject["concepts/%s" % c.conceptid])
-
-                # get other identifiers:
-                ext_idents = [
-                    ident.value
-                    for ident in models.Value.objects.all().filter(concept_id__exact=c.conceptid, valuetype__category="identifiers")
-                ]
-            rangenode = get_rangenode(arches_uri, ext_idents)
-
-            g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
-            g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), rangenode))
-
-            assert c.value is not None, "Null or blank concept value"
-            g.add((rangenode, URIRef(RDFS.label), Literal(c.value)))
-
+            g.add((edge_info["r_uri"], RDF.type, URIRef(edge.rangenode.ontologyclass)))
+            g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), edge_info["r_uri"]))
+            g.add((edge_info["r_uri"], URIRef(RDFS.label), Literal(c.value)))
         return g
 
     def from_rdf(self, json_ld_node):
@@ -270,6 +252,9 @@ class ConceptDataType(BaseConceptDataType):
             # amongst the current Arches ConceptValues
             pass
 
+    def ignore_keys(self):
+        return ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]
+
 
 class ConceptListDataType(BaseConceptDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
@@ -319,6 +304,13 @@ class ConceptListDataType(BaseConceptDataType):
         except KeyError as e:
             pass
 
+    def get_rdf_uri(self, node, data, which="r"):
+        c = ConceptDataType()
+        if not data:
+            print(f"concept-list got data without values: {node}, {data}")
+            return []
+        return [c.get_rdf_uri(node, d, which) for d in data]
+
     def to_rdf(self, edge_info, edge):
         g = Graph()
         c = ConceptDataType()
@@ -336,3 +328,9 @@ class ConceptListDataType(BaseConceptDataType):
             return [ctype.from_rdf(item) for item in json_ld_node]
         else:
             return [ctype.from_rdf(json_ld_node)]
+
+    def collects_multiple_values(self):
+        return True
+
+    def ignore_keys(self):
+        return ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]

@@ -169,7 +169,7 @@ class SearchResultsExporter(object):
         csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=headers)
         csvwriter.writeheader()
         # csvs_for_export.append({"name": csv_name, "outputfile": dest})
-        print(f"{name} = {len(instances)}")
+        # print(f"{name} = {len(instances)}")
         for instance in instances:
             csvwriter.writerow({k: str(v) for k, v in list(instance.items())})
         return {"name": f"{name}.csv", "outputfile": dest}

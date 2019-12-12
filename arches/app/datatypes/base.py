@@ -204,6 +204,11 @@ class BaseDataType(object):
         """
         return False
 
+    def get_rdf_uri(self, node, data, which="r"):
+        if self.is_a_literal_in_rdf():
+            return None
+        return node
+
     def to_rdf(self, edge_info, edge):
         """
         Outputs an in-memory graph, converting the range tile data JSON into
@@ -233,5 +238,23 @@ class BaseDataType(object):
         return g
 
     def from_rdf(self, json_ld_node):
-        print(json_ld_node)
         raise NotImplementedError
+
+    def collects_multiple_values(self):
+        """
+        Data type that can collect multiple values at once like DomainListDataType, etc...
+        """
+
+        return False
+
+    def ignore_keys(self):
+        """
+        Each entry returned in the array is a string, consisting of the combination of two full URIs 
+        separated by a space -- the first is the URI of the property in the ontology, 
+        and the second is the class of the value of the property. 
+        When this key is encountered in incoming data, it will be ignored. 
+        This is useful for either when the data is handled internally by the datatype, 
+        or when the incoming data has annotations that should not be persisted.
+        """
+
+        return []
