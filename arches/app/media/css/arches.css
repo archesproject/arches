@@ -4280,10 +4280,37 @@ div.profile-notif-settings {
     padding-top: 12px;
 }
 
+.notif-table {
+    width: 100%;
+    margin-top: -40px;
+}
+
+.notif-table th {
+    font-size: 1.05em;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+    color: #4d627b;
+}
+
+th.notif-type {
+    width: 150px;
+}
+
+.widget-input-label-notif {
+    padding-left: 30px;
+    font-size: 12px;
+    margin-top: 2px;
+    font-weight: 500;
+    color: #666;
+}
+
+.widget-input-label-notif .arches-switch {
+    margin-right: 5px;
+}
+
 .profile-notif-settings td {
-    border: 1px solid gray;
-    font-size: 18px;
-    padding: 4px 6px 4px 6px;
+    padding: 8px 10px;
+    color: #666;
 }
 
 .profile-notif-settings th {
@@ -4418,7 +4445,7 @@ div.profile-notif-settings {
 
 .project-search-widget {
     position: absolute;
-    top: -45px;
+    top: -40px;
     width: 250px;
 }
 
@@ -5110,8 +5137,12 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .ep-notifs-close {
     position: absolute;
     top: 0px;
-    right: -10px;
+    right: 0px;
     font-size: 17px;
+}
+
+.entry .ep-notifs-close {
+    right: -10px;
 }
 
 .ep-notifs-close:hover {
