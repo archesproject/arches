@@ -1318,22 +1318,21 @@ class Graph(models.GraphModel):
         # validate that nodes have a datatype assigned to them
         # validate that node.fieldnames are unique and not blank
 
-        def validate_fieldname(fieldname, fieldnames, datatype):
-            if datatype == "geojson-feature-collection":
-                if node.fieldname == "":
-                    raise GraphValidationError(_("Field Name must not be blank for geometry nodes."), 1008)
-                if len(fieldname) > 10:
-                    fieldname = fieldname[:10]
-                chars = set("`~!@#$%^&*()-+=[{]}\|;:<,>./?")
-                if any((c in chars) for c in fieldname):
-                    raise GraphValidationError(_("Field Name must contain only alpha-numeric characters or underscores."), 1010)
-                if fieldname[0] == "_" or fieldname[0].isdigit():
-                    raise GraphValidationError(_("Field Name must begin with alphabet letter"), 1011)
-                try:
-                    dupe = fieldnames[fieldname]
-                    raise GraphValidationError(_("Field Name must be unique to the graph."), 1009)
-                except KeyError as e:
-                    fieldnames[fieldname] = True
+        def validate_fieldname(fieldname, fieldnames):
+            chars = set("`~!@#$%^&*()-+=[{]}\|;:<,>./?")
+            if node.fieldname == "":
+                raise GraphValidationError(_("Field Name must not be blank."), 1008)
+            if any((c in chars) for c in fieldname):
+                raise GraphValidationError(_("Field Name must contain only alpha-numeric characters or underscores."), 1010)
+            if fieldname[0] == "_" or fieldname[0].isdigit():
+                raise GraphValidationError(_("Field Name must begin with alphabet letter"), 1011)
+            if len(fieldname) > 10:
+                fieldname = fieldname[:10]
+            try:
+                dupe = fieldnames[fieldname]
+                raise GraphValidationError(_("Field Name must be unique to the graph."), 1009)
+            except KeyError as e:
+                fieldnames[fieldname] = True
 
             return True
 
