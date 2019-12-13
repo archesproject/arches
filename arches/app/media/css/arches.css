@@ -1287,7 +1287,6 @@ ul.tabbed-report-tab-list {
 .scroll-y {
     height: 100vh;
     overflow-y: auto;
-    background: #fff;
 }
 
 .scroll-y-hidden {
@@ -2861,11 +2860,23 @@ div.dropdown-menu.open {
 #circle {
     width: 8px;
     height: 8px;
-    background: red;
+    background: #55AA55;
     border-radius: 50%;
     z-index: 10;
     position: absolute;
   }
+
+#circle-outline {
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    border: 1px solid #6E7F93;
+    border-radius: 50%;
+    z-index: 9;
+    position: absolute;
+    margin-left: -2px;
+    margin-top: -2px;
+}
 
 .ep-edits-header {
     display: inline-flex;
@@ -4578,9 +4589,13 @@ th.notif-type {
 }
 
 .ep-tools:hover {
-    background: #f2f2f2;
+    background: #fff;
     border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
+}
+
+.ep-tools .fa-bell {
+    color: #6E7F93;
 }
 
 .navbar-top-links>li>a.navbar-button {
