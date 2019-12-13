@@ -945,6 +945,7 @@ class MapLayer(models.Model):
     centery = models.FloatField(blank=True, null=True)
     zoom = models.FloatField(blank=True, null=True)
     legend = models.TextField(blank=True, null=True)
+    searchonly = models.BooleanField(default=False)
 
     @property
     def layer_json(self):
@@ -1017,6 +1018,7 @@ class NotificationType(models.Model):
     """
     Creates a 'type' of notification that would be associated with a specific trigger, e.g. Search Export Complete or Consultation Complete
     """
+
     typeid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     name = models.TextField(blank=True, null=True)
     emailtemplate = models.TextField(blank=True, null=True)
@@ -1033,7 +1035,7 @@ class Notification(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     # created.editable = True
     message = models.TextField(blank=True, null=True)
-    context = JSONField(blank=True, null=True, default=dict())
+    context = JSONField(blank=True, null=True, default=dict)
     # TODO: Ideally validate context against a list of keys from NotificationType
     notiftype = models.ForeignKey(NotificationType, on_delete=models.CASCADE, null=True)
 
@@ -1046,6 +1048,7 @@ class UserXNotification(models.Model):
     """
     1 Notification instance (and its optional 1 NotificationType instance) can spawn N UserXNotification instances
     """
+
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     notif = models.ForeignKey(Notification, on_delete=models.CASCADE)
     isread = models.BooleanField(default=False)
@@ -1061,6 +1064,7 @@ class UserXNotificationType(models.Model):
     Creates a user-setting to override existing default notification settings (emailnotify, webnotify, etc.)
     for specific a NotificationType instance
     """
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     notiftype = models.ForeignKey(NotificationType, on_delete=models.CASCADE)
