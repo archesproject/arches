@@ -41,6 +41,7 @@ define([
         layer.name = ko.observable(layer.name);
         layer.icon = ko.observable(layer.icon);
         layer.legend = ko.observable(layer.legend);
+        layer.searchonly = ko.observable(layer.searchonly);
         layer.centerX = ko.observable(layer.centerx);
         layer.centerY = ko.observable(layer.centery);
         layer.zoom = ko.observable(layer.zoom);
@@ -59,6 +60,7 @@ define([
                 "isoverlay": layer.isoverlay,
                 "icon": layer.icon(),
                 "legend": layer.legend(),
+                "searchonly": layer.searchonly(),
                 "activated": layer.activated(),
                 "addtomap": layer.addtomap(),
                 "is_resource_layer": false,
@@ -112,6 +114,7 @@ define([
             layer.centerY(_layer.centery);
             layer.zoom(_layer.zoom);
             layer.legend(_layer.legend);
+            layer.searchonly(_layer.searchonly);
         };
         layer.delete = function() {
             pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmMaplayerDelete.title, arches.confirmMaplayerDelete.text, function() {

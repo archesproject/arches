@@ -86,6 +86,8 @@ define([
                     ]
                 );
 
+                options.search = true;
+
                 MapComponentViewModel.apply(this, [options]);
 
                 this.updateLayers = function(layers) {
@@ -319,7 +321,7 @@ define([
                 this.map.subscribe(function(){
                     this.setupDraw();
                     this.restoreState();
-                    
+
                     var filterUpdated = ko.computed(function() {
                         return JSON.stringify(ko.toJS(this.filter.feature_collection())) + this.filter.inverted();
                     }, this);
