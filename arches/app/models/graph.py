@@ -1315,9 +1315,6 @@ class Graph(models.GraphModel):
                         _("If your graph contains more than one node and is not a resource the root must be a collector."), 999
                     )
 
-        # validate that nodes have a datatype assigned to them
-        # validate that node.fieldnames are unique and not blank
-
         def validate_fieldname(fieldname, fieldnames):
             chars = set("`~!@#$%^&*()-+=[{]}\|;:<,>./?")
             if node.fieldname == "":
@@ -1334,14 +1331,17 @@ class Graph(models.GraphModel):
             except KeyError as e:
                 fieldnames[fieldname] = True
 
-            return True
+            return fieldname
 
         fieldnames = {}
         for node_id, node in self.nodes.items():
             if node.datatype == "":
                 raise GraphValidationError(_("A valid node datatype must be selected"), 1007)
             if node.exportable is True:
-                validate_fieldname(node.fieldname, fieldnames, node.datatype)
+                validated_fieldname = validate_fieldname(node.fieldname, fieldnames, node.datatype)
+                if validated_fieldname != node.fieldname:
+                    node.fieldname = validated_fieldname
+                    node.save()
 
         # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
         if self.ontology is not None:
