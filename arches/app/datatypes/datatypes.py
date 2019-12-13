@@ -361,6 +361,12 @@ class EDTFDataType(BaseDataType):
 
         return errors
 
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(tile)
+        value = data[str(node.pk)]["value"]
+
+        return value
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         def add_date_to_doc(document, edtf):
             if edtf.lower == edtf.upper:
@@ -1036,12 +1042,23 @@ class FileListDataType(BaseDataType):
             errors.append({"type": "ERROR", "message": f"datatype: {dt}, value: {value} - {e} ."})
         return errors
 
-    def get_tile_data(self, user_is_reviewer, user_id, tile):
+    def get_tile_data(self, user_is_reviewer=False, user_id=None, tile=None):
         if user_is_reviewer is False and tile.provisionaledits is not None and user_id in tile.provisionaledits:
             data = tile.provisionaledits[user_id]["value"]
         else:
             data = tile.data
         return data
+
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(user_is_reviewer=True, tile=tile)
+        # if search_export is permission-bound, user_is_reviewer=True should be okay
+        # else, search_export would circumvent permissions
+        files = data[str(node.pk)]
+        file_list_str = ""
+        for f in files:
+            file_list_str = file_list_str + f["name"] + "|"
+
+        return file_list_str
 
     def handle_request(self, current_tile, request, node):
         previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
@@ -1049,9 +1066,11 @@ class FileListDataType(BaseDataType):
         if hasattr(request.user, "userprofile") is not True:
             models.UserProfile.objects.create(user=request.user)
         user_is_reviewer = user_is_resource_reviewer(request.user)
-        current_tile_data = self.get_tile_data(user_is_reviewer, str(user.id), current_tile)
+        current_tile_data = self.get_tile_data(user_is_reviewer=user_is_reviewer, user_id=str(user.id), tile=current_tile)
         if previously_saved_tile.count() == 1:
-            previously_saved_tile_data = self.get_tile_data(user_is_reviewer, str(user.id), previously_saved_tile[0])
+            previously_saved_tile_data = self.get_tile_data(
+                user_is_reviewer=user_is_reviewer, user_id=str(user.id), tile=previously_saved_tile[0]
+            )
             if previously_saved_tile_data[str(node.pk)] is not None:
                 for previously_saved_file in previously_saved_tile_data[str(node.pk)]:
                     previously_saved_file_has_been_removed = True
@@ -1254,6 +1273,9 @@ class FileListDataType(BaseDataType):
             pass
         return node_value
 
+    def collects_multiple_values(self):
+        return True
+
 
 class BaseDomainDataType(BaseDataType):
     def get_option_text(self, node, option_id):
@@ -1267,22 +1289,42 @@ class BaseDomainDataType(BaseDataType):
         for dnode in models.Node.objects.filter(config__contains={"options": [{"text": value}]}):
             for option in dnode.config["options"]:
                 if option["text"] == value:
-                    yield option["id"], dnode.node_id
+                    yield option["id"], dnode.nodeid
+
+    def is_a_literal_in_rdf(self):
+        return True
 
 
 class DomainDataType(BaseDomainDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
-        domain_val_node_query = models.Node.objects.filter(config__contains={"options": [{"id": value}]})
+        key = "id"
         if value is not None:
-            if len(domain_val_node_query) < 1:
-                errors.append(
-                    {
-                        "type": "ERROR",
-                        "message": f"{value} {row_number} is not a valid domain id. Please check the node this value \
+            try:
+                uuid.UUID(str(value))
+            except ValueError as e:
+                key = "text"
+
+            domain_val_node_query = models.Node.objects.filter(config__contains={"options": [{key: value}]})
+
+            if len(domain_val_node_query) != 1:
+                row_number = row_number if row_number else ""
+                if len(domain_val_node_query) == 0:
+                    errors.append(
+                        {
+                            "type": "ERROR",
+                            "message": f"{value} {row_number} is not a valid domain id. Please check the node this value \
                             is mapped to for a list of valid domain ids. This data was not imported.",
-                    }
-                )
+                        }
+                    )
+                elif len(domain_val_node_query) > 1:
+                    errors.append(
+                        {
+                            "type": "ERROR",
+                            "message": f"Multiple domain values were found for '{value}' {row_number}.  \
+                        Please use an explicit id instead of a domain string value. This data was not imported.",
+                        }
+                    )
         return errors
 
     def get_search_terms(self, nodevalue, nodeid=None):
@@ -1359,24 +1401,20 @@ class DomainDataType(BaseDomainDataType):
         # via models.Node.objects.filter(config__options__contains=[{"text": value}])
         value = get_value_from_jsonld(json_ld_node)
         try:
-            return [{"id": v_id, "n_id": node_id} for v_id, n_id in self.get_option_id_from_text(value[0])]
+            return [str(v_id) for v_id, n_id in self.get_option_id_from_text(value[0])][0]
         except (AttributeError, KeyError, TypeError) as e:
             print(e)
 
 
 class DomainListDataType(BaseDomainDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, values, row_number=None, source="", node=None, nodeid=None):
+        domainDataType = DomainDataType()
         errors = []
-        if value is not None:
-            for v in value:
-                if len(models.Node.objects.filter(config__contains={"options": [{"id": v}]})) < 1:
-                    errors.append(
-                        {
-                            "type": "ERROR",
-                            "message": f"{v} {row_number} is not a valid domain id. Please check the node this value \
-                                is mapped to for a list of valid domain ids. This data was not imported.",
-                        }
-                    )
+        if values is not None:
+            if not isinstance(values, list):
+                values = [values]
+            for value in values:
+                errors = errors + domainDataType.validate(value, row_number)
         return errors
 
     def transform_import_values(self, value, nodeid):
@@ -1460,6 +1498,9 @@ class DomainListDataType(BaseDomainDataType):
 
         return [domtype.from_rdf(item) for item in json_ld_node]
 
+    def collects_multiple_values(self):
+        return True
+
 
 class ResourceInstanceDataType(BaseDataType):
     def get_id_list(self, nodevalue):
@@ -1542,6 +1583,11 @@ class ResourceInstanceDataType(BaseDataType):
         except KeyError as e:
             pass
 
+    def get_rdf_uri(self, node, data, which="r"):
+        if type(data) == list:
+            return [URIRef(archesproject[f"resources/{x}"]) for x in data]
+        return URIRef(archesproject[f"resources/{data}"])
+
     def to_rdf(self, edge_info, edge):
         g = Graph()
 
@@ -1556,10 +1602,15 @@ class ResourceInstanceDataType(BaseDataType):
                 res_insts = [res_insts]
 
             for res_inst in res_insts:
-                rangenode = URIRef(archesproject["resources/%s" % res_inst])
-                # FIXME: should be the class of the Resource Instance, rather than the expected class
-                # from the edge.
-                _add_resource(edge_info["d_uri"], edge.ontologyproperty, rangenode, edge.rangenode.ontologyclass)
+                rangenode = self.get_rdf_uri(None, res_inst)
+                try:
+                    res_inst_obj = models.ResourceInstance.objects.get(pk=res_inst)
+                    r_type = res_inst_obj.graph.node_set.get(istopnode=True).ontologyclass
+                except models.ResourceInstance.DoesNotExist:
+                    # This should never happen excpet if trying to export when the
+                    # referenced resource hasn't been saved to the database yet
+                    r_type = edge.rangenode.ontologyclass
+                _add_resource(edge_info["d_uri"], edge.ontologyproperty, rangenode, r_type)
         return g
 
     def from_rdf(self, json_ld_node):
@@ -1571,6 +1622,19 @@ class ResourceInstanceDataType(BaseDataType):
         m = p.search(res_inst_uri)
         if m is not None:
             return m.groupdict()["r"]
+
+    def ignore_keys(self):
+        return ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]
+
+
+class ResourceInstanceListDataType(ResourceInstanceDataType):
+    def from_rdf(self, json_ld_node):
+        m = super(ResourceInstanceListDataType, self).from_rdf(json_ld_node)
+        if m is not None:
+            return [m]
+
+    def collects_multiple_values(self):
+        return True
 
 
 class NodeValueDataType(BaseDataType):

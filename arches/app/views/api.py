@@ -125,6 +125,7 @@ class APIBase(View):
 
 class Sync(APIBase):
     import arches.app.tasks as tasks
+
     def get(self, request, surveyid=None):
         can_sync = userCanAccessMobileSurvey(request, surveyid)
         if can_sync:
@@ -372,7 +373,10 @@ class MVT(APIBase):
 
                         SELECT ST_AsMVT(
                             tile,
-                            %s
+                             %s,
+                            4096,
+                            'geom',
+                            'id'
                         ) FROM (
                             SELECT resourceinstanceid::text,
                                 row_number() over () as id,
@@ -405,7 +409,7 @@ class MVT(APIBase):
                     )
                 else:
                     cursor.execute(
-                        """SELECT ST_AsMVT(tile, %s) FROM (SELECT tileid,
+                        """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
                             row_number() over () as id,
                             resourceinstanceid,
                             nodeid,
@@ -717,7 +721,7 @@ class Concepts(APIBase):
             try:
                 skos = SKOSWriter()
                 value = skos.write(ret, format="nt")
-                js = from_rdf(str(value), options={format: "application/nquads"})
+                js = from_rdf(value.decode("utf-8"), options={format: "application/nquads"})
 
                 context = [{"@context": {"skos": SKOS, "dcterms": DCTERMS, "rdf": str(RDF)}}, {"@context": settings.RDM_JSONLD_CONTEXT}]
 

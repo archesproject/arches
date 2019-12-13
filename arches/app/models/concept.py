@@ -1461,11 +1461,11 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
         # due to language formating issues, and with (hopefully) small result sets
         # easier to have filter logic in python than to craft it in dsl
         if conceptid is None:
-            return {"query": {"constant_score": {"filter": {"terms": {"value": [val]}}}}}
+            return {"query": {"bool": {"filter": {"match_phrase": {"value": val}}}}}
         else:
             return {
                 "query": {
-                    "constant_score": {"filter": {"bool": {"must": [{"term": {"value": val}}, {"term": {"conceptid": conceptid}}, ]}}}
+                    "bool": {"filter": [{"match_phrase": {"value": val}}, {"term": {"conceptid": conceptid}}, ]}
                 }
             }
 

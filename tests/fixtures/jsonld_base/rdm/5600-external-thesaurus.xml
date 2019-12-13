@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+>
+  <skos:Concept rdf:about="http://localhost:8000/86007827-7f49-41af-a7a7-160b24f1f89c">
+    <skos:inScheme>
+      <skos:ConceptScheme rdf:about="http://localhost:8000/20e1b040-c433-4f92-a4c4-9eadd66d19e1">
+        <dcterms:title xml:lang="en-us">{"id": "012afe67-aff1-40af-b224-595b8bb13a68", "value": "External ID Thesaurus"}</dcterms:title>
+        <skos:hasTopConcept rdf:resource="http://localhost:8000/86007827-7f49-41af-a7a7-160b24f1f89c"/>
+      </skos:ConceptScheme>
+    </skos:inScheme>
+    <skos:prefLabel xml:lang="en-us">{"id": "ce2b38d4-5766-42b2-af11-e3ee78d3ad5d", "value": "Top Concept"}</skos:prefLabel>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/d65511d3-74d5-4e75-9531-b300afedb073">
+        <skos:narrower rdf:resource="http://localhost:8000/0193c48c-ae34-411f-89ad-49c7e1f76a3a"/>
+        <skos:inScheme rdf:resource="http://localhost:8000/20e1b040-c433-4f92-a4c4-9eadd66d19e1"/>
+        <skos:prefLabel xml:lang="en-us">{"id": "ae8eb119-49fc-4e24-aa8c-8e99fe1e6b9f", "value": "aat terms"}</skos:prefLabel>
+        <skos:narrower rdf:resource="http://localhost:8000/cf16ec66-4a14-497a-bcd5-007833bb51d9"/>
+      </skos:Concept>
+    </skos:narrower>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/cf16ec66-4a14-497a-bcd5-007833bb51d9">
+    <skos:inScheme rdf:resource="http://localhost:8000/20e1b040-c433-4f92-a4c4-9eadd66d19e1"/>
+    <dcterms:identifier xml:lang="en-us">{"id": "47227d47-1f8d-47e4-a4d7-d445cae4e163", "value": "http://vocab.getty.edu/aat/300033898"}</dcterms:identifier>
+    <skos:scopeNote xml:lang="de">{"id": "dfffd382-df98-4829-92f6-a72c1b0f94e0", "value": "Gem\u00e4lde, das vielfigurige, erz\u00e4hlende Szenen von realen oder sagenhaften Ereignissen darstellt, insbesondere ein Gem\u00e4lde im akademischen Stil und mit Themen, die ein edles Gef\u00fchl vermitteln wollen. Der Begriff bezieht sich besonders auf Gem\u00e4lde, die vom 17. bis zum 19. Jahrhundert \u00fcblich waren."}</skos:scopeNote>
+    <skos:prefLabel xml:lang="de">{"id": "2072eab6-cd91-43c0-8811-9e17c5714637", "value": "Historienmalerei (visuelles Werk)"}</skos:prefLabel>
+    <skos:prefLabel xml:lang="en">{"id": "905f7408-5e4f-4dc2-93b1-6e3b84e6e9d4", "value": "history paintings"}</skos:prefLabel>
+    <skos:scopeNote xml:lang="en">{"id": "ea48e7f7-4143-483c-b703-493e85506b88", "value": "Paintings that depict multi-figure narrative scenes of real or legendary events, especially those in the academic style and with subject matter intended to convey a noble sentiment. The term is especially applied to paintings that were common from the 17th through the 19th century."}</skos:scopeNote>
+    <skos:prefLabel xml:lang="en-us">{"id": "27a19a68-faf1-4a93-b2d1-fb313045d568", "value": "History"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/0193c48c-ae34-411f-89ad-49c7e1f76a3a">
+    <dcterms:identifier xml:lang="en-us">{"id": "11441bc0-999d-4ad2-a846-bcc20e89c9cb", "value": "http://vocab.getty.edu/aat/300417328"}</dcterms:identifier>
+    <skos:scopeNote xml:lang="en">{"id": "59ce9c5a-e42e-440b-84f0-34351489ba5d", "value": "Visual works in any medium that depict a landscape that based on natural forms but highly idealized."}</skos:scopeNote>
+    <skos:inScheme rdf:resource="http://localhost:8000/20e1b040-c433-4f92-a4c4-9eadd66d19e1"/>
+    <skos:prefLabel xml:lang="en">{"id": "8c18a741-44a0-43d5-9c3b-d94eb69d8be0", "value": "idealized landscapes (visual works)"}</skos:prefLabel>
+  </skos:Concept>
+</rdf:RDF>

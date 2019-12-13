@@ -20,8 +20,7 @@ from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMultiAlternatives
-from django.template.loader import get_template
-from django.template import Context
+from django.template.loader import get_template, render_to_string
 from django.core.validators import RegexValidator
 from django.db.models import Q, Max
 from django.db.models.signals import post_delete, pre_save, post_save
@@ -34,15 +33,6 @@ from django.core.validators import validate_slug
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
 from django.conf import settings
-
-
-def get_ontology_storage_system():
-    try:
-        location = os.path.join(settings.APP_ROOT, "ontologies")
-    except AttributeError:
-        location = os.path.join(settings.ROOT_DIR, "db", "ontologies")
-
-    return FileSystemStorage(location=location)
 
 
 class CardModel(models.Model):
@@ -537,7 +527,8 @@ class Ontology(models.Model):
     ontologyid = models.UUIDField(default=uuid.uuid1, primary_key=True)
     name = models.TextField()
     version = models.TextField()
-    path = models.FileField(storage=get_ontology_storage_system())
+    path = models.TextField(null=True, blank=True)
+    namespaces = JSONField(null=True, blank=True)
     parentontology = models.ForeignKey(
         "Ontology", db_column="parentontologyid", related_name="extensions", null=True, blank=True, on_delete=models.CASCADE
     )
@@ -954,6 +945,7 @@ class MapLayer(models.Model):
     centery = models.FloatField(blank=True, null=True)
     zoom = models.FloatField(blank=True, null=True)
     legend = models.TextField(blank=True, null=True)
+    searchonly = models.BooleanField(default=False)
 
     @property
     def layer_json(self):
@@ -1028,6 +1020,10 @@ class UserXTask(models.Model):
 
 
 class NotificationType(models.Model):
+    """
+    Creates a 'type' of notification that would be associated with a specific trigger, e.g. Search Export Complete or Consultation Complete
+    """
+
     typeid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     name = models.TextField(blank=True, null=True)
     emailtemplate = models.TextField(blank=True, null=True)
@@ -1042,8 +1038,10 @@ class NotificationType(models.Model):
 class Notification(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     created = models.DateTimeField(auto_now_add=True)
-    # created.editable = True  # must comment this out when running makemigrations, then uncomment after migration made
+    # created.editable = True
     message = models.TextField(blank=True, null=True)
+    context = JSONField(blank=True, null=True, default=dict)
+    # TODO: Ideally validate context against a list of keys from NotificationType
     notiftype = models.ForeignKey(NotificationType, on_delete=models.CASCADE, null=True)
 
     class Meta:
@@ -1052,6 +1050,10 @@ class Notification(models.Model):
 
 
 class UserXNotification(models.Model):
+    """
+    1 Notification instance (and its optional 1 NotificationType instance) can spawn N UserXNotification instances
+    """
+
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     notif = models.ForeignKey(Notification, on_delete=models.CASCADE)
     isread = models.BooleanField(default=False)
@@ -1063,6 +1065,11 @@ class UserXNotification(models.Model):
 
 
 class UserXNotificationType(models.Model):
+    """
+    Creates a user-setting to override existing default notification settings (emailnotify, webnotify, etc.)
+    for specific a NotificationType instance
+    """
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     notiftype = models.ForeignKey(NotificationType, on_delete=models.CASCADE)
@@ -1076,17 +1083,19 @@ class UserXNotificationType(models.Model):
 
 @receiver(post_save, sender=UserXNotification)
 def send_email_on_save(sender, instance, **kwargs):
-    """Checks if a notification type needs to send an email, does so if email server running
+    """Checks if a notification type needs to send an email, does so if email server exists
     """
 
     if instance.notif.notiftype is not None and instance.isread is False:
+        if UserXNotificationType.objects.filter(user=instance.recipient, notiftype=instance.notif.notiftype, emailnotify=False).exists():
+            return False
+
         if instance.notif.notiftype.emailnotify is True and (settings.EMAIL_BACKEND is not None or settings.EMAIL_HOST is not None):
-            dl_link = instance.notif.message
-            text_content = "This is an important message."
+            context = instance.notif.context.copy()
+            text_content = render_to_string(instance.notif.notiftype.emailtemplate, context)
             html_template = get_template(instance.notif.notiftype.emailtemplate)
-            context = {"link": dl_link, "button_text": "Download", "greeting": "Hello", "closing": "Thank you"}
             html_content = html_template.render(context)
-            subject, from_email, to = "Download Ready", "from@example.com", "to@example.com"
+            subject, from_email, to = instance.notif.notiftype.name, "from@example.com", instance.recipient.email
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
             msg.attach_alternative(html_content, "text/html")
             msg.send()

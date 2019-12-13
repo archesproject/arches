@@ -9,7 +9,6 @@ from django.core import management
 from django.contrib.postgres.fields import JSONField
 from django.db import migrations, models
 from arches.db.migration_operations.extras import CreateExtension, CreateAutoPopulateUUIDField, CreateFunction
-from arches.app.models.models import get_ontology_storage_system
 from arches.app.models.system_settings import settings
 
 
@@ -417,7 +416,7 @@ class Migration(migrations.Migration):
                 ("ontologyid", models.UUIDField(default=uuid.uuid1, primary_key=True)),
                 ("name", models.TextField()),
                 ("version", models.TextField()),
-                ("path", models.FileField(storage=get_ontology_storage_system())),
+                ("path", models.TextField()),
                 (
                     "parentontology",
                     models.ForeignKey(

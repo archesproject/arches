@@ -986,6 +986,14 @@ ul.tabbed-report-tab-list {
     border-top: 1px solid #041B33;
 }
 
+.widgets .workbench-card-wrapper {
+    border: 1px solid #a8a8a8;
+}
+
+.widgets .workbench-card-wrapper {
+    height: 500px;
+}
+
 .workbench-card-container {
     height: 100%;
     margin-right: 75px;
@@ -1279,6 +1287,7 @@ ul.tabbed-report-tab-list {
 .scroll-y {
     height: 100vh;
     overflow-y: auto;
+    background: #fff;
 }
 
 .scroll-y-hidden {
@@ -1332,6 +1341,10 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 
 .widget-input {
     border-radius: 2px;
+}
+
+.widget-file {
+    width: 100px;
 }
 
 .date .form-control {
@@ -1935,6 +1948,18 @@ a.select2-search-choice-close {
     background: #fbfbfb;
 }
 
+.mpm-instruction-title {
+    font-size: 15px;
+}
+
+.mpm-instruction {
+    padding: 2px 15px;
+}
+
+.settings-panel-heading + .permissions-instructions-panel {
+    margin-top: 55px;
+}
+
 .permission-manager.panel-body {
     display: flex;
     background-color: white;
@@ -2022,31 +2047,37 @@ a.select2-search-choice-close {
     float: right;
     padding-right: 10px;
     font-size: 11px;
-    color: #777;
+    font-weight: 600;
+    color: #454545;
+    padding-top: 10px;
+    margin-top: -10px;
+    margin-bottom: -10px;
+    padding-left: 10px;
 }
 
 .permissions-node {
     font-size: 13px;
-    color: #777;
+    color: #555;
 }
 
 .no-cards-selected {
-    padding: 5px;
+    padding: 10px;
     font-size: 13px;
 }
 
 .permissions-node-row {
     display: inline-flex;
     background: #fff;
-    padding-top: 6px;
-    padding-bottom: 6px;
+    border-bottom: 1px solid #D3E5F4;
+    padding-top: 10px;
+    padding-bottom: 10px;
     padding-left: 10px;
     margin-right: 0px;
     justify-content: space-between;
 }
 
 .permissions-node-row:nth-child(even) {
-    background: #f9f9f9;
+    background: #F5FAFE;
 }
 
 .permissions-title {
@@ -2090,6 +2121,7 @@ a.select2-search-choice-close {
 .permissions-selected {
     display: flex;
     flex-direction: column;
+    margin-top: 5px;
     list-style: none;
     color: #666;
     line-height: 1.2;
@@ -2302,23 +2334,31 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .settings-panel {
-    padding: 10px 20px 25px 25px;
+    padding: 10px 20px 55px 25px;
 }
 
 .settings-panel-heading {
+    position: fixed;
+    top: 115px;
     height: 50px;
+    width: 100%;
     background: #25476a;
     margin-top: -10px;
     margin-bottom: 20px;
     margin-left: -25px;
     margin-right: -20px;
     padding-left: 25px;
+    z-index: 10;
+}
+
+.settings-panel-heading + div {
+    margin-top: 13px;
 }
 
 .graph-crm-class,
 .graph-type {
     font-size: 15px;
-    color: #eee;
+    color: #777;
     padding-left: 10px;
 }
 
@@ -2388,10 +2428,10 @@ ul.nav.nav-tabs.nav-justified {
     margin-top: -5px;
     display: inline-block;
     color: #5F7D9A;
-    font-size: 11px;
     position: relative;
     top: -5px;
     font-size: 13px;
+    font-weight: 400;
 }
 
 .exportable-field-name {
@@ -2434,9 +2474,10 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .function-node-alert {
+    display: inline-block;
     background: #72D3C9;
-    padding: 15px 10px;
-    margin-top: -15px;
+    padding: 15px 30px;
+    margin-top: -10px;
     margin-left: -5px;
     margin-bottom: 15px;
     font-size: 14px;
@@ -2793,21 +2834,28 @@ div.dropdown-menu.open {
 .btn-notifs-download {
     color: #6494cc;
     background-color: transparent;
+    border: 1px solid #ddd;
+    margin-top: 5px;
 }
 
 .btn-notifs-dismiss-all {
     width: 100%;
+    height: 50px;
     color: #fff;
     background-color: #579DDB;
+    border: 1px solid #2A24C2;
 }
 
-.btn-notifs-dismiss-all .disabled {
+.btn-notifs-dismiss-all.disabled {
     background-color: #B0D4F5;
+    color: #6D69D5;
+    border: 1px solid #6D69D5;
 }
 
 .btn-notifs-dismiss-all:hover {
     cursor: pointer;
-    color: #fff
+    color: #fff;
+    background: #3685CB;
 }
 
 #circle {
@@ -3988,6 +4036,14 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     padding: 10px 15px 25px;
 }
 
+.widget-container.data-type {
+    padding-bottom: 5px;
+}
+
+.widget-container.data-type-config {
+    padding-bottom: 0px;
+}
+
 a.selected {
     font-weight: 600;
     font-size: 13px;
@@ -4202,11 +4258,11 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .profile-report {
-    height: 250px;
-    background: #f2f2f2;
+    height: 150px;
+    background: #A43741;
     width: 100%;
     padding: 40px 150px 0px 150px;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #520008;
 }
 
 .profile-list {
@@ -4221,6 +4277,47 @@ ul.jqtree_common li.jqtree-folder {
     min-height: 650px;
 }
 
+div.profile-notif-settings {
+    padding-top: 12px;
+}
+
+.notif-table {
+    width: 100%;
+    margin-top: -40px;
+}
+
+.notif-table th {
+    font-size: 1.05em;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+    color: #4d627b;
+}
+
+th.notif-type {
+    width: 150px;
+}
+
+.widget-input-label-notif {
+    padding-left: 20px;
+    font-size: 12px;
+    margin-top: 2px;
+    font-weight: 500;
+    color: #666;
+}
+
+.widget-input-label-notif .arches-switch {
+    margin-right: 5px;
+}
+
+.profile-notif-settings td {
+    padding: 8px 10px;
+    color: #666;
+}
+
+.profile-notif-settings th {
+    padding: 4px 6px 4px 6px;
+}
+
 .profile-projects {
     height: 100vh;
 }
@@ -4233,7 +4330,7 @@ ul.jqtree_common li.jqtree-folder {
     position: absolute;
     color: #fff;
     font-size: 2.6em;
-    top: 140px;
+    top: 35px;
     left: 100px;
 }
 
@@ -4241,9 +4338,9 @@ ul.jqtree_common li.jqtree-folder {
     position: absolute;
     color: #fff;
     font-size: 16px;
-    top: 180px;
+    top: 80px;
     left: 100px;
-    color: #aaa;
+    color: #ddd;
     font-weight: 500;
 }
 
@@ -4349,7 +4446,7 @@ ul.jqtree_common li.jqtree-folder {
 
 .project-search-widget {
     position: absolute;
-    top: -45px;
+    top: -40px;
     width: 250px;
 }
 
@@ -4481,7 +4578,7 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .ep-tools:hover {
-    background: #f8f8f8;
+    background: #f2f2f2;
     border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
 }
@@ -4511,7 +4608,9 @@ ul.jqtree_common li.jqtree-folder {
 
 .ep-tools-right {
     border-right: none;
+    border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
+    background: #fafafa;
     font-size: 17px;
     padding-left: 16px;
     padding-right: 20px;
@@ -5036,6 +5135,22 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     background-color: #fcfcfc;
 }
 
+.ep-notifs-close {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    font-size: 17px;
+}
+
+.entry .ep-notifs-close {
+    right: -10px;
+}
+
+.ep-notifs-close:hover {
+    color: #1B3974;
+}
+
+
 .ep-edits-body.provisional-edit-history {
     overflow: visible;
 }
@@ -5060,7 +5175,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .new-provisional-edit-history:hover, .notifications-container:hover {
-    background-color: #f0f0f0;
+    background-color: #fff;
 }
 
 .new-provisional-edit-history .entry, .notifications-container .entry {
@@ -9442,7 +9557,7 @@ a.filter-tools:hover {
 }
 
 .account-wrapper {
-    padding-top: 20px;
+    padding-top: 0px;
 }
 
 .msm-data-selection .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn) {
@@ -9724,7 +9839,7 @@ a.filter-tools:hover {
 }
 
 .mpm-manager .btn-rr {
-    margin: 0;
+    margin: -2px 0px 0px 0px;
 }
 
 .library-card.inactive {
@@ -10259,7 +10374,7 @@ ul.select2-choices:after {
     margin-bottom: 15px;
     font-size: 13px;
     font-weight: 600;
-    margin-top: 0px;
+    margin-top: 5px;
     margin-bottom: 15px;
     border-radius: 2px;
 }

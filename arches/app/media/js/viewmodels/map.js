@@ -52,6 +52,7 @@ define([
                 if (layer.addtomap && !params.activeBasemap) self.activeBasemap(layer);
             }
             else if (!params.overlaysObservable) {
+                if (layer.searchonly && !params.search) return;
                 layer.opacity = ko.observable(layer.addtomap ? 100 : 0);
                 layer.onMap = ko.pureComputed({
                     read: function() { return layer.opacity() > 0; },
