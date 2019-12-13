@@ -6,13 +6,9 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '5668_add_resourceinstancelist'),
+        ("models", "5668_add_resourceinstancelist"),
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='maplayer',
-            name='searchonly',
-            field=models.BooleanField(default=False),
-        ),
+        migrations.AddField(model_name="maplayer", name="searchonly", field=models.BooleanField(default=False),),
     ]
