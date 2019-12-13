@@ -3033,7 +3033,6 @@ ul .collapse li:last-of-type {
 .resource-grid-icon {
     height: 42px;
     width: 42px;
-    padding-left: 12px;
     padding-top: 12px;
     color: #999;
     transform: translate(0px, 7px);
@@ -3361,6 +3360,12 @@ ul .collapse li:last-of-type {
     left: 100px;
     top: 10px;
     width: 450px;
+    z-index: 10;
+}
+
+.graph-list-header {
+    position: sticky;
+    top: 0px;
     z-index: 10;
 }
 
@@ -8156,6 +8161,9 @@ a.search-query-link-captions:focus {
 }
 
 .search-count-container {
+    position: sticky;
+    top: 0px;
+    z-index: 10;
     padding: 10px 20px 0px 20px;
     background: #f4f4f4;
     border-bottom: 1px solid #ddd;
