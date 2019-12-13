@@ -1,6 +1,9 @@
 from io import StringIO
+import logging
 from django.http import HttpResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+
+logger = logging.getLogger(__name__)
 
 
 class JSONResponse(HttpResponse):
@@ -34,14 +37,17 @@ class JSONResponse(HttpResponse):
 
 
 class JSONErrorResponse(JSONResponse):
-
-    def __init__(self, title=None, message=None, content=b'', status=500, *args, **kwargs):
-        content['status'] = content.get('status', 'false')
-        content['success'] = content.get('success', False)
-        content['title'] = content.get('title', title)
-        content['message'] = content.get('message', message)
+    def __init__(self, title=None, message=None, content=b"", status=500, *args, **kwargs):
+        try:
+            content["status"] = content.get("status", "false")
+            content["success"] = content.get("success", False)
+            content["title"] = content.get("title", title)
+            content["message"] = content.get("message", message)
+        except AttributeError as e:
+            logger.exception(_("Could not return JSON Response"))
 
         super(JSONErrorResponse, self).__init__(content=content, status=status, *args, **kwargs)
+
 
 class Http401Response(HttpResponse):
     status_code = 401

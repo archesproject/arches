@@ -67,11 +67,13 @@ class SearchResultsExporter(object):
 
         for graph_id, resources in output.items():
             graph = models.GraphModel.objects.get(pk=graph_id)
-            headers = list(graph.node_set.filter(exportable=True).values_list("fieldname", flat=True))
-            headers.append("resourceid")
             if format == "tilecsv":
+                headers = list(graph.node_set.filter(exportable=True).values_list("fieldname", flat=True))
+                headers.append("resourceid")
                 ret.append(self.to_csv(resources["output"], headers=headers, name=graph.name))
             if format == "shp":
+                headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype")
+                list(headers).append({"fieldname": "resourceid", "datatype": "str"})
                 ret += self.to_shp(resources["output"], headers=headers, name=graph.name)
         return ret
 
