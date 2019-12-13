@@ -8161,9 +8161,6 @@ a.search-query-link-captions:focus {
 }
 
 .search-count-container {
-    position: sticky;
-    top: 0px;
-    z-index: 10;
     padding: 10px 20px 0px 20px;
     background: #f4f4f4;
     border-bottom: 1px solid #ddd;
