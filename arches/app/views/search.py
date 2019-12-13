@@ -36,7 +36,7 @@ from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.views.base import MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
-from arches.app.utils.permission_backend import get_nodegroups_by_perm
+from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer
 import arches.app.utils.data_management.zip as zip_utils
 import arches.app.utils.task_management as task_management
 import arches.app.tasks as tasks
@@ -66,6 +66,7 @@ class SearchView(MapBaseManagerView):
             main_script="views/search",
             resource_graphs=resource_graphs,
             datatypes=datatypes,
+            user_is_reviewer=user_is_resource_reviewer(request.user),
         )
 
         graphs = JSONSerializer().serialize(
@@ -102,7 +103,7 @@ def search_terms(request):
     lang = request.GET.get("lang", settings.LANGUAGE_CODE)
     se = SearchEngineFactory().create()
     searchString = request.GET.get("q", "")
-    user_is_reviewer = request.user.groups.filter(name="Resource Reviewer").exists()
+    user_is_reviewer = user_is_resource_reviewer(request.user)
 
     i = 0
     ret = {}
@@ -249,7 +250,7 @@ def search_results(request):
         for key, value in list(search_results_object.items()):
             ret[key] = value
 
-        ret["reviewer"] = request.user.groups.filter(name="Resource Reviewer").exists()
+        ret["reviewer"] = user_is_resource_reviewer(request.user)
         ret["timestamp"] = datetime.now()
         ret["total_results"] = dsl.count(index="resources")
 
@@ -269,7 +270,7 @@ def get_provisional_type(request):
 
     result = False
     provisional_filter = JSONDeserializer().deserialize(request.GET.get("provisional-filter", "[]"))
-    user_is_reviewer = request.user.groups.filter(name="Resource Reviewer").exists()
+    user_is_reviewer = user_is_resource_reviewer(request.user)
     if user_is_reviewer is not False:
         if len(provisional_filter) == 0:
             result = True

@@ -2,6 +2,7 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, NestedAgg, FiltersAgg, GeoHashGridAgg, GeoBoundsAgg
 from arches.app.search.components.base import BaseSearchFilter
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 
 details = {
     "searchcomponentid": "",
@@ -41,7 +42,7 @@ class SearchResultsFilter(BaseSearchFilter):
         search_results_object["query"].add_aggregation(nested_agg)
 
     def post_search_hook(self, search_results_object, results, permitted_nodegroups):
-        user_is_reviewer = self.request.user.groups.filter(name="Resource Reviewer").exists()
+        user_is_reviewer = user_is_resource_reviewer(self.request.user)
 
         # only reuturn points and geometries a user is allowed to view
         geojson_nodes = get_nodegroups_by_datatype_and_perm(self.request, "geojson-feature-collection", "read_nodegroup")
