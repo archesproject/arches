@@ -11,15 +11,16 @@ def forwards_func(apps, schema_editor):
     NodeGroup = apps.get_model("models", "NodeGroup")
 
     try:
-        GraphModel.objects.get(graphid='22000000-0000-0000-0000-000000000000').delete()
+        GraphModel.objects.get(graphid="22000000-0000-0000-0000-000000000000").delete()
     except GraphModel.DoesNotExist:
         pass
 
     try:
-        GraphModel.objects.get(graphid='22000000-0000-0000-0000-000000000001').delete()
-        NodeGroup.objects.get(nodegroupid='20000000-0000-0000-0000-100000000001').delete()
+        GraphModel.objects.get(graphid="22000000-0000-0000-0000-000000000001").delete()
+        NodeGroup.objects.get(nodegroupid="20000000-0000-0000-0000-100000000001").delete()
     except (GraphModel.DoesNotExist, NodeGroup.DoesNotExist):
         pass
+
 
 def reverse_func(apps, schema_editor):
     GraphModel = apps.get_model("models", "GraphModel")
@@ -40,9 +41,9 @@ def reverse_func(apps, schema_editor):
         "isactive": True,
         "isresource": False,
         "name": "Node",
-        "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+        "ontology_id": None,
         "subtitle": "Represents a single node in a graph.",
-        "version": "v1"
+        "version": "v1",
     }
     GraphModel.objects.create(**graph_dict).save()
 
@@ -73,9 +74,9 @@ def reverse_func(apps, schema_editor):
         "isactive": True,
         "isresource": False,
         "name": "Node/Node Type",
-        "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+        "ontology_id": None,
         "subtitle": "Represents a node and node type pairing",
-        "version": "v1"
+        "version": "v1",
     }
     GraphModel.objects.create(**graph_dict).save()
 
@@ -83,7 +84,7 @@ def reverse_func(apps, schema_editor):
         "cardinality": "n",
         "legacygroupid": "",
         "nodegroupid": "20000000-0000-0000-0000-100000000001",
-        "parentnodegroup_id": None
+        "parentnodegroup_id": None,
     }
     NodeGroup.objects.create(**nodegroup_dict).save()
 
@@ -99,7 +100,7 @@ def reverse_func(apps, schema_editor):
         "name": "Node/Node Type",
         "nodegroup_id": "20000000-0000-0000-0000-100000000001",
         "sortorder": None,
-        "visible": True
+        "visible": True,
     }
     CardModel.objects.create(**card_dict).save()
 
@@ -115,12 +116,10 @@ def reverse_func(apps, schema_editor):
             "name": "Node",
             "nodegroup_id": "20000000-0000-0000-0000-100000000001",
             "nodeid": "20000000-0000-0000-0000-100000000001",
-            "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
+            "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity",
         },
         {
-            "config": {
-                "rdmCollection": None
-            },
+            "config": {"rdmCollection": None},
             "datatype": "concept",
             "description": "",
             "graph_id": "22000000-0000-0000-0000-000000000001",
@@ -130,8 +129,8 @@ def reverse_func(apps, schema_editor):
             "name": "Node Type",
             "nodegroup_id": "20000000-0000-0000-0000-100000000001",
             "nodeid": "20000000-0000-0000-0000-100000000002",
-            "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type"
-        }
+            "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
+        },
     ]
 
     for node in nodes:
@@ -144,7 +143,7 @@ def reverse_func(apps, schema_editor):
         "graph_id": "22000000-0000-0000-0000-000000000001",
         "name": None,
         "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type",
-        "rangenode_id": "20000000-0000-0000-0000-100000000002"
+        "rangenode_id": "20000000-0000-0000-0000-100000000002",
     }
     Edge.objects.create(**edges_dict).save()
 
@@ -152,7 +151,7 @@ def reverse_func(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '3201_replace_node_and_nodetype_branches'),
+        ("models", "3201_replace_node_and_nodetype_branches"),
     ]
 
     operations = [

@@ -5,6 +5,7 @@ define([
     'moment',
     'views/base-manager',
     'viewmodels/alert',
+    'viewmodels/alert-json',
     'models/graph',
     'models/report',
     'viewmodels/card',
@@ -17,7 +18,7 @@ define([
     'widgets',
     'card-components',
     'views/resource/related-resources-manager'
-], function($, _, ko, moment, BaseManagerView, AlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, reportLookup) {
+], function($, _, ko, moment, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, reportLookup) {
     var handlers = {
         'after-update': [],
         'tile-reset': []
@@ -218,7 +219,7 @@ define([
                         type: "DELETE",
                         url: arches.urls.resource_editor + resourceId(),
                         error: function(err) {
-                            vm.alert(new AlertViewModel('ep-alert-red', err.responseJSON.title, err.responseJSON.message, null, function(){}));
+                            vm.alert(new JsonErrorAlertViewModel('ep-alert-red', err.responseJSON));
                         },
                         complete: function(request, status) {
                             loading(false);

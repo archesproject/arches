@@ -9,10 +9,11 @@ require([
     'models/node',
     'models/graph',
     'viewmodels/alert',
+    'viewmodels/alert-json',
     'arches',
     'graph-manager-data',
     'datatype-config-components'
-], function($, _, ko, PageView, GraphView, NodeListView, NodeFormView, NodeModel, GraphModel, AlertViewModel, arches, data) {
+], function($, _, ko, PageView, GraphView, NodeListView, NodeFormView, NodeModel, GraphModel, AlertViewModel, JsonErrorAlertViewModel, arches, data) {
     /**
     * create graph model
     */
@@ -28,14 +29,7 @@ require([
         viewModel.alert(null);
         loading(false);
         if(response.status != 200){
-            var errorMessageTitle = arches.requestFailed.title
-            var errorMessageText = arches.requestFailed.text
-            viewModel.alert(null);
-            if (response.responseJSON) {
-              errorMessageTitle = response.responseJSON.title
-              errorMessageText = response.responseJSON.message
-            }
-            viewModel.alert(new AlertViewModel('ep-alert-red', errorMessageTitle, errorMessageText));
+            viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
         }
     });
     graphModel.on('select-node', function(node){

@@ -83,7 +83,6 @@ class ConceptLookup:
 class CsvWriter(Writer):
     def __init__(self, **kwargs):
         super(CsvWriter, self).__init__(**kwargs)
-        self.datatype_factory = DataTypeFactory()
         self.node_datatypes = {
             str(nodeid): datatype
             for nodeid, datatype in Node.objects.values_list("nodeid", "datatype").filter(~Q(datatype="semantic"), graph__isresource=True)
@@ -163,9 +162,7 @@ class CsvWriter(Writer):
                                 concept_export_value_type = None
                                 if k in concept_export_value_lookup:
                                     concept_export_value_type = concept_export_value_lookup[k]
-                                value = self.transform_value_for_export(
-                                    self.node_datatypes[k], tile.data[k], concept_export_value_type, k,
-                                )
+                                value = self.transform_value_for_export(self.node_datatypes[k], tile.data[k], concept_export_value_type, k,)
                                 other_group_record[mapping[k]] = value
                         else:
                             del tile.data[k]
@@ -194,7 +191,7 @@ class CsvWriter(Writer):
             csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=csv_header)
             csvwriter.writeheader()
             csvs_for_export.append(
-                {"name": csv_name.split(".")[0] + "_groups." + csv_name.split(".")[1], "outputfile": dest, }
+                {"name": csv_name.split(".")[0] + "_groups." + csv_name.split(".")[1], "outputfile": dest,}
             )
             for csv_record in other_group_records:
                 if "populated_node_groups" in csv_record:
@@ -252,7 +249,6 @@ class CsvWriter(Writer):
 class TileCsvWriter(Writer):
     def __init__(self, **kwargs):
         super(TileCsvWriter, self).__init__(**kwargs)
-        self.datatype_factory = DataTypeFactory()
         self.node_datatypes = {
             str(nodeid): datatype
             for nodeid, datatype in Node.objects.values_list("nodeid", "datatype").filter(~Q(datatype="semantic"), graph__isresource=True)
@@ -274,14 +270,7 @@ class TileCsvWriter(Writer):
         nodes = Node.objects.filter(graph_id=self.graph_id)
         for node in nodes:
             mapping[str(node.nodeid)] = node.name
-        csv_header = [
-            "ResourceID",
-            "ResourceLegacyID",
-            "ResourceModelID",
-            "TileID",
-            "ParentTileID",
-            "NodeGroupID"
-        ] + list(mapping.values())
+        csv_header = ["ResourceID", "ResourceLegacyID", "ResourceModelID", "TileID", "ParentTileID", "NodeGroupID"] + list(mapping.values())
         csvs_for_export = []
 
         for resourceinstanceid, tiles in self.resourceinstances.items():
@@ -332,6 +321,9 @@ class TileCsvWriter(Writer):
 
 
 class CsvReader(Reader):
+    def __init__(self):
+        super(CsvReader, self).__init__()
+
     def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number):
         # create a resource instance only if there are populated_tiles
         errors = []
@@ -1017,6 +1009,7 @@ class CsvReader(Reader):
 
 class TileCsvReader(Reader):
     def __init__(self, business_data):
+        super(TileCsvReader, self).__init__()
         self.csv_reader = CsvReader()
         self.business_data = business_data
 

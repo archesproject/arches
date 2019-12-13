@@ -82,10 +82,11 @@ PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
 RESOURCE_IMPORT_LOG = "arches/logs/resource_import.log"
 
-RESOURCE_FORMATERS = {
+RESOURCE_FORMATTERS = {
     "csv": "arches.app.utils.data_management.resources.formats.csvfile.CsvWriter",
     "json": "arches.app.utils.data_management.resources.formats.archesfile.ArchesFileWriter",
     "tilecsv": "arches.app.utils.data_management.resources.formats.csvfile.TileCsvWriter",
+    "shp": "arches.app.utils.data_management.resources.formats.shpfile.ShpWriter",
     "xml": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
     "pretty-xml": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
     "json-ld": "arches.app.utils.data_management.resources.formats.rdffile.JsonLdWriter",
@@ -93,20 +94,6 @@ RESOURCE_FORMATERS = {
     "nt": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
     "trix": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
 }
-
-ONTOLOGY_PATH = os.path.join(ROOT_DIR, "db", "ontologies", "cidoc_crm")
-ONTOLOGY_BASE = "cidoc_crm_v6.2.xml"
-ONTOLOGY_BASE_VERSION = "6.2"
-ONTOLOGY_BASE_NAME = "CIDOC CRM v6.2"
-ONTOLOGY_BASE_ID = "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd"
-ONTOLOGY_EXT = [
-    "CRMsci_v1.2.3.rdfs.xml",
-    "CRMarchaeo_v1.4.rdfs.xml",
-    "CRMgeo_v1.2.rdfs.xml",
-    "CRMdig_v3.2.1.rdfs.xml",
-    "CRMinf_v0.7.rdfs.xml",
-    "arches_crm_enhancements.xml",
-]
 
 # Set the ontolgoy namespace prefixes to use in the UI, set the namespace to '' omit a prefix
 # Users can also override existing namespaces as well if you like
@@ -121,10 +108,13 @@ ONTOLOGY_NAMESPACES = {
     "http://www.ics.forth.gr/isl/CRMsci/": "",
 }
 
+ONTOLOGY_DIR = os.path.join(ROOT_DIR, "ontologies")
+
+
 # Used in the JSON-LD export for determining which external concept scheme URI
 # to use in preference for the URI of a concept. If there is no match, the default
 # Arches host URI will be used (eg http://localhost/concepts/123f323f-...)
-PREFERRED_CONCEPT_SCHEME = "http://vocab.getty.edu/aat/"
+PREFERRED_CONCEPT_SCHEMES = ["http://vocab.getty.edu/aat/", "http://www.cidoc-crm.org/cidoc-crm/"]
 
 # This is the namespace to use for export of data (for RDF/XML for example)
 # Ideally this should point to the url where you host your site
@@ -345,7 +335,7 @@ except Exception as e:
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {"console": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s", }, },
+    "formatters": {"console": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",},},
     "handlers": {
         "file": {
             "level": "WARNING",  # DEBUG, INFO, WARNING, ERROR, CRITICAL
@@ -438,11 +428,16 @@ OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 604800}  # one week
 
 PHONE_REGEX = r"^\+\d{8,15}$"
 SEARCH_ITEMS_PER_PAGE = 5
-SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
+SEARCH_EXPORT_ITEMS_PER_PAGE = 2000
+SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD = 2000  # The maximum number of instances a user can download from search export without celery
 RELATED_RESOURCES_PER_PAGE = 15
 RELATED_RESOURCES_EXPORT_LIMIT = 10000
 SEARCH_DROPDOWN_LENGTH = 100
-SEARCH_TERM_SENSITIVITY = 3  # a lower number will give more "Fuzzy" matches, recomend between 0-4, see "prefix_length" at https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl-fuzzy-query.html#_parameters_7
+
+# a lower number will give more "Fuzzy" matches, recomend between 0-4,
+# see "prefix_length" at https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl-fuzzy-query.html#_parameters_7
+SEARCH_TERM_SENSITIVITY = 3
+
 WORDS_PER_SEARCH_TERM = 10  # set to None for unlimited number of words allowed for search terms
 SEARCH_RESULT_LIMIT = 10000  # should be less than or equal to elasticsearch configuration, index.max_result_window (default = 10,000)
 
@@ -534,6 +529,17 @@ CELERY_BROKER_URL = "amqp://guest:guest@localhost"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_RESULT_BACKEND = "django-db"  # Use 'django-cache' if you want to use your cache as your backend
 CELERY_TASK_SERIALIZER = "json"
+CELERY_SEARCH_EXPORT_DIR = os.path.join(MEDIA_ROOT, "uploadedfiles")
+CELERY_SEARCH_EXPORT_EXPIRES = 24 * 3600  # seconds
+CELERY_SEARCH_EXPORT_CHECK = 3600  # seconds
+
+CELERY_BEAT_SCHEDULE = {
+    "delete-expired-search-export": {"task": "arches.app.tasks.delete_file", "schedule": CELERY_SEARCH_EXPORT_CHECK},
+    "notification": {"task": "arches.app.tasks.message", "schedule": CELERY_SEARCH_EXPORT_CHECK, "args": ("Celery Beat is Running",)},
+}
+
+AUTO_REFRESH_GEOM_VIEW = True
+TILE_CACHE_TIMEOUT = 600
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################

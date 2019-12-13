@@ -84,9 +84,7 @@ class Command(BaseCommand):
             choices=[
                 "setup",
                 "install",
-                "setup_db",
                 "setup_indexes",
-                "build_permissions",
                 "load_concept_scheme",
                 "export_business_data",
                 "export_graphs",
@@ -107,10 +105,8 @@ class Command(BaseCommand):
             ],
             help="Operation Type; "
             + "'setup'=Sets up the database schema and code"
-            + "'setup_db'=Truncate the entire arches based db and re-installs the base schema"
             + "'setup_indexes'=Creates the indexes in Elastic Search needed by the system"
-            + "'install'=Runs the setup file defined in your package root"
-            + "'build_permissions'=generates \"add,update,read,delete\" permissions for each entity mapping",
+            + "'install'=Runs the setup file defined in your package root",
         )
 
         parser.add_argument(
@@ -154,14 +150,6 @@ class Command(BaseCommand):
         parser.add_argument(
             "-c", "--config_file", action="store", dest="config_file", default=None, help="Usually an export mapping file.",
         )
-
-        # parser.add_argument(
-        #     '-m', '--mapnik_xml_path', action='store', dest='mapnik_xml_path', default=False,
-        #     help='A path to a mapnik xml file to generate a tileserver layer from.')
-
-        # parser.add_argument(
-        #     '-t', '--tile_config_path', action='store', dest='tile_config_path', default=False,
-        #     help='A path to a tile config json file to generate a tileserver layer from.')
 
         parser.add_argument(
             "-j",
@@ -245,17 +233,11 @@ class Command(BaseCommand):
         if options["operation"] == "install":
             self.install(package_name)
 
-        if options["operation"] == "setup_db":
-            self.setup_db(package_name)
-
         if options["operation"] == "setup_indexes":
             self.setup_indexes()
 
         if options["operation"] == "delete_indexes":
             self.delete_indexes()
-
-        if options["operation"] == "build_permissions":
-            self.build_permissions()
 
         if options["operation"] == "load_concept_scheme":
             self.load_concept_scheme(package_name, options["source"])
@@ -487,28 +469,12 @@ class Command(BaseCommand):
     def load_package(
         self, source, setup_db=True, overwrite_concepts="ignore", bulk_load=False, stage_concepts="keep", yes=False,
     ):
-        def load_ontology():
-            load_default_ontology = True
-            if settings.ONTOLOGY_BASE_NAME is not None:
-                if yes is False:
-                    response = input("Would you like to load the {0} ontology? (Y/N): ".format(settings.ONTOLOGY_BASE_NAME))
-                    if response.lower() not in ("t", "true", "y", "yes"):
-                        load_default_ontology = False
-            else:
-                load_default_ontology = False
-
-            if load_default_ontology == True:
-                print("loading the {0} ontology".format(settings.ONTOLOGY_BASE_NAME))
-                extensions = [os.path.join(settings.ONTOLOGY_PATH, x) for x in settings.ONTOLOGY_EXT]
-                management.call_command(
-                    "load_ontology",
-                    source=os.path.join(settings.ONTOLOGY_PATH, settings.ONTOLOGY_BASE),
-                    version=settings.ONTOLOGY_BASE_VERSION,
-                    ontology_name=settings.ONTOLOGY_BASE_NAME,
-                    id=settings.ONTOLOGY_BASE_ID,
-                    extensions=",".join(extensions),
-                    verbosity=0,
-                )
+        def load_ontologies(package_dir):
+            ontologies = glob.glob(os.path.join(package_dir, "ontologies/*"))
+            if len(ontologies) > 0:
+                print("loading ontologies")
+            for ontology in ontologies:
+                management.call_command("load_ontology", source=ontology)
 
         def load_system_settings(package_dir):
             update_system_settings = True
@@ -793,7 +759,7 @@ class Command(BaseCommand):
             if setup_db.lower() in ("t", "true", "y", "yes"):
                 management.call_command("setup_db", force=True)
 
-        load_ontology()
+        load_ontologies(package_location)
         print("loading package_settings.py")
         load_package_settings(package_location)
         print("loading preliminary sql")
@@ -870,13 +836,6 @@ class Command(BaseCommand):
 
         management.call_command("setup_db", force=True)
 
-        print(
-            "\n" + "~" * 80 + "\n"
-            "Warning: This command will be deprecated in Arches 4.5. From now on please use\n\n"
-            "    python manage.py setup_db [--force]\n\nThe --force argument will "
-            "suppress the interactive confirmation prompt.\n" + "~" * 80
-        )
-
     def setup_indexes(self):
         management.call_command("es", operation="setup_indexes")
 
@@ -885,42 +844,6 @@ class Command(BaseCommand):
 
     def delete_indexes(self):
         management.call_command("es", operation="delete_indexes")
-
-    def build_permissions(self):
-        """
-        Creates permissions based on all the installed resource types
-
-        """
-
-        from arches.app.models import models
-        from django.contrib.auth.models import Permission, ContentType
-
-        resourcetypes = {}
-        mappings = models.Mappings.objects.all()
-        mapping_steps = models.MappingSteps.objects.all()
-        rules = models.Rules.objects.all()
-        for mapping in mappings:
-            # print('%s -- %s' % (mapping.entitytypeidfrom_id, mapping.entitytypeidto_id))
-            if mapping.entitytypeidfrom_id not in resourcetypes:
-                resourcetypes[mapping.entitytypeidfrom_id] = {mapping.entitytypeidfrom_id}
-            for step in mapping_steps.filter(pk=mapping.pk):
-                resourcetypes[mapping.entitytypeidfrom_id].add(step.ruleid.entitytyperange_id)
-
-        for resourcetype in resourcetypes:
-            for entitytype in resourcetypes[resourcetype]:
-                content_type = ContentType.objects.get_or_create(app_label=resourcetype, model=entitytype)
-                Permission.objects.create(
-                    codename="add_%s" % entitytype, name="%s - add" % entitytype, content_type=content_type[0],
-                )
-                Permission.objects.create(
-                    codename="update_%s" % entitytype, name="%s - update" % entitytype, content_type=content_type[0],
-                )
-                Permission.objects.create(
-                    codename="read_%s" % entitytype, name="%s - read" % entitytype, content_type=content_type[0],
-                )
-                Permission.objects.create(
-                    codename="delete_%s" % entitytype, name="%s - delete" % entitytype, content_type=content_type[0],
-                )
 
     def export_business_data(
         self, data_dest=None, file_format=None, config_file=None, graph=None, single_file=False,

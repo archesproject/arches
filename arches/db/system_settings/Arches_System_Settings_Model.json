@@ -329,7 +329,7 @@
                     "card_id": "d0987b78-fad8-11e6-9a59-6c4008b05c4c",
                     "config": {
                         "defaultValue": "",
-                        "label": "Max number of search results to export",
+                        "label": "Max number of search results to export (see help for limitations on this value)",
                         "max": "",
                         "min": "",
                         "placeholder": "Enter number",
@@ -340,7 +340,7 @@
                         "width": "100%"
                     },
                     "id": "ec6bc4ae-2e9f-11e7-86ec-14109fd34195",
-                    "label": "Max number of search results to export",
+                    "label": "Max number of search results to export (see help for limitations on this value)",
                     "node_id": "d0987ec0-fad8-11e6-aad3-6c4008b05c4c",
                     "sortorder": 2,
                     "widget_id": "10000000-0000-0000-0000-000000000008"

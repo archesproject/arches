@@ -4,13 +4,14 @@ require([
     'knockout',
     'views/base-manager',
     'viewmodels/alert',
+    'viewmodels/alert-json',
     'arches',
     'view-data',
     'graph-manager-data',
     'bootstrap',
     'bindings/hover',
     'bindings/chosen'
-], function($, _, ko, BaseManager, AlertViewModel, arches, data, graphManagerData) {
+], function($, _, ko, BaseManager, AlertViewModel, JsonErrorAlertViewModel, arches, data, graphManagerData) {
 
     var GraphView = BaseManager.extend({
         /**
@@ -85,7 +86,7 @@ require([
                                 if (status === 'success') {
                                     self.viewModel.allGraphs.remove(graph);
                                 } else {
-                                    self.viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+                                    self.viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                                 }
                             }
                         });
@@ -104,7 +105,7 @@ require([
                                 if (status === 'success') {
                                     self.viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
                                 } else {
-                                    self.viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+                                    self.viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                                 }
                             }
                         });
