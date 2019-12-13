@@ -2354,7 +2354,12 @@ ul.nav.nav-tabs.nav-justified {
     margin-top: 13px;
 }
 
-.graph-crm-class,
+.graph-crm-class {
+    font-size: 15px;
+    color: #ddd;
+    padding-left: 10px;
+}
+
 .graph-type {
     font-size: 15px;
     color: #777;
@@ -3032,9 +3037,10 @@ ul .collapse li:last-of-type {
     padding-top: 12px;
     color: #999;
     transform: translate(0px, 7px);
-    background: #ebeef0;
+    background: #e2e2e2;
     border: 1px solid #ddd;
     margin-bottom: 10px;
+    text-align: center;
 }
 
 .resource-grid-icon-highlight {
@@ -4592,10 +4598,6 @@ th.notif-type {
     background: #fff;
     border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
-}
-
-.ep-tools .fa-bell {
-    color: #6E7F93;
 }
 
 .navbar-top-links>li>a.navbar-button {

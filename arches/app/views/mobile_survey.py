@@ -93,7 +93,7 @@ class MobileSurveyManagerView(BaseManagerView):
         )
 
         context["nav"]["title"] = _("Arches Collector Manager")
-        context["nav"]["icon"] = "fa-server"
+        context["nav"]["icon"] = "fa-globe"
         context["nav"]["help"] = {"title": _("Arches Collector Manager"), "template": "arches-collector-manager-help"}
 
         return render(request, "views/mobile-survey-manager.htm", context)
@@ -244,7 +244,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
 
         context["nav"]["menu"] = True
         context["nav"]["title"] = _("Arches Collector Manager")
-        context["nav"]["icon"] = "fa-server"
+        context["nav"]["icon"] = "fa-globe"
         context["nav"]["help"] = {"title": _("Arches Collector Manager"), "template": "arches-collector-manager-help"}
 
         return render(request, "views/mobile-survey-designer.htm", context)
