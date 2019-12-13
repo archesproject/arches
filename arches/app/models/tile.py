@@ -30,6 +30,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.resource import EditLog
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -243,7 +244,7 @@ class Tile(models.TileModel):
             userid = str(request.user.id)
             if hasattr(request.user, 'userprofile') is not True:
                 models.UserProfile.objects.create(user=request.user)
-            user_is_reviewer = request.user.userprofile.is_reviewer()
+            user_is_reviewer = user_is_resource_reviewer(request.user)
         tile_data = self.get_tile_data(user_is_reviewer, userid)
         for nodeid, value in tile_data.items():
             datatype_factory = DataTypeFactory()
@@ -269,7 +270,7 @@ class Tile(models.TileModel):
         try:
             if user is None and request is not None:
                 user = request.user
-            user_is_reviewer = user.groups.filter(name='Resource Reviewer').exists()
+            user_is_reviewer = user_is_resource_reviewer(user)
         except AttributeError:  # no user - probably importing data
             user = None
 
@@ -343,9 +344,10 @@ class Tile(models.TileModel):
             tile.delete(*args, request=request, **kwargs)
         try:
             user = request.user
-            user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
+            user_is_reviewer = user_is_resource_reviewer(user)
         except AttributeError:  # no user
             user = None
+            user_is_reviewer = True
 
         if user_is_reviewer is True or self.user_owns_provisional(user):
             query = Query(se)

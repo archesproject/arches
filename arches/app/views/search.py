@@ -43,7 +43,7 @@ from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.utils.permission_backend import get_nodegroups_by_perm
+from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer
 
 
 
@@ -91,7 +91,7 @@ class SearchView(MapBaseManagerView):
             resource_graphs=resource_graphs,
             datatypes=datatypes,
             datatypes_json=JSONSerializer().serialize(datatypes),
-            user_is_reviewer=request.user.groups.filter(name='Resource Reviewer').exists()
+            user_is_reviewer=user_is_resource_reviewer(request.user),
         )
 
         graphs = JSONSerializer().serialize(
@@ -129,7 +129,7 @@ def search_terms(request):
     se = SearchEngineFactory().create()
     searchString = request.GET.get('q', '')
     query = Query(se, start=0, limit=0)
-    user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
+    user_is_reviewer = user_is_resource_reviewer(request.user)
 
     boolquery = Bool()
     boolquery.should(Match(field='value', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
@@ -230,7 +230,7 @@ def search_results(request):
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
 
     if results is not None:
-        user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
+        user_is_reviewer = user_is_resource_reviewer(request.user)
         total = results['hits']['total']
         page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
 
@@ -298,7 +298,7 @@ def get_provisional_type(request):
 
     result = False
     provisional_filter = JSONDeserializer().deserialize(request.GET.get('provisionalFilter', '[]'))
-    user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
+    user_is_reviewer = user_is_resource_reviewer(request.user)
     if user_is_reviewer != False:
         if len(provisional_filter) == 0:
             result = True

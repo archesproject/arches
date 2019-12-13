@@ -34,6 +34,7 @@ from arches.app.utils.decorators import group_required
 from arches.app.views.base import BaseManagerView
 from arches.app.utils.forms import ArchesUserProfileForm
 from arches.app.utils.response import JSONResponse
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 
 class UserManagerView(BaseManagerView):
     action = ''
@@ -103,7 +104,7 @@ class UserManagerView(BaseManagerView):
 
         if self.action == 'get_user_names':
             data = {}
-            if self.request.user.is_authenticated() and request.user.groups.filter(name='Resource Reviewer').exists():
+            if self.request.user.is_authenticated() and user_is_resource_reviewer(request.user):
                 userids = json.loads(request.POST.get('userids', '[]'))
                 data = {u.id:u.username for u in User.objects.filter(id__in=userids)}
                 return JSONResponse(data)
