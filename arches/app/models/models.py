@@ -1035,7 +1035,7 @@ class Notification(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     # created.editable = True
     message = models.TextField(blank=True, null=True)
-    context = JSONField(blank=True, null=True, default=dict())
+    context = JSONField(blank=True, null=True, default=dict)
     # TODO: Ideally validate context against a list of keys from NotificationType
     notiftype = models.ForeignKey(NotificationType, on_delete=models.CASCADE, null=True)
 
