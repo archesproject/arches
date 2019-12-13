@@ -1322,8 +1322,8 @@ class Graph(models.GraphModel):
             if node.datatype == "":
                 raise GraphValidationError(_("A valid node datatype must be selected"), 1007)
             if node.exportable is True:
-                if node.fieldname == "":
-                    raise GraphValidationError(_("Field Name must not be blank."), 1008)
+                if node.fieldname == "" and node.datatype == "geojson-feature-collection":
+                    raise GraphValidationError(_("Field Name must not be blank for geometry nodes."), 1008)
                 try:
                     x = fieldnames[node.fieldname]
                     raise GraphValidationError(_("Field Name must be unique to the graph."), 1009)
