@@ -156,14 +156,16 @@ class ConceptDataType(BaseConceptDataType):
         ext_ids = [
             ident.value for ident in models.Value.objects.all().filter(concept_id__exact=c.conceptid, valuetype__category="identifiers")
         ]
-        for id_uri in ext_ids:
-            if str(id_uri).startswith(settings.PREFERRED_CONCEPT_SCHEME):
-                return URIRef(id_uri)
+        for p in settings.PREFERRED_CONCEPT_SCHEMES:
+            for id_uri in ext_ids:
+                if str(id_uri).startswith(p):
+                    return URIRef(id_uri)
         return URIRef(archesproject[f"concepts/{c.conceptid}"])
 
     def to_rdf(self, edge_info, edge):
         g = Graph()
-        if edge_info["r_uri"] == self.get_rdf_uri(None, edge_info["range_tile_data"]):
+        myuri = self.get_rdf_uri(None, edge_info["range_tile_data"])
+        if edge_info["r_uri"] == myuri:
             c = ConceptValue(str(edge_info["range_tile_data"]))
             g.add((edge_info["r_uri"], RDF.type, URIRef(edge.rangenode.ontologyclass)))
             g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), edge_info["r_uri"]))

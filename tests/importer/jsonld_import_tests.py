@@ -10,7 +10,7 @@ from django.test.client import RequestFactory, Client
 from django.contrib.auth.models import User, Group, AnonymousUser
 from django.urls import reverse
 from django.db import connection
-from tests.base_test import ArchesTestCase
+from tests.base_test import ArchesTestCase, CREATE_TOKEN_SQL
 from arches.app.utils.skos import SKOSReader
 from arches.app.models.models import TileModel, ResourceInstance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -29,36 +29,12 @@ class JsonLDImportTests(ArchesTestCase):
         # This runs once per instantiation
         cls.loadOntology()
         cls.factory = RequestFactory()
-
-        sql = """
-            INSERT INTO public.oauth2_provider_application(
-                id,client_id, redirect_uris, client_type, authorization_grant_type,
-                client_secret,
-                name, user_id, skip_authorization, created, updated)
-            VALUES (
-                44,'{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
-                '{oauth_client_secret}',
-                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000')
-            ON CONFLICT DO NOTHING;
-            INSERT INTO public.oauth2_provider_accesstoken(
-                token, expires, scope, application_id, user_id, created, updated)
-                VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018')
-                ON CONFLICT DO NOTHING;
-        """
-
-        cls.token = "abc"
-        cls.oauth_client_id = "AAac4uRQSqybRiO6hu7sHT50C4wmDp9fAmsPlCj9"
-        cls.oauth_client_secret = "7fos0s7qIhFqUmalDI1QiiYj0rAtEdVMY4hYQDQjOxltbRCBW3dIydOeMD4MytDM9ogCPiYFiMBW6o6ye5bMh5dkeU7pg1cH86wF6Bap9Ke2aaAZaeMPejzafPSj96ID"
-
-        sql = sql.format(
-            token=cls.token, user_id=1, oauth_client_id=cls.oauth_client_id, oauth_client_secret=cls.oauth_client_secret  # admin is 1
-        )
-
-        cursor = connection.cursor()
-        cursor.execute(sql)
-
-        key = "{0}:{1}".format(cls.oauth_client_id, cls.oauth_client_secret)
+        cls.token = "abc123"
         cls.client = Client(HTTP_AUTHORIZATION="Bearer %s" % cls.token)
+
+        sql_str = CREATE_TOKEN_SQL.format(token=cls.token, user_id=1)
+        cursor = connection.cursor()
+        cursor.execute(sql_str)
 
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/jsonld_test_thesaurus.xml")
@@ -135,6 +111,7 @@ class JsonLDImportTests(ArchesTestCase):
         pass
 
     def test_1_basic_import(self):
+
         data = """{
             "@id": "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
             "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
@@ -217,7 +194,6 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/12345678-abcd-11e9-9cbb-3af9d3b32b71")
 
-
         hagu = "http://www.cidoc-crm.org/cidoc-crm/P101_had_as_general_use"
         p2 = "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"
         temp = "http://www.cidoc-crm.org/cidoc-crm/P160_has_temporal_projection"
@@ -239,7 +215,6 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(js[note] == "Test Data")
         self.assertTrue(pts in js)
         self.assertTrue(js[pts] == 12)
-
 
     def test_2b_complex_multiple(self):
         data = """

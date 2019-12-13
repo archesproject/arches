@@ -27,21 +27,67 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from tests import test_settings
+from django.db import connection
+from django.contrib.auth.models import User
 from django.core import management
 
 # these tests can be run from the command line via
 # python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
 
+OAUTH_CLIENT_ID = "AAac4uRQSqybRiO6hu7sHT50C4wmDp9fAmsPlCj9"
+OAUTH_CLIENT_SECRET = "7fos0s7qIhFqUmalDI1QiiYj0rAtEdVMY4hYQDQjOxltbRCBW3dIydOeMD4MytDM9ogCPiYFiMBW6o6ye5bMh5dkeU7pg1cH86wF6B\
+        ap9Ke2aaAZaeMPejzafPSj96ID"
+CREATE_TOKEN_SQL = """
+        INSERT INTO public.oauth2_provider_accesstoken(
+            token, expires, scope, application_id, user_id, created, updated)
+            VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018');
+    """
 
-def setUpModule():
-    pass
+
+def setUpTestPackage():
+    """
+    see https://nose.readthedocs.io/en/latest/writing_tests.html#test-packages
+    this is called from __init__.py
+    """
+
+    cursor = connection.cursor()
+    sql = """
+        INSERT INTO public.oauth2_provider_application(
+            id,client_id, redirect_uris, client_type, authorization_grant_type,
+            client_secret,
+            name, user_id, skip_authorization, created, updated)
+        VALUES (
+            44,'{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
+            '{oauth_client_secret}',
+            'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000');
+    """
+
+    sql = sql.format(user_id=1, oauth_client_id=OAUTH_CLIENT_ID, oauth_client_secret=OAUTH_CLIENT_SECRET)
+    cursor.execute(sql)
 
 
-def tearDownModule():
+def tearDownTestPackage():
+    """
+    see https://nose.readthedocs.io/en/latest/writing_tests.html#test-packages
+    this is called from __init__.py
+    """
+
     se = SearchEngineFactory().create()
     se.delete_index(index="terms,concepts")
     se.delete_index(index="resources")
     se.delete_index(index="resource_relations")
+
+
+def setUpModule():
+    # This doesn't appear to be called because ArchesTestCase is never called directly
+    # See setUpTestPackage above
+    pass
+
+
+def tearDownModule():
+    # This doesn't appear to be called because ArchesTestCase is never called directly
+    # See tearDownTestPackage above
+    pass
 
 
 class ArchesTestCase(TestCase):
