@@ -1045,7 +1045,7 @@ class FileListDataType(BaseDataType):
         if user_is_reviewer is False and tile.provisionaledits is not None and user_id in tile.provisionaledits:
             data = tile.provisionaledits[user_id]["value"]
         else:
-            data = tile["data"]
+            data = tile.data
         return data
 
     def get_display_value(self, tile, node):
