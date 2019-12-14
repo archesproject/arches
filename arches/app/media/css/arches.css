@@ -4206,7 +4206,7 @@ span.editable-card i.fa.fa-align-justify:hover {
     text-align: center;
 }
 
-.r-select-card:hover {
+.r-grid-item:hover .r-select-card, .r-select-card:hover {
     opacity: 1;
 }
 
