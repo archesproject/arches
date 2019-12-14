@@ -4188,7 +4188,7 @@ span.editable-card i.fa.fa-align-justify:hover {
     float: left;
     width: 275px;
     height: 275px;
-    margin: 3px;
+    margin: 5px;
     border: 1px solid #7847CE;
 }
 
@@ -4201,7 +4201,6 @@ span.editable-card i.fa.fa-align-justify:hover {
     background: #8BC3EB;
     padding: 10px;
     color: #fff;
-    border: 1px solid #ddd;
     height: 225px;
     text-align: center;
 }
@@ -4216,7 +4215,7 @@ span.editable-card i.fa.fa-align-justify:hover {
 
 .r-select-title {
     font-size: 19px;
-    font-weight: 400;
+    font-weight: 500;
     color: #fff;
     text-align: center;
 }
@@ -4239,6 +4238,9 @@ span.editable-card i.fa.fa-align-justify:hover {
 }
 
 .r-select-circle {
+    position: absolute;
+    top: 75px;
+    left: 97px;
     width: 80px;
     height: 80px;
     display: inline-block;
@@ -4269,6 +4271,7 @@ span.editable-card i.fa.fa-align-justify:hover {
     font-size: 14px;
     font-weight: 600;
     padding-top: 12px;
+    border-top: 1px solid #7847CE;
 }
 
 .card-grid-item {
