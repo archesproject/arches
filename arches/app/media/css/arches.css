@@ -4194,7 +4194,7 @@ span.editable-card i.fa.fa-align-justify:hover {
 
 #resource-list .r-grid-item:hover {
     cursor: default;
-    border: 1px solid #7847CE;
+    border: 1px solid #333;
 }
 
 .r-select-card {
@@ -4252,7 +4252,7 @@ span.editable-card i.fa.fa-align-justify:hover {
 
 .r-select-icon {
     color: #fff;
-    font-size: 30px;
+    font-size: 28px;
     line-height: 32px;
 }
 
