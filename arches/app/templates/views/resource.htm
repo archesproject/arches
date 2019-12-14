@@ -93,6 +93,37 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </div>
             </div>
+
+            <div class="r-grid-item relative" data-bind="css: { 'disabled': disable_instance_creation}">
+                <div data-bind="attr: {href: '#', title: name, target: '_blank'}" href="#">
+                    <div class="r-select-card">
+                        <h4 class="r-select-title" data-bind="text: name"></h4>
+                        <div class="r-select-circle">
+                            <span><i data-bind="attr:{class: ('fa '+ iconclass +' r-select-icon')}"></i></span>
+                        </div>
+                        <div class="r-desc-container">
+                            <p data-bind="text: description" class="r-select-desc"></p> 
+                        </div>  
+                    </div>
+                </div>
+
+                <!-- card Tools -->
+                <div class="r-select-card-footer">
+                    <!-- ko if: disable_instance_creation -->
+                    <div class="r-warning">
+                      <i class="fa fa-warning"></i> <span class="form-warning" style="" data-bind="text: disable_instance_creation"></span>
+                    </div>
+                    <!-- /ko -->
+                    <!-- ko if: !disable_instance_creation-->
+                    <div class="">
+                        <a href="#" class="btn btn-primary btn-resource-select" role="button" data-bind="
+                        attr: { href: $parent.arches.urls.add_resource(graphid), 'data-arches-graphid': graphid},
+                        css: { 'disabled': disable_instance_creation }">
+                        {% trans "Create Resource" %}</a>
+                    </div>
+                    <!-- /ko -->
+                </div>
+            </div>
             <!-- /ko -->
 
         </div>

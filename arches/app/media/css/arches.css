@@ -4184,6 +4184,93 @@ span.editable-card i.fa.fa-align-justify:hover {
     margin: 5px
 }
 
+.r-grid-item {
+    float: left;
+    width: 275px;
+    height: 275px;
+    margin: 3px;
+    border: 1px solid #7847CE;
+}
+
+#resource-list .r-grid-item:hover {
+    cursor: default;
+    border: 1px solid #7847CE;
+}
+
+.r-select-card {
+    background: #8BC3EB;
+    padding: 10px;
+    color: #fff;
+    border: 1px solid #ddd;
+    height: 225px;
+    text-align: center;
+}
+
+.r-select-card-footer {
+    height: 50px;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    background: #62A8DB;
+}
+
+.r-select-title {
+    font-size: 19px;
+    font-weight: 400;
+    color: #fff;
+    text-align: center;
+}
+
+.r-desc-container {
+    position: absolute;
+    bottom: 60px;
+    left: 5px;
+    right: 5px;
+    padding: 0px 5px;
+}
+
+.r-select-desc {
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2; 
+}
+
+.r-select-circle {
+    width: 80px;
+    height: 80px;
+    display: inline-block;
+    text-align: center;
+    padding: 18px;
+    border-radius: 40px;
+    background: #BFE0F7
+}
+
+.r-select-icon {
+    color: #fff;
+    font-size: 36px;
+    line-height: 40px;
+}
+
+.r-warning {
+    padding: 5px;
+    background: #FFE947;
+    color: #5E29BA;
+    height: 50px;
+    text-align: center;
+    border-top: 1px solid #5E29BA;
+}
+
+.btn-resource-select {
+    height: 50px;
+    width: 100%;
+    font-size: 14px;
+    font-weight: 600;
+    padding-top: 12px;
+}
+
 .card-grid-item {
     float: left;
     width: 290px;
