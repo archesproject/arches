@@ -3,7 +3,7 @@
     <div class="filter-title">{% trans "Export Search Results" %}
     </div>
     <hr class="title-underline">
-    
+
     <div class="search-export">
         <div class="instruction">
             <h2 class=""> {% trans "1. Format" %} </h2>
@@ -22,7 +22,7 @@
                 </label>
             </div>
         </div>
-          
+
         <div class="instruction">
                 <h2 class=""> {% trans "2. Coordinate Precision" %} </h2>
                 <h4 class=""> {% trans "Tell us how many decimal places of precision you'd like for geo-data results" %} </h4>
@@ -46,7 +46,7 @@
         <button class="btn btn-lg btn-primary btn-active-primary"
             type="button"
             aria-expanded="true"
-            data-bind="click: function(){executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} )}"> {% trans "Download" %}
+            data-bind="css: {disabled: total() === 0},click: function(){executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} )}"> {% trans "Download" %}
         </button>
     </div>
     <div class="download-message" data-bind="text: result, fadeVisible: downloadStarted, delay:0, fade: 600">
