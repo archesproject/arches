@@ -4187,7 +4187,7 @@ span.editable-card i.fa.fa-align-justify:hover {
 .r-grid-item {
     float: left;
     width: 275px;
-    height: 260px;
+    height: 250px;
     margin: 5px;
     border: 1px solid #7847CE;
 }
@@ -4201,8 +4201,13 @@ span.editable-card i.fa.fa-align-justify:hover {
     background: #8BC3EB;
     padding: 10px;
     color: #fff;
-    height: 210px;
+    height: 200px;
+    opacity: .8;
     text-align: center;
+}
+
+.r-select-card:hover {
+    opacity: 1;
 }
 
 .r-select-card-footer {
@@ -4218,6 +4223,7 @@ span.editable-card i.fa.fa-align-justify:hover {
     font-weight: 500;
     color: #fff;
     text-align: center;
+    overflow-wrap: break-word;
 }
 
 .r-desc-container {
@@ -4263,6 +4269,10 @@ span.editable-card i.fa.fa-align-justify:hover {
     height: 50px;
     text-align: center;
     border-top: 1px solid #5E29BA;
+}
+
+.r-warning .form-warning {
+    color: #5E29BA;
 }
 
 .btn-resource-select {
