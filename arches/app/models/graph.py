@@ -1335,10 +1335,8 @@ class Graph(models.GraphModel):
 
         fieldnames = {}
         for node_id, node in self.nodes.items():
-            if node.datatype == "":
-                raise GraphValidationError(_("A valid node datatype must be selected"), 1007)
             if node.exportable is True:
-                validated_fieldname = validate_fieldname(node.fieldname, fieldnames, node.datatype)
+                validated_fieldname = validate_fieldname(node.fieldname, fieldnames)
                 if validated_fieldname != node.fieldname:
                     node.fieldname = validated_fieldname
                     node.save()
