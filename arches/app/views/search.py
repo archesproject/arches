@@ -204,6 +204,15 @@ def export_results(request):
     else:
         exporter = SearchResultsExporter(search_request=request)
         export_files = exporter.export(format)
+        if len(export_files) == 0 and format == "shp":
+            message = _(
+                "Either no instances were identified for export or no resources have exportable geometry nodes\
+                Please confirm that the models of instances you would like to export have geometry nodes and that\
+                those nodes are set as exportable"
+            )
+            dest = StringIO()
+            dest.write(message)
+            export_files.append({"name": "error.txt", "outputfile": dest})
         return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
 
 
