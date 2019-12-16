@@ -132,7 +132,10 @@ class ShpWriter(Writer):
                         writer = shapefile.Writer(shp=shp, shx=shx, dbf=dbf, shapeType=shapefile.POLYGON)
 
                     for header in headers:
-                        datatype = header.pop("datatype")
+                        try:
+                            datatype = header.pop("datatype")
+                        except KeyError:
+                            pass
                         if header["fieldname"] != geometry_field:
                             writer.field(header["fieldname"], "C", 255)
 

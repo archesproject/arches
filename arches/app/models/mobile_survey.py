@@ -36,6 +36,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.couch import Couch
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 import arches.app.views.search as search
 
 logger = logging.getLogger(__name__)
@@ -235,7 +236,7 @@ class MobileSurvey(models.MobileSurveyModel):
     def handle_reviewer_edits(self, user, tile):
         if hasattr(user, "userprofile") is not True:
             models.UserProfile.objects.create(user=user)
-        if user.userprofile.is_reviewer():
+        if user_is_resource_reviewer(user):
             user_id = str(user.id)
             if user_id in tile.provisionaledits:
                 tile.provisionaledits.pop(user_id, None)

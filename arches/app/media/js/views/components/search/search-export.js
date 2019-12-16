@@ -45,7 +45,7 @@ function($, ko, arches) {
             this.executeExport = function(limit){
                 if (this.total() > limit) {
                     this.getExportData();
-                } else {
+                } else if (this.total() > 0) {
                     window.open(this.url());
                 }
             };

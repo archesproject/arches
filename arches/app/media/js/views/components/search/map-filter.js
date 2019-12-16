@@ -12,11 +12,10 @@ define([
     'mapbox-gl',
     'mapbox-gl-draw',
     'geojson-extent',
-    'mathjs',
     'uuid',
     'geojsonhint',
     'codemirror/mode/javascript/javascript'
-], function($, _, arches, ko, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash, mapboxgl, MapboxDraw, geojsonExtent, mathjs, uuid, geojsonhint) {
+], function($, _, arches, ko, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash, mapboxgl, MapboxDraw, geojsonExtent, uuid, geojsonhint) {
     var componentName = 'map-filter';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -85,6 +84,8 @@ define([
                         }
                     ]
                 );
+
+                options.search = true;
 
                 MapComponentViewModel.apply(this, [options]);
 
@@ -319,7 +320,7 @@ define([
                 this.map.subscribe(function(){
                     this.setupDraw();
                     this.restoreState();
-                    
+
                     var filterUpdated = ko.computed(function() {
                         return JSON.stringify(ko.toJS(this.filter.feature_collection())) + this.filter.inverted();
                     }, this);
@@ -403,16 +404,28 @@ define([
                 this.drawMode(undefined);
             },
 
+            useMaxBuffer: function (unit, buffer, maxBuffer) {
+                res = false;
+                if (unit === 'ft') {
+                    res = (buffer * 0.3048) > maxBuffer
+                } else {
+                    res = buffer > maxBuffer
+                }
+                return res;
+            },
+
             updateFilter: function(){
-                var maxBufferUnit = mathjs.unit(this.maxBuffer, this.maxBufferUnits);
-                var unit = mathjs.unit(this.buffer() + this.bufferUnit());
-                unit.equalBase(maxBufferUnit);
                 if (this.buffer() < 0) {
                     this.buffer(0);
-                } else if (unit.value > maxBufferUnit.value) {
-                    this.buffer(this.maxBuffer);
-                    this.bufferUnit(this.maxBufferUnits);
                 }
+
+                var useMaxBuffer = this.useMaxBuffer(this.bufferUnit(), this.buffer(), this.maxBuffer);
+                var buffer = this.buffer();
+                if (useMaxBuffer) {
+                    max = this.bufferUnit() === 'ft' ? 328084 : this.maxBuffer;
+                    this.buffer(max);
+                }
+
                 this.searchGeometries().forEach(function(feature){
                     if(!feature.properties){
                         feature.properties = {};

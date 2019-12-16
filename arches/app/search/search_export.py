@@ -72,8 +72,8 @@ class SearchResultsExporter(object):
                 headers.append("resourceid")
                 ret.append(self.to_csv(resources["output"], headers=headers, name=graph.name))
             if format == "shp":
-                headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype")
-                list(headers).append({"fieldname": "resourceid", "datatype": "str"})
+                headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype")[::1]
+                headers.append({"fieldname": "resourceid", "datatype": "str"})
                 ret += self.to_shp(resources["output"], headers=headers, name=graph.name)
 
         search_export_info = models.SearchExportHistory(
@@ -176,8 +176,6 @@ class SearchResultsExporter(object):
         dest = StringIO()
         csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=headers)
         csvwriter.writeheader()
-        # csvs_for_export.append({"name": csv_name, "outputfile": dest})
-        # print(f"{name} = {len(instances)}")
         for instance in instances:
             csvwriter.writerow({k: str(v) for k, v in list(instance.items())})
         return {"name": f"{name}.csv", "outputfile": dest}

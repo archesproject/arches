@@ -93,7 +93,7 @@ class MobileSurveyManagerView(BaseManagerView):
         )
 
         context["nav"]["title"] = _("Arches Collector Manager")
-        context["nav"]["icon"] = "fa-server"
+        context["nav"]["icon"] = "fa-globe"
         context["nav"]["help"] = {"title": _("Arches Collector Manager"), "template": "arches-collector-manager-help"}
 
         return render(request, "views/mobile-survey-manager.htm", context)
@@ -103,7 +103,7 @@ class MobileSurveyManagerView(BaseManagerView):
         try:
             mobile_survey_id = JSONDeserializer().deserialize(request.body)["id"]
         except Exception as e:
-            print(e)
+            logger.exception(e)
 
         try:
             connection_error = False
@@ -114,7 +114,7 @@ class MobileSurveyManagerView(BaseManagerView):
                     return JSONResponse({"success": True})
         except Exception as e:
             if connection_error is False:
-                error_title = _("Unable to delete survey")
+                error_title = _("Unable to delete collector project")
                 if "strerror" in e and e.strerror == "Connection refused" or "Connection refused" in e:
                     error_message = _("Unable to connect to CouchDB")
                 else:
@@ -244,7 +244,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
 
         context["nav"]["menu"] = True
         context["nav"]["title"] = _("Arches Collector Manager")
-        context["nav"]["icon"] = "fa-server"
+        context["nav"]["icon"] = "fa-globe"
         context["nav"]["help"] = {"title": _("Arches Collector Manager"), "template": "arches-collector-manager-help"}
 
         return render(request, "views/mobile-survey-designer.htm", context)
@@ -261,7 +261,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
             if connection_error is False:
                 error_title = _("Unable to delete survey")
                 if "strerror" in e and e.strerror == "Connection refused" or "Connection refused" in e:
-                    error_message = _("Unable to connect to CouchDB")
+                    error_message = _("Unable to connect to CouchDB. Please confirm that CouchDB is running")
                 else:
                     error_message = e.message
                 connection_error = JSONErrorResponse(error_title, error_message)
@@ -364,18 +364,17 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         mobile_survey.lasteditedby = self.request.user
 
         try:
-            connection_error = False
             with transaction.atomic():
                 mobile_survey.save()
+        except ConnectionRefusedError as e:
+            error_title = _("Unable to save collector project")
+            error_message = _("Failed to connect to a CouchDB service")
+            connection_error = JSONErrorResponse(error_title, error_message)
+            return connection_error
         except Exception as e:
-            if connection_error is False:
-                error_title = _("Unable to save survey")
-                print(e)
-                if "strerror" in e or "Connection refused" in e:
-                    error_message = _("Unable to connect to CouchDB")
-                else:
-                    error_message = e.message
-                connection_error = JSONErrorResponse(error_title, error_message)
+            error_title = _("Unable to save collector project")
+            logger.exception(e)
+            connection_error = JSONErrorResponse(error_title, e)
             return connection_error
 
         return JSONResponse({"success": True, "mobile_survey": mobile_survey})
