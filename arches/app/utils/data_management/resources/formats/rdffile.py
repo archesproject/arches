@@ -399,7 +399,7 @@ class JsonLdReader(Reader):
                 self.resource.pk = resourceid
             self.resource.graph_id = graphid
             self.resources.append(self.resource)
-            
+
             ### --- Process Instance ---
             # now walk the instance and align to the tree
             result = {"data": [jsonld_document["@id"]]}
