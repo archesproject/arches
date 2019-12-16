@@ -2015,10 +2015,10 @@ meow@^5.0.0:
     trim-newlines "^2.0.0"
     yargs-parser "^10.0.0"
 
-metismenu@^2.7.2:
-  version "2.7.9"
-  resolved "https://registry.yarnpkg.com/metismenu/-/metismenu-2.7.9.tgz#78366586a0c29281ff503509b1c1f4a3338fb57a"
-  integrity sha512-l2F61AaGdqiSh0NFmTofCfI59M6EruCOTRSAmbLxZ1ZpUD1Fjdo6/ZFfyMCxHbIejLamtVVHGRwNrerR/pPmbA==
+metismenu@^3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/metismenu/-/metismenu-3.0.4.tgz#993185b841e07aac936cbf3fd0b0fd8bc99afa82"
+  integrity sha512-eL/IcGMVlwtn0oda+ff5psD1R1meQB+5W1xX2nXdDZEgyTXGUNmLBQHte1jbNZ1XjV5MLzOJ1FAK5Cn8Fkg52g==
 
 mgrs@1.0.0:
   version "1.0.0"
