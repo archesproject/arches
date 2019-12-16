@@ -987,6 +987,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
     def after_update_all(self):
         # import arches.app.tasks as tasks
         from arhes.app.tasks import refresh_materialized_view
+
         celery_worker_running = task_management.check_if_celery_available()
         if celery_worker_running is True:
             res = refresh_materialized_view.apply_async(())
