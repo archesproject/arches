@@ -47,7 +47,6 @@
         "leaflet-iiif": "^1.1.1",
         "lt-themify-icons": "^1.1.0",
         "mapbox-gl": "^1.0.0",
-        "mathjs": "^3.11.4",
         "metismenu": "^2.7.2",
         "moment": ">=2.10.5",
         "nouislider": "11.0.3",
