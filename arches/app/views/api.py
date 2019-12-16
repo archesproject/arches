@@ -37,6 +37,7 @@ from arches.app.utils.data_management.resources.formats.rdffile import JsonLdRea
 from arches.app.utils.permission_backend import user_can_read_resources
 from arches.app.utils.permission_backend import user_can_edit_resources
 from arches.app.utils.permission_backend import user_can_read_concepts
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
@@ -124,6 +125,7 @@ class APIBase(View):
 
 class Sync(APIBase):
     import arches.app.tasks as tasks
+
     def get(self, request, surveyid=None):
         can_sync = userCanAccessMobileSurvey(request, surveyid)
         if can_sync:
@@ -371,7 +373,10 @@ class MVT(APIBase):
 
                         SELECT ST_AsMVT(
                             tile,
-                            %s
+                             %s,
+                            4096,
+                            'geom',
+                            'id'
                         ) FROM (
                             SELECT resourceinstanceid::text,
                                 row_number() over () as id,
@@ -404,7 +409,7 @@ class MVT(APIBase):
                     )
                 else:
                     cursor.execute(
-                        """SELECT ST_AsMVT(tile, %s) FROM (SELECT tileid,
+                        """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
                             row_number() over () as id,
                             resourceinstanceid,
                             nodeid,
@@ -716,7 +721,7 @@ class Concepts(APIBase):
             try:
                 skos = SKOSWriter()
                 value = skos.write(ret, format="nt")
-                js = from_rdf(str(value), options={format: "application/nquads"})
+                js = from_rdf(value.decode("utf-8"), options={format: "application/nquads"})
 
                 context = [{"@context": {"skos": SKOS, "dcterms": DCTERMS, "rdf": str(RDF)}}, {"@context": settings.RDM_JSONLD_CONTEXT}]
 
@@ -770,7 +775,7 @@ class Card(APIBase):
             widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in cards] for widget in widgets
         ]
         datatypes = models.DDataType.objects.all()
-        user_is_reviewer = request.user.groups.filter(name="Resource Reviewer").exists()
+        user_is_reviewer = user_is_resource_reviewer(request.user)
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
 

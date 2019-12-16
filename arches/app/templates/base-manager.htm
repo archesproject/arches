@@ -125,6 +125,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="" data-placement="bottom" data-toggle="tooltip" aria-expanded="true" data-original-title="{% trans 'Notifications' %}">
                                 <div >
                                     <div data-bind="visible: unreadNotifs()" id="circle"></div>
+                                    <div data-bind="visible: unreadNotifs()" id="circle-outline"></div>
                                     <i class="fa fa-bell"></i>
                                 </div>
                             </div>
@@ -181,7 +182,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <div class="ep-help-title">
                                     <span>{% trans 'Notifications' %}</span>
                                 </div>
-                                <a href="javascript:void(0);" data-bind="click: function() {getNotifications();}" class="ep-notifs-toggle ep-notifs-close ep-tools ep-tools-right" style="border:none;">
+                                <a href="javascript:void(0);" data-bind="click: function() {getNotifications();}" class="ep-notifs-toggle ep-notifs-close ep-tools ep-tools-right">
                                     <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close" %}'>
                                       <i class="fa fa-times-circle fa-lg"></i>
                                     </div>

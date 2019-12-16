@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+>
+  <skos:Concept rdf:about="http://localhost:8000/0bb450bc-8fe3-46cb-968e-2b56849e6e96">
+    <skos:inScheme>
+      <skos:ConceptScheme rdf:about="http://localhost:8000/77d9d36e-054a-47a3-96c0-4165872a2d5d">
+        <skos:hasTopConcept rdf:resource="http://localhost:8000/467f6269-1f04-410e-b4f6-5a46a1ed0bf8"/>
+        <dcterms:title xml:lang="en-us">{"id": "d5123af1-9972-49c7-b365-aa503d8aec1d", "value": "Test Thesaurus"}</dcterms:title>
+      </skos:ConceptScheme>
+    </skos:inScheme>
+    <skos:prefLabel xml:lang="en-us">{"id": "ac1d498c-9c61-4573-bfe8-1653641c028a", "value": "Concept 1"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/467f6269-1f04-410e-b4f6-5a46a1ed0bf8">
+    <skos:inScheme rdf:resource="http://localhost:8000/77d9d36e-054a-47a3-96c0-4165872a2d5d"/>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/1f92e7ca-e1c9-45cf-b228-510ee0d29ef1">
+        <skos:prefLabel xml:lang="en-us">{"id": "8c7b7251-4396-4f59-9809-59daf1d90094", "value": "5126 concepts"}</skos:prefLabel>
+        <skos:narrower rdf:resource="http://localhost:8000/2b259ab7-5eda-4745-968b-9c9477bb504c"/>
+        <skos:narrower rdf:resource="http://localhost:8000/9fb36cb1-e66c-4a37-880e-96b13e273f5c"/>
+        <skos:inScheme rdf:resource="http://localhost:8000/77d9d36e-054a-47a3-96c0-4165872a2d5d"/>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/7ceb6310-2ab2-4da8-a682-62458475750e">
+        <skos:prefLabel xml:lang="en-us">{"id": "2a288827-1933-4b8f-8628-e75886a3a9b3", "value": "5126 aat concepts"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://localhost:8000/77d9d36e-054a-47a3-96c0-4165872a2d5d"/>
+        <skos:narrower rdf:resource="http://localhost:8000/36bd68ba-9ee4-43b2-9855-e2d91b56b9c9"/>
+        <skos:narrower rdf:resource="http://localhost:8000/f7d88cd2-28c7-4736-a354-7c301affd723"/>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/83791203-b82e-4e73-9f86-72c98c9d2b60">
+        <skos:prefLabel xml:lang="en-us">{"id": "3300a2fc-625d-4fcb-b5f0-e31493317d46", "value": "5098 Concepts"}</skos:prefLabel>
+        <skos:narrower rdf:resource="http://localhost:8000/0bb450bc-8fe3-46cb-968e-2b56849e6e96"/>
+        <skos:inScheme rdf:resource="http://localhost:8000/77d9d36e-054a-47a3-96c0-4165872a2d5d"/>
+        <skos:narrower rdf:resource="http://localhost:8000/c3c4b8a8-39bb-41e7-af45-3a0c60fa4ddf"/>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:prefLabel xml:lang="en-us">{"id": "6ccd7838-38ee-4e69-904e-9ba6da7f200f", "value": "Top"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/36bd68ba-9ee4-43b2-9855-e2d91b56b9c9">
+    <skos:prefLabel xml:lang="en">{"id": "a314bcd7-17aa-4388-a4fe-1f97c2ea7c93", "value": "aquarelles (paintings)"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://localhost:8000/77d9d36e-054a-47a3-96c0-4165872a2d5d"/>
+    <skos:scopeNote xml:lang="en">{"id": "18e7830c-0970-4d56-aaac-f8c7c59f0466", "value": "Paintings produced by applying washes of thin, transparent watercolor, usually onto paper."}</skos:scopeNote>
+    <dcterms:identifier xml:lang="en-us">{"id": "a1d70f4a-746f-419d-adf2-b7db9422a3a1", "value": "http://vocab.getty.edu/aat/300404216"}</dcterms:identifier>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/f7d88cd2-28c7-4736-a354-7c301affd723">
+    <dcterms:identifier xml:lang="en-us">{"id": "6eb2c14a-7944-465b-bc5c-05763d503584", "value": "http://vocab.getty.edu/aat/300178308"}</dcterms:identifier>
+    <skos:prefLabel xml:lang="en">{"id": "e7130600-f84e-4c29-9313-14b3ccd395d6", "value": "cave paintings"}</skos:prefLabel>
+    <skos:prefLabel xml:lang="de">{"id": "31e4593a-b6a4-46bb-bf8f-ce02796f4e45", "value": "H\u00f6hlenmalerei"}</skos:prefLabel>
+    <skos:scopeNote xml:lang="en">{"id": "eec33bd9-fe2d-4bcd-82e9-f548aa69751e", "value": "Paintings and other markings executed on the surface of the living rock in natural caves, especially during the Paleolithic period. For markings cut into the living rock, use \"rock engravings.\""}</skos:scopeNote>
+    <skos:inScheme rdf:resource="http://localhost:8000/77d9d36e-054a-47a3-96c0-4165872a2d5d"/>
+    <skos:scopeNote xml:lang="de">{"id": "81463571-803b-4543-a7d4-248093affb6c", "value": "Malerei und andere Markierung, die auf der Oberfl\u00e4che von festen Felsen in nat\u00fcrlichen H\u00f6hlen ausgef\u00fchrt wurde, insbesondere w\u00e4hrend des Pal\u00e4olithikums. F\u00fcr eine Markierung, die in den festen Felsen geritzt wurde, siehe \"Felsgravierung\"."}</skos:scopeNote>
+    <skos:prefLabel xml:lang="fr">{"id": "a9bb2654-d082-429b-a8fa-ac83dcd166d5", "value": "peintures rupestres"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/2b259ab7-5eda-4745-968b-9c9477bb504c">
+    <skos:prefLabel xml:lang="en-us">{"id": "65e185fc-545f-4c1e-a88f-673811f9cca0", "value": "5126 concept A"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://localhost:8000/77d9d36e-054a-47a3-96c0-4165872a2d5d"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/c3c4b8a8-39bb-41e7-af45-3a0c60fa4ddf">
+    <skos:prefLabel xml:lang="en-us">{"id": "9a94ce98-4d76-4405-89df-b9ddeaddfae1", "value": "Concept 2"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://localhost:8000/77d9d36e-054a-47a3-96c0-4165872a2d5d"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/9fb36cb1-e66c-4a37-880e-96b13e273f5c">
+    <skos:inScheme rdf:resource="http://localhost:8000/77d9d36e-054a-47a3-96c0-4165872a2d5d"/>
+    <skos:prefLabel xml:lang="en-us">{"id": "ef9a23b1-244d-4db7-9936-95a9ad976a2f", "value": "5126 Concept B"}</skos:prefLabel>
+  </skos:Concept>
+</rdf:RDF>

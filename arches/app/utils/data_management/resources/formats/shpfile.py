@@ -132,8 +132,12 @@ class ShpWriter(Writer):
                         writer = shapefile.Writer(shp=shp, shx=shx, dbf=dbf, shapeType=shapefile.POLYGON)
 
                     for header in headers:
-                        if header != geometry_field:
-                            writer.field(header, "C", 255)
+                        try:
+                            datatype = header.pop("datatype")
+                        except KeyError:
+                            pass
+                        if header["fieldname"] != geometry_field:
+                            writer.field(header["fieldname"], "C", 255)
 
                     for feature in features:
                         shp_geom = self.convert_geom(feature[geometry_field])
@@ -143,6 +147,11 @@ class ShpWriter(Writer):
                             writer.line(shp_geom)
                         elif geom_type == "poly":
                             writer.poly(shp_geom)
+
+                        for header in headers:
+                            if header["fieldname"] not in feature:
+                                feature[header["fieldname"]] = ""
+
                         writer.record(**feature)
 
                     prj.write(

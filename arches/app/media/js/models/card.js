@@ -313,7 +313,7 @@ define([
                 });
                 if (originalWidgetData) {
                     widget.configKeys().forEach(function(configKey){
-                        widget.config[configKey](originalWidgetData.config[configKey]);
+                        koMapping.fromJS(originalWidgetData.config[configKey], widget.config[configKey]);
                     });
                     widget.label(originalWidgetData.label);
                     widget.widget_id(originalWidgetData.widget_id);

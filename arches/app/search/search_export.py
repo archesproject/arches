@@ -24,7 +24,7 @@ from arches.app.utils.flatten_dict import flatten_dict
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.geo_utils import GeoUtils
-import arches.app.views.search as SearchView
+from arches.app.views import search as SearchView
 
 
 class SearchResultsExporter(object):
@@ -67,11 +67,13 @@ class SearchResultsExporter(object):
 
         for graph_id, resources in output.items():
             graph = models.GraphModel.objects.get(pk=graph_id)
-            headers = list(graph.node_set.filter(exportable=True).values_list("fieldname", flat=True))
-            headers.append("resourceid")
             if format == "tilecsv":
+                headers = list(graph.node_set.filter(exportable=True).values_list("fieldname", flat=True))
+                headers.append("resourceid")
                 ret.append(self.to_csv(resources["output"], headers=headers, name=graph.name))
             if format == "shp":
+                headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype")[::1]
+                headers.append({"fieldname": "resourceid", "datatype": "str"})
                 ret += self.to_shp(resources["output"], headers=headers, name=graph.name)
         return ret
 
@@ -168,8 +170,6 @@ class SearchResultsExporter(object):
         dest = StringIO()
         csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=headers)
         csvwriter.writeheader()
-        # csvs_for_export.append({"name": csv_name, "outputfile": dest})
-        print(f"{name} = {len(instances)}")
         for instance in instances:
             csvwriter.writerow({k: str(v) for k, v in list(instance.items())})
         return {"name": f"{name}.csv", "outputfile": dest}

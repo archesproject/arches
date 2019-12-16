@@ -106,11 +106,11 @@ class Command(BaseCommand):
         instance.modulename = os.path.basename(source)
         instance.classname = details["classname"]
         instance.defaultwidget = details["defaultwidget"]
-        instance.defaultconfig = details["defaultconfig"]
-        instance.configcomponent = details["configcomponent"]
-        instance.configname = details["configname"]
-        instance.isgeometric = details["isgeometric"]
-        instance.issearchable = details["issearchable"]
+        instance.defaultconfig = details['defaultconfig']
+        instance.configcomponent = details['configcomponent']
+        instance.configname = details['configname']
+        instance.isgeometric = details['isgeometric']
+        # instance.issearchable = details['issearchable']
 
         instance.save()
 

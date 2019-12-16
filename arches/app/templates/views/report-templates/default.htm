@@ -59,6 +59,7 @@
             <h4 class="rp-section-title">{% trans 'Related Resources' %}</h4>
         </div>
         <!-- ko foreach: { data: report.related_resources, as: 'rr' } -->
+        <!-- ko if: rr.related.length > 0 -->
         <div class="rp-card-section">
             <h5 class="rp-tile-title">
                 <span class="rp-tile-title-float" data-bind="text:rr.graph_name"></span>
@@ -81,6 +82,7 @@
             </div>
             <!--/ko-->
         </div>
+        <!-- /ko -->
         <!-- /ko -->
     </div>
 </div>

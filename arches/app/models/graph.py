@@ -1315,20 +1315,31 @@ class Graph(models.GraphModel):
                         _("If your graph contains more than one node and is not a resource the root must be a collector."), 999
                     )
 
-        # validate that nodes have a datatype assigned to them
-        # validate that node.fieldnames are unique and not blank
+        def validate_fieldname(fieldname, fieldnames):
+            chars = set("`~!@#$%^&*()-+=[{]}\|;:<,>./?")
+            if node.fieldname == "":
+                raise GraphValidationError(_("Field Name must not be blank."), 1008)
+            if any((c in chars) for c in fieldname):
+                raise GraphValidationError(_("Field Name must contain only alpha-numeric characters or underscores."), 1010)
+            if fieldname[0] == "_" or fieldname[0].isdigit():
+                raise GraphValidationError(_("Field Name must begin with alphabet letter"), 1011)
+            if len(fieldname) > 10:
+                fieldname = fieldname[:10]
+            try:
+                dupe = fieldnames[fieldname]
+                raise GraphValidationError(_("Field Name must be unique to the graph."), 1009)
+            except KeyError as e:
+                fieldnames[fieldname] = True
+
+            return fieldname
+
         fieldnames = {}
         for node_id, node in self.nodes.items():
-            if node.datatype == "":
-                raise GraphValidationError(_("A valid node datatype must be selected"), 1007)
             if node.exportable is True:
-                if node.fieldname == "":
-                    raise GraphValidationError(_("Field Name must not be blank."), 1008)
-                try:
-                    x = fieldnames[node.fieldname]
-                    raise GraphValidationError(_("Field Name must be unique to the graph."), 1009)
-                except KeyError as e:
-                    fieldnames[node.fieldname] = True
+                validated_fieldname = validate_fieldname(node.fieldname, fieldnames)
+                if validated_fieldname != node.fieldname:
+                    node.fieldname = validated_fieldname
+                    node.save()
 
         # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
         if self.ontology is not None:

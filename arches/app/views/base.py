@@ -23,7 +23,7 @@ from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.views.generic import TemplateView
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.utils.permission_backend import get_createable_resource_types
+from arches.app.utils.permission_backend import get_createable_resource_types, user_is_resource_reviewer
 
 
 class BaseManagerView(TemplateView):
@@ -54,7 +54,7 @@ class BaseManagerView(TemplateView):
                 "author",
             ],
         )
-        context["notifications"] = models.Notification.objects.filter(recipient_id=self.request.user, is_read=False)
+        context["notifications"] = models.UserXNotification.objects.filter(recipient=self.request.user, isread=False)
         context["nav"] = {
             "icon": "fa fa-chevron-circle-right",
             "title": "",
@@ -68,7 +68,7 @@ class BaseManagerView(TemplateView):
             "login": True,
             "print": False,
         }
-        context["user_is_reviewer"] = self.request.user.groups.filter(name="Resource Reviewer").exists()
+        context["user_is_reviewer"] = user_is_resource_reviewer(self.request.user)
         context["app_name"] = settings.APP_NAME
         return context
 

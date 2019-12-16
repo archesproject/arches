@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+>
+  <skos:Collection rdf:about="http://localhost:8000/0481e0ba-b063-4405-8f89-356b33a532fe">
+    <skos:member>
+      <skos:Concept rdf:about="http://localhost:8000/9fb36cb1-e66c-4a37-880e-96b13e273f5c"/>
+    </skos:member>
+    <skos:member>
+      <skos:Concept rdf:about="http://localhost:8000/2b259ab7-5eda-4745-968b-9c9477bb504c"/>
+    </skos:member>
+    <skos:prefLabel xml:lang="en-us">{"id": "8f03cf4c-20db-45ea-bfc0-db2d9ae9e345", "value": "5126 concepts"}</skos:prefLabel>
+  </skos:Collection>
+  <skos:Collection rdf:about="http://localhost:8000/00000000-0000-0000-0000-000000000005">
+    <skos:member>
+      <skos:Concept rdf:about="http://localhost:8000/00000000-0000-0000-0000-000000000007"/>
+    </skos:member>
+    <skos:prefLabel xml:lang="en-us">{"id": "d8c622f6-e786-11e6-905a-475a5eee86f5", "value": "Resource To Resource Relationship Types"}</skos:prefLabel>
+  </skos:Collection>
+  <skos:Collection rdf:about="http://localhost:8000/b36de6ed-1b8c-47f0-b480-5811c0466672">
+    <skos:member>
+      <skos:Concept rdf:about="http://localhost:8000/36bd68ba-9ee4-43b2-9855-e2d91b56b9c9"/>
+    </skos:member>
+    <skos:member>
+      <skos:Concept rdf:about="http://localhost:8000/f7d88cd2-28c7-4736-a354-7c301affd723"/>
+    </skos:member>
+    <skos:prefLabel xml:lang="en-us">{"id": "b8f5ad97-748b-49ca-98b0-340f9f211724", "value": "5126 aat concepts"}</skos:prefLabel>
+  </skos:Collection>
+  <skos:Collection rdf:about="http://localhost:8000/9ba62a7b-1036-410f-b6ae-3da59ad0447e">
+    <skos:prefLabel xml:lang="en-us">{"id": "4ea96627-656a-476a-9671-5a1549ae8cbd", "value": "5098 Concepts"}</skos:prefLabel>
+    <skos:member>
+      <skos:Concept rdf:about="http://localhost:8000/0bb450bc-8fe3-46cb-968e-2b56849e6e96"/>
+    </skos:member>
+    <skos:member>
+      <skos:Concept rdf:about="http://localhost:8000/c3c4b8a8-39bb-41e7-af45-3a0c60fa4ddf"/>
+    </skos:member>
+  </skos:Collection>
+</rdf:RDF>

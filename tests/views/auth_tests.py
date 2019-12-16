@@ -24,7 +24,7 @@ Replace this with more appropriate tests for your application.
 """
 
 import base64
-from tests.base_test import ArchesTestCase
+from tests.base_test import ArchesTestCase, OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, CREATE_TOKEN_SQL
 from django.db import connection
 from django.urls import reverse
 from django.contrib.auth.models import User, Group, AnonymousUser
@@ -40,42 +40,27 @@ from arches.app.utils.middleware import SetAnonymousUser
 
 
 class AuthTests(ArchesTestCase):
-    def setUp(self):
-        self.factory = RequestFactory()
-        self.client = Client()
-        self.user = User.objects.create_user("test", "test@archesproject.org", "password")
-        self.user.save()
+    @classmethod
+    def setUpClass(cls):
+        cls.factory = RequestFactory()
+        cls.client = Client()
+        cls.user = User.objects.create_user("test", "test@archesproject.org", "password")
 
         rdm_admin_group = Group.objects.get(name="RDM Administrator")
-        self.user.groups.add(rdm_admin_group)
+        cls.user.groups.add(rdm_admin_group)
+        cls.anonymous_user = User.objects.get(username="anonymous")
 
-        self.anonymous_user = User.objects.get(username="anonymous")
+        cls.token = "abc"
+        cls.oauth_client_id = OAUTH_CLIENT_ID
+        cls.oauth_client_secret = OAUTH_CLIENT_SECRET
 
-        sql = """
-            INSERT INTO public.oauth2_provider_application(
-                id,client_id, redirect_uris, client_type, authorization_grant_type,
-                client_secret,
-                name, user_id, skip_authorization, created, updated)
-            VALUES (
-                44,'{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
-                '{oauth_client_secret}',
-                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000');
-            INSERT INTO public.oauth2_provider_accesstoken(
-                token, expires, scope, application_id, user_id, created, updated)
-                VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018');
-        """
-
-        self.token = "abc"
-        self.oauth_client_id = "AAac4uRQSqybRiO6hu7sHT50C4wmDp9fAmsPlCj9"
-        self.oauth_client_secret = "7fos0s7qIhFqUmalDI1QiiYj0rAtEdVMY4hYQDQjOxltbRCBW3dIydOeMD4MytDM9ogCPiYFiMBW6o6ye5bMh5dkeU7pg1cH86wF6B\
-            ap9Ke2aaAZaeMPejzafPSj96ID"
-
-        sql = sql.format(
-            token=self.token, user_id=self.user.pk, oauth_client_id=self.oauth_client_id, oauth_client_secret=self.oauth_client_secret
-        )
-
+        sql_str = CREATE_TOKEN_SQL.format(token=cls.token, user_id=cls.user.pk)
         cursor = connection.cursor()
-        cursor.execute(sql)
+        cursor.execute(sql_str)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.user.delete()
 
     def test_login(self):
         """
@@ -258,9 +243,6 @@ class AuthTests(ArchesTestCase):
 
         self.assertTrue(response.status_code == 302)
         self.assertTrue(response.get("location").split("?")[0] == reverse("auth"))
-
-    def tearDown(self):
-        self.user.delete()
 
 
 def apply_middleware(request):

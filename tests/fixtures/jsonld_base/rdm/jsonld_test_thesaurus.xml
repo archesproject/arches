@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+>
+  <skos:Concept rdf:about="http://localhost:8000/1df7e2d6-08b2-4fc6-9152-30b72931ba0c">
+    <skos:inScheme>
+      <skos:ConceptScheme rdf:about="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2">
+        <dcterms:title xml:lang="en-us">{"id": "395f2e0c-7b3a-4836-a8e2-e316c82832ce", "value": "Test Thesaurus"}</dcterms:title>
+        <skos:hasTopConcept rdf:resource="http://localhost:8000/447c0aaa-9d05-4036-8a39-1ffcf54ccc9a"/>
+      </skos:ConceptScheme>
+    </skos:inScheme>
+    <skos:prefLabel xml:lang="en-us">{"id": "6aab307f-43c6-4962-aaa3-abc13b889594", "value": "english"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/d6a5290a-9fdc-4f68-b7fe-006361a7644e">
+    <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/5f32de86-d6be-40ac-a7d3-6999471c4e6e">
+        <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+        <skos:prefLabel xml:lang="en-us">{"id": "bdc4d9a9-7658-4735-9691-2f47923fdda2", "value": "still used"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:prefLabel xml:lang="en-us">{"id": "848e1906-2ee3-4b3f-a20a-78fed1c3e7de", "value": "language meta types"}</skos:prefLabel>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/babcafca-138f-43e6-b32e-22050d482304">
+        <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+        <skos:prefLabel xml:lang="en-us">{"id": "3a35d4fe-15ea-47b9-8ad7-f66ff78428a7", "value": "spoken"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:narrower>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/e9b19aa2-c3fd-4d53-bcb5-d44b9ac1c5dd">
+    <skos:prefLabel xml:lang="en-us">{"id": "d7ab1fd2-006b-41d1-83cb-2b29eb633e02", "value": "Complex Export Types"}</skos:prefLabel>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/fb457e76-e018-41e7-9be3-0f986816450a">
+        <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+        <skos:prefLabel xml:lang="en-us">{"id": "946e7b38-889a-4826-94a8-ae1dd1c8c2d0", "value": "Test Type A"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/6458c29a-e043-46f7-b89b-bb6f50be9f78">
+        <skos:prefLabel xml:lang="en-us">{"id": "babd6b3c-82b4-47c9-9112-86332320c48e", "value": "Test Type B"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+      </skos:Concept>
+    </skos:narrower>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/348aa028-020e-48fd-b27d-ad1bd475a240">
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/dcd28b8a-0840-4a7f-a0d6-0341438552e6">
+        <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+        <skos:prefLabel xml:lang="en-us">{"id": "0797783b-8663-4a12-9105-653d5180139f", "value": "Meta Type B"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/14c92c17-5e2f-413a-95c2-3c5e41ee87d2">
+        <skos:prefLabel xml:lang="en-us">{"id": "911072cc-df43-4e4e-bd17-d69aa64fe6ba", "value": "Meta Type A"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+    <skos:prefLabel xml:lang="en-us">{"id": "8d9d21ec-9474-4060-907a-af512e246732", "value": "Meta Types"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/ecd1fb6c-16e0-4fd4-b973-a047833f51c2">
+    <skos:narrower rdf:resource="http://localhost:8000/1df7e2d6-08b2-4fc6-9152-30b72931ba0c"/>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/be4ee3ba-37e4-4e37-b401-069d750734b7">
+        <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+        <skos:prefLabel xml:lang="en-us">{"id": "70d5af6c-d61a-4495-b371-4ad379b35813", "value": "spanish"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:prefLabel xml:lang="en-us">{"id": "ec260b2e-e319-4645-abce-a393d8010ab6", "value": "languages"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/6bac5802-a6f8-427c-ba5f-d4b30d5b070e">
+    <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+    <skos:prefLabel xml:lang="en-us">{"id": "2361509b-2d03-4774-a20d-8e796787d448", "value": "Single Type A"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/447c0aaa-9d05-4036-8a39-1ffcf54ccc9a">
+    <skos:narrower rdf:resource="http://localhost:8000/348aa028-020e-48fd-b27d-ad1bd475a240"/>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/6ac81529-838f-4b83-b204-67bb529441a1">
+        <skos:narrower rdf:resource="http://localhost:8000/36c8d7a3-32e7-49e4-bd4c-2169a06b240a"/>
+        <skos:prefLabel xml:lang="en-us">{"id": "5f3c6b7d-c9fd-4ce2-8bef-24b9f0b89bf1", "value": "material types"}</skos:prefLabel>
+        <skos:narrower rdf:resource="http://localhost:8000/9b61c995-71d8-4bce-987b-0ffa3da4c71c"/>
+        <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/f682d491-38f1-4dc9-a39b-addeddc0dd4b">
+        <skos:narrower rdf:resource="http://localhost:8000/6bac5802-a6f8-427c-ba5f-d4b30d5b070e"/>
+        <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+        <skos:prefLabel xml:lang="en-us">{"id": "f9780234-c9a4-475b-b780-a3506cc3b34f", "value": "Single Type"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower rdf:resource="http://localhost:8000/e9b19aa2-c3fd-4d53-bcb5-d44b9ac1c5dd"/>
+    <skos:prefLabel xml:lang="en-us">{"id": "2a78e390-dd68-4b5f-bd11-a1368118df44", "value": "Top Test Concept"}</skos:prefLabel>
+    <skos:narrower rdf:resource="http://localhost:8000/d6a5290a-9fdc-4f68-b7fe-006361a7644e"/>
+    <skos:narrower rdf:resource="http://localhost:8000/ecd1fb6c-16e0-4fd4-b973-a047833f51c2"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/36c8d7a3-32e7-49e4-bd4c-2169a06b240a">
+    <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+    <skos:prefLabel xml:lang="en-us">{"id": "d2908ab9-19a6-4a82-953d-5ebe8d164e85", "value": "material a"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/9b61c995-71d8-4bce-987b-0ffa3da4c71c">
+    <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+    <skos:prefLabel xml:lang="en-us">{"id": "fa7dcb78-cd32-4902-bc6d-798fa38a99f0", "value": "material b"}</skos:prefLabel>
+  </skos:Concept>
+</rdf:RDF>

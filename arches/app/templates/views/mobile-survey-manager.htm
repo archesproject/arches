@@ -75,7 +75,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <div class="resource-grid-main mpm-manager">
                                     <div class="title-items" style="display:flex; flex-direction: column;">
 
-                                        <i class="icon-wrap resource-grid-icon fa fa-server"></i>
+                                        <i class="icon-wrap resource-grid-icon fa fa-globe"></i>
 
 
                                         <div class="mpm-title"><span data-bind="text: name() === '' ? '{% trans "Unnamed Project" %}' : name()"></span></div>
@@ -95,8 +95,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </div>
                             </div>
                             <div class="resource-grid-tools-container mpm-manager">
-                                    <button class="btn btn-shim btn-rr btn-labeled btn-sm fa fa-trash" data-bind="click: function(val){$parent.deleteMobileSurvey(val)}, clickBubble: false, css: {'disabled': active()}" aria-expanded="true">{% trans 'delete' %}</button>
-                                    <div class="resource-status-label">{% trans "Status" %}: <span class="resource-status" data-bind="text:active()?'{% trans "Active" %}':'{% trans "Inactive" %}'"></span></div>
+                                
+                                <button class="btn btn-shim btn-rr graph-btn btn-labeled btn-sm fa fa-trash" data-bind="click: function(val){$parent.deleteMobileSurvey(val)}, clickBubble: false, css: {'disabled': active()}" aria-expanded="true">{% trans 'delete' %}</button>
+
+                                <div>
+                                    <p class="resource-status-label">
+                                    {% trans "Status" %}: <span class="resource-status" data-bind="text:active()?'{% trans "Active" %}':'{% trans "Inactive" %}'"></span>
+                                    </p>
+                                </div>
+                                
                             </div>
                         </div>
                         <!-- /ko -->

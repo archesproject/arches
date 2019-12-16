@@ -11,6 +11,7 @@ try:
 except ImportError:
     pass
 
+APP_NAME = {{ project_name }}
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 STATICFILES_DIRS =  (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
 
@@ -39,6 +40,9 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 #     'module': '{{ project_name }}.search_indexes.sample_index.SampleIndex',
 #     'name': 'my_new_custom_index' <-- follow ES index naming rules
 # }]
+
+LOAD_DEFAULT_ONTOLOGY = False
+LOAD_PACKAGE_ONTOLOGIES = True
 
 DATABASES = {
     "default": {
