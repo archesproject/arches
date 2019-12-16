@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("models", "5668_add_resourceinstancelist"),
+        ("models", "5669_maplayer_searchonly"),
     ]
 
     operations = [
