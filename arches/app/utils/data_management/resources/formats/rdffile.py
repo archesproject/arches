@@ -559,7 +559,7 @@ class JsonLdReader(Reader):
                             bnode["tile"].data[bnodeid].extend(node_value)
                     elif branch[0]["cardinality"] != "n":
                         bnode = result[bnodeid][0]
-                        if node_value == bnode['tile'].data[bnodeid]:
+                        if node_value == bnode["tile"].data[bnodeid]:
                             # No-op, attempt to readd same value
                             pass
                         else:
