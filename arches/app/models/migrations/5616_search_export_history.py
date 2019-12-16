@@ -23,6 +23,6 @@ class Migration(migrations.Migration):
                 ("exporttime", models.DateTimeField(auto_now_add=True)),
                 ("url", models.TextField()),
             ],
-            options={"db_table": "search_export_history", "managed": True,},
+            options={"db_table": "search_export_history", "managed": True, },
         ),
     ]
