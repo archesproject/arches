@@ -361,43 +361,49 @@ class JsonLdReader(Reader):
         return None
 
     def read_resource(self, data, use_ids=False, resourceid=None, graphid=None):
+
+        if graphid is None and self.graphtree is None:
+            raise Exception("No graphid supplied to read_resource")
+        elif self.graphtree is None:
+            self.graphtree = self.process_graph(graphid)
+
+        # Ensure we've reset from any previous call
+        self.errors = {}
+        self.resources = []
+        self.resource = None
         self.use_ids = use_ids
         if not isinstance(data, list):
             data = [data]
+        # Force use_ids if there is more than one record being passed in
+        if len(data) > 1:
+            self.use_ids = True
 
         for jsonld_document in data:
-            self.errors = {}
             jsonld_document = expand(jsonld_document)[0]
-            # print(jsonld_document)
-            if graphid is None:
-                graphid = self.get_graph_id(jsonld_document["@type"][0])
-                self.logger.debug("graphid is not set. Using the @type value instead: {0}".format(jsonld_document["@type"][0]))
-            if graphid:
-                if use_ids == True:
-                    resourceinstanceid = self.get_resource_id(jsonld["@id"])
-                    if resourceinstanceid is None:
-                        self.logger.error("The @id of the resource was not supplied, was null or URI was not correctly formatted")
-                        raise Exception("The @id of the resource was not supplied, was null or URI was not correctly formatted")
-                    self.logger.debug("Resource instance ID found: {0}".format(resourceinstanceid))
-                    self.resource = Resource.objects.get(pk=resourceinstanceid)
-                else:
-                    self.logger.debug("`use_ids` setting is set to False, creating new Resource Instance IDs on import")
-                    self.resource = Resource()
-                    self.resource.graph_id = graphid
-                    self.resource.pk = resourceid
-                self.resources.append(self.resource)
 
-            tree = self.process_graph(graphid)
-
-            ### --- Process Instance ---
-            # now walk the instance and align to the tree
-            # first check @type of the instance against the model
-            if jsonld_document["@type"][0] != tree["class"]:
+            # Possibly bail very early
+            if jsonld_document["@type"][0] != self.graphtree["class"]:
                 raise ValueError("Instance does not have same top level class as model")
 
+            if self.use_ids:
+                resourceinstanceid = self.get_resource_id(jsonld_document["@id"])
+                if resourceinstanceid is None:
+                    self.logger.error("The @id of the resource was not supplied, was null or URI was not correctly formatted")
+                    raise Exception("The @id of the resource was not supplied, was null or URI was not correctly formatted")
+                self.logger.debug("Using resource instance ID found: {0}".format(resourceinstanceid))
+            else:
+                self.logger.debug("`use_ids` setting is set to False, ignoring @id from the data if any")
+
+            self.resource = Resource()
+            if resourceid is not None:
+                self.resource.pk = resourceid
+            self.resource.graph_id = graphid
+            self.resources.append(self.resource)
+            
+            ### --- Process Instance ---
+            # now walk the instance and align to the tree
             result = {"data": [jsonld_document["@id"]]}
-            self.data_walk(jsonld_document, tree, result)
-            # print(JSONSerializer().serialize(result, indent=4))
+            self.data_walk(jsonld_document, self.graphtree, result)
 
     def is_semantic_node(self, graph_node):
         return self.datatype_factory.datatypes[graph_node["datatype_type"]].defaultwidget is None
@@ -561,11 +567,7 @@ class JsonLdReader(Reader):
                         result[bnodeid].append(bnode)
                 else:
                     if not self.is_semantic_node(branch[0]):
-                        # FIXME: This is clearly broken
-                        if branch[0]["datatype"].collects_multiple_values() and tile is not None:
-                            tile.data[bnodeid] = node_value
-                        else:
-                            tile.data[bnodeid] = node_value
+                        tile.data[bnodeid] = node_value
                     bnode["data"].append(branch[1])
                     result[bnodeid] = [bnode]
 
@@ -578,7 +580,6 @@ class JsonLdReader(Reader):
             for kid in path:
                 if kid["required"] and not f"{kid['node_id']}" in result:
                     raise ValueError("Required field not present")
-
 
 # class JsonLdReader(Reader):
 #     def __init__(self):
