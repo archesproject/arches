@@ -68,7 +68,6 @@ def export_search_results(self, userid, request_dict, format):
 
 @shared_task(bind=True)
 def refresh_materialized_view(self):
-    # create_user_task_record(self.request.id, self.name, userid) # get user from session?
     cursor = connection.cursor()
     sql = """
         REFRESH MATERIALIZED VIEW mv_geojson_geoms;
@@ -102,13 +101,16 @@ def update_user_task_record(arg_dict={}):
 def log_error(request, exc, traceback, msg=None):
     logger = logging.getLogger(__name__)
     logger.warn(exc)
-    task_obj = models.UserXTask.objects.get(taskid=request.id)
-    task_obj.status = "FAILED"
-    task_obj.date_done = datetime.now()
-    task_obj.save()
-    if msg is None:
-        msg = task_obj.status + ": " + task_obj.name
-    notify_completion(msg, task_obj.user)
+    try:
+        task_obj = models.UserXTask.objects.get(taskid=request.id)
+        task_obj.status = "FAILED"
+        task_obj.date_done = datetime.now()
+        task_obj.save()
+        if msg is None:
+            msg = task_obj.status + ": " + task_obj.name
+        notify_completion(msg, task_obj.user)
+    except Exception as e:
+        print("No such UserXTask record exists. Notification aborted.")
 
 
 def create_user_task_record(taskid, taskname, userid):

@@ -985,12 +985,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         }
 
     def after_update_all(self):
-        # import arches.app.tasks as tasks
-        from arches.app.tasks import refresh_materialized_view
+        from arches.app.tasks import refresh_materialized_view, log_error
 
         celery_worker_running = task_management.check_if_celery_available()
         if celery_worker_running is True:
-            res = refresh_materialized_view.apply_async(())
+            res = refresh_materialized_view.apply_async((), link_error=log_error.s())
         elif settings.AUTO_REFRESH_GEOM_VIEW:
             cursor = connection.cursor()
             sql = """
