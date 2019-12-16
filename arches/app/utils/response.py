@@ -1,6 +1,7 @@
 from io import StringIO
 import logging
 from django.http import HttpResponse
+from django.utils.translation import ugettext as _
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 logger = logging.getLogger(__name__)
@@ -37,7 +38,7 @@ class JSONResponse(HttpResponse):
 
 
 class JSONErrorResponse(JSONResponse):
-    def __init__(self, title=None, message=None, content=b"", status=500, *args, **kwargs):
+    def __init__(self, title=None, message=None, content={}, status=500, *args, **kwargs):
         try:
             content["status"] = content.get("status", "false")
             content["success"] = content.get("success", False)

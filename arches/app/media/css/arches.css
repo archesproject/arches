@@ -1287,7 +1287,6 @@ ul.tabbed-report-tab-list {
 .scroll-y {
     height: 100vh;
     overflow-y: auto;
-    background: #fff;
 }
 
 .scroll-y-hidden {
@@ -2355,7 +2354,12 @@ ul.nav.nav-tabs.nav-justified {
     margin-top: 13px;
 }
 
-.graph-crm-class,
+.graph-crm-class {
+    font-size: 15px;
+    color: #ddd;
+    padding-left: 10px;
+}
+
 .graph-type {
     font-size: 15px;
     color: #777;
@@ -2861,11 +2865,23 @@ div.dropdown-menu.open {
 #circle {
     width: 8px;
     height: 8px;
-    background: red;
+    background: #55AA55;
     border-radius: 50%;
     z-index: 10;
     position: absolute;
   }
+
+#circle-outline {
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    border: 1px solid #6E7F93;
+    border-radius: 50%;
+    z-index: 9;
+    position: absolute;
+    margin-left: -2px;
+    margin-top: -2px;
+}
 
 .ep-edits-header {
     display: inline-flex;
@@ -3017,13 +3033,13 @@ ul .collapse li:last-of-type {
 .resource-grid-icon {
     height: 42px;
     width: 42px;
-    padding-left: 12px;
     padding-top: 12px;
     color: #999;
     transform: translate(0px, 7px);
-    background: #ebeef0;
+    background: #e2e2e2;
     border: 1px solid #ddd;
     margin-bottom: 10px;
+    text-align: center;
 }
 
 .resource-grid-icon-highlight {
@@ -3344,6 +3360,12 @@ ul .collapse li:last-of-type {
     left: 100px;
     top: 10px;
     width: 450px;
+    z-index: 10;
+}
+
+.graph-list-header {
+    position: sticky;
+    top: 0px;
     z-index: 10;
 }
 
@@ -4162,6 +4184,110 @@ span.editable-card i.fa.fa-align-justify:hover {
     margin: 5px
 }
 
+.r-grid-item {
+    float: left;
+    width: 275px;
+    height: 250px;
+    margin: 5px;
+    border: 1px solid #7847CE;
+}
+
+#resource-list .r-grid-item:hover {
+    cursor: default;
+    border: 1px solid #333;
+}
+
+.r-select-card {
+    background: #8BC3EB;
+    padding: 10px;
+    color: #fff;
+    height: 200px;
+    opacity: .8;
+    text-align: center;
+}
+
+.r-grid-item:hover .r-select-card, .r-select-card:hover {
+    opacity: 1;
+}
+
+.r-select-card-footer {
+    height: 50px;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    background: #62A8DB;
+}
+
+.r-select-title {
+    font-size: 19px;
+    font-weight: 500;
+    color: #fff;
+    text-align: center;
+    overflow-wrap: break-word;
+}
+
+.r-desc-container {
+    position: absolute;
+    bottom: 55px;
+    left: 5px;
+    right: 5px;
+    padding: 0px 5px;
+}
+
+.r-select-desc {
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2; 
+}
+
+.r-select-circle {
+    position: absolute;
+    top: 67px;
+    left: 97px;
+    width: 70px;
+    height: 70px;
+    display: inline-block;
+    text-align: center;
+    padding: 18px;
+    border-radius: 50%;
+    background: #BFE0F7
+}
+
+.r-select-icon {
+    color: #fff;
+    font-size: 28px;
+    line-height: 32px;
+}
+
+.r-warning {
+    padding: 5px;
+    background: #FFE947;
+    color: #5E29BA;
+    height: 50px;
+    text-align: center;
+    border-top: 1px solid #5E29BA;
+}
+
+.r-warning .form-warning {
+    color: #5E29BA;
+}
+
+.btn-resource-select {
+    height: 50px;
+    width: 100%;
+    font-size: 14px;
+    font-weight: 600;
+    padding-top: 12px;
+    border-top: 1px solid #7847CE;
+}
+
+.btn-resource-select:hover {
+    border-top: 1px solid #0859A1;
+}
+
 .card-grid-item {
     float: left;
     width: 290px;
@@ -4578,7 +4704,7 @@ th.notif-type {
 }
 
 .ep-tools:hover {
-    background: #f2f2f2;
+    background: #fff;
     border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
 }

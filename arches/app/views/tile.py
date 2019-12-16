@@ -29,6 +29,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import can_edit_resource_instance
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 from django.contrib.auth.models import User
 from django.http import HttpResponseNotFound
 from django.utils.decorators import method_decorator
@@ -219,7 +220,7 @@ class TileData(View):
                     tile = Tile.objects.get(tileid=data["tileid"])
                 except ObjectDoesNotExist:
                     return JSONErrorResponse(_('This tile is no longer available'), _('It was likely already deleted by another user'))
-                user_is_reviewer = request.user.groups.filter(name="Resource Reviewer").exists()
+                user_is_reviewer = user_is_resource_reviewer(request.user)
                 if (user_is_reviewer or tile.is_provisional() is True) and is_active is True:
                     if tile.filter_by_perm(request.user, "delete_nodegroup"):
                         nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
