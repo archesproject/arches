@@ -76,9 +76,9 @@ class SearchResultsExporter(object):
                 list(headers).append({"fieldname": "resourceid", "datatype": "str"})
                 ret += self.to_shp(resources["output"], headers=headers, name=graph.name)
 
-        search_export_info = models.SearchExportHistory(user=self.search_request.user,
-                                numberofinstances=len(instances),
-                                url=self.search_request.get_full_path())
+        search_export_info = models.SearchExportHistory(
+            user=self.search_request.user, numberofinstances=len(instances), url=self.search_request.get_full_path()
+        )
         search_export_info.save()
 
         return ret

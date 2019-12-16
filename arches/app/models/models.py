@@ -721,6 +721,7 @@ class SearchComponent(models.Model):
 
         return JSONSerializer().serialize(self)
 
+
 class SearchExportHistory(models.Model):
     searchexportid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
