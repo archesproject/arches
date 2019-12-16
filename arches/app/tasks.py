@@ -6,6 +6,7 @@ import os
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import management
+from django.db import connection
 from django.http import HttpRequest
 from arches.app.models import models
 from arches.app.search.search_export import SearchResultsExporter
@@ -63,6 +64,17 @@ def export_search_results(self, userid, request_dict, format):
     response = {"taskid": self.request.id, "msg": msg, "notiftype_name": "Search Export Download Ready", "context": context}
 
     return response
+
+
+@shared_task(bind=True)
+def refresh_materialized_view(self):
+    # create_user_task_record(self.request.id, self.name, userid) # get user from session?
+    cursor = connection.cursor()
+    sql = """
+        REFRESH MATERIALIZED VIEW mv_geojson_geoms;
+    """
+    cursor.execute(sql)
+    response = {"taskid": self.request.id}
 
 
 @shared_task

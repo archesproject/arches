@@ -15,6 +15,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
+import arches.app.utils.task_management as task_management
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.core.cache import cache
@@ -984,7 +985,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         }
 
     def after_update_all(self):
-        if settings.AUTO_REFRESH_GEOM_VIEW:
+        # import arches.app.tasks as tasks
+        from arhes.app.tasks import refresh_materialized_view
+        celery_worker_running = task_management.check_if_celery_available()
+        if celery_worker_running is True:
+            res = refresh_materialized_view.apply_async(())
+        elif settings.AUTO_REFRESH_GEOM_VIEW:
             cursor = connection.cursor()
             sql = """
                 REFRESH MATERIALIZED VIEW mv_geojson_geoms;
