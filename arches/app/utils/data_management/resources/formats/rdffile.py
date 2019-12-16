@@ -558,7 +558,12 @@ class JsonLdReader(Reader):
                                 bnode["tile"].data[bnodeid] = [n]
                             bnode["tile"].data[bnodeid].extend(node_value)
                     elif branch[0]["cardinality"] != "n":
-                        raise ValueError("Attempt to add a value to cardinality 1, non-list node")
+                        bnode = result[bnodeid][0]
+                        if node_value == bnode['tile'].data[bnodeid]:
+                            # No-op, attempt to readd same value
+                            pass
+                        else:
+                            raise ValueError(f"Attempt to add a value to cardinality 1, non-list node {k} {clss}:\n {vi}")
                     else:
                         bnode["data"].append(branch[1])
                         if not self.is_semantic_node(branch[0]):
