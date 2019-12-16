@@ -721,6 +721,16 @@ class SearchComponent(models.Model):
 
         return JSONSerializer().serialize(self)
 
+class SearchExportHistory(models.Model):
+    searchexportid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    exporttime = models.DateTimeField(auto_now_add=True)
+    numberofinstances = models.IntegerField()
+    url = models.TextField()
+
+    class Meta:
+        managed = True
+        db_table = "search_export_history"
 
 class TileModel(models.Model):  # Tile
     """
