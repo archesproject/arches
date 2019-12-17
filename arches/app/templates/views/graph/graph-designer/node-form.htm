@@ -131,9 +131,9 @@
                     </form>
                 </div>
 
-                <div class="graph-designer-header" style="margin-top: 20px;">{% trans 'Node Settings' %}</div> 
+                <div class="graph-designer-header" style="margin-top: 20px;">{% trans 'Node Settings' %}</div>
                 <div class="graph-settings-panel-body fade in">
-                    <form>       
+                    <form>
                         <!-- ko if: node().datatypeIsSearchable() -->
                         <div class="row widget-container graph-settings-switch">
                             <div class="form-group">
@@ -175,6 +175,7 @@
                             </div>
                         </div>
 
+                        <!-- ko if: node() && node().datatypeDataBearing() -->
                         <div class="row widget-container graph-settings-switch">
                             <div class="form-group">
                                 <div class="relative">
@@ -191,11 +192,12 @@
                                         {% trans "Provide a field name for Shapefiles. " %} <strong>{% trans "Name will be truncated to 10 characters to support Shapefile spec." %}</strong>
                                     </span>
                                     <div class="exportable-field-name">
-                                        <input class="form-control input-md widget-input" placeholder="Shapefile fieldname" type="text" data-bind="textInput: node().fieldname, disable: !node().exportable(), css: {'disabled': !node().exportable()}"></input>
+                                        <input class="form-control input-md widget-input" placeholder="{% trans 'Shapefile fieldname' %}" type="text" data-bind="textInput: node().fieldname, disable: !node().exportable(), css: {'disabled': !node().exportable()}"></input>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <!--/ko-->
 
                         <!-- ko if: node() && !isResourceTopNode() && displayMakeCard() === true -->
                         <div class="row widget-container graph-settings-switch">
