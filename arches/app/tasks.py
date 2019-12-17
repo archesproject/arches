@@ -63,7 +63,7 @@ def export_search_results(self, userid, request_dict, format):
         button_text="Download Now",
         closing="Thank you",
         email=email,
-        name=export_name
+        name=export_name,
     )
     response = {"taskid": self.request.id, "msg": export_name, "notiftype_name": "Search Export Download Ready", "context": context}
 
