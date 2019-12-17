@@ -32,13 +32,15 @@
 
             <div>
                 <div class='entry'><i data-bind=""></i>
-                    <div class='entry-label'>{% trans 'Message: ' %}</div>
-                    <span data-bind="text: $data.displaytime" ></span>
+                    <div class='entry-label'>{% trans 'Message: ' %}<span data-bind="text: message"></span></div>
+                    <span data-bind="text: displaytime" ></span>
                 </div>
 
+                <!-- ko if: $data["downloadBtn"] -->
                 <div class='entry'>
-                    <div data-bind="html: $data.message"></div>
+                    <div data-bind="html: downloadBtn"></div>
                 </div>
+                <!-- /ko -->
             </div>
 
             <div class='entry relative'>

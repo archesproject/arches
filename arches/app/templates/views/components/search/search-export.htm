@@ -30,16 +30,25 @@
         <div class="parameter">
             <input type="number" class="form-control input-md widget-input precision" data-bind="textInput: precision"></input>
         </div>
-
+        <!-- ko if: total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() === "True" -->
+        <div>
+            <div class="instruction">
+                <h2>{% trans "3. Name this export" %}</h2>
+            </div>
+            <div class="parameter">
+                <input type="" class="form-control input-md widget-input" data-bind="textInput: exportName" placeholder="Arches Export"></input>
+            </div>
+        </div>
         <div class="">
             <div class="instruction">
                     <h2 class=""> {% trans "3. Email Address" %} </h2>
                     <h4 class=""> {% trans "This download will take some time.  Tell us where to email your results" %} </h4>
             </div>
             <div class="parameter">
-                <input type="" class="form-control input-md widget-input" placeholder="john.doe@domain.com"></input>
+                <input type="" class="form-control input-md widget-input" data-bind="textInput: emailInput" placeholder="No Email saved for User"></input>
             </div>
         </div>
+        <!-- /ko -->
     </div>
 
     <div class="search-export download">
