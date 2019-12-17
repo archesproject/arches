@@ -187,7 +187,6 @@ class ConceptDataType(BaseConceptDataType):
         concept_id = lang = None
         import re
 
-
         # FIXME: This should use settings for host and check for UUID
         p = re.compile(r"(http|https)://(?P<host>[^/]*)/concepts/(?P<concept_id>[A-Fa-f0-9\-]*)/?$")
         m = p.match(concept_uri)
@@ -224,9 +223,9 @@ class ConceptDataType(BaseConceptDataType):
 
         if concept_id and label is None:
             value = get_preflabel_from_conceptid(concept_id, lang=lang)
-            if value['id']:
+            if value["id"]:
                 return value["id"]
-            else:   
+            else:
                 hits = [ident for ident in models.Value.objects.all()]
                 if hits:
                     return str(hits[0].pk)
