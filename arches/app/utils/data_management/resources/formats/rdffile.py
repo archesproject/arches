@@ -256,20 +256,15 @@ class JsonLdReader(Reader):
     def __init__(self):
         super(JsonLdReader, self).__init__()
         self.tiles = {}
-        self.errors = {}
         self.resources = []
         self.resource = None
         self.use_ids = False
         self.resource_model_root_classes = set()
         self.non_unique_classes = set()
-        self.graph_id_lookup = {}
         self.root_ontologyclass_lookup = {}
-        self.jsonld_doc = None
-        self.graphtree = None
         self.logger = logging.getLogger(__name__)
         for graph in models.GraphModel.objects.filter(isresource=True):
             node = models.Node.objects.get(graph_id=graph.pk, istopnode=True)
-            self.graph_id_lookup[node.ontologyclass] = graph.pk
             self.root_ontologyclass_lookup[str(graph.pk)] = node.ontologyclass
             if node.ontologyclass in self.resource_model_root_classes:
                 # make a note of non-unique root classes
@@ -362,7 +357,6 @@ class JsonLdReader(Reader):
             data = [data]
 
         for jsonld_document in data:
-            self.errors = {}
             jsonld_document = expand(jsonld_document)[0]
             if graphid is None:
                 graphid = self.get_graph_id(jsonld_document["@type"][0])
