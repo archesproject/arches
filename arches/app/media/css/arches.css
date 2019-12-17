@@ -2701,6 +2701,32 @@ div.dropdown-menu.open {
     z-index: 100000001;
 }
 
+.time-wheel-loading-mask {
+    height: 100%;
+    position: relative;
+    margin: auto;
+    width: 50%;
+    padding: 36px;
+    text-align: center;
+    opacity: .5;
+    z-index: 100000001;
+}
+
+.time-wheel-loading-mask:before {
+    position: relative;
+    content: '\f110';
+    animation: fa-spin 2s infinite linear;
+    -webkit-animation: fa-spin 2s infinite linear;
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: 30px;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform: translate(0, 0);
+    z-index: 100000001;
+}
+
 .card-form-preview-container.loading-mask {
     position: relative;
     opacity: .5;
@@ -4240,7 +4266,7 @@ span.editable-card i.fa.fa-align-justify:hover {
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2; 
+    -webkit-line-clamp: 2;
 }
 
 .r-select-circle {
