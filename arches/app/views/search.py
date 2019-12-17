@@ -91,6 +91,7 @@ class SearchView(MapBaseManagerView):
             "title": _("Searching the Database"),
             "template": "search-help",
         }
+        context["celery_running"] = task_management.check_if_celery_available()
 
         return render(request, "views/search.htm", context)
 
@@ -187,7 +188,7 @@ def export_results(request):
     download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
     if total > download_limit:
         celery_worker_running = task_management.check_if_celery_available()
-        if celery_worker_running:
+        if celery_worker_running is True:
             req_dict = dict(request.GET)
             result = tasks.export_search_results.apply_async(
                 (request.user.id, req_dict, format), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()

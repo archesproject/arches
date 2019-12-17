@@ -347,6 +347,7 @@
               'icon': '{{ resource.iconclass }}',
             },{% endfor %}{% endautoescape %}],
             userEmail: '{{ user.email }}',
+            celeryRunning: '{{celery_running}}',
             graphs: {% autoescape off %}{{graphs|default:"[]"}}{% endautoescape %}
         };
     });

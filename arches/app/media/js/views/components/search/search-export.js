@@ -14,6 +14,8 @@ function($, ko, arches) {
             this.precision = ko.observable(6);
             this.result = ko.observable();
             this.emailInput = ko.observable(arches.userEmail);
+            this.exportName = ko.observable("Arches Export");
+            this.celeryRunning = ko.observable(arches.celeryRunning);
 
             this.url = ko.computed(function() {
                 var url = arches.urls.export_results;
@@ -31,6 +33,7 @@ function($, ko, arches) {
                 payload.precision = this.precision();
                 payload.total = this.total();
                 payload.email = this.emailInput();
+                payload.exportName = this.exportName();
                 $.ajax({
                     type: "GET",
                     url: arches.urls.export_results,
