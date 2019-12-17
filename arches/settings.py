@@ -529,7 +529,7 @@ CELERY_BROKER_URL = "amqp://guest:guest@localhost"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_RESULT_BACKEND = "django-db"  # Use 'django-cache' if you want to use your cache as your backend
 CELERY_TASK_SERIALIZER = "json"
-CELERY_SEARCH_EXPORT_DIR = os.path.join(MEDIA_ROOT, "uploadedfiles")
+CELERY_SEARCH_EXPORT_DIR = os.path.join(MEDIA_ROOT, "exportdeliverables")
 CELERY_SEARCH_EXPORT_EXPIRES = 24 * 3600  # seconds
 CELERY_SEARCH_EXPORT_CHECK = 3600  # seconds
 
