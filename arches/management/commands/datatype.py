@@ -60,6 +60,7 @@ class Command(BaseCommand):
 
         dt_source = imp.load_source("", source)
         details = dt_source.details
+        self.validate_details(details)
 
         dt = models.DDataType(
             datatype=details["datatype"],
@@ -71,12 +72,19 @@ class Command(BaseCommand):
             configcomponent=details["configcomponent"],
             configname=details["configname"],
             isgeometric=details["isgeometric"],
+            issearchable=details["issearchable"],
         )
 
         if len(models.DDataType.objects.filter(datatype=dt.datatype)) == 0:
             dt.save()
         else:
             print("{0} already exists".format(dt.datatype))
+
+    def validate_details(self, details):
+        try:
+            details["issearchable"]
+        except KeyError:
+            details["issearchable"] = False
 
     def unregister(self, datatype):
         """
@@ -100,17 +108,18 @@ class Command(BaseCommand):
 
         dt_source = imp.load_source("", source)
         details = dt_source.details
+        self.validate_details(details)
 
         instance = models.DDataType.objects.get(datatype=details["datatype"])
         instance.iconclass = details["iconclass"]
         instance.modulename = os.path.basename(source)
         instance.classname = details["classname"]
         instance.defaultwidget = details["defaultwidget"]
-        instance.defaultconfig = details['defaultconfig']
-        instance.configcomponent = details['configcomponent']
-        instance.configname = details['configname']
-        instance.isgeometric = details['isgeometric']
-        # instance.issearchable = details['issearchable']
+        instance.defaultconfig = details["defaultconfig"]
+        instance.configcomponent = details["configcomponent"]
+        instance.configname = details["configname"]
+        instance.isgeometric = details["isgeometric"]
+        instance.issearchable = details["issearchable"]
 
         instance.save()
 

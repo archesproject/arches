@@ -14,6 +14,7 @@ details = {
     "configcomponent": None,
     "configname": None,
     "isgeometric": False,
+    "issearchable": True,
 }
 
 
@@ -22,7 +23,7 @@ class SampleDataType(BaseDataType):
         errors = []
         try:
             value.upper()
-        except:
+        except Exception:
             errors.append(
                 {
                     "type": "ERROR",
