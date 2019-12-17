@@ -346,6 +346,7 @@
               'name': '{{ resource.name }}',
               'icon': '{{ resource.iconclass }}',
             },{% endfor %}{% endautoescape %}],
+            userEmail: '{{ user.email }}',
             graphs: {% autoescape off %}{{graphs|default:"[]"}}{% endautoescape %}
         };
     });

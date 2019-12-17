@@ -13,6 +13,7 @@ function($, ko, arches) {
             this.format = ko.observable('tilecsv');
             this.precision = ko.observable(6);
             this.result = ko.observable();
+            this.emailInput = ko.observable(arches.userEmail);
 
             this.url = ko.computed(function() {
                 var url = arches.urls.export_results;
@@ -29,6 +30,7 @@ function($, ko, arches) {
                 payload.format = this.format();
                 payload.precision = this.precision();
                 payload.total = this.total();
+                payload.email = this.emailInput();
                 $.ajax({
                     type: "GET",
                     url: arches.urls.export_results,

@@ -46,6 +46,7 @@ def sync(self, surveyid=None, userid=None):
 def export_search_results(self, userid, request_dict, format):
     create_user_task_record(self.request.id, self.name, userid)
     _user = User.objects.get(id=userid)
+    email = request_dict["email"]
     new_req = HttpRequest()
     new_req.method = "GET"
     new_req.user = _user
@@ -60,6 +61,7 @@ def export_search_results(self, userid, request_dict, format):
         link=msg,
         button_text="Download Now",
         closing="Thank you",
+        email=email
     )
     response = {"taskid": self.request.id, "msg": msg, "notiftype_name": "Search Export Download Ready", "context": context}
 
