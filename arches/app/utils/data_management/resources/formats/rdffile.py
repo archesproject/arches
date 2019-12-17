@@ -298,7 +298,7 @@ class JsonLdReader(Reader):
             node["datatype"] = self.datatype_factory.get_instance(n.datatype)
             node["datatype_type"] = n.datatype
             node["extra_class"] = []
-            if n.datatype in ["resource-instance", "resource-instance-list"]:
+            if node["datatype"].references_resource_type():
                 if "graphid" in n.config and n.config["graphid"]:
                     graph_ids = n.config["graphid"]
                     for gid in graph_ids:
