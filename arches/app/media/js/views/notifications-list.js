@@ -31,7 +31,7 @@ define([
                     data: {"unread_only": true}
                 }).done(function(data) {
                     self.items(_.filter(data.notifications, function(notif) {
-                        notif.displaytime = moment(notif.created).format('DD-MM-YYYY hh:mm a');
+                        notif.displaytime = moment(notif.created).format('dddd, DD MMMM YYYY | hh:mm A');
                         if (notif.link) {
                             notif.downloadBtn = ("<a download href="+notif.link+"><button class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'>Download File</button></a>");
                         }
