@@ -5,6 +5,7 @@ import json
 import uuid
 import importlib
 import datetime
+import logging
 from io import StringIO
 from time import time
 from copy import deepcopy
@@ -233,8 +234,13 @@ class BusinessDataImporter(object):
             datatype_factory = DataTypeFactory()
             datatypes = DDataType.objects.all()
             for datatype in datatypes:
-                datatype_instance = datatype_factory.get_instance(datatype.datatype)
-                datatype_instance.after_update_all()
+                try:
+                    datatype_instance = datatype_factory.get_instance(datatype.datatype)
+                    datatype_instance.after_update_all()
+                except BrokenPipeError as e:
+                    logger = logging.getLogger(__name__)
+                    logger.info("Celery not working: tasks unavailable during import.")
+
 
     def shape_to_csv(self, shp_path):
         csv_records = []
