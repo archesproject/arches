@@ -63,7 +63,11 @@ class MapFilter(BaseSearchFilter):
 
         if details["componentname"] not in search_results_object:
             search_results_object[details["componentname"]] = {}
-        search_results_object[details["componentname"]]["search_buffer"] = feature_geom
+
+        try:
+            search_results_object[details["componentname"]]["search_buffer"] = feature_geom
+        except NameError:
+            print("feature geom is not defined")
 
 
 def _buffer(geojson, width=0, unit="ft"):
@@ -72,7 +76,7 @@ def _buffer(geojson, width=0, unit="ft"):
 
     try:
         width = float(width)
-    except:
+    except Exception:
         width = 0
 
     if width > 0:
