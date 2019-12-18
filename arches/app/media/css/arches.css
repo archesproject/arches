@@ -4778,7 +4778,10 @@ th.notif-type {
     border: none;
     padding-left: 16px;
     padding-right: 20px;
-    vertical-align: middle
+    vertical-align: middle;
+    background: #fafafa;
+    border-bottom: 1px solid #ddd;
+    border-left: 1px solid #ddd;
 }
 
 .ep-tool-title {
