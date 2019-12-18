@@ -51,11 +51,12 @@
         <!-- /ko -->
     </div>
 
-    <div class="search-export download">
+    <div data-bind="visible: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}) && (celeryRunning() !== 'True')), text: ('Arches is currently running without Celery. All exports will be limited to {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} records.')"></div>
+    <div class="search-export download" data-bind="">
         <button class="btn btn-lg btn-primary btn-active-primary"
             type="button"
             aria-expanded="true"
-            data-bind="css: {disabled: total() === 0},click: function(){executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} )}"> {% trans "Download" %}
+            data-bind="css: {disabled: (total() === 0) || (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() !== 'True')},click: function(){executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} )}"> {% trans "Download" %}
         </button>
     </div>
     <div class="download-message" data-bind="text: result, fadeVisible: downloadStarted, delay:0, fade: 600">
