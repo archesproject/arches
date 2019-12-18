@@ -138,11 +138,6 @@ class SKOSReader(object):
                         if predicate == SKOS.hasTopConcept:
                             top_concept_id = self.generate_uuid_from_subject(baseuuid, object)
                             self.relations.append(
-                                # models.Relation(
-                                # conceptfrom_id=scheme_id,
-                                # conceptto_id=top_concept_id,
-                                # relationtype_id="hasTopConcept"
-                                # )
                                 {"source": scheme_id, "type": "hasTopConcept", "target": top_concept_id}
                             )
 
@@ -190,11 +185,6 @@ class SKOSReader(object):
                                 )
                             elif predicate == SKOS.broader:
                                 self.relations.append(
-                                    # models.Relation(
-                                    # conceptfrom_id=self.generate_uuid_from_subject(baseuuid, object),
-                                    # conceptto_id=self.generate_uuid_from_subject(baseuuid, s),
-                                    # relationtype_id="narrower"
-                                    # )
                                     {
                                         "source": self.generate_uuid_from_subject(baseuuid, object),
                                         "type": "narrower",
@@ -203,11 +193,6 @@ class SKOSReader(object):
                                 )
                             elif predicate == SKOS.narrower:
                                 self.relations.append(
-                                    # models.Relation(
-                                    #     conceptfrom_id=self.generate_uuid_from_subject(baseuuid, s),
-                                    #     conceptto_id=self.generate_uuid_from_subject(baseuuid, object),
-                                    #     relationtype_id=relation_or_value_type,
-                                    # )
                                     {
                                         "source": self.generate_uuid_from_subject(baseuuid, s),
                                         "type": relation_or_value_type,
@@ -216,11 +201,6 @@ class SKOSReader(object):
                                 )
                             elif predicate == SKOS.related:
                                 self.relations.append(
-                                    # models.Relation(
-                                    #     conceptfrom_id=self.generate_uuid_from_subject(baseuuid, s),
-                                    #     conceptto_id=self.generate_uuid_from_subject(baseuuid, object),
-                                    #     relationtype_id=relation_or_value_type,
-                                    # )
                                     {
                                         "source": self.generate_uuid_from_subject(baseuuid, s),
                                         "type": relation_or_value_type,
@@ -302,18 +282,10 @@ class SKOSReader(object):
                             # this is a new concept, so add a reference to it in the Candidates schema
                             if node.nodetype.nodetype != "ConceptScheme":
                                 self.relations.append(
-                                    # models.Relation(
-                                    #     conceptfrom_id="00000000-0000-0000-0000-000000000006",
-                                    #     conceptto_id=node.conceptid,
-                                    #     relationtype_id="narrower",
-                                    # )
                                     {"source": "00000000-0000-0000-0000-000000000006", "type": "narrower", "target": node.conceptid}
                                 )
 
                 # insert the concept relations
-                # TODO: make sure this still works with code commented out, then remove
-                # relation_objs = []
-
                 # with transaction.atomic():
                 #     models.Relation.objects.bulk_create(self.relations, ignore_conflicts=True)
                 # NOTE: relations.bulk_create errors with:
@@ -323,13 +295,11 @@ class SKOSReader(object):
                     newrelation, created = models.Relation.objects.get_or_create(
                         conceptfrom_id=relation["source"], conceptto_id=relation["target"], relationtype_id=relation["type"]
                     )
-                    # models.Relation.objects.bulk_create(relation_objs)
                     # check for orphaned concepts, every concept except the concept scheme should have an edge pointing to it
                     if (relation["type"] == "narrower" or relation["type"] == "hasTopConcept") and orphaned_concepts.get(
                         relation["target"]
                     ) is not None:
                         orphaned_concepts.pop(str(relation["target"]))
-                    # relation_objs.append(newrelation)
 
                 if len(list(orphaned_concepts.keys())) > 0:
                     if scheme_node:
@@ -362,20 +332,12 @@ class SKOSReader(object):
             # TODO: debug bulk_create to speed up this section of skos
             for relation in self.member_relations:
                 try:
-                    # newrelation = models.Relation(
-                    #     conceptfrom_id=relation['source'],
-                    #     conceptto_id=relation['target'],
-                    #     relationtype_id=relation['type']
-                    # )
-                    # relation_objs.append(newrelation)
                     newrelation, created = models.Relation.objects.get_or_create(
                         conceptfrom_id=relation["source"], conceptto_id=relation["target"], relationtype_id=relation["type"]
                     )
                 except IntegrityError as e:
                     self.logger.warning(e)
                     pass
-
-            # models.Relation.objects.bulk_create(relation_objs, ignore_conflicts=True)
 
             return scheme_node
         else:
