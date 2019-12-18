@@ -17,9 +17,6 @@
                 <label data-bind="css: { 'active': format() === 'shp' }, click: function () { format('shp') }" class="form-radio form-normal form-text">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'shp'" value="false"> {% trans "shapefile" %}
                 </label>
-                <label data-bind="css: { 'active': format() === 'json' }, click: function () { format('json') }" class="form-radio form-normal form-text">
-                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'json'" value="false"> {% trans "geojson" %}
-                </label>
             </div>
         </div>
 
