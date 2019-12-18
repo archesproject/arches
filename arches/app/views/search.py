@@ -230,7 +230,7 @@ def search_results(request):
             if search_filter:
                 search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional)
     except Exception as err:
-        return JSONErrorResponse(message=err.message)
+        return JSONErrorResponse(message=err)
 
     dsl = search_results_object.pop("query", None)
     dsl.include("graph_id")
