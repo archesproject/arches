@@ -359,8 +359,6 @@ class SKOSReader(object):
                     scheme_node.bulk_index()
 
             # insert the concept collection relations
-            # we do this outide a transaction so that we can load incomplete collections
-            # relation_objs = []
             # TODO: debug bulk_create to speed up this section of skos
             for relation in self.member_relations:
                 try:
