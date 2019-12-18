@@ -5287,6 +5287,20 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     background-color: #fcfcfc;
 }
 
+.notification-message {
+    padding-bottom: 5px;
+    color: #777;
+}
+
+.notification-message span {
+    font-weight: 600;
+    color: #454545;
+}
+
+.entry .time-label {
+    font-weight: 600;
+}
+
 .ep-notifs-close {
     position: absolute;
     top: 0px;
