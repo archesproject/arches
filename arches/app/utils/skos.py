@@ -91,7 +91,7 @@ class SKOSReader(object):
                 identifier = self.unwrapJsonLiteral(str(scheme))
                 scheme_id = self.generate_uuid_from_subject(baseuuid, scheme)
                 concept_scheme = models.Concept(pk=scheme_id, legacyoid=str(scheme), nodetype_id="ConceptScheme")
-                
+
                 for predicate, object in graph.predicate_objects(subject=scheme):
                     if str(DCTERMS) in predicate and predicate.replace(DCTERMS, "") in dcterms_value_types.values_list(
                         "valuetype", flat=True
@@ -163,7 +163,7 @@ class SKOSReader(object):
                 for s, v, o in graph.triples((None, SKOS.inScheme, scheme)):
                     identifier = self.unwrapJsonLiteral(str(s))
                     concept = models.Concept(pk=self.generate_uuid_from_subject(baseuuid, s), legacyoid=str(s), nodetype_id="Concept")
-                    
+
                     # loop through all the elements within a <skos:Concept> element
                     for predicate, object in graph.predicate_objects(subject=s):
                         if str(SKOS) in predicate or str(ARCHES) in predicate:
@@ -309,16 +309,16 @@ class SKOSReader(object):
                                     # )
                                     {"source": "00000000-0000-0000-0000-000000000006", "type": "narrower", "target": node.conceptid}
                                 )
-                
+
                 # insert the concept relations
                 # TODO: make sure this still works with code commented out, then remove
                 # relation_objs = []
-                
+
                 # with transaction.atomic():
                 #     models.Relation.objects.bulk_create(self.relations, ignore_conflicts=True)
                 # NOTE: relations.bulk_create errors with:
-                # django.db.utils.NotSupportedError: 
-                #   INSERT with ON CONFLICT clause cannot be used with table that has INSERT or UPDATE rules 
+                # django.db.utils.NotSupportedError:
+                #   INSERT with ON CONFLICT clause cannot be used with table that has INSERT or UPDATE rules
                 for relation in self.relations:
                     newrelation, created = models.Relation.objects.get_or_create(
                         conceptfrom_id=relation["source"], conceptto_id=relation["target"], relationtype_id=relation["type"]
