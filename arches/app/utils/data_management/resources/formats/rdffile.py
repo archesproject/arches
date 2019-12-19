@@ -525,7 +525,13 @@ class JsonLdReader(Reader):
                 bnode = {"data": [], "nodegroup_id": branch[0]["nodegroup_id"], "cardinality": branch[0]["cardinality"]}
                 if create_new_tile:
                     parenttile_id = tile.tileid if tile else None
-                    tile = Tile(tileid=uuid.uuid4(), resourceinstance_id=self.resource.pk, parenttile_id=parenttile_id, nodegroup_id=branch[0]["nodegroup_id"], data={})
+                    tile = Tile(
+                        tileid=uuid.uuid4(),
+                        resourceinstance_id=self.resource.pk,
+                        parenttile_id=parenttile_id,
+                        nodegroup_id=branch[0]["nodegroup_id"],
+                        data={},
+                    )
 
                     self.resource.tiles.append(tile)
 
