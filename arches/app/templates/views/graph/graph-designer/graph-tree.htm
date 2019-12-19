@@ -53,6 +53,9 @@
             <!-- ko if: !node.istopnode && _.contains(graphTree.restrictedNodegroups, node.nodeGroupId()) === false -->
                 <i class="jstree-node-action-icon fa fa-trash" role="presentation" data-bind="click: graphTree.deleteNode.bind(graphTree)" data-toggle="tooltip" data-original-title="{% trans "Delete Node" %}"></i>
             <!-- /ko -->
+            <!-- ko if: node.exportable -->
+            <i class="fa fa-download" role="presentation" data-toggle="tooltip" data-original-title="{% trans 'Node is exportable in search' %}"></i>
+            <!-- /ko -->
         </a>
         <ul class="jstree-children" aria-expanded="true" data-bind="if: node.childNodes().length > 0">
             <div data-bind="sortable: {
