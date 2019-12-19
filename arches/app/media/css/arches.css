@@ -6116,9 +6116,16 @@ a.list-group-item:not(.active):hover, div .switch label:hover, #demo-dt-selectio
 }
 
 .file-upload-filter {
-    margin-right: 5px;
+    /* margin-right: 5px; */
     padding: 5px 10px;
     width: 250px;
+}
+
+span.file-upload-clear-filter {
+    position: absolute;
+    left: 238px;
+    top: 37px;
+    z-index: 25;
 }
 
 .dz-previews .file-upload-card {
