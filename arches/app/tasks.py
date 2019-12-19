@@ -10,7 +10,7 @@ from django.db import connection
 from django.http import HttpRequest
 from arches.app.models import models
 from arches.app.search.search_export import SearchResultsExporter
-import arches.app.utils.data_management.zip as zip_utils
+import arches.app.utils.zip as zip_utils
 
 
 @shared_task
