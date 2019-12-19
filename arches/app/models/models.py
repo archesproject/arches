@@ -13,13 +13,14 @@ import os
 import json
 import uuid
 import datetime
+import logging
 from datetime import timedelta
 from arches.app.utils.module_importer import get_class_from_modulename
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
 from django.core.files.storage import FileSystemStorage
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives, get_connection
 from django.template.loader import get_template, render_to_string
 from django.core.validators import RegexValidator
 from django.db.models import Q, Max
@@ -1101,18 +1102,25 @@ def send_email_on_save(sender, instance, **kwargs):
         if UserXNotificationType.objects.filter(user=instance.recipient, notiftype=instance.notif.notiftype, emailnotify=False).exists():
             return False
 
-        if instance.notif.notiftype.emailnotify is True and (settings.EMAIL_BACKEND is not None or settings.EMAIL_HOST is not None):
+        try:
             context = instance.notif.context.copy()
             text_content = render_to_string(instance.notif.notiftype.emailtemplate, context)
             html_template = get_template(instance.notif.notiftype.emailtemplate)
             html_content = html_template.render(context)
-            subject, from_email, to = instance.notif.notiftype.name, "from@example.com", instance.recipient.email
+            if context["email"] == instance.recipient.email:
+                email_to = instance.recipient.email
+            else:
+                email_to = context["email"]
+            subject, from_email, to = instance.notif.notiftype.name, "from@example.com", email_to
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
             if instance.notif.notiftype.webnotify is not True:
                 instance.isread = True
                 instance.save()
+        except Exception as e:
+            logger = logging.getLogger(__name__)
+            logger.warn("Email Server not correctly set up. See settings to configure.")
 
     return False
 

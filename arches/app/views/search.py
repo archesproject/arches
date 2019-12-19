@@ -37,7 +37,7 @@ from arches.app.search.components.base import SearchFilterFactory
 from arches.app.views.base import MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer
-import arches.app.utils.data_management.zip as zip_utils
+import arches.app.utils.zip as zip_utils
 import arches.app.utils.task_management as task_management
 import arches.app.tasks as tasks
 from io import StringIO
@@ -91,6 +91,7 @@ class SearchView(MapBaseManagerView):
             "title": _("Searching the Database"),
             "template": "search-help",
         }
+        context["celery_running"] = task_management.check_if_celery_available()
 
         return render(request, "views/search.htm", context)
 
@@ -187,7 +188,7 @@ def export_results(request):
     download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
     if total > download_limit:
         celery_worker_running = task_management.check_if_celery_available()
-        if celery_worker_running:
+        if celery_worker_running is True:
             req_dict = dict(request.GET)
             result = tasks.export_search_results.apply_async(
                 (request.user.id, req_dict, format), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
@@ -217,6 +218,8 @@ def export_results(request):
 
 
 def search_results(request):
+    for_export = request.GET.get("export")
+    total = int(request.GET.get("total", "0"))
     se = SearchEngineFactory().create()
     search_results_object = {"query": Query(se)}
 
@@ -230,7 +233,7 @@ def search_results(request):
             if search_filter:
                 search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional)
     except Exception as err:
-        return JSONErrorResponse(message=err.message)
+        return JSONErrorResponse(message=err)
 
     dsl = search_results_object.pop("query", None)
     dsl.include("graph_id")
@@ -245,7 +248,20 @@ def search_results(request):
     if request.GET.get("tiles", None) is not None:
         dsl.include("tiles")
 
-    results = dsl.search(index="resources")
+    if for_export is True:
+        results = dsl.search(index="resources", scroll="1m")
+        scroll_id = results["_scroll_id"]
+
+        if total <= settings.SEARCH_EXPORT_LIMIT:
+            pages = (total // settings.SEARCH_RESULT_LIMIT) + 1
+        if total > settings.SEARCH_EXPORT_LIMIT:
+            pages = int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT) - 1
+        for page in range(pages):
+            results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
+            results["hits"]["hits"] += results_scrolled["hits"]["hits"]
+    else:
+        results = dsl.search(index="resources", scroll="1m")
+
     ret = {}
     if results is not None:
         # allow filters to modify the results

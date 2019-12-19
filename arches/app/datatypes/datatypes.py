@@ -1621,6 +1621,13 @@ class ResourceInstanceDataType(BaseDataType):
     def ignore_keys(self):
         return ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]
 
+    def references_resource_type(self):
+        """
+        This resource references another resource type (eg resource-instance-datatype, etc...)
+        """
+
+        return True
+
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
     def from_rdf(self, json_ld_node):

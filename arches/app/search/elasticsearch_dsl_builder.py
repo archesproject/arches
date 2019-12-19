@@ -86,10 +86,12 @@ class Query(Dsl):
     def search(self, index="", **kwargs):
         self.start = kwargs.pop("start", self.start)
         self.limit = kwargs.pop("limit", self.limit)
-
+        self.scroll = kwargs.pop("scroll", None)
         self.prepare()
-        # print self
-        return self.se.search(index=index, body=self.dsl)
+        if self.scroll is None:
+            return self.se.search(index=index, body=self.dsl)
+        else:
+            return self.se.search(index=index, body=self.dsl, scroll=self.scroll)
 
     def count(self, index="", **kwargs):
         return self.se.count(index=index, body=self.dsl)

@@ -67,7 +67,7 @@
             <p>
                 <strong>Number of search results per page</strong> - Set the number of search results shown per page. Note this also defines the number of search result markers that are shown on the map.<br>
                 <strong>Number of search hints per dropdown</strong> - Set the number of search hints that will appear under the search bar as you type in search terms.<br>
-                <strong>Max number of search results to export</strong> - Set the maximum number of resources to be exported from the search results.  This is restricted and should be in sync with the Elasticsearch setting which defaults to 10,000.<br>See "index.max_result_window" setting <a href='https://www.elastic.co/guide/en/elasticsearch/reference/7.4/index-modules.html#dynamic-index-settings' target="_blank"><strong>here.</strong></a>
+                <strong>Max number of search results to export</strong> - Set the maximum number of resources to be exported from the search results. This value should generally be evenly divible by the SEARCH_RESULT_LIMIT setting in Arches (10,000 by default).
             </p>
             {% endblocktrans %}
         </div>
