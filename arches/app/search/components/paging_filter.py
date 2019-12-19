@@ -23,7 +23,7 @@ class PagingFilter(BaseSearchFilter):
         page = 1 if self.request.GET.get(details["componentname"]) == "" else int(self.request.GET.get(details["componentname"], 1))
 
         if export is not None:
-            limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE
+            limit = settings.SEARCH_RESULT_LIMIT
         elif mobile_download is not None:
             limit = self.request.GET["resourcecount"]
         else:

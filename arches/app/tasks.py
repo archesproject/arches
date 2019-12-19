@@ -44,6 +44,11 @@ def sync(self, surveyid=None, userid=None):
 
 @shared_task(bind=True)
 def export_search_results(self, userid, request_dict, format):
+
+    from arches.app.models.system_settings import settings
+
+    settings.update_from_db()
+
     create_user_task_record(self.request.id, self.name, userid)
     _user = User.objects.get(id=userid)
     email = request_dict["email"]
