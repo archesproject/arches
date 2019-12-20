@@ -1199,7 +1199,7 @@ ul.tabbed-report-tab-list {
     opacity: 1;
 }
 .legend-listing .legend-name {
-    font-size: 16px;
+    font-size: 14px;
 }
 .legend-listing .legend-content {
     padding: 10px 10px 0;
@@ -4778,7 +4778,10 @@ th.notif-type {
     border: none;
     padding-left: 16px;
     padding-right: 20px;
-    vertical-align: middle
+    vertical-align: middle;
+    background: #fafafa;
+    border-bottom: 1px solid #ddd;
+    border-left: 1px solid #ddd;
 }
 
 .ep-tool-title {
@@ -4907,6 +4910,11 @@ th.notif-type {
 
 .ep-help-close {
     float: right;
+    background: #f8f8f8;
+}
+
+.ep-help-close:hover {
+    background: #f2f2f2;
 }
 
 .ep-help-body {
@@ -5287,11 +5295,27 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     background-color: #fcfcfc;
 }
 
+.notification-message {
+    padding-bottom: 5px;
+    color: #777;
+}
+
+.notification-message span {
+    font-weight: 600;
+    color: #454545;
+}
+
+.entry .time-label {
+    font-weight: 600;
+}
+
 .ep-notifs-close {
     position: absolute;
     top: 0px;
     right: 0px;
     font-size: 17px;
+    background: #f6f6f6;
+    border-left: 1px solid transparent;
 }
 
 .entry .ep-notifs-close {
@@ -5300,6 +5324,8 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .ep-notifs-close:hover {
     color: #1B3974;
+    border-left: 1px solid transparent;
+    background: #f2f2f2;
 }
 
 

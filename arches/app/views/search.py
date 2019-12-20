@@ -196,7 +196,7 @@ def export_results(request):
             # if os.path.exists("result"): # this might not exist until after write_zip_file in task is done ?
             message = _(
                 f"{total} instances have been submitted for export. \
-                Click the bell icon to check for a notification once your export is completed and ready for download"
+                Click the Bell icon to check for a link to download your data"
             )
             return JSONResponse({"success": True, "message": message})
         else:
@@ -218,6 +218,8 @@ def export_results(request):
 
 
 def search_results(request):
+    for_export = request.GET.get("export")
+    total = int(request.GET.get("total", "0"))
     se = SearchEngineFactory().create()
     search_results_object = {"query": Query(se)}
 
@@ -246,7 +248,20 @@ def search_results(request):
     if request.GET.get("tiles", None) is not None:
         dsl.include("tiles")
 
-    results = dsl.search(index="resources")
+    if for_export is True:
+        results = dsl.search(index="resources", scroll="1m")
+        scroll_id = results["_scroll_id"]
+
+        if total <= settings.SEARCH_EXPORT_LIMIT:
+            pages = (total // settings.SEARCH_RESULT_LIMIT) + 1
+        if total > settings.SEARCH_EXPORT_LIMIT:
+            pages = int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT) - 1
+        for page in range(pages):
+            results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
+            results["hits"]["hits"] += results_scrolled["hits"]["hits"]
+    else:
+        results = dsl.search(index="resources", scroll="1m")
+
     ret = {}
     if results is not None:
         # allow filters to modify the results
