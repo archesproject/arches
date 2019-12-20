@@ -43,7 +43,7 @@ def sync(self, surveyid=None, userid=None):
 
 
 @shared_task(bind=True)
-def export_search_results(self, userid, request_dict, format):
+def export_search_results(self, userid, request_values, format):
 
     from arches.app.models.system_settings import settings
 
@@ -51,17 +51,18 @@ def export_search_results(self, userid, request_dict, format):
 
     create_user_task_record(self.request.id, self.name, userid)
     _user = User.objects.get(id=userid)
-    email = request_dict["email"]
-    export_name = request_dict["exportName"][0]
-    new_req = HttpRequest()
-    new_req.method = "GET"
-    new_req.user = _user
-    for k, v in request_dict.items():
-        new_req.GET.__setitem__(k, v[0])  # copies k,v pairs from old req to new_req
+    email = request_values["email"]
+    export_name = request_values["exportName"][0]
+    new_request = HttpRequest()
+    new_request.method = "GET"
+    new_request.user = _user
+    for k, v in request_values.items():
+        new_request.GET.__setitem__(k, v[0])
+    new_request.path = request_values["path"]
+    exporter = SearchResultsExporter(search_request=new_request)
+    files, export_info = exporter.export(format)
+    url = zip_utils.write_zip_file(files, export_info)
 
-    exporter = SearchResultsExporter(search_request=new_req)
-    # prod instances of arches should exclude the return_relative_url kwarg (default=False)
-    url = zip_utils.write_zip_file(exporter.export(format), return_relative_url=True)
     context = dict(
         greeting="Hello,\nYour request to download a set of search results is now ready.",
         link=url,

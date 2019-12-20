@@ -189,9 +189,10 @@ def export_results(request):
     if total > download_limit:
         celery_worker_running = task_management.check_if_celery_available()
         if celery_worker_running is True:
-            req_dict = dict(request.GET)
+            request_values = dict(request.GET)
+            request_values["path"] = request.get_full_path()
             result = tasks.export_search_results.apply_async(
-                (request.user.id, req_dict, format), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
+                (request.user.id, request_values, format), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
             )
             # if os.path.exists("result"): # this might not exist until after write_zip_file in task is done ?
             message = _(
@@ -204,7 +205,7 @@ def export_results(request):
             return JSONResponse({"success": False, "message": message})
     else:
         exporter = SearchResultsExporter(search_request=request)
-        export_files = exporter.export(format)
+        export_files, export_info = exporter.export(format)
         if len(export_files) == 0 and format == "shp":
             message = _(
                 "Either no instances were identified for export or no resources have exportable geometry nodes\
@@ -260,7 +261,7 @@ def search_results(request):
             results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
             results["hits"]["hits"] += results_scrolled["hits"]["hits"]
     else:
-        results = dsl.search(index="resources", scroll="1m")
+        results = dsl.search(index="resources")
 
     ret = {}
     if results is not None:
