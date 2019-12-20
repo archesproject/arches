@@ -1,9 +1,9 @@
 from __future__ import absolute_import, unicode_literals
 from celery import shared_task
 from datetime import datetime
+from datetime import timedelta
 import logging
 import os
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import management
 from django.db import connection
@@ -11,22 +11,26 @@ from django.http import HttpRequest
 from arches.app.models import models
 from arches.app.search.search_export import SearchResultsExporter
 import arches.app.utils.zip as zip_utils
+from django.utils.translation import ugettext as _
 
 
 @shared_task
 def delete_file():
+    from arches.app.models.system_settings import settings
+
+    settings.update_from_db()
+
+    logger = logging.getLogger(__name__)
     now = datetime.timestamp(datetime.now())
     file_list = []
-    counter = 0
-    with os.scandir(settings.CELERY_SEARCH_EXPORT_DIR) as current_files:
-        for file in current_files:
-            file_stat = os.stat(os.path.join(settings.CELERY_SEARCH_EXPORT_DIR, file))
-            if file_stat.st_ctime > settings.CELERY_SEARCH_EXPORT_EXPIRES:
-                file_list.append(file.name)
-    for file in file_list:
-        os.remove(os.path.join(settings.CELERY_SEARCH_EXPORT_DIR, file))
-        counter += 1
-    return f"{counter} files deleted"
+    range = datetime.now() - timedelta(seconds=settings.CELERY_SEARCH_EXPORT_EXPIRES)
+    exports = models.SearchExportHistory.objects.filter(exporttime__lt=range).exclude(downloadfile="")
+    for export in exports:
+        file_list.append(export.downloadfile.url)
+        export.downloadfile.delete()
+    deleted_message = _("files_deleted")
+    logger.warning(f"{len(file_list)} {deleted_message}")
+    return f"{len(file_list)} {deleted_message}"
 
 
 @shared_task
