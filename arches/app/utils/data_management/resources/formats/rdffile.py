@@ -532,8 +532,9 @@ class JsonLdReader(Reader):
                         nodegroup_id=branch[0]["nodegroup_id"],
                         data={},
                     )
-
                     self.resource.tiles.append(tile)
+                elif 'tile' in result and result['tile']:
+                    tile = result['tile']
 
                 bnode["tile"] = tile
 
