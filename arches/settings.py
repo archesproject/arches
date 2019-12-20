@@ -140,11 +140,11 @@ RESOURCE_EDITOR_GROUPS = ("Resource Editor", "Crowdsource Editor")
 SESSION_COOKIE_NAME = "arches"
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
-# EMAIL_USE_TLS = True
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_HOST_USER = 'xxxx@xxx.com'
-# EMAIL_HOST_PASSWORD = 'xxxxxxx'
-# EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'gmancino@fargeo.com'
+EMAIL_HOST_PASSWORD = '5mellsLikeBac0n'
+EMAIL_PORT = 587
 
 POSTGIS_VERSION = (2, 5, 3)
 
