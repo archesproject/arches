@@ -570,7 +570,7 @@ class Command(BaseCommand):
                 self.import_reference_data(path, overwrite, stage, bulk_load)
                 if bar1 is not None:
                     head, tail = os.path.split(path)
-                    bar1.update(item_id=tail+(" "*10))
+                    bar1.update(item_id=tail + (" " * 10))
 
             collection_data = []
             for file_type in file_types:
