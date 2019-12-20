@@ -196,7 +196,7 @@ def export_results(request):
             # if os.path.exists("result"): # this might not exist until after write_zip_file in task is done ?
             message = _(
                 f"{total} instances have been submitted for export. \
-                Click the bell icon to check for a notification once your export is completed and ready for download"
+                Click the Bell icon to check for a link to download your data"
             )
             return JSONResponse({"success": True, "message": message})
         else:
