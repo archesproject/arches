@@ -177,7 +177,7 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
         q.delete(index="concepts")
 
     with se.BulkIndexer(batch_size=batch_size, refresh=True) as concept_indexer:
-        concept_strings = []
+        indexed_values = []
         for conceptValue in models.Value.objects.filter(
             Q(concept__nodetype="Collection") | Q(concept__nodetype="ConceptScheme"), valuetype__category="label"
         ):
@@ -191,11 +191,11 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
                 "top_concept": conceptValue.concept_id,
             }
             concept_indexer.add(index="concepts", id=doc["id"], data=doc)
+            indexed_values.append(doc["id"])
+
 
         valueTypes = []
-        valueTypes2 = []
         for valuetype in models.DValueType.objects.filter(category="label").values_list("valuetype", flat=True):
-            valueTypes2.append("%s" % valuetype)
             valueTypes.append("'%s'" % valuetype)
         valueTypes = ",".join(valueTypes)
 
@@ -237,10 +237,25 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
                     "top_concept": topConcept,
                 }
                 concept_indexer.add(index="concepts", id=doc["id"], data=doc)
+                indexed_values.append(doc["id"])
+
+        # we add this step to catch any concepts/values that are orphaned (have no parent concept)
+        for conceptValue in models.Value.objects.filter(valuetype__category="label").exclude(valueid__in=indexed_values):
+            doc = {
+                "category": "label",
+                "conceptid": conceptValue.concept_id,
+                "language": conceptValue.language_id,
+                "value": conceptValue.value,
+                "type": conceptValue.valuetype_id,
+                "id": conceptValue.valueid,
+                "top_concept": conceptValue.concept_id,
+            }
+            concept_indexer.add(index="concepts", id=doc["id"], data=doc)
 
     cursor.execute("SELECT count(*) from values WHERE valuetype in ({0})".format(valueTypes))
     concept_count_in_db = cursor.fetchone()[0]
     index_count = se.count(index="concepts")
+
     print(
         "Status: {0}, In Database: {1}, Indexed: {2}, Took: {3} seconds".format(
             "Passed" if concept_count_in_db == index_count else "Failed", concept_count_in_db, index_count, (datetime.now() - start).seconds
