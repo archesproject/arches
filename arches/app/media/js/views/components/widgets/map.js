@@ -17,8 +17,6 @@ define([
     'geocoder-templates'
 ], function(arches, _, ko, koMapping, WidgetViewModel, MapEditorViewModel) {
     var viewModel = function(params) {
-        var self = this;
-        var draw = null;
         this.context = params.type;
         this.summaryDetails = [];
         this.defaultValueOptions = [

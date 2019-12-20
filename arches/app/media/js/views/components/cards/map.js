@@ -1,15 +1,23 @@
 define([
+    'arches',
     'knockout',
     'viewmodels/card-component',
     'viewmodels/map-editor',
     'bindings/chosen',
     'bindings/codemirror',
     'codemirror/mode/javascript/javascript'
-], function(ko, CardComponentViewModel, MapEditorViewModel) {
+], function(arches, ko, CardComponentViewModel, MapEditorViewModel) {
     var viewModel = function(params) {
         var self = this;
 
-        params.configKeys = ['selectSource', 'selectSourceLayer', 'selectText'];
+        params.configKeys = [
+            'selectSource',
+            'selectSourceLayer',
+            'selectText',
+            'zoom',
+            'centerX',
+            'centerY'
+        ];
 
         CardComponentViewModel.apply(this, [params]);
 
@@ -23,6 +31,16 @@ define([
             params.overlaysObservable = this.card.overlaysObservable;
             params.activeBasemap = this.card.activeBasemap;
         }
+
+        if (this.centerX() == 0 && this.centerY() == 0 && this.zoom() == 0) {
+            this.centerX(arches.mapDefaultX);
+            this.centerY(arches.mapDefaultY);
+            this.zoom(arches.mapDefaultZoom);
+        }
+        params.zoom = this.zoom;
+        params.x = this.centerX;
+        params.y = this.centerY;
+        params.usePosition = true;
 
         MapEditorViewModel.apply(this, [params]);
 
