@@ -151,12 +151,17 @@ define([
                 sprite: arches.mapboxSprites,
                 glyphs: arches.mapboxGlyphs,
                 layers: self.layers(),
-                center: [x, y],
-                zoom: zoom
-            },
-            bounds: bounds,
-            fitBoundsOptions: params.fitBoundsOptions
+                center: [
+                    parseFloat(ko.unwrap(x)),
+                    parseFloat(ko.unwrap(y))
+                ],
+                zoom: parseFloat(ko.unwrap(zoom))
+            }
         };
+        if (!params.usePosition) {
+            this.mapOptions.bounds = bounds;
+            this.mapOptions.fitBoundsOptions = params.fitBoundsOptions;
+        }
 
         this.toggleTab = function(tabName) {
             if (self.activeTab() === tabName) {
@@ -281,6 +286,46 @@ define([
                     }
                 }
                 setTimeout(function() { map.resize(); }, 1);
+
+                if (ko.isObservable(zoom)) {
+                    map.on('zoomend', function() {
+                        zoom(map.getZoom());
+                    });
+                    zoom.subscribe(function(level) {
+                        level = parseFloat(level);
+                        if (level) map.setZoom(level);
+                    });
+                }
+
+                if (ko.isObservable(x)) {
+                    map.on('dragend', function() {
+                        var center = map.getCenter();
+                        x(center.lng);
+                    });
+                    x.subscribe(function(lng) {
+                        var center = map.getCenter();
+                        lng = parseFloat(lng);
+                        if (lng) {
+                            center.lng = lng;
+                            map.setCenter(center);
+                        }
+                    });
+                }
+
+                if (ko.isObservable(y)) {
+                    map.on('dragend', function() {
+                        var center = map.getCenter();
+                        y(center.lat);
+                    });
+                    y.subscribe(function(lat) {
+                        var center = map.getCenter();
+                        lat = parseFloat(lat);
+                        if (lat) {
+                            center.lat = lat;
+                            map.setCenter(center);
+                        }
+                    });
+                }
             });
         };
     };
