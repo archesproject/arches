@@ -533,8 +533,8 @@ class JsonLdReader(Reader):
                         data={},
                     )
                     self.resource.tiles.append(tile)
-                elif 'tile' in result and result['tile']:
-                    tile = result['tile']
+                elif "tile" in result and result["tile"]:
+                    tile = result["tile"]
 
                 bnode["tile"] = tile
 
