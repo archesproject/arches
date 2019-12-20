@@ -570,7 +570,7 @@ class Command(BaseCommand):
                 self.import_reference_data(path, overwrite, stage, bulk_load)
                 if bar1 is not None:
                     head, tail = os.path.split(path)
-                    bar1.update(item_id=tail)
+                    bar1.update(item_id=tail + (" " * 10))
 
             collection_data = []
             for file_type in file_types:
@@ -883,7 +883,7 @@ class Command(BaseCommand):
 
         skos = SKOSReader()
         rdf = skos.read_file(data_source)
-        ret = skos.save_concepts_from_skos(rdf, overwrite, stage, bulk_load, data_source)
+        ret = skos.save_concepts_from_skos(rdf, overwrite, stage)
 
     def import_business_data(
         self, data_source, config_file=None, overwrite=None, bulk_load=False, create_concepts=False, use_multiprocessing=False, force=False
