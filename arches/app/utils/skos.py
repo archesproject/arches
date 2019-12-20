@@ -271,10 +271,6 @@ class SKOSReader(object):
                 if scheme_node:
                     scheme_node.bulk_index()
 
-                if orphaned_scheme:
-                    orphaned_scheme.bulk_index()
-
-
             # insert the concept collection relations
             # we do this outide a transaction so that we can load incomplete collections
             for relation in self.member_relations:
