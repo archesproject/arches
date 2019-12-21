@@ -68,4 +68,4 @@ def write_zip_file(files_for_export, export_info):
     download = File(f)
     search_history_obj.downloadfile.save(name, download)
 
-    return search_history_obj.downloadfile.url
+    return search_history_obj.searchexportid

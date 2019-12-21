@@ -18,10 +18,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 from datetime import datetime
-from django.shortcuts import render
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
 from django.http import HttpResponseNotFound
+from django.shortcuts import render
 from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.concept import Concept
@@ -367,3 +367,16 @@ def time_wheel_config(request):
     if config is None:
         config = time_wheel.time_wheel_config(request.user)
     return JSONResponse(config, indent=4)
+
+
+def get_export_file(request):
+    exportid = request.GET.get("exportid", None)
+    user = request.user
+    url = None
+    if exportid is not None:
+        export = models.SearchExportHistory.objects.get(pk=exportid)
+        try:
+            url = export.downloadfile.url
+            return JSONResponse({"message": _("Downloading"), "url": url}, indent=4)
+        except ValueError:
+            return JSONResponse({"message": _("The requested file is no longer available")}, indent=4)

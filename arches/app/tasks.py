@@ -65,11 +65,11 @@ def export_search_results(self, userid, request_values, format):
     new_request.path = request_values["path"]
     exporter = SearchResultsExporter(search_request=new_request)
     files, export_info = exporter.export(format)
-    url = zip_utils.write_zip_file(files, export_info)
+    exportid = zip_utils.write_zip_file(files, export_info)
 
     context = dict(
         greeting="Hello,\nYour request to download a set of search results is now ready.",
-        link=url,
+        link=exportid,
         button_text="Download Now",
         closing="Thank you",
         email=email,

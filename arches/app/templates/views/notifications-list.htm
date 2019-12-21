@@ -6,7 +6,7 @@
 <span>
     <!--ko with: notifsList -->
     <div>
-        <button class="btn btn-lg btn-notifs-dismiss-all" 
+        <button class="btn btn-lg btn-notifs-dismiss-all"
             data-bind="click:function(){$data.dismiss();}, css: {disabled: $data.items().length === 0}" >{% trans 'Dismiss All' %}</button>
     </div>
     <!-- /ko -->
@@ -36,9 +36,10 @@
                     <span data-bind="text: displaytime" ></span>
                 </div>
 
-                <!-- ko if: $data["downloadBtn"] -->
+                <!-- ko if: $data["link"] -->
                 <div class='entry'>
-                    <div data-bind="html: downloadBtn"></div>
+                    <button data-bind="click: function(){$parent.getExportFile(this)}" class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'>{% trans 'Download File' %}</button>
+                    <div style="padding-left: 10px;" data-bind="text: info"></div>
                 </div>
                 <!-- /ko -->
             </div>
