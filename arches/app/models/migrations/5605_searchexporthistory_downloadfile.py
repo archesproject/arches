@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "5712_update_sys_setting"),
+        ("models", "5608_adds_map_card_configs"),
     ]
 
     operations = [
