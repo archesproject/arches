@@ -17,13 +17,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import csv
+import datetime
 from io import StringIO
+from io import BytesIO
+from django.core.files import File
 from arches.app.models import models
+from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.flatten_dict import flatten_dict
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.geo_utils import GeoUtils
+import arches.app.utils.zip as zip_utils
 from arches.app.views import search as SearchView
 
 
@@ -84,6 +89,19 @@ class SearchResultsExporter(object):
         search_export_info.save()
 
         return ret, search_export_info
+
+    def write_export_zipfile(self, files_for_export, export_info):
+        """
+        Writes a list of file like objects out to a zip file
+        """
+        zip_stream = zip_utils.create_zip_file(files_for_export)
+        today = datetime.datetime.now().isoformat()
+        name = f"{settings.APP_NAME}_{today}.zip"
+        search_history_obj = models.SearchExportHistory.objects.get(pk=export_info.searchexportid)
+        f = BytesIO(zip_stream)
+        download = File(f)
+        search_history_obj.downloadfile.save(name, download)
+        return search_history_obj.searchexportid
 
     def get_node(self, nodeid):
         nodeid = str(nodeid)

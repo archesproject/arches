@@ -20,9 +20,7 @@ import zipfile
 import datetime
 from io import BytesIO
 from arches.app.models import models
-from arches.app.models.system_settings import settings
 from django.http import HttpResponse
-from django.core.files import File
 
 
 def create_zip_file(files_for_export):
@@ -53,19 +51,3 @@ def zip_response(files_for_export, zip_file_name=None):
     response["Content-Type"] = "application/zip"
     response.write(zip_stream)
     return response
-
-
-def write_zip_file(files_for_export, export_info):
-    """
-    Writes a list of file like objects out to a zip file
-    Only Development instances of arches should have return_relative_url=True
-    """
-    zip_stream = create_zip_file(files_for_export)
-    today = datetime.datetime.now().isoformat()
-    name = f"{settings.APP_NAME}_{today}.zip"
-    search_history_obj = models.SearchExportHistory.objects.get(pk=export_info.searchexportid)
-    f = BytesIO(zip_stream)
-    download = File(f)
-    search_history_obj.downloadfile.save(name, download)
-
-    return search_history_obj.searchexportid
