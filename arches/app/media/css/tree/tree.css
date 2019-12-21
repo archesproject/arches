@@ -239,6 +239,13 @@ a.filtered > span:hover {
     display: none;
 }
 
+.jstree-leading-icon {
+    float: left;
+    margin-top: 7px;
+    left: 10px;
+    padding-right: 5px;
+}
+
 .jstree-clicked .jstree-node-action-icon {
     font: normal normal normal 14px/1 FontAwesome;
     color: white;
