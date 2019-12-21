@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '5712_update_sys_setting'),
+        ("models", "5712_update_sys_setting"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='searchexporthistory',
-            name='downloadfile',
-            field=models.FileField(blank=True, null=True, upload_to='export_deliverables'),
+            model_name="searchexporthistory",
+            name="downloadfile",
+            field=models.FileField(blank=True, null=True, upload_to="export_deliverables"),
         ),
     ]
