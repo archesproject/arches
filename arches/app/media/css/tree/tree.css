@@ -239,11 +239,11 @@ a.filtered > span:hover {
     display: none;
 }
 
-.jstree-anchor .tooltip {
+.jstree-leading-icon + .tooltip {
     margin-left: 25px;
 }
 
-.jstree-anchor .tooltip.top .tooltip-arrow  {
+.jstree-leading-icon + .tooltip.top .tooltip-arrow  {
     margin-left: -28px;
 }
 
