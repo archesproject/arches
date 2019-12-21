@@ -239,6 +239,14 @@ a.filtered > span:hover {
     display: none;
 }
 
+.jstree-anchor .tooltip {
+    margin-left: 25px;
+}
+
+.jstree-anchor .tooltip.top .tooltip-arrow  {
+    margin-left: -28px;
+}
+
 .jstree-leading-icon {
     padding-right: 2px;
     padding-left: 5px;

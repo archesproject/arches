@@ -41,7 +41,7 @@
             <i data-bind="css: 'node.iconclass'" role="presentation"></i>
 
             <!-- ko if: node.exportable -->
-            <i class="jstree-leading-icon fa fa-download" role="presentation" data-toggle="tooltip" data-placement="right" data-original-title="{% trans 'Node is exportable in search' %}"></i>
+            <i class="jstree-leading-icon fa fa-download" role="presentation" data-toggle="tooltip" data-placement="top" data-original-title="{% trans 'Node is exportable in search' %}"></i>
             <!-- /ko -->
             
             <span class="" data-bind="{text: graphTree.getDisplayName(node), style: { 'padding-right': graphTree.showIds() == true ? '0px' : '10px' }}"></span>
