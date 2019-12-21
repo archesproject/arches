@@ -240,10 +240,8 @@ a.filtered > span:hover {
 }
 
 .jstree-leading-icon {
-    float: left;
-    margin-top: 7px;
-    left: 10px;
-    padding-right: 5px;
+    padding-right: 2px;
+    padding-left: 5px;
 }
 
 .jstree-clicked .jstree-node-action-icon {
