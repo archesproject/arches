@@ -194,7 +194,6 @@ def export_results(request):
             result = tasks.export_search_results.apply_async(
                 (request.user.id, request_values, format), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
             )
-            # if os.path.exists("result"): # this might not exist until after write_zip_file in task is done ?
             message = _(
                 f"{total} instances have been submitted for export. \
                 Click the bell icon to check for a notification once your export is completed and ready for download"
