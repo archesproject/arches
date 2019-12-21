@@ -65,7 +65,7 @@ define([
                     if (data.url) {
                         window.open(data.url);
                     } else {
-                        item.info(data.message)
+                        item.info(data.message);
                     }
                 });
             };
