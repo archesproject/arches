@@ -32,8 +32,12 @@
 
             <div>
                 <div class='entry'><i data-bind=""></i>
-                    <div class='entry-label'>{% trans 'Message: ' %}<span data-bind="text: message"></span></div>
-                    <span data-bind="text: displaytime" ></span>
+                    <div class='entry-label'>{% trans 'Download ready ' %}</div>
+                    <span class='time-label' data-bind="text: displaytime" ></span>
+                </div>
+
+                <div class="notification-message">
+                    {% trans "Your search " %} <span class="" data-bind="text: message"> </span> {% trans " is ready for download.  You have 24 hours to access this file, after which we'll automatically remove it." %}
                 </div>
 
                 <!-- ko if: $data["link"] -->
