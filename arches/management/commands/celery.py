@@ -30,12 +30,16 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("operation", nargs="?", help="operation 'start' starts a celery worker for your project")
+        parser.add_argument("-b", "--beat", action="store_true", dest="beat", help="Includes the beat worker with your celery worker")
 
     def handle(self, *args, **options):
         if options["operation"] == "start":
-            self.start_worker()
+            self.start_worker(options["beat"])
 
-    def start_worker(self):
-        cmd = f"celery -A {settings.ELASTICSEARCH_PREFIX} worker -l info"
+    def start_worker(self, beat):
+        if beat is True:
+            cmd = f"celery -A {settings.ELASTICSEARCH_PREFIX} worker -B -l info"
+        else:
+            cmd = f"celery -A {settings.ELASTICSEARCH_PREFIX} worker -l info"
         cmd_process = cmd.split()
         subprocess.call(cmd_process)

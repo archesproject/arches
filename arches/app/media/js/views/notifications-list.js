@@ -32,9 +32,7 @@ define([
                 }).done(function(data) {
                     self.items(_.filter(data.notifications, function(notif) {
                         notif.displaytime = moment(notif.created).format('dddd, DD MMMM YYYY | hh:mm A');
-                        if (notif.link) {
-                            notif.downloadBtn = ("<a download href="+notif.link+"><button class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'>Download File</button></a>");
-                        }
+                        notif.info = ko.observable();
                         return notif.isread === false;
                     }));
                     self.helploading(false);
@@ -46,7 +44,7 @@ define([
                 if (!notifId) { // i.e. dismissAll
                     notifs = self.items().map(function(notif) { return notif.id; });
                     self.items.removeAll();
-                } else { 
+                } else {
                     notifs = [notifId];
                     item = self.items().find(function(it) { return it.id === notifId; });
                     self.items.remove(item);
@@ -55,6 +53,20 @@ define([
                     type: 'POST',
                     url: arches.urls.dismiss_notifications,
                     data: {"dismissals": JSON.stringify(notifs)},
+                });
+            };
+
+            this.getExportFile = function(item) {
+                $.ajax({
+                    type: 'GET',
+                    url: arches.urls.get_export_file,
+                    data: {"exportid": item.link}
+                }).done(function(data) {
+                    if (data.url) {
+                        window.open(data.url);
+                    } else {
+                        item.info(data.message);
+                    }
                 });
             };
 

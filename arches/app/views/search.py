@@ -18,10 +18,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 from datetime import datetime
-from django.shortcuts import render
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
 from django.http import HttpResponseNotFound
+from django.shortcuts import render
 from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.concept import Concept
@@ -189,11 +189,11 @@ def export_results(request):
     if total > download_limit:
         celery_worker_running = task_management.check_if_celery_available()
         if celery_worker_running is True:
-            req_dict = dict(request.GET)
+            request_values = dict(request.GET)
+            request_values["path"] = request.get_full_path()
             result = tasks.export_search_results.apply_async(
-                (request.user.id, req_dict, format), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
+                (request.user.id, request_values, format), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
             )
-            # if os.path.exists("result"): # this might not exist until after write_zip_file in task is done ?
             message = _(
                 f"{total} instances have been submitted for export. \
                 Click the Bell icon to check for a link to download your data"
@@ -204,7 +204,7 @@ def export_results(request):
             return JSONResponse({"success": False, "message": message})
     else:
         exporter = SearchResultsExporter(search_request=request)
-        export_files = exporter.export(format)
+        export_files, export_info = exporter.export(format)
         if len(export_files) == 0 and format == "shp":
             message = _(
                 "Either no instances were identified for export or no resources have exportable geometry nodes\
@@ -260,7 +260,7 @@ def search_results(request):
             results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
             results["hits"]["hits"] += results_scrolled["hits"]["hits"]
     else:
-        results = dsl.search(index="resources", scroll="1m")
+        results = dsl.search(index="resources")
 
     ret = {}
     if results is not None:
@@ -366,3 +366,16 @@ def time_wheel_config(request):
     if config is None:
         config = time_wheel.time_wheel_config(request.user)
     return JSONResponse(config, indent=4)
+
+
+def get_export_file(request):
+    exportid = request.GET.get("exportid", None)
+    user = request.user
+    url = None
+    if exportid is not None:
+        export = models.SearchExportHistory.objects.get(pk=exportid)
+        try:
+            url = export.downloadfile.url
+            return JSONResponse({"message": _("Downloading"), "url": url}, indent=4)
+        except ValueError:
+            return JSONResponse({"message": _("The requested file is no longer available")}, indent=4)

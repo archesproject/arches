@@ -100,6 +100,7 @@ urlpatterns = [
     url(r"^search/resources$", search.search_results, name="search_results"),
     url(r"^search/time_wheel_config$", search.time_wheel_config, name="time_wheel_config"),
     url(r"^search/export_results$", search.export_results, name="export_results"),
+    url(r"^search/get_export_file$", search.get_export_file, name="get_export_file"),
     url(r"^buffer/$", search.buffer, name="buffer"),
     url(
         r"^settings/",

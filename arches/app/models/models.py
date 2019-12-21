@@ -729,10 +729,12 @@ class SearchExportHistory(models.Model):
     exporttime = models.DateTimeField(auto_now_add=True)
     numberofinstances = models.IntegerField()
     url = models.TextField()
+    downloadfile = models.FileField(upload_to="export_deliverables", blank=True, null=True)
 
     class Meta:
         managed = True
         db_table = "search_export_history"
+
 
 class TileModel(models.Model):  # Tile
     """
