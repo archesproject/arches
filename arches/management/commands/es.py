@@ -124,6 +124,14 @@ class Command(BaseCommand):
         if options["operation"] == "index_resource_relations":
             index_database.index_resource_relations(clear_index=options["clear_index"], batch_size=options["batch_size"])
 
+    def register_index(self, name):
+        es_index = get_index(name)
+        es_index.prepare_index()
+
+    def remove_index(self, name):
+        es_index = get_index(name)
+        es_index.delete_index()
+
     def setup_indexes(self):
         prepare_terms_index(create=True)
         prepare_concepts_index(create=True)
