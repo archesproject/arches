@@ -24,6 +24,7 @@ from django.forms.widgets import PasswordInput, TextInput
 from django.utils.translation import ugettext as _
 from arches.app.models import models
 from captcha.fields import ReCaptchaField
+import logging
 
 
 class ArchesUserCreationForm(UserCreationForm):
@@ -35,8 +36,13 @@ class ArchesUserCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         self.enable_captcha = kwargs.pop("enable_captcha", False)
         super(ArchesUserCreationForm, self).__init__(*args, **kwargs)
-        if self.enable_captcha:
-            self.fields["captcha"] = ReCaptchaField(attrs={"theme": "clean"})
+        attrs = {"theme": "clean"}
+        if self.enable_captcha is True:
+            try:
+                self.fields["captcha"] = ReCaptchaField(attrs)
+            except Exception as e:
+                logger = logging.getLogger(__name__)
+                logger.warn(e)
 
     first_name = forms.CharField()
     last_name = forms.CharField()
