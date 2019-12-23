@@ -1317,16 +1317,16 @@ class Graph(models.GraphModel):
 
         def validate_fieldname(fieldname, fieldnames):
             if node.fieldname == "":
-                raise GraphValidationError(_("Field Name must not be blank."), 1008)
+                raise GraphValidationError(_("Field name must not be blank."), 1008)
             if fieldname.replace("_", "").isalnum() is False:
-                raise GraphValidationError(_("Field Name must contain only alpha-numeric characters or underscores."), 1010)
+                raise GraphValidationError(_("Field name must contain only alpha-numeric characters or underscores."), 1010)
             if fieldname[0] == "_" or fieldname[0].isdigit():
-                raise GraphValidationError(_("Field Name cannot begin with an underscore or number"), 1011)
+                raise GraphValidationError(_("Field name cannot begin with an underscore or number"), 1011)
             if len(fieldname) > 10:
                 fieldname = fieldname[:10]
             try:
                 dupe = fieldnames[fieldname]
-                raise GraphValidationError(_(f"Field Name must be unique to the graph; '{fieldname}' already exists."), 1009)
+                raise GraphValidationError(_(f"Field name must be unique to the graph; '{fieldname}' already exists."), 1009)
             except KeyError as e:
                 fieldnames[fieldname] = True
 
