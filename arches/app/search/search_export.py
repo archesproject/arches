@@ -73,7 +73,7 @@ class SearchResultsExporter(object):
         for graph_id, resources in output.items():
             graph = models.GraphModel.objects.get(pk=graph_id)
             if format == "tilecsv":
-                headers = list(graph.node_set.filter(exportable=True).values_list("fieldname", flat=True))
+                headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
                 headers.append("resourceid")
                 ret.append(self.to_csv(resources["output"], headers=headers, name=graph.name))
             if format == "shp":
@@ -157,7 +157,8 @@ class SearchResultsExporter(object):
                     datatype = datatype_factory.get_instance(node.datatype)
                     # node_value = datatype.transform_export_values(tile['data'][str(node.nodeid)])
                     node_value = datatype.get_display_value(tile, node)
-                    label = node.fieldname
+                    # label = node.fieldname
+                    label = node.name
 
                     if compact:
                         if node.datatype == "geojson-feature-collection":
