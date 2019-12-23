@@ -2,6 +2,11 @@
     margin-top: 17px;
 }
 
+div.collapse.navbar-collapse.navbar-ex1-collapse > div > .v5-splash-list {
+    margin-right: 10px;
+    margin-top: -7px;
+}
+
 div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     margin-right: 10px;
     margin-top: 5px;
@@ -69,6 +74,14 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     padding: 48px 72px 24px 72px;
 }
 
+.v5-splash-nav {
+    z-index: 500;
+    background-color: #343a40;
+    border: none;
+    padding: 12px 40px 12px 40px;
+    border-radius: 0px;
+}
+
 .cons-splash-nav {
     z-index: 500;
     background-color: rgba(0, 0, 0, 0);
@@ -91,8 +104,56 @@ ul.splash-list > li > a:focus, ul.splash-list > li > a:hover {
     background-color: rgba(0, 0, 0, 0.174);
 }
 
+.v5-splash-list li a {
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    padding: 10px 15px;
+    margin-top: 5px;
+    margin-right: 5px;
+}
+
+.v5-splash-list .application-login {
+    /*background: #C3F9DA;*/
+    padding: 10px 25px;
+    color: #13ce67;
+    border: 1px solid #20BB63;
+    border-radius: 2px;
+}
+
+.v5-splash-list .application-login:hover {
+    border: 1px solid #20BB63;
+}
+
+.v5-splash-list a {
+    /*background: #C3F9DA;*/
+    padding: 10px 25px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+}
+
+.v5-splash-list a:hover {
+    /*background: #C3F9DA;*/
+    color: #13ce67;
+    border: 1px solid transparent;
+    border-radius: 2px;
+}
+
+ul.v5-splash-list > li > a:focus, ul.v5-splash-list > li > a:hover {
+    background-color: rgba(0, 0, 0, 0.174);
+}
+
 ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     background-color: rgba(0, 0, 0, 0.174);
+}
+
+.navbar-brand-v5 {
+    height: 40px;
+    color: #594b4b;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    padding: 0;
 }
 
 .navbar-brand-disco {
@@ -103,10 +164,25 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     padding: 0;
 }
 
+.navbar-brand-v5 span {
+    font-size: 16px;
+    display: block;
+    /*font-family: "Open Sans",Arial,sans-serif;*/
+}
+
 .navbar-brand-disco span {
     font-size: 16px;
     display: block;
     /*font-family: "Open Sans",Arial,sans-serif;*/
+}
+
+.navbar-brand-v5 h2 {
+    margin-bottom: 8px;
+    margin-top: 0px;
+    margin-left: -12px;
+    font-size: 19px;
+    color: #fff;
+    display: inline-block;
 }
 
 .navbar-brand-disco h2 {
@@ -118,8 +194,23 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     display: inline-block;
 }
 
+.navbar-brand-v5 > div + div {
+    padding: 3px 24px 0px 24px;
+}
+
 .navbar-brand-disco > div + div {
     padding: 12px 24px 20px 24px;
+}
+
+.navbar-brand-v5-icon-container {
+    height: 40px; 
+    width: 40px; 
+    border-radius: 50%; 
+    border: 1px solid #ff0000; 
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .navbar-brand-disco-icon-container {
@@ -131,6 +222,13 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.navbar-brand-v5-icon {
+    height: 18px; 
+    width: 18px; 
+    text-align: center; 
+    margin-top: -5px
 }
 
 .navbar-brand-disco-icon {
@@ -197,6 +295,10 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+}
+
+.v5-splash-nav .nav-container {
+    height: 40px;
 }
 
 .image-gradient {

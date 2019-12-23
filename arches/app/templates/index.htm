@@ -1,4 +1,3 @@
-
 <!--
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
@@ -51,70 +50,48 @@ The #page-top ID is part of the scrolling feature.
 The data-spy and data-target are part of the built-in Bootstrap scrollspy function.
 -->
 
-<body id="body" data-spy="scroll" data-target=".one-page-header" class="demo-lightbox-gallery">
+<body id="body" data-spy="scroll" data-target=".splash-nav" class="demo-lightbox-gallery">
 
     <!--=== Header ===-->
-    <nav class="one-page-header navbar navbar-default navbar-fixed-top" role="navigation">
-        <div class="container">
-
-            <div class="menu-container page-scroll">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-                    <span class="sr-only">{% trans "Toggle navigation" %}</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-
-                <a class="navbar-brand" style="padding-top: 5px;" href="#intro">
-                    <img src="{% static 'img/landing/arches_logo_light.png' %}" style="height: 36px; width: 36px;" alt="Logo">
-                </a>
+    <nav class="v5-splash-nav navbar" role="navigation">
+        <div class="nav-container">
+            <div class="navbar-brand-v5">
+                <div class="navbar-brand-v5-icon-container" style="">
+                    <img class="navbar-brand-v5-icon" src="{% static 'img/landing/arches_logo_dark.png' %}" style="" alt="Arches Logo">
+                </div>
+                <div class="application-name">
+                    <h2>{% trans "Arches | v5" %}</h2>
+                    <!-- <span>Data Integration for Science and Conservation</span> -->
+                </div>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <div class="menu-container">
-                    <ul class="nav navbar-nav">
+                    <ul class="nav navbar-nav v5-splash-list">
+                        
                         <li class="page-scroll">
-                            <a href="#about">{% trans "About Arches" %}</a>
+                            <a href="{% url 'search_home' %}">{% trans "Find" %}</a>
                         </li>
+                        
+                        {% if user|can_create_resource_instance and user.username != 'anonymous' %}
                         <li class="page-scroll">
-                            <a href="#services">{% trans "Capabilities" %}</a>
-                        </li>
-                        <li class="page-scroll">
-                            <a href="#news">{% trans "News" %}</a>
-                        </li>
-                        <li class="page-scroll">
-                            <a href="{% url 'search_home' %}">{% trans "Search" %}</a>
-                        </li>
-                        {% if user|can_create_resource_instance %}
-                        <li class="page-scroll">
-                            <a href="{% url 'resource' %}">{% trans "Manage Data" %}</a>
+                            <a href="{% url 'resource' %}" target="_blank">{% trans "Manage" %}</a>
                         </li>
                         {% endif %}
-                        {% if user|has_group:"Graph Editor" %}
+                        
                         <li class="page-scroll">
-                            <a href="{% url 'graph' '' %}">{% trans "Design" %}</a>
-                        </li>
-                        {% endif %}
-                        <li class="page-scroll" style="display: flex; flex-direction: row">
                             {% if user.username == 'anonymous' %}
-                            <a id="auth-link" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">
-                                {% trans "Login" %}
-                            </a>
+                                <a class="application-login" id="auth-link" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans "Sign in" %}</a>
                             {% else %}
-                            <a id="auth-link" data-bind="click: function(){showAuthMenu(!showAuthMenu())}">
-                                {% trans "Welcome" %} {{ user.first_name|default:user.username }}
-                            </a>
-                            <span class="fa fa-chevron-circle-down auth-options" data-bind="click: function(){showAuthMenu(!showAuthMenu())}"></span>
-
+                                <a class="auth-welcome" href="{% url 'user_profile_manager' %}">
+                                    {% trans "Welcome, " %} {{ user.first_name|default:user.username }}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">({% trans 'logoff' %})</a>
                             {% endif %}
                         </li>
-                        <!-- ko if: showAuthMenu -->
-                        <ul class="auth-options">
-                            <li><a href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans 'Logout' %}</a></li>
-                            <li><a href="{% url 'user_profile_manager' %}">{% trans 'User Profile' %}</a></li>
-                        </ul>
-                        <!-- /ko -->
                     </ul>
                 </div>
             </div>
@@ -125,93 +102,43 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <!--=== End Header ===-->
 
     <!-- Intro Section -->
-    <section id="intro" class="intro-section">
+    <section id="intro-cons" class="intro-section" style="">
         <div class="fullscreenbanner-container">
             <div class="fullscreenbanner">
                 <ul>
                     <!-- SLIDE 1 -->
-                    <li data-transition="slideright" data-slotamount="5" data-masterspeed="700" data-title="Slide 1">
+                    <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Slide 1">
                         <!-- MAIN IMAGE -->
-                        <img src="{% static 'img/landing/landing1.png' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
+                        <img src="{% static 'img/landing/the_shard.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
 
                         <!-- LAYERS -->
-                        <div class="tp-caption rs-caption-1 sft start text-bold" delay="4500" data-x="center" data-hoffset="0" data-y="100" data-speed="800" data-start="1000" data-easing="Back.easeInOut" data-endspeed="300">
-                            Arches
+                        <!-- NEW LAYER -->
+                        <div class="tp-caption sft start text-bold disco-caption" delay="4500" data-x="-50" data-hoffset="0" data-y="450" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
+                            <h2><a href="#info-block-1">{% trans "Consultations at GLAAS..." %}</a></h2>
+                            <p>{% trans "How the Greater London Archaeology Advisory Service manages development" %}</p>
                         </div>
 
-                        <!-- LAYER -->
-                        <div class="tp-caption rs-caption-2 sft" data-x="center" data-hoffset="0" data-y="200" data-speed="1000" data-start="3000" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
-                            {% trans "A Data Management and Integration Platform<br> To Preserve and Protect Cultural Heritage." %}
+                        <!-- NEW LAYER -->
+                        <div class="tp-caption sft start text-bold disco-caption" delay="4500" data-x="450" data-hoffset="0" data-y="450" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
+                            <h2><a href="#info-block-2">{% trans "Search and Discover..." %}</a></h2>
+                            <p>{% trans "Find and review information on our current and past consultations" %}</p>
                         </div>
 
-                        <!-- LAYER -->
-                        <div class="tp-caption rs-caption-3 sft" data-x="center" data-hoffset="0" data-y="360" data-speed="800" data-start="3500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
-                            <span class="page-scroll"><a href="#about" class="btn-u btn-brd btn-brd-hover btn-u-light">{% trans "Learn More" %}</a></span>
-                            {% if user.username == 'anonymous' %}
-                            <span class="page-scroll"><a href="{% url 'auth' %}?next={% url 'graph' '' %}" class="btn-u btn-brd btn-brd-hover btn-u-light">{% trans "Login" %}</a></span>
-                            {% endif %}
-                            {% if user|can_create_resource_instance %}
-                            <span class="page-scroll"><a href="{% url 'resource' %}" class="btn-u btn-brd btn-brd-hover btn-u-light">{% trans "Manage Data" %}</a></span>
-                            {% endif %}
+                        <!-- NEW LAYER -->
+                        <div class="tp-caption sft start text-bold disco-caption" delay="4500" data-x="950" data-hoffset="0" data-y="450" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
+                            <h2><a href="#info-block-3">{% trans "Get Involved..." %}</a></h2>
+                            <p>{% trans "Want to help?  Here's how you can participate" %}</p>
                         </div>
+
+                        <!-- Gradient -->
+                        <div class="image-gradient"></div>
 
                         <!-- Attribution -->
-                        <div class="" style="position: absolute; top: 95%; left: 15px; color: #fff; padding: 10px; background: rgba(0,0,0,.5);">
-                            <span class="">Photo:  https://www.flickr.com/photos/bibendum84/ (CC BY 2.0)</span>
+                        <div class="image-attribution" style="">
+                            <span class="">{% trans "The Shard | https://www.flickr.com/photos/cathedraljack/ | Attribution 2.0 Generic (CC BY 2.0)" %}</span>
                         </div>
                     </li>
 
-                    <!-- SLIDE 2 -->
-                    <li data-transition="slideup" data-slotamount="5" data-masterspeed="1000" data-title="Slide 2">
-                        <!-- MAIN IMAGE -->
-                        <img src="{% static 'img/landing/landing2.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
-
-                        <!-- LAYERS -->
-                        <div class="tp-caption rs-caption-1 sft start text-bold" data-x="center" data-hoffset="0" data-y="100" data-speed="800" data-start="1500" data-easing="Back.easeInOut" data-endspeed="300">
-                            {% trans "Dynamically Define Your Inventory" %}
-                        </div>
-
-                        <!-- LAYER -->
-                        <div class="tp-caption rs-caption-2 sft" data-x="center" data-hoffset="0" data-y="200" data-speed="1000" data-start="2500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
-                            {% trans "Arches Lets You Easily Create Inventory Databases<br> And Share Them With Others" %}
-                        </div>
-
-                        <!-- LAYER -->
-                        <div class="tp-caption rs-caption-3 sft" data-x="center" data-hoffset="0" data-y="360" data-speed="800" data-start="3500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
-                            <span class="page-scroll"><a href="#about" class="btn-u btn-brd btn-brd-hover btn-u-light">{% trans "Learn More" %}</a></span>
-                        </div>
-
-                        <!-- Attribution -->
-                        <div class="" style="position: absolute; top: 95%; left: 15px; color: #fff; padding: 10px; background: rgba(0,0,0,.5);">
-                            <span class="">Photo:  https://www.flickr.com/photos/davidedamico/ (CC BY 2.0)</span>
-                        </div>
-                    </li>
-
-                    <!-- SLIDE 3 -->
-                    <li data-transition="slideup" data-slotamount="5" data-masterspeed="700" data-title="Slide 3">
-                        <!-- MAIN IMAGE -->
-                        <img src="{% static 'img/landing/landing3.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
-
-                        <!-- LAYERS -->
-                        <div class="tp-caption rs-caption-1 sft start text-bold" data-x="center" data-hoffset="0" data-y="110" data-speed="800" data-start="1500" data-easing="Back.easeInOut" data-endspeed="300">
-                            {% trans "Data Discovery" %}
-                        </div>
-
-                        <!-- LAYER -->
-                        <div class="tp-caption rs-caption-2 sfb" data-x="center" data-hoffset="0" data-y="210" data-speed="800" data-start="2500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
-                            {% trans "Easily Find Relevant Projects, Artistic Works<br> and Retrieve Data for Interpretation and Analysis" %}
-                        </div>
-
-                        <!-- LAYER -->
-                        <div class="tp-caption rs-caption-3 sfb" data-x="center" data-hoffset="0" data-y="370" data-speed="800" data-start="3500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
-                            <span class="page-scroll"><a href="#about" class="btn-u btn-brd btn-brd-hover btn-u-light">{% trans "Search Arches" %}</a></span>
-                        </div>
-
-                        <!-- Attribution -->
-                        <div class="" style="position: absolute; top: 95%; left: 15px; color: #fff; padding: 10px; background: rgba(0,0,0,.5);">
-                            <span class="">Photo:  https://www.flickr.com/photos/pedrosz/ (CC BY 2.0)</span>
-                        </div>
-                    </li>
                 </ul>
                 <div class="tp-bannertimer tp-bottom"></div>
             </div>
@@ -219,165 +146,74 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     </section>
     <!-- End Intro Section -->
 
+    <!-- Page Custom Content -->
+    <div class="custom-content-container">
+        <!-- Info Block 1 -->
+        <div id="info-block-1" class="app-info-block">
+          <h2 class="">{% trans "Consultations at GLAAS" %}</h2>
 
-    <!--  About Section -->
-    <section class="about-section section-first" style="padding-top: 0px;">
+        </div>
+        <!-- End Info Block 1 -->
 
+        <!-- Info Block 2 -->
+        <div id="info-block-2" class="app-info-block">
+          <h2 class="">{% trans "Find and Review Consultations" %}</h2>
 
-        <div id="about" class="about-image bg-grey">
-            <div class="container">
-                <div class="title-v1">
-                    <h1>{% trans "What is Arches" %}</h1>
-                    <p>{% trans "Arches is <strong>awesome</strong> technology designed to ease Cultural Heritage data management.<br> Use Arches to build an inventory of cultural heritage assets such as objects, research activities, areas, datasets, and people or  organizations." %}</p>
+        </div>
+        <!-- End Info Block 2 -->
+
+        <!-- Info Block 3 -->
+        <div id="info-block-3" class="app-info-block">
+          <h2 class="">{% trans "Working with GLAAS" %}</h2>
+
+        </div>
+        <!-- End Info Block 3 -->
+
+    </div>
+    <!-- End Page Custome Content -->
+
+    <!-- Footer -->
+    <div class="app-footer">
+
+        <!-- footer content container -->
+        <div class="app-footer-content-container">
+
+            <!-- branding column -->
+            <div class="app-footer-branding">
+                <img class="app-footer-image" src='/media/img/projects/consultations/HE_Logo_White.svg' title="Historic England" alt="Historic England">
+
+                <div class="organization-address">
+                  Greater London Archaeological Advisory Service<br>
+                  Historic England<br>
+                  4th floor, Cannon Bridge House<br>
+                  25 Dowgate Hill<br>
+                  London<br>
+                  EC4R 2YA
                 </div>
-                <div class="img-center">
-                    <img class="img-responsive" src="{% static 'img/landing/disco.jpg' %}" alt="">
-                </div>
+            </div>
+
+            <!-- Info Column -->
+            <div class="app-footer-info">
+                <h2 class="app-footer-heading">{% trans "Guides and Documentation" %}</h2>
             </div>
         </div>
+    </div>
+    <!-- End Footer -->
 
-    </section>
-    <!--  About Section -->
+    <!-- Copyright Panel -->
+    <div class="copyright-container">
 
-    <!-- Services Section -->
-    <section id="services">
-        <div class="container content-lg">
-            <div class="title-v1">
-                <h2>{% trans "Capabilities" %}</h2>
-                <p>{% trans "Arches can <strong> streamline your work</strong> so that you can focus on managing your assets.<br> Build interoperable, shareable, and secure <strong> cultural heritage data repositories</strong> as a natural part of your workflow." %}</p>
-            </div>
 
-            <div class="row service-box-v1">
-                <div class="col-md-4 col-sm-6">
-                    <div class="service-block service-block-default">
-                        <i class="icon-custom icon-lg icon-bg-u rounded-x fa fa-lightbulb-o"></i>
-                        <h2 class="heading-md">{% trans "Manage Heritage Inventories" %}</h2>
-                        <p></p>
-                        <ul class="list-unstyled">
-                            <li>{% trans "Heritage Objects" %}</li>
-                            <li>{% trans "Research Activities" %}</li>
-                            <li>{% trans "People and Orgnizations" %}</li>
-                            <li>{% trans "Important Areas" %}</li>
-                            <li>{% trans "Documents and Images" %}</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <div class="service-block service-block-default">
-                        <i class="icon-custom icon-lg icon-bg-u rounded-x icon-line icon-present"></i>
-                        <h2 class="heading-md">{% trans "Research Data" %}</h2>
-                        <p></p>
-                        <ul class="list-unstyled">
-                            <li>{% trans "Manage Digital Datasets" %}</li>
-                            <li>{% trans "Visualize Spectra" %}</li>
-                            <li>{% trans "Easy Dataset Import" %}</li>
-                            <li>{% trans "View & Manage Data" %}</li>
-                            <li>{% trans "Easy Access" %}</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-12">
-                    <div class="service-block service-block-default">
-                        <i class="icon-custom icon-lg icon-bg-u rounded-x icon-line icon-rocket"></i>
-                        <h2 class="heading-md">{% trans "Interpretations & Results" %}</h2>
-                        <p></p>
-                        <ul class="list-unstyled">
-                            <li>{% trans "Manage Data Interpretations" %}</li>
-                            <li>{% trans "Share Research Results" %}</li>
-                            <li>{% trans "Tie Results to Iconography" %}</li>
-                            <li>{% trans "Centralize Results" %}</li>
-                            <li>{% trans "Publish Results" %}</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+        <!-- Arches link -->
+        <div class="app-footer-links">
+            <a class="link-spacing" href="">{% trans "Terms & Conditions" %}</a>
+            <a class="link-spacing" href="">{% trans "Privacy Policy" %}</a>
+            <a class="app-footer-arches-link" href="www.archesproject.org">Powered by Arches</a>
         </div>
-    </section>
-    <!-- End Services Section -->
-
-    <!-- News Section -->
-    <section id="news" class="news-section bg-grey" >
-        <div class="container content-lg">
-            <div class="title-v1">
-                <h2>{% trans "Latest News" %}</h2>
-                <p></p>
-            </div>
-
-            <div class="row news-v1 text-center">
-                Add your content here
-            </div>
-
-            <!-- <div class="row news-v1">
-                <div class="col-md-4 md-margin-bottom-40">
-                    <div class="news-v1-in">
-                        <img class="img-responsive" src="{% static 'img/landing/img1.jpg' %}" alt="">
-                        <h3><a href="#">At vero eos et accusamus</a></h3>
-                        <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores.</p>
-                        <ul class="list-inline news-v1-info">
-                            <li><span>By</span> <a href="#">Arches Project Team</a></li>
-                            <li>|</li>
-                            <li><i class="fa fa-clock-o"></i> March 02, 2016</li>
-                            <li class="pull-right"><a href="#"><i class="fa fa-comments-o"></i> 14</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-md-4 md-margin-bottom-40">
-                    <div class="news-v1-in">
-                        <img class="img-responsive" src="{% static 'img/landing/img4.jpg' %}" alt="">
-                        <h3><a href="#">Voluptatum deleniti atque</a></h3>
-                        <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores.</p>
-                        <ul class="list-inline news-v1-info">
-                            <li><span>By</span> <a href="#">Catherine Patterson</a></li>
-                            <li>|</li>
-                            <li><i class="fa fa-clock-o"></i> July 02, 2015</li>
-                            <li class="pull-right"><a href="#"><i class="fa fa-comments-o"></i> 07</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="news-v1-in">
-                        <img class="img-responsive" src="{% static 'img/landing/img3.jpg' %}" alt="">
-                        <h3><a href="#">Accusamus et iusto odio dignissimos</a></h3>
-                        <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores.</p>
-                        <ul class="list-inline news-v1-info">
-                            <li><span>By</span> <a href="#">Karen Trentleman</a></li>
-                            <li>|</li>
-                            <li><i class="fa fa-clock-o"></i> July 02, 2015</li>
-                            <li class="pull-right"><a href="#"><i class="fa fa-comments-o"></i> 22</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div> -->
-        </div>
-    </section>
-    <!-- End News Section -->
+    </div>
+    <!-- End Copyright Container -->
 
 
-    <!-- Contact Section -->
-    <section id="contact" class="contacts-section">
-        <div class="copyright-section">
-            <p>{{copyright_year}} &copy; {{copyright_text}} </p>
-            <ul class="social-icons">
-                <li>
-                    <a href="#" data-original-title="Facebook" class="social_facebook rounded-x"></a>
-                </li>
-                <li>
-                    <a href="#" data-original-title="Twitter" class="social_twitter rounded-x"></a>
-                </li>
-                <li>
-                    <a href="#" data-original-title="Google Plus" class="social_googleplus rounded-x"></a>
-                </li>
-                <li>
-                    <a href="#" data-original-title="Pinterest" class="social_pintrest rounded-x"></a>
-                </li>
-                <li>
-                    <a href="#" data-original-title="Linkedin" class="social_linkedin rounded-x"></a>
-                </li>
-            </ul>
-            <span class="page-scroll"><a href="#intro"><i class="fa fa-angle-double-up back-to-top"></i></a></span>
-        </div>
-    </section>
-    <!-- End Contact Section -->
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-migrate/1.4.0/jquery-migrate.min.js"></script>
