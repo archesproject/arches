@@ -1316,13 +1316,12 @@ class Graph(models.GraphModel):
                     )
 
         def validate_fieldname(fieldname, fieldnames):
-            chars = set("`~!@#$%^&*()-+=[{]}\|;:<,>./?")
             if node.fieldname == "":
                 raise GraphValidationError(_("Field Name must not be blank."), 1008)
-            if any((c in chars) for c in fieldname):
+            if fieldname.replace("_", "").isalnum() is False:
                 raise GraphValidationError(_("Field Name must contain only alpha-numeric characters or underscores."), 1010)
             if fieldname[0] == "_" or fieldname[0].isdigit():
-                raise GraphValidationError(_("Field Name must begin with alphabet letter"), 1011)
+                raise GraphValidationError(_("Field Name cannot begin with an underscore or number"), 1011)
             if len(fieldname) > 10:
                 fieldname = fieldname[:10]
             try:
