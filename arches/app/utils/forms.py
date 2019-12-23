@@ -36,10 +36,10 @@ class ArchesUserCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         self.enable_captcha = kwargs.pop("enable_captcha", False)
         super(ArchesUserCreationForm, self).__init__(*args, **kwargs)
-        # attrs = {"theme": "clean"}
+        attrs = {"theme": "clean"}
         if self.enable_captcha is True:
             try:
-                self.fields["captcha"] = ReCaptchaField(attrs={"theme": "clean"})
+                self.fields["captcha"] = ReCaptchaField(attrs)
             except Exception as e:
                 logger = logging.getLogger(__name__)
                 logger.warn(e)
