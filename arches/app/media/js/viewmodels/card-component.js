@@ -83,8 +83,8 @@ define([
                 params.pageVm.alert(
                     new AlertViewModel(
                         'ep-alert-red',
-                        response.responseJSON.message[0],
-                        response.responseJSON.message[1],
+                        response.responseJSON.title,
+                        response.responseJSON.message,
                         null,
                         function(){}
                     )
@@ -106,8 +106,8 @@ define([
                 params.pageVm.alert(
                     new AlertViewModel(
                         'ep-alert-red',
-                        response.responseJSON.message[0],
-                        response.responseJSON.message[1],
+                        response.responseJSON.title,
+                        response.responseJSON.message,
                         null,
                         function(){}
                     )

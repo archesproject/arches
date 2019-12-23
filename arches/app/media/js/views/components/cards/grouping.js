@@ -214,8 +214,8 @@ define([
                 var title = [];
                 var message = [];
                 errors.forEach(function(response) {
-                    title.push(response.responseJSON.message[0]);
-                    message.push(response.responseJSON.message[1]);
+                    title.push(response.responseJSON.title);
+                    message.push(response.responseJSON.message);
                 });
                 params.pageVm.alert(new AlertViewModel('ep-alert-red', title.join(), message.join(), null, function(){}));
                 if (params.form.onSaveError) {
@@ -251,8 +251,8 @@ define([
                 var title = [];
                 var message = [];
                 errors.forEach(function(response) {
-                    title.push(response.responseJSON.message[0]);
-                    message.push(response.responseJSON.message[1]);
+                    title.push(response.responseJSON.title);
+                    message.push(response.responseJSON.message);
                 });
                 params.pageVm.alert(new AlertViewModel('ep-alert-red', title.join(), message.join(), null, function(){}));
             });
