@@ -80,7 +80,6 @@ define([
             self.loading(true);
             self.tile.save(function(response) {
                 self.loading(false);
-                console.log(response);
                 params.pageVm.alert(
                     new AlertViewModel(
                         'ep-alert-red',
