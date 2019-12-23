@@ -1327,7 +1327,7 @@ class Graph(models.GraphModel):
                 fieldname = fieldname[:10]
             try:
                 dupe = fieldnames[fieldname]
-                raise GraphValidationError(_("Field Name must be unique to the graph."), 1009)
+                raise GraphValidationError(_(f"Field Name must be unique to the graph; '{fieldname}' already exists."), 1009)
             except KeyError as e:
                 fieldnames[fieldname] = True
 

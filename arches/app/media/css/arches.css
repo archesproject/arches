@@ -2205,7 +2205,7 @@ a.select2-search-choice-close {
 }
 
 .node {
-    font-size: 17px;
+    font-size: 13px;
     transition: all .40s ease;
     stroke: #aaa;
     stroke-width: 1px;
@@ -2381,7 +2381,7 @@ ul.nav.nav-tabs.nav-justified {
 .graph-designer-graph-content .graph-designer-title {
     font-size: 17px;
     font-weight: 500;
-    margin-top: 0;
+    margin-top: 2px;
     margin-bottom: 5px;
     color: #fff;
     padding: 10px 0 5px 0px;
@@ -5324,7 +5324,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .ep-notifs-close:hover {
     color: #1B3974;
-    border-left: 1px solid transparent;
+    border-left: 1px solid #ddd;
     background: #f2f2f2;
 }
 
