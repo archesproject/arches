@@ -39,7 +39,7 @@
         <div class="">
             <div class="instruction">
                     <h2 class=""> {% trans "3. Email Address" %} </h2>
-                    <h4 class=""> {% trans "This download will take some time.  Tell us where to email your results" %} </h4>
+                    <h4 class=""> {% trans "This download may take some time.  Tell us where to email a download link to your results" %} </h4>
             </div>
             <div class="parameter">
                 <input type="" class="form-control input-md widget-input" data-bind="textInput: emailInput" placeholder="No Email saved for User"></input>
@@ -54,6 +54,7 @@
             type="button"
             aria-expanded="true"
             data-bind="css: {disabled: (total() === 0) || (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() !== 'True')},click: function(){executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} )}"> {% trans "Download" %}
+            <i class="fa fa-spin fa-spinner" data-bind="visible: downloadPending() === true"></i>
         </button>
     </div>
     <div class="download-message" data-bind="text: result, fadeVisible: downloadStarted, delay:0, fade: 600">
