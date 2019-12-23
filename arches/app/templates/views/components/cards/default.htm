@@ -379,6 +379,7 @@
                 <!-- /ko -->
                 <!-- ko if: !tile.tileid -->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">{% trans 'Add'  %}</button>
+                <button class="btn btn-lg fa fa-file-o" data-bind="click: function(){console.log(self);}">CLICK ME</button>
                 <!-- /ko -->
             </div>
             {% endblock form_buttons %}
