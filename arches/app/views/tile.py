@@ -85,7 +85,7 @@ class TileData(View):
             )
         )
 
-        return JSONErrorResponse(_(title), _(str(message)))
+        return JSONErrorResponse(_(title), _(str(message)), {"message": message, "title": title})
 
     def post(self, request):
         if self.action == "update_tile":
