@@ -364,8 +364,10 @@ class EDTFDataType(BaseDataType):
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
-        value = data[str(node.pk)]["value"]
-
+        try:
+            value = data[str(node.pk)]["value"]
+        except TypeError:
+            value = data[str(node.pk)]
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
