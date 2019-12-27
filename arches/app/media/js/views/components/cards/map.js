@@ -44,7 +44,7 @@ define([
 
         this.expandSidePanel = ko.computed(function(){
             if (self.tile) {
-                return self.tile.hasprovisionaledits();
+                return self.tile.hasprovisionaledits() && self.reviewer === true;
             } else {
                 return false;
             }
