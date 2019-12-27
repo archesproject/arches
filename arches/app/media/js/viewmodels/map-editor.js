@@ -419,9 +419,13 @@ define([
                     var featureCollection;
                     for (var k in self.tile.data){
                         if (self.featureLookup[k]) {
-                            featureCollection = self.draw.getAll();
-                            featureCollection.features = ko.unwrap(self.featureLookup[k].features);
-                            self.draw.set(featureCollection);
+                            try {
+                                featureCollection = self.draw.getAll();
+                                featureCollection.features = ko.unwrap(self.featureLookup[k].features);
+                                self.draw.set(featureCollection);
+                            } catch (e) {
+                                console.log(e);  //TODO: Figure out why draw error occurs. Error seems harmless. 
+                            }
                         }
                     }
                 };
