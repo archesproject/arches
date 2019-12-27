@@ -413,23 +413,27 @@ define([
             });
         };
 
+
         if (this.provisionalTileViewModel) {
-            this.provisionalTileViewModel.selectedProvisionalEdit.subscribe(function(){
-                var displayAll = function(){
-                    var featureCollection;
-                    for (var k in self.tile.data){
-                        if (self.featureLookup[k]) {
-                            try {
-                                featureCollection = self.draw.getAll();
-                                featureCollection.features = ko.unwrap(self.featureLookup[k].features);
-                                self.draw.set(featureCollection);
-                            } catch (e) {
-                                console.log(e);  //TODO: Figure out why draw error occurs. Error seems harmless. 
+            this.provisionalTileViewModel.resetAuthoritative();
+            this.provisionalTileViewModel.selectedProvisionalEdit.subscribe(function(val){
+                if (val) {
+                    var displayAll = function(){
+                        var featureCollection;
+                        for (var k in self.tile.data){
+                            if (self.featureLookup[k] && self.draw) {
+                                try {
+                                    featureCollection = self.draw.getAll();
+                                    featureCollection.features = ko.unwrap(self.featureLookup[k].features);
+                                    self.draw.set(featureCollection);
+                                } catch(e) {
+                                    //pass: TypeError in draw seems inconsequential.
+                                }
                             }
                         }
-                    }
-                };
-                setTimeout(displayAll, 100);
+                    };
+                    setTimeout(displayAll, 100);
+                }
             });
         }
 
