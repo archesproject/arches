@@ -413,6 +413,24 @@ define([
             });
         };
 
+        if (this.provisionalTileViewModel) {
+            this.provisionalTileViewModel.selectedProvisionalEdit.subscribe(function(){
+                var displayAll = function(scope){return function(){
+                    var featureCollection;
+                    for (var k in scope.tile.data){
+                        if (scope.featureLookup[k]) {
+                            featureCollection = scope.draw.getAll();
+                            featureCollection.features = ko.unwrap(scope.featureLookup[k].features);
+                            scope.draw.set(featureCollection);
+                        }
+                    }
+                };
+                };
+                var getAll = displayAll(this);
+                setTimeout(getAll, 2000);
+            }, this);
+        }
+
         this.map.subscribe(setupDraw);
 
         if (!params.additionalDrawOptions) {
