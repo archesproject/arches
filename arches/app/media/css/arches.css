@@ -930,6 +930,10 @@ ul.tabbed-report-tab-list {
     color: rgb(33, 62, 95);
 }
 
+.workbench-card-sidepanel.expanded {
+    width: 600px
+}
+
 .basemap-listing, .overlay-listing, .legend-listing {
     padding: 20px;
     border-bottom: 1px solid rgb(216, 216, 216);
