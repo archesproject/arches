@@ -75,10 +75,13 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
 }
 
 .v5-splash-nav {
+    position: fixed;
+    top: 0px;
+    width: 100%;
     z-index: 500;
-    background-color: #343a40;
+    background-color: #041B33;
     border: none;
-    padding: 12px 40px 12px 40px;
+    padding: 12px 120px 12px 120px;
     border-radius: 0px;
 }
 
@@ -105,8 +108,8 @@ ul.splash-list > li > a:focus, ul.splash-list > li > a:hover {
 }
 
 .v5-splash-list li a {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 15px;
+    font-weight: 400;
     color: #fff;
     padding: 10px 15px;
     margin-top: 5px;
@@ -140,11 +143,25 @@ ul.splash-list > li > a:focus, ul.splash-list > li > a:hover {
 }
 
 ul.v5-splash-list > li > a:focus, ul.v5-splash-list > li > a:hover {
-    background-color: rgba(0, 0, 0, 0.174);
+    background-color: rgba(0, 6, 12, 0.75);
 }
 
 ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     background-color: rgba(0, 0, 0, 0.174);
+}
+
+.v5-splash-caption h2 {
+    font-size: 55px;
+    font-weight: 300;
+    color: #fff;
+    padding-bottom: 5px;
+}
+
+.v5-splash-caption p {
+    font-size: 29px;
+    font-weight: 300;
+    color: #fff;
+    line-height: 0.7;
 }
 
 .navbar-brand-v5 {
@@ -319,8 +336,8 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .app-info-block {
-    min-height: 700px;
-    padding: 70px 100px;
+    min-height: 800px;
+    padding: 50px 100px;
     background: #fff;
     border-top: 1px solid #ddd;
 }
@@ -333,6 +350,15 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     font-size: 32px;
     font-weight: 300;
     color: #25476A;
+}
+
+.app-info-block .container {
+    padding-top: 40px;
+}
+
+.app-info-block-text {
+    color: #6c757d;
+    font-size: 16px;
 }
 
 .app-footer {
@@ -386,7 +412,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .app-footer-links {
     font-size: 15px;
-    color: ; #041B33;
+    color: #041B33;
 }
 
 .link-spacing {
@@ -396,6 +422,66 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .app-footer-arches-link {
     float: right;
 }
+
+.datatype-box {
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    padding: 15px;
+    min-height: 225px;
+}
+
+.sub-section {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 40px;
+}
+
+.vertical-nav-container {
+    position: fixed;
+    right: 20px;
+    top: 350px;
+    z-index: 3000;
+    padding: 5px;
+}
+
+.vertical-nav-list {
+    list-style: none;
+}
+
+.vertical-nav-list-item {
+    border-right: 1px solid #fff;
+    height: 30px;
+    margin-bottom: 10px;
+}
+
+.vertical-nav-list-item.active {
+    border-right: 3px solid #fff;
+    margin-right: -1px;
+}
+
+.vertical-nav-list-link {
+    line-height: 1.8;
+    padding-right: 10px;
+    font-size: 17px;
+    font-weight: 400;
+    color: transparent;
+    float: right;
+}
+
+.vertical-nav-list-link:hover {
+    color: #fff;
+    text-decoration: none;
+}
+
+.active .vertical-nav-list-link {
+    color: #fff;
+}
+
+.active .vertical-nav-list-link:hover {
+    cursor: default;
+}
+
 
 @media (min-width: 768px) {
     .one-page-header .navbar-nav>li> .fa-chevron-circle-down {

@@ -69,9 +69,25 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <div class="menu-container">
                     <ul class="nav navbar-nav v5-splash-list">
+
+                        <li class="page-scroll">
+                            <a href="#info-block-0">{% trans "Home" %}</a>
+                        </li>
+
+                        <li class="page-scroll">
+                            <a href="#info-block-1">{% trans "Flexible" %}</a>
+                        </li>
+
+                        <li class="page-scroll">
+                            <a href="#info-block-2">{% trans "Fast" %}</a>
+                        </li>
+
+                        <li class="page-scroll">
+                            <a href="#info-block-3">{% trans "Mobile" %}</a>
+                        </li>
                         
                         <li class="page-scroll">
-                            <a href="{% url 'search_home' %}">{% trans "Find" %}</a>
+                            <a href="{% url 'search_home' %}">{% trans "Jump to Search" %}</a>
                         </li>
                         
                         {% if user|can_create_resource_instance and user.username != 'anonymous' %}
@@ -89,7 +105,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                                 </a>
                             </li>
                             <li>
-                                <a href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">({% trans 'logoff' %})</a>
+                                <a class="application-login" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans 'Log off' %}</a>
                             {% endif %}
                         </li>
                     </ul>
@@ -102,32 +118,40 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <!--=== End Header ===-->
 
     <!-- Intro Section -->
-    <section id="intro-cons" class="intro-section" style="">
+    <section id="info-block-0" class="intro-section" style="">
+        <!-- Vertical Nav -->
+        <div class="vertical-nav-container">
+            <ul class="vertical-nav-list">
+                <li class="vertical-nav-list-item active">
+                    <a class="vertical-nav-list-link" href="#info-block-0">Home</a>
+                </li>
+                <li class="vertical-nav-list-item">
+                    <a class="vertical-nav-list-link" href="#info-block-1">Flexibility</a>
+                </li>
+                <li class="vertical-nav-list-item">
+                    <a class="vertical-nav-list-link" href="#info-block-2">Fast</a>
+                </li>
+                <li class="vertical-nav-list-item">
+                    <a class="vertical-nav-list-link" href="#info-block-3">Mobile</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Splash Screen -->
         <div class="fullscreenbanner-container">
             <div class="fullscreenbanner">
                 <ul>
                     <!-- SLIDE 1 -->
                     <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Slide 1">
                         <!-- MAIN IMAGE -->
-                        <img src="{% static 'img/landing/the_shard.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
+                        <img src="{% static 'img/landing/potala_palace.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
 
                         <!-- LAYERS -->
                         <!-- NEW LAYER -->
-                        <div class="tp-caption sft start text-bold disco-caption" delay="4500" data-x="-50" data-hoffset="0" data-y="450" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
-                            <h2><a href="#info-block-1">{% trans "Consultations at GLAAS..." %}</a></h2>
-                            <p>{% trans "How the Greater London Archaeology Advisory Service manages development" %}</p>
-                        </div>
-
-                        <!-- NEW LAYER -->
-                        <div class="tp-caption sft start text-bold disco-caption" delay="4500" data-x="450" data-hoffset="0" data-y="450" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
-                            <h2><a href="#info-block-2">{% trans "Search and Discover..." %}</a></h2>
-                            <p>{% trans "Find and review information on our current and past consultations" %}</p>
-                        </div>
-
-                        <!-- NEW LAYER -->
-                        <div class="tp-caption sft start text-bold disco-caption" delay="4500" data-x="950" data-hoffset="0" data-y="450" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
-                            <h2><a href="#info-block-3">{% trans "Get Involved..." %}</a></h2>
-                            <p>{% trans "Want to help?  Here's how you can participate" %}</p>
+                        <div class="tp-caption sft start text-bold v5-splash-caption" style="left: 150px;" delay="4500"  data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
+                            <h2>{% trans "Arches v5.0" %}</h2>
+                            <p>{% trans "A web and mobile platform for" %}</p>
+                            <p>{% trans "managing your most important resource information" %}</p>
                         </div>
 
                         <!-- Gradient -->
@@ -135,7 +159,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                         <!-- Attribution -->
                         <div class="image-attribution" style="">
-                            <span class="">{% trans "The Shard | https://www.flickr.com/photos/cathedraljack/ | Attribution 2.0 Generic (CC BY 2.0)" %}</span>
+                            <span class="">{% trans "Potala Palace, Lhasa | TJKakuris https://www.flickr.com/photos/60546255@N03/5521603324/ | (CC BY-NC-ND 2.0)" %}</span>
                         </div>
                     </li>
 
@@ -150,8 +174,51 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <div class="custom-content-container">
         <!-- Info Block 1 -->
         <div id="info-block-1" class="app-info-block">
-          <h2 class="">{% trans "Consultations at GLAAS" %}</h2>
+            <div class="container">
+          
+                <!-- Heading Info -->
+                <div class="sub-section">
+                    <div class="col-lg-7">
+                        <div class="app-info-block-intro text-center">
+                            <h3 class="app-info-block-header">{% trans "Flexiblity" %}</h3>
+                            <h2 class="app-info-block-title">{% trans "Arches Manages Diverse Data" %}</h2>
+                            <p class="app-info-block-text">
+                                {% trans "Arches implements a modular data type design, allowing the platform to manage traditional data, geospatial and temporal information, and thesauri." %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Content -->
+                
+                    
+                <div class="row">
 
+                    <div class="col-lg-4">
+                        
+                        <!-- Arches Data Type Block -->
+                        <div class="datatype-box text-center">
+                            <div class="agency-services-icon">
+                                <i class="fa fa-code"></i>
+                            </div>
+
+                            <div class="services-desc">
+                                <h5 class="">{% trans "Data Type" %}</h5>
+                                <p class="">
+                                    {% trans "Brief Data Type description" %}
+                                </p>
+                                <div>
+                                    <a href="#" class="text-custom">
+                                        <i class="mdi mdi-arrow-right h3"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                
+            </div>
         </div>
         <!-- End Info Block 1 -->
 
