@@ -437,9 +437,22 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     padding-bottom: 40px;
 }
 
+.vertical-nav-container-background {
+    position: fixed;
+    right: 21px;
+    top: 325px;
+    z-index: 2500;
+    width: 20px;
+    background: #041B33;
+    border: 1px solid #000;
+    border-radius: 5px;
+    height: 250px;
+    opacity: .85
+}
+
 .vertical-nav-container {
     position: fixed;
-    right: 20px;
+    right: 25px;
     top: 350px;
     z-index: 3000;
     padding: 5px;
@@ -461,8 +474,8 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .vertical-nav-list-link {
-    line-height: 1.8;
-    padding-right: 10px;
+    line-height: 1.4;
+    padding: 5px 10px;
     font-size: 17px;
     font-weight: 400;
     color: transparent;
@@ -470,16 +483,11 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .vertical-nav-list-link:hover {
-    color: #fff;
+    color: #041B33;
+    background: #fff;
     text-decoration: none;
-}
-
-.active .vertical-nav-list-link {
-    color: #fff;
-}
-
-.active .vertical-nav-list-link:hover {
-    cursor: default;
+    margin-right: 15px;
+    opacity: .4;
 }
 
 

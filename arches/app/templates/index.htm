@@ -71,19 +71,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                     <ul class="nav navbar-nav v5-splash-list">
 
                         <li class="page-scroll">
-                            <a href="#info-block-0">{% trans "Home" %}</a>
-                        </li>
-
-                        <li class="page-scroll">
-                            <a href="#info-block-1">{% trans "Flexible" %}</a>
-                        </li>
-
-                        <li class="page-scroll">
-                            <a href="#info-block-2">{% trans "Fast" %}</a>
-                        </li>
-
-                        <li class="page-scroll">
-                            <a href="#info-block-3">{% trans "Mobile" %}</a>
+                            <a href="#info-block-0">{% trans "Arches Features" %}</a>
                         </li>
                         
                         <li class="page-scroll">
@@ -118,8 +106,12 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <!--=== End Header ===-->
 
     <!-- Intro Section -->
-    <section id="info-block-0" class="intro-section" style="">
+    <section id="info-block-0" class="intro-section relative" style="">
         <!-- Vertical Nav -->
+        <div class="vertical-nav-container-background">
+
+
+        </div>
         <div class="vertical-nav-container">
             <ul class="vertical-nav-list">
                 <li class="vertical-nav-list-item active">
@@ -130,6 +122,9 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 </li>
                 <li class="vertical-nav-list-item">
                     <a class="vertical-nav-list-link" href="#info-block-2">Fast</a>
+                </li>
+                <li class="vertical-nav-list-item">
+                    <a class="vertical-nav-list-link" href="#info-block-3">No Code</a>
                 </li>
                 <li class="vertical-nav-list-item">
                     <a class="vertical-nav-list-link" href="#info-block-3">Mobile</a>
@@ -171,7 +166,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <!-- End Intro Section -->
 
     <!-- Page Custom Content -->
-    <div class="custom-content-container">
+    <div class="custom-content-container relative">
         <!-- Info Block 1 -->
         <div id="info-block-1" class="app-info-block">
             <div class="container">
@@ -188,11 +183,9 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         </div>
                     </div>
                 </div>
-                <!-- Content -->
                 
-                    
+                <!-- Content -->
                 <div class="row">
-
                     <div class="col-lg-4">
                         
                         <!-- Arches Data Type Block -->
@@ -200,24 +193,16 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                             <div class="agency-services-icon">
                                 <i class="fa fa-code"></i>
                             </div>
-
                             <div class="services-desc">
                                 <h5 class="">{% trans "Data Type" %}</h5>
                                 <p class="">
                                     {% trans "Brief Data Type description" %}
                                 </p>
-                                <div>
-                                    <a href="#" class="text-custom">
-                                        <i class="mdi mdi-arrow-right h3"></i>
-                                    </a>
-                                </div>
                             </div>
                         </div>
 
                     </div>
                 </div>
-
-                
             </div>
         </div>
         <!-- End Info Block 1 -->
