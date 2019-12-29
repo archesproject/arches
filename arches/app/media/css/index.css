@@ -424,7 +424,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .datatype-box {
-    background: #f8f8f8;
+    background: #fff;
     border: 1px solid #ddd;
     border-radius: 2px;
     padding: 15px;
@@ -440,20 +440,20 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .vertical-nav-container-background {
     position: fixed;
     right: 21px;
-    top: 325px;
+    top: 305px;
     z-index: 2500;
     width: 20px;
     background: #041B33;
     border: 1px solid #000;
     border-radius: 5px;
-    height: 250px;
+    height: 240px;
     opacity: .85
 }
 
 .vertical-nav-container {
     position: fixed;
     right: 25px;
-    top: 350px;
+    top: 325px;
     z-index: 3000;
     padding: 5px;
 }
@@ -490,6 +490,27 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     opacity: .4;
 }
 
+.down-button {
+    position: absolute;
+    bottom: 70px;
+    left: 50%;
+    z-index: 1000;
+}
+
+.down-button-icon {
+    color: #fff;
+    background: #041B33;
+    font-size: 43px;
+    padding-top: 4px;
+    padding-left: 10px;
+    border: 1px solid #fff;
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+    align-items: center;
+    justify-content: center;
+    opacity: .7;
+}
 
 @media (min-width: 768px) {
     .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
