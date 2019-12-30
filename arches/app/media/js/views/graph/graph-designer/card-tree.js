@@ -231,6 +231,16 @@ define([
             updateCards: function(selectedNodegroupId, data) {
                 if (data.updated_values.card) {
                     var card = data.updated_values.card;
+                    var defaultCardName = data.default_card_name;
+                    self.cachedFlatTree.forEach(function(c){
+                        if (c.model.name().startsWith(defaultCardName)){
+                            if (data.updated_values.node) {
+                                c.model.name(data.updated_values.node.name);
+                                card.name = c.model.name;
+                                c.model.save();
+                            }
+                        }
+                    });
                     card.parentnodegroupId = _.filter(data.nodegroups, function(ng){return data.updated_values.card.nodegroup_id === ng.nodegroupid;})[0].parentnodegroup_id;
                     self.updateCard(self.topCards(), card, data);
                 } else {
