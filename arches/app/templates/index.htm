@@ -66,7 +66,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <div id="navbarCollapse" class="collapse navbar-collapse">
                 <div class="menu-container">
                     <ul class="nav navbar-nav v5-splash-list">
 
@@ -106,36 +106,36 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <!--=== End Header ===-->
 
     <!-- Intro Section -->
-    <section id="info-block-0" class="intro-section relative" style="">
+    <section id="info-block-0" class="app-info-block intro-section relative" style="">
         <!-- Vertical Nav -->
         <div class="vertical-nav-container-background">
 
 
         </div>
-        <div class="vertical-nav-container">
+        <div id="cd-vertical-nav" class="vertical-nav-container">
             <ul class="vertical-nav-list">
                 <li class="active">
-                    <a class="vertical-nav-list-link" href="#info-block-0">
+                    <a class="vertical-nav-list-link" href="#info-block-0" data-number="1">
                         <span class="vertical-nav-list-ref">{% trans "Home" %}</span>
                     </a>
                 </li>
                 <li class="">
-                    <a class="vertical-nav-list-link" href="#info-block-1">
+                    <a class="vertical-nav-list-link" href="#info-block-1" data-number="2">
                         <span class="vertical-nav-list-ref">{% trans "Flexibility" %}</span>
                     </a>
                 </li>
                 <li class="">
-                    <a class="vertical-nav-list-link" href="#info-block-2">
+                    <a class="vertical-nav-list-link" href="#info-block-2" data-number="3">
                         <span class="vertical-nav-list-ref">{% trans "Fast" %}</span>
                     </a>
                 </li>
                 <li class="">
-                    <a class="vertical-nav-list-link" href="#info-block-3">
+                    <a class="vertical-nav-list-link" href="#info-block-3" data-number="4">
                         <span class="vertical-nav-list-ref">{% trans "No Code" %}</span>
                     </a>
                 </li>
                 <li class="">
-                    <a class="vertical-nav-list-link" href="#info-block-4">
+                    <a class="vertical-nav-list-link" href="#info-block-4" data-number="5">
                         <span class="vertical-nav-list-ref">{% trans "Mobile" %}</span>
                     </a>
                 </li>
@@ -553,6 +553,36 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             OwlCarousel.initOwlCarousel();
             StyleSwitcher.initStyleSwitcher();
             RevolutionSlider.initRSfullScreen();
+
+            var contentSections = $('.app-info-block'),
+                navigationItems = $('#cd-vertical-nav a');
+
+            updateNavigation();
+            $(window).on('scroll', function(){
+                updateNavigation();
+            });
+        
+
+            function updateNavigation() {
+                contentSections.each(function(){
+                    $this = $(this);
+                    var activeSection = $('#cd-vertical-nav a[href="#'+$this.attr('id')+'"]').data('number') - 1;
+                    if ( ( $this.offset().top - $(window).height()/2 < $(window).scrollTop() ) && ( $this.offset().top + $this.height() - $(window).height()/2 > $(window).scrollTop() ) ) {
+                        navigationItems.eq(activeSection).addClass('is-selected');
+                    }else {
+                        navigationItems.eq(activeSection).removeClass('is-selected');
+                    }
+                });
+            }
+
+            function smoothScroll(target) {
+                $('body,html').animate(
+                    {'scrollTop':target.offset().top},
+                    600
+                );
+            }
+
+
         });
 
         var ViewModel = function(first, last) {

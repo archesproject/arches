@@ -2,6 +2,10 @@
     margin-top: 17px;
 }
 
+.v5-splash-list {
+    margin-top: -5px;
+}
+
 div.collapse.navbar-collapse.navbar-ex1-collapse > div > .v5-splash-list {
     margin-right: 10px;
     margin-top: -7px;
@@ -342,6 +346,10 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     border-top: 1px solid #ddd;
 }
 
+.app-info-block.intro-section {
+    padding: 0px;
+}
+
 .app-info-block:nth-child(even) {
     background: #f8f8f8;
 }
@@ -481,7 +489,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     left: 10px;
 }
 
-.active .vertical-nav-list-link {
+.vertical-nav-list-link.is-selected {
     background: #fff;
 }
 
