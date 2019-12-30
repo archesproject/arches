@@ -561,6 +561,18 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             $(window).on('scroll', function(){
                 updateNavigation();
             });
+
+            //smooth scroll to the section
+            navigationItems.on('click', function(event){
+                event.preventDefault();
+                smoothScroll($(this.hash));
+            });
+            
+            //smooth scroll to second section
+            $('.cd-scroll-down').on('click', function(event){
+                event.preventDefault();
+                smoothScroll($(this.hash));
+            });
         
 
             function updateNavigation() {
