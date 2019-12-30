@@ -337,7 +337,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .app-info-block {
     min-height: 800px;
-    padding: 50px 100px;
+    padding: 50px 100px 80px 100px;
     background: #fff;
     border-top: 1px solid #ddd;
 }
@@ -428,7 +428,8 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     border: 1px solid #ddd;
     border-radius: 2px;
     padding: 15px;
-    min-height: 225px;
+    height: 250px;
+    margin-bottom: 15px;
 }
 
 .sub-section {
@@ -510,6 +511,22 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     align-items: center;
     justify-content: center;
     opacity: .7;
+}
+
+.data-type-icon {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: #fff;
+    background: #041B33;
+    font-size: 31px;
+    padding-top: 12px;
+    padding-left: 3px;
+    border: 1px solid #fff;
+    border-radius: 50%;
+    height: 60px;
+    width: 60px;
+    align-items: center;
+    justify-content: center;
 }
 
 @media (min-width: 768px) {

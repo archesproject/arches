@@ -75,7 +75,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         </li>
                         
                         <li class="page-scroll">
-                            <a href="{% url 'search_home' %}">{% trans "Jump to Search" %}</a>
+                            <a href="{% url 'search_home' %}">{% trans "Search Arches" %}</a>
                         </li>
                         
                         {% if user|can_create_resource_instance and user.username != 'anonymous' %}
@@ -189,21 +189,197 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             
             <!-- Content -->
             <div class="row">
+                
+                <!-- Arches Data Type Block -->
                 <div class="col-lg-4">
-                    
-                    <!-- Arches Data Type Block -->
                     <div class="datatype-box text-center">
                         <div class="agency-services-icon">
-                            <i class="fa fa-code"></i>
+                            <i class="fa fa-code data-type-icon"></i>
                         </div>
                         <div class="services-desc">
-                            <h5 class="">{% trans "Data Type" %}</h5>
-                            <p class="">
+                            <h3 class="">{% trans "Strings" %}</h3>
+                            <p class="text-muted">
                                 {% trans "Brief Data Type description" %}
                             </p>
                         </div>
                     </div>
+                </div>
 
+                <!-- Arches Data Type Block -->
+                <div class="col-lg-4">
+                    <div class="datatype-box text-center">
+                        <div class="agency-services-icon">
+                            <i class="fa fa-code data-type-icon"></i>
+                        </div>
+                        <div class="services-desc">
+                            <h3 class="">{% trans "Numbers" %}</h3>
+                            <p class="text-muted">
+                                {% trans "Brief Data Type description" %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arches Data Type Block -->
+                <div class="col-lg-4">
+                    <div class="datatype-box text-center">
+                        <div class="agency-services-icon">
+                            <i class="fa fa-code data-type-icon"></i>
+                        </div>
+                        <div class="services-desc">
+                            <h3 class="">{% trans "Geospatial" %}</h3>
+                            <p class="text-muted">
+                                {% trans "Brief Data Type description" %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="row">
+                
+                <!-- Arches Data Type Block -->
+                <div class="col-lg-4">
+                    <div class="datatype-box text-center">
+                        <div class="agency-services-icon">
+                            <i class="fa fa-code data-type-icon"></i>
+                        </div>
+                        <div class="services-desc">
+                            <h3 class="">{% trans "Fuzzy Dates" %}</h3>
+                            <p class="text-muted">
+                                {% trans "Brief Data Type description" %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arches Data Type Block -->
+                <div class="col-lg-4">
+                    <div class="datatype-box text-center">
+                        <div class="agency-services-icon">
+                            <i class="fa fa-code data-type-icon"></i>
+                        </div>
+                        <div class="services-desc">
+                            <h3 class="">{% trans "Dates" %}</h3>
+                            <p class="text-muted">
+                                {% trans "Brief Data Type description" %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arches Data Type Block -->
+                <div class="col-lg-4">
+                    <div class="datatype-box text-center">
+                        <div class="agency-services-icon">
+                            <i class="fa fa-code data-type-icon"></i>
+                        </div>
+                        <div class="services-desc">
+                            <h3 class="">{% trans "Domains" %}</h3>
+                            <p class="text-muted">
+                                {% trans "Brief Data Type description" %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="row">
+                
+                <!-- Arches Data Type Block -->
+                <div class="col-lg-4">
+                    <div class="datatype-box text-center">
+                        <div class="agency-services-icon">
+                            <i class="fa fa-code data-type-icon"></i>
+                        </div>
+                        <div class="services-desc">
+                            <h3 class="">{% trans "Thesauri (Concepts)" %}</h3>
+                            <p class="text-muted">
+                                {% trans "Brief Data Type description" %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arches Data Type Block -->
+                <div class="col-lg-4">
+                    <div class="datatype-box text-center">
+                        <div class="agency-services-icon">
+                            <i class="fa fa-code data-type-icon"></i>
+                        </div>
+                        <div class="services-desc">
+                            <h3 class="">{% trans "Files" %}</h3>
+                            <p class="text-muted">
+                                {% trans "Brief Data Type description" %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arches Data Type Block -->
+                <div class="col-lg-4">
+                    <div class="datatype-box text-center">
+                        <div class="agency-services-icon">
+                            <i class="fa fa-code data-type-icon"></i>
+                        </div>
+                        <div class="services-desc">
+                            <h3 class="">{% trans "Boolean" %}</h3>
+                            <p class="text-muted">
+                                {% trans "Brief Data Type description" %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="row">
+                
+                <!-- Arches Data Type Block -->
+                <div class="col-lg-4">
+                    <div class="datatype-box text-center">
+                        <div class="agency-services-icon">
+                            <i class="fa fa-code data-type-icon"></i>
+                        </div>
+                        <div class="services-desc">
+                            <h3 class="">{% trans "Node-to-Resource" %}</h3>
+                            <p class="text-muted">
+                                {% trans "Brief Data Type description" %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arches Data Type Block -->
+                <div class="col-lg-4">
+                    <div class="datatype-box text-center">
+                        <div class="agency-services-icon">
+                            <i class="fa fa-code data-type-icon"></i>
+                        </div>
+                        <div class="services-desc">
+                            <h3 class="">{% trans "Node-to-Node" %}</h3>
+                            <p class="text-muted">
+                                {% trans "Brief Data Type description" %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arches Data Type Block -->
+                <div class="col-lg-4">
+                    <div class="datatype-box text-center">
+                        <div class="agency-services-icon">
+                            <i class="fa fa-code data-type-icon"></i>
+                        </div>
+                        <div class="services-desc">
+                            <h3 class="">{% trans "Semantic" %}</h3>
+                            <p class="text-muted">
+                                {% trans "Brief Data Type description" %}
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
