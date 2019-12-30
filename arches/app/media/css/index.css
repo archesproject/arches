@@ -341,7 +341,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .app-info-block {
     min-height: 800px;
-    padding: 50px 100px 80px 100px;
+    padding: 50px 100px 140px 100px;
     background: #fff;
     border-top: 1px solid #ddd;
 }
@@ -352,6 +352,10 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .app-info-block:nth-child(even) {
     background: #f8f8f8;
+}
+
+.app-info-block.intro-section h2 {
+    color: #fff;
 }
 
 .app-info-block h2 {
@@ -551,6 +555,24 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     width: 60px;
     align-items: center;
     justify-content: center;
+}
+
+.splash-img {
+    display:block;
+    margin:auto;
+}
+
+.splash-img img {
+    width: 100%;
+}
+
+.search-screen {
+    border: 1px solid #bbb;
+}
+
+.iphone {
+    max-height: 700px;
+    margin: auto;
 }
 
 @media (min-width: 768px) {

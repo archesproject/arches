@@ -131,7 +131,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 </li>
                 <li class="">
                     <a class="vertical-nav-list-link" href="#info-block-3" data-number="4">
-                        <span class="vertical-nav-list-ref">{% trans "No Code" %}</span>
+                        <span class="vertical-nav-list-ref">{% trans "Search Tools" %}</span>
                     </a>
                 </li>
                 <li class="">
@@ -189,7 +189,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 <div class="col-lg-7">
                     <div class="app-info-block-intro text-center">
                         <h3 class="app-info-block-header">{% trans "Flexiblity" %}</h3>
-                        <h2 class="app-info-block-title">{% trans "Arches Manages Diverse Data" %}</h2>
+                        <h2 class="app-info-block-title">{% trans "Manage large, diverse datasets" %}</h2>
                         <p class="app-info-block-text">
                             {% trans "Arches implements a modular data type design, allowing the platform to manage traditional data, geospatial and temporal information, and thesauri." %}
                         </p>
@@ -405,17 +405,18 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 <div class="col-lg-7">
                     <div class="app-info-block-intro text-center">
                         <h3 class="app-info-block-header">{% trans "Fast" %}</h3>
-                        <h2 class="app-info-block-title">{% trans "Deploy Applications Quickly" %}</h2>
+                        <h2 class="app-info-block-title">{% trans "Deploy Applications Rapidly" %}</h2>
                         <p class="app-info-block-text">
-                            {% trans "Arches implements a modular data type design, allowing the platform to manage traditional data, geospatial and temporal information, and thesauri." %}
+                            {% trans "Design custom information management applications in hours.  Build your databases with Arches Designer, then configure your interface all without having to write any code." %}
                         </p>
                     </div>
                 </div>
             </div>
 
             <!-- Content -->
-      
-
+            <div class="splash-img">
+                <img class="" src="{% static 'img/landing/imac.jpg' %}" style="" alt="Arches Designer">>
+            </div>
 
       
         </div>
@@ -430,16 +431,20 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             <div class="sub-section">
                 <div class="col-lg-7">
                     <div class="app-info-block-intro text-center">
-                        <h3 class="app-info-block-header">{% trans "No Code" %}</h3>
-                        <h2 class="app-info-block-title">{% trans "Custom Content Without Coding" %}</h2>
+                        <h3 class="app-info-block-header">{% trans "Search Tools" %}</h3>
+                        <h2 class="app-info-block-title">{% trans "Find what you're looking for" %}</h2>
                         <p class="app-info-block-text">
-                            {% trans "Arches implements a modular data type design, allowing the platform to manage traditional data, geospatial and temporal information, and thesauri." %}
+                            {% trans "Arches comes with powerful built-in search tools.  Quickly filter large databases with term, geospatial, and time-based search components" %}
                         </p>
                     </div>
                 </div>
             </div>
 
             <!-- Content -->
+            <!-- Content -->
+            <div class="splash-img">
+                <img class="search-screen" src="{% static 'img/landing/arches_search.png' %}" style="" alt="Arches Search">
+            </div>
       
 
 
@@ -456,7 +461,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             <div class="sub-section">
                 <div class="col-lg-7">
                     <div class="app-info-block-intro text-center">
-                        <h3 class="app-info-block-header">{% trans "Mobile" %}</h3>
+                        <h3 class="app-info-block-header">{% trans "Mobile Data Collection" %}</h3>
                         <h2 class="app-info-block-title">{% trans "Arches is a Mobile Ready Platform" %}</h2>
                         <p class="app-info-block-text">
                             {% trans "Arches implements a modular data type design, allowing the platform to manage traditional data, geospatial and temporal information, and thesauri." %}
@@ -466,6 +471,9 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             </div>
 
             <!-- Content -->
+            <div class="">
+                <img class="iphone" src="{% static 'img/landing/iphone.jpg' %}" style="" alt="Arches Designer">>
+            </div>
       
 
 
@@ -567,7 +575,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 event.preventDefault();
                 smoothScroll($(this.hash));
             });
-            
+
             //smooth scroll to second section
             $('.cd-scroll-down').on('click', function(event){
                 event.preventDefault();
