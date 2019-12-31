@@ -588,7 +588,6 @@ class ResourceTiles(View):
                             datatype = datatype_factory.get_instance(node.datatype)
                             display_value = datatype.get_display_value(tile, node)
                             if search_term is not None and search_term in display_value:
-                                print(search_term, display_value)
                                 tile_dict["display_values"].append({"value": display_value, "label": node.name, "nodeid": node.nodeid})
                             elif search_term is None:
                                 tile_dict["display_values"].append({"value": display_value, "label": node.name, "nodeid": node.nodeid})
@@ -597,7 +596,6 @@ class ResourceTiles(View):
                     permitted_tiles.append(tile_dict)
                 elif len(tile_dict["display_values"]) > 0:
                     permitted_tiles.append(tile_dict)
-        print("returning ", len(permitted_tiles))
         return JSONResponse({"tiles": permitted_tiles})
 
 
