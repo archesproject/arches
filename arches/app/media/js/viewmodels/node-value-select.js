@@ -21,18 +21,17 @@ define([
                 resourceId = window.location.pathname.split('/');
                 resourceId = resourceId[resourceId.length-1];
             }
-            return arches.urls.resource_tiles.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceId);
+            if (resourceId) {
+                return arches.urls.resource_tiles.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceId);
+            } else {
+                return null;
+            }
         };
 
         this.updateTiles = function(term) {
             var nodeid = params.node.config.nodeid();
-            var resourceId = ko.unwrap(self.resourceinstanceid);
-            if (resourceId === '') {
-                resourceId = window.location.pathname.split('/');
-                resourceId = resourceId[resourceId.length-1];
-            }
-            var url = arches.urls.resource_tiles.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceId);
-            if (nodeid && resourceId) {
+            var url = this.url();
+            if (nodeid && url) {
                 $.ajax({
                     dataType: "json",
                     url: url,
@@ -50,11 +49,7 @@ define([
             }
         };
 
-        params.node.config.nodeid.subscribe(this.updateTiles);
         this.updateTiles();
-        if (this.form) {
-            this.form.on('after-update', this.updateTiles);
-        }
 
         this.toggleDisplayOnlySelected = function(){
             this.displayOnlySelectedNode(!this.displayOnlySelectedNode());
@@ -97,8 +92,8 @@ define([
                 data: function(term) {
                     return {nodeid: params.node.config.nodeid(), term:term};
                 },
-                results: function(data, page) {
-                    var options = []
+                results: function(data) {
+                    var options = [];
                     data.tiles.forEach(function(tile) {
                         options.push(tile);
                     });
