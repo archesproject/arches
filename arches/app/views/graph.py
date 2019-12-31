@@ -324,6 +324,7 @@ class GraphDataView(View):
                     graph.save()
                     ret = JSONSerializer().serializeToPython(graph)
                     ret["updated_values"] = updated_values
+                    ret["default_card_name"] = graph.temp_node_name
 
                 elif self.action == "update_node_layer":
                     nodeid = uuid.UUID(str(data.get("nodeid")))
