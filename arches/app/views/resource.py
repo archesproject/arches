@@ -568,6 +568,7 @@ class ResourceTiles(View):
     def get(self, request, resourceid=None, include_display_values=True):
         datatype_factory = DataTypeFactory()
         nodeid = request.GET.get("nodeid", None)
+        search_term = request.GET.get("term", None)
         permitted_tiles = []
         perm = "read_nodegroup"
         tiles = models.TileModel.objects.filter(resourceinstance_id=resourceid)
@@ -585,11 +586,16 @@ class ResourceTiles(View):
                     for node in models.Node.objects.filter(nodegroup=tile.nodegroup):
                         if str(node.nodeid) in tile.data:
                             datatype = datatype_factory.get_instance(node.datatype)
-                            tile_dict["display_values"].append(
-                                {"value": datatype.get_display_value(tile, node), "label": node.name, "nodeid": node.nodeid}
-                            )
-                permitted_tiles.append(tile_dict)
+                            display_value = datatype.get_display_value(tile, node)
+                            if search_term is not None and search_term in display_value:
+                                tile_dict["display_values"].append({"value": display_value, "label": node.name, "nodeid": node.nodeid})
+                            elif search_term is None:
+                                tile_dict["display_values"].append({"value": display_value, "label": node.name, "nodeid": node.nodeid})
 
+                if search_term is None:
+                    permitted_tiles.append(tile_dict)
+                elif len(tile_dict["display_values"]) > 0:
+                    permitted_tiles.append(tile_dict)
         return JSONResponse({"tiles": permitted_tiles})
 
 
