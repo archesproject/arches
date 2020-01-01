@@ -209,6 +209,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 <div class="col-lg-6">
                     <div class="sub-block-container">
                         <h2 class="">{% trans "Interface Design" %}</h2>
+                        <img style="max-width: 600px;" class="" src="{% static 'img/landing/consultation_workflow.jpg' %}" style="" alt="Arches Designer">
                     </div>
                 </div>
 
@@ -250,11 +251,6 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 <img class="search-screen" src="{% static 'img/landing/consultation_workflow.jpg' %}" style="" alt="Arches Workflows">
             </div>
             
-
-
-
-
-
         </div>
     </section>
     <!-- End Info Block 2 -->
@@ -324,13 +320,21 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             </div>
 
             <!-- Content -->
-            <div class="">
-                <img class="iphone" src="{% static 'img/landing/iphone.jpg' %}" style="" alt="Arches Designer">>
+            <div class="row" style="display: inline-flex;">
+                <div class="col-lg-4">
+                    <img class="iphone" src="{% static 'img/landing/iPhone_8_map.png' %}" style="" alt="Arches Designer">
+                </div>
+                <div class="col-lg-8">
+                    <div class="mobile-description-container">
+                        <div class="box-highlight">
+                            <h3 class="">{% trans "Update your data, even when you're away from your desk." %}</h3>
+                            <p class="">
+                                {% trans "Arches Collector allows you to create new data and edit existing records when you're away from your computer.  Don't worry if you're out of cell or Wi-Fi range.  Create new records, update information, even add new map locations.  Then synch your changes to your Arches application when you re-establish a network connection." %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
-      
-
-
-      
         </div>
 
     </section>

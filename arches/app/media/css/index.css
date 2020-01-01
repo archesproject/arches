@@ -383,7 +383,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     border: 1px solid #ddd;
     min-height: 550px;
     padding: 40px;
-    margin: -5px;
+    margin: 10px -5px;
     text-align: center;
 }
 
@@ -572,12 +572,13 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .splash-img {
-    display:block;
-    margin:auto;
+    display: inline-flex;
+    margin: auto;
+    justify-content: center;
 }
 
 .splash-img img {
-    width: 100%;
+    max-width: 90%;
 }
 
 .search-screen {
@@ -588,6 +589,21 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     max-height: 700px;
     margin: auto;
 }
+
+.mobile-description-container {
+    padding: 180px 10px;
+}
+
+.box-highlight {
+    background: #f9f9f9; 
+    padding: 50px;
+}
+
+.mobile-description-container p {
+    font-size: 17px;
+    color: #777;
+}
+
 
 @media (min-width: 768px) {
     .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
