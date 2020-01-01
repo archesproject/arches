@@ -341,9 +341,13 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .app-info-block {
     min-height: 800px;
-    padding: 50px 100px 140px 100px;
+    padding: 80px 150px 140px 150px;
     background: #fff;
     border-top: 1px solid #ddd;
+}
+
+.app-info-sub-block {
+    padding-top: 60px;
 }
 
 .app-info-block.intro-section {
@@ -356,6 +360,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .app-info-block.intro-section h2 {
     color: #fff;
+    font-size: 55px;
 }
 
 .app-info-block h2 {
@@ -371,6 +376,15 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .app-info-block-text {
     color: #6c757d;
     font-size: 16px;
+}
+
+.sub-block-container {
+    background: #fff;
+    border: 1px solid #ddd;
+    min-height: 550px;
+    padding: 40px;
+    margin: -5px;
+    text-align: center;
 }
 
 .app-footer {
@@ -436,7 +450,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .datatype-box {
-    background: #fff;
+    background: #fafafa;
     border: 1px solid #ddd;
     border-radius: 2px;
     padding: 15px;
@@ -523,7 +537,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     position: absolute;
     bottom: 70px;
     left: 50%;
-    z-index: 1000;
+    z-index: 100;
 }
 
 .down-button-icon {
