@@ -382,9 +382,14 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     background: #fff;
     border: 1px solid #ddd;
     min-height: 550px;
-    padding: 40px;
+    padding: 40px 40px 60px 40px;
     margin: 10px -5px;
     text-align: center;
+}
+
+.sub-block-image {
+    max-width: 600px;
+    border: 1px solid #ddd;
 }
 
 .sub-block-description {
@@ -408,7 +413,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     width: 33%;
     max-width: 600px;
     min-width: 300px;
-    padding: 40px 80px;
+    padding: 40px 80px 40px 120px;
 }
 
 .app-footer-info {
@@ -439,7 +444,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     height: 80px;
     background: #041B33;
     color: #fff;
-    padding: 30px 80px;
+    padding: 30px 120px 30px 120px;
 }
 
 .app-footer-links {
@@ -623,6 +628,22 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .mobile-description-container p {
     font-size: 17px;
     color: #777;
+}
+
+.splash-links {
+    margin-top: 20px;
+}
+
+.splash-link-address {
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.5;
+    color: #fff;
+}
+
+.splash-link-container {
+    list-style: none;
+    padding-left: 0px;
 }
 
 
