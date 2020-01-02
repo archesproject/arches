@@ -16,6 +16,27 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     margin-top: 5px;
 }
 
+.navbar {
+    margin-bottom: 0px;
+}
+
+.navbar-nav>li>a {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 300;
+    padding: 18px 20px;
+}
+
+.navbar-nav>li> .application-login {
+    color: #13ce67;
+    border-radius: 2px;
+}
+
+.v5-splash-navbar .navbar-nav>li>a:hover {
+    background: #000;
+    color: #13ce67;
+}
+
 .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
     padding: 0px 0px 0px;
     z-index: 100;
@@ -78,7 +99,17 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     padding: 48px 72px 24px 72px;
 }
 
-.v5-splash-nav {
+.v5-splash-navbar {
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    z-index: 500;
+    background-color: #041B33;
+    border: none;
+    border-radius: 0px;
+}
+
+/*.v5-splash-nav {
     position: fixed;
     top: 0px;
     width: 100%;
@@ -87,7 +118,7 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     border: none;
     padding: 12px 120px 12px 120px;
     border-radius: 0px;
-}
+}*/
 
 .cons-splash-nav {
     z-index: 500;
@@ -118,18 +149,6 @@ ul.splash-list > li > a:focus, ul.splash-list > li > a:hover {
     padding: 10px 15px;
     margin-top: 5px;
     margin-right: 5px;
-}
-
-.v5-splash-list .application-login {
-    /*background: #C3F9DA;*/
-    padding: 10px 25px;
-    color: #13ce67;
-    border: 1px solid #20BB63;
-    border-radius: 2px;
-}
-
-.v5-splash-list .application-login:hover {
-    border: 1px solid #20BB63;
 }
 
 .v5-splash-list a {
@@ -197,13 +216,8 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     /*font-family: "Open Sans",Arial,sans-serif;*/
 }
 
-.navbar-brand-v5 h2 {
-    margin-bottom: 8px;
-    margin-top: 0px;
-    margin-left: -12px;
-    font-size: 19px;
+.application-name h2 {
     color: #fff;
-    display: inline-block;
 }
 
 .navbar-brand-disco h2 {
@@ -646,12 +660,38 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     padding-left: 0px;
 }
 
+.icon-bar {
+    background: #fff;
+}
 
 @media (min-width: 768px) {
     .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
         color: #eee;
     }
 }
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    .navbar-collapse.collapse {
+        display: none !important;
+    }
+    .navbar-collapse.collapse.in {
+        display: block !important;
+    }
+    .navbar-header .collapse, .navbar-toggle {
+        display:block !important;
+        background: #000;
+        margin-top: 11px;
+        margin-right: 80px;
+    }
+    .navbar-header {
+        float:none;
+    }
+    .navbar-nav>li {
+        float: none;
+    }
+}
+
+
 
 @media (max-width: 1000px) {
     .one-page-header .navbar-nav>li> .fa-chevron-circle-down {

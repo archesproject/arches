@@ -53,41 +53,46 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 <body id="body" data-spy="scroll" data-target=".splash-nav" class="demo-lightbox-gallery">
 
     <!--=== Header ===-->
-    <nav class="v5-splash-nav navbar" role="navigation">
-        <div class="nav-container">
-
-
-
-            <div class="navbar-brand-v5">
-                <div class="navbar-brand-v5-icon-container" style="">
-                    <img class="navbar-brand-v5-icon" src="{% static 'img/landing/arches_logo_dark.png' %}" style="" alt="Arches Logo">
+    <nav class="v5-splash-navbar navbar" role="navigation">
+        
+        <nav class="navbar">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>                        
+                    </button>
+                    
+                    <div class="relative" style="padding: 8px 10px 8px 100px; width: 300px;">
+                        <div class="navbar-brand-v5-icon-container" style="">
+                            <img class="navbar-brand-v5-icon" src="{% static 'img/landing/arches_logo_dark.png' %}" style="" alt="Arches Logo">
+                        </div>
+                        <div class="application-name" style="position: absolute; top: 5px; left: 160px;">
+                            <h2>{% trans "Arches | v5" %}</h2>
+                        </div>
+                    </div>
                 </div>
-                <div class="application-name">
-                    <h2>{% trans "Arches | v5" %}</h2>
-                    <!-- <span>Data Integration for Science and Conservation</span> -->
-                </div>
-            </div>
-
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div id="navbarCollapse" class="collapse navbar-collapse navbar-ex1-collapse">
-                <div class="menu-container">
-                    <ul class="nav navbar-nav v5-splash-list">
-
-                        <li class="page-scroll">
+                
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav">
+                        <li class="">
                             <a href="#info-block-0">{% trans "Arches Features" %}</a>
                         </li>
                         
-                        <li class="page-scroll">
+                        <li class="">
                             <a href="{% url 'search_home' %}">{% trans "Search Arches" %}</a>
                         </li>
                         
                         {% if user|can_create_resource_instance and user.username != 'anonymous' %}
-                        <li class="page-scroll">
+                        <li class="">
                             <a href="{% url 'resource' %}" target="_blank">{% trans "Manage" %}</a>
                         </li>
                         {% endif %}
-                        
-                        <li class="page-scroll">
+                    </ul>
+
+                    <ul class="nav navbar-nav navbar-right" style="padding-right: 80px;">
+                        <li class="">
                             {% if user.username == 'anonymous' %}
                                 <a class="application-login" id="auth-link" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans "Sign in" %}</a>
                             {% else %}
@@ -102,9 +107,8 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                     </ul>
                 </div>
             </div>
-            <!-- /.navbar-collapse -->
-        </div>
-        <!-- /.container -->
+        </nav>
+        <!-- /container -->
     </nav>
     <!--=== End Header ===-->
 
@@ -331,6 +335,10 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                             <p class="">
                                 {% trans "Arches Collector allows you to create new data and edit existing records when you're away from your computer.  Don't worry if you're out of cell or Wi-Fi range.  Create new records, update information, even add new map locations.  Then synch your changes to your Arches application when you re-establish a network connection." %}
                             </p>
+                            <br>
+                            <p class="">
+                                {% trans "Arches Collector is available for iOS and Android devices.  Download the app from your favorite marketplace." %}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -395,7 +403,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                                     <a class="splash-link-address" href="https://www.archesproject.org/standards/" target="_blank">{% trans "Standards and Interoperability" %}</a>
                                 </li>
                                 <li>
-                                    <a class="splash-link-address" href="https://arches.readthedocs.io/en/stable/overview/" target="_blank">{% trans "Installation Guide" %}</a>
+                                    <a class="splash-link-address" href="https://arches.readthedocs.io/en/stable/requirements-and-dependencies/" target="_blank">{% trans "Installation Guide" %}</a>
                                 </li>
                             </ul>
                         </div>
