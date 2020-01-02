@@ -387,6 +387,12 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     text-align: center;
 }
 
+.sub-block-description {
+    font-size: 15px;
+    color: #777;
+    padding: 20px 0px 30px 0px;
+}
+
 .app-footer {
     background: #0F2E4F;
     color: #fff;
@@ -594,9 +600,24 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     padding: 180px 10px;
 }
 
+.wide-box {
+    padding: 30px 0px 10px 20px;
+    margin-left: 45px;
+    margin-right: 70px;
+}
+
 .box-highlight {
     background: #f9f9f9; 
     padding: 50px;
+}
+
+.wide-box .box-highlight {
+    background: #fff;
+    font-size: 15px;
+}
+
+.wide-box .box-highlight p {
+    color: #777;
 }
 
 .mobile-description-container p {
