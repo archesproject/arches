@@ -10165,9 +10165,9 @@ a.filter-tools:hover {
 .msm-map-container {
     padding: 0px;
     height: 100vh;
-    margin-left: -10px;
+    margin-left: -13px;
     margin-right: -20px;
-    margin-top: -30px;
+    margin-top: -10px;
 }
 
 .msm-map-container .widget-wrapper .mapboxgl-map {
