@@ -60,7 +60,10 @@ class SearchResultsExporter(object):
         output = {}
 
         for resource_instance in instances:
-            resource_obj = self.flatten_tiles(resource_instance["_source"]["tiles"], self.datatype_factory, compact=self.compact)
+            use_fieldname = self.format in ("shp",)
+            resource_obj = self.flatten_tiles(
+                resource_instance["_source"]["tiles"], self.datatype_factory, compact=self.compact, use_fieldname=use_fieldname
+            )
             has_geom = resource_obj.pop("has_geometry")
             skip_resource = self.format in ("shp",) and has_geom is False
             if skip_resource is False:
@@ -143,7 +146,7 @@ class SearchResultsExporter(object):
                     resource_json[tile["card_name"]] = tile[tile["card_name"]]
         return resource_json
 
-    def flatten_tiles(self, tiles, datatype_factory, compact=True):
+    def flatten_tiles(self, tiles, datatype_factory, compact=True, use_fieldname=False):
         feature_collections = {}
         compacted_data = {}
         lookup = {}
@@ -155,10 +158,8 @@ class SearchResultsExporter(object):
                 node = self.get_node(nodeid)
                 if node.exportable:
                     datatype = datatype_factory.get_instance(node.datatype)
-                    # node_value = datatype.transform_export_values(tile['data'][str(node.nodeid)])
                     node_value = datatype.get_display_value(tile, node)
-                    # label = node.fieldname
-                    label = node.name
+                    label = node.fieldname if use_fieldname is True else node.name
 
                     if compact:
                         if node.datatype == "geojson-feature-collection":
