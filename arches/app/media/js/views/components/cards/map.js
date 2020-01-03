@@ -42,6 +42,8 @@ define([
         params.y = this.centerY;
         params.usePosition = true;
 
+        MapEditorViewModel.apply(this, [params]);
+
         this.expandSidePanel = ko.computed(function(){
             if (self.tile) {
                 return self.tile.hasprovisionaledits() && self.reviewer === true;
@@ -49,8 +51,6 @@ define([
                 return false;
             }
         });
-
-        MapEditorViewModel.apply(this, [params]);
 
         if (!this.card.overlaysObservable) {
             this.card.overlaysObservable = this.overlays;
