@@ -11,7 +11,7 @@ try:
 except ImportError:
     pass
 
-APP_NAME = {{ project_name }}
+APP_NAME = '{{ project_name }}'
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 STATICFILES_DIRS =  (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
 
@@ -158,7 +158,7 @@ APP_TITLE = 'Arches | Heritage Data Management'
 COPYRIGHT_TEXT = 'All Rights Reserved.'
 COPYRIGHT_YEAR = '2019'
 
-ENABLE_CAPTCHA = FALSE
+ENABLE_CAPTCHA = False
 # RECAPTCHA_PUBLIC_KEY = ''
 # RECAPTCHA_PRIVATE_KEY = ''
 # RECAPTCHA_USE_SSL = False
