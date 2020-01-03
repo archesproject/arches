@@ -91,8 +91,8 @@ define([
         params.usePosition = true;
 
         this.expandSidePanel = ko.computed(function(){
-            if (self.tile) {
-                return self.tile.hasprovisionaledits() && self.reviewer === true;
+            if (this.tile) {
+                return this.tile.hasprovisionaledits() && this.reviewer === true;
             } else {
                 return false;
             }
