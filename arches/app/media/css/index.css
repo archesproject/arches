@@ -354,7 +354,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .app-info-block {
-    min-height: 800px;
+    min-height: 600px;
     padding: 80px 150px 140px 150px;
     background: #fff;
     border-top: 1px solid #ddd;
@@ -402,7 +402,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .sub-block-image {
-    max-width: 600px;
+    max-width: 100%;
     border: 1px solid #ddd;
 }
 
@@ -415,6 +415,8 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .app-footer {
     background: #0F2E4F;
     color: #fff;
+    min-height: 400px;
+    overflow-x: hidden;
 }
 
 .app-footer-content-container {
@@ -440,6 +442,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     font-weight: 200;
     color: #dcdcdc;
     margin-top: 27px;
+    padding-left: 80px;
 }
 
 .app-footer-image {
@@ -452,6 +455,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     font-weight: 300;
     line-height: 1.5;
     margin-top: 20px;
+    padding-left: 80px;
 }
 
 .copyright-container {
@@ -561,7 +565,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .down-button {
     position: absolute;
     bottom: 70px;
-    left: 50%;
+    left: 48%;
     z-index: 100;
 }
 
@@ -616,7 +620,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .mobile-description-container {
-    padding: 180px 10px;
+    padding: 140px 10px;
 }
 
 .wide-box {
@@ -688,6 +692,48 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     }
     .navbar-nav>li {
         float: none;
+    }
+    .app-info-block {
+        padding: 80px 10px 60px 10px;
+    }
+    .mobile-description-container {
+        padding: 80px 10px;
+    }
+}
+
+@media (max-width: 320px) { 
+    .app-info-block {
+        padding: 20px 10px;
+    } 
+}
+
+@media (max-width: 481px) {
+    .app-info-block {
+        padding: 20px 10px;
+    }
+    .wide-box {
+         padding: 0px; 
+         margin-left: 5px; 
+         margin-right: 10px; 
+         margin-top: 10px;
+    }
+    .mobile-description-container {
+        padding: 140px 10px 40px 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-info-block {
+        padding: 20px 10px;
+    }
+    .wide-box {
+         padding: 0px; 
+         margin-left: 5px; 
+         margin-right: 10px; 
+         margin-top: 10px;
+    }
+    .mobile-description-container {
+        padding: 140px 10px 40px 10px;
     }
 }
 
