@@ -90,6 +90,14 @@ define([
         params.y = this.centerY;
         params.usePosition = true;
 
+        this.expandSidePanel = ko.computed(function(){
+            if (self.tile) {
+                return self.tile.hasprovisionaledits() && self.reviewer === true;
+            } else {
+                return false;
+            }
+        });
+
         MapEditorViewModel.apply(this, [params]);
     };
     ko.components.register('map-widget', {
