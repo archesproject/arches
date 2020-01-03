@@ -6678,8 +6678,8 @@ a.mega-dropdown-toggle.disabled {
 
 .rp-report-tile {
     padding-bottom: 15px;
-    padding-left: 20px;
-    margin-top: 5px;
+    padding-left: 8px;
+    margin-top: 0px;
 }
 
 .rp-report-tile.related {
@@ -6693,7 +6693,7 @@ a.mega-dropdown-toggle.disabled {
 
 .rp-no-data {
     color: #888;
-    margin-top: 10px;
+    margin-top: 0px;
 }
 
 .rp-report-container-tile .rp-report-tile {
@@ -11042,14 +11042,14 @@ a.jstree-anchor.permissions-widget {
     }
 
     .rp-no-data {
-        margin-left: 200px;
+        margin-left: 0px;
     }
 
     .rp-no-data {
         color: #888;
         position: relative;
-        top: -20px;
-        left: 90px;
+        top: 0px;
+        left: 0px;
     }
 
     .report-related-resources .rp-card-section {
