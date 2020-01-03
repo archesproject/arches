@@ -157,7 +157,7 @@ class SearchResultsExporter(object):
                 if node.exportable:
                     datatype = datatype_factory.get_instance(node.datatype)
                     node_value = datatype.get_display_value(tile, node)
-                    label = node.fieldname if use_fieldname == True else node.name
+                    label = node.fieldname if use_fieldname is True else node.name
 
                     if compact:
                         if node.datatype == "geojson-feature-collection":
