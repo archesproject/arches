@@ -61,7 +61,9 @@ class SearchResultsExporter(object):
 
         for resource_instance in instances:
             use_fieldname = self.format in ("shp",)
-            resource_obj = self.flatten_tiles(resource_instance["_source"]["tiles"], self.datatype_factory, compact=self.compact, use_fieldname=use_fieldname)
+            resource_obj = self.flatten_tiles(
+                resource_instance["_source"]["tiles"], self.datatype_factory, compact=self.compact, use_fieldname=use_fieldname
+            )
             has_geom = resource_obj.pop("has_geometry")
             skip_resource = self.format in ("shp",) and has_geom is False
             if skip_resource is False:
