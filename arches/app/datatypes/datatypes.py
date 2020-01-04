@@ -140,7 +140,7 @@ class NumberDataType(BaseDataType):
         errors = []
 
         try:
-            if value == '':
+            if value == "":
                 value = None
             if value is not None:
                 decimal.Decimal(value)
