@@ -140,9 +140,11 @@ class NumberDataType(BaseDataType):
         errors = []
 
         try:
+            if value == "":
+                value = None
             if value is not None:
                 decimal.Decimal(value)
-        except Exception as e:
+        except Exception:
             dt = self.datatype_model.datatype
             errors.append(
                 {
@@ -177,7 +179,7 @@ class NumberDataType(BaseDataType):
                 else:
                     search_query = Match(field="tiles.data.%s" % (str(node.pk)), query=value["val"], type="phrase_prefix")
                 query.must(search_query)
-        except KeyError as e:
+        except KeyError:
             pass
 
     def is_a_literal_in_rdf(self):
