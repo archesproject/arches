@@ -158,6 +158,7 @@ define([
         drawFeatures = getDrawFeatures();
 
         if (drawFeatures.length > 0) {
+            params.usePosition = false;
             params.bounds = geojsonExtent({
                 type: 'FeatureCollection',
                 features: drawFeatures
