@@ -137,7 +137,6 @@ define([
                             if (status === 'success') {
                                 viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
                             } else {
-                                console.log(response);
                                 viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                             }
                         }
