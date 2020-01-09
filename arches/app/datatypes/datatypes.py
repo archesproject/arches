@@ -1056,8 +1056,9 @@ class FileListDataType(BaseDataType):
         data = self.get_tile_data(tile)
         files = data[str(node.pk)]
         file_list_str = ""
-        for f in files:
-            file_list_str = file_list_str + f["name"] + " | "
+        if files is not None:
+            for f in files:
+                file_list_str = file_list_str + f["name"] + " | "
 
         return file_list_str
 
