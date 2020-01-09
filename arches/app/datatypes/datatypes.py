@@ -175,9 +175,9 @@ class NumberDataType(BaseDataType):
                 if value["op"] != "eq":
                     operators = {"gte": None, "lte": None, "lt": None, "gt": None}
                     operators[value["op"]] = value["val"]
-                    search_query = Range(field="tiles.data.%s" % (str(node.pk)), **operators)
                 else:
-                    search_query = Match(field="tiles.data.%s" % (str(node.pk)), query=value["val"], type="phrase_prefix")
+                    operators = {"gte": value["val"], "lte": value["val"]}
+                search_query = Range(field="tiles.data.%s" % (str(node.pk)), **operators)
                 query.must(search_query)
         except KeyError:
             pass
