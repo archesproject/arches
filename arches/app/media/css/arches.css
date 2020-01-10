@@ -11006,7 +11006,7 @@ a.jstree-anchor.permissions-widget {
         clear: left;
         text-align: right;
         text-overflow: ellipsis;
-        white-space: nowrap;
+        white-space: pre-wrap;
         width: 200px;
     }
     .dl-horizontal dt a {
@@ -11026,6 +11026,7 @@ a.jstree-anchor.permissions-widget {
 
     .dl-horizontal dt {
         width: 300px;
+        margin-bottom: 0px;
     }
 
     .dl-horizontal dd {
@@ -11067,7 +11068,11 @@ a.jstree-anchor.permissions-widget {
 
 }
 
-@media (min-width: 400px) {
+@media (min-width: 768px) {
+    .dl-horizontal dt {
+        white-space: pre-wrap;
+        margin-bottom: 5px;
+    }
 }
 
 @media screen and (max-width: 767px) {
