@@ -5173,11 +5173,17 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     font-weight: 700;
     border-bottom: 1px solid #FFB700;
     height: 50px;
-    margin-top: -15px;
+    margin-top: -25px;
     margin-bottom: 15px;
-    margin-left: -25px;
-    margin-right: -25px;
+    margin-left: -35px;
+    margin-right: -35px;
     padding: 15px 25px;
+}
+
+.workbench-card-sidepanel.expanded .edit-message-container {
+    margin-top: -16px;
+    margin-left: -20px;
+    margin-right: -20px;
 }
 
 .edit-message-container .reset-authoritative {
@@ -5208,12 +5214,16 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     flex-direction: column;
     top: -15px;
     position: relative;
-    margin-right: -25px;
+    margin-right: -50px;
     width: 250px;
     padding: 5px 5px 0px 5px;
     border-left: 1px solid #ddd;
     height: 100vh;
     background: #fafafa;
+}
+
+.workbench-card-sidepanel.expanded .new-provisional-edits-list {
+    margin-right: -30px;
 }
 
 .new-provisional-edit-card-container {
@@ -5234,6 +5244,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     padding: 5px;
     margin-left: -5px;
     width: 200px;
+    position: relative;
 }
 
 .new-provisional-edit-entry .title {
@@ -5243,12 +5254,16 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .new-provisional-edits-title {
-    font-size: 16px;
+    font-size: 14px;
+    margin-bottom: 5px;
     font-weight: 400;
     color: #2f527a;
 }
 
 .new-delete-provisional-edit {
+    position: absolute;
+    top: 10px;
+    right: -140px;
     color: red;
     font-size: 16px;
 }
@@ -5260,8 +5275,8 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-left: -5px;
     /*margin-right: -40px;*/
     margin-top: -5px;
-    padding: 10px 10px;
-    height: 75px;
+    padding: 10px 25px 10px 10px;
+    height: 80px;
 }
 
 .new-provisional-edit-entry:hover {
@@ -5281,12 +5296,13 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .new-provisional-edit-entry .field {
     padding: 5px;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 500;
+    width: 170px;
 }
 
 .field.timestamp {
-    font-weight: 500;
+    font-weight: 400;
     font-size: 12px;
     margin-top: -10px;
 }
@@ -10528,7 +10544,7 @@ ul.select2-choices:after {
 }
 
 .card-component {
-    padding: 15px 25px;
+    padding: 25px 35px;
 }
 
 .card-component-panel {
