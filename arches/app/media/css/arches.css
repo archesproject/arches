@@ -5181,7 +5181,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .workbench-card-sidepanel.expanded .edit-message-container {
-    margin-top: -16px;
+    margin-top: -15px;
     margin-left: -20px;
     margin-right: -20px;
 }
@@ -5303,7 +5303,8 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .field.timestamp {
     font-weight: 400;
-    font-size: 12px;
+    font-size: 11px;
+    color: #777;
     margin-top: -10px;
 }
 
