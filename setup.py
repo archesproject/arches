@@ -11,7 +11,8 @@ class post_install(install):
         install.run(self)
         arches_install()
 
-with open('arches/install/requirements.txt') as f:
+
+with open("arches/install/requirements.txt") as f:
     requirements = f.read().splitlines()
 
 # Dynamically calculate the version based on arches.VERSION.
