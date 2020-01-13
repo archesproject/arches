@@ -12,6 +12,9 @@ class post_install(install):
         arches_install()
 
 
+with open("arches/install/requirements.txt") as f:
+    requirements = f.read().splitlines()
+
 # Dynamically calculate the version based on arches.VERSION.
 version = __import__("arches").__version__
 
@@ -30,6 +33,7 @@ setup(
     license="GNU AGPL3",
     scripts=["arches/install/arches-project"],
     cmdclass={"install": post_install},
+    install_requires=requirements,
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         # How mature is this project? Common values are
@@ -41,8 +45,8 @@ setup(
         "Intended Audience :: Science/Research",
         "Intended Audience :: Information Technology",
         "Topic :: Software Development :: Build Tools",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
         "Framework :: Django :: 1.11",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     ],
@@ -50,7 +54,7 @@ setup(
     keywords="django arches cultural heritage",
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    packages=find_packages(),
+    packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     include_package_data=True,
     zip_safe=False,
     test_suite="tests.run_tests.run_all",
