@@ -98,7 +98,7 @@ class TimeWheel(object):
                     period_agg = FiltersAgg(name=period_name)
                     period_agg.add_filter(period_boolquery)
                     if "root" not in date_tier:
-                        if within_range == True:
+                        if within_range is True:
                             previous_period_agg.add_aggregation(period_agg)
                     range_lookup[period_name] = [min_period, max_period]
                     if "child" in date_tier:

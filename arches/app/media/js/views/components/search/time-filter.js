@@ -40,6 +40,7 @@ function($, _, ko, moment, BaseFilter, arches) {
                 this.breadCrumb = ko.observable();
                 this.selectedPeriod = ko.observable();
                 this.wheelConfig = ko.observable();
+                this.loading = ko.observable(false);
                 this.getTimeWheelConfig();
                 this.date_nodes = ko.observableArray();
                 this.graph_models = ko.observableArray();
@@ -101,7 +102,7 @@ function($, _, ko, moment, BaseFilter, arches) {
                     this.graph_models(response.graph_models);
                     this.restoreState();
                     $("#" + this.dateDropdownEleId).trigger("chosen:updated");
-                    
+
                     this.filterChanged = ko.computed(function(){
                         if(!!this.filter.fromDate() || !!this.filter.toDate()){
                             this.getFilter('term-filter').addTag(this.name, this.name, this.filter.inverted);
@@ -129,16 +130,17 @@ function($, _, ko, moment, BaseFilter, arches) {
             },
 
             getTimeWheelConfig: function(){
+                this.loading(true);
                 $.ajax({
                     type: "GET",
                     context: this,
-                    url: arches.urls.time_wheel_config,
-                    success: function(response) {
-                        this.wheelConfig(response);
-                    },
-                    error: function(response) {
-                        this.breadCrumb(response.responseText);
-                    }
+                    url: arches.urls.time_wheel_config
+                }).done(function(response) {
+                    this.wheelConfig(response);
+                }).fail(function(response) {
+                    this.breadCrumb(response.responseText);
+                }).always(function(){
+                    this.loading(false);
                 });
             },
 

@@ -75,7 +75,6 @@ class TileData(View):
                 message += ": {0}".format(e.message)
         else:
             message = str(e)
-
         logger.error(
             title
             + """ [Tile id: {tile_id}] \
@@ -85,7 +84,7 @@ class TileData(View):
             )
         )
 
-        return JSONErrorResponse(_(title), _(str(message)))
+        return JSONErrorResponse(_(title), _(str(message)), {"message": message, "title": title})
 
     def post(self, request):
         if self.action == "update_tile":
@@ -166,7 +165,7 @@ class TileData(View):
                     response = {"status": "false", "message": [_("Request Failed"), _("Unable to Save. Verify model status is active")]}
                     return JSONResponse(response, status=500)
                 else:
-                    return JSONErrorResponse(_('Request Failed'), _('Permission Denied'))
+                    return JSONErrorResponse(_("Request Failed"), _("Permission Denied"))
 
         if self.action == "reorder_tiles":
             json = request.body
@@ -219,7 +218,7 @@ class TileData(View):
                 try:
                     tile = Tile.objects.get(tileid=data["tileid"])
                 except ObjectDoesNotExist:
-                    return JSONErrorResponse(_('This tile is no longer available'), _('It was likely already deleted by another user'))
+                    return JSONErrorResponse(_("This tile is no longer available"), _("It was likely already deleted by another user"))
                 user_is_reviewer = user_is_resource_reviewer(request.user)
                 if (user_is_reviewer or tile.is_provisional() is True) and is_active is True:
                     if tile.filter_by_perm(request.user, "delete_nodegroup"):
@@ -244,12 +243,14 @@ class TileData(View):
                         update_system_settings_cache(tile)
                         return JSONResponse(tile)
                     else:
-                        return JSONErrorResponse(_('Request Failed'), _('Permission Denied'))
+                        return JSONErrorResponse(_("Request Failed"), _("Permission Denied"))
                 elif is_active is False:
                     response = {"status": "false", "message": [_("Request Failed"), _("Unable to delete. Verify model status is active")]}
                     return JSONResponse(response, status=500)
                 else:
-                    return JSONErrorResponse(_('Request Failed'), _('You do not have permissions to delete a tile with authoritative data.'))
+                    return JSONErrorResponse(
+                        _("Request Failed"), _("You do not have permissions to delete a tile with authoritative data.")
+                    )
 
         return HttpResponseNotFound()
 

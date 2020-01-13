@@ -146,7 +146,7 @@ SESSION_COOKIE_NAME = "arches"
 # EMAIL_HOST_PASSWORD = 'xxxxxxx'
 # EMAIL_PORT = 587
 
-POSTGIS_VERSION = (2, 5, 3)
+POSTGIS_VERSION = (3, 0, 0)
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -428,7 +428,7 @@ OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 604800}  # one week
 
 PHONE_REGEX = r"^\+\d{8,15}$"
 SEARCH_ITEMS_PER_PAGE = 5
-SEARCH_EXPORT_ITEMS_PER_PAGE = 2000
+SEARCH_EXPORT_LIMIT = 100000
 SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD = 2000  # The maximum number of instances a user can download from search export without celery
 RELATED_RESOURCES_PER_PAGE = 15
 RELATED_RESOURCES_EXPORT_LIMIT = 10000
@@ -529,7 +529,6 @@ CELERY_BROKER_URL = "amqp://guest:guest@localhost"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_RESULT_BACKEND = "django-db"  # Use 'django-cache' if you want to use your cache as your backend
 CELERY_TASK_SERIALIZER = "json"
-CELERY_SEARCH_EXPORT_DIR = os.path.join(MEDIA_ROOT, "uploadedfiles")
 CELERY_SEARCH_EXPORT_EXPIRES = 24 * 3600  # seconds
 CELERY_SEARCH_EXPORT_CHECK = 3600  # seconds
 

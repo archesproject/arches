@@ -19,12 +19,6 @@ define([
     var viewModel = function(params) {
         this.context = params.type;
         this.summaryDetails = [];
-        this.zoomConfigOpen = ko.observable(false);
-        this.positionConfigOpen = ko.observable(false);
-        this.geocoderConfigOpen = ko.observable(false);
-        this.resourcePropertiesConfigOpen = ko.observable(false);
-        this.defaultValueConfigOpen = ko.observable(false);
-        this.geocodingProviders = arches.geocodingProviders;
         this.defaultValueOptions = [
             {
                 "name": "",
@@ -47,22 +41,7 @@ define([
             'zoom',
             'centerX',
             'centerY',
-            'geocodeProvider',
-            'basemap',
             'geometryTypes',
-            'pitch',
-            'bearing',
-            'geocodePlaceholder',
-            'geocoderVisible',
-            'minZoom',
-            'maxZoom',
-            'featureColor',
-            'featurePointSize',
-            'featureLineWidth',
-            'featureEditingDisabled',
-            'overlayConfigs',
-            'overlayOpacity',
-            'mapControlsHidden',
             'defaultValueType',
             'defaultValue'
         ];
@@ -95,29 +74,21 @@ define([
             return value.features.length;
         }, this);
 
-        if (!this.geocodeProvider()) {
-            this.geocodeProvider(arches.geocoderDefault);
-        }
-
-        this.geocodeProviderDetails = ko.mapping.fromJS(_.findWhere(this.geocodingProviders, {
-            'geocoderid': this.geocodeProvider()
-        }));
-
-        this.geocodeProvider.subscribe(function(geocoderid) {
-            if (geocoderid) {
-                var provider = _.findWhere(this.geocodingProviders, {
-                    'geocoderid': geocoderid
-                });
-                this.geocodeProviderDetails.api_key(provider.api_key);
-                this.geocodeProviderDetails.component(provider.component);
-            }
-        }, this);
-
         if (params.widget) params.widgets = [params.widget];
 
         if (ko.unwrap(this.value) !== null) {
             this.summaryDetails = koMapping.toJS(this.value).features || [];
         }
+
+        if (this.centerX() == 0 && this.centerY() == 0 && this.zoom() == 0) {
+            this.centerX(arches.mapDefaultX);
+            this.centerY(arches.mapDefaultY);
+            this.zoom(arches.mapDefaultZoom);
+        }
+        params.zoom = this.zoom;
+        params.x = this.centerX;
+        params.y = this.centerY;
+        params.usePosition = true;
 
         MapEditorViewModel.apply(this, [params]);
     };

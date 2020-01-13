@@ -169,7 +169,7 @@ class NewResourceEditorView(MapBaseManagerView):
                                     # if the tile has authoritaive data and the current user is not the owner,
                                     # we don't send the provisional data of other users back to the client.
                                     tile.provisionaledits = None
-                if append_tile == True:
+                if append_tile is True:
                     provisionaltiles.append(tile)
             tiles = provisionaltiles
         map_layers = models.MapLayer.objects.all()
@@ -237,7 +237,7 @@ class NewResourceEditorView(MapBaseManagerView):
             if deleted is True:
                 return JSONResponse(ret)
             else:
-                return JSONErrorResponse('Unable to Delete Resource', 'Provisional users cannot delete resources with authoritative data')
+                return JSONErrorResponse("Unable to Delete Resource", "Provisional users cannot delete resources with authoritative data")
         return HttpResponseNotFound()
 
     def copy(self, request, resourceid=None):
@@ -416,6 +416,7 @@ class ResourceEditLogView(BaseManagerView):
                 "tile create": _("Tile Created"),
                 "tile edit": _("Tile Updated"),
                 "delete edit": _("Edit Deleted"),
+                "bulk_create": _("Resource Created"),
             }
             deleted_instances = [e.resourceinstanceid for e in recent_edits if e.edittype == "delete"]
             graph_name_lookup = {str(r.resourceinstanceid): r.graph.name for r in resources}
@@ -429,7 +430,7 @@ class ResourceEditLogView(BaseManagerView):
                 if edit.resource_model_name is None:
                     try:
                         edit.resource_model_name = models.GraphModel.objects.get(pk=edit.resourceclassid).name
-                    except:
+                    except Exception:
                         pass
 
             context = self.get_context_data(main_script="views/edit-history", recent_edits=recent_edits)
@@ -567,6 +568,7 @@ class ResourceTiles(View):
     def get(self, request, resourceid=None, include_display_values=True):
         datatype_factory = DataTypeFactory()
         nodeid = request.GET.get("nodeid", None)
+        search_term = request.GET.get("term", None)
         permitted_tiles = []
         perm = "read_nodegroup"
         tiles = models.TileModel.objects.filter(resourceinstance_id=resourceid)
@@ -584,11 +586,16 @@ class ResourceTiles(View):
                     for node in models.Node.objects.filter(nodegroup=tile.nodegroup):
                         if str(node.nodeid) in tile.data:
                             datatype = datatype_factory.get_instance(node.datatype)
-                            tile_dict["display_values"].append(
-                                {"value": datatype.get_display_value(tile, node), "label": node.name, "nodeid": node.nodeid}
-                            )
-                permitted_tiles.append(tile_dict)
+                            display_value = datatype.get_display_value(tile, node)
+                            if search_term is not None and search_term in display_value:
+                                tile_dict["display_values"].append({"value": display_value, "label": node.name, "nodeid": node.nodeid})
+                            elif search_term is None:
+                                tile_dict["display_values"].append({"value": display_value, "label": node.name, "nodeid": node.nodeid})
 
+                if search_term is None:
+                    permitted_tiles.append(tile_dict)
+                elif len(tile_dict["display_values"]) > 0:
+                    permitted_tiles.append(tile_dict)
         return JSONResponse({"tiles": permitted_tiles})
 
 

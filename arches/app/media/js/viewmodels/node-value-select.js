@@ -13,22 +13,31 @@ define([
 
         WidgetViewModel.apply(this, [params]);
         this.resourceinstanceid = params.tile ? params.tile.resourceinstance_id : '';
-
         this.tiles = ko.observableArray();
-        var updateTiles = function() {
-            var nodeid = params.node.config.nodeid();
+
+        this.url = function(){
             var resourceId = ko.unwrap(self.resourceinstanceid);
             if (resourceId === '') {
                 resourceId = window.location.pathname.split('/');
                 resourceId = resourceId[resourceId.length-1];
             }
-            var url = arches.urls.resource_tiles.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceId);
-            if (nodeid && resourceId) {
+            if (resourceId) {
+                return arches.urls.resource_tiles.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceId);
+            } else {
+                return null;
+            }
+        };
+
+        this.updateTiles = function(term) {
+            var nodeid = params.node.config.nodeid();
+            var url = this.url();
+            if (nodeid && url) {
                 $.ajax({
                     dataType: "json",
                     url: url,
                     data: {
-                        nodeid: nodeid
+                        nodeid: nodeid,
+                        term: term
                     },
                     success: function(data) {
                         self.tiles(data.tiles);
@@ -40,11 +49,7 @@ define([
             }
         };
 
-        params.node.config.nodeid.subscribe(updateTiles);
-        updateTiles();
-        if (this.form) {
-            this.form.on('after-update', updateTiles);
-        }
+        this.updateTiles();
 
         this.toggleDisplayOnlySelected = function(){
             this.displayOnlySelectedNode(!this.displayOnlySelectedNode());
@@ -81,13 +86,26 @@ define([
             multiple: this.multiple,
             placeholder: this.placeholder,
             allowClear: true,
-            query: function(query) {
-                var tiles = self.tiles();
-                var data = {results: []};
-                tiles.forEach(function(tile) {
-                    data.results.push(tile);
-                });
-                query.callback(data);
+            ajax: {
+                dataType: "json",
+                url: self.url(),
+                data: function(term) {
+                    return {nodeid: params.node.config.nodeid(), term:term};
+                },
+                results: function(data) {
+                    var options = [];
+                    data.tiles.forEach(function(tile) {
+                        options.push(tile);
+                    });
+                    return { results: options };
+                },
+                success: function(data) {
+                    self.tiles(data.tiles);
+                    return data;
+                },
+                error: function(err) {
+                    console.log(err, 'unable to fetch tiles');
+                }
             },
             initSelection: function(element, callback) {
                 var id = $(element).val();

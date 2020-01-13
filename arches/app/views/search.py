@@ -18,10 +18,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 from datetime import datetime
-from django.shortcuts import render
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
 from django.http import HttpResponseNotFound
+from django.shortcuts import render
 from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.concept import Concept
@@ -37,7 +37,7 @@ from arches.app.search.components.base import SearchFilterFactory
 from arches.app.views.base import MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer
-import arches.app.utils.data_management.zip as zip_utils
+import arches.app.utils.zip as zip_utils
 import arches.app.utils.task_management as task_management
 import arches.app.tasks as tasks
 from io import StringIO
@@ -91,6 +91,7 @@ class SearchView(MapBaseManagerView):
             "title": _("Searching the Database"),
             "template": "search-help",
         }
+        context["celery_running"] = task_management.check_if_celery_available()
 
         return render(request, "views/search.htm", context)
 
@@ -187,15 +188,15 @@ def export_results(request):
     download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
     if total > download_limit:
         celery_worker_running = task_management.check_if_celery_available()
-        if celery_worker_running:
-            req_dict = dict(request.GET)
+        if celery_worker_running is True:
+            request_values = dict(request.GET)
+            request_values["path"] = request.get_full_path()
             result = tasks.export_search_results.apply_async(
-                (request.user.id, req_dict, format), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
+                (request.user.id, request_values, format), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
             )
-            # if os.path.exists("result"): # this might not exist until after write_zip_file in task is done ?
             message = _(
                 f"{total} instances have been submitted for export. \
-                Click the bell icon to check for a notification once your export is completed and ready for download"
+                Click the Bell icon to check for a link to download your data"
             )
             return JSONResponse({"success": True, "message": message})
         else:
@@ -203,7 +204,7 @@ def export_results(request):
             return JSONResponse({"success": False, "message": message})
     else:
         exporter = SearchResultsExporter(search_request=request)
-        export_files = exporter.export(format)
+        export_files, export_info = exporter.export(format)
         if len(export_files) == 0 and format == "shp":
             message = _(
                 "Either no instances were identified for export or no resources have exportable geometry nodes\
@@ -217,6 +218,8 @@ def export_results(request):
 
 
 def search_results(request):
+    for_export = request.GET.get("export")
+    total = int(request.GET.get("total", "0"))
     se = SearchEngineFactory().create()
     search_results_object = {"query": Query(se)}
 
@@ -230,7 +233,7 @@ def search_results(request):
             if search_filter:
                 search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional)
     except Exception as err:
-        return JSONErrorResponse(message=err.message)
+        return JSONErrorResponse(message=err)
 
     dsl = search_results_object.pop("query", None)
     dsl.include("graph_id")
@@ -245,7 +248,20 @@ def search_results(request):
     if request.GET.get("tiles", None) is not None:
         dsl.include("tiles")
 
-    results = dsl.search(index="resources")
+    if for_export is True:
+        results = dsl.search(index="resources", scroll="1m")
+        scroll_id = results["_scroll_id"]
+
+        if total <= settings.SEARCH_EXPORT_LIMIT:
+            pages = (total // settings.SEARCH_RESULT_LIMIT) + 1
+        if total > settings.SEARCH_EXPORT_LIMIT:
+            pages = int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT) - 1
+        for page in range(pages):
+            results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
+            results["hits"]["hits"] += results_scrolled["hits"]["hits"]
+    else:
+        results = dsl.search(index="resources")
+
     ret = {}
     if results is not None:
         # allow filters to modify the results
@@ -350,3 +366,16 @@ def time_wheel_config(request):
     if config is None:
         config = time_wheel.time_wheel_config(request.user)
     return JSONResponse(config, indent=4)
+
+
+def get_export_file(request):
+    exportid = request.GET.get("exportid", None)
+    user = request.user
+    url = None
+    if exportid is not None:
+        export = models.SearchExportHistory.objects.get(pk=exportid)
+        try:
+            url = export.downloadfile.url
+            return JSONResponse({"message": _("Downloading"), "url": url}, indent=4)
+        except ValueError:
+            return JSONResponse({"message": _("The requested file is no longer available")}, indent=4)

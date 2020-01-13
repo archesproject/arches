@@ -61,6 +61,17 @@ define([
                 },
                 owner: this
             });
+
+            self.datatypeDataBearing = ko.computed(function() {
+                var result = false;
+                if (self.datatype()) {
+                    if (self.datatypelookup[self.datatype()]) {
+                        result = !!self.datatypelookup[self.datatype()].defaultwidget_id;
+                    }
+                }
+                return result;
+            });
+
             self.datatypeIsSearchable = ko.computed(function() {
                 var searchable = false;
                 var datatype = self.datatypelookup[self.datatype()];

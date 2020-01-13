@@ -19,8 +19,8 @@ define([
             tile.deleteTile( function(response) {
                 self.alert(new AlertViewModel(
                     'ep-alert-red', 
-                    response.responseJSON.message[0], 
-                    response.responseJSON.message[1], 
+                    response.responseJSON.title,
+                    response.responseJSON.message,
                     null, 
                     function(){ return; }
                 ));

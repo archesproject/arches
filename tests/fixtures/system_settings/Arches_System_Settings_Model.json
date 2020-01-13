@@ -1456,7 +1456,7 @@
                     "isrequired": false,
                     "issearchable": false,
                     "istopnode": false,
-                    "name": "SEARCH_EXPORT_ITEMS_PER_PAGE",
+                    "name": "SEARCH_EXPORT_LIMIT",
                     "nodegroup_id": "d0987880-fad8-11e6-8cce-6c4008b05c4c",
                     "nodeid": "d0987ec0-fad8-11e6-aad3-6c4008b05c4c",
                     "ontologyclass": null,

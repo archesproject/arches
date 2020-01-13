@@ -15,6 +15,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
+import arches.app.utils.task_management as task_management
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.core.cache import cache
@@ -139,9 +140,11 @@ class NumberDataType(BaseDataType):
         errors = []
 
         try:
+            if value == "":
+                value = None
             if value is not None:
                 decimal.Decimal(value)
-        except Exception as e:
+        except Exception:
             dt = self.datatype_model.datatype
             errors.append(
                 {
@@ -172,11 +175,11 @@ class NumberDataType(BaseDataType):
                 if value["op"] != "eq":
                     operators = {"gte": None, "lte": None, "lt": None, "gt": None}
                     operators[value["op"]] = value["val"]
-                    search_query = Range(field="tiles.data.%s" % (str(node.pk)), **operators)
                 else:
-                    search_query = Match(field="tiles.data.%s" % (str(node.pk)), query=value["val"], type="phrase_prefix")
+                    operators = {"gte": value["val"], "lte": value["val"]}
+                search_query = Range(field="tiles.data.%s" % (str(node.pk)), **operators)
                 query.must(search_query)
-        except KeyError as e:
+        except KeyError:
             pass
 
     def is_a_literal_in_rdf(self):
@@ -363,8 +366,10 @@ class EDTFDataType(BaseDataType):
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
-        value = data[str(node.pk)]["value"]
-
+        try:
+            value = data[str(node.pk)]["value"]
+        except TypeError:
+            value = data[str(node.pk)]
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -984,7 +989,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         }
 
     def after_update_all(self):
-        if settings.AUTO_REFRESH_GEOM_VIEW:
+        from arches.app.tasks import refresh_materialized_view, log_error
+
+        celery_worker_running = task_management.check_if_celery_available()
+        if celery_worker_running is True:
+            res = refresh_materialized_view.apply_async((), link_error=log_error.s())
+        elif settings.AUTO_REFRESH_GEOM_VIEW:
             cursor = connection.cursor()
             sql = """
                 REFRESH MATERIALIZED VIEW mv_geojson_geoms;
@@ -1046,8 +1056,9 @@ class FileListDataType(BaseDataType):
         data = self.get_tile_data(tile)
         files = data[str(node.pk)]
         file_list_str = ""
-        for f in files:
-            file_list_str = file_list_str + f["name"] + " | "
+        if files is not None:
+            for f in files:
+                file_list_str = file_list_str + f["name"] + " | "
 
         return file_list_str
 
@@ -1614,6 +1625,13 @@ class ResourceInstanceDataType(BaseDataType):
 
     def ignore_keys(self):
         return ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]
+
+    def references_resource_type(self):
+        """
+        This resource references another resource type (eg resource-instance-datatype, etc...)
+        """
+
+        return True
 
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):

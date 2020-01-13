@@ -83,7 +83,7 @@ define([
                                 this.get('label')(value[key]);
                             }
                             var oldJSON = koMapping.toJSON(config[key]);
-                            var newJSON = koMapping.toJSON(value[key]);
+                            var newJSON = value[key] ? koMapping.toJSON(value[key]) : value[key];
                             if (config[key] && oldJSON !== newJSON) {
                                 koMapping.fromJSON(
                                     newJSON,

@@ -257,8 +257,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- System Settings list item -->
                                         {% if request.user|has_group:"System Administrator" %}
-                                        <li{% if "views/resource" in main_script and is_system_settings is True %} class="active-sub"{% endif %}>
-                                            <a href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
+                                        <li{% if "views/resource" in main_script and is_system_settings is True %} class="active-sub"{% endif %} data-bind="click: navigate.bind(this, '{% url 'config' %}')">
+                                            <a href="{% url 'config' %}">
                                                 <i class="ti-alarm-clock"></i>
                                                 <span class="menu-title">
                                                     <strong>{% trans "Manage System Settings" %}</strong>
@@ -269,7 +269,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <a class="link-submenu" href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}')">{% trans "System Settings" %}</a>
                                                 </li>
                                                 <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="{% url 'graph' system_settings_graphid %}" data-bind="click: navigate.bind(this, '{% url 'graph_designer' system_settings_graphid %}')">{% trans "System Settings Graph" %}</a>
+                                                    <a class="link-submenu" href="{% url 'graph' system_settings_graphid %}" data-bind="click: navigate.bind(this, '{% url 'graph_designer' system_settings_graphid %}'), clickBubble: false">{% trans "System Settings Graph" %}</a>
                                                 </li>
                                             </ul>
                                         </li>
@@ -286,8 +286,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!--Menu list item-->
                                         {% if request.user|can_edit_resource_instance %}
-                                        <li{% if "views/resource" in main_script and is_system_settings is False %} class="active-sub"{% endif %}>
-                                            <a href="{% url 'resource' %}" data-bind="click: navigate.bind(this, '{% url 'resource' %}') ">
+                                        <li{% if "views/resource" in main_script and is_system_settings is False %} class="active-sub"{% endif %} data-bind="click: navigate.bind(self, '{% url 'resource' %}')">
+                                            <a href="{% url 'resource' %}">
                                                 <i class="fa fa-building-o"></i>
                                                 <span class="menu-title">
                                                     <strong>{% trans "Add New Resource" %}</strong>
@@ -310,8 +310,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!--Menu list item-->
                                         {% if request.user|has_group:"Graph Editor" %}
-                                        <li{% if "views/graph" in main_script %} class="active-sub"{% endif %}>
-                                            <a href="#" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}') ">
+                                        <li{% if "views/graph" in main_script %} class="active-sub"{% endif %} data-bind="click: navigate.bind(this, '{% url 'graph' '' %}')">
+                                            <a href="#">
                                                 <i class="fa fa-bookmark"></i>
                                                 <span class="menu-title">
                                                     <strong>{% trans "Arches Designer" %}</strong>
@@ -330,8 +330,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!--Menu list item-->
                                         {% if request.user|has_group:"Application Administrator" %}
-                                        <li{% if "views/map-layer-manager" in main_script %} class="active-sub"{% endif %}>
-                                            <a href="{% url 'map_layer_manager' %}" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}') ">
+                                        <li{% if "views/map-layer-manager" in main_script %} class="active-sub"{% endif %} data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}')">
+                                            <a href="{% url 'map_layer_manager' %}">
                                                 <i class="fa fa-server"></i>
                                                 <span class="menu-title">
                                                     <strong>{% trans "Map Layer Manager" %}</strong>

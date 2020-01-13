@@ -43,8 +43,12 @@
                 <h4>{% trans "Uploaded Files" %}</h4>
                 <div class="file-upload-options">
                     <!--ko if: filesJSON().length > 1-->
-                    <input data-bind="textInput: filter" type="text" placeholder="{% trans "find a file..." %}" class="file-upload-filter">
+                    <input data-bind="textInput: filter" type="text" placeholder="{% trans 'find a file...' %}" class="file-upload-filter">
                     <!-- /ko -->
+
+                    <!-- Clear Search -->
+                    <span class="file-upload-clear-filter" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+
                     <!-- ko if: filter() -->
                     <span data-bind="text: filteredList().length+' out of '+filesJSON().length+' files match filter'"></span>
                     <!-- /ko -->

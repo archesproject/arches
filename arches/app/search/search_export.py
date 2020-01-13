@@ -17,13 +17,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import csv
+import datetime
 from io import StringIO
+from io import BytesIO
+from django.core.files import File
 from arches.app.models import models
+from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.flatten_dict import flatten_dict
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.geo_utils import GeoUtils
+import arches.app.utils.zip as zip_utils
 from arches.app.views import search as SearchView
 
 
@@ -55,7 +60,10 @@ class SearchResultsExporter(object):
         output = {}
 
         for resource_instance in instances:
-            resource_obj = self.flatten_tiles(resource_instance["_source"]["tiles"], self.datatype_factory, compact=self.compact)
+            use_fieldname = self.format in ("shp",)
+            resource_obj = self.flatten_tiles(
+                resource_instance["_source"]["tiles"], self.datatype_factory, compact=self.compact, use_fieldname=use_fieldname
+            )
             has_geom = resource_obj.pop("has_geometry")
             skip_resource = self.format in ("shp",) and has_geom is False
             if skip_resource is False:
@@ -68,14 +76,35 @@ class SearchResultsExporter(object):
         for graph_id, resources in output.items():
             graph = models.GraphModel.objects.get(pk=graph_id)
             if format == "tilecsv":
-                headers = list(graph.node_set.filter(exportable=True).values_list("fieldname", flat=True))
+                headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
                 headers.append("resourceid")
                 ret.append(self.to_csv(resources["output"], headers=headers, name=graph.name))
             if format == "shp":
                 headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype")[::1]
                 headers.append({"fieldname": "resourceid", "datatype": "str"})
                 ret += self.to_shp(resources["output"], headers=headers, name=graph.name)
-        return ret
+
+        full_path = self.search_request.get_full_path()
+        search_request_path = self.search_request.path if full_path is None else full_path
+        search_export_info = models.SearchExportHistory(
+            user=self.search_request.user, numberofinstances=len(instances), url=search_request_path
+        )
+        search_export_info.save()
+
+        return ret, search_export_info
+
+    def write_export_zipfile(self, files_for_export, export_info):
+        """
+        Writes a list of file like objects out to a zip file
+        """
+        zip_stream = zip_utils.create_zip_file(files_for_export)
+        today = datetime.datetime.now().isoformat()
+        name = f"{settings.APP_NAME}_{today}.zip"
+        search_history_obj = models.SearchExportHistory.objects.get(pk=export_info.searchexportid)
+        f = BytesIO(zip_stream)
+        download = File(f)
+        search_history_obj.downloadfile.save(name, download)
+        return search_history_obj.searchexportid
 
     def get_node(self, nodeid):
         nodeid = str(nodeid)
@@ -117,7 +146,7 @@ class SearchResultsExporter(object):
                     resource_json[tile["card_name"]] = tile[tile["card_name"]]
         return resource_json
 
-    def flatten_tiles(self, tiles, datatype_factory, compact=True):
+    def flatten_tiles(self, tiles, datatype_factory, compact=True, use_fieldname=False):
         feature_collections = {}
         compacted_data = {}
         lookup = {}
@@ -129,9 +158,8 @@ class SearchResultsExporter(object):
                 node = self.get_node(nodeid)
                 if node.exportable:
                     datatype = datatype_factory.get_instance(node.datatype)
-                    # node_value = datatype.transform_export_values(tile['data'][str(node.nodeid)])
                     node_value = datatype.get_display_value(tile, node)
-                    label = node.fieldname
+                    label = node.fieldname if use_fieldname is True else node.name
 
                     if compact:
                         if node.datatype == "geojson-feature-collection":

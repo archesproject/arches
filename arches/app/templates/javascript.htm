@@ -63,7 +63,6 @@
             'leaflet': '{{ STATIC_URL }}packages/leaflet/dist/leaflet',
             'leaflet-iiif': '{{ STATIC_URL }}packages/leaflet-iiif/leaflet-iiif',
             'leaflet-draw': '{{ STATIC_URL }}packages/leaflet-draw/dist/leaflet.draw',
-            'mathjs': '{{ STATIC_URL }}packages/mathjs/dist/math.min',
             'metismenu': '{{ STATIC_URL }}packages/metismenu/dist/metisMenu.min',
             'knockstrap': '{{ STATIC_URL }}packages/knockstrap/build/knockstrap.min',
             'jqtree': '{{ STATIC_URL }}packages/jqtree/tree.jquery',
@@ -183,6 +182,7 @@
                 search_terms: "{% url 'search_terms' %}",
                 search_results: "{% url 'search_results' %}",
                 export_results: "{% url 'export_results' %}",
+                get_export_file: "{% url 'get_export_file' %}",
                 buffer: "{% url 'buffer'%}",
                 config: "{% url 'config' %}",
                 node: "{% url 'node' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
@@ -346,6 +346,8 @@
               'name': '{{ resource.name }}',
               'icon': '{{ resource.iconclass }}',
             },{% endfor %}{% endautoescape %}],
+            userEmail: '{{ user.email }}',
+            celeryRunning: '{{celery_running}}',
             graphs: {% autoescape off %}{{graphs|default:"[]"}}{% endautoescape %}
         };
     });

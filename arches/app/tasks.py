@@ -1,31 +1,36 @@
 from __future__ import absolute_import, unicode_literals
 from celery import shared_task
 from datetime import datetime
+from datetime import timedelta
 import logging
 import os
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import management
+from django.db import connection
 from django.http import HttpRequest
 from arches.app.models import models
 from arches.app.search.search_export import SearchResultsExporter
-import arches.app.utils.data_management.zip as zip_utils
+import arches.app.utils.zip as zip_utils
+from django.utils.translation import ugettext as _
 
 
 @shared_task
 def delete_file():
+    from arches.app.models.system_settings import settings
+
+    settings.update_from_db()
+
+    logger = logging.getLogger(__name__)
     now = datetime.timestamp(datetime.now())
     file_list = []
-    counter = 0
-    with os.scandir(settings.CELERY_SEARCH_EXPORT_DIR) as current_files:
-        for file in current_files:
-            file_stat = os.stat(os.path.join(settings.CELERY_SEARCH_EXPORT_DIR, file))
-            if file_stat.st_ctime > settings.CELERY_SEARCH_EXPORT_EXPIRES:
-                file_list.append(file.name)
-    for file in file_list:
-        os.remove(os.path.join(settings.CELERY_SEARCH_EXPORT_DIR, file))
-        counter += 1
-    return f"{counter} files deleted"
+    range = datetime.now() - timedelta(seconds=settings.CELERY_SEARCH_EXPORT_EXPIRES)
+    exports = models.SearchExportHistory.objects.filter(exporttime__lt=range).exclude(downloadfile="")
+    for export in exports:
+        file_list.append(export.downloadfile.url)
+        export.downloadfile.delete()
+    deleted_message = _("files_deleted")
+    logger.warning(f"{len(file_list)} {deleted_message}")
+    return f"{len(file_list)} {deleted_message}"
 
 
 @shared_task
@@ -42,27 +47,47 @@ def sync(self, surveyid=None, userid=None):
 
 
 @shared_task(bind=True)
-def export_search_results(self, userid, request_dict, format):
+def export_search_results(self, userid, request_values, format):
+
+    from arches.app.models.system_settings import settings
+
+    settings.update_from_db()
+
     create_user_task_record(self.request.id, self.name, userid)
     _user = User.objects.get(id=userid)
-    new_req = HttpRequest()
-    new_req.method = "GET"
-    new_req.user = _user
-    for k, v in request_dict.items():
-        new_req.GET.__setitem__(k, v[0])  # copies k,v pairs from old req to new_req
+    email = request_values["email"]
+    export_name = request_values["exportName"][0]
+    new_request = HttpRequest()
+    new_request.method = "GET"
+    new_request.user = _user
+    for k, v in request_values.items():
+        new_request.GET.__setitem__(k, v[0])
+    new_request.path = request_values["path"]
+    exporter = SearchResultsExporter(search_request=new_request)
+    files, export_info = exporter.export(format)
+    exportid = exporter.write_export_zipfile(files, export_info)
 
-    exporter = SearchResultsExporter(search_request=new_req)
-    # prod instances of arches should exclude the return_relative_url kwarg (default=False)
-    msg = zip_utils.write_zip_file(exporter.export(format), return_relative_url=True)
     context = dict(
         greeting="Hello,\nYour request to download a set of search results is now ready.",
-        link=msg,
+        link=exportid,
         button_text="Download Now",
         closing="Thank you",
+        email=email,
+        name=export_name,
     )
-    response = {"taskid": self.request.id, "msg": msg, "notiftype_name": "Search Export Download Ready", "context": context}
+    response = {"taskid": self.request.id, "msg": export_name, "notiftype_name": "Search Export Download Ready", "context": context}
 
     return response
+
+
+@shared_task(bind=True)
+def refresh_materialized_view(self):
+    cursor = connection.cursor()
+    sql = """
+        REFRESH MATERIALIZED VIEW mv_geojson_geoms;
+    """
+    cursor.execute(sql)
+    response = {"taskid": self.request.id}
 
 
 @shared_task
@@ -90,13 +115,16 @@ def update_user_task_record(arg_dict={}):
 def log_error(request, exc, traceback, msg=None):
     logger = logging.getLogger(__name__)
     logger.warn(exc)
-    task_obj = models.UserXTask.objects.get(taskid=request.id)
-    task_obj.status = "FAILED"
-    task_obj.date_done = datetime.now()
-    task_obj.save()
-    if msg is None:
-        msg = task_obj.status + ": " + task_obj.name
-    notify_completion(msg, task_obj.user)
+    try:
+        task_obj = models.UserXTask.objects.get(taskid=request.id)
+        task_obj.status = "FAILED"
+        task_obj.date_done = datetime.now()
+        task_obj.save()
+        if msg is None:
+            msg = task_obj.status + ": " + task_obj.name
+        notify_completion(msg, task_obj.user)
+    except Exception as e:
+        print("No such UserXTask record exists. Notification aborted.")
 
 
 def create_user_task_record(taskid, taskname, userid):

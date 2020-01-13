@@ -224,11 +224,11 @@ class UserProfileView(View):
             if hasattr(user, "userprofile") is not True:
                 models.UserProfile.objects.create(user=user)
             userDict = JSONSerializer().serializeToPython(user)
-            userDict['password'] = None
-            userDict['is_reviewer'] = user_is_resource_reviewer(user)
-            userDict['viewable_nodegroups'] = user.userprofile.viewable_nodegroups
-            userDict['editable_nodegroups'] = user.userprofile.editable_nodegroups
-            userDict['deletable_nodegroups'] = user.userprofile.deletable_nodegroups
+            userDict["password"] = None
+            userDict["is_reviewer"] = user_is_resource_reviewer(user)
+            userDict["viewable_nodegroups"] = user.userprofile.viewable_nodegroups
+            userDict["editable_nodegroups"] = user.userprofile.editable_nodegroups
+            userDict["deletable_nodegroups"] = user.userprofile.deletable_nodegroups
             response = JSONResponse(userDict)
         else:
             response = Http401Response()
@@ -250,7 +250,7 @@ class GetClientIdView(View):
             if user:
                 if hasattr(user, "userprofile") is not True:
                     models.UserProfile.objects.create(user=user)
-                is_reviewer = user_is_resource_reviewer(user.userprofile)
+                is_reviewer = user_is_resource_reviewer(user)
                 user = JSONSerializer().serializeToPython(user)
                 user["password"] = None
                 user["is_reviewer"] = is_reviewer

@@ -50,7 +50,6 @@ from arches.app.views.plugin import PluginView
 from arches.app.views.concept import RDMView
 from arches.app.views.user import UserManagerView
 from arches.app.views.tile import TileData
-from arches.app.views.user_tasks import UserTaskView
 from arches.app.views.notifications import NotificationView
 from arches.app.views.map import MapLayerManagerView, TileserverProxyView
 from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources, MobileSurveyDesignerView
@@ -101,6 +100,7 @@ urlpatterns = [
     url(r"^search/resources$", search.search_results, name="search_results"),
     url(r"^search/time_wheel_config$", search.time_wheel_config, name="time_wheel_config"),
     url(r"^search/export_results$", search.export_results, name="export_results"),
+    url(r"^search/get_export_file$", search.get_export_file, name="get_export_file"),
     url(r"^buffer/$", search.buffer, name="buffer"),
     url(
         r"^settings/",
@@ -200,8 +200,6 @@ urlpatterns = [
     url(r"^feature_popup_content$", main.feature_popup_content, name="feature_popup_content"),
     url(r"^user$", UserManagerView.as_view(), name="user_profile_manager"),
     url(r"^user/get_user_names$", UserManagerView.as_view(action="get_user_names"), name="get_user_names"),
-    url(r"^user_tasks$", UserTaskView.as_view(), name="get_user_tasks"),
-    url(r"^user_tasks$", UserTaskView.as_view(action="get_all"), name="get_all_tasks"),
     url(r"^notifications$", NotificationView.as_view(), name="get_notifications"),
     url(r"^notifications/dismiss$", NotificationView.as_view(action="dismiss"), name="dismiss_notifications"),
     url(r"^notifications/get_types$", NotificationView.as_view(action="get_types"), name="get_notification_types"),

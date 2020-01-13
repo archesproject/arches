@@ -38,6 +38,7 @@ from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
+from arches.app.models.resource import ModelInactiveError
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export, create_mapping_configuration_file
 from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
 from arches.app.utils.system_metadata import system_metadata
@@ -324,6 +325,7 @@ class GraphDataView(View):
                     graph.save()
                     ret = JSONSerializer().serializeToPython(graph)
                     ret["updated_values"] = updated_values
+                    ret["default_card_name"] = graph.temp_node_name
 
                 elif self.action == "update_node_layer":
                     nodeid = uuid.UUID(str(data.get("nodeid")))
@@ -377,6 +379,8 @@ class GraphDataView(View):
             return JSONResponse(ret)
         except GraphValidationError as e:
             return JSONErrorResponse(e.title, e.message, {"status": "Failed"})
+        except ModelInactiveError as e:
+            return JSONErrorResponse(e.title, e.message)
 
     @method_decorator(group_required("Graph Editor"), name="dispatch")
     def delete(self, request, graphid):
@@ -400,6 +404,8 @@ class GraphDataView(View):
                     }
                 )
             except GraphValidationError as e:
+                return JSONErrorResponse(e.title, e.message)
+            except ModelInactiveError as e:
                 return JSONErrorResponse(e.title, e.message)
         elif self.action == "delete_graph":
             try:

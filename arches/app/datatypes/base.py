@@ -258,3 +258,10 @@ class BaseDataType(object):
         """
 
         return []
+
+    def references_resource_type(self):
+        """
+        This resource references another resource type (eg resource-instance-datatype, etc...)
+        """
+
+        return False

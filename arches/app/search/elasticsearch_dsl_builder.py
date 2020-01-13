@@ -52,6 +52,7 @@ class Query(Dsl):
         self.se = se
         self.start = kwargs.pop("start", 0)
         self.limit = kwargs.pop("limit", 10)
+        self.scroll = None
 
         self.dsl = {"query": {"match_all": {}}, "_source": {"includes": [], "excludes": []}}
 
@@ -86,10 +87,12 @@ class Query(Dsl):
     def search(self, index="", **kwargs):
         self.start = kwargs.pop("start", self.start)
         self.limit = kwargs.pop("limit", self.limit)
-
+        self.scroll = kwargs.pop("scroll", None)
         self.prepare()
-        # print self
-        return self.se.search(index=index, body=self.dsl)
+        if self.scroll is None:
+            return self.se.search(index=index, body=self.dsl)
+        else:
+            return self.se.search(index=index, body=self.dsl, scroll=self.scroll)
 
     def count(self, index="", **kwargs):
         return self.se.count(index=index, body=self.dsl)
@@ -97,8 +100,9 @@ class Query(Dsl):
     def delete(self, index="", **kwargs):
         return self.se.delete(index=index, body=self.dsl, **kwargs)
 
-    def prepare(self):
-        self.dsl["from"] = self.start
+    def prepare(self, scroll=False):
+        if self.scroll is None:
+            self.dsl["from"] = self.start
         self.dsl["size"] = self.limit
 
 
