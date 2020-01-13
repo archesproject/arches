@@ -54,7 +54,10 @@ def function_templates(request, template):
 
 
 def templates(request, template):
-    return render(request, template)
+    try:
+        return render(request, template)
+    except Exception as e:
+        print(e)
 
 
 def help_templates(request):
