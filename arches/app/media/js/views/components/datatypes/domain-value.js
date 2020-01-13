@@ -5,6 +5,7 @@ define(['arches', 'knockout', 'uuid'], function (arches, ko, uuid) {
             this.search = params.search;
             if (this.search) {
                 this.options = params.node.config.options;
+                this.options.unshift({id:"", selected:true, text:"Select an Option"});
                 var filter = params.filterValue();
                 this.op = ko.observable(filter.op || '');
                 this.searchValue = ko.observable(filter.val || '');
