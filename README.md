@@ -18,7 +18,7 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 
 Installation is fully documented in the official documentation, [arches.readthedocs.io/en/stable](https://arches.readthedocs.io/en/stable), but assuming you have all of the dependencies installed you should make a virtual environment, activate it, and then run
 
-    pip install arches --no-binary :all:
+    pip install arches
 
 then
 
