@@ -21,7 +21,7 @@
                     <optgroup data-bind="if: (graph.isresource && graph.isactive), attr: { label: graph.name }">
                         <!-- ko foreach: { data: $parent.date_nodes, as: 'node' } -->
                             <!-- ko if: graph.graphid === node.graph_id -->
-                                <option data-bind="attr: { value: node.nodeid }, text: node.name"></option>
+                                <option data-bind="attr: { value: node.nodeid }, text: node.label"></option>
                             <!-- /ko -->
                         <!-- /ko -->
                     </optgroup>
