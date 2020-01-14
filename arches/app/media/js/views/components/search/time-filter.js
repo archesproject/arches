@@ -43,7 +43,7 @@ function($, _, ko, moment, BaseFilter, arches) {
                 this.loading = ko.observable(false);
                 this.getTimeWheelConfig();
                 this.date_nodes = ko.observableArray();
-                this.widget_name_lookup = ko.observable();
+                this.widgetNameLookup = ko.observable();
                 this.graph_models = ko.observableArray();
                 this.selectedPeriod.subscribe(function (d) {
                     if (d) {
@@ -100,7 +100,7 @@ function($, _, ko, moment, BaseFilter, arches) {
                     context: this
                 }).done(function(response) {
                     this.date_nodes(response.date_nodes);
-                    this.widget_name_lookup(response.widget_name_lookup);
+                    this.widgetNameLookup(response.widget_name_lookup);
                     this.graph_models(response.graph_models);
                     this.restoreState();
                     $("#" + this.dateDropdownEleId).trigger("chosen:updated");
