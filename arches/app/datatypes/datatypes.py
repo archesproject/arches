@@ -1052,6 +1052,11 @@ class FileListDataType(BaseDataType):
             errors.append({"type": "ERROR", "message": f"datatype: {dt}, value: {value} - {e} ."})
         return errors
 
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        for f in tile.data[str(nodeid)]:
+            val = {"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+            document["strings"].append(val)
+
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
         files = data[str(node.pk)]

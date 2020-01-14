@@ -14,28 +14,6 @@ root_dir = os.path.dirname(here)
 
 
 def install():
-    if confirm_system_requirements():
-        install_dir = os.path.join(site_packages_dir(), "arches", "install")
-        django_install_location = os.path.join(site_packages_dir(), "django")
-
-        # INSTALL DJANGO, RAWES, SPHINX AND OTHER DEPENDENCIES
-        tmpinstalldir = os.path.join(site_packages_dir(), "arches", "tmp")
-        os.system("pip install -b %s setuptools --upgrade" % (tmpinstalldir))
-        os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, "requirements.txt")))
-        if settings.MODE == "DEV":
-            os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, "requirements_dev.txt")))
-        shutil.rmtree(tmpinstalldir, True)
-
-
-def site_packages_dir():
-    if sys.platform == "win32":
-        return os.path.join(sys.prefix, "Lib", "site-packages")
-    else:
-        py_version = "python%s.%s" % (sys.version_info[0], sys.version_info[1])
-        return os.path.join(sys.prefix, "lib", py_version, "site-packages")
-
-
-def confirm_system_requirements():
     # CHECK PYTHON VERSION
     if not sys.version_info >= (3, 7):
         print("ERROR: Arches requires at least Python 3.7")
@@ -44,15 +22,6 @@ def confirm_system_requirements():
         pass
 
     return True
-
-
-def activate_env(path_to_virtual_env):
-    # ACIVATE THE VIRTUAL ENV
-    if sys.platform == "win32":
-        activate_this = os.path.join(path_to_virtual_env, "Scripts", "activate_this.py")
-    else:
-        activate_this = os.path.join(path_to_virtual_env, "bin", "activate_this.py")
-    execfile(activate_this, dict(__file__=activate_this))
 
 
 def unzip_file(file_name, unzip_location):
