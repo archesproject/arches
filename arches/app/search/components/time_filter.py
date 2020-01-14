@@ -110,28 +110,23 @@ class TimeFilter(BaseSearchFilter):
     def view_data(self):
         ret = {}
         date_datatypes = ["date", "edtf"]
-        alt_widget_labels = {"datepicker-widget": "Date Widget", "edtf-widget": "Extended Date Time"}
-
         date_nodes = models.Node.objects.filter(datatype__in=date_datatypes, graph__isresource=True, graph__isactive=True)
+        node_graph_dict = {
+            str(node.nodeid): str(node.graph_id) for node in date_nodes if self.request.user.has_perm("read_nodegroup", node.nodegroup)
+        }
+        
+        date_cardxnodesxwidgets = models.CardXNodeXWidget.objects.filter(node_id__in=list(node_graph_dict.keys()))
+        card_ids = [cnw.card_id for cnw in date_cardxnodesxwidgets]
+        cards = models.CardModel.objects.filter(cardid__in=card_ids)
+        card_name_dict = {str(card.cardid): card.name for card in cards}
+        node_obj_list = []
+        for cnw in date_cardxnodesxwidgets:
+            node_obj = {}
+            node_obj["nodeid"] = str(cnw.node_id)
+            node_obj["label"] = card_name_dict[str(cnw.card_id)]+" - "+cnw.label
+            node_obj["graph_id"] = node_graph_dict[node_obj["nodeid"]]
+            node_obj_list.append(node_obj)
 
-        date_cardxnodesxwidgets = list(models.CardXNodeXWidget.objects.filter(node_id__in=list(date_nodes)))
-        date_widget_ids = [str(cnw.widget_id) for cnw in date_cardxnodesxwidgets]
-        date_widgets = list(models.Widget.objects.filter(widgetid__in=date_widget_ids))
-        node_widget_dict = {str(cnw.node_id): str(cnw.widget_id) for cnw in date_cardxnodesxwidgets}
-        widget_name_dict = {}
-        try:
-            widget_name_dict = {str(widget.widgetid): alt_widget_labels[str(widget.name)] for widget in date_widgets}
-        except KeyError as e:
-            for widget in date_widgets:
-                if widget.name in alt_widget_labels.keys():
-                    widget_name_dict[str(widget.widgetid)] = alt_widget_labels[str(widget.name)]
-                else:
-                    widget_name_dict[str(widget.widgetid)] = str(widget.name)
-
-        node_widget_name_dict = {k: widget_name_dict[v] for k, v in node_widget_dict.items()}
-        searchable_date_nodes = [node for node in date_nodes if self.request.user.has_perm("read_nodegroup", node.nodegroup)]
-
-        ret["date_nodes"] = searchable_date_nodes
-        ret["widget_name_lookup"] = node_widget_name_dict
-        ret["graph_models"] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        ret["date_nodes"] = node_obj_list
+        ret["graph_models"] = models.GraphModel.objects.filter(graphid__in=list(node_graph_dict.values()))
         return ret
