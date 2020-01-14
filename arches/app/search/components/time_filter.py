@@ -114,7 +114,7 @@ class TimeFilter(BaseSearchFilter):
         node_graph_dict = {
             str(node.nodeid): str(node.graph_id) for node in date_nodes if self.request.user.has_perm("read_nodegroup", node.nodegroup)
         }
-        
+
         date_cardxnodesxwidgets = models.CardXNodeXWidget.objects.filter(node_id__in=list(node_graph_dict.keys()))
         card_ids = [cnw.card_id for cnw in date_cardxnodesxwidgets]
         cards = models.CardModel.objects.filter(cardid__in=card_ids)
@@ -123,7 +123,7 @@ class TimeFilter(BaseSearchFilter):
         for cnw in date_cardxnodesxwidgets:
             node_obj = {}
             node_obj["nodeid"] = str(cnw.node_id)
-            node_obj["label"] = card_name_dict[str(cnw.card_id)]+" - "+cnw.label
+            node_obj["label"] = card_name_dict[str(cnw.card_id)] + " - " + cnw.label
             node_obj["graph_id"] = node_graph_dict[node_obj["nodeid"]]
             node_obj_list.append(node_obj)
 
