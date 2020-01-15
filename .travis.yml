@@ -22,8 +22,8 @@ services:
 
 before_install:
   - echo 'ELASTICSEARCH_PREFIX="arches"' > arches/settings_local.py
-  - psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
-  - echo "*:*:*:postgres:postgis" >> ~/.pgpass
+  # - psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
+  # - echo "*:*:*:postgres:postgis" >> ~/.pgpass
   - psql -d postgres -c "SET standard_conforming_strings = off;"
   - psql -c "CREATE DATABASE template_postgis;"
   - psql -d template_postgis -c "CREATE EXTENSION postgis;"
