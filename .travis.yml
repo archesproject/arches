@@ -13,7 +13,7 @@ addons:
       - libpq-dev
       - openjdk-8-jdk
       - python-dev
-      - postgresql-12.0-postgis-3.0
+      - postgresql-12.0
       - libgconf2-4
 
 services:
