@@ -3,7 +3,7 @@ services:
 
     arches:
       container_name: arches
-      image: archesproject/arches:latest
+      image: getty/arches:5.0
       build:
         context: .
         dockerfile: ./Dockerfile
@@ -12,9 +12,8 @@ services:
         - arches-log:/arches/arches/logs
         - arches-static:/static_root
       environment:
-        # - ARCHES_PROJECT=insert_project_name
-        - INSTALL_DEFAULT_GRAPHS=True
-        - INSTALL_DEFAULT_CONCEPTS=True
+        - INSTALL_DEFAULT_GRAPHS=False
+        - INSTALL_DEFAULT_CONCEPTS=False
         - PGUSERNAME=postgres
         - PGPASSWORD=postgres
         - PGDBNAME=arches
@@ -26,7 +25,6 @@ services:
         - COUCHDB_PASS=password
         - ESHOST=elasticsearch
         - ESPORT=9200
-        # - ELASTICSEARCH_PREFIX=insert_project_name
         - DJANGO_MODE=PROD
         - DJANGO_DEBUG=False
         # - DJANGO_REMOTE_DEBUG=False
@@ -64,7 +62,7 @@ services:
 
     db:
       container_name: db
-      image: mdillon/postgis:9.6-alpine
+      image: kartoza/postgis:12.0
       volumes:
           - postgres-data:/var/lib/postgresql/data
           - postgres-log:/var/log/postgresql
@@ -72,7 +70,10 @@ services:
       ports:
         - '5432:5432'
       environment:
-        - POSTGRES_PASSWORD=postgres
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASS=postgres
+        - POSTGRES_DB=postgres
+        - POSTGRES_MULTIPLE_EXTENSIONS=postgis,postgis_topology
         - TZ=PST
 
     couchdb:
@@ -89,7 +90,7 @@ services:
 
     elasticsearch:
       container_name: elasticsearch
-      image: docker.elastic.co/elasticsearch/elasticsearch:6.7.1
+      image: elasticsearch:7.5.1
       volumes:
         - elasticsearch-data:/usr/share/elasticsearch/data
       ports:
@@ -97,6 +98,9 @@ services:
         - "9300:9300"
       environment:
         - TZ=PST
+        - discovery.type=single-node
+        - discovery.seed_hosts=
+        - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
 
     letsencrypt:
       container_name: letsencrypt
