@@ -6,14 +6,14 @@ env:
   - ES_VERSION=7.4.0 ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz
 
 addons:
-  postgresql: 12.0
+  postgresql: 9.6
   apt:
     packages:
       - libxml2-dev
       - libpq-dev
       - openjdk-8-jdk
       - python-dev
-      - postgresql-12
+      - postgresql-9.6-postgis-2.4
       - libgconf2-4
 
 services:
@@ -22,8 +22,8 @@ services:
 
 before_install:
   - echo 'ELASTICSEARCH_PREFIX="arches"' > arches/settings_local.py
-  # - psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
-  # - echo "*:*:*:postgres:postgis" >> ~/.pgpass
+  - psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
+  - echo "*:*:*:postgres:postgis" >> ~/.pgpass
   - psql -d postgres -c "SET standard_conforming_strings = off;"
   - psql -c "CREATE DATABASE template_postgis;"
   - psql -d template_postgis -c "CREATE EXTENSION postgis;"
