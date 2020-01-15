@@ -96,10 +96,6 @@ RUN yarn install
 ## Install virtualenv
 WORKDIR ${WEB_ROOT}
 
-# Install the Arches application
-# FIXME: ADD from github repository instead?
-COPY . ${ARCHES_ROOT}
-
 RUN mv ${WHEELS}/entrypoint.sh entrypoint.sh
 
 RUN python3.8 -m venv ENV \
@@ -113,6 +109,10 @@ RUN python3.8 -m venv ENV \
                    -f ${WHEELS} \
     && rm -rf ${WHEELS} \
     && rm -rf /root/.cache/pip/*
+
+# Install the Arches application
+# FIXME: ADD from github repository instead?
+COPY . ${ARCHES_ROOT}
 
 # From here, run commands from ARCHES_ROOT
 WORKDIR ${ARCHES_ROOT}
