@@ -183,7 +183,7 @@ def prepare_search_index(create=False):
                     "dates": {
                         "type": "nested",
                         "properties": {
-                            "date": {"type": "float"},
+                            "date": {"type": "integer"},
                             "nodegroup_id": {"type": "keyword"},
                             "nodeid": {"type": "keyword"},
                             "provisional": {"type": "boolean"},
@@ -200,7 +200,7 @@ def prepare_search_index(create=False):
                     "date_ranges": {
                         "type": "nested",
                         "properties": {
-                            "date_range": {"type": "float_range"},
+                            "date_range": {"type": "integer_range"},
                             "nodegroup_id": {"type": "keyword"},
                             "provisional": {"type": "boolean"},
                         },
