@@ -90,6 +90,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
                 <div class="ep-card-crud-container">
                     <div class="panel">
+                        <!-- ko if: !selection() -->
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><span data-bind="text: 'You have no layers loaded here.'"></span></h3>
+                        </div>
+                        <!-- /ko -->
+
                         <!-- ko if: selection()  && selection().nodeid -->
                         <div class="panel-heading">
                             <h3 class="panel-title"><i data-bind="css: selection().config.layerIcon() || selection().layer.icon"></i> <span data-bind="text: selection().config.layerName() || selection().layer.name"></span></h3>
