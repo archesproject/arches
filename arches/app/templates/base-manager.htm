@@ -1,21 +1,3 @@
-<!--
-ARCHES - a program developed to inventory and manage immovable cultural heritage.
-Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
--->
-
 {% extends "base.htm" %}
 {% load staticfiles %}
 {% load template_tags %}
@@ -99,8 +81,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% block graph_title %}
                         <!-- Page Title and Icon -->
                         <div class="ep-tools-title">
-                            <h1 class="page-header text-overflow ep-graph-title">
-                                <i class="fa {{graph.iconclass|default:nav.icon}} text-center icon-wrap bg-gray ep-graph-title-icon"></i>
+                            <h1 class="page-header ep-graph-title">
+                                <i class="fa {{graph.iconclass|default:nav.icon}} text-center icon-wrap bg-gray ep-graph-title-icon hidden-xs"></i>
                                 <span>{% trans nav.title %}</span>
                             </h1>
                         </div>
@@ -125,7 +107,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="" data-placement="bottom" data-toggle="tooltip" aria-expanded="true" data-original-title="{% trans 'Notifications' %}">
                                 <div >
                                     <div data-bind="visible: unreadNotifs()" id="circle"></div>
-                                    <div data-bind="visible: unreadNotifs()" id="circle-outline"></div>
                                     <i class="fa fa-bell"></i>
                                 </div>
                             </div>
@@ -182,7 +163,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <div class="ep-help-title">
                                     <span>{% trans 'Notifications' %}</span>
                                 </div>
-                                <a href="javascript:void(0);" data-bind="click: function() {getNotifications();}" class="ep-notifs-toggle ep-notifs-close ep-tools ep-tools-right">
+                                <a href="javascript:void(0);" data-bind="click: function() {getNotifications();}" class="ep-notifs-toggle ep-notifs-close ep-tools ep-tools-right" style="border:none;">
                                     <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close" %}'>
                                       <i class="fa fa-times-circle fa-lg"></i>
                                     </div>
@@ -257,8 +238,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- System Settings list item -->
                                         {% if request.user|has_group:"System Administrator" %}
-                                        <li{% if "views/resource" in main_script and is_system_settings is True %} class="active-sub"{% endif %} data-bind="click: navigate.bind(this, '{% url 'config' %}')">
-                                            <a href="{% url 'config' %}">
+                                        <li{% if "views/resource" in main_script and is_system_settings is True %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
                                                 <i class="ti-alarm-clock"></i>
                                                 <span class="menu-title">
                                                     <strong>{% trans "Manage System Settings" %}</strong>
@@ -269,7 +250,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <a class="link-submenu" href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}')">{% trans "System Settings" %}</a>
                                                 </li>
                                                 <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="{% url 'graph' system_settings_graphid %}" data-bind="click: navigate.bind(this, '{% url 'graph_designer' system_settings_graphid %}'), clickBubble: false">{% trans "System Settings Graph" %}</a>
+                                                    <a class="link-submenu" href="{% url 'graph' system_settings_graphid %}" data-bind="click: navigate.bind(this, '{% url 'graph_designer' system_settings_graphid %}')">{% trans "System Settings Graph" %}</a>
                                                 </li>
                                             </ul>
                                         </li>
@@ -286,8 +267,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!--Menu list item-->
                                         {% if request.user|can_edit_resource_instance %}
-                                        <li{% if "views/resource" in main_script and is_system_settings is False %} class="active-sub"{% endif %} data-bind="click: navigate.bind(self, '{% url 'resource' %}')">
-                                            <a href="{% url 'resource' %}">
+                                        <li{% if "views/resource" in main_script and is_system_settings is False %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'resource' %}" data-bind="click: navigate.bind(this, '{% url 'resource' %}') ">
                                                 <i class="fa fa-building-o"></i>
                                                 <span class="menu-title">
                                                     <strong>{% trans "Add New Resource" %}</strong>
@@ -310,8 +291,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!--Menu list item-->
                                         {% if request.user|has_group:"Graph Editor" %}
-                                        <li{% if "views/graph" in main_script %} class="active-sub"{% endif %} data-bind="click: navigate.bind(this, '{% url 'graph' '' %}')">
-                                            <a href="#">
+                                        <li{% if "views/graph" in main_script %} class="active-sub"{% endif %}>
+                                            <a href="#" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}') ">
                                                 <i class="fa fa-bookmark"></i>
                                                 <span class="menu-title">
                                                     <strong>{% trans "Arches Designer" %}</strong>
@@ -330,8 +311,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!--Menu list item-->
                                         {% if request.user|has_group:"Application Administrator" %}
-                                        <li{% if "views/map-layer-manager" in main_script %} class="active-sub"{% endif %} data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}')">
-                                            <a href="{% url 'map_layer_manager' %}">
+                                        <li{% if "views/map-layer-manager" in main_script %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'map_layer_manager' %}" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}') ">
                                                 <i class="fa fa-server"></i>
                                                 <span class="menu-title">
                                                     <strong>{% trans "Map Layer Manager" %}</strong>

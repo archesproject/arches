@@ -272,14 +272,14 @@
 
         <div class="card">
             {% block form_header %}
-            <h4 data-bind="text: card.model.name"></h4>
+            <h2 data-bind="text: card.model.name"></h2>
 
             <!-- ko if: card.model.helpenabled -->
             <span>
                 <a class="pull-right card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
             </span>
             <!-- /ko -->
-            <h5 data-bind="text: card.model.instructions"></h5>
+            <h3 data-bind="text: card.model.instructions"></h3>
 
             <!-- ko if: card.isFuncNode && card.isFuncNode()  -->
             <h4 class="is-function-node" data-bind="text: card.isFuncNode()"></h4>
@@ -295,7 +295,6 @@
                     <div data-bind='component: {
                         name: self.form.widgetLookup[widget.widget_id()].name,
                         params: {
-                            widget: widget,
                             formData: self.tile.formData,
                             tile: self.tile,
                             form: self.form,
@@ -410,7 +409,7 @@
 <div data-bind="css: {'print-hide': !reportExpanded()}">
     <!-- ko if: showHeaderLine--><hr class="rp-tile-separator"><!-- /ko -->
     <div class="rp-card-section" data-bind="css: card.model.cssclass, visible: card.fullyProvisional() !== 'fullyprovisional'">
-            <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
+            <h2 class="rp-tile-title" data-bind="text: card.model.get('name')"></h2>
             <!-- ko if: card.tiles().length > 0 -->
             <i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': reportExpanded(), 'fa-angle-right': !reportExpanded()}, click: function () { reportExpanded(!reportExpanded()) }"></i>
             <!-- ko if: reportExpanded() -->
