@@ -317,7 +317,7 @@ class DateDataType(BaseDataType):
                     operators[value["op"]] = date_value
                     search_query = Range(field="tiles.data.%s" % (str(node.pk)), **operators)
                 else:
-                    search_query = Match(field="tiles.data.%s" % (str(node.pk)), query=date_value, type="phrase_prefix")
+                    search_query = Match(field="tiles.data.%s" % (str(node.pk)), query=date_value, type="phrase")
                 query.must(search_query)
         except KeyError as e:
             pass

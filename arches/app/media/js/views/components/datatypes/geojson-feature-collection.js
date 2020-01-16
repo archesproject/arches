@@ -144,23 +144,33 @@ define([
                             break;
                         case "resources-line-halo-" + params.nodeid:
                             layer.paint["line-width"] = parseInt(self.config.haloWeight());
+                            if (!(self.config.haloWeight() > 0)) { layer.paint["line-width"] = 1; }
+                            self.config.haloWeight(layer.paint["line-width"]);
                             layer.paint["line-color"] = self.config.lineHaloColor();
                             break;
                         case "resources-line-" + params.nodeid:
                             layer.paint["line-width"] = parseInt(self.config.weight());
+                            if (!(self.config.weight() > 0)) { layer.paint["line-width"] = 1; }
+                            self.config.weight(layer.paint["line-width"]);
                             layer.paint["line-color"] = self.config.lineColor();
                             break;
                         case "resources-poly-outline-" + params.nodeid:
                             layer.paint["line-width"] = parseInt(self.config.outlineWeight());
+                            if (!(self.config.outlineWeight() > 0)) { layer.paint["line-width"] = 1; }
+                            self.config.outlineWeight(layer.paint["line-width"]);
                             layer.paint["line-color"] = self.config.outlineColor();
                             break;
                         case "resources-point-halo-" + params.nodeid:
                             layer.paint["circle-radius"] = parseInt(self.config.haloRadius());
+                            if (!(self.config.haloRadius() > 0)) { layer.paint["circle-radius"] = 1; }
+                            self.config.haloRadius(layer.paint["circle-radius"]);
                         case "resources-cluster-point-halo-" + params.nodeid:
                             layer.paint["circle-color"] = self.config.pointHaloColor();
                             break;
                         case "resources-point-" + params.nodeid:
                             layer.paint["circle-radius"] = parseInt(self.config.radius());
+                            if (!(self.config.radius() > 0)) { layer.paint["circle-radius"] = 1; }
+                            self.config.radius(layer.paint["circle-radius"]);
                         case "resources-cluster-point-" + params.nodeid:
                             layer.paint["circle-color"] = self.config.pointColor();
                             break;
