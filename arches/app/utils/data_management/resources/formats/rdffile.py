@@ -19,23 +19,33 @@ from arches.app.utils.data_management.resource_graphs.exporter import get_graphs
 from rdflib import Namespace
 from rdflib import URIRef, Literal
 from rdflib import ConjunctiveGraph as Graph
-from rdflib.namespace import RDF, RDFS
 from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand, set_document_loader
 
 
-try:
-    # If we have a context file in our working directory, load it
-    fh = open("linked-art.json")
-    context_data = fh.read()
+# Stop code from looking up the contexts online for every operation
+docCache = {}
+
+def fetch(url):
+    fh = urllib.urlopen(url)
+    data = fh.read()
     fh.close()
+    return data
 
-    def cached_context(url):
-        return {"contextUrl": None, "documentUrl": "https://linked.art/ns/v1/linked-art.json", "document": context_data}
+def load_document_and_cache(url):
+    if docCache.has_key(url):
+        return docCache[url]
 
-    set_document_loader(cached_context)
-except:
-    #  Guess we don't...
-    pass
+    doc = {
+        'contextUrl': None,
+        'documentUrl': None,
+        'document': ''
+    }
+    data = fetch(url)
+    doc['document'] = data;
+    docCache[url] = doc
+    return doc
+
+set_document_loader(load_document_and_cache)
 
 
 class RdfWriter(Writer):
