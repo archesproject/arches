@@ -2,6 +2,7 @@ import os
 import re
 import json
 import uuid
+import requests
 import datetime
 import logging
 from io import StringIO
@@ -26,13 +27,11 @@ from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand, set_document_l
 docCache = {}
 
 def fetch(url):
-    fh = urllib.urlopen(url)
-    data = fh.read()
-    fh.close()
-    return data
+    resp = requests.get(url)
+    return resp.json()
 
 def load_document_and_cache(url):
-    if docCache.has_key(url):
+    if url in docCache:
         return docCache[url]
 
     doc = {
@@ -363,7 +362,6 @@ class JsonLdReader(Reader):
         return None
 
     def read_resource(self, data, use_ids=False, resourceid=None, graphid=None):
-
         if graphid is None and self.graphtree is None:
             raise Exception("No graphid supplied to read_resource")
         elif self.graphtree is None:
