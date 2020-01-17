@@ -52,15 +52,8 @@ node_js: 10.8
 
 matrix:
   allow_failures:
-    - python: 2.7.9
     - name: "Javascript - Cypress.io tests"
   include:
-    - name: "Python 2 - Nose/unittests"
-      install: echo "Python dependences installed"
-      python: 2.7.9
-      script:
-        - wait-on http://localhost:9200/
-        - python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
     - name: "Python 3 - Nose/unittests"
       install: echo "Python dependences installed"
       python: 3.7
