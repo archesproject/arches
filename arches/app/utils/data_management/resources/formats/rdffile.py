@@ -20,6 +20,7 @@ from arches.app.utils.data_management.resource_graphs.exporter import get_graphs
 from rdflib import Namespace
 from rdflib import URIRef, Literal
 from rdflib import ConjunctiveGraph as Graph
+from rdflib.namespace import RDF, RDFS
 from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand, set_document_loader
 
 
