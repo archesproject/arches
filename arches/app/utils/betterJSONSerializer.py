@@ -116,7 +116,9 @@ class JSONSerializer(object):
         elif isinstance(object, File):
             return object.name
         elif isinstance(object, uuid.UUID):
-            return str(object)
+            print("instance of uuid")
+            # return str(object)
+            return object.hex
         elif hasattr(object, "__dict__"):
             # call an objects serialize method if it exists
             if hasattr(object, "serialize"):
