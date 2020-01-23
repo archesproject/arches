@@ -354,7 +354,7 @@ class Graph(models.GraphModel):
                 datatype = datatype_factory.get_instance(node.datatype)
                 datatype_mapping = datatype.get_es_mapping(node.nodeid)
                 if datatype_mapping and datatype_factory.datatypes[node.datatype].defaultwidget:
-                    se.create_mapping('resources', body=datatype_mapping)
+                    se.create_mapping("resources", body=datatype_mapping)
 
             for edge in self.edges.values():
                 edge.save()

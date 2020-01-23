@@ -271,15 +271,7 @@ class BaseDataType(object):
         Default mapping if not specified is a text field
         """
 
-        text_mapping = {
-            "type": "text",
-            "fields": {
-                "keyword": {
-                    "ignore_above": 256,
-                    "type": "keyword"
-                }
-            }
-        }
+        text_mapping = {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}
         return text_mapping
 
     def get_es_mapping(self, nodeid):
@@ -290,19 +282,5 @@ class BaseDataType(object):
         ret = None
         default_mapping = self.default_es_mapping()
         if default_mapping:
-            ret = { 
-                "properties":{
-                    "tiles": {
-                        "type": "nested",
-                        "properties": {
-                            "data": {
-                                "properties": {
-                                    str(nodeid): default_mapping
-                                }
-                            }
-                        },
-                    }
-                }
-            }
+            ret = {"properties": {"tiles": {"type": "nested", "properties": {"data": {"properties": {str(nodeid): default_mapping}}},}}}
         return ret
-        

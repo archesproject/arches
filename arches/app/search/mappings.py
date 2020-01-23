@@ -126,9 +126,7 @@ def prepare_search_index(create=False):
                             "parenttile_id": {"type": "keyword"},
                             "resourceinstanceid_id": {"type": "keyword"},
                             "provisionaledits": {"enabled": False},
-                            "data": {
-                                "properties": {}
-                            }
+                            "data": {"properties": {}},
                         },
                     },
                     "strings": {
