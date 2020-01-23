@@ -282,5 +282,5 @@ class BaseDataType(object):
         ret = None
         default_mapping = self.default_es_mapping()
         if default_mapping:
-            ret = {"properties": {"tiles": {"type": "nested", "properties": {"data": {"properties": {str(nodeid): default_mapping}}}, }}}
+            ret = {"properties": {"tiles": {"type": "nested", "properties": {"data": {"properties": {str(nodeid): default_mapping}}},}}}
         return ret
