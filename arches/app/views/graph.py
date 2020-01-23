@@ -386,7 +386,8 @@ class GraphDataView(View):
             return JSONErrorResponse(
                 _("Elasticsearch indexing error"),
                 _(
-                    "If you want to change the datatype of an existing node.  Delete and then re-create the node, or export the branch then edit the datatype and re-import the branch."
+                    """If you want to change the datatype of an existing node.  
+                    Delete and then re-create the node, or export the branch then edit the datatype and re-import the branch."""
                 ),
             )
 
