@@ -138,18 +138,9 @@ class SearchEngine(object):
         """
 
         index = self._add_prefix(index)
-        if not body:
-            if fieldtype == "geo_shape":
-                body = {"_doc": {"properties": {fieldname: {"type": "geo_shape", "tree": "geohash", "precision": "1m"}}}}
-            else:
-                fn = {"type": fieldtype}
-                if fieldindex:
-                    fn["index"] = fieldindex
-                body = {"_doc": {"properties": {fieldname: fn}}}
-
         self.es.indices.create(index=index, ignore=400)
         self.es.indices.put_mapping(index=index, doc_type="_doc", body=body, include_type_name=True)
-        print("creating index : %s" % (index))
+        print(f"adding mapping : {body}")
 
     def create_index(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
