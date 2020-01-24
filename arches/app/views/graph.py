@@ -45,6 +45,7 @@ from arches.app.utils.system_metadata import system_metadata
 from arches.app.views.base import BaseManagerView
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 from io import BytesIO
+from elasticsearch.exceptions import RequestError
 
 logger = logging.getLogger(__name__)
 
@@ -381,6 +382,14 @@ class GraphDataView(View):
             return JSONErrorResponse(e.title, e.message, {"status": "Failed"})
         except ModelInactiveError as e:
             return JSONErrorResponse(e.title, e.message)
+        except RequestError as e:
+            return JSONErrorResponse(
+                _("Elasticsearch indexing error"),
+                _(
+                    """If you want to change the datatype of an existing node.  
+                    Delete and then re-create the node, or export the branch then edit the datatype and re-import the branch."""
+                ),
+            )
 
     @method_decorator(group_required("Graph Editor"), name="dispatch")
     def delete(self, request, graphid):
