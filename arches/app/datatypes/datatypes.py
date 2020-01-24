@@ -208,6 +208,9 @@ class NumberDataType(BaseDataType):
         except (AttributeError, KeyError) as e:
             pass
 
+    def default_es_mapping(self):
+        return {"type": "long"}
+
 
 class BooleanDataType(BaseDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
@@ -251,6 +254,9 @@ class BooleanDataType(BaseDataType):
             return value[0]
         except (AttributeError, KeyError) as e:
             pass
+
+    def default_es_mapping(self):
+        return {"type": "boolean"}
 
 
 class DateDataType(BaseDataType):
@@ -315,9 +321,9 @@ class DateDataType(BaseDataType):
                 if value["op"] != "eq":
                     operators = {"gte": None, "lte": None, "lt": None, "gt": None}
                     operators[value["op"]] = date_value
-                    search_query = Range(field="tiles.data.%s" % (str(node.pk)), **operators)
                 else:
-                    search_query = Match(field="tiles.data.%s" % (str(node.pk)), query=date_value, type="phrase")
+                    operators = {"gte": date_value, "lte": date_value}
+                search_query = Range(field="tiles.data.%s" % (str(node.pk)), **operators)
                 query.must(search_query)
         except KeyError as e:
             pass
@@ -347,6 +353,9 @@ class DateDataType(BaseDataType):
             return value[0]
         except (AttributeError, KeyError) as e:
             pass
+
+    def default_es_mapping(self):
+        return {"type": "date"}
 
 
 class EDTFDataType(BaseDataType):
@@ -441,6 +450,9 @@ class EDTFDataType(BaseDataType):
                 add_date_to_doc(query, result)
         else:
             add_date_to_doc(query, edtf)
+
+    def default_es_mapping(self):
+        return {"properties": {"value": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}}}
 
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
@@ -1001,6 +1013,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             """
             cursor.execute(sql)
 
+    def default_es_mapping(self):
+        # let ES dyanamically map this datatype
+        return
+
 
 class FileListDataType(BaseDataType):
     def __init__(self, model=None):
@@ -1280,6 +1296,17 @@ class FileListDataType(BaseDataType):
 
     def collects_multiple_values(self):
         return True
+
+    def default_es_mapping(self):
+        return {
+            "properties": {
+                "file_id": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
+                "name": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
+                "type": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
+                "url": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
+                "status": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
+            }
+        }
 
 
 class BaseDomainDataType(BaseDataType):

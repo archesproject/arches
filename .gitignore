@@ -35,3 +35,4 @@ djcp.sh
 .vscode
 .DS_Store
 pip-wheel-metadata
+.eggs
