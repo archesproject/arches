@@ -6,11 +6,14 @@
 
     <!-- Title Block -->
     <div class="report-toolbar-preview ep-form-toolbar">
-        <h4 class="report-toolbar-title"><span data-bind="text: report.get('name')"></span> - <span data-bind="text: report.get('displayname') "></span></h4>
-
-        <!-- Tools -->
-        <div class="ep-form-toolbar-tools mar-no flex">
-            <p class="report-print-date">{% trans "Report Date:" %} <span data-bind="text: reportDate"></span></p>
+        <div class="col-xs-6">
+            <h2 class="report-toolbar-title"><span data-bind="text: report.get('name')"></span> - <span data-bind="text: report.get('displayname') "></span></h2>
+        </div>
+        <div class="col-xs-6">
+            <!-- Tools -->
+            <div class="ep-form-toolbar-tools mar-no flex">
+                <p class="report-print-date">{% trans "Report Date:" %} <span data-bind="text: reportDate"></span></p>
+            </div>
         </div>
     </div>
 </div>

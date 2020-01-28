@@ -3561,9 +3561,8 @@ a.disabled {
 
 .sticky {
     z-index: 200;
-    padding-top: 0px;
-    padding-bottom: 10px; 
-    padding-top: 30px;
+    padding-top: 16px;
+    padding-bottom: 0;
 }
 
 .fixed {

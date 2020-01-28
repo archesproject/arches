@@ -33,7 +33,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 	 <!-- LOGIN FORM -->
 	<div class="cls-content arches-signin">
-	 	<div class="cls-content-sm panel login-panel" style="width: 350px;">
+	 	<div class="cls-content-sm panel login-panel">
 			<div class="panel-body">
 				<h3 class="login-panel-header arches-signin">{% trans "Sign In" %}</h3>
 				<p class="arches-signin-subtext">
@@ -45,13 +45,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 					<div class="form-group">
 						<div class="input-group">
 							<div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
-							<input type="text" class="form-control input-lg" placeholder="Email or Username" name='username' autofocus>
+							<input type="text" class="form-control input-lg" placeholder="Email or Username" aria-label="Email or Username" name='username' autofocus>
 						</div>
 					</div>
 					<div class="form-group">
 						<div class="input-group">
 							<div class="input-group-addon"><i class="ion-asterisk"></i></div>
-							<input type="password" class="form-control input-lg" placeholder="Password" name='password'>
+							<input type="password" class="form-control input-lg" placeholder="Password" aria-label="Password" name='password'>
 						</div>
 					</div>
 					<div class="form-group">

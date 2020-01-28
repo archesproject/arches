@@ -2,11 +2,11 @@
 {% load i18n %}
 
 {% block tabs %}
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+<div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('filter');
 }, css: {
     'active': activeTab() === 'filter'
-}">
+}" onkeypress="$(this).trigger('click');">
     <i class="fa fa-pencil"></i>
     <span class="map-sidebar-text">{% trans "Filter" %}</span>
 </div>

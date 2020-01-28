@@ -19,7 +19,7 @@
 
 
     <!--=== App Header ===-->
-    <div class="breadcrumbs sticky" id="appheader" style="">
+    <div class="breadcrumbs sticky rdm-appheader" id="appheader">
 
         <!-- Search Terms -->
         <div class="container">
@@ -41,7 +41,7 @@
     <!--=== End App Header ===-->
 
     <!-- Main Content -->
-    <div class="block-description arches-secondary-header" id="main-container">
+    <div class="block-description arches-secondary-header rdm-maincontent" id="main-container">
 
         <div class="container content arches-forms-container" id="forms-container">
 
@@ -51,10 +51,7 @@
                 <!-- Begin RDM Tree -->
                 <div class="col-md-5 col-lg-4">
 
-
-
-                    <div class="left-inner arches-box-grey-border padding-10 hidden-xs hidden-sm" id="sidebar" style="background: #ffffff;">
-
+                    <div class="left-inner arches-box-grey-border padding-10" id="sidebar" style="background: #ffffff;">
 
                         <ul class="nav nav-tabs map-service-nav-tabs">
                             <li class="active">
@@ -65,17 +62,14 @@
                             </li>
                         </ul>
 
-
-
-
                         <!-- RDM Tree Container -->
                         <div class="tab-content">
-                            <section id="rdm-panel" role="tabpanel" class="tab-pane active" style="height: 600px; overflow-y: scroll; overflow-x:hidden;">
+                            <section id="rdm-panel" role="tabpanel" class="tab-pane active">
                                 <div class="concept_tree" id="jqtree">
                                 </div>
                             </section>
 
-                            <section id="dropdown-panel" role="tabpanel" class="tab-pane" style="height: 600px; overflow-y: scroll; overflow-x:hidden;">
+                            <section id="dropdown-panel" role="tabpanel" class="tab-pane">
                                 <div class="concept_tree" id="ddtree">
                                 </div>
                             </section>
@@ -105,10 +99,8 @@
                 </div>
                 <!-- End RDM Tree -->
 
-
                 <!-- Spacer for small screens -->
                 <div class="margin-top-10 hidden-md hidden-lg"></div>
-
 
                 <!-- Concept CRUD Form -->
                 <div class="col-md-7 col-lg-8">
@@ -170,6 +162,5 @@
 <div id="delete-collection-form">
     {% include "views/rdm/modals/delete-collection-form.htm" %}
 </div>
-
 
 {% endblock main_content %}
