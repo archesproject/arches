@@ -21,6 +21,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.db.utils import ProgrammingError
 
+
 def prepare_terms_index(create=False):
     """
     Creates the settings and mappings in Elasticsearch to support term search
@@ -106,7 +107,10 @@ def prepare_search_index(create=False):
     """
 
     index_settings = {
-        "settings": {"analysis": {"analyzer": {"folding": {"tokenizer": "standard", "filter": ["lowercase", "asciifolding"]}}}},
+        "settings": {
+            "analysis": {"analyzer": {"folding": {"tokenizer": "standard", "filter": ["lowercase", "asciifolding"]}}},
+            "index.mapping.total_fields.limit": 20000,
+        },
         "mappings": {
             "_doc": {
                 "properties": {
