@@ -345,8 +345,10 @@ class CsvReader(Reader):
             else:
                 try:
                     newresourceinstance.save()
+
                 except TransportError as e:
-                    cause = json.dumps(e.info["error"]["caused_by"], indent=1)
+
+                    cause = json.dumps(e.info["error"]["reason"], indent=1)
                     msg = "%s: WARNING: failed to index document in resource: %s %s. Exception detail:\n%s\n" % (
                         datetime.datetime.now(),
                         resourceinstanceid,
