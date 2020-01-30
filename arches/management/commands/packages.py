@@ -740,7 +740,7 @@ class Command(BaseCommand):
                 zip_file = os.path.join(unzip_into_dir, "source_data.zip")
                 urllib.request.urlretrieve(source, zip_file)
                 unzip_file(zip_file, unzip_into_dir)
-            except Exception as e:
+            except Exception:
                 pass
 
             for path in os.listdir(unzip_into_dir):
