@@ -187,12 +187,14 @@ To create it, use:
         else:
             self.reset_db(cursor)
 
-        # delete and setup initial Elasticsearch indexes
+        # delete existing indexes
         management.call_command("es", operation="delete_indexes")
-        management.call_command("es", operation="setup_indexes")
 
         # run all migrations
         management.call_command("migrate")
+
+        # setup initial Elasticsearch indexes
+        management.call_command("es", operation="setup_indexes")
 
         # import system settings graph and any saved system settings data
         settings_graph = os.path.join(settings.ROOT_DIR, "db", "system_settings", "Arches_System_Settings_Model.json")

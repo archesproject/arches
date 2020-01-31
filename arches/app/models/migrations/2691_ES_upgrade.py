@@ -16,79 +16,8 @@ class Migration(migrations.Migration):
     ]
 
     def forwards_func(apps, schema_editor):
-        if settings.SEARCH_BACKEND != 'tests.base_test.TestSearchEngine':
-            se = SearchEngineFactory().create()
-            se_old = SearchEngineFactory().create(hosts=[settings.ELASTICSEARCH_TEMP_HTTP_ENDPOINT])
-            prefix = settings.ELASTICSEARCH_PREFIX
-            if (se.es.indices.exists(index="%s_terms" % prefix) is False and 
-                    se_old.es.indices.exists(index="%s_strings" % prefix) is True):
-                prepare_terms_index(create=True)
-                doc = {
-                    "source": {
-                        "remote": {
-                            "host": settings.ELASTICSEARCH_TEMP_HTTP_ENDPOINT
-                        },
-                        "index": "%s_strings" % prefix,
-                        "type": "term"
-                    },
-                    "dest": {
-                        "index": "%s_terms" % prefix,
-                        "type": "_doc"
-                    }
-                }
-                se.es.reindex(body=doc)
+        pass
 
-            if (se.es.indices.exists(index="%s_concepts" % prefix) is False and 
-                    se_old.es.indices.exists(index="%s_strings" % prefix) is True):
-                prepare_concepts_index(create=True)
-                doc = {
-                    "source": {
-                        "remote": {
-                            "host": settings.ELASTICSEARCH_TEMP_HTTP_ENDPOINT
-                        },
-                        "index": "%s_strings" % prefix,
-                        "type": "concept"
-                    },
-                    "dest": {
-                        "index": "%s_concepts" % prefix,
-                        "type": "_doc"
-                    }
-                }
-                se.es.reindex(body=doc)
-
-            if(se.es.indices.exists(index="%s_resources" % prefix) is False and 
-                    se_old.es.indices.exists(index="%s_resource" % prefix) is True):
-                prepare_search_index(create=True)
-                doc = {
-                    "source": {
-                        "remote": {
-                            "host": settings.ELASTICSEARCH_TEMP_HTTP_ENDPOINT
-                        },
-                        "index": "%s_resource" % prefix
-                    },
-                    "dest": {
-                        "index": "%s_resources" % prefix,
-                        "type": "_doc"
-                    }
-                }
-                se.es.reindex(body=doc)
-
-            if(se.es.indices.exists(index="%s_resource_relations" % prefix) is False and 
-                    se_old.es.indices.exists(index="%s_resource_relations" % prefix) is True):
-                prepare_resource_relations_index(create=True)
-                doc = {
-                    "source": {
-                        "remote": {
-                            "host": settings.ELASTICSEARCH_TEMP_HTTP_ENDPOINT
-                        },
-                        "index": "%s_resource_relations" % prefix
-                    },
-                    "dest": {
-                        "index": "%s_resource_relations" % prefix,
-                        "type": "_doc"
-                    }
-                }
-                se.es.reindex(body=doc)
 
     def reverse_func(apps, schema_editor):
         pass
