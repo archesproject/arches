@@ -3,7 +3,6 @@ from django.core.exceptions import ImproperlyConfigured
 import ast
 import requests
 import sys
-from settings import *
 
 
 def get_env_variable(var_name):
