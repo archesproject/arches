@@ -115,6 +115,7 @@ ONTOLOGY_DIR = os.path.join(ROOT_DIR, "ontologies")
 # to use in preference for the URI of a concept. If there is no match, the default
 # Arches host URI will be used (eg http://localhost/concepts/123f323f-...)
 PREFERRED_CONCEPT_SCHEMES = ["http://vocab.getty.edu/aat/", "http://www.cidoc-crm.org/cidoc-crm/"]
+JSONLD_CONTEXT_CACHE_TIMEOUT = 43800 # in minutes (43800 minutes ~= 1 month)
 
 # This is the namespace to use for export of data (for RDF/XML for example)
 # Ideally this should point to the url where you host your site
