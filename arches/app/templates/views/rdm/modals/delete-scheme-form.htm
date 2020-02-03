@@ -10,9 +10,9 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <h5 class="arches-modal-section">{% trans "Select scheme to delete" %}</h5>
+                        <label class="arches-modal-section" id="schemetodelete">{% trans "Select scheme to delete" %}</label>
                         <p> 
-                            <select style="width:100%" class="select2" name="scheme_dd" required>
+                            <select aria-labelledby="schemetodelete" style="width:100%" class="select2" name="scheme_dd" required>
                                 <option value=""></option>
                                 {% for scheme in concept_schemes %}
                                     {% if scheme.conceptid not in CORE_CONCEPTS %}

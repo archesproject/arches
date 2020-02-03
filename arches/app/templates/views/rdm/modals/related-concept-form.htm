@@ -24,14 +24,14 @@
                                 <div class="row">
                                     <div class="col-xs-9">
                                         <!-- Concept Search Widget -->
-                                        <h5 id="" class="arches-modal-section">{% trans "Select a concept" %}</h5>
-                                        <div class="">  
+                                        <h5 class="arches-modal-section">{% trans "Select a concept" %}</h5>
+                                        <div>  
                                             {% include 'views/concept-search.htm' %}  
                                         </div>
                                     </div>
 
                                     <div class="col-xs-3">
-                                        <h5 id="" class="arches-modal-section">{% trans "Relation type" %}</h5>
+                                        <label class="arches-modal-section" for="related-relation-type">{% trans "Relation type" %}</label>
                                         <select style="width:100%;" class="select2" id="related-relation-type" placeholder="{% trans "Relation to Concept" %}" name="relationtype_dd">
                                             <option value=""></option>
                                             {% for relation in related_relations %}

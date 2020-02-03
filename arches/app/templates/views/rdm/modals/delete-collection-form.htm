@@ -10,9 +10,9 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <h5 class="arches-modal-section">{% trans "Select collection to delete" %}</h5>
+                        <label class="arches-modal-section" for="delcolselect">{% trans "Select collection to delete" %}</label>
                         <p> 
-                            <select style="width:100%" class="select2" name="scheme_dd" required>
+                            <select id="delcolselect" style="width:100%" class="select2" name="scheme_dd" required>
                                 <option value=""></option>
                                 {% for collection in collections %}
                                     {% if collection.conceptid not in CORE_CONCEPTS %}
