@@ -569,6 +569,8 @@ input[type="checkbox"] {
 
 .padded-workflow-step, .workflow-step-body .card-component {
     padding: 20px 35px 82px 40px;
+    border: none;
+    background: #fafafa;
 }
 
 .workflow-step-body .padded-workflow-step .card-component {
@@ -6240,7 +6242,7 @@ span.file-upload-clear-filter {
 .file-select {
     text-align: center;
     padding: 70px 0;
-    background: #f9f9f9;
+    background: #f6f6f6;
 }
 
 .file-select-window {
@@ -10545,7 +10547,11 @@ ul.select2-choices:after {
 }
 
 .card-component {
-    padding: 25px 35px;
+    padding: 25px;
+    margin: 10px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 3px;
 }
 
 .card-component-panel {
@@ -10600,6 +10606,7 @@ ul.select2-choices:after {
     height: 100%;
     padding-bottom: 50px;
     overflow-y: auto;
+    background: #fafafa;
 }
 
 .card-header {
