@@ -35,7 +35,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block main_content %}
 <div class="content-panel">
-    <div class="flex">
+    <div class="flex draggable-panels-container">
         <div class="left-panel graph-designer resource-editor" data-bind="resizableSidepanel:true">
             <div class="jstree jstree-default" data-bind="visible: true" style="display: none;">
                 <div class="header">
@@ -114,7 +114,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <!--ko if: selection() === 'related-resources' -->
             <div>
-                 <div data-bind="component: {
+                <div data-bind="component: {
                     name: 'related-resources-manager',
                     params: relatedResourcesManagerObj
                 }"></div>
@@ -254,6 +254,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- /ko -->
         </div>
     </div>
+
 </div>
 {% endblock main_content %}
 

@@ -29,7 +29,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block main_content %}
 <div class="content-panel" data-bind="click:function() { menuActive(false); }">
     <div class="flex">
-        <div class="flex">
+        <div class="flex draggable-panels-container">
             <div class="left-column-crud-container form-list">
                 <div class="layer-list">
                     <!-- Layer Filter -->
@@ -105,19 +105,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- ko if: selection()  && !selection().nodeid -->
                         <div class="panel-heading relative">
-                            <div class="col-xs-7">
+                            <div class="row">
                                 <h3 class="panel-title"><i data-bind="css: selection().icon"></i> <span data-bind="text: selection().name"></span></h3>
                             </div>
-                            <div class="col-xs-5">
-                                <!-- Service management buttons (for convenience) -->
-                                <div class="service-buttons-heading">
-                                    <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { selection().delete() }">{% trans "Delete Layer" %}</button>
+                            <!-- Service management buttons (for convenience) -->
+                            <div class="row service-buttons-heading">
+                                <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { selection().delete() }">{% trans "Delete Layer" %}</button>
 
-                                    <!-- ko if: selection().dirty() -->
-                                    <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { selection().save() }">{% trans "Save Edits" %}</button>
-                                    <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { selection().reset() }">{% trans "Discard Edits" %}</button>
-                                    <!-- /ko -->
-                                </div>
+                                <!-- ko if: selection().dirty() -->
+                                <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { selection().save() }">{% trans "Save Edits" %}</button>
+                                <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { selection().reset() }">{% trans "Discard Edits" %}</button>
+                                <!-- /ko -->
                             </div>
                         </div>
 

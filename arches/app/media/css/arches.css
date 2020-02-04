@@ -102,7 +102,8 @@ i.report-expander:focus,
 
 /*##### Keyboard focus highlighting - END ###################################################*/
 
-.btn-primary {
+.btn-primary,
+.library-icon .bg-primary {
     background-color: #2B4E6D;
 }
 
@@ -5153,6 +5154,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-bottom: 200px;
     height: calc(100vh - 111px);
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .flex.relative {
@@ -6447,7 +6449,7 @@ div.row.widget-wrapper {
 .related-resources-nodes {
     position: absolute;
     width: 275px;
-    right: 0;
+    right: 1px;
     height: auto;
     background: #fff;
     z-index: 3;
@@ -7844,8 +7846,8 @@ a.clear-geojson-button:hover {
 }
 
 .category-title.active {
-    color: #123;
-    background: #ddd;
+    color: #fff;
+    background: #595959;
     cursor: default;
 }
 
@@ -8797,12 +8799,6 @@ table.table.dataTable {
 
 .map-preview-panel {
     padding-top: 5px;
-}
-
-.service-buttons-heading {
-    position: absolute;
-    top: -3px;
-    right: 10px;
 }
 
 .basemap-preview-panel {
@@ -11071,6 +11067,13 @@ a.tree-display-tool, a.tree-display-tool:hover {
     border-top: 1px solid #ddd;
 }
 
+.service-buttons-heading {
+    padding: 0 20px 10px 20px;
+}
+.service-buttons-heading button {
+    margin-top: 5px;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
@@ -11195,10 +11198,6 @@ a.tree-display-tool, a.tree-display-tool:hover {
 }
 
 @media screen and (max-width: 768px) {
-    .rp-no-data {
-        position: relative;
-        top: -30px;
-    }
     .search-toolbar {
         flex-direction: column;
     }
@@ -11270,9 +11269,6 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .rp-report-container-preview {
         padding: 0 0 35px 0;
     }
-    .sidepanel-draggable {
-        display: none;
-    }
     .search-type-btn {
         height: 20px;
     }
@@ -11328,6 +11324,39 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .ep-help {
         z-index: 4100;
         width: 100%;
+    }
+    .left-panel.graph-designer.resource-editor,
+    .left-panel.graph-designer,
+    .left-column-crud-container.form-list {
+        flex: none !important;
+        height: 40vh;
+        overflow-wrap: break-word;
+        width: 100% !important;
+    }
+    .left-column-crud-container.form-list {
+        height: 30vh;
+    }
+    .sidepanel-draggable {
+        display: none;
+    }
+    .draggable-panels-container {
+        display: block;
+    }
+    .left-panel-overflow {
+        height: auto;
+    }
+    .node-configuration {
+        height: 43vh;
+    }
+    .report-image-grid {
+        margin-bottom: 0;
+    }
+    .ep-card-crud-container {
+        height: 52.3vh !important;
+        margin: 10px 0;
+    }
+    .form-group div input {
+        max-width: 52vw;
     }
 }
 
