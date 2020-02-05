@@ -2373,7 +2373,7 @@ ul.nav.nav-tabs.nav-justified {
     padding-left: 25px;
     padding-top: 10px;
     color: #fff;
-    z-index: 10;
+    z-index: 100;
 }
 
 .settings-panel-heading + div {
@@ -5580,6 +5580,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-left: 1px solid #ddd;
     background: #f4f4f4; /*#2d3c4b*/
     color: #2d3c4b; /*#f1f1f1*/
+    height: 100%;
 }
 
 .panel-config .middle-column-container.card-configuration {
@@ -6645,12 +6646,16 @@ a.mega-dropdown-toggle.disabled {
     transition: all .25s ease;
 }
 
-.rp-report-container-preview {
+.graph-designer .rp-report-container-preview {
     margin-top: 50px;
     color: #666;
     padding-bottom: 50px;
     transition: all .25s ease;
     background-color: white;
+}
+
+.card-component-panel .editor-report .rp-report-container-preview {
+    margin-top: 0px;
 }
 
 .rp-report-section.rp-report-section-root {
@@ -10572,7 +10577,7 @@ ul.select2-choices:after {
 }
 
 .card-component {
-    padding: 25px;
+    padding: 15px 25px 25px 25px;
     margin: 10px;
     background: #fff;
     border: 1px solid #ddd;
