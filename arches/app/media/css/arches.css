@@ -467,6 +467,10 @@ input[type="checkbox"] {
     margin-right: 5px;
 }
 
+.workflow-nav-controls .btn-labeled:not(.btn-block):not(.form-icon) {
+    color: #f9f9f9;
+}
+
 .workflow-step-body div .new-provisional-edit-card-container div .install-buttons button {
     font-weight: 800;
 }
@@ -2353,6 +2357,22 @@ ul.nav.nav-tabs.nav-justified {
     margin-left: -25px;
     margin-right: -20px;
     padding-left: 25px;
+    z-index: 10;
+}
+
+.card-settings-panel-heading {
+    position: fixed;
+    top: 115px;
+    height: 50px;
+    width: 100%;
+    background: #25476a;
+    margin-top: -10px;
+    margin-bottom: 20px;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding-left: 25px;
+    padding-top: 10px;
+    color: #fff;
     z-index: 10;
 }
 
@@ -5562,6 +5582,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     color: #2d3c4b; /*#f1f1f1*/
 }
 
+.panel-config .middle-column-container.card-configuration {
+    margin-top: 50px;
+} 
+
 .panel-config .toggle-container {
     padding-bottom: 5px;
 }
@@ -6068,7 +6092,7 @@ a.list-group-item:not(.active):hover, div .switch label:hover, #demo-dt-selectio
     top: 0px;
     z-index: 5000;
     width: 100%;
-    height: 90px;
+    height: 100px;
     padding: 10px 25px;
     color: #fff;
     transition: all .40s ease;
@@ -6622,6 +6646,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rp-report-container-preview {
+    margin-top: 50px;
     color: #666;
     padding-bottom: 50px;
     transition: all .25s ease;
@@ -10538,8 +10563,8 @@ ul.select2-choices:after {
 }
 
 .graph-designer .card-component {
-    width: 100%;
-    background-color: white;
+    /*width: 100%;*/
+    background-color: #fff;
 }
 
 .graph-designer .card-component .install-buttons {
@@ -10556,10 +10581,17 @@ ul.select2-choices:after {
 
 .card-component-panel {
     padding: 0px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
     flex: 1 0 250px;
     width: 250px;
     background-color: white;
     z-index: 10;
+}
+
+.graph-designer .card-component-panel {
+    background: #fafafa;
+    margin-top: 50px;
 }
 
 .card-component-panel h3 {
