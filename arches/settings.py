@@ -539,6 +539,13 @@ CELERY_BEAT_SCHEDULE = {
 
 AUTO_REFRESH_GEOM_VIEW = True
 TILE_CACHE_TIMEOUT = 600
+RENDERERS = [
+    {
+        "name": "imagereader",
+        "component": "views/components/cards/file-renderers/imagereader",
+        "type": "image/*", 
+        "hastab": True}
+    ]
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################
