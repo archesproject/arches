@@ -29,6 +29,8 @@
             'underscore': '{{ STATIC_URL }}packages/underscore/underscore-min',
             'jquery-validate': '{{ STATIC_URL }}packages/jquery-validation/dist/jquery.validate.min',
             'd3': '{{ STATIC_URL }}packages/d3/d3.min',
+            'd3v5': '{{ STATIC_URL }}packages/c3/node_modules/d3/dist/d3.min',
+            'c3': '{{ STATIC_URL }}packages/c3/c3.min',
             'dropzone': '{{ STATIC_URL }}packages/dropzone/downloads/dropzone-amd-module.min',
             'ckeditor': '{{ STATIC_URL }}packages/ckeditor/ckeditor',
             'ckeditor-jquery': '{{ STATIC_URL }}packages/ckeditor/adapters/jquery',
@@ -68,7 +70,7 @@
             'jqtree': '{{ STATIC_URL }}packages/jqtree/tree.jquery',
             'core-js':'{{ STATIC_URL }}packages/core-js/client/shim.min',
             'dom-4': '{{ STATIC_URL }}packages/dom4/build/dom4',
-            'numeral': '{{ STATIC_URL }}packages/numeral/numeral'
+            'numeral': '{{ STATIC_URL }}packages/numeral/numeral',
         },
         packages: [{
             name: "codemirror",
@@ -144,11 +146,21 @@
             },
             'ckeditor-jquery': {
                 deps: ['ckeditor']
+            },
+            'c3': {
+                deps: ['register-d3']
             }
         }
     });
 
     require(['utils/set-csrf-token']);
+
+    
+    define('register-d3', ['d3v5'], function (d3) {
+            'registering d3'
+            window.d3 = d3;
+        });
+
 
     // put values here that should be accessible application wide
     define('arches', [], function () {
@@ -414,6 +426,15 @@
 
     define('geocoder-templates', [{% for provider in geocoding_providers %}'{{ provider.component }}',{% endfor %}], function () {
          return;
+    });
+
+    define('file-renderers', [{% for renderer in app_settings.RENDERERS %}'{{ renderer.component }}',{% endfor %}], function () {
+        return [{% autoescape off %}{% for renderer in app_settings.RENDERERS %}
+                {'name': '{{ renderer.name }}',
+                'component': '{{ renderer.component }}',
+                'type': '{{ renderer.type }}',
+                'hastab': '{{ renderer.hastab }}'},
+                {% endfor %}{% endautoescape %}];
     });
 
     define('datatype-config-components',

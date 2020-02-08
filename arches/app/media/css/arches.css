@@ -20,6 +20,7 @@
 @import url(../packages/leaflet-draw/dist/leaflet.draw.css);
 @import url(../css/tree/tree.css);
 @import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
+@import url(../packages/c3/c3.min.css);
 .regular-link {
     color: #337ab7;
     text-decoration: none;
@@ -852,6 +853,42 @@ ul.tabbed-report-tab-list {
 }
 
 .mouse-pointer canvas {
+    cursor: pointer;
+}
+
+.photo-workbench-photos {
+    height: 136px;
+    overflow-y: scroll;
+    border: solid 1px #ddd;
+    display: flex;
+    flex-direction: column;
+    margin: 5px 20px 10px 20px;
+}
+
+.photo-workbench-photo {
+    position: relative;
+    padding: 4px;
+}
+
+.photo-workbench-photo:nth-child(even) {
+    background: #fff;
+    border-bottom: 1px solid #D3E5F4;
+}
+
+.photo-workbench-photo:nth-child(odd) {
+  background: #F5FAFE;
+  border-bottom: 1px solid #D3E5F4;
+}
+
+.photo-workbench-photo.selected-photo {
+    background-color: #9CC3E4;
+    color: #fff;
+    font-weight: 600;
+    padding: 4px;
+}
+
+.photo-workbench-photo:not(.selected-photo):hover {
+    background: #CAE2F5;
     cursor: pointer;
 }
 
