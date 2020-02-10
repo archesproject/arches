@@ -43,6 +43,7 @@ define([
             this.getUrl = function(tile){
                 var url = '';
                 var type = '';
+                var name;
                 _.each(tile.data,
                     function(v, k) {
                         var val = ko.unwrap(v);
@@ -94,13 +95,6 @@ define([
             }, this);
 
             if (this.displayContent() === undefined) {
-                var selectedIndex = 0;
-                if (
-                    this.card.tiles().length > 0 &&
-                    this.form &&
-                    (ko.unwrap(this.form.selection) && this.form.selection() !== 'root') ||
-                    (this.form && !ko.unwrap(this.form.selection))) {
-                }
                 this.activeTab(undefined);
             }
 
@@ -110,7 +104,7 @@ define([
                         val.selected(true);
                     }
                 }
-            }
+            };
 
             this.removeTile = function(val){
                 //TODO: Upon deletion select the tile to the left of the deleted tile
