@@ -10437,7 +10437,6 @@ ul.select2-choices:after {
 }
 
 .left-panel-overflow {
-    height: calc(100vh - 231px);
     overflow-x: hidden;
     overflow-y: auto;
     background: #ecf0f5;
@@ -11072,6 +11071,10 @@ a.tree-display-tool, a.tree-display-tool:hover {
 }
 .service-buttons-heading button {
     margin-top: 5px;
+}
+
+.graph-designer .workbench-card-wrapper {
+    top: 0;
 }
 
 @keyframes loader {
