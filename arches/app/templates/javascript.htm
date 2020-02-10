@@ -2,6 +2,7 @@
 {% load l10n %}
 {% load i18n %}
 
+{% block require_config %}
 <script>
     var CKEDITOR_BASEPATH = '{{ STATIC_URL }}packages/ckeditor/';
     require.config({
@@ -71,6 +72,7 @@
             'core-js':'{{ STATIC_URL }}packages/core-js/client/shim.min',
             'dom-4': '{{ STATIC_URL }}packages/dom4/build/dom4',
             'numeral': '{{ STATIC_URL }}packages/numeral/numeral',
+            {% block paths %}{% endblock paths %}
         },
         packages: [{
             name: "codemirror",
@@ -149,18 +151,21 @@
             },
             'c3': {
                 deps: ['register-d3']
-            }
+            },
+            {% block shim %}{% endblock shim %}
         }
     });
+</script>
+{% endblock require_config %}
 
+{% block arches_modules %}
+<script>
     require(['utils/set-csrf-token']);
-
-    
+ 
     define('register-d3', ['d3v5'], function (d3) {
             'registering d3'
             window.d3 = d3;
         });
-
 
     // put values here that should be accessible application wide
     define('arches', [], function () {
@@ -509,3 +514,9 @@
         L.drawLocal.edit.handlers.remove.tooltip.text = '{% trans "Click on a feature to remove" %}';
     });
 </script>
+{% endblock arches_modules %}
+
+{% block project_modules %}
+{% endblock project_modules %}
+
+
