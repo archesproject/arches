@@ -122,49 +122,50 @@ define([
             };
 
             this.typeMatch = function(type){
-                var rawFileType = ko.unwrap(self.displayContent).type
+                var rawFileType = ko.unwrap(self.displayContent).type;
                 if (type === rawFileType) {
-                    return true
+                    return true;
                 }
                 var splitFileType = ko.unwrap(self.displayContent).type.split('/');
                 var fileType = splitFileType[0];
                 var splitAllowableType = type.split('/');
-                var allowableType = splitAllowableType[0]
-                var allowableSubType = splitAllowableType[1]
+                var allowableType = splitAllowableType[0];
+                var allowableSubType = splitAllowableType[1];
                 if (allowableSubType === '*' && fileType === allowableType) {
                     return true;
                 }
                 return false;
-            }
+            };
 
             this.addTile = function(file){
-                        var newtile;
-                        newtile = self.card.getNewTile();
-                        var tilevalue = {
-                            name: file.name,
-                            accepted: true,
-                            height: file.height,
-                            lastModified: file.lastModified,
-                            size: file.size,
-                            status: file.status,
-                            type: file.type,
-                            width: file.width,
-                            url: null,
-                            file_id: null,
-                            index: 0,
-                            content: URL.createObjectURL(file),
-                            error: file.error
-                        };
-                        Object.keys(newtile.data).forEach(function(val){
-                            if (newtile.datatypeLookup && newtile.datatypeLookup[val] === 'file-list') {
-                                targetNode = val;
-                            }
-                        });
-                        newtile.data[targetNode]([tilevalue]);
-                        newtile.formData.append('file-list_' + targetNode, file, file.name);
-                        newtile.save();
+                var newtile;
+                newtile = self.card.getNewTile();
+                var targetNode;
+                var tilevalue = {
+                    name: file.name,
+                    accepted: true,
+                    height: file.height,
+                    lastModified: file.lastModified,
+                    size: file.size,
+                    status: file.status,
+                    type: file.type,
+                    width: file.width,
+                    url: null,
+                    file_id: null,
+                    index: 0,
+                    content: URL.createObjectURL(file),
+                    error: file.error
+                };
+                Object.keys(newtile.data).forEach(function(val){
+                    if (newtile.datatypeLookup && newtile.datatypeLookup[val] === 'file-list') {
+                        targetNode = val;
+                    }
+                });
+                newtile.data[targetNode]([tilevalue]);
+                newtile.formData.append('file-list_' + targetNode, file, file.name);
+                newtile.save();
                 self.card.newTile = undefined;
-            }
+            };
 
             this.dropzoneOptions = {
                 url: "arches.urls.root",
@@ -175,7 +176,6 @@ define([
                 clickable: ".fileinput-button." + this.uniqueidClass(),
                 previewsContainer: '#hidden-dz-previews',
                 init: function() {
-                    var targetNode;
                     self.dropzone = this;
                     this.on("addedfile", self.addTile, self);
                     this.on("error", function(file, error) {
