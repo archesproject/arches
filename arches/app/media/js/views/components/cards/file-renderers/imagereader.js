@@ -1,4 +1,4 @@
-define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetViewModel) {
+define(['knockout'], function(ko) {
     return ko.components.register('imagereader', {
         viewModel: function(params) {
             this.params = params;
@@ -7,7 +7,6 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
             if (this.params.displayContent) {
                 this.url = this.params.displayContent.url;
                 this.type = this.params.displayContent.type;
-                console.log(this.type);
             }
             this.fileType = 'image/jpeg';
         },
