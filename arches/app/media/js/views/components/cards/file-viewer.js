@@ -35,7 +35,6 @@ define([
                 });
 
             self.card.tiles.subscribe(function(val){
-                console.log('no tiles')
                 if (val.length === 0) {
                     self.activeTab(null);
                 }
@@ -68,7 +67,6 @@ define([
             this.selectDefault = function(){
                 var self = this;
                 return function() {
-                    console.log('selecting default')
                     var selectedIndex = self.card.tiles.indexOf(self.selected());
                     if(self.card.tiles().length > 0 && selectedIndex === -1) {
                         selectedIndex = 0;
@@ -80,7 +78,6 @@ define([
             this.defaultSelector = this.selectDefault();
 
             this.displayContent = ko.pureComputed(function(){
-                console.log('updating displaycontnet')
                 var file;
                 var selected = this.card.tiles().find(
                     function(tile){
@@ -104,7 +101,6 @@ define([
                     (ko.unwrap(this.form.selection) && this.form.selection() !== 'root') ||
                     (this.form && !ko.unwrap(this.form.selection))) {
                 }
-                console.log('no content')
                 this.activeTab(undefined);
             }
 
