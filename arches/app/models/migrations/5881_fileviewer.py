@@ -8,11 +8,10 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '5605_searchexporthistory_downloadfile'),
+        ("models", "5605_searchexporthistory_downloadfile"),
     ]
 
     operations = [
-
         migrations.RunSQL(
             """
             insert into card_components (componentid, name, description, component, componentname, defaultconfig) 
