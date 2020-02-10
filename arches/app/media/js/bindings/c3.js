@@ -30,6 +30,6 @@ define([
                 this.chart.load({columns: val});
             }, this);
         },
-    }
+    };
     return ko.bindingHandlers.c3;
 });
