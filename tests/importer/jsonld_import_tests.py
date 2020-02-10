@@ -2,6 +2,7 @@ import os
 import json
 import csv
 import base64
+import datetime
 from io import BytesIO
 from tests import test_settings
 from operator import itemgetter
@@ -135,12 +136,18 @@ class JsonLDImportTests(ArchesTestCase):
         # now set the function back and test normally
         rdffile.fetch = fetch
         jsonld_document = expand(data)
-        self.assertTrue("https://linked.art/ns/v1/linked-art.json" in rdffile.docCache)
+        self.assertTrue(data["@context"] in rdffile.docCache)
 
         # now set it to the temp fetch and confirm that the tempFetch isn't called on subsequent uses as it was initially
         rdffile.fetch = tempFetch
         jsonld_document = expand(data)
         rdffile.fetch = fetch
+
+        # now invalidate the cache and make sure it refreshes the doc
+        rdffile.docCache[data["@context"]]["expires"] = datetime.datetime.now()
+        jsonld_document = expand(data)
+        self.assertTrue(rdffile.docCache[data["@context"]]["expires"] > datetime.datetime.now())
+        self.assertTrue(data["@context"] in rdffile.docCache)
 
     def test_1_basic_import(self):
 

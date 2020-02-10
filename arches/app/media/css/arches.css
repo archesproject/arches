@@ -468,6 +468,10 @@ input[type="checkbox"] {
     margin-right: 5px;
 }
 
+.workflow-nav-controls .btn-labeled:not(.btn-block):not(.form-icon) {
+    color: #f9f9f9;
+}
+
 .workflow-step-body div .new-provisional-edit-card-container div .install-buttons button {
     font-weight: 800;
 }
@@ -570,6 +574,8 @@ input[type="checkbox"] {
 
 .padded-workflow-step, .workflow-step-body .card-component {
     padding: 20px 35px 82px 40px;
+    border: none;
+    background: #fafafa;
 }
 
 .workflow-step-body .padded-workflow-step .card-component {
@@ -2389,6 +2395,22 @@ ul.nav.nav-tabs.nav-justified {
     margin-right: -20px;
     padding-left: 25px;
     z-index: 10;
+}
+
+.card-settings-panel-heading {
+    position: fixed;
+    top: 115px;
+    height: 50px;
+    width: 100%;
+    background: #25476a;
+    margin-top: -10px;
+    margin-bottom: 20px;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding-left: 25px;
+    padding-top: 10px;
+    color: #fff;
+    z-index: 100;
 }
 
 .settings-panel-heading + div {
@@ -5595,7 +5617,12 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-left: 1px solid #ddd;
     background: #f4f4f4; /*#2d3c4b*/
     color: #2d3c4b; /*#f1f1f1*/
+    height: 100%;
 }
+
+.panel-config .middle-column-container.card-configuration {
+    margin-top: 50px;
+} 
 
 .panel-config .toggle-container {
     padding-bottom: 5px;
@@ -6103,7 +6130,7 @@ a.list-group-item:not(.active):hover, div .switch label:hover, #demo-dt-selectio
     top: 0px;
     z-index: 5000;
     width: 100%;
-    height: 90px;
+    height: 100px;
     padding: 10px 25px;
     color: #fff;
     transition: all .40s ease;
@@ -6277,7 +6304,7 @@ span.file-upload-clear-filter {
 .file-select {
     text-align: center;
     padding: 70px 0;
-    background: #f9f9f9;
+    background: #f6f6f6;
 }
 
 .file-select-window {
@@ -6656,11 +6683,16 @@ a.mega-dropdown-toggle.disabled {
     transition: all .25s ease;
 }
 
-.rp-report-container-preview {
+.graph-designer .rp-report-container-preview {
+    margin-top: 50px;
     color: #666;
     padding-bottom: 50px;
     transition: all .25s ease;
     background-color: white;
+}
+
+.card-component-panel .editor-report .rp-report-container-preview {
+    margin-top: 0px;
 }
 
 .rp-report-section.rp-report-section-root {
@@ -10573,8 +10605,8 @@ ul.select2-choices:after {
 }
 
 .graph-designer .card-component {
-    width: 100%;
-    background-color: white;
+    /*width: 100%;*/
+    background-color: #fff;
 }
 
 .graph-designer .card-component .install-buttons {
@@ -10582,15 +10614,26 @@ ul.select2-choices:after {
 }
 
 .card-component {
-    padding: 25px 35px;
+    padding: 15px 25px 25px 25px;
+    margin: 10px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 3px;
 }
 
 .card-component-panel {
     padding: 0px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
     flex: 1 0 250px;
     width: 250px;
     background-color: white;
     z-index: 10;
+}
+
+.graph-designer .card-component-panel {
+    background: #fafafa;
+    margin-top: 50px;
 }
 
 .card-component-panel h3 {
@@ -10637,6 +10680,7 @@ ul.select2-choices:after {
     height: 100%;
     padding-bottom: 50px;
     overflow-y: auto;
+    background: #fafafa;
 }
 
 .card-header {

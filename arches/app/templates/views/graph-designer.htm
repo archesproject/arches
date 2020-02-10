@@ -240,8 +240,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                     <!-- /ko -->
                 </div>
+                
                 <!-- Card Manager -->
                 <div class="flex tab-pane fade in graph-designer" data-bind="css: { active: activeTab() === 'card' }">
+
+                    <!-- Card Header -->
+                    <div class="card-settings-panel-heading">
+                        <div class="graph-designer-title">
+                            <div class="name">
+                                <span class="">{% trans "Card Designer" %}</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- ko if: selectedCard() -->
                     <div class="card-component-panel">
                         <!-- ko component: {

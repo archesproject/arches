@@ -1069,9 +1069,15 @@ class FileListDataType(BaseDataType):
         return errors
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        for f in tile.data[str(nodeid)]:
-            val = {"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
-            document["strings"].append(val)
+        try:
+            for f in tile.data[str(nodeid)]:
+                val = {"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+                document["strings"].append(val)
+        except KeyError as e:
+            for k, pe in tile.provisionaledits.items():
+                for f in pe["value"][nodeid]:
+                    val = {"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+                    document["strings"].append(val)
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
