@@ -19,7 +19,7 @@
     <span class="map-sidebar-text">{% trans "Add" %}</span>
 </div>
 <!--ko foreach: fileFormatRenderers-->
-        <!--ko if: ko.unwrap($parent.displayContent) && (ko.unwrap($parent.displayContent).type === $data.type) && $data.hastab -->
+        <!--ko if: ko.unwrap($parent.displayContent) && ($parent.typeMatch($data.type)) && $data.hastab -->
         <div class="workbench-card-sidebar-tab" data-bind="click: function() {
         $parent.toggleTab('file-context');
     }, css: {
