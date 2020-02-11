@@ -230,6 +230,10 @@ class BusinessDataImporter(object):
 
             reader.report_errors()
 
+        except Exception as e:
+            print("exception in importer")
+            print(e)
+
         finally:
             datatype_factory = DataTypeFactory()
             datatypes = DDataType.objects.all()
