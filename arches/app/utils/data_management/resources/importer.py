@@ -180,9 +180,9 @@ class BusinessDataImporter(object):
     ):
         reader = None
         start = time()
-        cursor = connection.cursor()
-
         try:
+            cursor = connection.cursor()
+
             if file_format is None:
                 file_format = self.file_format
             if business_data is None:
