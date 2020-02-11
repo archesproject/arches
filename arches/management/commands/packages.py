@@ -941,13 +941,17 @@ will be very jumbled."""
                 path = utils.get_valid_path(source)
                 if path is not None:
                     print("Importing {0}. . .".format(path))
-                    BusinessDataImporter(path, config_file).import_business_data(
-                        overwrite=overwrite,
-                        bulk=bulk_load,
-                        create_concepts=create_concepts,
-                        create_collections=create_collections,
-                        use_multiprocessing=use_multiprocessing,
-                    )
+                    try:
+                        BusinessDataImporter(path, config_file).import_business_data(
+                            overwrite=overwrite,
+                            bulk=bulk_load,
+                            create_concepts=create_concepts,
+                            create_collections=create_collections,
+                            use_multiprocessing=use_multiprocessing,
+                        )
+                    except Exception as e:
+                        print("biz data import failed")
+                        print(e)
                 else:
                     utils.print_message("No file found at indicated location: {0}".format(source))
                     sys.exit()
