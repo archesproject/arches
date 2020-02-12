@@ -17,6 +17,7 @@ define([
             params.configKeys = ['acceptedFiles', 'maxFilesize'];
             var self = this;
             this.fileFormatRenderers = fileRenderers;
+            this.filter = ko.observable('');
             this.fileFormatRenderers.forEach(function(r){
                 r.state = {};
             });
@@ -39,6 +40,10 @@ define([
                     self.activeTab(null);
                 }
             });
+
+            this.isFiltered = function(t){
+                return self.getUrl(t).name.toLowerCase().includes(self.filter().toLowerCase());
+            };
 
             this.getUrl = function(tile){
                 var url = '';

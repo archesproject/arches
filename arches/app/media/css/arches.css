@@ -898,6 +898,108 @@ ul.tabbed-report-tab-list {
     cursor: pointer;
 }
 
+.workbench-card-sidepanel-header-container.file-workbench {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+.file-workbench-files {
+    height: 136px;
+    overflow-y: scroll;
+    border: solid 1px #ddd;
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0px;
+}
+
+.file-workbench-file {
+    position: relative;
+    padding: 4px;
+    display: inline-flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.file-workbench-file .file-name {
+   padding-left: 5px;
+}
+
+.file-workbench-file:nth-child(even) {
+    background: #fff;
+    border-bottom: 1px solid #D3E5F4;
+}
+
+.file-workbench-file:nth-child(odd) {
+  background: #F5FAFE;
+  border-bottom: 1px solid #D3E5F4;
+}
+
+.file-workbench-file.selected-photo {
+    background-color: #9CC3E4;
+    color: #fff;
+    font-weight: 600;
+    padding: 4px;
+}
+
+.file-workbench-file:not(.selected-photo):hover {
+    background: #CAE2F5;
+    cursor: pointer;
+}
+
+.file-viewer {
+    position: relative;
+}
+
+.file-viewer .loading-mask {
+    position: relative;
+    opacity: .5;
+    background-color: gray;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 240;
+}
+
+.file-viewer .loading-mask::before {
+    position: fixed;
+    opacity: .5;
+    color: #7b7b7b;
+    content: '\f110';
+    -webkit-animation: fa-spin 2s infinite linear;
+    animation: fa-spin 2s infinite linear;
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: 10vw;
+    margin-top: 42vh;
+    margin-left: 32vw;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform: translate(0, 0);
+    z-index: 100000001;
+}
+
+.file-viewer .loading-mask:after {
+    position: fixed;
+    opacity: .5;
+    color: #7b7b7b;
+    content: '\f110';
+    -webkit-animation: fa-spin 2s infinite linear;
+    animation: fa-spin 2s infinite linear;
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: 10vw;
+    margin-top: 42vh;
+    margin-left: 32vw;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform: translate(0, 0);
+    z-index: 100000001;
+}
+
+
 .workbench-card-wrapper {
     flex: 1;
     height: 100%;
