@@ -921,9 +921,11 @@ ul.tabbed-report-tab-list {
     width: 92px;
     background-color: rgb(247, 247, 247);
     border-left: 1px solid rgb(216, 216, 216);
+    z-index: 200;
 }
 
 .workbench-card-sidebar-tab {
+    z-index: 200;
     color: rgb(33, 62, 95);
     padding: 16px;
     text-align: center;
@@ -933,6 +935,7 @@ ul.tabbed-report-tab-list {
 }
 
 .workbench-card-sidebar-tab.active {
+    z-index: 200;
     background-color: white;
     border-left: solid 1px white;
     margin-left: -1px;
@@ -942,35 +945,6 @@ ul.tabbed-report-tab-list {
     font-size: 1.7em;
     display: block;
     padding-bottom: 6px;
-}
-
-.workbench-card-sidepanel {
-    position:absolute;
-    z-index: 10;
-    right: 92px;
-    height: 100%;
-    width: 400px;
-    background: white;
-    border-left: 1px solid rgb(216, 216, 216);
-    padding: 16px;
-    overflow-y: scroll;
-}
-
-.workbench-card-sidepanel-header {
-    cursor: pointer;
-    color: rgb(33, 62, 95);
-}
-
-.workbench-card-sidepanel-header:before {
-    content: "\f00d";
-    font-family: FontAwesome;
-    margin-right: 6px;
-    color: rgb(158, 158, 158);
-    font-weight:lighter;
-}
-
-.workbench-card-sidepanel-header:hover:before {
-    color: rgb(33, 62, 95);
 }
 
 .workbench-card-sidepanel.expanded {
@@ -1093,8 +1067,8 @@ ul.tabbed-report-tab-list {
 }
 
 .workbench-card-sidepanel {
-    position:absolute;
-    z-index: 10;
+    position: absolute;
+    z-index: 250;
     right: 75px;
     height: 100%;
     width: 400px;
