@@ -27,7 +27,7 @@ define([
             });
             var chart = c3.generate(options);
             config.data.subscribe(function(val){
-                this.chart.load({columns: val});
+                chart.load({columns: val});
             }, this);
 
             // Handle disposal if KO removes an chart through template binding
