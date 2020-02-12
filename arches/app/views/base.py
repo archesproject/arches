@@ -23,7 +23,7 @@ from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.views.generic import TemplateView
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.utils.permission_backend import get_createable_resource_types, user_is_resource_reviewer
+from arches.app.utils.permission_backend import get_createable_resource_types, user_is_resource_reviewer, get_nodegroups_by_perm
 
 
 class BaseManagerView(TemplateView):
@@ -78,20 +78,19 @@ class MapBaseManagerView(BaseManagerView):
         context = super(MapBaseManagerView, self).get_context_data(**kwargs)
         datatype_factory = DataTypeFactory()
         geom_datatypes = [d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
-        geom_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=geom_datatypes).exclude(
-            graph__graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
-        )
+        allowed_nodegroups = get_nodegroups_by_perm(self.request.user, 'models.read_nodegroup')
+        geom_nodes = models.Node.objects.filter(nodegroup__in=allowed_nodegroups, graph__isresource=True, graph__isactive=True, datatype__in=geom_datatypes).exclude(graph__graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+
         resource_layers = []
         resource_sources = []
         for node in geom_nodes:
-            if self.request.user.has_perm("read_nodegroup", node.nodegroup):
-                datatype = datatype_factory.get_instance(node.datatype)
-                map_source = datatype.get_map_source(node)
-                if map_source is not None:
-                    resource_sources.append(map_source)
-                    map_layer = datatype.get_map_layer(node)
-                    if map_layer is not None:
-                        resource_layers.append(map_layer)
+            datatype = datatype_factory.get_instance(node.datatype)
+            map_source = datatype.get_map_source(node)
+            if map_source is not None:
+                resource_sources.append(map_source)
+                map_layer = datatype.get_map_layer(node)
+                if map_layer is not None:
+                    resource_layers.append(map_layer)
 
         context["geom_nodes"] = geom_nodes
         context["resource_map_layers"] = resource_layers
