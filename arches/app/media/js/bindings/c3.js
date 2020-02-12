@@ -32,7 +32,6 @@ define([
 
             // Handle disposal if KO removes an chart through template binding
             ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
-                chart.destroy();
             }, this); 
         },
     };
