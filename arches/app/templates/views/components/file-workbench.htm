@@ -145,7 +145,7 @@
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
 </div>
 
-<input type="text" class="form-control" style="width: 100%; height:initial" placeholder="Filter" data-bind="textInput: filter"></input>
+<input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'filter file list...' %}" data-bind="textInput: filter"></input>
 <div class='file-workbench-files'>
 <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
     <!--ko if: $parent.getUrl(tile) && ($parent.filter().length === 0 || $parent.isFiltered(tile)) -->
