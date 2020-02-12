@@ -115,9 +115,10 @@ define([
                 setTimeout(self.defaultSelector, 150);
             };
 
-            this.typeMatch = function(type){
+            this.typeMatch = function(type, ext, hastab){
                 var rawFileType = ko.unwrap(self.displayContent).type;
-                if (type === rawFileType) {
+                var rawExtension = ko.unwrap(self.displayContent).url.split('.').pop();
+                if (type === rawFileType && ext === rawExtension)  {
                     return true;
                 }
                 var splitFileType = ko.unwrap(self.displayContent).type.split('/');
@@ -147,7 +148,7 @@ define([
                     url: null,
                     file_id: null,
                     index: 0,
-                    content: URL.createObjectURL(file),
+                    content: window.URL.createObjectURL(file),
                     error: file.error
                 };
                 Object.keys(newtile.data).forEach(function(val){

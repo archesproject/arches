@@ -25,10 +25,15 @@ define([
                     }
                 }
             });
-            this.chart = c3.generate(options);
+            var chart = c3.generate(options);
             config.data.subscribe(function(val){
                 this.chart.load({columns: val});
             }, this);
+
+            // Handle disposal if KO removes an chart through template binding
+            ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+                chart.destroy();
+            }, this); 
         },
     };
     return ko.bindingHandlers.c3;
