@@ -19,7 +19,7 @@
     <span class="map-sidebar-text">{% trans "Add" %}</span>
 </div>
 <!--ko foreach: fileFormatRenderers-->
-        <!--ko if: ko.unwrap($parent.displayContent) && ($parent.typeMatch($data.type)) && $data.hastab -->
+        <!--ko if: ko.unwrap($parent.displayContent) && ($parent.typeMatch($data.type, $data.ext, $data.hastab)) && $data.hastab -->
         <div class="workbench-card-sidebar-tab" data-bind="click: function() {
         $parent.toggleTab('file-context');
     }, css: {
@@ -50,7 +50,7 @@
             <div id="hidden-dz-previews" style="display:none"></div>
             <!--ko if: displayContent() -->
                 <!--ko foreach: fileFormatRenderers-->
-                    <!--ko if: ko.unwrap($parent.displayContent) && ($parent.typeMatch($data.type)) -->
+                    <!--ko if: ko.unwrap($parent.displayContent) && ($parent.typeMatch($data.type, $data.ext, $data.hastab)) -->
                         <!-- ko component: {
                             name: $data.name,
                             params: {
@@ -58,7 +58,8 @@
                                 selected: $parent.selected,
                                 state: $data.state,
                                 displayContent: ko.unwrap($parent.displayContent),
-                                context: 'render'
+                                context: 'render',
+                                loading: $parent.loading
                             }
                         } --> <!-- /ko -->
                     <!--/ko-->
@@ -325,7 +326,7 @@
 
 <!--ko if: activeTab() === 'file-context' -->
     <!--ko foreach: fileFormatRenderers-->
-         <!--ko if: ko.unwrap($parent.displayContent) && ($parent.typeMatch($data.type)) && $data.hastab -->
+         <!--ko if: ko.unwrap($parent.displayContent) && ($parent.typeMatch($data.type, $data.ext, $data.hastab)) && $data.hastab -->
         <!-- ko component: {
             name: $data.name,
             params: {
