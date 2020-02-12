@@ -43,7 +43,7 @@ define([
 
             this.isFiltered = function(t){
                 return self.getUrl(t).name.toLowerCase().includes(self.filter().toLowerCase());
-            }
+            };
 
             this.getUrl = function(tile){
                 var url = '';

@@ -141,16 +141,18 @@
 
 
 <!--ko if: activeTab() === 'edit' -->
-<div class="workbench-card-sidepanel-header-container">
+<div class="workbench-card-sidepanel-header-container file-workbench">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
 </div>
 
-<h5 class="workbench-tile-picker-label">{% trans 'File List' %}</h5>
 <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="Filter" data-bind="textInput: filter"></input>
-<div class='photo-workbench-photos'>
+<div class='file-workbench-files'>
 <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
     <!--ko if: $parent.getUrl(tile) && ($parent.filter().length === 0 || $parent.isFiltered(tile)) -->
-    <div class='photo-workbench-photo' data-bind="text: $index() + 1 + ' | ' + ($parent.getUrl(tile).name), click: $parent.selectItem, css: {'selected-photo': ko.unwrap(selected)}"></div>
+    <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {'selected-photo': ko.unwrap(selected)}, click: $parent.selectItem">
+    <i class="fa fa-file" role="presentation" data-bind="css:{'fa-pencil':false,'fa-file':true}"></i>
+    <div class='file-name' data-bind="text: $parent.getUrl(tile).name"></div>
+    </div>
     <!--/ko-->
 <!-- /ko -->
 </div>
