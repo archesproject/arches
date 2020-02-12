@@ -6,7 +6,10 @@ from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import get_perms, get_objects_for_user
 from guardian.exceptions import WrongAppError
 from django.contrib.auth.models import User, Group, Permission
+from django.core.cache import cache
 
+# Needs to be part of settings really
+cache_timeout_secs = 120
 
 class PermissionBackend(ObjectPermissionBackend):
     def has_perm(self, user_obj, perm, obj=None):
@@ -75,11 +78,17 @@ def get_users_for_object(perm, obj):
     obj -- the model instance to check
 
     """
+    key = 'users_for_object_{0}_'.format(str(obj.pk)) + str("_".join(perm) if type(perm) == list else str(perm))    
+    ret = cache.get(key)
+    if ret is not None:
+        return ret
 
     ret = []
     for user in User.objects.all():
         if user.has_perm(perm, obj):
             ret.append(user)
+    
+    cache.set(key, ret, cache_timeout_secs)
     return ret
 
 
@@ -93,7 +102,11 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
     any_perm -- True to check ANY perm in "perms" or False to check ALL perms
 
     """
-
+    key = 'node_perms_{0}_'.format(user.username,) + str("_".join(perms) if type(perms) == list else str(perms))
+    node_perms = cache.get(key)
+    if node_perms is not None:
+        return node_perms
+    
     A = set(
         get_objects_for_user(
             user,
@@ -104,7 +117,10 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
     )
     B = set(get_objects_for_user(user, perms, accept_global_perms=False, any_perm=any_perm))
     C = set(get_objects_for_user(user, perms, accept_global_perms=True, any_perm=any_perm))
-    return list(C - A | B)
+    
+    node_perms = list(C - A | B)
+    cache.set(key, node_perms, cache_timeout_secs)
+    return node_perms
 
 
 def get_editable_resource_types(user):
@@ -140,13 +156,20 @@ def get_resource_types_by_perm(user, perms):
     perms -- the permssion string eg: "read_nodegroup" or list of strings
 
     """
-
+    key = 'get_resource_types_by_perm_{0}_'.format(user.username) + str("_".join(perms) if type(perms) == list else str(perms))
+    graphlist = cache.get(key)
+    if graphlist is not None:
+        return graphlist
+    
     graphs = set()
     nodegroups = get_nodegroups_by_perm(user, perms)
-    for node in Node.objects.filter(nodegroup__in=nodegroups).select_related("graph"):
-        if node.graph.isresource and str(node.graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
-            graphs.add(node.graph)
-    return list(graphs)
+    for node in Node.objects.filter(nodegroup__in=nodegroups, graph__isresource=True).exclude(graph__graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).select_related('graph'):
+        graphs.add(node.graph)
+
+    graphlist = list(graphs)
+    cache.set(key, graphlist, cache_timeout_secs)
+
+    return graphlist
 
 
 def user_can_read_resources(user):
