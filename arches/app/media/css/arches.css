@@ -10523,7 +10523,7 @@ ul.select2-choices:after {
 }
 
 .card-header {
-    height: 50px;
+    min-height: 50px;
     padding: 10px 20px;
     background: #f4f4f4;
 }
@@ -10982,6 +10982,11 @@ a.jstree-anchor.permissions-widget {
 
 .rdm-maincontent .arches-box-grey-border {
     margin-bottom: 0;
+}
+
+#scroll-top {
+    right: 30px;
+    z-index: 9999;
 }
 
 #scroll-top.in:hover {

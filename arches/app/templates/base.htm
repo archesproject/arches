@@ -60,9 +60,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     {% block body %}
 
     {% endblock body %}
-</body>
 
-{% block javascript %}
+    {% block javascript %}
     <script src="{{ STATIC_URL }}packages/requirejs/require.js"></script>
 
     {% block pre_require_js %}
@@ -88,6 +87,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     {% endif %}
 
-{% endblock javascript %}
+    {% endblock javascript %}
+</body>
 
 </html>
