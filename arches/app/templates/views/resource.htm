@@ -36,11 +36,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="edit-panel-search-bar">
 
                 <!-- Find Button -->
-                <div class="">
+                <div>
                     <a class="page-header text-overflow graph-find" href="#" data-bind="click: function () { showFind(!showFind()) }"> {% trans "Find" %} </a>
-                </div>
-
-                <!-- Find resource -->
+                </div          <!-- Find resource -->
                 <div class="find-widget" style="display: none;" data-bind="visible: showFind()">
                     <div>
                         <select data-bind="chosen: {width: '100%'}, value: graphId, options: resources, optionsText: 'name', optionsValue: 'graphid', optionsCaption: '{% trans "Select a resource..." %}', optionsAfterRender: setResourceOptionDisable"></select>
@@ -59,44 +57,42 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
     <!-- Default Page content-->
-    <div id="page-content" style="padding: 0 50px 160px; margin-top: 30px;">
+    <div id="page-content" class="resource-manager-container">
+
         <div id="resource-list" class="report-image-grid" style="margin-top: 5px;">
-            
+
             <!-- ko foreach: createableResources -->
-            <div class="r-grid-item relative" data-bind="css: { 'disabled': disable_instance_creation}">
-                <div data-bind="attr: {href: '#', title: name, target: '_blank'}" href="#">
-                    <div class="r-select-card">
-                        <h4 class="r-select-title" data-bind="text: name"></h4>
-                        <div class="r-select-circle">
-                            <span><i data-bind="attr:{class: ('fa '+ iconclass +' r-select-icon')}"></i></span>
-                        </div>
-                        <div class="r-desc-container">
-                            <p data-bind="text: description" class="r-select-desc"></p> 
-                        </div>  
+            <div class="card-grid-item" data-bind="css: { 'disabled': disable_instance_creation}">
+                <!-- Abstract -->
+                <div class="panel-body library-card-body">
+                    <!-- card Name -->
+                    <div class="panel-heading">
+                        <h2 class="panel-title library-card-panel-title"><i class="text-center" data-bind="css: iconclass"></i> <span data-bind="text:name" ></span></h2>
                     </div>
+                    <p data-bind="text: description"></p>
                 </div>
 
                 <!-- card Tools -->
-                <div class="r-select-card-footer">
+                <div class="panel-footer">
                     <!-- ko if: disable_instance_creation -->
-                    <div class="r-warning">
-                      <i class="fa fa-warning"></i> <span class="form-warning" style="" data-bind="text: disable_instance_creation"></span>
+                    <div>
+                        <i class="fa fa-warning"></i> <span class="form-warning" data-bind="text: disable_instance_creation"></span>
                     </div>
                     <!-- /ko -->
                     <!-- ko if: !disable_instance_creation-->
-                    <div class="">
-                        <a href="#" class="btn btn-primary btn-resource-select" role="button" data-bind="
+                    <div class="pull-right">
+                        <a href="#" class="btn btn-primary btn-labeled fa fa-plus" role="button" data-bind="
                         attr: { href: $parent.arches.urls.add_resource(graphid), 'data-arches-graphid': graphid},
                         css: { 'disabled': disable_instance_creation }">
                         {% trans "Create Resource" %}</a>
                     </div>
                     <!-- /ko -->
-
                 </div>
             </div>
             <!-- /ko -->
 
         </div>
+
     </div>
 </div>
 

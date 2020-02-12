@@ -10,9 +10,9 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <h5 class="arches-modal-section">{% trans "Select scheme to export" %}</h5>
+                        <label class="arches-modal-section" id="schemetoexport">{% trans "Select scheme to export" %}</label>
                         <p> 
-                            <select style="width:100%" class="select2" name="scheme_dd" required>
+                            <select aria-labelledby="schemetoexport" style="width:100%" class="select2" name="scheme_dd" required>
                                 <option value=""></option>
                                 {% for scheme in concept_schemes %}
                                     <option value="{{scheme.conceptid}}">{{scheme.value}}</option>

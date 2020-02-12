@@ -11,21 +11,21 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <h4>{% trans "Label" %}</h4>
-                        <p><input class="form-control" type="text" name="label" required/></p>
+                        <label for="addconclabel">{% trans "Label" %}</label>
+                        <p><input id="addconclabel" class="form-control" type="text" name="label" required/></p>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <h4>{% trans "Note" %}</h4>
-                        <p><textarea class="form-control textarea textarea-resizable" rows="3" type="text" name="note"></textarea></p>
+                        <label for="addconcnote">{% trans "Note" %}</label>
+                        <p><textarea id="addconcnote" class="form-control textarea textarea-resizable" rows="3" type="text" name="note"></textarea></p>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <h4>{% trans "Language" %}</h4>
+                        <label id="addconclang">{% trans "Language" %}</label>
                         <p> 
-                            <select style="width:100%" class="select2" name="language_dd" required>
+                            <select aria-labelledby="addconclang" style="width:100%" class="select2" name="language_dd" required>
                                 {% for language in languages %}
                                   <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
                                 {% endfor %}
@@ -34,9 +34,9 @@
                     </div>
 
                     <div class="col-xs-6">
-                        <h4>{% trans "Relation from Parent" %}</h4>
+                        <label id="addconcrel">{% trans "Relation from Parent" %}</label>
                         <div> 
-                            <select style="width:100%;" class="select2" name="relationshiptype_dd" required>
+                            <select aria-labelledby="addconcrel" style="width:100%;" class="select2" name="relationshiptype_dd" required>
                                 {% for relation in parent_relations %}
                                   <option value="{{relation.relationtype}}">{{relation.relationtype}}</option>
                                 {% endfor %}

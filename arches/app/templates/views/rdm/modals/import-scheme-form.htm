@@ -7,7 +7,7 @@
             <!-- Form Header -->
             <div class="modal-header arches-modal-header">
                 <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
-                <h4 id="" class="modal-title">{% trans "Import New Concept Scheme" %}</h4>
+                <h4 class="modal-title">{% trans "Import New Concept Scheme" %}</h4>
             </div>
             <!-- End Form Header -->
 
@@ -17,8 +17,8 @@
                     <div class="col-xs-12">
                         <form class="form-inline" role="form">
                             <div class="form-group arches-modal-form-group">
-                                <h5 class="arches-modal-section">{% trans "SKOS File" %}</h5>
-                                <input type="file" class="form-control" style="width: 100%;" name="skosfile">
+                                <label class="arches-modal-section" for="skosfile">{% trans "SKOS File" %}</label>
+                                <input id="skosfile" type="file" class="form-control" style="width: 100%;" name="skosfile">
                             </div>
                         </form>
                     </div>
@@ -26,8 +26,8 @@
 
                 <div class="row">
                     <div class="col-xs-12">
-                        <div class="form-group arches-modal-form-group">
-                            <h5 class="arches-modal-section">{% trans "When concept ids match" %}</h5>
+                        <div class="form-group arches-modal-form-group" role="radiogroup" aria-labelledby="overwriteoptionslbl">
+                            <label class="arches-modal-section" id="overwriteoptionslbl">{% trans "When concept ids match" %}</label>
                             <div style="margin-left: 10px">
                                 <input type="radio" name="overwrite_options" id="overwrite" value="overwrite" checked="checked" /><label for="overwrite" style="margin-left: 3px">{% trans "overwrite system concept" %}</label>
                                 <input type="radio" name="overwrite_options" id="ignore" value="ignore" style="margin-left: 6px"/><label for="ignore" style="margin-left: 3px">{% trans "use system concept" %}</label>
@@ -37,8 +37,8 @@
                 </div>
                 <div class="row">
                     <div class="col-xs-12">
-                        <div class="form-group arches-modal-form-group">
-                            <h5 class="arches-modal-section">{% trans "When inserting new concepts" %}</h5>
+                        <div class="form-group arches-modal-form-group" role="radiogroup" aria-labelledby="stagingoptionslbl">
+                            <label class="arches-modal-section" id="stagingoptionslbl">{% trans "When inserting new concepts" %}</label>
                             <div style="margin-left: 10px">
                                 <input type="radio" name="staging_options" id="keep" value="keep" checked="checked"/><label for="keep" style="margin-left: 3px">{% trans "keep within scheme" %}</label>
                                 <input type="radio" name="staging_options" id="stage" value="stage" style="margin-left: 6px"/><label for="stage" style="margin-left: 3px">{% trans "stage in candidates" %}</label>

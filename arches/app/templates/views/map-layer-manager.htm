@@ -29,7 +29,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block main_content %}
 <div class="content-panel" data-bind="click:function() { menuActive(false); }">
     <div class="flex">
-        <div class="flex">
+        <div class="flex draggable-panels-container">
             <div class="left-column-crud-container form-list">
                 <div class="layer-list">
                     <!-- Layer Filter -->
@@ -80,12 +80,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="card-form-preview-container">
 
                 <!-- Header -->
-                <div class="category-header" style="">
+                <div class="category-header">
                     <!-- Resource/Graph Toggle -->
                     <div style="display: block;">
-                        <a id="" class="category-title" href="" data-bind="css: { 'active': selectedList() && selectedList() === geomNodes  }, click: function() { selectedList(geomNodes); }">{% trans "Resource Layers" %}</a>
-                        <a id="" class="category-title" href="" data-bind="css: { 'active': selectedList() && selectedList() === basemaps  }, click: function() { selectedList(basemaps); }">{% trans "Basemaps" %}</a>
-                        <a id="" class="category-title" href="" data-bind="css: { 'active': selectedList() && selectedList() === overlays  }, click: function() { selectedList(overlays); }">{% trans "Overlays" %}</a>
+                        <a class="category-title" href="" data-bind="css: { 'active': selectedList() && selectedList() === geomNodes  }, click: function() { selectedList(geomNodes); }">{% trans "Resource Layers" %}</a>
+                        <a class="category-title" href="" data-bind="css: { 'active': selectedList() && selectedList() === basemaps  }, click: function() { selectedList(basemaps); }">{% trans "Basemaps" %}</a>
+                        <a class="category-title" href="" data-bind="css: { 'active': selectedList() && selectedList() === overlays  }, click: function() { selectedList(overlays); }">{% trans "Overlays" %}</a>
                     </div>
                 </div>
                 <div class="ep-card-crud-container">
@@ -105,10 +105,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- ko if: selection()  && !selection().nodeid -->
                         <div class="panel-heading relative">
-                            <h3 class="panel-title"><i data-bind="css: selection().icon"></i> <span data-bind="text: selection().name"></span></h3>
-
+                            <div class="row">
+                                <h3 class="panel-title"><i data-bind="css: selection().icon"></i> <span data-bind="text: selection().name"></span></h3>
+                            </div>
                             <!-- Service management buttons (for convenience) -->
-                            <div class="service-buttons-heading">
+                            <div class="row service-buttons-heading">
                                 <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { selection().delete() }">{% trans "Delete Layer" %}</button>
 
                                 <!-- ko if: selection().dirty() -->

@@ -31,7 +31,7 @@
                                     </div>
 
                                     <div class="col-xs-3">
-                                        <h5 id="" class="arches-modal-section">{% trans "Relation type" %}</h5>
+                                        <label class="arches-modal-section" for="related-relation-type">{% trans "Relation type" %}</label>
                                         <select style="width:100%;" class="select2" id="related-relation-type" placeholder="{% trans "Relation to Concept" %}">
                                             {% for relation in related_relations %}
                                               <option value="{{relation.relationtype}}">{{relation.relationtype}}</option>

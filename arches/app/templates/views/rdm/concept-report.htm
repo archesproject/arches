@@ -5,13 +5,15 @@
     <div class="col-xs-12 concept-report-content">
         <div style="display:none" name="modeldata" data-id="{{concept.id}}" data-legacyoid="{{concept.legacyoid}}" data-nodetype="{{concept.nodetype}}"></div>
         <!-- Concept Preferred Label -->
-        <div class="headline arches-RDM-headline"><h3 class="arches-RDM-Concept">{{prefLabel.value}} ({{prefLabel.language}})</h3>
+        <div class="headline arches-RDM-headline">
+            
+            <h2 class="arches-RDM-Concept">{{prefLabel.value}} ({{prefLabel.language}})</h2>
 
             <!-- Spacer for xs screens -->
             <div class="divider hidden-sm hidden-md hidden-lg"></div>
 
             <!-- Concept Type Label -->
-            <span class="arches-search-filter-font text-muted" style="">
+            <span class="arches-search-filter-font text-muted">
                 ({{concept.nodetype}})
             </span>
 
@@ -66,11 +68,11 @@
         <div class="margin-bottom-10 padding-left-10">
             <dl>
                 <dt>
-                    <h5 id="" class="section-headline">{% trans "Labels" %}
+                    <h3 class="section-headline">{% trans "Labels" %}
                         <span>
                             <a href="javascript:void(0);" class="arches-RDM-link pull-right edit-value" data-category="label" data-target="#labelmodal">{% trans "Add label" %}</a>
                         <span>
-                    </h5>
+                    </h3>
                 </dt>
                 {% for value in labels %}
                     <dd class="arches-RDM-label-highlighted">
@@ -91,11 +93,11 @@
         <div class="margin-bottom-10 padding-left-10">
             <dl>
                 <dt>
-                    <h5 id="" class="section-headline">{% trans "Notes" %}
+                    <h3 class="section-headline">{% trans "Notes" %}
                         <span>
                             <a href="javascript:void(0);" class="arches-RDM-link pull-right edit-value" data-category="note" data-target="#notemodal">{% trans "Add note" %}</a>
                         <span>
-                    </h5>
+                    </h3>
                 </dt>
                 {% for value in concept.values %}
                     {% if value.category == 'note' %}
@@ -121,12 +123,12 @@
             <dl>
 
                 <dt>
-                    <h5 id="" class="section-headline">{% trans "Broader/Narrower Concepts" %}
+                    <h3 class="section-headline">{% trans "Broader/Narrower Concepts" %}
                         <span>
                             <a href="javascript:void(0);" class="arches-RDM-link pull-right graph-toggle">{% trans "Show graph" %}</a>
                             <a href="javascript:void(0);" class="arches-RDM-link pull-right graph-toggle" style="display: none;">{% trans "Show tree" %}</a>
                         <span>
-                    </h5>
+                    </h3>
                 </dt>
 
                 <div class="concept-tree">
@@ -179,11 +181,11 @@
         <div class="margin-bottom-10 padding-left-10">
             <dl>
                 <dt>
-                    <h5 id="" class="section-headline">{% trans "Related Concepts" %}
+                    <h3 class="section-headline">{% trans "Related Concepts" %}
                         <span>
                             <a href="javascript:void(0);" class="arches-RDM-link pull-right" data-toggle="#related-concept-form">{% trans "Add related concept" %}</a>
                         <span>
-                    </h5>
+                    </h3>
                 </dt>
 
                 {% for concept in concept.relatedconcepts %}
@@ -205,11 +207,11 @@
         <div class="margin-bottom-10 padding-left-10">
             <dl>
                 <dt>
-                    <h5 id="" class="section-headline">{% trans "Values" %}
+                    <h3 class="section-headline">{% trans "Values" %}
                         <span>
                             <a href="javascript:void(0);" class="arches-RDM-link pull-right edit-value" data-category="" data-target="#related_valuemodal">{% trans "Add value" %}</a>
                         <span>
-                    </h5>
+                    </h3>
                 </dt>
                 {% for value in concept.values %}
                     {% if value.category == 'undefined' %}
@@ -232,11 +234,11 @@
         <div class="padding-left-10">
             <dl>
                 <dt>
-                    <h5 id="" class="section-headline">{% trans "Images" %}
+                    <h3 class="section-headline">{% trans "Images" %}
                         <span>
                             <a href="javascript:void(0);" class="arches-RDM-link pull-right add-image-link">{% trans "Add images" %}</a>
                         <span>
-                    </h5>
+                    </h3>
                 </dt>
 
                 <dd class="arches-RDM-labels">
@@ -272,9 +274,9 @@
     <div class="padding-left-10">
         <dl>
             <dt>
-                <h5 id="arches-names-form" class="section-headline">
+                <h3 id="arches-names-form" class="section-headline">
                     {% trans "Identifiers" %}
-                </h5>
+                </h3>
             </dt>
 
             <dd class="arches-concept-heirarchy">
@@ -342,27 +344,29 @@
     </div>
 {% else %}
     <div class="col-xs-12 concept-report-content">
-        <div class="headline arches-RDM-headline"><h3 class="arches-RDM-Concept">Arches Reference Data Manager</h3></div>
+
+        <div class="headline arches-RDM-headline">
+            <h2 class="arches-RDM-Concept">Arches Reference Data Manager</h2>
+        </div>
 
         <div class="row margin-bottom-40">
             <div class="counters col-md-3 col-sm-3">
+                <h3>Collections</h3>
                 <span class="counter">{{collection_count}}</span>
-                <h4>Collections</h4>
             </div>
             <div class="counters col-md-3 col-sm-3">
+                <h3>Schemes</h3>
                 <span class="counter">{{scheme_count}}</span>
-                <h4>Schemes</h4>
             </div>
             <div class="counters col-md-3 col-sm-3">
+                <h3>Entity Types</h3>
                 <span class="counter">{{entitytype_count}}</span>
-                <h4>Entity Types</h4>
             </div>
             <div class="counters col-md-3 col-sm-3">
+                <h3>Concepts</h3>
                 <span class="counter">{{concept_count}}</span>
-                <h4>Concepts</h4>
             </div>
         </div>
-
 
     </div>
 {% endif %}
