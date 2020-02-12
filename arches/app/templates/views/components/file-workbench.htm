@@ -146,9 +146,10 @@
 </div>
 
 <h5 class="workbench-tile-picker-label">{% trans 'File List' %}</h5>
+<input type="text" class="form-control" style="width: 100%; height:initial" placeholder="Filter" data-bind="textInput: filter"></input>
 <div class='photo-workbench-photos'>
 <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
-    <!--ko if: $parent.getUrl(tile) -->
+    <!--ko if: $parent.getUrl(tile) && ($parent.filter().length === 0 || $parent.isFiltered(tile)) -->
     <div class='photo-workbench-photo' data-bind="text: $index() + 1 + ' | ' + ($parent.getUrl(tile).name), click: $parent.selectItem, css: {'selected-photo': ko.unwrap(selected)}"></div>
     <!--/ko-->
 <!-- /ko -->
