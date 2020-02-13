@@ -50,15 +50,15 @@
             <div id="hidden-dz-previews" style="display:none"></div>
 
             <!--ko if: displayContent() -->
-                <!--ko foreach: fileFormatRenderers-->
-                    <!--ko if: ko.unwrap($parent.displayContent) && ($parent.typeMatch($data.type, $data.ext, $data.hastab)) -->
+            <!--ko foreach: fileFormatRenderers-->
+            <!--ko if: $parent.typeMatch($data.type, $data.ext, $data.hastab) -->
                         <!-- ko component: {
                             name: $data.name,
                             params: {
                                 card: $parent.card,
                                 selected: $parent.selected,
                                 state: $data.state,
-                                displayContent: ko.unwrap($parent.displayContent),
+                                displayContent: $parent.displayContent,
                                 context: 'render',
                                 loading: $parent.loading
                             }
@@ -339,7 +339,7 @@
                 card: $parent.card,
                 selected: $parent.selected,
                 state: $data.state,
-                displayContent: ko.unwrap($parent.displayContent),
+                displayContent: $parent.displayContent,
                 context: 'tab-contents'
             }
         } --> <!-- /ko -->
