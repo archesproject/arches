@@ -68,8 +68,6 @@ define([
                 return "unique_id_" + self.uniqueId;
             });
 
-            this.showThumbnails = ko.observable(false);
-
             this.selectDefault = function(){
                 var self = this;
                 return function() {
@@ -90,7 +88,9 @@ define([
                         return tile.selected() === true;
                     });
                 if (selected) {
-                    this.selected(selected);
+                    if (!this.selected() || (this.selected() && this.selected().tileid !== selected.tileid)) {
+                        this.selected(selected);
+                    }
                     file = this.getUrl(selected);
                 }
                 else {
@@ -105,7 +105,7 @@ define([
 
             this.selectItem = function(val){
                 if (val && val.selected) {
-                    if (ko.unwrap(val) !== true) {
+                    if (ko.unwrap(val) !== true && ko.unwrap(val.selected) !== true) {
                         val.selected(true);
                     }
                 }
