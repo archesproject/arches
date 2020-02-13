@@ -1011,6 +1011,14 @@ ul.tabbed-report-tab-list {
     z-index: 100000001;
 }
 
+.gallery-controls {
+    margin: 35px 110px 35px 35px;
+}
+
+.gallery-controls.new-tile.sidebar {
+    margin: 25px;
+}
+
 
 .workbench-card-wrapper {
     flex: 1;
@@ -1113,7 +1121,7 @@ ul.tabbed-report-tab-list {
     flex: 1;
     height: 100%;
     position: relative;
-    background-color: #eee;
+    background-color: #fafafa;
     border-top: 1px solid #ddd;
 }
 
