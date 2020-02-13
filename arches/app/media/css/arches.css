@@ -912,6 +912,18 @@ ul.tabbed-report-tab-list {
     margin: 15px 0px;
 }
 
+.file-workbench-files::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 9px;
+    border-left: 1px solid #ddd;
+}
+
+.file-workbench-files::-webkit-scrollbar-thumb {
+    border-radius: 2px;
+    background-color: rgba(0,0,0,.28);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}
+
 .file-workbench-file {
     position: relative;
     padding: 4px;
