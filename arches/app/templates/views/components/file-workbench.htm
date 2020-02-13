@@ -48,16 +48,17 @@
     <div class="card-display-panel">
         <div>
             <div id="hidden-dz-previews" style="display:none"></div>
+
             <!--ko if: displayContent() -->
-                <!--ko foreach: fileFormatRenderers-->
-                    <!--ko if: ko.unwrap($parent.displayContent) && ($parent.typeMatch($data.type, $data.ext, $data.hastab)) -->
+            <!--ko foreach: fileFormatRenderers-->
+            <!--ko if: $parent.typeMatch($data.type, $data.ext, $data.hastab) -->
                         <!-- ko component: {
                             name: $data.name,
                             params: {
                                 card: $parent.card,
                                 selected: $parent.selected,
                                 state: $data.state,
-                                displayContent: ko.unwrap($parent.displayContent),
+                                displayContent: $parent.displayContent,
                                 context: 'render',
                                 loading: $parent.loading
                             }
@@ -234,6 +235,7 @@
                 <div data-bind="foreach: {
                         data: $parent.card.widgets, as: 'widget'
                     }">
+                    <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) !== 'file-list' -->
                     <div data-bind='component: {
                         name: self.form.widgetLookup[widget.widget_id()].name,
                         params: {
@@ -262,8 +264,9 @@
                         mouseout: function(){
                             if (self.preview) widget.hovered(null);
                         }
-                    }, visible: widget.visible && self.form.widgetLookup[widget.widget_id()].name !== "newfile-widget" && self.form.widgetLookup[widget.widget_id()].name !== "file-widget"'>
+                    }, visible: widget.visible'>
                 </div>
+                <!--/ko-->
                 </div>
             </form>
             <!--/ko-->
@@ -283,7 +286,7 @@
                 <!-- /ko -->
                 <!-- ko if: tile.dirty() -->
                     <!-- ko if: $parent.provisionalTileViewModel && !$parent.provisionalTileViewModel.tileIsFullyProvisional() && $parent.card.isWritable -->
-                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: selected().reset">{% trans 'Cancel' %}</button>
+                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function(){tile.reset()}">{% trans 'Cancel' %}</button>
                     <!-- /ko -->
                     <!-- ko if: tile.tileid -->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: tile.save, css: {
@@ -329,14 +332,14 @@
 
 <!--ko if: activeTab() === 'file-context' -->
     <!--ko foreach: fileFormatRenderers-->
-         <!--ko if: ko.unwrap($parent.displayContent) && ($parent.typeMatch($data.type, $data.ext, $data.hastab)) && $data.hastab -->
+         <!--ko if: ko.unwrap($parent.displayContent) && ($parent.typeMatch($data.type, $data.ext, $data.hastab)) -->
         <!-- ko component: {
             name: $data.name,
             params: {
                 card: $parent.card,
                 selected: $parent.selected,
                 state: $data.state,
-                displayContent: ko.unwrap($parent.displayContent),
+                displayContent: $parent.displayContent,
                 context: 'tab-contents'
             }
         } --> <!-- /ko -->
