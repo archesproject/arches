@@ -229,7 +229,7 @@ define([
                     loading(false);
                 });
             },
-            deleteTile: function(onFail) {
+            deleteTile: function(onFail, onSuccess) {
                 loading(true);
                 $.ajax({
                     type: "DELETE",
@@ -238,6 +238,9 @@ define([
                 }).done(function(response) {
                     params.card.tiles.remove(self);
                     selection(params.card);
+                    if (typeof onSuccess === 'function') {
+                        onSuccess(response);
+                    }
                 }).fail(function(response) {
                     if (typeof onFail === 'function') {
                         onFail(response);
