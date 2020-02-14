@@ -215,8 +215,16 @@ dl.inline-flex dd {
     width: 35px;
 }
 
+.iiif-image-tool-slider .switch.switch-small.switch-widget {
+    width: 25px;
+}
+
 .switch.switch-widget.on>small {
     left: 22px;
+}
+
+.iiif-image-tool-slider .switch.switch-widget.on>small {
+    left: 12px;
 }
 
 .switch.switch-widget.null>small {
@@ -871,6 +879,18 @@ ul.tabbed-report-tab-list {
     margin: 5px 20px 10px 20px;
 }
 
+.photo-workbench-photos::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 9px;
+    border-left: 1px solid #ddd;
+}
+
+.photo-workbench-photos::-webkit-scrollbar-thumb {
+    border-radius: 2px;
+    background-color: rgba(0,0,0,.28);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}
+
 .photo-workbench-photo {
     position: relative;
     padding: 4px;
@@ -910,6 +930,18 @@ ul.tabbed-report-tab-list {
     display: flex;
     flex-direction: column;
     margin: 15px 0px;
+}
+
+.file-workbench-files::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 9px;
+    border-left: 1px solid #ddd;
+}
+
+.file-workbench-files::-webkit-scrollbar-thumb {
+    border-radius: 2px;
+    background-color: rgba(0,0,0,.28);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
 }
 
 .file-workbench-file {
@@ -997,6 +1029,14 @@ ul.tabbed-report-tab-list {
     -moz-osx-font-smoothing: grayscale;
     transform: translate(0, 0);
     z-index: 100000001;
+}
+
+.gallery-controls {
+    margin: 35px 110px 35px 35px;
+}
+
+.gallery-controls.new-tile.sidebar {
+    margin: 25px;
 }
 
 
@@ -1101,7 +1141,7 @@ ul.tabbed-report-tab-list {
     flex: 1;
     height: 100%;
     position: relative;
-    background-color: #eee;
+    background-color: #fafafa;
     border-top: 1px solid #ddd;
 }
 
