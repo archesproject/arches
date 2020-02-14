@@ -30,5 +30,5 @@ def can_create_resource_instance(user):
 
 
 @register.filter(name="can_create_graph")
-def can_edit_graphs(user):
+def can_create_graph(user):
     return len(get_resource_types_by_perm(user, ["models.write_nodegroup", "models.delete_nodegroup"])) > 0
