@@ -71,11 +71,18 @@ define([
             this.selectDefault = function(){
                 var self = this;
                 return function() {
+                    var t;
+                    self.toggleTab('edit');
+                    self.activeTab('edit');
                     var selectedIndex = self.card.tiles.indexOf(self.selected());
                     if(self.card.tiles().length > 0 && selectedIndex === -1) {
                         selectedIndex = 0;
                     }
-                    self.card.tiles()[selectedIndex];
+                    t = self.card.tiles()[selectedIndex];
+                    if(t) {
+                        t.selected(true);
+                        self.selectItem(t);
+                    }
                 };
             };
 
@@ -112,12 +119,7 @@ define([
             };
 
             this.removeTile = function(val){
-                //TODO: Upon deletion select the tile to the left of the deleted tile
-                //If the deleted tile is the first tile, then select the tile to the right
-                // var tileCount = this.parent.tiles().length;
-                // var index = this.parent.tiles.indexOf(val);
-                val.deleteTile();
-                setTimeout(self.defaultSelector, 150);
+                val.deleteTile(null, self.defaultSelector);
             };
 
             this.typeMatch = function(type, ext, hastab){

@@ -145,8 +145,10 @@
 <div class="workbench-card-sidepanel-header-container file-workbench">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
 </div>
-
-<input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'filter file list...' %}" data-bind="textInput: filter"></input>
+<div style='position: relative;'>
+    <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'Filter file list...' %}" data-bind="textInput: filter"></input>
+    <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }" style=""><i class="fa fa-times-circle"></i></span>
+</div>
 <div class='file-workbench-files'>
 <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
     <!--ko if: $parent.getUrl(tile) && ($parent.filter().length === 0 || $parent.isFiltered(tile)) -->
