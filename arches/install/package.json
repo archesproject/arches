@@ -55,8 +55,5 @@
         "select2": "3.5.1",
         "underscore": "1.9.1",
         "uuidjs": "^3.3.0"
-    },
-    "resolutions": {
-        "c3/d3": "^5.8.0"
     }
 }
