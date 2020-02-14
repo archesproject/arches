@@ -20,7 +20,7 @@
 @import url(../packages/leaflet-draw/dist/leaflet.draw.css);
 @import url(../css/tree/tree.css);
 @import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
-@import url(../packages/c3/c3.min.css);
+
 .regular-link {
     color: #337ab7;
     text-decoration: none;
