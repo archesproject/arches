@@ -4,9 +4,10 @@ define(['knockout'], function(ko) {
             this.params = params;
             this.url = "";
             this.type = "";
-            if (this.params.displayContent) {
-                this.url = this.params.displayContent.url;
-                this.type = this.params.displayContent.type;
+            this.displayContent = ko.unwrap(this.params.displayContent);
+            if (this.displayContent) {
+                this.url = this.displayContent.url;
+                this.type = this.displayContent.type;
             }
             this.fileType = 'image/jpeg';
         },
