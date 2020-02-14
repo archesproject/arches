@@ -18,7 +18,6 @@
         "ckeditor": "^4.6.2",
         "codemirror": "^5.24.0",
         "core-js": "^2.5.7",
-        "c3": "^0.7.12",
         "d3": "3.5.17",
         "datatables.net": "~1.10.12",
         "datatables.net-bs": "~1.10.12",
