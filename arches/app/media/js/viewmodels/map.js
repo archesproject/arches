@@ -184,6 +184,10 @@ define([
             return feature.properties.resourceinstanceid;
         };
 
+        this.expandSidePanel = function() {
+            return false;
+        };
+
         this.resourceLookup = {};
         this.getPopupData = function(feature) {
             var data = feature.properties;

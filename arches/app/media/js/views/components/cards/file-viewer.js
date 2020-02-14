@@ -1,0 +1,193 @@
+define([
+    'knockout',
+    'knockout-mapping',
+    'underscore',
+    'arches',
+    'dropzone',
+    'uuid',
+    'viewmodels/card-component',
+    'views/components/workbench',
+    'file-renderers',
+    'bindings/slide',
+    'bindings/fadeVisible',
+    'bindings/dropzone'
+], function(ko, koMapping, _, arches, Dropzone, uuid, CardComponentViewModel, WorkbenchComponentViewModel, fileRenderers) {
+    return ko.components.register('file-viewer', {
+        viewModel: function(params) {
+            params.configKeys = ['acceptedFiles', 'maxFilesize'];
+            var self = this;
+            this.fileFormatRenderers = fileRenderers;
+            this.filter = ko.observable('');
+            this.fileFormatRenderers.forEach(function(r){
+                r.state = {};
+            });
+            CardComponentViewModel.apply(this, [params]);
+            WorkbenchComponentViewModel.apply(this, [params]);
+            if (this.card && this.card.activeTab) {
+                self.activeTab(this.card.activeTab);
+            } else {
+                self.activeTab = ko.observable();
+            }
+
+            this.selected = ko.observable();
+            self.activeTab.subscribe(
+                function(val){
+                    self.card.activeTab = val;
+                });
+
+            self.card.tiles.subscribe(function(val){
+                if (val.length === 0) {
+                    self.activeTab(null);
+                }
+            });
+
+            this.isFiltered = function(t){
+                return self.getUrl(t).name.toLowerCase().includes(self.filter().toLowerCase());
+            };
+
+            this.getUrl = function(tile){
+                var url = '';
+                var type = '';
+                var name;
+                _.each(tile.data,
+                    function(v, k) {
+                        var val = ko.unwrap(v);
+                        if (Array.isArray(val)
+                            && val.length == 1
+                            && (ko.unwrap(val[0].url) || ko.unwrap(val[0].content))) {
+                            url = ko.unwrap(val[0].url) || ko.unwrap(val[0].content);
+                            type = ko.unwrap(val[0].type);
+                            name = ko.unwrap(val[0].name);
+                        }
+                    });
+                return {url: url, type: type, name: name};
+            };
+
+            this.uniqueId = uuid.generate();
+            this.uniqueidClass = ko.computed(function() {
+                return "unique_id_" + self.uniqueId;
+            });
+
+            this.selectDefault = function(){
+                var self = this;
+                return function() {
+                    var t;
+                    self.toggleTab('edit');
+                    self.activeTab('edit');
+                    var selectedIndex = self.card.tiles.indexOf(self.selected());
+                    if(self.card.tiles().length > 0 && selectedIndex === -1) {
+                        selectedIndex = 0;
+                    }
+                    t = self.card.tiles()[selectedIndex];
+                    if(t) {
+                        t.selected(true);
+                        self.selectItem(t);
+                    }
+                };
+            };
+
+            this.defaultSelector = this.selectDefault();
+
+            this.displayContent = ko.pureComputed(function(){
+                var file;
+                var selected = this.card.tiles().find(
+                    function(tile){
+                        return tile.selected() === true;
+                    });
+                if (selected) {
+                    if (!this.selected() || (this.selected() && this.selected().tileid !== selected.tileid)) {
+                        this.selected(selected);
+                    }
+                    file = this.getUrl(selected);
+                }
+                else {
+                    this.selected(undefined);
+                }
+                return file;
+            }, this);
+
+            if (this.displayContent() === undefined) {
+                this.activeTab(undefined);
+            }
+
+            this.selectItem = function(val){
+                if (val && val.selected) {
+                    if (ko.unwrap(val) !== true && ko.unwrap(val.selected) !== true) {
+                        val.selected(true);
+                    }
+                }
+            };
+
+            this.removeTile = function(val){
+                val.deleteTile(null, self.defaultSelector);
+            };
+
+            this.typeMatch = function(type, ext, hastab){
+                var rawFileType = ko.unwrap(self.displayContent).type;
+                var rawExtension = ko.unwrap(self.displayContent).url.split('.').pop();
+                if (type === rawFileType && ext === rawExtension)  {
+                    return true;
+                }
+                var splitFileType = ko.unwrap(self.displayContent).type.split('/');
+                var fileType = splitFileType[0];
+                var splitAllowableType = type.split('/');
+                var allowableType = splitAllowableType[0];
+                var allowableSubType = splitAllowableType[1];
+                if (allowableSubType === '*' && fileType === allowableType) {
+                    return true;
+                }
+                return false;
+            };
+
+            this.addTile = function(file){
+                var newtile;
+                newtile = self.card.getNewTile();
+                var targetNode;
+                var tilevalue = {
+                    name: file.name,
+                    accepted: true,
+                    height: file.height,
+                    lastModified: file.lastModified,
+                    size: file.size,
+                    status: file.status,
+                    type: file.type,
+                    width: file.width,
+                    url: null,
+                    file_id: null,
+                    index: 0,
+                    content: window.URL.createObjectURL(file),
+                    error: file.error
+                };
+                Object.keys(newtile.data).forEach(function(val){
+                    if (newtile.datatypeLookup && newtile.datatypeLookup[val] === 'file-list') {
+                        targetNode = val;
+                    }
+                });
+                newtile.data[targetNode]([tilevalue]);
+                newtile.formData.append('file-list_' + targetNode, file, file.name);
+                newtile.save();
+                self.card.newTile = undefined;
+            };
+
+            this.dropzoneOptions = {
+                url: "arches.urls.root",
+                dictDefaultMessage: '',
+                autoProcessQueue: false,
+                uploadMultiple: true,
+                autoQueue: false,
+                clickable: ".fileinput-button." + this.uniqueidClass(),
+                previewsContainer: '#hidden-dz-previews',
+                init: function() {
+                    self.dropzone = this;
+                    this.on("addedfile", self.addTile, self);
+                    this.on("error", function(file, error) {
+                        file.error = error;
+                    });
+                }
+            };
+        },
+        template: {
+            require: 'text!templates/views/components/cards/file-viewer.htm'
+        }
+    });
+});

@@ -60,8 +60,15 @@ class Command(BaseCommand):
             else:
                 return None
 
+        ontology_version = None
+        ontology_src = None
+
         if options["source"]:
             config_file = os.path.join(options["source"], "ontology_config.json")
+            if not os.path.exists(config_file):
+                # try from the cwd
+                config_file = os.path.join(os.getcwd(), options["source"], "ontology_config.json")
+
             if os.path.exists(config_file):
                 with open(config_file, "r") as f:
                     configs = json.load(f)
@@ -73,6 +80,10 @@ class Command(BaseCommand):
                     ontology_version = configs["base_version"]
                     ontology_extensions = extension_paths = [os.path.join(options["source"], ext) for ext in configs["extensions"]]
                     ontology_src = os.path.join(options["source"], configs["base"])
+            else:
+                print(_("You must supply an ontology_config.json within your ontology source directory."))
+                print(_(f"'{config_file}' was not found."))
+                return
 
         if ontology_version is None:
             print(_("You must supply a version number using the -vn/--version argument."))

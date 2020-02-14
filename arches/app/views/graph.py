@@ -38,12 +38,14 @@ from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
+from arches.app.models.resource import ModelInactiveError
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export, create_mapping_configuration_file
 from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
 from arches.app.utils.system_metadata import system_metadata
 from arches.app.views.base import BaseManagerView
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 from io import BytesIO
+from elasticsearch.exceptions import RequestError
 
 logger = logging.getLogger(__name__)
 
@@ -378,6 +380,16 @@ class GraphDataView(View):
             return JSONResponse(ret)
         except GraphValidationError as e:
             return JSONErrorResponse(e.title, e.message, {"status": "Failed"})
+        except ModelInactiveError as e:
+            return JSONErrorResponse(e.title, e.message)
+        except RequestError as e:
+            return JSONErrorResponse(
+                _("Elasticsearch indexing error"),
+                _(
+                    """If you want to change the datatype of an existing node.  
+                    Delete and then re-create the node, or export the branch then edit the datatype and re-import the branch."""
+                ),
+            )
 
     @method_decorator(group_required("Graph Editor"), name="dispatch")
     def delete(self, request, graphid):
@@ -401,6 +413,8 @@ class GraphDataView(View):
                     }
                 )
             except GraphValidationError as e:
+                return JSONErrorResponse(e.title, e.message)
+            except ModelInactiveError as e:
                 return JSONErrorResponse(e.title, e.message)
         elif self.action == "delete_graph":
             try:

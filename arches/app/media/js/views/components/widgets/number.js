@@ -17,23 +17,26 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber
 
         var self = this;
 
-        var updateVal = ko.computed(function(){
+        this.updateVal = ko.computed(function(){
             if (self.value()){
                 var val = self.value();
-                if (self.min() != "") {
+                if (typeof self.min() === 'number') {
                     val = Number(val) < Number(self.min()) ? Number(self.min()) : Number(val);
                 }
 
-                if (self.max() != "") {
+                if (typeof self.max() === 'number') {
                     val = Number(val) > Number(self.max()) ? Number(self.max()) : Number(val);
                 }
 
                 if (self.precision()) {
                     val = Number(val).toFixed(self.precision());
                 }
-                self.value(Number(val));
+                
             }
-        }, self).extend({ throttle: 600 });
+            return val || self.value();
+        }, self).extend({throttle: 600});
+
+        this.value(this.updateVal());
 
         if (ko.isObservable(this.precision)) {
             var precisionSubscription = this.precision.subscribe(function(val){
@@ -43,7 +46,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber
             }, self);
             self.disposables.push(precisionSubscription);
         }
-        self.disposables.push(updateVal);
+        self.disposables.push(this.updateVal);
     };
 
     return ko.components.register('number-widget', {

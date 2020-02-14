@@ -27,7 +27,7 @@ before_install:
   - psql -d postgres -c "SET standard_conforming_strings = off;"
   - psql -c "CREATE DATABASE template_postgis;"
   - psql -d template_postgis -c "CREATE EXTENSION postgis;"
-  - "pip install -e . --no-binary :all:"
+  - "pip install -e ."
   - pip install -r arches/install/requirements.txt
   - pip install -r arches/install/requirements_dev.txt
   - npm install -g wait-on
@@ -52,15 +52,8 @@ node_js: 10.8
 
 matrix:
   allow_failures:
-    - python: 2.7.9
     - name: "Javascript - Cypress.io tests"
   include:
-    - name: "Python 2 - Nose/unittests"
-      install: echo "Python dependences installed"
-      python: 2.7.9
-      script:
-        - wait-on http://localhost:9200/
-        - python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
     - name: "Python 3 - Nose/unittests"
       install: echo "Python dependences installed"
       python: 3.7

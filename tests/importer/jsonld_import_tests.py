@@ -2,6 +2,7 @@ import os
 import json
 import csv
 import base64
+import datetime
 from io import BytesIO
 from tests import test_settings
 from operator import itemgetter
@@ -17,7 +18,9 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from arches.app.utils.data_management.resources.exporter import ResourceExporter as BusinessDataExporter
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
-
+from arches.app.utils.data_management.resources.formats import rdffile
+from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
+from pyld.jsonld import expand
 
 # these tests can be run from the command line via
 # python manage.py test tests/importer/jsonld_import_tests.py --settings="tests.test_settings"
@@ -109,6 +112,42 @@ class JsonLDImportTests(ArchesTestCase):
 
     def tearDown(self):
         pass
+
+    def test_context_caching(self):
+        data = {
+            "@context": "https://linked.art/ns/v1/linked-art.json",
+            "id": "https://linked.art/example/object/3",
+            "type": "HumanMadeObject",
+            "_label": "Black and White Photograph of 'St. Sebastian'",
+            "classified_as": [{"id": "http://vocab.getty.edu/aat/300128359", "type": "Type", "_label": "Black and White Photograph"}],
+        }
+
+        fetch = rdffile.fetch
+
+        def tempFetch(url):
+            raise Exception("This should not happen becauase we cached the doc")
+
+        # rdffile.fetch = tempFetch
+
+        # # first we test that we can override the fetch function and confirm that it gets called
+        # with self.assertRaises(Exception):
+        #     jsonld_document = expand(data)
+
+        # now set the function back and test normally
+        rdffile.fetch = fetch
+        jsonld_document = expand(data)
+        self.assertTrue(data["@context"] in rdffile.docCache)
+
+        # now set it to the temp fetch and confirm that the tempFetch isn't called on subsequent uses as it was initially
+        rdffile.fetch = tempFetch
+        jsonld_document = expand(data)
+        rdffile.fetch = fetch
+
+        # now invalidate the cache and make sure it refreshes the doc
+        rdffile.docCache[data["@context"]]["expires"] = datetime.datetime.now()
+        jsonld_document = expand(data)
+        self.assertTrue(rdffile.docCache[data["@context"]]["expires"] > datetime.datetime.now())
+        self.assertTrue(data["@context"] in rdffile.docCache)
 
     def test_1_basic_import(self):
 

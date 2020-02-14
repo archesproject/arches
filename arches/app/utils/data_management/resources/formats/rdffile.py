@@ -2,6 +2,7 @@ import os
 import re
 import json
 import uuid
+import requests
 import datetime
 import logging
 from io import StringIO
@@ -23,19 +24,35 @@ from rdflib.namespace import RDF, RDFS
 from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand, set_document_loader
 
 
-try:
-    # If we have a context file in our working directory, load it
-    fh = open("linked-art.json")
-    context_data = fh.read()
-    fh.close()
+# Stop code from looking up the contexts online for every operation
+docCache = {}
 
-    def cached_context(url):
-        return {"contextUrl": None, "documentUrl": "https://linked.art/ns/v1/linked-art.json", "document": context_data}
 
-    set_document_loader(cached_context)
-except:
-    #  Guess we don't...
-    pass
+def fetch(url):
+    resp = requests.get(url)
+    return resp.json()
+
+
+def use_cache(url):
+    if docCache[url]["expires"] is not None and docCache[url]["expires"] < datetime.datetime.now():
+        return False
+    else:
+        return True
+
+
+def load_document_and_cache(url):
+    if url in docCache and use_cache(url):
+        return docCache[url]
+
+    doc = {"expires": None, "contextUrl": None, "documentUrl": None, "document": ""}
+    data = fetch(url)
+    doc["document"] = data
+    doc["expires"] = datetime.datetime.now() + datetime.timedelta(minutes=settings.JSONLD_CONTEXT_CACHE_TIMEOUT)
+    docCache[url] = doc
+    return doc
+
+
+set_document_loader(load_document_and_cache)
 
 
 class RdfWriter(Writer):
@@ -353,7 +370,6 @@ class JsonLdReader(Reader):
         return None
 
     def read_resource(self, data, use_ids=False, resourceid=None, graphid=None):
-
         if graphid is None and self.graphtree is None:
             raise Exception("No graphid supplied to read_resource")
         elif self.graphtree is None:
@@ -525,8 +541,16 @@ class JsonLdReader(Reader):
                 bnode = {"data": [], "nodegroup_id": branch[0]["nodegroup_id"], "cardinality": branch[0]["cardinality"]}
                 if create_new_tile:
                     parenttile_id = tile.tileid if tile else None
-                    tile = Tile(tileid=uuid.uuid4(), parenttile_id=parenttile_id, nodegroup_id=branch[0]["nodegroup_id"], data={})
+                    tile = Tile(
+                        tileid=uuid.uuid4(),
+                        resourceinstance_id=self.resource.pk,
+                        parenttile_id=parenttile_id,
+                        nodegroup_id=branch[0]["nodegroup_id"],
+                        data={},
+                    )
                     self.resource.tiles.append(tile)
+                elif "tile" in result and result["tile"]:
+                    tile = result["tile"]
 
                 bnode["tile"] = tile
 

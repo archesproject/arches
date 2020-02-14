@@ -9,7 +9,6 @@ from django.core import management
 from django.db import connection
 from django.http import HttpRequest
 from arches.app.models import models
-from arches.app.search.search_export import SearchResultsExporter
 import arches.app.utils.zip as zip_utils
 from django.utils.translation import ugettext as _
 
@@ -48,7 +47,7 @@ def sync(self, surveyid=None, userid=None):
 
 @shared_task(bind=True)
 def export_search_results(self, userid, request_values, format):
-
+    from arches.app.search.search_export import SearchResultsExporter
     from arches.app.models.system_settings import settings
 
     settings.update_from_db()

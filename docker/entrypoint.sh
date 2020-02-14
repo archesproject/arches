@@ -149,7 +149,7 @@ wait_for_db() {
     echo "Testing if Elasticsearch is up..."
     while [[ ! ${return_code} == 0 ]]
     do
-        curl -s "http://${ESHOST}:${ESPORT}" >&/dev/null
+        curl -s "http://${ESHOST}:${ESPORT}/_cluster/health?wait_for_status=green&timeout=60s" >&/dev/null
         return_code=$?
         sleep 1
     done
