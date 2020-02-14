@@ -1152,11 +1152,6 @@ bit-twiddle@^1.0.0:
   resolved "https://registry.yarnpkg.com/bit-twiddle/-/bit-twiddle-1.0.2.tgz#0c6c1fabe2b23d17173d9a61b7b7093eb9e1769e"
   integrity sha1-DGwfq+KyPRcXPZpht7cJPrnhdp4=
 
-blueimp-gallery@2.15.2:
-  version "2.15.2"
-  resolved "https://registry.yarnpkg.com/blueimp-gallery/-/blueimp-gallery-2.15.2.tgz#9a02c1d0ba450b0e8ba70d804f745d9ec9e66004"
-  integrity sha1-mgLB0LpFCw6Lpw2AT3RdnsnmYAQ=
-
 bootstrap-colorpicker@^2.3.6:
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/bootstrap-colorpicker/-/bootstrap-colorpicker-2.5.3.tgz#b50aff8590fbaa6b5aa63a5624e4213f1659a49d"
@@ -1732,13 +1727,6 @@ find-up@^2.0.0:
   dependencies:
     locate-path "^2.0.0"
 
-flexslider@~2.6.3:
-  version "2.6.4"
-  resolved "https://registry.yarnpkg.com/flexslider/-/flexslider-2.6.4.tgz#d81fb58b342f9e3e8f497ee8198a35ab8777d9e0"
-  integrity sha1-2B+1izQvnj6PSX7oGYo1q4d32eA=
-  dependencies:
-    jquery ">=1.11.3"
-
 font-awesome@~4.6.3:
   version "4.6.3"
   resolved "https://registry.yarnpkg.com/font-awesome/-/font-awesome-4.6.3.tgz#86933651540ee00874c664017f50f2172f6531a2"
@@ -1844,9 +1832,9 @@ get-stream@3.0.0, get-stream@^3.0.0:
   integrity sha1-jpQ9E1jcN1VQVOy+LtsFqhdO3hQ=
 
 gl-matrix@^3.0.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/gl-matrix/-/gl-matrix-3.1.0.tgz#f5b2de17d8fed95a79e5025b10cded0ab9ccbed0"
-  integrity sha512-526NA+3EA+ztAQi0IZpSWiM0fyQXIp7IbRvfJ4wS/TjjQD0uv0fVybXwwqqSOlq33UckivI0yMDlVtboWm3k7A==
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/gl-matrix/-/gl-matrix-3.2.1.tgz#2d8e35125bf854f49abded8a0c8350b1a4907a26"
+  integrity sha512-YYVO8jUSf6+SakL4AJmx9Jc7zAZhkJQ+WhdtX3VQe5PJdCOX6/ybY4x1vk+h94ePnjRn6uml68+QxTAJneUpvA==
 
 got@^8.3.2:
   version "8.3.2"
@@ -2082,17 +2070,12 @@ jquery-validation@1.17.0:
   dependencies:
     jquery "^1.7 || ^2.0 || ^3.1"
 
-jquery.easing@^1.4.1:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/jquery.easing/-/jquery.easing-1.4.1.tgz#47982c5836bd758fd48494923c4a101ef6e93e3b"
-  integrity sha1-R5gsWDa9dY/UhJSSPEoQHvbpPjs=
-
 jquery@3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
   integrity sha512-Ubldcmxp5np52/ENotGxlLe6aGMvmF4R8S6tZjsP6Knsaxd/xp3Zrh50cG93lR6nPXyUFwzN3ZSOQI0wRJNdGg==
 
-jquery@>=1.10, jquery@>=1.11.3, jquery@>=1.7, jquery@>=1.9, jquery@>=1.9.0, "jquery@^1.7 || ^2.0 || ^3.1", "jquery@^1.8.3 || ^2.0 || ^3.0":
+jquery@>=1.10, jquery@>=1.7, jquery@>=1.9, jquery@>=1.9.0, "jquery@^1.7 || ^2.0 || ^3.1", "jquery@^1.8.3 || ^2.0 || ^3.0":
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.4.1.tgz#714f1f8d9dde4bdfa55764ba37ef214630d80ef2"
   integrity sha512-36+AdBzCL+y6qjw5Tx7HgzeGCzC81MDDgaUP8ld2zhx58HdqXGoBd+tHdrBMiyjGQs0Hxs/MLZTu/eHNJJuWPw==
@@ -2680,9 +2663,9 @@ resolve-protobuf-schema@^2.1.0:
     protocol-buffers-schema "^3.3.1"
 
 resolve@^1.10.0:
-  version "1.15.0"
-  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.15.0.tgz#1b7ca96073ebb52e741ffd799f6b39ea462c67f5"
-  integrity sha512-+hTmAldEGE80U2wJJDC1lebb5jWqvTYAfm3YZ1ckk1gBr0MnCqUKlwK1e+anaFljIl+F5tR5IoZcm4ZDA1zMQw==
+  version "1.15.1"
+  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.15.1.tgz#27bdcdeffeaf2d6244b95bb0f9f4b4653451f3e8"
+  integrity sha512-84oo6ZTtoTUpjgNEr5SJyzQhzL72gaRodsSfyxC/AXRvwu0Yse9H8eF9IpGo7b8YetZhlI6v7ZQ6bKBFV/6S7w==
   dependencies:
     path-parse "^1.0.6"
 
