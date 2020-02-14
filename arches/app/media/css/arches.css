@@ -215,8 +215,16 @@ dl.inline-flex dd {
     width: 35px;
 }
 
+.iiif-image-tool-slider .switch.switch-small.switch-widget {
+    width: 25px;
+}
+
 .switch.switch-widget.on>small {
     left: 22px;
+}
+
+.iiif-image-tool-slider .switch.switch-widget.on>small {
+    left: 12px;
 }
 
 .switch.switch-widget.null>small {
@@ -869,6 +877,18 @@ ul.tabbed-report-tab-list {
     display: flex;
     flex-direction: column;
     margin: 5px 20px 10px 20px;
+}
+
+.photo-workbench-photos::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 9px;
+    border-left: 1px solid #ddd;
+}
+
+.photo-workbench-photos::-webkit-scrollbar-thumb {
+    border-radius: 2px;
+    background-color: rgba(0,0,0,.28);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
 }
 
 .photo-workbench-photo {
