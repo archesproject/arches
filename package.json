@@ -1,5 +1,6 @@
 {
     "name": "arches",
+    "version": "5.0.1_development",
     "repository": {
         "url": "git@github.com:archesproject/arches.git",
         "type": "git"
