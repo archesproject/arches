@@ -20,7 +20,7 @@
 @import url(../packages/leaflet-draw/dist/leaflet.draw.css);
 @import url(../css/tree/tree.css);
 @import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
-@import url(../packages/c3/c3.min.css);
+
 .regular-link {
     color: #337ab7;
     text-decoration: none;
@@ -929,7 +929,14 @@ ul.tabbed-report-tab-list {
     border: solid 1px #ddd;
     display: flex;
     flex-direction: column;
-    margin: 15px 0px;
+    margin: 15px 0px 5px 0px;
+}
+
+.file-workbench-filecount {
+    color: steelblue;
+    font-size: 11px;
+    padding-left: 5px;
+    margin-bottom: 10px;
 }
 
 .file-workbench-files::-webkit-scrollbar {
