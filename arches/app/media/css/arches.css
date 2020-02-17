@@ -3116,13 +3116,17 @@ div.dropdown-menu.open {
 }
 
 #circle {
-    width: 8px;
-    height: 8px;
+    width: 14px;
+    height: 14px;
     background: red;
     border-radius: 50%;
     z-index: 10;
     position: absolute;
-  }
+    top: -9px;
+    left: -9px;
+    color: #fff;
+    font-size: 0.6em;
+}
 
 .ep-edits-header {
     display: inline-flex;
@@ -4826,7 +4830,7 @@ ul.jqtree_common li.jqtree-folder {
     border-left: 1px solid #ddd;
     font-size: 17px;
     padding-left: 16px;
-    padding-right: 20px;
+    padding-right: 16px;
     min-width: 50px;
     max-width: inherit;
 }
