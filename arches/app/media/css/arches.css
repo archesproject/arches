@@ -11086,6 +11086,18 @@ a.tree-display-tool, a.tree-display-tool:hover {
     top: 0;
 }
 
+.btn-warning,
+.btn-warning:focus,
+.btn-hover-warning:hover,
+.btn-hover-warning:active,
+.btn-hover-warning.active,
+.btn.btn-active-warning:active,
+.btn.btn-active-warning.active,
+.dropdown.open>.btn.btn-active-warning,
+.btn-group.open .dropdown-toggle.btn.btn-active-warning {
+    color: #292929;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
@@ -11275,7 +11287,7 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .card-component-panel {
         flex: none;
         width: 100%;
-        height: calc(60vh - 50px);
+        height: 48vh;
     }
     .rp-report-container-preview {
         padding: 0 0 35px 0;
@@ -11368,6 +11380,18 @@ a.tree-display-tool, a.tree-display-tool:hover {
     }
     .form-group div input {
         max-width: 52vw;
+    }
+    .mobile-project-manager-editor .flex {
+        display: block;
+    }
+    .msm-designer-panel {
+        height: 53vh;
+    }
+    #summary-card.mpm-card .card-content {
+        margin: 0;
+    }
+    .msm-edit-buttons button:before {
+        display: none;
     }
 }
 
