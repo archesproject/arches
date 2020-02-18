@@ -3,12 +3,11 @@
 {% load template_tags %}
 {% load i18n %}
 
-
 {% block body %}
 
-
-
     <div class="wrapper">
+
+        <a id="topskip" tabindex="1" href="#main-content">Skip to content</a>
 
         <div id="container" class="effect aside-left aside-bright navbar-fixed mainnav-sm" data-bind="css: {'mainnav-in': tabsActive() && showTabs(), 'mainnav-sm': !navExpanded(), 'mainnav-lg': navExpanded()}">
 
@@ -437,7 +436,7 @@
                 {% endblock aside_container %}
             </div>
 
-            <button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>
+            <button id="scroll-top" class="btn" aria-label="Go to top of page"><i class="fa fa-chevron-up"></i></button>
         </div>
 
     </div>
@@ -452,7 +451,7 @@
             return {
                 graphs: {{graphs}},
                 createableResources: {{createable_resources}},
-                help: "{{nav.help.template}}",
+                help: "{{nav.help.template}}"
             };
         });
         {% endautoescape %}
