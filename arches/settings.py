@@ -548,7 +548,6 @@ RENDERERS = [{
         "component": "views/components/cards/file-renderers/imagereader",
         "ext": "",
         "type": "image/*",
-        "hastab": True,
         }]
 
 ##########################################

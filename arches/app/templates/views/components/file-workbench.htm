@@ -19,23 +19,18 @@
     <span class="map-sidebar-text">{% trans "Add" %}</span>
 </div>
 <!--ko foreach: fileFormatRenderers-->
-        <!--ko if: ko.unwrap($parent.displayContent) && ($parent.displayContent().renderer.id === $data.id) && $data.hastab -->
-        <div class="workbench-card-sidebar-tab" data-bind="click: function() {
-        $parent.toggleTab('file-context');
-    }, css: {
-        'active': $parent.activeTab() === 'file-context'
-    }">
-        <!-- ko component: {
-            name: $data.name,
-            params: {
-                card: $parent.card,
-                selected: $parent.selected,
-                state: $data.state,
-                displayContent: ko.unwrap($parent.displayContent),
-                context: 'tab'
-            }
-        } --> <!-- /ko -->
-    </div>
+        <!--ko if: ko.unwrap($parent.displayContent) && ($parent.displayContent().renderer.id === $data.id) -->
+            <!-- ko component: {
+                name: $data.name,
+                params: {
+                    fileViewer: $parent,
+                    card: $parent.card,
+                    selected: $parent.selected,
+                    state: $data.state,
+                    displayContent: ko.unwrap($parent.displayContent),
+                    context: 'tab'
+                }
+            } --> <!-- /ko -->
     <!--/ko-->
 <!--/ko-->
 {{ block.super }}
@@ -351,20 +346,19 @@
 </div>
 <!--/ko-->
 
-<!--ko if: activeTab() === 'file-context' -->
-    <!--ko foreach: fileFormatRenderers-->
-         <!--ko if: ko.unwrap($parent.displayContent) && ($parent.displayContent().renderer.id === $data.id) -->
-        <!-- ko component: {
-            name: $data.name,
-            params: {
-                card: $parent.card,
-                selected: $parent.selected,
-                state: $data.state,
-                displayContent: $parent.displayContent,
-                context: 'tab-contents'
-            }
-        } --> <!-- /ko -->
-        <!--/ko-->
+<!--ko foreach: fileFormatRenderers-->
+        <!--ko if: ko.unwrap($parent.displayContent) && ($parent.displayContent().renderer.id === $data.id) -->
+    <!-- ko component: {
+        name: $data.name,
+        params: {
+            fileViewer: $parent,
+            card: $parent.card,
+            selected: $parent.selected,
+            state: $data.state,
+            displayContent: $parent.displayContent,
+            context: 'tab-contents'
+        }
+    } --> <!-- /ko -->
     <!--/ko-->
 <!--/ko-->
 
