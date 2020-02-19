@@ -424,6 +424,9 @@
         return [{% autoescape off %}{% for renderer in app_settings.RENDERERS %}
                 {'name': '{{ renderer.name }}',
                 'component': '{{ renderer.component }}',
+                'id': '{{ renderer.id }}',
+                'iconclass': '{{ renderer.iconclass }}',
+                'text': '{{ renderer.name }}, {{ renderer.type }}, {{renderer.ext }}',
                 'type': '{{ renderer.type }}',
                 'ext': '{{ renderer.ext }}',
                 'hastab': '{{ renderer.hastab }}'},

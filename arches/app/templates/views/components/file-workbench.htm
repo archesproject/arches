@@ -19,7 +19,7 @@
     <span class="map-sidebar-text">{% trans "Add" %}</span>
 </div>
 <!--ko foreach: fileFormatRenderers-->
-        <!--ko if: ko.unwrap($parent.displayContent) && ($parent.typeMatch($data.type, $data.ext, $data.hastab)) && $data.hastab -->
+        <!--ko if: ko.unwrap($parent.displayContent) && ($parent.displayContent().renderer.id === $data.id) && $data.hastab -->
         <div class="workbench-card-sidebar-tab" data-bind="click: function() {
         $parent.toggleTab('file-context');
     }, css: {
@@ -48,24 +48,28 @@
     <div class="card-display-panel">
         <div>
             <div id="hidden-dz-previews" style="display:none"></div>
-
-            <!--ko if: displayContent() -->
-            <!--ko foreach: fileFormatRenderers-->
-            <!--ko if: $parent.typeMatch($data.type, $data.ext, $data.hastab) -->
-                        <!-- ko component: {
-                            name: $data.name,
-                            params: {
-                                card: $parent.card,
-                                selected: $parent.selected,
-                                state: $data.state,
-                                displayContent: $parent.displayContent,
-                                context: 'render',
-                                loading: $parent.loading
-                            }
-                        } --> <!-- /ko -->
+                    <!--ko if: displayContent() -->
+                        <!--ko foreach: fileFormatRenderers-->
+                            <!--ko if: $data.id && $parent.displayContent().renderer.id === $data.id -->
+                                <!-- ko component: {
+                                    name: $data.name,
+                                    params: {
+                                        card: $parent.card,
+                                        selected: $parent.selected,
+                                        state: $data.state,
+                                        displayContent: $parent.displayContent,
+                                        context: 'render',
+                                        loading: $parent.loading
+                                        }
+                                    } --> 
+                                <!-- /ko -->
+                            <!--/ko-->
+                        <!--/ko-->
+                        <!--ko ifnot: $data.id && $parent.displayContent().renderer.id === $data.id -->
+                                <div>{% trans 'Unable to recognize this data format.' %}</div><div data-bind="text: $parent.displayContent().name"></div>
+                        <!--/ko-->
                     <!--/ko-->
-                <!--/ko-->
-            <!--/ko-->
+
         </div>
     </div>
 
@@ -147,19 +151,33 @@
 </div>
 <div style='position: relative;'>
     <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'Filter file list...' %}" data-bind="textInput: filter"></input>
-    <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }" style=""><i class="fa fa-times-circle"></i></span>
+    <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
 </div>
 <div class='file-workbench-files'>
 <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
     <!--ko if: $parent.getUrl(tile) && ($parent.filter().length === 0 || $parent.isFiltered(tile)) -->
     <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {'selected-photo': ko.unwrap(selected)}, click: $parent.selectItem">
-    <i class="fa fa-file" role="presentation" data-bind="css:{'fa-pencil':false,'fa-file':true}"></i>
+
+    <i role="presentation" data-bind="class: $parent.getUrl(tile).iconclass || 'fa fa-file'"></i>
     <div class='file-name' data-bind="text: $parent.getUrl(tile).name"></div>
     </div>
     <!--/ko-->
 <!-- /ko -->
 </div>
 <div class='file-workbench-filecount' data-bind='text: card.tiles().length + "{% trans ' files uploaded' %}"'></div>
+
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input style="display:inline-block;"
+    data-bind="select2Query: {
+        select2Config: {
+            clickBubble: true,
+            disabled: false,
+            data: fileFormatRenderers,
+            value: fileRenderer,
+            multiple: false,
+            placeholder: 'File Renderer'
+        }}">
+</div>
 
 <div data-bind="css: card.model.cssclass">
 
@@ -335,7 +353,7 @@
 
 <!--ko if: activeTab() === 'file-context' -->
     <!--ko foreach: fileFormatRenderers-->
-         <!--ko if: ko.unwrap($parent.displayContent) && ($parent.typeMatch($data.type, $data.ext, $data.hastab)) -->
+         <!--ko if: ko.unwrap($parent.displayContent) && ($parent.displayContent().renderer.id === $data.id) -->
         <!-- ko component: {
             name: $data.name,
             params: {

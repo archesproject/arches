@@ -21,6 +21,8 @@ define([
             this.fileFormatRenderers.forEach(function(r){
                 r.state = {};
             });
+            this.fileRenderer = ko.observable();
+
             CardComponentViewModel.apply(this, [params]);
             WorkbenchComponentViewModel.apply(this, [params]);
             if (this.card && this.card.activeTab) {
@@ -45,10 +47,34 @@ define([
                 return self.getUrl(t).name.toLowerCase().includes(self.filter().toLowerCase());
             };
 
+            this.getDefaultRenderer = function(type, file){
+                var defaultRenderer = '';
+                this.fileFormatRenderers.forEach(function(renderer){
+                    var rawFileType = type;
+                    var rawExtension = file.url ? ko.unwrap(file.url).split('.').pop() : file.split('.').pop();
+                    if (renderer.type === rawFileType && renderer.ext === rawExtension)  {
+                        defaultRenderer = renderer;
+                    }
+                    var splitFileType = type.split('/');
+                    var fileType = splitFileType[0];
+                    var splitAllowableType = renderer.type.split('/');
+                    var allowableType = splitAllowableType[0];
+                    var allowableSubType = splitAllowableType[1];
+                    if (allowableSubType === '*' && fileType === allowableType) {
+                        defaultRenderer = renderer;
+                    }
+                }); 
+
+                return defaultRenderer;
+            };
+
             this.getUrl = function(tile){
                 var url = '';
                 var type = '';
                 var name;
+                var renderer;
+                var iconclass;
+                var rendererid;
                 _.each(tile.data,
                     function(v, k) {
                         var val = ko.unwrap(v);
@@ -58,9 +84,22 @@ define([
                             url = ko.unwrap(val[0].url) || ko.unwrap(val[0].content);
                             type = ko.unwrap(val[0].type);
                             name = ko.unwrap(val[0].name);
+                            rendererid = ko.unwrap(val[0].renderer);
+                            renderer = self.fileFormatRenderers.find(function(item) {
+                                return item.id === rendererid;
+                            });
+                            if (renderer) {
+                                iconclass = renderer.iconclass;
+                            } else {
+                                renderer = self.getDefaultRenderer(type, val[0]);
+                                if (renderer) {
+                                    renderer = self.getDefaultRenderer(type, val[0].name());
+                                    iconclass = renderer.iconclass;
+                                }
+                            }
                         }
                     });
-                return {url: url, type: type, name: name};
+                return {url: url, type: type, name: name, renderer: renderer, iconclass: iconclass};
             };
 
             this.uniqueId = uuid.generate();
@@ -99,6 +138,7 @@ define([
                         this.selected(selected);
                     }
                     file = this.getUrl(selected);
+                    this.fileRenderer(file.renderer ? file.renderer.id : undefined)
                 }
                 else {
                     this.selected(undefined);
@@ -122,23 +162,6 @@ define([
                 val.deleteTile(null, self.defaultSelector);
             };
 
-            this.typeMatch = function(type, ext, hastab){
-                var rawFileType = ko.unwrap(self.displayContent).type;
-                var rawExtension = ko.unwrap(self.displayContent).url.split('.').pop();
-                if (type === rawFileType && ext === rawExtension)  {
-                    return true;
-                }
-                var splitFileType = ko.unwrap(self.displayContent).type.split('/');
-                var fileType = splitFileType[0];
-                var splitAllowableType = type.split('/');
-                var allowableType = splitAllowableType[0];
-                var allowableSubType = splitAllowableType[1];
-                if (allowableSubType === '*' && fileType === allowableType) {
-                    return true;
-                }
-                return false;
-            };
-
             this.addTile = function(file){
                 var newtile;
                 newtile = self.card.getNewTile();
@@ -156,7 +179,8 @@ define([
                     file_id: null,
                     index: 0,
                     content: window.URL.createObjectURL(file),
-                    error: file.error
+                    error: file.error,
+                    renderer: self.getDefaultRenderer(file.type, file.name).id
                 };
                 Object.keys(newtile.data).forEach(function(val){
                     if (newtile.datatypeLookup && newtile.datatypeLookup[val] === 'file-list') {
