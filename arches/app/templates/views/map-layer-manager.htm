@@ -58,10 +58,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </div>
                             <div class="crud-card-main">
                                 <!-- ko if: item.nodeid -->
-                                <a class="listitem_name" data-bind="text: (item.config.layerName ? item.config.layerName() : false) || item.layer.name"></a>
+                                <a href="#" class="listitem_name" data-bind="text: (item.config.layerName ? item.config.layerName() : false) || item.layer.name"></a>
                                 <!-- /ko -->
                                 <!-- ko if: !item.nodeid -->
-                                <a class="listitem_name" data-bind="text: item.name"></a>
+                                <a href="#" class="listitem_name" data-bind="text: item.name"></a>
                                 <!-- /ko -->
                             </div>
                             <!-- ko if: item.nodeid -->
