@@ -57,7 +57,7 @@ define([
             }
             self.canFinish(canFinish);
         };
-        this.activeStep.subscribe(function(val) {
+        this.activeStep.subscribe(function() {
             self.checkCanFinish();
         });
 
