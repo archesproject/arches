@@ -142,6 +142,9 @@ define([
                 }
                 else {
                     this.selected(undefined);
+                    if (['add', 'edit'].indexOf(self.activeTab()) < 0) {
+                        self.activeTab(undefined);
+                    }
                 }
                 return file;
             }, this);
