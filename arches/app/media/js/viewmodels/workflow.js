@@ -46,7 +46,7 @@ define([
         this.canFinish = ko.observable(false);
 
         this.checkCanFinish = function(){
-            var required = false, canFinish = true, tileid = null, complete = null;
+            var required = false, canFinish = true, complete = null;
             for(var i = 0; i < self.steps.length; i++) {
                 required = ko.unwrap(self.steps[i].required);
                 complete = ko.unwrap(self.steps[i].complete);
@@ -57,7 +57,7 @@ define([
             }
             self.canFinish(canFinish);
         };
-        this.activeStep.subscribe(function(step) {
+        this.activeStep.subscribe(function(val) {
             self.checkCanFinish();
         });
 
