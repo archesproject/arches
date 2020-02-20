@@ -228,7 +228,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         </div>
 
                                                                         <div style="position: absolute; left: 110px; top: 10px;">
-                                                                            <input type="text" class="form-control" style="width: 366px; height: 36px;" placeholder="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
+                                                                            <input type="text" class="form-control" style="width: 366px; height: 36px;" placeholder="{% trans "Find an icon" %}" aria-label="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
 
                                                                             <!-- ko if: iconFilter() !== '' -->
                                                                             <span class="clear-search" style="position: absolute; left: 345px; top: 5px; color: #123; font-size: 17px;" data-bind="click: function () { iconFilter(''); }"><i class="fa fa-times-circle"></i></span>
