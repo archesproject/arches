@@ -22,8 +22,23 @@ define([
                 r.state = {};
             });
             this.fileRenderer = ko.observable();
-
             CardComponentViewModel.apply(this, [params]);
+
+            var getfileListNode = function(){
+                var fileListNodeId;
+                var fileListNodes = params.card.model.nodes().filter(
+                    function(val){
+                        if (val.datatype() === 'file-list' && self.card.nodegroupid == val.nodeGroupId())
+                            return val;
+                    });
+                if (fileListNodes.length) {
+                    fileListNodeId = fileListNodes[0].nodeid;
+                }
+                return fileListNodeId;
+            };
+
+            this.fileListNodeId = getfileListNode();
+
             WorkbenchComponentViewModel.apply(this, [params]);
             if (this.card && this.card.activeTab) {
                 self.activeTab(this.card.activeTab);
@@ -75,30 +90,27 @@ define([
                 var renderer;
                 var iconclass;
                 var rendererid;
-                _.each(tile.data,
-                    function(v, k) {
-                        var val = ko.unwrap(v);
-                        if (Array.isArray(val)
-                            && val.length == 1
-                            && (ko.unwrap(val[0].url) || ko.unwrap(val[0].content))) {
-                            url = ko.unwrap(val[0].url) || ko.unwrap(val[0].content);
-                            type = ko.unwrap(val[0].type);
-                            name = ko.unwrap(val[0].name);
-                            rendererid = ko.unwrap(val[0].renderer);
-                            renderer = self.fileFormatRenderers.find(function(item) {
-                                return item.id === rendererid;
-                            });
-                            if (renderer) {
-                                iconclass = renderer.iconclass;
-                            } else {
-                                renderer = self.getDefaultRenderer(type, val[0]);
-                                if (renderer) {
-                                    renderer = self.getDefaultRenderer(type, val[0].name());
-                                    iconclass = renderer.iconclass;
-                                }
+                var val = ko.unwrap(tile.data[this.fileListNodeId]);
+                if (val && val.length == 1) {
+                    {
+                        url = ko.unwrap(val[0].url) || ko.unwrap(val[0].content);
+                        type = ko.unwrap(val[0].type);
+                        name = ko.unwrap(val[0].name);
+                        rendererid = ko.unwrap(val[0].renderer);
+                        renderer = self.fileFormatRenderers.find(function(item) {
+                            return item.id === rendererid;
+                        });
+                        if (!renderer) {
+                            renderer = self.getDefaultRenderer(type, val[0]);
+                            if (!renderer) {
+                                renderer = self.getDefaultRenderer(type, ko.unwrap(val[0].name));
                             }
                         }
-                    });
+                        if (renderer) {
+                            iconclass = renderer.iconclass;
+                        }
+                    }
+                }
                 return {url: url, type: type, name: name, renderer: renderer, iconclass: iconclass};
             };
 
