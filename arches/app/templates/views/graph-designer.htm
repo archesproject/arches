@@ -224,12 +224,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% trans "Report Configuration" %}
                     </div>
                     <div class="tab-content listing-container form-divider">
-                        <div class="node-config-item" style="">
-                            <div class="control-label">
+                        <div class="node-config-item">
+                            <label class="control-label" for="templatedesign">
                                 {% trans "Template" %}
-                            </div>
+                            </label>
                             <div class="pad-no">
-                                <select class="design" data-bind="value: report.get('template_id'), options: reportTemplates, optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                                <select id="templatedesign" class="design" data-bind="value: report.get('template_id'), options: reportTemplates, optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                             </div>
                         </div>
 

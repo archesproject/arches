@@ -40,7 +40,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="jstree jstree-default" data-bind="visible: true" style="display: none;">
                 <div class="header">
                     <div class="list-filter" data-bind="">
-                        <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter, event: {keypress: filterEnterKeyHandler}">
+                        <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter, event: {keypress: filterEnterKeyHandler}" aria-label="{% trans 'Find a card...' %}">
 
                         <!-- Clear Search -->
                         <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
@@ -53,8 +53,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="resource-editor-tree">
                     <ul class="jstree-container-ul jstree-children" aria-expanded="true">
                     <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
-                        <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
-                        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root'}">
+                        <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}" onkeypress="$(this).trigger('click');"></i>
+                        <a class="jstree-anchor" href="#" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root'}">
                             <strong>
                                 <i data-bind="css: graphiconclass != (null || '') ? graphiconclass : 'fa fa-question'" role="presentation"></i>
                                 <span data-bind="text: displayname"></span> (<span data-bind="text: graphname"></span>)
@@ -81,8 +81,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </li>
                     <!--ko ifnot: issystemsettings -->
                     <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId()}">
-                        <i class="jstree-icon jstree-ocl" role="presentation"></i>
-                        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showRelatedResourcesManager()}}, css: {'jstree-clicked': selection() === 'related-resources', 'disabled': resourceId() === ''}">
+                        <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" onkeypress="$(this).trigger('click');"></i>
+                        <a class="jstree-anchor" href="#" data-bind="click: function(){if (resourceId()){showRelatedResourcesManager()}}, css: {'jstree-clicked': selection() === 'related-resources', 'disabled': resourceId() === ''}">
                             <strong>
                                 <i class="fa fa-link" role="presentation"></i>
                                 <span>{% trans 'Related Resources' %}</span>
@@ -161,7 +161,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <div class="card-breadcrumbs">
 
-                        <a href="" class="toggle-tree"><i class="ion-arrow-left-b"></i></a>
+                        <a href="#" class="toggle-tree"><i class="ion-arrow-left-b" alt="Toggle tree node"></i></a>
 
                         <!-- ko foreach: { data: selectionBreadcrumbs(), as: 'crumb' } -->
                             <!-- ko if: crumb.tileid -->
