@@ -3,7 +3,7 @@
 <div class="jstree jstree-default">
     <div class="header">
         <div class="list-filter" data-bind="" style="text-align: center;">
-            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter" aria-label="{% trans 'Find a card...' %}">
+            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" aria-label="{% trans 'Find a card...' %}" data-bind="textInput: filter">
 
             <!-- Clear Search -->
             <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>

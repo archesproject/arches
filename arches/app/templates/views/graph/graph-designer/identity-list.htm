@@ -7,7 +7,7 @@
 {% block filter %}
 <!-- ko if:  permissionsDesigner.identityList.filterFunction -->
 <div class="list-filter" style="display:none" data-bind="visible:  permissionsDesigner.identityList.filterFunction">
-    <input type="text" class="form-control" style="" placeholder="{% block search_placeholder %}{% endblock %}" data-bind="value: permissionsDesigner.identityList.filter, valueUpdate: 'afterkeydown'">
+    <input type="text" class="form-control" placeholder="{% block search_placeholder %}{% endblock %}" aria-label="{% block search_placeholder %}{% endblock %}" data-bind="value: permissionsDesigner.identityList.filter, valueUpdate: 'afterkeydown'">
 
     <!-- Clear Search -->
     <span class="clear-node-search" data-bind="click: permissionsDesigner.identityList.clearSearch()"><i class="fa fa-times-circle"></i></span>

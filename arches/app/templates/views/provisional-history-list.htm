@@ -10,7 +10,7 @@
     <!-- Date Selector -->
     <div class="provisional-edit-history-filter">
         <div class="calendar">
-            <select id="" class="resources" placeholder="Select" tabindex="-1" data-bind="value: dateRangeType, chosen:{ width: '100%'}">
+            <select class="resources" placeholder="Select" tabindex="-1" data-bind="value: dateRangeType, chosen:{ width: '100%'}" aria-label="Date range">
                 <!-- <option value="custom">{% trans "Custom date range" %}</option> -->
                 <option value="today">{% trans "Today" %}</option>
                 <option value="last-7">{% trans "Last 7 days" %}</option>
@@ -46,7 +46,7 @@
             {% block listitem %}
             <div class='entry'>
                 <!--ko if: $data.resource_deleted == false -->
-                <a class="resource-edit-link" href='' data-bind="text: '{% trans "Edit" %}', click: function(){$parent.editResource($data.resourceinstanceid)}"></a>
+                <a class="resource-edit-link" href='#' data-bind="text: '{% trans "Edit" %}', click: function(){$parent.editResource($data.resourceinstanceid)}"></a>
                 <div class="entry-label-resource" data-bind="text: $data.resourcedisplayname"></div>
                 <!--/ko-->
                 <!--ko if: $data.resource_deleted == true -->

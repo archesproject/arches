@@ -44,7 +44,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="find-widget" style="display: none;" data-bind="visible: showFind()">
                         <div>
                             <!-- ko if: groupedGraphs -->
-                            <select data-bind="template: { name: 'selectGraphTemplate', data: groupedGraphs }, chosen: {width: '100%'}, value: graphId"></select>
+                            <select data-bind="template: { name: 'selectGraphTemplate', data: groupedGraphs }, chosen: {width: '100%'}, value: graphId" aria-label="{% trans "Find a Resource Model/Branch..." %}"></select>
                             <!-- /ko -->
                             <script type="text/html" id="selectGraphTemplate">
                                 <option disabled selected value>{% trans "Find a Resource Model/Branch..." %}</option>
