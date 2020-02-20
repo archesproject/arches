@@ -49,9 +49,8 @@ define([
             var required = false, canFinish = true, tileid = null, complete = null;
             for(var i = 0; i < self.steps.length; i++) {
                 required = ko.unwrap(self.steps[i].required);
-                tileid = ko.unwrap(self.steps[i].tileid);
                 complete = ko.unwrap(self.steps[i].complete);
-                if(!complete && required && (tileid == "" || !tileid)) {
+                if(!complete && required) {
                     canFinish = false;
                     break;
                 }
