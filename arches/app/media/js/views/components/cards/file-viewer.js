@@ -10,6 +10,7 @@ define([
     'file-renderers',
     'bindings/slide',
     'bindings/fadeVisible',
+    'bindings/scroll-to-file',
     'bindings/dropzone'
 ], function(ko, koMapping, _, arches, Dropzone, uuid, CardComponentViewModel, WorkbenchComponentViewModel, fileRenderers) {
     return ko.components.register('file-viewer', {
@@ -17,12 +18,39 @@ define([
             params.configKeys = ['acceptedFiles', 'maxFilesize'];
             var self = this;
             this.fileFormatRenderers = fileRenderers;
-            this.filter = ko.observable('');
             this.fileFormatRenderers.forEach(function(r){
                 r.state = {};
             });
+
             CardComponentViewModel.apply(this, [params]);
+
+            if ('filter' in this.card === false) {
+                this.card.filter = ko.observable('');
+            }
+            if ('renderer' in this.card === false) {
+                this.card.renderer = ko.observable();
+            }
+
+            this.fileRenderer = this.card.renderer;
+            this.filter = this.card.filter;
+
+            var getfileListNode = function(){
+                var fileListNodeId;
+                var fileListNodes = params.card.model.nodes().filter(
+                    function(val){
+                        if (val.datatype() === 'file-list' && self.card.nodegroupid == val.nodeGroupId())
+                            return val;
+                    });
+                if (fileListNodes.length) {
+                    fileListNodeId = fileListNodes[0].nodeid;
+                }
+                return fileListNodeId;
+            };
+
+            this.fileListNodeId = getfileListNode();
+
             WorkbenchComponentViewModel.apply(this, [params]);
+
             if (this.card && this.card.activeTab) {
                 self.activeTab(this.card.activeTab);
             } else {
@@ -35,6 +63,12 @@ define([
                     self.card.activeTab = val;
                 });
 
+            this.fileRenderer.subscribe(function(){
+                if (['add', 'edit'].indexOf(self.activeTab()) < 0) {
+                    self.activeTab(undefined);
+                }
+            });
+
             self.card.tiles.subscribe(function(val){
                 if (val.length === 0) {
                     self.activeTab(null);
@@ -45,22 +79,56 @@ define([
                 return self.getUrl(t).name.toLowerCase().includes(self.filter().toLowerCase());
             };
 
+            this.getDefaultRenderers = function(type, file){
+                var defaultRenderers = [];
+                this.fileFormatRenderers.forEach(function(renderer){
+                    var rawFileType = type;
+                    var rawExtension = file.url ? ko.unwrap(file.url).split('.').pop() : file.split('.').pop();
+                    if (renderer.type === rawFileType && renderer.ext === rawExtension)  {
+                        defaultRenderers.push(renderer);
+                    }
+                    var splitFileType = type.split('/');
+                    var fileType = splitFileType[0];
+                    var splitAllowableType = renderer.type.split('/');
+                    var allowableType = splitAllowableType[0];
+                    var allowableSubType = splitAllowableType[1];
+                    if (allowableSubType === '*' && fileType === allowableType) {
+                        defaultRenderers.push(renderer);
+                    }
+                }); 
+                return defaultRenderers;
+            };
+
             this.getUrl = function(tile){
                 var url = '';
                 var type = '';
                 var name;
-                _.each(tile.data,
-                    function(v, k) {
-                        var val = ko.unwrap(v);
-                        if (Array.isArray(val)
-                            && val.length == 1
-                            && (ko.unwrap(val[0].url) || ko.unwrap(val[0].content))) {
-                            url = ko.unwrap(val[0].url) || ko.unwrap(val[0].content);
-                            type = ko.unwrap(val[0].type);
-                            name = ko.unwrap(val[0].name);
+                var renderer;
+                var iconclass;
+                var rendererid;
+                var availableRenderers;
+                var val = ko.unwrap(tile.data[this.fileListNodeId]);
+                if (val && val.length == 1) {
+                    {
+                        url = ko.unwrap(val[0].url) || ko.unwrap(val[0].content);
+                        type = ko.unwrap(val[0].type);
+                        name = ko.unwrap(val[0].name);
+                        rendererid = ko.unwrap(val[0].renderer);
+                        renderer = self.fileFormatRenderers.find(function(item) {
+                            return item.id === rendererid;
+                        });
+                        if (!renderer) {
+                            availableRenderers = self.getDefaultRenderers(type, val[0]);
+                            if (!renderer) {
+                                availableRenderers = self.getDefaultRenderers(type, ko.unwrap(val[0].name));
+                            }
                         }
-                    });
-                return {url: url, type: type, name: name};
+                        if (renderer) {
+                            iconclass = renderer.iconclass;
+                        }
+                    }
+                }
+                return {url: url, type: type, name: name, renderer: renderer, iconclass: iconclass, tile: tile, renderers: availableRenderers};
             };
 
             this.uniqueId = uuid.generate();
@@ -88,7 +156,18 @@ define([
 
             this.defaultSelector = this.selectDefault();
 
-            this.displayContent = ko.pureComputed(function(){
+            this.applyFileRenderer = function(val) {
+                var tile = self.displayContent().tile;
+                var node = ko.unwrap(tile.data[self.fileListNodeId]);
+                if (node.length > 0) {
+                    node[0].renderer = val.id;
+                    tile.save();
+                }
+            }; 
+
+            
+
+            this.displayContent = ko.computed(function(){
                 var file;
                 var selected = this.card.tiles().find(
                     function(tile){
@@ -99,12 +178,19 @@ define([
                         this.selected(selected);
                     }
                     file = this.getUrl(selected);
+                    this.fileRenderer(file.renderer ? file.renderer.id : undefined);
                 }
                 else {
                     this.selected(undefined);
+                    if (['add', 'edit'].indexOf(self.activeTab()) < 0) {
+                        self.activeTab(undefined);
+                    }
+                }
+                if (file) {
+                    file.availableRenderers = self.getDefaultRenderers(file.type, file);
                 }
                 return file;
-            }, this);
+            }, this).extend({deferred: true});
 
             if (this.displayContent() === undefined) {
                 this.activeTab(undefined);
@@ -122,27 +208,11 @@ define([
                 val.deleteTile(null, self.defaultSelector);
             };
 
-            this.typeMatch = function(type, ext, hastab){
-                var rawFileType = ko.unwrap(self.displayContent).type;
-                var rawExtension = ko.unwrap(self.displayContent).url.split('.').pop();
-                if (type === rawFileType && ext === rawExtension)  {
-                    return true;
-                }
-                var splitFileType = ko.unwrap(self.displayContent).type.split('/');
-                var fileType = splitFileType[0];
-                var splitAllowableType = type.split('/');
-                var allowableType = splitAllowableType[0];
-                var allowableSubType = splitAllowableType[1];
-                if (allowableSubType === '*' && fileType === allowableType) {
-                    return true;
-                }
-                return false;
-            };
-
             this.addTile = function(file){
                 var newtile;
                 newtile = self.card.getNewTile();
                 var targetNode;
+                var defaultRenderers = self.getDefaultRenderers(file.type, file.name);
                 var tilevalue = {
                     name: file.name,
                     accepted: true,
@@ -156,7 +226,8 @@ define([
                     file_id: null,
                     index: 0,
                     content: window.URL.createObjectURL(file),
-                    error: file.error
+                    error: file.error,
+                    renderer: defaultRenderers.length === 1 ? defaultRenderers[0].id : undefined,
                 };
                 Object.keys(newtile.data).forEach(function(val){
                     if (newtile.datatypeLookup && newtile.datatypeLookup[val] === 'file-list') {
