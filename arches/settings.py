@@ -543,8 +543,10 @@ TILE_CACHE_TIMEOUT = 600
 
 RENDERERS = [{
         "name": "imagereader",
+        "title": "Image Reader",
+        "description": "Displays most image file types",
         "id": "5e05aa2e-5db0-4922-8938-b4d2b7919733",
-        "iconclass": "fa fa-pencil",
+        "iconclass": "fa fa-camera",
         "component": "views/components/cards/file-renderers/imagereader",
         "ext": "",
         "type": "image/*",
@@ -564,3 +566,5 @@ except ImportError as e:
     except ImportError as e:
         print("Error attempting to load settings from 'arches.settings_local.py'.")
         print(e)
+
+
