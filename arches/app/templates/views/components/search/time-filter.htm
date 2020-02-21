@@ -1,14 +1,18 @@
 {% load i18n %}
 <div class="search-container time-search-container">
 
-    <div class="filter-title">{% trans "Date Interval" %}
-        <div class="pull-right">
-            <div class="btn-group">
+    <div class="row">
+        <div class="col-xs-8">
+            <h3 class="filter-title">{% trans "Date Interval" %}</h3>
+        </div>
+        <div class="col-xs-4">
+            <div class="btn-group pull-right">
                 <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true" data-bind="click: function () { clear(); }"> <i class="fa fa-close"></i> {% trans "Clear" %}
                 </button>
             </div>
         </div>
     </div>
+    
     <hr class="title-underline">
     <div id="calendar">
 
