@@ -423,6 +423,8 @@
     define('file-renderers', [{% for renderer in app_settings.RENDERERS %}'{{ renderer.component }}',{% endfor %}], function () {
         return [{% autoescape off %}{% for renderer in app_settings.RENDERERS %}
                 {'name': '{{ renderer.name }}',
+                'title': '{{ renderer.title }}',
+                'description': '{{ renderer.description }}',
                 'component': '{{ renderer.component }}',
                 'id': '{{ renderer.id }}',
                 'iconclass': '{{ renderer.iconclass }}',
