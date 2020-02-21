@@ -212,8 +212,7 @@
 <div class='file-workbench-files'>
 <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
     <!--ko if: $parent.getUrl(tile) && ($parent.filter().length === 0 || $parent.isFiltered(tile)) -->
-    <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {'selected-photo': ko.unwrap(selected)}, click: $parent.selectItem">
-
+    <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {'selected-photo': ko.unwrap(selected)}, click: $parent.selectItem, scrollToFile: $parent.displayContent() && $parent.displayContent().tile === tile ? $parent.displayContent().tile : undefined, container: '.file-workbench-files'">
     <i role="presentation" data-bind="class: $parent.getUrl(tile).iconclass || 'fa fa-file'"></i>
     <div class='file-name' data-bind="text: $parent.getUrl(tile).name"></div>
     </div>

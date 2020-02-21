@@ -10,6 +10,7 @@ define([
     'file-renderers',
     'bindings/slide',
     'bindings/fadeVisible',
+    'bindings/scroll-to-file',
     'bindings/dropzone'
 ], function(ko, koMapping, _, arches, Dropzone, uuid, CardComponentViewModel, WorkbenchComponentViewModel, fileRenderers) {
     return ko.components.register('file-viewer', {
