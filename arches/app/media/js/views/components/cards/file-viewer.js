@@ -21,13 +21,17 @@ define([
             this.fileFormatRenderers.forEach(function(r){
                 r.state = {};
             });
-            this.fileRenderer = ko.observable();
+
             CardComponentViewModel.apply(this, [params]);
 
             if ('filter' in this.card === false) {
                 this.card.filter = ko.observable('');
             }
+            if ('renderer' in this.card === false) {
+                this.card.renderer = ko.observable();
+            }
 
+            this.fileRenderer = this.card.renderer;
             this.filter = this.card.filter;
 
             var getfileListNode = function(){
@@ -46,6 +50,7 @@ define([
             this.fileListNodeId = getfileListNode();
 
             WorkbenchComponentViewModel.apply(this, [params]);
+
             if (this.card && this.card.activeTab) {
                 self.activeTab(this.card.activeTab);
             } else {
@@ -57,6 +62,12 @@ define([
                 function(val){
                     self.card.activeTab = val;
                 });
+
+            this.fileRenderer.subscribe(function(){
+                if (['add', 'edit'].indexOf(self.activeTab()) < 0) {
+                    self.activeTab(undefined);
+                }
+            });
 
             self.card.tiles.subscribe(function(val){
                 if (val.length === 0) {
@@ -117,7 +128,6 @@ define([
                         }
                     }
                 }
-                console.log(renderer)
                 return {url: url, type: type, name: name, renderer: renderer, iconclass: iconclass, tile: tile, renderers: availableRenderers};
             };
 
@@ -155,7 +165,9 @@ define([
                 }
             }; 
 
-            this.displayContent = ko.pureComputed(function(){
+            
+
+            this.displayContent = ko.computed(function(){
                 var file;
                 var selected = this.card.tiles().find(
                     function(tile){
@@ -166,7 +178,7 @@ define([
                         this.selected(selected);
                     }
                     file = this.getUrl(selected);
-                    this.fileRenderer(file.renderer ? file.renderer.id : undefined)
+                    this.fileRenderer(file.renderer ? file.renderer.id : undefined);
                 }
                 else {
                     this.selected(undefined);
@@ -178,7 +190,7 @@ define([
                     file.availableRenderers = self.getDefaultRenderers(file.type, file);
                 }
                 return file;
-            }, this);
+            }, this).extend({deferred: true});
 
             if (this.displayContent() === undefined) {
                 this.activeTab(undefined);
