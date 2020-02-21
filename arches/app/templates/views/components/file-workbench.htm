@@ -61,25 +61,27 @@
                             <!--/ko-->
                         <!--/ko-->
                         <!--ko ifnot: $parent.displayContent().renderer -->
-                        
-
-
-
-
-
-
                     <div>
-
-
                         <div class="gallery-controls new-tile">
                             <div class="dropzone-photo-upload">
                                 <div class="file-select-window">
+                                    <!--ko if: $parent.displayContent().availableRenderers.length === 0 -->
+                                    <div class="bord-top pad-ver file-select" style="padding: 0px">
+                                        <div class="" style="padding: 5px">
+                                            <h2>{% trans 'Unable to display the selected file' %}</h2>
+                                            <h4>{% trans 'There are no file renderers that support this format' %}</h4>
+                                        </div>
+                                    <br>
+                                    </div>
+                                    <!--/ko-->
                                     
+                                    <!--ko if: $parent.displayContent().availableRenderers.length > 0 -->
                                     <div class="bord-top pad-ver file-select" style="padding: 0px">
                                         <div class="" style="padding: 5px">
                                             <h2>{% trans 'Select File Renderer' %}</h2>
                                             <h4>{% trans 'Select the renderer best suited for visualization the selected file' %}</h4>
                                             <div style="display: flex; flex-flow: wrap; justify-content: space-evenly; padding-top: 15px">
+
                                             <!--ko foreach: $parent.displayContent().availableRenderers -->
                                             <div>
                                                 <div class="r-grid-item relative" style="border: 1px solid #c4c4c4">
@@ -108,14 +110,15 @@
                                                 </div>
                                             </div>
                                             <!--/ko-->
-                                            </div>
-                                       </div>
-                                       <br>
-                    
-                                   </div>
-                                   <div class="file-upload-footer">
-                                       <span>{% trans 'Apply the same selection to all files in the dataset' %}</span>
-                                   </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    
+                                </div>
+                                <div class="file-upload-footer">
+                                    <span>{% trans 'Apply the same selection to all files in the dataset' %}</span>
+                                </div>
+                                <!--/ko-->
                                </div>
                     
                             </div>
