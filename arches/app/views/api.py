@@ -170,7 +170,7 @@ class Surveys(APIBase):
                     survey.deactivate_expired_survey()
                     survey = survey.serialize_for_mobile()
                     ret[survey["id"]] = {}
-                    for key in ["active", "name", "description", "startdate", "enddate", "onlinebasemaps", "bounds", "tilecache"]:
+                    for key in ["active", "name", "description", "startdate", "enddate", "onlinebasemaps", "bounds", "tilecache", "image_size_limits"]:
                         ret[survey["id"]][key] = survey[key]
                 response = JSONResponse(ret, indent=4)
             else:
