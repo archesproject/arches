@@ -1286,7 +1286,7 @@ class FileListDataType(BaseDataType):
                     attachment_file = attachment.read()
                     file_data = ContentFile(attachment_file, name=file["name"])
                     file_model, created = models.File.objects.get_or_create(fileid=file["file_id"])
-                    
+
                     if created:
                         file_model.path = file_data
 

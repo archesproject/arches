@@ -247,8 +247,8 @@ MOBILE_OAUTH_CLIENT_ID = ""  #'9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
 MOBILE_DEFAULT_ONLINE_BASEMAP = {"default": "mapbox://styles/mapbox/streets-v9"}
 MOBILE_IMAGE_SIZE_LIMITS = {
     # These limits are meant to be approximates. Expect to see uploaded sizes range +/- 20%
-    "full": 1500000, # ~1.5 Mb 
-    "thumb": 60000 # ~60 Kb
+    "full": 1500000,  # ~1.5 Mb
+    "thumb": 60000,  # ~60 Kb
 }
 
 TEMPLATES = [

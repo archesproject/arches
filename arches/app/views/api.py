@@ -170,7 +170,17 @@ class Surveys(APIBase):
                     survey.deactivate_expired_survey()
                     survey = survey.serialize_for_mobile()
                     ret[survey["id"]] = {}
-                    for key in ["active", "name", "description", "startdate", "enddate", "onlinebasemaps", "bounds", "tilecache", "image_size_limits"]:
+                    for key in [
+                        "active",
+                        "name",
+                        "description",
+                        "startdate",
+                        "enddate",
+                        "onlinebasemaps",
+                        "bounds",
+                        "tilecache",
+                        "image_size_limits",
+                    ]:
                         ret[survey["id"]][key] = survey[key]
                 response = JSONResponse(ret, indent=4)
             else:
@@ -861,7 +871,7 @@ class Images(APIBase):
         try:
             image_file, file_created = models.File.objects.get_or_create(pk=fileid)
             image_file.path.save(file_name, ContentFile(file_data.read()))
-            
+
             tile = models.TileModel.objects.get(pk=tileid)
             for image in tile.data[nodeid]:
                 if image["file_id"] == fileid:
@@ -875,13 +885,12 @@ class Images(APIBase):
             #     f.write(base64.b64decode(request.POST.get('data')))
 
         except models.TileModel.DoesNotExist:
-            # it's ok if the Tile doesn't exist, that just means that there is some 
+            # it's ok if the Tile doesn't exist, that just means that there is some
             # latency in the updating of the db from couch
-            # see process_mobile_data in the FileListDatatype for how image thumbnails get 
+            # see process_mobile_data in the FileListDatatype for how image thumbnails get
             # pushed to the db and files saved
             pass
         except Exception as e:
             return JSONResponse(status=500)
 
         return JSONResponse()
-
