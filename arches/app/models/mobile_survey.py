@@ -196,6 +196,7 @@ class MobileSurvey(models.MobileSurveyModel):
 
         ret["graphs"] = graphs
         ret["cards"] = ordered_cards
+        ret["image_size_limits"] = settings.MOBILE_IMAGE_SIZE_LIMITS
         try:
             bounds = json.loads(ret["bounds"])
             ret["bounds"] = bounds

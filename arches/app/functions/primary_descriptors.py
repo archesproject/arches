@@ -18,6 +18,7 @@ class PrimaryDescriptorsFunction(BaseFunction):
                     )
                 for tile in tiles:
                     for node in models.Node.objects.filter(nodegroup_id=uuid.UUID(config["nodegroup_id"])):
+                        data = {}
                         if len(list(tile.data.keys())) > 0:
                             data = tile.data
                         elif tile.provisionaledits is not None and len(list(tile.provisionaledits.keys())) == 1:

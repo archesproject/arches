@@ -228,6 +228,7 @@ urlpatterns = [
         api.MVT.as_view(),
         name="mvt",
     ),
+    url(r"^images$", api.Images.as_view(), name="images"),
     url(r"^tileserver/(?P<path>.*)$", TileserverProxyView.as_view()),
     url(r"^history/$", ResourceActivityStreamCollectionView.as_view(), name="as_stream_collection"),
     url(r"^history/(?P<page>[0-9]+)$", ResourceActivityStreamPageView.as_view(), name="as_stream_page"),
