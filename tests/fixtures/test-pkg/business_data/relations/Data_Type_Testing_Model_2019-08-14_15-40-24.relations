@@ -1,0 +1,12 @@
+resourcexid,resourceinstanceidfrom,resourceinstanceidto,relationshiptype,datestarted,dateended,notes
+c0b82c2b-beca-11e9-a8fc-6c4008b05c4c,ad8dca49-0b15-4b55-99b9-8fa098a22382,a03c8429-662c-46cf-afb2-f34fe2eb293b,ac41d9be-79db-4256-b368-2f4559cfbe55,,,
+c0bc6b40-beca-11e9-9c37-6c4008b05c4c,ad8dca49-0b15-4b55-99b9-8fa098a22382,d5042031-c683-4159-bc27-302b3d314ee7,ac41d9be-79db-4256-b368-2f4559cfbe55,,,
+c0bffdcf-beca-11e9-82bc-6c4008b05c4c,ad8dca49-0b15-4b55-99b9-8fa098a22382,a0bac7d3-9ee0-4b16-8bcc-17cdaae435c8,ac41d9be-79db-4256-b368-2f4559cfbe55,,,
+c0c370e3-beca-11e9-8fbf-6c4008b05c4c,ad8dca49-0b15-4b55-99b9-8fa098a22382,63d7d552-0ad3-4854-b409-04b8def0f92a,ac41d9be-79db-4256-b368-2f4559cfbe55,,,
+341d18b3-becb-11e9-8e83-6c4008b05c4c,63d7d552-0ad3-4854-b409-04b8def0f92a,41f63130-318f-40ca-a034-04013a67f8af,http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as,,,
+3420d4de-becb-11e9-8195-6c4008b05c4c,63d7d552-0ad3-4854-b409-04b8def0f92a,ffdc873d-8a6b-4cde-905d-51d0c1c7a4b7,http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as,,,
+342446c7-becb-11e9-a821-6c4008b05c4c,63d7d552-0ad3-4854-b409-04b8def0f92a,13f1a82d-2422-4d06-b002-df7d509f6167,http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as,,,
+5e3d95e8-becb-11e9-bfeb-6c4008b05c4c,41f63130-318f-40ca-a034-04013a67f8af,d5042031-c683-4159-bc27-302b3d314ee7,ac41d9be-79db-4256-b368-2f4559cfbe55,,,
+5e41e597-becb-11e9-896d-6c4008b05c4c,41f63130-318f-40ca-a034-04013a67f8af,50e6d9d5-013e-43db-a900-0c4e1a292d0b,ac41d9be-79db-4256-b368-2f4559cfbe55,,,
+899fff02-becb-11e9-a1e3-6c4008b05c4c,bdaa18cf-bdf3-11e9-a3c8-6c4008b05c4c,0f211d98-1ab4-454d-8535-0cabd4655b52,ac41d9be-79db-4256-b368-2f4559cfbe55,,,
+89a3989c-becb-11e9-91c4-6c4008b05c4c,bdaa18cf-bdf3-11e9-a3c8-6c4008b05c4c,ad8dca49-0b15-4b55-99b9-8fa098a22382,ac41d9be-79db-4256-b368-2f4559cfbe55,,,
