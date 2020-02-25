@@ -9761,6 +9761,8 @@ a.filter-tools:hover {
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow-y: auto;
+    height: calc(100vh - 110px);
 }
 
 .mpm-summary-panel {
