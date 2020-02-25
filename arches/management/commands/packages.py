@@ -548,7 +548,11 @@ class Command(BaseCommand):
                 print("Could not connect to db")
 
         def load_graphs(package_dir):
-            branches = glob.glob(os.path.join(package_dir, "graphs", "branches"))[0]
+            try:
+                branches = glob.glob(os.path.join(package_dir, "graphs", "branches"))[0]
+            except IndexError as e:
+                logger.warning("No branches in package")
+                branches = ""
             resource_models = glob.glob(os.path.join(package_dir, "graphs", "resource_models"))[0]
             # self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'graphs','branches'), overwrite_graphs=False)
             overwrite_graphs = True if yes is True else False
