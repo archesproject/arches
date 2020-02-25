@@ -80,8 +80,7 @@ i.report-expander:focus,
 }
 
 .dataTable th:focus,
-.dataTable td:focus,
-.resource-grid-item a:focus {
+.dataTable td:focus {
 	box-shadow: inset 0 0 0 3px #006600;
     outline: none;
 }
@@ -3216,10 +3215,6 @@ ul .collapse li:first-of-type {
     border-top: 1px solid #ddd;
 }
 
-.resource-grid-main-container {
-    background: #ebeef0;
-}
-
 .report-image-grid .resource-grid-item:last-of-type .resource-grid-tools-container .btn-group ul {
     margin-top: -331px;
 }
@@ -3278,7 +3273,7 @@ ul .collapse li:first-of-type {
     color: #999;
     background: #ebeef0;
     border: 1px solid #ddd;
-    margin-bottom: 10px;
+    margin: 5px 10px 10px 10px;
 }
 
 .resource-grid-icon-highlight {
@@ -3295,8 +3290,6 @@ ul .collapse li:first-of-type {
 .resource-grid-item a:hover,
 .resource-grid-item a:focus {
     cursor: pointer;
-    border-left: 1px solid #d5d5d5;
-    border-right: 1px solid #d5d5d5;
     opacity: 1.0;
     background: #f9f9f9;
 }
@@ -6289,7 +6282,7 @@ div.hide-file-list > div > div > div > div > form > div > div:nth-child(3) {
 
 .resource-grid-title {
     font-weight: normal;
-    padding: 3px 20px 0 20px;
+    padding: 8px 20px 0 20px;
     font-size: 1.416em;
     display: inline-block;
 }
