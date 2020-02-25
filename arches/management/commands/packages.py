@@ -474,6 +474,8 @@ class Command(BaseCommand):
             ontologies = glob.glob(os.path.join(package_dir, "ontologies/*"))
             if len(ontologies) > 0:
                 print("loading ontologies")
+            else:
+                print("No Ontologies to load")
             for ontology in ontologies:
                 management.call_command("load_ontology", source=ontology)
 
