@@ -1254,6 +1254,9 @@ ul.tabbed-report-tab-list {
     position: relative;
     background-color: #eee;
     border-top: 1px solid #ddd;
+}
+
+.search-container .workbench-card-wrapper {
     top: 51px;
 }
 
@@ -3214,7 +3217,6 @@ ul .collapse li:first-of-type {
 }
 
 .resource-grid-main-container {
-    height: 90px;
     background: #ebeef0;
 }
 
