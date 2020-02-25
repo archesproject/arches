@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+>
+  <skos:Concept rdf:about="http://localhost:8000/cc18b684-0a54-4666-ac68-6136f22baad7">
+    <skos:scopeNote xml:lang="en-us">{"id": "5c5234d5-71a9-4bfb-ba72-2eb18a394576", "value": "Test"}</skos:scopeNote>
+    <skos:inScheme>
+      <skos:ConceptScheme rdf:about="http://localhost:8000/3096d1c7-4d54-4e0e-af9a-7fd42b07aede">
+        <skos:hasTopConcept rdf:resource="http://localhost:8000/cc18b684-0a54-4666-ac68-6136f22baad7"/>
+        <skos:hasTopConcept rdf:resource="http://localhost:8000/c4d780cf-73b5-45bd-9228-1acf85b174b6"/>
+        <dcterms:title xml:lang="en-us">{"id": "2802926b-4ae1-4323-baea-8171b33c0ffd", "value": "Test Scheme"}</dcterms:title>
+        <skos:related rdf:resource="http://localhost:8000/c4d780cf-73b5-45bd-9228-1acf85b174b6"/>
+        <dcterms:description xml:lang="en-us">{"id": "8a28d992-1bb3-4ecd-9d85-91994e4251a9", "value": "Testing scheme for the concept data type"}</dcterms:description>
+      </skos:ConceptScheme>
+    </skos:inScheme>
+    <skos:prefLabel xml:lang="en-us">{"id": "118b4e63-4466-494c-94ac-4cb98886c372", "value": "Test"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/c4d780cf-73b5-45bd-9228-1acf85b174b6">
+    <skos:related rdf:resource="http://localhost:8000/3096d1c7-4d54-4e0e-af9a-7fd42b07aede"/>
+    <skos:scopeNote xml:lang="en-us">{"id": "24c4b234-663b-4fa0-8e46-44616a089a58", "value": "Testing of the Concept data type"}</skos:scopeNote>
+    <skos:inScheme rdf:resource="http://localhost:8000/3096d1c7-4d54-4e0e-af9a-7fd42b07aede"/>
+    <skos:prefLabel xml:lang="en-us">{"id": "8c08196e-90bb-4359-b4ca-733861409de6", "value": "ASD"}</skos:prefLabel>
+  </skos:Concept>
+</rdf:RDF>

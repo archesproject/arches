@@ -1,0 +1,37 @@
+{
+    "name": "datatables.net-buttons",
+    "version": "1.6.1",
+    "description": "Buttons for DataTables ",
+    "files": [
+        "js/**/*.js",
+        "swf/flashExport.swf"
+    ],
+    "main": "js/dataTables.buttons.js",
+    "keywords": [
+        "buttons",
+        "excel",
+        "pdf",
+        "csv",
+        "column visibility",
+        "print",
+        "DataTables",
+        "jQuery",
+        "table",
+        "DataTables"
+    ],
+    "homepage": "https://datatables.net",
+    "bugs": "https://datatables.net/forums",
+    "license": "MIT",
+    "author": {
+        "name": "SpryMedia Ltd",
+        "url": "http://datatables.net"
+    },
+    "dependencies": {
+        "jquery": ">=1.7",
+        "datatables.net": "^1.10.15"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DataTables/Dist-DataTables-Buttons.git"
+    }
+}

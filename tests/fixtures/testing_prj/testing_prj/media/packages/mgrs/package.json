@@ -1,0 +1,31 @@
+{
+  "name": "mgrs",
+  "version": "1.0.0",
+  "description": "Utility for converting between WGS84 lat/lng and MGRS coordinates",
+  "main": "dist/mgrs.js",
+  "module": "mgrs.js",
+  "scripts": {
+    "test": "npm run build && istanbul test _mocha test/test.js",
+    "build": "mkdir -p dist && rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/proj4js/mgrs.git"
+  },
+  "keywords": [
+    "mgrs",
+    "proj4",
+    "gis"
+  ],
+  "author": "proj4 team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/proj4js/mgrs/issues"
+  },
+  "devDependencies": {
+    "rollup": "^0.41.4",
+    "chai": "~1.8.1",
+    "istanbul": "~0.1.46",
+    "mocha": "~1.15.1"
+  }
+}

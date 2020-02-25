@@ -1,0 +1,25 @@
+{
+  "author": {
+    "name": "Christian Leicht Jørgensen",
+    "email": "clj@leicht-thruesen.com"
+  },
+  "directories": {},
+  "homepage": "https://github.com/ChristianLJ/themify-icons",
+  "keywords": [
+
+  ],
+  "license": "MIT",
+  "maintainers": [
+    {
+      "name": "christianlj",
+      "email": "clj@leicht-thruesen.com"
+    }
+  ],
+  "name": "lt-themify-icons",
+  "optionalDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChristianLJ/themify-icons.git"
+  },
+  "version": "1.1.0"
+}

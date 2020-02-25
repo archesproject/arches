@@ -1,0 +1,42 @@
+{
+  "name": "suggestions",
+  "version": "1.7.0",
+  "description": "A typeahead component for inputs",
+  "main": "index.js",
+  "scripts": {
+    "start": "budo index.js --serve=dist/suggestions.js --live -d",
+    "build": "browserify index.js | uglifyjs -c -m > dist/suggestions.js",
+    "lint": "eslint --no-eslintrc -c .eslintrc index.js src",
+    "docs": "documentation --format=md > API.md",
+    "test": "npm run lint && browserify test/test.js | smokestack -b firefox | tap-status"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/tristen/suggestions.git"
+  },
+  "keywords": [
+    "typeahead",
+    "autocomplete",
+    "component"
+  ],
+  "author": "tristen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tristen/suggestions/issues"
+  },
+  "homepage": "https://github.com/tristen/suggestions#readme",
+  "devDependencies": {
+    "browserify": "^12.0.1",
+    "budo": "^7.0.2",
+    "documentation": "^3.0.0",
+    "eslint": "^6.6.0",
+    "smokestack": "^3.4.1",
+    "tap-status": "^1.0.1",
+    "tape": "^4.2.2",
+    "uglify-js": "^2.5.0"
+  },
+  "dependencies": {
+    "fuzzy": "^0.1.1",
+    "xtend": "^4.0.0"
+  }
+}

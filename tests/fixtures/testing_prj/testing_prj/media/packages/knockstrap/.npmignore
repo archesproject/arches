@@ -1,0 +1,12 @@
+node_modules
+src
+temp
+examples
+examples-src
+tests
+Gruntfile.js
+.gitignore
+.jamignore
+.travis.yml
+knockstrap.nuspec
+bower.json

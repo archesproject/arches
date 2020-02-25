@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="x-ua-compatible" content="IE=edge">
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <meta charset=utf-8 />
+  <title>Mapbox GL Draw | Mapbox</title>
+  <link href='/mapbox-gl.css' rel='stylesheet' />
+  <link href='/dist/mapbox-gl-draw.css' rel='stylesheet' />
+  <link href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.1.0/mapbox-gl-geocoder.css' rel='stylesheer' />
+  <style>
+    body { margin:0; padding:0; }
+    html, body, #map { height: 100%; }
+    .start-draw {
+      width: 315px;
+      position: absolute;
+      left :10px;
+      bottom: 10px;
+      background: #efefef;
+    }
+    .start-draw div {
+      float: right;
+      border: 1px solid #ccc;
+      background: #ddd;
+      padding: 5px;
+      margin: 5px;
+      cursor: pointer;
+    }
+    .toggle {
+      position: absolute;
+      bottom: 20px;
+      right: 50px;
+      width: 100px;
+    }
+  </style>
+</head>
+<body>
+<div id='map'></div>
+<div class='start-draw' >
+  <div id='start-static'>STATIC</div>
+  <div id='start-point'>POINT</div>
+  <div id='start-line'>LINE</div>
+  <div id='start-polygon'>POLYGON</div>
+</div>
+<div class='toggle'>
+  <button id='doubleClickZoom'>disable dblclick zoom</button>
+  <button id='addBtn'>add draw</button>
+  <button id='removeBtn'>remove draw</button>
+  <button id='flipStyleBtn'>change style</button>
+</div>
+<script src='/mapbox-gl.js'></script>
+<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.2.0/mapbox-gl-geocoder.min.js'></script>
+<link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.2.0/mapbox-gl-geocoder.css' type='text/css' />
+<script src='/debug/access_token_generated.js'></script>
+<script src='/mapbox-gl-draw.js'></script>
+<script src='/app.js'></script>
+<script type='text/javascript'>
+// Adds in the FPS graph to the top of the page.
+(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();stats.domElement.style.cssText='position:fixed;right: 500px;top:0;z-index:10000';document.body.appendChild(stats.domElement);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//rawgit.com/mrdoob/stats.js/master/build/stats.min.js';document.head.appendChild(script);})();
+</script>
+</body>
+</html>

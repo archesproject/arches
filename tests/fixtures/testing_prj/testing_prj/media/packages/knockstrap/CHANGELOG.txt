@@ -1,0 +1,82 @@
+v1.3.2
+-Fixed changing of selected radio button, when it is disabled 
+-Fixed changing of selected checkbox, when it is disabled
+
+v1.3.1
+-Fixed not working close button in popover, when  bootstrap 3.3.5 used
+-Removed unwrapProperties implementation as ko.toJS do the same. ko.utils.unwrapProperties still available as alias for ko.toJS
+-Prioritised loading reference to knockout and jQuery from global context. It fixes cases, when knockout and jQuery are loaded from cdn and knockstarp is loaded via 'require'
+
+v1.3.0
+-Added pagination binding
+-Added pager binding
+-Added class binding
+-Updated bower dependencies with official knockout package
+-Updated to use anonymous module when exporting via AMD
+-Fixed alert and checkbox binding to work in ie8
+-Fixed carousel binding to add "active" class to first indicator after loading
+-Fixed radioBinding using value with quote
+-Fixed the previous css class is not removed from alert element
+-Popover now subscribes to the bootstrap 3.3.5 event inserted.bs.popover if available
+-Changed grunt-templates-concat to grunt-html-convert in build process, because grunt-templates-concat was removed from npm repo for unknown reasons.
+
+v1.2.1
+-Fixed issue with submitting forms with toggle buttons
+-Fixed attemting to set visible property for computed value for modal binding
+-Updated docs to work via https
+
+v1.2.0
+-Changed dependency name from jQuery to official jquery
+-Added dialogCss property to modal binding
+
+v1.1.0
+-Added possibility to use popover binding with other bindings on same element and with other bindings on child elements
+-Added support of close button via 'data-dismiss="popover"' for popover binding
+-Made visible property optional for modal binding
+-Added possibility of using observable header, body and footer properties to modal binding
+-Added possibility to obtain added templates from stringTemplateEngine
+-Added possibility to provide different options for progress-bar in progress binding
+-Added possibility to change default css and attributes of root element for modal, progress and carousel bindings
+
+v1.0.0
+-Fixed popover positioning, when template is used
+-Fixed not changing template, when popover is opened
+-Added possibility to add new string-based templates dynamically
+-Added possibility to change default template engine for default templates of Knockstrap bindings
+-Rewrote stringTemplateEngine implementation
+-Added tests for stringTemplateEngine
+-Added possibility to change default template engine for header, footer and body in modal binding
+-Added possibility to pass modal options via data-attributes
+-Reorganized and updated documentation
+-Added travis-ci support
+
+v0.4.0
+-Added unit tests via jasmine for all bindings and utility functions
+-Added throwing exception, when binding is used with incompatible values
+-Added unchecking of buttons for radio binding, when no buttons have passed value
+-Fixed checkboxes don't have 'checked' property set to true, when they are clicked for checkbox binding
+-Made 'footer' property optional for modal binding
+-Fixed carousel binding bugs
+-Removed close callback from alert binding ('close.bs.alert' event from bootstrap can be used instead)
+-Updated alert binding default template: now it require only 'message' property, 'type' property doesn't depend on template data
+-Updated unwrapPoperties function: now if you pass not objects, it returns them without transformation into objects.
+-Added nuget package manager support
+
+v0.3.0
+-Added checkbox binding
+-Added carousel binding
+-Changed bindings documentation
+-Updated uniqueId function: now it will generate separate sequences for different prefixes
+-Updated radio binding: now it will support dynamically added buttons
+-Added short notation for popover binding
+-Added bower and jam package managers support
+
+v0.2.0
+-Added radio binding
+-Added toggle binding
+-Dividing examples into separate files
+-Added sources for examples
+-Small fixes
+
+v0.1.0
+-First version

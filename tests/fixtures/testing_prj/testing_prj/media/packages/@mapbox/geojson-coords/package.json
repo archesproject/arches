@@ -1,0 +1,35 @@
+{
+  "name": "@mapbox/geojson-coords",
+  "version": "0.0.0",
+  "description": "return all coordinates from a geojson object",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "tap test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mapbox/geojson-coords.git"
+  },
+  "keywords": [
+    "geojson",
+    "coords",
+    "browser",
+    "coordinates"
+  ],
+  "author": "Tom MacWright",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mapbox/geojson-coords/issues"
+  },
+  "homepage": "https://github.com/mapbox/geojson-coords",
+  "devDependencies": {
+    "tap": "~9.0.3"
+  },
+  "dependencies": {
+    "@mapbox/geojson-normalize": "0.0.1",
+    "geojson-flatten": "~0.2.1"
+  }
+}

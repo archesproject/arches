@@ -1,0 +1,47 @@
+{
+  "name": "knockout-mapping",
+  "version": "2.6.0",
+  "description": "Knockout Mapping plugin",
+  "main": "dist/knockout.mapping.js",
+  "files": [
+    "dist",
+    "HISTORY.md"
+  ],
+  "keywords": [
+    "knockout",
+    "mapping",
+    "knockout-mapping",
+    "knockout.mapping",
+    "plugin",
+    "ko"
+  ],
+  "peerDependencies": {
+    "knockout": ">=2.2.0"
+  },
+  "devDependencies": {
+    "del": "^2.0.2",
+    "gulp": "^3.8.11",
+    "gulp-header": "^1.2.2",
+    "gulp-if": "^2.0.0",
+    "gulp-jshint": "^2.0.0",
+    "gulp-plumber": "^1.0.1",
+    "gulp-qunit": "^1.2.1",
+    "gulp-rename": "^1.2.0",
+    "gulp-replace": "^0.5.3",
+    "gulp-sourcemaps": "^1.3.0",
+    "gulp-uglify": "^1.1.0",
+    "jshint": "^2.9.1",
+    "jshint-stylish": "^2.0.1"
+  },
+  "scripts": {
+    "test": "gulp test-ci"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/crissdev/knockout.mapping.git"
+  },
+  "bugs": {
+    "url": "https://github.com/crissdev/knockout.mapping/issues"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,636 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+CRMdig 3.2.1 Encoded in RDFS
+
+RDFS updated by FORTH-ICS April 2016
+
+Encoding Rules:
+1. The RDF spelling rules do not allow blanks. Hence we have replaced them by underscores.
+   The blank between the concept identifier and concept name is replaced by underscore too.
+   For instance "D7_Digital_Machine_Event" or "P2i_is_type_of".
+
+2. RDF does not allow to instantiate properties beginning from a range value.
+   Therefore, each CRMdig property is represented as two RDFS properties.
+   For instance "L2 used as source (was source for)" is represented as:
+   "L2_used_as_source" for the domain to range direction and "L2i_was_source_for" for the range to domain direction.
+
+-->
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" 
+xml:base="http://www.ics.forth.gr/isl/CRMdig/" xml:lang="en">
+
+<rdfs:Class rdf:about="D1_Digital_Object">
+	<rdfs:comment>This class comprises identifiable immaterial items that can be represented as sets of bit sequences, 
+	such as data sets, e-texts, images, audio or video items, software, etc., and are documented as single units. 
+	Any aggregation of instances of D1 Digital Object into a whole treated as single unit is also regarded as an instance of D1 Digital Object. 
+	This means that for instance, the content of a DVD, an XML file on it, and an element of this file, are regarded as distinct instances of 
+	D1 Digital Object, mutually related by the P106 is composed of (forms part of) property.
+A D1 Digital Object does not depend on a specific physical carrier, and it can exist on one or more carriers simultaneously.
+</rdfs:comment>
+	<rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E73_Information_Object"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="D2_Digitization_Process">
+	<rdfs:comment>This class comprises events that result in the creation of instances of D9 Data Object that 
+	represent the appearance and/or form of an instance of E18 Physical Thing such as paper documents, statues, buildings, paintings, etc. 
+	A particular case is the analogue-to-digital conversion of audiovisual material.
+	This class represents the transition from a material thing to an immaterial representation of it. 
+	The characteristic subsequent processing steps on digital objects are regarded as instances of D3 Formal Derivation.
+</rdfs:comment>
+	<rdfs:subClassOf rdf:resource="D11_Digital_Measurement_Event"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="D3_Formal_Derivation">
+	<rdfs:comment>This class comprises events that result in the creation of a D1 Digital Object from another one following a deterministic algorithm, 
+	such that the resulting instance of digital object shares representative properties with the original object. 
+	In other words, this class describes the transition from an immaterial object referred to by property L21 used as derivation source (was derivation source for) 
+	to another immaterial object referred to by property L22 created derivative (was derivative created by) preserving the 
+	representation of some things but in a different form. Characteristic examples are colour corrections, contrast changes and resizing of images.
+	</rdfs:comment>
+	<rdfs:subClassOf rdf:resource="D10_Software_Execution"/>
+</rdfs:Class>
+
+<rdfs:Class rdf:about="D7_Digital_Machine_Event">
+	<rdfs:comment>This class comprises events that happen on physical digital devices following a human activity that intentionally caused its 
+	immediate or delayed initiation and results in the creation of a new instance of D1 Digital Object on behalf of the human actor. 
+	The input of a D7 Digital Machine Event may be parameter settings and/or data to be processed. 
+	Some D7 Digital Machine Events may form part of a wider E65 Creation event. 
+	In this case, all machine output of the partial events is regarded as creation of the overall activity.
+	</rdfs:comment>
+	<rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E11_Modification"/>
+	<rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E65_Creation"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="D8_Digital_Device">
+	<rdfs:comment>This class comprises identifiable material items such as computers, scanners, cameras, etc. that 
+	have the capability to process or produce instances of  D1 Digital Object.
+	</rdfs:comment>
+	<rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="D9_Data_Object">
+	<rdfs:comment>This class comprises instances of D1 Digital Object that are the direct result of a digital 
+	measurement or a formal derivative of it, containing quantitative properties of some physical things or other constellations of matter.
+	</rdfs:comment>
+	<rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E54_Dimension"/>
+	<rdfs:subClassOf rdf:resource="D1_Digital_Object"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="D10_Software_Execution">
+	<rdfs:comment>This class comprises events by which a digital device runs a software program or a series of  computing 
+	operations on a digital object  as a single task, which is completely determined by its digital input, 
+	the software and the generic properties of the device. 
+	</rdfs:comment>
+	<rdfs:subClassOf rdf:resource="D7_Digital_Machine_Event"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="D11_Digital_Measurement_Event">
+	<rdfs:comment>This class comprises actions measuring physical properties using a digital device, 
+	that are determined by a systematic procedure and creates an instance of D9 Data Object, 
+	which is stored on an instance of D13 Digital Information Carrier. 
+	In contrast to instances of D10 Software Execution, environmental factors have an intended influence on the outcome of an instance of D11 Digital Measurement Event. 
+	Measurement devices may include running distinct software, such as the RAW to JPEG conversion in digital cameras. 
+	In this case, the event is regarded as instance of both classes, D10 Software Execution and D11 Digital Measurement Event.
+	</rdfs:comment>
+	<rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E16_Measurement"/>
+	<rdfs:subClassOf rdf:resource="D7_Digital_Machine_Event"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="D12_Data_Transfer_Event">
+	<rdfs:comment>This class comprises events that transfer a digital object from one digital carrier to another. 
+	Normally, the digital object remains the same. If in general or by observation the transfer implies or has 
+	implied some data corruption, the change of the digital objects may be documented distinguishing input and output 
+	rather than instantiating the property L14 transferred (was transferred by). 
+	</rdfs:comment>
+	<rdfs:subClassOf rdf:resource="D7_Digital_Machine_Event"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="D13_Digital_Information_Carrier">
+	<rdfs:comment>This class comprises all instances of E84 Information Carrier that are explicitly designed to be 
+	used as persistent digital physical carriers of instances of D1 Digital Object. 
+	A D13 Digital Information Carrier may or may not contain information, e.g., an empty diskette.
+	</rdfs:comment>
+	<rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E84_Information_Carrier"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="D14_Software">
+	<rdfs:comment>This class comprises software codes,computer programs,procedures, and functions that are
+	used to operate a system of digital objects. </rdfs:comment>
+	<rdfs:subClassOf rdf:resource="D1_Digital_Object"/>
+</rdfs:Class>
+
+<rdfs:Class rdf:about="D21_Person_Name">
+	<rdfs:comment>This class comprises the proper noun name that identifies a person that acts
+as an entity.</rdfs:comment>
+	<rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E82_Actor_Appellation"/>
+</rdfs:Class>
+
+<rdfs:Class rdf:about="D23_Room">
+	<rdfs:comment/>
+	<rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+</rdfs:Class>
+
+<rdfs:Class rdf:about="D29_Annotation_Object">
+	<rdfs:comment>This class comprises objects that make propositions about other artefacts. 
+	Instances of this class are not the attributes themselves, by which things are annotated, 
+	but represent the connection between the concepts related in a proposition, and the activities of creation, modification and deletion. 
+	</rdfs:comment>
+	<rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E89_Propositional_Object"/>
+</rdfs:Class>
+
+<rdfs:Class rdf:about="D30_Annotation_Event">
+	<rdfs:comment>This class comprises events that describe the creation of associations (Annotation Objects) between objects 
+	or areas of objects of the Repository, with other objects or regions or persons, places, events. It is the event that creates the Annotation Object.</rdfs:comment>
+	<rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E65_Creation"/>
+</rdfs:Class>
+
+<rdfs:Class rdf:about="D35_Area">
+	<rdfs:comment>This class describes a part (of any shape or size) of interest in basically any media object stored in the Object Repository,
+	i.e., a text, an image, a video or a 3D model. It points to content consisting of just a portion or area of a file. 
+In some contexts, however, the area can also point to content represented by an integral (i.e., proper) file. It is equal to the METS AREA element </rdfs:comment>
+	<rdfs:subClassOf rdf:resource="D1_Digital_Object"/>
+	<rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E26_Physical_Feature"/>
+</rdfs:Class>
+
+<rdf:Property rdf:about="L1_digitized">
+<rdfs:comment>This property associates an instance of D2 Digitization Process with an instance of E18 Physical Thing which is a material thing.  
+This property is a specialisation of P39 measured (was measured by).
+</rdfs:comment>
+	<rdfs:domain rdf:resource="D2_Digitization_Process"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P39_measured"/>
+</rdf:Property>
+<rdf:Property rdf:about="L1i_was_digitized_by">
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
+	<rdfs:range rdf:resource="D2_Digitization_Process"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P39i_was_measured_by"/>
+</rdf:Property>
+<rdf:Property rdf:about="L2_used_as_source">
+	<rdfs:comment>This property associates an instance of D10 Software Execution with an instance of D1 Digital Object
+ which is used as a source, a software essential for the performance.  
+This property is a specialisation of L10F had input (was input of).
+	</rdfs:comment>
+	<rdfs:domain rdf:resource="D10_Software_Execution"/>
+	<rdfs:range rdf:resource="D1_Digital_Object"/>
+	<rdfs:subPropertyOf rdf:resource="L10_had_input"/>
+</rdf:Property>
+<rdf:Property rdf:about="L2i_was_source_for">
+	<rdfs:domain rdf:resource="D1_Digital_Object"/>
+	<rdfs:range rdf:resource="D10_Software_Execution"/>
+	<rdfs:subPropertyOf rdf:resource="L10i_was_input_of"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L4_has_preferred_label">
+	<rdfs:comment>This property associates an instance of E1 Entity with an instance of resource used as a preferred lexical label.  
+This property is a specialisation of rdf schema label.
+</rdfs:comment>
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>	
+</rdf:Property>
+
+<rdf:Property rdf:about="L10_had_input">
+	<rdfs:comment>This property associates an instance of D7 Digital Machine Event with an instance of D1 Digital Object
+ which is the input used to specify the machine action.  
+This property is a specialisation of P16 used specific object(was used for).
+</rdfs:comment>
+	<rdfs:domain rdf:resource="D7_Digital_Machine_Event"/>
+	<rdfs:range rdf:resource="D1_Digital_Object"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P16_used_specific_object"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L10i_was_input_of">
+	<rdfs:domain rdf:resource="D1_Digital_Object"/>
+	<rdfs:range rdf:resource="D7_Digital_Machine_Event"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P16i_was_used_for"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L11_had_output">
+	<rdfs:comment>This property associates an instance of D7 Digital Machine Event with an instance of D1 Digital Object
+ which is the output of the activity.  
+This property is a specialisation of P94 has created (was created by).</rdfs:comment>
+	<rdfs:domain rdf:resource="D7_Digital_Machine_Event"/>
+	<rdfs:range rdf:resource="D1_Digital_Object"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P94_has_created"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L11i_was_output_of">
+	<rdfs:domain rdf:resource="D1_Digital_Object"/>
+	<rdfs:range rdf:resource="D7_Digital_Machine_Event"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P94i_was_created_by"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L12_happened_on_device">
+<rdfs:comment>This property associates an instance of D7 Digital Machine Event  with an object,
+ the D8 Digital Device, which happened with, e.g  a capturing event that happened on/with a digital camera, etc. 
+This property is a specialisation of P12 occurred in the presence of (was present at).</rdfs:comment>
+	<rdfs:domain rdf:resource="D7_Digital_Machine_Event"/>
+	<rdfs:range rdf:resource="D8_Digital_Device"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P12_occurred_in_the_presence_of"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L12i_was_device_for">
+	<rdfs:domain rdf:resource="D8_Digital_Device"/>
+	<rdfs:range rdf:resource="D7_Digital_Machine_Event"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P12i_was_present_at"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L13_used_parameters">
+	<rdfs:comment>This property associates an instance of D10 Software Execution with a digital object
+ used as a parameter during the process.This property is a specialisation of L1O had input (was input of).</rdfs:comment>
+	<rdfs:domain rdf:resource="D10_Software_Execution"/>
+	<rdfs:range rdf:resource="D1_Digital_Object"/>
+	<rdfs:subPropertyOf rdf:resource="L10_had_input"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L13i_parameters_for">
+	<rdfs:domain rdf:resource="D1_Digital_Object"/>
+	<rdfs:range rdf:resource="D10_Software_Execution"/>
+	<rdfs:subPropertyOf rdf:resource="L10i_was_input_of"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L14_transferred">
+<rdfs:comment>This property  identifies a digital object transferred by a D12 Data Transfer Event.
+This property is a specialisation of L11 had output (was output of).</rdfs:comment>
+	<rdfs:domain rdf:resource="D12_Data_Transfer_Event"/>
+	<rdfs:range rdf:resource="D1_Digital_Object"/>
+	<rdfs:subPropertyOf rdf:resource="L10_had_input"/>
+	<rdfs:subPropertyOf rdf:resource="L11_had_output"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L14i_was_transferred_by">
+	<rdfs:domain rdf:resource="D1_Digital_Object"/>
+	<rdfs:range rdf:resource="D12_Data_Transfer_Event"/>
+	<rdfs:subPropertyOf rdf:resource="L10i_was_input_of"/>
+	<rdfs:subPropertyOf rdf:resource="L11i_was_output_of"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L15_has_sender">
+<rdfs:comment>This property  identifies a digital device used as a medium on which data are transferred 
+through a D12 Data Transfer Event.</rdfs:comment>
+	<rdfs:domain rdf:resource="D12_Data_Transfer_Event"/>
+	<rdfs:range rdf:resource="D8_Digital_Device"/>
+	<rdfs:subPropertyOf rdf:resource="L12_happened_on_device"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L15i_was_sender_for">
+	<rdfs:domain rdf:resource="D8_Digital_Device"/>
+	<rdfs:range rdf:resource="D12_Data_Transfer_Event"/>
+	<rdfs:subPropertyOf rdf:resource="L12i_was_device_for"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L16_has_receiver">
+<rdfs:comment>This property  identifies a digital device used as a medium to receive data  
+through a D12 Data Transfer Event.</rdfs:comment>
+	<rdfs:domain rdf:resource="D12_Data_Transfer_Event"/>
+	<rdfs:range rdf:resource="D8_Digital_Device"/>
+	<rdfs:subPropertyOf rdf:resource="L12_happened_on_device"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L16i_was_receiver_for">
+	<rdfs:domain rdf:resource="D8_Digital_Device"/>
+	<rdfs:range rdf:resource="D12_Data_Transfer_Event"/>
+	<rdfs:subPropertyOf rdf:resource="L12i_was_device_for"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L17_measured_thing_of_type">
+<rdfs:comment>This property associates an instance of D11 Digital Measurement Event with the instance of E55
+Type of object to which it applied. This property is a specialisation of P125 used object of type. </rdfs:comment>
+	<rdfs:domain rdf:resource="D11_Digital_Measurement_Event"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E55_Type"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P125_used_object_of_type"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L17i_was_type_of_thing_measured_by">
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E55_Type"/>
+	<rdfs:range rdf:resource="D11_Digital_Measurement_Event"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P125i_was_type_of_object_used_in"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L18_has_modified">
+<rdfs:comment>This property identifies a Digital Information Carrier modified in a Digital Machine Event.
+This property is a specialisation of P31 has modified.</rdfs:comment>
+	<rdfs:domain rdf:resource="D7_Digital_Machine_Event"/>
+	<rdfs:range rdf:resource="D13_Digital_Information_Carrier"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P31_has_modified"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L18i_was_modified_by">
+	<rdfs:domain rdf:resource="D13_Digital_Information_Carrier"/>
+	<rdfs:range rdf:resource="D7_Digital_Machine_Event"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P31i_was_modified_by"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L19_stores">
+<rdfs:comment>This property associates an instance of a D13 Digital Information Carrier with the instance of Digital Object 
+that is stored on it. This property is a specialisation of P128 carries.</rdfs:comment>
+	<rdfs:domain rdf:resource="D13_Digital_Information_Carrier"/>
+	<rdfs:range rdf:resource="D1_Digital_Object"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P128_carries"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L19i_is_stored_on">
+	<rdfs:domain rdf:resource="D1_Digital_Object"/>
+	<rdfs:range rdf:resource="D13_Digital_Information_Carrier"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P128i_is_carried_by"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L20_has_created">
+<rdfs:comment>This property identifies a Data Object that came into existence as a result of a D11 Digital Measurement Event.
+This property is a specialisation of P40 observed dimension and L11 had output.</rdfs:comment>
+	<rdfs:domain rdf:resource="D11_Digital_Measurement_Event"/>
+	<rdfs:range rdf:resource="D9_Data_Object"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P40_observed_dimension"/>
+	<rdfs:subPropertyOf rdf:resource="L11_had_output"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L20i_was_created_by">
+	<rdfs:domain rdf:resource="D9_Data_Object"/>
+	<rdfs:range rdf:resource="D11_Digital_Measurement_Event"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P40i_was_observed_in"/>
+	<rdfs:subPropertyOf rdf:resource="L11i_was_output_of"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L21_used_as_derivation_source">
+<rdfs:comment>This property associates an instance of a D3 Formal Derivation with the instance of D1 Digital Object that is used as a derivation source.</rdfs:comment>
+	<rdfs:domain rdf:resource="D3_Formal_Derivation"/>
+	<rdfs:range rdf:resource="D1_Digital_Object"/>
+	<rdfs:subPropertyOf rdf:resource="L2_used_as_source"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L21i_was_derivation_source_for">
+	<rdfs:domain rdf:resource="D1_Digital_Object"/>
+	<rdfs:range rdf:resource="D3_Formal_Derivation"/>
+	<rdfs:subPropertyOf rdf:resource="L2i_was_source_for"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L22_created_derivative">
+<rdfs:comment>This property associates an instance of D3 Formal Derivation with the Digital Object it used to create a version of.
+This property is a specialisation of L11 had output.</rdfs:comment>
+	<rdfs:domain rdf:resource="D3_Formal_Derivation"/>
+	<rdfs:range rdf:resource="D1_Digital_Object"/>
+	<rdfs:subPropertyOf rdf:resource="L11_had_output"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L22i_was_derivative_created_by">
+	<rdfs:domain rdf:resource="D1_Digital_Object"/>
+	<rdfs:range rdf:resource="D3_Formal_Derivation"/>
+	<rdfs:subPropertyOf rdf:resource="L11i_was_output_of"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L23_used_software_or_firmware">
+<rdfs:comment>This property associates an instance of D7 Digital Machine Event with the instance of D14 Software that had used.
+This property is a specialisation of P16 used specific object.</rdfs:comment>
+	<rdfs:domain rdf:resource="D7_Digital_Machine_Event"/>
+	<rdfs:range rdf:resource="D14_Software"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P16_used_specific_object"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L23i_was_software_or_firmware_used_by">
+	<rdfs:domain rdf:resource="D14_Software"/>
+	<rdfs:range rdf:resource="D7_Digital_Machine_Event"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P16i_was_used_for"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L24_created_logfile">
+<rdfs:comment>This property identifies the logfile that was created by a D10 Software Execution in order to record all the activities in the system.</rdfs:comment>
+	<rdfs:domain rdf:resource="D10_Software_Execution"/>
+	<rdfs:range rdf:resource="D1_Digital_Object"/>
+	<rdfs:subPropertyOf rdf:resource="L11_had_output"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L24i_was_logfile_created_by">
+	<rdfs:domain rdf:resource="D1_Digital_Object"/>
+	<rdfs:range rdf:resource="D10_Software_Execution"/>
+	<rdfs:subPropertyOf rdf:resource="L11i_was_output_of"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L29_has_responsible_organization">
+<rdfs:comment>This property describes the participation of a Legal Body in being responsible for the outcome of a specific activity.
+This property is a specialisation of P14 carried out by.</rdfs:comment>
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E7_Activity"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E40_Legal_Body"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P14_carried_out_by"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L29i_is_responsible_organization_for">
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E40_Legal_Body"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E7_Activity"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P14i_performed"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L30_has_operator">
+<rdfs:comment>This property describes the activity that is being operated by a person.
+This property is a specialisation of P14 carried out by.</rdfs:comment>
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E7_Activity"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E21_Person"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P14_carried_out_by"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L30i_is_operator_of">
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E21_Person"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E7_Activity"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P14i_performed"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L31_has_starting_date-time">
+<rdfs:comment>This property allows the starting point for a D7 Digital Machine Event to be situated.   
+This property expresses the approximation of the starting date of a time span.</rdfs:comment>
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L32_has_ending_date-time">
+<rdfs:comment>This property allows the ending point for a D7 Digital Machine Event to be situated.   
+This property expresses the approximation of the ending date of a time span.</rdfs:comment>
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P82b_end_of_the_end"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L33_has_maker">
+<rdfs:comment>This property identifies the maker, the actor who is responsible for the production of a device,
+ a computer, a digital camera, any kind of a machine that has been produced.
+This property is a shortcut of a more fully developed path from CRM E12 Production:P108 has produced:E24 Physical Man-Made Thing. 
+In this case, there is no need to describe the more detailed property through a production event,so L33 has maker is reccomended to be used instead. </rdfs:comment>
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E72_Legal_Object"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E39_Actor"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L33i_is_maker_of">
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E39_Actor"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E72_Legal_Object"/>
+</rdf:Property>
+
+<!-- EXTENTION for contractor and commissioner -->
+
+<rdf:Property rdf:about="L34_has_contractor">
+<rdfs:comment>This property describes the participation of a Legal Body in being contractor for the outcome of a specific activity.
+This property is a specialisation of L29_has_responsible_organization.</rdfs:comment>
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E7_Activity"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E40_Legal_Body"/>
+	<rdfs:subPropertyOf rdf:resource="L29_has_responsible_organization"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L34i_is_contractor_for">
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E40_Legal_Body"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E7_Activity"/>
+	<rdfs:subPropertyOf rdf:resource="L29i_is_responsible_organization_for"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L35_has_commissioner">
+<rdfs:comment>This property describes the participation of a Legal Body in being commissioner for the outcome of a specific activity.
+This property is a specialisation of L29_has_responsible_organization.</rdfs:comment>
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E7_Activity"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E40_Legal_Body"/>
+	<rdfs:subPropertyOf rdf:resource="L29_has_responsible_organization"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L35i_is_commissioner_for">
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E40_Legal_Body"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E7_Activity"/>
+	<rdfs:subPropertyOf rdf:resource="L29i_is_responsible_organization_for"/>
+</rdf:Property>
+
+<!-- END of EXTENTION for contractor and commissioner-->
+
+<rdf:Property rdf:about="L43_annotates">
+<rdfs:comment>This property describes the associations between objects or areas of objects of the RI, 
+with other objects or regions or persons, places, events..</rdfs:comment>
+	<rdfs:domain rdf:resource="D29_Annotation_Object"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>
+</rdf:Property>
+<rdf:Property rdf:about="L43i_is_annotated_by">
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>
+	<rdfs:range rdf:resource="D29_Annotation_Object"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L47_has_comment">
+<rdfs:comment>This property is a specialisation of P3 has note and associates a comment with an instance of an object E1 CRM Entity.</rdfs:comment>
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P3_has_note"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L48_created_annotation">
+<rdfs:comment>This property identifies the D29 Annotation Object (associations) that came into existence as a result of a D30 Annotation Event.
+This property is a specialisation of P94 has created.</rdfs:comment>
+	<rdfs:domain rdf:resource="D30_Annotation_Event"/>
+	<rdfs:range rdf:resource="D29_Annotation_Object"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P94_has_created"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L48i_was_annotation_created_by">
+	<rdfs:domain rdf:resource="D29_Annotation_Object"/>
+	<rdfs:range rdf:resource="D30_Annotation_Event"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P94i_was_created_by"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L49_is_primary_area_of">
+<rdfs:comment>This property describes the association between a particular area declared in an original digital object.
+This property is a specialisation of P106 is composed of.</rdfs:comment>
+	<rdfs:domain rdf:resource="D35_Area"/>
+	<rdfs:range rdf:resource="D1_Digital_Object"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P106i_forms_part_of"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L49i_has_primary_area">
+	<rdfs:domain rdf:resource="D1_Digital_Object"/>
+	<rdfs:range rdf:resource="D35_Area"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P106_is_composed_of"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L50_is_propagated_area_of">
+<rdfs:comment>This property describes the association between an area and the digital object to which it is propagated.
+This property is a specialisation of P106 is composed of.</rdfs:comment>
+	<rdfs:domain rdf:resource="D35_Area"/>
+	<rdfs:range rdf:resource="D1_Digital_Object"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P106i_forms_part_of"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L50i_has_propagated_area">
+	<rdfs:domain rdf:resource="D1_Digital_Object"/>
+	<rdfs:range rdf:resource="D35_Area"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P106_is_composed_of"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="L51_has_first_name">
+<rdfs:comment>This property defines a personal name used to identify a person.</rdfs:comment>
+	<rdfs:domain rdf:resource="D21_Person_Name"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>	
+</rdf:Property>
+
+<rdf:Property rdf:about="L52_has_last_name">
+<rdfs:comment>This property defines the last name used to identify a person.
+This property is a specialisation of L4 has preferred label.</rdfs:comment>
+	<rdfs:domain rdf:resource="D21_Person_Name"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+	<rdfs:subPropertyOf rdf:resource="L4_has_preferred_label"/>	
+</rdf:Property>
+
+<rdf:Property rdf:about="L53_is_not_uniquely_identified_by">
+<rdfs:comment>This property describes a non unique identification applied to E1 CRM Entity.</rdfs:comment>
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>	
+</rdf:Property>
+
+<rdf:Property rdf:about="L54_is_same-as">
+<rdfs:comment>This property describes the association kind of "same as" between objects. It is used to declare that two or more objects are
+exactly the same.</rdfs:comment>
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>	
+</rdf:Property>
+
+<rdf:Property rdf:about="L54i_is_same-as">
+<rdfs:comment>This property describes the association kind of "same as" between objects. It is used to declare that two or more objects are
+exactly the same.</rdfs:comment>
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>	
+</rdf:Property>
+
+<rdf:Property rdf:about="L55_has_inventory_no">
+<rdfs:comment>This property records the inventory number that was used to identify an instance of E1 CRM Entity 
+at the time this property was record. This property is a specialisation of L53F is not uniquely identified by.</rdfs:comment>
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+	<rdfs:subPropertyOf rdf:resource="L53_is_not_uniquely_identified_by"/>	
+</rdf:Property>
+<rdf:Property rdf:about="L56_has_pixel_width">
+<rdfs:comment>This property records the pixel width of the data object; it approximates a dimension that is 
+part of the image data analysis.This property is a specialisation of P90 has value.</rdfs:comment>
+	<rdfs:domain rdf:resource="D9_Data_Object"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P90_has_value"/>	
+</rdf:Property>
+
+<rdf:Property rdf:about="L57_has_pixel_height">
+<rdfs:comment>This property records the pixel height of the data object; it approximates a dimension that is 
+part of the image data analysis.This property is a specialisation of P90 has value.</rdfs:comment>
+	<rdfs:domain rdf:resource="D9_Data_Object"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P90_has_value"/>	
+</rdf:Property>
+
+<rdf:Property rdf:about="L59_has_serial_number">
+<rdfs:comment>This property records the serial number that was assigned to identify an instance of E22 Man Made Object.
+ This property is a specialisation of L53 is not uniquely identified by.</rdfs:comment>
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+	<rdfs:subPropertyOf rdf:resource="L53_is_not_uniquely_identified_by"/>	
+</rdf:Property>
+
+<rdf:Property rdf:about="L60_documents">
+<rdfs:comment>This property describes the CRM Entities documented by instances of Digitization Processes.
+This property is a specialisation of P140 assigned attribute to.</rdfs:comment>
+	<rdfs:domain rdf:resource="D2_Digitization_Process"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P140_assigned_attribute_to"/>	
+</rdf:Property>
+<rdf:Property rdf:about="L60i_is_documented_by">
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>
+	<rdfs:range rdf:resource="D2_Digitization_Process"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P140i_was_attributed_by"/>	
+</rdf:Property>
+<rdf:Property rdf:about="L61_was_ongoing_at">
+<rdfs:comment>This property describes the minimum period of time covered by a digital machine event. It 
+identifies the minimum extent of the event. This property is a specialisation of P81 ongoing throughout.</rdfs:comment>
+	<rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P81a_end_of_the_begin"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P81b_begin_of_the_end"/>
+</rdf:Property>
+
+</rdf:RDF>

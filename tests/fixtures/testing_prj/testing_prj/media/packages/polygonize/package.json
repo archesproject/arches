@@ -1,0 +1,56 @@
+{
+  "name": "polygonize",
+  "version": "1.0.1",
+  "description": "Javascript implementation of GEOS's Polygonize function",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "npm run lint && npm run test-es5 && npm run bench",
+    "test-es5": "npm run build && tape dist/*.test.js dist/test.js",
+    "test-es6": "tape src/*.test.js src/test.js",
+    "lint": "eslint .",
+    "build": "babel src --out-dir dist",
+    "prepublish": "npm run build",
+    "bench-es6": "node src/bench.js",
+    "bench": "node dist/bench.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/nickcis/polygonize.git"
+  },
+  "keywords": [
+    "geojson",
+    "gis",
+    "polygonize",
+    "polygon",
+    "line",
+    "linestring"
+  ],
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
+  "author": "Nicolas Cisco <@nickcis>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nickcis/polygonize/issues"
+  },
+  "homepage": "https://github.com/nickcis/polygonize#readme",
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-es2015": "^6.24.1",
+    "benchmark": "^2.1.4",
+    "eslint": "^3.19.0",
+    "eslint-config-mourner": "^2.0.1",
+    "load-json-file": "^2.0.0",
+    "tape": "^4.6.3",
+    "write-json-file": "^2.2.0"
+  },
+  "dependencies": {
+    "@turf/envelope": "^4.3.0",
+    "@turf/helpers": "^4.3.0",
+    "@turf/inside": "^4.3.0",
+    "@turf/invariant": "^4.3.0",
+    "@turf/meta": "^4.3.0"
+  }
+}

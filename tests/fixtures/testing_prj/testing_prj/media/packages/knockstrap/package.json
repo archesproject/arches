@@ -1,0 +1,53 @@
+{
+  "name": "knockstrap",
+  "version": "1.3.2",
+  "description": "Knockout bindings to Twitter Bootstrap 3",
+  "homepage": "http://faulknercs.github.io/Knockstrap/",
+  "bugs": "https://github.com/faulknercs/Knockstrap/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/faulknercs/knockstrap.git"
+  },
+  "keywords": [
+    "knockout",
+    "bootstrap",
+    "knockstrap",
+    "custom",
+    "bindings",
+    "library",
+    "templates"
+  ],
+  "author": "Artem Stepanyuk",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "main": "build/knockstrap.js",
+  "dependencies": {
+    "jquery": ">=1.9.0",
+    "knockout": ">=2.3.0",
+    "twitter-bootstrap-3.0.0": "~3"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-concat": "^0.3.0",
+    "grunt-contrib-copy": "^0.4.1",
+    "grunt-contrib-jasmine": "^0.6.5",
+    "grunt-contrib-jshint": "^0.6.5",
+    "grunt-contrib-uglify": "^0.2.7",
+    "grunt-html-convert": "0.0.2",
+    "grunt-nuget": "~0.1.2",
+    "grunt-preprocess": "^3.0.1"
+  },
+  "jam": {
+    "dependencies": {
+      "jquery": ">=1.9.0",
+      "knockoutjs": ">=2.3.0",
+      "bootstrap-v3.0.1": "~3"
+    },
+    "main": "build/knockstrap.js"
+  },
+  "github": "https://github.com/faulknercs/Knockstrap/",
+  "scripts": {
+    "test": "grunt travis --verbose"
+  }
+}

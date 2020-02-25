@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+>
+  <skos:Concept rdf:about="http://www.archesproject.org/9331d4d8-3480-4d20-91bd-bae5c5c185a1">
+    <skos:inScheme>
+      <skos:ConceptScheme rdf:about="http://www.archesproject.org/31b24dba-d67d-4bc5-824b-b5bf9372918e">
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/9331d4d8-3480-4d20-91bd-bae5c5c185a1"/>
+        <dcterms:title xml:lang="en-US">{"id": "a47f15ac-90a3-4f2c-8b45-8e221e7e9034", "value": "Test Model Concepts"}</dcterms:title>
+      </skos:ConceptScheme>
+    </skos:inScheme>
+    <skos:prefLabel xml:lang="en-US">{"id": "8aef0eee-b3df-484b-a2d3-08069402752c", "value": "Concepts"}</skos:prefLabel>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://www.archesproject.org/cf2ed5bd-4d3c-4b34-8ba5-e4ee5ccc5b6f">
+        <skos:inScheme rdf:resource="http://www.archesproject.org/31b24dba-d67d-4bc5-824b-b5bf9372918e"/>
+        <skos:prefLabel xml:lang="en-US">{"id": "acadcbfc-6f85-4d59-821d-d0ef0c5babe7", "value": "Option 1"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://www.archesproject.org/b6ea98d2-f203-426d-9913-eff060043146">
+        <skos:prefLabel xml:lang="en-US">{"id": "e2acecb9-0511-470b-b26b-8c0681b542f0", "value": "Option 2"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://www.archesproject.org/31b24dba-d67d-4bc5-824b-b5bf9372918e"/>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://www.archesproject.org/bf2ca706-a122-4d75-a8d0-1b3c863ba38b">
+        <skos:prefLabel xml:lang="en-US">{"id": "fd845a76-6bcc-4b30-8aef-602a9071b6b5", "value": "Option 3"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://www.archesproject.org/31b24dba-d67d-4bc5-824b-b5bf9372918e"/>
+      </skos:Concept>
+    </skos:narrower>
+  </skos:Concept>
+</rdf:RDF>

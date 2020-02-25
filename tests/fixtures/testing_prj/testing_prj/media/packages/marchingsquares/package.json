@@ -1,0 +1,26 @@
+{
+  "name": "marchingsquares",
+  "main": "./marchingsquares.js",
+  "description": "MarchingSquaresJS - An implementation of the Marching Squares algorithm featuring Isocontour and Isoband computation.",
+  "version": "1.2.0",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@krios.tbi.univie.ac.at:ronny/MarchingSquaresJS.git"
+  },
+  "keywords": [
+    "marchingsquares",
+    "marching",
+    "squares",
+    "isocontour",
+    "isoband",
+    "isoline"
+  ],
+  "author": "Ronny Lorenz <ronny@tbi.univie.ac.at>",
+  "license": "AGPL-3.0"
+}

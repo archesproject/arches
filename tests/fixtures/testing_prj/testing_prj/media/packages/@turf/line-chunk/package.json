@@ -1,0 +1,51 @@
+{
+  "name": "@turf/line-chunk",
+  "version": "4.7.3",
+  "description": "turf line-chunk module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
+  "scripts": {
+    "bench": "node bench.js",
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Turfjs/turf.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Turfjs/turf/issues"
+  },
+  "homepage": "https://github.com/Turfjs/turf",
+  "keywords": [
+    "turf",
+    "gis",
+    "geojson",
+    "linestring",
+    "line segment"
+  ],
+  "author": "Turf Authors",
+  "contributors": [
+    "Tim Channell <@tcql>",
+    "Rowan Winsemius <@rowanwins>",
+    "Denis Carriere <@DenisCarriere>",
+    "Daniel Pulido <@dpmcmlxxvi>"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@turf/truncate": "^4.7.3",
+    "benchmark": "^2.1.4",
+    "load-json-file": "^2.0.0",
+    "tape": "^4.6.3",
+    "write-json-file": "^2.0.0"
+  },
+  "dependencies": {
+    "@turf/helpers": "^4.7.3",
+    "@turf/line-distance": "^4.7.3",
+    "@turf/line-slice-along": "^4.7.3",
+    "@turf/meta": "^4.7.3"
+  }
+}

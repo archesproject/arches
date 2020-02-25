@@ -1,0 +1,41 @@
+{
+  "name": "simplicial-complex",
+  "version": "1.0.0",
+  "description": "Topological indexing for simplicial complexes",
+  "main": "topology.js",
+  "dependencies": {
+    "bit-twiddle": "^1.0.0",
+    "union-find": "^1.0.0"
+  },
+  "scripts": {
+    "test": "tape test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mikolalysenko/simplicial-complex.git"
+  },
+  "keywords": [
+    "mesh",
+    "cell",
+    "complex",
+    "simplex",
+    "simplicial",
+    "topology",
+    "vertex",
+    "triangle",
+    "star",
+    "edge",
+    "graph",
+    "winged",
+    "edge",
+    "half",
+    "edge"
+  ],
+  "author": "Mikola Lysenko",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "24aa75407005c898a4171dcc1e97215a261b3b79",
+  "devDependencies": {
+    "tape": "^2.12.3"
+  }
+}
