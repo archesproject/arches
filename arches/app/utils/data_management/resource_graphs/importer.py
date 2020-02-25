@@ -69,14 +69,18 @@ def import_graph(graphs, overwrite_graphs=True):
     with transaction.atomic():
         errors = []
         for resource in graphs:
-            try:
-                if resource["ontology_id"] is not None:
-                    if resource["ontology_id"] not in [str(f["ontologyid"]) for f in Ontology.objects.all().values("ontologyid")]:
-                        errors.append("The ontologyid of the graph you're trying to load does not exist in Arches.")
+            if len(list(OntologyClass.objects.all())) > 0:
+                if resource["ontology_id"] is not None and resource["ontology_id"] not in [
+                    str(f["ontologyid"]) for f in Ontology.objects.all().values("ontologyid")
+                ]:
+                    errors.append("The ontologyid of the graph you're trying to load does not exist in Arches.")
+            else:
+                errors.append("No ontologies have been loaded. Any GraphModel that depends on an ontology cannot be loaded.")
 
-                reporter.name = resource["name"]
-                reporter.resource_model = resource["isresource"]
-                reporter.graph_id = resource["graphid"]
+            reporter.name = resource["name"]
+            reporter.resource_model = resource["isresource"]
+            reporter.graph_id = resource["graphid"]
+            try:
                 graph = Graph(resource)
                 ontology_classes = [str(f["source"]) for f in OntologyClass.objects.all().values("source")]
 
@@ -116,22 +120,22 @@ def import_graph(graphs, overwrite_graphs=True):
                         default_config = Widget.objects.get(widgetid=card_x_node_x_widget["widget_id"]).defaultconfig
                         card_x_node_x_widget["config"] = check_default_configs(default_config, card_x_node_x_widget_config)
                         cardxnodexwidget = CardXNodeXWidget.objects.update_or_create(**card_x_node_x_widget)
-
-                # try/except block here until all graphs have a resource_2_resource_constraints object.
-                try:
-                    if not hasattr(graph, "resource_2_resource_constraints"):
-                        errors.append(
-                            "{0} graph has no attribute resource_2_resource_constraints".format(graph.resource_2_resource_constraints)
-                        )
-                    else:
-                        for resource_2_resource_constraint in graph.resource_2_resource_constraints:
-                            resource2resourceconstraint = Resource2ResourceConstraint.objects.update_or_create(
-                                **resource_2_resource_constraint
-                            )
-                except:
-                    pass
+            except GraphImportException as ge:
+                errors.append(ge)
             except Exception as e:
-                print(e)
+                errors.append(f"Could not define graph. Its resources were not loaded.")
+                errors.append(e)
+            # try/except block here until all graphs have a resource_2_resource_constraints object.
+            try:
+                if not hasattr(graph, "resource_2_resource_constraints"):
+                    errors.append(
+                        "{0} graph has no attribute resource_2_resource_constraints".format(graph.resource_2_resource_constraints)
+                    )
+                else:
+                    for resource_2_resource_constraint in graph.resource_2_resource_constraints:
+                        resource2resourceconstraint = Resource2ResourceConstraint.objects.update_or_create(**resource_2_resource_constraint)
+            except:
+                pass
 
         return errors, reporter
 
