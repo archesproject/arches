@@ -1808,10 +1808,10 @@ isurl@^1.0.0-alpha5:
     has-to-string-tag-x "^1.2.0"
     is-object "^1.0.1"
 
-jqtree@1.3.4:
-  version "1.3.4"
-  resolved "https://registry.yarnpkg.com/jqtree/-/jqtree-1.3.4.tgz#dd56ef3bc96d1098115392d41ef1b1f5aec47469"
-  integrity sha1-3VbvO8ltEJgRU5LUHvGx9a7EdGk=
+jqtree@1.4.12:
+  version "1.4.12"
+  resolved "https://registry.yarnpkg.com/jqtree/-/jqtree-1.4.12.tgz#f93e366e46b68b893d3e4eb43ea53f73bb7e502e"
+  integrity sha512-zNdnVFFNWAmPbtVFZaAhIjhFVoYpRF/NWeVGU1THRdefjKhXFwLeVILW1R4Frr/qiGg4TTbXWAxk7V7E+Wu3ZQ==
   dependencies:
     jquery ">=1.9"
 
