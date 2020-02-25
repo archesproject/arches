@@ -1,6 +1,0 @@
-#!/usr/bin/env node
-
-var count = (process.argv[2] && parseInt(process.argv[2], 10)) || 100;
-var type = process.argv[3] || 'point';
-
-console.log(JSON.stringify(require('./')[type](count)));
