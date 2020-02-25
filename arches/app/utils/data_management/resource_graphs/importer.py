@@ -123,7 +123,7 @@ def import_graph(graphs, overwrite_graphs=True):
             except GraphImportException as ge:
                 errors.append(ge)
             except Exception as e:
-                errors.append(f"Could not define graph. {graph.name} not loaded and its resources not loaded.")
+                errors.append(f"Could not define graph. Its resources were not loaded.")
                 errors.append(e)
             # try/except block here until all graphs have a resource_2_resource_constraints object.
             try:
