@@ -25,6 +25,7 @@ Replace this with more appropriate tests for your application.
 
 import os
 from tests import test_settings
+
 # from tests.base_test import ArchesTestCase
 from django.test import TestCase
 from django.core import management
@@ -32,16 +33,17 @@ from arches.app.models import models
 
 # python manage.py test tests/views/command_line_tests.py --pattern="*.py" --settings="tests.test_settings"
 
+
 class CommandLineTests(TestCase):
     def setUp(self):
         pass
 
     def tearDown(self):
         pass
-    
+
     @classmethod
     def setUpClass(cls):
-        test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj","testing_prj", "pkg")
+        test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
 
     @classmethod

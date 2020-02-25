@@ -70,7 +70,9 @@ def import_graph(graphs, overwrite_graphs=True):
         errors = []
         for resource in graphs:
             if len(list(OntologyClass.objects.all())) > 0:
-                if resource["ontology_id"] is not None and resource["ontology_id"] not in [str(f["ontologyid"]) for f in Ontology.objects.all().values("ontologyid")]:
+                if resource["ontology_id"] is not None and resource["ontology_id"] not in [
+                    str(f["ontologyid"]) for f in Ontology.objects.all().values("ontologyid")
+                ]:
                     errors.append("The ontologyid of the graph you're trying to load does not exist in Arches.")
             else:
                 errors.append("No ontologies have been loaded. Any GraphModel that depends on an ontology cannot be loaded.")
@@ -131,9 +133,7 @@ def import_graph(graphs, overwrite_graphs=True):
                     )
                 else:
                     for resource_2_resource_constraint in graph.resource_2_resource_constraints:
-                        resource2resourceconstraint = Resource2ResourceConstraint.objects.update_or_create(
-                            **resource_2_resource_constraint
-                        )
+                        resource2resourceconstraint = Resource2ResourceConstraint.objects.update_or_create(**resource_2_resource_constraint)
             except:
                 pass
 
