@@ -541,7 +541,8 @@ CELERY_BEAT_SCHEDULE = {
 AUTO_REFRESH_GEOM_VIEW = True
 TILE_CACHE_TIMEOUT = 600
 
-RENDERERS = [{
+RENDERERS = [
+    {
         "name": "imagereader",
         "title": "Image Reader",
         "description": "Displays most image file types",
@@ -550,7 +551,8 @@ RENDERERS = [{
         "component": "views/components/cards/file-renderers/imagereader",
         "ext": "",
         "type": "image/*",
-        }]
+    }
+]
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
@@ -566,5 +568,3 @@ except ImportError as e:
     except ImportError as e:
         print("Error attempting to load settings from 'arches.settings_local.py'.")
         print(e)
-
-
