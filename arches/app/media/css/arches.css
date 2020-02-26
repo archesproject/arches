@@ -11440,7 +11440,7 @@ a.tree-display-tool, a.tree-display-tool:hover {
         margin-top: 0;
     }
     .search-facets {
-        height: 47vh;
+        height: 41vh;
     }
 }
 
@@ -11477,7 +11477,7 @@ a.tree-display-tool, a.tree-display-tool:hover {
         min-width: inherit;
     }
     .search-popup-panel {
-        top: 0;
+        top: 52px;
         width: 100%;
         max-height: 41vh;
     }
