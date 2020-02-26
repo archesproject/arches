@@ -146,8 +146,11 @@ class ExtendedDateFormat(SortableDateRange):
                 dr = SortableDateRange()
                 dr.lower = dr.lower_fuzzy = dr.upper = dr.upper_fuzzy = object
                 return dr
-        else:
-            raise UnhandledEDTFException()
+        elif isinstance(object, list):
+            if len(object) == 1:
+                return self.handle_object(object[0])
+
+        raise UnhandledEDTFException()
 
     def handle_date(self, date, fuzzy_padding=None):
         dr = SortableDateRange()
@@ -181,7 +184,7 @@ class ExtendedDateFormat(SortableDateRange):
             # we need to recaculate the day under special circumstances
             if date.day is None and not self.is_season(date) and (date.precision == PRECISION_YEAR or date.precision == PRECISION_MONTH):
                 day = self.calculate_upper_day(fuzzy_year, upper_fuzzy.month)
-            if date.day >= 29 and upper_fuzzy.month == 2:
+            elif date.day is not None and int(date.day) >= 29 and upper_fuzzy.month == 2:
                 day = self.calculate_upper_day(fuzzy_year, upper_fuzzy.month)
 
             dr.upper_fuzzy = self.to_sortable_date(year=fuzzy_year, month=upper_fuzzy.month, day=day)

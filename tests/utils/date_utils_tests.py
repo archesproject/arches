@@ -185,6 +185,7 @@ NEGATIVE_DATES = (
     ("-1295~", "-12949899", "-12948769", "-12959899", "-12938769"),
     ("-1295?~", "-12949899", "-12948769", "-12969899", "-12928769"),
     ("-0095?~", "-949899", "-948769", "-969899", "-928769"),
+    ("-1550~/-1295~", "-15499899", "-12948769", "-15509899", "-12938769"),
 )
 
 LEAP_YEARS = (
@@ -248,7 +249,7 @@ class SortableDateTests(ArchesTestCase):
         elif len(test_case) == 1:
             self.assertEqual(f.is_valid(), False)
         else:
-            raise Exception("")
+            raise Exception(test_case)
 
     def test_edtf_parsing(self):
         for test_case in EDTF_DATES:
