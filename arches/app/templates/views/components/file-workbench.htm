@@ -102,7 +102,7 @@
                                                     <!-- card Tools -->
                                                     <div class="r-select-card-footer">
                                                         <div class="">
-                                                            <div data-bind="click: $parent.applyFileRenderer" style="border-top: 1px solid #c4c4c4;" class="btn btn-primary btn-resource-select" role="button">
+                                                            <div data-bind="click: function(){$parent.applyFileRenderer($data)}" style="border-top: 1px solid #c4c4c4;" class="btn btn-primary btn-resource-select" role="button">
                                                             {% trans 'Select and Apply' %}
                                                             </div>
                                                         </div>
@@ -232,9 +232,10 @@
             disabled: false,
             data: fileFormatRenderers,
             value: fileRenderer,
+            allowClear: false,
             multiple: false,
-            placeholder: 'File Renderer'
-        }}">
+            onSelect: $parent.applyFileRenderer,
+            placeholder: {% trans "'File Renderer'" %}}}">
 </div>
 
 <div data-bind="css: card.model.cssclass">

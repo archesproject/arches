@@ -49,6 +49,10 @@ define([
 
             this.fileListNodeId = getfileListNode();
 
+            this.displayWidgetIndex = self.card.widgets().indexOf(self.card.widgets().find(function(widget) {
+                return widget.datatype.datatype === 'file-list';
+            }));
+
             WorkbenchComponentViewModel.apply(this, [params]);
 
             if (this.card && this.card.activeTab) {
@@ -208,6 +212,19 @@ define([
                 val.deleteTile(null, self.defaultSelector);
             };
 
+            if (this.card.resourceinstanceid === undefined) {
+                this.card.resourceinstanceid = uuid.generate();
+            }
+
+            function sleep(milliseconds) {
+                var start = new Date().getTime();
+                for (var i = 0; i < 1e7; i++) {
+                    if ((new Date().getTime() - start) > milliseconds){
+                        break;
+                    }
+                }
+            }
+
             this.addTile = function(file){
                 var newtile;
                 newtile = self.card.getNewTile();
@@ -236,6 +253,10 @@ define([
                 });
                 newtile.data[targetNode]([tilevalue]);
                 newtile.formData.append('file-list_' + targetNode, file, file.name);
+                newtile.resourceinstance_id = self.card.resourceinstanceid;
+                if (self.card.tiles().length === 0) {
+                    sleep(50);
+                }
                 newtile.save();
                 self.card.newTile = undefined;
             };
