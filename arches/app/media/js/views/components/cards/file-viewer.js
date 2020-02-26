@@ -49,6 +49,10 @@ define([
 
             this.fileListNodeId = getfileListNode();
 
+            this.displayWidgetIndex = self.card.widgets().indexOf(self.card.widgets().find(function(widget) {
+                return widget.datatype.datatype === 'file-list';
+            }));
+
             WorkbenchComponentViewModel.apply(this, [params]);
 
             if (this.card && this.card.activeTab) {
