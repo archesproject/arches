@@ -9131,12 +9131,12 @@ table.table.dataTable {
 }
 
 .resource_search_widget_dropdown ul .select2-disabled div span span button.active {
-    background: #8EAFE3;
+    background: #223D62;
 }
 
 .resource_search_widget_dropdown ul .select2-disabled div span span button.term-search-btn:not(.active) {
     background: #BBD1EA;
-    color: #658CC9;
+    color: #223D62;
 }
 
 .resource_search_widget_dropdown ul .select2-disabled div span span button:not(.active):hover {
@@ -9168,7 +9168,7 @@ table.table.dataTable {
 }
 
 .term-search-btn.active {
-    color: #4330A4;
+    color: #BBD1EA;
 }
 
 .search-type-btn i {
@@ -11398,6 +11398,11 @@ a.tree-display-tool, a.tree-display-tool:hover {
     }
     .msm-edit-buttons button:before {
         display: none;
+    }
+    .resource_search_widget_dropdown ul .select2-disabled div span span button {
+        width: auto;
+        height: auto;
+        padding: 7px;
     }
 }
 
