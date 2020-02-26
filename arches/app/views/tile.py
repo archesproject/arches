@@ -103,8 +103,7 @@ class TileData(View):
                     try:
                         resource = Resource(uuid.UUID(data["resourceinstance_id"]))
                     except ValueError:
-                    resource = Resource()
-
+                        resource = Resource()
                     graphid = models.Node.objects.filter(nodegroup=data["nodegroup_id"])[0].graph_id
                     resource.graph_id = graphid
                     try:
