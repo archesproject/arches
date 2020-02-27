@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import json
 import couchdb
+import logging
 import urllib.parse
 from datetime import datetime
 from datetime import timedelta
@@ -63,6 +64,9 @@ def get_survey_resources(mobile_survey):
         )
 
     return resources
+
+
+logger = logging.getLogger(__name__)
 
 
 @method_decorator(group_required("Application Administrator"), name="dispatch")
