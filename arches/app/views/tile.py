@@ -101,7 +101,7 @@ class TileData(View):
                     models.ResourceInstance.objects.get(pk=data["resourceinstance_id"])
                 except ObjectDoesNotExist:
                     try:
-                        resource = Resource(uuid.UUID(data["resourceinstance_id"]))
+                        resource = Resource(uuid.UUID(str(data["resourceinstance_id"])))
                     except ValueError:
                         resource = Resource()
                     graphid = models.Node.objects.filter(nodegroup=data["nodegroup_id"])[0].graph_id
