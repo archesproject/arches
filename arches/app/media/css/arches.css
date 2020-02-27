@@ -1348,7 +1348,7 @@ ul.tabbed-report-tab-list {
     content: "\f00d";
     font-family: FontAwesome;
     margin-right: 6px;
-    color: rgb(158, 158, 158);
+    color: #000;
     font-weight:lighter;
 }
 
@@ -1373,7 +1373,6 @@ ul.tabbed-report-tab-list {
 
 .basemap-listing, .overlay-listing {
     font-size: 14px;
-    color: rgb(158, 158, 158);
 }
 
 .basemap-listing-container {
@@ -11403,6 +11402,10 @@ a.tree-display-tool, a.tree-display-tool:hover {
         width: auto;
         height: auto;
         padding: 7px;
+    }
+    .overlay-listing .overlay-name {
+        width: 100%;
+        white-space: normal;
     }
 }
 
