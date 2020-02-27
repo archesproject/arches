@@ -121,6 +121,7 @@ class CommandLineTests(TestCase):
             resp = JSONDeserializer().deserialize(raw_resp.content)
         except couchdb.http.Unauthorized:
             # try again
+            print("Not authorized to post to couch")
             pass
 
         self.assertTrue(resp["success"])
