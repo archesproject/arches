@@ -27,6 +27,7 @@ import os
 import uuid
 from tests import test_settings
 from arches.app.utils.couch import Couch
+import couchdb
 # from tests.base_test import ArchesTestCase
 from django.test import TestCase
 from django.core import management
@@ -43,9 +44,10 @@ class CommandLineTests(TestCase):
         self.survey_id = "d309d38e-29b9-45c0-b0f5-542f34a4576a"
         self.expected_resource_count = 2
         self.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
+        self.c = Client()
 
     def tearDown(self):
-        # management.call_command("mobile", operation="delete_surveys", id=self.survey_id)
+        management.call_command("mobile", operation="delete_surveys", id=self.survey_id)
         models.ResourceInstance.objects.filter(graph_id=self.data_type_graphid).delete()
 
     @classmethod
@@ -62,7 +64,6 @@ class CommandLineTests(TestCase):
         self.assertEqual(len(list(resources)), self.expected_resource_count)
 
     def test_mobile_survey(self):
-        c = Client()
         data = {  # note that cards and resourceid belong to datatype testing model in testing_prj/pkg
             "id": self.survey_id,
             "name": "test_project",
@@ -70,7 +71,7 @@ class CommandLineTests(TestCase):
             "createdby_id": None,
             "lasteditedby_id": None,
             "startdate": "2020-01-26",
-            "enddate": "2021-03-07",
+            "enddate": "2025-03-07",
             "description": "desc here 1",
             "bounds": {
                 "features": [
@@ -113,9 +114,15 @@ class CommandLineTests(TestCase):
         }
         payload = JSONSerializer().serialize(data)
         content_type = "application/x-www-form-urlencoded"
-        c.login(username="admin", password="admin")
-        raw_resp = c.post(reverse("collector_designer", kwargs={"surveyid": self.survey_id}), payload, content_type)
-        resp = JSONDeserializer().deserialize(raw_resp.content)
+        self.c.login(username="admin", password="admin")
+        resp = {"success": False}
+        try:
+            raw_resp = self.c.post(reverse("collector_designer", kwargs={"surveyid": self.survey_id}), payload, content_type)
+            resp = JSONDeserializer().deserialize(raw_resp.content)
+        except couchdb.http.Unauthorized:
+            # try again
+            pass
+        
         self.assertTrue(resp["success"])
 
         test_survey_id = ""

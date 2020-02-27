@@ -1,6 +1,6 @@
 #!/bin/bash
 
-HOST="http://localhost:5984"
+HOST="http://localhost:9200"
 echo "couch version :"
 curl -X GET $HOST
 echo "adding admin :"
