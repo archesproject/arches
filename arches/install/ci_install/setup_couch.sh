@@ -6,4 +6,5 @@ curl -X GET $HOST
 echo "adding admin :"
 curl -X PUT $HOST/_config/admins/admin -d '"admin"'
 echo "=_=_=_=_=_printing logs=_=_=_=_=_"
-curl -X GET $HOST/_config
+# curl -X GET $HOST/_config
+echo /var/log/couchdb/couch.log
