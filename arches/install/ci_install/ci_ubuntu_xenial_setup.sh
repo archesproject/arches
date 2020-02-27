@@ -34,7 +34,6 @@ function install_couchdb {
     sudo add-apt-repository "deb https://apache.bintray.com/couchdb-deb xenial main"
     sudo apt-get update
     sudo apt-get install couchdb
-    sudo chmod o+rwx /var/logs/couchdb/
 }
 
 function install_yarn {
