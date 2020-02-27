@@ -47,11 +47,13 @@ class SearchTests(ArchesTestCase):
             y = {"id": i + 100, "type": "altLabel", "value": "test alt label"}
             se.index_data(index="test", body=y, idfield="id", refresh=True)
 
-        time.sleep(1)
+        time.sleep(3)
 
         query = Query(se, start=0, limit=100)
         match = Match(field="type", query="altLabel")
         query.add_query(match)
+        # initial = se.count(index="test")
+        # print(initial)
 
         query.delete(index="test", refresh=True)
 
