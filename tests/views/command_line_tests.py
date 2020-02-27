@@ -122,7 +122,7 @@ class CommandLineTests(TestCase):
         except couchdb.http.Unauthorized:
             # try again
             pass
-        
+
         self.assertTrue(resp["success"])
 
         test_survey_id = ""
