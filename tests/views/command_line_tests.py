@@ -45,7 +45,7 @@ class CommandLineTests(TestCase):
         self.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
 
     def tearDown(self):
-        management.call_command("mobile", operation="delete_surveys", id=self.survey_id)
+        # management.call_command("mobile", operation="delete_surveys", id=self.survey_id)
         models.ResourceInstance.objects.filter(graph_id=self.data_type_graphid).delete()
 
     @classmethod

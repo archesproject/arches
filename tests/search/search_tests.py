@@ -52,8 +52,6 @@ class SearchTests(ArchesTestCase):
         query = Query(se, start=0, limit=100)
         match = Match(field="type", query="altLabel")
         query.add_query(match)
-        # initial = se.count(index="test")
-        # print(initial)
 
         query.delete(index="test", refresh=True)
 
