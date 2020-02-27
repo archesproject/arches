@@ -214,6 +214,8 @@ define([
 
             if (this.card.resourceinstanceid === undefined) {
                 this.card.resourceinstanceid = uuid.generate();
+            } else if (this.form && ko.unwrap(this.form.resourceId()) !== this.card.resourceinstanceid) {
+                this.card.resourceinstanceid = this.form.resourceId();
             }
 
             function sleep(milliseconds) {
