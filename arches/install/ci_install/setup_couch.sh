@@ -3,6 +3,9 @@
 HOST="http://localhost:5984"
 echo "couch version :"
 curl -X GET $HOST
+# chown -R couchdb:couchdb /usr/local/{lib,etc}/couchdb /usr/local/var/{lib,log,run}/couchdb
+sudo chmod o+rwx /etc/couchdb/local.d/erlang_query_server.ini
+service couchdb restart
 echo "adding admin :"
-sudo curl -X PUT $HOST/_config/admins/admin -d '"admin"'
+curl -X PUT $HOST/_config/admins/admin -d '"admin"'
 sudo cat /var/log/couchdb/couch.log
