@@ -212,7 +212,9 @@ define([
                 val.deleteTile(null, self.defaultSelector);
             };
 
-            if (this.card.resourceinstanceid === undefined) {
+            if (this.form && ko.unwrap(this.form.resourceId)) {
+                this.card.resourceinstanceid = ko.unwrap(this.form.resourceId);
+            } else if (this.card.resourceinstanceid === undefined && this.card.tiles().length === 0) {
                 this.card.resourceinstanceid = uuid.generate();
             }
 

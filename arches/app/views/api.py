@@ -125,9 +125,9 @@ class APIBase(View):
 
 
 class Sync(APIBase):
-    import arches.app.tasks as tasks
-
     def get(self, request, surveyid=None):
+        import arches.app.tasks as tasks
+
         can_sync = userCanAccessMobileSurvey(request, surveyid)
         if can_sync:
             try:
