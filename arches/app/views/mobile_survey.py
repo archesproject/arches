@@ -65,7 +65,9 @@ def get_survey_resources(mobile_survey):
 
     return resources
 
+
 logger = logging.getLogger(__name__)
+
 
 @method_decorator(group_required("Application Administrator"), name="dispatch")
 class MobileSurveyManagerView(BaseManagerView):
