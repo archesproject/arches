@@ -11419,6 +11419,12 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .map-server-basemap-button {
         top: -24px;
     }
+    .graph-list-header .graph-add-btn {
+        top: 16px;
+    }
+    .resource-toolbar {
+        height: 86px;
+    }
 }
 
 @media screen and (max-width: 1024px) {
