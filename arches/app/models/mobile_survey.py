@@ -13,10 +13,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import io
 import uuid
 import json
 import urllib.parse
 import logging
+from PIL import Image
 from datetime import datetime
 from datetime import timedelta
 from copy import copy, deepcopy
@@ -421,11 +423,21 @@ class MobileSurvey(models.MobileSurveyModel):
                 try:
                     tile["type"] = "tile"
                     self.couch.update_doc(db, tile, tile["tileid"])
+                    self.add_attachments(db, tile)
                 except Exception as e:
                     print(e, tile)
         nodegroups = models.NodeGroup.objects.filter(parentnodegroup=nodegroup)
         for nodegroup in nodegroups:
             self.load_tiles_into_couch(instances, nodegroup)
+
+    def add_attachments(self, db, tile):
+        files = models.File.objects.filter(tile_id=tile["tileid"])
+        for file in files:
+            with Image.open(file.path.file).copy() as image:
+                image.thumbnail((300,300))
+                b = io.BytesIO()
+                image.save(b, "JPEG")
+                db.put_attachment(tile, b.getvalue(), filename=str(file.fileid), content_type="image/jpeg")
 
     def load_instances_into_couch(self, instances):
         """
