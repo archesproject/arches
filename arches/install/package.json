@@ -25,7 +25,7 @@
         "datatables.net-responsive": "~2.1.0",
         "datatables.net-responsive-bs": "~2.1.0",
         "dom4": "^2.0.1",
-        "dropzone": "3.8.4",
+        "dropzone": "5.7.0",
         "eonasdan-bootstrap-datetimepicker": "~4.17.43",
         "font-awesome": "~4.6.3",
         "ionicons": "~2.0.1",
