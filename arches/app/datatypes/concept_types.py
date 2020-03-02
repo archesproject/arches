@@ -94,7 +94,7 @@ class ConceptDataType(BaseConceptDataType):
                 errors.append(
                     {
                         "type": "ERROR",
-                        "message": f"datatype: {self.datatype_model.datatype} value: {value} {source} {row_number} - {message}. This data was not imported."
+                        "message": f"datatype: {self.datatype_model.datatype} value: {value} {source} {row_number} - {message}. This data was not imported.",
                     }
                 )
                 return errors
@@ -106,7 +106,7 @@ class ConceptDataType(BaseConceptDataType):
                 errors.append(
                     {
                         "type": "ERROR",
-                        "message": f"datatype: {self.datatype_model.datatype} value: {value} {source} {row_number} - {message}. This data was not imported."
+                        "message": f"datatype: {self.datatype_model.datatype} value: {value} {source} {row_number} - {message}. This data was not imported.",
                     }
                 )
                 return errors
@@ -119,7 +119,7 @@ class ConceptDataType(BaseConceptDataType):
                 errors.append(
                     {
                         "type": "ERROR",
-                        "message": f"datatype: {self.datatype_model.datatype} value: {value} {source} {row_number} - {message}. This data was not imported."
+                        "message": f"datatype: {self.datatype_model.datatype} value: {value} {source} {row_number} - {message}. This data was not imported.",
                     }
                 )
         return errors
