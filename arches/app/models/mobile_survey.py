@@ -434,7 +434,7 @@ class MobileSurvey(models.MobileSurveyModel):
         files = models.File.objects.filter(tile_id=tile["tileid"])
         for file in files:
             with Image.open(file.path.file).copy() as image:
-                image.thumbnail((settings.MOBILE_IMAGE_SIZE_LIMITS["thumb"],settings.MOBILE_IMAGE_SIZE_LIMITS["thumb"]))
+                image.thumbnail((settings.MOBILE_IMAGE_SIZE_LIMITS["thumb"], settings.MOBILE_IMAGE_SIZE_LIMITS["thumb"]))
                 b = io.BytesIO()
                 image.save(b, "JPEG")
                 db.put_attachment(tile, b.getvalue(), filename=str(file.fileid), content_type="image/jpeg")
