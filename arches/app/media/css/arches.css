@@ -7719,10 +7719,10 @@ a.clear-geojson-button:hover {
 }
 
 .href-button {
-    color: #f4f4f4;
+    color: #fff;
     font-size: 11px;
     padding: 5px 0;
-    background: #5393C8;
+    background: #2B4E6D;
     border: 1px solid #1561A1;
     display: inline-block;
     width: 100%;
@@ -7730,7 +7730,7 @@ a.clear-geojson-button:hover {
 
 .href-button:hover {
     color: #fff;
-    background: #1266AB;
+    background: #0F5B99;
 }
 
 .href-button:focus {
