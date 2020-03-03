@@ -9,6 +9,8 @@ from django.core import management
 from django.db import connection
 from django.http import HttpRequest
 from arches.app.models import models
+from arches.app.utils.data_management.resources.formats.csvfile import CsvReader
+from arches.app.utils.data_management.resources.formats.archesfile import ArchesFileReader
 import arches.app.utils.zip as zip_utils
 from django.utils.translation import ugettext as _
 
@@ -87,6 +89,27 @@ def refresh_materialized_view(self):
     """
     cursor.execute(sql)
     response = {"taskid": self.request.id}
+
+
+@shared_task(bind=True)
+def import_resource_instances(
+    self, file_format="", business_data=None, mapping=None, overwrite="", bulk=False, create_concepts=False, create_collections=False
+):
+    if file_format == "json":
+        reader = ArchesFileReader()
+        reader.import_business_data(business_data, mapping)
+    elif file_format == "csv" or file_format == "shp" or file_format == "zip":
+        reader = CsvReader()
+        reader.import_business_data(
+            business_data=business_data,
+            mapping=mapping,
+            overwrite=overwrite,
+            bulk=bulk,
+            create_concepts=create_concepts,
+            create_collections=create_collections,
+        )
+
+    reader.report_errors()
 
 
 @shared_task
