@@ -1064,6 +1064,8 @@ ul.tabbed-report-tab-list {
 .plotly .legend .bg {
     fill: #fafafa ! important;
     transform: translate(-5px, -10px) scaleX(1.05)scaleY(1.2);
+    stroke-width: 1px ! important;
+    stroke: #eee ! important;
 }
 
 .gallery-controls {
