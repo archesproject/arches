@@ -1053,6 +1053,19 @@ ul.tabbed-report-tab-list {
     z-index: 100000001;
 }
 
+.chart .plotly {
+    border: 1px solid #ddd;
+    padding-top: 10px ! important;
+    padding-bottom: 30px ! important;
+    border-radius: 2px;
+    background: #fff;
+}
+
+.plotly .legend .bg {
+    fill: #fafafa ! important;
+    transform: translate(-5px, -10px) scaleX(1.05)scaleY(1.2);
+}
+
 .gallery-controls {
     margin: 35px 110px 35px 35px;
 }
@@ -10715,7 +10728,7 @@ ul.select2-choices:after {
 }
 
 .sidepanel-draggable {
-    background-color: #fafafa;
+    background-color: #f7f7f7;
     border-left: solid 1px gainsboro;
     border-right: solid 1px gainsboro;
     height:100%;
