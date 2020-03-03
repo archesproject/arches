@@ -66,7 +66,7 @@
                             <div class="dropzone-photo-upload">
                                 <div class="file-select-window">
                                     <!--ko if: $parent.displayContent().availableRenderers.length === 0 -->
-                                    <div class="bord-top pad-ver file-select" style="padding: 0px">
+                                    <div class="bord-top file-select">
                                         <div class="" style="padding: 5px">
                                             <h2>{% trans 'Unable to display the selected file' %}</h2>
                                             <h4>{% trans 'There are no file renderers that support this format' %}</h4>
@@ -76,11 +76,11 @@
                                     <!--/ko-->
                                     
                                     <!--ko if: $parent.displayContent().availableRenderers.length > 0 -->
-                                    <div class="bord-top pad-ver file-select" style="padding: 0px">
+                                    <div class="bord-top file-select loader-select">
                                         <div class="" style="padding: 5px">
                                             <h2>{% trans 'Select File Loader' %}</h2>
                                             <h4>{% trans 'Select the loader best suited for processing and visualizing the selected file' %}</h4>
-                                            <div style="display: flex; flex-flow: wrap; justify-content: space-evenly; padding-top: 15px">
+                                            <div style="display: flex; flex-flow: wrap; padding: 15px 25px;">
 
                                             <!--ko foreach: $parent.displayContent().availableRenderers -->
                                             <div>
@@ -103,7 +103,7 @@
                                                     <div class="r-select-card-footer">
                                                         <div class="">
                                                             <div data-bind="click: function(){$parent.applyFileRenderer($data)}" style="border-top: 1px solid #c4c4c4;" class="btn btn-primary btn-resource-select" role="button">
-                                                            {% trans 'Select and Apply' %}
+                                                            {% trans 'Select' %}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -112,8 +112,7 @@
                                             <!--/ko-->
                                         </div>
                                     </div>
-                                    <br>
-                                    
+                                    <br>  
                                 </div>
                                 <div class="file-upload-footer">
                                     <span>{% trans 'Apply the same selection to all files in the dataset' %}</span>
