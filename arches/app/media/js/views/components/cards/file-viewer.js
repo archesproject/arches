@@ -230,7 +230,6 @@ define([
             this.addTile = function(file){
                 var newtile;
                 newtile = self.card.getNewTile();
-                var targetNode;
                 var defaultRenderers = self.getDefaultRenderers(file.type, file.name);
                 var tilevalue = {
                     name: file.name,
@@ -248,13 +247,8 @@ define([
                     error: file.error,
                     renderer: defaultRenderers.length === 1 ? defaultRenderers[0].id : undefined,
                 };
-                Object.keys(newtile.data).forEach(function(val){
-                    if (newtile.datatypeLookup && newtile.datatypeLookup[val] === 'file-list') {
-                        targetNode = val;
-                    }
-                });
-                newtile.data[targetNode]([tilevalue]);
-                newtile.formData.append('file-list_' + targetNode, file, file.name);
+                newtile.data[self.fileListNodeId]([tilevalue]);
+                newtile.formData.append('file-list_' + self.fileListNodeId, file, file.name);
                 newtile.resourceinstance_id = self.card.resourceinstanceid;
                 if (self.card.tiles().length === 0) {
                     sleep(50);
