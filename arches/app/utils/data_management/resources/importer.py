@@ -214,7 +214,10 @@ class BusinessDataImporter(object):
             elif file_format == "csv" or file_format == "shp" or file_format == "zip":
                 if mapping is not None:
                     if celery_worker_running is True:
-                        res = tasks.import_resource_instances.apply_async((file_format, business_data, mapping, overwrite, bulk, create_concepts, create_collections), link_error=tasks.log_error.s())
+                        res = tasks.import_resource_instances.apply_async(
+                            (file_format, business_data, mapping, overwrite, bulk, create_concepts, create_collections),
+                            link_error=tasks.log_error.s(),
+                        )
                     else:
                         reader = CsvReader()
                         reader.import_business_data(

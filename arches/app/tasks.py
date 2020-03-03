@@ -92,7 +92,9 @@ def refresh_materialized_view(self):
 
 
 @shared_task(bind=True)
-def import_resource_instances(self, file_format="", business_data=None, mapping=None, overwrite="", bulk=False, create_concepts=False, create_collections=False):
+def import_resource_instances(
+    self, file_format="", business_data=None, mapping=None, overwrite="", bulk=False, create_concepts=False, create_collections=False
+):
     if file_format == "json":
         reader = ArchesFileReader()
         reader.import_business_data(business_data, mapping)
