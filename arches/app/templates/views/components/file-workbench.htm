@@ -78,8 +78,8 @@
                                     <!--ko if: $parent.displayContent().availableRenderers.length > 0 -->
                                     <div class="bord-top pad-ver file-select" style="padding: 0px">
                                         <div class="" style="padding: 5px">
-                                            <h2>{% trans 'Select File Renderer' %}</h2>
-                                            <h4>{% trans 'Select the renderer best suited for visualization the selected file' %}</h4>
+                                            <h2>{% trans 'Select File Loader' %}</h2>
+                                            <h4>{% trans 'Select the loader best suited for processing and visualizing the selected file' %}</h4>
                                             <div style="display: flex; flex-flow: wrap; justify-content: space-evenly; padding-top: 15px">
 
                                             <!--ko foreach: $parent.displayContent().availableRenderers -->
@@ -149,13 +149,12 @@
                    <div style="padding: 10px">{% trans "Adding files to this record is " %}
                        <span><strong>{% trans "optional." %}</strong></span>
                        <br>
-                       {% trans "You may upload as many files as you wish, but the maximum size of any single file is " %}
-                       <span>8MB</span>
+                       {% trans "You may upload as many files as you wish; check with the site admin on the maximum file size." %}
                    </div>
 
                </div>
                <div class="file-upload-footer">
-                   <span>{% trans 'Images formatted as .jpg, .png, .tiff files may be uploaded. Other formats will be ignored.' %}</span>
+                   <span>{% trans 'Images formatted as .jpg, .png, .tiff files may be uploaded. Other formats may require a loader.' %}</span>
                </div>
            </div>
 
@@ -189,13 +188,12 @@
                <div style="padding: 10px">{% trans "Adding documents to this record is " %}
                    <span><strong>{% trans "optional." %}</strong></span>
                    <br>
-                   {% trans "You may upload as many documents as you wish, but the maximum size of any single file is " %}
-                   <span>8MB</span>
+                   {% trans "You may upload as many documents as you wish; check with your system admin on the maximum file size " %}
                </div>
 
            </div>
            <div class="file-upload-footer">
-               <span>{% trans 'Accepted formats: .jpg, .png, .tiff' %}</span>
+               <span>{% trans 'Accepted formats: various' %}</span>
            </div>
        </div>
 
@@ -208,8 +206,9 @@
 <div class="workbench-card-sidepanel-header-container file-workbench">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
 </div>
-<div style='position: relative;'>
-    <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'Filter file list...' %}" data-bind="textInput: filter"></input>
+<div class="file-workbench-filter" style=''>
+    <h2 class="file-workbench-filter-header">File Filter</h2>
+    <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'e.g.: .txt' %}" data-bind="textInput: filter"></input>
     <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
 </div>
 <div class='file-workbench-files'>
@@ -225,6 +224,7 @@
 <div class='file-workbench-filecount' data-bind='text: card.tiles().length + "{% trans ' files uploaded' %}"'></div>
 
 <div class="col-xs-12 pad-no crud-widget-container">
+    <h2 class="file-workbench-filter-header">Loader</h2>
     <input style="display:inline-block;"
     data-bind="select2Query: {
         select2Config: {

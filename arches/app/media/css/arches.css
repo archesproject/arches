@@ -923,20 +923,31 @@ ul.tabbed-report-tab-list {
     margin-left: 0px;
 }
 
+.file-workbench-filter {
+    position: relative;
+    margin-bottom: -10px;
+}
+
+.file-workbench-filter-header {
+    font-size: 15px;
+    font-weight: 400;
+}
+
 .file-workbench-files {
     height: 136px;
     overflow-y: scroll;
     border: solid 1px #ddd;
     display: flex;
     flex-direction: column;
-    margin: 15px 0px 5px 0px;
+    margin: 15px 0px 15px 0px;
 }
 
 .file-workbench-filecount {
     color: steelblue;
     font-size: 11px;
     padding-left: 5px;
-    margin-bottom: 10px;
+    margin-top: -10px;
+    margin-bottom: 0px;
 }
 
 .file-workbench-files::-webkit-scrollbar {
@@ -10746,7 +10757,6 @@ ul.select2-choices:after {
 
 .card-component-panel {
     padding: 0px;
-    border: 1px solid #ddd;
     border-radius: 3px;
     flex: 1 0 250px;
     width: 250px;
@@ -10808,6 +10818,7 @@ ul.select2-choices:after {
 
 .card-header {
     height: 50px;
+    margin-left: -1px;
     padding: 10px 20px;
     background: #25476a;
 }
