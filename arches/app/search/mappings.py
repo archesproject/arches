@@ -19,6 +19,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from arches.app.models import models
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from django.db.utils import ProgrammingError
+
 
 def prepare_terms_index(create=False):
     """
@@ -105,7 +107,10 @@ def prepare_search_index(create=False):
     """
 
     index_settings = {
-        "settings": {"analysis": {"analyzer": {"folding": {"tokenizer": "standard", "filter": ["lowercase", "asciifolding"]}}}},
+        "settings": {
+            "analysis": {"analyzer": {"folding": {"tokenizer": "standard", "filter": ["lowercase", "asciifolding"]}}},
+            "index.mapping.total_fields.limit": 20000,
+        },
         "mappings": {
             "_doc": {
                 "properties": {
@@ -211,14 +216,16 @@ def prepare_search_index(create=False):
             }
         },
     }
-
-    datatype_factory = DataTypeFactory()
-    data = index_settings["mappings"]["_doc"]["properties"]["tiles"]["properties"]["data"]["properties"]
-    for node in models.Node.objects.all():
-        datatype = datatype_factory.get_instance(node.datatype)
-        datatype_mapping = datatype.default_es_mapping()
-        if datatype_mapping and datatype_factory.datatypes[node.datatype].defaultwidget:
-            data[str(node.nodeid)] = datatype_mapping
+    try:
+        datatype_factory = DataTypeFactory()
+        data = index_settings["mappings"]["_doc"]["properties"]["tiles"]["properties"]["data"]["properties"]
+        for node in models.Node.objects.all():
+            datatype = datatype_factory.get_instance(node.datatype)
+            datatype_mapping = datatype.default_es_mapping()
+            if datatype_mapping and datatype_factory.datatypes[node.datatype].defaultwidget:
+                data[str(node.nodeid)] = datatype_mapping
+    except ProgrammingError:
+        print("Skipping datatype mappings because the datatypes table is not yet available")
 
     if create:
         se = SearchEngineFactory().create()

@@ -229,7 +229,7 @@ define([
         };
 
         this.displayValue = ko.computed(function() {
-            return self.uploadedFiles().length;
+            return self.uploadedFiles().length === 1 ? ko.unwrap(self.uploadedFiles()[0].name) : self.uploadedFiles().length; 
         });
 
         this.reportFiles = ko.computed(function() {

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+>
+  <skos:Collection rdf:about="http://localhost:8000/00000000-0000-0000-0000-000000000005">
+    <skos:member>
+      <skos:Concept rdf:about="http://localhost:8000/00000000-0000-0000-0000-000000000007"/>
+    </skos:member>
+    <skos:prefLabel xml:lang="en-us">{"id": "d8c622f6-e786-11e6-905a-475a5eee86f5", "value": "Resource To Resource Relationship Types"}</skos:prefLabel>
+  </skos:Collection>
+  <skos:Collection rdf:about="http://localhost:8000/bcc94cf1-75b3-4ca9-a40a-3ee7561c3b9c">
+    <skos:scopeNote xml:lang="en-us">{"id": "d91df30b-3c8b-4455-93de-77ff1096cb9d", "value": "Testing scheme for the concept data type"}</skos:scopeNote>
+    <skos:altLabel xml:lang="en-us">{"id": "5e328859-7a75-494f-948d-730169def957", "value": "Test"}</skos:altLabel>
+    <skos:prefLabel xml:lang="en-us">{"id": "42d3c53e-5a04-405c-a60b-7127c67baca1", "value": "Test Scheme"}</skos:prefLabel>
+    <skos:member>
+      <skos:Concept rdf:about="http://localhost:8000/cc18b684-0a54-4666-ac68-6136f22baad7"/>
+    </skos:member>
+    <skos:member>
+      <skos:Concept rdf:about="http://localhost:8000/c4d780cf-73b5-45bd-9228-1acf85b174b6"/>
+    </skos:member>
+  </skos:Collection>
+  <skos:Collection rdf:about="http://localhost:8000/d3d0e4de-177e-4b5f-a533-0b666a757102">
+    <skos:scopeNote xml:lang="en-us">{"id": "ae9b7e86-17e1-4f34-8373-477d959df8ff", "value": "Test Scheme"}</skos:scopeNote>
+    <skos:prefLabel xml:lang="en-us">{"id": "4988260a-eebb-4894-bb5a-8dfdc0117732", "value": "Test"}</skos:prefLabel>
+    <skos:altLabel xml:lang="en-us">{"id": "c32b1ac4-7891-4660-b9c7-60ed0af4b86a", "value": "Test"}</skos:altLabel>
+  </skos:Collection>
+</rdf:RDF>

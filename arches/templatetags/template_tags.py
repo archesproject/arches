@@ -27,3 +27,8 @@ def can_read_resource_instance(user):
 @register.filter(name="can_create_resource_instance")
 def can_create_resource_instance(user):
     return len(get_createable_resource_types(user)) > 0
+
+
+@register.filter(name="can_create_graph")
+def can_create_graph(user):
+    return len(get_resource_types_by_perm(user, ["models.write_nodegroup", "models.delete_nodegroup"])) > 0

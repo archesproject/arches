@@ -33,13 +33,21 @@ def fetch(url):
     return resp.json()
 
 
+def use_cache(url):
+    if docCache[url]["expires"] is not None and docCache[url]["expires"] < datetime.datetime.now():
+        return False
+    else:
+        return True
+
+
 def load_document_and_cache(url):
-    if url in docCache:
+    if url in docCache and use_cache(url):
         return docCache[url]
 
-    doc = {"contextUrl": None, "documentUrl": None, "document": ""}
+    doc = {"expires": None, "contextUrl": None, "documentUrl": None, "document": ""}
     data = fetch(url)
     doc["document"] = data
+    doc["expires"] = datetime.datetime.now() + datetime.timedelta(minutes=settings.JSONLD_CONTEXT_CACHE_TIMEOUT)
     docCache[url] = doc
     return doc
 

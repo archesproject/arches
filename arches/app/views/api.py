@@ -20,6 +20,7 @@ from django.core.cache import cache
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
+from django.core.files.base import ContentFile
 from revproxy.views import ProxyView
 from oauth2_provider.views import ProtectedResourceView
 from arches.app.models import models
@@ -124,9 +125,9 @@ class APIBase(View):
 
 
 class Sync(APIBase):
-    import arches.app.tasks as tasks
-
     def get(self, request, surveyid=None):
+        import arches.app.tasks as tasks
+
         can_sync = userCanAccessMobileSurvey(request, surveyid)
         if can_sync:
             try:
@@ -169,7 +170,17 @@ class Surveys(APIBase):
                     survey.deactivate_expired_survey()
                     survey = survey.serialize_for_mobile()
                     ret[survey["id"]] = {}
-                    for key in ["active", "name", "description", "startdate", "enddate", "onlinebasemaps", "bounds", "tilecache"]:
+                    for key in [
+                        "active",
+                        "name",
+                        "description",
+                        "startdate",
+                        "enddate",
+                        "onlinebasemaps",
+                        "bounds",
+                        "tilecache",
+                        "image_size_limits",
+                    ]:
                         ret[survey["id"]][key] = survey[key]
                 response = JSONResponse(ret, indent=4)
             else:
@@ -846,3 +857,40 @@ class SearchComponentData(APIBase):
         if search_filter:
             return JSONResponse(search_filter.view_data())
         return JSONResponse(status=404)
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class Images(APIBase):
+    # meant to handle uploading of full sized images from a mobile client
+    def post(self, request):
+        tileid = request.POST.get("tileid")
+        fileid = request.POST.get("file_id")
+        nodeid = request.POST.get("nodeid")
+        file_name = request.POST.get("file_name", "temp.jpg")
+        file_data = request.FILES.get("data")
+        try:
+            image_file, file_created = models.File.objects.get_or_create(pk=fileid)
+            image_file.path.save(file_name, ContentFile(file_data.read()))
+
+            tile = models.TileModel.objects.get(pk=tileid)
+            for image in tile.data[nodeid]:
+                if image["file_id"] == fileid:
+                    image["url"] = image_file.path.url
+                    image["size"] = image_file.path.size
+                    tile.save()
+
+            # to use base64 use the below code
+            # import base64
+            # with open("foo.jpg", "w+b") as f:
+            #     f.write(base64.b64decode(request.POST.get('data')))
+
+        except models.TileModel.DoesNotExist:
+            # it's ok if the Tile doesn't exist, that just means that there is some
+            # latency in the updating of the db from couch
+            # see process_mobile_data in the FileListDatatype for how image thumbnails get
+            # pushed to the db and files saved
+            pass
+        except Exception as e:
+            return JSONResponse(status=500)
+
+        return JSONResponse()

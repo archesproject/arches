@@ -474,6 +474,8 @@ class Command(BaseCommand):
             ontologies = glob.glob(os.path.join(package_dir, "ontologies/*"))
             if len(ontologies) > 0:
                 print("loading ontologies")
+            else:
+                print("No Ontologies to load")
             for ontology in ontologies:
                 management.call_command("load_ontology", source=ontology)
 
@@ -546,7 +548,11 @@ class Command(BaseCommand):
                 print("Could not connect to db")
 
         def load_graphs(package_dir):
-            branches = glob.glob(os.path.join(package_dir, "graphs", "branches"))[0]
+            try:
+                branches = glob.glob(os.path.join(package_dir, "graphs", "branches"))[0]
+            except IndexError as e:
+                logger.warning("No branches in package")
+                branches = ""
             resource_models = glob.glob(os.path.join(package_dir, "graphs", "resource_models"))[0]
             # self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'graphs','branches'), overwrite_graphs=False)
             overwrite_graphs = True if yes is True else False
@@ -740,7 +746,7 @@ class Command(BaseCommand):
                 zip_file = os.path.join(unzip_into_dir, "source_data.zip")
                 urllib.request.urlretrieve(source, zip_file)
                 unzip_file(zip_file, unzip_into_dir)
-            except Exception as e:
+            except Exception:
                 pass
 
             for path in os.listdir(unzip_into_dir):

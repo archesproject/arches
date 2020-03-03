@@ -1069,9 +1069,15 @@ class FileListDataType(BaseDataType):
         return errors
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        for f in tile.data[str(nodeid)]:
-            val = {"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
-            document["strings"].append(val)
+        try:
+            for f in tile.data[str(nodeid)]:
+                val = {"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+                document["strings"].append(val)
+        except KeyError as e:
+            for k, pe in tile.provisionaledits.items():
+                for f in pe["value"][nodeid]:
+                    val = {"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+                    document["strings"].append(val)
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
@@ -1084,6 +1090,7 @@ class FileListDataType(BaseDataType):
         return file_list_str
 
     def handle_request(self, current_tile, request, node):
+        # this does not get called when saving data from the mobile app
         previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
         user = request.user
         if hasattr(request.user, "userprofile") is not True:
@@ -1278,9 +1285,12 @@ class FileListDataType(BaseDataType):
                 if attachment is not None:
                     attachment_file = attachment.read()
                     file_data = ContentFile(attachment_file, name=file["name"])
-                    file_model = models.File()
-                    file_model.path = file_data
-                    file_model.pk = file["file_id"]
+                    file_model, created = models.File.objects.get_or_create(fileid=file["file_id"])
+
+                    if created:
+                        file_model.path = file_data
+
+                    file_model.tile = tile
                     file_model.save()
                     if file["name"] == file_data.name and "url" not in list(file.keys()):
                         file["file_id"] = str(file_model.pk)
@@ -1288,7 +1298,6 @@ class FileListDataType(BaseDataType):
                         file["status"] = "uploaded"
                         file["accepted"] = True
                         file["size"] = file_data.size
-                    # db.delete_attachment(couch_doc, file['name'])
 
         except KeyError as e:
             pass

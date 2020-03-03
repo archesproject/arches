@@ -2,6 +2,7 @@
 {% load l10n %}
 {% load i18n %}
 
+{% block require_config %}
 <script>
     var CKEDITOR_BASEPATH = '{{ STATIC_URL }}packages/ckeditor/';
     require.config({
@@ -23,8 +24,6 @@
             'select2': '{{ STATIC_URL }}packages/select2/select2',
             'bootstrap': '{{ STATIC_URL }}packages/bootstrap/dist/js/bootstrap.min',
             'jquery-ui': '{{ STATIC_URL }}packages/jqueryui/jquery-ui.min',
-            'flexslider': '{{ STATIC_URL }}packages/flexslider/jquery.flexslider-min',
-            'easing': '{{ STATIC_URL }}packages/jquery.easing/jquery.easing.min',
             'backbone': '{{ STATIC_URL }}packages/backbone/backbone-min',
             'underscore': '{{ STATIC_URL }}packages/underscore/underscore-min',
             'jquery-validate': '{{ STATIC_URL }}packages/jquery-validation/dist/jquery.validate.min',
@@ -36,19 +35,18 @@
             'knockout-mapping': '{{ STATIC_URL }}packages/knockout-mapping/dist/knockout.mapping.min',
             'moment': '{{ STATIC_URL }}packages/moment/min/moment.min',
             'bootstrap-datetimepicker': '{{ STATIC_URL }}packages/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min',
-            'shp': '{{ STATIC_URL }}packages/js-shapefile-to-geojson/shapefile',
             'blueimp-gallery': '{{ STATIC_URL }}packages/blueimp-gallery/js/blueimp-gallery.min',
             'blueimp-jquery': '{{ STATIC_URL }}packages/blueimp-gallery/js/jquery.blueimp-gallery.min',
             'blueimp-helper': '{{ STATIC_URL }}packages/blueimp-gallery/js/blueimp-helper.min',
-            'datatables.net': '{{ STATIC_URL }}packages/datatables.net/js/jquery.dataTables',
-            'datatables.net-bs': '{{ STATIC_URL }}packages/datatables.net-bs/js/dataTables.bootstrap',
+            'datatables.net': '{{ STATIC_URL }}packages/datatables.net/js/jquery.dataTables.min',
+            'datatables.net-bs': '{{ STATIC_URL }}packages/datatables.net-bs/js/dataTables.bootstrap.min',
             'datatables.net-buttons': '{{ STATIC_URL }}packages/datatables.net-buttons/js/dataTables.buttons.min',
             'datatables.net-buttons-print': '{{ STATIC_URL }}packages/datatables.net-buttons/js/buttons.print.min',
             'datatables.net-buttons-html5': '{{ STATIC_URL }}packages/datatables.net-buttons/js/buttons.html5.min',
             'datatables.net-buttons-bs': '{{ STATIC_URL }}packages/datatables.net-buttons-bs/js/buttons.bootstrap.min',
             'datatables.net-responsive': '{{ STATIC_URL }}packages/datatables.net-responsive/js/dataTables.responsive',
             'datatables.net-responsive-bs': '{{ STATIC_URL }}packages/datatables.net-responsive-bs/js/responsive.bootstrap',
-            'chosen': '{{ STATIC_URL }}packages/chosen-js/chosen.jquery',
+            'chosen': '{{ STATIC_URL }}packages/chosen-js/chosen.jquery.min',
             'mapbox-gl': '{{ STATIC_URL }}packages/mapbox-gl/dist/mapbox-gl',
             'mapbox-gl-draw': '{{ STATIC_URL }}packages/@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw',
             'mapbox-gl-geocoder': '{{ STATIC_URL }}packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.min',
@@ -68,7 +66,8 @@
             'jqtree': '{{ STATIC_URL }}packages/jqtree/tree.jquery',
             'core-js':'{{ STATIC_URL }}packages/core-js/client/shim.min',
             'dom-4': '{{ STATIC_URL }}packages/dom4/build/dom4',
-            'numeral': '{{ STATIC_URL }}packages/numeral/numeral'
+            'numeral': '{{ STATIC_URL }}packages/numeral/numeral',
+            {% block paths %}{% endblock paths %}
         },
         packages: [{
             name: "codemirror",
@@ -133,10 +132,6 @@
             'geohash': {
                 exports: 'Geohash'
             },
-            'nvd3': {
-                deps: ['d3'],
-                exports: 'nv'
-            },
             'leaflet-iiif': {
                 deps: ['leaflet']
             },
@@ -148,10 +143,15 @@
             },
             'ckeditor-jquery': {
                 deps: ['ckeditor']
-            }
+            },
+            {% block shim %}{% endblock shim %}
         }
     });
+</script>
+{% endblock require_config %}
 
+{% block arches_modules %}
+<script>
     require(['utils/set-csrf-token']);
 
     // put values here that should be accessible application wide
@@ -420,6 +420,21 @@
          return;
     });
 
+    define('file-renderers', [{% for renderer in app_settings.RENDERERS %}'{{ renderer.component }}',{% endfor %}], function () {
+        return [{% autoescape off %}{% for renderer in app_settings.RENDERERS %}
+                {'name': '{{ renderer.name }}',
+                'title': '{{ renderer.title }}',
+                'description': '{{ renderer.description }}',
+                'component': '{{ renderer.component }}',
+                'id': '{{ renderer.id }}',
+                'iconclass': '{{ renderer.iconclass }}',
+                'text': '{{ renderer.title }}',
+                'type': '{{ renderer.type }}',
+                'ext': '{{ renderer.ext }}',
+                 },
+                {% endfor %}{% endautoescape %}];
+    });
+
     define('datatype-config-components',
         [{% for datatype in datatypes %}
             {% if datatype.configcomponent != None %}
@@ -492,3 +507,9 @@
         L.drawLocal.edit.handlers.remove.tooltip.text = '{% trans "Click on a feature to remove" %}';
     });
 </script>
+{% endblock arches_modules %}
+
+{% block project_modules %}
+{% endblock project_modules %}
+
+

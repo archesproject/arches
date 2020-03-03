@@ -43,18 +43,22 @@ define([
             res.steps = res.steps ? JSON.parse(res.steps) : [];
             this.state = res;
         };
+        this.canFinish = ko.observable(false);
 
-        this.canFinish = ko.pureComputed(function(){
-            var required = false, canFinish = true, tileid = null;
+        this.checkCanFinish = function(){
+            var required = false, canFinish = true, complete = null;
             for(var i = 0; i < self.steps.length; i++) {
                 required = ko.unwrap(self.steps[i].required);
-                tileid = ko.unwrap(self.steps[i].tileid);
-                if(required && (tileid == "" || !tileid)) {
+                complete = ko.unwrap(self.steps[i].complete);
+                if(!complete && required) {
                     canFinish = false;
                     break;
                 }
             }
-            return canFinish;
+            self.canFinish(canFinish);
+        };
+        this.activeStep.subscribe(function() {
+            self.checkCanFinish();
         });
 
         this.finishWorkflow = function() {

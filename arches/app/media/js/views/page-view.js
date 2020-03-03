@@ -76,7 +76,7 @@ define([
                     }
                     self.viewModel.alert(null);
                     self.viewModel.loading(true);
-                    window.location = url;
+                    window.location.assign(url);
                 },
                 getHelp: function() {
                     self.viewModel.helploading(true);
