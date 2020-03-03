@@ -928,6 +928,10 @@ ul.tabbed-report-tab-list {
     margin-bottom: -10px;
 }
 
+.file-workbench-filter .clear-node-search {
+    margin-top: 25px;
+}
+
 .file-workbench-filter-header {
     font-size: 15px;
     font-weight: 400;
@@ -6445,6 +6449,12 @@ span.file-upload-clear-filter {
     text-align: center;
     padding: 40px 0;
     background: #f6f6f6;
+}
+
+.loader-select .r-select-title {
+    padding: 5px 10px;
+    overflow: hidden;
+    height: 40px;
 }
 
 .card-component-panel .loader-select h4 {
