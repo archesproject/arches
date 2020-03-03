@@ -6453,8 +6453,12 @@ span.file-upload-clear-filter {
 
 .loader-select .r-select-title {
     padding: 5px 10px;
+    text-align: center;
     overflow: hidden;
-    height: 40px;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
 }
 
 .card-component-panel .loader-select h4 {
