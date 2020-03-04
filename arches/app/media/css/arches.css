@@ -1063,7 +1063,7 @@ ul.tabbed-report-tab-list {
 
 .plotly .legend .bg {
     fill: #fafafa ! important;
-    transform: translate(-5px, -10px) scaleX(1.05)scaleY(1.2);
+    transform: translate(-5px, -5px) scaleX(1.05)scaleY(1.2);
     stroke-width: 1px ! important;
     stroke: #eee ! important;
 }
@@ -4495,7 +4495,12 @@ span.editable-card i.fa.fa-align-justify:hover {
     text-align: center;
     padding: 18px;
     border-radius: 50%;
-    background: #BFE0F7
+    background: #BFE0F7;
+}
+
+.r-select-circle.loader-button {
+    background: #C85FDA;
+    border: 1px solid #86039D;
 }
 
 .r-select-icon {
