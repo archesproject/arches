@@ -137,35 +137,36 @@ def search_terms(request):
 
         ret[index] = []
         results = query.search(index=index)
-        for result in results["aggregations"]["value_agg"]["buckets"]:
-            if len(result["top_concept"]["buckets"]) > 0:
-                for top_concept in result["top_concept"]["buckets"]:
-                    top_concept_id = top_concept["key"]
-                    top_concept_label = get_preflabel_from_conceptid(top_concept["key"], lang)["value"]
-                    for concept in top_concept["conceptid"]["buckets"]:
-                        ret[index].append(
-                            {
-                                "type": "concept",
-                                "context": top_concept_id,
-                                "context_label": top_concept_label,
-                                "id": i,
-                                "text": result["key"],
-                                "value": concept["key"],
-                            }
-                        )
+        if result is not None:
+            for result in results["aggregations"]["value_agg"]["buckets"]:
+                if len(result["top_concept"]["buckets"]) > 0:
+                    for top_concept in result["top_concept"]["buckets"]:
+                        top_concept_id = top_concept["key"]
+                        top_concept_label = get_preflabel_from_conceptid(top_concept["key"], lang)["value"]
+                        for concept in top_concept["conceptid"]["buckets"]:
+                            ret[index].append(
+                                {
+                                    "type": "concept",
+                                    "context": top_concept_id,
+                                    "context_label": top_concept_label,
+                                    "id": i,
+                                    "text": result["key"],
+                                    "value": concept["key"],
+                                }
+                            )
+                        i = i + 1
+                else:
+                    ret[index].append(
+                        {
+                            "type": "term",
+                            "context": "",
+                            "context_label": get_resource_model_label(result),
+                            "id": i,
+                            "text": result["key"],
+                            "value": result["key"],
+                        }
+                    )
                     i = i + 1
-            else:
-                ret[index].append(
-                    {
-                        "type": "term",
-                        "context": "",
-                        "context_label": get_resource_model_label(result),
-                        "id": i,
-                        "text": result["key"],
-                        "value": result["key"],
-                    }
-                )
-                i = i + 1
 
     return JSONResponse(ret)
 
