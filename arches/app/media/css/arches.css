@@ -923,20 +923,35 @@ ul.tabbed-report-tab-list {
     margin-left: 0px;
 }
 
+.file-workbench-filter {
+    position: relative;
+    margin-bottom: -10px;
+}
+
+.file-workbench-filter .clear-node-search {
+    margin-top: 25px;
+}
+
+.file-workbench-filter-header {
+    font-size: 15px;
+    font-weight: 400;
+}
+
 .file-workbench-files {
     height: 136px;
     overflow-y: scroll;
     border: solid 1px #ddd;
     display: flex;
     flex-direction: column;
-    margin: 15px 0px 5px 0px;
+    margin: 15px 0px 15px 0px;
 }
 
 .file-workbench-filecount {
     color: steelblue;
     font-size: 11px;
     padding-left: 5px;
-    margin-bottom: 10px;
+    margin-top: -10px;
+    margin-bottom: 0px;
 }
 
 .file-workbench-files::-webkit-scrollbar {
@@ -1036,6 +1051,21 @@ ul.tabbed-report-tab-list {
     -moz-osx-font-smoothing: grayscale;
     transform: translate(0, 0);
     z-index: 100000001;
+}
+
+.chart .plotly {
+    border: 1px solid #ddd;
+    padding-top: 10px ! important;
+    padding-bottom: 30px ! important;
+    border-radius: 2px;
+    background: #fff;
+}
+
+.plotly .legend .bg {
+    fill: #fafafa ! important;
+    transform: translate(-5px, -5px) scaleX(1.05)scaleY(1.2);
+    stroke-width: 1px ! important;
+    stroke: #eee ! important;
 }
 
 .gallery-controls {
@@ -4465,7 +4495,12 @@ span.editable-card i.fa.fa-align-justify:hover {
     text-align: center;
     padding: 18px;
     border-radius: 50%;
-    background: #BFE0F7
+    background: #BFE0F7;
+}
+
+.r-select-circle.loader-button {
+    background: #C85FDA;
+    border: 1px solid #86039D;
 }
 
 .r-select-icon {
@@ -6428,6 +6463,26 @@ span.file-upload-clear-filter {
     text-align: center;
     padding: 70px 0;
     background: #f6f6f6;
+}
+
+.loader-select {
+    text-align: center;
+    padding: 40px 0;
+    background: #f6f6f6;
+}
+
+.loader-select .r-select-title {
+    padding: 5px 10px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.card-component-panel .loader-select h4 {
+    font-weight: 400;
 }
 
 .file-select-window {
@@ -10680,7 +10735,7 @@ ul.select2-choices:after {
 }
 
 .sidepanel-draggable {
-    background-color: #fafafa;
+    background-color: #f7f7f7;
     border-left: solid 1px gainsboro;
     border-right: solid 1px gainsboro;
     height:100%;
@@ -10746,7 +10801,6 @@ ul.select2-choices:after {
 
 .card-component-panel {
     padding: 0px;
-    border: 1px solid #ddd;
     border-radius: 3px;
     flex: 1 0 250px;
     width: 250px;
@@ -10808,6 +10862,7 @@ ul.select2-choices:after {
 
 .card-header {
     height: 50px;
+    margin-left: -1px;
     padding: 10px 20px;
     background: #25476a;
 }
