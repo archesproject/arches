@@ -137,7 +137,7 @@ def search_terms(request):
 
         ret[index] = []
         results = query.search(index=index)
-        if result is not None:
+        if results is not None:
             for result in results["aggregations"]["value_agg"]["buckets"]:
                 if len(result["top_concept"]["buckets"]) > 0:
                     for top_concept in result["top_concept"]["buckets"]:
