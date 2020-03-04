@@ -1046,6 +1046,232 @@ ul.tabbed-report-tab-list {
     margin: 25px;
 }
 
+/* photo gallery */
+
+.gallery-container .tab-container .tab-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.thumbnail-gallery-controls {
+    width: 35px;
+    height: 105px;
+    display: flex;
+    background-color: rgba(0,0,0, 0.75);
+    align-items: center;
+    font-size: 41px;
+    justify-content: center;
+    border-bottom: solid 1px #333;
+    color: #ddd
+}
+
+.thumbnail-gallery-controls.left {
+    border-left: solid 1px #333;
+}
+
+.thumbnail-gallery-controls.right {
+    border-right: solid 1px #333;
+}
+
+.thumbnail-container {
+    display: flex;
+    justify-content: space-between;
+    width: calc(100% - 438px);
+}
+
+.workbench-card-container-sidepanel-active .thumbnail-container {
+    display: flex;
+    justify-content: space-between;
+    width: calc(100% - 475px);
+}
+
+.show-thumbnails-btn {
+    padding: 4px 10px;
+    font-size: 14px;
+    margin-left: 35px;
+    width: 130px;
+    color: #fff;
+    font-weight: 500;
+    background-color: rgba(0,0,0, 0.7);
+    text-align: center;
+}
+
+.show-thumbnails-btn:hover {
+    cursor: pointer;
+}
+
+.show-thumbnails-btn.open {
+    position: relative;
+}
+
+.show-thumbnails-btn.closed {
+    position: absolute;
+    bottom: 0;
+}
+
+.thumbnail-gallery-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+}
+
+.workflow-step-body .thumbnail-gallery-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: fixed;
+    bottom: 0px;
+    width: calc(100% + 311px);
+    left: 50px;
+}
+
+.workflow-step-container .thumbnail-gallery-container {
+    bottom: 0px;
+    left: 50px;
+}
+
+.gallery-container {
+    position: relative;
+}
+
+.gallery-thumbnails {
+    display: inline-flex;
+    align-items: center;
+    text-align: center;
+    background-color: rgba(0,0,0, 0.65);
+    height: 105px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100%;
+    border-top: solid 1px #000;
+}
+
+.gallery-thumbnails img {
+    height: 80px;
+    margin: 3px 6px;
+    border: solid 1.5px #333;
+}
+
+.gallery-thumbnails img:hover {
+    cursor: pointer;
+    border: 1.5px solid #FFF;
+}
+
+.gallery .preview img {
+    border: solid 1px #333;
+    width: 100%;
+    height: auto;
+    margin: 0 auto !important;
+    display: block !important;
+}
+
+.gallery-thumbnails .dz-cancel {
+    color: black;
+    background-color: #ccc;
+    position: absolute;
+    right: 0;
+    opacity: 0.75;
+    position: absolute;
+}
+
+.gallery-thumbnails .dz-cancel:hover {
+    background-color: #eee;
+    opacity: 1;
+}
+
+.gallery-thumbnails .btn-xs {
+    padding: 0.5px 3.5px;
+}
+
+.gallery-controls {
+    display: flex;
+    position:absolute;
+    right: 0px;
+    top: 0px;
+    height: 100%;
+}
+
+.gallery-controls.new-tile {
+    background: #ededed;
+    justify-content: center;
+    width: 100%
+}
+
+.gallery-controls.new-tile .dropzone-photo-upload {
+    margin-top: 0;
+    padding: 45px;
+    background-color: #ffffff;
+    width: 100%;
+}
+
+
+.dropzone-photo-upload {
+    margin-top: 40px;
+}
+
+.photo-workbench-photos {
+    height: 136px;
+    overflow-y: scroll;
+    border: solid 1px #ddd;
+    display: flex;
+    flex-direction: column;
+    margin: 5px 20px 10px 20px;
+}
+
+.photo-workbench-photo {
+    position: relative;
+    padding: 4px;
+}
+
+.photo-workbench-photo:nth-child(even) {
+    background: #fff;
+    border-bottom: 1px solid #D3E5F4;
+}
+
+.photo-workbench-photo:nth-child(odd) {
+  background: #F5FAFE;
+  border-bottom: 1px solid #D3E5F4;
+}
+
+.photo-workbench-photo.selected-photo {
+    background-color: #9CC3E4;
+    color: #fff;
+    font-weight: 600;
+    padding: 4px;
+}
+
+.photo-workbench-photo:not(.selected-photo):hover {
+    background: #CAE2F5;
+    cursor: pointer;
+}
+
+.gallery-controls.new-tile .dropzone-photo-upload {
+    margin-top: 0;
+    padding: 45px;
+    background-color: #ffffff;
+    width: 100%;
+}
+
+.workbench-card-sidepanel .gallery-controls.new-tile .dropzone-photo-upload {
+    margin-top: 0;
+    padding: 15px;
+    background-color: #ffffff;
+    width: 100%;
+}
+
+.workbench-card-sidepanel .gallery-controls.new-tile .dropzone-photo-upload {
+    margin-top: 0;
+    padding: 15px;
+    background-color: #ffffff;
+    width: 100%;
+}
+
+/* end photo gallery */
 
 .workbench-card-wrapper {
     flex: 1;
