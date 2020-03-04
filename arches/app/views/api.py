@@ -131,6 +131,7 @@ class Sync(APIBase):
         can_sync = userCanAccessMobileSurvey(request, surveyid)
         if can_sync:
             try:
+                res = None
                 logger.info("Starting sync for user {0}".format(request.user.username))
                 celery_worker_running = task_management.check_if_celery_available()
                 if celery_worker_running is True:
@@ -138,12 +139,12 @@ class Sync(APIBase):
                         (surveyid, request.user.id), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
                     )
                 else:
-                    management.call_command("mobile", operation="sync_survey", id=surveyid, user=request.user.id)
+                    management.call_command("mobile", operation="sync_survey", id=surveyid, userid=request.user.id)
                 logger.info("Sync complete for user {0}".format(request.user.username))
             except Exception:
                 logger.exception(_("Sync Failed"))
 
-            return JSONResponse(_("Sync Failed"))
+            return JSONResponse(res)
         else:
             return JSONResponse(_("Sync Failed"), status=403)
 

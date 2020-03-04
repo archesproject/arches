@@ -40,7 +40,7 @@ def message(arg):
 @shared_task(bind=True)
 def sync(self, surveyid=None, userid=None):
     create_user_task_record(self.request.id, self.name, userid)
-    management.call_command("mobile", operation="sync_survey", id=surveyid, user=userid)
+    management.call_command("mobile", operation="sync_survey", id=surveyid, userid=userid)
     response = {"taskid": self.request.id}
     return response
 
