@@ -90,11 +90,21 @@ def refresh_materialized_view(self):
     cursor.execute(sql)
     response = {"taskid": self.request.id}
 
+@shared_task(bind=True)
+def import_business_data(self, data_source="", overwrite="", bulk_load=False, create_concepts=False, create_collections=False):
+    management.call_command("packages", operation="import_business_data", source=data_source, overwrite=True)
+
+
+@shared_task(bind=True)
+def post_load_indexing(self, *args):
+    management.call_command("es", operation="index_database")
 
 @shared_task(bind=True)
 def import_resource_instances(
     self, file_format="", business_data=None, mapping=None, overwrite="", bulk=False, create_concepts=False, create_collections=False
 ):
+    # admin_userid = 1
+    # create_user_task_record(self.request.id, self.name, admin_userid)
     if file_format == "json":
         reader = ArchesFileReader()
         reader.import_business_data(business_data, mapping)
@@ -110,6 +120,22 @@ def import_resource_instances(
         )
 
     reader.report_errors()
+
+
+@shared_task
+def package_load_complete(*args, msg=None):
+    print(args)
+    if msg is None:
+        msg = "Package Load Complete"
+    user = User.objects.get(id=1)
+    context = dict(
+        greeting="Hello,\nYour package has successfully loaded into your Arches project.",
+        link="",
+        link_text="Log me in",
+        closing="Thank you",
+        email="",
+    )
+    notify_completion(msg, user, 'Package Load Complete', context)
 
 
 @shared_task
