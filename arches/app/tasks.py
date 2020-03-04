@@ -90,6 +90,7 @@ def refresh_materialized_view(self):
     cursor.execute(sql)
     response = {"taskid": self.request.id}
 
+
 @shared_task(bind=True)
 def import_business_data(self, data_source="", overwrite="", bulk_load=False, create_concepts=False, create_collections=False):
     management.call_command("packages", operation="import_business_data", source=data_source, overwrite=True)
@@ -135,7 +136,7 @@ def package_load_complete(*args, msg=None):
         closing="Thank you",
         email="",
     )
-    notify_completion(msg, user, 'Package Load Complete', context)
+    notify_completion(msg, user, "Package Load Complete", context)
 
 
 @shared_task
