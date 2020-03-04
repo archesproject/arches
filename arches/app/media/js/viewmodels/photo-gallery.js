@@ -2,7 +2,7 @@ define([
     'knockout',
 ], function(ko) {
 
-    GalleryViewModel = function() {
+    var GalleryViewModel = function() {
         this.selectedItem;
         this.selectItem = function(val){
             if (val && val.selected) {
@@ -13,7 +13,7 @@ define([
             }
         };
 
-        this.pan = ko.observable()
+        this.pan = ko.observable();
         this.updatePan = function(val){
             if (this.pan() !== val) {
                 this.pan(val);
