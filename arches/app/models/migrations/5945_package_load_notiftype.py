@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             """
             INSERT INTO notification_types (typeid, name, emailtemplate, emailnotify, webnotify)
             VALUES (
-                '08013c4c-8456-4677-88a6-94511c5771af,
+                '08013c4c-8456-4677-88a6-94511c5771af',
                 'Package Load Complete',
                 'email/download_ready_email_notification.htm',
                 true,
