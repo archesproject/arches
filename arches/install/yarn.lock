@@ -1416,10 +1416,10 @@ dom4@^2.0.1:
   resolved "https://registry.yarnpkg.com/dom4/-/dom4-2.1.5.tgz#f98a94eb67b340f0fa5b42b0ee9c38cda035428e"
   integrity sha512-gJbnVGq5zaBUY0lUh0LUEVGYrtN75Ks8ZwpwOYvnVFrKy/qzXK4R/1WuLIFExWj/tBxbRAkTzZUGJHXmqsBNjQ==
 
-dropzone@3.8.4:
-  version "3.8.4"
-  resolved "https://registry.yarnpkg.com/dropzone/-/dropzone-3.8.4.tgz#526470f5cb83d0e653debe610b58e3126f8eb162"
-  integrity sha1-UmRw9cuD0OZT3r5hC1jjEm+OsWI=
+dropzone@5.7.0:
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/dropzone/-/dropzone-5.7.0.tgz#8d1007f3ebcc6e6d64096823f854d898f7564ef2"
+  integrity sha512-kOltiZXH5cO/72I22JjE+w6BoT6uaVLfWdFMsi1PMKFkU6BZWpqRwjnsRm0o6ANGTBuZar5Piu7m/CbKqRPiYg==
 
 duplexer3@^0.1.4:
   version "0.1.4"
