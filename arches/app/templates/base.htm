@@ -46,7 +46,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 </head>
 
-<body {% block body_attributes %}class="scroll-y-auto"{% endblock %}>
+<body {% block body_attributes %}class="scroll-y-auto base-page"{% endblock %}>
     {% block loading_mask %}
 
     <div class="loading-mask" data-bind="visible: typeof(loading()) === 'boolean' && loading()"></div>
@@ -62,6 +62,40 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     {% endblock body %}
 
     {% block javascript %}
+    <script>
+        function copyToClipboard(urlval){
+            var urlval;
+            var dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = urlval;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+        }
+
+        //Check for escape key pressed, and if any modals/popups open, close them
+        document.onkeydown = function(evt) {
+            evt = evt || window.event;
+            var isEscape = false;
+            if ('key' in evt) {
+                isEscape = (evt.key === 'Escape' || evt.key === 'Esc');
+            } else {
+                isEscape = (evt.keyCode === 27);
+            }
+            if (isEscape) {
+                //alert('Escape key was pressed');
+                //Toast message
+                var topdisplayed = document.getElementById('top-alert-containerID');
+                if(topdisplayed) {
+                    if(topdisplayed.style.display != 'none') {
+                        //alert('Toast message is currently being displayed');
+                        topdisplayed.style.display = 'none';
+                    }
+                }
+            }
+        };
+    </script>
+
     <script src="{{ STATIC_URL }}packages/requirejs/require.js"></script>
 
     {% block pre_require_js %}
@@ -86,6 +120,49 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </script>
 
     {% endif %}
+
+    <script>
+        //Hide toggle image when scrolling unless at top
+        document.addEventListener('scroll', function (event) {
+            if (event.target.className === 'nano-content') {
+                var elToTest = document.getElementsByClassName('nano-content')[0];
+                var elToChange = document.getElementById('menu-toggle-temp');
+                elToTest.scrollTop > 1 ? elToChange.style.display = 'none' : elToChange.style.display = 'block';
+            }
+        }, true);
+
+        //Detect click of scroll to top button
+        document.addEventListener('click', function (event) {
+            // If the clicked element isn't the scroll to top link, bail
+            if (!event.target.matches('#scroll-top, #scroll-top>*')) return;
+
+            // Don't follow the link
+            event.preventDefault();
+
+            //Do the scroll to top
+            var scrollContainer = document.querySelector('.back-to-top-me');
+            scrollContainer.scrollTo({
+                top: 0,
+                left: 0,
+                behavior: 'smooth'
+            });
+        }, false);
+
+        //Override the show/hide of the scroll to top button
+        window.onload = function() {
+            var scrollContainer = document.getElementsByClassName('back-to-top-me')[0];
+            var scrolllink = document.getElementById('scroll-top');
+            if(scrollContainer){
+                scrollContainer.onscroll = function() {
+                    if(scrollContainer.scrollTop >= 600) {
+                        scrolllink.classList.add("in");
+                    } else {
+                        scrolllink.classList.remove("in");
+                    }
+                }
+            }
+        }
+    </script>
 
     {% endblock javascript %}
 </body>

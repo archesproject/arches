@@ -8192,7 +8192,6 @@ a.clear-geojson-button:hover {
 }
 
 .saved-search-grid {
-    height: calc(100vh - 105px);
     width: 100%;
     min-height: 100%;
     overflow-y: auto;
@@ -8204,7 +8203,6 @@ a.clear-geojson-button:hover {
 }
 
 .ss-grid-item {
-    position: absolute;
     border: 1px solid #ddd;
     width: 224px;
     height: 164px;
@@ -8218,6 +8216,7 @@ a.clear-geojson-button:hover {
     -o-background-size: cover;
     background-size: cover;
     background-color: white;
+    margin: 5px;
 }
 
 .search-caption-activeWrap {
@@ -9211,7 +9210,7 @@ table.table.dataTable {
 
 .search-popup-panel {
     position: absolute;
-    top: 51px;
+    top: 52px;
     right: 0;
     z-index: 900;
     background-color: #fff;
