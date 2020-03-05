@@ -21,6 +21,7 @@
 @import url(../css/tree/tree.css);
 @import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 
+
 .regular-link {
     color: #337ab7;
     text-decoration: none;
@@ -943,14 +944,13 @@ ul.tabbed-report-tab-list {
     border: solid 1px #ddd;
     display: flex;
     flex-direction: column;
-    margin: 15px 0px 15px 0px;
+    margin: 15px 0px 5px 0px;
 }
 
 .file-workbench-filecount {
     color: steelblue;
     font-size: 11px;
     padding-left: 5px;
-    margin-top: -10px;
     margin-bottom: 0px;
 }
 
@@ -996,6 +996,28 @@ ul.tabbed-report-tab-list {
 }
 
 .file-workbench-file:not(.selected-photo):hover {
+    background: #CAE2F5;
+    cursor: pointer;
+}
+
+
+.staged {
+    background-color:#90DFFF
+}
+
+.staged:hover{
+    background-color:#7FC7E3
+}
+
+
+.file-workbench-file.staged {
+    background-color: #90DFFF;
+    color: #fff;
+    font-weight: 600;
+    padding: 4px;
+}
+
+.file-workbench-file:not(.staged):hover {
     background: #CAE2F5;
     cursor: pointer;
 }
