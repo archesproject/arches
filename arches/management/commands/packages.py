@@ -633,7 +633,7 @@ class Command(BaseCommand):
             if celery_worker_running:
                 from celery import chord
                 from arches.app.tasks import import_business_data, package_load_complete, log_error
-                chord((import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load) for path in business_data), package_load_complete.s())()
+                chord([import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load) for path in business_data])(package_load_complete.s())
             else:
                 for path in business_data:
                     if path.endswith("csv"):
