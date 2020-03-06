@@ -55,28 +55,28 @@ class BaseConceptDataType(BaseDataType):
             result = date_range
         return result
 
-    # def default_es_mapping(self):
-    #     """
-    #     Default mapping for BaseConceptDataType
-    #     """
+    def default_es_mapping(self):
+        """
+        Default mapping for BaseConceptDataType
+        """
 
-    #     keyword_mapping = {
-    #         "properties": {
-    #             "provisional": {"type": "boolean"},
-    #             "top_concept": {"type": "keyword"},
-    #             "conceptid": {"type": "keyword"},
-    #             "language": {"type": "keyword"},
-    #             "id": {"type": "keyword"},
-    #             "category": {"type": "keyword"},
-    #             "type": {"type": "keyword"},
-    #             "value": {
-    #                 "analyzer": "standard",
-    #                 "type": "text",
-    #                 "fields": {"raw": {"type": "keyword"},"folded": {"analyzer": "folding","type": "text"}}
-    #             }
-    #         }
-    #     }
-    #     return keyword_mapping
+        keyword_mapping = {
+            "properties": {
+                "provisional": {"type": "boolean"},
+                "top_concept": {"type": "keyword"},
+                "conceptid": {"type": "keyword"},
+                "language": {"type": "keyword"},
+                "id": {"type": "keyword"},
+                "category": {"type": "keyword"},
+                "type": {"type": "keyword"},
+                "value": {
+                    "analyzer": "standard",
+                    "type": "text",
+                    "fields": {"raw": {"type": "keyword"},"folded": {"analyzer": "folding","type": "text"}}
+                }
+            }
+        }
+        return keyword_mapping
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         try:

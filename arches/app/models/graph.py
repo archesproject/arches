@@ -25,9 +25,7 @@ from django.db import transaction
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
-from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.utils.translation import ugettext as _
 from pyld.jsonld import compact, JsonLdError
 
@@ -347,8 +345,6 @@ class Graph(models.GraphModel):
             for nodegroup in self.get_nodegroups():
                 nodegroup.save()
 
-            se = SearchEngineFactory().create()
-            datatype_factory = DataTypeFactory()
             for node in self.nodes.values():
                 node.save()
 
