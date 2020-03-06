@@ -178,8 +178,6 @@ define([
                             if (defaultRenderers.indexOf(val) > -1) {
                                 file.renderer = val.id;
                                 stagedTile.save();
-                            } else {
-                                console.log(file.name, 'is not compatible with the', val.name, 'renderer');
                             }
                         }
                     });

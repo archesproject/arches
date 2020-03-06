@@ -7,7 +7,7 @@ define(['knockout'], function(ko) {
     *
     * @param  {string} params - a configuration object
     */
-    var CardMultiSelect = function(params) {
+    var CardMultiSelect = function() {
         this.card.staging = ko.observableArray();
         this.staging = this.card.staging;
         var self = this;
