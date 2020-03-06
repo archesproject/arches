@@ -83,14 +83,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 isEscape = (evt.keyCode === 27);
             }
             if (isEscape) {
-                //alert('Escape key was pressed');
-                //Toast message
+                console.log('Escape key was pressed');
+                //Top message
                 var topdisplayed = document.getElementById('top-alert-containerID');
                 if(topdisplayed) {
                     if(topdisplayed.style.display != 'none') {
-                        //alert('Toast message is currently being displayed');
                         topdisplayed.style.display = 'none';
                     }
+                }
+                //Sidebar panel
+                var sidebarpanel = document.getElementsByClassName('workbench-card-sidepanel')[0];
+                if(sidebarpanel) {
+                    var el = document.getElementsByClassName('workbench-card-sidepanel-header')[0];
+                    el.click();
                 }
             }
         };
