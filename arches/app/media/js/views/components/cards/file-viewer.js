@@ -94,7 +94,7 @@ define([
                 var defaultRenderers = [];
                 this.fileFormatRenderers.forEach(function(renderer){
                     var rawFileType = type;
-                    var rawExtension = file.url ? ko.unwrap(file.url).split('.').pop() : file.split('.').pop();
+                    var rawExtension = file.url ? ko.unwrap(file.url).split('.').pop() : ko.unwrap(file).split('.').pop();
                     if (renderer.type === rawFileType && renderer.ext === rawExtension)  {
                         defaultRenderers.push(renderer);
                     }
