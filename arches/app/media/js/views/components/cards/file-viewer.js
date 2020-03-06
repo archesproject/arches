@@ -98,7 +98,7 @@ define([
                     if (renderer.type === rawFileType && renderer.ext === rawExtension)  {
                         defaultRenderers.push(renderer);
                     }
-                    var splitFileType = type.split('/');
+                    var splitFileType = ko.unwrap(type).split('/');
                     var fileType = splitFileType[0];
                     var splitAllowableType = renderer.type.split('/');
                     var allowableType = splitAllowableType[0];
@@ -168,6 +168,14 @@ define([
             this.defaultSelector = this.selectDefault();
 
             this.applyFileRenderer = function(val) {
+                function applyRendererToSelected(renderer){
+                    var tile = self.displayContent().tile;
+                    var node = ko.unwrap(tile.data[self.fileListNodeId]);
+                    if (node.length > 0) {
+                        node[0].renderer = renderer.id;
+                        tile.save();
+                    }
+                }
                 if (ko.unwrap(self.applyToAll)) {
                     this.card.staging().forEach(function(tileid){
                         var stagedTile = self.card.tiles().find(function(t){return t.tileid == tileid;});
@@ -181,14 +189,9 @@ define([
                             }
                         }
                     });
+                    applyRendererToSelected(val);
                 } else {
-                    var tile = self.displayContent().tile;
-                    var node = ko.unwrap(tile.data[self.fileListNodeId]);
-                    if (node.length > 0) {
-                        node[0].renderer = val.id;
-                        tile.save();
-                    }
-
+                    applyRendererToSelected(val);
                 }
             }; 
 
