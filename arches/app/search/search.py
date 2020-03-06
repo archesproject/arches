@@ -140,7 +140,7 @@ class SearchEngine(object):
         index = self._add_prefix(index)
         self.es.indices.create(index=index, ignore=400)
         self.es.indices.put_mapping(index=index, doc_type="_doc", body=body, include_type_name=True)
-        print(f"adding mapping : {body}")
+        print(f"adding mapping to {index} : {body}")
 
     def create_index(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
