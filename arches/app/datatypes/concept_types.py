@@ -72,8 +72,8 @@ class BaseConceptDataType(BaseDataType):
                 "value": {
                     "analyzer": "standard",
                     "type": "text",
-                    "fields": {"raw": {"type": "keyword"},"folded": {"analyzer": "folding","type": "text"}}
-                }
+                    "fields": {"raw": {"type": "keyword"}, "folded": {"analyzer": "folding", "type": "text"}},
+                },
             }
         }
         return keyword_mapping
