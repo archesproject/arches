@@ -94,11 +94,6 @@ def refresh_materialized_view(self):
 def import_business_data(self, data_source="", overwrite="", bulk_load=False, create_concepts=False, create_collections=False):
     management.call_command("packages", operation="import_business_data", source=data_source, overwrite=True)
 
-
-@shared_task(bind=True)
-def post_load_indexing(self, *args):
-    management.call_command("es", operation="index_database")
-
 @shared_task(bind=True)
 def import_resource_instances(
     self, file_format="", business_data=None, mapping=None, overwrite="", bulk=False, create_concepts=False, create_collections=False
