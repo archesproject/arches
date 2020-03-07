@@ -243,7 +243,8 @@ class MobileSyncLog(models.Model):
     userid = models.IntegerField(null=True)  # not a ForeignKey so we can track deletions
     started = models.DateTimeField(auto_now_add=True, null=True)
     finished = models.DateTimeField(auto_now=True, null=True)
-    note = models.TextField(blank=True, null=True)
+    message = models.TextField(blank=True, null=True)
+    status = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True

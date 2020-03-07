@@ -9,6 +9,7 @@ from django.core import management
 from django.db import connection
 from django.http import HttpRequest
 from arches.app.models import models
+from arches.app.models.mobile_survey import MobileSurvey
 import arches.app.utils.zip as zip_utils
 from django.utils.translation import ugettext as _
 
@@ -38,9 +39,11 @@ def message(arg):
 
 
 @shared_task(bind=True)
-def sync(self, surveyid=None, userid=None):
+def sync(self, surveyid=None, userid=None, synclogid=None):
     create_user_task_record(self.request.id, self.name, userid)
-    management.call_command("mobile", operation="sync_survey", id=surveyid, userid=userid)
+    survey = MobileSurvey.objects.get(id=surveyid)
+    survey._sync(synclogid, userid)
+    # management.call_command("mobile", operation="sync_survey", id=surveyid, userid=userid)
     response = {"taskid": self.request.id}
     return response
 
@@ -92,7 +95,7 @@ def refresh_materialized_view(self):
 @shared_task
 def update_user_task_record(arg_dict={}):
     taskid = arg_dict["taskid"]
-    msg = arg_dict["msg"]
+    msg = arg_dict.get("msg", None)
     if "notiftype_name" in list(arg_dict.keys()):
         notiftype_name = arg_dict["notiftype_name"]
     else:

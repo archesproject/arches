@@ -33,6 +33,7 @@ from arches.app.models.tile import Tile
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
 from arches.app.models.models import ResourceInstance
+from arches.app.models.models import MobileSyncLog
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.geo_utils import GeoUtils
@@ -40,6 +41,7 @@ from arches.app.utils.couch import Couch
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 import arches.app.views.search as search
+import arches.app.utils.task_management as task_management
 
 logger = logging.getLogger(__name__)
 
@@ -277,10 +279,60 @@ class MobileSurvey(models.MobileSurveyModel):
         revisionlog.synclog = synclog
         revisionlog.action = action
         revisionlog.save()
+    
+    def sync(self, userid=None, use_celery=True):
+        synclog = MobileSyncLog(userid=userid, survey=self, status="PROCESSING")
+        synclog.save()
+        logger.info("Starting sync for userid {0}".format(userid))
+        res = None
+        if use_celery:
+            celery_worker_running = task_management.check_if_celery_available()
+            if celery_worker_running is True:
+                import arches.app.tasks as tasks
+                tasks.sync.apply_async(
+                    (self.id, userid, synclog.pk), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
+                )
+            else:
+                self._sync_failed(synclog, userid)
+                synclog.message = _("Celery appears not to be running, you need to have celery running in order to sync from Arches Collector.")
+                synclog.save()
+                # raise Exception(_("Celery appears not to be running, you need to have celery running in order to sync from Arches Collector."))
+        else:
+            self._sync(synclog, userid=userid)
+        return synclog
 
-    def push_edits_to_db(self, synclog=None, userid=None):
+    def _sync(self, synclogid, userid=None):
+        try:
+            # import ipdb
+            # ipdb.sset_trace()
+            synclog = MobileSyncLog.objects.get(pk=synclogid)
+            self.push_edits_to_db(synclog, userid)
+            print('BEFORE sleep')
+            import time
+            time.sleep(30)
+            print('after sleep')
+            self.load_data_into_couch()
+            self._sync_succeeded(synclog, userid)
+        except:
+            self._sync_failed(synclog, userid)
+
+    def _sync_succeeded(self, synclog, userid):
+        logger.info("Sync complete for userid {0}".format(userid))
+        synclog.status = "FINISHED"
+        synclog.message = _("Sync Completed")
+        synclog.save()
+
+    def _sync_failed(self, synclog, userid):
+        logger.info("Sync complete for userid {0}".format(userid))
+        synclog.status = "FAILED"
+        synclog.message = _("There was an error syncing.")
+        synclog.save()
+
+    def push_edits_to_db(self, synclog, userid=None):
         # read all docs that have changes
         # save back to postgres db
+        synclog.message = _("Pushing Edits to Arches")
+        synclog.save()
         db = self.couch.create_db("project_" + str(self.id))
         user_lookup = {}
         is_reviewer = False
