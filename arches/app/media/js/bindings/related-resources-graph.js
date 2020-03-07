@@ -441,7 +441,7 @@ define([
                                     iconclass: rr.node_config_lookup[rr.resource_instance.graph_id].iconclass,
                                     color: rr.node_config_lookup[rr.resource_instance.graph_id].fillColor,
                                     relationCount: {
-                                        total: rr.total,
+                                        total: rr.total.value,
                                         loaded: rr.resource_relationships.length
                                     }
                                 };
@@ -450,10 +450,10 @@ define([
                                 newNodeId += 1;
                             } else if (rootNode.relationCount) {
                                 total_loaded = rootNode.relationCount.loaded + rr.resource_relationships.length;
-                                rootNode.relationCount.loaded = total_loaded <= rr.total ? total_loaded : total_loaded - 1;
+                                rootNode.relationCount.loaded = total_loaded <= rr.total.value ? total_loaded : total_loaded - 1;
                             } else {
                                 rootNode.relationCount = {
-                                    total: rr.total,
+                                    total: rr.total.value,
                                     loaded: rr.resource_relationships.length
                                 };
                             }
@@ -475,7 +475,7 @@ define([
                                         isRoot: false,
                                         relationType: 'Ancestor',
                                         relationCount: {
-                                            total: related_resource.total_relations,
+                                            total: related_resource.total_relations.value,
                                             loaded: 1
                                         }
                                     };
