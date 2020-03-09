@@ -28,7 +28,7 @@
             'underscore': '{{ STATIC_URL }}packages/underscore/underscore-min',
             'jquery-validate': '{{ STATIC_URL }}packages/jquery-validation/dist/jquery.validate.min',
             'd3': '{{ STATIC_URL }}packages/d3/d3.min',
-            'dropzone': '{{ STATIC_URL }}packages/dropzone/downloads/dropzone-amd-module.min',
+            'dropzone': '{{ STATIC_URL }}packages/dropzone/dist/min/dropzone-amd-module.min',
             'ckeditor': '{{ STATIC_URL }}packages/ckeditor/ckeditor',
             'ckeditor-jquery': '{{ STATIC_URL }}packages/ckeditor/adapters/jquery',
             'knockout': '{{ STATIC_URL }}packages/knockout/build/output/knockout-latest',
@@ -423,10 +423,15 @@
     define('file-renderers', [{% for renderer in app_settings.RENDERERS %}'{{ renderer.component }}',{% endfor %}], function () {
         return [{% autoescape off %}{% for renderer in app_settings.RENDERERS %}
                 {'name': '{{ renderer.name }}',
+                'title': '{{ renderer.title }}',
+                'description': '{{ renderer.description }}',
                 'component': '{{ renderer.component }}',
+                'id': '{{ renderer.id }}',
+                'iconclass': '{{ renderer.iconclass }}',
+                'text': '{{ renderer.title }}',
                 'type': '{{ renderer.type }}',
                 'ext': '{{ renderer.ext }}',
-                'hastab': '{{ renderer.hastab }}'},
+                 },
                 {% endfor %}{% endautoescape %}];
     });
 

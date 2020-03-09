@@ -245,6 +245,12 @@ OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 36000}
 # see https://arches.readthedocs.io/en/stable/api/#authentication
 MOBILE_OAUTH_CLIENT_ID = ""  #'9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
 MOBILE_DEFAULT_ONLINE_BASEMAP = {"default": "mapbox://styles/mapbox/streets-v9"}
+MOBILE_IMAGE_SIZE_LIMITS = {
+    # These limits are meant to be approximates. Expect to see uploaded sizes range +/- 20%
+    # Not to exceed the limit defined in DATA_UPLOAD_MAX_MEMORY_SIZE
+    "full": min(1500000, DATA_UPLOAD_MAX_MEMORY_SIZE),  # ~1.5 Mb
+    "thumb": 400,  # max width/height in pixels, this will maintain the aspect ratio of the original image
+}
 
 TEMPLATES = [
     {
@@ -540,7 +546,20 @@ CELERY_BEAT_SCHEDULE = {
 
 AUTO_REFRESH_GEOM_VIEW = True
 TILE_CACHE_TIMEOUT = 600
-RENDERERS = [{"name": "imagereader", "component": "views/components/cards/file-renderers/imagereader", "type": "image/*", "hastab": True}]
+
+RENDERERS = [
+    {
+        "name": "imagereader",
+        "title": "Image Reader",
+        "description": "Displays most image file types",
+        "id": "5e05aa2e-5db0-4922-8938-b4d2b7919733",
+        "iconclass": "fa fa-camera",
+        "component": "views/components/cards/file-renderers/imagereader",
+        "ext": "",
+        "type": "image/*",
+    }
+]
+
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################
