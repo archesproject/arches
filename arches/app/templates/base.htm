@@ -117,6 +117,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         document.getElementsByClassName('ep-help-close')[0].click();
                     }
                 }
+                //Manage menu panel
+                var managepanel = document.getElementById('menu-panel');
+                if(managepanel) {
+                    if(managepanel.style.display != 'none') {
+                        document.getElementById('menu-control').click();
+                    }
+                }
             }
         };
     </script>
