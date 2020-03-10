@@ -83,7 +83,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 isEscape = (evt.keyCode === 27);
             }
             if (isEscape) {
-                console.log('Escape key was pressed');
                 //Top message
                 var topdisplayed = document.getElementById('top-alert-containerID');
                 if(topdisplayed) {
@@ -96,6 +95,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 if(sidebarpanel) {
                     var el = document.getElementsByClassName('workbench-card-sidepanel-header')[0];
                     el.click();
+                }
+                //Notifications panel
+                var notifpanel = document.getElementById('ep-notifs-panel');
+                if(notifpanel) {
+                    if(notifpanel.style.display != 'none') {
+                        document.getElementsByClassName('ep-notifs-close')[0].click();
+                    }
+                }
+                //Edits panel
+                var editspanel = document.getElementById('ep-edits-panel');
+                if(editspanel) {
+                    if(editspanel.style.display != 'none') {
+                        document.getElementsByClassName('ep-edits-close')[0].click();
+                    }
+                }
+                //Help panel
+                var helppanel = document.getElementById('ep-help-panel');
+                if(helppanel) {
+                    if(helppanel.style.display != 'none') {
+                        document.getElementsByClassName('ep-help-close')[0].click();
+                    }
                 }
             }
         };
