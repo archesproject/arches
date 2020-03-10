@@ -124,6 +124,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         document.getElementById('menu-control').click();
                     }
                 }
+                //Profile popup form
+                var profilepanel = document.getElementsByClassName('change-password-form')[0];
+                if(profilepanel) {
+                    if(profilepanel.style.display != 'none') {
+                        document.getElementsByClassName('btn-profile-password')[0].click();
+                    }
+                }
             }
         };
     </script>
