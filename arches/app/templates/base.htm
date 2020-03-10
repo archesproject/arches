@@ -131,6 +131,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         document.getElementsByClassName('btn-profile-password')[0].click();
                     }
                 }
+                //Search top right panels
+                var toprightpanel = document.getElementsByClassName('active')[0];
+                if(toprightpanel) {
+                    if(toprightpanel.style.display != 'none') {
+                        document.querySelectorAll('.search-type-btn-popup-panel .search-type-btn.active')[0].click();
+                    }
+                }
             }
         };
     </script>
