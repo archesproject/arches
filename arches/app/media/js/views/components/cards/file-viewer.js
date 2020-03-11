@@ -86,10 +86,6 @@ define([
                 }
             });
 
-            this.isFiltered = function(t){
-                return self.getUrl(t).name.toLowerCase().includes(self.filter().toLowerCase());
-            };
-
             this.getDefaultRenderers = function(type, file){
                 var defaultRenderers = [];
                 this.fileFormatRenderers.forEach(function(renderer){
@@ -141,6 +137,16 @@ define([
                 }
                 return {url: url, type: type, name: name, renderer: renderer, iconclass: iconclass, tile: tile, renderers: availableRenderers};
             };
+
+            this.isFiltered = function(t){
+                return self.getUrl(t).name.toLowerCase().includes(self.filter().toLowerCase());
+            };
+
+            this.filteredTiles = ko.pureComputed(function(){
+                return self.card.tiles().filter(function(t){
+                    return self.getUrl(t).name.toLowerCase().includes(self.filter().toLowerCase());
+                }, this);
+            }, this);
 
             this.uniqueId = uuid.generate();
             this.uniqueidClass = ko.computed(function() {
@@ -243,9 +249,6 @@ define([
                         stagedTile.deleteTile();
                     }
                 }, this);
-                if (this.selected()) {
-                    this.selected().deleteTile();
-                }
                 self.card.staging([]);
             };  
             
@@ -254,7 +257,16 @@ define([
                     if (self.card.staging().indexOf(tile.tileid) < 0) {
                         self.card.staging.push(tile.tileid);
                     }
-                })
+                });
+            };
+
+            this.stageFiltered = function() {
+                self.card.staging([]);
+                this.filteredTiles().forEach(function(tile){
+                    if (self.card.staging().indexOf(tile.tileid) < 0) {
+                        self.card.staging.push(tile.tileid);
+                    }
+                });
             };
 
             this.clearStaging = function() {

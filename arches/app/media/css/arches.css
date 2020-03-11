@@ -1361,6 +1361,11 @@ ul.tabbed-report-tab-list {
     cursor: pointer;
 }
 
+.workbench-card-sidebar-tab.disabled {
+    color: #aaa;
+    cursor: auto;
+}
+
 .workbench-card-sidebar-tab.active {
     z-index: 200;
     background-color: white;
@@ -1372,6 +1377,29 @@ ul.tabbed-report-tab-list {
     font-size: 1.7em;
     display: block;
     padding-bottom: 6px;
+}
+
+.workbench-card-sidebar-tab i {
+    font-size: 1.1em;
+    display: block;
+    padding-bottom: 2px;
+}
+
+.workbench-card-sidebar-tab:hover {
+    background: #fbfbfb;
+    color: #454545;
+}
+
+.workbench-card-sidebar-tab.disabled:hover {
+    color: #aaa;
+    background-color: #f1f1f1;
+}
+
+.workbench-card-sidebar-tab.active {
+    background-color: white;
+    border-left: solid 1px white;
+    margin-left: -1px;
+    color: #454545;
 }
 
 .workbench-card-sidepanel.expanded {
@@ -1469,24 +1497,6 @@ ul.tabbed-report-tab-list {
     font-size: 1.1em;
     border-bottom: 1px solid rgb(216, 216, 216);
     cursor: pointer;
-}
-
-.workbench-card-sidebar-tab:hover {
-    background: #fbfbfb;
-    color: #454545;
-}
-
-.workbench-card-sidebar-tab.active {
-    background-color: white;
-    border-left: solid 1px white;
-    margin-left: -1px;
-    color: #454545;
-}
-
-.workbench-card-sidebar-tab i {
-    font-size: 1.1em;
-    display: block;
-    padding-bottom: 2px;
 }
 
 .map-sidebar-text {
