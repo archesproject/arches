@@ -3332,7 +3332,6 @@ ul .collapse li:first-of-type {
 
 .eh-timeline-panel {
     overflow-y: auto;
-    height: calc(100vh - 60px);
     background: #ebeef0;
 }
 
