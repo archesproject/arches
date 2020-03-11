@@ -329,7 +329,14 @@ class Graph(models.GraphModel):
                 old.update({k: v})
         return old, new
 
-    def save(self, validate=True):
+    def _create_mappings(self, node, datatype_factory, se):
+        node.save()
+        datatype = datatype_factory.get_instance(node.datatype)
+        datatype_mapping = datatype.get_es_mapping(node.nodeid)
+        if datatype_mapping and datatype_factory.datatypes[node.datatype].defaultwidget:
+            se.create_mapping("resources", body=datatype_mapping)
+
+    def save(self, validate=True, nodeid=None):
         """
         Saves an a graph and its nodes, edges, and nodegroups back to the db
         creates associated card objects if any of the nodegroups don't already have a card
@@ -349,12 +356,14 @@ class Graph(models.GraphModel):
 
             se = SearchEngineFactory().create()
             datatype_factory = DataTypeFactory()
+
+            if nodeid is not None:
+                node = self.nodes[nodeid]
+                self._create_mappings(node, datatype_factory, se)
+            else:
             for node in self.nodes.values():
                 node.save()
-                datatype = datatype_factory.get_instance(node.datatype)
-                datatype_mapping = datatype.get_es_mapping(node.nodeid)
-                if datatype_mapping and datatype_factory.datatypes[node.datatype].defaultwidget:
-                    se.create_mapping("resources", body=datatype_mapping)
+                    self._create_mapping(node, datatype_factory, se)
 
             for edge in self.edges.values():
                 edge.save()

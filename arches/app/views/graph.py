@@ -323,7 +323,10 @@ class GraphDataView(View):
 
                 elif self.action == "update_node":
                     updated_values = graph.update_node(data)
-                    graph.save()
+                    if 'nodeid' in data:
+                        graph.save(nodeid=data['nodeid'])
+                    else:
+                        graph.save()
                     ret = JSONSerializer().serializeToPython(graph)
                     ret["updated_values"] = updated_values
                     ret["default_card_name"] = graph.temp_node_name
