@@ -11371,7 +11371,7 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .search-count-container .search-title {
         font-size: 1.1em;
     }
-    .ep-help {
+    .ep-help, .ep-notifs, .ep-edits {
         z-index: 4100;
         width: 100%;
     }
@@ -11437,6 +11437,10 @@ a.tree-display-tool, a.tree-display-tool:hover {
     }
     .resource-toolbar {
         height: 86px;
+    }
+    .eh-timeline {
+        margin-left: 0;
+        padding: 0 10px 0;
     }
 }
 
