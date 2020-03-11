@@ -203,7 +203,9 @@
 <div style="display:inline-flex; justify-content: space-between; width: 100%; padding-top: 15px; padding-bottom: 5px">
     <div style="display:inline-flex; justify-content: flex-end">
         <button style="margin-right: 3px;" class="btn btn-shim btn-labeled btn-sm fa fa-check-square btn-primary" data-bind="click: function(){stageAll()}">{% trans 'Select All' %}</button>
-        <button style="margin-right: 3px;" class="btn btn-shim btn-labeled btn-sm fa fa-check-square btn-primary" data-bind="click: function(){stageFiltered()}">{% trans 'Select Filtered' %}</button>
+        <button style="margin-right: 3px;" class="btn btn-shim btn-labeled btn-sm fa fa-check-square btn-primary" data-bind="click: function(){stageFiltered()}, css: {
+            disabled: filter().length === 0}"
+        >{% trans 'Select Filtered' %}</button>
         <button class="btn btn-shim btn-labeled btn-sm fa fa-eraser btn-primary" data-bind="click: function(){clearStaging()}, css: {
             disabled: card.staging().length === 0
         }">{% trans 'Clear All' %}</button>
@@ -211,7 +213,7 @@
 </div>
 <button class="btn btn-shim btn-labeled btn-sm fa fa-trash btn-warning" data-bind="click: function(){removeTiles()}, visible: card.staging().length > 0">{% trans 'Delete Selected' %}</button>
 
-<!-- <div class="col-xs-12 pad-no crud-widget-container">
+<div class="col-xs-12 pad-no crud-widget-container">
     <h2 class="file-workbench-filter-header">{% trans 'Loader' %}</h2>
     <input style="display:inline-block;"
     data-bind="select2Query: {
@@ -222,9 +224,9 @@
             value: fileRenderer,
             allowClear: false,
             multiple: false,
-            onSelect: $parent.applyFileRenderer,
             placeholder: {% trans "'File Renderer'" %}}}">
-</div> -->
+    <div style="padding-top: 10px"><button style="margin-right: 3px;" class="btn btn-shim btn-labeled btn-sm fa fa-file btn-primary" data-bind="click: function(){$parent.applyToAll(true); $parent.applyFileRenderer($parent.getFileFormatRenderer(fileRenderer()))}">{% trans 'Apply to Selected Files' %}</button></div>
+</div>
 <!--/ko-->
 
 <!--ko if: activeTab() === 'edit' -->
@@ -247,21 +249,6 @@
 <!-- /ko -->
 </div>
 <div class='file-workbench-filecount' data-bind='text: card.tiles().length + "{% trans ' files uploaded' %}"'></div>
-
-<div class="col-xs-12 pad-no crud-widget-container">
-    <h2 class="file-workbench-filter-header">{% trans 'Loader' %}</h2>
-    <input style="display:inline-block;"
-    data-bind="select2Query: {
-        select2Config: {
-            clickBubble: true,
-            disabled: false,
-            data: fileFormatRenderers,
-            value: fileRenderer,
-            allowClear: false,
-            multiple: false,
-            onSelect: $parent.applyFileRenderer,
-            placeholder: {% trans "'File Renderer'" %}}}">
-</div>
 
 <div data-bind="css: card.model.cssclass">
 

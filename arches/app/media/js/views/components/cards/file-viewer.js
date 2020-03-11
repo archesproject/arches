@@ -86,6 +86,12 @@ define([
                 }
             });
 
+            this.getFileFormatRenderer = function(rendererid) {
+                return self.fileFormatRenderers.find(function(item) {
+                    return item.id === rendererid;
+                });
+            };
+
             this.getDefaultRenderers = function(type, file){
                 var defaultRenderers = [];
                 this.fileFormatRenderers.forEach(function(renderer){
@@ -173,24 +179,36 @@ define([
 
             this.defaultSelector = this.selectDefault();
 
+            this.checkIfRendererIsValid = function(file, renderer){
+                var defaultRenderers = self.getDefaultRenderers(file.type, file.name);
+                return (defaultRenderers.indexOf(renderer) > -1);
+            };
+
             this.applyFileRenderer = function(val) {
+
                 function applyRendererToSelected(renderer){
+                    if (self.displayContent()) {
                     var tile = self.displayContent().tile;
                     var node = ko.unwrap(tile.data[self.fileListNodeId]);
                     if (node.length > 0) {
-                        node[0].renderer = renderer.id;
+                            var valid = self.checkIfRendererIsValid(node[0], renderer);
+                            if (valid) {
+                                node[0].renderer = renderer ? renderer.id : '';
                         tile.save();
                     }
                 }
+                    }
+                }
+
                 if (ko.unwrap(self.applyToAll)) {
                     this.card.staging().forEach(function(tileid){
                         var stagedTile = self.card.tiles().find(function(t){return t.tileid == tileid;});
                         if (stagedTile) {
                             var node = ko.unwrap(stagedTile.data[self.fileListNodeId]);
                             var file = node[0];
-                            var defaultRenderers = self.getDefaultRenderers(file.type, file.name);
-                            if (defaultRenderers.indexOf(val) > -1) {
-                                file.renderer = val.id;
+                            var valid = self.checkIfRendererIsValid(file, val);
+                            if (valid) {
+                                file.renderer = val ? val.id : '';
                                 stagedTile.save();
                             }
                         }
