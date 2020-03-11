@@ -361,8 +361,8 @@ class Graph(models.GraphModel):
                 node = self.nodes[nodeid]
                 self._create_mappings(node, datatype_factory, se)
             else:
-            for node in self.nodes.values():
-                node.save()
+                for node in self.nodes.values():
+                    node.save()
                     self._create_mapping(node, datatype_factory, se)
 
             for edge in self.edges.values():
@@ -1361,10 +1361,11 @@ class Graph(models.GraphModel):
         fieldnames = {}
         for node_id, node in self.nodes.items():
             if node.exportable is True:
-                validated_fieldname = validate_fieldname(node.fieldname, fieldnames)
-                if validated_fieldname != node.fieldname:
-                    node.fieldname = validated_fieldname
-                    node.save()
+                if node.fieldname is not None:
+                    validated_fieldname = validate_fieldname(node.fieldname, fieldnames)
+                    if validated_fieldname != node.fieldname:
+                        node.fieldname = validated_fieldname
+                        node.save()
 
         # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
         if self.ontology is not None:
