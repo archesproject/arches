@@ -3333,6 +3333,7 @@ ul .collapse li:first-of-type {
 .eh-timeline-panel {
     overflow-y: auto;
     background: #ebeef0;
+    height: calc(100vh - 100px);
 }
 
 .eh-timeline-time {
