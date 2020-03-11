@@ -69,7 +69,8 @@ define([
             }
 
             this.selected = ko.observable();
-            self.activeTab.subscribe(
+
+            this.activeTab.subscribe(
                 function(val){
                     self.card.activeTab = val;
                 });
@@ -163,8 +164,8 @@ define([
                 var self = this;
                 return function() {
                     var t;
-                    self.toggleTab('edit');
-                    self.activeTab('edit');
+                    var openTab = self.activeTab() === 'manage' ? 'manage' : 'edit'; 
+                    self.toggleTab(openTab);
                     var selectedIndex = self.card.tiles.indexOf(self.selected());
                     if(self.card.tiles().length > 0 && selectedIndex === -1) {
                         selectedIndex = 0;
@@ -174,6 +175,7 @@ define([
                         t.selected(true);
                         self.selectItem(t);
                     }
+                    self.activeTab(openTab);
                 };
             };
 
@@ -188,15 +190,15 @@ define([
 
                 function applyRendererToSelected(renderer){
                     if (self.displayContent()) {
-                    var tile = self.displayContent().tile;
-                    var node = ko.unwrap(tile.data[self.fileListNodeId]);
-                    if (node.length > 0) {
+                        var tile = self.displayContent().tile;
+                        var node = ko.unwrap(tile.data[self.fileListNodeId]);
+                        if (node.length > 0) {
                             var valid = self.checkIfRendererIsValid(node[0], renderer);
                             if (valid) {
                                 node[0].renderer = renderer ? renderer.id : '';
-                        tile.save();
-                    }
-                }
+                                tile.save();
+                            }
+                        }
                     }
                 }
 
@@ -264,7 +266,7 @@ define([
                 this.card.staging().forEach(function(tileid){
                     var stagedTile = self.card.tiles().find(function(t){return t.tileid == tileid;});
                     if (stagedTile) {
-                        stagedTile.deleteTile();
+                        stagedTile.deleteTile(null, self.defaultSelector);
                     }
                 }, this);
                 self.card.staging([]);
