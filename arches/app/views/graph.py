@@ -323,8 +323,8 @@ class GraphDataView(View):
 
                 elif self.action == "update_node":
                     updated_values = graph.update_node(data)
-                    if 'nodeid' in data:
-                        graph.save(nodeid=data['nodeid'])
+                    if "nodeid" in data:
+                        graph.save(nodeid=data["nodeid"])
                     else:
                         graph.save()
                     ret = JSONSerializer().serializeToPython(graph)
