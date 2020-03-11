@@ -362,7 +362,6 @@ class Graph(models.GraphModel):
                 self._create_mappings(node, datatype_factory, se)
             else:
                 for node in self.nodes.values():
-                    node.save()
                     self._create_mapping(node, datatype_factory, se)
 
             for edge in self.edges.values():
