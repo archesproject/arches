@@ -11442,6 +11442,9 @@ a.tree-display-tool, a.tree-display-tool:hover {
         margin-left: 0;
         padding: 0 10px 0;
     }
+    .profile-list {
+        padding: 0 20px 20px;
+    }
 }
 
 @media screen and (max-width: 1024px) {
