@@ -329,12 +329,18 @@ class Graph(models.GraphModel):
                 old.update({k: v})
         return old, new
 
-    def _create_mappings(self, node, datatype_factory, se):
+    def _update_node(self, node, datatype_factory, se):
+        already_saved = models.Node.objects.filter(pk=node.nodeid).exists()
+        saved_node_datatype = None
+        if already_saved is True:
+            saved_node_datatype = models.Node.objects.get(pk=node.nodeid).datatype
         node.save()
-        datatype = datatype_factory.get_instance(node.datatype)
-        datatype_mapping = datatype.get_es_mapping(node.nodeid)
-        if datatype_mapping and datatype_factory.datatypes[node.datatype].defaultwidget:
-            se.create_mapping("resources", body=datatype_mapping)
+        if saved_node_datatype != node.datatype:
+            datatype = datatype_factory.get_instance(node.datatype)
+            datatype_mapping = datatype.get_es_mapping(node.nodeid)
+            if datatype_mapping and datatype_factory.datatypes[node.datatype].defaultwidget:
+                se.create_mapping("resources", body=datatype_mapping)
+        
 
     def save(self, validate=True, nodeid=None):
         """
@@ -359,10 +365,10 @@ class Graph(models.GraphModel):
 
             if nodeid is not None:
                 node = self.nodes[nodeid]
-                self._create_mappings(node, datatype_factory, se)
+                self._update_node(node, datatype_factory, se)
             else:
                 for node in self.nodes.values():
-                    self._create_mappings(node, datatype_factory, se)
+                    self._update_node(node, datatype_factory, se)
 
             for edge in self.edges.values():
                 edge.save()
@@ -1352,7 +1358,7 @@ class Graph(models.GraphModel):
             try:
                 dupe = fieldnames[fieldname]
                 raise GraphValidationError(_(f"Field name must be unique to the graph; '{fieldname}' already exists."), 1009)
-            except KeyError as e:
+            except KeyError:
                 fieldnames[fieldname] = True
 
             return fieldname
@@ -1435,7 +1441,7 @@ class Graph(models.GraphModel):
 
         try:
             out = compact({}, context)
-        except JsonLdError as err:
+        except JsonLdError:
             raise GraphValidationError(_("The json-ld context you supplied wasn't formatted correctly."), 1006)
 
 
