@@ -340,7 +340,6 @@ class Graph(models.GraphModel):
             datatype_mapping = datatype.get_es_mapping(node.nodeid)
             if datatype_mapping and datatype_factory.datatypes[node.datatype].defaultwidget:
                 se.create_mapping("resources", body=datatype_mapping)
-        
 
     def save(self, validate=True, nodeid=None):
         """
