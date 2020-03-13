@@ -1,5 +1,5 @@
 {% load i18n %}
-<div id="card-preview" class="pad-all" style="">
+<div id="card-preview" class="pad-all">
 
     <div class="permission-manager" class="project-panel">
         <div class="permissions-form permission-manager header">
@@ -14,7 +14,7 @@
                 </ul>
                 <ul class="permissions-selected" style="display:none;" data-bind="foreach: selectedIdentities, visible: selectedIdentities().length !== 0">
                     <li>
-                        <div class="library-icon-permissions" style="">
+                        <div class="library-icon-permissions">
                             <span class="icon-wrap icon-wrap-sm icon-circle" data-bind="css: $data.type === 'group' ? 'bg-purple' : 'bg-mint'">
                                 <i data-bind="attr: {class: 'fa fa-' + $data.type}" class="fa fa-group"></i>
                             </span>
@@ -34,7 +34,7 @@
         </div>
 
         <!-- Alert Panel -->
-        <div id="basemap-delete-alert" class="panel wizard-data-card-alert" style=""></div>
+        <div id="basemap-delete-alert" class="panel wizard-data-card-alert"></div>
 
 
         <!-- Data Entry -->
@@ -94,8 +94,8 @@
                             </div>
 
                             <!-- Permissions Selector -->
-                            <div id="" class="permission-selector" style="">
-                                <div class="row widget-container" style="">
+                            <div id="" class="permission-selector">
+                                <div class="row widget-container">
                                     <div class="col-xs-12">
                                         <div class="form-group">
                                             <div class="col-xs-12">

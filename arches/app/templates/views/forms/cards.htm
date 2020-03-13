@@ -2,10 +2,10 @@
 
 <!-- it's assumed that ko.$data is a tile array context -->
 
-<div id="arches-server-help-cc" class="outline" style="">
+<div id="arches-server-help-cc" class="outline">
 
     <!--Nav Tabs-->
-    <ul class="nav nav-tabs card-nav-container" style="">
+    <ul class="nav nav-tabs card-nav-container">
         {% for card in cardgroup.cards %}
 
         <li id="settings-menu-li" class="{% if forloop.first %}active{% endif %}">
@@ -16,15 +16,15 @@
     </ul>
 
     <!--Tabs Content-->
-    <div class="tab-content" style="">
+    <div class="tab-content">
         {% for card in cardgroup.cards %}
 
 
         <div class="" id="{{card.nodegroup_id}}" data-bind="attr: {id: 'abc{{card.nodegroup_id}}' + $data.tileid() }"  class="tab-pane fade in {% if forloop.first %}active{% endif %}">
-            <div class="panel-body card-panel-body" style="">
+            <div class="panel-body card-panel-body">
 
                 <!-- Card Level Alert -->
-                <div class="panel install-card-alert" style=""></div>
+                <div class="panel install-card-alert"></div>
 
                 <!-- Card Instruction -->
                 <div class="content-instructions">
@@ -32,7 +32,7 @@
                         {{ card.description }}
                     </span>
                     <span>
-                        <a id="add-basemap-wizard-help-link" href="" class="pull-right card-help help editable-help" style=""> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
+                        <a id="add-basemap-wizard-help-link" href="" class="pull-right card-help help editable-help"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
                     </span>
                 </div>
 
@@ -80,7 +80,7 @@
                             </a>
 
                             <!-- Card Level Alert -->
-                            <div id="db-connection-alert" class="panel install-card-alert" style=""></div>
+                            <div id="db-connection-alert" class="panel install-card-alert"></div>
 
                             <!-- Card Instruction -->
                             <p class="content-instructions">{{ card.description }}</p>
@@ -112,10 +112,10 @@
         <!-- Help/Thesaurus term Panel -->
         <aside id="arches-server-help" data-page="./help/config_manager/arches_server_summary.html" class="card-help-panel" style="display: none;">
             <div class="relative">
-                <a id="arches-server-help-close" href="" class="help-close fa fa-times fa-lg" style=""></a>
+                <a id="arches-server-help-close" href="" class="help-close fa fa-times fa-lg"></a>
             </div>
-            <div id="arches-server-help-content" class="" style="">
-                <div class="" style="">
+            <div id="arches-server-help-content">
+                <div>
                     <div class="panel-heading">
                         <h3 class="panel-title" style="padding: 0 10px 0 10px;"><span class="help-text-small">{% trans "Help" %}</span> {% trans "Database Connection" %}</h3>
                     </div>

@@ -20,7 +20,7 @@
 
         <!-- ko foreach: $data.filtered_items -->
             <div class="library-card" data-bind="click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected() && $data.isactive===true, disabled: $data.isactive === false }">
-                <div class="library-icon" style="">
+                <div class="library-icon">
                     <!-- ko if: $data.isactive -->
                     <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-mint" data-bind="click: $parent.appendBranch.bind($parent), clickBubble: false">
                         <i class="branch-library-icon ion-plus-round"></i>
