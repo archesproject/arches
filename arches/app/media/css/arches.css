@@ -1026,6 +1026,17 @@ ul.tabbed-report-tab-list {
     position: relative;
 }
 
+.file-viewer.chart-header {
+    position: relative;
+    margin-left: 15px;
+    padding-left: 8px;
+    background: #f1f1f1;
+    width: 100%;
+    display: inline-block;
+    border-left: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
 .file-viewer .loading-mask {
     position: relative;
     opacity: .5;
