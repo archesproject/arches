@@ -1000,6 +1000,14 @@ ul.tabbed-report-tab-list {
     cursor: pointer;
 }
 
+.file-workbench-file.chart-series-selector {
+    display: inline-flex; 
+    width: 100%;
+}
+
+.file-workbench-file.chart-series-selector div{
+    padding-left: 5px;
+}
 
 .staged {
     background-color:#90DFFF
@@ -1041,6 +1049,17 @@ ul.tabbed-report-tab-list {
     margin-top: 15px;
     margin-bottom: 15px;
     font-size: 15px ! important;
+}
+
+.chart-style-panel h2 {
+    font-size: 15px;
+    margin-bottom: 0px;
+}
+
+.chart-style-panel .input-group-addon {
+    background: #26d664;
+    height: 40px;
+    border: 1px solid black;
 }
 
 .file-viewer .loading-mask {
