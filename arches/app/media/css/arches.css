@@ -1028,13 +1028,19 @@ ul.tabbed-report-tab-list {
 
 .file-viewer.chart-header {
     position: relative;
-    margin-left: 15px;
-    padding-left: 8px;
+    padding-left: 20px;
     background: #f1f1f1;
     width: 100%;
     display: inline-block;
     border-left: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
+}
+
+.chart-header h3 {
+    font-size: 15px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    font-size: 15px ! important;
 }
 
 .file-viewer .loading-mask {
