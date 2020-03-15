@@ -200,18 +200,18 @@
         </button>
     </div>
 </div>
-<div style="display:inline-flex; justify-content: space-between; width: 100%; padding-top: 15px; padding-bottom: 5px">
-    <div style="display:inline-flex; justify-content: flex-end">
-        <button style="margin-right: 3px;" class="btn btn-shim btn-labeled btn-sm fa fa-check-square btn-primary" data-bind="click: function(){stageAll()}">{% trans 'Select All' %}</button>
-        <button style="margin-right: 3px;" class="btn btn-shim btn-labeled btn-sm fa fa-check-square btn-primary" data-bind="click: function(){stageFiltered()}, css: {
+<div class="file-workbench-button-container">
+    <div class="file-workbench-buttons">
+        <button style="width: 30%" class="btn btn-shim btn-labeled btn-sm fa fa-check btn-primary" data-bind="click: function(){stageAll()}">{% trans 'Select All' %}</button>
+        <button style="width: 40%; margin-right: 3px; margin-left: 3px;" class="btn btn-shim btn-labeled btn-sm fa fa-check-square btn-primary" data-bind="click: function(){stageFiltered()}, css: {
             disabled: filter().length === 0}"
         >{% trans 'Select Filtered' %}</button>
-        <button class="btn btn-shim btn-labeled btn-sm fa fa-eraser btn-primary" data-bind="click: function(){clearStaging()}, css: {
+        <button style="width: 30%" class="btn btn-shim btn-labeled btn-sm fa fa-eraser btn-primary" data-bind="click: function(){clearStaging()}, css: {
             disabled: card.staging().length === 0
         }">{% trans 'Clear All' %}</button>
     </div>
 </div>
-<button class="btn btn-shim btn-labeled btn-sm fa fa-trash btn-warning" data-bind="click: function(){removeTiles()}, visible: card.staging().length > 0">{% trans 'Delete Selected' %}</button>
+<button class="btn btn-lg btn-workbench btn-warning" data-bind="click: function(){removeTiles()}, visible: card.staging().length > 0"><i class="fa fa-trash"></i> {% trans 'Delete Selected' %}</button>
 
 <div class="col-xs-12 pad-no crud-widget-container">
     <h2 class="file-workbench-filter-header">{% trans 'Loader' %}</h2>
@@ -225,7 +225,9 @@
             allowClear: false,
             multiple: false,
             placeholder: {% trans "'File Renderer'" %}}}">
-    <div style="padding-top: 10px"><button style="margin-right: 3px;" class="btn btn-shim btn-labeled btn-sm fa fa-file btn-primary" data-bind="click: function(){$parent.applyToAll(true); $parent.applyFileRenderer($parent.getFileFormatRenderer(fileRenderer()))}">{% trans 'Apply to Selected Files' %}</button></div>
+    <div style="padding-top: 10px">
+        <button style="margin-right: 3px;" class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){$parent.applyToAll(true); $parent.applyFileRenderer($parent.getFileFormatRenderer(fileRenderer()))}"><i class="fa fa-gears"></i> {% trans 'Apply to Selected Files' %}</button>
+    </div>
 </div>
 <!--/ko-->
 

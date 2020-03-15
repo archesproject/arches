@@ -962,8 +962,28 @@ ul.tabbed-report-tab-list {
 
 .file-workbench-files::-webkit-scrollbar-thumb {
     border-radius: 2px;
-    background-color: rgba(0,0,0,.28);
+    background-color: rgba(0,0,0,.1);
     -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}
+
+.file-workbench-button-container {
+    display:inline-flex; 
+    justify-content: space-between; 
+    width: 100%; 
+    padding-top: 15px; 
+    padding-bottom: 5px
+}
+
+.file-workbench-buttons {
+    display:inline-flex; 
+    justify-content: space-between;
+    width: 100%;
+}
+
+.btn-workbench {
+    width: 100%;
+    font-size: 15px;
+    margin-top: -5px;
 }
 
 .file-workbench-file {
