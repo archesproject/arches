@@ -1009,6 +1009,27 @@ ul.tabbed-report-tab-list {
     padding-left: 5px;
 }
 
+.add-data-series {
+    width: 27px;
+    height: 27px;
+    border-bottom: 1px solid #D3E5F4;
+    background: #9CC3E4;
+    color: #fff;
+    margin: -4px 0px -5px -4px;
+    padding-top: 4px;
+    padding-left: 8px ! important;
+}
+
+.add-data-series:hover {
+    background: #497DA9;
+}
+
+.selected-photo .add-data-series {
+    border-bottom: 1px solid #D3E5F4;
+    background: #497DA9;
+    color: #fff;
+}
+
 .staged {
     background-color:#90DFFF
 }
