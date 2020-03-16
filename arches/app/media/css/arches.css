@@ -11481,6 +11481,12 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .search-facets {
         height: 41vh;
     }
+    #content-container .content-panel .node-configuration .flex,
+    .graph-settings-panel-body .widgets .widget-container div div > input,
+    .graph-settings-panel-body .widgets .widget-container div div .chosen-disabled {
+        width: 100% !important;
+        min-width: inherit;
+    }
 }
 
 @media screen and (max-width: 991px) {
