@@ -41,14 +41,14 @@ define([
             return getLabel(manifestData || {label: ''});
         });
         this.zoomToCanvas = true;
-        
+
         this.getManifestData = function() {
             var manifestURL = self.manifest();
             if (manifestURL) {
                 self.manifestLoading(true);
                 self.manifestError(undefined);
                 abortFetchManifest = new window.AbortController();
-                fetch(manifestURL, {signal: abortFetchManifest.signal})
+                window.fetch(manifestURL, {signal: abortFetchManifest.signal})
                     .then(function(response) {
                         return response.json();
                     })
@@ -67,22 +67,22 @@ define([
             }
         };
         this.getManifestData();
-        
+
         WorkbenchViewmodel.apply(this, [params]);
-        
+
         this.showGallery = ko.observable(true);
-        
+
         this.toggleGallery = function() {
             self.showGallery(!self.showGallery());
         };
-        
+
         this.leafletConfig = {
             center: [0, 0],
             crs: L.CRS.Simple,
             zoom: 0,
             afterRender: this.map
         };
-        
+
         var canvasLayer;
         this.brightness = ko.observable(100);
         this.contrast = ko.observable(100);
@@ -104,7 +104,7 @@ define([
             }
         };
         this.canvasFilter.subscribe(updateCanvasLayerFilter);
-        
+
         this.resetImageSettings = function() {
             self.brightness(100);
             self.contrast(100);
@@ -132,17 +132,17 @@ define([
         };
         this.map.subscribe(addCanvasLayer);
         this.canvas.subscribe(addCanvasLayer);
-        
+
         this.selectCanvas = function(canvas) {
             var service = self.getCanvasService(canvas);
             self.zoomToCanvas = true;
             if (service) self.canvas(service);
         };
-        
+
         this.getCanvasService = function(canvas) {
             if (canvas.images.length > 0) return canvas.images[0].resource.service['@id'];
         };
-        
+
         this.manifestData.subscribe(function(manifestData) {
             if (!self.canvas() && manifestData.sequences.length > 0) {
                 var sequence = manifestData.sequences[0];
@@ -152,7 +152,7 @@ define([
                 }
             }
         });
-        
+
         this.toggleManifestEditor = function() {
             self.editManifest(!self.editManifest());
             if (abortFetchManifest) abortFetchManifest.abort();
