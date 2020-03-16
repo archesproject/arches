@@ -1036,7 +1036,7 @@ class UserXTask(models.Model):
 class NotificationType(models.Model):
     """
     Creates a 'type' of notification that would be associated with a specific trigger, e.g. Search Export Complete or Package Load Complete
-    Must be created manually using Django ORM.
+    Must be created manually using Django ORM or SQL.
     """
 
     typeid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
