@@ -95,32 +95,31 @@ def refresh_materialized_view(self):
 def import_business_data(self, data_source="", overwrite="", bulk_load=False, create_concepts=False, create_collections=False):
     management.call_command("packages", operation="import_business_data", source=data_source, overwrite=True)
 
-@shared_task(bind=True)
-def import_resource_instances(
-    self, file_format="", business_data=None, mapping=None, overwrite="", bulk=False, create_concepts=False, create_collections=False
-):
-    # admin_userid = 1
-    # create_user_task_record(self.request.id, self.name, admin_userid)
-    if file_format == "json":
-        reader = ArchesFileReader()
-        reader.import_business_data(business_data, mapping)
-    elif file_format == "csv" or file_format == "shp" or file_format == "zip":
-        reader = CsvReader()
-        reader.import_business_data(
-            business_data=business_data,
-            mapping=mapping,
-            overwrite=overwrite,
-            bulk=bulk,
-            create_concepts=create_concepts,
-            create_collections=create_collections,
-        )
+# @shared_task(bind=True)
+# def import_resource_instances(
+#     self, file_format="", business_data=None, mapping=None, overwrite="", bulk=False, create_concepts=False, create_collections=False
+# ):
+#     # admin_userid = 1
+#     # create_user_task_record(self.request.id, self.name, admin_userid)
+#     if file_format == "json":
+#         reader = ArchesFileReader()
+#         reader.import_business_data(business_data, mapping)
+#     elif file_format == "csv" or file_format == "shp" or file_format == "zip":
+#         reader = CsvReader()
+#         reader.import_business_data(
+#             business_data=business_data,
+#             mapping=mapping,
+#             overwrite=overwrite,
+#             bulk=bulk,
+#             create_concepts=create_concepts,
+#             create_collections=create_collections,
+#         )
 
-    reader.report_errors()
+#     reader.report_errors()
 
 
 @shared_task
 def package_load_complete(*args, msg=None):
-    print(args)
     if msg is None:
         msg = "Package Load Complete"
     user = User.objects.get(id=1)
@@ -150,9 +149,10 @@ def update_user_task_record(arg_dict={}):
     task_obj.status = "SUCCESS"
     task_obj.datedone = datetime.now()
     task_obj.save()
-    if msg is None:
-        msg = task_obj.status + ": " + task_obj.name
-    notify_completion(msg, task_obj.user, notiftype_name, context)
+    if notiftype_name is not None:
+        if msg is None:
+            msg = task_obj.status + ": " + task_obj.name
+        notify_completion(msg, task_obj.user, notiftype_name, context)
 
 
 @shared_task
@@ -161,7 +161,7 @@ def log_error(request, exc, traceback, msg=None):
     logger.warn(exc)
     try:
         task_obj = models.UserXTask.objects.get(taskid=request.id)
-        task_obj.status = "FAILED"
+        task_obj.status = "ERROR"
         task_obj.date_done = datetime.now()
         task_obj.save()
         if msg is None:
