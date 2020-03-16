@@ -632,9 +632,11 @@ class Command(BaseCommand):
 
             if celery_worker_running:
                 from celery import chord
-                from arches.app.tasks import import_business_data, package_load_complete, log_error
+                from arches.app.tasks import import_business_data, package_load_complete
 
-                chord([import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load) for path in business_data])(
+                # assumes resources in csv do not depend on data being loaded prior from json in same dir
+                # only loads from csv's paired with mapping files
+                chord([import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load) for path in business_data if ('.csv' in path and os.path.exists(path.replace('.csv', '.mapping'))) or ('.json' in path)])(
                     package_load_complete.s()
                 )
             else:
