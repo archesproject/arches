@@ -329,7 +329,19 @@ class Graph(models.GraphModel):
                 old.update({k: v})
         return old, new
 
-    def save(self, validate=True):
+    def _update_node(self, node, datatype_factory, se):
+        already_saved = models.Node.objects.filter(pk=node.nodeid).exists()
+        saved_node_datatype = None
+        if already_saved is True:
+            saved_node_datatype = models.Node.objects.get(pk=node.nodeid).datatype
+        node.save()
+        if saved_node_datatype != node.datatype:
+            datatype = datatype_factory.get_instance(node.datatype)
+            datatype_mapping = datatype.get_es_mapping(node.nodeid)
+            if datatype_mapping and datatype_factory.datatypes[node.datatype].defaultwidget:
+                se.create_mapping("resources", body=datatype_mapping)
+
+    def save(self, validate=True, nodeid=None):
         """
         Saves an a graph and its nodes, edges, and nodegroups back to the db
         creates associated card objects if any of the nodegroups don't already have a card
@@ -349,12 +361,13 @@ class Graph(models.GraphModel):
 
             se = SearchEngineFactory().create()
             datatype_factory = DataTypeFactory()
-            for node in self.nodes.values():
-                node.save()
-                datatype = datatype_factory.get_instance(node.datatype)
-                datatype_mapping = datatype.get_es_mapping(node.nodeid)
-                if datatype_mapping and datatype_factory.datatypes[node.datatype].defaultwidget:
-                    se.create_mapping("resources", body=datatype_mapping)
+
+            if nodeid is not None:
+                node = self.nodes[nodeid]
+                self._update_node(node, datatype_factory, se)
+            else:
+                for node in self.nodes.values():
+                    self._update_node(node, datatype_factory, se)
 
             for edge in self.edges.values():
                 edge.save()
@@ -1344,7 +1357,7 @@ class Graph(models.GraphModel):
             try:
                 dupe = fieldnames[fieldname]
                 raise GraphValidationError(_(f"Field name must be unique to the graph; '{fieldname}' already exists."), 1009)
-            except KeyError as e:
+            except KeyError:
                 fieldnames[fieldname] = True
 
             return fieldname
@@ -1352,10 +1365,11 @@ class Graph(models.GraphModel):
         fieldnames = {}
         for node_id, node in self.nodes.items():
             if node.exportable is True:
-                validated_fieldname = validate_fieldname(node.fieldname, fieldnames)
-                if validated_fieldname != node.fieldname:
-                    node.fieldname = validated_fieldname
-                    node.save()
+                if node.fieldname is not None:
+                    validated_fieldname = validate_fieldname(node.fieldname, fieldnames)
+                    if validated_fieldname != node.fieldname:
+                        node.fieldname = validated_fieldname
+                        node.save()
 
         # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
         if self.ontology is not None:
@@ -1426,7 +1440,7 @@ class Graph(models.GraphModel):
 
         try:
             out = compact({}, context)
-        except JsonLdError as err:
+        except JsonLdError:
             raise GraphValidationError(_("The json-ld context you supplied wasn't formatted correctly."), 1006)
 
 
