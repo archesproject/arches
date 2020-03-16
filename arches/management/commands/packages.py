@@ -636,9 +636,13 @@ class Command(BaseCommand):
 
                 # assumes resources in csv do not depend on data being loaded prior from json in same dir
                 # only loads from csv's paired with mapping files
-                chord([import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load) for path in business_data if ('.csv' in path and os.path.exists(path.replace('.csv', '.mapping'))) or ('.json' in path)])(
-                    package_load_complete.s()
-                )
+                chord(
+                    [
+                        import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load)
+                        for path in business_data
+                        if (".csv" in path and os.path.exists(path.replace(".csv", ".mapping"))) or (".json" in path)
+                    ]
+                )(package_load_complete.s())
             else:
                 for path in business_data:
                     if path.endswith("csv"):
