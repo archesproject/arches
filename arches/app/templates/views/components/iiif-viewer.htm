@@ -1,0 +1,149 @@
+{% extends "views/components/workbench.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block tabs %}
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('imageTools');
+}, css: {
+    'active': activeTab() === 'imageTools'
+}">
+    <i class="fa fa-image"></i>
+    <span class="map-sidebar-text">{% trans "Image" %}</span>
+</div>
+{% endblock tabs %}
+
+{% block sidepanel %}
+<!--ko if: activeTab() === 'imageTools' -->
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Image Tools" %}</h4>
+</div>
+<div class="iiif-image-tools">
+    <div class="iiif-image-tool-slider">
+        <div class="iiif-image-tool-label">
+            <i class="fa fa-lightbulb-o"></i>
+            {% trans "Brightness" %}
+        </div>
+        <div class="iiif-image-tool-slider-wrap">
+            <input type="range" min="0" max="200" step="1" data-bind="value: brightness, valueUpdate: 'input'">
+        </div>
+        <div class="iiif-image-tool-value">
+            <span data-bind="text: brightness"></span>%
+        </div>
+    </div>
+    <div class="iiif-image-tool-slider">
+        <div class="iiif-image-tool-label">
+            <i class="fa fa-adjust"></i>
+            {% trans "Contrast" %}
+        </div>
+        <div class="iiif-image-tool-slider-wrap">
+            <input type="range" min="0" max="200" step="1" data-bind="value: contrast, valueUpdate: 'input'">
+        </div>
+        <div class="iiif-image-tool-value">
+            <span data-bind="text: contrast"></span>%
+        </div>
+    </div>
+    <div class="iiif-image-tool-slider">
+        <div class="iiif-image-tool-label">
+            <i class="fa fa-eyedropper"></i>
+            {% trans "Saturation" %}
+        </div>
+        <div class="iiif-image-tool-slider-wrap">
+            <input type="range" min="0" max="200" step="1" data-bind="value: saturation, valueUpdate: 'input'">
+        </div>
+        <div class="iiif-image-tool-value">
+            <span data-bind="text: saturation"></span>%
+        </div>
+    </div>
+    <div class="iiif-image-tool-slider">
+        <div class="iiif-image-tool-label">
+            <i class="fa fa-image"></i>
+            {% trans "Greyscale" %}
+        </div>
+        <div class="toggle-container">
+            <span class="switch switch-small switch-widget" data-bind="css: {'on': greyscale()}, click: function() { greyscale(!greyscale()); }"><small></small></span>
+            <div style="display:flex; flex-direction:row;">
+                <div class="arches-toggle-sm" data-bind="click: function() { greyscale(!greyscale()); }">Display as greyscale</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="install-buttons">
+        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: resetImageSettings">{% trans 'Reset to defaults' %}</button>
+    </div>
+</div>
+<!--/ko -->
+{% endblock sidepanel %}
+
+{% block content_management %}
+<div class="workbench-card-container" data-bind="css: {'gallery-visible': showGallery}">
+    <div class="iiif-leaflet" data-bind="leaflet: leafletConfig"></div>
+</div>
+<div class="show-gallery-control" data-bind="
+    click: toggleGallery,
+    css: {'gallery-visible': showGallery},
+    text: showGallery() ? '{% trans "Hide Gallery" %}' : '{% trans "Show Gallery" %}'
+"></div>
+<!--ko let: {selectCanvas: selectCanvas, getCanvasService: getCanvasService, selectedCanvas: canvas} -->
+<div class="iiif-viewer-gallery">
+    <!--ko if: showGallery() -->
+    <div class="iiif-gallery-content">
+        <!--ko if: !editManifest() -->
+            <!--ko if: manifestLoading() -->
+            <span class="manifest-editor-loading">
+                {% trans "Loading manifest..." %}
+            </span>
+            <!--/ko -->
+            <!--ko if: !manifestLoading() -->
+                <div class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor">
+                    <span data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
+                    <i class="fa fa-pencil"></i>
+                </div>
+                <!--ko foreach: sequences -->
+                <div class="iiif-gallery-sequence">
+                    <div class="iiif-gallery-sequence-canvases" data-bind="foreach: canvases">
+                        <div class="iiif-gallery-canvas" data-bind="click: function() {
+                            selectCanvas($data);
+                        }, css: {
+                            active: getCanvasService($data) === selectedCanvas()
+                        }">
+                            <div class="iiif-gallery-canvas-thumbnail" data-bind="style: { backgroundImage: 'url(\'' + ($data.thumbnail || '{% static 'img/photo_missing.png' %}') + '\')' }"></div>
+                            <div class="iiif-gallery-canvas-label" data-bind="text: label"></div>
+                        </div>
+                    </div>
+                </div>
+                <!--/ko -->
+            <!--/ko -->
+        <!--/ko -->
+        <!--ko if: editManifest() -->
+            <div class="manifest-editor">
+                <div class="manifest-editor-label">
+                    {% trans "Enter manifest URL:" %}
+                </div>
+                <div class="manifest-editor-input">
+                    <input type="text" data-bind="textInput: manifest" class="form-control input-lg widget-input">
+                </div>
+            </div>
+            <div class="install-buttons">
+                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-pencil" data-bind="click: getManifestData,
+                    disabled: manifestLoading(),
+                    css: { 'disabled': manifestLoading() }
+                ">{% trans 'Update manifest' %}</button>
+                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: toggleManifestEditor">{% trans 'Cancel' %}</button>
+                <!--ko if: manifestLoading() -->
+                <span class="manifest-editor-loading">
+                    {% trans "Loading manifest..." %}
+                </span>
+                <!--/ko -->
+                <!--ko if: manifestError() -->
+                <span class="manifest-editor-error">
+                    {% trans "Error loading manifest..." %}
+                </span>
+                <!--/ko -->
+            </div>
+        <!--/ko -->
+    </div>
+    <!--/ko -->
+</div>
+<!--/ko -->
+{% endblock content_management %}
