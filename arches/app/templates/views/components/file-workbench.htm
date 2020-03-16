@@ -195,20 +195,19 @@
     <div style='padding-left: 15px;' data-bind='text: card.staging().length + "{% trans ' files selected' %}"'></div>
     </div>
     <div data-bind="dropzone: dropzoneOptions">
-        <button type="button" class="btn-file-select fileinput-button dz-clickable" style='width: 60px; margin: 0;' data-bind="css: uniqueidClass">
+        <button type="button" class="btn-file-select fileinput-button dz-clickable" style='width: 90px; margin: 0;' data-bind="css: uniqueidClass">
             <div>{% trans ' add files' %}</div>
         </button>
     </div>
 </div>
 <div class="file-workbench-button-container">
     <div class="file-workbench-buttons">
-        <button style="width: 30%" class="btn btn-shim btn-labeled btn-sm fa fa-check btn-primary" data-bind="click: function(){stageAll()}">{% trans 'Select All' %}</button>
-        <button style="width: 40%; margin-right: 3px; margin-left: 3px;" class="btn btn-shim btn-labeled btn-sm fa fa-check-square btn-primary" data-bind="click: function(){stageFiltered()}, css: {
+        <button style="width: 50%; margin-right: 2px;" class="btn btn-md btn-primary" data-bind="click: function(){stageFiltered()}, css: {
             disabled: filter().length === 0}"
-        >{% trans 'Select Filtered' %}</button>
-        <button style="width: 30%" class="btn btn-shim btn-labeled btn-sm fa fa-eraser btn-primary" data-bind="click: function(){clearStaging()}, css: {
+        ><i class="fa fa-check-square"></i> {% trans 'Select Filtered' %}</button>
+        <button style="width: 50%; margin-left: 2px;" class="btn btn-md btn-primary" data-bind="click: function(){clearStaging()}, css: {
             disabled: card.staging().length === 0
-        }">{% trans 'Clear All' %}</button>
+        }"><i class="fa fa-eraser"></i> {% trans 'Clear All' %}</button>
     </div>
 </div>
 <button class="btn btn-lg btn-workbench btn-warning" data-bind="click: function(){removeTiles()}, visible: card.staging().length > 0"><i class="fa fa-trash"></i> {% trans 'Delete Selected' %}</button>

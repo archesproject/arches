@@ -983,7 +983,6 @@ ul.tabbed-report-tab-list {
 .btn-workbench {
     width: 100%;
     font-size: 15px;
-    margin-top: -5px;
 }
 
 .file-workbench-file {
@@ -1051,11 +1050,11 @@ ul.tabbed-report-tab-list {
 }
 
 .staged {
-    background-color:#90DFFF
+    background-color:#90DFFF;
 }
 
 .staged:hover{
-    background-color:#7FC7E3
+    background-color:#7FC7E3;
 }
 
 
