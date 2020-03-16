@@ -967,15 +967,15 @@ ul.tabbed-report-tab-list {
 }
 
 .file-workbench-button-container {
-    display:inline-flex; 
-    justify-content: space-between; 
-    width: 100%; 
-    padding-top: 15px; 
+    display:inline-flex;
+    justify-content: space-between;
+    width: 100%;
+    padding-top: 15px;
     padding-bottom: 5px
 }
 
 .file-workbench-buttons {
-    display:inline-flex; 
+    display:inline-flex;
     justify-content: space-between;
     width: 100%;
 }
@@ -1020,7 +1020,7 @@ ul.tabbed-report-tab-list {
 }
 
 .file-workbench-file.chart-series-selector {
-    display: inline-flex; 
+    display: inline-flex;
     width: 100%;
 }
 
@@ -6114,7 +6114,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .panel-config .middle-column-container.card-configuration {
     margin-top: 50px;
-} 
+}
 
 .panel-config .toggle-container {
     padding-bottom: 5px;
@@ -11579,6 +11579,149 @@ a.jstree-anchor.permissions-widget {
 
 .report-map-header-component {
     height: 400px;
+}
+
+.iiif-viewer-gallery, .show-gallery-control {
+    color: rgb(45, 70, 103);
+    position: absolute;
+    bottom:0;
+}
+.iiif-gallery-content, .show-gallery-control {
+    background-color: rgb(242, 242, 242);
+}
+.show-gallery-control {
+    cursor: pointer;
+    font-weight: bold;
+    left: 25px;
+    padding: 6px 12px;
+    border: solid 1px rgb(221, 221, 221);
+    border-bottom: transparent;
+    z-index: 10000;
+}
+.gallery-visible.show-gallery-control {
+    bottom: 129px;
+}
+.iiif-viewer-gallery {
+    width: 100%;
+    padding-right: 75px;
+}
+.workbench-card-container-sidepanel-active .iiif-viewer-gallery {
+    padding-right: 475px;
+}
+.workbench-card-container-sidepanel-active .workbench-card-container {
+    margin-right: 475px;
+}
+.iiif-gallery-content {
+    border-top: solid 1px rgb(221, 221, 221);
+    height: 130px;
+    width: 100%;
+    padding: 10px;
+    white-space: nowrap;
+    overflow-x: auto;
+}
+.workbench-card-wrapper .workbench-card-container-wrapper {
+    height: 100%;
+}
+.workbench-card-container.gallery-visible {
+    padding-bottom: 130px;
+}
+.iiif-leaflet {
+    height: 100%;
+    background: #fafafa;
+}
+.iiif-leaflet .leaflet-draw {
+    display: none;
+}
+.iiif-gallery-canvas, .iiif-gallery-sequence, .iiif-gallery-sequence-canvases {
+    padding-left: 10px;
+    display: inline-block;
+    white-space: nowrap;
+}
+.iiif-gallery-sequence {
+    padding-right: 20px;
+}
+.iiif-gallery-canvas-thumbnail {
+    height: 55px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.iiif-gallery-sequence-label {
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: underline;
+    padding-bottom: 3px;
+}
+.iiif-gallery-canvas {
+    cursor: pointer;
+    margin-left:6px;
+    padding: 3px;
+    border: 1px solid transparent;
+    min-width: 60px;
+    height: 80px;
+}
+.iiif-gallery-canvas:hover, .iiif-gallery-canvas.active {
+    border: 1px solid rgb(180, 180, 180);
+    background-color: rgb(230, 230, 230);
+}
+.iiif-gallery-canvas-label {
+    font-size: 0.9em;
+    text-align: center;
+}
+.iiif-image-tools {
+    padding: 10px;
+    color: rgb(30, 63, 94);
+    font-size: 1.1em;
+}
+.iiif-image-tool-slider {
+    padding-bottom: 20px;
+}
+.iiif-image-tool-slider-wrap {
+    margin: 0 20px;
+}
+.iiif-image-tool-value {
+    padding: 0 20px;
+}
+.iiif-image-tool-slider .toggle-container {
+    padding: 5px;
+}
+.iiif-image-tool-slider .arches-toggle-sm {
+    cursor: pointer;
+    margin-top: -19px;
+}
+.manifest-editor {
+    padding-bottom: 10px;
+}
+.manifest-editor-loading, .manifest-editor-error {
+    display: inline-block;
+    padding-left: 10px;
+}
+
+.manifest-editor-error {
+    color: red;
+}
+
+.chart {
+    margin-right: 105px;
+    margin-left: 15px;
+    margin-top: 20px;
+}
+.style-tools-collapser {
+    cursor: pointer;
+    padding: 5px;
+    font-size: 0.9em;
+}
+
+.style-tools-panel {
+    background: #fbfbfb;
+    border: 1px solid #ddd;
+    padding: 15px 15px 5px 5px;
+    margin-bottom: 5px;
+    border-radius: 2px;
+}
+
+.style-tools-color-visualizer {
+    border: 1px solid #000;
 }
 
 @keyframes loader {
