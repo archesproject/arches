@@ -962,8 +962,27 @@ ul.tabbed-report-tab-list {
 
 .file-workbench-files::-webkit-scrollbar-thumb {
     border-radius: 2px;
-    background-color: rgba(0,0,0,.28);
+    background-color: rgba(0,0,0,.1);
     -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}
+
+.file-workbench-button-container {
+    display:inline-flex; 
+    justify-content: space-between; 
+    width: 100%; 
+    padding-top: 15px; 
+    padding-bottom: 5px
+}
+
+.file-workbench-buttons {
+    display:inline-flex; 
+    justify-content: space-between;
+    width: 100%;
+}
+
+.btn-workbench {
+    width: 100%;
+    font-size: 15px;
 }
 
 .file-workbench-file {
@@ -1000,13 +1019,42 @@ ul.tabbed-report-tab-list {
     cursor: pointer;
 }
 
+.file-workbench-file.chart-series-selector {
+    display: inline-flex; 
+    width: 100%;
+}
+
+.file-workbench-file.chart-series-selector div{
+    padding-left: 5px;
+}
+
+.add-data-series {
+    width: 27px;
+    height: 27px;
+    border-bottom: 1px solid #D3E5F4;
+    background: #9CC3E4;
+    color: #fff;
+    margin: -4px 0px -5px -4px;
+    padding-top: 4px;
+    padding-left: 8px ! important;
+}
+
+.add-data-series:hover {
+    background: #497DA9;
+}
+
+.selected-photo .add-data-series {
+    border-bottom: 1px solid #D3E5F4;
+    background: #497DA9;
+    color: #fff;
+}
 
 .staged {
-    background-color:#90DFFF
+    background-color:#90DFFF;
 }
 
 .staged:hover{
-    background-color:#7FC7E3
+    background-color:#7FC7E3;
 }
 
 
@@ -1028,13 +1076,30 @@ ul.tabbed-report-tab-list {
 
 .file-viewer.chart-header {
     position: relative;
-    margin-left: 15px;
-    padding-left: 8px;
+    padding-left: 20px;
     background: #f1f1f1;
     width: 100%;
     display: inline-block;
     border-left: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
+}
+
+.chart-header h3 {
+    font-size: 15px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    font-size: 15px ! important;
+}
+
+.chart-style-panel h2 {
+    font-size: 15px;
+    margin-bottom: 0px;
+}
+
+.chart-style-panel .input-group-addon {
+    background: #26d664;
+    height: 40px;
+    border: 1px solid black;
 }
 
 .file-viewer .loading-mask {
