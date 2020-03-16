@@ -223,7 +223,6 @@ class BusinessDataImporter(object):
                         with the '-c' paramater or place one in the same directory as your business data."
                     )
                     print("*" * 80)
-                    sys.exit()
 
             elapsed = time() - start
             print("Time to import_business_data = {0}".format(datetime.timedelta(seconds=elapsed)))
