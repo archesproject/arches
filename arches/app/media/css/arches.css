@@ -930,6 +930,8 @@ ul.tabbed-report-tab-list {
     margin-bottom: -10px;
 }
 
+
+
 .file-workbench-filter .clear-node-search {
     margin-top: 25px;
 }
@@ -1601,6 +1603,11 @@ ul.tabbed-report-tab-list {
     overflow-y: scroll;
 }
 
+.workbench-sidepanel-card-container {
+    margin: -40px -10px 10px -10px;
+
+}
+
 .workbench-card-sidepanel .install-buttons {
     background: #f9f9f9;
     position: fixed;
@@ -1614,7 +1621,7 @@ ul.tabbed-report-tab-list {
 }
 
 .workbench-card-sidepanel div .new-provisional-edit-card-container {
-    padding-left: 10px;
+    padding-left: 5px;
 }
 
 .workbench-card-sidepanel .new-provisional-edit-card-container {
@@ -1624,7 +1631,7 @@ ul.tabbed-report-tab-list {
 
 .workbench-card-sidepanel-header-container {
     border-bottom: 1px solid #ddd;
-    padding: 17px 30px 10px 25px;
+    padding: 17px 30px 10px 0px;
     margin-left: 0px;
     margin-top: -16px;
     position: fixed;
@@ -11698,6 +11705,7 @@ a.jstree-anchor.permissions-widget {
     text-align: center;
 }
 .iiif-image-tools {
+    margin-top: 55px;
     padding: 10px;
     color: rgb(30, 63, 94);
     font-size: 1.1em;
@@ -11710,6 +11718,7 @@ a.jstree-anchor.permissions-widget {
 }
 .iiif-image-tool-value {
     padding: 0 20px;
+    color: #777;
 }
 .iiif-image-tool-slider .toggle-container {
     padding: 5px;
