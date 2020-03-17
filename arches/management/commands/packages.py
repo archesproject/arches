@@ -629,20 +629,30 @@ class Command(BaseCommand):
 
             relations = glob.glob(os.path.join(package_dir, "business_data", "relations", "*.relations"))
             celery_worker_running = task_management.check_if_celery_available()
+            
+            erring_csvs = [path for path in business_data if '.csv' in path and os.path.exists(path.replace('.csv', '.mapping') is False)]
+            if yes is False and len(erring_csvs) > 0:
+                print(f"The following .csv files are missing accompanying .mapping files: \n {str(erring_csvs)}")
+                response = input("Proceed with package load without loading indicated csv files? (Y/N): ")
+                if response.lower() in ("t", "true", "y", "yes"):
+                    print("Proceeding with package load")
+                else:
+                    print("Aborting operation: Package Load")
+                    sys.exit()
 
             if celery_worker_running:
                 from celery import chord
-                from arches.app.tasks import import_business_data, package_load_complete
+                from arches.app.tasks import import_business_data, package_load_complete, on_chord_error
 
                 # assumes resources in csv do not depend on data being loaded prior from json in same dir
                 # only loads from csv's paired with mapping files
                 chord([import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load) for path in business_data if ('.csv' in path and os.path.exists(path.replace('.csv', '.mapping'))) or ('.json' in path)])(
-                    package_load_complete.s()
+                    package_load_complete.s().on_error(on_chord_error.s())
                 )
             else:
                 for path in business_data:
                     if path.endswith("csv"):
-                        config_file = path.replace(".csv", ".mapping")
+                        # config_file = path.replace(".csv", ".mapping")
                         self.import_business_data(path, overwrite=True, bulk_load=bulk_load)
                     else:
                         self.import_business_data(path, overwrite=True, bulk_load=bulk_load)
