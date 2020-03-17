@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("models", "4751_adds_photo_gallery_card"),
+        ("models", "5972_migrates_iiif_annotations"),
     ]
 
     operations = [
