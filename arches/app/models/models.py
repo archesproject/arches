@@ -1035,7 +1035,8 @@ class UserXTask(models.Model):
 
 class NotificationType(models.Model):
     """
-    Creates a 'type' of notification that would be associated with a specific trigger, e.g. Search Export Complete or Consultation Complete
+    Creates a 'type' of notification that would be associated with a specific trigger, e.g. Search Export Complete or Package Load Complete
+    Must be created manually using Django ORM or SQL.
     """
 
     typeid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
@@ -1050,6 +1051,10 @@ class NotificationType(models.Model):
 
 
 class Notification(models.Model):
+    """
+    A Notification instance that may optionally have a NotificationType. Can spawn N UserXNotification instances
+    Must be created manually using Django ORM.
+    """
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     created = models.DateTimeField(auto_now_add=True)
     # created.editable = True
@@ -1065,7 +1070,11 @@ class Notification(models.Model):
 
 class UserXNotification(models.Model):
     """
-    1 Notification instance (and its optional 1 NotificationType instance) can spawn N UserXNotification instances
+    A UserXNotification instance depends on an existing Notification instance and a User.
+    If its Notification instance has a NotificationType, this Type can be overriden for this particular User with a UserXNotificationType.
+    Must be created manually using Django ORM.
+    Only one UserXNotification created per medium of notification (e.g. emailnotify, webnotify).
+    Property 'isread' refers to either webnotify or emailnotify, not both, behaves differently.
     """
 
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
@@ -1080,8 +1089,11 @@ class UserXNotification(models.Model):
 
 class UserXNotificationType(models.Model):
     """
-    Creates a user-setting to override existing default notification settings (emailnotify, webnotify, etc.)
-    for specific a NotificationType instance
+    A UserXNotificationType instance only exists as an override of an existing NotificationType and is user-specific and
+    notification-settings-specific (e.g. emailnotify, webnotify, etc.)
+    Can be created in UI: see arches user profile editor to create a UserXNotificationType instance against an existing NotificationTypes
+    Else to create manually check 'notification_types' table in db for reference.
+    UserXNotificationTypes are automatically queried and applied as filters in get() requests for UserXNotifications in views/notifications
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
