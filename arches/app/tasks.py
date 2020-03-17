@@ -1,19 +1,16 @@
 from __future__ import absolute_import, unicode_literals
+import os
+import logging
 from celery import shared_task
 from datetime import datetime
 from datetime import timedelta
-import logging
-import os
 from django.contrib.auth.models import User
 from django.core import management
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.http import HttpRequest
-from arches.app.models import models
-from arches.app.utils.data_management.resources.formats.csvfile import CsvReader
-from arches.app.utils.data_management.resources.formats.archesfile import ArchesFileReader
-import arches.app.utils.zip as zip_utils
 from django.utils.translation import ugettext as _
+from arches.app.models import models
 
 
 @shared_task
@@ -41,9 +38,11 @@ def message(arg):
 
 
 @shared_task(bind=True)
-def sync(self, surveyid=None, userid=None):
+def sync(self, surveyid=None, userid=None, synclogid=None):
+    from arches.app.models.mobile_survey import MobileSurvey
     create_user_task_record(self.request.id, self.name, userid)
-    management.call_command("mobile", operation="sync_survey", id=surveyid, user=userid)
+    survey = MobileSurvey.objects.get(id=surveyid)
+    survey._sync(synclogid, userid)
     response = {"taskid": self.request.id}
     return response
 
@@ -116,7 +115,7 @@ def package_load_complete(*args, msg=None):
 @shared_task
 def update_user_task_record(arg_dict={}):
     taskid = arg_dict["taskid"]
-    msg = arg_dict["msg"]
+    msg = arg_dict.get("msg", None)
     if "notiftype_name" in list(arg_dict.keys()):
         notiftype_name = arg_dict["notiftype_name"]
     else:
