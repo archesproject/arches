@@ -36,6 +36,7 @@ from arches.app.models import models
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resources.remover as resource_remover
+import arches.app.utils.task_management as task_management
 from django.forms.models import model_to_dict
 from django.db.utils import IntegrityError
 from django.db import transaction, connection
@@ -627,13 +628,38 @@ class Command(BaseCommand):
                 business_data += glob.glob(os.path.join(package_dir, "business_data", "*.csv"))
 
             relations = glob.glob(os.path.join(package_dir, "business_data", "relations", "*.relations"))
+            celery_worker_running = task_management.check_if_celery_available()
 
-            for path in business_data:
-                if path.endswith("csv"):
-                    config_file = path.replace(".csv", ".mapping")
-                    self.import_business_data(path, overwrite=True, bulk_load=bulk_load)
+            erring_csvs = [path for path in business_data if ".csv" in path and os.path.exists(path.replace(".csv", ".mapping") is False)]
+            if yes is False and len(erring_csvs) > 0:
+                print(f"The following .csv files are missing accompanying .mapping files: \n {str(erring_csvs)}")
+                response = input("Proceed with package load without loading indicated csv files? (Y/N): ")
+                if response.lower() in ("t", "true", "y", "yes"):
+                    print("Proceeding with package load")
                 else:
-                    self.import_business_data(path, overwrite=True, bulk_load=bulk_load)
+                    print("Aborting operation: Package Load")
+                    sys.exit()
+
+            if celery_worker_running:
+                from celery import chord
+                from arches.app.tasks import import_business_data, package_load_complete, on_chord_error
+
+                # assumes resources in csv do not depend on data being loaded prior from json in same dir
+                # only loads from csv's paired with mapping files
+                chord(
+                    [
+                        import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load)
+                        for path in business_data
+                        if (".csv" in path and os.path.exists(path.replace(".csv", ".mapping"))) or (".json" in path)
+                    ]
+                )(package_load_complete.s().on_error(on_chord_error.s()))
+            else:
+                for path in business_data:
+                    if path.endswith("csv"):
+                        # config_file = path.replace(".csv", ".mapping")
+                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load)
+                    else:
+                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load)
 
             for relation in relations:
                 self.import_business_data_relations(relation)
@@ -815,7 +841,11 @@ class Command(BaseCommand):
             css_files = glob.glob(os.path.join(css_source, "*.css"))
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
-        print("package load complete")
+        celery_worker_running = task_management.check_if_celery_available()
+        if celery_worker_running:
+            print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
+        else:
+            print("package load complete")
 
     def setup(self, package_name, es_install_location=None):
         """
