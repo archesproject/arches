@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "5881_fileviewer"),
+        ("models", "5945_package_load_notiftype"),
     ]
 
     operations = [
