@@ -549,7 +549,7 @@ class MobileSurvey(models.MobileSurveyModel):
         tile and resource instance data into the couch instance.
         """
 
-        if initializing_couch == False:
+        if initializing_couch is False:
             self.delete_resources_and_tiles_from_couch()
 
         instances = self.collect_resource_instances_for_couch()
