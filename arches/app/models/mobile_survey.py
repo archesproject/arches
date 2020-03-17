@@ -78,7 +78,7 @@ class MobileSurvey(models.MobileSurveyModel):
     def save(self):
         super(MobileSurvey, self).save()
         if self.datadownloadconfig["download"] and self.active:
-            self.load_data_into_couch()
+            self.load_data_into_couch(initializing_couch=True)
         else:
             # remove all docs by first deleting and then recreating the database
             try:
@@ -279,8 +279,15 @@ class MobileSurvey(models.MobileSurveyModel):
         revisionlog.synclog = synclog
         revisionlog.action = action
         revisionlog.save()
-    
+
+    def check_if_resource_deleted(self, doc):
+        return models.EditLog.objects.filter(resourceinstanceid=doc["resourceinstanceid"], edittype="delete").exists()
+
+    def check_if_tile_deleted(self, doc):
+        return models.EditLog.objects.filter(tileinstanceid=doc["tileid"], edittype="tile delete").exists()
+
     def sync(self, userid=None, use_celery=True):
+        # delegates the _sync process to celery or to be directly invoked
         synclog = MobileSyncLog(userid=userid, survey=self, status="PROCESSING")
         synclog.save()
         logger.info("Starting sync for userid {0}".format(userid))
@@ -289,28 +296,25 @@ class MobileSurvey(models.MobileSurveyModel):
             celery_worker_running = task_management.check_if_celery_available()
             if celery_worker_running is True:
                 import arches.app.tasks as tasks
+
                 tasks.sync.apply_async(
                     (self.id, userid, synclog.pk), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
                 )
             else:
                 self._sync_failed(synclog, userid)
-                synclog.message = _("Celery appears not to be running, you need to have celery running in order to sync from Arches Collector.")
+                synclog.message = _(
+                    "Celery appears not to be running, you need to have celery running in order to sync from Arches Collector."
+                )
                 synclog.save()
-                # raise Exception(_("Celery appears not to be running, you need to have celery running in order to sync from Arches Collector."))
         else:
-            self._sync(synclog, userid=userid)
+            self._sync(synclog.pk, userid=userid)
         return synclog
 
     def _sync(self, synclogid, userid=None):
+        # core function that manages the syncing of data between CouchDB and Postgres
         try:
-            # import ipdb
-            # ipdb.sset_trace()
             synclog = MobileSyncLog.objects.get(pk=synclogid)
             self.push_edits_to_db(synclog, userid)
-            print('BEFORE sleep')
-            import time
-            time.sleep(30)
-            print('after sleep')
             self.load_data_into_couch()
             self._sync_succeeded(synclog, userid)
         except:
@@ -346,15 +350,17 @@ class MobileSurvey(models.MobileSurveyModel):
             couch_docs = self.couch.all_docs(db)
             for row in couch_docs:
                 if row.doc["type"] == "resource":
-                    if self.check_if_revision_exists(row.doc) is False:
+                    if self.check_if_revision_exists(row.doc) is False and self.check_if_resource_deleted(row.doc) is False:
                         if "provisional_resource" in row.doc and row.doc["provisional_resource"] == "true":
                             resourceinstance, created = ResourceInstance.objects.update_or_create(
                                 resourceinstanceid=uuid.UUID(str(row.doc["resourceinstanceid"])),
                                 defaults=dict(graph_id=uuid.UUID(str(row.doc["graph_id"]))),
                             )
                             if created is True:
+                                print(f"ResourceInstance created: {resourceinstance.pk}")
                                 self.save_revision_log(row.doc, synclog, "create")
                             else:
+                                print(f"ResourceInstance updated: {resourceinstance.pk}")
                                 self.save_revision_log(row.doc, synclog, "update")
 
                             print("Resource {0} Saved".format(row.doc["resourceinstanceid"]))
@@ -363,7 +369,7 @@ class MobileSurvey(models.MobileSurveyModel):
 
             for row in couch_docs:
                 if row.doc["type"] == "tile" and ResourceInstance.objects.filter(pk=row.doc["resourceinstance_id"]).exists():
-                    if self.check_if_revision_exists(row.doc) is False:
+                    if self.check_if_revision_exists(row.doc) is False and self.check_if_tile_deleted(row.doc) is False:
                         if "provisionaledits" in row.doc and row.doc["provisionaledits"] is not None:
                             action = "update"
                             try:
@@ -504,11 +510,50 @@ class MobileSurvey(models.MobileSurveyModel):
             except Exception as e:
                 print(e, instance)
 
-    def load_data_into_couch(self):
+    def delete_resources_and_tiles_from_couch(self):
+        items_to_delete = self.collect_resource_instances_to_delete() + self.collect_tiles_to_delete()
+        db = self.couch.create_db("project_" + str(self.id))
+        query = {
+           "selector": {
+              "_id": {
+                 "$in": items_to_delete
+              }
+           }
+        }
+        for doc in db.find(query):                          
+           db.delete(doc)
+
+    def collect_resource_instances_to_delete(self):
+        instances_to_delete = []
+        try:
+            synclog = models.MobileSyncLog.objects.filter(survey=self, status="FINISHED").latest("finished")
+            instances_to_delete = models.EditLog.objects.filter(timestamp__gte=synclog.finished, edittype="delete").values_list("resourceinstanceid", flat=True)
+        except models.MobileSyncLog.DoesNotExist:
+            pass
+
+        print("deleting resources: ", instances_to_delete)
+        return list(instances_to_delete)
+
+    def collect_tiles_to_delete(self):
+        tiles_to_delete = []
+        try:
+            synclog = models.MobileSyncLog.objects.filter(survey=self, status="FINISHED").latest("finished")
+            tiles_to_delete = models.EditLog.objects.filter(timestamp__gte=synclog.finished, edittype="tile delete").values_list("tileinstanceid", flat=True)
+        except models.MobileSyncLog.DoesNotExist:
+            pass
+
+        print("deleting tiles: ", tiles_to_delete)
+        return list(tiles_to_delete)
+
+    def load_data_into_couch(self, initializing_couch=False):
         """
         Takes a mobile survey, a couch database intance and a django user and loads
         tile and resource instance data into the couch instance.
         """
+
+        if initializing_couch == False:
+            self.delete_resources_and_tiles_from_couch()
+
         instances = self.collect_resource_instances_for_couch()
         cards = self.cards.all()
         for card in cards:
