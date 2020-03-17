@@ -629,8 +629,8 @@ class Command(BaseCommand):
 
             relations = glob.glob(os.path.join(package_dir, "business_data", "relations", "*.relations"))
             celery_worker_running = task_management.check_if_celery_available()
-            
-            erring_csvs = [path for path in business_data if '.csv' in path and os.path.exists(path.replace('.csv', '.mapping') is False)]
+
+            erring_csvs = [path for path in business_data if ".csv" in path and os.path.exists(path.replace(".csv", ".mapping") is False)]
             if yes is False and len(erring_csvs) > 0:
                 print(f"The following .csv files are missing accompanying .mapping files: \n {str(erring_csvs)}")
                 response = input("Proceed with package load without loading indicated csv files? (Y/N): ")
@@ -646,9 +646,13 @@ class Command(BaseCommand):
 
                 # assumes resources in csv do not depend on data being loaded prior from json in same dir
                 # only loads from csv's paired with mapping files
-                chord([import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load) for path in business_data if ('.csv' in path and os.path.exists(path.replace('.csv', '.mapping'))) or ('.json' in path)])(
-                    package_load_complete.s().on_error(on_chord_error.s())
-                )
+                chord(
+                    [
+                        import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load)
+                        for path in business_data
+                        if (".csv" in path and os.path.exists(path.replace(".csv", ".mapping"))) or (".json" in path)
+                    ]
+                )(package_load_complete.s().on_error(on_chord_error.s()))
             else:
                 for path in business_data:
                     if path.endswith("csv"):
