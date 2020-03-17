@@ -513,21 +513,17 @@ class MobileSurvey(models.MobileSurveyModel):
     def delete_resources_and_tiles_from_couch(self):
         items_to_delete = self.collect_resource_instances_to_delete() + self.collect_tiles_to_delete()
         db = self.couch.create_db("project_" + str(self.id))
-        query = {
-           "selector": {
-              "_id": {
-                 "$in": items_to_delete
-              }
-           }
-        }
-        for doc in db.find(query):                          
-           db.delete(doc)
+        query = {"selector": {"_id": {"$in": items_to_delete}}}
+        for doc in db.find(query):
+            db.delete(doc)
 
     def collect_resource_instances_to_delete(self):
         instances_to_delete = []
         try:
             synclog = models.MobileSyncLog.objects.filter(survey=self, status="FINISHED").latest("finished")
-            instances_to_delete = models.EditLog.objects.filter(timestamp__gte=synclog.finished, edittype="delete").values_list("resourceinstanceid", flat=True)
+            instances_to_delete = models.EditLog.objects.filter(timestamp__gte=synclog.finished, edittype="delete").values_list(
+                "resourceinstanceid", flat=True
+            )
         except models.MobileSyncLog.DoesNotExist:
             pass
 
@@ -538,7 +534,9 @@ class MobileSurvey(models.MobileSurveyModel):
         tiles_to_delete = []
         try:
             synclog = models.MobileSyncLog.objects.filter(survey=self, status="FINISHED").latest("finished")
-            tiles_to_delete = models.EditLog.objects.filter(timestamp__gte=synclog.finished, edittype="tile delete").values_list("tileinstanceid", flat=True)
+            tiles_to_delete = models.EditLog.objects.filter(timestamp__gte=synclog.finished, edittype="tile delete").values_list(
+                "tileinstanceid", flat=True
+            )
         except models.MobileSyncLog.DoesNotExist:
             pass
 
