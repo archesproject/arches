@@ -1070,7 +1070,7 @@ class Notification(models.Model):
 
 class UserXNotification(models.Model):
     """
-    A UserXNotification instance depends on an existing Notification instance and a User. 
+    A UserXNotification instance depends on an existing Notification instance and a User.
     If its Notification instance has a NotificationType, this Type can be overriden for this particular User with a UserXNotificationType.
     Must be created manually using Django ORM.
     Only one UserXNotification created per medium of notification (e.g. emailnotify, webnotify).
