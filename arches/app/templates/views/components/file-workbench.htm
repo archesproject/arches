@@ -202,9 +202,8 @@
 </div>
 <div class="file-workbench-button-container">
     <div class="file-workbench-buttons">
-        <button style="width: 50%; margin-right: 2px;" class="btn btn-md btn-primary" data-bind="click: function(){stageFiltered()}, css: {
-            disabled: filter().length === 0}"
-        ><i class="fa fa-check-square"></i> {% trans 'Select Filtered' %}</button>
+        <button style="width: 50%; margin-right: 2px;" class="btn btn-md btn-primary" data-bind="click: function(){stageFiltered()}"
+        ><i class="fa fa-check-square"></i> {% trans 'Select All' %}</button>
         <button style="width: 50%; margin-left: 2px;" class="btn btn-md btn-primary" data-bind="click: function(){clearStaging()}, css: {
             disabled: card.staging().length === 0
         }"><i class="fa fa-eraser"></i> {% trans 'Clear All' %}</button>
@@ -220,12 +219,12 @@
             clickBubble: true,
             disabled: false,
             data: fileFormatRenderers,
-            value: fileRenderer,
+            value: managerRenderer,
             allowClear: false,
             multiple: false,
             placeholder: {% trans "'File Renderer'" %}}}">
     <div style="padding-top: 10px">
-        <button style="margin-right: 3px;" class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){$parent.applyToAll(true); $parent.applyFileRenderer($parent.getFileFormatRenderer(fileRenderer()))}"><i class="fa fa-gears"></i> {% trans 'Apply to Selected Files' %}</button>
+        <button style="margin-right: 3px;" class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){$parent.applyToAll(true); $parent.applyFileRenderer($parent.getFileFormatRenderer(managerRenderer()))}"><i class="fa fa-gears"></i> {% trans 'Apply to Selected Files' %}</button>
     </div>
 </div>
 <!--/ko-->
