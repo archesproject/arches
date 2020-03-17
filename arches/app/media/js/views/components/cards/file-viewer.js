@@ -19,8 +19,10 @@ define([
             params.configKeys = ['acceptedFiles', 'maxFilesize'];
             var self = this;
             this.fileFormatRenderers = fileRenderers;
+
             this.fileFormatRenderers.forEach(function(r){
                 r.state = {};
+                r.disabled = true;
             });
 
             this.applyToAll = ko.observable(false);
@@ -29,6 +31,8 @@ define([
 
             if (!this.card.staging) {
                 CardMultiSelectViewModel.apply(this, [params]);
+            } else {
+                this.card.staging.valueHasMutated();
             }
             
             if ('filter' in this.card === false) {
@@ -39,6 +43,8 @@ define([
             }
 
             this.fileRenderer = this.card.renderer;
+            this.managerRenderer = ko.observable();
+
             this.filter = this.card.filter;
 
             var getfileListNode = function(){
@@ -92,6 +98,36 @@ define([
                     return item.id === rendererid;
                 });
             };
+
+            this.card.staging.subscribe(function(){
+                var compatible = [];
+                var compatibleIds = [];
+                var allCompatible = true;
+                var staging = self.card ? self.card.staging() : [];
+                var staged = self.card.tiles().filter(function(tile){
+                    return staging.indexOf(tile.tileid) >= 0;  
+                });
+                staged.forEach(function(tile){
+                    var file = tile.data[self.fileListNodeId]()[0];
+                    var defaultRenderers = self.getDefaultRenderers(ko.unwrap(file.type), ko.unwrap(file.name));
+                    if (compatible.length === 0) {
+                        compatible = defaultRenderers;
+                        compatibleIds = compatible.map(function(x){return x.id;});
+                    } else {
+                        allCompatible = defaultRenderers.every(function(renderer){
+                            return compatibleIds.indexOf(renderer.id) > -1;
+                        }); 
+                    }
+                });
+                self.fileFormatRenderers.forEach(function(r){
+                    if (compatibleIds.indexOf(r.id) === -1 || allCompatible === false) {
+                        r.disabled = true;
+                    } else {
+                        r.disabled = false;
+                    }
+                });
+            });
+
 
             this.getDefaultRenderers = function(type, file){
                 var defaultRenderers = [];
@@ -182,26 +218,11 @@ define([
             this.defaultSelector = this.selectDefault();
 
             this.checkIfRendererIsValid = function(file, renderer){
-                var defaultRenderers = self.getDefaultRenderers(file.type, file.name);
+                var defaultRenderers = self.getDefaultRenderers(ko.unwrap(file.type), ko.unwrap(file.name));
                 return (defaultRenderers.indexOf(renderer) > -1);
             };
 
             this.applyFileRenderer = function(val) {
-
-                function applyRendererToSelected(renderer){
-                    if (self.displayContent()) {
-                        var tile = self.displayContent().tile;
-                        var node = ko.unwrap(tile.data[self.fileListNodeId]);
-                        if (node.length > 0) {
-                            var valid = self.checkIfRendererIsValid(node[0], renderer);
-                            if (valid) {
-                                node[0].renderer = renderer ? renderer.id : '';
-                                tile.save();
-                            }
-                        }
-                    }
-                }
-
                 if (ko.unwrap(self.applyToAll)) {
                     this.card.staging().forEach(function(tileid){
                         var stagedTile = self.card.tiles().find(function(t){return t.tileid == tileid;});
@@ -215,9 +236,6 @@ define([
                             }
                         }
                     });
-                    applyRendererToSelected(val);
-                } else {
-                    applyRendererToSelected(val);
                 }
             }; 
 
