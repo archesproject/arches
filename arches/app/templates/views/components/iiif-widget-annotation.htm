@@ -1,0 +1,183 @@
+{% extends "views/components/iiif-viewer.htm" %}
+{% load i18n %}
+
+{% block tabs %}
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('editor');
+}, css: {
+    'active': activeTab() === 'editor'
+}">
+    <i class="fa fa-pencil"></i>
+    <span class="map-sidebar-text">{% trans "Edit" %}</span>
+</div>
+{{ block.super }}
+{% endblock tabs %}
+
+{% block sidepanel %}
+<!-- ko foreach: { data: [$data], as: 'self' } -->
+<!--ko if: activeTab() === 'editor' -->
+    <div class="workbench-card-sidepanel-header-container">
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: label"></h4>
+    </div>
+
+    <div>
+        <div class="new-provisional-edit-card-container">
+            <div class="card">
+                <div class="row widget-wrapper">
+                    <div class="form-group">
+                        <div class="col-xs-12">
+                            <div class="style-tools-collapser" data-bind=" click: function() {
+                                self.showStylingTools(!self.showStylingTools());
+                            }">
+                                <span data-bind="text: self.showStylingTools() ? '{% trans "Hide Style Tools" %}' : '{% trans "Show Style Tools" %}'"></span>
+                                <i class="fa" data-bind="{
+                                    css: {
+                                        'fa-caret-down' : !self.showStylingTools(),
+                                        'fa-caret-up' : self.showStylingTools(),
+                                    }
+                                }"></i>
+                            </div>
+                            <div class="form-horizontal" data-bind="if: self.showStylingTools">
+                                <div class="style-tools-panel">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label">{% trans "Line Color" %}</label>
+                                        <div class="col-sm-8">
+                                            <div class="colorpicker-component input-group">
+                                                <input placeholder="{% trans "Line Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: self.lineColor, format:'hex'}">
+                                                <span class="input-group-addon style-tools-color-visualizer" data-bind="style: {background: self.lineColor}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label">{% trans "Fill color" %}</label>
+                                        <div class="col-sm-8">
+                                            <div class="colorpicker-component input-group">
+                                                <input placeholder="{% trans "Fill Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: self.fillColor, format:'hex'}">
+                                                <span class="input-group-addon style-tools-color-visualizer" data-bind="style: {background: self.fillColor}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label">{% trans "Line Width" %}</label>
+                                        <div class="col-sm-8">
+                                            <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: self.lineWidth">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label">{% trans "Line Opacity" %}</label>
+                                        <div class="col-sm-8">
+                                            <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: self.lineOpacity">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label">{% trans "Point Radius" %}</label>
+                                        <div class="col-sm-8">
+                                            <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: self.pointRadius">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label">{% trans "Fill Opacity" %}</label>
+                                        <div class="col-sm-8">
+                                            <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: self.fillOpacity">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="map-card-feature-list">
+                                <div class="add-new-feature" data-bind="visible: !self.disableDrawing()">
+                                    <select data-placeholder="{% trans "Add a new feature..." %}" data-bind="
+                                        value: self.featureLookup[widget.node_id()].selectedTool,
+                                        valueAllowUnset: true,
+                                        options: [
+                                            {
+                                                value: '',
+                                                text: ''
+                                            },
+                                            {
+                                                value: 'draw_point',
+                                                text: 'Add point'
+                                            },
+                                            {
+                                                value: 'draw_line_string',
+                                                text: 'Add line'
+                                            },
+                                            {
+                                                value: 'draw_polygon',
+                                                text: 'Add polygon'
+                                            }
+                                        ],
+                                        optionsText: 'text',
+                                        optionsValue: 'value',
+                                        chosen: {
+                                            'width': '100%',
+                                            'disable_search_threshold': 10,
+                                            'allow_single_deselect': true
+                                        }
+                                    "></select>
+                                </div>
+                                <div class="add-new-feature" data-bind="visible: self.disableDrawing">
+                                    <select data-placeholder="{% trans "Add a new feature..." %}" data-bind="
+                                        value: self.featureLookup[widget.node_id()].selectedTool,
+                                        valueAllowUnset: true,
+                                        options: [
+                                            {
+                                                value: '',
+                                                text: ''
+                                            },
+                                            {
+                                                value: 'draw_point',
+                                                text: 'Add point'
+                                            },
+                                            {
+                                                value: 'draw_line_string',
+                                                text: 'Add line'
+                                            },
+                                            {
+                                                value: 'draw_polygon',
+                                                text: 'Add polygon'
+                                            }
+                                        ],
+                                        optionsText: 'text',
+                                        optionsValue: 'value',
+                                        chosen: {
+                                            disabled: true,
+                                            'width': '100%',
+                                            'disable_search_threshold': 10,
+                                            'allow_single_deselect': true
+                                        }
+                                    "></select>
+                                </div>
+                            </div>
+                            <table class="table">
+                                <tbody>
+                                    <!-- ko foreach: {data: self.featureLookup[widget.node_id()].features, as: 'feature'} -->
+                                    <tr class="map-card-feature-item" data-bind="css: {'active': self.selectedFeatureIds().indexOf(feature.id) >= 0}, click: function() { self.showFeature(feature); }">
+                                        <td>
+                                            <span class="map-card-feature-name" data-bind="text: feature.geometry.type"></span>
+                                        </td>
+                                        <td class="map-card-feature-tool">
+                                            <a href="javascript:void(0);" data-bind="click: function() { self.editFeature(feature); }, clickBubble: false">
+                                                <i class="fa fa-pencil map-card-feature-edit"></i>
+                                                {% trans "Edit" %}
+                                            </a>
+                                        </td>
+                                        <td class="map-card-feature-tool">
+                                            <a href="javascript:void(0);" data-bind="click: function() { self.deleteFeature(feature); }, clickBubble: false">
+                                                <i class="fa fa-trash map-card-feature-delete"></i>
+                                                {% trans "Delete" %}
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <!-- /ko -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!--/ko -->
+<!--/ko -->
+{{ block.super }}
+{% endblock sidepanel %}
