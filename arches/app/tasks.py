@@ -6,6 +6,7 @@ import logging
 import os
 from django.contrib.auth.models import User
 from django.core import management
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.http import HttpRequest
 from arches.app.models import models
@@ -95,33 +96,12 @@ def refresh_materialized_view(self):
 def import_business_data(self, data_source="", overwrite="", bulk_load=False, create_concepts=False, create_collections=False):
     management.call_command("packages", operation="import_business_data", source=data_source, overwrite=True)
 
-# @shared_task(bind=True)
-# def import_resource_instances(
-#     self, file_format="", business_data=None, mapping=None, overwrite="", bulk=False, create_concepts=False, create_collections=False
-# ):
-#     # admin_userid = 1
-#     # create_user_task_record(self.request.id, self.name, admin_userid)
-#     if file_format == "json":
-#         reader = ArchesFileReader()
-#         reader.import_business_data(business_data, mapping)
-#     elif file_format == "csv" or file_format == "shp" or file_format == "zip":
-#         reader = CsvReader()
-#         reader.import_business_data(
-#             business_data=business_data,
-#             mapping=mapping,
-#             overwrite=overwrite,
-#             bulk=bulk,
-#             create_concepts=create_concepts,
-#             create_collections=create_collections,
-#         )
-
-#     reader.report_errors()
-
 
 @shared_task
 def package_load_complete(*args, msg=None):
     if msg is None:
-        msg = "Package Load Complete"
+        msg = "Resources have completed loading."
+    notifytype_name = "Package Load Complete"
     user = User.objects.get(id=1)
     context = dict(
         greeting="Hello,\nYour package has successfully loaded into your Arches project.",
@@ -130,7 +110,7 @@ def package_load_complete(*args, msg=None):
         closing="Thank you",
         email="",
     )
-    notify_completion(msg, user, "Package Load Complete", context)
+    notify_completion(msg, user, notifytype_name, context)
 
 
 @shared_task
@@ -167,8 +147,18 @@ def log_error(request, exc, traceback, msg=None):
         if msg is None:
             msg = task_obj.status + ": " + task_obj.name
         notify_completion(msg, task_obj.user)
-    except Exception as e:
+    except ObjectDoesNotExist:
         print("No such UserXTask record exists. Notification aborted.")
+
+
+@shared_task
+def on_chord_error(request, exc, traceback):
+    logger = logging.getLogger(__name__)
+    logger.warn(exc)
+    logger.warn(traceback)
+    msg = f"Package Load erred on import_business_data. Exception: {exc}. See logs for details."
+    user = User.objects.get(id=1)
+    notify_completion(msg, user)
 
 
 def create_user_task_record(taskid, taskname, userid):
