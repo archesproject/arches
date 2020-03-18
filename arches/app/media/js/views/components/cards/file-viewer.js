@@ -274,6 +274,7 @@ define([
                 }
                 if (file) {
                     file.availableRenderers = self.getDefaultRenderers(file.type, file);
+                    file.validRenderer = ko.observable(true);
                 }
                 return file;
             }, this).extend({deferred: true});

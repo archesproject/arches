@@ -45,7 +45,7 @@
     <div class="card-display-panel">
         <div>
             <div id="hidden-dz-previews" style="display:none"></div>
-                    <!--ko if: displayContent() -->
+            <!--ko if: displayContent() -->
                         <!--ko foreach: fileFormatRenderers-->
                             <!--ko if: $data.id && $parent.displayContent().renderer && $parent.displayContent().renderer.id === $data.id -->
                                 <!-- ko component: {
@@ -62,7 +62,7 @@
                                 <!-- /ko -->
                             <!--/ko-->
                         <!--/ko-->
-                        <!--ko ifnot: $parent.displayContent().renderer -->
+                    <!--ko if: !$parent.displayContent().renderer || $parent.displayContent().validRenderer() === false -->
                     <div>
                         <div class="gallery-controls new-tile" style="position: relative">
                             <div class="dropzone-photo-upload">
@@ -80,6 +80,9 @@
                                     <!--ko if: $parent.displayContent().availableRenderers.length > 0 -->
                                     <div class="bord-top file-select loader-select">
                                         <div class="" style="padding: 5px">
+                                            <!--ko if: $parent.displayContent().validRenderer() === false -->
+                                            <h4>{% trans 'Unable to parse your file with the '%}<span data-bind="text:$parent.displayContent().renderer.name"></span>{% trans ' loader'%}</h4>
+                                            <!--/ko-->
                                             <h2>{% trans 'Select File Loader' %}</h2>
                                             <h4>{% trans 'Select the loader best suited for processing and visualizing the selected file' %}</h4>
                                             <div style="display: flex; flex-flow: wrap; padding: 15px 25px;">
