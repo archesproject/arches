@@ -104,7 +104,7 @@
                                                     <!-- card Tools -->
                                                     <div class="r-select-card-footer">
                                                         <div class="">
-                                                            <div data-bind="click: function(){$parent.applyFileRenderer($data)}" style="border-top: 1px solid #c4c4c4;" class="btn btn-primary btn-resource-select" role="button">
+                                                            <div data-bind="click: function(){$parent.applyRendererToSelected($data)}" style="border-top: 1px solid #c4c4c4;" class="btn btn-primary btn-resource-select" role="button">
                                                             {% trans 'Select' %}
                                                             </div>
                                                         </div>
@@ -182,7 +182,7 @@
 <div class='file-workbench-files'>
 <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
     <!--ko if: $parent.getUrl(tile) && ($parent.filter().length === 0 || $parent.isFiltered(tile)) -->
-    <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {'selected-photo': ko.unwrap(selected), 'staged': $parent.card.staging.indexOf(tile.tileid) > -1}, click: $parent.card.stageTile">
+    <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {'staged': $parent.card.staging.indexOf(tile.tileid) > -1}, click: $parent.card.stageTile">
     <i role="presentation" data-bind="class: $parent.getUrl(tile).iconclass || 'fa fa-file'"></i>
     <div class='file-name' data-bind="text: $parent.getUrl(tile).name"></div>
     </div>
@@ -224,7 +224,7 @@
             multiple: false,
             placeholder: {% trans "'File Renderer'" %}}}">
     <div style="padding-top: 10px">
-        <button style="margin-right: 3px;" class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){$parent.applyToAll(true); $parent.applyFileRenderer($parent.getFileFormatRenderer(managerRenderer()))}"><i class="fa fa-gears"></i> {% trans 'Apply to Selected Files' %}</button>
+        <button style="margin-right: 3px;" class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){$parent.applyRendererToStaged($parent.getFileFormatRenderer(managerRenderer()))}"><i class="fa fa-gears"></i> {% trans 'Apply to Selected Files' %}</button>
     </div>
 </div>
 <!--/ko-->
