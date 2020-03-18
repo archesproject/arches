@@ -7239,7 +7239,7 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 #mainnav-container {
-    z-index: 15;
+    z-index: 3000;
 }
 
 #navbar {
