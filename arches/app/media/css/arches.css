@@ -926,8 +926,11 @@ ul.tabbed-report-tab-list {
 
 .file-workbench-filter {
     position: relative;
+    margin-top: 60px;
     margin-bottom: -10px;
 }
+
+
 
 .file-workbench-filter .clear-node-search {
     margin-top: 25px;
@@ -1026,6 +1029,10 @@ ul.tabbed-report-tab-list {
 
 .file-workbench-file.chart-series-selector div{
     padding-left: 5px;
+}
+
+.chart-config-panel {
+    margin-top: 50px;
 }
 
 .add-data-series {
@@ -1348,7 +1355,7 @@ ul.tabbed-report-tab-list {
     border: solid 1px #ddd;
     display: flex;
     flex-direction: column;
-    margin: 5px 20px 10px 20px;
+    margin: 55px 20px 10px 20px;
 }
 
 .photo-workbench-photo {
@@ -1411,6 +1418,11 @@ ul.tabbed-report-tab-list {
 .workbench-card-container {
     height: 100%;
     margin-right: 92px;
+}
+
+.workbench-model-card-container {
+    margin-top: 50px;
+    padding-bottom: 40px;
 }
 
 .workbench-card-container.workbench-card-container-sidepanel-active {
@@ -1591,16 +1603,41 @@ ul.tabbed-report-tab-list {
     overflow-y: scroll;
 }
 
+.workbench-sidepanel-card-container {
+    margin: -40px -10px 10px -10px;
+
+}
+
+.workbench-card-sidepanel .install-buttons {
+    background: #f9f9f9;
+    position: fixed;
+    bottom: 0px;
+    border-top: 1px solid #ddd;
+    height: 60px;
+    padding-top: 10px;
+    right: 75px;
+    width: 399px;
+    padding-left: 35px;
+}
+
 .workbench-card-sidepanel div .new-provisional-edit-card-container {
-    padding-left: 10px;
+    padding-left: 5px;
+}
+
+.workbench-card-sidepanel .new-provisional-edit-card-container {
+    margin-top: 55px;
+    padding-bottom: 40px;
 }
 
 .workbench-card-sidepanel-header-container {
     border-bottom: 1px solid #ddd;
-    padding: 0px 20px 10px 5px;
-    margin-right: 15px;
-    margin-left: 15px;
-    margin-bottom: 15px;
+    padding: 17px 30px 10px 0px;
+    margin-left: 0px;
+    margin-top: -16px;
+    position: fixed;
+    background: #fff;
+    z-index: 20;
+    width: 370px;
 }
 
 .workbench-card-sidepanel-header {
@@ -1641,15 +1678,15 @@ ul.tabbed-report-tab-list {
 }
 
 .basemap-listing-container {
-    margin-top: -15px;
+    margin-top: 50px;
 }
 
 .overlays-listing-container {
-    margin-top: -15px;
+    margin-top: 50px;
 }
 
 .legend-listing-container {
-    margin-top: -15px;
+    margin-top: 50px;
 }
 
 .basemap-listing:before, .overlay-listing .overlay-name:before {
@@ -8017,7 +8054,7 @@ a#close-map-tools.map-widget-icon:hover {
 
 .spatial-filter-container {
     padding: 10px 5px 15px 5px;
-    margin-top: -15px;
+    margin-top: 45px;
     border-bottom: 1px solid #ddd;
 }
 
@@ -11196,7 +11233,6 @@ ul.select2-choices:after {
 
 .card-header {
     height: 50px;
-    margin-left: -1px;
     padding: 10px 20px;
     background: #25476a;
 }
@@ -11669,6 +11705,7 @@ a.jstree-anchor.permissions-widget {
     text-align: center;
 }
 .iiif-image-tools {
+    margin-top: 55px;
     padding: 10px;
     color: rgb(30, 63, 94);
     font-size: 1.1em;
@@ -11681,6 +11718,7 @@ a.jstree-anchor.permissions-widget {
 }
 .iiif-image-tool-value {
     padding: 0 20px;
+    color: #777;
 }
 .iiif-image-tool-slider .toggle-container {
     padding: 5px;

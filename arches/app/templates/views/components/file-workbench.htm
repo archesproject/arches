@@ -172,7 +172,7 @@
 {% block sidepanel %}
 <!--ko if: activeTab() === 'manage' -->
 <div class="workbench-card-sidepanel-header-container file-workbench">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: 'Manage'"></h4>
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: 'Manage Files/Loaders'"></h4>
 </div>
 <div class="file-workbench-filter">
     <h2 class="file-workbench-filter-header">File Filter</h2>
@@ -250,7 +250,7 @@
 </div>
 <div class='file-workbench-filecount' data-bind='text: card.tiles().length + "{% trans ' files uploaded' %}"'></div>
 
-<div data-bind="css: card.model.cssclass">
+<div class="workbench-sidepanel-card-container" data-bind="css: card.model.cssclass">
 
     <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
     <div class="edit-message-container">
