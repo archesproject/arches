@@ -240,14 +240,11 @@ class EditLog(models.Model):
 class MobileSyncLog(models.Model):
     logid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     survey = models.ForeignKey("MobileSurveyModel", on_delete=models.CASCADE, related_name="surveyid")
-    user = models.IntegerField(null=True)  # not a ForeignKey so we can track deletions
+    userid = models.IntegerField(null=True)  # not a ForeignKey so we can track deletions
     started = models.DateTimeField(auto_now_add=True, null=True)
     finished = models.DateTimeField(auto_now=True, null=True)
-    tilescreated = models.IntegerField(default=0, null=True)
-    tilesupdated = models.IntegerField(default=0, null=True)
-    tilesdeleted = models.IntegerField(default=0, null=True)
-    resourcescreated = models.IntegerField(default=0, null=True)
-    note = models.TextField(blank=True, null=True)
+    message = models.TextField(blank=True, null=True)
+    status = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
