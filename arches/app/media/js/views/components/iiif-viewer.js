@@ -71,6 +71,13 @@ define([
         WorkbenchViewmodel.apply(this, [params]);
 
         this.showGallery = ko.observable(true);
+        this.expandGallery = ko.observable(true);
+        this.expandGallery.subscribe(function(expandGallery) {
+            if (expandGallery) self.showGallery(true);
+        });
+        this.showGallery.subscribe(function(showGallery) {
+            if (!showGallery) self.expandGallery(false);
+        });
 
         this.toggleGallery = function() {
             self.showGallery(!self.showGallery());

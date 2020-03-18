@@ -76,45 +76,31 @@
 {% endblock sidepanel %}
 
 {% block content_management %}
-<div class="workbench-card-container" data-bind="css: {'gallery-visible': showGallery}">
+<div class="workbench-card-container" data-bind="css: {
+        'gallery-visible': showGallery,
+        'gallery-expanded': expandGallery
+    }">
     <div class="iiif-leaflet" data-bind="leaflet: leafletConfig"></div>
 </div>
-<div class="show-gallery-control" data-bind="
-    click: toggleGallery,
-    css: {'gallery-visible': showGallery},
-    text: showGallery() ? '{% trans "Hide Gallery" %}' : '{% trans "Show Gallery" %}'
-"></div>
+<div class="show-gallery-control" data-bind="css: {
+        'gallery-visible': showGallery,
+        'gallery-expanded': expandGallery
+    }">
+    <i class="fa" data-bind="css: {
+        'fa-caret-up': !expandGallery(),
+        'fa-caret-down': expandGallery()
+    }, click: function() { expandGallery(!expandGallery()); }"></i>
+    <a href="javascript: void(0)" data-bind="
+        click: toggleGallery,
+        text: showGallery() ? '{% trans "Hide Gallery" %}' : '{% trans "Show Gallery" %}'
+    "></a>
+</div>
 <!--ko let: {selectCanvas: selectCanvas, getCanvasService: getCanvasService, selectedCanvas: canvas} -->
-<div class="iiif-viewer-gallery">
+<div class="iiif-viewer-gallery" data-bind="css: {
+        'gallery-expanded': expandGallery
+    }">
     <!--ko if: showGallery() -->
     <div class="iiif-gallery-content">
-        <!--ko if: !editManifest() -->
-            <!--ko if: manifestLoading() -->
-            <span class="manifest-editor-loading">
-                {% trans "Loading manifest..." %}
-            </span>
-            <!--/ko -->
-            <!--ko if: !manifestLoading() -->
-                <div class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor">
-                    <span data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
-                    <i class="fa fa-pencil"></i>
-                </div>
-                <!--ko foreach: sequences -->
-                <div class="iiif-gallery-sequence">
-                    <div class="iiif-gallery-sequence-canvases" data-bind="foreach: canvases">
-                        <div class="iiif-gallery-canvas" data-bind="click: function() {
-                            selectCanvas($data);
-                        }, css: {
-                            active: getCanvasService($data) === selectedCanvas()
-                        }">
-                            <div class="iiif-gallery-canvas-thumbnail" data-bind="style: { backgroundImage: 'url(\'' + ($data.thumbnail || '{% static 'img/photo_missing.png' %}') + '\')' }"></div>
-                            <div class="iiif-gallery-canvas-label" data-bind="text: label"></div>
-                        </div>
-                    </div>
-                </div>
-                <!--/ko -->
-            <!--/ko -->
-        <!--/ko -->
         <!--ko if: editManifest() -->
             <div class="manifest-editor">
                 <div class="manifest-editor-label">
@@ -141,6 +127,33 @@
                 </span>
                 <!--/ko -->
             </div>
+        <!--/ko -->
+        <!--ko if: !editManifest() -->
+            <!--ko if: manifestLoading() -->
+            <span class="manifest-editor-loading">
+                {% trans "Loading manifest..." %}
+            </span>
+            <!--/ko -->
+            <!--ko if: !manifestLoading() -->
+                <div class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor">
+                    <span data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
+                    <i class="fa fa-pencil"></i>
+                </div>
+                <!--ko foreach: sequences -->
+                <div class="iiif-gallery-sequence">
+                    <div class="iiif-gallery-sequence-canvases" data-bind="foreach: canvases">
+                        <div class="iiif-gallery-canvas" data-bind="click: function() {
+                            selectCanvas($data);
+                        }, css: {
+                            active: getCanvasService($data) === selectedCanvas()
+                        }">
+                            <div class="iiif-gallery-canvas-thumbnail" data-bind="style: { backgroundImage: 'url(\'' + ($data.thumbnail || '{% static 'img/photo_missing.png' %}') + '\')' }"></div>
+                            <div class="iiif-gallery-canvas-label" data-bind="text: label"></div>
+                        </div>
+                    </div>
+                </div>
+                <!--/ko -->
+            <!--/ko -->
         <!--/ko -->
     </div>
     <!--/ko -->
