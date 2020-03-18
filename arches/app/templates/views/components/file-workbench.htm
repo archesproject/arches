@@ -140,7 +140,7 @@
                <div class="bord-top pad-ver file-select">
                    <div class="" style="padding: 5px">
                        <h2>{% trans 'Upload Files' %}</h2>
-                       <h4>{% trans 'Drag & Dop your files onto this panel to upload' %}</h4>
+                       <h4>{% trans 'Drag & Drop your files onto this panel to upload' %}</h4>
                    </div>
                    <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
                        <i class="fa fa-file"></i>
@@ -172,7 +172,7 @@
 {% block sidepanel %}
 <!--ko if: activeTab() === 'manage' -->
 <div class="workbench-card-sidepanel-header-container file-workbench">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: 'Manage'"></h4>
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: 'Manage Files/Loaders'"></h4>
 </div>
 <div class="file-workbench-filter">
     <h2 class="file-workbench-filter-header">File Filter</h2>
@@ -250,7 +250,7 @@
 </div>
 <div class='file-workbench-filecount' data-bind='text: card.tiles().length + "{% trans ' files uploaded' %}"'></div>
 
-<div data-bind="css: card.model.cssclass">
+<div class="workbench-sidepanel-card-container" data-bind="css: card.model.cssclass">
 
     <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
     <div class="edit-message-container">

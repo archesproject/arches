@@ -5,7 +5,6 @@ import re
 import sys
 import uuid
 import importlib
-import arches.app.utils.task_management as task_management
 from io import StringIO
 from django.shortcuts import render
 from django.views.generic import View
@@ -126,26 +125,25 @@ class APIBase(View):
 
 class Sync(APIBase):
     def get(self, request, surveyid=None):
-        import arches.app.tasks as tasks
 
         can_sync = userCanAccessMobileSurvey(request, surveyid)
         if can_sync:
+            synclog = {"logid": "", "message": "", "status": "", "survey_id": surveyid, "userid": request.user.id}
             try:
-                logger.info("Starting sync for user {0}".format(request.user.username))
-                celery_worker_running = task_management.check_if_celery_available()
-                if celery_worker_running is True:
-                    res = tasks.sync.apply_async(
-                        (surveyid, request.user.id), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
-                    )
-                else:
-                    management.call_command("mobile", operation="sync_survey", id=surveyid, user=request.user.id)
-                logger.info("Sync complete for user {0}".format(request.user.username))
+                survey = MobileSurvey.objects.get(id=surveyid)
+                synclog = survey.sync(userid=request.user.id, use_celery=True)
             except Exception:
                 logger.exception(_("Sync Failed"))
 
-            return JSONResponse(_("Sync Failed"))
+            return JSONResponse(synclog)
         else:
             return JSONResponse(_("Sync Failed"), status=403)
+
+
+class CheckSyncStatus(APIBase):
+    def get(self, request, synclogid=None):
+        synclog = models.MobileSyncLog.objects.get(pk=synclogid)
+        return JSONResponse(synclog)
 
 
 class Surveys(APIBase):

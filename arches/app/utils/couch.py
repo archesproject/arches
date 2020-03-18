@@ -16,15 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import json
 import couchdb
-from urllib.parse import urlparse, urljoin
-from arches.app.models import models
 from arches.app.models.system_settings import settings
-from arches.app.utils.response import JSONResponse
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from django.http import HttpRequest, HttpResponseNotFound
-import arches.app.views.search as search
 
 
 class Couch(object):
