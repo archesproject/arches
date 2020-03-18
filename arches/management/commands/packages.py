@@ -629,8 +629,14 @@ class Command(BaseCommand):
                 for ext in ["*.json", "*.jsonl", "*.csv"]:
                     business_data += glob.glob(os.path.join(package_dir, "business_data", ext))
 
-            erring_csvs = [path for path in business_data if os.path.splitext(path)[1] == '.csv' and os.path.isfile(os.path.splitext(path)[0] + '.mapping') is False]
-            message = f"The following .csv files will not load because they are missing accompanying .mapping files: \n\t {','.join(erring_csvs)}"
+            erring_csvs = [
+                path
+                for path in business_data
+                if os.path.splitext(path)[1] == ".csv" and os.path.isfile(os.path.splitext(path)[0] + ".mapping") is False
+            ]
+            message = (
+                f"The following .csv files will not load because they are missing accompanying .mapping files: \n\t {','.join(erring_csvs)}"
+            )
             if len(erring_csvs) > 0:
                 print(message)
             if yes is False and len(erring_csvs) > 0:
@@ -640,10 +646,11 @@ class Command(BaseCommand):
                 else:
                     print("Aborting operation: Package Load")
                     sys.exit()
-                    
+
             if celery_worker_running:
                 from celery import chord
                 from arches.app.tasks import import_business_data, package_load_complete, on_chord_error
+
                 # assumes resources in csv do not depend on data being loaded prior from json in same dir
                 chord(
                     [
