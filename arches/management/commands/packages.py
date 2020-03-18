@@ -471,6 +471,9 @@ class Command(BaseCommand):
     def load_package(
         self, source, setup_db=True, overwrite_concepts="ignore", bulk_load=False, stage_concepts="keep", yes=False,
     ):
+
+        celery_worker_running = task_management.check_if_celery_available()
+
         def load_ontologies(package_dir):
             ontologies = glob.glob(os.path.join(package_dir, "ontologies/*"))
             if len(ontologies) > 0:
@@ -623,16 +626,20 @@ class Command(BaseCommand):
                 for f in configs["business_data_load_order"]:
                     business_data.append(os.path.join(package_dir, "business_data", f))
             else:
-                business_data += glob.glob(os.path.join(package_dir, "business_data", "*.json"))
-                business_data += glob.glob(os.path.join(package_dir, "business_data", "*.jsonl"))
-                business_data += glob.glob(os.path.join(package_dir, "business_data", "*.csv"))
+                for ext in ["*.json", "*.jsonl", "*.csv"]:
+                    business_data += glob.glob(os.path.join(package_dir, "business_data", ext))
 
-            relations = glob.glob(os.path.join(package_dir, "business_data", "relations", "*.relations"))
-            celery_worker_running = task_management.check_if_celery_available()
-
-            erring_csvs = [path for path in business_data if ".csv" in path and os.path.exists(path.replace(".csv", ".mapping") is False)]
+            erring_csvs = [
+                path
+                for path in business_data
+                if os.path.splitext(path)[1] == ".csv" and os.path.isfile(os.path.splitext(path)[0] + ".mapping") is False
+            ]
+            message = (
+                f"The following .csv files will not load because they are missing accompanying .mapping files: \n\t {','.join(erring_csvs)}"
+            )
+            if len(erring_csvs) > 0:
+                print(message)
             if yes is False and len(erring_csvs) > 0:
-                print(f"The following .csv files are missing accompanying .mapping files: \n {str(erring_csvs)}")
                 response = input("Proceed with package load without loading indicated csv files? (Y/N): ")
                 if response.lower() in ("t", "true", "y", "yes"):
                     print("Proceeding with package load")
@@ -645,7 +652,6 @@ class Command(BaseCommand):
                 from arches.app.tasks import import_business_data, package_load_complete, on_chord_error
 
                 # assumes resources in csv do not depend on data being loaded prior from json in same dir
-                # only loads from csv's paired with mapping files
                 chord(
                     [
                         import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load)
@@ -655,12 +661,10 @@ class Command(BaseCommand):
                 )(package_load_complete.s().on_error(on_chord_error.s()))
             else:
                 for path in business_data:
-                    if path.endswith("csv"):
-                        # config_file = path.replace(".csv", ".mapping")
-                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load)
-                    else:
+                    if path not in erring_csvs:
                         self.import_business_data(path, overwrite=True, bulk_load=bulk_load)
 
+            relations = glob.glob(os.path.join(package_dir, "business_data", "relations", "*.relations"))
             for relation in relations:
                 self.import_business_data_relations(relation)
 
@@ -841,7 +845,6 @@ class Command(BaseCommand):
             css_files = glob.glob(os.path.join(css_source, "*.css"))
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
-        celery_worker_running = task_management.check_if_celery_available()
         if celery_worker_running:
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
