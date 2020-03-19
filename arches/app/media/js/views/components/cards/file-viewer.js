@@ -222,22 +222,36 @@ define([
                 return (defaultRenderers.indexOf(renderer) > -1);
             };
 
-            this.applyFileRenderer = function(val) {
-                if (ko.unwrap(self.applyToAll)) {
-                    this.card.staging().forEach(function(tileid){
-                        var stagedTile = self.card.tiles().find(function(t){return t.tileid == tileid;});
-                        if (stagedTile) {
-                            var node = ko.unwrap(stagedTile.data[self.fileListNodeId]);
-                            var file = node[0];
-                            var valid = self.checkIfRendererIsValid(file, val);
-                            if (valid) {
-                                file.renderer = val ? val.id : '';
-                                stagedTile.save();
-                            }
+            this.applyRendererToStaged = function(renderer) {
+                this.card.staging().forEach(function(tileid){
+                    var stagedTile = self.card.tiles().find(function(t){return t.tileid == tileid;});
+                    if (stagedTile) {
+                        var node = ko.unwrap(stagedTile.data[self.fileListNodeId]);
+                        var file = node[0];
+                        var valid = self.checkIfRendererIsValid(file, renderer);
+                        if (valid) {
+                            file.renderer = renderer ? renderer.id : '';
+                            stagedTile.save();
                         }
-                    });
-                }
+                    }
+                });
             }; 
+
+            this.applyRendererToSelected = function(renderer){	
+                if (self.displayContent()) {	
+                    var tile = self.displayContent().tile;	
+                    var node = ko.unwrap(tile.data[self.fileListNodeId]);	
+                    if (node.length > 0) {	
+                        var valid = self.checkIfRendererIsValid(node[0], renderer);	
+                        if (valid) {	
+                            node[0].renderer = renderer ? renderer.id : '';	
+                            tile.save();	
+                        }	
+                    }	
+                } if (ko.unwrap(self.applyToAll)) {
+                    self.applyRendererToStaged(renderer);
+                }	
+            };
 
             this.displayContent = ko.computed(function(){
                 var file;
@@ -260,6 +274,7 @@ define([
                 }
                 if (file) {
                     file.availableRenderers = self.getDefaultRenderers(file.type, file);
+                    file.validRenderer = ko.observable(true);
                 }
                 return file;
             }, this).extend({deferred: true});
