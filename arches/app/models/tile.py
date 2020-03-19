@@ -25,6 +25,7 @@ import logging
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.db.models import Q
+from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from arches.app.models import models
@@ -275,22 +276,25 @@ class Tile(models.TileModel):
                 errors += error
         return errors
 
-    def get_tile_data(self, user_is_reviewer, user_id):
-        if user_is_reviewer is False and self.provisionaledits is not None and user_id in self.provisionaledits:
-            data = self.provisionaledits[user_id]["value"]
-        else:
-            data = self.data
+    def get_tile_data(self, user_id=None):
+        data = self.data
+        
+        if user_id is not None:
+            user_id = str(user_id)
+            user = User.objects.get(pk=user_id)
+            user_is_reviewer = user_is_resource_reviewer(user)
+            if user_is_reviewer is False and self.provisionaledits is not None and user_id in self.provisionaledits:
+                data = self.provisionaledits[user_id]["value"]
+
         return data
 
     def datatype_post_save_actions(self, request=None):
         userid = None
-        user_is_reviewer = True
         if request is not None:
             userid = str(request.user.id)
             if hasattr(request.user, "userprofile") is not True:
                 models.UserProfile.objects.create(user=request.user)
-            user_is_reviewer = user_is_resource_reviewer(request.user)
-        tile_data = self.get_tile_data(user_is_reviewer, userid)
+        tile_data = self.get_tile_data(userid)
         for nodeid, value in list(tile_data.items()):
             datatype_factory = DataTypeFactory()
             node = models.Node.objects.get(nodeid=nodeid)
@@ -375,13 +379,13 @@ class Tile(models.TileModel):
                     provisional_edit_log_details=provisional_edit_log_details,
                 )
 
-            if index:
-                self.index()
+        if index:
+            self.index()
 
-            for tile in self.tiles:
-                tile.resourceinstance = self.resourceinstance
-                tile.parenttile = self
-                tile.save(*args, request=request, index=index, **kwargs)
+        for tile in self.tiles:
+            tile.resourceinstance = self.resourceinstance
+            tile.parenttile = self
+            tile.save(*args, request=request, index=index, **kwargs)
 
     def delete(self, *args, **kwargs):
         se = SearchEngineFactory().create()
