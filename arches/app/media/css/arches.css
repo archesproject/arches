@@ -1540,7 +1540,8 @@ ul.tabbed-report-tab-list {
 
 .workbench-card-wrapper {
     flex: 1;
-    height: 100%;
+    height: auto;
+    min-height: 100%;
     position: relative;
     background-color: #fafafa;
     border-top: 1px solid #ddd;
