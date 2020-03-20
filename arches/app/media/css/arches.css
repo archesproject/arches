@@ -1408,25 +1408,9 @@ ul.tabbed-report-tab-list {
 
 /* end photo gallery */
 
-.workbench-card-wrapper {
-    flex: 1;
-    height: 100%;
-    position: relative;
-    background-color: #eee;
-}
-
-.workbench-card-container {
-    height: 100%;
-    margin-right: 92px;
-}
-
 .workbench-model-card-container {
     margin-top: 50px;
     padding-bottom: 40px;
-}
-
-.workbench-card-container.workbench-card-container-sidepanel-active {
-    margin-right: 492px;
 }
 
 .workbench-card-sidebar {
@@ -1439,32 +1423,9 @@ ul.tabbed-report-tab-list {
     z-index: 200;
 }
 
-.workbench-card-sidebar-tab {
-    z-index: 200;
-    color: rgb(33, 62, 95);
-    padding: 16px;
-    text-align: center;
-    font-size: 1.1em;
-    border-bottom: 1px solid rgb(216, 216, 216);
-    cursor: pointer;
-}
-
 .workbench-card-sidebar-tab.disabled {
     color: #aaa;
     cursor: auto;
-}
-
-.workbench-card-sidebar-tab.active {
-    z-index: 200;
-    background-color: white;
-    border-left: solid 1px white;
-    margin-left: -1px;
-}
-
-.workbench-card-sidebar-tab i {
-    font-size: 1.7em;
-    display: block;
-    padding-bottom: 6px;
 }
 
 .workbench-card-sidebar-tab i {
@@ -1484,6 +1445,7 @@ ul.tabbed-report-tab-list {
 }
 
 .workbench-card-sidebar-tab.active {
+    z-index: 200;
     background-color: white;
     border-left: solid 1px white;
     margin-left: -1px;
