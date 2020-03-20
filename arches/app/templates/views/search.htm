@@ -110,7 +110,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                         <!-- ko if: filter.type === 'filter' && filter.enabled -->
                         <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}">
-                            <div style="height: calc(100vh - 101px)" data-bind="component: {
+                            <div class="search-map-container" data-bind="component: {
                                 name: filter.componentname,
                                 params: $parent.sharedStateObject
                             }"></div>

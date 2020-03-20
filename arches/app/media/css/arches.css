@@ -1259,6 +1259,10 @@ ul.tabbed-report-tab-list {
     top: 51px;
 }
 
+.search-container .card-form-preview-container .search-map-container {
+    height: calc(100vh - 101px);
+}
+
 .card-component-wrapper-editor .workbench-card-wrapper {
     border-top: 1px solid #041B33;
 }
@@ -11450,9 +11454,6 @@ a.tree-display-tool, a.tree-display-tool:hover {
         flex: 1;
         flex-direction: column-reverse;
     }
-    article.search-container .search-map-container {
-        height: 50vh;
-    }
     .search-results-panel {
         max-width: inherit;
     }
@@ -11486,6 +11487,13 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .graph-settings-panel-body .widgets .widget-container div div .chosen-disabled {
         width: 100% !important;
         min-width: inherit;
+    }
+    .search-container .card-form-preview-container .search-map-container {
+        height: 47vh;
+        overflow: hidden;
+    }
+    .search-container .workbench-card-wrapper {
+        height: calc(42vh - 5px)
     }
 }
 
