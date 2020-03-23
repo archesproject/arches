@@ -71,7 +71,7 @@ define([
         WorkbenchViewmodel.apply(this, [params]);
 
         this.showGallery = ko.observable(true);
-        this.expandGallery = ko.observable(true);
+        this.expandGallery = ko.observable(false);
         this.expandGallery.subscribe(function(expandGallery) {
             if (expandGallery) self.showGallery(true);
         });
@@ -163,6 +163,10 @@ define([
         this.toggleManifestEditor = function() {
             self.editManifest(!self.editManifest());
             if (abortFetchManifest) abortFetchManifest.abort();
+        };
+
+        this.getAnnotationCount = function() {
+            return 0;
         };
     };
     ko.components.register('iiif-viewer', {

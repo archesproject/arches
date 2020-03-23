@@ -90,12 +90,13 @@
         'fa-caret-up': !expandGallery(),
         'fa-caret-down': expandGallery()
     }, click: function() { expandGallery(!expandGallery()); }"></i>
+    <h3>Gallery</h3>
     <a href="javascript: void(0)" data-bind="
         click: toggleGallery,
-        text: showGallery() ? '{% trans "Hide Gallery" %}' : '{% trans "Show Gallery" %}'
+        text: showGallery() ? '{% trans "hide" %}' : '{% trans "show" %}'
     "></a>
 </div>
-<!--ko let: {selectCanvas: selectCanvas, getCanvasService: getCanvasService, selectedCanvas: canvas} -->
+<!--ko let: {selectCanvas: selectCanvas, getCanvasService: getCanvasService, selectedCanvas: canvas, getAnnotationCount: getAnnotationCount} -->
 <div class="iiif-viewer-gallery" data-bind="css: {
         'gallery-expanded': expandGallery
     }">
@@ -145,10 +146,23 @@
                         <div class="iiif-gallery-canvas" data-bind="click: function() {
                             selectCanvas($data);
                         }, css: {
-                            active: getCanvasService($data) === selectedCanvas()
+                            active: getCanvasService($data) === selectedCanvas(),
+                            annotated: getAnnotationCount(getCanvasService($data))
                         }">
-                            <div class="iiif-gallery-canvas-thumbnail" data-bind="style: { backgroundImage: 'url(\'' + ($data.thumbnail || '{% static 'img/photo_missing.png' %}') + '\')' }"></div>
-                            <div class="iiif-gallery-canvas-label" data-bind="text: label"></div>
+                            <div class="iiif-gallery-canvas-thumbnail">
+                                <img data-bind="attr: { src: $data.thumbnail || '{% static 'img/photo_missing.png' %}' }">
+                            </div>
+                            <div class="iiif-gallery-canvas-label">
+                                <span data-bind="text: label"></span>
+                                <span class="annotation-count">
+                                    <!--ko if: getAnnotationCount(getCanvasService($data)) -->
+                                    <span data-bind="text: getAnnotationCount(getCanvasService($data))"></span> Annotation(s)
+                                    <!--/ko -->
+                                    <!--ko if: !getAnnotationCount(getCanvasService($data)) -->
+                                    &nbsp;
+                                    <!--/ko -->
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
