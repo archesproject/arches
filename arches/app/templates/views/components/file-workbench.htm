@@ -45,7 +45,7 @@
     <div class="card-display-panel">
         <div>
             <div id="hidden-dz-previews" style="display:none"></div>
-                    <!--ko if: displayContent() -->
+            <!--ko if: displayContent() -->
                         <!--ko foreach: fileFormatRenderers-->
                             <!--ko if: $data.id && $parent.displayContent().renderer && $parent.displayContent().renderer.id === $data.id -->
                                 <!-- ko component: {
@@ -62,7 +62,7 @@
                                 <!-- /ko -->
                             <!--/ko-->
                         <!--/ko-->
-                        <!--ko ifnot: $parent.displayContent().renderer -->
+                    <!--ko if: !$parent.displayContent().renderer || $parent.displayContent().validRenderer() === false -->
                     <div>
                         <div class="gallery-controls new-tile" style="position: relative">
                             <div class="dropzone-photo-upload">
@@ -80,6 +80,9 @@
                                     <!--ko if: $parent.displayContent().availableRenderers.length > 0 -->
                                     <div class="bord-top file-select loader-select">
                                         <div class="" style="padding: 5px">
+                                            <!--ko if: $parent.displayContent().validRenderer() === false -->
+                                            <h4>{% trans 'Unable to parse your file with the '%}<span data-bind="text:$parent.displayContent().renderer.name"></span>{% trans ' loader'%}</h4>
+                                            <!--/ko-->
                                             <h2>{% trans 'Select File Loader' %}</h2>
                                             <h4>{% trans 'Select the loader best suited for processing and visualizing the selected file' %}</h4>
                                             <div style="display: flex; flex-flow: wrap; padding: 15px 25px;">
@@ -104,7 +107,7 @@
                                                     <!-- card Tools -->
                                                     <div class="r-select-card-footer">
                                                         <div class="">
-                                                            <div data-bind="click: function(){$parent.applyFileRenderer($data)}" style="border-top: 1px solid #c4c4c4;" class="btn btn-primary btn-resource-select" role="button">
+                                                            <div data-bind="click: function(){$parent.applyRendererToSelected($data)}" style="border-top: 1px solid #c4c4c4;" class="btn btn-primary btn-resource-select" role="button">
                                                             {% trans 'Select' %}
                                                             </div>
                                                         </div>
@@ -182,7 +185,7 @@
 <div class='file-workbench-files'>
 <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
     <!--ko if: $parent.getUrl(tile) && ($parent.filter().length === 0 || $parent.isFiltered(tile)) -->
-    <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {'selected-photo': ko.unwrap(selected), 'staged': $parent.card.staging.indexOf(tile.tileid) > -1}, click: $parent.card.stageTile">
+    <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {'staged': $parent.card.staging.indexOf(tile.tileid) > -1}, click: $parent.card.stageTile">
     <i role="presentation" data-bind="class: $parent.getUrl(tile).iconclass || 'fa fa-file'"></i>
     <div class='file-name' data-bind="text: $parent.getUrl(tile).name"></div>
     </div>
@@ -224,7 +227,7 @@
             multiple: false,
             placeholder: {% trans "'File Renderer'" %}}}">
     <div style="padding-top: 10px">
-        <button style="margin-right: 3px;" class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){$parent.applyToAll(true); $parent.applyFileRenderer($parent.getFileFormatRenderer(managerRenderer()))}"><i class="fa fa-gears"></i> {% trans 'Apply to Selected Files' %}</button>
+        <button style="margin-right: 3px;" class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){$parent.applyRendererToStaged($parent.getFileFormatRenderer(managerRenderer()))}"><i class="fa fa-gears"></i> {% trans 'Apply to Selected Files' %}</button>
     </div>
 </div>
 <!--/ko-->
