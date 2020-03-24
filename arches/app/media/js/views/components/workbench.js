@@ -13,6 +13,14 @@ define([
             self.activeTab(undefined);
         };
         this.card.allowProvisionalEditRerender(false);
+        this.expandSidePanel = ko.computed(function(){
+            if (self.tile) {
+                return self.tile.hasprovisionaledits() && self.reviewer === true;
+            } else {
+                return false;
+            }
+        });
+        this.workbenchWrapperClass = ko.observable();
 
         this.toggleTab = function(tabName) {
             if (self.activeTab() === tabName) {

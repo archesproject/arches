@@ -325,7 +325,7 @@
             <!-- ko if: card.widgets().length > 0 -->
             {% block form_widgets %}
             <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
-                <!--ko if: $parent.getUrl(tile) && tile.selected()-->
+                <!--ko if: $parent.getUrl(tile) && tile.selected() -->
             <form class="widgets" style="margin-bottom: 20px;">
                 <div data-bind="foreach: {
                         data: $parent.card.widgets, as: 'widget'

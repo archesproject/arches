@@ -106,7 +106,7 @@ define([
         };
 
         self.tileIsFullyProvisional = ko.computed(function() {
-            return self.selectedProvisionalEdit() && self.selectedProvisionalEdit().isfullyprovisional() === true;
+            return self.selectedProvisionalEdit() && ko.unwrap(self.selectedProvisionalEdit().isfullyprovisional) === true;
         });
 
         self.updateProvisionalEdits(self.selectedTile);

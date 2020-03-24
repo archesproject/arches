@@ -67,6 +67,7 @@ define([
             }));
 
             WorkbenchComponentViewModel.apply(this, [params]);
+            this.workbenchWrapperClass = ko.observable('autoheight');
 
             if (this.card && this.card.activeTab) {
                 self.activeTab(this.card.activeTab);
