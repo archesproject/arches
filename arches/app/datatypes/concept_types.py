@@ -182,8 +182,7 @@ class ConceptDataType(BaseConceptDataType):
         return g
 
     def from_rdf(self, json_ld_node):
-        # Expects a label and a concept URI within the json_ld_node
-        # But might not always get them both.
+        # Expects a label and a concept URI within the json_ld_node, might not always get them both
 
         try:
             # assume a list, and as this is a ConceptDataType, assume a single entry
