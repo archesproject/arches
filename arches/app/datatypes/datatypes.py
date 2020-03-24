@@ -1079,6 +1079,14 @@ class FileListDataType(BaseDataType):
                     val = {"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
                     document["strings"].append(val)
 
+    def get_search_terms(self, nodevalue, nodeid):
+        terms = []
+        for file_obj in nodevalue:
+            if file_obj["name"] is not None:
+                terms.append(file_obj["name"])
+
+        return terms
+
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
         files = data[str(node.pk)]
