@@ -877,7 +877,7 @@ class Images(APIBase):
                 if image["file_id"] == fileid:
                     image["url"] = image_file.path.url
                     image["size"] = image_file.path.size
-                    # I don't really want to run all the code Tile.save(), 
+                    # I don't really want to run all the code Tile.save(),
                     # so I just call it's super class
                     super(Tile, tile).save()
                     tile.index()

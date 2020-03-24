@@ -278,7 +278,7 @@ class Tile(models.TileModel):
 
     def get_tile_data(self, user_id=None):
         data = self.data
-        
+
         if user_id is not None:
             user_id = str(user_id)
             user = User.objects.get(pk=user_id)

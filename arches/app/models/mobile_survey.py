@@ -304,9 +304,7 @@ class MobileSurvey(models.MobileSurveyModel):
                     (self.id, userid, synclog.pk), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
                 )
             else:
-                err = _(
-                    "Celery appears not to be running, you need to have celery running in order to sync from Arches Collector."
-                )
+                err = _("Celery appears not to be running, you need to have celery running in order to sync from Arches Collector.")
                 self._sync_failed(synclog, userid, err)
         else:
             self._sync(synclog.pk, userid=userid)
@@ -523,7 +521,7 @@ class MobileSurvey(models.MobileSurveyModel):
         files = models.File.objects.filter(tile_id=tile["tileid"])
         for file in files:
             with Image.open(file.path.file).copy() as image:
-                image = image.convert('RGB')
+                image = image.convert("RGB")
                 image.thumbnail((settings.MOBILE_IMAGE_SIZE_LIMITS["thumb"], settings.MOBILE_IMAGE_SIZE_LIMITS["thumb"]))
                 b = io.BytesIO()
                 image.save(b, "JPEG")
@@ -553,9 +551,7 @@ class MobileSurvey(models.MobileSurveyModel):
         instances_to_delete = []
         try:
             synclog = models.MobileSyncLog.objects.filter(survey=self, status="FINISHED").latest("finished")
-            instances_to_delete = models.EditLog.objects.filter(edittype="delete").values_list(
-                "resourceinstanceid", flat=True
-            )
+            instances_to_delete = models.EditLog.objects.filter(edittype="delete").values_list("resourceinstanceid", flat=True)
         except models.MobileSyncLog.DoesNotExist:
             pass
 
@@ -569,9 +565,7 @@ class MobileSurvey(models.MobileSurveyModel):
         tiles_to_delete = []
         try:
             synclog = models.MobileSyncLog.objects.filter(survey=self, status="FINISHED").latest("finished")
-            tiles_to_delete = models.EditLog.objects.filter(edittype="tile delete").values_list(
-                "tileinstanceid", flat=True
-            )
+            tiles_to_delete = models.EditLog.objects.filter(edittype="tile delete").values_list("tileinstanceid", flat=True)
         except models.MobileSyncLog.DoesNotExist:
             pass
 
