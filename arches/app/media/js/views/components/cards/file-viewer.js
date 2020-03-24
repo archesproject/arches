@@ -215,7 +215,6 @@ define([
                     self.activeTab(openTab);
                 };
             };
-
             this.defaultSelector = this.selectDefault();
 
             this.checkIfRendererIsValid = function(file, renderer){
