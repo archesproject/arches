@@ -61,6 +61,7 @@ define([
             };
 
             this.fileListNodeId = getfileListNode();
+            this.acceptedFiles = ko.observable(null);
 
             this.displayWidgetIndex = self.card.widgets().indexOf(self.card.widgets().find(function(widget) {
                 return widget.datatype.datatype === 'file-list';
@@ -214,7 +215,6 @@ define([
                     self.activeTab(openTab);
                 };
             };
-
             this.defaultSelector = this.selectDefault();
 
             this.checkIfRendererIsValid = function(file, renderer){
@@ -375,12 +375,24 @@ define([
                 self.card.newTile = undefined;
             };
 
+            this.getWidgetConfig = function(){
+                self.card.widgets().forEach(function(w) {
+                    if (w.node_id() === self.fileListNodeId) {
+                        if (ko.unwrap(w.attributes.config.acceptedFiles)) {
+                            self.acceptedFiles(ko.unwrap(w.attributes.config.acceptedFiles));
+                        }
+                    }
+                });
+            };
+            this.getWidgetConfig();
+
             this.dropzoneOptions = {
                 url: "arches.urls.root",
                 dictDefaultMessage: '',
                 autoProcessQueue: false,
                 uploadMultiple: true,
                 autoQueue: false,
+                acceptedFiles: self.acceptedFiles(),
                 clickable: ".fileinput-button." + this.uniqueidClass(),
                 previewsContainer: '#hidden-dz-previews',
                 init: function() {
