@@ -422,19 +422,28 @@ class MobileSurvey(models.MobileSurveyModel):
         resource instances relevant to a mobile survey. Takes a user object which
         is required for search.
         """
+
         query = self.datadownloadconfig["custom"]
         resource_types = self.datadownloadconfig["resources"]
         all_instances = {}
         if query in ("", None) and len(resource_types) == 0:
             logger.info("No resources or data query defined")
         else:
-            import ipdb
-            ipdb.sset_trace()
+            resources_in_couch = set()
+            resources_in_couch_by_type = {}
+            for res_type in resource_types:
+                resources_in_couch_by_type[res_type] = []
+
+            db = self.couch.create_db("project_" + str(self.id))
+            couch_query = {"selector": {"type": "resource"}, "fields": ["_id", "graph_id"]}
+            for doc in db.find(couch_query):
+                resources_in_couch.add(doc["_id"])
+                resources_in_couch_by_type[doc["graph_id"]].append(doc["_id"])
+
             if self.datadownloadconfig["download"]:
                 request = HttpRequest()
                 request.user = self.lasteditedby
                 request.GET["mobiledownload"] = True
-                request.GET["resourcecount"] = self.datadownloadconfig["count"]
                 if query in ("", None):
                     if len(self.bounds.coords) == 0:
                         default_bounds = settings.DEFAULT_BOUNDS
@@ -448,11 +457,11 @@ class MobileSurvey(models.MobileSurveyModel):
                             request.GET["resource-type-filter"] = json.dumps([{"graphid": res_type, "inverted": False}])
                             request.GET["map-filter"] = map_filter
                             request.GET["paging-filter"] = "1"
-                            request.GET["resourcecount"] = self.datadownloadconfig["count"]
+                            request.GET["resourcecount"] = int(self.datadownloadconfig["count"]) - len(resources_in_couch_by_type[res_type])
                             self.append_to_instances(request, instances, res_type)
-                            if len(list(instances.keys())) < int(self.datadownloadconfig["count"]):
+                            if len(list(instances.keys())) < request.GET["resourcecount"]:
                                 request.GET["map-filter"] = "{}"
-                                request.GET["resourcecount"] = int(self.datadownloadconfig["count"]) - len(list(instances.keys()))
+                                request.GET["resourcecount"] = request.GET["resourcecount"] - len(list(instances.keys()))
                                 self.append_to_instances(request, instances, res_type)
                             for key, value in instances.items():
                                 all_instances[key] = value
@@ -460,6 +469,7 @@ class MobileSurvey(models.MobileSurveyModel):
                         logger.exception(e)
                 else:
                     try:
+                        request.GET["resourcecount"] = int(self.datadownloadconfig["count"]) - len(resources_in_couch)
                         parsed = urllib.parse.urlparse(query)
                         urlparams = urllib.parse.parse_qs(parsed.query)
                         for k, v in urlparams.items():
@@ -470,22 +480,21 @@ class MobileSurvey(models.MobileSurveyModel):
                             all_instances[hit["_source"]["resourceinstanceid"]] = hit["_source"]
                     except KeyError:
                         print("no instances found in", search_res)
-            else:
-                ids = []
-                db = self.couch.create_db("project_" + str(self.id))
-                query = {"selector": {"type": "resource"}, "fields": ["_id"]}
-                for doc in db.find(query):
-                    ids.append(doc["_id"])
 
-                if len(ids) > 0:
-                    se = SearchEngineFactory().create()
-                    query = Query(se, start=0, limit=settings.SEARCH_RESULT_LIMIT)
-                    ids_query = Terms(field="_id", terms=ids)
-                    query.add_query(ids_query)
-                    results = query.search(index="resources")
-                    if results is not None:
-                        for result in results["hits"]["hits"]:
-                            all_instances[result["_id"]] = result["_source"]
+            # this effectively makes sure that resources in couch always get updated
+            # even if they weren't included in the search results above (assuming self.datadownloadconfig["download"] == True)
+            # if self.datadownloadconfig["download"] == False then this will always update the resources in couch
+            ids = list(resources_in_couch - set(all_instances.keys()))
+
+            if len(ids) > 0:
+                se = SearchEngineFactory().create()
+                query = Query(se, start=0, limit=settings.SEARCH_RESULT_LIMIT)
+                ids_query = Terms(field="_id", terms=ids)
+                query.add_query(ids_query)
+                results = query.search(index="resources")
+                if results is not None:
+                    for result in results["hits"]["hits"]:
+                        all_instances[result["_id"]] = result["_source"]
         return all_instances
 
     def load_tiles_into_couch(self, instances, nodegroup):
