@@ -41,6 +41,8 @@ from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.couch import Couch
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Terms, Query
 import arches.app.views.search as search
 import arches.app.utils.task_management as task_management
 
@@ -426,48 +428,64 @@ class MobileSurvey(models.MobileSurveyModel):
         if query in ("", None) and len(resource_types) == 0:
             logger.info("No resources or data query defined")
         else:
-            request = HttpRequest()
-            request.user = self.lasteditedby
-            request.GET["mobiledownload"] = True
-            request.GET["resourcecount"] = self.datadownloadconfig["count"]
-            if query in ("", None):
-                if len(self.bounds.coords) == 0:
-                    default_bounds = settings.DEFAULT_BOUNDS
-                    default_bounds["features"][0]["properties"]["inverted"] = False
-                    map_filter = json.dumps(default_bounds)
-                else:
-                    map_filter = json.dumps({"type": "FeatureCollection", "features": [{"geometry": json.loads(self.bounds.json)}]})
-                try:
-                    for res_type in resource_types:
-                        instances = {}
-                        request.GET["resource-type-filter"] = json.dumps([{"graphid": res_type, "inverted": False}])
-                        request.GET["map-filter"] = map_filter
-                        request.GET["paging-filter"] = "1"
-                        request.GET["resourcecount"] = self.datadownloadconfig["count"]
-                        self.append_to_instances(request, instances, res_type)
-                        if len(list(instances.keys())) < int(self.datadownloadconfig["count"]):
-                            request.GET["map-filter"] = "{}"
-                            request.GET["resourcecount"] = int(self.datadownloadconfig["count"]) - len(list(instances.keys()))
+            import ipdb
+            ipdb.sset_trace()
+            if self.datadownloadconfig["download"]:
+                request = HttpRequest()
+                request.user = self.lasteditedby
+                request.GET["mobiledownload"] = True
+                request.GET["resourcecount"] = self.datadownloadconfig["count"]
+                if query in ("", None):
+                    if len(self.bounds.coords) == 0:
+                        default_bounds = settings.DEFAULT_BOUNDS
+                        default_bounds["features"][0]["properties"]["inverted"] = False
+                        map_filter = json.dumps(default_bounds)
+                    else:
+                        map_filter = json.dumps({"type": "FeatureCollection", "features": [{"geometry": json.loads(self.bounds.json)}]})
+                    try:
+                        for res_type in resource_types:
+                            instances = {}
+                            request.GET["resource-type-filter"] = json.dumps([{"graphid": res_type, "inverted": False}])
+                            request.GET["map-filter"] = map_filter
+                            request.GET["paging-filter"] = "1"
+                            request.GET["resourcecount"] = self.datadownloadconfig["count"]
                             self.append_to_instances(request, instances, res_type)
-                        for key, value in instances.items():
-                            all_instances[key] = value
-                except Exception as e:
-                    logger.exception(e)
+                            if len(list(instances.keys())) < int(self.datadownloadconfig["count"]):
+                                request.GET["map-filter"] = "{}"
+                                request.GET["resourcecount"] = int(self.datadownloadconfig["count"]) - len(list(instances.keys()))
+                                self.append_to_instances(request, instances, res_type)
+                            for key, value in instances.items():
+                                all_instances[key] = value
+                    except Exception as e:
+                        logger.exception(e)
+                else:
+                    try:
+                        parsed = urllib.parse.urlparse(query)
+                        urlparams = urllib.parse.parse_qs(parsed.query)
+                        for k, v in urlparams.items():
+                            request.GET[k] = v[0]
+                        search_res_json = search.search_results(request)
+                        search_res = JSONDeserializer().deserialize(search_res_json.content)
+                        for hit in search_res["results"]["hits"]["hits"]:
+                            all_instances[hit["_source"]["resourceinstanceid"]] = hit["_source"]
+                    except KeyError:
+                        print("no instances found in", search_res)
             else:
-                try:
-                    instances = {}
-                    parsed = urllib.parse.urlparse(query)
-                    urlparams = urllib.parse.parse_qs(parsed.query)
-                    for k, v in urlparams.items():
-                        request.GET[k] = v[0]
-                    search_res_json = search.search_results(request)
-                    search_res = JSONDeserializer().deserialize(search_res_json.content)
-                    for hit in search_res["results"]["hits"]["hits"]:
-                        instances[hit["_source"]["resourceinstanceid"]] = hit["_source"]
-                    for key, value in instances.items():
-                        all_instances[key] = value
-                except KeyError:
-                    print("no instances found in", search_res)
+                ids = []
+                db = self.couch.create_db("project_" + str(self.id))
+                query = {"selector": {"type": "resource"}, "fields": ["_id"]}
+                for doc in db.find(query):
+                    ids.append(doc["_id"])
+
+                if len(ids) > 0:
+                    se = SearchEngineFactory().create()
+                    query = Query(se, start=0, limit=settings.SEARCH_RESULT_LIMIT)
+                    ids_query = Terms(field="_id", terms=ids)
+                    query.add_query(ids_query)
+                    results = query.search(index="resources")
+                    if results is not None:
+                        for result in results["hits"]["hits"]:
+                            all_instances[result["_id"]] = result["_source"]
         return all_instances
 
     def load_tiles_into_couch(self, instances, nodegroup):
