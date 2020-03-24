@@ -12,6 +12,7 @@ define([
         this.hideSidePanel = function() {
             self.activeTab(undefined);
         };
+        this.card.allowProvisionalEditRerender(false);
 
         this.toggleTab = function(tabName) {
             if (self.activeTab() === tabName) {

@@ -93,7 +93,7 @@ define([
                 self.selectedTile().parent.widgets().forEach(
                     function(w){
                         var defaultconfig = w.widgetLookup[w.widget_id()].defaultconfig;
-                        if (JSON.parse(defaultconfig).rerender === true) {
+                        if (JSON.parse(defaultconfig).rerender === true && self.selectedTile().parent.allowProvisionalEditRerender() === true) {
                             self.selectedTile().parent.widgets()[0].label.valueHasMutated();
                         }
                     });
