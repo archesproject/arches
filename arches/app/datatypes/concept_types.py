@@ -29,7 +29,7 @@ class BaseConceptDataType(BaseDataType):
         try:
             return self.value_lookup[valueid]
         except:
-            self.value_lookup[valueid] = models.Value.objects.get(pk=valueid)
+            self.value_lookup[valueid], created = models.Value.objects.get_or_create(pk=valueid)
             return self.value_lookup[valueid]
 
     def get_concept_export_value(self, valueid, concept_export_value_type=None):
