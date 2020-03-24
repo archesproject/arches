@@ -158,7 +158,12 @@
 
                </div>
                <div class="file-upload-footer">
+                   <!-- ko if: acceptedFiles() !== null -->
+                   <span data-bind="text: ('Files formatted as '+acceptedFiles()+' may be uploaded.')"></span>
+                   <!-- /ko -->
+                   <!-- ko if: acceptedFiles() === null -->
                    <span>{% trans 'Images formatted as .jpg, .png, .tiff files may be uploaded. Other formats may require a loader.' %}</span>
+                   <!-- /ko -->
                </div>
            </div>
 
