@@ -68,6 +68,7 @@ define([
             }));
 
             WorkbenchComponentViewModel.apply(this, [params]);
+            this.workbenchWrapperClass = ko.observable('autoheight');
 
             if (this.card && this.card.activeTab) {
                 self.activeTab(this.card.activeTab);
@@ -99,35 +100,37 @@ define([
                     return item.id === rendererid;
                 });
             };
-
-            this.card.staging.subscribe(function(){
-                var compatible = [];
-                var compatibleIds = [];
-                var allCompatible = true;
-                var staging = self.card ? self.card.staging() : [];
-                var staged = self.card.tiles().filter(function(tile){
-                    return staging.indexOf(tile.tileid) >= 0;  
+            
+            if (!this.card.checkrenderers) {
+                this.card.checkrenderers = this.card.staging.subscribe(function(){
+                    var compatible = [];
+                    var compatibleIds = [];
+                    var allCompatible = true;
+                    var staging = self.card ? self.card.staging() : [];
+                    var staged = self.card.tiles().filter(function(tile){
+                        return staging.indexOf(tile.tileid) >= 0;  
+                    });
+                    staged.forEach(function(tile){
+                        var file = tile.data[self.fileListNodeId]()[0];
+                        var defaultRenderers = self.getDefaultRenderers(ko.unwrap(file.type), ko.unwrap(file.name));
+                        if (compatible.length === 0) {
+                            compatible = defaultRenderers;
+                            compatibleIds = compatible.map(function(x){return x.id;});
+                        } else {
+                            allCompatible = defaultRenderers.every(function(renderer){
+                                return compatibleIds.indexOf(renderer.id) > -1;
+                            }); 
+                        }
+                    });
+                    self.fileFormatRenderers.forEach(function(r){
+                        if (compatibleIds.indexOf(r.id) === -1 || allCompatible === false) {
+                            r.disabled = true;
+                        } else {
+                            r.disabled = false;
+                        }
+                    });
                 });
-                staged.forEach(function(tile){
-                    var file = tile.data[self.fileListNodeId]()[0];
-                    var defaultRenderers = self.getDefaultRenderers(ko.unwrap(file.type), ko.unwrap(file.name));
-                    if (compatible.length === 0) {
-                        compatible = defaultRenderers;
-                        compatibleIds = compatible.map(function(x){return x.id;});
-                    } else {
-                        allCompatible = defaultRenderers.every(function(renderer){
-                            return compatibleIds.indexOf(renderer.id) > -1;
-                        }); 
-                    }
-                });
-                self.fileFormatRenderers.forEach(function(r){
-                    if (compatibleIds.indexOf(r.id) === -1 || allCompatible === false) {
-                        r.disabled = true;
-                    } else {
-                        r.disabled = false;
-                    }
-                });
-            });
+            }
 
 
             this.getDefaultRenderers = function(type, file){

@@ -926,11 +926,9 @@ ul.tabbed-report-tab-list {
 
 .file-workbench-filter {
     position: relative;
-    margin-top: 60px;
+    margin-top: 25px;
     margin-bottom: -10px;
 }
-
-
 
 .file-workbench-filter .clear-node-search {
     margin-top: 25px;
@@ -954,7 +952,6 @@ ul.tabbed-report-tab-list {
     color: steelblue;
     font-size: 11px;
     padding-left: 5px;
-    margin-bottom: 0px;
 }
 
 .file-workbench-files::-webkit-scrollbar {
@@ -1453,7 +1450,8 @@ ul.tabbed-report-tab-list {
 }
 
 .workbench-card-sidepanel.expanded {
-    width: 600px
+    width: 600px;
+    z-index: 1001;
 }
 
 .basemap-listing, .overlay-listing, .legend-listing {
@@ -1506,6 +1504,11 @@ ul.tabbed-report-tab-list {
     position: relative;
     background-color: #fafafa;
     border-top: 1px solid #ddd;
+}
+
+.workbench-card-wrapper.autoheight {
+    height: auto;
+    min-height: 100%;
 }
 
 .card-component-wrapper-editor .workbench-card-wrapper {
@@ -1566,8 +1569,11 @@ ul.tabbed-report-tab-list {
 }
 
 .workbench-sidepanel-card-container {
-    margin: -40px -10px 10px -10px;
+    /* margin: -40px -10px 10px -10px; */
+}
 
+.workbench-sidepanel-body {
+    margin-top: 50px;
 }
 
 .workbench-card-sidepanel .install-buttons {
@@ -1582,12 +1588,15 @@ ul.tabbed-report-tab-list {
     padding-left: 35px;
 }
 
+.workbench-card-sidepanel.expanded .install-buttons {
+    width: 599px;
+}
+
 .workbench-card-sidepanel div .new-provisional-edit-card-container {
     padding-left: 5px;
 }
 
 .workbench-card-sidepanel .new-provisional-edit-card-container {
-    margin-top: 55px;
     padding-bottom: 40px;
 }
 
@@ -1600,6 +1609,16 @@ ul.tabbed-report-tab-list {
     background: #fff;
     z-index: 20;
     width: 370px;
+}
+
+.expanded .workbench-card-sidepanel-header-container {
+    width: 599px;
+    margin-left: -16px;
+    padding-left: 15px;
+}
+
+.workbench-header-buffer {
+    height: 40px
 }
 
 .workbench-card-sidepanel-header {
@@ -5724,16 +5743,16 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-bottom: 1px solid #FFB700;
     height: 50px;
     margin-top: -25px;
-    margin-bottom: 15px;
     margin-left: -35px;
     margin-right: -35px;
     padding: 15px 25px;
 }
 
 .workbench-card-sidepanel.expanded .edit-message-container {
-    margin-top: -15px;
-    margin-left: -20px;
-    margin-right: -20px;
+    z-index: 5000;
+    width: 600px;
+    margin-top: 8px;
+    margin-left: -16px;
 }
 
 .edit-message-container .reset-authoritative {
@@ -5762,7 +5781,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .new-provisional-edits-list {
     display: flex;
     flex-direction: column;
-    top: -15px;
     position: relative;
     margin-right: -50px;
     width: 250px;
@@ -5773,7 +5791,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .workbench-card-sidepanel.expanded .new-provisional-edits-list {
-    margin-right: -30px;
+    margin-right: -16px;
 }
 
 .new-provisional-edit-card-container {
@@ -5784,6 +5802,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .new-provisional-edit-card-container .card {
     width: 100%;
+    padding-top: 15px;
 }
 
 
@@ -5824,7 +5843,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     height: 40px;
     margin-left: -5px;
     /*margin-right: -40px;*/
-    margin-top: -5px;
+    /* margin-top: -5px; */
     padding: 10px 25px 10px 10px;
     height: 80px;
 }

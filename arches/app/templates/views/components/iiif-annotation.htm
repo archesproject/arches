@@ -15,10 +15,11 @@
 
 {% block sidepanel %}
 <!--ko if: activeTab() === 'editor' -->
-    <div class="workbench-card-sidepanel-header-container">
-        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
+    <div class="workbench-header-buffer">
+        <div class="workbench-card-sidepanel-header-container">
+            <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
+        </div>
     </div>
-
     <div data-bind="css: card.model.cssclass">
 
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
@@ -336,6 +337,7 @@
             </div>
         </div>
     </div>
+
 <!--/ko -->
 {{ block.super }}
 {% endblock sidepanel %}

@@ -75,6 +75,7 @@ define([
         var loading = params.loading || ko.observable();
         var perms = ko.observableArray();
         var permsLiteral = ko.observableArray();
+        var allowProvisionalEditRerender = ko.observable(true);
         var nodegroups = params.graphModel.get('nodegroups');
         var multiselect = params.multiselect || false;
         var isWritable = params.card.is_writable || false;
@@ -147,6 +148,7 @@ define([
             isWritable: isWritable,
             model: cardModel,
             appliedFunctions: appliedFunctions,
+            allowProvisionalEditRerender: allowProvisionalEditRerender,
             multiselect: params.multiselect,
             widgets: cardModel.widgets,
             parent: params.tile,

@@ -52,6 +52,8 @@ define([
             }
         });
 
+        this.card.allowProvisionalEditRerender(false);
+
         if (!this.card.overlaysObservable) {
             this.card.overlaysObservable = this.overlays;
             this.card.activeBasemap = this.activeBasemap;
