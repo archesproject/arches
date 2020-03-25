@@ -159,9 +159,9 @@
                </div>
                <div class="file-upload-footer">
                    <!-- ko if: acceptedFiles() !== null -->
-                   <span data-bind="text: ('Files formatted as '+acceptedFiles()+' may be uploaded.')"></span>
+                   <span data-bind="text: ('The following file formats may be uploaded: ' + acceptedFiles())"></span>
                    <!-- /ko -->
-                   <!-- ko if: acceptedFiles() === null -->
+                   <!-- ko if: !acceptedFiles() -->
                    <span>{% trans 'Images formatted as .jpg, .png, .tiff files may be uploaded. Other formats may require a loader.' %}</span>
                    <!-- /ko -->
                </div>
@@ -244,7 +244,7 @@
     </div>
 </div>
 <div class="file-workbench-filter">
-    <h2 class="file-workbench-filter-header">File Filter</h2>
+    <h2 class="file-workbench-filter-header">{% trans 'File Filter' %}</h2>
     <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'e.g.: .txt' %}" data-bind="textInput: filter"></input>
     <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
 </div>
