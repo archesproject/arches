@@ -233,8 +233,10 @@
 <!--/ko-->
 
 <!--ko if: activeTab() === 'edit' -->
-<div class="workbench-card-sidepanel-header-container file-workbench">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
+<div class="workbench-header-buffer">
+    <div class="workbench-card-sidepanel-header-container">
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
+    </div>
 </div>
 <div class="file-workbench-filter">
     <h2 class="file-workbench-filter-header">File Filter</h2>
@@ -423,6 +425,7 @@
         </div>
     </div>
 </div>
+
 <!--/ko-->
 
 <!--ko foreach: fileFormatRenderers-->

@@ -12,7 +12,11 @@ define([
         this.hideSidePanel = function() {
             self.activeTab(undefined);
         };
-        this.card.allowProvisionalEditRerender(false);
+
+        if (this.card) {
+            this.card.allowProvisionalEditRerender(false);
+        }
+
         this.expandSidePanel = ko.computed(function(){
             if (self.tile) {
                 return self.tile.hasprovisionaledits() && self.reviewer === true;
@@ -20,6 +24,7 @@ define([
                 return false;
             }
         });
+        
         this.workbenchWrapperClass = ko.observable();
 
         this.toggleTab = function(tabName) {
