@@ -166,7 +166,7 @@ define([
                 var provisionalindex;
                 var summary = _.map(this.tiles(), function(tile){
                     var dataEmpty = _.keys(koMapping.toJS(tile.data)).length === 0;
-                    if (tile.provisionaledits() !== null && dataEmpty) {
+                    if (ko.unwrap(tile.provisionaledits) !== null && dataEmpty) {
                         return 2;
                     } else if (tile.provisionaledits() !== null && !dataEmpty) {
                         return 1;
