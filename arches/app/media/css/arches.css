@@ -22,6 +22,10 @@
 @import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 
 
+img {
+    image-orientation: from-image;
+}
+
 .regular-link {
     color: #337ab7;
     text-decoration: none;
