@@ -378,7 +378,7 @@ define([
                 self.card.newTile = undefined;
             };
 
-            this.getWidgetConfig = function(){
+            this.getAcceptedFiles = function(){
                 self.card.widgets().forEach(function(w) {
                     if (w.node_id() === self.fileListNodeId) {
                         if (ko.unwrap(w.attributes.config.acceptedFiles)) {
@@ -387,7 +387,7 @@ define([
                     }
                 });
             };
-            this.getWidgetConfig();
+            this.getAcceptedFiles();
 
             this.dropzoneOptions = {
                 url: "arches.urls.root",
