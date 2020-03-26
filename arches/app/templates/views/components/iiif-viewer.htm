@@ -152,7 +152,7 @@
                         <div class="iiif-gallery-canvas" data-bind="click: function() {
                             selectCanvas($data);
                         },
-                        visible: label.toLowerCase().includes(self.filter()),
+                        visible: label.toLowerCase().includes(self.filter().toLowerCase()),
                         css: {
                             active: getCanvasService($data) === selectedCanvas(),
                             annotated: getAnnotationCount(getCanvasService($data))

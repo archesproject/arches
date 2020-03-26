@@ -23,7 +23,6 @@ define([
         this.manifestData = ko.observable();
         this.manifestError = ko.observable();
         this.canvases = ko.pureComputed(function() {
-            var filter = self.filter().toLowerCase();
             var manifestData = self.manifestData();
             var sequences = manifestData ? manifestData.sequences : [];
             var canvases = [];
