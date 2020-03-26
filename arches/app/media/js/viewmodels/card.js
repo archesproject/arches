@@ -75,6 +75,7 @@ define([
         var loading = params.loading || ko.observable();
         var perms = ko.observableArray();
         var permsLiteral = ko.observableArray();
+        var allowProvisionalEditRerender = ko.observable(true);
         var nodegroups = params.graphModel.get('nodegroups');
         var multiselect = params.multiselect || false;
         var isWritable = params.card.is_writable || false;
@@ -147,6 +148,7 @@ define([
             isWritable: isWritable,
             model: cardModel,
             appliedFunctions: appliedFunctions,
+            allowProvisionalEditRerender: allowProvisionalEditRerender,
             multiselect: params.multiselect,
             widgets: cardModel.widgets,
             parent: params.tile,
@@ -164,7 +166,7 @@ define([
                 var provisionalindex;
                 var summary = _.map(this.tiles(), function(tile){
                     var dataEmpty = _.keys(koMapping.toJS(tile.data)).length === 0;
-                    if (tile.provisionaledits() !== null && dataEmpty) {
+                    if (ko.unwrap(tile.provisionaledits) !== null && dataEmpty) {
                         return 2;
                     } else if (tile.provisionaledits() !== null && !dataEmpty) {
                         return 1;
