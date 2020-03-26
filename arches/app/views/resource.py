@@ -19,17 +19,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import json
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import User, Group, Permission
+from django.db import transaction
+from django.forms.models import model_to_dict
 from django.http import HttpResponseNotFound
 from django.http import HttpResponse
 from django.http import Http404
 from django.http import HttpResponseBadRequest, JsonResponse
-from django.urls import reverse
 from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
-from django.forms.models import model_to_dict
-from django.template.loader import render_to_string
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
@@ -37,6 +39,7 @@ from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource, ModelInactiveError
 from arches.app.models.system_settings import settings
 from arches.app.utils.pagination import get_paginator
+from arches.app.utils.decorators import group_required
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -49,6 +52,7 @@ from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from elasticsearch import Elasticsearch
+from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 import logging
 
 logger = logging.getLogger(__name__)
@@ -377,6 +381,43 @@ class ResourceEditorView(MapBaseManagerView):
     def copy(self, request, resourceid=None):
         resource_instance = Resource.objects.get(pk=resourceid)
         return JSONResponse(resource_instance.copy())
+
+
+@method_decorator(group_required("Resource Editor"), name="dispatch")
+class ResourcePermissionDataView(View):
+    perm_cache = {}
+    action = None
+
+    def post(self, request):
+        data = JSONDeserializer().deserialize(request.body)
+        self.apply_permissions(data)
+        return JSONResponse(data)
+
+    def delete(self, request):
+        data = JSONDeserializer().deserialize(request.body)
+        self.apply_permissions(data, revert=True)
+        return JSONResponse(data)
+
+    def apply_permissions(self, data, revert=False):
+        with transaction.atomic():
+            for identity in data["selectedIdentities"]:
+                if identity["type"] == "group":
+                    identityModel = Group.objects.get(pk=identity["id"])
+                else:
+                    identityModel = User.objects.get(pk=identity["id"])
+
+                for instance in data["selectedInstances"]:
+                    resource_instance_id = instance["resourceinstanceid"]
+                    resource_instance = models.ResourceInstance.objects.get(pk=resource_instance_id)
+
+                    # first remove all the current permissions
+                    for perm in get_perms(identityModel, resource_instance):
+                        remove_perm(perm, identityModel, resource_instance)
+
+                    if not revert:
+                        # then add the new permissions
+                        for perm in data["selectedPermissions"]:
+                            assign_perm(perm["codename"], identityModel, resource_instance)
 
 
 @method_decorator(can_edit_resource_instance(), name="dispatch")

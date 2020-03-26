@@ -44,6 +44,7 @@ from arches.app.views.resource import (
     ResourceDescriptors,
     ResourceEditLogView,
     ResourceTiles,
+    ResourcePermissionDataView
 )
 from arches.app.views.resource import NewResourceEditorView, ResourceActivityStreamPageView, ResourceActivityStreamCollectionView
 from arches.app.views.plugin import PluginView
@@ -117,6 +118,7 @@ urlpatterns = [
     url(r"^graph/import/", GraphDataView.as_view(action="import_graph"), name="import_graph"),
     url(r"^graph/reorder_nodes$", GraphDataView.as_view(action="reorder_nodes"), name="reorder_nodes"),
     url(r"^graph/permissions$", PermissionDataView.as_view(), name="permission_data"),
+    url(r"^resource/permissions$", ResourcePermissionDataView.as_view(), name="resource_permission_data"),
     url(
         r"^graph/permissions/permission_manager_data$",
         PermissionDataView.as_view(action="get_permission_manager_data"),

@@ -161,6 +161,27 @@ define([
         collapseAll: function() {
             toggleAll(false);
         },
+        updatePermissions: function(){
+            console.log(self);
+            var payload = {
+                "selectedIdentities": [
+                    {"type": "group", "id": 2}
+                ],
+                "selectedInstances": [
+                    {"resourceinstanceid": ko.unwrap(this.resourceId)}
+                ],
+                "selectedPermissions": [
+                    {"codename": "change_resourceinstance"},
+                    {"codename": "delete_resourceinstance"}
+                ]};
+            $.ajax({
+                type: 'POST',
+                url: arches.urls.resource_permission_data,
+                data: JSON.stringify(payload),
+            }).done(function(data){
+               console.log(data);
+            });
+        },
         rootExpanded: ko.observable(true),
         topCards: topCards,
         selection: selection,
