@@ -136,16 +136,24 @@
             </span>
             <!--/ko -->
             <!--ko if: !manifestLoading() -->
-                <div class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor">
-                    <span data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
-                    <i class="fa fa-pencil"></i>
+                <div class="iiif-gallery-header">
+                    <span class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor, text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
+                    |
+                    Filter
+                    <div class="list-filter" data-bind="">
+                        <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
+
+                        <!-- Clear Search -->
+                        <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+                    </div>
                 </div>
-                <!--ko foreach: sequences -->
                 <div class="iiif-gallery-sequence">
                     <div class="iiif-gallery-sequence-canvases" data-bind="foreach: canvases">
                         <div class="iiif-gallery-canvas" data-bind="click: function() {
                             selectCanvas($data);
-                        }, css: {
+                        },
+                        visible: label.toLowerCase().includes(self.filter()),
+                        css: {
                             active: getCanvasService($data) === selectedCanvas(),
                             annotated: getAnnotationCount(getCanvasService($data))
                         }">
@@ -166,7 +174,6 @@
                         </div>
                     </div>
                 </div>
-                <!--/ko -->
             <!--/ko -->
         <!--/ko -->
     </div>

@@ -11686,13 +11686,20 @@ a.jstree-anchor.permissions-widget {
 }
 .iiif-gallery-sequence-label {
     cursor: pointer;
-    font-weight: bold;
-    text-decoration: underline;
-    padding-bottom: 3px;
+    color: rgb(91, 155, 215);
+    font-weight: 600;
+    text-decoration: none;
+}
+.iiif-gallery-header {
+    font-size: 1.2em;
+    padding-left: 28px;
+}
+.iiif-gallery-header .list-filter {
+    display: inline-block;
 }
 .iiif-gallery-canvas {
     cursor: pointer;
-    margin-left:10px;
+    margin-left: 10px;
     padding: 6px;
     border: 1px solid transparent;
     min-width: 60px;
