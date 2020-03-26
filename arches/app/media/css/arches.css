@@ -11717,6 +11717,10 @@ a.jstree-anchor.permissions-widget {
     font-size: 1.2em;
     padding-left: 28px;
 }
+.manifest-editor-label {
+    font-size: 1.2em;
+    padding: 3px;
+}
 .iiif-gallery-header .list-filter {
     display: inline-block;
 }
