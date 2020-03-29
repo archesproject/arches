@@ -470,7 +470,7 @@ class Resources(APIBase):
     # }]
 
     def get(self, request, resourceid=None, slug=None, graphid=None):
-        if user_can_read_resources(user=request.user):
+        if user_can_read_resources(user=request.user, resourceid=resourceid):
             allowed_formats = ["json", "json-ld"]
             format = request.GET.get("format", "json-ld")
             if format not in allowed_formats:

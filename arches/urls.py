@@ -35,7 +35,6 @@ from arches.app.views.graph import (
     NodegroupView,
 )
 from arches.app.views.resource import (
-    ResourceEditorView,
     ResourceListView,
     ResourceData,
     ResourceCards,
@@ -46,7 +45,7 @@ from arches.app.views.resource import (
     ResourceTiles,
     ResourcePermissionDataView
 )
-from arches.app.views.resource import NewResourceEditorView, ResourceActivityStreamPageView, ResourceActivityStreamCollectionView
+from arches.app.views.resource import ResourceEditorView, ResourceActivityStreamPageView, ResourceActivityStreamCollectionView
 from arches.app.views.plugin import PluginView
 from arches.app.views.concept import RDMView
 from arches.app.views.user import UserManagerView
@@ -105,7 +104,7 @@ urlpatterns = [
     url(r"^buffer/$", search.buffer, name="buffer"),
     url(
         r"^settings/",
-        NewResourceEditorView.as_view(),
+        ResourceEditorView.as_view(),
         {
             "resourceid": settings.RESOURCE_INSTANCE_ID,
             "view_template": "views/resource/new-editor.htm",
@@ -164,15 +163,9 @@ urlpatterns = [
     url(r"^graph_settings/(?P<graphid>%s)$" % uuid_regex, GraphSettingsView.as_view(), name="graph_settings"),
     url(r"^components/datatypes/(?P<template>[a-zA-Z_-]*)", DatatypeTemplateView.as_view(), name="datatype_template"),
     url(r"^resource$", ResourceListView.as_view(), name="resource"),
-    url(
-        r"^resource/(?P<resourceid>%s)/(?P<graphid>%s)/add_resource$" % (uuid_regex, uuid_regex),
-        ResourceEditorView.as_view(),
-        name="old_add_resource",
-    ),
-    url(r"^resource-old/(?P<resourceid>%s)$" % uuid_regex, ResourceEditorView.as_view(), name="old_resource_editor"),
-    url(r"^resource/(?P<resourceid>%s)$" % uuid_regex, NewResourceEditorView.as_view(), name="resource_editor"),
-    url(r"^add-resource/(?P<graphid>%s)$" % uuid_regex, NewResourceEditorView.as_view(), name="add_resource"),
-    url(r"^resource/(?P<resourceid>%s)/copy$" % uuid_regex, NewResourceEditorView.as_view(action="copy"), name="resource_copy"),
+    url(r"^resource/(?P<resourceid>%s)$" % uuid_regex, ResourceEditorView.as_view(), name="resource_editor"),
+    url(r"^add-resource/(?P<graphid>%s)$" % uuid_regex, ResourceEditorView.as_view(), name="add_resource"),
+    url(r"^resource/(?P<resourceid>%s)/copy$" % uuid_regex, ResourceEditorView.as_view(action="copy"), name="resource_copy"),
     url(r"^resource/(?P<resourceid>%s)/history$" % uuid_regex, ResourceEditLogView.as_view(), name="resource_edit_log"),
     url(r"^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$" % (uuid_regex, uuid_regex), ResourceData.as_view(), name="resource_data"),
     url(r"^resource/(?P<resourceid>%s)/cards$" % uuid_regex, ResourceCards.as_view(), name="resource_cards"),

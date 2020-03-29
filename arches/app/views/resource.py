@@ -41,6 +41,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.decorators import group_required
 from arches.app.utils.decorators import can_edit_resource_instance
+from arches.app.utils.decorators import can_delete_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.permission_backend import user_is_resource_reviewer
@@ -58,7 +59,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@method_decorator(can_edit_resource_instance(), name="dispatch")
+@method_decorator(can_edit_resource_instance, name="dispatch")
 class ResourceListView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
         context = self.get_context_data(main_script="views/resource")
@@ -84,10 +85,10 @@ def get_resource_relationship_types():
     return relationship_type_values
 
 
-@method_decorator(can_edit_resource_instance(), name="dispatch")
-class NewResourceEditorView(MapBaseManagerView):
+class ResourceEditorView(MapBaseManagerView):
     action = None
 
+    @method_decorator(can_edit_resource_instance, name="dispatch")
     def get(
         self,
         request,
@@ -230,6 +231,7 @@ class NewResourceEditorView(MapBaseManagerView):
 
         return render(request, view_template, context)
 
+    @method_decorator(can_delete_resource_instance, name="dispatch")
     def delete(self, request, resourceid=None):
         if resourceid is not None:
             ret = Resource.objects.get(pk=resourceid)
@@ -242,140 +244,6 @@ class NewResourceEditorView(MapBaseManagerView):
                 return JSONResponse(ret)
             else:
                 return JSONErrorResponse("Unable to Delete Resource", "Provisional users cannot delete resources with authoritative data")
-        return HttpResponseNotFound()
-
-    def copy(self, request, resourceid=None):
-        resource_instance = Resource.objects.get(pk=resourceid)
-        return JSONResponse(resource_instance.copy())
-
-
-@method_decorator(can_edit_resource_instance(), name="dispatch")
-class ResourceEditorView(MapBaseManagerView):
-    action = None
-
-    def get(
-        self,
-        request,
-        graphid=None,
-        resourceid=None,
-        view_template="views/resource/editor.htm",
-        main_script="views/resource/editor",
-        nav_menu=True,
-    ):
-        if self.action == "copy":
-            return self.copy(request, resourceid)
-
-        resource_instance_exists = False
-
-        try:
-            resource_instance = Resource.objects.get(pk=resourceid)
-            resource_instance_exists = True
-            graphid = resource_instance.graph_id
-
-        except ObjectDoesNotExist:
-            resource_instance = Resource()
-            resource_instance.resourceinstanceid = resourceid
-            resource_instance.graph_id = graphid
-
-        if resourceid is not None:
-            resource_graphs = (
-                models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-                .exclude(isresource=False)
-                .exclude(isactive=False)
-            )
-            graph = Graph.objects.get(graphid=graphid)
-            relationship_type_values = get_resource_relationship_types()
-            datatypes = models.DDataType.objects.all()
-            widgets = models.Widget.objects.all()
-            map_layers = models.MapLayer.objects.all()
-            map_markers = models.MapMarker.objects.all()
-            map_sources = models.MapSource.objects.all()
-            geocoding_providers = models.Geocoder.objects.all()
-            required_widgets = []
-
-            widget_datatypes = [v.datatype for k, v in graph.nodes.items()]
-            widgets = widgets.filter(datatype__in=widget_datatypes)
-
-            if resource_instance_exists == True:
-                displayname = Resource.objects.get(pk=resourceid).displayname
-                if displayname == "undefined":
-                    displayname = "Unnamed Resource"
-            else:
-                displayname = "Unnamed Resource"
-
-            date_nodes = models.Node.objects.filter(datatype="date", graph__isresource=True, graph__isactive=True)
-            searchable_datatypes = [d.pk for d in models.DDataType.objects.filter(issearchable=True)]
-            searchable_nodes = models.Node.objects.filter(
-                graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes, issearchable=True
-            )
-            resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__isactive=True)
-            context = self.get_context_data(
-                main_script=main_script,
-                resource_type=graph.name,
-                relationship_types=relationship_type_values,
-                iconclass=graph.iconclass,
-                datatypes_json=JSONSerializer().serialize(datatypes, exclude=["iconclass", "modulename", "classname"]),
-                datatypes=datatypes,
-                widgets=widgets,
-                date_nodes=date_nodes,
-                map_layers=map_layers,
-                map_markers=map_markers,
-                map_sources=map_sources,
-                geocoding_providers=geocoding_providers,
-                widgets_json=JSONSerializer().serialize(widgets),
-                resourceid=resourceid,
-                resource_graphs=resource_graphs,
-                graph_json=JSONSerializer().serialize(
-                    graph,
-                    exclude=[
-                        "iconclass",
-                        "functions",
-                        "functions_x_graphs",
-                        "name",
-                        "description",
-                        "deploymentfile",
-                        "author",
-                        "deploymentdate",
-                        "version",
-                        "isresource",
-                        "isactive",
-                        "iconclass",
-                        "ontology",
-                    ],
-                ),
-                displayname=displayname,
-                resource_cards=JSONSerializer().serialize(resource_cards, exclude=["description", "instructions", "active", "isvisible"]),
-                searchable_nodes=JSONSerializer().serialize(
-                    searchable_nodes, exclude=["description", "ontologyclass", "isrequired", "issearchable", "istopnode"]
-                ),
-                saved_searches=JSONSerializer().serialize(settings.SAVED_SEARCHES),
-                resource_instance_exists=resource_instance_exists,
-                user_is_reviewer=json.dumps(user_is_resource_reviewer(request.user)),
-                userid=request.user.id,
-            )
-
-            if graph.iconclass:
-                context["nav"]["icon"] = graph.iconclass
-            context["nav"]["title"] = graph.name
-            context["nav"]["menu"] = nav_menu
-            if resourceid == settings.RESOURCE_INSTANCE_ID:
-                context["nav"]["help"] = (_("Managing System Settings"), "help/base-help.htm")
-                context["help"] = "system-settings-help"
-            else:
-                context["nav"]["help"] = (_("Using the Resource Editor"), "help/base-help.htm")
-                context["help"] = "resource-editor-help"
-
-            return render(request, view_template, context)
-
-        return HttpResponseNotFound()
-
-    def delete(self, request, resourceid=None):
-
-        if resourceid is not None:
-            ret = Resource.objects.get(pk=resourceid)
-            ret.delete(user=request.user)
-            return JSONResponse(ret)
-
         return HttpResponseNotFound()
 
     def copy(self, request, resourceid=None):
@@ -420,7 +288,7 @@ class ResourcePermissionDataView(View):
                             assign_perm(perm["codename"], identityModel, resource_instance)
 
 
-@method_decorator(can_edit_resource_instance(), name="dispatch")
+@method_decorator(can_edit_resource_instance, name="dispatch")
 class ResourceEditLogView(BaseManagerView):
     def getEditConceptValue(self, values):
         if values is not None:
@@ -523,7 +391,7 @@ class ResourceEditLogView(BaseManagerView):
         return HttpResponseNotFound()
 
 
-@method_decorator(can_edit_resource_instance(), name="dispatch")
+@method_decorator(can_edit_resource_instance, name="dispatch")
 class ResourceActivityStreamPageView(BaseManagerView):
     def get(self, request, page=None):
         current_page = 1
@@ -571,7 +439,7 @@ class ResourceActivityStreamPageView(BaseManagerView):
         return JsonResponse(collection_page.to_obj())
 
 
-@method_decorator(can_edit_resource_instance(), name="dispatch")
+@method_decorator(can_edit_resource_instance, name="dispatch")
 class ResourceActivityStreamCollectionView(BaseManagerView):
     def get(self, request):
         page_size = 100
@@ -594,7 +462,7 @@ class ResourceActivityStreamCollectionView(BaseManagerView):
         return JsonResponse(collection.to_obj())
 
 
-@method_decorator(can_edit_resource_instance(), name="dispatch")
+@method_decorator(can_edit_resource_instance, name="dispatch")
 class ResourceData(View):
     def get(self, request, resourceid=None, formid=None):
         if formid is not None:
@@ -604,7 +472,7 @@ class ResourceData(View):
         return HttpResponseNotFound()
 
 
-@method_decorator(can_read_resource_instance(), name="dispatch")
+@method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceTiles(View):
     def get(self, request, resourceid=None, include_display_values=True):
         datatype_factory = DataTypeFactory()
@@ -640,7 +508,7 @@ class ResourceTiles(View):
         return JSONResponse({"tiles": permitted_tiles})
 
 
-@method_decorator(can_read_resource_instance(), name="dispatch")
+@method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceCards(View):
     def get(self, request, resourceid=None):
         cards = []
@@ -673,6 +541,7 @@ class ResourceDescriptors(View):
         return HttpResponseNotFound()
 
 
+@method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
         lang = request.GET.get("lang", settings.LANGUAGE_CODE)
@@ -792,7 +661,7 @@ class ResourceReportView(MapBaseManagerView):
         return render(request, "views/resource/report.htm", context)
 
 
-@method_decorator(can_read_resource_instance(), name="dispatch")
+@method_decorator(can_read_resource_instance, name="dispatch")
 class RelatedResourcesView(BaseManagerView):
     action = None
 
