@@ -274,122 +274,132 @@
                         
                         <div class="ep-toolbar">
 
-                            <!-- Tools Menu -->
-                            {% if nav.menu %}
-                            <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
-                                <div class="manage-dropdown">{% trans "Manage" %}
-                                    <i class="ion-more"></i>
+                            <div class="col-xs-8">
+
+                                <!-- Tools Menu -->
+                                {% if nav.menu %}
+                                <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
+                                    <div class="manage-dropdown">{% trans "Manage" %}
+                                        <i class="ion-more"></i>
+                                    </div>
+                                </a>
+                                    {% if main_script == 'views/resource/editor' %}
+                                        {% include 'navbar/resource-manage-menu.htm' %}
+                                    {% elif main_script == 'views/resource/new-editor' %}
+                                        {% include 'navbar/new-resource-manage-menu.htm' %}
+                                    {% elif main_script == 'views/graph/function-manager' %}
+                                        {% include 'navbar/function-manage-menu.htm' %}
+                                    {% elif main_script == 'views/mobile-survey-designer' %}
+                                        {% include 'navbar/mobile-survey-manage-menu.htm' %}
+                                    {% else %}
+                                        {% include 'navbar/graph-designer-menu.htm' %}
+                                    {% endif %}
+                                {% endif %}
+
+
+                                {% block graph_title %}
+                                <!-- Page Title and Icon -->
+                                <div class="ep-tools-title">
+                                    <h1 class="page-header ep-graph-title">
+                                        <i class="fa {{graph.iconclass|default:nav.icon}} text-center icon-wrap bg-gray ep-graph-title-icon hidden-xs"></i>
+                                        <span>{% trans nav.title %}</span>
+                                    </h1>
                                 </div>
-                            </a>
-                                {% if main_script == 'views/resource/editor' %}
-                                    {% include 'navbar/resource-manage-menu.htm' %}
-                                {% elif main_script == 'views/resource/new-editor' %}
-                                    {% include 'navbar/new-resource-manage-menu.htm' %}
-                                {% elif main_script == 'views/graph/function-manager' %}
-                                    {% include 'navbar/function-manage-menu.htm' %}
-                                {% elif main_script == 'views/mobile-survey-designer' %}
-                                    {% include 'navbar/mobile-survey-manage-menu.htm' %}
-                                {% else %}
-                                    {% include 'navbar/graph-designer-menu.htm' %}
-                                {% endif %}
-                            {% endif %}
-
-                            {% block graph_title %}
-                            <!-- Page Title and Icon -->
-                            <div class="ep-tools-title">
-                                <h1 class="page-header ep-graph-title">
-                                    <i class="fa {{graph.iconclass|default:nav.icon}} text-center icon-wrap bg-gray ep-graph-title-icon hidden-xs"></i>
-                                    <span>{% trans nav.title %}</span>
-                                </h1>
-                            </div>
-                            {% endblock graph_title %}
-
-                            <div role="navigation" class="top-right-nav">
-
-                                <!-- Login -->
-                                {% if nav.login %}
-                                <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="ep-tools ep-tools-login">
-                                    <div class="top-btn-container" data-placement="bottom" data-toggle="tooltip" data-original-title="{% if user.username != 'anonymous' %}Logout{% else %}Login{% endif %}">
-                                        {% if user.username == 'anonymous' %}
-                                        <p class="hidden-xs welcome-msg">{% trans "Login" %}</p>
-                                        {% else %}
-                                        <i class="fa fa-sign-out" aria-hidden="true" aria-label="{% trans "Logout" %}"></i>
-                                        <div class="top-btn-txt hidden-xs">
-                                            <span>{% trans "Logout" %}<br>{{ user.first_name|default:user.username }}</span>
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </a>
-                                {% endif %}
-
-                                <!-- Notifications -->
-                                {% if nav.notifs %}
-                                <a href="#" class="ep-tools ep-notifs-toggle ep-tools-right" data-bind="click: function() {getNotifications();}">
-                                    <div class="top-btn-container" data-placement="bottom" data-toggle="tooltip" aria-expanded="true" data-original-title="{% trans 'Notifications' %}">
-                                        <i class="fa fa-bell" aria-hidden="true" aria-label="{% trans "Notifications" %}"></i>
-                                        <div data-bind="visible: unreadNotifs()" id="circle"></div>
-                                    </div>
-                                </a>
-                                {% endif %}
-
-                                <!-- Search Bar -->
-                                {% if nav.search %}
-                                <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }" aria-label="Search">
-                                    <div class="top-btn-container" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Search" %}'>
-                                        <i class="fa fa-search" aria-hidden="true"></i>
-                                        <div class="top-btn-txt hidden-xs">
-                                            <span>{% trans "Search" %}</span>
-                                        </div>
-                                    </div>
-                                </a>
-                                {% endif %}
-
-                                <!-- Prov edit history-->
-                                {% if user_is_reviewer == False and user|can_edit_resource_instance %}
-                                <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right" data-bind="click:function () { getProvisionalHistory(); }" aria-label="My Recent Edits">
-                                    <div class="top-btn-container" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "My Recent Edits" %}'>
-                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
-                                        <div class="top-btn-txt hidden-xs">
-                                            <span>{% trans "Recent" %}<br>{% trans "Edits" %}</span>
-                                        </div>
-                                    </div>
-                                </a>
-                                {% endif %}
-
-                                {% if nav.res_edit and user|can_edit_resource_instance %}
-                                <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }" aria-label="Edit Resource">
-                                    <div class="top-btn-container" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Edit Resource" %}'>
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                                        <div class="top-btn-txt hidden-xs">
-                                            <span>{% trans "Edit" %}<br>{% trans "Resource" %}</span>
-                                        </div>
-                                    </div>
-                                </a>
-                                {% endif %}
-
-                                {% if nav.print %}
-                                <a href="#" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }" aria-label="Print">
-                                    <div class="top-btn-container" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Print" %}'>
-                                        <i class="fa fa-print" aria-hidden="true"></i>
-                                        <div class="top-btn-txt hidden-xs">
-                                            <span>{% trans "Print" %}</span>
-                                        </div>
-                                    </div>
-                                </a>
-                                {% endif %}
-
-                                {% if nav.help %}
-                                <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right" data-bind="click: function(){ getHelp('{{ nav.help.template }}'); helpOpen(true) }" aria-label="Help">
-                                    <div class="top-btn-container" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
-                                        <i class="fa fa-question" aria-hidden="true" aria-label="{% trans "Help" %}"></i>
-                                        <div class="top-btn-txt hidden-xs">
-                                            <span>{% trans "Help" %}</span>
-                                        </div>
-                                    </div>
-                                </a>
-                                {% endif %}
+                                {% endblock graph_title %}
 
                             </div>
+                            
+                            <div class="col-xs-4">
+
+                                <div role="navigation" class="top-right-nav">
+
+                                    <!-- Login -->
+                                    {% if nav.login %}
+                                    <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="ep-tools ep-tools-login">
+                                        <div class="top-btn-container" data-placement="bottom" data-toggle="tooltip" data-original-title="{% if user.username != 'anonymous' %}Logout{% else %}Login{% endif %}">
+                                            {% if user.username == 'anonymous' %}
+                                            <p class="hidden-xs welcome-msg">{% trans "Login" %}</p>
+                                            {% else %}
+                                            <i class="fa fa-sign-out" aria-hidden="true" aria-label="{% trans "Logout" %}"></i>
+                                            <div class="top-btn-txt hidden-xs">
+                                                <span>{% trans "Logout" %}<br>{{ user.first_name|default:user.username }}</span>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </a>
+                                    {% endif %}
+
+                                    <!-- Notifications -->
+                                    {% if nav.notifs %}
+                                    <a href="#" class="ep-tools ep-notifs-toggle ep-tools-right" data-bind="click: function() {getNotifications();}">
+                                        <div class="top-btn-container" data-placement="bottom" data-toggle="tooltip" aria-expanded="true" data-original-title="{% trans 'Notifications' %}">
+                                            <i class="fa fa-bell" aria-hidden="true" aria-label="{% trans "Notifications" %}"></i>
+                                            <div data-bind="visible: unreadNotifs()" id="circle"></div>
+                                        </div>
+                                    </a>
+                                    {% endif %}
+
+                                    <!-- Search Bar -->
+                                    {% if nav.search %}
+                                    <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }" aria-label="Search">
+                                        <div class="top-btn-container" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Search" %}'>
+                                            <i class="fa fa-search" aria-hidden="true"></i>
+                                            <div class="top-btn-txt hidden-xs">
+                                                <span>{% trans "Search" %}</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    {% endif %}
+
+                                    <!-- Prov edit history-->
+                                    {% if user_is_reviewer == False and user|can_edit_resource_instance %}
+                                    <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right" data-bind="click:function () { getProvisionalHistory(); }" aria-label="My Recent Edits">
+                                        <div class="top-btn-container" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "My Recent Edits" %}'>
+                                            <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                            <div class="top-btn-txt hidden-xs">
+                                                <span>{% trans "Recent" %}<br>{% trans "Edits" %}</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    {% endif %}
+
+                                    {% if nav.res_edit and user|can_edit_resource_instance %}
+                                    <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }" aria-label="Edit Resource">
+                                        <div class="top-btn-container" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Edit Resource" %}'>
+                                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                            <div class="top-btn-txt hidden-xs">
+                                                <span>{% trans "Edit" %}<br>{% trans "Resource" %}</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    {% endif %}
+
+                                    {% if nav.print %}
+                                    <a href="#" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }" aria-label="Print">
+                                        <div class="top-btn-container" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Print" %}'>
+                                            <i class="fa fa-print" aria-hidden="true"></i>
+                                            <div class="top-btn-txt hidden-xs">
+                                                <span>{% trans "Print" %}</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    {% endif %}
+
+                                    {% if nav.help %}
+                                    <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right" data-bind="click: function(){ getHelp('{{ nav.help.template }}'); helpOpen(true) }" aria-label="Help">
+                                        <div class="top-btn-container" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
+                                            <i class="fa fa-question" aria-hidden="true" aria-label="{% trans "Help" %}"></i>
+                                            <div class="top-btn-txt hidden-xs">
+                                                <span>{% trans "Help" %}</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
                         </div>
 
                         <!-- Notifications Panel -->

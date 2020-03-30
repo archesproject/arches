@@ -4733,7 +4733,7 @@ ul.jqtree_common li.jqtree-folder {
     position: absolute;
     top: 50px;
     bottom: 0;
-    z-index: 4000;
+    z-index: 2500;
 }
 
 .ep-menu-panel {
@@ -11446,6 +11446,9 @@ a.tree-display-tool, a.tree-display-tool:hover {
     }
     .profile-list {
         padding: 0 20px 20px;
+    }
+    .search-container .card-form-preview-container .search-map-container {
+        height: 50vh;
     }
 }
 
