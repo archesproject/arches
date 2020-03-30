@@ -181,6 +181,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     left: 8vw !important;
     top: 66vh !important;
     white-space: normal;
+    background: rgba(0,0,0,.5);
 }
 
 .v5-splash-caption h2 {
@@ -400,7 +401,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .app-info-block-text {
-    color: #6c757d;
+    color: #555;
     font-size: 16px;
 }
 
@@ -420,7 +421,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .sub-block-description {
     font-size: 15px;
-    color: #777;
+    color: #555;
     padding: 20px 0px 30px 0px;
 }
 
@@ -484,10 +485,12 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .link-spacing {
     margin-right: 20px;
+    color: #91A7CF;
 }
 
 .app-footer-arches-link {
     float: right;
+    color: #91A7CF;
 }
 
 .datatype-box {
@@ -660,12 +663,12 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .wide-box .box-highlight p {
-    color: #777;
+    color: #555;
 }
 
 .mobile-description-container p {
     font-size: 17px;
-    color: #777;
+    color: #555;
 }
 
 .splash-links {
