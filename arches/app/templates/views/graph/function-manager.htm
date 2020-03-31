@@ -38,7 +38,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="left-column-crud-container form-list">
         <!-- Title Block -->
         <div class="title-block-title">
-            <h4 class="title-block-title"> {% trans "Selected Functions" %}</h4>
+            <h3 class="title-block-title"> {% trans "Selected Functions" %}</h3>
         </div>
 
 
@@ -64,50 +64,44 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     </div>
 
-
     <!-- Card Container -->
     <div class="card-form-preview-container">
         <div style="display: none;" class="card-form-preview-container library-container" data-bind="visible: !selectedFunction()">
-            <div class="">
+            <!-- Header -->
+            <div class="library-header">
 
-                <!-- Header -->
-                <div class="library-header">
-
-                    <!-- Search -->
+                <!-- Search -->
+                <div>
+                    <!-- Find Button -->
                     <div>
-
-                        <!-- Find Button -->
-                        <div class="">
-                            <a class="library-find" href="#"> {% trans "Find" %} </a>
-                        </div>
-
-                        <!-- Find widget -->
-                        <div class="find-widget" style="display: none;">
-                            <div class="">
-
-                                {% trans "Library filter goes here" %}
-
-                            </div>
-                        </div>
+                        <a class="library-find" href="#"> {% trans "Find" %} </a>
                     </div>
 
-                    <!-- Resource/Graph Toggle -->
-                    <div style="display: block;">
-                        <a id="" class="library-grid-title active" href="">{% trans "Function Library" %}</a>
+                    <!-- Find widget -->
+                    <div class="find-widget" style="display: none;">
+                        <div>
+
+                            {% trans "Library filter goes here" %}
+
+                        </div>
                     </div>
                 </div>
 
-                <!-- Function Grid Container -->
-                <div id="page-content">
+                <!-- Resource/Graph Toggle -->
+                <div style="display: block;">
+                    <a class="library-grid-title active" href="">{% trans "Function Library" %}</a>
+                </div>
+            </div>
 
-                    <!-- Function Grid -->
-                    <div id="function-list" class="report-image-grid" style="margin-top: 5px;" data-bind="with: functionList">
-                        {% include 'views/graph/function-manager/function-list.htm' %}
-                    </div>
+            <!-- Function Grid Container -->
+            <div id="page-content">
+
+                <!-- Function Grid -->
+                <div id="function-list" class="report-image-grid" style="margin-top: 5px;" data-bind="with: functionList">
+                    {% include 'views/graph/function-manager/function-list.htm' %}
                 </div>
             </div>
         </div>
-
 
         <!-- Right Panel: Config Form -->
         <div style="display: none;" class="card-form-preview-container" data-bind="visible: !!selectedFunction(), with: selectedFunction">

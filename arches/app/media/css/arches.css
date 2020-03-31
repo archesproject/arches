@@ -1604,7 +1604,6 @@ ul.tabbed-report-tab-list {
 
 .panel-heading {
     height: auto;
-    min-height: 50px;
     border-bottom: 1px solid #dddddd;
 }
 
@@ -1672,6 +1671,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 
 .list-wrapper {
+    overflow-x: hidden;
     overflow-y: auto;
     height: calc(100% - 60px); /*60px accounts for header so list scrolls to bottom*/
 }
@@ -3693,12 +3693,11 @@ ul .collapse li:first-of-type {
 }
 
 .library-card-body {
-    height: 116px;
-    padding: 5px 10px 25px;
+    padding: 5px 10px 10px;
     color: #595959;
     margin-top: 0;
     overflow-y: auto;
-    min-height: 145px;
+    height: 145px;
 }
 
 .library-card-body p {
