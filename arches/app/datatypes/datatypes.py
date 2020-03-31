@@ -1322,6 +1322,7 @@ class DomainDataType(BaseDomainDataType):
                             is mapped to for a list of valid domain ids. This data was not imported.",
                         }
                     )
+                """
                 elif len(domain_val_node_query) > 1:
                     errors.append(
                         {
@@ -1330,6 +1331,7 @@ class DomainDataType(BaseDomainDataType):
                         Please use an explicit id instead of a domain string value. This data was not imported.",
                         }
                     )
+                """
         return errors
 
     def get_search_terms(self, nodevalue, nodeid=None):
