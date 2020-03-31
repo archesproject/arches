@@ -191,6 +191,25 @@ class CommandLineTests(ArchesTestCase):
         response = self.client.delete(url)
         self.assertTrue(response.status_code==403)
 
+    def test_user_cannot_access_with_no_access(self):
+        """
+        Test we cannot read, edit, or delete an instance without the 'delete_resourceinstance' permission
+
+        """
+        self.client.login(username="ben", password="Test12345!")
+        group = Group.objects.get(pk=2)
+        resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
+        view_url = reverse("resource_report", kwargs={"resourceid": self.resource_instance_id})
+        edit_url = reverse("resource_editor", kwargs={"resourceid": self.resource_instance_id})
+        assign_perm('view_resourceinstance', group, resource)
+        assign_perm('change_resourceinstance', group, resource)
+        assign_perm('delete_resourceinstance', group, resource)
+        assign_perm('no_access_to_resourceinstance', group, resource)
+        view = self.client.get(view_url)
+        edit = self.client.get(edit_url)
+        delete = self.client.delete(edit_url)
+        self.assertTrue(view.status_code == 403 and edit.status_code == 403 and delete.status_code == 403)
+    
     def test_user_can_view_with_permission(self):
         """
         Test we can access a report with the 'view_resourceinstance' permission
