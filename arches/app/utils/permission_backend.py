@@ -180,7 +180,7 @@ def user_can_delete_model_nodegroups(user, resource):
 
 def user_has_resource_model_permissions(user, perms, resource):
     """
-    Checks if a user has any explicit permissions to a models nodegroups
+    Checks if a user has any explicit permissions to a model's nodegroups
 
     Arguments:
     user -- the user to check
@@ -188,10 +188,10 @@ def user_has_resource_model_permissions(user, perms, resource):
     resource -- a resource instance to check if a user has permissions to that resource's type specifically
 
     """
-
+    
     nodegroups = get_nodegroups_by_perm(user, perms)
     nodes = Node.objects.filter(nodegroup__in=nodegroups).filter(graph_id=resource.graph_id).select_related("graph")
-    return nodes.count()
+    return nodes.count() > 0
 
 
 def check_resource_instance_permissions(user, resourceid, permission):
