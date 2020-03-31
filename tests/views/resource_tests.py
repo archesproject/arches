@@ -97,10 +97,6 @@ class CommandLineTests(ArchesTestCase):
     def tearDownClass(cls):
         pass
 
-    def test_load_package(self):
-        resources = ResourceInstance.objects.filter(graph_id=self.data_type_graphid)
-        self.assertEqual(len(list(resources)), self.expected_resource_count)
-
     def test_resource_instance_permission_assignment(self):
         """
         Test that we can assign resource instance permissions
