@@ -19,11 +19,13 @@ define([
         this.editManifest = ko.observable(!params.manifest);
         this.canvas = ko.observable(params.canvas);
         this.manifestLoading = ko.observable();
+        this.filter = ko.observable('');
         this.manifestData = ko.observable();
         this.manifestError = ko.observable();
-        this.sequences = ko.pureComputed(function() {
+        this.canvases = ko.pureComputed(function() {
             var manifestData = self.manifestData();
             var sequences = manifestData ? manifestData.sequences : [];
+            var canvases = [];
             sequences.forEach(function(sequence) {
                 if (sequence.canvases) {
                     sequence.label = getLabel(sequence);
@@ -31,10 +33,13 @@ define([
                         canvas.label = getLabel(canvas);
                         if (typeof canvas.thumbnail === 'object')
                             canvas.thumbnail = canvas.thumbnail["@id"];
+                        else if (canvas.images && canvas.images[0] && canvas.images[0].resource)
+                            canvas.thumbnail = canvas.images[0].resource["@id"];
+                        canvases.push(canvas);
                     });
                 }
             });
-            return sequences;
+            return canvases;
         });
         this.manifestName = ko.pureComputed(function() {
             var manifestData = self.manifestData();
@@ -71,6 +76,13 @@ define([
         WorkbenchViewmodel.apply(this, [params]);
 
         this.showGallery = ko.observable(true);
+        this.expandGallery = ko.observable(false);
+        this.expandGallery.subscribe(function(expandGallery) {
+            if (expandGallery) self.showGallery(true);
+        });
+        this.showGallery.subscribe(function(showGallery) {
+            if (!showGallery) self.expandGallery(false);
+        });
 
         this.toggleGallery = function() {
             self.showGallery(!self.showGallery());
@@ -156,6 +168,10 @@ define([
         this.toggleManifestEditor = function() {
             self.editManifest(!self.editManifest());
             if (abortFetchManifest) abortFetchManifest.abort();
+        };
+
+        this.getAnnotationCount = function() {
+            return 0;
         };
     };
     ko.components.register('iiif-viewer', {
