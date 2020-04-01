@@ -107,8 +107,8 @@ urlpatterns = [
         ResourceEditorView.as_view(),
         {
             "resourceid": settings.RESOURCE_INSTANCE_ID,
-            "view_template": "views/resource/new-editor.htm",
-            "main_script": "views/resource/new-editor",
+            "view_template": "views/resource/editor.htm",
+            "main_script": "views/resource/editor",
             "nav_menu": False,
         },
         name="config",
