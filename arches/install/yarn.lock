@@ -2759,10 +2759,10 @@ util-deprecate@~1.0.1:
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
   integrity sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8=
 
-uuidjs@^3.3.0:
-  version "3.6.2"
-  resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-3.6.2.tgz#d46cc53ab911b71915fe363ff27a2fa0f1a704a0"
-  integrity sha512-F0uFcS9jQg+hY87SRBNtPTVTVaCkDUxXtvbOruZJJXIX+NLVD4Z+zlU3XuOlj4WMSByuJHqXEvtVDaK+BmfTPQ==
+uuidjs@^4.2.5:
+  version "4.2.5"
+  resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-4.2.5.tgz#a80439ece05dfe6ed875a5d62de0820046055713"
+  integrity sha512-0utbJ3L/C/AUv8cRAfFnUC7XhvRvaQaGNPbrroBeXF26BWfYT6aD8/n5UQ4ic3bpkJfVd2W15yQS+YCwvQxtXA==
 
 validate-npm-package-license@^3.0.1:
   version "3.0.4"
