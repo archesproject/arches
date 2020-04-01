@@ -1017,11 +1017,6 @@ class FileListDataType(BaseDataType):
                 node = models.Node.objects.get(nodeid=nodeid)
                 self.node_lookup[str(nodeid)] = node
 
-        config = node.config
-        errors = []
-        limit = config["maxFiles"]
-        max_size = config["maxFileSize"] if "maxFileSize" in config.keys() else None
-
         def format_bytes(size):
             # 2**10 = 1024
             power = 2 ** 10
@@ -1032,7 +1027,12 @@ class FileListDataType(BaseDataType):
                 n += 1
             return size, power_labels[n] + "bytes"
 
+        errors = []
         try:
+            config = node.config
+            limit = config["maxFiles"]
+            max_size = config["maxFileSize"] if "maxFileSize" in config.keys() else None
+
             if value is not None and config["activateMax"] is True and len(value) > limit:
                 errors.append({"type": "ERROR", "message": f"This node has a limit of {limit} files. Please reduce files."})
 
