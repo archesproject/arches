@@ -229,6 +229,8 @@ def user_can_read_resources(user, resourceid=None):
                     return user_has_resource_model_permissions(user, ["models.read_nodegroup"], result['resource'])
                 else:
                     return result['permitted']
+            else:
+                return None
 
         return len(get_resource_types_by_perm(user, ["models.read_nodegroup"])) > 0
     return False
@@ -244,10 +246,13 @@ def user_can_edit_resources(user, resourceid=None):
             return True
         if resourceid is not None:
             result = check_resource_instance_permissions(user, resourceid, 'change_resourceinstance')
-            if result['permitted'] == 'unknown':
-                return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or user_can_edit_model_nodegroups(user, result['resource'])
+            if result is not None:
+                if result['permitted'] == 'unknown':
+                    return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or user_can_edit_model_nodegroups(user, result['resource'])
+                else:
+                    return result['permitted']
             else:
-                return result['permitted']
+                return None
 
         return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or len(get_editable_resource_types(user)) > 0
     return False
@@ -263,10 +268,13 @@ def user_can_delete_resources(user, resourceid=None):
             return True
         if resourceid is not None:
             result = check_resource_instance_permissions(user, resourceid, 'delete_resourceinstance')
-            if result['permitted'] == 'unknown':
-                return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or user_can_edit_model_nodegroups(user, result['resource'])
+            if result is not None:
+                if result['permitted'] == 'unknown':
+                    return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or user_can_edit_model_nodegroups(user, result['resource'])
+                else:
+                    return result['permitted']
             else:
-                return result['permitted']
+                return None
     return False
 
 
