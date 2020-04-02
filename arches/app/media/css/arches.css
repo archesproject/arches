@@ -1609,7 +1609,7 @@ ul.tabbed-report-tab-list {
     padding: 17px 30px 10px 0px;
     margin-left: 0px;
     margin-top: -16px;
-    position: fixed;
+    position: absolute;
     background: #fff;
     z-index: 20;
     width: 370px;
