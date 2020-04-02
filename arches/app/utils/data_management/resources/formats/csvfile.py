@@ -468,7 +468,7 @@ class CsvReader(Reader):
                         Please add a 'ResourceID' column with a unique resource identifier."
                     )
                     print("*" * 80)
-                    if celery_worker_running is False: # prevents celery chord from breaking on WorkerLostError
+                    if celery_worker_running is False:  # prevents celery chord from breaking on WorkerLostError
                         sys.exit()
                 graphid = mapping["resource_model_id"]
                 blanktilecache = {}
@@ -540,7 +540,7 @@ class CsvReader(Reader):
                         Please sort your csv file by ResourceID and try import again."
                     )
                     print("*" * 80)
-                    if celery_worker_running is False: # prevents celery chord from breaking on WorkerLostError
+                    if celery_worker_running is False:  # prevents celery chord from breaking on WorkerLostError
                         sys.exit()
 
                 def create_reference_data(new_concepts, create_collections):
@@ -843,7 +843,7 @@ class CsvReader(Reader):
                                 )
                                 print(e)
                                 print("*" * 80)
-                                if celery_worker_running is False: # prevents celery chord from breaking on WorkerLostError
+                                if celery_worker_running is False:  # prevents celery chord from breaking on WorkerLostError
                                     sys.exit()
 
                         target_tile = get_blank_tile(source_data)
