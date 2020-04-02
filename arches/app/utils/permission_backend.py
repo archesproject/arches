@@ -4,7 +4,7 @@ from guardian.backends import check_support
 from guardian.backends import ObjectPermissionBackend
 from django.core.exceptions import ObjectDoesNotExist
 from guardian.core import ObjectPermissionChecker
-from guardian.shortcuts import get_perms, get_objects_for_user
+from guardian.shortcuts import get_perms, get_objects_for_user, get_group_perms, get_user_perms
 from guardian.exceptions import WrongAppError
 from django.contrib.auth.models import User, Group, Permission
 from arches.app.models.models import ResourceInstance
@@ -195,22 +195,47 @@ def user_has_resource_model_permissions(user, perms, resource):
 
 
 def check_resource_instance_permissions(user, resourceid, permission):
+    """
+    Checks if a user has permission to access a resource instance
+
+    Arguments:
+    user -- the user to check
+    resourceid -- the id of the resource 
+    permission -- the permission codename (e.g. 'view_resourceinstance') for which to check
+
+    """
     result = {}
     try:
         resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
+        result['resource'] = resource
+        all_perms = get_perms(user, resource)
+        if len(all_perms) == 0:                                      # no permissions assigned. permission implied
+            result['permitted'] = 'unknown'
+            return result
+        else:
+            user_permissions = get_user_perms(user, resource)
+            if 'no_access_to_resourceinstance' in user_permissions:  # user is restricted
+                result['permitted'] = False
+                return result
+            elif permission in user_permissions:                     # user is permitted                         
+                result['permitted'] = True
+                return result
+
+            group_permissions = get_group_perms(user, resource)
+            if 'no_access_to_resourceinstance' in group_permissions: # group is restricted - no user override
+                result['permitted'] = False
+                return result
+            elif permission in group_permissions:                    # group is permitted - no user override
+                result['permitted'] = True
+                return result
+            
+            if permission not in all_perms:                          # neither user nor group explicitly permits or restricts. 
+                result['permitted'] = False                          # restriction implied
+                return result
+
     except ObjectDoesNotExist:
         return None
-    permissions = get_perms(user, resource)
-    result['resource'] = resource
-    explicitly_permitted = permission in permissions
-    implicitly_permitted = len(permissions) == 0
-    restricted = 'no_access_to_resourceinstance' in permissions or (permission not in permissions and len(permissions) > 0)
-    if explicitly_permitted is True:
-        result['permitted'] = True
-    if restricted is True:
-        result['permitted'] = False
-    if implicitly_permitted is True and explicitly_permitted is False and restricted is False:
-        result['permitted'] = 'unknown'
+
     return result
 
 

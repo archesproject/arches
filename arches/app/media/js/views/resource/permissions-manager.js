@@ -1,13 +1,16 @@
 define([
     'jquery',
     'knockout',
-], function($, ko) {
+    'arches'
+], function($, ko, arches) {
     return ko.components.register('permissions-manager', {
         viewModel: function(params) {
             this.makeInstancePrivate = function(){
                 $.ajax({
+                    type: 'POST',
                     url: arches.urls.restrict_resource_access,
-                    data: {"instanceid": params.resourceId}
+                    data: {"instanceid": params.resourceId},
+                    dataType: 'json'
                 }).done(function(data){
                     console.log(data);
                 });
