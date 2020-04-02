@@ -11611,40 +11611,68 @@ a.jstree-anchor.permissions-widget {
     background-color: rgb(242, 242, 242);
 }
 .show-gallery-control {
-    cursor: pointer;
-    font-weight: bold;
     left: 25px;
     padding: 6px 12px;
     border: solid 1px rgb(221, 221, 221);
     border-bottom: transparent;
     z-index: 10000;
+    color: #2f527a;
+}
+.show-gallery-control i, .show-gallery-control a {
+    cursor: pointer;
+    color: #2f527a;
 }
 .gallery-visible.show-gallery-control {
-    bottom: 129px;
+    bottom: 159px;
+}
+.show-gallery-control.gallery-expanded {
+    top: 0;
+    left: 0;
+    right: 75px;
+    bottom: auto;
+    border-bottom: solid 1px rgb(221, 221, 221);
+    z-index: 2000;
+    padding-left: 30px;
+}
+.workbench-card-container-sidepanel-active .show-gallery-control.gallery-expanded {
+    right: 475px;
 }
 .iiif-viewer-gallery {
-    width: 100%;
-    padding-right: 75px;
+    right: 75px;
+    left: 0;
+}
+.iiif-viewer-gallery.gallery-expanded {
+    top: 0;
+    padding-top: 30px;
+    z-index: 1000;
 }
 .workbench-card-container-sidepanel-active .iiif-viewer-gallery {
-    padding-right: 475px;
+    right: 475px;
 }
 .workbench-card-container-sidepanel-active .workbench-card-container {
     margin-right: 475px;
 }
 .iiif-gallery-content {
     border-top: solid 1px rgb(221, 221, 221);
-    height: 130px;
+    height: 160px;
     width: 100%;
     padding: 10px;
     white-space: nowrap;
     overflow-x: auto;
 }
+.show-gallery-control h3 {
+    display: inline-block;
+    margin: 0 4px;
+}
+.gallery-expanded .iiif-gallery-content {
+    height: 100%;
+    background-color: rgb(250, 250, 250);
+}
 .workbench-card-wrapper .workbench-card-container-wrapper {
     height: 100%;
 }
 .workbench-card-container.gallery-visible {
-    padding-bottom: 130px;
+    padding-bottom: 160px;
 }
 .iiif-leaflet {
     height: 100%;
@@ -11658,28 +11686,56 @@ a.jstree-anchor.permissions-widget {
     display: inline-block;
     white-space: nowrap;
 }
+.iiif-viewer-gallery.gallery-expanded .iiif-gallery-canvas, .iiif-viewer-gallery.gallery-expanded .iiif-gallery-sequence, .iiif-viewer-gallery.gallery-expanded .iiif-gallery-sequence-canvases {
+    white-space: normal;
+}
 .iiif-gallery-sequence {
     padding-right: 20px;
 }
-.iiif-gallery-canvas-thumbnail {
+.iiif-viewer-gallery.gallery-expanded .iiif-gallery-sequence{
+    display: block;
+}
+.iiif-gallery-canvas-thumbnail img {
+    margin: 1px;
+    border: 1px solid rgb(162, 162, 162);
     height: 55px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+}
+.annotated .iiif-gallery-canvas-thumbnail img {
+    margin: 0px;
+    border: 2px solid rgb(28, 62, 95);
+}
+.iiif-viewer-gallery.gallery-expanded .iiif-gallery-canvas-thumbnail img {
+    height: 110px;
 }
 .iiif-gallery-sequence-label {
     cursor: pointer;
-    font-weight: bold;
-    text-decoration: underline;
-    padding-bottom: 3px;
+    color: rgb(91, 155, 215);
+    font-weight: 600;
+    text-decoration: none;
+}
+.iiif-gallery-header {
+    font-size: 1.2em;
+    padding-left: 28px;
+}
+.manifest-editor-label {
+    font-size: 1.2em;
+    padding: 3px;
+}
+.iiif-gallery-header .list-filter {
+    display: inline-block;
 }
 .iiif-gallery-canvas {
     cursor: pointer;
-    margin-left:6px;
-    padding: 3px;
+    margin-left: 10px;
+    padding: 6px;
     border: 1px solid transparent;
     min-width: 60px;
-    height: 80px;
+    height: 100px;
+    margin-bottom: 10px;
+}
+.iiif-viewer-gallery.gallery-expanded .iiif-gallery-canvas {
+    height: 155px;
+    min-width: 120px;
 }
 .iiif-gallery-canvas:hover, .iiif-gallery-canvas.active {
     border: 1px solid rgb(180, 180, 180);
@@ -11687,7 +11743,14 @@ a.jstree-anchor.permissions-widget {
 }
 .iiif-gallery-canvas-label {
     font-size: 0.9em;
-    text-align: center;
+    font-weight: 650;
+    color: rgb(91, 155, 215);
+}
+.iiif-gallery-canvas-label .annotation-count {
+    font-size: 0.8em;
+    font-weight: normal;
+    color: rgb(142, 142, 142);
+    display: block;
 }
 .iiif-image-tools {
     margin-top: 55px;
