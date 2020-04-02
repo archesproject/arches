@@ -1,0 +1,30 @@
+{% load staticfiles %}
+{% load i18n %}
+{% load template_tags %}
+<div id="related-resources-drag-panel" style="height: calc(100vh - 102px);" class="search-container related-resources-container">
+
+
+    <!-- Target -->
+    <div id="rr-manager-content-id" class="rr-drag-panel-target">
+
+        <div id="rr-splash" class="rr-splash">
+
+            <!-- Image -->
+            <div class="img-lg img-circle rr-splash-img-container">
+                <!-- <img class="rr-splash-img" src="{% static "/img/Workflow.png" %}" alt="Resource Editor"> -->
+                <i class="fa fa-lock"></i>
+            </div>
+
+            <!-- Splash Title -->
+            <div class="rr-splash-title">{% trans "Resource Instance Permissions" %}</div>
+
+
+            <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-link" data-bind="click: function(){displaySplash(false)}">{% trans 'Restrict Access to this Instance' %}</button>
+
+            <!-- Splash Instructions -->
+            <div class="rr-splash-description">{% trans "Make this instance accessible only to the creator of this instance, or select which user accounts and groups have access" %}</div>
+
+            <!-- Help Hyperlink -->
+        </div>
+    </div>
+</div>

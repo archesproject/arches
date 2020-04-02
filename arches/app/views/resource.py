@@ -253,18 +253,28 @@ class ResourceEditorView(MapBaseManagerView):
 
 @method_decorator(group_required("Resource Editor"), name="dispatch")
 class ResourcePermissionDataView(View):
-    perm_cache = {}
     action = None
+    perm_cache = {}
 
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
-        self.apply_permissions(data)
+        if action == 'restrict':
+            self.make_instance_private(data)
+        else:
+            self.apply_permissions(data)
         return JSONResponse(data)
 
     def delete(self, request):
         data = JSONDeserializer().deserialize(request.body)
         self.apply_permissions(data, revert=True)
         return JSONResponse(data)
+
+    def make_instance_private(self, data):
+        groups = Group.objects.all()
+        resource_instance = models.ResourceInstance.objects.get(pk=data['instanceid'])
+        for group in groups:
+            assign_perm('no_access_to_resourceinstance', group, resource_instance)
+        return JSONResponse({'complete': True})
 
     def apply_permissions(self, data, revert=False):
         with transaction.atomic():

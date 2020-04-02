@@ -17,7 +17,8 @@ define([
     'bindings/sortable',
     'widgets',
     'card-components',
-    'views/resource/related-resources-manager'
+    'views/resource/related-resources-manager',
+    'views/resource/permissions-manager'
 ], function($, _, ko, moment, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, reportLookup) {
     var handlers = {
         'after-update': [],
@@ -310,6 +311,9 @@ define([
         }
     };
 
+    vm.showInstancePermissionsManager = function(a){
+        vm.selection('permissions-manager');
+    };
 
     vm.selectionBreadcrumbs = ko.computed(function() {
         var item = vm.selectedTile();

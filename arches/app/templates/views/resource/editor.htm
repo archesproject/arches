@@ -89,22 +89,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <span>{% trans 'Related Resources' %}</span>
                             </strong>
                         </a>
-                        <ul class="jstree-container-ul jstree-children related-resources" aria-expanded="true" data-bind="foreach: {
-                            data: [],
-                            as: 'rr'
-                        }">
-                            <li role="treeitem card-treeitem" class="jstree-node jstree-leaf">
-                                <i class="jstree-icon jstree-ocl" role="presentation"></i>
-                                <a class="jstree-anchor" href="#" tabindex="0">
-                                    <strong>
-                                        <i class="fa fa-link" role="presentation"></i>
-                                        <span data-bind="text: rr.name"></span>
-                                    </strong>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                     <!--/ko-->
+                    <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId()}">
+                        <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showInstancePermissionsManager(self)}}, css: {'jstree-clicked': selection() === 'resource-permissions', 'disabled': resourceId() === ''}">
+                            <strong>
+                                <i class="fa fa-link" role="presentation"></i>
+                                <span>{% trans 'Manage Permissions' %}</span>
+                            </strong>
+                        </a>
+                    </li>
                 </ul>
                 </div>
             </div>
@@ -118,6 +113,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                  <div data-bind="component: {
                     name: 'related-resources-manager',
                     params: relatedResourcesManagerObj
+                }"></div>
+            </div>
+            <!--/ko -->
+
+            <!--ko if: selection() === 'permissions-manager' -->
+            <div>
+                <div data-bind="component: {
+                    name: 'permissions-manager',
+                    params: {'test': 'cat'}
                 }"></div>
             </div>
             <!--/ko -->
