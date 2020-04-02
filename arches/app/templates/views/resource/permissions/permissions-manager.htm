@@ -5,6 +5,7 @@
 
 
     <!-- Target -->
+    <!--ko if: openEditor() === false -->
     <div id="rr-manager-content-id" class="rr-drag-panel-target">
 
         <div id="rr-splash" class="rr-splash">
@@ -27,4 +28,8 @@
             <!-- Help Hyperlink -->
         </div>
     </div>
+    <!--/ko-->
+    <!--ko if: openEditor() -->
+        <div data-bind="text: JSON.stringify(instancePermissions(), null, 4)"></div>
+    <!--/ko-->
 </div>
