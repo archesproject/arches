@@ -372,7 +372,7 @@ define([
                 newtile.formData.append('file-list_' + self.fileListNodeId, file, file.name);
                 newtile.resourceinstance_id = self.card.resourceinstanceid;
                 if (self.card.tiles().length === 0) {
-                    sleep(50);
+                    sleep(100);
                 }
                 newtile.save(null, stageTile);
                 self.card.newTile = undefined;
