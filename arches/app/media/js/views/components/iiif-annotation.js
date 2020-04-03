@@ -120,6 +120,12 @@ define([
         params.activeTab = 'editor';
         IIIFViewerViewmodel.apply(this, [params]);
 
+        this.getAnnotationCount = function(canvas) {
+            return drawFeatures().filter(function(feature) {
+                return feature.properties.canvas === canvas;
+            }).length;
+        };
+
         var disableEditing = function() {
             if (editingFeature) editingFeature.editing.disable();
             editingFeature = undefined;
