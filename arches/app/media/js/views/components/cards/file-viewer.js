@@ -1,9 +1,7 @@
 define([
+    'jquery',
     'knockout',
-    'knockout-mapping',
-    'underscore',
     'arches',
-    'dropzone',
     'uuid',
     'viewmodels/card-component',
     'viewmodels/card-multi-select',
@@ -12,8 +10,9 @@ define([
     'bindings/slide',
     'bindings/fadeVisible',
     'bindings/scroll-to-file',
+    'dropzone',
     'bindings/dropzone'
-], function(ko, koMapping, _, arches, Dropzone, uuid, CardComponentViewModel, CardMultiSelectViewModel, WorkbenchComponentViewModel, fileRenderers) {
+], function($, ko, arches, uuid, CardComponentViewModel, CardMultiSelectViewModel, WorkbenchComponentViewModel, fileRenderers) {
     return ko.components.register('file-viewer', {
         viewModel: function(params) {
             params.configKeys = ['acceptedFiles', 'maxFilesize'];
@@ -131,7 +130,6 @@ define([
                     });
                 });
             }
-
 
             this.getDefaultRenderers = function(type, file){
                 var defaultRenderers = [];
@@ -347,6 +345,11 @@ define([
             function stageTile(t) {
                 self.card.staging.push(t.tileid);
             }
+
+            this.downloadSelection = function() {
+                var url = arches.urls.download_files + "?tiles=" + JSON.stringify(self.card.staging()) + "&node=" + self.fileListNodeId;
+                window.open(url);
+            };
 
             this.addTile = function(file){
                 var newtile;

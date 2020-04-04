@@ -928,6 +928,13 @@ ul.tabbed-report-tab-list {
     margin-left: 0px;
 }
 
+.file-workbench-selected-buttons {
+    display: flex;
+    flex-direction: column;
+    height: 87px;
+    justify-content: space-between;
+}
+
 .file-workbench-filter {
     position: relative;
     margin-top: 25px;
