@@ -6830,6 +6830,10 @@ span.file-upload-clear-filter {
     background: #f6f6f6;
 }
 
+.file-select h2 {
+    font-weight: 400;
+}
+
 .loader-select {
     text-align: center;
     padding: 40px 0;
@@ -6872,6 +6876,10 @@ span.file-upload-clear-filter {
 .file-select-window {
     border: 1px solid #c4c4c4;
     border-radius: 2px;
+}
+
+.file-select-window h2 {
+    font-weight: 400;
 }
 
 .btn-file-select {
@@ -11201,6 +11209,19 @@ ul.select2-choices:after {
     color: #2f527a;
     font-size: 17px;
     font-weight: 400;
+}
+
+.card-component-panel h3.rr-splash-description {
+    font-size: 16px;
+    padding: 0px 20px;
+    color: #888;
+    margin: 0px;
+}
+
+.file-select .rr-splash-img {
+    margin-top: 0px;
+    margin-left: 2px; 
+    height: 90%;
 }
 
 .card-component-panel h4 {

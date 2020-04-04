@@ -68,12 +68,24 @@
                             <div class="dropzone-photo-upload">
                                 <div class="file-select-window">
                                     <!--ko if: $parent.displayContent().availableRenderers.length === 0 -->
-                                    <div class="bord-top file-select">
-                                        <div class="" style="padding: 5px">
-                                            <h2>{% trans 'Unable to display the selected file' %}</h2>
-                                            <h4>{% trans 'There are no file renderers that support this format' %}</h4>
+                                    <div class="bord-top file-select" style="padding-bottom: 90px;">
+
+                                        <!-- Image -->
+                                        <div class="img-lg img-circle rr-splash-img-container">
+                                            <img class="rr-splash-img" src="/media/img/answers.png" alt="Resource Editor">
                                         </div>
-                                    <br>
+
+                                        <!-- Splash Title -->
+                                        <h2 class="rr-splash-title">{% trans 'Unable to display the selected file' %}</h2>
+
+                                        <!-- Splash Instructions -->
+                                        <h3 class="rr-splash-description">{% trans "This file can't be displayed." %}</h3>
+
+                                        <!-- Splash Instructions -->
+                                        <h3 class="rr-splash-description">{% trans "It may be a proprietary format or there isn't a loader available yet " %}</h3>
+
+                                        <!-- Splash Instructions -->
+                                        <h3 class="rr-splash-description">{% trans "to present it in this webpage." %}</h3>
                                     </div>
                                     <!--/ko-->
                                     
