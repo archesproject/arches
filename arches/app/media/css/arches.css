@@ -6820,6 +6820,10 @@ span.file-upload-clear-filter {
     padding: 15px 15px;
 }
 
+.file-upload-footer .loader-selector {
+    max-height: 25px;
+}
+
 .file-select {
     text-align: center;
     padding: 70px 0;
@@ -6844,6 +6848,25 @@ span.file-upload-clear-filter {
 
 .card-component-panel .loader-select h4 {
     font-weight: 400;
+}
+
+.loader-error-message {
+    background: #E94484;
+    color: #fff ! important;
+    padding: 20px 0px;
+    margin-top: -46px;
+    margin-bottom: 45px;
+}
+
+.loader-error-message span {
+    font-weight: 800;
+}
+
+.file-chart-upload-panel {
+    position: relative;
+    margin-right: -30px;
+    margin-left: 100px;
+    margin-top: -35px;
 }
 
 .file-select-window {

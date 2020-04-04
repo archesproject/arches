@@ -63,8 +63,8 @@
                             <!--/ko-->
                         <!--/ko-->
                     <!--ko if: !$parent.displayContent().renderer || $parent.displayContent().validRenderer() === false -->
-                    <div>
-                        <div class="gallery-controls new-tile" style="position: relative">
+                    <div class="file-chart-upload-panel">
+                        <div class="gallery-controls new-tile">
                             <div class="dropzone-photo-upload">
                                 <div class="file-select-window">
                                     <!--ko if: $parent.displayContent().availableRenderers.length === 0 -->
@@ -79,10 +79,13 @@
                                     
                                     <!--ko if: $parent.displayContent().availableRenderers.length > 0 -->
                                     <div class="bord-top file-select loader-select">
-                                        <div class="" style="padding: 5px">
+                                        <div class="">
                                             <!--ko if: $parent.displayContent().validRenderer() === false -->
-                                            <h4>{% trans 'Unable to parse your file with the '%}<span data-bind="text:$parent.displayContent().renderer.name"></span>{% trans ' loader'%}</h4>
+                                            <h4 class="loader-error-message">{% trans 'Unable to parse your file with the '%}
+                                                <span data-bind="text:$parent.displayContent().renderer.name"></span>{% trans ' loader'%}
+                                            </h4>
                                             <!--/ko-->
+                                            
                                             <h2>{% trans 'Select File Loader' %}</h2>
                                             <h4>{% trans 'Select the loader best suited for processing and visualizing the selected file' %}</h4>
                                             <div style="display: flex; flex-flow: wrap; padding: 15px 25px;">
@@ -120,7 +123,7 @@
                                     <br>  
                                 </div>
                                 <div class="file-upload-footer">
-                                    <span class="pad-top" data-bind="component: { name: 'views/components/simple-switch', params: {value: applyToAll, config:{label: '{% trans "Apply the same loader to all selected files in the dataset" %}'}}}"></span>
+                                    <span class="loader-selector" data-bind="component: { name: 'views/components/simple-switch', params: {value: applyToAll, config:{label: '{% trans "Apply the same loader to all selected files in the dataset" %}'}}}"></span>
                                 </div>
                                 <!--/ko-->
                                </div>
@@ -137,36 +140,38 @@
     </div>
 
     <!--ko if: self.displayContent() === undefined -->
-    <div class="gallery-controls new-tile">
-        <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
-            <div class="file-select-window">
-               <div class="bord-top pad-ver file-select">
-                   <div class="" style="padding: 5px">
-                       <h2>{% trans 'Upload Files' %}</h2>
-                       <h4>{% trans 'Drag & Drop your files onto this panel to upload' %}</h4>
-                   </div>
-                   <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
-                       <i class="fa fa-file"></i>
-                       <span>{% trans "Select Files" %}</span>
-                   </button>
-                   <br>
-                   <div style="padding: 10px">{% trans "Adding files to this record is " %}
-                       <span><strong>{% trans "optional." %}</strong></span>
+    <div class="file-chart-upload-panel">
+        <div class="gallery-controls new-tile">
+            <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
+                <div class="file-select-window">
+                   <div class="bord-top pad-ver file-select">
+                       <div class="" style="padding: 5px">
+                           <h2>{% trans 'Upload Files' %}</h2>
+                           <h4>{% trans 'Drag & Drop your files onto this panel to upload' %}</h4>
+                       </div>
+                       <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                           <i class="fa fa-file"></i>
+                           <span>{% trans "Select Files" %}</span>
+                       </button>
                        <br>
-                       {% trans "You may upload as many files as you wish; check with the site admin on the maximum file size." %}
+                       <div style="padding: 10px">{% trans "Adding files to this record is " %}
+                           <span><strong>{% trans "optional." %}</strong></span>
+                           <br>
+                           {% trans "You may upload as many files as you wish; check with the site admin on the maximum file size." %}
+                       </div>
+
                    </div>
-
+                   <div class="file-upload-footer">
+                       <!-- ko if: acceptedFiles() !== null -->
+                       <span data-bind="text: ('The following file formats may be uploaded: ' + acceptedFiles())"></span>
+                       <!-- /ko -->
+                       <!-- ko if: !acceptedFiles() -->
+                       <span>{% trans 'Images formatted as .jpg, .png files may be uploaded. Other formats may require a loader to view.' %}</span>
+                       <!-- /ko -->
+                   </div>
                </div>
-               <div class="file-upload-footer">
-                   <!-- ko if: acceptedFiles() !== null -->
-                   <span data-bind="text: ('The following file formats may be uploaded: ' + acceptedFiles())"></span>
-                   <!-- /ko -->
-                   <!-- ko if: !acceptedFiles() -->
-                   <span>{% trans 'Images formatted as .jpg, .png, .tiff files may be uploaded. Other formats may require a loader.' %}</span>
-                   <!-- /ko -->
-               </div>
-           </div>
 
+            </div>
         </div>
     </div>
     <!--/ko-->
