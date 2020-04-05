@@ -24,7 +24,7 @@
 
 {% block content_management %}
 <!-- ko if: card.widgets().length > 0 -->
-<div>
+<div class="">
 
     <div class="card-display-panel">
         <div>
@@ -67,32 +67,34 @@
     </div>
 
     <!--ko if: self.displayContent() === undefined -->
-    <div class="gallery-controls new-tile">
-        <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
-            <div class="file-select-window">
-               <div class="bord-top pad-ver file-select">
-                   <div class="" style="padding: 5px">
-                       <h2>{% trans 'Upload Photographs' %}</h2>
-                       <h4>{% trans 'Drag & Dop your photos onto this panel to upload' %}</h4>
-                   </div>
-                   <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
-                       <i class="fa fa-file"></i>
-                       <span>{% trans "Select Photographs" %}</span>
-                   </button>
-                   <br>
-                   <div style="padding: 10px">{% trans "Adding photos to this record is " %}
-                       <span><strong>{% trans "optional." %}</strong></span>
+    <div class="file-chart-upload-panel" style="margin-top: -435px;">
+        <div class="gallery-controls new-tile">
+            <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
+                <div class="file-select-window">
+                   <div class="bord-top pad-ver file-select">
+                       <div class="" style="padding: 5px">
+                           <h2>{% trans 'Upload Photographs' %}</h2>
+                           <h4>{% trans 'Drag & Dop your photos onto this panel to upload' %}</h4>
+                       </div>
+                       <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                           <i class="fa fa-file"></i>
+                           <span>{% trans "Select Photographs" %}</span>
+                       </button>
                        <br>
-                       {% trans "You may upload as many photos as you wish, but the maximum size of any single file is " %}
-                       <span>8MB</span>
+                       <div style="padding: 10px">{% trans "Adding photos to this record is " %}
+                           <span><strong>{% trans "optional." %}</strong></span>
+                           <br>
+                           {% trans "You may upload as many photos as you wish, but the maximum size of any single file is " %}
+                           <span>8MB</span>
+                       </div>
+
                    </div>
-
+                   <div class="file-upload-footer">
+                       <span>{% trans 'Images formatted as .jpg, .png, .tiff files may be uploaded. Other formats will be ignored.' %}</span>
+                   </div>
                </div>
-               <div class="file-upload-footer">
-                   <span>{% trans 'Images formatted as .jpg, .png, .tiff files may be uploaded. Other formats will be ignored.' %}</span>
-               </div>
-           </div>
 
+            </div>
         </div>
     </div>
     <!--/ko-->
@@ -107,32 +109,34 @@
 {% block sidepanel %}
 
 <!--ko if: activeTab() === 'add' -->
-<div class="gallery-controls new-tile">
-    <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
-        <div class="file-select-window">
-           <div class="bord-top pad-ver file-select">
-               <div class="" style="padding: 5px">
-                   <h2>{% trans 'Upload Photographs' %}</h2>
-                   <h4>{% trans 'Drag & Dop your photos onto this panel' %}</h4>
-               </div>
-               <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
-                   <i class="fa fa-file"></i>
-                   <span>{% trans "Select Documents" %}</span>
-               </button>
-               <br>
-               <div style="padding: 10px">{% trans "Adding documents to this record is " %}
-                   <span><strong>{% trans "optional." %}</strong></span>
+<div class="file-chart-upload-panel">
+    <div class="gallery-controls new-tile">
+        <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
+            <div class="file-select-window">
+               <div class="bord-top pad-ver file-select">
+                   <div class="" style="padding: 5px">
+                       <h2>{% trans 'Upload Photographs' %}</h2>
+                       <h4>{% trans 'Drag & Dop your photos onto this panel' %}</h4>
+                   </div>
+                   <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                       <i class="fa fa-file"></i>
+                       <span>{% trans "Select Documents" %}</span>
+                   </button>
                    <br>
-                   {% trans "You may upload as many documents as you wish, but the maximum size of any single file is " %}
-                   <span>8MB</span>
+                   <div style="padding: 10px">{% trans "Adding documents to this record is " %}
+                       <span><strong>{% trans "optional." %}</strong></span>
+                       <br>
+                       {% trans "You may upload as many documents as you wish, but the maximum size of any single file is " %}
+                       <span>8MB</span>
+                   </div>
+
                </div>
-
+               <div class="file-upload-footer">
+                   <span>{% trans 'Accepted formats: .jpg, .png, .tiff' %}</span>
+               </div>
            </div>
-           <div class="file-upload-footer">
-               <span>{% trans 'Accepted formats: .jpg, .png, .tiff' %}</span>
-           </div>
-       </div>
 
+        </div>
     </div>
 </div>
 <!--/ko-->

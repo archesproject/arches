@@ -1407,6 +1407,10 @@ ul.tabbed-report-tab-list {
     width: 100%;
 }
 
+.workbench-card-sidepanel .file-chart-upload-panel {
+    margin-right: -120px;
+}
+
 /* end photo gallery */
 
 .workbench-model-card-container {
@@ -11185,7 +11189,7 @@ ul.select2-choices:after {
 
 .card-component {
     padding: 15px 25px 25px 25px;
-    margin: 10px;
+    margin: 15px;
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 3px;
@@ -11838,7 +11842,7 @@ a.jstree-anchor.permissions-widget {
 
 .chart {
     margin-right: 105px;
-    margin-left: 15px;
+    margin-left: 20px;
     margin-top: 20px;
 }
 .style-tools-collapser {
