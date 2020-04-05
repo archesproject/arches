@@ -11765,7 +11765,7 @@ a.jstree-anchor.permissions-widget {
     border: 2px solid rgb(28, 62, 95);
 }
 .iiif-viewer-gallery.gallery-expanded .iiif-gallery-canvas-thumbnail img {
-    height: 110px;
+    height: 175px;
 }
 .iiif-gallery-sequence-label {
     cursor: pointer;
@@ -11799,7 +11799,7 @@ a.jstree-anchor.permissions-widget {
     margin-bottom: 10px;
 }
 .iiif-viewer-gallery.gallery-expanded .iiif-gallery-canvas {
-    height: 155px;
+    height: 220px;
     min-width: 120px;
 }
 .iiif-gallery-canvas:hover, .iiif-gallery-canvas.active {
