@@ -875,15 +875,6 @@ ul.tabbed-report-tab-list {
     cursor: pointer;
 }
 
-.photo-workbench-photos {
-    height: 136px;
-    overflow-y: scroll;
-    border: solid 1px #ddd;
-    display: flex;
-    flex-direction: column;
-    margin: 5px 20px 10px 20px;
-}
-
 .photo-workbench-photos::-webkit-scrollbar {
     -webkit-appearance: none;
     width: 9px;
@@ -921,6 +912,13 @@ ul.tabbed-report-tab-list {
 .photo-workbench-photo:not(.selected-photo):hover {
     background: #CAE2F5;
     cursor: pointer;
+}
+
+.card-component-panel .workbench-tile-picker-label {
+    font-weight: 600;
+    color: #666;
+    margin-left: 10px;
+    margin-top: 60px;
 }
 
 .workbench-card-sidepanel-header-container.file-workbench {
@@ -1356,7 +1354,7 @@ ul.tabbed-report-tab-list {
     border: solid 1px #ddd;
     display: flex;
     flex-direction: column;
-    margin: 5px 20px 10px 20px;
+    margin: 5px 10px 10px 10px;
 }
 
 .photo-workbench-photo {
