@@ -11690,7 +11690,7 @@ a.jstree-anchor.permissions-widget {
     bottom: auto;
     border-bottom: solid 1px rgb(221, 221, 221);
     z-index: 2000;
-    padding: 10px 0 10px 30px;
+    padding: 15px 0 15px 30px;
 }
 
 .workbench-card-container-sidepanel-active .show-gallery-control.gallery-expanded {
@@ -11701,7 +11701,7 @@ a.jstree-anchor.permissions-widget {
     left: 0;
 }
 .iiif-viewer-gallery.gallery-expanded {
-    top: 0;
+    top: 10px;
     padding-top: 30px;
     z-index: 1000;
 }
