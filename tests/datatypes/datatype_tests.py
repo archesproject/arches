@@ -30,7 +30,7 @@ from tests.base_test import ArchesTestCase
 from django.core import management
 from arches.app.models.models import ResourceInstance, Node, GraphModel
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.datatypes import datatypes 
+from arches.app.datatypes import datatypes
 
 from arches.app.search.mappings import (
     prepare_resource_relations_index,
@@ -46,7 +46,7 @@ class DataTypeTests(ArchesTestCase):
         self.graph = GraphModel.objects.get(pk="330802c5-95bd-11e8-b7ac-acde48001122")
         datatype_factory = datatypes.DataTypeFactory()
         nodes = self.graph.node_set.all()
-        self.datatypes = {node.datatype: {'datatype': datatype_factory.get_instance(node.datatype), 'node': node} for node in nodes}
+        self.datatypes = {node.datatype: {"datatype": datatype_factory.get_instance(node.datatype), "node": node} for node in nodes}
 
     def tearDown(self):
         pass
@@ -67,9 +67,8 @@ class DataTypeTests(ArchesTestCase):
         Tests string datatype validation
 
         """
-        datatype = self.datatypes['string']['datatype']
-        errors = datatype.validate('cat')
+        datatype = self.datatypes["string"]["datatype"]
+        errors = datatype.validate("cat")
         errors += datatype.validate(7)
         errors += datatype.validate(None)
         self.assertEqual(1, len(errors))
-
