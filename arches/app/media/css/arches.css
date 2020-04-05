@@ -11668,10 +11668,18 @@ a.jstree-anchor.permissions-widget {
     z-index: 10000;
     color: #2f527a;
 }
-.show-gallery-control i, .show-gallery-control a {
+.show-gallery-control i {
+    cursor: pointer;
+    color: #2f527a;
+    font-size: 15px;
+}
+
+.show-gallery-control a {
     cursor: pointer;
     color: #2f527a;
 }
+
+
 .gallery-visible.show-gallery-control {
     bottom: 159px;
 }
@@ -11682,8 +11690,9 @@ a.jstree-anchor.permissions-widget {
     bottom: auto;
     border-bottom: solid 1px rgb(221, 221, 221);
     z-index: 2000;
-    padding-left: 30px;
+    padding: 10px 0 10px 30px;
 }
+
 .workbench-card-container-sidepanel-active .show-gallery-control.gallery-expanded {
     right: 475px;
 }
@@ -11712,11 +11721,12 @@ a.jstree-anchor.permissions-widget {
 }
 .show-gallery-control h3 {
     display: inline-block;
-    margin: 0 4px;
+    margin: 0 2px;
 }
 .gallery-expanded .iiif-gallery-content {
     height: 100%;
     background-color: rgb(250, 250, 250);
+    padding: 25px 20px 20px 20px;
 }
 .workbench-card-wrapper .workbench-card-container-wrapper {
     height: 100%;
@@ -11732,7 +11742,7 @@ a.jstree-anchor.permissions-widget {
     display: none;
 }
 .iiif-gallery-canvas, .iiif-gallery-sequence, .iiif-gallery-sequence-canvases {
-    padding-left: 10px;
+    padding-left: 0px;
     display: inline-block;
     white-space: nowrap;
 }
@@ -11765,7 +11775,12 @@ a.jstree-anchor.permissions-widget {
 }
 .iiif-gallery-header {
     font-size: 1.2em;
-    padding-left: 28px;
+    padding-left: 10px;
+    position: sticky;
+    left: 0px;
+}
+.gallery-expanded .iiif-gallery-header {
+    padding-left: 10px;
 }
 .manifest-editor-label {
     font-size: 1.2em;
