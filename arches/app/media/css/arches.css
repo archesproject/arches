@@ -1356,7 +1356,7 @@ ul.tabbed-report-tab-list {
     border: solid 1px #ddd;
     display: flex;
     flex-direction: column;
-    margin: 55px 20px 10px 20px;
+    margin: 5px 20px 10px 20px;
 }
 
 .photo-workbench-photo {
@@ -6872,7 +6872,7 @@ span.file-upload-clear-filter {
 
 .file-chart-upload-panel {
     position: relative;
-    margin-right: -30px;
+    margin-right: -40px;
     margin-left: 100px;
     margin-top: -35px;
 }
@@ -11257,9 +11257,8 @@ ul.select2-choices:after {
 
 .card-component-panel h5 {
     color: #999;
-    margin-top: -8px;
+    margin-top: 5px;
     margin-bottom: 5px;
-    font-size: 13px;
 }
 
 .card-component-wrapper-editor {
@@ -11417,7 +11416,7 @@ a.jstree-anchor.permissions-widget {
 
 .rr-splash {
     text-align: center;
-    margin: 48px 41px 20px 45px;
+    margin: 48px 45px 20px 45px;
     border: 1px solid #ddd;
     padding: 40px 30px;
     background: #f6f6f6;
