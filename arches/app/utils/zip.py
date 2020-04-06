@@ -41,7 +41,7 @@ def create_zip_file(files_for_export, filekey):
     return zip_stream
 
 
-def zip_response(files_for_export, zip_file_name=None, filekey='outputfile'):
+def zip_response(files_for_export, zip_file_name=None, filekey="outputfile"):
     """
     Takes a list of dictionaries, each with a file object and a name, returns an HttpResponse object with a zip file.
     """

@@ -260,16 +260,21 @@ class TileData(View):
 
     def download_files(self, request):
         try:
-            tileids = jsonparser.loads(request.GET.get("tiles", None))              
+            tileids = jsonparser.loads(request.GET.get("tiles", None))
             nodeid = request.GET.get("node", None)
             tiles = Tile.objects.filter(pk__in=tileids)
-            files = sum([[{'name':file['name'], 'outputfile': models.File.objects.get(pk=file['file_id']).path} for file in tile.data[nodeid]]   for tile in tiles], [])
-            response = arches_zip.zip_response(files, 'file-viewer-download.zip')
+            files = sum(
+                [
+                    [{"name": file["name"], "outputfile": models.File.objects.get(pk=file["file_id"]).path} for file in tile.data[nodeid]]
+                    for tile in tiles
+                ],
+                [],
+            )
+            response = arches_zip.zip_response(files, "file-viewer-download.zip")
             return response
         except TypeError as e:
             logger.error("Tile id array required to download files.")
             return JSONErrorResponse(_("Request Failed"), _(e))
-
 
     def get(self, request):
         if self.action == "tile_history":
