@@ -18,6 +18,7 @@ import uuid
 import json
 import urllib.parse
 import logging
+import traceback
 from PIL import Image
 from datetime import datetime
 from datetime import timedelta
@@ -40,6 +41,8 @@ from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.couch import Couch
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Terms, Query
 import arches.app.views.search as search
 import arches.app.utils.task_management as task_management
 
@@ -243,7 +246,7 @@ class MobileSurvey(models.MobileSurveyModel):
             models.UserProfile.objects.create(user=user)
         if user_is_resource_reviewer(user):
             user_id = str(user.id)
-            if user_id in tile.provisionaledits:
+            if tile.provisionaledits:
                 tile.provisionaledits.pop(user_id, None)
 
     def get_provisional_edit(self, doc, tile, sync_user_id, db):
@@ -301,11 +304,8 @@ class MobileSurvey(models.MobileSurveyModel):
                     (self.id, userid, synclog.pk), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
                 )
             else:
-                self._sync_failed(synclog, userid)
-                synclog.message = _(
-                    "Celery appears not to be running, you need to have celery running in order to sync from Arches Collector."
-                )
-                synclog.save()
+                err = _("Celery appears not to be running, you need to have celery running in order to sync from Arches Collector.")
+                self._sync_failed(synclog, userid, err)
         else:
             self._sync(synclog.pk, userid=userid)
         return synclog
@@ -317,8 +317,8 @@ class MobileSurvey(models.MobileSurveyModel):
             self.push_edits_to_db(synclog, userid)
             self.load_data_into_couch()
             self._sync_succeeded(synclog, userid)
-        except:
-            self._sync_failed(synclog, userid)
+        except Exception as err:
+            self._sync_failed(synclog, userid, err)
 
     def _sync_succeeded(self, synclog, userid):
         logger.info("Sync complete for userid {0}".format(userid))
@@ -326,10 +326,13 @@ class MobileSurvey(models.MobileSurveyModel):
         synclog.message = _("Sync Completed")
         synclog.save()
 
-    def _sync_failed(self, synclog, userid):
-        logger.info("Sync complete for userid {0}".format(userid))
+    def _sync_failed(self, synclog, userid, err=None):
+        msg = str(err) + "\n"
+        for tb in traceback.format_tb(err.__traceback__):
+            msg += tb
+        logger.warning(f"Sync failed for userid {userid}, with error: \n{msg}")
         synclog.status = "FAILED"
-        synclog.message = _("There was an error syncing.")
+        synclog.message = err
         synclog.save()
 
     def push_edits_to_db(self, synclog, userid=None):
@@ -417,54 +420,79 @@ class MobileSurvey(models.MobileSurveyModel):
         resource instances relevant to a mobile survey. Takes a user object which
         is required for search.
         """
+
         query = self.datadownloadconfig["custom"]
         resource_types = self.datadownloadconfig["resources"]
         all_instances = {}
         if query in ("", None) and len(resource_types) == 0:
             logger.info("No resources or data query defined")
         else:
-            request = HttpRequest()
-            request.user = self.lasteditedby
-            request.GET["mobiledownload"] = True
-            request.GET["resourcecount"] = self.datadownloadconfig["count"]
-            if query in ("", None):
-                if len(self.bounds.coords) == 0:
-                    default_bounds = settings.DEFAULT_BOUNDS
-                    default_bounds["features"][0]["properties"]["inverted"] = False
-                    map_filter = json.dumps(default_bounds)
-                else:
-                    map_filter = json.dumps({"type": "FeatureCollection", "features": [{"geometry": json.loads(self.bounds.json)}]})
-                try:
-                    for res_type in resource_types:
-                        instances = {}
-                        request.GET["resource-type-filter"] = json.dumps([{"graphid": res_type, "inverted": False}])
-                        request.GET["map-filter"] = map_filter
-                        request.GET["paging-filter"] = "1"
-                        request.GET["resourcecount"] = self.datadownloadconfig["count"]
-                        self.append_to_instances(request, instances, res_type)
-                        if len(list(instances.keys())) < int(self.datadownloadconfig["count"]):
-                            request.GET["map-filter"] = "{}"
-                            request.GET["resourcecount"] = int(self.datadownloadconfig["count"]) - len(list(instances.keys()))
+            resources_in_couch = set()
+            resources_in_couch_by_type = {}
+            for res_type in resource_types:
+                resources_in_couch_by_type[res_type] = []
+
+            db = self.couch.create_db("project_" + str(self.id))
+            couch_query = {"selector": {"type": "resource"}, "fields": ["_id", "graph_id"]}
+            for doc in db.find(couch_query):
+                resources_in_couch.add(doc["_id"])
+                resources_in_couch_by_type[doc["graph_id"]].append(doc["_id"])
+
+            if self.datadownloadconfig["download"]:
+                request = HttpRequest()
+                request.user = self.lasteditedby
+                request.GET["mobiledownload"] = True
+                if query in ("", None):
+                    if len(self.bounds.coords) == 0:
+                        default_bounds = settings.DEFAULT_BOUNDS
+                        default_bounds["features"][0]["properties"]["inverted"] = False
+                        map_filter = json.dumps(default_bounds)
+                    else:
+                        map_filter = json.dumps({"type": "FeatureCollection", "features": [{"geometry": json.loads(self.bounds.json)}]})
+                    try:
+                        for res_type in resource_types:
+                            instances = {}
+                            request.GET["resource-type-filter"] = json.dumps([{"graphid": res_type, "inverted": False}])
+                            request.GET["map-filter"] = map_filter
+                            request.GET["paging-filter"] = "1"
+                            request.GET["resourcecount"] = int(self.datadownloadconfig["count"]) - len(resources_in_couch_by_type[res_type])
                             self.append_to_instances(request, instances, res_type)
-                        for key, value in instances.items():
-                            all_instances[key] = value
-                except Exception as e:
-                    logger.exception(e)
-            else:
-                try:
-                    instances = {}
-                    parsed = urllib.parse.urlparse(query)
-                    urlparams = urllib.parse.parse_qs(parsed.query)
-                    for k, v in urlparams.items():
-                        request.GET[k] = v[0]
-                    search_res_json = search.search_results(request)
-                    search_res = JSONDeserializer().deserialize(search_res_json.content)
-                    for hit in search_res["results"]["hits"]["hits"]:
-                        instances[hit["_source"]["resourceinstanceid"]] = hit["_source"]
-                    for key, value in instances.items():
-                        all_instances[key] = value
-                except KeyError:
-                    print("no instances found in", search_res)
+                            if len(list(instances.keys())) < request.GET["resourcecount"]:
+                                request.GET["map-filter"] = "{}"
+                                request.GET["resourcecount"] = request.GET["resourcecount"] - len(list(instances.keys()))
+                                self.append_to_instances(request, instances, res_type)
+                            for key, value in instances.items():
+                                all_instances[key] = value
+                    except Exception as e:
+                        logger.exception(e)
+                else:
+                    try:
+                        request.GET["resourcecount"] = int(self.datadownloadconfig["count"]) - len(resources_in_couch)
+                        parsed = urllib.parse.urlparse(query)
+                        urlparams = urllib.parse.parse_qs(parsed.query)
+                        for k, v in urlparams.items():
+                            request.GET[k] = v[0]
+                        search_res_json = search.search_results(request)
+                        search_res = JSONDeserializer().deserialize(search_res_json.content)
+                        for hit in search_res["results"]["hits"]["hits"]:
+                            all_instances[hit["_source"]["resourceinstanceid"]] = hit["_source"]
+                    except KeyError:
+                        print("no instances found in", search_res)
+
+            # this effectively makes sure that resources in couch always get updated
+            # even if they weren't included in the search results above (assuming self.datadownloadconfig["download"] == True)
+            # if self.datadownloadconfig["download"] == False then this will always update the resources in couch
+            ids = list(resources_in_couch - set(all_instances.keys()))
+
+            if len(ids) > 0:
+                se = SearchEngineFactory().create()
+                query = Query(se, start=0, limit=settings.SEARCH_RESULT_LIMIT)
+                ids_query = Terms(field="_id", terms=ids)
+                query.add_query(ids_query)
+                results = query.search(index="resources")
+                if results is not None:
+                    for result in results["hits"]["hits"]:
+                        all_instances[result["_id"]] = result["_source"]
         return all_instances
 
     def load_tiles_into_couch(self, instances, nodegroup):
@@ -480,9 +508,10 @@ class MobileSurvey(models.MobileSurveyModel):
             if str(tile["resourceinstance_id"]) in instances:
                 try:
                     tile["type"] = "tile"
-                    self.couch.update_doc(db, tile, tile["tileid"])
-                    self.add_attachments(db, tile)
+                    doc = self.couch.update_doc(db, tile, tile["tileid"])
+                    self.add_attachments(db, doc)
                 except Exception as e:
+                    print("error on load_tiles_into_couch")
                     print(e, tile)
         nodegroups = models.NodeGroup.objects.filter(parentnodegroup=nodegroup)
         for nodegroup in nodegroups:
@@ -492,6 +521,7 @@ class MobileSurvey(models.MobileSurveyModel):
         files = models.File.objects.filter(tile_id=tile["tileid"])
         for file in files:
             with Image.open(file.path.file).copy() as image:
+                image = image.convert("RGB")
                 image.thumbnail((settings.MOBILE_IMAGE_SIZE_LIMITS["thumb"], settings.MOBILE_IMAGE_SIZE_LIMITS["thumb"]))
                 b = io.BytesIO()
                 image.save(b, "JPEG")
@@ -510,38 +540,38 @@ class MobileSurvey(models.MobileSurveyModel):
             except Exception as e:
                 print(e, instance)
 
-    def delete_resources_and_tiles_from_couch(self):
-        items_to_delete = self.collect_resource_instances_to_delete() + self.collect_tiles_to_delete()
+    def _delete_items_from_couch(self, key, items_to_delete):
         db = self.couch.create_db("project_" + str(self.id))
-        query = {"selector": {"_id": {"$in": items_to_delete}}}
+        query = {"selector": {key: {"$in": list(items_to_delete)}}}
         for doc in db.find(query):
+            print(f"deleting {doc['type']}: {doc['_id']}")
             db.delete(doc)
 
-    def collect_resource_instances_to_delete(self):
+    def delete_resource_instances_from_couch(self):
         instances_to_delete = []
         try:
             synclog = models.MobileSyncLog.objects.filter(survey=self, status="FINISHED").latest("finished")
-            instances_to_delete = models.EditLog.objects.filter(timestamp__gte=synclog.finished, edittype="delete").values_list(
-                "resourceinstanceid", flat=True
-            )
+            instances_to_delete = models.EditLog.objects.filter(edittype="delete").values_list("resourceinstanceid", flat=True)
         except models.MobileSyncLog.DoesNotExist:
             pass
 
-        print("deleting resources: ", instances_to_delete)
-        return list(instances_to_delete)
+        # print("deleting resources: ", instances_to_delete)
+        # delete resouce instances
+        self._delete_items_from_couch("resourceinstanceid", instances_to_delete)
+        # delete tiles related to those resources that were deleted
+        self._delete_items_from_couch("resourceinstance_id", instances_to_delete)
 
-    def collect_tiles_to_delete(self):
+    def delete_tiles_from_couch(self):
         tiles_to_delete = []
         try:
             synclog = models.MobileSyncLog.objects.filter(survey=self, status="FINISHED").latest("finished")
-            tiles_to_delete = models.EditLog.objects.filter(timestamp__gte=synclog.finished, edittype="tile delete").values_list(
-                "tileinstanceid", flat=True
-            )
+            tiles_to_delete = models.EditLog.objects.filter(edittype="tile delete").values_list("tileinstanceid", flat=True)
         except models.MobileSyncLog.DoesNotExist:
             pass
 
-        print("deleting tiles: ", tiles_to_delete)
-        return list(tiles_to_delete)
+        # print("deleting tiles: ", tiles_to_delete)
+        # delete just individual tiles that were deleted
+        self._delete_items_from_couch("tileid", tiles_to_delete)
 
     def load_data_into_couch(self, initializing_couch=False):
         """
@@ -550,7 +580,8 @@ class MobileSurvey(models.MobileSurveyModel):
         """
 
         if initializing_couch is False:
-            self.delete_resources_and_tiles_from_couch()
+            self.delete_resource_instances_from_couch()
+            self.delete_tiles_from_couch()
 
         instances = self.collect_resource_instances_for_couch()
         cards = self.cards.all()

@@ -34,13 +34,14 @@ class Couch(object):
     def delete_db(self, name):
         return self.couch.delete(name)
 
-    def update_doc(self, db, doc, doc_id=None):
+    def update_doc(self, db, doc, doc_id):
         try:
             x = db.get(doc_id)
             x.update(doc)
             db.save(x)
         except:
             db[doc_id] = doc
+        return db.get(doc_id)
 
     def read_doc(self, db, doc_id, rev=None):
         if rev is None:
