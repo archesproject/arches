@@ -87,8 +87,8 @@
         'gallery-expanded': expandGallery
     }">
     <i class="fa" data-bind="css: {
-        'fa-caret-up': !expandGallery(),
-        'fa-caret-down': expandGallery()
+        'fa-chevron-circle-up': !expandGallery(),
+        'fa-chevron-circle-down': expandGallery()
     }, click: function() { expandGallery(!expandGallery()); }"></i>
     <h3>Gallery</h3>
     <a href="javascript: void(0)" data-bind="
@@ -105,7 +105,7 @@
         <!--ko if: editManifest() -->
             <div class="manifest-editor">
                 <div class="manifest-editor-label">
-                    {% trans "Enter manifest URL:" %}
+                    {% trans "Select a manifest:" %}
                 </div>
                 <div class="manifest-editor-input">
                     <input type="text" data-bind="textInput: manifest" class="form-control input-lg widget-input">
