@@ -107,17 +107,15 @@
             <!--ko if: resourceEditorContext -->
             <!--ko if: !showGraph() -->
             <div class="resource-search-container">
-                <!-- ko component: {
-                name: 'resource-instance-multiselect-widget',
-                params: {
-                    placeholder: '{% trans "Search for resources" %}',
-                    value: relationshipCandidateIds,
-                    disable: disableSearchResults(),
-                    disableMessage: '{% trans "Cannot be related" %}'
-                },
-            } -->
-                <!-- /ko -->
-                <button class="btn btn-mint btn-labeled fa fa-plus" data-bind="click: function(){relateResources()}, text: '{% trans 'Add' %}', css: {'disabled': relationshipCandidateIds() === undefined || relationshipCandidateIds().length === 0}"></button>
+                <div class="col-xs-12 resource-instance-wrapper">
+                    <input style="width:30%; display:inline-block;"
+                        data-bind="
+                            select2Query: {
+                                select2Config: select2Config
+                            }
+                        ">
+                </div>
+                <button class="btn btn-mint btn-labeled fa fa-plus" style="margin-left: 20px;" data-bind="click: function(){relateResources()}, text: '{% trans 'Add' %}', css: {'disabled': relationshipCandidateIds() === undefined || relationshipCandidateIds().length === 0}"></button>
             </div>
             <!--/ko-->
             <!--/ko-->

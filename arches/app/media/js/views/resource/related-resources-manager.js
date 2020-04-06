@@ -38,16 +38,14 @@ define([
                     items: self.graphNodeList
                 });
 
-                this.disableSearchResults = function() {
+                this.disableSearchResults = function(result) {
                     var resourceinstanceid = this.editingInstanceId;
                     var graph = this.graph;
-                    return function(result) {
-                        if (result._id === resourceinstanceid || _.contains(graph.relatable_resources, result._source.graph_id) === false) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    };
+                    if (result._id === resourceinstanceid || _.contains(graph.relatable_resources, result._source.graph_id) === false) {
+                        return true;
+                    } else {
+                        return false;
+                    }
                 };
 
                 this.relationshipCandidates = ko.observableArray([]);
@@ -352,6 +350,100 @@ define([
                         this.relatedProperties.relationship_type(this.defaultRelationshipType);
                     }
                 }, this);
+
+                var url = ko.observable(arches.urls.search_results);
+                this.url = url;
+                this.select2Config = {
+                    placeholder: 'Search for resources',
+                    value: this.relationshipCandidateIds,
+                    clickBubble: true,
+                    multiple: true,
+                    closeOnSelect: false,
+                    allowClear: true,
+                    disabled: this.disabled,
+                    ajax: {
+                        url: function() {
+                            return url();
+                        },
+                        dataType: 'json',
+                        quietMillis: 250,
+                        data: function(term, page) {
+                            //TODO This regex isn't working, but it would nice fix it so that we can do more robust url checking
+                            // var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
+                            // var regex = new RegExp(expression);
+                            // var isUrl = val.target.value.match(regex)
+                            var isUrl = term.startsWith('http');
+                            if (isUrl) {
+                                url(term.replace('search', 'search/resources'));
+                                return {};
+                            } else {
+                                url(arches.urls.search_results);
+                                var graphid = undefined;
+                                //if(!!params.graphid) { graphid = [ko.unwrap(params.graphid)]; }
+                                var data = { 'paging-filter': page };
+                                if (graphid && graphid.length > 0) {
+                                    data['resource-type-filter'] = JSON.stringify(
+                                        graphid.map(function(id) {
+                                            return {
+                                                "graphid": id,
+                                                "inverted": false
+                                            };
+                                        })
+                                    );
+                                }
+                                if (term) {
+                                    data['term-filter'] = JSON.stringify([{
+                                        "inverted": false,
+                                        "type": "string",
+                                        "context": "",
+                                        "context_label": "",
+                                        "id": term,
+                                        "text": term,
+                                        "value": term
+                                    }]);
+                                }
+                                return data;
+                            }
+                        },
+
+                        results: function(data, page) {
+                            return {
+                                results: data.results.hits.hits,
+                                more: data['paging-filter'].paginator.has_next
+                            };
+                        }
+                    },
+                    id: function(item) {
+                        return item._id;
+                    },
+                    formatResult: function(item) {
+                        if (self.disableSearchResults(item) === false) {
+                            if (item._source) {
+                                return item._source.displayname;
+                            } else {
+                                return '<b> Create a new ' + item.name + ' . . . </b>';
+                            }
+                        } else {
+                            return '<span>' + item._source.displayname + ' Cannot be related</span>';
+                        }
+                    },
+                    formatResultCssClass: function(item) {
+                        if (self.disableSearchResults(item) === false) {
+                            return '';
+                        } else {
+                            return 'disabled';
+                        }
+                    },
+                    formatSelection: function(item) {
+                        if (item._source) {
+                            return item._source.displayname;
+                        } else {
+                            return item.name;
+                        }
+                    },
+                    initSelection: function(el, callback) {
+                    }
+                };
             },
 
             deleteRelationships: function() {

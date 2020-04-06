@@ -12,14 +12,46 @@
         <div class="col-xs-12 resource-instance-wrapper">
             <input style="width:30%; display:inline-block;"
                 data-bind="
-                    value: value,
                     select2Query: {
                         select2Config: select2Config
                     }
                 ">
+
+            <button class="btn btn-mint btn-labeled fa fa-plus" style="margin-left: 20px;" data-bind="click: function(){relateResources()}, text: '{% trans 'Add' %}', css: {'disabled': value() === null}"></button>
         </div>
     </div>
 </div>
+
+<div>
+    <table class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th class="rr-tab-field">{% trans "Target Resource" %}</th>
+                <th class="rr-tab-field">{% trans "Relationship" %}</th>
+                <th class="rr-tab-field">{% trans "Reverse Relationship" %}</th>
+                <th class="rr-tab-field">{% trans "Target Ontology Class" %}</th>
+            </tr>
+        </thead>
+        <tbody data-bind="foreach: value">
+            <tr class="rr-table-row">
+                <td>
+                    <span data-bind="text: resource.name"></span>
+                </td>
+                <td>
+                    <span data-bind="text: ontologyproperty"></span>
+                </td>
+                <td>
+                    <span data-bind="text: revProperty"></span>
+                </td>
+                <td>
+                    <span data-bind="text: ontologyclass"></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
 <!-- ko if: newTileStep -->
 <div class="create-resource-instance-card-component" data-bind="with: newTileStep">
     <div class="create-instance-header" style="display: flex; justify-content: space-between;">

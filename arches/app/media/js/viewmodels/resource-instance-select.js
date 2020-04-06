@@ -11,9 +11,6 @@ define([
         params.configKeys = ['placeholder'];
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
-        this.disable = params.disable || function() {
-            return false;
-        };
         this.graphids = params.node ? ko.unwrap(params.node.config.graphid) : [params.graphid];
         this.graphids = this.graphids || [];
         this.graphNames = {};
@@ -23,7 +20,8 @@ define([
             });
         });
 
-        this.disableMessage = params.disableMessage || '';
+        this.useSemanticRelationships = arches.useSemanticRelationships;
+
 
         WidgetViewModel.apply(this, [params]);
         var displayName = ko.observable('');
@@ -120,13 +118,34 @@ define([
         var url = ko.observable(arches.urls.search_results);
         this.url = url;
         this.select2Config = {
-            value: this.value,
+            value: this.selectedResource,
             clickBubble: true,
             multiple: this.multiple,
             placeholder: this.placeholder,
             closeOnSelect: false,
             allowClear: true,
-            disabled: this.disabled,
+            onSelect: function(item) {
+                if (item._source) {
+                    var ret = {
+                        "resource": {
+                            "id": item._id,
+                            "name": item._source.displayname
+                        },
+                        "ontologyproperty": "p44_test",
+                        "revProperty": "p44i_from_test",
+                        "ontologyclass": item._source.root_ontology_class
+                    };
+                    if (self.multiple) {
+                        ret = [ret];
+                        if (self.value() !== null) {
+                            ret = ret.concat(self.value());
+                        }
+                    }
+                    self.value(ret);
+                } else {
+                    return '<b> Create a new ' + item.name + ' . . . </b>';
+                }
+            },
             ajax: {
                 url: function() {
                     return url();
@@ -190,21 +209,10 @@ define([
                 return item._id;
             },
             formatResult: function(item) {
-                if (self.disable(item) === false) {
-                    if (item._source) {
-                        return item._source.displayname;
-                    } else {
-                        return '<b> Create a new ' + item.name + ' . . . </b>';
-                    }
+                if (item._source) {
+                    return item._source.displayname;
                 } else {
-                    return '<span>' + item._source.displayname + ' ' + self.disableMessage + '</span>';
-                }
-            },
-            formatResultCssClass: function(item) {
-                if (self.disable(item) === false) {
-                    return '';
-                } else {
-                    return 'disabled';
+                    return '<b> Create a new ' + item.name + ' . . . </b>';
                 }
             },
             formatSelection: function(item) {
@@ -213,64 +221,6 @@ define([
                 } else {
                     return item.name;
                 }
-            },
-            initSelection: function(el, callback) {
-                var valueList = self.valueList();
-                var setSelectionData = function() {
-                    var valueData = self.valueObjects().map(function(item) {
-                        return {
-                            _id: item.id,
-                            _source: {
-                                displayname: item.name
-                            }
-                        };
-                    });
-                    valueData = self.multiple ? valueData : valueData[0];
-                    if (valueData) {
-                        callback(valueData);
-                    }
-                };
-
-                valueList.forEach(function(value) {
-                    var names = [];
-                    if (value) {
-                        var modelIds = relatedResourceModels().map(function(model) {
-                            return model._id;
-                        });
-                        if (!(modelIds.indexOf(value) > -1)) {
-                            if (nameLookup[value]) {
-                                setSelectionData();
-                            } else {
-                                $.ajax(arches.urls.resource_descriptors + value, {
-                                    dataType: "json"
-                                }).done(function(data) {
-                                    nameLookup[value] = data.displayname;
-                                    names.push(data.displayname);
-                                    displayName(names.join(', '));
-                                    setSelectionData();
-                                });
-                            }
-                        } else {
-                            var params = {
-                                graphid: value,
-                                complete: ko.observable(false),
-                                resourceid: ko.observable(),
-                                tileid: ko.observable()
-                            };
-                            self.newTileStep(params);
-                            params.complete.subscribe(function() {
-                                var result = params.resourceid();
-                                if (self.multiple) {
-                                    self.valueList().push(params.resourceid());
-                                    result = self.valueList();
-                                }
-                                result = self.removeGraphIdsFromValue(result);
-                                self.newTileStep(null);
-                                self.value(result);
-                            });
-                        }
-                    }
-                });
             }
         };
     };
