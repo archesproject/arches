@@ -399,7 +399,7 @@ define([
             }
         };
 
-       this.isDirty = function(){
+        this.isDirty = function(){
             if(self.newTile) {
                 if(self.newTile.dirty()) { return true; }
             }
