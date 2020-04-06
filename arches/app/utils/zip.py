@@ -23,15 +23,16 @@ from arches.app.models import models
 from django.http import HttpResponse
 
 
-def create_zip_file(files_for_export):
+def create_zip_file(files_for_export, filekey):
     """
-    Given a list of export file names, zips up all the files with those names and returns and http response.
+    Takes a list of dictionaries, each with a file object and a name, zips up all the files with those names and returns a zip file buffer.
     """
+
     buffer = BytesIO()
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zip:
         for f in files_for_export:
-            f["outputfile"].seek(0)
-            zip.writestr(f["name"], f["outputfile"].read())
+            f[filekey].seek(0)
+            zip.writestr(f["name"], f[filekey].read())
 
     zip.close()
     buffer.flush()
@@ -40,11 +41,12 @@ def create_zip_file(files_for_export):
     return zip_stream
 
 
-def zip_response(files_for_export, zip_file_name=None):
+def zip_response(files_for_export, zip_file_name=None, filekey="outputfile"):
     """
-    Given a list of export file names, zips up all the files with those names and returns and http response.
+    Takes a list of dictionaries, each with a file object and a name, returns an HttpResponse object with a zip file.
     """
-    zip_stream = create_zip_file(files_for_export)
+
+    zip_stream = create_zip_file(files_for_export, filekey)
     response = HttpResponse()
     response["Content-Disposition"] = "attachment; filename=" + zip_file_name
     response["Content-length"] = str(len(zip_stream))

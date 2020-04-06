@@ -222,7 +222,7 @@
     <div style='padding-left: 15px;' data-bind='text: card.staging().length + "{% trans ' files selected' %}"'></div>
     </div>
     <div data-bind="dropzone: dropzoneOptions">
-        <button type="button" class="btn-file-select fileinput-button dz-clickable" style='width: 90px; margin: 0;' data-bind="css: uniqueidClass">
+        <button type="button" class="btn-file-select fileinput-button dz-clickable" style='width: 65px; margin: 0;' data-bind="css: uniqueidClass">
             <div>{% trans 'add files' %}</div>
         </button>
     </div>
@@ -236,7 +236,11 @@
         }"><i class="fa fa-eraser"></i> {% trans 'Clear All' %}</button>
     </div>
 </div>
-<button class="btn btn-lg btn-workbench btn-warning" data-bind="click: function(){removeTiles()}, visible: card.staging().length > 0"><i class="fa fa-trash"></i> {% trans 'Delete Selected' %}</button>
+
+<div class="file-workbench-selected-buttons" data-bind="visible: card.staging().length > 0">
+    <button class="btn btn-lg btn-workbench btn-warning" data-bind="click: function(){removeTiles()}"><i class="fa fa-trash"></i> {% trans 'Delete Selected' %}</button>
+    <button class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){downloadSelection()}"><i class="fa fa-download"></i> {% trans 'Download Selected' %}</button>
+</div>
 
 <div class="col-xs-12 pad-no crud-widget-container">
     <h2 class="file-workbench-filter-header">{% trans 'Loader' %}</h2>
