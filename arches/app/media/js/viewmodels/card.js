@@ -405,8 +405,7 @@ define([
                 if(self.newTile.dirty()) {
                     var res = {};
                     self.widgets().forEach(function(w){
-                        if (typeof w.config.defaultValue === 'function')
-                            res[w.node.nodeid] = w.config.defaultValue();
+                        res[w.node.nodeid] = ko.unwrap(w.config.defaultValue);
                     });
                     for (var k in self.newTile.data) {
                         if (Object.keys(res).indexOf(k) > -1) {
