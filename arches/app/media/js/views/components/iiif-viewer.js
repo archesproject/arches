@@ -53,6 +53,7 @@ define([
         };
 
         var queryTerm;
+        var limit = 10;
         this.manifestSelectConfig = {
             value: this.manifest,
             clickBubble: true,
@@ -63,20 +64,23 @@ define([
                 url: arches.urls.iiifmanifest,
                 dataType: 'json',
                 quietMillis: 250,
-                data: function(term) {
+                data: function(term, page) {
                     queryTerm = term;
                     return {
+                        start: (page-1)*limit,
+                        limit: limit,
                         query: term
                     };
                 },
-                results: function(data) {
-                    if (validateUrl(queryTerm)) data.unshift({
+                results: function(data, page) {
+                    var results = data.results;
+                    if (validateUrl(queryTerm)) results.unshift({
                         url: queryTerm,
                         label: queryTerm
                     });
                     return {
-                        results: data,
-                        more: false
+                        results: results,
+                        more: data.count >= (page*limit)
                     };
                 }
             },
