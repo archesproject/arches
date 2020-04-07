@@ -905,7 +905,7 @@ class IIIFManifest(APIBase):
 
         manifests = models.IIIFManifest.objects.all()
         if query is not None:
-            manifests = manifests.filter(label__startswith=query)
+            manifests = manifests.filter(label__icontains=query)
 
         response = JSONResponse(manifests)
         return response
