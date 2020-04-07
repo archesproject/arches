@@ -409,7 +409,6 @@ define([
                     });
                     this.on("addedfile", self.addTile, self);
                     this.on("error", function(file, error) {
-                        console.log('error', error)
                         file.error = error;
                     });
                 }
