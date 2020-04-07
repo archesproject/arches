@@ -190,6 +190,7 @@ urlpatterns = [
     url(r"^tiles/reorder_tiles$", TileData.as_view(action="reorder_tiles"), name="reorder_tiles"),
     url(r"^tiles/tile_history$", TileData.as_view(action="tile_history"), name="tile_history"),
     url(r"^tiles/delete_provisional_tile$", TileData.as_view(action="delete_provisional_tile"), name="delete_provisional_tile"),
+    url(r"^tiles/download_files$", TileData.as_view(action="download_files"), name="download_files"),
     url(r"^templates/(?P<template>[a-zA-Z_\-./]*)", main.templates, name="templates"),
     url(r"^map_layer_manager/(?P<maplayerid>%s)$" % uuid_regex, MapLayerManagerView.as_view(), name="map_layer_update"),
     url(r"^map_layer_manager/*", MapLayerManagerView.as_view(), name="map_layer_manager"),

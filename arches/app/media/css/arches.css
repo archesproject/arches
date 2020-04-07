@@ -875,15 +875,6 @@ ul.tabbed-report-tab-list {
     cursor: pointer;
 }
 
-.photo-workbench-photos {
-    height: 136px;
-    overflow-y: scroll;
-    border: solid 1px #ddd;
-    display: flex;
-    flex-direction: column;
-    margin: 5px 20px 10px 20px;
-}
-
 .photo-workbench-photos::-webkit-scrollbar {
     -webkit-appearance: none;
     width: 9px;
@@ -923,14 +914,28 @@ ul.tabbed-report-tab-list {
     cursor: pointer;
 }
 
+.card-component-panel .workbench-tile-picker-label {
+    font-weight: 600;
+    color: #666;
+    margin-left: 10px;
+    margin-top: 60px;
+}
+
 .workbench-card-sidepanel-header-container.file-workbench {
     margin-right: 0px;
     margin-left: 0px;
 }
 
+.file-workbench-selected-buttons {
+    display: flex;
+    flex-direction: column;
+    height: 87px;
+    justify-content: space-between;
+}
+
 .file-workbench-filter {
     position: relative;
-    margin-top: 25px;
+    margin-top: 20px;
     margin-bottom: -10px;
 }
 
@@ -1356,7 +1361,7 @@ ul.tabbed-report-tab-list {
     border: solid 1px #ddd;
     display: flex;
     flex-direction: column;
-    margin: 55px 20px 10px 20px;
+    margin: 5px 10px 10px 10px;
 }
 
 .photo-workbench-photo {
@@ -1405,6 +1410,10 @@ ul.tabbed-report-tab-list {
     padding: 15px;
     background-color: #ffffff;
     width: 100%;
+}
+
+.workbench-card-sidepanel .file-chart-upload-panel {
+    margin-right: -120px;
 }
 
 /* end photo gallery */
@@ -1609,7 +1618,7 @@ ul.tabbed-report-tab-list {
     padding: 17px 30px 10px 0px;
     margin-left: 0px;
     margin-top: -16px;
-    position: fixed;
+    position: absolute;
     background: #fff;
     z-index: 20;
     width: 370px;
@@ -1800,9 +1809,14 @@ ul.tabbed-report-tab-list {
     font-weight: 600;
 }
 
+.geojson-card {
+    margin-top: 65px;
+}
+
 .geojson-editor {
     border: 1px solid #808080;
-    margin-bottom: 16px;
+    margin-bottom: 5px;
+    margin-top: 5px;
 }
 
 .geojson-error-list {
@@ -6815,10 +6829,18 @@ span.file-upload-clear-filter {
     padding: 15px 15px;
 }
 
+.file-upload-footer .loader-selector {
+    max-height: 25px;
+}
+
 .file-select {
     text-align: center;
     padding: 70px 0;
     background: #f6f6f6;
+}
+
+.file-select h2 {
+    font-weight: 400;
 }
 
 .loader-select {
@@ -6841,9 +6863,32 @@ span.file-upload-clear-filter {
     font-weight: 400;
 }
 
+.loader-error-message {
+    background: #E94484;
+    color: #fff ! important;
+    padding: 20px 0px;
+    margin-top: -46px;
+    margin-bottom: 45px;
+}
+
+.loader-error-message span {
+    font-weight: 800;
+}
+
+.file-chart-upload-panel {
+    position: relative;
+    margin-right: -40px;
+    margin-left: 100px;
+    margin-top: -35px;
+}
+
 .file-select-window {
     border: 1px solid #c4c4c4;
     border-radius: 2px;
+}
+
+.file-select-window h2 {
+    font-weight: 400;
 }
 
 .btn-file-select {
@@ -11149,7 +11194,7 @@ ul.select2-choices:after {
 
 .card-component {
     padding: 15px 25px 25px 25px;
-    margin: 10px;
+    margin: 15px;
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 3px;
@@ -11173,6 +11218,19 @@ ul.select2-choices:after {
     color: #2f527a;
     font-size: 17px;
     font-weight: 400;
+}
+
+.card-component-panel h3.rr-splash-description {
+    font-size: 16px;
+    padding: 0px 20px;
+    color: #888;
+    margin: 0px;
+}
+
+.file-select .rr-splash-img {
+    margin-top: 0px;
+    margin-left: 2px; 
+    height: 90%;
 }
 
 .card-component-panel h4 {
@@ -11204,9 +11262,8 @@ ul.select2-choices:after {
 
 .card-component-panel h5 {
     color: #999;
-    margin-top: -8px;
+    margin-top: 5px;
     margin-bottom: 5px;
-    font-size: 13px;
 }
 
 .card-component-wrapper-editor {
@@ -11364,7 +11421,7 @@ a.jstree-anchor.permissions-widget {
 
 .rr-splash {
     text-align: center;
-    margin: 48px 41px 20px 45px;
+    margin: 48px 45px 20px 45px;
     border: 1px solid #ddd;
     padding: 40px 30px;
     background: #f6f6f6;
@@ -11618,10 +11675,18 @@ a.jstree-anchor.permissions-widget {
     z-index: 10000;
     color: #2f527a;
 }
-.show-gallery-control i, .show-gallery-control a {
+.show-gallery-control i {
+    cursor: pointer;
+    color: #2f527a;
+    font-size: 15px;
+}
+
+.show-gallery-control a {
     cursor: pointer;
     color: #2f527a;
 }
+
+
 .gallery-visible.show-gallery-control {
     bottom: 159px;
 }
@@ -11632,8 +11697,9 @@ a.jstree-anchor.permissions-widget {
     bottom: auto;
     border-bottom: solid 1px rgb(221, 221, 221);
     z-index: 2000;
-    padding-left: 30px;
+    padding: 15px 0 15px 30px;
 }
+
 .workbench-card-container-sidepanel-active .show-gallery-control.gallery-expanded {
     right: 475px;
 }
@@ -11642,7 +11708,7 @@ a.jstree-anchor.permissions-widget {
     left: 0;
 }
 .iiif-viewer-gallery.gallery-expanded {
-    top: 0;
+    top: 10px;
     padding-top: 30px;
     z-index: 1000;
 }
@@ -11662,11 +11728,12 @@ a.jstree-anchor.permissions-widget {
 }
 .show-gallery-control h3 {
     display: inline-block;
-    margin: 0 4px;
+    margin: 0 2px;
 }
 .gallery-expanded .iiif-gallery-content {
     height: 100%;
     background-color: rgb(250, 250, 250);
+    padding: 25px 20px 20px 20px;
 }
 .workbench-card-wrapper .workbench-card-container-wrapper {
     height: 100%;
@@ -11682,7 +11749,7 @@ a.jstree-anchor.permissions-widget {
     display: none;
 }
 .iiif-gallery-canvas, .iiif-gallery-sequence, .iiif-gallery-sequence-canvases {
-    padding-left: 10px;
+    padding-left: 0px;
     display: inline-block;
     white-space: nowrap;
 }
@@ -11705,7 +11772,7 @@ a.jstree-anchor.permissions-widget {
     border: 2px solid rgb(28, 62, 95);
 }
 .iiif-viewer-gallery.gallery-expanded .iiif-gallery-canvas-thumbnail img {
-    height: 110px;
+    height: 175px;
 }
 .iiif-gallery-sequence-label {
     cursor: pointer;
@@ -11715,7 +11782,12 @@ a.jstree-anchor.permissions-widget {
 }
 .iiif-gallery-header {
     font-size: 1.2em;
-    padding-left: 28px;
+    padding-left: 10px;
+    position: sticky;
+    left: 0px;
+}
+.gallery-expanded .iiif-gallery-header {
+    padding-left: 10px;
 }
 .manifest-editor-label {
     font-size: 1.2em;
@@ -11734,7 +11806,7 @@ a.jstree-anchor.permissions-widget {
     margin-bottom: 10px;
 }
 .iiif-viewer-gallery.gallery-expanded .iiif-gallery-canvas {
-    height: 155px;
+    height: 220px;
     min-width: 120px;
 }
 .iiif-gallery-canvas:hover, .iiif-gallery-canvas.active {
@@ -11789,7 +11861,7 @@ a.jstree-anchor.permissions-widget {
 
 .chart {
     margin-right: 105px;
-    margin-left: 15px;
+    margin-left: 20px;
     margin-top: 20px;
 }
 .style-tools-collapser {

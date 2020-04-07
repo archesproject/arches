@@ -28,6 +28,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
+from arches.app.models.tile import Tile
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.decorators import can_read_resource_instance, can_edit_resource_instance, can_read_concept
@@ -871,19 +872,23 @@ class Images(APIBase):
             image_file, file_created = models.File.objects.get_or_create(pk=fileid)
             image_file.path.save(file_name, ContentFile(file_data.read()))
 
-            tile = models.TileModel.objects.get(pk=tileid)
-            for image in tile.data[nodeid]:
+            tile = Tile.objects.get(pk=tileid)
+            tile_data = tile.get_tile_data(request.user.pk)
+            for image in tile_data[nodeid]:
                 if image["file_id"] == fileid:
                     image["url"] = image_file.path.url
                     image["size"] = image_file.path.size
-                    tile.save()
+                    # I don't really want to run all the code Tile.save(),
+                    # so I just call it's super class
+                    super(Tile, tile).save()
+                    tile.index()
 
             # to use base64 use the below code
             # import base64
             # with open("foo.jpg", "w+b") as f:
             #     f.write(base64.b64decode(request.POST.get('data')))
 
-        except models.TileModel.DoesNotExist:
+        except Tile.DoesNotExist:
             # it's ok if the Tile doesn't exist, that just means that there is some
             # latency in the updating of the db from couch
             # see process_mobile_data in the FileListDatatype for how image thumbnails get
