@@ -897,3 +897,15 @@ class Images(APIBase):
             return JSONResponse(status=500)
 
         return JSONResponse()
+
+
+class IIIFManifest(APIBase):
+    def get(self, request):
+        query = request.GET.get("query", None)
+
+        manifests = models.IIIFManifest.objects.all()
+        if query is not None:
+            manifests = manifests.filter(label__startswith=query)
+
+        response = JSONResponse(manifests)
+        return response
