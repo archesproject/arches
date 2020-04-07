@@ -557,7 +557,7 @@ RENDERERS = [
         "component": "views/components/cards/file-renderers/imagereader",
         "ext": "",
         "type": "image/*",
-        "exclude": "tif,tiff,psd"
+        "exclude": "tif,tiff,psd",
     }
 ]
 
