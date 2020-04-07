@@ -1,10 +1,11 @@
 define([
+    'arches',
     'knockout',
     'leaflet',
     'views/components/workbench',
     'leaflet-iiif',
     'bindings/leaflet'
-], function(ko, L, WorkbenchViewmodel) {
+], function(arches, ko, L, WorkbenchViewmodel) {
     var IIIFViewerViewmodel = function(params) {
         var self = this;
         var abortFetchManifest;
@@ -46,6 +47,48 @@ define([
             return getLabel(manifestData || {label: ''});
         });
         this.zoomToCanvas = true;
+
+        this.manifestSelectConfig = {
+            value: this.manifest,
+            clickBubble: true,
+            multiple: false,
+            closeOnSlect: false,
+            allowClear: true,
+            ajax: {
+                url: arches.urls.iiifmanifest,
+                dataType: 'json',
+                quietMillis: 250,
+                data: function(term) {
+                    return {
+                        query: term
+                    };
+                },
+                results: function(data) {
+                    return {
+                        results: data,
+                        more: false
+                    };
+                }
+            },
+            id: function(item) {
+                return item.url;
+            },
+            formatResult: function(item) {
+                return item.label;
+            },
+            formatSelection: function(item) {
+                return item.label;
+            },
+            clear: function() {
+                self.manifest('');
+            },
+            isEmpty: ko.computed(function() {
+                return self.manifest() === '' || !self.manifest();
+            }, this),
+            initSelection: function() {
+                return;
+            }
+        };
 
         this.getManifestData = function() {
             var manifestURL = self.manifest();

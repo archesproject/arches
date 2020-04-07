@@ -108,7 +108,11 @@
                     {% trans "Select a manifest:" %}
                 </div>
                 <div class="manifest-editor-input">
-                    <input type="text" data-bind="textInput: manifest" class="form-control input-lg widget-input">
+                    <input class="form-control input-lg widget-input"
+                        data-bind="value: manifest,
+                        select2Query: {
+                            select2Config: manifestSelectConfig
+                        }">
                 </div>
             </div>
             <div class="install-buttons">
