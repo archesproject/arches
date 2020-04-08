@@ -2,7 +2,8 @@ define([
     'jquery',
     'knockout',
     'knockout-mapping',
-    'arches'
+    'arches',
+    'bindings/select2-query'
 ], function($, ko, koMapping, arches) {
     return ko.components.register('permissions-manager', {
         viewModel: function(params) {
@@ -10,6 +11,8 @@ define([
             this.instancePermissions = ko.observable();
             this.resourceId = params.resourceId();
             this.openEditor = ko.observable(undefined);
+            this.identities = [{'text':'one', 'id': 1}, {'text':'two', 'id': 2}];
+            this.selectedIdentities = ko.observableArray([]);
             this.updatePermissions = function(){
                 var payload = {
                     "selectedIdentities": [

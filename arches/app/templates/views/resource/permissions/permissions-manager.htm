@@ -30,6 +30,32 @@
     </div>
     <!--/ko-->
     <!--ko if: openEditor() -->
-        <div data-bind="text: JSON.stringify(instancePermissions(), null, 4)"></div>
+        <div class="permission-grid">
+            <div class="permission-header">
+                <h4>{% trans 'Set Permissions for this instance' %}</h4>
+                <h5>{% trans 'By default everyone has access to this record. You can limit access to specific people or groups by selecting to whom you will grant access' %}</h5>
+            </div>
+            <div class="permission-control">
+                <div style="display:inline-flex; justify-content: space-between;">
+                <button type="button" class="btn btn-md btn-success"><i class="fa fa-check-circle"></i> {% trans 'Add New Person/Group' %}</button>
+                <div style="width: 200px; padding-left: 12px">
+                    <input style="display:inline-block;"
+                        data-bind="select2Query: {
+                        select2Config: {
+                            clickBubble: true,
+                            disabled: false,
+                            data: identities,
+                            value: selectedIdentities,
+                            allowClear: false,
+                            multiple: true,
+                            placeholder: {% trans "'Users or Groups'" %}}}">
+                    </div>
+                </div>
+            </div>
+            <div class="permission-list" data-bind="text: JSON.stringify(instancePermissions(), null, 4)"></div>
+            <div class="permission-footer"></div>
+        </div>
+
+    
     <!--/ko-->
 </div>
