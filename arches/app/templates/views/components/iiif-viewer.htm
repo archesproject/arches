@@ -96,7 +96,7 @@
         text: showGallery() ? '{% trans "hide" %}' : '{% trans "show" %}'
     "></a>
 </div>
-<!--ko let: {selectCanvas: selectCanvas, getCanvasService: getCanvasService, selectedCanvas: canvas, getAnnotationCount: getAnnotationCount} -->
+<!--ko let: {canvasClick: canvasClick, getCanvasService: getCanvasService, selectedCanvas: canvas, getAnnotationCount: getAnnotationCount} -->
 <div class="iiif-viewer-gallery" data-bind="css: {
         'gallery-expanded': expandGallery
     }">
@@ -154,7 +154,7 @@
                 <div class="iiif-gallery-sequence">
                     <div class="iiif-gallery-sequence-canvases" data-bind="foreach: canvases">
                         <div class="iiif-gallery-canvas" data-bind="click: function() {
-                            selectCanvas($data);
+                            canvasClick($data);
                         },
                         visible: label.toLowerCase().includes(self.filter().toLowerCase()),
                         css: {
