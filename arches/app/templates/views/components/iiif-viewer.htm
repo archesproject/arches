@@ -132,6 +132,28 @@
                 </span>
                 <!--/ko -->
             </div>
+            <!--ko if: expandGallery() && manifestData() -->
+            <div class="manifest-details">
+                <h3>
+                    Current Manifest:
+                    <span data-bind="text: manifestName"></span>
+                </h3>
+                <h4>Details</h4>
+                <div class="manifest-details-list" data-bind="foreach: manifestData().metadata || []">
+                    <dt data-bind="text: label"></dt>
+                    <!--ko foreach: Array.isArray(value) ? value : [value] -->
+                    <dd data-bind="html: $data"></dd>
+                    <!--/ko -->
+                </div>
+                <h4>Attribution</h4>
+                <div class="manifest-attribution">
+                    <!--ko if: manifestData().logo -->
+                    <img data-bind="attr: {src: typeof manifestData().logo === 'string' ? manifestData().logo : manifestData().logo['@id']}">
+                    <!--/ko -->
+                    <div data-bind="text: manifestData().attribution || '{% trans "None" %}'"></div>
+                </div>
+            </div>
+            <!--/ko -->
         <!--/ko -->
         <!--ko if: !editManifest() -->
             <!--ko if: manifestLoading() -->
