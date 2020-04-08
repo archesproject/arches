@@ -1203,6 +1203,27 @@ class FileListDataType(BaseDataType):
         result = json.loads(json.dumps(tile_data))
         return result
 
+    def is_a_literal_in_rdf(self):  
+        return False
+
+    def get_rdf_uri(self, node, data, which="r"):
+        if type(data) == list:
+            l = []
+            for x in data:
+                if x["url"].startswith("/"):
+                    l.append(URIRef(archesproject[x["url"][1:]]))
+                else:
+                    l.append(URIRef(archesproject[x["url"]]))
+            return l
+        elif data:
+            if data["url"].startswith("/"):
+                return URIRef(archesproject[data["url"][1:]])
+            else:
+                return URIRef(archesproject[data["url"]])        
+        else:
+            return node
+
+
     def to_rdf(self, edge_info, edge):
         # outputs a graph holding an RDF representation of the file stored in the Arches instance
 
@@ -1233,10 +1254,10 @@ class FileListDataType(BaseDataType):
 
         def add_dimension(graphobj, domain_uri, unittype, unit, value):
             dim_node = BNode()
-            graphobj.add((domain_uri, cidoc["P43_has_dimension"], dim_node))
-            graphobj.add((dim_node, RDF.type, cidoc["E54_Dimension"]))
-            graphobj.add((dim_node, cidoc["P2_has_type"], aatrefs[unittype]))
-            graphobj.add((dim_node, cidoc["P91_has_unit"], aatrefs[unit]))
+            graphobj.add((domain_uri, cidoc_nm["P43_has_dimension"], dim_node))
+            graphobj.add((dim_node, RDF.type, cidoc_nm["E54_Dimension"]))
+            graphobj.add((dim_node, cidoc_nm["P2_has_type"], aatrefs[unittype]))
+            graphobj.add((dim_node, cidoc_nm["P91_has_unit"], aatrefs[unit]))
             graphobj.add((dim_node, RDF.value, Literal(value)))
 
         for f_data in edge_info["range_tile_data"]:
@@ -1264,14 +1285,14 @@ class FileListDataType(BaseDataType):
                 lm = f_data["lastModified"]
                 if lm > 9999999999:  # not a straight timestamp, but includes milliseconds
                     lm = f_data["lastModified"] / 1000
-                graph.add((f_uri, DCTERMS.modified, Literal(datetime.utcfromtimestamp(lm).isoformat())))
+                g.add((f_uri, DCTERMS.modified, Literal(datetime.utcfromtimestamp(lm).isoformat())))
 
             if "size" in f_data:
-                add_dimension(graph, f_uri, "file size", "bytes", f_data["size"])
+                add_dimension(g, f_uri, "file size", "bytes", f_data["size"])
             if "height" in f_data:
-                add_dimension(graph, f_uri, "height", "pixels", f_data["height"])
+                add_dimension(g, f_uri, "height", "pixels", f_data["height"])
             if "width" in f_data:
-                add_dimension(graph, f_uri, "width", "pixels", f_data["width"])
+                add_dimension(g, f_uri, "width", "pixels", f_data["width"])
 
         return g
 
