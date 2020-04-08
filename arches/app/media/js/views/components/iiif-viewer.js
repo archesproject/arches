@@ -134,7 +134,7 @@ define([
         WorkbenchViewmodel.apply(this, [params]);
 
         this.showGallery = ko.observable(true);
-        this.expandGallery = ko.observable(false);
+        this.expandGallery = ko.observable(!params.manifest);
         this.expandGallery.subscribe(function(expandGallery) {
             if (expandGallery) self.showGallery(true);
         });
@@ -207,6 +207,11 @@ define([
             var service = self.getCanvasService(canvas);
             self.zoomToCanvas = true;
             if (service) self.canvas(service);
+        };
+
+        this.canvasClick = function(canvas) {
+            self.selectCanvas(canvas);
+            self.expandGallery(false);
         };
 
         this.getCanvasService = function(canvas) {
