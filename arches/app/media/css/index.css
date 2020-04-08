@@ -227,6 +227,12 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     /*font-family: "Open Sans",Arial,sans-serif;*/
 }
 
+.application-name {
+    position: absolute;
+    top: 5px;
+    left: 80px;
+}
+
 .application-name h1 {
     color: #fff;
     font-size: 24px;
@@ -673,6 +679,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .splash-links {
     margin-top: 20px;
+    padding-left: 80px;
 }
 
 .splash-link-address {
@@ -689,6 +696,10 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .icon-bar {
     background: #fff;
+}
+
+.logo-name-container {
+    padding: 8px 10px 8px 10px;
 }
 
 @media (min-width: 768px) {
@@ -708,7 +719,6 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
         display:block !important;
         background: #000;
         margin-top: 11px;
-        margin-right: 80px;
     }
     .navbar-header {
         float:none;
@@ -725,9 +735,24 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 @media (max-width: 320px) { 
+    .application-name {
+        left: 60px;
+    }
     .app-info-block {
         padding: 20px 10px;
-    } 
+    }
+    .iphone {
+        width: 100%;
+    }
+    .organization-address, .app-footer-heading, .splash-links .row {
+        padding: 0 10px;
+    }
+    .splash-links {
+        padding-left: 10px;
+    }
+    .box-highlight {
+        padding: 10px;
+    }
 }
 
 @media (max-width: 481px) {

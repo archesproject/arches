@@ -64,34 +64,28 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                             <span class="icon-bar"></span>
                         </button>
 
-                        <div class="relative" style="padding: 8px 10px 8px 100px; width: 300px;">
+                        <div class="relative logo-name-container">
                             <div class="navbar-brand-v5-icon-container">
                                 <img class="navbar-brand-v5-icon" src="{% static 'img/landing/arches_logo_dark.png' %}" alt="Arches Logo">
                             </div>
-                            <div class="application-name" style="position: absolute; top: 5px; left: 160px;">
+                            <div class="application-name">
                                 <h1>{% trans "Arches | v5" %}</h1>
                             </div>
                         </div>
                     </div>
-
                     <div class="collapse navbar-collapse" id="myNavbar">
-                        <ul class="nav navbar-nav">
+                        <ul class="nav navbar-nav navbar-right">
                             <li>
                                 <a href="#info-block-1">{% trans "Arches Features" %}</a>
                             </li>
-
                             <li>
                                 <a href="{% url 'search_home' %}">{% trans "Search Arches" %}</a>
                             </li>
-
                             {% if user|can_create_resource_instance and user.username != 'anonymous' %}
                             <li>
                                 <a href="{% url 'resource' %}" target="_blank">{% trans "Manage" %}</a>
                             </li>
                             {% endif %}
-                        </ul>
-
-                        <ul class="nav navbar-nav navbar-right" style="padding-right: 80px;">
                             <li>
                                 {% if user.username == 'anonymous' %}
                                     <a class="application-login" id="auth-link" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans "Sign in" %}</a>
@@ -362,7 +356,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                 <!-- Links -->
                 <div class="splash-links">
-                    <div class="row" style="padding-left: 80px;">
+                    <div class="row">
                         <div class="col-lg-4">
                             <ul class="splash-link-container">
                                 <li>
