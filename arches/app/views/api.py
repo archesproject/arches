@@ -907,7 +907,7 @@ class IIIFManifest(APIBase):
 
         manifests = models.IIIFManifest.objects.all()
         if query is not None:
-            manifests = manifests.filter(label__icontains=query)
+            manifests = manifests.filter(Q(label__icontains=query) | Q(description__icontains=query))
         count = manifests.count()
         if limit is not None:
             manifests = manifests[start : start + int(limit)]

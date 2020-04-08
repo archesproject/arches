@@ -65,12 +65,13 @@ define([
                 dataType: 'json',
                 quietMillis: 250,
                 data: function(term, page) {
-                    queryTerm = term;
-                    return {
+                    var data = {
                         start: (page-1)*limit,
-                        limit: limit,
-                        query: term
+                        limit: limit
                     };
+                    queryTerm = term;
+                    if (term) data.query = term;
+                    return data;
                 },
                 results: function(data, page) {
                     var results = data.results;
