@@ -21,6 +21,10 @@
 @import url(../css/tree/tree.css);
 @import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 
+html, body {
+    overflow-y: hidden;
+}
+
 body, .title-v1 p, .ep-tools-login, .ep-tools-right, .search-label, .counters h3 {
     font-size: 1.3em;
 }
@@ -11299,9 +11303,6 @@ a.tree-display-tool, a.tree-display-tool:hover {
         flex: none;
         overflow: hidden;
     }
-    .mapboxgl-map {
-        overflow: inherit;
-    }
     .search-attribute-widget {
         width: 100%;
         padding-right: 15px;
@@ -11403,8 +11404,8 @@ a.tree-display-tool, a.tree-display-tool:hover {
         margin-bottom: 0;
     }
     .ep-card-crud-container {
-        height: 55vh;
-        margin: 10px 0;
+        height: calc(55vh - 8px);
+        margin: 0;
     }
     .form-group div input {
         max-width: 52vw;
@@ -11554,6 +11555,18 @@ a.tree-display-tool, a.tree-display-tool:hover {
     }
     .calendar.picker select {
         width: 100%;
+    }
+    .category-title {
+        padding: 5px;
+    }
+    .form-list {
+        padding-bottom: 0;
+    }
+    .panel-title {
+        line-height: inherit;
+    }
+    .ep-card-crud-container {
+        height: calc(55vh - 8px);
     }
 }
 

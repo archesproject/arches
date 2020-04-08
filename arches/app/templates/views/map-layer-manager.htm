@@ -92,7 +92,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="panel">
                         <!-- ko if: selection()  && selection().nodeid -->
                         <div class="panel-heading">
-                            <h3 class="panel-title"><i data-bind="css: selection().config.layerIcon() || selection().layer.icon"></i> <span data-bind="text: selection().config.layerName() || selection().layer.name"></span></h3>
+                            <h2 class="panel-title"><i data-bind="css: selection().config.layerIcon() || selection().layer.icon"></i> <span data-bind="text: selection().config.layerName() || selection().layer.name"></span></h2>
                         </div>
 
                         <div class="panel-body map-preview-panel">
@@ -106,7 +106,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- ko if: selection()  && !selection().nodeid -->
                         <div class="panel-heading relative">
                             <div class="row">
-                                <h3 class="panel-title"><i data-bind="css: selection().icon"></i> <span data-bind="text: selection().name"></span></h3>
+                                <h2 class="panel-title"><i data-bind="css: selection().icon"></i> <span data-bind="text: selection().name"></span></h2>
                             </div>
                             <!-- Service management buttons (for convenience) -->
                             <div class="row service-buttons-heading">
@@ -217,7 +217,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                 </div>
                                                             </div>
 
-                                                            <div class="form-group">
+                                                            <div class="form-group icon-search-container">
                                                                 <!-- Icon search -->
                                                                 <div style="padding-left: 10px;">
                                                                     <div class="relative" style="padding: 10px 0px;">
@@ -228,7 +228,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         </div>
 
                                                                         <div style="position: absolute; left: 110px; top: 10px;">
-                                                                            <input type="text" class="form-control" style="width: 366px; height: 36px;" placeholder="{% trans "Find an icon" %}" aria-label="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
+                                                                            <input type="text" class="form-control icon-search-field" placeholder="{% trans "Find an icon" %}" aria-label="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
 
                                                                             <!-- ko if: iconFilter() !== '' -->
                                                                             <span class="clear-search" style="position: absolute; left: 345px; top: 5px; color: #123; font-size: 17px;" data-bind="click: function () { iconFilter(''); }"><i class="fa fa-times-circle"></i></span>
@@ -272,7 +272,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                             <div id="styling-panel" class="tab-pane fade">
                                                 <div class="row" style="margin-top: -5px; margin-left: -5px; margin-right: -5px; margin-bottom: 10px;">
-                                                    <div class="" data-bind="codemirror: { value: selectedLayerJSON, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
+                                                    <div data-bind="codemirror: { value: selectedLayerJSON, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
                                                 </div>
                                             </div>
 
