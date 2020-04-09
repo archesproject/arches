@@ -8,6 +8,7 @@ define([
         init: function(el, valueAccessor, allBindingsAccessor) {
             var allBindings = allBindingsAccessor().select2Query;
             var select2Config = ko.utils.unwrapObservable(allBindings.select2Config);
+            select2Config = Object.assign({}, select2Config);
             select2Config = _.defaults(select2Config, {
                 clickBubble: true,
                 multiple: false,

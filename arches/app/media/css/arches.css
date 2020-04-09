@@ -11229,7 +11229,7 @@ ul.select2-choices:after {
 
 .file-select .rr-splash-img {
     margin-top: 0px;
-    margin-left: 2px; 
+    margin-left: 2px;
     height: 90%;
 }
 
@@ -11788,6 +11788,18 @@ a.jstree-anchor.permissions-widget {
 }
 .gallery-expanded .iiif-gallery-header {
     padding-left: 10px;
+}
+.manifest-details {
+    white-space: normal;
+}
+.manifest-details h4 {
+    padding-left: 10px;
+}
+.manifest-details-list, .manifest-logo {
+    padding-left: 20px;
+}
+.manifest-logo {
+    max-width: 100%;
 }
 .manifest-editor-label {
     font-size: 1.2em;

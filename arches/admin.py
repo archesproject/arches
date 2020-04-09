@@ -37,6 +37,7 @@ admin.site.register(
         models.UserProfile,
         models.GraphModel,
         models.SearchComponent,
+        models.IIIFManifest,
     ]
 )
 

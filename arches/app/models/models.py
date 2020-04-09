@@ -1052,6 +1052,7 @@ class Notification(models.Model):
     A Notification instance that may optionally have a NotificationType. Can spawn N UserXNotification instances
     Must be created manually using Django ORM.
     """
+
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     created = models.DateTimeField(auto_now_add=True)
     # created.editable = True
@@ -1240,3 +1241,16 @@ class Plugin(models.Model):
     class Meta:
         managed = True
         db_table = "plugins"
+
+
+class IIIFManifest(models.Model):
+    label = models.TextField()
+    url = models.TextField()
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.label
+
+    class Meta:
+        managed = True
+        db_table = "iiif_manifests"

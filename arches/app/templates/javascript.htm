@@ -244,6 +244,7 @@
                 geojson: "{% url 'geojson' %}",
                 icons: "{% url 'icons' %}",
                 ontology_properties: "{% url 'ontology_properties' %}",
+                iiifmanifest: "{% url 'iiifmanifest' %}"
             },
             geocoderPlaceHolder: "{% trans 'Find an address...' %}",
             confirmNav: {
@@ -433,6 +434,7 @@
                 'text': '{{ renderer.title }}',
                 'type': '{{ renderer.type }}',
                 'ext': '{{ renderer.ext }}',
+                'exclude': '{{ renderer.exclude }}',
                  },
                 {% endfor %}{% endautoescape %}];
     });
@@ -513,5 +515,3 @@
 
 {% block project_modules %}
 {% endblock project_modules %}
-
-

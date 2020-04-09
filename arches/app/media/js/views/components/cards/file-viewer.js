@@ -134,6 +134,7 @@ define([
             this.getDefaultRenderers = function(type, file){
                 var defaultRenderers = [];
                 this.fileFormatRenderers.forEach(function(renderer){
+                    var excludeExtensions = renderer.exclude ? renderer.exclude.split(",") : [];
                     var rawFileType = type;
                     var rawExtension = file.url ? ko.unwrap(file.url).split('.').pop() : ko.unwrap(file).split('.').pop();
                     if (renderer.type === rawFileType && renderer.ext === rawExtension)  {
@@ -144,7 +145,7 @@ define([
                     var splitAllowableType = renderer.type.split('/');
                     var allowableType = splitAllowableType[0];
                     var allowableSubType = splitAllowableType[1];
-                    if (allowableSubType === '*' && fileType === allowableType) {
+                    if (allowableSubType === '*' && fileType === allowableType && excludeExtensions.indexOf(rawExtension) < 0) {
                         defaultRenderers.push(renderer);
                     }
                 }); 
