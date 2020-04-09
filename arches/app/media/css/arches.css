@@ -11795,8 +11795,11 @@ a.jstree-anchor.permissions-widget {
 .manifest-details h4 {
     padding-left: 10px;
 }
-.manifest-attribution, .manifest-details-list {
+.manifest-details-list, .manifest-logo {
     padding-left: 20px;
+}
+.manifest-logo {
+    max-width: 100%;
 }
 .manifest-editor-label {
     font-size: 1.2em;
