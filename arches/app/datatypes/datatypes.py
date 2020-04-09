@@ -1203,7 +1203,7 @@ class FileListDataType(BaseDataType):
         result = json.loads(json.dumps(tile_data))
         return result
 
-    def is_a_literal_in_rdf(self):  
+    def is_a_literal_in_rdf(self):
         return False
 
     def get_rdf_uri(self, node, data, which="r"):
@@ -1219,10 +1219,9 @@ class FileListDataType(BaseDataType):
             if data["url"].startswith("/"):
                 return URIRef(archesproject[data["url"][1:]])
             else:
-                return URIRef(archesproject[data["url"]])        
+                return URIRef(archesproject[data["url"]])
         else:
             return node
-
 
     def to_rdf(self, edge_info, edge):
         # outputs a graph holding an RDF representation of the file stored in the Arches instance
