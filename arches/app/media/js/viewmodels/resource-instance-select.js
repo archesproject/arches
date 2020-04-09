@@ -19,6 +19,13 @@ define([
                 return resource.graphid === graphid;
             });
         });
+        this.filter = ko.observable('');
+        this.relationshipInFilter = function(relationship) {
+            if (self.filter().toLowerCase() === '' || relationship.resource.name.toLowerCase().includes(self.filter().toLowerCase())){
+                return true;
+            }
+            return false;
+        };
 
         this.useSemanticRelationships = arches.useSemanticRelationships;
 
@@ -117,13 +124,14 @@ define([
 
         var url = ko.observable(arches.urls.search_results);
         this.url = url;
+        var resourceToAdd = ko.observable("");
         this.select2Config = {
-            value: this.selectedResource,
+            value: resourceToAdd,
             clickBubble: true,
-            multiple: this.multiple,
-            placeholder: this.placeholder,
-            closeOnSelect: false,
-            allowClear: true,
+            multiple: false,
+            placeholder: this.placeholder() || "Add new Relationship",
+            closeOnSelect: true,
+            allowClear: false,
             onSelect: function(item) {
                 if (item._source) {
                     var ret = {
@@ -131,9 +139,10 @@ define([
                             "id": item._id,
                             "name": item._source.displayname
                         },
-                        "ontologyproperty": "p44_test",
-                        "revProperty": "p44i_from_test",
-                        "ontologyclass": item._source.root_ontology_class
+                        "ontologyproperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"),
+                        "revProperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10i_contains"),
+                        "ontologyclass": item._source.root_ontology_class,
+                        "editing": ko.observable(false)
                     };
                     if (self.multiple) {
                         ret = [ret];
@@ -142,6 +151,9 @@ define([
                         }
                     }
                     self.value(ret);
+                    window.setTimeout(function() {
+                        resourceToAdd("");
+                    }, 250);
                 } else {
                     return '<b> Create a new ' + item.name + ' . . . </b>';
                 }
@@ -190,7 +202,6 @@ define([
                         return data;
                     }
                 },
-
                 results: function(data, page) {
                     if (!data['paging-filter'].paginator.has_next) {
                         if (relatedResourceModels()) {
@@ -221,8 +232,65 @@ define([
                 } else {
                     return item.name;
                 }
+            },
+            initSelection: function() {
+
             }
         };
+
+        this.deleteRelationship = function(valueToDelete) {
+            var newValues = [];
+            self.value().forEach(function(val) {
+                if (val.resource.id !== valueToDelete.resource.id) {
+                    newValues.push(val);
+                }
+            });
+            self.value(newValues);
+        };
+
+        this.makeFriendly = function(item) {
+            var parts = item.split("/");
+            return parts[parts.length-1];
+        };
+
+        this.getSelect2ConfigForOntologyProperties = function(value, domain, range) {
+            return {
+                value: value,
+                clickBubble: false,
+                placeholder: 'Select an Ontology Property',
+                closeOnSelect: true,
+                allowClear: false,
+                ajax: {
+                    url: function() {
+                        return arches.urls.ontology_properties;
+                    },
+                    data: function(term, page) {
+                        var data = { 
+                            'domain_ontology_class': domain,
+                            'range_ontology_class': range,
+                            'ontologyid': ''
+                        };
+                        return data;
+                    },
+                    dataType: 'json',
+                    quietMillis: 250,
+                    results: function(data, page) {
+                        return {
+                            results: data
+                        };
+                    }
+                },
+                id: function(item) {
+                    return item;
+                },
+                formatResult: this.makeFriendly,
+                formatSelection: this.makeFriendly,
+                initSelection: function(el, callback) {
+                    callback(value());
+                }
+            };
+        };
+
     };
 
     return ResourceInstanceSelectViewModel;
