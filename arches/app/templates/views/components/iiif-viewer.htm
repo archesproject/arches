@@ -145,13 +145,10 @@
                     <dd data-bind="html: $data"></dd>
                     <!--/ko -->
                 </div>
-                <h4>Attribution</h4>
-                <div class="manifest-attribution">
-                    <!--ko if: manifestData().logo -->
-                    <img data-bind="attr: {src: typeof manifestData().logo === 'string' ? manifestData().logo : manifestData().logo['@id']}">
-                    <!--/ko -->
-                    <div data-bind="text: manifestData().attribution || '{% trans "None" %}'"></div>
-                </div>
+                <h4 data-bind="text: manifestData().attribution || ''"></h4>
+                <!--ko if: manifestData().logo -->
+                <img class="manifest-logo" data-bind="attr: {src: typeof manifestData().logo === 'string' ? manifestData().logo : manifestData().logo['@id']}">
+                <!--/ko -->
             </div>
             <!--/ko -->
         <!--/ko -->
