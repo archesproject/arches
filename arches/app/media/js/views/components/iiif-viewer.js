@@ -133,6 +133,13 @@ define([
 
         WorkbenchViewmodel.apply(this, [params]);
 
+        this.activeTab.subscribe(function() {
+            var map = self.map();
+            if (map) setTimeout(function() {
+                map.invalidateSize();
+            }, 1);
+        });
+
         this.showGallery = ko.observable(true);
         this.expandGallery = ko.observable(!params.manifest);
         this.expandGallery.subscribe(function(expandGallery) {
