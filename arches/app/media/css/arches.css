@@ -20,6 +20,7 @@
 @import url(../packages/leaflet-draw/dist/leaflet.draw.css);
 @import url(../css/tree/tree.css);
 @import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
+@import url(../packages/leaflet.fullscreen/Control.FullScreen.css);
 
 
 img {

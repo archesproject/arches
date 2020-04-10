@@ -1921,6 +1921,11 @@ leaflet-iiif@^3.0.0:
   resolved "https://registry.yarnpkg.com/leaflet-iiif/-/leaflet-iiif-3.0.0.tgz#c8b80b01362df8a9c071ed7ad4b0b0d142c73df9"
   integrity sha512-WWejon+vWaJUPe4Lp/AidYMosyy82bU/OjVgHQCTUojFWaUxzs00Ao6pSd42EYw45S8SW2Drc4VsMb3sxSNUMQ==
 
+leaflet.fullscreen@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/leaflet.fullscreen/-/leaflet.fullscreen-1.6.0.tgz#daad9a6e07c8bdbca8e5af7e3d50272d31b0226a"
+  integrity sha512-Mr6STMeyKSfJ1CsKFcPZOm425LOe0c/6EHh0AK93GiTvteTAMFmO/oFDNe+0p1mk4+8yeGLcYgaXTSzPveEGhA==
+
 leaflet@1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.6.0.tgz#aecbb044b949ec29469eeb31c77a88e2f448f308"
