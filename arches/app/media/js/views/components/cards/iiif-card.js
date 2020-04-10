@@ -2,8 +2,9 @@ define([
     'knockout',
     'knockout-mapping',
     'viewmodels/card-component',
-    'views/components/iiif-annotation'
-], function(ko, koMapping, CardComponentViewModel, IIIFAnnotationViewmodel) {
+    'views/components/iiif-annotation',
+    'viewmodels/alert'
+], function(ko, koMapping, CardComponentViewModel, IIIFAnnotationViewmodel, AlertViewModel) {
     return ko.components.register('iiif-card', {
         viewModel: function(params) {
             var self = this;
@@ -11,6 +12,34 @@ define([
             params.configKeys = ['defaultManifest'];
 
             CardComponentViewModel.apply(this, [params]);
+
+            this.deleteTile = function() {
+                self.loading(true);
+                self.tile.deleteTile(function(response) {
+                    self.loading(false);
+                    params.pageVm.alert(
+                        new AlertViewModel(
+                            'ep-alert-red',
+                            response.responseJSON.title,
+                            response.responseJSON.message,
+                            null,
+                            function(){}
+                        )
+                    );
+                    if (params.form.onDeleteError) {
+                        params.form.onDeleteError(self.tile);
+                    }
+                }, function() {
+                    self.loading(false);
+                    if (!self.card.tiles().length) {
+                        self.card.manifest = undefined;
+                        self.card.canvas = undefined;
+                    }
+                    if (params.form.onDeleteSuccess) {
+                        params.form.onDeleteSuccess(self.tile);
+                    }
+                });
+            };
 
             if (this.form && this.tile) {
                 params.widgets = this.card.widgets().filter(function(widget) {
