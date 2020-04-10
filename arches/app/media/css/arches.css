@@ -1591,14 +1591,12 @@ ul.tabbed-report-tab-list {
 
 .workbench-card-sidepanel .install-buttons {
     background: #f9f9f9;
-    position: fixed;
+    position: absolute;
     bottom: 0px;
     border-top: 1px solid #ddd;
-    height: 60px;
-    padding-top: 10px;
-    right: 75px;
+    padding: 10px 35px;
+    right: 0;
     width: 399px;
-    padding-left: 35px;
 }
 
 .workbench-card-sidepanel.expanded .install-buttons {
