@@ -45,7 +45,7 @@
         "leaflet.fullscreen": "^1.6.0",
         "lt-themify-icons": "^1.1.0",
         "mapbox-gl": "^1.8.1",
-        "metismenu": "^2.7.2",
+        "metismenu": "^3.0.5",
         "moment": ">=2.10.5",
         "nouislider": "11.0.3",
         "numeral": "^2.0.6",

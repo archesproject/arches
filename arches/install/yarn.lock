@@ -2051,10 +2051,10 @@ meow@^5.0.0:
     trim-newlines "^2.0.0"
     yargs-parser "^10.0.0"
 
-metismenu@^2.7.2:
-  version "2.7.9"
-  resolved "https://registry.yarnpkg.com/metismenu/-/metismenu-2.7.9.tgz#78366586a0c29281ff503509b1c1f4a3338fb57a"
-  integrity sha512-l2F61AaGdqiSh0NFmTofCfI59M6EruCOTRSAmbLxZ1ZpUD1Fjdo6/ZFfyMCxHbIejLamtVVHGRwNrerR/pPmbA==
+metismenu@^3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/metismenu/-/metismenu-3.0.5.tgz#b7229ef17a305edf1f462bb18dac79082c04024f"
+  integrity sha512-s5rTYsejjLQO+uEbce6uVGVyGSVMPuN9jvGkWbNN7o8FVV50jHAX2DZlx9mqNnSI/uZIeOf+GduXaSYoSdAUOw==
 
 mgrs@1.0.0:
   version "1.0.0"
