@@ -42,6 +42,7 @@
         "leaflet": "1.6.0",
         "leaflet-draw": "^1.0.4",
         "leaflet-iiif": "^3.0.0",
+        "leaflet.fullscreen": "^1.6.0",
         "lt-themify-icons": "^1.1.0",
         "mapbox-gl": "^1.8.1",
         "metismenu": "^2.7.2",

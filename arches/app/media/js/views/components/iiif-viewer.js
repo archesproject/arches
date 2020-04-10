@@ -1,11 +1,13 @@
 define([
     'arches',
+    'jquery',
     'knockout',
     'leaflet',
     'views/components/workbench',
     'leaflet-iiif',
+    'leaflet-fullscreen',
     'bindings/leaflet'
-], function(arches, ko, L, WorkbenchViewmodel) {
+], function(arches, $, ko, L, WorkbenchViewmodel) {
     var IIIFViewerViewmodel = function(params) {
         var self = this;
         var abortFetchManifest;
@@ -207,7 +209,12 @@ define([
             }
             self.zoomToCanvas = false;
         };
-        this.map.subscribe(addCanvasLayer);
+        this.map.subscribe(function(map) {
+            L.control.fullscreen({
+                fullscreenElement: $(map.getContainer()).closest('.workbench-card-wrapper')[0]
+            }).addTo(map);
+            addCanvasLayer();
+        });
         this.canvas.subscribe(addCanvasLayer);
 
         this.selectCanvas = function(canvas) {
