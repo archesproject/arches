@@ -94,6 +94,7 @@ define([
                 }
             }, function() {
                 self.loading(false);
+                if (typeof self.onSaveSuccess === 'function') self.onSaveSuccess();
                 if (params.form.onSaveSuccess) {
                     params.form.onSaveSuccess(self.tile);
                 }
