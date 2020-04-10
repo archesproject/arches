@@ -189,7 +189,6 @@ define([
                                 window.setTimeout(function() {
                                     resourceToAdd("");
                                 }, 250);
-                                console.log("this didn't work");
                             });
                     });
                 }
