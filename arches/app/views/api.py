@@ -914,3 +914,21 @@ class IIIFManifest(APIBase):
 
         response = JSONResponse({"results": manifests, "count": count})
         return response
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class Tile(APIBase):
+    def post(self, request):
+        # tileid = request.POST.get("tileid")
+        # nodeid = request.POST.get("nodeid")
+        # data = request.POST.get("data")
+        
+
+        # tile = models.Tiles.objects.get(tileid)
+        # tile.data['nodeid'] = data
+        # tile.save()
+        logger.info('Got tile!')
+        
+        
+        response = JSONResponse({"results": "success!"})
+        return response
