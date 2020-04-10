@@ -155,7 +155,43 @@ define([
                         resourceToAdd("");
                     }, 250);
                 } else {
-                    return '<b> Create a new ' + item.name + ' . . . </b>';
+                    var params = {
+                        graphid: item._id,
+                        complete: ko.observable(false),
+                        resourceid: ko.observable(),
+                        tileid: ko.observable()
+                    };
+                    self.newTileStep(params);
+                    params.complete.subscribe(function() {
+                        window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
+                            .then(function(response){
+                                if(response.ok === false) {
+                                    return response.json();
+                                }
+                                throw("error");
+                            })
+                            .then(function(json) {
+                                var item = json.results.hits.hits[0];
+                                var ret = {
+                                    "resource": {
+                                        "id": params.resourceid(),
+                                        "name": item._source.displayname
+                                    },
+                                    "ontologyproperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"),
+                                    "revProperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10i_contains"),
+                                    "ontologyclass": item._source.root_ontology_class,
+                                    "editing": ko.observable(false)
+                                };
+                                self.value(ret);
+                            })
+                            .finally(function(){
+                                self.newTileStep(null);
+                                window.setTimeout(function() {
+                                    resourceToAdd("");
+                                }, 250);
+                                console.log("this didn't work");
+                            });
+                    });
                 }
             },
             ajax: {
@@ -197,6 +233,7 @@ define([
                                 "id": term,
                                 "text": term,
                                 "value": term
+
                             }]);
                         }
                         return data;
