@@ -13,6 +13,16 @@ define([
 
             CardComponentViewModel.apply(this, [params]);
 
+            var newTile = true;
+            if (self.tile) newTile = !self.tile.tileid;
+
+            if (newTile) {
+                this.onSaveSuccess = function() {
+                    self.card.center = self.map().getCenter();
+                    self.card.zoom = self.map().getZoom();
+                };
+            }
+
             this.deleteTile = function() {
                 self.loading(true);
                 self.tile.deleteTile(function(response) {
@@ -64,6 +74,8 @@ define([
             if (!params.manifest)
                 params.manifest = this.card.manifest || this.defaultManifest();
             params.canvas = params.canvas || this.card.canvas;
+            params.center = this.card.center;
+            params.zoom = this.card.zoom;
 
             IIIFAnnotationViewmodel.apply(this, [params]);
 
@@ -86,6 +98,9 @@ define([
                     if (m !== self.manifest()) self.manifest(m);
                 });
             }
+
+            self.card.center = undefined;
+            self.card.zoom = undefined;
         },
         template: {
             require: 'text!templates/views/components/cards/iiif-card.htm'
