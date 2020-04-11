@@ -105,14 +105,12 @@ class CommandLineTests(ArchesTestCase):
         self.client.login(username="ben", password="Test12345!")
 
         payload = {"selectedIdentities": [
-                    {"type": "group", "id": 2}
-                ],
-                "selectedInstances": [
-                    {"resourceinstanceid": self.resource_instance_id}
-                ],
-                "selectedPermissions": [
+                    {"type": "group", "id": 2, "selectedPermissions": [
                     {"codename": "change_resourceinstance"},
                     {"codename": "delete_resourceinstance"}
+                ]}],
+                "selectedInstances": [
+                    {"resourceinstanceid": self.resource_instance_id}
                 ]}
 
         url = reverse("resource_permission_data")
@@ -132,14 +130,12 @@ class CommandLineTests(ArchesTestCase):
         self.client.login(username="ben", password="Test12345!")
 
         payload = {"selectedIdentities": [
-                    {"type": "group", "id": 2}
-                ],
-                "selectedInstances": [
-                    {"resourceinstanceid": self.resource_instance_id}
-                ],
-                "selectedPermissions": [
+                    {"type": "group", "id": 2, "selectedPermissions": [
                     {"codename": "change_resourceinstance"},
                     {"codename": "delete_resourceinstance"}
+                ]}],
+                "selectedInstances": [
+                    {"resourceinstanceid": self.resource_instance_id}
                 ]}
 
         url = reverse("resource_permission_data")
