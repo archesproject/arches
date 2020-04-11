@@ -25,4 +25,15 @@
 {% endblock config_form %}
 
 {% block report %}
+<dt data-bind="text: label"></dt>
+<!-- ko if: canvasConfigs.length === 0 -->
+<dd data-bind="text: displayValue() || '{% trans "None" %}'"></dd>
+<!-- /ko -->
+<!-- ko if: canvasConfigs.length > 0 -->
+<div class="iiif-widget-report">
+<!-- ko foreach: canvasConfigs -->
+    <div class="iiif-leaflet" data-bind="leaflet: $data"></div>
+<!-- /ko -->
+</div>
+<!-- /ko -->
 {% endblock report %}
