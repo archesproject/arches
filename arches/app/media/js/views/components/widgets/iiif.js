@@ -41,18 +41,17 @@ define([
                                 features: features
                             }, {
                                 pointToLayer: function(feature, latlng) {
-                                    var style= {
+                                    return L.circleMarker(latlng, {
                                         color: feature.properties.color,
                                         fillColor: feature.properties.fillColor,
                                         weight: feature.properties.weight,
                                         radius: feature.properties.radius,
                                         opacity: feature.properties.opacity,
                                         fillOpacity: feature.properties.fillOpacity
-                                    };
-                                    return L.circleMarker(latlng, style);
+                                    });
                                 },
                                 style: function(feature) {
-                                    var style = {
+                                    return {
                                         color: feature.properties.color,
                                         fillColor: feature.properties.fillColor,
                                         weight: feature.properties.weight,
@@ -60,7 +59,6 @@ define([
                                         opacity: feature.properties.opacity,
                                         fillOpacity: feature.properties.fillOpacity
                                     };
-                                    return style;
                                 }
                             }));
                             L.control.fullscreen().addTo(map);
