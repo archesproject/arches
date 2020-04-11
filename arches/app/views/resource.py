@@ -53,7 +53,7 @@ from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from elasticsearch import Elasticsearch
-from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms, get_groups_with_perms, get_users_with_perms
+from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms, get_groups_with_perms, get_users_with_perms, get_perms_for_model
 import logging
 
 logger = logging.getLogger(__name__)
@@ -264,10 +264,15 @@ class ResourcePermissionDataView(View):
 
     def post(self, request):
         resourceid = request.POST.get('instanceid', None)
+        result = None
         if self.action == 'restrict':
             result = self.make_instance_private(resourceid)
         else:
-            result = self.apply_permissions(JSONDeserializer().deserialize(request.body))
+            data = JSONDeserializer().deserialize(request.body)
+            self.apply_permissions(data)
+            if "instanceid" in data:
+                resource = models.ResourceInstance.objects.get(pk=data["instanceid"])
+                result = self.get_instance_permissions(resource)
         return JSONResponse(result)
 
     def delete(self, request):
@@ -275,18 +280,41 @@ class ResourcePermissionDataView(View):
         self.apply_permissions(data, revert=True)
         return JSONResponse(data)
 
+    def get_perms(self, identity, type, obj, perms):
+        if type == 'user':
+            identity_perms = get_user_perms(identity, obj)
+        else:
+            identity_perms = get_group_perms(identity, obj)
+        res = []
+        for perm in identity_perms:
+            res += list(filter(lambda x: (x['codename'] == perm), perms)) 
+        return res
+
     def get_instance_permissions(self, resource_instance):
-        permissions = {}
-        permissions['users'] = [{user.username: get_user_perms(user, resource_instance)} for user in User.objects.all()]
-        permissions['groups'] = [{group.name: get_group_perms(group, resource_instance)} for group in Group.objects.all()]
-        permissions['limitedaccess'] = (len(get_users_with_perms(resource_instance)) + len(get_groups_with_perms(resource_instance))) > 1
-        return permissions
+        permission_order = ['view_resourceinstance', 'change_resourceinstance', 'delete_resourceinstance', 'no_access_to_resourceinstance']
+        perms = json.loads(JSONSerializer().serialize({p.codename:p for p in get_perms_for_model(resource_instance) if p.codename != "add_resourceinstance"}))
+        ordered_perms = []
+        for p in permission_order:
+            ordered_perms.append(perms[p])
+        identities = [{'name': user.username, 'id': user.id, 'type': 'user', 'default_permissions': self.get_perms(user, 'user', resource_instance, ordered_perms)} for user in User.objects.all()]
+        identities += [{'name': group.name, 'id': group.id, 'type': 'group', 'default_permissions': self.get_perms(group, 'group', resource_instance, ordered_perms)} for group in Group.objects.all()]
+        result = {'identities': identities}
+        result['permissions'] = ordered_perms
+        result['limitedaccess'] = (len(get_users_with_perms(resource_instance)) + len(get_groups_with_perms(resource_instance))) > 1
+        try:
+            createorid = models.EditLog.objects.filter(resourceinstanceid=resource_instance.resourceinstanceid).filter(edittype='create')[0].userid
+            result['creatorid'] = createorid
+        except Exception:
+            logger.error("Cannot find instance creator when retrieving instance permissions")
+            result['creatorid'] = None
+        return result
 
     def make_instance_private(self, instanceid):
-        groups = Group.objects.all()
+        groups = list(Group.objects.all())
         resource_instance = models.ResourceInstance.objects.get(pk=instanceid)
-        for group in groups:
-            assign_perm('no_access_to_resourceinstance', group, resource_instance)
+        users = list(User.objects.all())
+        for identity in groups + users:
+            assign_perm('no_access_to_resourceinstance', identity, resource_instance)
         return self.get_instance_permissions(resource_instance)
 
     def apply_permissions(self, data, revert=False):
@@ -307,7 +335,7 @@ class ResourcePermissionDataView(View):
 
                     if not revert:
                         # then add the new permissions
-                        for perm in data["selectedPermissions"]:
+                        for perm in identity["selectedPermissions"]:
                             assign_perm(perm["codename"], identityModel, resource_instance)
 
 
