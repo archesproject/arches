@@ -6,15 +6,15 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '5972_iiifmanifest'),
+        ("models", "5972_iiifmanifest"),
     ]
 
     def forwards_func(apps, schema_editor):
         permission = apps.get_model("auth", "Permission")
-        view = permission.objects.get(codename='view_resourceinstance')
-        change = permission.objects.get(codename='change_resourceinstance')
-        delete = permission.objects.get(codename='delete_resourceinstance')
-        add = permission.objects.get(codename='add_resourceinstance')
+        view = permission.objects.get(codename="view_resourceinstance")
+        change = permission.objects.get(codename="change_resourceinstance")
+        delete = permission.objects.get(codename="delete_resourceinstance")
+        add = permission.objects.get(codename="add_resourceinstance")
         view.name = "Read resource"
         change.name = "Update resource"
         delete.name = "Delete resource"
@@ -26,10 +26,10 @@ class Migration(migrations.Migration):
 
     def reverse_func(apps, schema_editor):
         permission = apps.get_model("auth", "Permission")
-        view = permission.objects.get(codename='view_resourceinstance')
-        change = permission.objects.get(codename='change_resourceinstance')
-        delete = permission.objects.get(codename='delete_resourceinstance')
-        add = permission.objects.get(codename='add_resourceinstance')
+        view = permission.objects.get(codename="view_resourceinstance")
+        change = permission.objects.get(codename="change_resourceinstance")
+        delete = permission.objects.get(codename="delete_resourceinstance")
+        add = permission.objects.get(codename="add_resourceinstance")
         view.name = "Can view resource instance"
         change.name = "Can change resource instance"
         delete.name = "Can delete resource instance"
@@ -41,10 +41,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name='resourceinstance',
-            options={'managed': True, 'permissions': (('no_access_to_resourceinstance', 'No Access'),)},
+            name="resourceinstance", options={"managed": True, "permissions": (("no_access_to_resourceinstance", "No Access"),)},
         ),
-        migrations.RunPython(
-            forwards_func, reverse_func
-        ),
+        migrations.RunPython(forwards_func, reverse_func),
     ]

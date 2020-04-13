@@ -76,12 +76,13 @@ def group_required(*group_names):
 def can_edit_resource_instance(function):
     @functools.wraps(function)
     def wrapper(request, *args, **kwargs):
-        resourceid = kwargs['resourceid'] if 'resourceid' in kwargs else None
+        resourceid = kwargs["resourceid"] if "resourceid" in kwargs else None
         if user_can_edit_resources(request.user, resourceid=resourceid):
             return function(request, *args, **kwargs)
         else:
             raise PermissionDenied
         return function(request, *args, **kwargs)
+
     return wrapper
 
 
@@ -90,30 +91,36 @@ def can_read_resource_instance(function):
     Requires that a user be able to edit or delete a single nodegroup of a resource
 
     """
+
     @functools.wraps(function)
     def wrapper(request, *args, **kwargs):
-        resourceid = kwargs['resourceid'] if 'resourceid' in kwargs else None
+        resourceid = kwargs["resourceid"] if "resourceid" in kwargs else None
         if user_can_read_resources(request.user, resourceid=resourceid):
             return function(request, *args, **kwargs)
         else:
             raise PermissionDenied
         return function(request, *args, **kwargs)
+
     return wrapper
+
 
 def can_delete_resource_instance(function):
     """
     Requires that a user be able to edit or delete a single nodegroup of a resource
 
     """
+
     @functools.wraps(function)
     def wrapper(request, *args, **kwargs):
-        resourceid = kwargs['resourceid'] if 'resourceid' in kwargs else None
+        resourceid = kwargs["resourceid"] if "resourceid" in kwargs else None
         if user_can_delete_resources(request.user, resourceid=resourceid):
             return function(request, *args, **kwargs)
         else:
             raise PermissionDenied
         return function(request, *args, **kwargs)
+
     return wrapper
+
 
 def can_read_concept():
     """

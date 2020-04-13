@@ -68,7 +68,6 @@ class ResourceTests(ArchesTestCase):
         cls.client = Client()
         cls.client.login(username="admin", password="admin")
 
-        
         with open(os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
         resource_graph_importer(archesfile["graph"])
@@ -234,13 +233,11 @@ class ResourceTests(ArchesTestCase):
         Test user that created instance has full permissions
         """
 
-        user = User.objects.create_user(username='sam',
-                                            email='sam@samsclub.com',
-                                            password='Test12345!')
+        user = User.objects.create_user(username="sam", email="sam@samsclub.com", password="Test12345!")
         user.save()
-        group = Group.objects.get(name='Resource Editor')
+        group = Group.objects.get(name="Resource Editor")
         group.user_set.add(user)
         test_resource = Resource(graph_id=self.search_model_graphid)
         test_resource.save(user=user)
         perms = set(get_perms(user, test_resource))
-        self.assertEqual(perms, {'view_resourceinstance', 'change_resourceinstance', 'delete_resourceinstance'})
+        self.assertEqual(perms, {"view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"})

@@ -117,8 +117,8 @@ class Resource(models.ResourceInstance):
             user = request.user
 
         try:
-            for perm in ('view_resourceinstance', 'change_resourceinstance', 'delete_resourceinstance'):
-                assign_perm(perm, user, self) 
+            for perm in ("view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"):
+                assign_perm(perm, user, self)
         except NotUserNorGroup:
             pass
 

@@ -43,7 +43,7 @@ from arches.app.views.resource import (
     ResourceDescriptors,
     ResourceEditLogView,
     ResourceTiles,
-    ResourcePermissionDataView
+    ResourcePermissionDataView,
 )
 from arches.app.views.resource import ResourceEditorView, ResourceActivityStreamPageView, ResourceActivityStreamCollectionView
 from arches.app.views.plugin import PluginView

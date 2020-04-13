@@ -188,7 +188,7 @@ def user_has_resource_model_permissions(user, perms, resource):
     resource -- a resource instance to check if a user has permissions to that resource's type specifically
 
     """
-    
+
     nodegroups = get_nodegroups_by_perm(user, perms)
     nodes = Node.objects.filter(nodegroup__in=nodegroups).filter(graph_id=resource.graph_id).select_related("graph")
     return nodes.count() > 0
@@ -207,30 +207,30 @@ def check_resource_instance_permissions(user, resourceid, permission):
     result = {}
     try:
         resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
-        result['resource'] = resource
+        result["resource"] = resource
         all_perms = get_perms(user, resource)
-        if len(all_perms) == 0:                                      # no permissions assigned. permission implied
-            result['permitted'] = 'unknown'
+        if len(all_perms) == 0:  # no permissions assigned. permission implied
+            result["permitted"] = "unknown"
             return result
         else:
             user_permissions = get_user_perms(user, resource)
-            if 'no_access_to_resourceinstance' in user_permissions:  # user is restricted
-                result['permitted'] = False
+            if "no_access_to_resourceinstance" in user_permissions:  # user is restricted
+                result["permitted"] = False
                 return result
-            elif permission in user_permissions:                     # user is permitted                         
-                result['permitted'] = True
+            elif permission in user_permissions:  # user is permitted
+                result["permitted"] = True
                 return result
 
             group_permissions = get_group_perms(user, resource)
-            if 'no_access_to_resourceinstance' in group_permissions: # group is restricted - no user override
-                result['permitted'] = False
+            if "no_access_to_resourceinstance" in group_permissions:  # group is restricted - no user override
+                result["permitted"] = False
                 return result
-            elif permission in group_permissions:                    # group is permitted - no user override
-                result['permitted'] = True
+            elif permission in group_permissions:  # group is permitted - no user override
+                result["permitted"] = True
                 return result
-            
-            if permission not in all_perms:                          # neither user nor group explicitly permits or restricts. 
-                result['permitted'] = False                          # restriction implied
+
+            if permission not in all_perms:  # neither user nor group explicitly permits or restricts.
+                result["permitted"] = False  # restriction implied
                 return result
 
     except ObjectDoesNotExist:
@@ -248,12 +248,12 @@ def user_can_read_resources(user, resourceid=None):
         if user.is_superuser:
             return True
         if resourceid is not None:
-            result = check_resource_instance_permissions(user, resourceid, 'view_resourceinstance')
+            result = check_resource_instance_permissions(user, resourceid, "view_resourceinstance")
             if result is not None:
-                if result['permitted'] == 'unknown':
-                    return user_has_resource_model_permissions(user, ["models.read_nodegroup"], result['resource'])
+                if result["permitted"] == "unknown":
+                    return user_has_resource_model_permissions(user, ["models.read_nodegroup"], result["resource"])
                 else:
-                    return result['permitted']
+                    return result["permitted"]
             else:
                 return None
 
@@ -270,12 +270,14 @@ def user_can_edit_resources(user, resourceid=None):
         if user.is_superuser:
             return True
         if resourceid is not None:
-            result = check_resource_instance_permissions(user, resourceid, 'change_resourceinstance')
+            result = check_resource_instance_permissions(user, resourceid, "change_resourceinstance")
             if result is not None:
-                if result['permitted'] == 'unknown':
-                    return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or user_can_edit_model_nodegroups(user, result['resource'])
+                if result["permitted"] == "unknown":
+                    return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or user_can_edit_model_nodegroups(
+                        user, result["resource"]
+                    )
                 else:
-                    return result['permitted']
+                    return result["permitted"]
             else:
                 return None
 
@@ -292,12 +294,14 @@ def user_can_delete_resources(user, resourceid=None):
         if user.is_superuser:
             return True
         if resourceid is not None:
-            result = check_resource_instance_permissions(user, resourceid, 'delete_resourceinstance')
+            result = check_resource_instance_permissions(user, resourceid, "delete_resourceinstance")
             if result is not None:
-                if result['permitted'] == 'unknown':
-                    return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or user_can_edit_model_nodegroups(user, result['resource'])
+                if result["permitted"] == "unknown":
+                    return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or user_can_edit_model_nodegroups(
+                        user, result["resource"]
+                    )
                 else:
-                    return result['permitted']
+                    return result["permitted"]
             else:
                 return None
     return False

@@ -484,7 +484,7 @@ class Resources(APIBase):
             if resourceid:
                 if format == "json-ld":
                     try:
-                        models.ResourceInstance.objects.get(pk=resourceid) #check for existance
+                        models.ResourceInstance.objects.get(pk=resourceid)  # check for existance
                         exporter = ResourceExporter(format=format)
                         output = exporter.writer.write_resources(resourceinstanceids=[resourceid], indent=indent, user=request.user)
                         out = output[0]["outputfile"].getvalue()

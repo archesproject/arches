@@ -68,27 +68,28 @@ class PermissionTests(ArchesTestCase):
         self.user = User.objects.get(username="ben")
         self.group = Group.objects.get(pk=2)
 
-
-
     def tearDown(self):
         ResourceInstance.objects.filter(graph_id=self.data_type_graphid).delete()
 
     def add_users(self):
         profiles = (
-            {'name': 'ben', 'email': 'ben@test.com', 'password': 'Test12345!', 'groups': ['Graph Editor', 'Resource Editor']},
-            {'name': 'sam', 'email': 'sam@test.com', 'password': 'Test12345!', 'groups': ['Graph Editor', 'Resource Editor', 'Resource Reviewer']},
+            {"name": "ben", "email": "ben@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
+            {
+                "name": "sam",
+                "email": "sam@test.com",
+                "password": "Test12345!",
+                "groups": ["Graph Editor", "Resource Editor", "Resource Reviewer"],
+            },
             # {'name': 'jim', 'email': 'jim@test.com', 'password': 'Test12345!', 'groups': ['Graph Editor', 'Resource Editor']},
         )
 
         for profile in profiles:
             try:
-                user = User.objects.create_user(username=profile['name'],
-                                                 email=profile['email'],
-                                                 password=profile['password'])
+                user = User.objects.create_user(username=profile["name"], email=profile["email"], password=profile["password"])
                 user.save()
                 print(("Added: {0}, password: {1}".format(user.username, user.password)))
 
-                for group_name in profile['groups']:
+                for group_name in profile["groups"]:
                     group = Group.objects.get(name=group_name)
                     group.user_set.add(user)
 
@@ -115,11 +116,13 @@ class PermissionTests(ArchesTestCase):
 
         implicit_permission = user_can_read_resources(self.user, self.resource_instance_id)
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
-        assign_perm('change_resourceinstance', self.group, resource)
+        assign_perm("change_resourceinstance", self.group, resource)
         can_access_without_view_permission = user_can_read_resources(self.user, self.resource_instance_id)
-        assign_perm('view_resourceinstance', self.group, resource)
+        assign_perm("view_resourceinstance", self.group, resource)
         can_access_with_view_permission = user_can_read_resources(self.user, self.resource_instance_id)
-        self.assertTrue(implicit_permission == True and can_access_without_view_permission == False and can_access_with_view_permission == True)
+        self.assertTrue(
+            implicit_permission == True and can_access_without_view_permission == False and can_access_with_view_permission == True
+        )
 
     def test_user_has_resource_model_permissions(self):
         "Tests that a user cannot access an instance if they have no access to any nodegroup."
@@ -129,5 +132,5 @@ class PermissionTests(ArchesTestCase):
         for node in nodes:
             if node.nodegroup:
                 assign_perm("no_access_to_nodegroup", self.group, node.nodegroup)
-        hasperms = user_has_resource_model_permissions(self.user, ['models.read_nodegroup'], resource)
+        hasperms = user_has_resource_model_permissions(self.user, ["models.read_nodegroup"], resource)
         self.assertTrue(hasperms == False)
