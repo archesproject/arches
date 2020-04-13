@@ -11788,9 +11788,12 @@ a.jstree-anchor.permissions-widget {
 .gallery-expanded .iiif-gallery-header {
     padding-left: 10px;
 }
+.iiif-widget-report {
+    margin: 0 0 0 320px;
+}
 .iiif-widget-report .iiif-leaflet {
     height: 300px;
-    margin: 0 20px 10px 220px;
+    margin: 0 20px 10px 0px;
     border: solid 1px #808080;
 }
 .manifest-details {
