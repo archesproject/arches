@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '5935_2way_sync'),
+        ('models', '5972_iiifmanifest'),
     ]
 
     def forwards_func(apps, schema_editor):
