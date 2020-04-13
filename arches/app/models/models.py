@@ -690,6 +690,7 @@ class ResourceInstance(models.Model):
     class Meta:
         managed = True
         db_table = "resource_instances"
+        permissions = (("no_access_to_resourceinstance", "No Access"),)
 
 
 class SearchComponent(models.Model):

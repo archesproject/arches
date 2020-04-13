@@ -471,7 +471,7 @@ class Resources(APIBase):
     # }]
 
     def get(self, request, resourceid=None, slug=None, graphid=None):
-        if user_can_read_resources(user=request.user):
+        if user_can_read_resources(user=request.user, resourceid=resourceid):
             allowed_formats = ["json", "json-ld"]
             format = request.GET.get("format", "json-ld")
             if format not in allowed_formats:
@@ -484,11 +484,12 @@ class Resources(APIBase):
             if resourceid:
                 if format == "json-ld":
                     try:
+                        models.ResourceInstance.objects.get(pk=resourceid)  # check for existance
                         exporter = ResourceExporter(format=format)
                         output = exporter.writer.write_resources(resourceinstanceids=[resourceid], indent=indent, user=request.user)
                         out = output[0]["outputfile"].getvalue()
                     except models.ResourceInstance.DoesNotExist:
-                        logger.exception(_("The specified resource '{0}' does not exist. JSON-LD export failed.".format(resourceid)))
+                        logger.error(_("The specified resource '{0}' does not exist. JSON-LD export failed.".format(resourceid)))
                         return JSONResponse(status=404)
                 elif format == "json":
                     out = Resource.objects.get(pk=resourceid)

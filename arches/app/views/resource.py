@@ -19,17 +19,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import json
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import User, Group, Permission
+from django.db import transaction
+from django.forms.models import model_to_dict
 from django.http import HttpResponseNotFound
 from django.http import HttpResponse
 from django.http import Http404
 from django.http import HttpResponseBadRequest, JsonResponse
-from django.urls import reverse
 from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
-from django.forms.models import model_to_dict
-from django.template.loader import render_to_string
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
@@ -37,7 +39,9 @@ from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource, ModelInactiveError
 from arches.app.models.system_settings import settings
 from arches.app.utils.pagination import get_paginator
+from arches.app.utils.decorators import group_required
 from arches.app.utils.decorators import can_edit_resource_instance
+from arches.app.utils.decorators import can_delete_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.permission_backend import user_is_resource_reviewer
@@ -49,12 +53,22 @@ from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from elasticsearch import Elasticsearch
+from guardian.shortcuts import (
+    assign_perm,
+    get_perms,
+    remove_perm,
+    get_group_perms,
+    get_user_perms,
+    get_groups_with_perms,
+    get_users_with_perms,
+    get_perms_for_model,
+)
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-@method_decorator(can_edit_resource_instance(), name="dispatch")
+@method_decorator(can_edit_resource_instance, name="dispatch")
 class ResourceListView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
         context = self.get_context_data(main_script="views/resource")
@@ -80,17 +94,17 @@ def get_resource_relationship_types():
     return relationship_type_values
 
 
-@method_decorator(can_edit_resource_instance(), name="dispatch")
-class NewResourceEditorView(MapBaseManagerView):
+class ResourceEditorView(MapBaseManagerView):
     action = None
 
+    @method_decorator(can_edit_resource_instance, name="dispatch")
     def get(
         self,
         request,
         graphid=None,
         resourceid=None,
-        view_template="views/resource/new-editor.htm",
-        main_script="views/resource/new-editor",
+        view_template="views/resource/editor.htm",
+        main_script="views/resource/editor",
         nav_menu=True,
     ):
         if self.action == "copy":
@@ -226,6 +240,7 @@ class NewResourceEditorView(MapBaseManagerView):
 
         return render(request, view_template, context)
 
+    @method_decorator(can_delete_resource_instance, name="dispatch")
     def delete(self, request, resourceid=None):
         if resourceid is not None:
             ret = Resource.objects.get(pk=resourceid)
@@ -245,141 +260,117 @@ class NewResourceEditorView(MapBaseManagerView):
         return JSONResponse(resource_instance.copy())
 
 
-@method_decorator(can_edit_resource_instance(), name="dispatch")
-class ResourceEditorView(MapBaseManagerView):
+@method_decorator(group_required("Resource Editor"), name="dispatch")
+class ResourcePermissionDataView(View):
+    perm_cache = {}
     action = None
 
-    def get(
-        self,
-        request,
-        graphid=None,
-        resourceid=None,
-        view_template="views/resource/editor.htm",
-        main_script="views/resource/editor",
-        nav_menu=True,
-    ):
-        if self.action == "copy":
-            return self.copy(request, resourceid)
+    def get(self, request):
+        resourceid = request.GET.get("instanceid", None)
+        resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+        result = self.get_instance_permissions(resource_instance)
+        return JSONResponse(result)
 
-        resource_instance_exists = False
+    def post(self, request):
+        resourceid = request.POST.get("instanceid", None)
+        result = None
+        if self.action == "restrict":
+            result = self.make_instance_private(resourceid)
+        else:
+            data = JSONDeserializer().deserialize(request.body)
+            self.apply_permissions(data)
+            if "instanceid" in data:
+                resource = models.ResourceInstance.objects.get(pk=data["instanceid"])
+                result = self.get_instance_permissions(resource)
+        return JSONResponse(result)
 
+    def delete(self, request):
+        data = JSONDeserializer().deserialize(request.body)
+        self.apply_permissions(data, revert=True)
+        return JSONResponse(data)
+
+    def get_perms(self, identity, type, obj, perms):
+        if type == "user":
+            identity_perms = get_user_perms(identity, obj)
+        else:
+            identity_perms = get_group_perms(identity, obj)
+        res = []
+        for perm in identity_perms:
+            res += list(filter(lambda x: (x["codename"] == perm), perms))
+        return res
+
+    def get_instance_permissions(self, resource_instance):
+        permission_order = ["view_resourceinstance", "change_resourceinstance", "delete_resourceinstance", "no_access_to_resourceinstance"]
+        perms = json.loads(
+            JSONSerializer().serialize(
+                {p.codename: p for p in get_perms_for_model(resource_instance) if p.codename != "add_resourceinstance"}
+            )
+        )
+        ordered_perms = []
+        for p in permission_order:
+            ordered_perms.append(perms[p])
+        identities = [
+            {
+                "name": user.username,
+                "id": user.id,
+                "type": "user",
+                "default_permissions": self.get_perms(user, "user", resource_instance, ordered_perms),
+            }
+            for user in User.objects.all()
+        ]
+        identities += [
+            {
+                "name": group.name,
+                "id": group.id,
+                "type": "group",
+                "default_permissions": self.get_perms(group, "group", resource_instance, ordered_perms),
+            }
+            for group in Group.objects.all()
+        ]
+        result = {"identities": identities}
+        result["permissions"] = ordered_perms
+        result["limitedaccess"] = (len(get_users_with_perms(resource_instance)) + len(get_groups_with_perms(resource_instance))) > 1
         try:
-            resource_instance = Resource.objects.get(pk=resourceid)
-            resource_instance_exists = True
-            graphid = resource_instance.graph_id
-
-        except ObjectDoesNotExist:
-            resource_instance = Resource()
-            resource_instance.resourceinstanceid = resourceid
-            resource_instance.graph_id = graphid
-
-        if resourceid is not None:
-            resource_graphs = (
-                models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-                .exclude(isresource=False)
-                .exclude(isactive=False)
+            createorid = (
+                models.EditLog.objects.filter(resourceinstanceid=resource_instance.resourceinstanceid).filter(edittype="create")[0].userid
             )
-            graph = Graph.objects.get(graphid=graphid)
-            relationship_type_values = get_resource_relationship_types()
-            datatypes = models.DDataType.objects.all()
-            widgets = models.Widget.objects.all()
-            map_layers = models.MapLayer.objects.all()
-            map_markers = models.MapMarker.objects.all()
-            map_sources = models.MapSource.objects.all()
-            geocoding_providers = models.Geocoder.objects.all()
-            required_widgets = []
+            result["creatorid"] = createorid
+        except Exception:
+            logger.error("Cannot find instance creator when retrieving instance permissions")
+            result["creatorid"] = None
+        return result
 
-            widget_datatypes = [v.datatype for k, v in graph.nodes.items()]
-            widgets = widgets.filter(datatype__in=widget_datatypes)
+    def make_instance_private(self, instanceid):
+        groups = list(Group.objects.all())
+        resource_instance = models.ResourceInstance.objects.get(pk=instanceid)
+        users = list(User.objects.all())
+        for identity in groups + users:
+            assign_perm("no_access_to_resourceinstance", identity, resource_instance)
+        return self.get_instance_permissions(resource_instance)
 
-            if resource_instance_exists == True:
-                displayname = Resource.objects.get(pk=resourceid).displayname
-                if displayname == "undefined":
-                    displayname = "Unnamed Resource"
-            else:
-                displayname = "Unnamed Resource"
+    def apply_permissions(self, data, revert=False):
+        with transaction.atomic():
+            for identity in data["selectedIdentities"]:
+                if identity["type"] == "group":
+                    identityModel = Group.objects.get(pk=identity["id"])
+                else:
+                    identityModel = User.objects.get(pk=identity["id"])
 
-            date_nodes = models.Node.objects.filter(datatype="date", graph__isresource=True, graph__isactive=True)
-            searchable_datatypes = [d.pk for d in models.DDataType.objects.filter(issearchable=True)]
-            searchable_nodes = models.Node.objects.filter(
-                graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes, issearchable=True
-            )
-            resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__isactive=True)
-            context = self.get_context_data(
-                main_script=main_script,
-                resource_type=graph.name,
-                relationship_types=relationship_type_values,
-                iconclass=graph.iconclass,
-                datatypes_json=JSONSerializer().serialize(datatypes, exclude=["iconclass", "modulename", "classname"]),
-                datatypes=datatypes,
-                widgets=widgets,
-                date_nodes=date_nodes,
-                map_layers=map_layers,
-                map_markers=map_markers,
-                map_sources=map_sources,
-                geocoding_providers=geocoding_providers,
-                widgets_json=JSONSerializer().serialize(widgets),
-                resourceid=resourceid,
-                resource_graphs=resource_graphs,
-                graph_json=JSONSerializer().serialize(
-                    graph,
-                    exclude=[
-                        "iconclass",
-                        "functions",
-                        "functions_x_graphs",
-                        "name",
-                        "description",
-                        "deploymentfile",
-                        "author",
-                        "deploymentdate",
-                        "version",
-                        "isresource",
-                        "isactive",
-                        "iconclass",
-                        "ontology",
-                    ],
-                ),
-                displayname=displayname,
-                resource_cards=JSONSerializer().serialize(resource_cards, exclude=["description", "instructions", "active", "isvisible"]),
-                searchable_nodes=JSONSerializer().serialize(
-                    searchable_nodes, exclude=["description", "ontologyclass", "isrequired", "issearchable", "istopnode"]
-                ),
-                saved_searches=JSONSerializer().serialize(settings.SAVED_SEARCHES),
-                resource_instance_exists=resource_instance_exists,
-                user_is_reviewer=json.dumps(user_is_resource_reviewer(request.user)),
-                userid=request.user.id,
-            )
+                for instance in data["selectedInstances"]:
+                    resource_instance_id = instance["resourceinstanceid"]
+                    resource_instance = models.ResourceInstance.objects.get(pk=resource_instance_id)
 
-            if graph.iconclass:
-                context["nav"]["icon"] = graph.iconclass
-            context["nav"]["title"] = graph.name
-            context["nav"]["menu"] = nav_menu
-            if resourceid == settings.RESOURCE_INSTANCE_ID:
-                context["nav"]["help"] = (_("Managing System Settings"), "help/base-help.htm")
-                context["help"] = "system-settings-help"
-            else:
-                context["nav"]["help"] = (_("Using the Resource Editor"), "help/base-help.htm")
-                context["help"] = "resource-editor-help"
+                    # first remove all the current permissions
+                    for perm in get_perms(identityModel, resource_instance):
+                        remove_perm(perm, identityModel, resource_instance)
 
-            return render(request, view_template, context)
-
-        return HttpResponseNotFound()
-
-    def delete(self, request, resourceid=None):
-
-        if resourceid is not None:
-            ret = Resource.objects.get(pk=resourceid)
-            ret.delete(user=request.user)
-            return JSONResponse(ret)
-
-        return HttpResponseNotFound()
-
-    def copy(self, request, resourceid=None):
-        resource_instance = Resource.objects.get(pk=resourceid)
-        return JSONResponse(resource_instance.copy())
+                    if not revert:
+                        # then add the new permissions
+                        for perm in identity["selectedPermissions"]:
+                            assign_perm(perm["codename"], identityModel, resource_instance)
 
 
-@method_decorator(can_edit_resource_instance(), name="dispatch")
+@method_decorator(can_edit_resource_instance, name="dispatch")
 class ResourceEditLogView(BaseManagerView):
     def getEditConceptValue(self, values):
         if values is not None:
@@ -482,7 +473,7 @@ class ResourceEditLogView(BaseManagerView):
         return HttpResponseNotFound()
 
 
-@method_decorator(can_edit_resource_instance(), name="dispatch")
+@method_decorator(can_edit_resource_instance, name="dispatch")
 class ResourceActivityStreamPageView(BaseManagerView):
     def get(self, request, page=None):
         current_page = 1
@@ -530,7 +521,7 @@ class ResourceActivityStreamPageView(BaseManagerView):
         return JsonResponse(collection_page.to_obj())
 
 
-@method_decorator(can_edit_resource_instance(), name="dispatch")
+@method_decorator(can_edit_resource_instance, name="dispatch")
 class ResourceActivityStreamCollectionView(BaseManagerView):
     def get(self, request):
         page_size = 100
@@ -553,7 +544,7 @@ class ResourceActivityStreamCollectionView(BaseManagerView):
         return JsonResponse(collection.to_obj())
 
 
-@method_decorator(can_edit_resource_instance(), name="dispatch")
+@method_decorator(can_edit_resource_instance, name="dispatch")
 class ResourceData(View):
     def get(self, request, resourceid=None, formid=None):
         if formid is not None:
@@ -563,7 +554,7 @@ class ResourceData(View):
         return HttpResponseNotFound()
 
 
-@method_decorator(can_read_resource_instance(), name="dispatch")
+@method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceTiles(View):
     def get(self, request, resourceid=None, include_display_values=True):
         datatype_factory = DataTypeFactory()
@@ -599,7 +590,7 @@ class ResourceTiles(View):
         return JSONResponse({"tiles": permitted_tiles})
 
 
-@method_decorator(can_read_resource_instance(), name="dispatch")
+@method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceCards(View):
     def get(self, request, resourceid=None):
         cards = []
@@ -632,6 +623,7 @@ class ResourceDescriptors(View):
         return HttpResponseNotFound()
 
 
+@method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
         lang = request.GET.get("lang", settings.LANGUAGE_CODE)
@@ -751,7 +743,7 @@ class ResourceReportView(MapBaseManagerView):
         return render(request, "views/resource/report.htm", context)
 
 
-@method_decorator(can_read_resource_instance(), name="dispatch")
+@method_decorator(can_read_resource_instance, name="dispatch")
 class RelatedResourcesView(BaseManagerView):
     action = None
 

@@ -43,7 +43,7 @@ from arches.app.models.resource import EditLog
 logger = logging.getLogger(__name__)
 
 
-@method_decorator(can_edit_resource_instance(), name="dispatch")
+@method_decorator(can_edit_resource_instance, name="dispatch")
 class TileData(View):
     action = "update_tile"
 

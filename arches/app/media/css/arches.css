@@ -2698,6 +2698,103 @@ a.select2-search-choice-close {
     border: 1px solid #ddd;
 }
 
+/*------------------------------------------------*/
+
+.permission-grid {
+    display: grid;
+    grid-template-columns: 40px 450px auto 40px;
+    grid-template-rows: 25px auto auto auto;
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+}
+
+.permission-grid .permission-header {
+    grid-column-start: 2;
+    grid-column-end: 4;
+    grid-row-start: 2;
+    grid-row-end: 2;
+  }
+
+.permission-grid .permission-control {
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 3;
+    grid-row-end: 3;
+  }
+
+.permission-grid .permission-list {
+    grid-column-start: 2;
+    grid-column-end: 4;
+    grid-row-start: 4;
+    grid-row-end: 4;
+    overflow-y: auto;
+  }
+
+
+.permissions-list-table {
+    height: 300px
+}
+
+.permissions-list-table-body {
+    height: 280px;
+    overflow-y: auto;
+    border: solid 1px #f0F0F0;
+}
+  
+.permissions-list-header {
+    background: #579ddb;
+    color: #fff;
+    width: 100%;
+    display: flex;
+    padding: 5px;
+    border-bottom: 1px solid #D3E5F4
+}
+
+.permission-control .clear-filter {
+    align-self: center;
+    font-size: 14px;
+    margin-left: -20px;
+    padding-right: 15px;
+}
+
+.permissions-table-row {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    border-bottom: 1px solid #D3E5F4
+}
+
+.permissions-table-row.selected {
+    background-color: #f4faff;
+}
+.permissions-table-row.selected:hover {
+    background-color: #f4faff;
+}
+
+.permissions-table-row:hover {
+    background-color: #fcfcfc;
+}
+
+.permission-list-table .identities-column {
+    width: 35%;
+}
+
+.permission-list-table .permissions-column {
+    width: 65%;
+}
+
+.permission-grid .permission-footer {
+    grid-column-start: 2;
+    grid-column-end: 4;
+    grid-row-start: 5;
+    grid-row-end: 5;
+    height: 75px;
+    align-items: baseline;
+  }
+
+/*------------------------------------------------*/
+
+
 .library-search {
     font-size: 11px;
     height: 32px;
