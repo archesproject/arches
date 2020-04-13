@@ -89,7 +89,9 @@ define([
                 self._currentPermissions = JSON.parse(self._startPermissions);
                 self._permissionLookup = {};
                 self.creator = data['creatorid']
-                data.permissions.forEach(perm => self._permissionLookup[perm.codename] = perm);
+                data.permissions.forEach(function(perm){ 
+                    self._permissionLookup[perm.codename] = perm;
+                });
                 data['identities'].forEach(function(id){
                     id.selected = ko.observable(false);
                     id.creator = Number(self.creator) === Number(id.id) && id.type == 'user';
