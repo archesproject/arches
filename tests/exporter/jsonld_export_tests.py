@@ -104,6 +104,7 @@ class JsonLDExportTests(ArchesTestCase):
 
     def test_0_missing_resource(self):
         # this 'resources' is from urls.py
+        self.client.login(username='admin', password='admin')
         url = reverse('resources', kwargs={"resourceid": "00000000-f6b5-11e9-8f09-a4d18cec433a"})
         response = self.client.get(url, secure=False)
         print(f"test missing on {url} gets {response.status_code}")
