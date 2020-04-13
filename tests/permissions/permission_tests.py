@@ -109,7 +109,7 @@ class PermissionTests(ArchesTestCase):
 
     def test_user_cannot_view_without_permission(self):
         """
-        Tests if a user is allowed to view a resource with implicit permissions and explicit permissions, but 
+        Tests if a user is allowed to view a resource with implicit permissions and explicit permissions, but
         not without explicit permission if a permission other than 'view_resourceinstance' is assigned.
 
         """
@@ -121,7 +121,7 @@ class PermissionTests(ArchesTestCase):
         assign_perm("view_resourceinstance", self.group, resource)
         can_access_with_view_permission = user_can_read_resources(self.user, self.resource_instance_id)
         self.assertTrue(
-            implicit_permission == True and can_access_without_view_permission == False and can_access_with_view_permission == True
+            implicit_permission is True and can_access_without_view_permission is False and can_access_with_view_permission is True
         )
 
     def test_user_has_resource_model_permissions(self):
@@ -133,4 +133,4 @@ class PermissionTests(ArchesTestCase):
             if node.nodegroup:
                 assign_perm("no_access_to_nodegroup", self.group, node.nodegroup)
         hasperms = user_has_resource_model_permissions(self.user, ["models.read_nodegroup"], resource)
-        self.assertTrue(hasperms == False)
+        self.assertTrue(hasperms is False)

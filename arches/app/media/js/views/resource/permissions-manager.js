@@ -74,7 +74,7 @@ define([
                         if (includePermission) {
                             id.default_permissions.push(permission);
                         } else {
-                            var permissionIndexLookup = (p) => p.codename === permission.codename;
+                            var permissionIndexLookup = function(p){return p.codename === permission.codename};
                             var permissionIndex = id.default_permissions.findIndex(permissionIndexLookup);
                             id.default_permissions.splice(permissionIndex, 1);
                         }

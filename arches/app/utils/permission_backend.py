@@ -135,7 +135,7 @@ def get_createable_resource_types(user):
 
 def get_resource_types_by_perm(user, perms):
     """
-    returns a list of graphs for which a user has specific node permissions 
+    returns a list of graphs for which a user has specific node permissions
 
     Arguments:
     user -- the user to check
@@ -200,7 +200,7 @@ def check_resource_instance_permissions(user, resourceid, permission):
 
     Arguments:
     user -- the user to check
-    resourceid -- the id of the resource 
+    resourceid -- the id of the resource
     permission -- the permission codename (e.g. 'view_resourceinstance') for which to check
 
     """
