@@ -61,6 +61,7 @@
             'leaflet': '{{ STATIC_URL }}packages/leaflet/dist/leaflet',
             'leaflet-iiif': '{{ STATIC_URL }}packages/leaflet-iiif/leaflet-iiif',
             'leaflet-draw': '{{ STATIC_URL }}packages/leaflet-draw/dist/leaflet.draw',
+            'leaflet-fullscreen': '{{ STATIC_URL }}packages/leaflet.fullscreen/Control.FullScreen',
             'metismenu': '{{ STATIC_URL }}packages/metismenu/dist/metisMenu.min',
             'knockstrap': '{{ STATIC_URL }}packages/knockstrap/build/knockstrap.min',
             'jqtree': '{{ STATIC_URL }}packages/jqtree/tree.jquery',
@@ -136,6 +137,9 @@
                 deps: ['leaflet']
             },
             'leaflet-draw': {
+                deps: ['leaflet']
+            },
+            'leaflet-fullscreen': {
                 deps: ['leaflet']
             },
             'ckeditor': {
@@ -245,6 +249,7 @@
                 api_search_component_data: "{% url 'api_search_component_data' 'aaaa'%}".replace('aaaa', ''),
                 geojson: "{% url 'geojson' %}",
                 icons: "{% url 'icons' %}",
+                iiifmanifest: "{% url 'iiifmanifest' %}"
             },
             geocoderPlaceHolder: "{% trans 'Find an address...' %}",
             confirmNav: {
@@ -515,5 +520,3 @@
 
 {% block project_modules %}
 {% endblock project_modules %}
-
-

@@ -76,7 +76,7 @@ define([
             }
             return tiles;
         }, this);
-        this.saveTile = function() {
+        this.saveTile = function(callback) {
             self.loading(true);
             self.tile.save(function(response) {
                 self.loading(false);
@@ -94,9 +94,18 @@ define([
                 }
             }, function() {
                 self.loading(false);
+                if (typeof self.onSaveSuccess === 'function') self.onSaveSuccess();
                 if (params.form.onSaveSuccess) {
                     params.form.onSaveSuccess(self.tile);
                 }
+                if (typeof callback === 'function') callback();
+            });
+        };
+        this.saveTileAddNew = function() {
+            self.saveTile(function() {
+                window.setTimeout(function() {
+                    self.card.selected(true);
+                }, 1);
             });
         };
         this.deleteTile = function() {

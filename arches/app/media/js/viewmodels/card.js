@@ -400,9 +400,9 @@ define([
         };
 
         this.isDirty = function(){
-            // Returns true if a tile is dirty and dirty state is not triggered by default values. 
+            // Returns true if a tile is dirty and dirty state is not triggered by default values.
             if(self.newTile) {
-                if(self.newTile.dirty()) { 
+                if(self.newTile.dirty()) {
                     var res = {};
                     self.widgets().forEach(function(w){
                         res[w.node.nodeid] = ko.unwrap(w.config.defaultValue);

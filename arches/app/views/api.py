@@ -898,3 +898,20 @@ class Images(APIBase):
             return JSONResponse(status=500)
 
         return JSONResponse()
+
+
+class IIIFManifest(APIBase):
+    def get(self, request):
+        query = request.GET.get("query", None)
+        start = int(request.GET.get("start", 0))
+        limit = request.GET.get("limit", None)
+
+        manifests = models.IIIFManifest.objects.all()
+        if query is not None:
+            manifests = manifests.filter(Q(label__icontains=query) | Q(description__icontains=query))
+        count = manifests.count()
+        if limit is not None:
+            manifests = manifests[start : start + int(limit)]
+
+        response = JSONResponse({"results": manifests, "count": count})
+        return response

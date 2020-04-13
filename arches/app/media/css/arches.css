@@ -20,6 +20,7 @@
 @import url(../packages/leaflet-draw/dist/leaflet.draw.css);
 @import url(../css/tree/tree.css);
 @import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
+@import url(../packages/leaflet.fullscreen/Control.FullScreen.css);
 
 
 img {
@@ -1591,14 +1592,12 @@ ul.tabbed-report-tab-list {
 
 .workbench-card-sidepanel .install-buttons {
     background: #f9f9f9;
-    position: fixed;
+    position: absolute;
     bottom: 0px;
     border-top: 1px solid #ddd;
-    height: 60px;
-    padding-top: 10px;
-    right: 75px;
+    padding: 10px 35px;
+    right: 0;
     width: 399px;
-    padding-left: 35px;
 }
 
 .workbench-card-sidepanel.expanded .install-buttons {
@@ -11326,7 +11325,7 @@ ul.select2-choices:after {
 
 .file-select .rr-splash-img {
     margin-top: 0px;
-    margin-left: 2px; 
+    margin-left: 2px;
     height: 90%;
 }
 
@@ -11885,6 +11884,23 @@ a.jstree-anchor.permissions-widget {
 }
 .gallery-expanded .iiif-gallery-header {
     padding-left: 10px;
+}
+.iiif-widget-report .iiif-leaflet {
+    height: 300px;
+    margin: 0 20px 10px 220px;
+    border: solid 1px #808080;
+}
+.manifest-details {
+    white-space: normal;
+}
+.manifest-details h4 {
+    padding-left: 10px;
+}
+.manifest-details-list, .manifest-logo {
+    padding-left: 20px;
+}
+.manifest-logo {
+    max-width: 100%;
 }
 .manifest-editor-label {
     font-size: 1.2em;
