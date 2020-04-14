@@ -200,9 +200,9 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 # It must end in a slash if set to a non-empty value.
 MEDIA_URL = "/files/"
 
-# Important! By setting RESTRICT_MEDIA_ACCESS to True, media requests will be
-# served by Django (app server) rather than your web server (e.g. Apache). This
-# will allow you to require user authentication and limit file access groups listed in
+# Important! By setting RESTRICT_MEDIA_ACCESS to True, media file requests will be
+# served by your app server (Django) rather than your web server (e.g. Apache). This
+# will allow you to require user authentication and limit file access to groups listed in
 # PERMITTED_MEDIA_GROUPS.
 # This may adversely impact performace when serving large files or
 # during periods of high traffic.
