@@ -70,7 +70,6 @@ define([
                                     var coords = features[0].geometry.coordinates;
                                     map.panTo([coords[1], coords[0]]);
                                 } else {
-                                    console.log(features);
                                     map.fitBounds([
                                         [extent[1], extent[0]],
                                         [extent[3], extent[2]]
