@@ -232,14 +232,16 @@ define([
             if (canvas.images.length > 0) return canvas.images[0].resource.service['@id'];
         };
 
+        var updateCanvas = !self.canvas();
         this.manifestData.subscribe(function(manifestData) {
-            if (!self.canvas() && manifestData.sequences.length > 0) {
+            if (updateCanvas && manifestData.sequences.length > 0) {
                 var sequence = manifestData.sequences[0];
                 if (sequence.canvases.length > 0) {
                     var canvas = sequence.canvases[0];
                     self.selectCanvas(canvas);
                 }
             }
+            updateCanvas = true;
         });
 
         this.toggleManifestEditor = function() {
