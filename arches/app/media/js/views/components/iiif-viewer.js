@@ -142,8 +142,10 @@ define([
             }, 1);
         });
 
-        this.showGallery = ko.observable(true);
-        this.expandGallery = ko.observable(!params.manifest);
+        if (params.showGallery === undefined) params.showGallery = true;
+        this.showGallery = ko.observable(params.showGallery);
+        if (!params.manifest) params.expandGallery = true;
+        this.expandGallery = ko.observable(params.expandGallery);
         this.expandGallery.subscribe(function(expandGallery) {
             if (expandGallery) self.showGallery(true);
         });
