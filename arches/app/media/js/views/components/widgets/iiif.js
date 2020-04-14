@@ -5,8 +5,9 @@ define([
     'knockout-mapping',
     'viewmodels/widget',
     'views/components/iiif-annotation',
+    'geojson-extent',
     'leaflet-fullscreen'
-], function(_, L, ko, koMapping, WidgetViewModel, IIIFAnnotationViewmodel) {
+], function(_, L, ko, koMapping, WidgetViewModel, IIIFAnnotationViewmodel, geojsonExtent) {
     return ko.components.register('iiif-widget', {
         viewModel: function(params) {
             var self = this;
@@ -36,10 +37,12 @@ define([
                         zoom:  0,
                         afterRender: function(map) {
                             L.tileLayer.iiif(canvas + '/info.json').addTo(map);
-                            map.addLayer(L.geoJson({
+                            var featureCollection = {
                                 type: 'FeatureCollection',
                                 features: features
-                            }, {
+                            };
+                            var extent = geojsonExtent(featureCollection);
+                            map.addLayer(L.geoJson(featureCollection, {
                                 pointToLayer: function(feature, latlng) {
                                     return L.circleMarker(latlng, {
                                         color: feature.properties.color,
@@ -62,6 +65,18 @@ define([
                                 }
                             }));
                             L.control.fullscreen().addTo(map);
+                            setTimeout(function() {
+                                if (features.length === 1 && features[0].geometry.type === 'Point') {
+                                    var coords = features[0].geometry.coordinates;
+                                    map.panTo([coords[1], coords[0]]);
+                                } else {
+                                    console.log(features);
+                                    map.fitBounds([
+                                        [extent[1], extent[0]],
+                                        [extent[3], extent[2]]
+                                    ]);
+                                }
+                            }, 250);
                         }
                     });
                 });
