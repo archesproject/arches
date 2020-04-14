@@ -2740,7 +2740,7 @@ a.select2-search-choice-close {
     overflow-y: auto;
     border: solid 1px #f0F0F0;
 }
-  
+
 .permissions-list-header {
     background: #579ddb;
     color: #fff;
@@ -11813,6 +11813,10 @@ a.jstree-anchor.permissions-widget {
 }
 .workbench-card-container-sidepanel-active .workbench-card-container {
     margin-right: 475px;
+}
+.add-new-crumb {
+    float: right;
+    cursor: pointer;
 }
 .iiif-gallery-content {
     border-top: solid 1px rgb(221, 221, 221);
