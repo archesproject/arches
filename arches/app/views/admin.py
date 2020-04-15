@@ -25,7 +25,6 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from django.shortcuts import redirect
 from arches.app.models import models
 from arches.app.models.system_settings import settings
-from arches.app.models.tile import Tile
 from django.core.exceptions import PermissionDenied
 
 
