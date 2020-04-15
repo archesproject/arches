@@ -200,6 +200,17 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 # It must end in a slash if set to a non-empty value.
 MEDIA_URL = "/files/"
 
+# Important! By setting RESTRICT_MEDIA_ACCESS to True, media file requests will be
+# served by your app server (Django) rather than your web server (e.g. Apache). This
+# will allow you to require user authentication and limit file access to groups listed in
+# PERMITTED_MEDIA_GROUPS.
+# This may adversely impact performace when serving large files or
+# during periods of high traffic.
+RESTRICT_MEDIA_ACCESS = False
+
+# If RESTRICT_MEDIA_ACCESS is True, limits file access to these groups
+PERMITTED_MEDIA_GROUPS = ["Resource Editor"]
+
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
@@ -557,6 +568,7 @@ RENDERERS = [
         "component": "views/components/cards/file-renderers/imagereader",
         "ext": "",
         "type": "image/*",
+        "exclude": "tif,tiff,psd",
     }
 ]
 

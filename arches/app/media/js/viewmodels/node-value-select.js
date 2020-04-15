@@ -74,10 +74,12 @@ define([
         }, this);
 
         var getDisplayValueMarkup = function(displayValue) {
-            return '<div>' +
-                    '<span class="node-value-select-label">' + displayValue.label + '</span>: ' +
-                    '<span class="node-value-select-value">' + displayValue.value + '</span>' +
-                '</div>';
+            if (displayValue) {
+                return '<div>' +
+                        '<span class="node-value-select-label">' + displayValue.label + '</span>: ' +
+                        '<span class="node-value-select-value">' + displayValue.value + '</span>' +
+                    '</div>';
+            }
         };
 
         this.select2Config = {
@@ -138,18 +140,20 @@ define([
                 var nodeDisplayValue = _.find(tile.display_values, function(displayValue) {
                     return nodeid === displayValue.nodeid;
                 });
-                var markup = '<div class="node-value-select-tile">' +
-                    '<div class="selected-node-value">' +
-                    getDisplayValueMarkup(nodeDisplayValue) +
-                    '</div>';
-                if (!params.config().displayOnlySelectedNode) {
-                    tile.display_values.forEach(function(displayValue) {
-                        if (nodeid !== displayValue.nodeid) {
-                            markup += getDisplayValueMarkup(displayValue);
-                        }
-                    });}
-                markup += '</div>';
-                return markup;
+                if (nodeDisplayValue) {
+                    var markup = '<div class="node-value-select-tile">' +
+                        '<div class="selected-node-value">' +
+                        getDisplayValueMarkup(nodeDisplayValue) +
+                        '</div>';
+                    if (!params.config().displayOnlySelectedNode) {
+                        tile.display_values.forEach(function(displayValue) {
+                            if (nodeid !== displayValue.nodeid) {
+                                markup += getDisplayValueMarkup(displayValue);
+                            }
+                        });}
+                    markup += '</div>';
+                    return markup;
+                }
             },
             formatSelection: function(tile) {
                 var nodeid = params.node.config.nodeid();

@@ -78,7 +78,7 @@ def reverse_migrate(apps, schema_editor, with_create_permissions=True):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '5935_2way_sync'),
+        ('models', '2724_instance_permissions'),
     ]
 
     operations = [

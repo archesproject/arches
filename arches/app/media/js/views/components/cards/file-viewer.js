@@ -1,9 +1,7 @@
 define([
+    'jquery',
     'knockout',
-    'knockout-mapping',
-    'underscore',
     'arches',
-    'dropzone',
     'uuid',
     'viewmodels/card-component',
     'viewmodels/card-multi-select',
@@ -12,8 +10,9 @@ define([
     'bindings/slide',
     'bindings/fadeVisible',
     'bindings/scroll-to-file',
+    'dropzone',
     'bindings/dropzone'
-], function(ko, koMapping, _, arches, Dropzone, uuid, CardComponentViewModel, CardMultiSelectViewModel, WorkbenchComponentViewModel, fileRenderers) {
+], function($, ko, arches, uuid, CardComponentViewModel, CardMultiSelectViewModel, WorkbenchComponentViewModel, fileRenderers) {
     return ko.components.register('file-viewer', {
         viewModel: function(params) {
             params.configKeys = ['acceptedFiles', 'maxFilesize'];
@@ -132,10 +131,10 @@ define([
                 });
             }
 
-
             this.getDefaultRenderers = function(type, file){
                 var defaultRenderers = [];
                 this.fileFormatRenderers.forEach(function(renderer){
+                    var excludeExtensions = renderer.exclude ? renderer.exclude.split(",") : [];
                     var rawFileType = type;
                     var rawExtension = file.url ? ko.unwrap(file.url).split('.').pop() : ko.unwrap(file).split('.').pop();
                     if (renderer.type === rawFileType && renderer.ext === rawExtension)  {
@@ -146,7 +145,7 @@ define([
                     var splitAllowableType = renderer.type.split('/');
                     var allowableType = splitAllowableType[0];
                     var allowableSubType = splitAllowableType[1];
-                    if (allowableSubType === '*' && fileType === allowableType) {
+                    if (allowableSubType === '*' && fileType === allowableType && excludeExtensions.indexOf(rawExtension) < 0) {
                         defaultRenderers.push(renderer);
                     }
                 }); 
@@ -348,6 +347,11 @@ define([
                 self.card.staging.push(t.tileid);
             }
 
+            this.downloadSelection = function() {
+                var url = arches.urls.download_files + "?tiles=" + JSON.stringify(self.card.staging()) + "&node=" + self.fileListNodeId;
+                window.open(url);
+            };
+
             this.addTile = function(file){
                 var newtile;
                 newtile = self.card.getNewTile();
@@ -372,13 +376,13 @@ define([
                 newtile.formData.append('file-list_' + self.fileListNodeId, file, file.name);
                 newtile.resourceinstance_id = self.card.resourceinstanceid;
                 if (self.card.tiles().length === 0) {
-                    sleep(50);
+                    sleep(100);
                 }
                 newtile.save(null, stageTile);
                 self.card.newTile = undefined;
             };
 
-            this.getWidgetConfig = function(){
+            this.getAcceptedFiles = function(){
                 self.card.widgets().forEach(function(w) {
                     if (w.node_id() === self.fileListNodeId) {
                         if (ko.unwrap(w.attributes.config.acceptedFiles)) {
@@ -387,7 +391,7 @@ define([
                     }
                 });
             };
-            this.getWidgetConfig();
+            this.getAcceptedFiles();
 
             this.dropzoneOptions = {
                 url: "arches.urls.root",

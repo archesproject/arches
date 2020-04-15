@@ -10,11 +10,6 @@ import urllib.request, urllib.parse, urllib.error
 import os
 import imp
 import logging
-from arches.app.search.mappings import (
-    prepare_terms_index,
-    prepare_concepts_index,
-    prepare_resource_relations_index,
-)
 from arches.setup import unzip_file
 from arches.management.commands import utils
 from arches.app.utils import import_class_from_string

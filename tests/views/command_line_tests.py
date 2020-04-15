@@ -28,7 +28,6 @@ import uuid
 from tests import test_settings
 from arches.app.utils.couch import Couch
 import couchdb
-# from tests.base_test import ArchesTestCase
 from django.test import TestCase
 from django.core import management
 from arches.app.models import models
@@ -36,6 +35,7 @@ from django.urls import reverse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.test.client import Client
 
+# these tests can be run from the command line via
 # python manage.py test tests/views/command_line_tests.py --pattern="*.py" --settings="tests.test_settings"
 
 

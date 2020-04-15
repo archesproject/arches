@@ -166,7 +166,7 @@ define([
                 var provisionalindex;
                 var summary = _.map(this.tiles(), function(tile){
                     var dataEmpty = _.keys(koMapping.toJS(tile.data)).length === 0;
-                    if (tile.provisionaledits() !== null && dataEmpty) {
+                    if (ko.unwrap(tile.provisionaledits) !== null && dataEmpty) {
                         return 2;
                     } else if (tile.provisionaledits() !== null && !dataEmpty) {
                         return 1;
@@ -399,9 +399,24 @@ define([
             }
         };
 
-       this.isDirty = function(){
+        this.isDirty = function(){
+            // Returns true if a tile is dirty and dirty state is not triggered by default values.
             if(self.newTile) {
-                if(self.newTile.dirty()) { return true; }
+                if(self.newTile.dirty()) {
+                    var res = {};
+                    self.widgets().forEach(function(w){
+                        res[w.node.nodeid] = ko.unwrap(w.config.defaultValue);
+                    });
+                    for (var k in self.newTile.data) {
+                        if (Object.keys(res).indexOf(k) > -1) {
+                            if ((res[k]||null) == (self.newTile.data[k]()||null) !== true) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }
+                    }
+                }
             }
             return false;
         };

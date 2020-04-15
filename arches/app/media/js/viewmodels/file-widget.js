@@ -24,6 +24,8 @@ define([
         this.uploadMulti = ko.observable(true);
         this.filesForUpload = ko.observableArray();
         this.uploadedFiles = ko.observableArray();
+        this.unsupportedImageTypes = ['tif', 'tiff', 'vnd.adobe.photoshop'];
+
 
         if (this.form) {
             this.form.on('after-update', function(req, tile) {
@@ -234,13 +236,15 @@ define([
 
         this.reportFiles = ko.computed(function() {
             return self.uploadedFiles().filter(function(file) {
-                return ko.unwrap(file.type).indexOf('image') < 0;
+                var ext = ko.unwrap(file.type).split('/').pop();
+                return ko.unwrap(file.type).indexOf('image') < 0 || self.unsupportedImageTypes.indexOf(ext) > -1;
             });
         });
 
         this.reportImages = ko.computed(function() {
             return self.uploadedFiles().filter(function(file) {
-                return ko.unwrap(file.type).indexOf('image') >= 0;
+                var ext = ko.unwrap(file.type).split('/').pop();
+                return ko.unwrap(file.type).indexOf('image') >= 0 && self.unsupportedImageTypes.indexOf(ext) <= 0;
             });
         });
     };
