@@ -1148,7 +1148,6 @@ class FileListDataType(BaseDataType):
                             tile_to_update.data[str(node.pk)] = updated_file_records
                         else:
                             tile_to_update.provisionaledits[str(user.id)]["value"][str(node.pk)] = updated_file_records
-                        import pdb; pdb.set_trace()
                         tile_to_update.save()
 
     def transform_import_values(self, value, nodeid):
