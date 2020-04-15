@@ -201,7 +201,7 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 MEDIA_URL = "/files/"
 
 # By setting RESTRICT_MEDIA_ACCESS to True, media file requests will be
-# served by Django rather than your web server (e.g. Apache). This allows file requests to be checked against nodegroup permissions. 
+# served by Django rather than your web server (e.g. Apache). This allows file requests to be checked against nodegroup permissions.
 # However, this will adversely impact performace when serving large files or during periods of high traffic.
 RESTRICT_MEDIA_ACCESS = False
 
