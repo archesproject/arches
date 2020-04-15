@@ -61,6 +61,7 @@
             'leaflet': '{{ STATIC_URL }}packages/leaflet/dist/leaflet',
             'leaflet-iiif': '{{ STATIC_URL }}packages/leaflet-iiif/leaflet-iiif',
             'leaflet-draw': '{{ STATIC_URL }}packages/leaflet-draw/dist/leaflet.draw',
+            'leaflet-fullscreen': '{{ STATIC_URL }}packages/leaflet.fullscreen/Control.FullScreen',
             'metismenu': '{{ STATIC_URL }}packages/metismenu/dist/metisMenu.min',
             'knockstrap': '{{ STATIC_URL }}packages/knockstrap/build/knockstrap.min',
             'jqtree': '{{ STATIC_URL }}packages/jqtree/tree.jquery',
@@ -136,6 +137,9 @@
                 deps: ['leaflet']
             },
             'leaflet-draw': {
+                deps: ['leaflet']
+            },
+            'leaflet-fullscreen': {
                 deps: ['leaflet']
             },
             'ckeditor': {
@@ -219,6 +223,8 @@
                 time_wheel_config: "{% url 'time_wheel_config' %}",
                 reindex: "{% url 'reindex' %}",
                 permission_data: "{% url 'permission_data' %}",
+                resource_permission_data: "{% url 'resource_permission_data' %}",
+                restrict_resource_access: "{% url 'restrict_resource_access' %}",
                 permission_manager_data: "{% url 'permission_manager_data' %}",
                 get_user_names: "{% url 'get_user_names' %}",
                 feature_popup_content: "{% url 'feature_popup_content' %}",

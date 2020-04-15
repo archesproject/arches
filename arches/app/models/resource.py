@@ -34,6 +34,8 @@ from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
 from arches.app.utils import import_class_from_string
+from guardian.shortcuts import assign_perm
+from guardian.exceptions import NotUserNorGroup
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.exceptions import (
     InvalidNodeNameException,
@@ -113,6 +115,12 @@ class Resource(models.ResourceInstance):
                 user = {}
         else:
             user = request.user
+
+        try:
+            for perm in ("view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"):
+                assign_perm(perm, user, self)
+        except NotUserNorGroup:
+            pass
 
         self.save_edit(user=user, edit_type="create")
         self.index()

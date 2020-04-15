@@ -20,6 +20,7 @@
 @import url(../packages/leaflet-draw/dist/leaflet.draw.css);
 @import url(../css/tree/tree.css);
 @import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
+@import url(../packages/leaflet.fullscreen/Control.FullScreen.css);
 
 
 img {
@@ -1591,14 +1592,12 @@ ul.tabbed-report-tab-list {
 
 .workbench-card-sidepanel .install-buttons {
     background: #f9f9f9;
-    position: fixed;
+    position: absolute;
     bottom: 0px;
     border-top: 1px solid #ddd;
-    height: 60px;
-    padding-top: 10px;
-    right: 75px;
+    padding: 10px 35px;
+    right: 0;
     width: 399px;
-    padding-left: 35px;
 }
 
 .workbench-card-sidepanel.expanded .install-buttons {
@@ -2698,6 +2697,103 @@ a.select2-search-choice-close {
     font-size: 15px;
     border: 1px solid #ddd;
 }
+
+/*------------------------------------------------*/
+
+.permission-grid {
+    display: grid;
+    grid-template-columns: 40px 450px auto 40px;
+    grid-template-rows: 25px auto auto auto;
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+}
+
+.permission-grid .permission-header {
+    grid-column-start: 2;
+    grid-column-end: 4;
+    grid-row-start: 2;
+    grid-row-end: 2;
+  }
+
+.permission-grid .permission-control {
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 3;
+    grid-row-end: 3;
+  }
+
+.permission-grid .permission-list {
+    grid-column-start: 2;
+    grid-column-end: 4;
+    grid-row-start: 4;
+    grid-row-end: 4;
+    overflow-y: auto;
+  }
+
+
+.permissions-list-table {
+    height: 300px
+}
+
+.permissions-list-table-body {
+    height: 280px;
+    overflow-y: auto;
+    border: solid 1px #f0F0F0;
+}
+
+.permissions-list-header {
+    background: #579ddb;
+    color: #fff;
+    width: 100%;
+    display: flex;
+    padding: 5px;
+    border-bottom: 1px solid #D3E5F4
+}
+
+.permission-control .clear-filter {
+    align-self: center;
+    font-size: 14px;
+    margin-left: -20px;
+    padding-right: 15px;
+}
+
+.permissions-table-row {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    border-bottom: 1px solid #D3E5F4
+}
+
+.permissions-table-row.selected {
+    background-color: #f4faff;
+}
+.permissions-table-row.selected:hover {
+    background-color: #f4faff;
+}
+
+.permissions-table-row:hover {
+    background-color: #fcfcfc;
+}
+
+.permission-list-table .identities-column {
+    width: 35%;
+}
+
+.permission-list-table .permissions-column {
+    width: 65%;
+}
+
+.permission-grid .permission-footer {
+    grid-column-start: 2;
+    grid-column-end: 4;
+    grid-row-start: 5;
+    grid-row-end: 5;
+    height: 75px;
+    align-items: baseline;
+  }
+
+/*------------------------------------------------*/
+
 
 .library-search {
     font-size: 11px;
@@ -11718,6 +11814,10 @@ a.jstree-anchor.permissions-widget {
 .workbench-card-container-sidepanel-active .workbench-card-container {
     margin-right: 475px;
 }
+.add-new-crumb {
+    float: right;
+    cursor: pointer;
+}
 .iiif-gallery-content {
     border-top: solid 1px rgb(221, 221, 221);
     height: 160px;
@@ -11788,6 +11888,14 @@ a.jstree-anchor.permissions-widget {
 }
 .gallery-expanded .iiif-gallery-header {
     padding-left: 10px;
+}
+.iiif-widget-report {
+    margin: 0 0 0 320px;
+}
+.iiif-widget-report .iiif-leaflet {
+    height: 300px;
+    margin: 0 20px 10px 0px;
+    border: solid 1px #808080;
 }
 .manifest-details {
     white-space: normal;
