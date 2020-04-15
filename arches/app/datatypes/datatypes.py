@@ -1135,6 +1135,7 @@ class FileListDataType(BaseDataType):
                     if file_json["name"] == file_data.name and file_json["url"] is None:
                         file_json["file_id"] = str(file_model.pk)
                         file_json["url"] = str(file_model.path.url)
+                        file_json["url"] = '/files/' + str(file_model.fileid)
                         file_json["status"] = "uploaded"
                         resave_tile = True
                     updated_file_records.append(file_json)
@@ -1147,6 +1148,7 @@ class FileListDataType(BaseDataType):
                             tile_to_update.data[str(node.pk)] = updated_file_records
                         else:
                             tile_to_update.provisionaledits[str(user.id)]["value"][str(node.pk)] = updated_file_records
+                        import pdb; pdb.set_trace()
                         tile_to_update.save()
 
     def transform_import_values(self, value, nodeid):
