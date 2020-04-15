@@ -287,17 +287,21 @@ class GraphDataView(View):
                 res.append({"ontology_property": r["ontology_property"], "ontology_classes": [c for c in r["ontology_classes"]]})
             return JSONResponse(res)
 
-        else:
+        elif self.action == "get_nodes":
             graph = Graph.objects.get(graphid=graphid)
-            if self.action == "get_related_nodes":
-                parent_nodeid = request.GET.get("parent_nodeid", None)
-                ret = graph.get_valid_ontology_classes(nodeid=nodeid, parent_nodeid=parent_nodeid)
+            return JSONResponse(graph.nodes)
 
-            elif self.action == "get_valid_domain_nodes":
-                if nodeid == "":
-                    nodeid = None
-                ret = graph.get_valid_domain_ontology_classes(nodeid=nodeid)
+        elif self.action == "get_related_nodes":
+            graph = Graph.objects.get(graphid=graphid)
+            parent_nodeid = request.GET.get("parent_nodeid", None)
+            ret = graph.get_valid_ontology_classes(nodeid=nodeid, parent_nodeid=parent_nodeid)
+            return JSONResponse(ret)
 
+        elif self.action == "get_valid_domain_nodes":
+            graph = Graph.objects.get(graphid=graphid)
+            if nodeid == "":
+                nodeid = None
+            ret = graph.get_valid_domain_ontology_classes(nodeid=nodeid)
             return JSONResponse(ret)
 
         return HttpResponseNotFound()

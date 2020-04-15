@@ -125,6 +125,7 @@ urlpatterns = [
         name="permission_manager_data",
     ),
     url(r"^graph/(?P<graphid>%s|())$" % uuid_regex, GraphManagerView.as_view(), name="graph"),
+    url(r"^graph/(?P<graphid>%s)/nodes$" % uuid_regex, GraphDataView.as_view(action="get_nodes"), name="graph_nodes"),
     url(r"^graph/(?P<graphid>%s)/append_branch$" % uuid_regex, GraphDataView.as_view(action="append_branch"), name="append_branch"),
     url(r"^graph/(?P<graphid>%s)/append_node$" % uuid_regex, GraphDataView.as_view(action="append_node"), name="append_node"),
     url(r"^graph/(?P<graphid>%s)/move_node$" % uuid_regex, GraphDataView.as_view(action="move_node"), name="move_node"),
