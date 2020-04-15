@@ -254,9 +254,6 @@ urlpatterns = [
     url(r"^iiifmanifest$", api.IIIFManifest.as_view(), name="iiifmanifest"),
 ]
 
-if settings.RESTRICT_MEDIA_ACCESS:
-    urlpatterns += [url(r"^%s(?P<path>.*)$" % settings.MEDIA_URL[1:], main.protected_media, {"document_root": settings.MEDIA_ROOT})]
-
 if settings.DEBUG:
     try:
         import debug_toolbar
