@@ -26,7 +26,7 @@ from django.shortcuts import redirect
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.models.tile import Tile
-from django.http import HttpResponseForbidden
+from django.core.exceptions import PermissionDenied
 
 
 @method_decorator(group_required("Graph Editor"), name="dispatch")
@@ -42,11 +42,10 @@ class FileView(View):
         file = models.File.objects.get(pk=fileid)
         path = file.path.url
         if settings.RESTRICT_MEDIA_ACCESS:
-            tile = Tile(file.tile)
-            permission = tile.filter_by_perm(request.user, "read_nodegroup")
+            permission = request.user.has_perm("read_nodegroup", file.tile.nodegroup)
             permitted = permission is None or permission is True
             if permitted:
                 return redirect(path)
             else:
-                return HttpResponseForbidden()
+                raise PermissionDenied()
         return redirect(path)
