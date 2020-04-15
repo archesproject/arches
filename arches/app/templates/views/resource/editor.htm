@@ -234,6 +234,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- /ko -->
 
                         <!-- /ko -->
+
+                        <!-- ko if: selectedCard().cardinality === 'n' && selectedTile().tileid  -->
+                        <span class="add-new-crumb current-crumb" data-bind="click: function() {
+                            selectedCard().selected(true);
+                        }">
+                            <i class="fa fa-plus"></i>
+                            {% trans 'Add New' %}
+                        </span>
+                        <!-- /ko -->
                     </div>
                 </div>
             </div>

@@ -76,6 +76,8 @@ define([
             params.canvas = params.canvas || this.card.canvas;
             params.center = this.card.center;
             params.zoom = this.card.zoom;
+            params.expandGallery = this.card.expandGallery;
+            params.showGallery = this.card.showGallery;
 
             IIIFAnnotationViewmodel.apply(this, [params]);
 
@@ -101,6 +103,12 @@ define([
 
             self.card.center = undefined;
             self.card.zoom = undefined;
+            self.expandGallery.subscribe(function(expandGallery) {
+                self.card.expandGallery = expandGallery;
+            });
+            self.showGallery.subscribe(function(showGallery) {
+                self.card.showGallery = showGallery;
+            });
         },
         template: {
             require: 'text!templates/views/components/cards/iiif-card.htm'

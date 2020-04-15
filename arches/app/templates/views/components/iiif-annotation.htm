@@ -305,12 +305,6 @@
                             disabled: !card.isWritable && !self.preview,
                             'btn-mint': card.isWritable
                         }">{% trans 'Save' %}</button>
-                        <!-- ko if: card.cardinality === 'n' -->
-                        <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTileAddNew, css: {
-                            disabled: !card.isWritable && !self.preview,
-                            'btn-mint': card.isWritable
-                        }">{% trans 'Save and add new' %}</button>
-                        <!-- /ko -->
                         <!-- /ko -->
                     <!-- /ko -->
                     <!-- ko if: !tile.tileid -->
@@ -318,12 +312,6 @@
                         disabled: !card.isWritable && !self.preview,
                         'btn-mint': card.isWritable
                     }">{% trans 'Add'  %}</button>
-                    <!-- ko if: card.cardinality === 'n' -->
-                    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTileAddNew, css: {
-                        disabled: !card.isWritable && !self.preview,
-                        'btn-mint': card.isWritable
-                    }">{% trans 'Save and add new' %}</button>
-                    <!-- /ko -->
                     <!-- /ko -->
                 </div>
                 {% endblock form_buttons %}
