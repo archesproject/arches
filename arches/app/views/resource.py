@@ -93,10 +93,11 @@ def get_resource_relationship_types():
     }
     return relationship_type_values
 
+
 def get_instance_creator(resource_instance, user):
     try:
-        creatorid = (
-            int(models.EditLog.objects.filter(resourceinstanceid=resource_instance.resourceinstanceid).filter(edittype="create")[0].userid)
+        creatorid = int(
+            models.EditLog.objects.filter(resourceinstanceid=resource_instance.resourceinstanceid).filter(edittype="create")[0].userid
         )
         return creatorid, user.id == creatorid or user.is_superuser
 
@@ -122,7 +123,7 @@ class ResourceEditorView(MapBaseManagerView):
             return self.copy(request, resourceid)
 
         creator = None
-        user_created_instance = None 
+        user_created_instance = None
 
         if resourceid is None:
             resource_instance = None
@@ -377,7 +378,7 @@ class ResourcePermissionDataView(View):
                     resource_instance_id = instance["resourceinstanceid"]
                     resource_instance = models.ResourceInstance.objects.get(pk=resource_instance_id)
                     creator, user_can_modify_permissions = get_instance_creator(resource_instance, user)
-    
+
                     if user_can_modify_permissions:
                         # first remove all the current permissions
                         for perm in get_perms(identityModel, resource_instance):
