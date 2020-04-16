@@ -32,6 +32,8 @@ define([
     var displayname = ko.observable(data.displayname);
     var resourceId = ko.observable(data.resourceid);
     var appliedFunctions = ko.observable(data['appliedFunctions']);
+    var userIsCreator = data['useriscreator'];
+    var creator = data['creator'];
     var selectedTile = ko.computed(function() {
         var item = selection();
         if (item && typeof item !== 'string') {
@@ -65,6 +67,7 @@ define([
             vm.rootExpanded(true);
         }
     };
+
     var createLookup = function(list, idKey) {
         return _.reduce(list, function(lookup, item) {
             lookup[item[idKey]] = item;
@@ -138,6 +141,8 @@ define([
         reviewer: data.userisreviewer,
         graphiconclass: data.graphiconclass,
         relationship_types: data.relationship_types,
+        userIsCreator: userIsCreator,
+        creator: creator,
         // appliedFunctions: appliedFunctions(),
         graph: {
             graphid: data.graphid,
@@ -281,7 +286,9 @@ define([
     };
 
     vm.showInstancePermissionsManager = function(){
-        vm.selection('permissions-manager');
+        if (vm.userIsCreator) {
+            vm.selection('permissions-manager');
+        }
     };
 
     vm.selectionBreadcrumbs = ko.computed(function() {

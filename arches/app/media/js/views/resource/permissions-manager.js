@@ -51,7 +51,7 @@ define([
                 var resetPermissions = JSON.parse(self._startPermissions);
                 resetPermissions.identities.forEach(function(identity){
                     if (Number(identity.id) === Number(self.creator) && identity.type == 'user') {
-                        console.log('skipping', identity)
+                        //pass
                     } else {
                         var defaultperms = identity.default_permissions.map(function(perm){return perm.codename});
                         self.instancePermissions()['identities'].forEach(function(activeidentity){
@@ -97,7 +97,14 @@ define([
                     id.creator = Number(self.creator) === Number(id.id) && id.type == 'user';
                     id.availablePermissions = JSON.parse(JSON.stringify(data['permissions']));
                     var defaultPermissions = id.default_permissions.map(function(perm){return perm.codename;});
+                    var iconLookup = {
+                        "view_resourceinstance":"ion-ios-book",
+                        "change_resourceinstance":"ion-edit",
+                        "no_access_to_resourceinstance":"ion-close",
+                        "delete_resourceinstance":"ion-android-delete",
+                    };
                     id.availablePermissions.forEach(function(p){
+                        p.icon = iconLookup[p.codename];
                         var hasPerm = defaultPermissions.indexOf(p.codename) > -1;
                         p.selected = ko.observable(hasPerm);
                         p.selected.subscribe(function(val){
