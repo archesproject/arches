@@ -21,8 +21,6 @@ from urllib.parse import urlparse
 from django.shortcuts import render
 from arches.app.models.system_settings import settings
 from django.http import HttpResponseNotFound, HttpResponse
-from arches.app.utils.decorators import group_required
-from django.views.static import serve
 
 
 def index(request):
@@ -83,11 +81,6 @@ def feature_popup_content(request):
             return HttpResponseNotFound()
     else:
         return HttpResponseNotFound()
-
-
-@group_required(settings.PERMITTED_MEDIA_GROUPS)
-def protected_media(request, path, document_root=None, show_indexes=False):
-    return serve(request, path, document_root, show_indexes)
 
 
 def custom_404(request):

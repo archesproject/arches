@@ -194,6 +194,9 @@ CELERY_BEAT_SCHEDULE = {
     "notification": {"task": "arches.app.tasks.message", "schedule": CELERY_SEARCH_EXPORT_CHECK, "args": ("Celery Beat is Running",),},
 }
 
+# By setting RESTRICT_MEDIA_ACCESS to True, media file requests outside of Arches will checked against nodegroup permissions. 
+RESTRICT_MEDIA_ACCESS = False
+
 try:
     from .package_settings import *
 except ImportError:
