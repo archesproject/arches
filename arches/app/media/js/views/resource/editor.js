@@ -2,7 +2,6 @@ define([
     'jquery',
     'underscore',
     'knockout',
-    'moment',
     'views/base-manager',
     'viewmodels/alert',
     'viewmodels/alert-json',
@@ -18,8 +17,9 @@ define([
     'widgets',
     'card-components',
     'views/resource/related-resources-manager',
-    'views/resource/permissions-manager'
-], function($, _, ko, moment, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, reportLookup) {
+    'views/resource/permissions-manager',
+    'moment',
+], function($, _, ko, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, reportLookup) {
     var handlers = {
         'after-update': [],
         'tile-reset': []
