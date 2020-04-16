@@ -142,8 +142,10 @@ define([
             }, 1);
         });
 
-        this.showGallery = ko.observable(true);
-        this.expandGallery = ko.observable(!params.manifest);
+        if (params.showGallery === undefined) params.showGallery = true;
+        this.showGallery = ko.observable(params.showGallery);
+        if (!params.manifest) params.expandGallery = true;
+        this.expandGallery = ko.observable(params.expandGallery);
         this.expandGallery.subscribe(function(expandGallery) {
             if (expandGallery) self.showGallery(true);
         });
@@ -232,14 +234,16 @@ define([
             if (canvas.images.length > 0) return canvas.images[0].resource.service['@id'];
         };
 
+        var updateCanvas = !self.canvas();
         this.manifestData.subscribe(function(manifestData) {
-            if (!self.canvas() && manifestData.sequences.length > 0) {
+            if (updateCanvas && manifestData.sequences.length > 0) {
                 var sequence = manifestData.sequences[0];
                 if (sequence.canvases.length > 0) {
                     var canvas = sequence.canvases[0];
                     self.selectCanvas(canvas);
                 }
             }
+            updateCanvas = true;
         });
 
         this.toggleManifestEditor = function() {

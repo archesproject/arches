@@ -2740,7 +2740,7 @@ a.select2-search-choice-close {
     overflow-y: auto;
     border: solid 1px #f0F0F0;
 }
-  
+
 .permissions-list-header {
     background: #579ddb;
     color: #fff;
@@ -11814,6 +11814,10 @@ a.jstree-anchor.permissions-widget {
 .workbench-card-container-sidepanel-active .workbench-card-container {
     margin-right: 475px;
 }
+.add-new-crumb {
+    float: right;
+    cursor: pointer;
+}
 .iiif-gallery-content {
     border-top: solid 1px rgb(221, 221, 221);
     height: 160px;
@@ -11885,9 +11889,12 @@ a.jstree-anchor.permissions-widget {
 .gallery-expanded .iiif-gallery-header {
     padding-left: 10px;
 }
+.iiif-widget-report {
+    margin: 0 0 0 320px;
+}
 .iiif-widget-report .iiif-leaflet {
     height: 300px;
-    margin: 0 20px 10px 220px;
+    margin: 0 20px 10px 0px;
     border: solid 1px #808080;
 }
 .manifest-details {
