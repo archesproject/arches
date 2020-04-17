@@ -92,7 +92,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!--/ko-->
                     <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId()}">
                         <i class="jstree-icon jstree-ocl" role="presentation"></i>
-                        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showInstancePermissionsManager(self)}}, css: {'jstree-clicked': selection() === 'resource-permissions', 'disabled': resourceId() === ''}">
+                        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showInstancePermissionsManager(self)}}, css: {'jstree-clicked': selection() === 'resource-permissions', 'disabled': resourceId() === '' || userIsCreator === false }">
                             <strong>
                                 <i class="fa fa-link" role="presentation"></i>
                                 <span>{% trans 'Manage Permissions' %}</span>
@@ -120,7 +120,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div>
                 <div data-bind="component: {
                     name: 'permissions-manager',
-                    params: {resourceId: resourceId}
+                    params: {resourceId: resourceId, creator: userIsCreator}
                 }"></div>
             </div>
             <!--/ko -->
@@ -294,10 +294,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 cardComponents: {{card_components_json}},
                 nodegroups: {{nodegroups}},
                 userisreviewer:  JSON.parse('{{ user_is_reviewer }}'.toLowerCase()),
+                creator:  JSON.parse('{{ creator }}'.toLowerCase()),
+                useriscreator:  JSON.parse('{{ user_created_instance }}'.toLowerCase()),
                 templates: {{templates_json}},
                 graph: {{graph_json}},
                 issystemsettings: {{is_system_settings|yesno:"true,false"}}
-            };
+            };ƒ
         });{% endautoescape %}
     </script>
 {% endblock pre_require_js %}

@@ -2730,6 +2730,10 @@ a.select2-search-choice-close {
     overflow-y: auto;
   }
 
+.permission-grid .permissions-options {
+    display: flex;
+    flex-direction: row;
+}
 
 .permissions-list-table {
     height: 300px
