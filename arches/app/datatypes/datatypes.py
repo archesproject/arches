@@ -1749,7 +1749,7 @@ class AnnotationDataType(BaseDataType):
         errors = []
         return errors
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         # document["strings"].append({"string": nodevalue["address"], "nodegroup_id": tile.nodegroup_id})
         return
 
