@@ -11,9 +11,6 @@ define([
         params.configKeys = ['placeholder'];
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
-        this.disable = params.disable || function() {
-            return false;
-        };
         this.graphids = params.node ? ko.unwrap(params.node.config.graphid) : [params.graphid];
         this.graphids = this.graphids || [];
         this.graphNames = {};
@@ -22,8 +19,16 @@ define([
                 return resource.graphid === graphid;
             });
         });
+        this.filter = ko.observable('');
+        this.relationshipInFilter = function(relationship) {
+            if (self.filter().toLowerCase() === '' || relationship.resource.name.toLowerCase().includes(self.filter().toLowerCase())){
+                return true;
+            }
+            return false;
+        };
 
-        this.disableMessage = params.disableMessage || '';
+        this.useSemanticRelationships = arches.useSemanticRelationships;
+
 
         WidgetViewModel.apply(this, [params]);
         var displayName = ko.observable('');
@@ -119,14 +124,75 @@ define([
 
         var url = ko.observable(arches.urls.search_results);
         this.url = url;
+        var resourceToAdd = ko.observable("");
         this.select2Config = {
-            value: this.value,
+            value: resourceToAdd,
             clickBubble: true,
-            multiple: this.multiple,
-            placeholder: this.placeholder,
-            closeOnSelect: false,
-            allowClear: true,
-            disabled: this.disabled,
+            multiple: false,
+            placeholder: this.placeholder() || "Add new Relationship",
+            closeOnSelect: true,
+            allowClear: false,
+            onSelect: function(item) {
+                if (item._source) {
+                    var ret = {
+                        "resource": {
+                            "id": item._id,
+                            "name": item._source.displayname
+                        },
+                        "ontologyproperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"),
+                        "revProperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10i_contains"),
+                        "ontologyclass": item._source.root_ontology_class,
+                        "editing": ko.observable(false)
+                    };
+                    if (self.multiple) {
+                        ret = [ret];
+                        if (self.value() !== null) {
+                            ret = ret.concat(self.value());
+                        }
+                    }
+                    self.value(ret);
+                    window.setTimeout(function() {
+                        resourceToAdd("");
+                    }, 250);
+                } else {
+                    var params = {
+                        graphid: item._id,
+                        complete: ko.observable(false),
+                        resourceid: ko.observable(),
+                        tileid: ko.observable()
+                    };
+                    self.newTileStep(params);
+                    params.complete.subscribe(function() {
+                        window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
+                            .then(function(response){
+                                if(response.ok === false) {
+                                    return response.json();
+                                }
+                                throw("error");
+                            })
+                            .then(function(json) {
+                                var item = json.results.hits.hits[0];
+                                var ret = {
+                                    "resource": {
+                                        "id": params.resourceid(),
+                                        "name": item._source.displayname
+                                    },
+                                    "ontologyproperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"),
+                                    "revProperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10i_contains"),
+                                    "ontologyclass": item._source.root_ontology_class,
+                                    "editing": ko.observable(false)
+                                };
+                                self.value(ret);
+                            })
+                            .finally(function(){
+                                self.newTileStep(null);
+                                window.setTimeout(function() {
+                                    resourceToAdd("");
+                                }, 250);
+                            });
+                    });
+                }
+            },
             ajax: {
                 url: function() {
                     return url();
@@ -166,12 +232,12 @@ define([
                                 "id": term,
                                 "text": term,
                                 "value": term
+
                             }]);
                         }
                         return data;
                     }
                 },
-
                 results: function(data, page) {
                     if (!data['paging-filter'].paginator.has_next) {
                         if (relatedResourceModels()) {
@@ -190,21 +256,10 @@ define([
                 return item._id;
             },
             formatResult: function(item) {
-                if (self.disable(item) === false) {
-                    if (item._source) {
-                        return item._source.displayname;
-                    } else {
-                        return '<b> Create a new ' + item.name + ' . . . </b>';
-                    }
+                if (item._source) {
+                    return item._source.displayname;
                 } else {
-                    return '<span>' + item._source.displayname + ' ' + self.disableMessage + '</span>';
-                }
-            },
-            formatResultCssClass: function(item) {
-                if (self.disable(item) === false) {
-                    return '';
-                } else {
-                    return 'disabled';
+                    return '<b> Create a new ' + item.name + ' . . . </b>';
                 }
             },
             formatSelection: function(item) {
@@ -214,65 +269,64 @@ define([
                     return item.name;
                 }
             },
-            initSelection: function(el, callback) {
-                var valueList = self.valueList();
-                var setSelectionData = function() {
-                    var valueData = self.valueObjects().map(function(item) {
-                        return {
-                            _id: item.id,
-                            _source: {
-                                displayname: item.name
-                            }
-                        };
-                    });
-                    valueData = self.multiple ? valueData : valueData[0];
-                    if (valueData) {
-                        callback(valueData);
-                    }
-                };
+            initSelection: function() {
 
-                valueList.forEach(function(value) {
-                    var names = [];
-                    if (value) {
-                        var modelIds = relatedResourceModels().map(function(model) {
-                            return model._id;
-                        });
-                        if (!(modelIds.indexOf(value) > -1)) {
-                            if (nameLookup[value]) {
-                                setSelectionData();
-                            } else {
-                                $.ajax(arches.urls.resource_descriptors + value, {
-                                    dataType: "json"
-                                }).done(function(data) {
-                                    nameLookup[value] = data.displayname;
-                                    names.push(data.displayname);
-                                    displayName(names.join(', '));
-                                    setSelectionData();
-                                });
-                            }
-                        } else {
-                            var params = {
-                                graphid: value,
-                                complete: ko.observable(false),
-                                resourceid: ko.observable(),
-                                tileid: ko.observable()
-                            };
-                            self.newTileStep(params);
-                            params.complete.subscribe(function() {
-                                var result = params.resourceid();
-                                if (self.multiple) {
-                                    self.valueList().push(params.resourceid());
-                                    result = self.valueList();
-                                }
-                                result = self.removeGraphIdsFromValue(result);
-                                self.newTileStep(null);
-                                self.value(result);
-                            });
-                        }
-                    }
-                });
             }
         };
+
+        this.deleteRelationship = function(valueToDelete) {
+            var newValues = [];
+            self.value().forEach(function(val) {
+                if (val.resource.id !== valueToDelete.resource.id) {
+                    newValues.push(val);
+                }
+            });
+            self.value(newValues);
+        };
+
+        this.makeFriendly = function(item) {
+            var parts = item.split("/");
+            return parts[parts.length-1];
+        };
+
+        this.getSelect2ConfigForOntologyProperties = function(value, domain, range) {
+            return {
+                value: value,
+                clickBubble: false,
+                placeholder: 'Select an Ontology Property',
+                closeOnSelect: true,
+                allowClear: false,
+                ajax: {
+                    url: function() {
+                        return arches.urls.ontology_properties;
+                    },
+                    data: function(term, page) {
+                        var data = { 
+                            'domain_ontology_class': domain,
+                            'range_ontology_class': range,
+                            'ontologyid': ''
+                        };
+                        return data;
+                    },
+                    dataType: 'json',
+                    quietMillis: 250,
+                    results: function(data, page) {
+                        return {
+                            results: data
+                        };
+                    }
+                },
+                id: function(item) {
+                    return item;
+                },
+                formatResult: this.makeFriendly,
+                formatSelection: this.makeFriendly,
+                initSelection: function(el, callback) {
+                    callback(value());
+                }
+            };
+        };
+
     };
 
     return ResourceInstanceSelectViewModel;

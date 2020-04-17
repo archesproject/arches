@@ -114,14 +114,11 @@ class SearchEngine(object):
 
         kwargs = self._add_prefix(**kwargs)
         body = kwargs.get("body", None)
-        id = kwargs.get("id", None)
+        id = kwargs.pop("id", None)
 
         if id:
-            if isinstance(id, list):
-                kwargs.setdefault("body", {"ids": kwargs.pop("id")})
-                return self.es.mget(**kwargs)
-            else:
-                return self.es.get(**kwargs)
+            kwargs["body"] = {"ids": id.split(',')}
+            return self.es.mget(**kwargs)
 
         ret = None
         try:

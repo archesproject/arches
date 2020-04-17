@@ -743,19 +743,6 @@ class Concepts(APIBase):
         return JSONResponse(ret, indent=indent)
 
 
-def get_resource_relationship_types():
-    resource_relationship_types = Concept().get_child_collections("00000000-0000-0000-0000-000000000005")
-    default_relationshiptype_valueid = None
-    for relationship_type in resource_relationship_types:
-        if relationship_type[0] == "00000000-0000-0000-0000-000000000007":
-            default_relationshiptype_valueid = relationship_type[2]
-    relationship_type_values = {
-        "values": [{"id": str(c[2]), "text": str(c[1])} for c in resource_relationship_types],
-        "default": str(default_relationshiptype_valueid),
-    }
-    return relationship_type_values
-
-
 class Card(APIBase):
     def get(self, request, resourceid):
         try:
@@ -915,3 +902,20 @@ class IIIFManifest(APIBase):
 
         response = JSONResponse({"results": manifests, "count": count})
         return response
+
+
+class OntolgyPropery(APIBase):
+
+    def get(self, request):
+        domain_ontology_class = request.GET.get("domain_ontology_class", None)
+        range_ontology_class = request.GET.get("range_ontology_class", None)
+        ontologyid = request.GET.get("ontologyid", 'sdl')
+        
+        ret = []
+        if domain_ontology_class and range_ontology_class:
+            ontology_classes = models.OntologyClass.objects.get(source=domain_ontology_class)
+            for ontologyclass in ontology_classes.target["down"]:
+                if range_ontology_class in ontologyclass["ontology_classes"]:
+                    ret.append(ontologyclass["ontology_property"])
+
+        return JSONResponse(ret)

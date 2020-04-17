@@ -2,24 +2,89 @@
 {% load i18n %}
 
 {% block form %}
-<div class="row widget-wrapper" data-bind="visible: !newTileStep()">
+<!--ko let: {self: $data} -->
+<div class="widget-wrapper" data-bind="visible: !newTileStep()">
     <div class="form-group">
         <label class="control-label widget-input-label" data-bind="text:label">
         </label>
         <!-- ko if: node -->
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
-        <div class="col-xs-12 resource-instance-wrapper">
-            <input style="width:30%; display:inline-block;"
-                data-bind="
-                    value: value,
-                    select2Query: {
-                        select2Config: select2Config
-                    }
-                ">
+
+        <div class="row">
+            <div class="col-sm-6 resource-instance-wrapper">
+                <input style="width:30%; display:inline-block;"
+                    data-bind="
+                        select2Query: {
+                            select2Config: select2Config
+                        }
+                    ">
+            </div>
+            <div data-bind="if: value() !== null && value().length > 5">
+                <div class="col-sm-2" style="text-align: right"><label class='file-workbench-filecount'>{% trans "Filter" %}</label></div>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'e.g.: .txt' %}" data-bind="textInput: filter"></input>
+                    <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter('');}"><i class="fa fa-times-circle"></i></span>
+                </div>
+            </div>
         </div>
     </div>
+    <div style="max-height: 200px; overflow-y: scroll;">
+        <table class="table table-striped table-bordered" style="margin-bottom: 5px;" cellspacing="0" width="100%">
+            <tbody data-bind="foreach: value">
+                <tr data-bind="if: self.relationshipInFilter($data), click: function() { editing(true); }, clickBubble: false" style="cursor: pointer;">
+                    <td>
+                        <div class="form-horizontal" data-bind="if: !editing()">
+                            <span data-bind="text: $data.resource.name + ' (' + self.makeFriendly($data.ontologyproperty()) + '/' + self.makeFriendly($data.revProperty()) + ')'"></span>
+                        </div>
+                        <div data-bind="if: editing()">
+                            <div class="row">
+                                <label class="col-sm-12" style="font-weight: bold;">{% trans "Relationship to" %} <span data-bind="text: $data.resource.name"></span></label>
+                            </div>
+                            <div class="row">
+                                <span class="col-sm-4" style="padding-top: 8px; text-align: right;" data-bind="text: self.node.name() + ' (' + self.makeFriendly(self.node.ontologyclass()) + ')'"></span>
+                                <span class="col-sm-4"><input style="width:30%; display:inline-block;" data-bind="
+                                    select2Query: {
+                                        select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyproperty, self.node.ontologyclass(), $data.ontologyclass)
+                                    }
+                                "></span>
+                                <span class="col-sm-4" style="padding-top: 8px;" data-bind="text: $data.resource.name + ' (' + self.makeFriendly($data.ontologyclass) + ')'"></span>
+                            </div>
+                            <div class="row" style="margin-top: 20px;">
+                                <label class="col-sm-12" style="font-weight: bold;">{% trans "Inverse Relationship to" %} <span data-bind="text: $data.resource.name"></span></label>
+                            </div>
+                            <div class="row">
+                                <span class="col-sm-4" style="padding-top: 8px; text-align: right;" data-bind="text: $data.resource.name + ' (' + self.makeFriendly($data.ontologyclass) + ')'"></span>
+                                <span class="col-sm-4"><input style="width:30%; display:inline-block;" data-bind="
+                                    select2Query: {
+                                        select2Config: self.getSelect2ConfigForOntologyProperties($data.revProperty, $data.ontologyclass, self.node.ontologyclass())
+                                    }
+                                "></span>
+                                <span class="col-sm-4" style="padding-top: 8px;" data-bind="text: self.node.name() + ' (' + self.makeFriendly(self.node.ontologyclass()) + ')'"></span>
+                            </div>
+                            <button href="javascript:void(0);" class="btn btn-shim btn-labeled btn-lg fa fa-pencil btn-mint" style="float: right; margin-top:15px;" data-bind="click: function() { editing(false); }, clickBubble: false">
+                                {% trans "Done" %}
+                            </button>
+                        </div>
+                    </td>
+                    <td style="min-width: 75px; margin-top: 15px;">
+                        <a href="javascript:void(0);" data-bind="click: $parent.deleteRelationship, clickBubble: false">
+                            <i class="fa fa-trash map-card-feature-delete"></i>
+                            {% trans "Delete" %}
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div data-bind="if: !!value() && value().hasOwnProperty('length')">
+        <div class='file-workbench-filecount' data-bind='text: value().length + "{% trans ' relationship(s)' %}"'></div>
+    </div>
+
 </div>
+<!-- /ko -->
+
 <!-- ko if: newTileStep -->
 <div class="create-resource-instance-card-component" data-bind="with: newTileStep">
     <div class="create-instance-header" style="display: flex; justify-content: space-between;">

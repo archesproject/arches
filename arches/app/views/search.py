@@ -221,6 +221,7 @@ def export_results(request):
 def search_results(request):
     for_export = request.GET.get("export")
     total = int(request.GET.get("total", "0"))
+    resourceinstanceid = request.GET.get("id", None)
     se = SearchEngineFactory().create()
     search_results_object = {"query": Query(se)}
 
@@ -260,8 +261,10 @@ def search_results(request):
         for page in range(pages):
             results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
             results["hits"]["hits"] += results_scrolled["hits"]["hits"]
-    else:
-        results = dsl.search(index="resources")
+    else: 
+        results = dsl.search(index="resources", id=resourceinstanceid)
+        if "docs" in results:
+            results = {"hits":{"hits": results["docs"]}}
 
     ret = {}
     if results is not None:
