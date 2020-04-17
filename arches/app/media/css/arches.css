@@ -8953,7 +8953,7 @@ a.clear-geojson-button:hover {
 }
 
 .ss-grid-item {
-    position: absolute;
+    position: sticky;
     border: 1px solid #ddd;
     width: 224px;
     height: 164px;
