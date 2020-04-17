@@ -29,7 +29,7 @@ from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.core import management
 from django.urls import reverse
-from arches.app.models.models import ResourceInstance
+from arches.app.models.models import ResourceInstance, EditLog
 from django.test.client import RequestFactory, Client
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.contrib.auth.models import User
@@ -49,42 +49,48 @@ from arches.app.search.mappings import (
 # these tests can be run from the command line via
 # python manage.py test tests/views/resource_tests.py --pattern="*.py" --settings="tests.test_settings"
 
+def add_users():
+    profiles = (
+        {"name": "ben", "email": "ben@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
+        {
+            "name": "sam",
+            "email": "sam@test.com",
+            "password": "Test12345!",
+            "groups": ["Graph Editor", "Resource Editor", "Resource Reviewer"],
+        },
+        # {'name': 'jim', 'email': 'jim@test.com', 'password': 'Test12345!', 'groups': ['Graph Editor', 'Resource Editor']},
+    )
+
+    for profile in profiles:
+        try:
+            user = User.objects.create_user(username=profile["name"], email=profile["email"], password=profile["password"])
+            user.save()
+            print(("Added: {0}, password: {1}".format(user.username, user.password)))
+
+            for group_name in profile["groups"]:
+                group = Group.objects.get(name=group_name)
+                group.user_set.add(user)
+
+        except Exception as e:
+            print(e)
+
 
 class CommandLineTests(ArchesTestCase):
     def setUp(self):
         self.expected_resource_count = 2
-        self.add_users()
         self.client = Client()
         self.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
         self.resource_instance_id = "f562c2fa-48d3-4798-a723-10209806c068"
+        user = User.objects.get(username='ben')
+        edit_records = EditLog.objects.filter(resourceinstanceid=self.resource_instance_id).filter(edittype='created')
+        if len(edit_records) == 0:
+            edit = EditLog(userid=user.id, edittype='create', resourceinstanceid=self.resource_instance_id)
+            edit.save()
 
     def tearDown(self):
         ResourceInstance.objects.filter(graph_id=self.data_type_graphid).delete()
+        EditLog.objects.filter(resourceinstanceid=self.resource_instance_id).filter(edittype='created').delete()
 
-    def add_users(self):
-        profiles = (
-            {"name": "ben", "email": "ben@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
-            {
-                "name": "sam",
-                "email": "sam@test.com",
-                "password": "Test12345!",
-                "groups": ["Graph Editor", "Resource Editor", "Resource Reviewer"],
-            },
-            # {'name': 'jim', 'email': 'jim@test.com', 'password': 'Test12345!', 'groups': ['Graph Editor', 'Resource Editor']},
-        )
-
-        for profile in profiles:
-            try:
-                user = User.objects.create_user(username=profile["name"], email=profile["email"], password=profile["password"])
-                user.save()
-                print(("Added: {0}, password: {1}".format(user.username, user.password)))
-
-                for group_name in profile["groups"]:
-                    group = Group.objects.get(name=group_name)
-                    group.user_set.add(user)
-
-            except Exception as e:
-                print(e)
 
     @classmethod
     def setUpClass(cls):
@@ -92,6 +98,7 @@ class CommandLineTests(ArchesTestCase):
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
         delete_resource_relations_index()
         prepare_resource_relations_index(create=True)
+        add_users()
 
     @classmethod
     def tearDownClass(cls):
