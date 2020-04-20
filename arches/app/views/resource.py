@@ -386,6 +386,10 @@ class ResourcePermissionDataView(View):
 
                         if not revert:
                             # then add the new permissions
+                            no_access = any(perm["codename"]== "no_access_to_resourceinstance" for perm in identity["selectedPermissions"])
+                            if no_access:
+                                assign_perm("no_access_to_resourceinstance", identityModel, resource_instance)
+                            else:
                             for perm in identity["selectedPermissions"]:
                                 assign_perm(perm["codename"], identityModel, resource_instance)
 
