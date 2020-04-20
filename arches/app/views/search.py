@@ -218,6 +218,14 @@ def export_results(request):
         return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
 
 
+def append_instance_permission_filter_dsl(request, search_results_object):
+    if request.user.is_superuser is False:
+        search_query = Bool()
+        terms = Terms(field="no_access_users", terms=[str(request.user.id)])
+        search_query.must_not(terms)
+        search_results_object["query"].add_query(search_query)
+
+
 def search_results(request):
     for_export = request.GET.get("export")
     total = int(request.GET.get("total", "0"))
@@ -233,6 +241,7 @@ def search_results(request):
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
                 search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional)
+        append_instance_permission_filter_dsl(request, search_results_object)
     except Exception as err:
         return JSONErrorResponse(message=err)
 
@@ -241,6 +250,7 @@ def search_results(request):
     dsl.include("root_ontology_class")
     dsl.include("resourceinstanceid")
     dsl.include("points")
+    dsl.include("no_access_users")
     dsl.include("geometries")
     dsl.include("displayname")
     dsl.include("displaydescription")

@@ -368,15 +368,14 @@ class ResourcePermissionDataView(View):
 
     def apply_permissions(self, data, user, revert=False):
         with transaction.atomic():
-            for identity in data["selectedIdentities"]:
-                if identity["type"] == "group":
-                    identityModel = Group.objects.get(pk=identity["id"])
-                else:
-                    identityModel = User.objects.get(pk=identity["id"])
+            for instance in data["selectedInstances"]:
+                resource_instance = models.ResourceInstance.objects.get(pk=instance["resourceinstanceid"])
+                for identity in data["selectedIdentities"]:
+                    if identity["type"] == "group":
+                        identityModel = Group.objects.get(pk=identity["id"])
+                    else:
+                        identityModel = User.objects.get(pk=identity["id"])
 
-                for instance in data["selectedInstances"]:
-                    resource_instance_id = instance["resourceinstanceid"]
-                    resource_instance = models.ResourceInstance.objects.get(pk=resource_instance_id)
                     creator, user_can_modify_permissions = get_instance_creator(resource_instance, user)
 
                     if user_can_modify_permissions:
@@ -390,8 +389,13 @@ class ResourcePermissionDataView(View):
                             if no_access:
                                 assign_perm("no_access_to_resourceinstance", identityModel, resource_instance)
                             else:
-                            for perm in identity["selectedPermissions"]:
-                                assign_perm(perm["codename"], identityModel, resource_instance)
+                                for perm in identity["selectedPermissions"]:
+                                    assign_perm(perm["codename"], identityModel, resource_instance)
+
+                resource = Resource(str(resource_instance.resourceinstanceid))
+                resource.graphid = resource_instance.graph_id
+                resource.graph = resource_instance.graph
+                resource.index()
 
 
 @method_decorator(can_edit_resource_instance, name="dispatch")

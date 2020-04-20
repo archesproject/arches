@@ -41,7 +41,7 @@ from arches.app.utils.exceptions import (
     InvalidNodeNameException,
     MultipleNodesFoundException,
 )
-from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.app.utils.permission_backend import user_is_resource_reviewer, get_users_for_object
 from arches.app.datatypes.datatypes import DataTypeFactory
 
 logger = logging.getLogger(__name__)
@@ -249,7 +249,16 @@ class Resource(models.ResourceInstance):
 
         tiles = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
 
+        can_view = [user.id for user in get_users_for_object('view_resourceinstance', self)]
+        can_edit = [user.id for user in get_users_for_object('change_resourceinstance', self)]
+        can_delete = [user.id for user in get_users_for_object('delete_resourceinstance', self)]
+        no_access = [user.id for user in get_users_for_object('no_access_to_resourceinstance', self)]
+        restricted = list(set(no_access) - set(can_view + can_edit + can_delete))
         document["tiles"] = tiles
+        document["can_view_users"] = can_view
+        document["can_edit_users"] = can_edit
+        document["can_delete_users"] = can_delete
+        document["no_access_users"] = restricted
         document["strings"] = []
         document["dates"] = []
         document["domains"] = []
