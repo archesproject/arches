@@ -1592,7 +1592,8 @@ ul.tabbed-report-tab-list {
 
 .workbench-card-sidepanel .install-buttons {
     background: #f9f9f9;
-    position: absolute;
+    position: fixed;
+    margin-right: 75px;
     bottom: 0px;
     border-top: 1px solid #ddd;
     padding: 10px 35px;
