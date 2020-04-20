@@ -2734,6 +2734,15 @@ a.select2-search-choice-close {
 .permission-grid .permissions-options {
     display: flex;
     flex-direction: row;
+    margin-top: 5px;
+    padding: 10px 0px 15px;
+}
+
+.permission-filter {
+    display:inline-flex; 
+    justify-content: 
+    space-between;
+    width: 250px;
 }
 
 .permissions-list-table {
@@ -2741,9 +2750,21 @@ a.select2-search-choice-close {
 }
 
 .permissions-list-table-body {
-    height: 280px;
+    height: 245px;
     overflow-y: auto;
-    border: solid 1px #f0F0F0;
+    border: solid 1px #ddd;
+}
+
+.permissions-list-table-body::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 9px;
+    border-left: 1px solid #eee;
+}
+
+.permissions-list-table-body::-webkit-scrollbar-thumb {
+    border-radius: 2px;
+    background-color: rgba(0,0,0,.1);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
 }
 
 .permissions-list-header {
@@ -2751,8 +2772,9 @@ a.select2-search-choice-close {
     color: #fff;
     width: 100%;
     display: flex;
-    padding: 5px;
-    border-bottom: 1px solid #D3E5F4
+    padding: 9px 5px;
+    border-bottom: 1px solid #D3E5F4;
+    font-weight: 600;
 }
 
 .permission-control .clear-filter {
@@ -2765,19 +2787,47 @@ a.select2-search-choice-close {
 .permissions-table-row {
     display: flex;
     flex-direction: column;
-    padding: 5px;
+    padding: 8px 5px;
     border-bottom: 1px solid #D3E5F4
 }
 
+.permissions-table-row:nth-child(odd) {
+    background: #F5FAFE;
+}
+
 .permissions-table-row.selected {
-    background-color: #f4faff;
+    background-color: #F1F1FF;
 }
 .permissions-table-row.selected:hover {
     background-color: #f4faff;
+    cursor: pointer;
 }
 
 .permissions-table-row:hover {
     background-color: #fcfcfc;
+    cursor: pointer;
+}
+
+.permissions-table-row:first-child {
+    background-color: #f8f8f8;
+    color: #777;
+    font-weight: 600;
+}
+
+.permissions-table-row:first-child:hover {
+    cursor: default;
+}
+
+.permission-selection-panel {
+    display: inline-flex;
+    background: #fbfbfb;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    margin: 8px -5px -10px -5px;
+}
+
+.permission-selection-panel:hover {
+    cursor: default;
 }
 
 .permission-list-table .identities-column {
