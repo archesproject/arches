@@ -11822,6 +11822,12 @@ a.jstree-anchor.permissions-widget {
 .add-new-crumb {
     float: right;
     cursor: pointer;
+    padding: 3px 10px;
+    font-size: 14px;
+    background: #6984A0;
+    border: 1px solid #0A0737;
+    border-radius: 2px;
+    margin-top: -2px;
 }
 .iiif-gallery-content {
     border-top: solid 1px rgb(221, 221, 221);
