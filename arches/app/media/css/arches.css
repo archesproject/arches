@@ -2799,12 +2799,12 @@ a.select2-search-choice-close {
     background-color: #F1F1FF;
 }
 .permissions-table-row.selected:hover {
-    background-color: #f4faff;
+    background-color: #F1F1FF;
     cursor: pointer;
 }
 
 .permissions-table-row:hover {
-    background-color: #fcfcfc;
+    background-color: #B6DEFF;
     cursor: pointer;
 }
 
@@ -2820,7 +2820,7 @@ a.select2-search-choice-close {
 
 .permission-selection-panel {
     display: inline-flex;
-    background: #fbfbfb;
+    background: #fcfcfc;
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
     margin: 8px -5px -10px -5px;
