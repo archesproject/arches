@@ -267,7 +267,7 @@ def user_can_edit_resources(user, resourceid=None):
     Requires that a user be able to edit an instance and delete a single nodegroup of a resource
 
     """
-    
+
     if user.is_authenticated:
         if user.is_superuser:
             return True
