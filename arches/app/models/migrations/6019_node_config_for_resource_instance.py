@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 new_config["graphs"].append({
                     "graphid": graphid,
                     "ontologyProperty": "",
-                    "inverseOntolgoyProperty": ""
+                    "inverseOntologyProperty": ""
                 })
             node.config = new_config
             node.save()
