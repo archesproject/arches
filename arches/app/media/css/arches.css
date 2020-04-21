@@ -5472,7 +5472,7 @@ th.notif-type {
 }
 
 .ep-tools:hover {
-    background: #fff;
+    background: #fafafa;
     border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
 }
@@ -5504,7 +5504,7 @@ th.notif-type {
     border-right: none;
     border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
-    background: #fafafa;
+    background: #fff;
     font-size: 17px;
     padding-left: 16px;
     padding-right: 20px;
@@ -5521,7 +5521,7 @@ th.notif-type {
     padding-left: 16px;
     padding-right: 20px;
     vertical-align: middle;
-    background: #fafafa;
+    background: #fff;
     border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
 }
@@ -11873,12 +11873,12 @@ a.jstree-anchor.permissions-widget {
 .add-new-crumb {
     float: right;
     cursor: pointer;
-    padding: 3px 10px;
-    font-size: 14px;
+    padding: 4px 12px;
+    font-size: 13px;
     background: #6984A0;
     border: 1px solid #0A0737;
     border-radius: 2px;
-    margin-top: -2px;
+    margin-top: -1px;
 }
 .iiif-gallery-content {
     border-top: solid 1px rgb(221, 221, 221);
