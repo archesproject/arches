@@ -263,11 +263,12 @@ def search_results(request):
             results["hits"]["hits"] += results_scrolled["hits"]["hits"]
     else: 
         results = dsl.search(index="resources", id=resourceinstanceid)
-        if "docs" in results:
-            results = {"hits":{"hits": results["docs"]}}
 
     ret = {}
     if results is not None:
+        if "docs" in results:
+            results = {"hits":{"hits": results["docs"]}}
+            
         # allow filters to modify the results
         for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
             search_filter = search_filter_factory.get_filter(filter_type)
