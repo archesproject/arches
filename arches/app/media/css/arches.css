@@ -3088,7 +3088,7 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .settings-panel-heading + div {
-    margin-top: 13px;
+    /*margin-top: 13px;*/
 }
 
 .graph-crm-class {
@@ -3131,6 +3131,10 @@ ul.nav.nav-tabs.nav-justified {
     padding-left: 5px;
     font-size: 17px;
     margin-top: 2px;
+}
+
+.top-node-panel {
+    margin-top: 60px;
 }
 
 .graph-designer-header {
