@@ -1592,7 +1592,8 @@ ul.tabbed-report-tab-list {
 
 .workbench-card-sidepanel .install-buttons {
     background: #f9f9f9;
-    position: absolute;
+    position: fixed;
+    margin-right: 75px;
     bottom: 0px;
     border-top: 1px solid #ddd;
     padding: 10px 35px;
@@ -2733,6 +2734,15 @@ a.select2-search-choice-close {
 .permission-grid .permissions-options {
     display: flex;
     flex-direction: row;
+    margin-top: 5px;
+    padding: 10px 0px 15px;
+}
+
+.permission-filter {
+    display:inline-flex; 
+    justify-content: 
+    space-between;
+    width: 250px;
 }
 
 .permissions-list-table {
@@ -2740,9 +2750,21 @@ a.select2-search-choice-close {
 }
 
 .permissions-list-table-body {
-    height: 280px;
+    height: 245px;
     overflow-y: auto;
-    border: solid 1px #f0F0F0;
+    border: solid 1px #ddd;
+}
+
+.permissions-list-table-body::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 9px;
+    border-left: 1px solid #eee;
+}
+
+.permissions-list-table-body::-webkit-scrollbar-thumb {
+    border-radius: 2px;
+    background-color: rgba(0,0,0,.1);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
 }
 
 .permissions-list-header {
@@ -2750,8 +2772,9 @@ a.select2-search-choice-close {
     color: #fff;
     width: 100%;
     display: flex;
-    padding: 5px;
-    border-bottom: 1px solid #D3E5F4
+    padding: 9px 5px;
+    border-bottom: 1px solid #D3E5F4;
+    font-weight: 600;
 }
 
 .permission-control .clear-filter {
@@ -2764,19 +2787,47 @@ a.select2-search-choice-close {
 .permissions-table-row {
     display: flex;
     flex-direction: column;
-    padding: 5px;
+    padding: 8px 5px;
     border-bottom: 1px solid #D3E5F4
 }
 
+.permissions-table-row:nth-child(odd) {
+    background: #F5FAFE;
+}
+
 .permissions-table-row.selected {
-    background-color: #f4faff;
+    background-color: #F1F1FF;
 }
 .permissions-table-row.selected:hover {
-    background-color: #f4faff;
+    background-color: #F1F1FF;
+    cursor: pointer;
 }
 
 .permissions-table-row:hover {
-    background-color: #fcfcfc;
+    background-color: #B6DEFF;
+    cursor: pointer;
+}
+
+.permissions-table-row:first-child {
+    background-color: #f8f8f8;
+    color: #777;
+    font-weight: 600;
+}
+
+.permissions-table-row:first-child:hover {
+    cursor: default;
+}
+
+.permission-selection-panel {
+    display: inline-flex;
+    background: #fcfcfc;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    margin: 8px -5px -10px -5px;
+}
+
+.permission-selection-panel:hover {
+    cursor: default;
 }
 
 .permission-list-table .identities-column {
@@ -3037,7 +3088,7 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .settings-panel-heading + div {
-    margin-top: 13px;
+    /*margin-top: 13px;*/
 }
 
 .graph-crm-class {
@@ -3080,6 +3131,10 @@ ul.nav.nav-tabs.nav-justified {
     padding-left: 5px;
     font-size: 17px;
     margin-top: 2px;
+}
+
+.top-node-panel {
+    margin-top: 60px;
 }
 
 .graph-designer-header {
@@ -5421,7 +5476,7 @@ th.notif-type {
 }
 
 .ep-tools:hover {
-    background: #fff;
+    background: #fafafa;
     border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
 }
@@ -5453,7 +5508,7 @@ th.notif-type {
     border-right: none;
     border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
-    background: #fafafa;
+    background: #fff;
     font-size: 17px;
     padding-left: 16px;
     padding-right: 20px;
@@ -5470,7 +5525,7 @@ th.notif-type {
     padding-left: 16px;
     padding-right: 20px;
     vertical-align: middle;
-    background: #fafafa;
+    background: #fff;
     border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
 }
@@ -11822,6 +11877,12 @@ a.jstree-anchor.permissions-widget {
 .add-new-crumb {
     float: right;
     cursor: pointer;
+    padding: 4px 12px;
+    font-size: 13px;
+    background: #6984A0;
+    border: 1px solid #0A0737;
+    border-radius: 2px;
+    margin-top: -1px;
 }
 .iiif-gallery-content {
     border-top: solid 1px rgb(221, 221, 221);
