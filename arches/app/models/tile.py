@@ -500,7 +500,7 @@ class Tile(models.TileModel):
     def update_node_value(nodeid, value, tileid=None, nodegroupid=None, resourceinstanceid=None):
         """
         Updates the value of a node in a tile. Creates the tile and parent tiles if they do not yet
-        exist. 
+        exist.
 
         """
         
