@@ -529,7 +529,7 @@ class Tile(models.TileModel):
                     function.save(self, request)
                 except NotImplementedError:
                     pass
-        except TypeError as e:
+        except TypeError:
             logger.info(_("No associated functions"))
 
     def __preDelete(self, request):
