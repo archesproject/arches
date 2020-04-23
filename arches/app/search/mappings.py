@@ -140,8 +140,8 @@ def prepare_search_index(create=False):
                             "users_with_read_perm": {"type": "integer"},
                             "users_with_edit_perm": {"type": "integer"},
                             "users_with_delete_perm": {"type": "integer"},
-                            "users_with_no_access": {"type": "integer"}
-                        }
+                            "users_with_no_access": {"type": "integer"},
+                        },
                     },
                     "strings": {
                         "type": "nested",
