@@ -255,10 +255,10 @@ class Resource(models.ResourceInstance):
         no_access = [user.id for user in get_users_for_object("no_access_to_resourceinstance", self)]
         restricted = list(set(no_access) - set(can_view + can_edit + can_delete))
         document["tiles"] = tiles
-        document["permissions"] = {"users_with_read_perm": can_view}
-        document["permissions"] = {"users_with_edit_perm": can_edit}
-        document["permissions"] = {"users_with_delete_perm": can_delete}
-        document["permissions"] = {"users_with_no_access": restricted}
+        document["permissions"] = {"users_without_read_perm": can_view}
+        document["permissions"]["users_without_edit_perm"] = can_edit
+        document["permissions"]["users_without_delete_perm"] = can_delete
+        document["permissions"]["users_with_no_access"] = restricted
         document["strings"] = []
         document["dates"] = []
         document["domains"] = []
