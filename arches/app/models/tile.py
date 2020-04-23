@@ -496,6 +496,32 @@ class Tile(models.TileModel):
 
         return tile
 
+    @staticmethod
+    def update_node_value(nodeid, value, tileid=None, nodegroupid=None, resourceinstanceid=None):
+        """
+        Updates the value of a node in a tile. Creates the tile and parent tiles if they do not yet
+        exist. 
+
+        """
+        
+        if tileid and models.TileModel.objects.filter(pk=tileid).exists():
+            tile = models.TileModel.objects.get(pk=tileid)
+            tile.data[nodeid] = value
+            tile.save()
+        elif models.TileModel.objects.filter(Q(resourceinstance_id=resourceinstanceid), Q(nodegroup_id=nodegroupid)).count() == 1:
+            tile = models.TileModel.objects.filter(Q(resourceinstance_id=resourceinstanceid), Q(nodegroup_id=nodegroupid))[0]
+            tile.data[nodeid] = value
+            tile.save()
+        else:
+            tile = Tile.get_blank_tile(nodeid, resourceinstanceid)
+            if nodeid in tile.data:
+                tile.data[nodeid] = value
+            else:
+                tile.save()
+                if nodegroupid and resourceinstanceid:
+                    tile = Tile.update_node_value(nodeid, value, nodegroupid=nodegroupid, resourceinstanceid=resourceinstanceid)
+        return tile
+
     def __preSave(self, request=None):
         try:
             for function in self.__getFunctionClassInstances():
