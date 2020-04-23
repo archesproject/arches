@@ -249,10 +249,10 @@ class Resource(models.ResourceInstance):
 
         tiles = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
 
-        can_view = [user.id for user in get_users_for_object('view_resourceinstance', self)]
-        can_edit = [user.id for user in get_users_for_object('change_resourceinstance', self)]
-        can_delete = [user.id for user in get_users_for_object('delete_resourceinstance', self)]
-        no_access = [user.id for user in get_users_for_object('no_access_to_resourceinstance', self)]
+        can_view = [user.id for user in get_users_for_object("view_resourceinstance", self)]
+        can_edit = [user.id for user in get_users_for_object("change_resourceinstance", self)]
+        can_delete = [user.id for user in get_users_for_object("delete_resourceinstance", self)]
+        no_access = [user.id for user in get_users_for_object("no_access_to_resourceinstance", self)]
         restricted = list(set(no_access) - set(can_view + can_edit + can_delete))
         document["tiles"] = tiles
         document["can_view_users"] = can_view
