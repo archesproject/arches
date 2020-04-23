@@ -221,7 +221,7 @@ def export_results(request):
 def append_instance_permission_filter_dsl(request, search_results_object):
     if request.user.is_superuser is False:
         search_query = Bool()
-        terms = Terms(field="no_access_users", terms=[str(request.user.id)])
+        terms = Terms(field="permissions.users_with_no_access", terms=[str(request.user.id)])
         search_query.must_not(terms)
         search_results_object["query"].add_query(search_query)
 
@@ -250,7 +250,7 @@ def search_results(request):
     dsl.include("root_ontology_class")
     dsl.include("resourceinstanceid")
     dsl.include("points")
-    dsl.include("no_access_users")
+    dsl.include("users_with_no_access")
     dsl.include("geometries")
     dsl.include("displayname")
     dsl.include("displaydescription")

@@ -134,10 +134,15 @@ def prepare_search_index(create=False):
                             "data": {"properties": {}},
                         },
                     },
-                    "can_view_users": {"type": "integer"},
-                    "can_edit_users": {"type": "integer"},
-                    "can_delete_users": {"type": "integer"},
-                    "no_access_users": {"type": "integer"},
+                    "permissions": {
+                        "type": "nested",
+                        "properties": {
+                            "users_with_read_perm": {"type": "integer"},
+                            "users_with_edit_perm": {"type": "integer"},
+                            "users_with_delete_perm": {"type": "integer"},
+                            "users_with_no_access": {"type": "integer"}
+                        }
+                    },
                     "strings": {
                         "type": "nested",
                         "properties": {
