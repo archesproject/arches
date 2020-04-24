@@ -178,6 +178,7 @@ define([
                 this.filterValue.subscribe(function(val) {
                     params.filterValue(val);
                 });
+                this.datatype = params.datatype;
 
             }
         },

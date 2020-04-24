@@ -78,7 +78,7 @@
 </div>
 <div class="col-md-8 col-lg-9 resource-instance-search">
     <!-- ko component: {
-        name: 'resource-instance-select-widget',
+        name:  datatype.datatype.includes('list') ? 'resource-instance-multiselect-widget' : 'resource-instance-select-widget', 
         params: {
             config: {
                 placeholder: '{% trans "Select a resource" %}'
@@ -87,8 +87,9 @@
             value: searchValue,
             node: node,
             disabled: false,
-            type: "resource-editor",
-            state: "form"
+            state: "search",
+            state: "form",
+            mulitple: !!datatype.datatype.includes('list'),
         }
     } --><!-- /ko -->
 </div>

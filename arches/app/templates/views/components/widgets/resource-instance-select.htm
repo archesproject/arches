@@ -3,6 +3,19 @@
 
 {% block form %}
 <!--ko let: {self: $data} -->
+<!-- ko if: self.type === 'search' -->
+<div class="row">
+    <div class="col-sm-6 resource-instance-wrapper">
+        <input style="width:30%; display:inline-block;"
+            data-bind="
+                select2Query: {
+                    select2Config: select2Config
+                }
+            ">
+    </div>
+</div>
+<!-- /ko -->
+<!-- ko ifnot: self.type === 'search' -->
 <div class="widget-wrapper" data-bind="visible: !newTileStep()">
     <div class="form-group">
         <label class="control-label widget-input-label" data-bind="text:label">
@@ -84,6 +97,8 @@
 
 </div>
 <!-- /ko -->
+<!-- /ko -->
+
 
 <!-- ko if: newTileStep -->
 <div class="create-resource-instance-card-component" data-bind="with: newTileStep">

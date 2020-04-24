@@ -1686,6 +1686,23 @@ class ResourceInstanceDataType(BaseDataType):
 
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
+    def append_search_filters(self, value, node, query, request):
+        try:
+            import ipdb
+            ipdb.sset_trace()
+            if value["val"] != "":
+                for val in value["val"]:
+                    m = super(ResourceInstanceListDataType, self).append_search_filters(val, node, query, request)
+                search_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
+                # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(value['val']))
+                if "!" in value["op"]:
+                    query.must_not(search_query)
+                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
+                else:
+                    query.must(search_query)
+        except KeyError as e:
+            pass
+
     def from_rdf(self, json_ld_node):
         m = super(ResourceInstanceListDataType, self).from_rdf(json_ld_node)
         if m is not None:

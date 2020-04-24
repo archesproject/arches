@@ -9,6 +9,7 @@ define([
     var ResourceInstanceSelectViewModel = function(params) {
         var self = this;
         params.configKeys = ['placeholder'];
+        this.state = params.state;
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
         this.graphids = params.node ? ko.unwrap(params.node.config.graphid) : [params.graphid];
@@ -126,71 +127,73 @@ define([
         this.url = url;
         var resourceToAdd = ko.observable("");
         this.select2Config = {
-            value: resourceToAdd,
+            value: self.state === 'search' ? self.value : resourceToAdd,
             clickBubble: true,
-            multiple: false,
+            multiple: self.state === 'search' ? params.multiple : false,
             placeholder: this.placeholder() || "Add new Relationship",
             closeOnSelect: true,
-            allowClear: false,
+            allowClear: self.state === 'search' ? true : false,
             onSelect: function(item) {
-                if (item._source) {
-                    var ret = {
-                        "resource": {
-                            "id": item._id,
-                            "name": item._source.displayname
-                        },
-                        "ontologyproperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"),
-                        "revProperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10i_contains"),
-                        "ontologyclass": item._source.root_ontology_class,
-                        "editing": ko.observable(false)
-                    };
-                    if (self.multiple) {
-                        ret = [ret];
-                        if (self.value() !== null) {
-                            ret = ret.concat(self.value());
+                if (self.state !== 'search') {
+                    if (item._source) {
+                        var ret = {
+                            "resource": {
+                                "id": item._id,
+                                "name": item._source.displayname
+                            },
+                            "ontologyproperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"),
+                            "revProperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10i_contains"),
+                            "ontologyclass": item._source.root_ontology_class,
+                            "editing": ko.observable(false)
+                        };
+                        if (self.multiple) {
+                            ret = [ret];
+                            if (self.value() !== null) {
+                                ret = ret.concat(self.value());
+                            }
                         }
+                        self.value(ret);
+                        window.setTimeout(function() {
+                            resourceToAdd("");
+                        }, 250);
+                    } else {
+                        var params = {
+                            graphid: item._id,
+                            complete: ko.observable(false),
+                            resourceid: ko.observable(),
+                            tileid: ko.observable()
+                        };
+                        self.newTileStep(params);
+                        params.complete.subscribe(function() {
+                            window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
+                                .then(function(response){
+                                    if(response.ok === false) {
+                                        return response.json();
+                                    }
+                                    throw("error");
+                                })
+                                .then(function(json) {
+                                    var item = json.results.hits.hits[0];
+                                    var ret = {
+                                        "resource": {
+                                            "id": params.resourceid(),
+                                            "name": item._source.displayname
+                                        },
+                                        "ontologyproperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"),
+                                        "revProperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10i_contains"),
+                                        "ontologyclass": item._source.root_ontology_class,
+                                        "editing": ko.observable(false)
+                                    };
+                                    self.value(ret);
+                                })
+                                .finally(function(){
+                                    self.newTileStep(null);
+                                    window.setTimeout(function() {
+                                        resourceToAdd("");
+                                    }, 250);
+                                });
+                        });
                     }
-                    self.value(ret);
-                    window.setTimeout(function() {
-                        resourceToAdd("");
-                    }, 250);
-                } else {
-                    var params = {
-                        graphid: item._id,
-                        complete: ko.observable(false),
-                        resourceid: ko.observable(),
-                        tileid: ko.observable()
-                    };
-                    self.newTileStep(params);
-                    params.complete.subscribe(function() {
-                        window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
-                            .then(function(response){
-                                if(response.ok === false) {
-                                    return response.json();
-                                }
-                                throw("error");
-                            })
-                            .then(function(json) {
-                                var item = json.results.hits.hits[0];
-                                var ret = {
-                                    "resource": {
-                                        "id": params.resourceid(),
-                                        "name": item._source.displayname
-                                    },
-                                    "ontologyproperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"),
-                                    "revProperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10i_contains"),
-                                    "ontologyclass": item._source.root_ontology_class,
-                                    "editing": ko.observable(false)
-                                };
-                                self.value(ret);
-                            })
-                            .finally(function(){
-                                self.newTileStep(null);
-                                window.setTimeout(function() {
-                                    resourceToAdd("");
-                                }, 250);
-                            });
-                    });
                 }
             },
             ajax: {
