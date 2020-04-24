@@ -36,13 +36,15 @@ class PermissionBackend(ObjectPermissionBackend):
                         return True
             return False
 
+
 def remove_resource_instance_permissions(resource_instance_id):
     groups = list(Group.objects.all())
     resource_instance = ResourceInstance.objects.get(pk=resource_instance_id)
     users = list(User.objects.all())
     for identity in groups + users:
-        for perm in ["no_access_to_resourceinstance","view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"]:
+        for perm in ["no_access_to_resourceinstance", "view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"]:
             remove_perm(perm, identity, resource_instance)
+
 
 def get_restricted_users(resource):
     """
@@ -55,27 +57,27 @@ def get_restricted_users(resource):
     user_and_group_perms = get_users_with_perms(resource, attach_perms=True, with_group_users=True)
 
     result = {
-        "no_access":[],
-        "cannot_read":[],
-        "cannot_write":[],
-        "cannot_delete":[],
+        "no_access": [],
+        "cannot_read": [],
+        "cannot_write": [],
+        "cannot_delete": [],
     }
 
     for user, perms in user_and_group_perms.items():
         if user.is_superuser:
             pass
-        elif user in user_perms and 'no_access_to_resourceinstance' in user_perms[user]:
+        elif user in user_perms and "no_access_to_resourceinstance" in user_perms[user]:
             for k, v in result.items():
                 v.append(user.id)
         else:
-            if 'view_resourceinstance' not in perms:
-                result['cannot_read'].append(user.id)
-            if 'change_resourceinstance' not in perms:
-                result['cannot_write'].append(user.id)
-            if 'delete_resourceinstance' not in perms:
-                result['cannot_delete'].append(user.id)
-            if 'no_access_to_resourceinstance' in perms and len(perms) == 1:
-                result['no_access'].append(user.id)
+            if "view_resourceinstance" not in perms:
+                result["cannot_read"].append(user.id)
+            if "change_resourceinstance" not in perms:
+                result["cannot_write"].append(user.id)
+            if "delete_resourceinstance" not in perms:
+                result["cannot_delete"].append(user.id)
+            if "no_access_to_resourceinstance" in perms and len(perms) == 1:
+                result["no_access"].append(user.id)
 
     return result
 

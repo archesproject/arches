@@ -82,7 +82,7 @@ class PermissionTests(ArchesTestCase):
                 "password": "Test12345!",
                 "groups": ["Graph Editor", "Resource Editor", "Resource Reviewer"],
             },
-            {'name': 'jim', 'email': 'jim@test.com', 'password': 'Test12345!', 'groups': ['Graph Editor', 'Resource Editor']},
+            {"name": "jim", "email": "jim@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
         )
 
         for profile in profiles:
@@ -156,18 +156,18 @@ class PermissionTests(ArchesTestCase):
         admin = User.objects.get(username="admin")
         assign_perm("view_resourceinstance", ben, resource)
         assign_perm("change_resourceinstance", jim, resource)
-        
+
         restrictions = get_restricted_users(resource)
 
         results = [
-            jim.id in restrictions['cannot_read'],
-            ben.id in restrictions['cannot_write'],
-            sam.id in restrictions['cannot_delete'],
-            sam.id in restrictions['no_access'],
-            admin.id not in restrictions['cannot_read'],
-            admin.id not in restrictions['cannot_write'],
-            admin.id not in restrictions['cannot_delete'],
-            admin.id not in restrictions['no_access']
+            jim.id in restrictions["cannot_read"],
+            ben.id in restrictions["cannot_write"],
+            sam.id in restrictions["cannot_delete"],
+            sam.id in restrictions["no_access"],
+            admin.id not in restrictions["cannot_read"],
+            admin.id not in restrictions["cannot_write"],
+            admin.id not in restrictions["cannot_delete"],
+            admin.id not in restrictions["no_access"],
         ]
 
         self.assertTrue(all(results) is True)

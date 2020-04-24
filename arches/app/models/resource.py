@@ -251,10 +251,10 @@ class Resource(models.ResourceInstance):
 
         restrictions = get_restricted_users(self)
         document["tiles"] = tiles
-        document["permissions"] = {"users_without_read_perm": restrictions['cannot_read']}
-        document["permissions"]["users_without_edit_perm"] = restrictions['cannot_write']
-        document["permissions"]["users_without_delete_perm"] = restrictions['cannot_delete']
-        document["permissions"]["users_with_no_access"] = restrictions['no_access']
+        document["permissions"] = {"users_without_read_perm": restrictions["cannot_read"]}
+        document["permissions"]["users_without_edit_perm"] = restrictions["cannot_write"]
+        document["permissions"]["users_without_delete_perm"] = restrictions["cannot_delete"]
+        document["permissions"]["users_with_no_access"] = restrictions["no_access"]
         document["strings"] = []
         document["dates"] = []
         document["domains"] = []
