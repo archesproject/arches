@@ -73,7 +73,8 @@ def tearDownTestPackage():
     """
 
     se = SearchEngineFactory().create()
-    se.delete_index(index="terms,concepts")
+    se.delete_index(index="terms")
+    se.delete_index(index="concepts")
     se.delete_index(index="resources")
     se.delete_index(index="resource_relations")
 

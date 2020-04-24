@@ -20,6 +20,7 @@
 @import url(../packages/leaflet-draw/dist/leaflet.draw.css);
 @import url(../css/tree/tree.css);
 @import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
+@import url(../packages/leaflet.fullscreen/Control.FullScreen.css);
 
 
 img {
@@ -1592,13 +1593,12 @@ ul.tabbed-report-tab-list {
 .workbench-card-sidepanel .install-buttons {
     background: #f9f9f9;
     position: fixed;
+    margin-right: 75px;
     bottom: 0px;
     border-top: 1px solid #ddd;
-    height: 60px;
-    padding-top: 10px;
-    right: 75px;
+    padding: 10px 35px;
+    right: 0;
     width: 399px;
-    padding-left: 35px;
 }
 
 .workbench-card-sidepanel.expanded .install-buttons {
@@ -2699,6 +2699,157 @@ a.select2-search-choice-close {
     border: 1px solid #ddd;
 }
 
+/*------------------------------------------------*/
+
+.permission-grid {
+    display: grid;
+    grid-template-columns: 40px 450px auto 40px;
+    grid-template-rows: 25px auto auto auto;
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+}
+
+.permission-grid .permission-header {
+    grid-column-start: 2;
+    grid-column-end: 4;
+    grid-row-start: 2;
+    grid-row-end: 2;
+  }
+
+.permission-grid .permission-control {
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 3;
+    grid-row-end: 3;
+  }
+
+.permission-grid .permission-list {
+    grid-column-start: 2;
+    grid-column-end: 4;
+    grid-row-start: 4;
+    grid-row-end: 4;
+    overflow-y: auto;
+  }
+
+.permission-grid .permissions-options {
+    display: flex;
+    flex-direction: row;
+    margin-top: 5px;
+    padding: 10px 0px 15px;
+}
+
+.permission-filter {
+    display:inline-flex; 
+    justify-content: 
+    space-between;
+    width: 250px;
+}
+
+.permissions-list-table {
+    height: 300px
+}
+
+.permissions-list-table-body {
+    height: 245px;
+    overflow-y: auto;
+    border: solid 1px #ddd;
+}
+
+.permissions-list-table-body::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 9px;
+    border-left: 1px solid #eee;
+}
+
+.permissions-list-table-body::-webkit-scrollbar-thumb {
+    border-radius: 2px;
+    background-color: rgba(0,0,0,.1);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}
+
+.permissions-list-header {
+    background: #579ddb;
+    color: #fff;
+    width: 100%;
+    display: flex;
+    padding: 9px 5px;
+    border-bottom: 1px solid #D3E5F4;
+    font-weight: 600;
+}
+
+.permission-control .clear-filter {
+    align-self: center;
+    font-size: 14px;
+    margin-left: -20px;
+    padding-right: 15px;
+}
+
+.permissions-table-row {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 5px;
+    border-bottom: 1px solid #D3E5F4
+}
+
+.permissions-table-row:nth-child(odd) {
+    background: #F5FAFE;
+}
+
+.permissions-table-row.selected {
+    background-color: #F1F1FF;
+}
+.permissions-table-row.selected:hover {
+    background-color: #F1F1FF;
+    cursor: pointer;
+}
+
+.permissions-table-row:hover {
+    background-color: #B6DEFF;
+    cursor: pointer;
+}
+
+.permissions-table-row:first-child {
+    background-color: #f8f8f8;
+    color: #777;
+    font-weight: 600;
+}
+
+.permissions-table-row:first-child:hover {
+    cursor: default;
+}
+
+.permission-selection-panel {
+    display: inline-flex;
+    background: #fcfcfc;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    margin: 8px -5px -10px -5px;
+}
+
+.permission-selection-panel:hover {
+    cursor: default;
+}
+
+.permission-list-table .identities-column {
+    width: 35%;
+}
+
+.permission-list-table .permissions-column {
+    width: 65%;
+}
+
+.permission-grid .permission-footer {
+    grid-column-start: 2;
+    grid-column-end: 4;
+    grid-row-start: 5;
+    grid-row-end: 5;
+    height: 75px;
+    align-items: baseline;
+  }
+
+/*------------------------------------------------*/
+
+
 .library-search {
     font-size: 11px;
     height: 32px;
@@ -2937,7 +3088,7 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .settings-panel-heading + div {
-    margin-top: 13px;
+    /*margin-top: 13px;*/
 }
 
 .graph-crm-class {
@@ -2980,6 +3131,10 @@ ul.nav.nav-tabs.nav-justified {
     padding-left: 5px;
     font-size: 17px;
     margin-top: 2px;
+}
+
+.top-node-panel {
+    margin-top: 60px;
 }
 
 .graph-designer-header {
@@ -5321,7 +5476,7 @@ th.notif-type {
 }
 
 .ep-tools:hover {
-    background: #fff;
+    background: #fafafa;
     border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
 }
@@ -5353,7 +5508,7 @@ th.notif-type {
     border-right: none;
     border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
-    background: #fafafa;
+    background: #fff;
     font-size: 17px;
     padding-left: 16px;
     padding-right: 20px;
@@ -5370,7 +5525,7 @@ th.notif-type {
     padding-left: 16px;
     padding-right: 20px;
     vertical-align: middle;
-    background: #fafafa;
+    background: #fff;
     border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
 }
@@ -8853,7 +9008,7 @@ a.clear-geojson-button:hover {
 }
 
 .ss-grid-item {
-    position: absolute;
+    position: sticky;
     border: 1px solid #ddd;
     width: 224px;
     height: 164px;
@@ -9778,6 +9933,7 @@ table.table.dataTable {
 .resource_search_widget_dropdown ul .select2-disabled .group {
     padding: 0px;
     border-top: 1px solid #C1D4F3;
+    width: 383px;
 }
 
 .resource_search_widget_dropdown ul .select2-disabled div span span button {
@@ -11718,6 +11874,16 @@ a.jstree-anchor.permissions-widget {
 .workbench-card-container-sidepanel-active .workbench-card-container {
     margin-right: 475px;
 }
+.add-new-crumb {
+    float: right;
+    cursor: pointer;
+    padding: 4px 12px;
+    font-size: 13px;
+    background: #6984A0;
+    border: 1px solid #0A0737;
+    border-radius: 2px;
+    margin-top: -1px;
+}
 .iiif-gallery-content {
     border-top: solid 1px rgb(221, 221, 221);
     height: 160px;
@@ -11788,6 +11954,14 @@ a.jstree-anchor.permissions-widget {
 }
 .gallery-expanded .iiif-gallery-header {
     padding-left: 10px;
+}
+.iiif-widget-report {
+    margin: 0 0 0 320px;
+}
+.iiif-widget-report .iiif-leaflet {
+    height: 300px;
+    margin: 0 20px 10px 0px;
+    border: solid 1px #808080;
 }
 .manifest-details {
     white-space: normal;

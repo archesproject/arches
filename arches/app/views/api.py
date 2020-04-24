@@ -29,6 +29,7 @@ from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.models.tile import Tile
+from arches.app.models.tile import Tile as tile_model
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.decorators import can_read_resource_instance, can_edit_resource_instance, can_read_concept
@@ -471,7 +472,7 @@ class Resources(APIBase):
     # }]
 
     def get(self, request, resourceid=None, slug=None, graphid=None):
-        if user_can_read_resources(user=request.user):
+        if user_can_read_resources(user=request.user, resourceid=resourceid):
             allowed_formats = ["json", "json-ld"]
             format = request.GET.get("format", "json-ld")
             if format not in allowed_formats:
@@ -484,11 +485,12 @@ class Resources(APIBase):
             if resourceid:
                 if format == "json-ld":
                     try:
+                        models.ResourceInstance.objects.get(pk=resourceid)  # check for existance
                         exporter = ResourceExporter(format=format)
                         output = exporter.writer.write_resources(resourceinstanceids=[resourceid], indent=indent, user=request.user)
                         out = output[0]["outputfile"].getvalue()
                     except models.ResourceInstance.DoesNotExist:
-                        logger.exception(_("The specified resource '{0}' does not exist. JSON-LD export failed.".format(resourceid)))
+                        logger.error(_("The specified resource '{0}' does not exist. JSON-LD export failed.".format(resourceid)))
                         return JSONResponse(status=404)
                 elif format == "json":
                     out = Resource.objects.get(pk=resourceid)
@@ -919,16 +921,12 @@ class IIIFManifest(APIBase):
 @method_decorator(csrf_exempt, name="dispatch")
 class Tile(APIBase):
     def post(self, request):
-        # tileid = request.POST.get("tileid")
-        # nodeid = request.POST.get("nodeid")
-        # data = request.POST.get("data")
+        tileid = request.POST.get("tileid")
+        nodeid = request.POST.get("nodeid")
+        data = request.POST.get("data")
         
+        geojson = GeoUtils().arcgisjson_to_geojson(data)
+        tile_model.update_node_value(nodeid, geojson, tileid)
 
-        # tile = models.Tiles.objects.get(tileid)
-        # tile.data['nodeid'] = data
-        # tile.save()
-        logger.info('Got tile!')
-        
-        
         response = JSONResponse({"results": "success!"})
         return response

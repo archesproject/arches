@@ -21,7 +21,7 @@ from django.contrib.auth import views as auth_views
 from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from arches.app.views import concept, main, map, search, graph, api
-from arches.app.views.admin import ReIndexResources
+from arches.app.views.admin import ReIndexResources, FileView
 from arches.app.views.graph import (
     GraphDesignerView,
     GraphSettingsView,
@@ -35,7 +35,6 @@ from arches.app.views.graph import (
     NodegroupView,
 )
 from arches.app.views.resource import (
-    ResourceEditorView,
     ResourceListView,
     ResourceData,
     ResourceCards,
@@ -44,8 +43,9 @@ from arches.app.views.resource import (
     ResourceDescriptors,
     ResourceEditLogView,
     ResourceTiles,
+    ResourcePermissionDataView,
 )
-from arches.app.views.resource import NewResourceEditorView, ResourceActivityStreamPageView, ResourceActivityStreamCollectionView
+from arches.app.views.resource import ResourceEditorView, ResourceActivityStreamPageView, ResourceActivityStreamCollectionView
 from arches.app.views.plugin import PluginView
 from arches.app.views.concept import RDMView
 from arches.app.views.user import UserManagerView
@@ -76,6 +76,7 @@ urlpatterns = [
     url(r"^auth/", LoginView.as_view(), name="auth"),
     url(r"^rdm/(?P<conceptid>%s|())$" % uuid_regex, RDMView.as_view(), name="rdm"),
     url(r"^admin/reindex/resources$", ReIndexResources.as_view(), name="reindex"),
+    url(r"^files/(?P<fileid>%s)$" % uuid_regex, FileView.as_view(), name="file_access"),
     url(r"^concepts/(?P<conceptid>%s)/manage_parents/$" % uuid_regex, concept.manage_parents, name="concept_manage_parents"),
     url(r"^concepts/(?P<conceptid>%s)/confirm_delete/$" % uuid_regex, concept.confirm_delete, name="confirm_delete"),
     url(r"^concepts/(?P<conceptid>%s)/make_collection/$" % uuid_regex, concept.make_collection, name="make_collection"),
@@ -104,11 +105,11 @@ urlpatterns = [
     url(r"^buffer/$", search.buffer, name="buffer"),
     url(
         r"^settings/",
-        NewResourceEditorView.as_view(),
+        ResourceEditorView.as_view(),
         {
             "resourceid": settings.RESOURCE_INSTANCE_ID,
-            "view_template": "views/resource/new-editor.htm",
-            "main_script": "views/resource/new-editor",
+            "view_template": "views/resource/editor.htm",
+            "main_script": "views/resource/editor",
             "nav_menu": False,
         },
         name="config",
@@ -117,6 +118,8 @@ urlpatterns = [
     url(r"^graph/import/", GraphDataView.as_view(action="import_graph"), name="import_graph"),
     url(r"^graph/reorder_nodes$", GraphDataView.as_view(action="reorder_nodes"), name="reorder_nodes"),
     url(r"^graph/permissions$", PermissionDataView.as_view(), name="permission_data"),
+    url(r"^resource/permissions$", ResourcePermissionDataView.as_view(), name="resource_permission_data"),
+    url(r"^resource/permissions/restrict$", ResourcePermissionDataView.as_view(action="restrict"), name="restrict_resource_access"),
     url(
         r"^graph/permissions/permission_manager_data$",
         PermissionDataView.as_view(action="get_permission_manager_data"),
@@ -162,15 +165,9 @@ urlpatterns = [
     url(r"^graph_settings/(?P<graphid>%s)$" % uuid_regex, GraphSettingsView.as_view(), name="graph_settings"),
     url(r"^components/datatypes/(?P<template>[a-zA-Z_-]*)", DatatypeTemplateView.as_view(), name="datatype_template"),
     url(r"^resource$", ResourceListView.as_view(), name="resource"),
-    url(
-        r"^resource/(?P<resourceid>%s)/(?P<graphid>%s)/add_resource$" % (uuid_regex, uuid_regex),
-        ResourceEditorView.as_view(),
-        name="old_add_resource",
-    ),
-    url(r"^resource-old/(?P<resourceid>%s)$" % uuid_regex, ResourceEditorView.as_view(), name="old_resource_editor"),
-    url(r"^resource/(?P<resourceid>%s)$" % uuid_regex, NewResourceEditorView.as_view(), name="resource_editor"),
-    url(r"^add-resource/(?P<graphid>%s)$" % uuid_regex, NewResourceEditorView.as_view(), name="add_resource"),
-    url(r"^resource/(?P<resourceid>%s)/copy$" % uuid_regex, NewResourceEditorView.as_view(action="copy"), name="resource_copy"),
+    url(r"^resource/(?P<resourceid>%s)$" % uuid_regex, ResourceEditorView.as_view(), name="resource_editor"),
+    url(r"^add-resource/(?P<graphid>%s)$" % uuid_regex, ResourceEditorView.as_view(), name="add_resource"),
+    url(r"^resource/(?P<resourceid>%s)/copy$" % uuid_regex, ResourceEditorView.as_view(action="copy"), name="resource_copy"),
     url(r"^resource/(?P<resourceid>%s)/history$" % uuid_regex, ResourceEditLogView.as_view(), name="resource_edit_log"),
     url(r"^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$" % (uuid_regex, uuid_regex), ResourceData.as_view(), name="resource_data"),
     url(r"^resource/(?P<resourceid>%s)/cards$" % uuid_regex, ResourceCards.as_view(), name="resource_cards"),
@@ -219,7 +216,7 @@ urlpatterns = [
     url(r"^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.Resources.as_view(), name="resources_graphid"),
     url(r"^resources/(?P<slug>[-\w]+)/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources_slug"),
     url(r"^resources/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources"),
-    url(r"^api/tiles$", api.Tile.as_view(), name="api_tiles"),
+    url(r"^api/tiles/$", api.Tile.as_view(), name="api_tiles"),
     url(r"^rdm/concepts/(?P<conceptid>%s|())$" % uuid_regex, api.Concepts.as_view(), name="concepts"),
     url(r"^plugins/(?P<pluginid>%s)$" % uuid_regex, PluginView.as_view(), name="plugins"),
     url(r"^plugins/(?P<slug>[-\w]+)$", PluginView.as_view(), name="plugins"),
@@ -257,7 +254,6 @@ urlpatterns = [
     url(r"^o/", include("oauth2_provider.urls", namespace="oauth2")),
     url(r"^iiifmanifest$", api.IIIFManifest.as_view(), name="iiifmanifest"),
 ]
-
 
 if settings.DEBUG:
     try:

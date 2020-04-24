@@ -1,11 +1,13 @@
 define([
     'arches',
+    'jquery',
     'knockout',
     'leaflet',
     'views/components/workbench',
     'leaflet-iiif',
+    'leaflet-fullscreen',
     'bindings/leaflet'
-], function(arches, ko, L, WorkbenchViewmodel) {
+], function(arches, $, ko, L, WorkbenchViewmodel) {
     var IIIFViewerViewmodel = function(params) {
         var self = this;
         var abortFetchManifest;
@@ -46,7 +48,7 @@ define([
             var manifestData = self.manifestData();
             return getLabel(manifestData || {label: ''});
         });
-        this.zoomToCanvas = true;
+        this.zoomToCanvas = !(params.zoom && params.center);
 
         var validateUrl = function(value) {
             return /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(value);
@@ -140,8 +142,10 @@ define([
             }, 1);
         });
 
-        this.showGallery = ko.observable(true);
-        this.expandGallery = ko.observable(!params.manifest);
+        if (params.showGallery === undefined) params.showGallery = true;
+        this.showGallery = ko.observable(params.showGallery);
+        if (!params.manifest) params.expandGallery = true;
+        this.expandGallery = ko.observable(params.expandGallery);
         this.expandGallery.subscribe(function(expandGallery) {
             if (expandGallery) self.showGallery(true);
         });
@@ -154,9 +158,9 @@ define([
         };
 
         this.leafletConfig = {
-            center: [0, 0],
+            center: params.center || [0, 0],
             crs: L.CRS.Simple,
-            zoom: 0,
+            zoom: params.zoom || 0,
             afterRender: this.map
         };
 
@@ -207,7 +211,12 @@ define([
             }
             self.zoomToCanvas = false;
         };
-        this.map.subscribe(addCanvasLayer);
+        this.map.subscribe(function(map) {
+            L.control.fullscreen({
+                fullscreenElement: $(map.getContainer()).closest('.workbench-card-wrapper')[0]
+            }).addTo(map);
+            addCanvasLayer();
+        });
         this.canvas.subscribe(addCanvasLayer);
 
         this.selectCanvas = function(canvas) {
@@ -225,14 +234,16 @@ define([
             if (canvas.images.length > 0) return canvas.images[0].resource.service['@id'];
         };
 
+        var updateCanvas = !self.canvas();
         this.manifestData.subscribe(function(manifestData) {
-            if (!self.canvas() && manifestData.sequences.length > 0) {
+            if (updateCanvas && manifestData.sequences.length > 0) {
                 var sequence = manifestData.sequences[0];
                 if (sequence.canvases.length > 0) {
                     var canvas = sequence.canvases[0];
                     self.selectCanvas(canvas);
                 }
             }
+            updateCanvas = true;
         });
 
         this.toggleManifestEditor = function() {
