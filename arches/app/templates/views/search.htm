@@ -54,7 +54,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="search-control-container" data-bind="css: { 'slide': !sharedStateObject.resultsExpanded() }">
                 <!-- Title Block -->
                 <div class="search-count-container">
-                    <h2 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h2>
+                    <h2 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total(), attr: {'aria-label' : 'Search results, displaying ' + total() + ' items'}"></h2>
                 </div>
 
                 <div class="search-results-container">
