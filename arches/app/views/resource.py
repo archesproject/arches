@@ -94,6 +94,18 @@ def get_resource_relationship_types():
     return relationship_type_values
 
 
+def get_instance_creator(resource_instance, user):
+    try:
+        creatorid = int(
+            models.EditLog.objects.filter(resourceinstanceid=resource_instance.resourceinstanceid).filter(edittype="create")[0].userid
+        )
+        return creatorid, user.id == creatorid or user.is_superuser
+
+    except Exception:
+        logger.error("Cannot find instance creator when retrieving instance permissions")
+        return None, None
+
+
 class ResourceEditorView(MapBaseManagerView):
     action = None
 
@@ -110,6 +122,9 @@ class ResourceEditorView(MapBaseManagerView):
         if self.action == "copy":
             return self.copy(request, resourceid)
 
+        creator = None
+        user_created_instance = None
+
         if resourceid is None:
             resource_instance = None
             graph = models.GraphModel.objects.get(pk=graphid)
@@ -117,6 +132,7 @@ class ResourceEditorView(MapBaseManagerView):
         else:
             resource_instance = Resource.objects.get(pk=resourceid)
             graph = resource_instance.graph
+            creator, user_created_instance = get_instance_creator(resource_instance, request.user)
         nodes = graph.node_set.all()
         resource_graphs = (
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
@@ -225,6 +241,8 @@ class ResourceEditorView(MapBaseManagerView):
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             user_is_reviewer=json.dumps(user_is_reviewer),
+            creator=json.dumps(creator),
+            user_created_instance=json.dumps(user_created_instance),
             report_templates=templates,
             templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=["name", "description"]),
             graph_json=JSONSerializer().serialize(graph),
@@ -278,7 +296,7 @@ class ResourcePermissionDataView(View):
             result = self.make_instance_private(resourceid)
         else:
             data = JSONDeserializer().deserialize(request.body)
-            self.apply_permissions(data)
+            self.apply_permissions(data, request.user)
             if "instanceid" in data:
                 resource = models.ResourceInstance.objects.get(pk=data["instanceid"])
                 result = self.get_instance_permissions(resource)
@@ -286,7 +304,7 @@ class ResourcePermissionDataView(View):
 
     def delete(self, request):
         data = JSONDeserializer().deserialize(request.body)
-        self.apply_permissions(data, revert=True)
+        self.apply_permissions(data, request.user, revert=True)
         return JSONResponse(data)
 
     def get_perms(self, identity, type, obj, perms):
@@ -348,26 +366,36 @@ class ResourcePermissionDataView(View):
             assign_perm("no_access_to_resourceinstance", identity, resource_instance)
         return self.get_instance_permissions(resource_instance)
 
-    def apply_permissions(self, data, revert=False):
+    def apply_permissions(self, data, user, revert=False):
         with transaction.atomic():
-            for identity in data["selectedIdentities"]:
-                if identity["type"] == "group":
-                    identityModel = Group.objects.get(pk=identity["id"])
-                else:
-                    identityModel = User.objects.get(pk=identity["id"])
+            for instance in data["selectedInstances"]:
+                resource_instance = models.ResourceInstance.objects.get(pk=instance["resourceinstanceid"])
+                for identity in data["selectedIdentities"]:
+                    if identity["type"] == "group":
+                        identityModel = Group.objects.get(pk=identity["id"])
+                    else:
+                        identityModel = User.objects.get(pk=identity["id"])
 
-                for instance in data["selectedInstances"]:
-                    resource_instance_id = instance["resourceinstanceid"]
-                    resource_instance = models.ResourceInstance.objects.get(pk=resource_instance_id)
+                    creator, user_can_modify_permissions = get_instance_creator(resource_instance, user)
 
-                    # first remove all the current permissions
-                    for perm in get_perms(identityModel, resource_instance):
-                        remove_perm(perm, identityModel, resource_instance)
+                    if user_can_modify_permissions:
+                        # first remove all the current permissions
+                        for perm in get_perms(identityModel, resource_instance):
+                            remove_perm(perm, identityModel, resource_instance)
 
-                    if not revert:
-                        # then add the new permissions
-                        for perm in identity["selectedPermissions"]:
-                            assign_perm(perm["codename"], identityModel, resource_instance)
+                        if not revert:
+                            # then add the new permissions
+                            no_access = any(perm["codename"] == "no_access_to_resourceinstance" for perm in identity["selectedPermissions"])
+                            if no_access:
+                                assign_perm("no_access_to_resourceinstance", identityModel, resource_instance)
+                            else:
+                                for perm in identity["selectedPermissions"]:
+                                    assign_perm(perm["codename"], identityModel, resource_instance)
+
+                resource = Resource(str(resource_instance.resourceinstanceid))
+                resource.graphid = resource_instance.graph_id
+                resource.graph = resource_instance.graph
+                resource.index()
 
 
 @method_decorator(can_edit_resource_instance, name="dispatch")

@@ -20,10 +20,10 @@
             <div class="rr-splash-title">{% trans "Resource Instance Permissions" %}</div>
 
 
-            <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-link" data-bind="click: function(){makeInstancePrivate()}">{% trans 'Restrict Access to this Instance' %}</button>
+            <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-link" data-bind="click: function(){makeInstancePrivate()}">{% trans 'Configure Access to this Instance' %}</button>
 
             <!-- Splash Instructions -->
-            <div class="rr-splash-description">{% trans "Make this instance accessible only to the creator of this instance, or select which user accounts and groups have access" %}</div>
+            <div class="rr-splash-description">{% trans "Define access privileges for this instance.  You may limit access to yourself, or select which user accounts and groups have permission to this resource." %}</div>
 
             <!-- Help Hyperlink -->
         </div>
@@ -33,10 +33,10 @@
         <div class="permission-grid">
             <div class="permission-header">
                 <h4>{% trans 'Set Permissions for this instance' %}</h4>
-                <h5>{% trans 'By default everyone has access to this record. You can limit access to specific people or groups by selecting to whom you will grant access' %}</h5>
+                <h5>{% trans 'By default only you have access to this record. You can set permissions for specific people or groups by selecting to whom you will grant access' %}</h5>
             </div>
             <div class="permission-control">
-                <div style="display:inline-flex; justify-content: space-between;">
+                <div class="permission-filter">
                 <input type="text" class="form-control" style="display:inline-block;" placeholder="filter table" data-bind="textInput: filter">
                 <div class="clear-filter" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></div>
                 </div>
@@ -51,7 +51,7 @@
                 <div class="permissions-list-table-body">
                      <!--ko foreach: filteredPermissions() --> 
                         <!--ko if: $data.creator -->
-                        <div class="permissions-table-row" style="color: #2f527a; font-weight: 600;">
+                        <div class="permissions-table-row">
                             <div style="display: inline-flex">
                                 <div class="identities-column"><i style="color: #579ddb; padding: 0 5px" class="fa" data-bind="class: function(){return $data['type']==='user' ? 'fa-user' : 'fa-users'}()"></i><span data-bind="text: $data['name']"></span></div>
                                 <div class="permissions-column" data-bind="text: $data.availablePermissions.filter(function(a){return !!a.selected() && a.codename !== 'no_access_to_resourceinstance'}).map(function(x){return x.name.replace(' resource', '')}).join(', ')"></div>
@@ -67,18 +67,18 @@
                             <div class="permissions-column" data-bind="text: $data.availablePermissions.filter(function(a){return !!a.selected()}).map(function(x){return x.name.replace(' resource', '')}).join(', ')"></div>
                         </div>
                         <!--ko if: selected-->
-                        <div style="display: inline-flex; padding-top: 6px 0px; margin-top: 6px;">
+                        <div class="permission-selection-panel">
                             <div class="identities-column"></div>
                             <!--ko if: $parent.instancePermissions()  -->
                             <div class="permissions-column">
                                 <div class="permissions-options">
                                     <!--ko foreach: $data.availablePermissions -->
-                                    <div>
+                                    <div style="margin-right: 15px">
                                     <label class="form-checkbox form-normal form-primary permission-option active" data-bind="css: {
                                             'active': $data.selected
                                         }, click: $data.selected.bind($data, !$data.selected())">
                                         <input type="checkbox" data-bind="checked: $data.selected">
-                                        <i data-bind="css: $data.icon" class="ion-android-delete"></i> <span data-bind="text: $data.name"></span>
+                                        <i data-bind="css: $data.icon"></i> <span data-bind="text: $data.name.replace(' resource', '')"></span>
                                     </label>
                                     </div>
                                     <!--/ko-->

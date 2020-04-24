@@ -95,6 +95,9 @@ define([
                         var defaultconfig = w.widgetLookup[w.widget_id()].defaultconfig;
                         if (JSON.parse(defaultconfig).rerender === true && self.selectedTile().parent.allowProvisionalEditRerender() === true) {
                             self.selectedTile().parent.widgets()[0].label.valueHasMutated();
+                        } 
+                        if (self.selectedTile().parent.triggerUpdate) {
+                            self.selectedTile().parent.triggerUpdate();
                         }
                     });
             }

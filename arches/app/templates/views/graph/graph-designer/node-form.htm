@@ -5,7 +5,7 @@
 
             <div class="settings-panel-heading">
                 <div class="graph-designer-title">
-                    <div data-bind="text: (node() && node().name()) ? node().name() : '{% trans "Unnamed node" %}'"></div>
+                    <div data-bind="text: (node() && node().name()) ? node().name() : '{% trans 'Unnamed node' %}'"></div>
                     <span class="graph-crm-class">
                         (
                         <!-- ko if: hasOntology -->
@@ -19,7 +19,7 @@
             </div>
 
             <!-- Settings Forms -->
-            <div>
+            <div class="top-node-panel">
 
                 <div class="graph-designer-header">{% trans 'Node Identifiers' %}</div>
                 <!-- ko if: node() -->
@@ -38,7 +38,22 @@
                                 </div>
 
                                 <div class="col-xs-12">
-                                    <input type="text" placeholder="{% trans "Enter node name here..." %}"class="form-control" style="" placeholder="{% trans "node name" %}" data-bind="value:node().name, valueUpdate: 'keyup'">
+                                    <input type="text" placeholder="{% trans 'Enter node name here...' %}"class="form-control" style="" placeholder="{% trans 'node name' %}" data-bind="value:node().name, valueUpdate: 'keyup'">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ko if: !node().istopnode -->
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label">
+                                        <span style="display:flex"><div class="node-form ontology">{% trans "Relationship to" %}</div><div class="node-form node-name" data-bind="text: graphModel.getParentNode(node()).name"></div><div style="margin-top: 1px;">({% trans "parent" %})</div></span>
+                                    </label>
+                                </div>
+
+                                <div class="col-xs-12 crm-selector">
+                                    <select class="design" data-bind="value: node().parentproperty, options: node().validproperties, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: '{% trans "Choose a property" %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
                                 </div>
                             </div>
                         </div>
@@ -54,22 +69,7 @@
                                 </div>
 
                                 <div class="col-xs-12 crm-selector">
-                                    <select class="" data-bind="value: node().ontologyclass, options: node().validclasses, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: '{% trans "Choose a class" %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- ko if: !node().istopnode -->
-                        <div class="row widget-container">
-                            <div class="form-group">
-                                <div class="relative">
-                                    <label class="col-xs-12 control-label widget-input-label">
-                                        <span style="display:flex"><div class="node-form ontology">{% trans "Relationship to" %}</div><div class="node-form node-name" data-bind="text: graphModel.getParentNode(node()).name"></div><div>({% trans "parent" %})</div></span>
-                                    </label>
-                                </div>
-
-                                <div class="col-xs-12 crm-selector">
-                                    <select class="design" data-bind="value: node().parentproperty, options: node().validproperties, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: '{% trans "Choose a property" %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                    <select class="" data-bind="value: node().ontologyclass, options: node().validclasses, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: '{% trans 'Choose a class'%}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
                                 </div>
                             </div>
                         </div>
@@ -111,7 +111,7 @@
                                 </div>
 
                                 <div class="col-xs-12 crm-selector">
-                                    <select class="design" data-bind="disable: disableDatatype(), value: node().datatype, options: datatypes, optionsCaption: '{% trans "Choose a data type" %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                    <select class="design" data-bind="disable: disableDatatype(), value: node().datatype, options: datatypes, optionsCaption: '{% trans 'Choose a data type' %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
                                 </div>
                             </div>
                         </div>
