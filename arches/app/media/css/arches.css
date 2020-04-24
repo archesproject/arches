@@ -1601,6 +1601,10 @@ ul.tabbed-report-tab-list {
     width: 399px;
 }
 
+.graph-designer .workbench-card-sidepanel .install-buttons {
+    margin-right: 375px;
+}
+
 .workbench-card-sidepanel.expanded .install-buttons {
     width: 599px;
 }
@@ -4727,9 +4731,10 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 }
 
 .nodeLabels {
-    font-size: 11px;
+    font-size: 14px;
     fill: #454545;
     text-anchor: middle;
+    font-weight: 600;
 }
 
 .node_info {
@@ -5157,7 +5162,7 @@ ul.jqtree_common li.jqtree-folder {
 
 .profile-report {
     height: 150px;
-    background: #A43741;
+    background: #102F4F;
     width: 100%;
     padding: 40px 150px 0px 150px;
     border-bottom: 1px solid #520008;
@@ -9591,12 +9596,6 @@ table.table.dataTable {
 
 .related-resources-header.open-graph {
     width: calc(100% - 245px);
-}
-
-.nodeLabels {
-    font-size: 11px;
-    fill: #777;
-    text-anchor: middle;
 }
 
 .root-node-label {
