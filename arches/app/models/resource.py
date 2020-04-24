@@ -41,7 +41,7 @@ from arches.app.utils.exceptions import (
     InvalidNodeNameException,
     MultipleNodesFoundException,
 )
-from arches.app.utils.permission_backend import user_is_resource_reviewer, get_users_for_object
+from arches.app.utils.permission_backend import user_is_resource_reviewer, get_users_for_object, get_restricted_users
 from arches.app.datatypes.datatypes import DataTypeFactory
 
 logger = logging.getLogger(__name__)
@@ -249,16 +249,12 @@ class Resource(models.ResourceInstance):
 
         tiles = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
 
-        can_view = [user.id for user in get_users_for_object("view_resourceinstance", self)]
-        can_edit = [user.id for user in get_users_for_object("change_resourceinstance", self)]
-        can_delete = [user.id for user in get_users_for_object("delete_resourceinstance", self)]
-        no_access = [user.id for user in get_users_for_object("no_access_to_resourceinstance", self)]
-        restricted = list(set(no_access) - set(can_view + can_edit + can_delete))
+        restrictions = get_restricted_users(self)
         document["tiles"] = tiles
-        document["permissions"] = {"users_with_read_perm": can_view}
-        document["permissions"] = {"users_with_edit_perm": can_edit}
-        document["permissions"] = {"users_with_delete_perm": can_delete}
-        document["permissions"] = {"users_with_no_access": restricted}
+        document["permissions"] = {"users_without_read_perm": restrictions["cannot_read"]}
+        document["permissions"]["users_without_edit_perm"] = restrictions["cannot_write"]
+        document["permissions"]["users_without_delete_perm"] = restrictions["cannot_delete"]
+        document["permissions"]["users_with_no_access"] = restrictions["no_access"]
         document["strings"] = []
         document["dates"] = []
         document["domains"] = []
