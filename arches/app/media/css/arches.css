@@ -2838,13 +2838,23 @@ a.select2-search-choice-close {
     width: 65%;
 }
 
-.permission-grid .permission-footer {
+.permission-grid .permissions-buttons {
     grid-column-start: 2;
-    grid-column-end: 4;
+    grid-column-end: 3;
     grid-row-start: 5;
     grid-row-end: 5;
     height: 75px;
     align-items: baseline;
+
+  }
+
+.permission-grid .remove-permissions-btn {
+    grid-column-start: 3;
+    grid-column-end: 4;
+    grid-row-start: 5;
+    grid-row-end: 5;
+    height: 75px;
+    justify-self: end;
   }
 
 /*------------------------------------------------*/

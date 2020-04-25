@@ -120,7 +120,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div>
                 <div data-bind="component: {
                     name: 'permissions-manager',
-                    params: {resourceId: resourceId, creator: userIsCreator}
+                    params: {resourceId: resourceId, creator: userIsCreator, alert: alert, alertTitle: '{% trans 'You are about assign normal user access to this instance' %}', alertMessage: '{% trans 'Would you like to proceed?' %}'},
                 }"></div>
             </div>
             <!--/ko -->
