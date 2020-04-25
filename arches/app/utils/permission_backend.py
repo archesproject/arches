@@ -4,7 +4,15 @@ from guardian.backends import check_support
 from guardian.backends import ObjectPermissionBackend
 from django.core.exceptions import ObjectDoesNotExist
 from guardian.core import ObjectPermissionChecker
-from guardian.shortcuts import get_perms, get_objects_for_user, get_group_perms, get_user_perms, get_users_with_perms, remove_perm, assign_perm
+from guardian.shortcuts import (
+    get_perms,
+    get_objects_for_user,
+    get_group_perms,
+    get_user_perms,
+    get_users_with_perms,
+    remove_perm,
+    assign_perm,
+)
 from guardian.exceptions import WrongAppError
 from django.contrib.auth.models import User, Group, Permission
 from arches.app.models.models import ResourceInstance
