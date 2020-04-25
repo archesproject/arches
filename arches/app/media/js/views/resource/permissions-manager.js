@@ -3,17 +3,21 @@ define([
     'knockout',
     'knockout-mapping',
     'arches',
+    'viewmodels/alert',
     'bindings/select2-query'
-], function($, ko, koMapping, arches) {
+], function($, ko, koMapping, arches, AlertViewModel) {
     return ko.components.register('permissions-manager', {
         viewModel: function(params) {
             var self = this;
             this.instancePermissions = ko.observable();
             this.resourceId = params.resourceId();
+            this.alert = params.alert;
             this.openEditor = ko.observable(undefined);
             this.identities = ko.observableArray();
             this.filter = ko.observable('');
             this.dirty = ko.observable(false);
+            this.alertTitle = params.alertTitle;
+            this.alertMessage = params.alertMessage;
 
             this.getInstancePermissions = function(){
                 $.ajax({
@@ -129,13 +133,29 @@ define([
             this.makeInstancePrivate = function(){
                 $.ajax({
                     type: 'POST',
-                    url: arches.urls.restrict_resource_access,
-                    data: {"instanceid": params.resourceId}
+                    url: arches.urls.resource_permission_data,
+                    data: {"instanceid": params.resourceId, "action": "restrict"}
                 }).done(function(data){
                     self.openEditor(data['limitedaccess']);
                     var parsed = self.initPermissions(data);
                     self.instancePermissions(parsed);
                 });
+            };
+
+            this.makeInstancePublic = function(){
+                this.alert(new AlertViewModel('ep-alert-red', this.alertTitle, this.alertMessage, function() {
+                    return;
+                }, function(){
+                    $.ajax({
+                        type: 'POST',
+                        url: arches.urls.resource_permission_data,
+                        data: {"instanceid": params.resourceId, "action": "open"}
+                    }).done(function(data){
+                        var parsed = self.initPermissions(data);
+                        self.instancePermissions(parsed);
+                        self.openEditor(data['limitedaccess']);
+                    });
+                }));
             };
 
             this.getInstancePermissions();

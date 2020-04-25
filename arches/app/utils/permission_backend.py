@@ -4,7 +4,15 @@ from guardian.backends import check_support
 from guardian.backends import ObjectPermissionBackend
 from django.core.exceptions import ObjectDoesNotExist
 from guardian.core import ObjectPermissionChecker
-from guardian.shortcuts import get_perms, get_objects_for_user, get_group_perms, get_user_perms, get_users_with_perms, remove_perm
+from guardian.shortcuts import (
+    get_perms,
+    get_objects_for_user,
+    get_group_perms,
+    get_user_perms,
+    get_users_with_perms,
+    remove_perm,
+    assign_perm,
+)
 from guardian.exceptions import WrongAppError
 from django.contrib.auth.models import User, Group, Permission
 from arches.app.models.models import ResourceInstance
@@ -40,10 +48,21 @@ class PermissionBackend(ObjectPermissionBackend):
 def remove_resource_instance_permissions(resource_instance_id):
     groups = list(Group.objects.all())
     resource_instance = ResourceInstance.objects.get(pk=resource_instance_id)
-    users = list(User.objects.all())
+    users = [user for user in User.objects.all() if user.is_superuser is False]
     for identity in groups + users:
         for perm in ["no_access_to_resourceinstance", "view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"]:
             remove_perm(perm, identity, resource_instance)
+    return resource_instance
+
+
+def add_permission_to_all(resource_instance_id, permission):
+    groups = list(Group.objects.all())
+    resource_instance = ResourceInstance.objects.get(pk=resource_instance_id)
+    users = [user for user in User.objects.all() if user.is_superuser is False]
+    for identity in groups + users:
+        assign_perm(permission, identity, resource_instance)
+    return resource_instance
+
 
 
 def get_restricted_users(resource):
