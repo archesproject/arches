@@ -365,7 +365,7 @@ class ResourcePermissionDataView(View):
         remove_resource_instance_permissions(instanceid)
         resource_instance = add_permission_to_all(instanceid, "no_access_to_resourceinstance")
         return self.get_instance_permissions(resource_instance)
-    
+
     def make_instance_public(self, instanceid):
         resource_instance = remove_resource_instance_permissions(instanceid)
         return self.get_instance_permissions(resource_instance)
