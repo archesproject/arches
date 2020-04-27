@@ -1590,6 +1590,37 @@ ul.tabbed-report-tab-list {
     margin-top: 50px;
 }
 
+.install-buttons .btn-warning {
+    background: #f75d3f;
+    border-color: #E53211;
+}
+
+.install-buttons .btn-warning:hover {
+    background: #E53211;
+    border-color: #B02107;
+}
+
+
+.install-buttons .btn-danger {
+    background: #FF836C;
+    border-color: #E53211;
+}
+
+.install-buttons .btn-danger:hover {
+    background: #f75d3f;
+    border-color: #E53211;
+}
+
+.install-buttons .btn-mint {
+    background: #3acaa1;
+    border-color: #42cca5;
+}
+
+.install-buttons .btn-mint:hover {
+    background: #1ABA8E;
+    border-color: #009E72;
+}
+
 .workbench-card-sidepanel .install-buttons {
     background: #f9f9f9;
     position: fixed;
@@ -1599,6 +1630,10 @@ ul.tabbed-report-tab-list {
     padding: 10px 35px;
     right: 0;
     width: 399px;
+}
+
+.graph-designer .workbench-card-sidepanel .install-buttons {
+    margin-right: 375px;
 }
 
 .workbench-card-sidepanel.expanded .install-buttons {
@@ -4737,9 +4772,10 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 }
 
 .nodeLabels {
-    font-size: 11px;
+    font-size: 14px;
     fill: #454545;
     text-anchor: middle;
+    font-weight: 600;
 }
 
 .node_info {
@@ -5167,7 +5203,7 @@ ul.jqtree_common li.jqtree-folder {
 
 .profile-report {
     height: 150px;
-    background: #A43741;
+    background: #102F4F;
     width: 100%;
     padding: 40px 150px 0px 150px;
     border-bottom: 1px solid #520008;
@@ -9603,12 +9639,6 @@ table.table.dataTable {
     width: calc(100% - 245px);
 }
 
-.nodeLabels {
-    font-size: 11px;
-    fill: #777;
-    text-anchor: middle;
-}
-
 .root-node-label {
     stroke: #999;
     /*#3275b1;*/
@@ -11859,7 +11889,7 @@ a.jstree-anchor.permissions-widget {
 .show-gallery-control.gallery-expanded {
     top: 0;
     left: 0;
-    right: 75px;
+    right: 74px;
     bottom: auto;
     border-bottom: solid 1px rgb(221, 221, 221);
     z-index: 2000;
@@ -11901,6 +11931,7 @@ a.jstree-anchor.permissions-widget {
     padding: 10px;
     white-space: nowrap;
     overflow-x: auto;
+    display: flex;
 }
 .show-gallery-control h3 {
     display: inline-block;
@@ -11956,6 +11987,12 @@ a.jstree-anchor.permissions-widget {
     font-weight: 600;
     text-decoration: none;
 }
+
+.gallery-expanded .iiif-gallery-panel {
+    padding-left: 15px;
+    margin-left: 225px;
+}
+
 .iiif-gallery-header {
     font-size: 1.2em;
     padding-left: 10px;
@@ -11973,17 +12010,40 @@ a.jstree-anchor.permissions-widget {
     margin: 0 20px 10px 0px;
     border: solid 1px #808080;
 }
+
+.manifest-metadata-title {
+    margin-top: 8px;
+}
+
+.manifest-metadata-value {
+    line-height: 1.2;
+}
+
 .manifest-details {
     white-space: normal;
+    width: 250px;
+    border-right: 1px solid #ddd;
+    background: #e9e9e9;
+    margin-top: -15px;
+    margin-left: -20px;
+    padding: 0px 10px;
+    height: 100%;
+    position: fixed;
+    overflow-y: scroll;
 }
+.manifest-details h3 {
+    width: 225px;
+}
+
 .manifest-details h4 {
-    padding-left: 10px;
+    padding-left: 0px;
 }
 .manifest-details-list, .manifest-logo {
-    padding-left: 20px;
+    padding-left: 0px;
+    margin-top: -5px;
 }
 .manifest-logo {
-    max-width: 100%;
+    max-width: 150px;
 }
 .manifest-editor-label {
     font-size: 1.2em;
@@ -12045,10 +12105,25 @@ a.jstree-anchor.permissions-widget {
 }
 .manifest-editor {
     padding-bottom: 10px;
+    width: 100%; 
+    padding-left: 20px;
 }
+
+.gallery-expanded .manifest-editor {
+    margin-left: -10px;
+}
+
+.manifest-details+.manifest-editor {
+    margin-left: 225px;
+}
+
 .manifest-editor-loading, .manifest-editor-error {
     display: inline-block;
     padding-left: 10px;
+}
+
+.manifest-editor-input {
+    margin-bottom: 10px;
 }
 
 .manifest-editor-error {
