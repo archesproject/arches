@@ -72,15 +72,26 @@ define([
                 });
             };
 
+            this.removePermission = function(permissionlist, codename) {
+                var permissionIndexLookup = function(p){return p.codename === codename;};
+                var permissionIndex = permissionlist.findIndex(permissionIndexLookup);
+                permissionlist.splice(permissionIndex, 1);
+            };
+
             this.updateState = function(includePermission, identityId, type, permission) {
                 self._currentPermissions['identities'].forEach(function(id) {
                     if (id.type === type && id.id === identityId) {
                         if (includePermission) {
+                            var currentIdentity = self.filteredPermissions().find(function(identity){return identity.type === type && identity.id === identityId;});
+                            if (permission.codename === 'no_access_to_resourceinstance') {
+                                id.default_permissions = [];
+                                currentIdentity.availablePermissions.forEach(function(p){if (p.codename !== 'no_access_to_resourceinstance'){p.selected(false);}});
+                            } else {
+                                currentIdentity.availablePermissions.forEach(function(p){if (p.codename === 'no_access_to_resourceinstance'){p.selected(false);}});
+                            }
                             id.default_permissions.push(permission);
                         } else {
-                            var permissionIndexLookup = function(p){return p.codename === permission.codename};
-                            var permissionIndex = id.default_permissions.findIndex(permissionIndexLookup);
-                            id.default_permissions.splice(permissionIndex, 1);
+                            self.removePermission(id.default_permissions, permission.codename);
                         }
                     }
                 }, self);
