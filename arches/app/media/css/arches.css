@@ -73,7 +73,8 @@ input:focus,
 textarea:focus,
 .form-control:focus,
 i.report-expander:focus,
-.select-icon:focus {
+.select-icon:focus,
+.chosen-container-active {
 	outline: #006600 solid 3px !important;
 }
 
