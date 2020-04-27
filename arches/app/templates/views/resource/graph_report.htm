@@ -1,0 +1,120 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+
+{% extends "base-manager.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block loading_mask %}
+{% endblock loading_mask %}
+
+{% block main_content %}
+
+<style>
+
+.mermaid {
+  margin-left: 10px;
+  margin-right: 10px;
+  display: none;
+  background: white;
+  border: 1px dashed black;
+  margin-bottom: 10px;
+  padding: 3px;
+  text-align: center;
+  border-radius: 6px;
+}
+
+.mermaid a div {
+    color: blue;
+}
+
+svg {
+  background: white;
+}
+
+span.edgeLabel {
+  padding-right: 5px;
+
+}
+
+.label {
+    line-height: 1.5;
+    font-size: 100%;
+}
+
+</style>
+
+<div class="mermaid" id="mermaid_{{ mmid }}">
+{{ data }}
+</div>
+<div id="mermaid_{{ mmid }}_svg"></div>
+
+<div>
+See: 
+<ul>
+    <li><a href="/resources/{{ mmid }}">JSON-LD</a></li>
+    <li><a href="/report/{{ mmid }}">Report</a></li>
+    <li><a href="/resource/{{ mmid }}">Edit Form</a></li>
+</ul>
+</div>
+
+{% endblock main_content %}
+
+{% block javascript %}
+
+<script src="{{ STATIC_URL }}js/jquery-3.2.1.min.js"></script>
+<script src="{{ STATIC_URL }}js/mermaid.min.js"></script>
+
+<script>
+    // Latest mermaid adds explicit width on the SVG that causes overflow
+    // This also gives us control for now FOUC by hiding the mermaid code
+    // in css, and then showing only after rendering
+    mermaid.initialize({
+      startOnLoad: false,    
+      theme: 'neutral',
+      logLevel: 3,
+      flowchart: { curve: 'basis' }
+    });
+    $(function(){
+        var render_mm = function(i, element) {
+            var insertSvg = function(svgCode, bindFn) {
+                element.innerHTML = svgCode;
+                // trash height and width, as they're absolute.
+                // This lets the page scale the image into the available space
+                // Setting maxWidth means it won't upscale
+                var w = $("#" + element.id + " svg").attr('width')
+                $("#" + element.id + " svg").removeAttr('width').removeAttr('height').css("maxWidth", w + "px")
+                var vb = $("#" + element.id +" svg").attr("viewBox");
+                // Add more height. Worst case is some extra whitespace
+                var bits = vb.split(' ');
+                var nh = parseInt(bits[3]) + 60;
+                var nval = bits[0] + " " + bits[1] + " " + bits[2] + " " + nh;
+                $("#" + element.id +" svg").attr("viewBox", nval);
+
+                $(element).show()
+            }
+            var txt = element.innerHTML.replace(/&gt;/g, ">")
+            var graph = mermaid.mermaidAPI.render(element.id + "_svg", txt, insertSvg)
+        };
+        $('.mermaid').each(render_mm)
+    })
+
+</script> 
+{% endblock javascript %}
+
+
