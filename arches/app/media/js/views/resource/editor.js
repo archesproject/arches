@@ -286,7 +286,7 @@ define([
     };
 
     vm.showInstancePermissionsManager = function(){
-        if (vm.userIsCreator) {
+        if (vm.userIsCreator === true || vm.userIsCreator === null) {
             vm.selection('permissions-manager');
         }
     };

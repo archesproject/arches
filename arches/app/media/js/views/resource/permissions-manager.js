@@ -3,17 +3,21 @@ define([
     'knockout',
     'knockout-mapping',
     'arches',
+    'viewmodels/alert',
     'bindings/select2-query'
-], function($, ko, koMapping, arches) {
+], function($, ko, koMapping, arches, AlertViewModel) {
     return ko.components.register('permissions-manager', {
         viewModel: function(params) {
             var self = this;
             this.instancePermissions = ko.observable();
             this.resourceId = params.resourceId();
+            this.alert = params.alert;
             this.openEditor = ko.observable(undefined);
             this.identities = ko.observableArray();
             this.filter = ko.observable('');
             this.dirty = ko.observable(false);
+            this.alertTitle = params.alertTitle;
+            this.alertMessage = params.alertMessage;
 
             this.getInstancePermissions = function(){
                 $.ajax({
@@ -68,15 +72,26 @@ define([
                 });
             };
 
+            this.removePermission = function(permissionlist, codename) {
+                var permissionIndexLookup = function(p){return p.codename === codename;};
+                var permissionIndex = permissionlist.findIndex(permissionIndexLookup);
+                permissionlist.splice(permissionIndex, 1);
+            };
+
             this.updateState = function(includePermission, identityId, type, permission) {
                 self._currentPermissions['identities'].forEach(function(id) {
                     if (id.type === type && id.id === identityId) {
                         if (includePermission) {
+                            var currentIdentity = self.filteredPermissions().find(function(identity){return identity.type === type && identity.id === identityId;});
+                            if (permission.codename === 'no_access_to_resourceinstance') {
+                                id.default_permissions = [];
+                                currentIdentity.availablePermissions.forEach(function(p){if (p.codename !== 'no_access_to_resourceinstance'){p.selected(false);}});
+                            } else {
+                                currentIdentity.availablePermissions.forEach(function(p){if (p.codename === 'no_access_to_resourceinstance'){p.selected(false);}});
+                            }
                             id.default_permissions.push(permission);
                         } else {
-                            var permissionIndexLookup = function(p){return p.codename === permission.codename};
-                            var permissionIndex = id.default_permissions.findIndex(permissionIndexLookup);
-                            id.default_permissions.splice(permissionIndex, 1);
+                            self.removePermission(id.default_permissions, permission.codename);
                         }
                     }
                 }, self);
@@ -129,13 +144,29 @@ define([
             this.makeInstancePrivate = function(){
                 $.ajax({
                     type: 'POST',
-                    url: arches.urls.restrict_resource_access,
-                    data: {"instanceid": params.resourceId}
+                    url: arches.urls.resource_permission_data,
+                    data: {"instanceid": params.resourceId, "action": "restrict"}
                 }).done(function(data){
                     self.openEditor(data['limitedaccess']);
                     var parsed = self.initPermissions(data);
                     self.instancePermissions(parsed);
                 });
+            };
+
+            this.makeInstancePublic = function(){
+                this.alert(new AlertViewModel('ep-alert-red', this.alertTitle, this.alertMessage, function() {
+                    return;
+                }, function(){
+                    $.ajax({
+                        type: 'POST',
+                        url: arches.urls.resource_permission_data,
+                        data: {"instanceid": params.resourceId, "action": "open"}
+                    }).done(function(data){
+                        var parsed = self.initPermissions(data);
+                        self.instancePermissions(parsed);
+                        self.openEditor(data['limitedaccess']);
+                    });
+                }));
             };
 
             this.getInstancePermissions();
