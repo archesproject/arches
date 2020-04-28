@@ -35,7 +35,12 @@ from arches.app.utils.decorators import can_read_resource_instance, can_edit_res
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
-from arches.app.utils.permission_backend import user_can_read_resources, user_can_edit_resources, user_can_read_concepts, user_is_resource_reviewer
+from arches.app.utils.permission_backend import (
+    user_can_read_resources,
+    user_can_edit_resources,
+    user_can_read_concepts,
+    user_is_resource_reviewer,
+)
 from arches.app.utils.decorators import group_required
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
@@ -676,7 +681,9 @@ class Resources(APIBase):
             return JSONResponse({"error": "resource data could not be saved: %s" % e}, status=500, reason=e)
 
     def delete(self, request, resourceid, slug=None, graphid=None):
-        if user_can_edit_resources(user=request.user, resourceid=resourceid) and user_can_delete_resources(user=request.user, resourceid=resourceid):
+        if user_can_edit_resources(user=request.user, resourceid=resourceid) and user_can_delete_resources(
+            user=request.user, resourceid=resourceid
+        ):
             try:
                 resource_instance = Resource.objects.get(pk=resourceid)
                 resource_instance.delete()

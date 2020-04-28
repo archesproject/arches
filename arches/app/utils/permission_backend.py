@@ -123,7 +123,13 @@ def get_resources_by_perm(user, perms, any_perm=True):
     A = set(
         get_objects_for_user(
             user,
-            ["models.view_resourceinstance", "models.add_resourceinstance", "models.delete_resourceinstance", "models.change_resourceinstance", "models.no_access_to_resourceinstance"],
+            [
+                "models.view_resourceinstance",
+                "models.add_resourceinstance",
+                "models.delete_resourceinstance",
+                "models.change_resourceinstance",
+                "models.no_access_to_resourceinstance",
+            ],
             accept_global_perms=False,
             any_perm=True,
         )
