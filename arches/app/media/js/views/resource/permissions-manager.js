@@ -36,9 +36,9 @@ define([
                         "selectedIdentities": [],
                         "selectedInstances": [{"resourceinstanceid": ko.unwrap(this.resourceId)}],
                         "instanceid": ko.unwrap(self.resourceId)
-                    }
+                    };
                     self._currentPermissions.identities.forEach(function(identity){
-                        var selectedPermissions = identity.default_permissions.map(function(perm){return {"codename": perm.codename} });
+                        var selectedPermissions = identity.default_permissions.map(function(perm){return {"codename": perm.codename};});
                         payload.selectedIdentities.push({"type": identity.type, "id": identity.id, "selectedPermissions": selectedPermissions});
                     });
                     $.ajax({
@@ -61,7 +61,7 @@ define([
                         if (Number(identity.id) === Number(self.creator) && identity.type == 'user') {
                             //pass
                         } else {
-                            var defaultperms = identity.default_permissions.map(function(perm){return perm.codename});
+                            var defaultperms = identity.default_permissions.map(function(perm){return perm.codename;});
                             self.instancePermissions()['identities'].forEach(function(activeidentity){
                                 if (activeidentity.id === identity.id && activeidentity.type === identity.type) {
                                     activeidentity.availablePermissions.forEach(function(availablePermission){
@@ -108,7 +108,7 @@ define([
                 self._startPermissions = JSON.stringify(data);
                 self._currentPermissions = JSON.parse(self._startPermissions);
                 self._permissionLookup = {};
-                self.creator = data['creatorid']
+                self.creator = data['creatorid'];
                 data.permissions.forEach(function(perm){ 
                     self._permissionLookup[perm.codename] = perm;
                 });
