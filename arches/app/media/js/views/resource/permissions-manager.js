@@ -89,8 +89,8 @@ define([
                 var clean = start.identities.every(function(k, i){
                     var startPerms = k.default_permissions;
                     var currentPerms = current.identities[i].default_permissions;
-                    var startPattern = JSON.stringify(startPerms.map(function(p){return p.id}).sort());
-                    var endPattern = JSON.stringify(currentPerms.map(function(p){return p.id}).sort());
+                    var startPattern = JSON.stringify(startPerms.map(function(p){return p.id;}).sort());
+                    var endPattern = JSON.stringify(currentPerms.map(function(p){return p.id;}).sort());
                     return startPattern === endPattern;
                 });
                 var dirty = !clean;
