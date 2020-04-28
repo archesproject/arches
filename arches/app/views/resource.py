@@ -103,7 +103,10 @@ def get_instance_creator(resource_instance, user):
 
     except Exception:
         logger.error("Cannot find instance creator when retrieving instance permissions")
-        return None, None
+        if user.is_superuser:
+            return user.id, user.is_superuser
+        else:
+            return None, False
 
 
 class ResourceEditorView(MapBaseManagerView):
