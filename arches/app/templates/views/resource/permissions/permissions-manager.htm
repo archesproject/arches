@@ -96,9 +96,9 @@
             </div>
             </div>
             <div class="permissions-buttons mar-btm">
-                <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt" data-bind="click: function(){revertPermissions()}, css: {'disabled': !dirty()}">{% trans 'Revert Permissions' %}
+                <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt" data-bind="click: function(){revertPermissions()}, css: {'disabled': !dirty()}">{% trans 'Cancel' %}
                 </button>
-                <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check" data-bind="click: function(){updatePermissions()}, css: {'disabled': !dirty()}">{% trans 'Apply Permissions' %}</button>
+                <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check" data-bind="click: function(){updatePermissions()}, css: {'disabled': !dirty()}">{% trans 'Apply' %}</button>
             </div>
             <div class="remove-permissions-btn mar-btm" style="align-self: end">
             <button id="cc-save-btn" class="btn btn-shim btn-warning btn-labeled btn-lg fa fa-unlock" data-bind="click: function(){makeInstancePublic()}">{% trans 'Allow Normal Access' %}</button>
