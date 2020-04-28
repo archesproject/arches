@@ -30,6 +30,8 @@ from django.urls import reverse
 from django.test.client import RequestFactory, Client
 from arches.app.views.api import APIBase
 from arches.app.models.graph import Graph
+from arches.app.models.resource import Resource
+from arches.app.models.tile import Tile
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
@@ -45,6 +47,7 @@ class APITests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
+        geojson_nodeid = "3ebc6785-fa61-11e6-8c85-14109fd34195"
         cls.loadOntology()
         with open(os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "rU") as f:
             json = JSONDeserializer().deserialize(f)
@@ -60,6 +63,16 @@ class APITests(ArchesTestCase):
             json = JSONDeserializer().deserialize(f)
             cls.phase_type_assignment_graph = Graph(json["graph"][0])
             cls.phase_type_assignment_graph.save()
+
+        with open(os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "rU") as f:
+            json = JSONDeserializer().deserialize(f)
+            cls.resource_graph = Graph(json["graph"][0])
+            cls.resource_graph.save()
+            # add resource instance
+            cls.resource_graph_instance = Resource(graph_id=cls.resource_graph)
+            tile = Tile(data={geojson_nodeid: ["Test"]}, nodegroup_id=geojson_nodeid)
+            cls.resource_graph_instance.tiles.append(tile)
+            cls.resource_graph_instance.save()
 
     def test_api_base_view(self):
         """
