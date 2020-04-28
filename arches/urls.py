@@ -119,7 +119,6 @@ urlpatterns = [
     url(r"^graph/reorder_nodes$", GraphDataView.as_view(action="reorder_nodes"), name="reorder_nodes"),
     url(r"^graph/permissions$", PermissionDataView.as_view(), name="permission_data"),
     url(r"^resource/permissions$", ResourcePermissionDataView.as_view(), name="resource_permission_data"),
-    url(r"^resource/permissions/restrict$", ResourcePermissionDataView.as_view(action="restrict"), name="restrict_resource_access"),
     url(
         r"^graph/permissions/permission_manager_data$",
         PermissionDataView.as_view(action="get_permission_manager_data"),
