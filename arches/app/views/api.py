@@ -35,10 +35,7 @@ from arches.app.utils.decorators import can_read_resource_instance, can_edit_res
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
-from arches.app.utils.permission_backend import user_can_read_resources
-from arches.app.utils.permission_backend import user_can_edit_resources
-from arches.app.utils.permission_backend import user_can_read_concepts
-from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.app.utils.permission_backend import user_can_read_resources, user_can_edit_resources, user_can_read_concepts, user_is_resource_reviewer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
@@ -280,10 +277,15 @@ class GeoJSON(APIBase):
                 property_node_map[str(node.nodeid)]["name"] = node.fieldname
         tiles = models.TileModel.objects.filter(nodegroup__in=[node.nodegroup for node in nodes])
         last_page = None
+        resourceids = []
         if resourceid is not None:
-            tiles = tiles.filter(resourceinstance_id__in=resourceid.split(","))
+            resourceids = resourceid.split(",")
+            resourceids = [r for r in resourceids if user_can_read_resources(request.user, r)]
+            tiles = tiles.filter(resourceinstance_id__in=resourceids)
         if tileid is not None:
-            tiles = tiles.filter(tileid=tileid)
+            tile = models.TileModel.objects.get(tileid=tileid)
+            if user_can_read_resources(request.user, tile.resourceinstance.resourceinstanceid):
+                tiles = tiles.filter(tileid=tileid)
         tiles = tiles.order_by("sortorder")
         if limit is not None:
             start = (page - 1) * limit
@@ -292,47 +294,48 @@ class GeoJSON(APIBase):
             last_page = tiles.count() < end
             tiles = tiles[start:end]
         for tile in tiles:
-            data = tile.data
-            for node in nodes:
-                try:
-                    for feature_index, feature in enumerate(data[str(node.pk)]["features"]):
-                        if geometry_type is None or geometry_type == feature["geometry"]["type"]:
-                            if len(nodegroups) > 0:
-                                for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id).order_by("sortorder"):
-                                    for key in pt.data:
-                                        field_name = key if use_uuid_names else property_node_map[key]["name"]
-                                        if pt.data[key] is not None:
-                                            if use_display_values:
-                                                property_node = property_node_map[key]["node"]
-                                                datatype = datatype_factory.get_instance(property_node.datatype)
-                                                value = datatype.get_display_value(pt, property_node)
-                                            else:
-                                                value = pt.data[key]
-                                            try:
-                                                feature["properties"][field_name].append(value)
-                                            except KeyError:
-                                                feature["properties"][field_name] = value
-                                            except AttributeError:
-                                                feature["properties"][field_name] = [feature["properties"][field_name], value]
-                            if include_primary_name:
-                                feature["properties"]["primary_name"] = self.get_name(tile.resourceinstance)
-                            feature["properties"]["resourceinstanceid"] = tile.resourceinstance_id
-                            feature["properties"]["tileid"] = tile.pk
-                            if nodeid is None:
-                                feature["properties"]["nodeid"] = node.pk
-                            if include_geojson_link:
-                                feature["properties"]["geojson"] = "%s?tileid=%s&nodeid=%s" % (reverse("geojson"), tile.pk, node.pk)
-                            feature["id"] = i
-                            if precision is not None:
-                                coordinates = set_precision(feature["geometry"]["coordinates"], precision)
-                                feature["geometry"]["coordinates"] = coordinates
-                            i += 1
-                            features.append(feature)
-                except KeyError:
-                    pass
-                except TypeError as e:
-                    print(e)
-                    print(tile.data)
+            if user_can_read_resources(request.user, tile.resourceinstance.resourceinstanceid):
+                data = tile.data
+                for node in nodes:
+                    try:
+                        for feature_index, feature in enumerate(data[str(node.pk)]["features"]):
+                            if geometry_type is None or geometry_type == feature["geometry"]["type"]:
+                                if len(nodegroups) > 0:
+                                    for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id).order_by("sortorder"):
+                                        for key in pt.data:
+                                            field_name = key if use_uuid_names else property_node_map[key]["name"]
+                                            if pt.data[key] is not None:
+                                                if use_display_values:
+                                                    property_node = property_node_map[key]["node"]
+                                                    datatype = datatype_factory.get_instance(property_node.datatype)
+                                                    value = datatype.get_display_value(pt, property_node)
+                                                else:
+                                                    value = pt.data[key]
+                                                try:
+                                                    feature["properties"][field_name].append(value)
+                                                except KeyError:
+                                                    feature["properties"][field_name] = value
+                                                except AttributeError:
+                                                    feature["properties"][field_name] = [feature["properties"][field_name], value]
+                                if include_primary_name:
+                                    feature["properties"]["primary_name"] = self.get_name(tile.resourceinstance)
+                                feature["properties"]["resourceinstanceid"] = tile.resourceinstance_id
+                                feature["properties"]["tileid"] = tile.pk
+                                if nodeid is None:
+                                    feature["properties"]["nodeid"] = node.pk
+                                if include_geojson_link:
+                                    feature["properties"]["geojson"] = "%s?tileid=%s&nodeid=%s" % (reverse("geojson"), tile.pk, node.pk)
+                                feature["id"] = i
+                                if precision is not None:
+                                    coordinates = set_precision(feature["geometry"]["coordinates"], precision)
+                                    feature["geometry"]["coordinates"] = coordinates
+                                i += 1
+                                features.append(feature)
+                    except KeyError:
+                        pass
+                    except TypeError as e:
+                        print(e)
+                        print(tile.data)
         feature_collection = {"type": "FeatureCollection", "features": features}
         if last_page is not None:
             feature_collection["_page"] = page
@@ -601,7 +604,7 @@ class Resources(APIBase):
         except Exception:
             indent = None
 
-        if not user_can_edit_resources(user=request.user):
+        if not user_can_edit_resources(user=request.user, resourceid=resourceid):
             return JSONResponse(status=403)
         else:
             with transaction.atomic():
@@ -643,7 +646,7 @@ class Resources(APIBase):
             indent = None
 
         try:
-            if user_can_edit_resources(user=request.user):
+            if user_can_edit_resources(user=request.user, resourceid=resourceid):
                 data = JSONDeserializer().deserialize(request.body)
                 reader = JsonLdReader()
                 if slug is not None:
@@ -673,7 +676,7 @@ class Resources(APIBase):
             return JSONResponse({"error": "resource data could not be saved: %s" % e}, status=500, reason=e)
 
     def delete(self, request, resourceid, slug=None, graphid=None):
-        if user_can_edit_resources(user=request.user):
+        if user_can_edit_resources(user=request.user, resourceid=resourceid) and user_can_delete_resources(user=request.user, resourceid=resourceid):
             try:
                 resource_instance = Resource.objects.get(pk=resourceid)
                 resource_instance.delete()
