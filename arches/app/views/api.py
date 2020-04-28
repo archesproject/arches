@@ -924,9 +924,17 @@ class Tile(APIBase):
         tileid = request.POST.get("tileid")
         nodeid = request.POST.get("nodeid")
         data = request.POST.get("data")
-        
-        geojson = GeoUtils().arcgisjson_to_geojson(data)
-        tile_model.update_node_value(nodeid, geojson, tileid)
+
+        try:
+            datatype = models.Node.objects.get(nodeid=nodeid).datatype
+        except Exception as e:
+            return JSONResponse(e)
+
+        if datatype == 'geojson-feature-collection':
+            # if data['format'] == 'esri-geom':
+            data = GeoUtils().arcgisjson_to_geojson(data)
+
+        tile_model.update_node_value(nodeid, data, tileid)
 
         response = JSONResponse({"results": "success!"})
         return response
