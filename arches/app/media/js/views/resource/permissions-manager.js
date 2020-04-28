@@ -31,6 +31,7 @@ define([
             };
 
             this.updatePermissions = function(){
+                if (ko.unwrap(self.dirty)) {
                 var payload = {
                     "selectedIdentities": [],
                     "selectedInstances": [{"resourceinstanceid": ko.unwrap(this.resourceId)}],
@@ -49,10 +50,13 @@ define([
                     self._currentPermissions = JSON.parse(self._startPermissions);
                     self.dirty(koMapping.toJSON(self._currentPermissions) !== self._startPermissions);
                 });
+                }
             };
 
             this.revertPermissions = function(){
-                var resetPermissions = JSON.parse(self._startPermissions);
+                var resetPermissions;
+                if (ko.unwrap(self.dirty)) {
+                    resetPermissions = JSON.parse(self._startPermissions);
                 resetPermissions.identities.forEach(function(identity){
                     if (Number(identity.id) === Number(self.creator) && identity.type == 'user') {
                         //pass
@@ -70,6 +74,7 @@ define([
                         });
                     }
                 });
+                }
             };
 
             this.removePermission = function(permissionlist, codename) {
