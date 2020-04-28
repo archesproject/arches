@@ -498,7 +498,7 @@ class Resource(models.ResourceInstance):
                         values.append(parse_node_value(value))
 
         return values
-    
+
     def remove_resource_instance_permissions(self):
         groups = list(Group.objects.all())
         users = [user for user in User.objects.all() if user.is_superuser is False]
@@ -530,7 +530,6 @@ def is_uuid(value_to_test):
         return True
     except Exception:
         return False
-
 
 
 class ModelInactiveError(Exception):
