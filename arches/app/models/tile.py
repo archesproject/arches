@@ -165,10 +165,12 @@ class Tile(models.TileModel):
                 "reviewtimestamp": None,
             }
 
+            # if this tile has been previously saved and already has provisional edits on it then
             if existing_model is not None and existing_model.provisionaledits is not None:
                 provisionaledits = existing_model.provisionaledits
                 provisionaledits[str(user.id)] = provisionaledit
             else:
+                # this is a new tile so there is no provisional edits object on the tile
                 provisionaledits = {str(user.id): provisionaledit}
             self.provisionaledits = provisionaledits
 
@@ -308,15 +310,12 @@ class Tile(models.TileModel):
         user = kwargs.pop("user", None)
         log = kwargs.pop("log", True)
         provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)
-        self.__preSave(request)
         missing_nodes = []
         creating_new_tile = True
         user_is_reviewer = False
         newprovisionalvalue = None
         oldprovisionalvalue = None
-        self.check_for_missing_nodes(request)
-        self.check_for_constraint_violation(request)
-
+        
         try:
             if user is None and request is not None:
                 user = request.user
@@ -324,18 +323,32 @@ class Tile(models.TileModel):
         except AttributeError:  # no user - probably importing data
             user = None
 
+
+        if user is not None:
+            self.validate([])
+
+
+        self.__preSave(request)
+        self.check_for_missing_nodes(request)
+        self.check_for_constraint_violation(request)
+
+
         creating_new_tile = models.TileModel.objects.filter(pk=self.tileid).exists() is False
         edit_type = "tile create" if (creating_new_tile is True) else "tile edit"
 
         if creating_new_tile is False:
             existing_model = models.TileModel.objects.get(pk=self.tileid)
 
+        # this section moves the data over from self.data to self.provisionaledits if certain users permissions are in force
+        # then self.data is restored from the previously saved tile data
         if user is not None:
             if user_is_reviewer is False and creating_new_tile is False:
                 self.apply_provisional_edit(user, self.data, action="update", existing_model=existing_model)
                 newprovisionalvalue = self.data
+                
                 oldprovisional = self.get_provisional_edit(existing_model, user)
                 if oldprovisional is not None:
+                    # the user has previously edited this tile
                     oldprovisionalvalue = oldprovisional["value"]
 
                 self.data = existing_model.data
@@ -349,9 +362,6 @@ class Tile(models.TileModel):
                     self.data = {}
                     if provisional_edit_log_details is None:
                         provisional_edit_log_details = {"user": user, "action": "create tile", "provisional_editor": user}
-
-        if user is not None:
-            self.validate([])
 
         super(Tile, self).save(*args, **kwargs)
         # We have to save the edit log record after calling save so that the

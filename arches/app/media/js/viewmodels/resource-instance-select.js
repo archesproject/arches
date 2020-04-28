@@ -10,8 +10,11 @@ define([
         var self = this;
         params.configKeys = ['placeholder'];
         this.state = params.state;
-        this.multiple = params.multiple || false;
-        this.value = params.value || undefined;
+        //if(this.state !== 'display_value'){
+            this.multiple = params.multiple || false;
+            this.value = params.value || undefined;
+            this.graphIsSemantic = params.graph ? !!params.graph.ontologyclass : false;
+        //}
         this.graphids = params.node ? ko.unwrap(params.node.config.graphid) : [params.graphid];
         this.graphids = this.graphids || [];
         this.graphNames = {};
@@ -22,7 +25,7 @@ define([
         });
         this.filter = ko.observable('');
         this.relationshipInFilter = function(relationship) {
-            if (self.filter().toLowerCase() === '' || relationship.resource.name.toLowerCase().includes(self.filter().toLowerCase())){
+            if (self.filter().toLowerCase() === '' || relationship.resourceName.toLowerCase().includes(self.filter().toLowerCase())){
                 return true;
             }
             return false;
@@ -123,6 +126,40 @@ define([
         }, this);
 
 
+        var makeObject = function(id, name, ontologyclass){
+            var ret = {
+                "resourceId": id,
+                "ontologyProperty": ko.observable(""),
+                "inverseOntologyProperty": ko.observable("")
+            };
+            Object.defineProperty(ret, 'resourceName', {
+                value: name
+            });
+            Object.defineProperty(ret, 'ontologyClass', {
+                value: ontologyclass
+            });
+            Object.defineProperty(ret, 'editing', {
+                value: ko.observable(false),
+                enumerable: false,
+                writable: true
+            });
+            return ret;
+        };
+
+        var getResourceInfo = function() {
+            return window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
+                .then(function(response){
+                    if(response.ok === false) {
+                        return response.json();
+                    }
+                    throw("error");
+                })
+                .then(function(json) {
+                    return json;
+                });
+        };
+
+
         var url = ko.observable(arches.urls.search_results);
         this.url = url;
         var resourceToAdd = ko.observable("");
@@ -136,16 +173,21 @@ define([
             onSelect: function(item) {
                 if (self.state !== 'search') {
                     if (item._source) {
-                        var ret = {
-                            "resource": {
-                                "id": item._id,
-                                "name": item._source.displayname
-                            },
-                            "ontologyproperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"),
-                            "revProperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10i_contains"),
-                            "ontologyclass": item._source.root_ontology_class,
-                            "editing": ko.observable(false)
-                        };
+                        var ret = makeObject(item._id, item._source.displayname, item._source.root_ontology_class);
+                        // var ret = {
+                        //     "resource": {
+                        //         "id": item._id,
+                        //         "name": item._source.displayname
+                        //     },
+                        //     "ontologyproperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"),
+                        //     "revProperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10i_contains"),
+                        //     "ontologyclass": item._source.root_ontology_class
+                        // };
+                        // Object.defineProperty(ret, 'editing', {
+                        //     value: ko.observable(false),
+                        //     enumerable: false,
+                        //     writable: true
+                        // });
                         if (self.multiple) {
                             ret = [ret];
                             if (self.value() !== null) {
@@ -174,16 +216,17 @@ define([
                                 })
                                 .then(function(json) {
                                     var item = json.results.hits.hits[0];
-                                    var ret = {
-                                        "resource": {
-                                            "id": params.resourceid(),
-                                            "name": item._source.displayname
-                                        },
-                                        "ontologyproperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"),
-                                        "revProperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10i_contains"),
-                                        "ontologyclass": item._source.root_ontology_class,
-                                        "editing": ko.observable(false)
-                                    };
+                                    var ret = makeObject(params.resourceid(), item._source.displayname, item._source.root_ontology_class);
+                                    // var ret = {
+                                    //     "resource": {
+                                    //         "id": params.resourceid(),
+                                    //         "name": item._source.displayname
+                                    //     },
+                                    //     "ontologyproperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"),
+                                    //     "revProperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10i_contains"),
+                                    //     "ontologyclass": item._source.root_ontology_class,
+                                    //     "editing": ko.observable(false)
+                                    // };
                                     self.value(ret);
                                 })
                                 .finally(function(){
@@ -213,18 +256,17 @@ define([
                         return {};
                     } else {
                         url(arches.urls.search_results);
-                        var graphid = params.node ? ko.unwrap(params.node.config.graphid) : undefined;
-                        if(!!params.graphid) { graphid = [ko.unwrap(params.graphid)]; }
                         var data = { 'paging-filter': page };
-                        if (graphid && graphid.length > 0) {
-                            data['resource-type-filter'] = JSON.stringify(
-                                graphid.map(function(id) {
-                                    return {
-                                        "graphid": id,
-                                        "inverted": false
-                                    };
-                                })
-                            );
+                        if (!!params.node) {
+                            var graphids = ko.unwrap(params.node.config.graphs()).map(function(graph) {
+                                return {
+                                    "graphid": graph.graphid,
+                                    "inverted": false
+                                };
+                            });
+                            if(graphids.length > 0) {
+                                data['resource-type-filter'] = JSON.stringify(graphids);
+                            }
                         }
                         if (term) {
                             data['term-filter'] = JSON.stringify([{
@@ -280,11 +322,20 @@ define([
         this.deleteRelationship = function(valueToDelete) {
             var newValues = [];
             self.value().forEach(function(val) {
-                if (val.resource.id !== valueToDelete.resource.id) {
+                if (val.resourceId !== valueToDelete.resourceId) {
                     newValues.push(val);
                 }
             });
             self.value(newValues);
+        };
+
+        this.formatLabel = function(name, ontologyProperty, inverseOntologyProperty){
+            if (self.graphIsSemantic) {
+                return name + ' (' + self.makeFriendly(ontologyProperty) + '/' + self.makeFriendly(inverseOntologyProperty) + ')';
+            }
+            else {
+                return name;
+            }
         };
 
         this.makeFriendly = function(item) {

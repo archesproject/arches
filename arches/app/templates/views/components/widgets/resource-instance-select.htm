@@ -48,29 +48,29 @@
                 <tr data-bind="if: self.relationshipInFilter($data), click: function() { editing(true); }, clickBubble: false" style="cursor: pointer;">
                     <td>
                         <div class="form-horizontal" data-bind="if: !editing()">
-                            <span data-bind="text: $data.resource.name + ' (' + self.makeFriendly($data.ontologyproperty()) + '/' + self.makeFriendly($data.revProperty()) + ')'"></span>
+                            <span data-bind="text: self.formatLabel($data.resourceName, $data.ontologyProperty(), $data.inverseOntologyProperty())"></span>
                         </div>
                         <div data-bind="if: editing()">
                             <div class="row">
-                                <label class="col-sm-12" style="font-weight: bold;">{% trans "Relationship to" %} <span data-bind="text: $data.resource.name"></span></label>
+                                <label class="col-sm-12" style="font-weight: bold;">{% trans "Relationship to" %} <span data-bind="text: $data.resourceName"></span></label>
                             </div>
                             <div class="row">
                                 <span class="col-sm-4" style="padding-top: 8px; text-align: right;" data-bind="text: self.node.name() + ' (' + self.makeFriendly(self.node.ontologyclass()) + ')'"></span>
                                 <span class="col-sm-4"><input style="width:30%; display:inline-block;" data-bind="
                                     select2Query: {
-                                        select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyproperty, self.node.ontologyclass(), $data.ontologyclass)
+                                        select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.node.ontologyclass(), $data.ontologyClass)
                                     }
                                 "></span>
-                                <span class="col-sm-4" style="padding-top: 8px;" data-bind="text: $data.resource.name + ' (' + self.makeFriendly($data.ontologyclass) + ')'"></span>
+                                <span class="col-sm-4" style="padding-top: 8px;" data-bind="text: $data.resourceName + ' (' + self.makeFriendly($data.ontologyClass) + ')'"></span>
                             </div>
                             <div class="row" style="margin-top: 20px;">
-                                <label class="col-sm-12" style="font-weight: bold;">{% trans "Inverse Relationship to" %} <span data-bind="text: $data.resource.name"></span></label>
+                                <label class="col-sm-12" style="font-weight: bold;">{% trans "Inverse Relationship to" %} <span data-bind="text: $data.resourceName"></span></label>
                             </div>
                             <div class="row">
-                                <span class="col-sm-4" style="padding-top: 8px; text-align: right;" data-bind="text: $data.resource.name + ' (' + self.makeFriendly($data.ontologyclass) + ')'"></span>
+                                <span class="col-sm-4" style="padding-top: 8px; text-align: right;" data-bind="text: $data.resourceName + ' (' + self.makeFriendly($data.ontologyClass) + ')'"></span>
                                 <span class="col-sm-4"><input style="width:30%; display:inline-block;" data-bind="
                                     select2Query: {
-                                        select2Config: self.getSelect2ConfigForOntologyProperties($data.revProperty, $data.ontologyclass, self.node.ontologyclass())
+                                        select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass, self.node.ontologyclass())
                                     }
                                 "></span>
                                 <span class="col-sm-4" style="padding-top: 8px;" data-bind="text: self.node.name() + ' (' + self.makeFriendly(self.node.ontologyclass()) + ')'"></span>

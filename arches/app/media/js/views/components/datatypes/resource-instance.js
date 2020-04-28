@@ -46,15 +46,12 @@ define([
                     var model = _.find(self.resourceModels, function(model){
                         return graph.graphid === model.graphid;
                     });
+                    graph.ontologyProperty = ko.observable(ko.unwrap(graph.ontologyProperty));
+                    graph.inverseOntologyProperty = ko.observable(ko.unwrap(graph.inverseOntologyProperty));
                     // use this so that graph.name won't get saved back to the node config
                     Object.defineProperty(graph, 'name', {
                         value: model.name
                     });
-                    graph.ontologyProperty = ko.observable(ko.unwrap(graph.ontologyProperty));
-                    graph.inverseOntologyProperty = ko.observable(ko.unwrap(graph.inverseOntologyProperty));
-                    graph.editConfig = function(val) {
-                        this.editing(val);
-                    };
                     // use this so that graph.editing won't get saved back to the node config
                     Object.defineProperty(graph, 'editing', {
                         value: ko.observable(false),
@@ -74,7 +71,7 @@ define([
                                 return node.istopnode;
                             });
                             // use this so that graph.ontologyclass won't get saved back to the node config
-                            Object.defineProperty(graph, 'ontologyclass', {
+                            Object.defineProperty(graph, 'ontologyClass', {
                                 value: node.ontologyclass
                             });
                         });
