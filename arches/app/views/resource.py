@@ -44,7 +44,7 @@ from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_delete_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.permission_backend import user_is_resource_reviewer, remove_resource_instance_permissions, add_permission_to_all
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
@@ -292,11 +292,12 @@ class ResourcePermissionDataView(View):
     def post(self, request):
         resourceid = request.POST.get("instanceid", None)
         action = request.POST.get("action", None)
+        graphid = request.POST.get("graphid", None)
         result = None
         if action == "restrict":
-            result = self.make_instance_private(resourceid)
+            result = self.make_instance_private(resourceid, graphid)
         elif action == "open":
-            result = self.make_instance_public(resourceid)
+            result = self.make_instance_public(resourceid, graphid)
         else:
             data = JSONDeserializer().deserialize(request.body)
             self.apply_permissions(data, request.user)
@@ -361,14 +362,17 @@ class ResourcePermissionDataView(View):
             result["creatorid"] = None
         return result
 
-    def make_instance_private(self, instanceid):
-        remove_resource_instance_permissions(instanceid)
-        resource_instance = add_permission_to_all(instanceid, "no_access_to_resourceinstance")
-        return self.get_instance_permissions(resource_instance)
+    def make_instance_private(self, resourceinstanceid, graphid=None):
+        resource = Resource(resourceinstanceid)
+        resource.graph_id = graphid if graphid else str(models.ResourceInstance.objects.get(pk=resourceinstanceid).graph_id)
+        resource.add_permission_to_all("no_access_to_resourceinstance")
+        return self.get_instance_permissions(resource)
 
-    def make_instance_public(self, instanceid):
-        resource_instance = remove_resource_instance_permissions(instanceid)
-        return self.get_instance_permissions(resource_instance)
+    def make_instance_public(self, resourceinstanceid, graphid=None):
+        resource = Resource(resourceinstanceid)
+        resource.graph_id = graphid if graphid else str(models.ResourceInstance.objects.get(pk=resourceinstanceid).graph_id)
+        resource.remove_resource_instance_permissions()
+        return self.get_instance_permissions(resource)
 
     def apply_permissions(self, data, user, revert=False):
         with transaction.atomic():
@@ -398,7 +402,6 @@ class ResourcePermissionDataView(View):
 
                 resource = Resource(str(resource_instance.resourceinstanceid))
                 resource.graphid = resource_instance.graph_id
-                resource.graph = resource_instance.graph
                 resource.index()
 
 

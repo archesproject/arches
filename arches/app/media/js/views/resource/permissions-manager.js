@@ -32,24 +32,24 @@ define([
 
             this.updatePermissions = function(){
                 if (ko.unwrap(self.dirty)) {
-                var payload = {
-                    "selectedIdentities": [],
-                    "selectedInstances": [{"resourceinstanceid": ko.unwrap(this.resourceId)}],
-                    "instanceid": ko.unwrap(self.resourceId)
-                }
-                self._currentPermissions.identities.forEach(function(identity){
-                    var selectedPermissions = identity.default_permissions.map(function(perm){return {"codename": perm.codename} });
-                    payload.selectedIdentities.push({"type": identity.type, "id": identity.id, "selectedPermissions": selectedPermissions});
-                });
-                $.ajax({
-                    type: 'POST',
-                    url: arches.urls.resource_permission_data,
-                    data: JSON.stringify(payload),
-                }).done(function(data){
-                    self._startPermissions = JSON.stringify(data);
-                    self._currentPermissions = JSON.parse(self._startPermissions);
-                    self.dirty(koMapping.toJSON(self._currentPermissions) !== self._startPermissions);
-                });
+                    var payload = {
+                        "selectedIdentities": [],
+                        "selectedInstances": [{"resourceinstanceid": ko.unwrap(this.resourceId)}],
+                        "instanceid": ko.unwrap(self.resourceId)
+                    }
+                    self._currentPermissions.identities.forEach(function(identity){
+                        var selectedPermissions = identity.default_permissions.map(function(perm){return {"codename": perm.codename} });
+                        payload.selectedIdentities.push({"type": identity.type, "id": identity.id, "selectedPermissions": selectedPermissions});
+                    });
+                    $.ajax({
+                        type: 'POST',
+                        url: arches.urls.resource_permission_data,
+                        data: JSON.stringify(payload),
+                    }).done(function(data){
+                        self._startPermissions = JSON.stringify(data);
+                        self._currentPermissions = JSON.parse(self._startPermissions);
+                        self.dirty(koMapping.toJSON(self._currentPermissions) !== self._startPermissions);
+                    });
                 }
             };
 
@@ -57,23 +57,23 @@ define([
                 var resetPermissions;
                 if (ko.unwrap(self.dirty)) {
                     resetPermissions = JSON.parse(self._startPermissions);
-                resetPermissions.identities.forEach(function(identity){
-                    if (Number(identity.id) === Number(self.creator) && identity.type == 'user') {
-                        //pass
-                    } else {
-                        var defaultperms = identity.default_permissions.map(function(perm){return perm.codename});
-                        self.instancePermissions()['identities'].forEach(function(activeidentity){
-                            if (activeidentity.id === identity.id && activeidentity.type === identity.type) {
-                                activeidentity.availablePermissions.forEach(function(availablePermission){
-                                    var status = defaultperms.indexOf(availablePermission.codename) > -1;
-                                    if (availablePermission.selected() !== status) {
-                                        availablePermission.selected(status); 
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
+                    resetPermissions.identities.forEach(function(identity){
+                        if (Number(identity.id) === Number(self.creator) && identity.type == 'user') {
+                            //pass
+                        } else {
+                            var defaultperms = identity.default_permissions.map(function(perm){return perm.codename});
+                            self.instancePermissions()['identities'].forEach(function(activeidentity){
+                                if (activeidentity.id === identity.id && activeidentity.type === identity.type) {
+                                    activeidentity.availablePermissions.forEach(function(availablePermission){
+                                        var status = defaultperms.indexOf(availablePermission.codename) > -1;
+                                        if (availablePermission.selected() !== status) {
+                                            availablePermission.selected(status); 
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
                 }
             };
 
@@ -150,7 +150,7 @@ define([
                 $.ajax({
                     type: 'POST',
                     url: arches.urls.resource_permission_data,
-                    data: {"instanceid": params.resourceId, "action": "restrict"}
+                    data: {"instanceid": params.resourceId, "action": "restrict", "graphid": params.graphId}
                 }).done(function(data){
                     self.openEditor(data['limitedaccess']);
                     var parsed = self.initPermissions(data);
@@ -165,7 +165,7 @@ define([
                     $.ajax({
                         type: 'POST',
                         url: arches.urls.resource_permission_data,
-                        data: {"instanceid": params.resourceId, "action": "open"}
+                        data: {"instanceid": params.resourceId, "action": "open", "graphid": params.graphId}
                     }).done(function(data){
                         var parsed = self.initPermissions(data);
                         self.instancePermissions(parsed);

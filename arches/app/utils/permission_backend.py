@@ -45,26 +45,6 @@ class PermissionBackend(ObjectPermissionBackend):
             return False
 
 
-def remove_resource_instance_permissions(resource_instance_id):
-    groups = list(Group.objects.all())
-    resource_instance = ResourceInstance.objects.get(pk=resource_instance_id)
-    users = [user for user in User.objects.all() if user.is_superuser is False]
-    for identity in groups + users:
-        for perm in ["no_access_to_resourceinstance", "view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"]:
-            remove_perm(perm, identity, resource_instance)
-    return resource_instance
-
-
-def add_permission_to_all(resource_instance_id, permission):
-    groups = list(Group.objects.all())
-    resource_instance = ResourceInstance.objects.get(pk=resource_instance_id)
-    users = [user for user in User.objects.all() if user.is_superuser is False]
-    for identity in groups + users:
-        assign_perm(permission, identity, resource_instance)
-    return resource_instance
-
-
-
 def get_restricted_users(resource):
     """
     Takes a resource instance and identifies which users are explicitly restricted from
