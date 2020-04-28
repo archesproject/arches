@@ -109,6 +109,30 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
     return list(C - A | B)
 
 
+def get_resources_by_perm(user, perms, any_perm=True):
+    """
+    returns a list of resource instances that a user has the given permission on
+
+    Arguments:
+    user -- the user to check
+    perms -- the permssion string eg: "read_nodegroup" or list of strings
+    any_perm -- True to check ANY perm in "perms" or False to check ALL perms
+
+    """
+
+    A = set(
+        get_objects_for_user(
+            user,
+            ["models.view_resourceinstance", "models.add_resourceinstance", "models.delete_resourceinstance", "models.change_resourceinstance", "models.no_access_to_resourceinstance"],
+            accept_global_perms=False,
+            any_perm=True,
+        )
+    )
+    B = set(get_objects_for_user(user, perms, accept_global_perms=False, any_perm=any_perm))
+    C = set(get_objects_for_user(user, perms, accept_global_perms=True, any_perm=any_perm))
+    return list(C - A | B)
+
+
 def get_editable_resource_types(user):
     """
     returns a list of graphs of which a user can edit resource instances
