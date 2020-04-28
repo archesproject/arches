@@ -64,16 +64,6 @@ class APITests(ArchesTestCase):
             cls.phase_type_assignment_graph = Graph(json["graph"][0])
             cls.phase_type_assignment_graph.save()
 
-        with open(os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "rU") as f:
-            json = JSONDeserializer().deserialize(f)
-            cls.resource_graph = Graph(json["graph"][0])
-            cls.resource_graph.save()
-            # add resource instance
-            cls.resource_graph_instance = Resource(graph_id=cls.resource_graph)
-            tile = Tile(data={geojson_nodeid: ["Test"]}, nodegroup_id=geojson_nodeid)
-            cls.resource_graph_instance.tiles.append(tile)
-            cls.resource_graph_instance.save()
-
     def test_api_base_view(self):
         """
         Test that our custom header parameters get pushed on to the GET QueryDict
