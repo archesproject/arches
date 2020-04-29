@@ -291,7 +291,7 @@ def search_results(request):
         ret["reviewer"] = user_is_resource_reviewer(request.user)
         ret["timestamp"] = datetime.now()
         ret["total_results"] = dsl.count(index="resources")
-
+        ret["userid"] = request.user.id
         return JSONResponse(ret)
 
     else:
