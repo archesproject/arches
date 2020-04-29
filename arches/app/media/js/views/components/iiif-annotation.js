@@ -222,6 +222,10 @@ define([
             }
         });
 
+        if (this.card) {
+            this.card.triggerUpdate = updateDrawFeatures; // can be called by the provisional tile view model to update the drawing
+        }
+
         this.disableDrawing = ko.computed(function() {
             return !self.canvas();
         });

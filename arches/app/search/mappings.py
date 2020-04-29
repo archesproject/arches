@@ -134,6 +134,15 @@ def prepare_search_index(create=False):
                             "data": {"properties": {}},
                         },
                     },
+                    "permissions": {
+                        "type": "nested",
+                        "properties": {
+                            "users_without_read_perm": {"type": "integer"},
+                            "users_without_edit_perm": {"type": "integer"},
+                            "users_without_delete_perm": {"type": "integer"},
+                            "users_with_no_access": {"type": "integer"},
+                        },
+                    },
                     "strings": {
                         "type": "nested",
                         "properties": {

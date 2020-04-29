@@ -29,12 +29,13 @@ from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.core import management
 from django.urls import reverse
-from arches.app.models.models import ResourceInstance, Node
 from django.test.client import RequestFactory, Client
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
+from arches.app.models.models import ResourceInstance, Node
+from arches.app.models.resource import Resource
 from arches.app.utils.permission_backend import get_editable_resource_types
 from arches.app.utils.permission_backend import get_resource_types_by_perm
 from arches.app.utils.permission_backend import user_can_read_resources
@@ -42,7 +43,7 @@ from arches.app.utils.permission_backend import user_can_edit_resources
 from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.permission_backend import user_can_delete_resources
 from arches.app.utils.permission_backend import user_has_resource_model_permissions
-
+from arches.app.utils.permission_backend import get_restricted_users
 from arches.app.search.mappings import (
     prepare_terms_index,
     prepare_concepts_index,
@@ -61,17 +62,20 @@ from arches.app.search.mappings import (
 class PermissionTests(ArchesTestCase):
     def setUp(self):
         self.expected_resource_count = 2
-        self.add_users()
         self.client = Client()
         self.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
         self.resource_instance_id = "f562c2fa-48d3-4798-a723-10209806c068"
         self.user = User.objects.get(username="ben")
         self.group = Group.objects.get(pk=2)
+        resource = Resource(pk=self.resource_instance_id)
+        resource.graph_id = self.data_type_graphid
+        resource.remove_resource_instance_permissions()
 
     def tearDown(self):
         ResourceInstance.objects.filter(graph_id=self.data_type_graphid).delete()
 
-    def add_users(self):
+    @classmethod
+    def add_users(cls):
         profiles = (
             {"name": "ben", "email": "ben@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
             {
@@ -80,7 +84,7 @@ class PermissionTests(ArchesTestCase):
                 "password": "Test12345!",
                 "groups": ["Graph Editor", "Resource Editor", "Resource Reviewer"],
             },
-            # {'name': 'jim', 'email': 'jim@test.com', 'password': 'Test12345!', 'groups': ['Graph Editor', 'Resource Editor']},
+            {"name": "jim", "email": "jim@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
         )
 
         for profile in profiles:
@@ -102,6 +106,8 @@ class PermissionTests(ArchesTestCase):
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
         delete_resource_relations_index()
         prepare_resource_relations_index(create=True)
+        cls.add_users()
+
 
     @classmethod
     def tearDownClass(cls):
@@ -125,7 +131,10 @@ class PermissionTests(ArchesTestCase):
         )
 
     def test_user_has_resource_model_permissions(self):
-        "Tests that a user cannot access an instance if they have no access to any nodegroup."
+        """
+        Tests that a user cannot access an instance if they have no access to any nodegroup.
+        
+        """
 
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
         nodes = Node.objects.filter(graph_id=resource.graph_id)
@@ -134,3 +143,33 @@ class PermissionTests(ArchesTestCase):
                 assign_perm("no_access_to_nodegroup", self.group, node.nodegroup)
         hasperms = user_has_resource_model_permissions(self.user, ["models.read_nodegroup"], resource)
         self.assertTrue(hasperms is False)
+
+    def test_get_restricted_users(self):
+        """
+        Tests that users are properly identified as restricted.
+
+        """
+
+        resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
+        assign_perm("no_access_to_resourceinstance", self.group, resource)
+        ben = self.user
+        jim = User.objects.get(username="jim")
+        sam = User.objects.get(username="sam")
+        admin = User.objects.get(username="admin")
+        assign_perm("view_resourceinstance", ben, resource)
+        assign_perm("change_resourceinstance", jim, resource)
+
+        restrictions = get_restricted_users(resource)
+
+        results = [
+            jim.id in restrictions["cannot_read"],
+            ben.id in restrictions["cannot_write"],
+            sam.id in restrictions["cannot_delete"],
+            sam.id in restrictions["no_access"],
+            admin.id not in restrictions["cannot_read"],
+            admin.id not in restrictions["cannot_write"],
+            admin.id not in restrictions["cannot_delete"],
+            admin.id not in restrictions["no_access"],
+        ]
+
+        self.assertTrue(all(results) is True)

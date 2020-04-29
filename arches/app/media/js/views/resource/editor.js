@@ -2,7 +2,6 @@ define([
     'jquery',
     'underscore',
     'knockout',
-    'moment',
     'views/base-manager',
     'viewmodels/alert',
     'viewmodels/alert-json',
@@ -18,8 +17,9 @@ define([
     'widgets',
     'card-components',
     'views/resource/related-resources-manager',
-    'views/resource/permissions-manager'
-], function($, _, ko, moment, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, reportLookup) {
+    'views/resource/permissions-manager',
+    'moment',
+], function($, _, ko, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, reportLookup) {
     var handlers = {
         'after-update': [],
         'tile-reset': []
@@ -32,6 +32,8 @@ define([
     var displayname = ko.observable(data.displayname);
     var resourceId = ko.observable(data.resourceid);
     var appliedFunctions = ko.observable(data['appliedFunctions']);
+    var userIsCreator = data['useriscreator'];
+    var creator = data['creator'];
     var selectedTile = ko.computed(function() {
         var item = selection();
         if (item && typeof item !== 'string') {
@@ -41,17 +43,7 @@ define([
             return item.getNewTile();
         }
     });
-    var addableCards = ko.computed(function() {
-        var items = [];
-        if (selectedTile()) {
-            _.each(selectedTile().cards, function(card) {
-                if (card && card.canAdd()) {
-                    items.push(card);
-                }
-            });
-            return items;
-        }
-    });
+
     var provisionalTileViewModel = new ProvisionalTileViewModel({tile: selectedTile, reviewer: data.user_is_reviewer});
 
     var flattenTree = function(parents, flatList) {
@@ -75,6 +67,7 @@ define([
             vm.rootExpanded(true);
         }
     };
+
     var createLookup = function(list, idKey) {
         return _.reduce(list, function(lookup, item) {
             lookup[item[idKey]] = item;
@@ -148,6 +141,8 @@ define([
         reviewer: data.userisreviewer,
         graphiconclass: data.graphiconclass,
         relationship_types: data.relationship_types,
+        userIsCreator: userIsCreator,
+        creator: creator,
         // appliedFunctions: appliedFunctions(),
         graph: {
             graphid: data.graphid,
@@ -291,7 +286,9 @@ define([
     };
 
     vm.showInstancePermissionsManager = function(){
-        vm.selection('permissions-manager');
+        if (vm.userIsCreator === true || vm.userIsCreator === null) {
+            vm.selection('permissions-manager');
+        }
     };
 
     vm.selectionBreadcrumbs = ko.computed(function() {

@@ -63,7 +63,7 @@
         <div class="toggle-container">
             <span class="switch switch-small switch-widget" data-bind="css: {'on': greyscale()}, click: function() { greyscale(!greyscale()); }"><small></small></span>
             <div style="display:flex; flex-direction:row;">
-                <div class="arches-toggle-sm" data-bind="click: function() { greyscale(!greyscale()); }">Display as greyscale</div>
+                <div class="arches-toggle-sm" data-bind="click: function() { greyscale(!greyscale()); }">{% trans "Display as greyscale" %}</div>
             </div>
         </div>
     </div>
@@ -90,11 +90,17 @@
         'fa-chevron-circle-up': !expandGallery(),
         'fa-chevron-circle-down': expandGallery()
     }, click: function() { expandGallery(!expandGallery()); }"></i>
-    <h3>Gallery</h3>
+    <h3>{% trans "Gallery" %}</h3>
     <a href="javascript: void(0)" data-bind="
         click: toggleGallery,
         text: showGallery() ? '{% trans "hide" %}' : '{% trans "show" %}'
     "></a>
+    
+    <!--ko if: expandGallery() -->
+    <span style="padding-right: 3px; padding-left: 3px;">|</span>
+    <a href="">{% trans "close info" %}</a>
+    <!--/ko -->
+
 </div>
 <!--ko let: {canvasClick: canvasClick, getCanvasService: getCanvasService, selectedCanvas: canvas, getAnnotationCount: getAnnotationCount} -->
 <div class="iiif-viewer-gallery" data-bind="css: {
@@ -102,19 +108,39 @@
     }">
     <!--ko if: showGallery() -->
     <div class="iiif-gallery-content">
-        <!--ko if: editManifest() -->
-            <div class="manifest-editor">
-                <div class="manifest-editor-label">
-                    {% trans "Select a manifest:" %}
-                </div>
-                <div class="manifest-editor-input">
-                    <input class="form-control input-lg widget-input"
-                        data-bind="value: manifest,
-                        select2Query: {
-                            select2Config: manifestSelectConfig
-                        }">
-                </div>
+
+        <!--ko if: expandGallery() && manifestData() -->
+        <div class="manifest-details">
+            <h3>
+                <span data-bind="text: manifestName"></span>
+            </h3>
+
+            <div class="manifest-details-list" data-bind="foreach: manifestData().metadata || []">
+                <dt class="manifest-metadata-title" data-bind="text: label"></dt>
+                <!--ko foreach: Array.isArray(value) ? value : [value] -->
+                <dd class="manifest-metadata-value" data-bind="html: $data"></dd>
+                <!--/ko -->
             </div>
+            <h4 data-bind="text: manifestData().attribution || ''"></h4>
+            <!--ko if: manifestData().logo -->
+            <img class="manifest-logo" data-bind="attr: {src: typeof manifestData().logo === 'string' ? manifestData().logo : manifestData().logo['@id']}">
+            <!--/ko -->
+        </div>
+        <!--/ko -->
+
+        <!--ko if: editManifest() -->
+        <div class="manifest-editor">
+            <div class="manifest-editor-label">
+                {% trans "Select a manifest:" %}
+            </div>
+            <div class="manifest-editor-input">
+                <input class="form-control input-lg widget-input"
+                    data-bind="value: manifest,
+                    select2Query: {
+                        select2Config: manifestSelectConfig
+                    }">
+            </div>
+
             <div class="install-buttons">
                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-pencil" data-bind="click: getManifestData,
                     disabled: manifestLoading(),
@@ -132,25 +158,9 @@
                 </span>
                 <!--/ko -->
             </div>
-            <!--ko if: expandGallery() && manifestData() -->
-            <div class="manifest-details">
-                <h3>
-                    Current Manifest:
-                    <span data-bind="text: manifestName"></span>
-                </h3>
-                <h4>Details</h4>
-                <div class="manifest-details-list" data-bind="foreach: manifestData().metadata || []">
-                    <dt data-bind="text: label"></dt>
-                    <!--ko foreach: Array.isArray(value) ? value : [value] -->
-                    <dd data-bind="html: $data"></dd>
-                    <!--/ko -->
-                </div>
-                <h4 data-bind="text: manifestData().attribution || ''"></h4>
-                <!--ko if: manifestData().logo -->
-                <img class="manifest-logo" data-bind="attr: {src: typeof manifestData().logo === 'string' ? manifestData().logo : manifestData().logo['@id']}">
-                <!--/ko -->
-            </div>
-            <!--/ko -->
+        </div>
+            
+            
         <!--/ko -->
         <!--ko if: !editManifest() -->
             <!--ko if: manifestLoading() -->
@@ -159,10 +169,11 @@
             </span>
             <!--/ko -->
             <!--ko if: !manifestLoading() -->
+            <div class="iiif-gallery-panel">
                 <div class="iiif-gallery-header">
                     <span class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor, text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
                     |
-                    Filter
+                    {% trans "Filter" %}
                     <div class="list-filter" data-bind="">
                         <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
 
@@ -170,6 +181,7 @@
                         <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
                     </div>
                 </div>
+
                 <div class="iiif-gallery-sequence">
                     <div class="iiif-gallery-sequence-canvases" data-bind="foreach: canvases">
                         <div class="iiif-gallery-canvas" data-bind="click: function() {
@@ -197,6 +209,7 @@
                         </div>
                     </div>
                 </div>
+            </div>
             <!--/ko -->
         <!--/ko -->
     </div>
