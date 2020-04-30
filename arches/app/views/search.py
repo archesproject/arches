@@ -220,10 +220,10 @@ def export_results(request):
 
 def append_instance_permission_filter_dsl(request, search_results_object):
     if request.user.is_superuser is False:
-        search_query = Bool()
+        has_access = Bool()
         terms = Terms(field="permissions.users_with_no_access", terms=[str(request.user.id)])
-        search_query.must_not(terms)
-        search_results_object["query"].add_query(search_query)
+        has_access.must_not(terms)
+        search_results_object["query"].add_query(has_access)
 
 
 def search_results(request):
@@ -291,7 +291,7 @@ def search_results(request):
         ret["reviewer"] = user_is_resource_reviewer(request.user)
         ret["timestamp"] = datetime.now()
         ret["total_results"] = dsl.count(index="resources")
-
+        ret["userid"] = request.user.id
         return JSONResponse(ret)
 
     else:

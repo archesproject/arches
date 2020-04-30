@@ -85,6 +85,18 @@ define([
                 permissionlist.splice(permissionIndex, 1);
             };
 
+            this.checkDirty = function(start, current) {
+                var clean = start.identities.every(function(k, i){
+                    var startPerms = k.default_permissions;
+                    var currentPerms = current.identities[i].default_permissions;
+                    var startPattern = JSON.stringify(startPerms.map(function(p){return p.id;}).sort());
+                    var endPattern = JSON.stringify(currentPerms.map(function(p){return p.id;}).sort());
+                    return startPattern === endPattern;
+                });
+                var dirty = !clean;
+                return dirty;
+            };
+
             this.updateState = function(includePermission, identityId, type, permission) {
                 self._currentPermissions['identities'].forEach(function(id) {
                     if (id.type === type && id.id === identityId) {
@@ -102,8 +114,7 @@ define([
                         }
                     }
                 }, self);
-                var dirty = koMapping.toJSON(self._currentPermissions) !== self._startPermissions;
-                self.dirty(dirty);
+                self.dirty(self.checkDirty(self._currentPermissions, JSON.parse(self._startPermissions)));
             };
 
             this.initPermissions = function(data) {

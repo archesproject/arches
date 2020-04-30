@@ -107,7 +107,10 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                             },
                             selected: ko.computed(function() {
                                 return result._source.resourceinstanceid === ko.unwrap(self.selectedResourceId);
-                            })
+                            }),
+                            canRead: result._source.permissions.users_without_read_perm.indexOf(this.userid) < 0,
+                            canEdit: result._source.permissions.users_without_edit_perm.indexOf(this.userid) < 0,
+                            // can_delete: result._source.permissions.users_without_delete_perm.indexOf(this.userid) < 0,
                         });
                     }, this);
                 }

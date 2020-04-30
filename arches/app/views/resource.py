@@ -369,6 +369,13 @@ class ResourcePermissionDataView(View):
         resource = Resource(resourceinstanceid)
         resource.graph_id = graphid if graphid else str(models.ResourceInstance.objects.get(pk=resourceinstanceid).graph_id)
         resource.add_permission_to_all("no_access_to_resourceinstance")
+        if models.EditLog.objects.filter(resourceinstanceid=resource.resourceinstanceid).filter(edittype="create").exists():
+            userid = models.EditLog.objects.filter(resourceinstanceid=resource.resourceinstanceid).filter(edittype="create")[0].userid
+            user = User.objects.get(pk=userid)
+            assign_perm("view_resourceinstance", user, resource)
+            assign_perm("change_resourceinstance", user, resource)
+            assign_perm("delete_resourceinstance", user, resource)
+            remove_perm("no_access_to_resourceinstance", user, resource)
         return self.get_instance_permissions(resource)
 
     def make_instance_public(self, resourceinstanceid, graphid=None):
