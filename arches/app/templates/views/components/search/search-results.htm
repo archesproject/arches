@@ -21,7 +21,7 @@
 
 
             {% if user|can_edit_resource_instance %}
-            <!--ko if: can_edit -->
+            <!--ko if: canEdit -->
             <a class="search-candidate-link" href="" data-bind="click: $parent.editResource.bind($parent)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %} </a>
             <!--/ko-->
             {% endif %}
