@@ -516,6 +516,7 @@ class Tile(models.TileModel):
             tile = Tile.get_blank_tile(nodeid, resourceinstanceid)
             if nodeid in tile.data:
                 tile.data[nodeid] = value
+                tile.save()
             else:
                 tile.save()
                 if nodegroupid and resourceinstanceid:
@@ -524,7 +525,7 @@ class Tile(models.TileModel):
 
     def __preSave(self, request=None):
         try:
-            for function in self.__getFunctionClassInstances():
+            for function in self._getFunctionClassInstances():
                 try:
                     function.save(self, request)
                 except NotImplementedError:
@@ -534,15 +535,15 @@ class Tile(models.TileModel):
 
     def __preDelete(self, request):
         try:
-            for function in self.__getFunctionClassInstances():
+            for function in self._getFunctionClassInstances():
                 try:
                     function.delete(self, request)
                 except NotImplementedError:
                     pass
-        except TypeError as e:
+        except TypeError:
             logger.info(_("No associated functions"))
 
-    def __getFunctionClassInstances(self):
+    def _getFunctionClassInstances(self):
         ret = []
         resource = models.ResourceInstance.objects.get(pk=self.resourceinstance_id)
         functionXgraphs = models.FunctionXGraph.objects.filter(
