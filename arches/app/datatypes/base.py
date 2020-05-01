@@ -193,6 +193,14 @@ class BaseDataType(object):
         """
         pass
 
+    def pre_tile_save(self, tile, nodeid):
+        """
+        Called during tile.save operation but before the tile is actually saved to the database
+
+        """
+        pass
+
+
     def is_a_literal_in_rdf(self):
         """
         Convenience method to determine whether or not this datatype's `to_rdf` method will express

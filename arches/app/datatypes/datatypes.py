@@ -1575,21 +1575,47 @@ class DomainListDataType(BaseDomainDataType):
 
 
 class ResourceInstanceDataType(BaseDataType):
+    """
+        tile data comes from the client looking like this:
+        {
+            "resourceId": "",
+            "ontologyProperty": "",
+            "inverseOntologyProperty": ""
+        }  
+
+        and get's saved looking like this:
+
+        {
+            "resourceXresourceId": uuid of relation id
+        }  
+
+    """
+
+    def disambiguateForeignKey(self, foreignKey):
+        rr = models.ResourceXResource.objects.get(pk=foreignKey)
+        return {
+            "resourceId": str(rr.resourceinstanceidto.pk),
+            "ontologyProperty": rr.relationshiptype,
+            "inverseOntologyProperty": rr.inverserelationshiptype
+        }  
+    
     def get_id_list(self, nodevalue):
-        id_list = nodevalue
-        if type(nodevalue) is str:
-            id_list = [nodevalue]
-        return id_list
+        if not isinstance(nodevalue, list):
+            nodevalue = [nodevalue]
+        return nodevalue
 
     def get_resource_names(self, nodevalue):
         resource_names = set([])
         if nodevalue is not None:
             se = SearchEngineFactory().create()
-            id_list = self.get_id_list(nodevalue)
-            for resourceid in id_list:
+            resourceXresourceIds = self.get_id_list(nodevalue)
+            for resourceXresourceId in resourceXresourceIds:
+                resourceid = None
                 try:
+                    tile_data = self.disambiguateForeignKey(resourceXresourceId["resourceXresourceId"])
+                    resourceid = tile_data["resourceId"]
                     resource_document = se.search(index="resources", id=resourceid)
-                    resource_names.add(resource_document["_source"]["displayname"])
+                    resource_names.add(resource_document["docs"][0]["_source"]["displayname"])
                 except NotFoundError as e:
                     logger.info(
                         f"Resource {resourceid} not available. This message may appear during resource load, \
@@ -1601,9 +1627,12 @@ class ResourceInstanceDataType(BaseDataType):
 
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
+        # import ipdb
+        # ipdb.sset_trace()
         if value is not None:
-            id_list = self.get_id_list(value)
-            for resourceid in id_list:
+            resourceXresourceIds = self.get_id_list(value)
+            for resourceXresourceId in resourceXresourceIds:
+                resourceid = resourceXresourceId["resourceId"]
                 try:
                     models.ResourceInstance.objects.get(pk=resourceid)
                 except ObjectDoesNotExist:
@@ -1616,6 +1645,26 @@ class ResourceInstanceDataType(BaseDataType):
                     )
         return errors
 
+    def pre_tile_save(self, tile, nodeid):
+        tiledata = tile.data[str(nodeid)]
+        if tiledata:
+            rr = models.ResourceXResource(
+                resourceinstanceidfrom=models.ResourceInstance(tile.resourceinstance_id),
+                resourceinstanceidto=models.ResourceInstance(tiledata["resourceId"]),
+                notes="",
+                relationshiptype=tiledata["ontologyProperty"],
+                inverserelationshiptype=tiledata["inverseOntologyProperty"],
+                tileid_id=tile.pk
+                # datestarted="",
+                # dateended="",
+            )
+            rr.save()
+            tiledata["resourceXresourceId"] = str(rr.pk)
+            # try:
+            # except ModelInactiveError as e:
+            #     message = _("Unable to save. Please verify the model status is active")
+            #     return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
+
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
         nodevalue = data[str(node.nodeid)]
@@ -1623,11 +1672,15 @@ class ResourceInstanceDataType(BaseDataType):
         return ", ".join(resource_names)
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        resource_names = self.get_resource_names(nodevalue)
-        for value in resource_names:
-            document["ids"].append({"id": nodevalue, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
-            if value not in document["strings"]:
-                document["strings"].append({"string": value, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
+        for relatedResourceItem in nodevalue:
+            tile_data = self.disambiguateForeignKey(nodevalue["resourceXresourceId"])
+            document["ids"].append({"id": tile_data["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
+        
+        import ipdb
+        ipdb.sset_trace()
+        for resource_name in self.get_resource_names(nodevalue):
+            if resource_name not in document["strings"]:
+                document["strings"].append({"string": resource_name, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
 
     def transform_import_values(self, value, nodeid):
         return [v.strip() for v in value.split(",")]
@@ -1705,12 +1758,16 @@ class ResourceInstanceDataType(BaseDataType):
 
         return True
 
+    def default_es_mapping(self):
+        return {
+            "properties": {
+                "resourceXresourceId": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}
+            }
+        }
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
     def append_search_filters(self, value, node, query, request):
         try:
-            import ipdb
-            ipdb.sset_trace()
             if value["val"] != "":
                 for val in value["val"]:
                     m = super(ResourceInstanceListDataType, self).append_search_filters(val, node, query, request)
