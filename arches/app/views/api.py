@@ -48,6 +48,7 @@ from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
 from slugify import slugify
+from urllib import parse
 from arches.celery import app
 
 logger = logging.getLogger(__name__)
@@ -938,3 +939,11 @@ class Tile(APIBase):
 
         response = JSONResponse({"results": "success!"})
         return response
+
+@method_decorator(csrf_exempt, name="dispatch")
+class Node(APIBase):
+    def get(self, request):
+        params = request.GET.dict()
+        result = models.Node.objects.filter(**dict(params))
+        
+        return JSONResponse(result)

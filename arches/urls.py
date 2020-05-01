@@ -217,6 +217,7 @@ urlpatterns = [
     url(r"^resources/(?P<slug>[-\w]+)/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources_slug"),
     url(r"^resources/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources"),
     url(r"^api/tiles/$", api.Tile.as_view(), name="api_tiles"),
+    url(r"^api/nodes/$", api.Node.as_view(), name="api_nodes"),
     url(r"^rdm/concepts/(?P<conceptid>%s|())$" % uuid_regex, api.Concepts.as_view(), name="concepts"),
     url(r"^plugins/(?P<pluginid>%s)$" % uuid_regex, PluginView.as_view(), name="plugins"),
     url(r"^plugins/(?P<slug>[-\w]+)$", PluginView.as_view(), name="plugins"),
