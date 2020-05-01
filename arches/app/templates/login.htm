@@ -47,17 +47,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 							<div class="input-group">
 								<div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
 								<input type="text" class="form-control input-lg" placeholder="Email or Username" aria-label="Email or Username" name='username' autofocus>
+								<span class="fa fa-asterisk reqfield"></span>
 							</div>
 						</div>
 						<div class="form-group">
 							<div class="input-group">
 								<div class="input-group-addon"><i class="ion-asterisk"></i></div>
 								<input type="password" class="form-control input-lg" placeholder="Password" aria-label="Password" name='password'>
+								<span class="fa fa-asterisk reqfield"></span>
 							</div>
 						</div>
 						<div class="form-group">
 							<div class="arches-signin-btn">
 								<button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Sign In" %}</button>
+							</div>
+							<div>
+								<span class="fa fa-asterisk reqfield reqtxt"></span> = Required field
 							</div>
 						</div>
 						<div class="row" style="padding-top:10px; margin: -20px 0px 5px 0px;">
