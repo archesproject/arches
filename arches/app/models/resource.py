@@ -24,6 +24,7 @@ from time import time
 from uuid import UUID
 from django.db import transaction
 from django.db.models import Q
+from django.contrib.auth.models import User, Group, Permission
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 from arches.app.models import models
@@ -34,14 +35,14 @@ from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
 from arches.app.utils import import_class_from_string
-from guardian.shortcuts import assign_perm
+from guardian.shortcuts import assign_perm, remove_perm
 from guardian.exceptions import NotUserNorGroup
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.exceptions import (
     InvalidNodeNameException,
     MultipleNodesFoundException,
 )
-from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.app.utils.permission_backend import user_is_resource_reviewer, get_users_for_object, get_restricted_users
 from arches.app.datatypes.datatypes import DataTypeFactory
 
 logger = logging.getLogger(__name__)
@@ -207,6 +208,7 @@ class Resource(models.ResourceInstance):
         Indexes all the nessesary items values of a resource to support search
 
         """
+
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             se = SearchEngineFactory().create()
             datatype_factory = DataTypeFactory()
@@ -249,7 +251,12 @@ class Resource(models.ResourceInstance):
 
         tiles = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
 
+        restrictions = get_restricted_users(self)
         document["tiles"] = tiles
+        document["permissions"] = {"users_without_read_perm": restrictions["cannot_read"]}
+        document["permissions"]["users_without_edit_perm"] = restrictions["cannot_write"]
+        document["permissions"]["users_without_delete_perm"] = restrictions["cannot_delete"]
+        document["permissions"]["users_with_no_access"] = restrictions["no_access"]
         document["strings"] = []
         document["dates"] = []
         document["domains"] = []
@@ -491,6 +498,21 @@ class Resource(models.ResourceInstance):
                         values.append(parse_node_value(value))
 
         return values
+
+    def remove_resource_instance_permissions(self):
+        groups = list(Group.objects.all())
+        users = [user for user in User.objects.all() if user.is_superuser is False]
+        for identity in groups + users:
+            for perm in ["no_access_to_resourceinstance", "view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"]:
+                remove_perm(perm, identity, self)
+        self.index()
+
+    def add_permission_to_all(self, permission):
+        groups = list(Group.objects.all())
+        users = [user for user in User.objects.all() if user.is_superuser is False]
+        for identity in groups + users:
+            assign_perm(permission, identity, self)
+        self.index()
 
 
 def parse_node_value(value):

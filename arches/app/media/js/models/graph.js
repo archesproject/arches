@@ -223,8 +223,10 @@ define(['arches',
                 data: JSON.stringify({nodeid:node.nodeid})
             }, function(response, status){
                 if (status === 'success' &&  response.responseJSON) {
+                    var nodeSource = response.responseJSON.node;
+                    nodeSource.parentproperty = response.responseJSON.edge.ontologyproperty;
                     var newNode = new NodeModel({
-                        source: response.responseJSON.node,
+                        source: nodeSource,
                         datatypelookup: this.get('datatypelookup'),
                         graph: this,
                         "ontology_namespaces": this.get('root').ontology_namespaces
@@ -234,6 +236,12 @@ define(['arches',
                     this.get('nodes').push(newNode);
                     this.get('edges').push(response.responseJSON.edge);
                     node.childNodes.unshift(newNode);
+                    
+                    // we set these to empty strings so that a user can easily choose the 
+                    // onology class and property they want instead of having to unselect 
+                    // the values chosen by default
+                    newNode.ontologyclass('');
+                    newNode.parentproperty('');
 
                     if(!this.get('isresource')){
                         this.selectNode(newNode);
