@@ -660,6 +660,8 @@ class ResourceDescriptors(View):
                         "map_popup": document["_source"]["map_popup"],
                         "displayname": document["_source"]["displayname"],
                         "geometries": document["_source"]["geometries"],
+                        "permissions": document["_source"]["permissions"],
+                        "userid": request.user.id,
                     }
                 )
             except Exception as e:
