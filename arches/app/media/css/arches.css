@@ -2785,7 +2785,7 @@ a.select2-search-choice-close {
 }
 
 .permissions-list-table-body {
-    height: 245px;
+    height: 400px;
     overflow-y: auto;
     border: solid 1px #ddd;
 }
