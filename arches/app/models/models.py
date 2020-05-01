@@ -653,6 +653,15 @@ class ResourceXResource(models.Model):
     )
     notes = models.TextField(blank=True, null=True)
     relationshiptype = models.TextField(blank=True, null=True)
+    inverserelationshiptype = models.TextField(blank=True, null=True)
+    tileid = models.ForeignKey(
+        "TileModel",
+        db_column="tileid",
+        blank=True,
+        null=True,
+        related_name="resxres_tile_id",
+        on_delete=models.CASCADE,
+    )
     datestarted = models.DateField(blank=True, null=True)
     dateended = models.DateField(blank=True, null=True)
     created = models.DateTimeField()
