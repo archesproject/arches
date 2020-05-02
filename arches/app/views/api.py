@@ -35,10 +35,13 @@ from arches.app.utils.decorators import can_read_resource_instance, can_edit_res
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
-from arches.app.utils.permission_backend import user_can_read_resources
-from arches.app.utils.permission_backend import user_can_edit_resources
-from arches.app.utils.permission_backend import user_can_read_concepts
-from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.app.utils.permission_backend import (
+    user_can_read_resources,
+    user_can_edit_resources,
+    user_can_read_concepts,
+    user_is_resource_reviewer,
+    get_restricted_instances,
+)
 from arches.app.utils.decorators import group_required
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
@@ -272,6 +275,7 @@ class GeoJSON(APIBase):
         property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups)
         property_node_map = {}
         property_nodes = models.Node.objects.filter(nodegroup_id__in=nodegroups).order_by("sortorder")
+        restricted_resource_ids = get_restricted_instances(request.user)
         for node in property_nodes:
             property_node_map[str(node.nodeid)] = {"node": node}
             if node.fieldname is None or node.fieldname == "":
@@ -285,10 +289,10 @@ class GeoJSON(APIBase):
         if tileid is not None:
             tiles = tiles.filter(tileid=tileid)
         tiles = tiles.order_by("sortorder")
+        tiles = [tile for tile in tiles if str(tile.resourceinstance_id) not in restricted_resource_ids]
         if limit is not None:
             start = (page - 1) * limit
             end = start + limit
-            tile_count = tiles.count()
             last_page = tiles.count() < end
             tiles = tiles[start:end]
         for tile in tiles:
@@ -350,6 +354,10 @@ class MVT(APIBase):
         if hasattr(request.user, "userprofile") is not True:
             models.UserProfile.objects.create(user=request.user)
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
+        resource_ids = get_restricted_instances(request.user)
+        if len(resource_ids) == 0:
+            resource_ids.append("10000000-0000-0000-0000-000000000001")  # This must have a uuid that will never be a resource id.
+        resource_ids = tuple(resource_ids)
         try:
             node = models.Node.objects.get(nodeid=nodeid, nodegroup_id__in=viewable_nodegroups)
         except models.Node.DoesNotExist:
@@ -377,7 +385,7 @@ class MVT(APIBase):
                                     nodeid,
                                     geom
                                 FROM mv_geojson_geoms
-                                WHERE nodeid = %s
+                                WHERE nodeid = %s and resourceinstanceid not in %s
                             ) m
                         )
 
@@ -415,7 +423,7 @@ class MVT(APIBase):
                             WHERE cid IS NOT NULL
                             GROUP BY cid
                         ) as tile;""",
-                        [distance, min_points, nodeid, nodeid, zoom, x, y, zoom, x, y],
+                        [distance, min_points, nodeid, resource_ids, nodeid, zoom, x, y, zoom, x, y],
                     )
                 else:
                     cursor.execute(
@@ -429,8 +437,8 @@ class MVT(APIBase):
                             ) AS geom,
                             1 AS total
                         FROM mv_geojson_geoms
-                        WHERE nodeid = %s) AS tile;""",
-                        [nodeid, zoom, x, y, nodeid],
+                        WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
+                        [nodeid, zoom, x, y, nodeid, resource_ids],
                     )
                 tile = bytes(cursor.fetchone()[0])
                 cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
@@ -601,7 +609,7 @@ class Resources(APIBase):
         except Exception:
             indent = None
 
-        if not user_can_edit_resources(user=request.user):
+        if not user_can_edit_resources(user=request.user, resourceid=resourceid):
             return JSONResponse(status=403)
         else:
             with transaction.atomic():
@@ -643,7 +651,7 @@ class Resources(APIBase):
             indent = None
 
         try:
-            if user_can_edit_resources(user=request.user):
+            if user_can_edit_resources(user=request.user, resourceid=resourceid):
                 data = JSONDeserializer().deserialize(request.body)
                 reader = JsonLdReader()
                 if slug is not None:
@@ -673,7 +681,9 @@ class Resources(APIBase):
             return JSONResponse({"error": "resource data could not be saved: %s" % e}, status=500, reason=e)
 
     def delete(self, request, resourceid, slug=None, graphid=None):
-        if user_can_edit_resources(user=request.user):
+        if user_can_edit_resources(user=request.user, resourceid=resourceid) and user_can_delete_resources(
+            user=request.user, resourceid=resourceid
+        ):
             try:
                 resource_instance = Resource.objects.get(pk=resourceid)
                 resource_instance.delete()

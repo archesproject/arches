@@ -16,6 +16,8 @@ from guardian.shortcuts import (
 from guardian.exceptions import WrongAppError
 from django.contrib.auth.models import User, Group, Permission
 from arches.app.models.models import ResourceInstance
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms
 
 
 class PermissionBackend(ObjectPermissionBackend):
@@ -79,6 +81,28 @@ def get_restricted_users(resource):
                 result["no_access"].append(user.id)
 
     return result
+
+
+def get_restricted_instances(user):
+    if user.is_superuser is False:
+        se = SearchEngineFactory().create()
+        query = Query(se, start=0, limit=settings.SEARCH_RESULT_LIMIT)
+        has_access = Bool()
+        terms = Terms(field="permissions.users_with_no_access", terms=[str(user.id)])
+        has_access.must(terms)
+        query.add_query(has_access)
+        results = query.search(index="resources", scroll="1m")
+        scroll_id = results["_scroll_id"]
+        total = results["hits"]["total"]["value"]
+        if total > settings.SEARCH_RESULT_LIMIT:
+            pages = total // settings.SEARCH_RESULT_LIMIT
+            for page in range(pages):
+                results_scrolled = query.se.es.scroll(scroll_id=scroll_id, scroll="1m")
+                results["hits"]["hits"] += results_scrolled["hits"]["hits"]
+        restricted_ids = [res["_id"] for res in results["hits"]["hits"]]
+        return restricted_ids
+    else:
+        return []
 
 
 def get_groups_for_object(perm, obj):
