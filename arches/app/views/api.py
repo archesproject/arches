@@ -40,7 +40,7 @@ from arches.app.utils.permission_backend import (
     user_can_edit_resources,
     user_can_read_concepts,
     user_is_resource_reviewer,
-    get_restricted_instances
+    get_restricted_instances,
 )
 from arches.app.utils.decorators import group_required
 from arches.app.utils.geo_utils import GeoUtils
@@ -361,7 +361,7 @@ class MVT(APIBase):
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
         resource_ids = get_restricted_instances(request.user)
         if len(resource_ids) == 0:
-            resource_ids.append('10000000-0000-0000-0000-000000000001') #This must have a uuid that will never be a resource id.
+            resource_ids.append("10000000-0000-0000-0000-000000000001")  # This must have a uuid that will never be a resource id.
         resource_ids = tuple(resource_ids)
         try:
             node = models.Node.objects.get(nodeid=nodeid, nodegroup_id__in=viewable_nodegroups)

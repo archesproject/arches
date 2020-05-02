@@ -93,9 +93,9 @@ def get_restricted_instances(user):
         query.add_query(has_access)
         results = query.search(index="resources", scroll="1m")
         scroll_id = results["_scroll_id"]
-        total = results['hits']['total']['value']
+        total = results["hits"]["total"]["value"]
         if total > settings.SEARCH_RESULT_LIMIT:
-            pages = (total // settings.SEARCH_RESULT_LIMIT)
+            pages = total // settings.SEARCH_RESULT_LIMIT
             for page in range(pages):
                 results_scrolled = query.se.es.scroll(scroll_id=scroll_id, scroll="1m")
                 results["hits"]["hits"] += results_scrolled["hits"]["hits"]
