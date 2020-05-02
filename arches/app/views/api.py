@@ -40,6 +40,7 @@ from arches.app.utils.permission_backend import (
     user_can_edit_resources,
     user_can_read_concepts,
     user_is_resource_reviewer,
+    get_restricted_instances
 )
 from arches.app.utils.decorators import group_required
 from arches.app.utils.geo_utils import GeoUtils
@@ -358,6 +359,10 @@ class MVT(APIBase):
         if hasattr(request.user, "userprofile") is not True:
             models.UserProfile.objects.create(user=request.user)
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
+        resource_ids = get_restricted_instances(request.user)
+        if len(resource_ids) == 0:
+            resource_ids.append('10000000-0000-0000-0000-000000000001') #This must have a uuid that will never be a resource id.
+        resource_ids = tuple(resource_ids)
         try:
             node = models.Node.objects.get(nodeid=nodeid, nodegroup_id__in=viewable_nodegroups)
         except models.Node.DoesNotExist:
@@ -385,7 +390,7 @@ class MVT(APIBase):
                                     nodeid,
                                     geom
                                 FROM mv_geojson_geoms
-                                WHERE nodeid = %s
+                                WHERE nodeid = %s and resourceinstanceid not in %s
                             ) m
                         )
 
@@ -423,7 +428,7 @@ class MVT(APIBase):
                             WHERE cid IS NOT NULL
                             GROUP BY cid
                         ) as tile;""",
-                        [distance, min_points, nodeid, nodeid, zoom, x, y, zoom, x, y],
+                        [distance, min_points, nodeid, resource_ids, nodeid, zoom, x, y, zoom, x, y],
                     )
                 else:
                     cursor.execute(
@@ -437,8 +442,8 @@ class MVT(APIBase):
                             ) AS geom,
                             1 AS total
                         FROM mv_geojson_geoms
-                        WHERE nodeid = %s) AS tile;""",
-                        [nodeid, zoom, x, y, nodeid],
+                        WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
+                        [nodeid, zoom, x, y, nodeid, resource_ids],
                     )
                 tile = bytes(cursor.fetchone()[0])
                 cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
