@@ -97,7 +97,7 @@ def get_restricted_instances(user):
         if total > settings.SEARCH_RESULT_LIMIT:
             pages = (total // settings.SEARCH_RESULT_LIMIT)
             for page in range(pages):
-                results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
+                results_scrolled = query.se.es.scroll(scroll_id=scroll_id, scroll="1m")
                 results["hits"]["hits"] += results_scrolled["hits"]["hits"]
         restricted_ids = [res['_id'] for res in results['hits']['hits']]
         return restricted_ids
