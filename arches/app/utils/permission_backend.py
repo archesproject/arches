@@ -100,9 +100,6 @@ def get_restricted_instances(user):
                 results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
                 results["hits"]["hits"] += results_scrolled["hits"]["hits"]
         restricted_ids = [res['_id'] for res in results['hits']['hits']]
-        test  = 'cc91df9c-f172-4917-a470-3ed54aff3742'
-        print(test in restricted_ids)
-        print(len(restricted_ids))
         return restricted_ids
     else:
         return []
