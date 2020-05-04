@@ -3866,6 +3866,8 @@ ul .collapse li:first-of-type {
 
 #container.cls-container.arches-login {
     background: rgb(236,238,241);
+    height: 100vh;
+    overflow-y: auto;
 }
 
 .arches-login > .cls-header {
