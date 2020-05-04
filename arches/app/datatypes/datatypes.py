@@ -1583,39 +1583,36 @@ class ResourceInstanceDataType(BaseDataType):
             "inverseOntologyProperty": ""
         }  
 
-        and get's saved looking like this:
-
-        {
-            "resourceXresourceId": uuid of relation id
-        }  
+        and get's saved as a single uuid representing a row id in the resourceXresource table
 
     """
 
-    def disambiguateForeignKey(self, foreignKey):
-        rr = models.ResourceXResource.objects.get(pk=foreignKey)
-        return {
-            "resourceId": str(rr.resourceinstanceidto.pk),
-            "ontologyProperty": rr.relationshiptype,
-            "inverseOntologyProperty": rr.inverserelationshiptype
-        }  
-    
     def get_id_list(self, nodevalue):
         if not isinstance(nodevalue, list):
             nodevalue = [nodevalue]
         return nodevalue
 
-    def get_resource_names(self, nodevalue):
-        resource_names = set([])
+    def disambiguate(self, nodevalue):
+        ret = []
         if nodevalue is not None:
-            se = SearchEngineFactory().create()
-            resourceXresourceIds = self.get_id_list(nodevalue)
-            for resourceXresourceId in resourceXresourceIds:
+            resourceXresourceList = self.get_id_list(nodevalue)
+            for resourceXresource in resourceXresourceList:
                 resourceid = None
                 try:
-                    tile_data = self.disambiguateForeignKey(resourceXresourceId["resourceXresourceId"])
-                    resourceid = tile_data["resourceId"]
+                    if isinstance(resourceXresource, str):
+                        resourceXresourceId = resourceXresource
+                    else:
+                        resourceXresourceId = resourceXresource["resourceXresourceId"]
+                    rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
+                    resourceid = str(rr.resourceinstanceidto_id)
+                    se = SearchEngineFactory().create()
                     resource_document = se.search(index="resources", id=resourceid)
-                    resource_names.add(resource_document["docs"][0]["_source"]["displayname"])
+                    ret.append({
+                        "resourceName": resource_document["docs"][0]["_source"]["displayname"],
+                        "resourceId": resourceid,
+                        "ontologyProperty": rr.relationshiptype,
+                        "inverseOntologyProperty": rr.inverserelationshiptype
+                    })
                 except NotFoundError as e:
                     logger.info(
                         f"Resource {resourceid} not available. This message may appear during resource load, \
@@ -1623,7 +1620,28 @@ class ResourceInstanceDataType(BaseDataType):
                     )
         else:
             logger.warning(_("No resource relationship available"))
-        return resource_names
+        return ret
+    
+    # def get_resource_names(self, nodevalue):
+    #     resource_names = set([])
+    #     if nodevalue is not None:
+    #         se = SearchEngineFactory().create()
+    #         resourceXresourceIds = self.get_id_list(nodevalue)
+    #         for resourceXresourceId in resourceXresourceIds:
+    #             resourceid = None
+    #             try:
+    #                 tile_data = self.disambiguate(resourceXresourceId)
+    #                 resourceid = tile_data["resourceId"]
+    #                 resource_document = se.search(index="resources", id=resourceid)
+    #                 resource_names.add(resource_document["docs"][0]["_source"]["displayname"])
+    #             except NotFoundError as e:
+    #                 logger.info(
+    #                     f"Resource {resourceid} not available. This message may appear during resource load, \
+    #                         in which case the problem will be resolved once the related resource is loaded"
+    #                 )
+    #     else:
+    #         logger.warning(_("No resource relationship available"))
+    #     return resource_names
 
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
@@ -1648,18 +1666,22 @@ class ResourceInstanceDataType(BaseDataType):
     def pre_tile_save(self, tile, nodeid):
         tiledata = tile.data[str(nodeid)]
         if tiledata:
-            rr = models.ResourceXResource(
-                resourceinstanceidfrom=models.ResourceInstance(tile.resourceinstance_id),
-                resourceinstanceidto=models.ResourceInstance(tiledata["resourceId"]),
-                notes="",
-                relationshiptype=tiledata["ontologyProperty"],
-                inverserelationshiptype=tiledata["inverseOntologyProperty"],
-                tileid_id=tile.pk
-                # datestarted="",
-                # dateended="",
-            )
-            rr.save()
-            tiledata["resourceXresourceId"] = str(rr.pk)
+            for relationship in tiledata:
+                rr = models.ResourceXResource(
+                    resourceinstanceidfrom=models.ResourceInstance(tile.resourceinstance_id),
+                    resourceinstanceidto=models.ResourceInstance(relationship["resourceId"]),
+                    notes="",
+                    relationshiptype=relationship["ontologyProperty"],
+                    inverserelationshiptype=relationship["inverseOntologyProperty"],
+                    tileid_id=tile.pk
+                    # datestarted="",
+                    # dateended="",
+                )
+                rr.save()
+                relationship["resourceXresourceId"] = str(rr.pk)
+            # tile.data[str(nodeid)] = [{"resourceXresourceId": str(rr.pk)}]
+
+            # tile.data[str(nodeid)] = str(rr.pk)
             # try:
             # except ModelInactiveError as e:
             #     message = _("Unable to save. Please verify the model status is active")
@@ -1668,19 +1690,22 @@ class ResourceInstanceDataType(BaseDataType):
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
         nodevalue = data[str(node.nodeid)]
-        resource_names = self.get_resource_names(nodevalue)
-        return ", ".join(resource_names)
+        items = self.disambiguate(nodevalue)
+        return ", ".join([item.resourceName for item in items])
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         for relatedResourceItem in nodevalue:
-            tile_data = self.disambiguateForeignKey(nodevalue["resourceXresourceId"])
-            document["ids"].append({"id": tile_data["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
+            document["ids"].append({"id": relatedResourceItem["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
+            if relatedResourceItem["resourceName"] not in document["strings"]:
+                document["strings"].append({"string": relatedResourceItem["resourceName"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
+
+        # for relatedResourceItem in self.get_id_list(nodevalue):
+        #     tile_data = self.disambiguate(relatedResourceItem)
+        #     document["ids"].append({"id": tile_data["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
         
-        import ipdb
-        ipdb.sset_trace()
-        for resource_name in self.get_resource_names(nodevalue):
-            if resource_name not in document["strings"]:
-                document["strings"].append({"string": resource_name, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
+        # for resource_name in self.get_resource_names(nodevalue):
+        #     if resource_name not in document["strings"]:
+        #         document["strings"].append({"string": resource_name, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
 
     def transform_import_values(self, value, nodeid):
         return [v.strip() for v in value.split(",")]
@@ -1761,11 +1786,25 @@ class ResourceInstanceDataType(BaseDataType):
     def default_es_mapping(self):
         return {
             "properties": {
+                "resourceId": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
+                "ontologyProperty": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
+                "inverseOntologyProperty": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
+                "resourceName": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
+                "ontologyClass": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
                 "resourceXresourceId": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}
             }
         }
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
+
+    def disambiguate(self, nodevalue):
+        ret = []
+        if nodevalue is not None:
+            for key in nodevalue:
+                m = super(ResourceInstanceListDataType, self).disambiguate(key)
+                ret.append(m)
+        return ret
+
     def append_search_filters(self, value, node, query, request):
         try:
             if value["val"] != "":

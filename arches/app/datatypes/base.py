@@ -292,3 +292,6 @@ class BaseDataType(object):
         if default_mapping:
             ret = {"properties": {"tiles": {"type": "nested", "properties": {"data": {"properties": {str(nodeid): default_mapping}}},}}}
         return ret
+
+    def disambiguate(self, value):
+        return value

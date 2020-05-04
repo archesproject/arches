@@ -10,11 +10,9 @@ define([
         var self = this;
         params.configKeys = ['placeholder'];
         this.state = params.state;
-        //if(this.state !== 'display_value'){
-            this.multiple = params.multiple || false;
-            this.value = params.value || undefined;
-            this.graphIsSemantic = params.graph ? !!params.graph.ontologyclass : false;
-        //}
+        this.multiple = params.multiple || false;
+        this.value = params.value || undefined;
+        this.graphIsSemantic = params.graph ? !!params.graph.ontologyclass : false;
         this.graphids = params.node ? ko.unwrap(params.node.config.graphid) : [params.graphid];
         this.graphids = this.graphids || [];
         this.graphNames = {};
@@ -35,21 +33,24 @@ define([
 
 
         WidgetViewModel.apply(this, [params]);
-        var displayName = ko.observable('');
+        //var displayName = ko.observable('');
         self.newTileStep = ko.observable();
-        this.valueList = ko.computed(function() {
-            var valueList = self.value();
-            displayName();
-            if (!self.multiple && valueList) {
-                valueList = [valueList];
-            }
-            if (Array.isArray(valueList)) {
-                return valueList;
-            }
-            return [];
-        });
-        this.displayValue = displayName;
+        // this.valueList = ko.computed(function() {
+        //     var valueList = ko.unwrap(self.value);
+        //     //displayName();
+        //     if (!self.multiple && valueList) {
+        //         valueList = [valueList];
+        //     }
+        //     if (Array.isArray(valueList)) {
+        //         return valueList;
+        //     }
+        //     return [];
+        // });
+        this.displayValue = ko.observable('');
 
+        ///
+        // this.removeGraphIdsFromValue and this.close are only used if newTileStep is True
+        ///
         this.removeGraphIdsFromValue = function(value) {
             if (Array.isArray(value)) {
                 self.graphids.forEach(function(graphid){
@@ -72,39 +73,109 @@ define([
             this.newTileStep(null);
         };
 
-        this.valueObjects = ko.computed(function() {
-            return self.valueList().map(function(value) {
-                return {
-                    id: value,
-                    name: nameLookup[value],
-                    reportUrl: arches.urls.resource_report + value
-                };
-            }).filter(function(item) {
-                return item.name;
-            });
-        });
+
+        this.selectedResourceRelationship = ko.observable(null);
+
+        // this.editRelationship = function(relationshipItem) {
+        //     this.selectedResourceRelationship(resourceName)
+        // }
+
+        // this.valueObjects = ko.computed(function() {
+        //     return self.valueList().map(function(value) {
+        //         return {
+        //             id: value,
+        //             name: nameLookup[value],
+        //             reportUrl: arches.urls.resource_report + value
+        //         };
+        //     }).filter(function(item) {
+        //         return item.name;
+        //     });
+        // });
+
+
+        var setValue = function(valueObject) {
+            if (self.multiple) {
+                valueObject = [valueObject];
+                if (self.value() !== null) {
+                    valueObject = valueObject.concat(self.value());
+                }
+                self.value(valueObject);
+            } else {
+                self.value([valueObject]);
+                // Object.assign(self.value, valueObject);
+                //self.value(valueObject);
+                // if(!self.value()[0].resourceName){
+                //     Object.assign(self.value()[0], valueObject);
+
+                //     Object.defineProperty(self.value()[0], 'resourceName', {
+                //         value: valueObject.resourceName
+                //     });
+                //     Object.defineProperty(self.value()[0], 'ontologyClass', {
+                //         value: valueObject.ontologyClass
+                //     });
+                // }
+            }
+        };
+
+        //this.valueObjects = ko.observableArray();
+
+        this.resourceReportUrl = arches.urls.resource_report;
 
         var updateName = function() {
             var names = [];
-            self.valueList().forEach(function(val) {
-                if (val) {
-                    if (nameLookup[val]) {
-                        names.push(nameLookup[val]);
-                        displayName(names.join(', '));
-                    } else {
-                        $.ajax(arches.urls.resource_descriptors + val, {
-                            dataType: "json"
-                        }).done(function(data) {
-                            nameLookup[val] = data.displayname;
-                            names.push(data.displayname);
-                            displayName(names.join(', '));
-                        });
+            var value = ko.unwrap(self.value);
+            if (!self.multiple && value && !Array.isArray(value)) {
+                value = [value];
+            }
+            if(!!value) {
+                //self.value(null);
+                value.forEach(function(val) {
+                    if (val) {
+                        if (nameLookup[val.resourceId()]) {
+                            names.push(nameLookup[val.resourceId()]);
+                            self.displayValue(names.join(', '));
+                        } else {
+                            window.fetch(arches.urls.disambiguate_node_value(params.datatype, val.resourceXresourceId()))
+                                .then(function(response) {
+                                    return response.json();
+                                }).then(function(data) {
+                                    data.forEach(function(resourceInstance){
+                                        nameLookup[val.resourceId()] = resourceInstance.resourceName;
+                                        names.push(resourceInstance.resourceName);
+                                        self.displayValue(names.join(', '));
+                                        val.resourceName(nameLookup[val.resourceId()]);
+                                        // var valueObj = makeObject(resourceInstance.resourceId, resourceInstance.resourceName, '');
+                                        // setValue(valueObj);
+                                    });
+                                    //self.valueObjects(data);
+                                });
+                            // $.ajax(arches.urls.disambiguate_node_value(val, {
+                            //     dataType: "json",
+                            //     data: 
+                            // }).done(function(data) {
+                            //     nameLookup[val] = data.displayname;
+                            //     names.push(data.displayname);
+                            //     displayName(names.join(', '));
+                            // });
+                        }
                     }
-                }
-            });
+                });
+            }
         };
 
-        updateName();
+        // update related resource names even though it's already in tile.data, 
+        // but the name might have been changed since the relationship was made
+        if(self.multiple === true){
+            if(!!self.value()){
+                self.value().forEach(function(value){
+                    if(typeof value === 'string'){
+                        updateName();
+                    }
+                });
+            }
+        }else{
+            updateName();
+        }
 
         var relatedResourceModels = ko.computed(function() {
             var res = [];
@@ -128,21 +199,19 @@ define([
 
         var makeObject = function(id, name, ontologyclass){
             var ret = {
-                "resourceId": id,
+                "resourceId": ko.observable(id),
                 "ontologyProperty": ko.observable(""),
-                "inverseOntologyProperty": ko.observable("")
+                "inverseOntologyProperty": ko.observable(""),
+                "resourceName": ko.observable(name),
+                "ontologyClass": ko.observable(ontologyclass),
+                "resourceXresourceId": ""
             };
-            Object.defineProperty(ret, 'resourceName', {
-                value: name
-            });
-            Object.defineProperty(ret, 'ontologyClass', {
-                value: ontologyclass
-            });
-            Object.defineProperty(ret, 'editing', {
-                value: ko.observable(false),
-                enumerable: false,
-                writable: true
-            });
+            // Object.defineProperty(ret, 'resourceName', {
+            //     value: name
+            // });
+            // Object.defineProperty(ret, 'ontologyClass', {
+            //     value: ontologyclass
+            // });
             return ret;
         };
 
@@ -158,7 +227,6 @@ define([
                     return json;
                 });
         };
-
 
         var url = ko.observable(arches.urls.search_results);
         this.url = url;
@@ -188,13 +256,14 @@ define([
                         //     enumerable: false,
                         //     writable: true
                         // });
-                        if (self.multiple) {
-                            ret = [ret];
-                            if (self.value() !== null) {
-                                ret = ret.concat(self.value());
-                            }
-                        }
-                        self.value(ret);
+                        setValue(ret);
+                        // if (self.multiple) {
+                        //     ret = [ret];
+                        //     if (self.value() !== null) {
+                        //         ret = ret.concat(self.value());
+                        //     }
+                        // }
+                        // self.value(ret);
                         window.setTimeout(function() {
                             resourceToAdd("");
                         }, 250);
@@ -225,9 +294,8 @@ define([
                                     //     "ontologyproperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"),
                                     //     "revProperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10i_contains"),
                                     //     "ontologyclass": item._source.root_ontology_class,
-                                    //     "editing": ko.observable(false)
                                     // };
-                                    self.value(ret);
+                                    setValue(ret);
                                 })
                                 .finally(function(){
                                     self.newTileStep(null);
