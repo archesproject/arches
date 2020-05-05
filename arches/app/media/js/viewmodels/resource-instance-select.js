@@ -242,28 +242,7 @@ define([
                 if (self.state !== 'search') {
                     if (item._source) {
                         var ret = makeObject(item._id, item._source.displayname, item._source.root_ontology_class);
-                        // var ret = {
-                        //     "resource": {
-                        //         "id": item._id,
-                        //         "name": item._source.displayname
-                        //     },
-                        //     "ontologyproperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"),
-                        //     "revProperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10i_contains"),
-                        //     "ontologyclass": item._source.root_ontology_class
-                        // };
-                        // Object.defineProperty(ret, 'editing', {
-                        //     value: ko.observable(false),
-                        //     enumerable: false,
-                        //     writable: true
-                        // });
                         setValue(ret);
-                        // if (self.multiple) {
-                        //     ret = [ret];
-                        //     if (self.value() !== null) {
-                        //         ret = ret.concat(self.value());
-                        //     }
-                        // }
-                        // self.value(ret);
                         window.setTimeout(function() {
                             resourceToAdd("");
                         }, 250);
@@ -286,15 +265,6 @@ define([
                                 .then(function(json) {
                                     var item = json.results.hits.hits[0];
                                     var ret = makeObject(params.resourceid(), item._source.displayname, item._source.root_ontology_class);
-                                    // var ret = {
-                                    //     "resource": {
-                                    //         "id": params.resourceid(),
-                                    //         "name": item._source.displayname
-                                    //     },
-                                    //     "ontologyproperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"),
-                                    //     "revProperty": ko.observable("http://www.cidoc-crm.org/cidoc-crm/P10i_contains"),
-                                    //     "ontologyclass": item._source.root_ontology_class,
-                                    // };
                                     setValue(ret);
                                 })
                                 .finally(function(){
@@ -326,7 +296,7 @@ define([
                         url(arches.urls.search_results);
                         var data = { 'paging-filter': page };
                         if (!!params.node) {
-                            var graphids = ko.unwrap(params.node.config.graphs()).map(function(graph) {
+                            var graphids = ko.unwrap(params.node.config.graphs).map(function(graph) {
                                 return {
                                     "graphid": graph.graphid,
                                     "inverted": false

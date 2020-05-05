@@ -184,7 +184,9 @@ define([
                                     };
                                 };
                                 relationship['resource'] = res.length > 0 ? res[0] : '';
-                                relationship.iconclass = viewModel.graphNameLookup[relationship.resource.graph_id].icon;
+                                if(!!relationship['resource']) {
+                                    relationship.iconclass = viewModel.graphNameLookup[relationship.resource.graph_id].icon;
+                                }
                                 relationshipsWithResource.push(relationship);
                             }, this);
                             var sorted = _(relationshipsWithResource).chain()

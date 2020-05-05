@@ -21,4 +21,9 @@ class Migration(migrations.Migration):
             name='tileid',
             field=models.ForeignKey(blank=True, db_column='tileid', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='resxres_tile_id', to='models.TileModel'),
         ),
+        migrations.AddField(
+            model_name='resourcexresource',
+            name='nodeid',
+            field=models.ForeignKey(blank=True, db_column='nodeid', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='resxres_node_id', to='models.Node'),
+        ),
     ]

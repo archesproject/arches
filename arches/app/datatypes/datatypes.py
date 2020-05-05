@@ -1580,10 +1580,10 @@ class ResourceInstanceDataType(BaseDataType):
         {
             "resourceId": "",
             "ontologyProperty": "",
-            "inverseOntologyProperty": ""
-        }  
-
-        and get's saved as a single uuid representing a row id in the resourceXresource table
+            "inverseOntologyProperty": "",
+            "resourceName": "",
+            "ontologyClass": ""
+        }
 
     """
 
@@ -1621,27 +1621,6 @@ class ResourceInstanceDataType(BaseDataType):
         else:
             logger.warning(_("No resource relationship available"))
         return ret
-    
-    # def get_resource_names(self, nodevalue):
-    #     resource_names = set([])
-    #     if nodevalue is not None:
-    #         se = SearchEngineFactory().create()
-    #         resourceXresourceIds = self.get_id_list(nodevalue)
-    #         for resourceXresourceId in resourceXresourceIds:
-    #             resourceid = None
-    #             try:
-    #                 tile_data = self.disambiguate(resourceXresourceId)
-    #                 resourceid = tile_data["resourceId"]
-    #                 resource_document = se.search(index="resources", id=resourceid)
-    #                 resource_names.add(resource_document["docs"][0]["_source"]["displayname"])
-    #             except NotFoundError as e:
-    #                 logger.info(
-    #                     f"Resource {resourceid} not available. This message may appear during resource load, \
-    #                         in which case the problem will be resolved once the related resource is loaded"
-    #                 )
-    #     else:
-    #         logger.warning(_("No resource relationship available"))
-    #     return resource_names
 
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
@@ -1665,27 +1644,45 @@ class ResourceInstanceDataType(BaseDataType):
 
     def pre_tile_save(self, tile, nodeid):
         tiledata = tile.data[str(nodeid)]
-        if tiledata:
+        if tiledata is None or tiledata == []:
+            # resource relationship has been removed
+            try:
+                for rr in models.ResourceXResource.objects.filter(tileid_id=tile.pk, nodeid_id=nodeid):
+                    rr.delete()
+            except:
+                pass
+        else:
+            resourceXresourceSaved = set()
             for relationship in tiledata:
-                rr = models.ResourceXResource(
-                    resourceinstanceidfrom=models.ResourceInstance(tile.resourceinstance_id),
-                    resourceinstanceidto=models.ResourceInstance(relationship["resourceId"]),
-                    notes="",
-                    relationshiptype=relationship["ontologyProperty"],
-                    inverserelationshiptype=relationship["inverseOntologyProperty"],
-                    tileid_id=tile.pk
-                    # datestarted="",
-                    # dateended="",
-                )
-                rr.save()
-                relationship["resourceXresourceId"] = str(rr.pk)
-            # tile.data[str(nodeid)] = [{"resourceXresourceId": str(rr.pk)}]
+                resourceXresourceId = None if relationship["resourceXresourceId"] == "" else relationship["resourceXresourceId"]
+                defaults={
+                    "resourceinstanceidfrom_id": tile.resourceinstance_id,
+                    "resourceinstanceidto_id": relationship["resourceId"],
+                    "notes": "",
+                    "relationshiptype": relationship["ontologyProperty"],
+                    "inverserelationshiptype": relationship["inverseOntologyProperty"],
+                    "tileid_id": tile.pk,
+                    "nodeid_id": nodeid
+                }
 
-            # tile.data[str(nodeid)] = str(rr.pk)
-            # try:
-            # except ModelInactiveError as e:
-            #     message = _("Unable to save. Please verify the model status is active")
-            #     return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
+                try:
+                    rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
+                    for key, value in defaults.items():
+                        setattr(rr, key, value)
+                    rr.save()
+                except models.ResourceXResource.DoesNotExist:
+                    rr = models.ResourceXResource(**defaults)
+                    rr.save()
+                relationship["resourceXresourceId"] = str(rr.pk)
+                resourceXresourceSaved.add(rr.pk)
+
+            # get a list of all resourceXresources with the same tile and node
+            # if there are any ids in that list that aren't in the resourceXresourceSaved 
+            # then those need to be removed from the db
+            resourceXresourceInDb = set(models.ResourceXResource.objects.filter(tileid_id=tile.pk, nodeid_id=nodeid).values_list('pk', flat=True))
+            to_delete = resourceXresourceInDb - resourceXresourceSaved
+            for rr in models.ResourceXResource.objects.filter(pk__in=to_delete):
+                rr.delete()
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
@@ -1698,14 +1695,6 @@ class ResourceInstanceDataType(BaseDataType):
             document["ids"].append({"id": relatedResourceItem["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
             if relatedResourceItem["resourceName"] not in document["strings"]:
                 document["strings"].append({"string": relatedResourceItem["resourceName"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
-
-        # for relatedResourceItem in self.get_id_list(nodevalue):
-        #     tile_data = self.disambiguate(relatedResourceItem)
-        #     document["ids"].append({"id": tile_data["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
-        
-        # for resource_name in self.get_resource_names(nodevalue):
-        #     if resource_name not in document["strings"]:
-        #         document["strings"].append({"string": resource_name, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
 
     def transform_import_values(self, value, nodeid):
         return [v.strip() for v in value.split(",")]

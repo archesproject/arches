@@ -4,7 +4,11 @@ define([
     'bindings/select2-query'
 ], function(ko, ResourceInstanceSelectViewModel) {
     return ko.components.register('resource-instance-select-widget', {
-        viewModel: ResourceInstanceSelectViewModel,
+        viewModel: function(params) {
+            params.multiple = false;
+            params.datatype = 'resource-instance';
+            ResourceInstanceSelectViewModel.apply(this, [params]);
+        },
         template: {
             require: 'text!widget-templates/resource-instance-select'
         }

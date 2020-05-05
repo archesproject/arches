@@ -662,6 +662,14 @@ class ResourceXResource(models.Model):
         related_name="resxres_tile_id",
         on_delete=models.CASCADE,
     )
+    nodeid = models.ForeignKey(
+        "Node",
+        db_column="nodeid",
+        blank=True,
+        null=True,
+        related_name="resxres_node_id",
+        on_delete=models.CASCADE,
+    )
     datestarted = models.DateField(blank=True, null=True)
     dateended = models.DateField(blank=True, null=True)
     created = models.DateTimeField()
