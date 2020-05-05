@@ -3,7 +3,8 @@ define([
     'jquery',
     'viewmodels/widget',
     'arches',
-], function(ko, $, WidgetViewModel, arches) {
+    'report-templates',
+], function(ko, $, WidgetViewModel, arches, reportLookup) {
     var nameLookup = {};
     require(['views/components/workflows/new-tile-step']);
     var ResourceInstanceSelectViewModel = function(params) {
@@ -23,7 +24,7 @@ define([
         });
         this.filter = ko.observable('');
         this.relationshipInFilter = function(relationship) {
-            if (self.filter().toLowerCase() === '' || relationship.resourceName.toLowerCase().includes(self.filter().toLowerCase())){
+            if (self.filter().toLowerCase() === '' || relationship.resourceName().toLowerCase().includes(self.filter().toLowerCase())){
                 return true;
             }
             return false;
