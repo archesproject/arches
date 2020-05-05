@@ -779,18 +779,20 @@ class ResourceReportView(MapBaseManagerView):
         context["nav"]["print"] = True
 
         if request.GET.get("json", False):
-            return JSONResponse({
-                'templates': templates,
-                'datatypes': datatypes,
-                'cards': context['cards'],
-                'tiles': context['tiles'],
-                'graph': context['graph_json'],
-                'related_resources': context['related_resources'],
-                'displayname': context['displayname'],
-                'cardComponents': context['card_components'],
-                'resourceid': context['resourceid'],
-                'cardwidgets': context['cardwidgets']
-            })
+            return JSONResponse(
+                {
+                    "templates": templates,
+                    "datatypes": datatypes,
+                    "cards": context["cards"],
+                    "tiles": context["tiles"],
+                    "graph": context["graph_json"],
+                    "related_resources": context["related_resources"],
+                    "displayname": context["displayname"],
+                    "cardComponents": context["card_components"],
+                    "resourceid": context["resourceid"],
+                    "cardwidgets": context["cardwidgets"],
+                }
+            )
 
         return render(request, "views/resource/report.htm", context)
 
