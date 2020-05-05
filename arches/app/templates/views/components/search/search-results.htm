@@ -19,6 +19,9 @@
             <a class="provisional-edits" href=""><i class="fa fa-exclamation-circle"></i> {% trans "Has provisional edits" %} </a>
             <!--/ko-->
 
+            <!-- ko if: !!$parent.details -->
+            <a class="search-candidate-link" href="" data-bind="click: showDetails"><i class="fa fa-info-circle"></i> {% trans "Details" %} </a>
+            <!-- /ko -->
 
             {% if user|can_edit_resource_instance %}
             <!--ko if: canEdit -->
