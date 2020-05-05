@@ -1489,9 +1489,6 @@ class DomainListDataType(BaseDomainDataType):
                 errors = errors + domainDataType.validate(value, row_number)
         return errors
 
-    def transform_import_values(self, value, nodeid):
-        return [v.strip() for v in value.split(",")]
-
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
         node = models.Node.objects.get(nodeid=nodeid)

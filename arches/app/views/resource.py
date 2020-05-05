@@ -103,7 +103,10 @@ def get_instance_creator(resource_instance, user):
 
     except Exception:
         logger.error("Cannot find instance creator when retrieving instance permissions")
-        return None, None
+        if user.is_superuser:
+            return user.id, user.is_superuser
+        else:
+            return None, False
 
 
 class ResourceEditorView(MapBaseManagerView):
@@ -366,6 +369,13 @@ class ResourcePermissionDataView(View):
         resource = Resource(resourceinstanceid)
         resource.graph_id = graphid if graphid else str(models.ResourceInstance.objects.get(pk=resourceinstanceid).graph_id)
         resource.add_permission_to_all("no_access_to_resourceinstance")
+        if models.EditLog.objects.filter(resourceinstanceid=resource.resourceinstanceid).filter(edittype="create").exists():
+            userid = models.EditLog.objects.filter(resourceinstanceid=resource.resourceinstanceid).filter(edittype="create")[0].userid
+            user = User.objects.get(pk=userid)
+            assign_perm("view_resourceinstance", user, resource)
+            assign_perm("change_resourceinstance", user, resource)
+            assign_perm("delete_resourceinstance", user, resource)
+            remove_perm("no_access_to_resourceinstance", user, resource)
         return self.get_instance_permissions(resource)
 
     def make_instance_public(self, resourceinstanceid, graphid=None):
@@ -401,7 +411,7 @@ class ResourcePermissionDataView(View):
                                     assign_perm(perm["codename"], identityModel, resource_instance)
 
                 resource = Resource(str(resource_instance.resourceinstanceid))
-                resource.graphid = resource_instance.graph_id
+                resource.graph_id = resource_instance.graph_id
                 resource.index()
 
 
@@ -651,6 +661,8 @@ class ResourceDescriptors(View):
                         "map_popup": document["map_popup"],
                         "displayname": document["displayname"],
                         "geometries": document["geometries"],
+                        "permissions": document["permissions"],
+                        "userid": request.user.id,
                     }
                 )
             except Exception as e:
@@ -775,6 +787,22 @@ class ResourceReportView(MapBaseManagerView):
         context["nav"]["res_edit"] = True
         context["nav"]["print"] = True
         context["nav"]["print"] = True
+
+        if request.GET.get("json", False):
+            return JSONResponse(
+                {
+                    "templates": templates,
+                    "datatypes": datatypes,
+                    "cards": context["cards"],
+                    "tiles": context["tiles"],
+                    "graph": context["graph_json"],
+                    "related_resources": context["related_resources"],
+                    "displayname": context["displayname"],
+                    "cardComponents": context["card_components"],
+                    "resourceid": context["resourceid"],
+                    "cardwidgets": context["cardwidgets"],
+                }
+            )
 
         return render(request, "views/resource/report.htm", context)
 

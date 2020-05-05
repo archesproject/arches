@@ -50,21 +50,21 @@
                 </div>
                 <div class="permissions-list-table-body">
                      <!--ko foreach: filteredPermissions() --> 
-                        <!--ko if: $data.creator -->
+                        <!--ko if: $data.creatorOrSuperUser -->
                         <div class="permissions-table-row">
                             <div style="display: inline-flex">
                                 <div class="identities-column"><i style="color: #579ddb; padding: 0 5px" class="fa" data-bind="class: function(){return $data['type']==='user' ? 'fa-user' : 'fa-users'}()"></i><span data-bind="text: $data['name']"></span></div>
-                                <div class="permissions-column" data-bind="text: $data.availablePermissions.filter(function(a){return !!a.selected() && a.codename !== 'no_access_to_resourceinstance'}).map(function(x){return x.name.replace(' resource', '')}).join(', ')"></div>
+                                <div class="permissions-column" data-bind="text: [$parent.permissionLabelLookup.view_resourceinstance,$parent.permissionLabelLookup.change_resourceinstance,$parent.permissionLabelLookup.delete_resourceinstance].join(', ')"></div>
                             </div>
                         </div>
                          <!--/ko-->
                      <!--/ko-->
                     <!--ko foreach: filteredPermissions() -->
-                    <!--ko ifnot: $data.creator -->
+                    <!--ko ifnot: $data.creatorOrSuperUser -->
                     <div class="permissions-table-row" data-bind = "css: {selected: $data.selected()}">
                         <div data-bind="click: function(){$data.selected(!$data.selected())}" style="display: inline-flex">
                             <div class="identities-column"><i style="color: #579ddb; padding: 0 5px" class="fa" data-bind="class: function(){return $data['type']==='user' ? 'fa-user' : 'fa-users'}()"></i><span data-bind="text: $data['name']"></span></div>
-                            <div class="permissions-column" data-bind="text: $data.availablePermissions.filter(function(a){return !!a.selected()}).map(function(x){return x.name.replace(' resource', '')}).join(', ')"></div>
+                            <div class="permissions-column" data-bind="text: $data.availablePermissions.filter(function(a){return !!a.selected()}).map(function(p){return $parent.permissionLabelLookup[p.codename]}).join(', ')"></div>
                         </div>
                         <!--ko if: selected-->
                         <div class="permission-selection-panel">

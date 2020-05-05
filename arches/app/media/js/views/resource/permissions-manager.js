@@ -16,8 +16,10 @@ define([
             this.identities = ko.observableArray();
             this.filter = ko.observable('');
             this.dirty = ko.observable(false);
+            this.creatorid = params.creator;
             this.alertTitle = params.alertTitle;
             this.alertMessage = params.alertMessage;
+            this.permissionLabelLookup = params.permissionLabelLookup;
 
             this.getInstancePermissions = function(){
                 $.ajax({
@@ -58,7 +60,7 @@ define([
                 if (ko.unwrap(self.dirty)) {
                     resetPermissions = JSON.parse(self._startPermissions);
                     resetPermissions.identities.forEach(function(identity){
-                        if (Number(identity.id) === Number(self.creator) && identity.type == 'user') {
+                        if (Number(identity.id) === Number(self.creatorid) && identity.type == 'user') {
                             //pass
                         } else {
                             var defaultperms = identity.default_permissions.map(function(perm){return perm.codename;});
@@ -83,6 +85,18 @@ define([
                 permissionlist.splice(permissionIndex, 1);
             };
 
+            this.checkDirty = function(start, current) {
+                var clean = start.identities.every(function(k, i){
+                    var startPerms = k.default_permissions;
+                    var currentPerms = current.identities[i].default_permissions;
+                    var startPattern = JSON.stringify(startPerms.map(function(p){return p.id;}).sort());
+                    var endPattern = JSON.stringify(currentPerms.map(function(p){return p.id;}).sort());
+                    return startPattern === endPattern;
+                });
+                var dirty = !clean;
+                return dirty;
+            };
+
             this.updateState = function(includePermission, identityId, type, permission) {
                 self._currentPermissions['identities'].forEach(function(id) {
                     if (id.type === type && id.id === identityId) {
@@ -100,21 +114,19 @@ define([
                         }
                     }
                 }, self);
-                var dirty = koMapping.toJSON(self._currentPermissions) !== self._startPermissions;
-                self.dirty(dirty);
+                self.dirty(self.checkDirty(self._currentPermissions, JSON.parse(self._startPermissions)));
             };
 
             this.initPermissions = function(data) {
                 self._startPermissions = JSON.stringify(data);
                 self._currentPermissions = JSON.parse(self._startPermissions);
                 self._permissionLookup = {};
-                self.creator = data['creatorid'];
                 data.permissions.forEach(function(perm){ 
                     self._permissionLookup[perm.codename] = perm;
                 });
                 data['identities'].forEach(function(id){
                     id.selected = ko.observable(false);
-                    id.creator = Number(self.creator) === Number(id.id) && id.type == 'user';
+                    id.creatorOrSuperUser = Number(self.creatorid) === Number(id.id) && id.type == 'user';
                     id.availablePermissions = JSON.parse(JSON.stringify(data['permissions']));
                     var defaultPermissions = id.default_permissions.map(function(perm){return perm.codename;});
                     var iconLookup = {
