@@ -11137,6 +11137,12 @@ a.tree-display-tool, a.tree-display-tool:hover {
     right: 0;
 }
 
+.password-reset-form #id_email {
+    width: 100%;
+    padding: 10px 16px;
+    line-height: 1.3333333;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
