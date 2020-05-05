@@ -1116,7 +1116,7 @@ ul.tabbed-report-tab-list {
     border: 1px solid black;
 }
 
-.file-viewer .loading-mask {
+.file-viewer .loading-mask, .search-result-details .loading-mask {
     position: relative;
     opacity: .5;
     background-color: gray;
@@ -1127,7 +1127,7 @@ ul.tabbed-report-tab-list {
     z-index: 240;
 }
 
-.file-viewer .loading-mask::before {
+.file-viewer .loading-mask::before, .search-result-details .loading-mask::before {
     position: fixed;
     opacity: .5;
     color: #7b7b7b;
@@ -1146,7 +1146,7 @@ ul.tabbed-report-tab-list {
     z-index: 100000001;
 }
 
-.file-viewer .loading-mask:after {
+.file-viewer .loading-mask:after, .search-result-details .loading-mask::after {
     position: fixed;
     opacity: .5;
     color: #7b7b7b;
@@ -2774,8 +2774,8 @@ a.select2-search-choice-close {
 }
 
 .permission-filter {
-    display:inline-flex; 
-    justify-content: 
+    display:inline-flex;
+    justify-content:
     space-between;
     width: 250px;
 }
@@ -11855,6 +11855,19 @@ a.jstree-anchor.permissions-widget {
     height: 400px;
 }
 
+.search-result-details {
+    background: #fff;
+    height: 100%;
+}
+
+.search-result-details-splash {
+    padding-top: 50px;
+}
+
+.search-result-details-splash .rr-splash {
+    margin-top: 0;
+}
+
 .iiif-viewer-gallery, .show-gallery-control {
     color: rgb(45, 70, 103);
     position: absolute;
@@ -12105,7 +12118,7 @@ a.jstree-anchor.permissions-widget {
 }
 .manifest-editor {
     padding-bottom: 10px;
-    width: 100%; 
+    width: 100%;
     padding-left: 20px;
 }
 
