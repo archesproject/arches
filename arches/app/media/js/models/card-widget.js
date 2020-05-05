@@ -100,7 +100,6 @@ define([
             this.disposables.push(this.configJSON);
 
             this.dispose = function() {
-                //console.log('disposing CardWidgetModel');
                 dispose(self);
             };
 
