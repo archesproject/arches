@@ -723,14 +723,16 @@ class ResourceReportView(MapBaseManagerView):
         card_components = models.CardComponent.objects.all()
 
         if request.GET.get("json", False) and request.GET.get("exclude_graph", False):
-            return JSONResponse({
-                'templates': templates,
-                'tiles': permitted_tiles,
-                'related_resources': related_resource_summary,
-                'displayname': displayname,
-                'cardComponents': card_components,
-                'resourceid': resourceid
-            })
+            return JSONResponse(
+                {
+                    "templates": templates,
+                    "tiles": permitted_tiles,
+                    "related_resources": related_resource_summary,
+                    "displayname": displayname,
+                    "cardComponents": card_components,
+                    "resourceid": resourceid,
+                }
+            )
 
         datatypes = models.DDataType.objects.all()
         graph = Graph.objects.get(graphid=resource.graph_id)
@@ -745,18 +747,20 @@ class ResourceReportView(MapBaseManagerView):
         ]
 
         if request.GET.get("json", False) and not request.GET.get("exclude_graph", False):
-            return JSONResponse({
-                'templates': templates,
-                'datatypes': datatypes,
-                'cards': permitted_cards,
-                'tiles': permitted_tiles,
-                'graph': graph,
-                'related_resources': related_resource_summary,
-                'displayname': displayname,
-                'cardComponents': card_components,
-                'resourceid': resourceid,
-                'cardwidgets': cardwidgets
-            })
+            return JSONResponse(
+                {
+                    "templates": templates,
+                    "datatypes": datatypes,
+                    "cards": permitted_cards,
+                    "tiles": permitted_tiles,
+                    "graph": graph,
+                    "related_resources": related_resource_summary,
+                    "displayname": displayname,
+                    "cardComponents": card_components,
+                    "resourceid": resourceid,
+                    "cardwidgets": cardwidgets,
+                }
+            )
 
         context = self.get_context_data(
             main_script="views/resource/report",
