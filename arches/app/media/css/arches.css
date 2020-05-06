@@ -11137,10 +11137,20 @@ a.tree-display-tool, a.tree-display-tool:hover {
     right: 0;
 }
 
-.password-reset-form #id_email {
+.password-reset-form #id_email,
+.password-reset-form #id_new_password1,
+.password-reset-form #id_new_password2 {
     width: 100%;
     padding: 10px 16px;
     line-height: 1.3333333;
+}
+
+#login-form .alert h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: inherit;
+    font-weight: 600;
+    font-size: 1.2em;
 }
 
 @keyframes loader {

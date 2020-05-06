@@ -25,152 +25,155 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     -->
 
     <!-- LOGIN FORM -->
-    <div class="cls-content arches-signin">
-        <div class="cls-content-sm panel login-panel" style="max-width: 350px;">
-            <div class="panel-body">
-                <h1 class="login-panel-header arches-signin">{% trans "Create Account" %}</h1>
-                <p class="arches-signin-subtext">
-                    Register to access data modeling, editing, and discovery tools. 
-                </p>
-                <form class="change-password-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
-                    {% csrf_token %}
-                    <div>
-                        {% if form.errors %}
-                        <p class="errornote">
-                            {% if form.errors.items|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
-                            {% if form.ts.errors %}
-                            {% for error in form.ts.errors %}
-                                <div style="color:darkred">{{ error|escape }}</div>
-                            {% endfor %}
+    <main>
+        <div class="cls-content arches-signin">
+            <div class="cls-content-sm panel login-panel" style="max-width: 350px;">
+                <div class="panel-body">
+                    <h1 class="login-panel-header arches-signin">{% trans "Create Account" %}</h1>
+                    <form class="change-password-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
+                        {% csrf_token %}
+                        <div>
+                            {% if form.errors %}
+                            <p class="errornote">
+                                {% if form.errors.items|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
+                                {% if form.ts.errors %}
+                                {% for error in form.ts.errors %}
+                                    <div style="color:darkred">{{ error|escape }}</div>
+                                {% endfor %}
+                                {% endif %}
+                            </p>
                             {% endif %}
-                        </p>
-                        {% endif %}
 
-                        {{ confirmation_message | safe }}
+                            {{ confirmation_message | safe }}
 
-                        {% if showform %}
-                        <fieldset>
-                        
-                            <div class="form-group">
-                                <label class="reqlabel control-label widget-input-label" for="username"><span class="fa fa-asterisk reqfield"></span> Username</label>
-                                <div class="input-group">
-                                    <div class="input-group-addon"><i class="ion-compose"></i></div>
-                                    <input id="username" type="text" class="form-control input-lg" name='username' autofocus value='{{postdata.username}}' aria-required="true">
-                                </div>
-                                {% if form.username.errors %}
-                                {% for error in form.username.errors %}
-                                    <div style="color:darkred">{{ error|escape }}</div>
-                                {% endfor %}
-                                {% endif %}
-                            </div>
+                            {% if showform %}
+                            <fieldset>
 
-                            <div class="form-group">
-                                <label class="reqlabel control-label widget-input-label" for="first_name"><span class="fa fa-asterisk reqfield"></span> First Name</label>
-                                <div class="input-group">
-                                    <div class="input-group-addon"><i class="ion-compose"></i></div>
-                                    <input id="first_name" type="text" class="form-control input-lg" name='first_name' autofocus value='{{postdata.first_name}}' aria-required="true">
-                                </div>
-                                {% if form.first_name.errors %}
-                                {% for error in form.first_name.errors %}
-                                    <div style="color:darkred">{{ error|escape }}</div>
-                                {% endfor %}
-                                {% endif %}
-                            </div>
-
-                            <div class="form-group">
-                                <label class="reqlabel control-label widget-input-label" for="last_name"><span class="fa fa-asterisk reqfield"></span> Last Name</label>
-                                <div class="input-group">
-                                    <div class="input-group-addon"><i class="ion-compose"></i></div>
-                                    <input id="last_name" type="text" class="form-control input-lg" name='last_name' value='{{postdata.last_name}}' aria-required="true">
-                                </div>
-                                {% if form.last_name.errors %}
-                                {% for error in form.last_name.errors %}
-                                    <div style="color:darkred">{{ error|escape }}</div>
-                                {% endfor %}
-                                {% endif %}
-                            </div>
-
-                            <div class="form-group">
-                                <label class="reqlabel control-label widget-input-label" for="email"><span class="fa fa-asterisk reqfield"></span> Email</label>
-                                <div class="input-group">
-                                    <div class="input-group-addon"><i class="ion-email"></i></div>
-                                    <input id="email" type="text" class="form-control input-lg" name='email' value='{{postdata.email}}' aria-required="true">
-                                </div>
-                                {% if form.email.errors %}
-                                {% for error in form.email.errors %}
-                                    <div style="color:darkred">{{ error|escape }}</div>
-                                {% endfor %}
-                                {% endif %}
-                            </div>
-
-                            <div class="form-group">
-                                <label class="reqlabel control-label widget-input-label" for="password1"><span class="fa fa-asterisk reqfield"></span> Password</label>
-                                <div class="input-group">
-                                    <div class="input-group-addon"><i class="ion-asterisk"></i></div>
-                                    <input id="password1" type="password" class="form-control input-lg" name='password1' aria-required="true">
-                                </div>
-                                {% if form.password1.errors %}
-                                {% for error in form.password1.errors %}
-                                    <div style="color:darkred">{{ error|escape }}</div>
-                                {% endfor %}
-                                {% endif %}
-                            </div>
-
-                            <div class="form-group">
-                                <label class="reqlabel control-label widget-input-label" for="password2"><span class="fa fa-asterisk reqfield"></span> Confirm Password</label>
-                                <div class="input-group">
-                                    <div class="input-group-addon"><i class="ion-asterisk"></i></div>
-                                    <input id="password2" type="password" class="form-control input-lg" name='password2' aria-required="true">
-                                </div>
-                                {% if form.password2.errors %}
-                                {% for error in form.password2.errors %}
-                                    <div style="color:darkred">{{ error|escape }}</div>
-                                {% endfor %}
-                                {% endif %}
-                            </div>
-
-                            <div class="form-group">
-                                <div class="arches-signin-btn">
-                                    {% if showform %}
-                                    <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Signup" %}</button>
+                                <legend class="arches-signin-subtext">
+                                    Register to access data modeling, editing, and discovery tools.
+                                </legend>
+                            
+                                <div class="form-group">
+                                    <label class="reqlabel control-label widget-input-label" for="username"><span class="fa fa-asterisk reqfield"></span> Username</label>
+                                    <div class="input-group">
+                                        <div class="input-group-addon"><i class="ion-compose"></i></div>
+                                        <input id="username" type="text" class="form-control input-lg" name='username' autofocus value='{{postdata.username}}' aria-required="true">
+                                    </div>
+                                    {% if form.username.errors %}
+                                    {% for error in form.username.errors %}
+                                        <div style="color:darkred">{{ error|escape }}</div>
+                                    {% endfor %}
                                     {% endif %}
                                 </div>
-                                <div>
-                                    <span class="fa fa-asterisk reqfield reqtxt"></span> indicates a required field
-                                </div>
-                            </div>
 
-                            <div class="password-rules text-left">
-                                {% trans 'Your password must:' %}
-                                <ul class="list-unstyled">
-                                    {% for message in validation_help %}
-                                    <li class="password-rule"><i class="ion-checkmark-circled"></i><span>{{ message }}</span></li>
+                                <div class="form-group">
+                                    <label class="reqlabel control-label widget-input-label" for="first_name"><span class="fa fa-asterisk reqfield"></span> First Name</label>
+                                    <div class="input-group">
+                                        <div class="input-group-addon"><i class="ion-compose"></i></div>
+                                        <input id="first_name" type="text" class="form-control input-lg" name='first_name' autofocus value='{{postdata.first_name}}' aria-required="true">
+                                    </div>
+                                    {% if form.first_name.errors %}
+                                    {% for error in form.first_name.errors %}
+                                        <div style="color:darkred">{{ error|escape }}</div>
                                     {% endfor %}
-                                </ul>
-                            </div>
+                                    {% endif %}
+                                </div>
 
-                            {% if enable_captcha %}
-                            <div class="form-group">
-                            {{form.captcha}}
-                            </div>
+                                <div class="form-group">
+                                    <label class="reqlabel control-label widget-input-label" for="last_name"><span class="fa fa-asterisk reqfield"></span> Last Name</label>
+                                    <div class="input-group">
+                                        <div class="input-group-addon"><i class="ion-compose"></i></div>
+                                        <input id="last_name" type="text" class="form-control input-lg" name='last_name' value='{{postdata.last_name}}' aria-required="true">
+                                    </div>
+                                    {% if form.last_name.errors %}
+                                    {% for error in form.last_name.errors %}
+                                        <div style="color:darkred">{{ error|escape }}</div>
+                                    {% endfor %}
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="reqlabel control-label widget-input-label" for="email"><span class="fa fa-asterisk reqfield"></span> Email</label>
+                                    <div class="input-group">
+                                        <div class="input-group-addon"><i class="ion-email"></i></div>
+                                        <input id="email" type="text" class="form-control input-lg" name='email' value='{{postdata.email}}' aria-required="true">
+                                    </div>
+                                    {% if form.email.errors %}
+                                    {% for error in form.email.errors %}
+                                        <div style="color:darkred">{{ error|escape }}</div>
+                                    {% endfor %}
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="reqlabel control-label widget-input-label" for="password1"><span class="fa fa-asterisk reqfield"></span> Password</label>
+                                    <div class="input-group">
+                                        <div class="input-group-addon"><i class="ion-asterisk"></i></div>
+                                        <input id="password1" type="password" class="form-control input-lg" name='password1' aria-required="true">
+                                    </div>
+                                    {% if form.password1.errors %}
+                                    {% for error in form.password1.errors %}
+                                        <div style="color:darkred">{{ error|escape }}</div>
+                                    {% endfor %}
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="reqlabel control-label widget-input-label" for="password2"><span class="fa fa-asterisk reqfield"></span> Confirm Password</label>
+                                    <div class="input-group">
+                                        <div class="input-group-addon"><i class="ion-asterisk"></i></div>
+                                        <input id="password2" type="password" class="form-control input-lg" name='password2' aria-required="true">
+                                    </div>
+                                    {% if form.password2.errors %}
+                                    {% for error in form.password2.errors %}
+                                        <div style="color:darkred">{{ error|escape }}</div>
+                                    {% endfor %}
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="arches-signin-btn">
+                                        {% if showform %}
+                                        <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Signup" %}</button>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <span class="fa fa-asterisk reqfield reqtxt"></span> indicates a required field
+                                    </div>
+                                </div>
+
+                                <div class="password-rules text-left">
+                                    {% trans 'Your password must:' %}
+                                    <ul class="list-unstyled">
+                                        {% for message in validation_help %}
+                                        <li class="password-rule"><i class="ion-checkmark-circled"></i><span>{{ message }}</span></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+
+                                {% if enable_captcha %}
+                                <div class="form-group">
+                                {{form.captcha}}
+                                </div>
+                                {% endif %}
+
+                            </fieldset>
                             {% endif %}
+                        </div>
+                    </form>
+                </div>
 
-                        </fieldset>
-                        {% endif %}
-                    </div>
-                </form>
+                <div class="panel-footer">
+                    Learn more about <a href="archesproject.org">{% trans "Arches" %}</a>
+                </div>
+
             </div>
-
-            <div class="panel-footer">
-                Learn more about <a href="archesproject.org">{% trans "Arches" %}</a>
-            </div>
-
         </div>
-    </div>
-    <div class="pad-ver hidden">
-        <a href="arches_password_reminder.html" class="btn-link mar-rgt">{% trans "Forgot password ?" %}</a>
-        <a href="arches_register.html" class="btn-link mar-lft">{% trans "Create a new account" %}</a>
-    </div>
+        <div class="pad-ver hidden">
+            <a href="arches_password_reminder.html" class="btn-link mar-rgt">{% trans "Forgot password ?" %}</a>
+            <a href="arches_register.html" class="btn-link mar-lft">{% trans "Create a new account" %}</a>
+        </div>
+    </main>
 </div>
 
 </div>
