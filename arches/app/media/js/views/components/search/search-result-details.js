@@ -50,7 +50,8 @@ define([
                                 graphModel: graphModel,
                                 cards: data.cards,
                                 graph: data.graph,
-                                datatypes: data.datatypes
+                                datatypes: data.datatypes,
+                                cardwidgets: data.cardwidgets
                             };
                             graphCache[graphId] = graph;
                         }
