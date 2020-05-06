@@ -56,7 +56,7 @@ def create_resource_instance_tiledata(relations, tile, nodeid, datatype):
         for resourceRelationItem in tile.data[nodeid]:
             relation = relations.objects.get(resourcexid=resourceRelationItem["resourceXresourceId"])
             relation.delete()
-            new_tile_data.append(str(resourceRelationItem["resourceXresourceId"]))
+            new_tile_data.append(str(resourceRelationItem["resourceId"]))
 
         if datatype == "resource-instance-list":
             return new_tile_data
