@@ -348,7 +348,10 @@ class Resource(models.ResourceInstance):
             se = SearchEngineFactory().create()
             related_resources = self.get_related_resources(lang="en-US", start=0, limit=1000, page=0)
             for rr in related_resources["resource_relationships"]:
-                models.ResourceXResource.objects.get(pk=rr["resourcexid"]).delete()
+                try:
+                    models.ResourceXResource.objects.get(pk=rr["resourcexid"]).delete()
+                except:
+                    pass
             query = Query(se)
             bool_query = Bool()
             bool_query.filter(Terms(field="resourceinstanceid", terms=[self.resourceinstanceid]))
@@ -408,6 +411,7 @@ class Resource(models.ResourceInstance):
             ret["resource_relationships"].append(relation["_source"])
             instanceids.add(relation["_source"]["resourceinstanceidto"])
             instanceids.add(relation["_source"]["resourceinstanceidfrom"])
+        
         if len(instanceids) > 0:
             instanceids.remove(str(self.resourceinstanceid))
 
@@ -416,8 +420,9 @@ class Resource(models.ResourceInstance):
             if related_resources:
                 for resource in related_resources["docs"]:
                     relations = get_relations(resource["_id"], 0, 0)
-                    resource["_source"]["total_relations"] = relations["hits"]["total"]
-                    ret["related_resources"].append(resource["_source"])
+                    if resource["found"]:
+                        resource["_source"]["total_relations"] = relations["hits"]["total"]
+                        ret["related_resources"].append(resource["_source"])
         return ret
 
     def copy(self):
