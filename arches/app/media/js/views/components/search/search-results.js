@@ -42,6 +42,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 this.restoreState();
 
                 this.mapFilter = this.getFilter('map-filter');
+                this.details = this.getFilter('search-result-details');
                 this.relatedResourcesManager = this.getFilter('related-resources-filter');
             },
 
@@ -65,6 +66,16 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                     self.showRelationships(resourceinstance);
                     if (self.selectedTab() !== 'related-resources-filter') {
                         self.selectedTab('related-resources-filter');
+                    }
+                };
+            },
+
+            showResourceDetails: function(graphId) {
+                var self = this;
+                return function(resourceinstance){
+                    self.details.setupReport(resourceinstance.resourceinstanceid, graphId);
+                    if (self.selectedTab() !== 'search-result-details') {
+                        self.selectedTab('search-result-details');
                     }
                 };
             },
@@ -93,6 +104,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                             geometries: ko.observableArray(result._source.geometries),
                             iconclass: graphdata ? graphdata.iconclass : '',
                             showrelated: this.showRelatedResources(result._source.resourceinstanceid),
+                            showDetails: this.showResourceDetails(result._source.graph_id),
                             mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
                             relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
                             ontologyclass: result._source.root_ontology_class,

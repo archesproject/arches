@@ -703,8 +703,7 @@ class ResourceReportView(MapBaseManagerView):
 
         tiles = Tile.objects.filter(resourceinstance=resource).order_by("sortorder")
 
-        graph = Graph.objects.get(graphid=resource.graph_id)
-        cards = Card.objects.filter(graph=graph).order_by("sortorder")
+        cards = Card.objects.filter(graph_id=resource.graph_id).order_by("sortorder")
         permitted_cards = []
         permitted_tiles = []
 
@@ -728,14 +727,49 @@ class ResourceReportView(MapBaseManagerView):
         except AttributeError:
             raise Http404(_("No active report template is available for this resource."))
 
+        widgets = models.Widget.objects.all()
+        templates = models.ReportTemplate.objects.all()
+        card_components = models.CardComponent.objects.all()
+
+        if request.GET.get("json", False) and request.GET.get("exclude_graph", False):
+            return JSONResponse(
+                {
+                    "templates": templates,
+                    "tiles": permitted_tiles,
+                    "related_resources": related_resource_summary,
+                    "displayname": displayname,
+                    "cardComponents": card_components,
+                    "resourceid": resourceid,
+                }
+            )
+
+        datatypes = models.DDataType.objects.all()
+        graph = Graph.objects.get(graphid=resource.graph_id)
+        cards = Card.objects.filter(graph_id=resource.graph_id).order_by("sortorder")
+        permitted_cards = []
+        for card in cards:
+            if request.user.has_perm(perm, card.nodegroup):
+                card.filter_by_perm(request.user, perm)
+                permitted_cards.append(card)
         cardwidgets = [
             widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
         ]
 
-        datatypes = models.DDataType.objects.all()
-        widgets = models.Widget.objects.all()
-        templates = models.ReportTemplate.objects.all()
-        card_components = models.CardComponent.objects.all()
+        if request.GET.get("json", False) and not request.GET.get("exclude_graph", False):
+            return JSONResponse(
+                {
+                    "templates": templates,
+                    "datatypes": datatypes,
+                    "cards": permitted_cards,
+                    "tiles": permitted_tiles,
+                    "graph": graph,
+                    "related_resources": related_resource_summary,
+                    "displayname": displayname,
+                    "cardComponents": card_components,
+                    "resourceid": resourceid,
+                    "cardwidgets": cardwidgets,
+                }
+            )
 
         context = self.get_context_data(
             main_script="views/resource/report",
