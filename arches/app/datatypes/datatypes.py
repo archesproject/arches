@@ -1709,11 +1709,11 @@ class ResourceInstanceDataType(BaseDataType):
     def append_search_filters(self, value, node, query, request):
         try:
             if value["val"] != "":
-                search_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
+                search_query = Match(field="tiles.data.%s.resourceId" % (str(node.pk)), type="phrase", query=value["val"])
                 # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(value['val']))
                 if "!" in value["op"]:
                     query.must_not(search_query)
-                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
+                    query.filter(Exists(field="tiles.data.%s.resourceId" % (str(node.pk))))
                 else:
                     query.must(search_query)
         except KeyError as e:
