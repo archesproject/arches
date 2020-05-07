@@ -18,15 +18,16 @@ define([
         this.useSemanticRelationships = arches.useSemanticRelationships;
         this.resourceReportUrl = arches.urls.resource_report;
         this.selectedResourceRelationship = ko.observable(null);
+        this.showReport = ko.observable(null);
 
-        this.graphids = params.node ? ko.unwrap(params.node.config.graphid) : [params.graphid];
-        this.graphids = this.graphids || [];
-        this.graphNames = {};
-        this.graphids.forEach(function(graphid){
-            self.graphNames[graphid] = arches.resources.find(function(resource){
-                return resource.graphid === graphid;
-            });
-        });
+        // this.graphids = params.node ? ko.unwrap(params.node.config.graphid) : [params.graphid];
+        // this.graphids = this.graphids || [];
+        // this.graphNames = {};
+        // this.graphids.forEach(function(graphid){
+        //     self.graphNames[graphid] = arches.resources.find(function(resource){
+        //         return resource.graphid === graphid;
+        //     });
+        // });
 
         this.filter = ko.observable('');
         this.relationshipInFilter = function(relationship) {
