@@ -14,6 +14,7 @@ define([
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
         this.graphIsSemantic = params.graph ? !!params.graph.ontologyclass : false;
+        
         this.graphids = params.node ? ko.unwrap(params.node.config.graphid) : [params.graphid];
         this.graphids = this.graphids || [];
         this.graphNames = {};
@@ -22,6 +23,7 @@ define([
                 return resource.graphid === graphid;
             });
         });
+
         this.filter = ko.observable('');
         this.relationshipInFilter = function(relationship) {
             if (self.filter().toLowerCase() === '' || relationship.resourceName().toLowerCase().includes(self.filter().toLowerCase())){
@@ -122,6 +124,24 @@ define([
 
         this.resourceReportUrl = arches.urls.resource_report;
 
+        var lookupResourceInstanceName = function(resourceid) {
+            return window.fetch(arches.urls.search_results + "?id=" + resourceid)
+                .then(function(response){
+                    if(response.ok) {
+                        return response.json();
+                    }
+                })
+                .then(function(json) {
+                    return json["results"]["hits"]["hits"][0];
+                    // .forEach(function(resourceInstance){
+                    //     nameLookup[val.resourceId()] = resourceInstance["_source"].displayname;
+                    //     names.push(resourceInstance["_source"].displayname);
+                    //     self.displayValue(names.join(', '));
+                    //     val.resourceName(nameLookup[val.resourceId()]);
+                    // });
+                });
+        };
+
         var updateName = function() {
             var names = [];
             var value = ko.unwrap(self.value);
@@ -135,20 +155,27 @@ define([
                             names.push(nameLookup[val.resourceId()]);
                             self.displayValue(names.join(', '));
                         } else {
-                            window.fetch(arches.urls.search_results + "?id=" + val.resourceId())
-                                .then(function(response){
-                                    if(response.ok) {
-                                        return response.json();
-                                    }
-                                })
-                                .then(function(json) {
-                                    json["results"]["hits"]["hits"].forEach(function(resourceInstance){
-                                        nameLookup[val.resourceId()] = resourceInstance["_source"].displayname;
-                                        names.push(resourceInstance["_source"].displayname);
-                                        self.displayValue(names.join(', '));
-                                        val.resourceName(nameLookup[val.resourceId()]);
-                                    });
+                            lookupResourceInstanceName(val.resourceId())
+                                .then(function(resourceInstance) {
+                                    nameLookup[val.resourceId()] = resourceInstance["_source"].displayname;
+                                    names.push(resourceInstance["_source"].displayname);
+                                    self.displayValue(names.join(', '));
+                                    val.resourceName(nameLookup[val.resourceId()]);
                                 });
+                            // window.fetch(arches.urls.search_results + "?id=" + val.resourceId())
+                            //     .then(function(response){
+                            //         if(response.ok) {
+                            //             return response.json();
+                            //         }
+                            //     })
+                            //     .then(function(json) {
+                            //         json["results"]["hits"]["hits"].forEach(function(resourceInstance){
+                            //             nameLookup[val.resourceId()] = resourceInstance["_source"].displayname;
+                            //             names.push(resourceInstance["_source"].displayname);
+                            //             self.displayValue(names.join(', '));
+                            //             val.resourceName(nameLookup[val.resourceId()]);
+                            //         });
+                            //     });
                             // window.fetch(arches.urls.disambiguate_node_value(params.datatype, val.resourceXresourceId()))
                             //     .then(function(response) {
                             //         return response.json();
@@ -181,26 +208,47 @@ define([
         //     updateName();
         // }
 
-        updateName();
+        if(self.renderContext !== 'search'){
+            updateName();
+        }
 
         var relatedResourceModels = ko.computed(function() {
             var res = [];
             if (params.node) {
-                var ids = ko.unwrap(params.node.config.graphid);
-                if (ids) {
-                    res = arches.resources.filter(function(graph) {
-                        return ids.indexOf(graph.graphid) >= 0;
-                    }).map(function(g) {
-                        return {
-                            name: g.name,
-                            _id: g.graphid,
-                            isGraph: true
-                        };
+                // var ids = params.node.config.graphs().map(function(item){
+                //     return item.graphid;
+                // });
+                res = params.node.config.graphs().map(function(item){
+                    var graph = arches.resources.find(function(graph){
+                        return graph.graphid === item.graphid;
                     });
-                }
+                    return {
+                        name: graph.name,
+                        _id: graph.graphid,
+                        isGraph: true
+                    };
+                });
+                // if (ids) {
+                //     res = arches.resources.filter(function(graph) {
+                //         return ids.indexOf(graph.graphid) >= 0;
+                //     }).map(function(g) {
+                //         return {
+                //             name: g.name,
+                //             _id: g.graphid,
+                //             isGraph: true
+                //         };
+                //     });
+                // }
             }
             return res;
         }, this);
+
+        this.lookupGraphName = function(graphid) {
+            var model = relatedResourceModels().find(function(model){
+                return model._id === graphid;
+            });
+            return model;
+        };
 
 
         var makeObject = function(id, name, ontologyclass){
@@ -238,7 +286,9 @@ define([
         this.url = url;
         var resourceToAdd = ko.observable("");
         this.select2Config = {
-            value: self.renderContext === 'search' ? self.value : resourceToAdd,
+            value: self.renderContext === 'search' ? ko.observable({
+                "resourceId": self.value
+            }) : resourceToAdd,
             clickBubble: true,
             multiple: self.renderContext === 'search' ? params.multiple : false,
             placeholder: this.placeholder() || "Add new Relationship",
@@ -263,7 +313,7 @@ define([
                         params.complete.subscribe(function() {
                             window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
                                 .then(function(response){
-                                    if(response.ok === false) {
+                                    if(response.ok) {
                                         return response.json();
                                     }
                                     throw("error");
@@ -358,8 +408,13 @@ define([
                     return item.name;
                 }
             },
-            initSelection: function() {
-
+            initSelection: function(ele, callback) {
+                if(self.renderContext === "search" && self.value() !== "") {
+                    lookupResourceInstanceName(self.value())
+                        .then(function(resourceInstance) {
+                            callback({"_source":{"displayname": resourceInstance["_source"].displayname}, "_id":self.value()});
+                        });
+                }
             }
         };
 
