@@ -210,45 +210,48 @@ define([
 
         if(self.renderContext !== 'search'){
             updateName();
+
+            var relatedResourceModels = ko.computed(function() {
+                var res = [];
+                if (params.node) {
+                    // var ids = params.node.config.graphs().map(function(item){
+                    //     return item.graphid;
+                    // });
+                    res = params.node.config.graphs().map(function(item){
+                        var graph = arches.resources.find(function(graph){
+                            return graph.graphid === item.graphid;
+                        });
+                        return {
+                            name: graph.name,
+                            _id: graph.graphid,
+                            isGraph: true
+                        };
+                    });
+                    // if (ids) {
+                    //     res = arches.resources.filter(function(graph) {
+                    //         return ids.indexOf(graph.graphid) >= 0;
+                    //     }).map(function(g) {
+                    //         return {
+                    //             name: g.name,
+                    //             _id: g.graphid,
+                    //             isGraph: true
+                    //         };
+                    //     });
+                    // }
+                }
+                return res;
+            }, this);
+
+            this.lookupGraphName = function(graphid) {
+                var model = relatedResourceModels().find(function(model){
+                    return model._id === graphid;
+                });
+                return model;
+            };
         }
 
-        var relatedResourceModels = ko.computed(function() {
-            var res = [];
-            if (params.node) {
-                // var ids = params.node.config.graphs().map(function(item){
-                //     return item.graphid;
-                // });
-                res = params.node.config.graphs().map(function(item){
-                    var graph = arches.resources.find(function(graph){
-                        return graph.graphid === item.graphid;
-                    });
-                    return {
-                        name: graph.name,
-                        _id: graph.graphid,
-                        isGraph: true
-                    };
-                });
-                // if (ids) {
-                //     res = arches.resources.filter(function(graph) {
-                //         return ids.indexOf(graph.graphid) >= 0;
-                //     }).map(function(g) {
-                //         return {
-                //             name: g.name,
-                //             _id: g.graphid,
-                //             isGraph: true
-                //         };
-                //     });
-                // }
-            }
-            return res;
-        }, this);
 
-        this.lookupGraphName = function(graphid) {
-            var model = relatedResourceModels().find(function(model){
-                return model._id === graphid;
-            });
-            return model;
-        };
+
 
 
         var makeObject = function(id, name, ontologyclass){
@@ -286,9 +289,7 @@ define([
         this.url = url;
         var resourceToAdd = ko.observable("");
         this.select2Config = {
-            value: self.renderContext === 'search' ? ko.observable({
-                "resourceId": self.value
-            }) : resourceToAdd,
+            value: self.renderContext === 'search' ? self.value : resourceToAdd,
             clickBubble: true,
             multiple: self.renderContext === 'search' ? params.multiple : false,
             placeholder: this.placeholder() || "Add new Relationship",
@@ -378,7 +379,7 @@ define([
                     }
                 },
                 results: function(data, page) {
-                    if (!data['paging-filter'].paginator.has_next) {
+                    if (!data['paging-filter'].paginator.has_next && self.renderContext !== 'search') {
                         if (relatedResourceModels()) {
                             relatedResourceModels().forEach(function(val) {
                                 data.results.hits.hits.push(val);
@@ -410,10 +411,27 @@ define([
             },
             initSelection: function(ele, callback) {
                 if(self.renderContext === "search" && self.value() !== "") {
-                    lookupResourceInstanceName(self.value())
-                        .then(function(resourceInstance) {
-                            callback({"_source":{"displayname": resourceInstance["_source"].displayname}, "_id":self.value()});
+                    var values = self.value();
+                    if(!Array.isArray(self.value())){
+                        values = [self.value()];
+                    }
+                    var lookups = [];
+                    values.forEach(function(val){
+                        lookups.push(lookupResourceInstanceName(val)
+                            .then(function(resourceInstance) {
+                                return resourceInstance;
+                            })
+                        );
+                    });
+                    Promise.all(lookups).then(function(val){
+                        var ret = val.map(function(item) {
+                            return {"_source":{"displayname": item["_source"].displayname}, "_id":item["_id"]};
                         });
+                        if(self.multiple === false) {
+                            ret = ret[0];
+                        }
+                        callback(ret);
+                    });
                 }
             }
         };

@@ -16,7 +16,7 @@ from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 import arches.app.utils.task_management as task_management
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists, RangeDSLException
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Terms, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.core.cache import cache
 from django.core.files.base import ContentFile
@@ -1708,16 +1708,18 @@ class ResourceInstanceDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value["val"] != "":
-                search_query = Match(field="tiles.data.%s.resourceId" % (str(node.pk)), type="phrase", query=value["val"])
-                # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(value['val']))
+            if value["val"] != "" and value["val"] != []:
+                # search_query = Match(field="tiles.data.%s.resourceId" % (str(node.pk)), type="phrase", query=value["val"])
+                search_query = Terms(field='tiles.data.%s.resourceId.keyword' % (str(node.pk)), terms=value['val'])
                 if "!" in value["op"]:
                     query.must_not(search_query)
-                    query.filter(Exists(field="tiles.data.%s.resourceId" % (str(node.pk))))
+                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
                     query.must(search_query)
         except KeyError as e:
             pass
+
+        print(query.dsl)
 
     def get_rdf_uri(self, node, data, which="r"):
         if type(data) == list:
@@ -1782,21 +1784,6 @@ class ResourceInstanceDataType(BaseDataType):
         }
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
-
-    def append_search_filters(self, value, node, query, request):
-        try:
-            if value["val"] != "":
-                for val in value["val"]:
-                    m = super(ResourceInstanceListDataType, self).append_search_filters(val, node, query, request)
-                search_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
-                # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(value['val']))
-                if "!" in value["op"]:
-                    query.must_not(search_query)
-                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
-                else:
-                    query.must(search_query)
-        except KeyError as e:
-            pass
 
     def from_rdf(self, json_ld_node):
         m = super(ResourceInstanceListDataType, self).from_rdf(json_ld_node)
