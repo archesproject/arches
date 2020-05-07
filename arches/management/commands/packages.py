@@ -1101,7 +1101,7 @@ will be very jumbled."""
         if data_dest != "":
             data = resource_exporter.export(graph_id=graph)
             for file in data:
-                with open(os.path.join(data_dest, file["name"]), "wb") as f:
+                with open(os.path.join(data_dest, file["name"]), "w") as f:
                     f.write(file["outputfile"].getvalue())
         else:
             utils.print_message("No destination directory specified. Please rerun this command with the '-d' parameter populated.")
