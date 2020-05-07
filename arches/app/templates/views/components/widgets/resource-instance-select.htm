@@ -3,7 +3,7 @@
 
 {% block form %}
 <!--ko let: {self: $data} -->
-<!-- ko if: self.state === 'search' -->
+<!-- ko if: self.renderContext === 'search' -->
 <div class="row">
     <div class="col-sm-6 resource-instance-wrapper">
         <input style="width:30%; display:inline-block;"
@@ -15,7 +15,7 @@
     </div>
 </div>
 <!-- /ko -->
-<!-- ko ifnot: self.state === 'search' -->
+<!-- ko ifnot: self.renderContext === 'search' -->
 <div class="widget-wrapper" data-bind="visible: !newTileStep()">
     <div class="form-group">
         <label class="control-label widget-input-label" data-bind="text:label">

@@ -10,7 +10,7 @@ define([
     var ResourceInstanceSelectViewModel = function(params) {
         var self = this;
         params.configKeys = ['placeholder'];
-        this.state = params.state;
+        this.renderContext = params.renderContext;
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
         this.graphIsSemantic = params.graph ? !!params.graph.ontologyclass : false;
@@ -129,35 +129,40 @@ define([
                 value = [value];
             }
             if(!!value) {
-                //self.value(null);
                 value.forEach(function(val) {
                     if (val) {
                         if (nameLookup[val.resourceId()]) {
                             names.push(nameLookup[val.resourceId()]);
                             self.displayValue(names.join(', '));
                         } else {
-                            window.fetch(arches.urls.disambiguate_node_value(params.datatype, val.resourceXresourceId()))
-                                .then(function(response) {
-                                    return response.json();
-                                }).then(function(data) {
-                                    data.forEach(function(resourceInstance){
-                                        nameLookup[val.resourceId()] = resourceInstance.resourceName;
-                                        names.push(resourceInstance.resourceName);
+                            window.fetch(arches.urls.search_results + "?id=" + val.resourceId())
+                                .then(function(response){
+                                    if(response.ok) {
+                                        return response.json();
+                                    }
+                                })
+                                .then(function(json) {
+                                    json["results"]["hits"]["hits"].forEach(function(resourceInstance){
+                                        nameLookup[val.resourceId()] = resourceInstance["_source"].displayname;
+                                        names.push(resourceInstance["_source"].displayname);
                                         self.displayValue(names.join(', '));
                                         val.resourceName(nameLookup[val.resourceId()]);
-                                        // var valueObj = makeObject(resourceInstance.resourceId, resourceInstance.resourceName, '');
-                                        // setValue(valueObj);
                                     });
-                                    //self.valueObjects(data);
                                 });
-                            // $.ajax(arches.urls.disambiguate_node_value(val, {
-                            //     dataType: "json",
-                            //     data: 
-                            // }).done(function(data) {
-                            //     nameLookup[val] = data.displayname;
-                            //     names.push(data.displayname);
-                            //     displayName(names.join(', '));
-                            // });
+                            // window.fetch(arches.urls.disambiguate_node_value(params.datatype, val.resourceXresourceId()))
+                            //     .then(function(response) {
+                            //         return response.json();
+                            //     }).then(function(data) {
+                            //         data.forEach(function(resourceInstance){
+                            //             nameLookup[val.resourceId()] = resourceInstance.resourceName;
+                            //             names.push(resourceInstance.resourceName);
+                            //             self.displayValue(names.join(', '));
+                            //             val.resourceName(nameLookup[val.resourceId()]);
+                            //             // var valueObj = makeObject(resourceInstance.resourceId, resourceInstance.resourceName, '');
+                            //             // setValue(valueObj);
+                            //         });
+                            //         //self.valueObjects(data);
+                            //     });
                         }
                     }
                 });
@@ -166,17 +171,17 @@ define([
 
         // update related resource names even though it's already in tile.data, 
         // but the name might have been changed since the relationship was made
-        if(self.multiple === true){
-            if(!!self.value()){
-                self.value().forEach(function(value){
-                    if(typeof value === 'string'){
-                        updateName();
-                    }
-                });
-            }
-        }else{
-            updateName();
-        }
+        // if(self.multiple === true){
+        //     if(!!self.value()){
+        //         self.value().forEach(function(value){
+        //             updateName();
+        //         });
+        //     }
+        // }else{
+        //     updateName();
+        // }
+
+        updateName();
 
         var relatedResourceModels = ko.computed(function() {
             var res = [];
@@ -233,14 +238,14 @@ define([
         this.url = url;
         var resourceToAdd = ko.observable("");
         this.select2Config = {
-            value: self.state === 'search' ? self.value : resourceToAdd,
+            value: self.renderContext === 'search' ? self.value : resourceToAdd,
             clickBubble: true,
-            multiple: self.state === 'search' ? params.multiple : false,
+            multiple: self.renderContext === 'search' ? params.multiple : false,
             placeholder: this.placeholder() || "Add new Relationship",
             closeOnSelect: true,
-            allowClear: self.state === 'search' ? true : false,
+            allowClear: self.renderContext === 'search' ? true : false,
             onSelect: function(item) {
-                if (self.state !== 'search') {
+                if (self.renderContext !== 'search') {
                     if (item._source) {
                         var ret = makeObject(item._id, item._source.displayname, item._source.root_ontology_class);
                         setValue(ret);

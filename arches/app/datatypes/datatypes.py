@@ -1783,14 +1783,6 @@ class ResourceInstanceDataType(BaseDataType):
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
 
-    def disambiguate(self, nodevalue):
-        ret = []
-        if nodevalue is not None:
-            for key in nodevalue:
-                m = super(ResourceInstanceListDataType, self).disambiguate(key)
-                ret.append(m)
-        return ret
-
     def append_search_filters(self, value, node, query, request):
         try:
             if value["val"] != "":
