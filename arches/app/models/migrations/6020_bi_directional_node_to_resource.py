@@ -5,6 +5,8 @@ import uuid
 import datetime
 from django.db.models import Q
 from django.db import migrations, models
+from arches.app.search.search_engine_factory import SearchEngineFactory
+
 
 def setup(apps):
     nodes = apps.get_model("models", "Node")
@@ -13,11 +15,12 @@ def setup(apps):
     resource = apps.get_model("models", "Resource")
     resource_instance_nodes = {str(node["nodeid"]):node["datatype"] for node in nodes.objects.filter(Q(datatype='resource-instance') | Q(datatype='resource-instance-list')).values('nodeid', 'datatype')}
     resource_instance_tiles = tiles.objects.filter(Q(nodegroup_id__node__datatype='resource-instance') | Q(nodegroup_id__node__datatype='resource-instance-list')).distinct()
+    root_ontology_classes = {str(node["graph_id"]):node["ontologyclass"] for node in nodes.objects.filter(istopnode=True).values('graph_id', 'ontologyclass')}
 
-    return resource, relations, resource_instance_nodes, resource_instance_tiles
+    return resource, relations, resource_instance_nodes, resource_instance_tiles, root_ontology_classes
 
 
-def create_relation(relations, resource, resourceinstanceid_from, resourceinstanceid_to, tileid, nodeid):
+def create_relation(relations, resource, resourceinstanceid_from, resourceinstanceid_to, tileid, nodeid, root_ontology_classes):
     relationid = uuid.uuid4()
     relations.objects.create(
         resourcexid=relationid,
@@ -28,12 +31,15 @@ def create_relation(relations, resource, resourceinstanceid_from, resourceinstan
         modified=datetime.datetime.now(),
         created=datetime.datetime.now()
     )
-    resourceName = ""
+
     ontologyClass = ""
+    resourceName = ""
     try:
-        resTo = resource.objects.get(resourceinstanceid=resourceinstanceid_to)
-        resourceName = resTo.displayname
-        ontologyClass = resTo.get_root_ontology()
+        resTo = resource.objects.get(pk=resourceinstanceid_to)
+        ontologyClass = root_ontology_classes[str(resTo.graph_id)]
+        se = SearchEngineFactory().create()
+        resource_document = se.search(index="resources", id=resourceinstanceid_to)
+        resourceName = resource_document["docs"][0]["_source"]["displayname"]
     except:
         pass
 
@@ -65,7 +71,7 @@ def create_resource_instance_tiledata(relations, tile, nodeid, datatype):
 
 
 def forward_migrate(apps, schema_editor, with_create_permissions=True):
-    resource, relations, resource_instance_nodes, resource_instance_tiles = setup(apps)
+    resource, relations, resource_instance_nodes, resource_instance_tiles, root_ontology_classes = setup(apps)
     # iterate over resource-instance tiles and identify resource-instance nodes
     for tile in resource_instance_tiles:
         for nodeid in tile.data.keys():
@@ -74,16 +80,16 @@ def forward_migrate(apps, schema_editor, with_create_permissions=True):
                 new_tile_resource_data = []
                 if isinstance(tile.data[nodeid], list):
                     for resourceinstanceidto in tile.data[nodeid]:
-                        new_tile_resource_data.append(create_relation(relations, resource, tile.resourceinstance_id, resourceinstanceidto, tile.tileid, nodeid))
+                        new_tile_resource_data.append(create_relation(relations, resource, tile.resourceinstance_id, resourceinstanceidto, tile.tileid, nodeid, root_ontology_classes))
                 else:
-                    new_tile_resource_data.append(create_relation(relations, resource, tile.resourceinstance_id, tile.data[nodeid], tile.tileid, nodeid))
+                    new_tile_resource_data.append(create_relation(relations, resource, tile.resourceinstance_id, tile.data[nodeid], tile.tileid, nodeid, root_ontology_classes))
 
                 tile.data[nodeid] = new_tile_resource_data
                 tile.save()
 
 
 def reverse_migrate(apps, schema_editor, with_create_permissions=True):
-    resource, relations, resource_instance_nodes, resource_instance_tiles = setup(apps)
+    resource, relations, resource_instance_nodes, resource_instance_tiles, root_ontology_classes = setup(apps)
     for tile in resource_instance_tiles:
         for nodeid in tile.data.keys():
             if nodeid in resource_instance_nodes.keys() and tile.data[nodeid] is not None:
