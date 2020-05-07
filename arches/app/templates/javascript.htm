@@ -248,7 +248,8 @@
                 api_search_component_data: "{% url 'api_search_component_data' 'aaaa'%}".replace('aaaa', ''),
                 geojson: "{% url 'geojson' %}",
                 icons: "{% url 'icons' %}",
-                iiifmanifest: "{% url 'iiifmanifest' %}"
+                iiifmanifest: "{% url 'iiifmanifest' %}",
+                {% block urls %}{% endblock urls %}
             },
             geocoderPlaceHolder: "{% trans 'Find an address...' %}",
             confirmNav: {
