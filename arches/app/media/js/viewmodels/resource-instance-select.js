@@ -4,10 +4,10 @@ define([
     'underscore',
     'viewmodels/widget',
     'arches',
-], function(ko, $, _, WidgetViewModel, arches) {
+    'views/components/resource-summary'
+], function(ko, $, _, WidgetViewModel, arches, ResourceSummary) {
     var resourceLookup = {};
     require(['views/components/workflows/new-tile-step']);
-    require(['views/components/resource-summary']);
     var ResourceInstanceSelectViewModel = function(params) {
         var self = this;
         params.configKeys = ['placeholder'];
