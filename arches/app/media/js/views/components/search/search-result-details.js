@@ -38,7 +38,7 @@ define([
                 this.query(query);
 
                 var graphCache = {};
-                var processReportData = function(data, graph, graphId) {
+                var processReportData = function(data, graph) {
                     data.cards = _.filter(graph.cards, function(card) {
                         var nodegroup = _.find(graph.graph.nodegroups, function(group) {
                             return group.nodegroupid === card.nodegroup_id;
@@ -77,8 +77,7 @@ define([
                             "displayname": source.displayname,
                             "resourceid": source.resourceinstanceid
                         },
-                        graph,
-                        graphId
+                        graph
                     );
                     else {
                         $.getJSON(arches.urls.resource_report + resId + qs, function(data) {
@@ -95,7 +94,7 @@ define([
                                 cardwidgets: data.cardwidgets
                             };
                             graphCache[graphId] = graph;
-                            processReportData(data, graph, graphId);
+                            processReportData(data, graph);
                         });
                     }
                 };
