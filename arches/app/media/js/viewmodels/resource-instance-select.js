@@ -1,12 +1,13 @@
 define([
     'knockout',
     'jquery',
+    'underscore',
     'viewmodels/widget',
     'arches',
-    'report-templates',
-], function(ko, $, WidgetViewModel, arches, reportLookup) {
+], function(ko, $, _, WidgetViewModel, arches) {
     var resourceLookup = {};
     require(['views/components/workflows/new-tile-step']);
+    require(['views/components/resource-summary']);
     var ResourceInstanceSelectViewModel = function(params) {
         var self = this;
         params.configKeys = ['placeholder'];
@@ -18,23 +19,19 @@ define([
         this.useSemanticRelationships = arches.useSemanticRelationships;
         this.resourceReportUrl = arches.urls.resource_report;
         this.selectedResourceRelationship = ko.observable(null);
-        this.showReport = ko.observable(null);
-
-        // this.graphids = params.node ? ko.unwrap(params.node.config.graphid) : [params.graphid];
-        // this.graphids = this.graphids || [];
-        // this.graphNames = {};
-        // this.graphids.forEach(function(graphid){
-        //     self.graphNames[graphid] = arches.resources.find(function(resource){
-        //         return resource.graphid === graphid;
-        //     });
-        // });
-
+        this.showReport = ko.observable(false);
         this.filter = ko.observable('');
         this.relationshipInFilter = function(relationship) {
             if (self.filter().toLowerCase() === '' || relationship.resourceName().toLowerCase().includes(self.filter().toLowerCase())){
                 return true;
             }
             return false;
+        };
+        this.reportResourceId = ko.observable(null);
+        this.reportGraphId = ko.observable(null);
+        this.initReport = function(resourceId, graphId){
+            this.reportResourceId(resourceId);
+            this.showReport(true);
         };
 
         WidgetViewModel.apply(this, [params]);

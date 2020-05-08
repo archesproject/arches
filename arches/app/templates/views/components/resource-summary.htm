@@ -1,0 +1,14 @@
+{% load i18n %}
+
+<!--ko if: loading() -->
+<div class='loading-mask'></div>
+<!--/ko-->
+<!-- ko if: !loading() && report -->
+<div class='resource-report' data-bind='component: {
+    name: reportLookup[report.get("template_id")()].componentname,
+    params: {
+        report: report,
+        summary: true
+    }
+}'></div>
+<!-- /ko -->
