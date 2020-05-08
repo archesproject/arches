@@ -704,42 +704,21 @@ class ResourceReportView(MapBaseManagerView):
 
         tiles = Tile.objects.filter(resourceinstance=resource).order_by("sortorder")
 
-        cards = Card.objects.filter(graph_id=resource.graph_id).order_by("sortorder")
-        permitted_cards = []
         permitted_tiles = []
 
         perm = "read_nodegroup"
-
-        for card in cards:
-            if request.user.has_perm(perm, card.nodegroup):
-                card.filter_by_perm(request.user, perm)
-                permitted_cards.append(card)
 
         for tile in tiles:
             if request.user.has_perm(perm, tile.nodegroup):
                 tile.filter_by_perm(request.user, perm)
                 permitted_tiles.append(tile)
 
-        try:
-            map_layers = models.MapLayer.objects.all()
-            map_markers = models.MapMarker.objects.all()
-            map_sources = models.MapSource.objects.all()
-            geocoding_providers = models.Geocoder.objects.all()
-        except AttributeError:
-            raise Http404(_("No active report template is available for this resource."))
-
-        widgets = models.Widget.objects.all()
-        templates = models.ReportTemplate.objects.all()
-        card_components = models.CardComponent.objects.all()
-
         if request.GET.get("json", False) and request.GET.get("exclude_graph", False):
             return JSONResponse(
                 {
-                    "templates": templates,
                     "tiles": permitted_tiles,
                     "related_resources": related_resource_summary,
                     "displayname": displayname,
-                    "cardComponents": card_components,
                     "resourceid": resourceid,
                 }
             )
@@ -759,18 +738,27 @@ class ResourceReportView(MapBaseManagerView):
         if request.GET.get("json", False) and not request.GET.get("exclude_graph", False):
             return JSONResponse(
                 {
-                    "templates": templates,
                     "datatypes": datatypes,
                     "cards": permitted_cards,
                     "tiles": permitted_tiles,
                     "graph": graph,
                     "related_resources": related_resource_summary,
                     "displayname": displayname,
-                    "cardComponents": card_components,
                     "resourceid": resourceid,
                     "cardwidgets": cardwidgets,
                 }
             )
+
+        widgets = models.Widget.objects.all()
+        templates = models.ReportTemplate.objects.all()
+        card_components = models.CardComponent.objects.all()
+        try:
+            map_layers = models.MapLayer.objects.all()
+            map_markers = models.MapMarker.objects.all()
+            map_sources = models.MapSource.objects.all()
+            geocoding_providers = models.Geocoder.objects.all()
+        except AttributeError:
+            raise Http404(_("No active report template is available for this resource."))
 
         context = self.get_context_data(
             main_script="views/resource/report",
