@@ -70,10 +70,10 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 };
             },
 
-            showResourceDetails: function(graphId) {
+            showResourceDetails: function(graphId, result) {
                 var self = this;
                 return function(resourceinstance){
-                    self.details.setupReport(resourceinstance.resourceinstanceid, graphId);
+                    self.details.setupReport(resourceinstance.resourceinstanceid, graphId, result._source);
                     if (self.selectedTab() !== 'search-result-details') {
                         self.selectedTab('search-result-details');
                     }
@@ -104,7 +104,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                             geometries: ko.observableArray(result._source.geometries),
                             iconclass: graphdata ? graphdata.iconclass : '',
                             showrelated: this.showRelatedResources(result._source.resourceinstanceid),
-                            showDetails: this.showResourceDetails(result._source.graph_id),
+                            showDetails: this.showResourceDetails(result._source.graph_id, result),
                             mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
                             relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
                             ontologyclass: result._source.root_ontology_class,
