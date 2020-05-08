@@ -411,7 +411,7 @@ class Resource(models.ResourceInstance):
             ret["resource_relationships"].append(relation["_source"])
             instanceids.add(relation["_source"]["resourceinstanceidto"])
             instanceids.add(relation["_source"]["resourceinstanceidfrom"])
-        
+
         if len(instanceids) > 0:
             instanceids.remove(str(self.resourceinstanceid))
 

@@ -13,9 +13,18 @@ def setup(apps):
     tiles = apps.get_model("models", "Tile")
     relations = apps.get_model("models", "ResourceXResource")
     resource = apps.get_model("models", "Resource")
-    resource_instance_nodes = {str(node["nodeid"]):node["datatype"] for node in nodes.objects.filter(Q(datatype='resource-instance') | Q(datatype='resource-instance-list')).values('nodeid', 'datatype')}
-    resource_instance_tiles = tiles.objects.filter(Q(nodegroup_id__node__datatype='resource-instance') | Q(nodegroup_id__node__datatype='resource-instance-list')).distinct()
-    root_ontology_classes = {str(node["graph_id"]):node["ontologyclass"] for node in nodes.objects.filter(istopnode=True).values('graph_id', 'ontologyclass')}
+    resource_instance_nodes = {
+        str(node["nodeid"]): node["datatype"]
+        for node in nodes.objects.filter(Q(datatype="resource-instance") | Q(datatype="resource-instance-list")).values(
+            "nodeid", "datatype"
+        )
+    }
+    resource_instance_tiles = tiles.objects.filter(
+        Q(nodegroup_id__node__datatype="resource-instance") | Q(nodegroup_id__node__datatype="resource-instance-list")
+    ).distinct()
+    root_ontology_classes = {
+        str(node["graph_id"]): node["ontologyclass"] for node in nodes.objects.filter(istopnode=True).values("graph_id", "ontologyclass")
+    }
 
     return resource, relations, resource_instance_nodes, resource_instance_tiles, root_ontology_classes
 
@@ -29,7 +38,7 @@ def create_relation(relations, resource, resourceinstanceid_from, resourceinstan
         tileid_id=tileid,
         nodeid_id=nodeid,
         modified=datetime.datetime.now(),
-        created=datetime.datetime.now()
+        created=datetime.datetime.now(),
     )
 
     ontologyClass = ""
@@ -49,7 +58,7 @@ def create_relation(relations, resource, resourceinstanceid_from, resourceinstan
         "inverseOntologyProperty": "",
         "resourceName": resourceName,
         "ontologyClass": ontologyClass,
-        "resourceXresourceId": str(relationid)
+        "resourceXresourceId": str(relationid),
     }
     return ret
 
@@ -80,9 +89,23 @@ def forward_migrate(apps, schema_editor, with_create_permissions=True):
                 new_tile_resource_data = []
                 if isinstance(tile.data[nodeid], list):
                     for resourceinstanceidto in tile.data[nodeid]:
-                        new_tile_resource_data.append(create_relation(relations, resource, tile.resourceinstance_id, resourceinstanceidto, tile.tileid, nodeid, root_ontology_classes))
+                        new_tile_resource_data.append(
+                            create_relation(
+                                relations,
+                                resource,
+                                tile.resourceinstance_id,
+                                resourceinstanceidto,
+                                tile.tileid,
+                                nodeid,
+                                root_ontology_classes,
+                            )
+                        )
                 else:
-                    new_tile_resource_data.append(create_relation(relations, resource, tile.resourceinstance_id, tile.data[nodeid], tile.tileid, nodeid, root_ontology_classes))
+                    new_tile_resource_data.append(
+                        create_relation(
+                            relations, resource, tile.resourceinstance_id, tile.data[nodeid], tile.tileid, nodeid, root_ontology_classes
+                        )
+                    )
 
                 tile.data[nodeid] = new_tile_resource_data
                 tile.save()
@@ -96,10 +119,11 @@ def reverse_migrate(apps, schema_editor, with_create_permissions=True):
                 tile.data[nodeid] = create_resource_instance_tiledata(relations, tile, nodeid, resource_instance_nodes[nodeid])
                 tile.save()
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '6019_node_config_for_resource_instance'),
+        ("models", "6019_node_config_for_resource_instance"),
     ]
 
     operations = [

@@ -279,14 +279,14 @@ def search_results(request):
         for page in range(pages):
             results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
             results["hits"]["hits"] += results_scrolled["hits"]["hits"]
-    else: 
+    else:
         results = dsl.search(index="resources", id=resourceinstanceid)
 
     ret = {}
     if results is not None:
         if "docs" in results:
-            results = {"hits":{"hits": results["docs"]}}
-            
+            results = {"hits": {"hits": results["docs"]}}
+
         # allow filters to modify the results
         for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
             search_filter = search_filter_factory.get_filter(filter_type)
