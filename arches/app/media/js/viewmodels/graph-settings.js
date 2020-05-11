@@ -47,7 +47,7 @@ define([
         self.jsonData = ko.computed(function() {
             var relatableResourceIds = _.filter(self.resource_data(), function(resource){
                 if (resource.isRelatable === undefined) {
-                    resource.isRelatable = ko.observable(resource.is_relatable)
+                    resource.isRelatable = ko.observable(resource.is_relatable);
                 }
                 return resource.isRelatable();
             }).map(function(resource){
