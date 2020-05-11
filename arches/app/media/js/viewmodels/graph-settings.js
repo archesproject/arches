@@ -15,11 +15,7 @@ define([
         self.resource_data = ko.observableArray([]);
         self.relatable_resources = ko.computed(function() {
             return _.each(self.resource_data(), function(resource) {
-                if (resource.isRelatable === undefined) {
-                    resource.isRelatable = ko.observable(resource.is_relatable);
-                } else {
-                    resource.isRelatable;
-                }
+                resource.isRelatable = ko.observable(resource.is_relatable);
             });
         });
 
@@ -46,9 +42,6 @@ define([
 
         self.jsonData = ko.computed(function() {
             var relatableResourceIds = _.filter(self.resource_data(), function(resource){
-                if (resource.isRelatable === undefined) {
-                    resource.isRelatable = ko.observable(resource.is_relatable);
-                }
                 return resource.isRelatable();
             }).map(function(resource){
                 return resource.id;
