@@ -316,7 +316,7 @@ class Tile(models.TileModel):
         user_is_reviewer = False
         newprovisionalvalue = None
         oldprovisionalvalue = None
-        
+
         try:
             if user is None and request is not None:
                 user = request.user
@@ -336,11 +336,9 @@ class Tile(models.TileModel):
                 datatype = datatype_factory.get_instance(node.datatype)
                 datatype.pre_tile_save(self, nodeid)
 
-
             self.__preSave(request)
             self.check_for_missing_nodes(request)
             self.check_for_constraint_violation(request)
-
 
             creating_new_tile = models.TileModel.objects.filter(pk=self.tileid).exists() is False
             edit_type = "tile create" if (creating_new_tile is True) else "tile edit"
@@ -361,14 +359,17 @@ class Tile(models.TileModel):
                     self.apply_provisional_edit(user, self.data, action="update", existing_model=existing_model)
                     newprovisionalvalue = self.data
                     self.data = existing_model.data
-                    
+
                     oldprovisional = self.get_provisional_edit(existing_model, user)
                     if oldprovisional is not None:
                         oldprovisionalvalue = oldprovisional["value"]
 
                 if provisional_edit_log_details is None:
-                    provisional_edit_log_details = {"user": user, "provisional_editor": user, "action": "create tile" if creating_new_tile else "add edit"}
-
+                    provisional_edit_log_details = {
+                        "user": user,
+                        "provisional_editor": user,
+                        "action": "create tile" if creating_new_tile else "add edit",
+                    }
 
             super(Tile, self).save(*args, **kwargs)
             # We have to save the edit log record after calling save so that the

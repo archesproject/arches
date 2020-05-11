@@ -118,7 +118,7 @@ class SearchEngine(object):
 
         if id:
             if isinstance(id, str):
-                id = id.split(',')
+                id = id.split(",")
             kwargs["body"] = {"ids": id}
             return self.es.mget(**kwargs)
 

@@ -915,12 +915,11 @@ class IIIFManifest(APIBase):
 
 
 class OntolgyPropery(APIBase):
-
     def get(self, request):
         domain_ontology_class = request.GET.get("domain_ontology_class", None)
         range_ontology_class = request.GET.get("range_ontology_class", None)
-        ontologyid = request.GET.get("ontologyid", 'sdl')
-        
+        ontologyid = request.GET.get("ontologyid", "sdl")
+
         ret = []
         if domain_ontology_class and range_ontology_class:
             ontology_classes = models.OntologyClass.objects.get(source=domain_ontology_class)

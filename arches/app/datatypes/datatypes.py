@@ -1604,12 +1604,14 @@ class ResourceInstanceDataType(BaseDataType):
                     resourceid = str(rr.resourceinstanceidto_id)
                     se = SearchEngineFactory().create()
                     resource_document = se.search(index="resources", id=resourceid)
-                    ret.append({
-                        "resourceName": resource_document["docs"][0]["_source"]["displayname"],
-                        "resourceId": resourceid,
-                        "ontologyProperty": rr.relationshiptype,
-                        "inverseOntologyProperty": rr.inverserelationshiptype
-                    })
+                    ret.append(
+                        {
+                            "resourceName": resource_document["docs"][0]["_source"]["displayname"],
+                            "resourceId": resourceid,
+                            "ontologyProperty": rr.relationshiptype,
+                            "inverseOntologyProperty": rr.inverserelationshiptype,
+                        }
+                    )
                 except NotFoundError as e:
                     logger.info(
                         f"Resource {resourceid} not available. This message may appear during resource load, \
@@ -1652,14 +1654,14 @@ class ResourceInstanceDataType(BaseDataType):
             resourceXresourceSaved = set()
             for relationship in tiledata:
                 resourceXresourceId = None if relationship["resourceXresourceId"] == "" else relationship["resourceXresourceId"]
-                defaults={
+                defaults = {
                     "resourceinstanceidfrom_id": tile.resourceinstance_id,
                     "resourceinstanceidto_id": relationship["resourceId"],
                     "notes": "",
                     "relationshiptype": relationship["ontologyProperty"],
                     "inverserelationshiptype": relationship["inverseOntologyProperty"],
                     "tileid_id": tile.pk,
-                    "nodeid_id": nodeid
+                    "nodeid_id": nodeid,
                 }
 
                 try:
@@ -1674,9 +1676,11 @@ class ResourceInstanceDataType(BaseDataType):
                 resourceXresourceSaved.add(rr.pk)
 
             # get a list of all resourceXresources with the same tile and node
-            # if there are any ids in that list that aren't in the resourceXresourceSaved 
+            # if there are any ids in that list that aren't in the resourceXresourceSaved
             # then those need to be removed from the db
-            resourceXresourceInDb = set(models.ResourceXResource.objects.filter(tileid_id=tile.pk, nodeid_id=nodeid).values_list('pk', flat=True))
+            resourceXresourceInDb = set(
+                models.ResourceXResource.objects.filter(tileid_id=tile.pk, nodeid_id=nodeid).values_list("pk", flat=True)
+            )
             to_delete = resourceXresourceInDb - resourceXresourceSaved
             for rr in models.ResourceXResource.objects.filter(pk__in=to_delete):
                 rr.delete()
@@ -1691,7 +1695,9 @@ class ResourceInstanceDataType(BaseDataType):
         for relatedResourceItem in nodevalue:
             document["ids"].append({"id": relatedResourceItem["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
             if relatedResourceItem["resourceName"] not in document["strings"]:
-                document["strings"].append({"string": relatedResourceItem["resourceName"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
+                document["strings"].append(
+                    {"string": relatedResourceItem["resourceName"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+                )
 
     def transform_import_values(self, value, nodeid):
         return [v.strip() for v in value.split(",")]
@@ -1710,7 +1716,7 @@ class ResourceInstanceDataType(BaseDataType):
         try:
             if value["val"] != "" and value["val"] != []:
                 # search_query = Match(field="tiles.data.%s.resourceId" % (str(node.pk)), type="phrase", query=value["val"])
-                search_query = Terms(field='tiles.data.%s.resourceId.keyword' % (str(node.pk)), terms=value['val'])
+                search_query = Terms(field="tiles.data.%s.resourceId.keyword" % (str(node.pk)), terms=value["val"])
                 if "!" in value["op"]:
                     query.must_not(search_query)
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
@@ -1779,12 +1785,12 @@ class ResourceInstanceDataType(BaseDataType):
                 "inverseOntologyProperty": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
                 "resourceName": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
                 "ontologyClass": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
-                "resourceXresourceId": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}
+                "resourceXresourceId": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
             }
         }
 
-class ResourceInstanceListDataType(ResourceInstanceDataType):
 
+class ResourceInstanceListDataType(ResourceInstanceDataType):
     def from_rdf(self, json_ld_node):
         m = super(ResourceInstanceListDataType, self).from_rdf(json_ld_node)
         if m is not None:
