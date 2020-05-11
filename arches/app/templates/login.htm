@@ -19,6 +19,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
+{% block title %} {{ block.super }} {% trans "Sign In" %} {% endblock title %}
+
 {% block loading_mask %}
 {% endblock loading_mask %}
 
