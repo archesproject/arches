@@ -356,7 +356,6 @@ class Tile(models.TileModel):
         super(Tile, self).save(*args, **kwargs)
         # We have to save the edit log record after calling save so that the
         # resource's displayname changes are avaliable
-        if log is True:
             user = {} if user is None else user
             self.datatype_post_save_actions(request)
             if creating_new_tile is True:
