@@ -102,7 +102,7 @@ def get_instance_creator(resource_instance, user=None):
     if creatorid is None or creatorid == '':
         creatorid = settings.DEFAULT_RESOURCE_IMPORT_USER['userid']
     if user:
-        can_edit = user.id == creatorid or user.is_superuser
+        can_edit = user.id == int(creatorid) or user.is_superuser
     return {'creatorid': creatorid, 'user_can_edit_instance_permissions': can_edit}
 
 
