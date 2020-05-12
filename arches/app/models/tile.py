@@ -358,6 +358,7 @@ class Tile(models.TileModel):
         # resource's displayname changes are avaliable
         user = {} if user is None else user
         self.datatype_post_save_actions(request)
+        self.__postSave(request)
         if creating_new_tile is True:
             self.save_edit(
                 user=user,
