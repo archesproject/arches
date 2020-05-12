@@ -59,7 +59,7 @@ define([
             }
         };
 
-        var lookupResourceInstanceName = function(resourceid) {
+        var lookupResourceInstanceData = function(resourceid) {
             if (resourceLookup[resourceid]) {
                 return Promise.resolve(resourceLookup[resourceid]);
             } else {
@@ -86,11 +86,12 @@ define([
             if(!!value) {
                 value.forEach(function(val) {
                     if (val) {
-                        lookupResourceInstanceName(val.resourceId())
+                        lookupResourceInstanceData(val.resourceId())
                             .then(function(resourceInstance) {
                                 names.push(resourceInstance["_source"].displayname);
                                 self.displayValue(names.join(', '));
                                 val.resourceName(resourceInstance["_source"].displayname);
+                                val.ontologyClass(resourceInstance["_source"].root_ontology_class);
                             });
                     }
                 });
@@ -266,7 +267,7 @@ define([
                     }
                     var lookups = [];
                     values.forEach(function(val){
-                        lookups.push(lookupResourceInstanceName(val)
+                        lookups.push(lookupResourceInstanceData(val)
                             .then(function(resourceInstance) {
                                 return resourceInstance;
                             })
