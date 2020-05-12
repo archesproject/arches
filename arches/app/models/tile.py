@@ -542,7 +542,6 @@ class Tile(models.TileModel):
                     pass
         except TypeError:
             logger.info(_("No associated functions"))
-    
 
     def __postSave(self, request=None):
         try:
