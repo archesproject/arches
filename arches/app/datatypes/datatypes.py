@@ -1623,8 +1623,6 @@ class ResourceInstanceDataType(BaseDataType):
 
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
-        # import ipdb
-        # ipdb.sset_trace()
         if value is not None:
             resourceXresourceIds = self.get_id_list(value)
             for resourceXresourceId in resourceXresourceIds:
@@ -1651,15 +1649,16 @@ class ResourceInstanceDataType(BaseDataType):
             except:
                 pass
         else:
+            
             resourceXresourceSaved = set()
-            for relationship in tiledata:
-                resourceXresourceId = None if relationship["resourceXresourceId"] == "" else relationship["resourceXresourceId"]
+            for related_resource in tiledata:
+                resourceXresourceId = None if ("resourceXresourceId" not in related_resource or related_resource["resourceXresourceId"] == "") else related_resource["resourceXresourceId"]
                 defaults = {
                     "resourceinstanceidfrom_id": tile.resourceinstance_id,
-                    "resourceinstanceidto_id": relationship["resourceId"],
+                    "resourceinstanceidto_id": related_resource["resourceId"],
                     "notes": "",
-                    "relationshiptype": relationship["ontologyProperty"],
-                    "inverserelationshiptype": relationship["inverseOntologyProperty"],
+                    "relationshiptype": related_resource["ontologyProperty"],
+                    "inverserelationshiptype": related_resource["inverseOntologyProperty"],
                     "tileid_id": tile.pk,
                     "nodeid_id": nodeid,
                 }
@@ -1672,7 +1671,7 @@ class ResourceInstanceDataType(BaseDataType):
                 except models.ResourceXResource.DoesNotExist:
                     rr = models.ResourceXResource(**defaults)
                     rr.save()
-                relationship["resourceXresourceId"] = str(rr.pk)
+                related_resource["resourceXresourceId"] = str(rr.pk)
                 resourceXresourceSaved.add(rr.pk)
 
             # get a list of all resourceXresources with the same tile and node
@@ -1694,7 +1693,7 @@ class ResourceInstanceDataType(BaseDataType):
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         for relatedResourceItem in nodevalue:
             document["ids"].append({"id": relatedResourceItem["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
-            if relatedResourceItem["resourceName"] not in document["strings"]:
+            if "resourceName" in relatedResourceItem and relatedResourceItem["resourceName"] not in document["strings"]:
                 document["strings"].append(
                     {"string": relatedResourceItem["resourceName"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
                 )
@@ -1729,8 +1728,8 @@ class ResourceInstanceDataType(BaseDataType):
 
     def get_rdf_uri(self, node, data, which="r"):
         if type(data) == list:
-            return [URIRef(archesproject[f"resources/{x}"]) for x in data]
-        return URIRef(archesproject[f"resources/{data}"])
+            return [URIRef(archesproject[f"resources/{x['resourceId']}"]) for x in data]
+        return URIRef(archesproject[f"resources/{data['resourceId']}"])
 
     def to_rdf(self, edge_info, edge):
         g = Graph()
@@ -1748,7 +1747,7 @@ class ResourceInstanceDataType(BaseDataType):
             for res_inst in res_insts:
                 rangenode = self.get_rdf_uri(None, res_inst)
                 try:
-                    res_inst_obj = models.ResourceInstance.objects.get(pk=res_inst)
+                    res_inst_obj = models.ResourceInstance.objects.get(pk=res_inst["resourceId"])
                     r_type = res_inst_obj.graph.node_set.get(istopnode=True).ontologyclass
                 except models.ResourceInstance.DoesNotExist:
                     # This should never happen excpet if trying to export when the
