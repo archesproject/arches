@@ -554,7 +554,6 @@ class Tile(models.TileModel):
             logger.warn(_("No associated functions"))
             logger.warn(e)
 
-
     def _getFunctionClassInstances(self):
         ret = []
         resource = models.ResourceInstance.objects.get(pk=self.resourceinstance_id)
