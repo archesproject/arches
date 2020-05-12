@@ -4,10 +4,20 @@ from guardian.backends import check_support
 from guardian.backends import ObjectPermissionBackend
 from django.core.exceptions import ObjectDoesNotExist
 from guardian.core import ObjectPermissionChecker
-from guardian.shortcuts import get_perms, get_objects_for_user, get_group_perms, get_user_perms
+from guardian.shortcuts import (
+    get_perms,
+    get_objects_for_user,
+    get_group_perms,
+    get_user_perms,
+    get_users_with_perms,
+    remove_perm,
+    assign_perm,
+)
 from guardian.exceptions import WrongAppError
 from django.contrib.auth.models import User, Group, Permission
 from arches.app.models.models import ResourceInstance
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms
 
 
 class PermissionBackend(ObjectPermissionBackend):
@@ -35,6 +45,64 @@ class PermissionBackend(ObjectPermissionBackend):
                     if perm in permission.codename:
                         return True
             return False
+
+
+def get_restricted_users(resource):
+    """
+    Takes a resource instance and identifies which users are explicitly restricted from
+    reading, editing, deleting, or accessing it.
+
+    """
+
+    user_perms = get_users_with_perms(resource, attach_perms=True, with_group_users=False)
+    user_and_group_perms = get_users_with_perms(resource, attach_perms=True, with_group_users=True)
+
+    result = {
+        "no_access": [],
+        "cannot_read": [],
+        "cannot_write": [],
+        "cannot_delete": [],
+    }
+
+    for user, perms in user_and_group_perms.items():
+        if user.is_superuser:
+            pass
+        elif user in user_perms and "no_access_to_resourceinstance" in user_perms[user]:
+            for k, v in result.items():
+                v.append(user.id)
+        else:
+            if "view_resourceinstance" not in perms:
+                result["cannot_read"].append(user.id)
+            if "change_resourceinstance" not in perms:
+                result["cannot_write"].append(user.id)
+            if "delete_resourceinstance" not in perms:
+                result["cannot_delete"].append(user.id)
+            if "no_access_to_resourceinstance" in perms and len(perms) == 1:
+                result["no_access"].append(user.id)
+
+    return result
+
+
+def get_restricted_instances(user):
+    if user.is_superuser is False:
+        se = SearchEngineFactory().create()
+        query = Query(se, start=0, limit=settings.SEARCH_RESULT_LIMIT)
+        has_access = Bool()
+        terms = Terms(field="permissions.users_with_no_access", terms=[str(user.id)])
+        has_access.must(terms)
+        query.add_query(has_access)
+        results = query.search(index="resources", scroll="1m")
+        scroll_id = results["_scroll_id"]
+        total = results["hits"]["total"]["value"]
+        if total > settings.SEARCH_RESULT_LIMIT:
+            pages = total // settings.SEARCH_RESULT_LIMIT
+            for page in range(pages):
+                results_scrolled = query.se.es.scroll(scroll_id=scroll_id, scroll="1m")
+                results["hits"]["hits"] += results_scrolled["hits"]["hits"]
+        restricted_ids = [res["_id"] for res in results["hits"]["hits"]]
+        return restricted_ids
+    else:
+        return []
 
 
 def get_groups_for_object(perm, obj):
@@ -244,6 +312,7 @@ def user_can_read_resources(user, resourceid=None):
     Requires that a user be able to read an instance and read a single nodegroup of a resource
 
     """
+
     if user.is_authenticated:
         if user.is_superuser:
             return True
@@ -266,6 +335,7 @@ def user_can_edit_resources(user, resourceid=None):
     Requires that a user be able to edit an instance and delete a single nodegroup of a resource
 
     """
+
     if user.is_authenticated:
         if user.is_superuser:
             return True

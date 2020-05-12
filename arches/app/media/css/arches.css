@@ -1116,7 +1116,7 @@ ul.tabbed-report-tab-list {
     border: 1px solid black;
 }
 
-.file-viewer .loading-mask {
+.file-viewer .loading-mask, .search-result-details .loading-mask {
     position: relative;
     opacity: .5;
     background-color: gray;
@@ -1127,7 +1127,7 @@ ul.tabbed-report-tab-list {
     z-index: 240;
 }
 
-.file-viewer .loading-mask::before {
+.file-viewer .loading-mask::before, .search-result-details .loading-mask::before {
     position: fixed;
     opacity: .5;
     color: #7b7b7b;
@@ -1146,7 +1146,7 @@ ul.tabbed-report-tab-list {
     z-index: 100000001;
 }
 
-.file-viewer .loading-mask:after {
+.file-viewer .loading-mask:after, .search-result-details .loading-mask::after {
     position: fixed;
     opacity: .5;
     color: #7b7b7b;
@@ -1275,6 +1275,191 @@ ul.tabbed-report-tab-list {
 .workflow-step-container .thumbnail-gallery-container {
     bottom: 0px;
     left: 50px;
+}
+
+.workflow-panel {
+    background: #26476a;
+    /* width: 12%; */
+    color: white;
+}
+
+div.workflow-panel {
+    min-width: 250px;
+}
+
+.workflow-panel ul {
+    /* text-decoration: none; */
+    list-style-type: none;
+    /* padding-left: 12px; */
+    margin-bottom: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    /* min-height: 200px; */
+    padding-left: 0;
+    /* border-bottom: #fff; */
+    border-width: 2px;
+}
+
+.workflow-panel i {
+    margin-right: 0px;
+    font-size: 13px;
+    color: #ddd;
+    width: 20px;
+    text-align: center;
+    margin-left: -5px;
+}
+
+.workflow-panel li {
+    padding-top: 12px;
+    padding-left: 20px;
+    padding-bottom: 12px;
+}
+
+.workflow-panel li:hover {
+    background: rgba(70, 130, 180, 0.4);
+    border-left: 4px solid steelblue;
+}
+
+.workflow-panel:not(.navbarclosed) li:hover a {
+    margin-left: -4px;
+}
+
+.workflow-panel:not(.navbarclosed) .active-sub:hover li {
+    cursor: default;
+    background: steelblue;
+}
+
+.workflow-panel .active-sub:hover a {
+    cursor: default;
+    background: steelblue;
+}
+
+.workflow-panel > hr {
+    border-color: white;
+    margin-left: 30px;
+    margin-right: 30px;
+    margin-bottom: 20px;
+}
+
+.workflow-panel.navbarclosed > hr {
+    border-color: #0B0737;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.workflow-panel .navbarclosed > hr {
+    border-color: white;
+    margin-bottom: 0px;
+}
+
+.workflow-panel li a span {
+    color: white;
+    font-size: 15px;
+    margin-top: 15px;
+    margin-left: 5px;
+}
+
+.workflow-select-wf-icon {
+    color: white;
+    font-size: 40px;
+}
+
+.workflow-select-title {
+    font-size: 1.4em;
+    font-weight: 500;
+}
+
+.workflow-select-wf-circle {
+    width: 80px;
+    height: 80px;
+    display: inline-block;
+    text-align: center;
+    padding: 18px;
+    border-radius: 40px;
+}
+
+.workflow-select-desc {
+    font-size: 12px;
+    padding-top: 10px;
+}
+
+.workflow-select-card-container-title {
+    font-size: 1.5em;
+    font-weight: 500;
+    padding-left: 30px;
+    margin-top: 5px;
+    margin-bottom: -15px;
+}
+
+.workflow-select-card-container {
+    display: flex;
+    flex-grow: inherit;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 20px;
+}
+
+.workflow-select-card {
+    width: 200px;
+    height: 200px;
+    padding: 10px;
+    color: white;
+    text-align: center;
+    border: 1px solid #777;
+    border-radius: 1px;
+    margin: 10px;
+    opacity: 0.85;
+}
+
+.workflow-select-card:hover {
+    opacity: 1.0;
+    border: 1px solid black;
+}
+
+div.final-cons-step-splash {
+    display:flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1%;
+}
+
+div.final-cons-step-splash > a {
+    max-width: 180px;
+}
+
+div.final-cons-step-splash > button {
+    border-radius: 2px;
+}
+
+div.final-cons-step-separator {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: stretch;
+    margin-top: 15px;
+    margin-bottom:8px;
+    color: #777;
+}
+
+div.final-cons-step-separator > hr {
+    margin-top:25px;
+    margin-bottom:8px;
+    margin-left: 0;
+    margin-right: 0;
+    flex-grow: 9;
+    border:1px solid #ddd;
+}
+
+div.final-cons-step-separator > h4 {
+    margin-left:24px;
+    margin-right:24px;
+    margin-top: 12px;
+    font-size: 21px;
+    font-weight: 500;
+    flex-grow: 1;
+    text-align: center;
 }
 
 .gallery-container {
@@ -1590,6 +1775,37 @@ ul.tabbed-report-tab-list {
     margin-top: 50px;
 }
 
+.install-buttons .btn-warning {
+    background: #f75d3f;
+    border-color: #E53211;
+}
+
+.install-buttons .btn-warning:hover {
+    background: #E53211;
+    border-color: #B02107;
+}
+
+
+.install-buttons .btn-danger {
+    background: #FF836C;
+    border-color: #E53211;
+}
+
+.install-buttons .btn-danger:hover {
+    background: #f75d3f;
+    border-color: #E53211;
+}
+
+.install-buttons .btn-mint {
+    background: #3acaa1;
+    border-color: #42cca5;
+}
+
+.install-buttons .btn-mint:hover {
+    background: #1ABA8E;
+    border-color: #009E72;
+}
+
 .workbench-card-sidepanel .install-buttons {
     background: #f9f9f9;
     position: fixed;
@@ -1599,6 +1815,10 @@ ul.tabbed-report-tab-list {
     padding: 10px 35px;
     right: 0;
     width: 399px;
+}
+
+.graph-designer .workbench-card-sidepanel .install-buttons {
+    margin-right: 375px;
 }
 
 .workbench-card-sidepanel.expanded .install-buttons {
@@ -2739,8 +2959,8 @@ a.select2-search-choice-close {
 }
 
 .permission-filter {
-    display:inline-flex; 
-    justify-content: 
+    display:inline-flex;
+    justify-content:
     space-between;
     width: 250px;
 }
@@ -2750,7 +2970,7 @@ a.select2-search-choice-close {
 }
 
 .permissions-list-table-body {
-    height: 245px;
+    height: 400px;
     overflow-y: auto;
     border: solid 1px #ddd;
 }
@@ -2838,13 +3058,23 @@ a.select2-search-choice-close {
     width: 65%;
 }
 
-.permission-grid .permission-footer {
+.permission-grid .permissions-buttons {
     grid-column-start: 2;
-    grid-column-end: 4;
+    grid-column-end: 3;
     grid-row-start: 5;
     grid-row-end: 5;
     height: 75px;
     align-items: baseline;
+
+  }
+
+.permission-grid .remove-permissions-btn {
+    grid-column-start: 3;
+    grid-column-end: 4;
+    grid-row-start: 5;
+    grid-row-end: 5;
+    height: 75px;
+    justify-self: end;
   }
 
 /*------------------------------------------------*/
@@ -4727,9 +4957,10 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 }
 
 .nodeLabels {
-    font-size: 11px;
+    font-size: 14px;
     fill: #454545;
     text-anchor: middle;
+    font-weight: 600;
 }
 
 .node_info {
@@ -5157,7 +5388,7 @@ ul.jqtree_common li.jqtree-folder {
 
 .profile-report {
     height: 150px;
-    background: #A43741;
+    background: #102F4F;
     width: 100%;
     padding: 40px 150px 0px 150px;
     border-bottom: 1px solid #520008;
@@ -9593,12 +9824,6 @@ table.table.dataTable {
     width: calc(100% - 245px);
 }
 
-.nodeLabels {
-    font-size: 11px;
-    fill: #777;
-    text-anchor: middle;
-}
-
 .root-node-label {
     stroke: #999;
     /*#3275b1;*/
@@ -11815,6 +12040,19 @@ a.jstree-anchor.permissions-widget {
     height: 400px;
 }
 
+.search-result-details {
+    background: #fff;
+    height: 100%;
+}
+
+.search-result-details-splash {
+    padding-top: 50px;
+}
+
+.search-result-details-splash .rr-splash {
+    margin-top: 0;
+}
+
 .iiif-viewer-gallery, .show-gallery-control {
     color: rgb(45, 70, 103);
     position: absolute;
@@ -11849,7 +12087,7 @@ a.jstree-anchor.permissions-widget {
 .show-gallery-control.gallery-expanded {
     top: 0;
     left: 0;
-    right: 75px;
+    right: 74px;
     bottom: auto;
     border-bottom: solid 1px rgb(221, 221, 221);
     z-index: 2000;
@@ -11889,8 +12127,10 @@ a.jstree-anchor.permissions-widget {
     height: 160px;
     width: 100%;
     padding: 10px;
+    padding-bottom: 0px;
     white-space: nowrap;
     overflow-x: auto;
+    display: flex;
 }
 .show-gallery-control h3 {
     display: inline-block;
@@ -11899,7 +12139,7 @@ a.jstree-anchor.permissions-widget {
 .gallery-expanded .iiif-gallery-content {
     height: 100%;
     background-color: rgb(250, 250, 250);
-    padding: 25px 20px 20px 20px;
+    padding: 5px 0px 20px 20px;
 }
 .workbench-card-wrapper .workbench-card-container-wrapper {
     height: 100%;
@@ -11946,6 +12186,12 @@ a.jstree-anchor.permissions-widget {
     font-weight: 600;
     text-decoration: none;
 }
+
+.gallery-expanded .iiif-gallery-panel {
+    padding-left: 15px;
+    margin-left: 225px;
+}
+
 .iiif-gallery-header {
     font-size: 1.2em;
     padding-left: 10px;
@@ -11953,7 +12199,14 @@ a.jstree-anchor.permissions-widget {
     left: 0px;
 }
 .gallery-expanded .iiif-gallery-header {
-    padding-left: 10px;
+    padding-left: 20px;
+    padding-top:  15px;
+    position: sticky;
+    top: 0px;
+    margin-left: -10px;
+    margin-top: 0px;
+    margin-bottom: 5px;
+    background: #fafafa;
 }
 .iiif-widget-report {
     margin: 0 0 0 320px;
@@ -11963,17 +12216,40 @@ a.jstree-anchor.permissions-widget {
     margin: 0 20px 10px 0px;
     border: solid 1px #808080;
 }
+
+.manifest-metadata-title {
+    margin-top: 8px;
+}
+
+.manifest-metadata-value {
+    line-height: 1.2;
+}
+
 .manifest-details {
     white-space: normal;
+    width: 250px;
+    border-right: 1px solid #ddd;
+    background: #e9e9e9;
+    margin-top: -15px;
+    margin-left: -20px;
+    padding: 15px 10px;
+    height: 100%;
+    position: fixed;
+    overflow-y: scroll;
 }
+.manifest-details h3 {
+    width: 225px;
+}
+
 .manifest-details h4 {
-    padding-left: 10px;
+    padding-left: 0px;
 }
 .manifest-details-list, .manifest-logo {
-    padding-left: 20px;
+    padding-left: 0px;
+    margin-top: -5px;
 }
 .manifest-logo {
-    max-width: 100%;
+    max-width: 150px;
 }
 .manifest-editor-label {
     font-size: 1.2em;
@@ -12035,10 +12311,30 @@ a.jstree-anchor.permissions-widget {
 }
 .manifest-editor {
     padding-bottom: 10px;
+    width: 100%;
+    padding-left: 20px;
 }
+
+.gallery-expanded .manifest-editor {
+    margin-left: -10px;
+    margin-top: 20px;
+}
+
+.manifest-details+.manifest-editor {
+    margin-left: 225px;
+}
+
 .manifest-editor-loading, .manifest-editor-error {
     display: inline-block;
     padding-left: 10px;
+}
+
+.gallery-expanded .manifest-editor-loading {
+    margin-top: 25px;
+}
+
+.manifest-editor-input {
+    margin-bottom: 10px;
 }
 
 .manifest-editor-error {

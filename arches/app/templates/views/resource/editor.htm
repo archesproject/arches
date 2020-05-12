@@ -94,7 +94,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <i class="jstree-icon jstree-ocl" role="presentation"></i>
                         <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showInstancePermissionsManager(self)}}, css: {'jstree-clicked': selection() === 'resource-permissions', 'disabled': resourceId() === '' || userIsCreator === false }">
                             <strong>
-                                <i class="fa fa-link" role="presentation"></i>
+                                <i class="fa fa-lock" role="presentation"></i>
                                 <span>{% trans 'Manage Permissions' %}</span>
                             </strong>
                         </a>
@@ -120,7 +120,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div>
                 <div data-bind="component: {
                     name: 'permissions-manager',
-                    params: {resourceId: resourceId, creator: userIsCreator}
+                    params: {
+                        graphId: graphid,
+                        resourceId: resourceId,
+                        creator: creator,
+                        userIsCreator: userIsCreator,
+                        alert: alert, 
+                        permissionLabelLookup: {
+                            'view_resourceinstance':'{% trans 'Read' %}',
+                            'change_resourceinstance':'{% trans 'Update' %}',
+                            'no_access_to_resourceinstance':'{% trans 'No Access' %}',
+                            'delete_resourceinstance':'{% trans 'Delete' %}',
+                        },
+                        alertTitle: '{% trans 'You are about assign normal user access to this instance' %}', 
+                        alertMessage: '{% trans 'Would you like to proceed?' %}'},
                 }"></div>
             </div>
             <!--/ko -->

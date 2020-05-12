@@ -56,6 +56,9 @@ class SearchView(MapBaseManagerView):
         geocoding_providers = models.Geocoder.objects.all()
         search_components = models.SearchComponent.objects.all()
         datatypes = models.DDataType.objects.all()
+        widgets = models.Widget.objects.all()
+        templates = models.ReportTemplate.objects.all()
+        card_components = models.CardComponent.objects.all()
 
         context = self.get_context_data(
             map_layers=map_layers,
@@ -63,6 +66,9 @@ class SearchView(MapBaseManagerView):
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             search_components=search_components,
+            widgets=widgets,
+            report_templates=templates,
+            card_components=card_components,
             main_script="views/search",
             resource_graphs=resource_graphs,
             datatypes=datatypes,
@@ -218,6 +224,14 @@ def export_results(request):
         return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
 
 
+def append_instance_permission_filter_dsl(request, search_results_object):
+    if request.user.is_superuser is False:
+        has_access = Bool()
+        terms = Terms(field="permissions.users_with_no_access", terms=[str(request.user.id)])
+        has_access.must_not(terms)
+        search_results_object["query"].add_query(has_access)
+
+
 def search_results(request):
     for_export = request.GET.get("export")
     total = int(request.GET.get("total", "0"))
@@ -233,6 +247,7 @@ def search_results(request):
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
                 search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional)
+        append_instance_permission_filter_dsl(request, search_results_object)
     except Exception as err:
         return JSONErrorResponse(message=err)
 
@@ -241,6 +256,9 @@ def search_results(request):
     dsl.include("root_ontology_class")
     dsl.include("resourceinstanceid")
     dsl.include("points")
+    dsl.include("permissions.users_without_read_perm")
+    dsl.include("permissions.users_without_edit_perm")
+    dsl.include("permissions.users_without_delete_perm")
     dsl.include("geometries")
     dsl.include("displayname")
     dsl.include("displaydescription")
@@ -279,7 +297,7 @@ def search_results(request):
         ret["reviewer"] = user_is_resource_reviewer(request.user)
         ret["timestamp"] = datetime.now()
         ret["total_results"] = dsl.count(index="resources")
-
+        ret["userid"] = request.user.id
         return JSONResponse(ret)
 
     else:

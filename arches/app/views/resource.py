@@ -94,16 +94,18 @@ def get_resource_relationship_types():
     return relationship_type_values
 
 
-def get_instance_creator(resource_instance, user):
-    try:
-        creatorid = int(
+def get_instance_creator(resource_instance, user=None):
+    creatorid = None
+    can_edit = None
+    if models.EditLog.objects.filter(resourceinstanceid=resource_instance.resourceinstanceid).filter(edittype="create").exists():
+        creatorid = (
             models.EditLog.objects.filter(resourceinstanceid=resource_instance.resourceinstanceid).filter(edittype="create")[0].userid
         )
-        return creatorid, user.id == creatorid or user.is_superuser
-
-    except Exception:
-        logger.error("Cannot find instance creator when retrieving instance permissions")
-        return None, None
+    if creatorid is None or creatorid == "":
+        creatorid = settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
+    if user:
+        can_edit = user.id == int(creatorid) or user.is_superuser
+    return {"creatorid": creatorid, "user_can_edit_instance_permissions": can_edit}
 
 
 class ResourceEditorView(MapBaseManagerView):
@@ -132,7 +134,9 @@ class ResourceEditorView(MapBaseManagerView):
         else:
             resource_instance = Resource.objects.get(pk=resourceid)
             graph = resource_instance.graph
-            creator, user_created_instance = get_instance_creator(resource_instance, request.user)
+            instance_creator = get_instance_creator(resource_instance, request.user)
+            creator = instance_creator["creatorid"]
+            user_created_instance = instance_creator["user_can_edit_instance_permissions"]
         nodes = graph.node_set.all()
         resource_graphs = (
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
@@ -291,9 +295,13 @@ class ResourcePermissionDataView(View):
 
     def post(self, request):
         resourceid = request.POST.get("instanceid", None)
+        action = request.POST.get("action", None)
+        graphid = request.POST.get("graphid", None)
         result = None
-        if self.action == "restrict":
-            result = self.make_instance_private(resourceid)
+        if action == "restrict":
+            result = self.make_instance_private(resourceid, graphid)
+        elif action == "open":
+            result = self.make_instance_public(resourceid, graphid)
         else:
             data = JSONDeserializer().deserialize(request.body)
             self.apply_permissions(data, request.user)
@@ -348,36 +356,41 @@ class ResourcePermissionDataView(View):
         result = {"identities": identities}
         result["permissions"] = ordered_perms
         result["limitedaccess"] = (len(get_users_with_perms(resource_instance)) + len(get_groups_with_perms(resource_instance))) > 1
-        try:
-            createorid = (
-                models.EditLog.objects.filter(resourceinstanceid=resource_instance.resourceinstanceid).filter(edittype="create")[0].userid
-            )
-            result["creatorid"] = createorid
-        except Exception:
-            logger.error("Cannot find instance creator when retrieving instance permissions")
-            result["creatorid"] = None
+        instance_creator = get_instance_creator(resource_instance)
+        result["creatorid"] = instance_creator["creatorid"]
         return result
 
-    def make_instance_private(self, instanceid):
-        groups = list(Group.objects.all())
-        resource_instance = models.ResourceInstance.objects.get(pk=instanceid)
-        users = list(User.objects.all())
-        for identity in groups + users:
-            assign_perm("no_access_to_resourceinstance", identity, resource_instance)
-        return self.get_instance_permissions(resource_instance)
+    def make_instance_private(self, resourceinstanceid, graphid=None):
+        resource = Resource(resourceinstanceid)
+        resource.graph_id = graphid if graphid else str(models.ResourceInstance.objects.get(pk=resourceinstanceid).graph_id)
+        resource.add_permission_to_all("no_access_to_resourceinstance")
+        instance_creator = get_instance_creator(resource)
+        user = User.objects.get(pk=instance_creator["creatorid"])
+        assign_perm("view_resourceinstance", user, resource)
+        assign_perm("change_resourceinstance", user, resource)
+        assign_perm("delete_resourceinstance", user, resource)
+        remove_perm("no_access_to_resourceinstance", user, resource)
+        return self.get_instance_permissions(resource)
+
+    def make_instance_public(self, resourceinstanceid, graphid=None):
+        resource = Resource(resourceinstanceid)
+        resource.graph_id = graphid if graphid else str(models.ResourceInstance.objects.get(pk=resourceinstanceid).graph_id)
+        resource.remove_resource_instance_permissions()
+        return self.get_instance_permissions(resource)
 
     def apply_permissions(self, data, user, revert=False):
         with transaction.atomic():
-            for identity in data["selectedIdentities"]:
-                if identity["type"] == "group":
-                    identityModel = Group.objects.get(pk=identity["id"])
-                else:
-                    identityModel = User.objects.get(pk=identity["id"])
+            for instance in data["selectedInstances"]:
+                resource_instance = models.ResourceInstance.objects.get(pk=instance["resourceinstanceid"])
+                for identity in data["selectedIdentities"]:
+                    if identity["type"] == "group":
+                        identityModel = Group.objects.get(pk=identity["id"])
+                    else:
+                        identityModel = User.objects.get(pk=identity["id"])
 
-                for instance in data["selectedInstances"]:
-                    resource_instance_id = instance["resourceinstanceid"]
-                    resource_instance = models.ResourceInstance.objects.get(pk=resource_instance_id)
-                    creator, user_can_modify_permissions = get_instance_creator(resource_instance, user)
+                    instance_creator = get_instance_creator(resource_instance, user)
+                    creator = instance_creator["creatorid"]
+                    user_can_modify_permissions = instance_creator["user_can_edit_instance_permissions"]
 
                     if user_can_modify_permissions:
                         # first remove all the current permissions
@@ -386,8 +399,16 @@ class ResourcePermissionDataView(View):
 
                         if not revert:
                             # then add the new permissions
-                            for perm in identity["selectedPermissions"]:
-                                assign_perm(perm["codename"], identityModel, resource_instance)
+                            no_access = any(perm["codename"] == "no_access_to_resourceinstance" for perm in identity["selectedPermissions"])
+                            if no_access:
+                                assign_perm("no_access_to_resourceinstance", identityModel, resource_instance)
+                            else:
+                                for perm in identity["selectedPermissions"]:
+                                    assign_perm(perm["codename"], identityModel, resource_instance)
+
+                resource = Resource(str(resource_instance.resourceinstanceid))
+                resource.graph_id = resource_instance.graph_id
+                resource.index()
 
 
 @method_decorator(can_edit_resource_instance, name="dispatch")
@@ -635,6 +656,8 @@ class ResourceDescriptors(View):
                         "map_popup": document["_source"]["map_popup"],
                         "displayname": document["_source"]["displayname"],
                         "geometries": document["_source"]["geometries"],
+                        "permissions": document["_source"]["permissions"],
+                        "userid": request.user.id,
                     }
                 )
             except Exception as e:
@@ -676,23 +699,54 @@ class ResourceReportView(MapBaseManagerView):
 
         tiles = Tile.objects.filter(resourceinstance=resource).order_by("sortorder")
 
-        graph = Graph.objects.get(graphid=resource.graph_id)
-        cards = Card.objects.filter(graph=graph).order_by("sortorder")
-        permitted_cards = []
         permitted_tiles = []
 
         perm = "read_nodegroup"
-
-        for card in cards:
-            if request.user.has_perm(perm, card.nodegroup):
-                card.filter_by_perm(request.user, perm)
-                permitted_cards.append(card)
 
         for tile in tiles:
             if request.user.has_perm(perm, tile.nodegroup):
                 tile.filter_by_perm(request.user, perm)
                 permitted_tiles.append(tile)
 
+        if request.GET.get("json", False) and request.GET.get("exclude_graph", False):
+            return JSONResponse(
+                {
+                    "tiles": permitted_tiles,
+                    "related_resources": related_resource_summary,
+                    "displayname": displayname,
+                    "resourceid": resourceid,
+                }
+            )
+
+        datatypes = models.DDataType.objects.all()
+        graph = Graph.objects.get(graphid=resource.graph_id)
+        cards = Card.objects.filter(graph_id=resource.graph_id).order_by("sortorder")
+        permitted_cards = []
+        for card in cards:
+            if request.user.has_perm(perm, card.nodegroup):
+                card.filter_by_perm(request.user, perm)
+                permitted_cards.append(card)
+        cardwidgets = [
+            widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
+        ]
+
+        if request.GET.get("json", False) and not request.GET.get("exclude_graph", False):
+            return JSONResponse(
+                {
+                    "datatypes": datatypes,
+                    "cards": permitted_cards,
+                    "tiles": permitted_tiles,
+                    "graph": graph,
+                    "related_resources": related_resource_summary,
+                    "displayname": displayname,
+                    "resourceid": resourceid,
+                    "cardwidgets": cardwidgets,
+                }
+            )
+
+        widgets = models.Widget.objects.all()
+        templates = models.ReportTemplate.objects.all()
+        card_components = models.CardComponent.objects.all()
         try:
             map_layers = models.MapLayer.objects.all()
             map_markers = models.MapMarker.objects.all()
@@ -700,15 +754,6 @@ class ResourceReportView(MapBaseManagerView):
             geocoding_providers = models.Geocoder.objects.all()
         except AttributeError:
             raise Http404(_("No active report template is available for this resource."))
-
-        cardwidgets = [
-            widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
-        ]
-
-        datatypes = models.DDataType.objects.all()
-        widgets = models.Widget.objects.all()
-        templates = models.ReportTemplate.objects.all()
-        card_components = models.CardComponent.objects.all()
 
         context = self.get_context_data(
             main_script="views/resource/report",

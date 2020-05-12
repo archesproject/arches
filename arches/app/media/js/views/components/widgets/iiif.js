@@ -44,37 +44,18 @@ define([
                             var extent = geojsonExtent(featureCollection);
                             map.addLayer(L.geoJson(featureCollection, {
                                 pointToLayer: function(feature, latlng) {
-                                    return L.circleMarker(latlng, {
-                                        color: feature.properties.color,
-                                        fillColor: feature.properties.fillColor,
-                                        weight: feature.properties.weight,
-                                        radius: feature.properties.radius,
-                                        opacity: feature.properties.opacity,
-                                        fillOpacity: feature.properties.fillOpacity
-                                    });
+                                    return L.circleMarker(latlng, feature.properties);
                                 },
                                 style: function(feature) {
-                                    return {
-                                        color: feature.properties.color,
-                                        fillColor: feature.properties.fillColor,
-                                        weight: feature.properties.weight,
-                                        radius: feature.properties.radius,
-                                        opacity: feature.properties.opacity,
-                                        fillOpacity: feature.properties.fillOpacity
-                                    };
+                                    return feature.properties;
                                 }
                             }));
                             L.control.fullscreen().addTo(map);
                             setTimeout(function() {
-                                if (features.length === 1 && features[0].geometry.type === 'Point') {
-                                    var coords = features[0].geometry.coordinates;
-                                    map.panTo([coords[1], coords[0]]);
-                                } else {
-                                    map.fitBounds([
-                                        [extent[1], extent[0]],
-                                        [extent[3], extent[2]]
-                                    ]);
-                                }
+                                map.fitBounds([
+                                    [extent[1]-1, extent[0]-1],
+                                    [extent[3]+1, extent[2]+1]
+                                ]);
                             }, 250);
                         }
                     });
