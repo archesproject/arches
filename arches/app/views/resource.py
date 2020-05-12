@@ -371,6 +371,8 @@ class ResourcePermissionDataView(View):
         resource.add_permission_to_all("no_access_to_resourceinstance")
         if models.EditLog.objects.filter(resourceinstanceid=resource.resourceinstanceid).filter(edittype="create").exists():
             userid = models.EditLog.objects.filter(resourceinstanceid=resource.resourceinstanceid).filter(edittype="create")[0].userid
+            if userid == '':
+                userid = settings.DEFAULT_RESOURCE_IMPORT_USER['userid']
             user = User.objects.get(pk=userid)
             assign_perm("view_resourceinstance", user, resource)
             assign_perm("change_resourceinstance", user, resource)
