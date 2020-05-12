@@ -399,6 +399,7 @@ if DEBUG is True:
 USER_SIGNUP_GROUP = "Crowdsource Editor"
 
 CACHES = {"default": {"BACKEND": "django.core.cache.backends.memcached.MemcachedCache", "LOCATION": "127.0.0.1:11211"}}
+DEFAULT_RESOURCE_IMPORT_USER = {"username": "admin", "userid": 1}
 
 # Example of a custom time wheel configuration:
 # TIMEWHEEL_DATE_TIERS = {
