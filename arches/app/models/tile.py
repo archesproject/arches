@@ -541,6 +541,19 @@ class Tile(models.TileModel):
                     pass
         except TypeError:
             logger.info(_("No associated functions"))
+    
+
+    def __postSave(self, request=None):
+        try:
+            for function in self._getFunctionClassInstances():
+                try:
+                    function.postSave(self, request)
+                except NotImplementedError:
+                    pass
+        except TypeError as e:
+            logger.warn(_("No associated functions"))
+            logger.warn(e)
+
 
     def _getFunctionClassInstances(self):
         ret = []
