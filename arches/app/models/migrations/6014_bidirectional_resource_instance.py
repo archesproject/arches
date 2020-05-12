@@ -9,6 +9,32 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AlterField(
+            model_name="resourcexresource",
+            name="resourceinstanceidfrom",
+            field=models.ForeignKey(
+                blank=True,
+                db_column="resourceinstanceidfrom",
+                db_constraint=False,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="resxres_resource_instance_ids_from",
+                to="models.ResourceInstance",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="resourcexresource",
+            name="resourceinstanceidto",
+            field=models.ForeignKey(
+                blank=True,
+                db_column="resourceinstanceidto",
+                db_constraint=False,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="resxres_resource_instance_ids_to",
+                to="models.ResourceInstance",
+            ),
+        ),
         migrations.AddField(model_name="resourcexresource", name="inverserelationshiptype", field=models.TextField(blank=True, null=True),),
         migrations.AddField(
             model_name="resourcexresource",
