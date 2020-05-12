@@ -94,19 +94,16 @@ def get_resource_relationship_types():
     return relationship_type_values
 
 
-def get_instance_creator(resource_instance, user):
-    try:
-        creatorid = int(
-            models.EditLog.objects.filter(resourceinstanceid=resource_instance.resourceinstanceid).filter(edittype="create")[0].userid
-        )
-        return creatorid, user.id == creatorid or user.is_superuser
-
-    except Exception:
-        logger.error("Cannot find instance creator when retrieving instance permissions")
-        if user.is_superuser:
-            return user.id, user.is_superuser
-        else:
-            return None, False
+def get_instance_creator(resource_instance, user=None):
+    creatorid = None
+    can_edit = None
+    if models.EditLog.objects.filter(resourceinstanceid=resource_instance.resourceinstanceid).filter(edittype="create").exists():
+        creatorid = models.EditLog.objects.filter(resourceinstanceid=resource_instance.resourceinstanceid).filter(edittype="create")[0].userid
+    if creatorid is None or creatorid == '':
+        creatorid = settings.DEFAULT_RESOURCE_IMPORT_USER['userid']
+    if user:
+        can_edit = user.id == creatorid or user.is_superuser
+    return {'creatorid': creatorid, 'user_can_edit_instance_permissions': can_edit}
 
 
 class ResourceEditorView(MapBaseManagerView):
@@ -135,7 +132,9 @@ class ResourceEditorView(MapBaseManagerView):
         else:
             resource_instance = Resource.objects.get(pk=resourceid)
             graph = resource_instance.graph
-            creator, user_created_instance = get_instance_creator(resource_instance, request.user)
+            instance_creator = get_instance_creator(resource_instance, request.user)
+            creator = instance_creator['creatorid']
+            user_created_instance = instance_creator['user_can_edit_instance_permissions'] 
         nodes = graph.node_set.all()
         resource_graphs = (
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
@@ -355,29 +354,20 @@ class ResourcePermissionDataView(View):
         result = {"identities": identities}
         result["permissions"] = ordered_perms
         result["limitedaccess"] = (len(get_users_with_perms(resource_instance)) + len(get_groups_with_perms(resource_instance))) > 1
-        try:
-            createorid = (
-                models.EditLog.objects.filter(resourceinstanceid=resource_instance.resourceinstanceid).filter(edittype="create")[0].userid
-            )
-            result["creatorid"] = createorid
-        except Exception:
-            logger.error("Cannot find instance creator when retrieving instance permissions")
-            result["creatorid"] = None
+        instance_creator = get_instance_creator(resource_instance)
+        result['creatorid'] = instance_creator['creatorid']
         return result
 
     def make_instance_private(self, resourceinstanceid, graphid=None):
         resource = Resource(resourceinstanceid)
         resource.graph_id = graphid if graphid else str(models.ResourceInstance.objects.get(pk=resourceinstanceid).graph_id)
         resource.add_permission_to_all("no_access_to_resourceinstance")
-        if models.EditLog.objects.filter(resourceinstanceid=resource.resourceinstanceid).filter(edittype="create").exists():
-            userid = models.EditLog.objects.filter(resourceinstanceid=resource.resourceinstanceid).filter(edittype="create")[0].userid
-            if userid == '':
-                userid = settings.DEFAULT_RESOURCE_IMPORT_USER['userid']
-            user = User.objects.get(pk=userid)
-            assign_perm("view_resourceinstance", user, resource)
-            assign_perm("change_resourceinstance", user, resource)
-            assign_perm("delete_resourceinstance", user, resource)
-            remove_perm("no_access_to_resourceinstance", user, resource)
+        instance_creator = get_instance_creator(resource)
+        user = User.objects.get(pk=instance_creator['creatorid'])
+        assign_perm("view_resourceinstance", user, resource)
+        assign_perm("change_resourceinstance", user, resource)
+        assign_perm("delete_resourceinstance", user, resource)
+        remove_perm("no_access_to_resourceinstance", user, resource)
         return self.get_instance_permissions(resource)
 
     def make_instance_public(self, resourceinstanceid, graphid=None):
@@ -396,7 +386,9 @@ class ResourcePermissionDataView(View):
                     else:
                         identityModel = User.objects.get(pk=identity["id"])
 
-                    creator, user_can_modify_permissions = get_instance_creator(resource_instance, user)
+                    instance_creator = get_instance_creator(resource_instance, user)
+                    creator = instance_creator['creatorid']
+                    user_can_modify_permissions = instance_creator['user_can_edit_instance_permissions'] 
 
                     if user_can_modify_permissions:
                         # first remove all the current permissions
