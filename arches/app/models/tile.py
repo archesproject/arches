@@ -356,27 +356,27 @@ class Tile(models.TileModel):
         super(Tile, self).save(*args, **kwargs)
         # We have to save the edit log record after calling save so that the
         # resource's displayname changes are avaliable
-            user = {} if user is None else user
-            self.datatype_post_save_actions(request)
-            if creating_new_tile is True:
-                self.save_edit(
-                    user=user,
-                    edit_type=edit_type,
-                    old_value={},
-                    new_value=self.data,
-                    newprovisionalvalue=newprovisionalvalue,
-                    provisional_edit_log_details=provisional_edit_log_details,
-                )
-            else:
-                self.save_edit(
-                    user=user,
-                    edit_type=edit_type,
-                    old_value=existing_model.data,
-                    new_value=self.data,
-                    newprovisionalvalue=newprovisionalvalue,
-                    oldprovisionalvalue=oldprovisionalvalue,
-                    provisional_edit_log_details=provisional_edit_log_details,
-                )
+        user = {} if user is None else user
+        self.datatype_post_save_actions(request)
+        if creating_new_tile is True:
+            self.save_edit(
+                user=user,
+                edit_type=edit_type,
+                old_value={},
+                new_value=self.data,
+                newprovisionalvalue=newprovisionalvalue,
+                provisional_edit_log_details=provisional_edit_log_details,
+            )
+        else:
+            self.save_edit(
+                user=user,
+                edit_type=edit_type,
+                old_value=existing_model.data,
+                new_value=self.data,
+                newprovisionalvalue=newprovisionalvalue,
+                oldprovisionalvalue=oldprovisionalvalue,
+                provisional_edit_log_details=provisional_edit_log_details,
+            )
 
         if index:
             self.index()
