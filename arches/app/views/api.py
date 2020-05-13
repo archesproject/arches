@@ -935,7 +935,7 @@ class Tile(APIBase):
         tileid = request.POST.get("tileid")
         nodeid = request.POST.get("nodeid")
         data = request.POST.get("data")
-
+        
         try:
             datatype = models.Node.objects.get(nodeid=nodeid).datatype
         except Exception as e:
@@ -945,9 +945,9 @@ class Tile(APIBase):
             # if data['format'] == 'esri-geom':
             data = GeoUtils().arcgisjson_to_geojson(data)
 
-        tile_model.update_node_value(nodeid, data, tileid)
+        new_tile = tile_model.update_node_value(nodeid, data, tileid)
 
-        response = JSONResponse({"results": "success!"})
+        response = JSONResponse(new_tile)
         return response
 
 @method_decorator(csrf_exempt, name="dispatch")
