@@ -945,9 +945,9 @@ class Tile(APIBase):
             # if data['format'] == 'esri-geom':
             data = GeoUtils().arcgisjson_to_geojson(data)
 
-        tile_model.update_node_value(nodeid, data, tileid)
+        new_tile = tile_model.update_node_value(nodeid, data, tileid)
 
-        response = JSONResponse({"results": "success!"})
+        response = JSONResponse(new_tile)
         return response
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -955,5 +955,5 @@ class Node(APIBase):
     def get(self, request):
         params = request.GET.dict()
         result = models.Node.objects.filter(**dict(params))
-        
+
         return JSONResponse(result)

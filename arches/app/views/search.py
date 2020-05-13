@@ -259,6 +259,7 @@ def search_results(request):
     dsl.include("permissions.users_without_read_perm")
     dsl.include("permissions.users_without_edit_perm")
     dsl.include("permissions.users_without_delete_perm")
+    dsl.include("permissions.users_with_no_access")
     dsl.include("geometries")
     dsl.include("displayname")
     dsl.include("displaydescription")
