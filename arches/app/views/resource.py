@@ -105,7 +105,7 @@ def get_instance_creator(resource_instance, user=None):
         creatorid = settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
     if user:
         can_edit = user.id == int(creatorid) or user.is_superuser
-    return {'creatorid': creatorid, 'user_can_edit_instance_permissions': can_edit}
+    return {"creatorid": creatorid, "user_can_edit_instance_permissions": can_edit}
 
 
 class ResourceEditorView(MapBaseManagerView):
