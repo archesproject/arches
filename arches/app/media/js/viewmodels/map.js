@@ -204,6 +204,9 @@ define([
                         'graph_name': '',
                         'map_popup': ''
                     });
+                    if (data.permissions) {
+                        data.permissions = JSON.parse(data.permissions);
+                    }
                     data = ko.mapping.fromJS(data);
                     data.reportURL = arches.urls.resource_report;
                     data.editURL = arches.urls.resource_editor;
