@@ -1775,7 +1775,7 @@ class ResourceInstanceDataType(BaseDataType):
                 "inverseOntologyProperty": "",
                 "resourceName": "",
                 "ontologyClass": "",
-                "resourceXresourceId": ""
+                "resourceXresourceId": "",
             }
 
     def ignore_keys(self):
