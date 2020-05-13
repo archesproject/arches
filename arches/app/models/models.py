@@ -642,7 +642,7 @@ class ResourceXResource(models.Model):
         null=True,
         related_name="resxres_resource_instance_ids_from",
         on_delete=models.CASCADE,
-        db_constraint=False
+        db_constraint=False,
     )
     resourceinstanceidto = models.ForeignKey(
         "ResourceInstance",
@@ -651,7 +651,7 @@ class ResourceXResource(models.Model):
         null=True,
         related_name="resxres_resource_instance_ids_to",
         on_delete=models.CASCADE,
-        db_constraint=False
+        db_constraint=False,
     )
     notes = models.TextField(blank=True, null=True)
     relationshiptype = models.TextField(blank=True, null=True)

@@ -1649,10 +1649,14 @@ class ResourceInstanceDataType(BaseDataType):
             except:
                 pass
         else:
-            
+
             resourceXresourceSaved = set()
             for related_resource in tiledata:
-                resourceXresourceId = None if ("resourceXresourceId" not in related_resource or related_resource["resourceXresourceId"] == "") else related_resource["resourceXresourceId"]
+                resourceXresourceId = (
+                    None
+                    if ("resourceXresourceId" not in related_resource or related_resource["resourceXresourceId"] == "")
+                    else related_resource["resourceXresourceId"]
+                )
                 defaults = {
                     "resourceinstanceidfrom_id": tile.resourceinstance_id,
                     "resourceinstanceidto_id": related_resource["resourceId"],
