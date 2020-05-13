@@ -935,7 +935,7 @@ class Tile(APIBase):
         tileid = request.POST.get("tileid")
         nodeid = request.POST.get("nodeid")
         data = request.POST.get("data")
-
+        
         try:
             datatype = models.Node.objects.get(nodeid=nodeid).datatype
         except Exception as e:
