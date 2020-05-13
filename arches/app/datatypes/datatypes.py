@@ -1768,7 +1768,15 @@ class ResourceInstanceDataType(BaseDataType):
         p = re.compile(r"(?P<r>[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})/?$")
         m = p.search(res_inst_uri)
         if m is not None:
-            return m.groupdict()["r"]
+            # return m.groupdict()["r"]
+            return {
+                "resourceId": m.groupdict()["r"],
+                "ontologyProperty": "",
+                "inverseOntologyProperty": "",
+                "resourceName": "",
+                "ontologyClass": "",
+                "resourceXresourceId": ""
+            }
 
     def ignore_keys(self):
         return ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]
