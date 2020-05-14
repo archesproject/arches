@@ -31,11 +31,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     -->
 
     <!-- LOGIN FORM -->
-    <main>
-        <div class="cls-content arches-signin">
-            <div class="cls-content-sm panel login-panel" style="max-width: 350px;">
-                <div class="panel-body">
-                    <h1 class="login-panel-header arches-signin">{% trans "Create Account" %}</h1>
+    <div class="cls-content arches-signin">
+        <div class="cls-content-sm panel login-panel" style="max-width: 350px;">
+            <div class="panel-body">
+                <header>
+					<h1 class="login-panel-header arches-signin">{% trans "Create Account" %}</h1>
+				</header>
+                <main>
                     <form class="change-password-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
                         {% csrf_token %}
                         <div>
@@ -49,12 +51,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 {% endif %}
                             </p>
                             {% endif %}
-
+    
                             {{ confirmation_message | safe }}
-
+    
                             {% if showform %}
                             <fieldset>
-
+    
                                 <legend class="arches-signin-subtext">
                                     Register to access data modeling, editing, and discovery tools.
                                 </legend>
@@ -71,7 +73,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     {% endfor %}
                                     {% endif %}
                                 </div>
-
+    
                                 <div class="form-group">
                                     <label class="reqlabel control-label widget-input-label" for="first_name"><span class="fa fa-asterisk reqfield"></span> First Name</label>
                                     <div class="input-group">
@@ -84,7 +86,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     {% endfor %}
                                     {% endif %}
                                 </div>
-
+    
                                 <div class="form-group">
                                     <label class="reqlabel control-label widget-input-label" for="last_name"><span class="fa fa-asterisk reqfield"></span> Last Name</label>
                                     <div class="input-group">
@@ -97,7 +99,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     {% endfor %}
                                     {% endif %}
                                 </div>
-
+    
                                 <div class="form-group">
                                     <label class="reqlabel control-label widget-input-label" for="email"><span class="fa fa-asterisk reqfield"></span> Email</label>
                                     <div class="input-group">
@@ -110,7 +112,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     {% endfor %}
                                     {% endif %}
                                 </div>
-
+    
                                 <div class="form-group">
                                     <label class="reqlabel control-label widget-input-label" for="password1"><span class="fa fa-asterisk reqfield"></span> Password</label>
                                     <div class="input-group">
@@ -123,7 +125,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     {% endfor %}
                                     {% endif %}
                                 </div>
-
+    
                                 <div class="form-group">
                                     <label class="reqlabel control-label widget-input-label" for="password2"><span class="fa fa-asterisk reqfield"></span> Confirm Password</label>
                                     <div class="input-group">
@@ -136,7 +138,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     {% endfor %}
                                     {% endif %}
                                 </div>
-
+    
                                 <div class="form-group">
                                     <div class="arches-signin-btn">
                                         {% if showform %}
@@ -147,7 +149,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <span class="fa fa-asterisk reqfield reqtxt"></span> indicates a required field
                                     </div>
                                 </div>
-
+    
                                 <div class="password-rules text-left">
                                     {% trans 'Your password must:' %}
                                     <ul class="list-unstyled">
@@ -156,30 +158,31 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         {% endfor %}
                                     </ul>
                                 </div>
-
+    
                                 {% if enable_captcha %}
                                 <div class="form-group">
                                 {{form.captcha}}
                                 </div>
                                 {% endif %}
-
+    
                             </fieldset>
                             {% endif %}
                         </div>
                     </form>
-                </div>
-
-                <div class="panel-footer">
-                    Learn more about <a href="archesproject.org">{% trans "Arches" %}</a>
-                </div>
-
+                </main>
+                
             </div>
+
+            <footer class="panel-footer">
+				Learn more about <a href="archesproject.org">{% trans "Arches" %}</a>
+			</footer>
+
         </div>
-        <div class="pad-ver hidden">
-            <a href="arches_password_reminder.html" class="btn-link mar-rgt">{% trans "Forgot password ?" %}</a>
-            <a href="arches_register.html" class="btn-link mar-lft">{% trans "Create a new account" %}</a>
-        </div>
-    </main>
+    </div>
+    <div class="pad-ver hidden">
+        <a href="arches_password_reminder.html" class="btn-link mar-rgt">{% trans "Forgot password ?" %}</a>
+        <a href="arches_register.html" class="btn-link mar-lft">{% trans "Create a new account" %}</a>
+    </div>
 </div>
 
 </div>

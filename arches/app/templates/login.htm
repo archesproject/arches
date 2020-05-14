@@ -34,15 +34,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 	-->
 
 	<!-- LOGIN FORM -->
-	<main>
-		<div class="cls-content arches-signin">
-			<div class="cls-content-sm panel login-panel">
-				<div class="panel-body">
+	
+	<div class="cls-content arches-signin">
+		<div class="cls-content-sm panel login-panel">
+			<div class="panel-body">
+				<header>
 					<h1 class="login-panel-header arches-signin">{% trans "Sign In" %}</h1>
+				</header>
+				<main>
 					<form id="login-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
 						<fieldset>
 							<legend class="arches-signin-subtext">
-								Sign in to Arches to access your data modeling, editing, and discovery tools. 
+								<p>Enter your email or username and password below to access your data modeling, editing, and discovery tools.</p>
 							</legend>
 							{% csrf_token %}
 							<input type="hidden" name="next" value="{{ next }}" />
@@ -83,14 +86,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 						<a href="{% url 'password_reset' %}" class="btn btn-link account-link">{% trans "Forgot password?" %}</a>
 						<a href="{% url 'signup' %}" class="btn btn-link account-link" target="_blank">{% trans "Create a new account" %}</a>
 					</div>
-				</div>
-
-				<div class="panel-footer">
-					Learn more about <a href="archesproject.org">{% trans "Arches" %}</a>
-				</div>
+				</main>
 			</div>
+			<footer class="panel-footer">
+				Learn more about <a href="archesproject.org">{% trans "Arches" %}</a>
+			</footer>
 		</div>
-	</main>
+	</div>
 </div>
 
 {% endblock body %}
