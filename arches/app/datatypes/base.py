@@ -204,6 +204,9 @@ class BaseDataType(object):
         """
         return False
 
+    def accepts_rdf_uri(self, uri):
+        return False
+
     def get_rdf_uri(self, node, data, which="r"):
         if self.is_a_literal_in_rdf():
             return None

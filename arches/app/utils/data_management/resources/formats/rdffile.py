@@ -416,11 +416,6 @@ class JsonLdReader(Reader):
     def is_semantic_node(self, graph_node):
         return self.datatype_factory.datatypes[graph_node["datatype_type"]].defaultwidget is None
 
-    def is_resource_instance_node(self, graph_node, uri):
-        return (
-            uri.startswith("urn:uuid:") or uri.startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "resources/")
-        ) and not self.is_semantic_node(graph_node)
-
     def is_concept_node(self, uri):
         pcs = settings.PREFERRED_CONCEPT_SCHEMES[:]
         pcs.append(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "concepts/")
@@ -479,9 +474,9 @@ class JsonLdReader(Reader):
                 options = tree_node["children"][key]
                 possible = []
                 ignore = []
-                # print(f"\nConsidering {len(options)} options ...")
+
                 for o in options:
-                    # print(f"Considering:\n  {vi}\n  {o}")
+                    #print(f"Considering:\n  {vi}\n  {o['name']}")
                     if is_literal and o["datatype"].is_a_literal_in_rdf():
                         if len(o["datatype"].validate(value)) == 0:
                             possible.append([o, value])
@@ -494,10 +489,11 @@ class JsonLdReader(Reader):
                                 possible.append([o, uri])
                             else:
                                 print(f"Concept URI {uri} not in Collection {collid}")
-                        elif self.is_resource_instance_node(o, uri):
-                            possible.append([o, uri])
                         elif self.is_semantic_node(o):
                             possible.append([o, ""])
+                        elif o['datatype'].accepts_rdf_uri(uri):
+                            # print(f"datatype for {o['name']} accepts uri")
+                            possible.append([o, uri])
                         else:
                             # This is when the current option doesn't match, but could be
                             # non-ambiguous resource-instance vs semantic node
@@ -505,7 +501,10 @@ class JsonLdReader(Reader):
                     else:
                         raise ValueError("No possible match?")
 
+                #print(f"Possible is: {[x[0]['name'] for x in possible]}")
+
                 if not possible:
+                    #print(f"Tried: {options}")
                     raise ValueError(f"Data does not match any actual node, despite prop/class combination {k} {clss}:\n{vi}")
                 elif len(possible) > 1:
                     # descend into data to check if there are further clarifying features
@@ -521,7 +520,7 @@ class JsonLdReader(Reader):
                     if not possible2:
                         raise ValueError("Considering branches, data does not match any node, despite a prop/class combination")
                     elif len(possible2) > 1:
-                        raise ValueError("Even after considering branches, data still matches more than one node")
+                        raise ValueError(f"Even after considering branches, data still matches more than one node: {[x[0]['name'] for x in possible2]}")
                     else:
                         branch = possible2[0]
                 else:
@@ -580,7 +579,7 @@ class JsonLdReader(Reader):
                     else:
                         bnode["data"].append(branch[1])
                         if not self.is_semantic_node(branch[0]):
-                            print(f"Adding to existing (n): {node_value}")
+                            # print(f"Adding to existing (n): {node_value}")
                             tile.data[bnodeid] = node_value
                         result[bnodeid].append(bnode)
                 else:
@@ -597,4 +596,4 @@ class JsonLdReader(Reader):
         for path in tree_node["children"].values():
             for kid in path:
                 if kid["required"] and not f"{kid['node_id']}" in result:
-                    raise ValueError("Required field not present")
+                    raise ValueError(f"Required field not present: {kid['name']}")
