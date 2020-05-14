@@ -513,6 +513,11 @@ class Tile(models.TileModel):
             tile.data[nodeid] = value
             tile.save()
         else:
+            if not resourceinstanceid:
+                graph = models.Node.objects.get(pk=nodeid).graph
+                resource_instance = models.ResourceInstance(graph=graph)
+                resource_instance.save()
+                resourceinstanceid = str(resource_instance.resourceinstanceid)
             tile = Tile.get_blank_tile(nodeid, resourceinstanceid)
             if nodeid in tile.data:
                 tile.data[nodeid] = value
