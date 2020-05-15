@@ -476,7 +476,7 @@ class JsonLdReader(Reader):
                 ignore = []
 
                 for o in options:
-                    #print(f"Considering:\n  {vi}\n  {o['name']}")
+                    # print(f"Considering:\n  {vi}\n  {o['name']}")
                     if is_literal and o["datatype"].is_a_literal_in_rdf():
                         if len(o["datatype"].validate(value)) == 0:
                             possible.append([o, value])
@@ -494,7 +494,7 @@ class JsonLdReader(Reader):
                                 print(f"Errored testing concept {uri} in collection {collid}")
                         elif self.is_semantic_node(o):
                             possible.append([o, ""])
-                        elif o['datatype'].accepts_rdf_uri(uri):
+                        elif o["datatype"].accepts_rdf_uri(uri):
                             # print(f"datatype for {o['name']} accepts uri")
                             possible.append([o, uri])
                         else:
@@ -504,10 +504,10 @@ class JsonLdReader(Reader):
                     else:
                         raise ValueError("No possible match?")
 
-                #print(f"Possible is: {[x[0]['name'] for x in possible]}")
+                # print(f"Possible is: {[x[0]['name'] for x in possible]}")
 
                 if not possible:
-                    #print(f"Tried: {options}")
+                    # print(f"Tried: {options}")
                     raise ValueError(f"Data does not match any actual node, despite prop/class combination {k} {clss}:\n{vi}")
                 elif len(possible) > 1:
                     # descend into data to check if there are further clarifying features
@@ -523,7 +523,9 @@ class JsonLdReader(Reader):
                     if not possible2:
                         raise ValueError("Considering branches, data does not match any node, despite a prop/class combination")
                     elif len(possible2) > 1:
-                        raise ValueError(f"Even after considering branches, data still matches more than one node: {[x[0]['name'] for x in possible2]}")
+                        raise ValueError(
+                            f"Even after considering branches, data still matches more than one node: {[x[0]['name'] for x in possible2]}"
+                        )
                     else:
                         branch = possible2[0]
                 else:
