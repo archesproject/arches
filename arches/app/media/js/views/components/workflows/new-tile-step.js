@@ -92,6 +92,16 @@ define([
                 });
             });
 
+            self.card.subscribe(function(card){
+                if (ko.unwrap(card.widgets) && params.hiddenNodes) {
+                    card.widgets().forEach(function(widget){
+                        if (params.hiddenNodes.indexOf(widget.node_id()) > -1) {
+                            widget.visible(false);
+                        }
+                    });
+                }
+            });
+
             self.topCards.forEach(function(topCard) {
                 topCard.topCards = self.topCards;
             });
