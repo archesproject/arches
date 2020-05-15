@@ -295,7 +295,7 @@
                             <!-- Find a survey -->
                             <div class="col-sm-9 col-sm-offset-3 relative">
                                 <div class="project-search-widget">
-                                    <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
+                                    <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" aria-label="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
                                     <span class="clear-node-search" data-bind="visible: mobileSurveyFilter().length > 0, click: function() { mobileSurveyFilter(''); }"><i class="fa fa-times-circle"></i></span>
                                 </div>
                             </div>
@@ -319,7 +319,7 @@
                                                     </li>
                                                 </ul>
                                             </div>
-                                            <h3 class="project-panel-title" data-bind="text: vm.mobilesurvey.name() === '' ? '{% trans "Unnamed Survey" %}' : vm.mobilesurvey.name()"></h3>
+                                            <h4 class="project-panel-title" data-bind="text: vm.mobilesurvey.name() === '' ? '{% trans "Unnamed Survey" %}' : vm.mobilesurvey.name()"></h4>
 
                                             <div class="">
                                                 <div class="project-details">

@@ -3953,7 +3953,7 @@ ul .collapse li:first-of-type {
     margin-top: 65px;
     font-size: 14px;
     width: auto;
-    max-width: fit-content;
+    max-width: 330px;
     border: 1px solid rgba(0,0,0,.2);
 }
 
@@ -4005,6 +4005,11 @@ ul .collapse li:first-of-type {
     line-height: 1.1;
     border-bottom: solid 0.5px #babebf;
     font-weight: 300;
+}
+
+.change-password-form.popover legend {
+    font-size: 0.9em;
+    padding: 0 0 10px 0;
 }
 
 .change-password-buttons {
@@ -9867,6 +9872,7 @@ a.filter-tools:hover {
     position: absolute;
     right: 10px;
     top: 10px;
+    color: #000;
 }
 
 .mobile-project-manager-editor .tab-content {
@@ -10265,7 +10271,7 @@ a.filter-tools:hover {
 .project-metadata-item {
 	display: inline-block;
     padding: 6px 10px 10px 10px;
-    color: #758697;
+    color: #4D5766 !important;
 }
 
 .project-details {
@@ -11122,13 +11128,6 @@ a.tree-display-tool, a.tree-display-tool:hover {
 .reqlabel {
     width: 100%;
     text-align: left;
-}
-
-.reqfield {
-    position: relative;
-    top: -2px;
-    color: red;
-    font-size: 0.7em;
 }
 
 .reqtxt {
