@@ -485,10 +485,13 @@ class JsonLdReader(Reader):
                     elif not is_literal and not o["datatype"].is_a_literal_in_rdf():
                         if self.is_concept_node(uri):
                             collid = o["config"]["collection_id"]
-                            if self.validate_concept_in_collection(uri, collid):
-                                possible.append([o, uri])
-                            else:
-                                print(f"Concept URI {uri} not in Collection {collid}")
+                            try:
+                                if self.validate_concept_in_collection(uri, collid):
+                                    possible.append([o, uri])
+                                else:
+                                    print(f"Concept URI {uri} not in Collection {collid}")
+                            except:
+                                print(f"Errored testing concept {uri} in collection {collid}")
                         elif self.is_semantic_node(o):
                             possible.append([o, ""])
                         elif o['datatype'].accepts_rdf_uri(uri):
