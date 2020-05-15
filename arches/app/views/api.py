@@ -42,6 +42,7 @@ from arches.app.utils.permission_backend import (
     user_can_read_concepts,
     user_is_resource_reviewer,
     get_restricted_instances,
+    check_resource_instance_permissions,
 )
 from arches.app.utils.decorators import group_required
 from arches.app.utils.geo_utils import GeoUtils
@@ -937,14 +938,33 @@ class Tile(APIBase):
         nodeid = request.POST.get("nodeid")
         data = request.POST.get("data")
         resourceid = request.POST.get("resourceinstanceid", None)
+        
+        #get node model return error if not found
         try:
             node = models.Node.objects.get(nodeid=nodeid)
-            datatype = datatype_factory.get_instance(node.datatype)
         except Exception as e:
             return JSONResponse(e)
-        data = datatype.process_api_data(data)
-        new_tile = tile_model.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid)
-        response = JSONResponse(new_tile)
+        
+        #check if user has permissions to write to node
+        user_has_perms = request.user.has_perm("write_nodegroup", node)
+        
+        if user_has_perms:
+            #get datatype of node
+            try:
+                datatype = datatype_factory.get_instance(node.datatype)
+            except Exception as e:
+                return JSONResponse(e)
+    
+            #filter datatype 
+            data = datatype.process_api_data(data)
+            
+            #update/create tile
+            new_tile = tile_model.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid)
+    
+            response = JSONResponse(new_tile)
+        else:
+            response = JSONResponse("User does not have permission to edit this node.")
+            
         return response
 
 
@@ -953,5 +973,16 @@ class Node(APIBase):
     def get(self, request):
         params = request.GET.dict()
         result = models.Node.objects.filter(**dict(params))
+        for node in result:
+            print(request.user.has_perm("read_nodegroup", node.nodegroup))
+
 
         return JSONResponse(result)
+
+@method_decorator(csrf_exempt, name="dispatch")
+class Instance_Permission(APIBase):
+    def get(self, request):
+        user = request.GET.get("user")
+        perms = request.GET.get("perms")
+        resourceinstanceid = request.GET.get()
+        pass
