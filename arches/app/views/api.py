@@ -1000,7 +1000,7 @@ class Node(APIBase):
         
         #check if any nodes were returned from attribute filter and throw error if none were returned
         if len(nodes) == 0:
-            return JSONResponse('No nodes matching those query parameters were found.')
+            return JSONResponse('No nodes matching query parameters found.')
         
         #filter nodes from attribute query based on user permissions
         result = [node for node in nodes if str(node.nodegroup_id) in editable_nodegroups]
@@ -1010,7 +1010,8 @@ class Node(APIBase):
 @method_decorator(csrf_exempt, name="dispatch")
 class Instance_Permission(APIBase):
     def get(self, request):
-        user = request.GET.get("user")
+        user = request.user
         perms = request.GET.get("perms")
-        resourceinstanceid = request.GET.get()
-        pass
+        resourceinstanceid = request.GET.get("resourceinstanceid")
+        
+        return JSONResponse(check_resource_instance_permissions(user, resourceinstanceid, perms))
