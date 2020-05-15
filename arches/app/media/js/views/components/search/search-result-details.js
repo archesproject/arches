@@ -5,13 +5,12 @@ define([
     'arches',
     'models/report',
     'models/graph',
-    'models/card',
     'viewmodels/card',
     'report-templates',
     'views/components/search/base-filter',
     'card-components',
     'bindings/chosen'
-], function($, _, ko, arches, ReportModel, GraphModel, CardModel, CardViewModel, reportLookup, BaseFilter, cardComponents) {
+], function($, _, ko, arches, ReportModel, GraphModel, CardViewModel, reportLookup, BaseFilter, cardComponents) {
     var componentName = 'search-result-details';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -23,7 +22,7 @@ define([
                 this.options = options;
                 this.report = null;
 
-                var loaded = ko.computed(function(){
+                var loaded = ko.computed(function() {
                     return this.getFilter('search-results');
                 }, this);
                 loaded.subscribe(function(loaded) {
