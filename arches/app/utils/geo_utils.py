@@ -61,9 +61,9 @@ class GeoUtils(object):
         '{"x":-0.11515950499995142,"y":51.534958948000053,"spatialReference":{"wkid":4326,"latestWkid":4326}},
          {"x":-0.11337002699997356,"y":51.536050094000075,"spatialReference":{"wkid":4326,"latestWkid":4326}}'
         """
-        payload = json.loads('{"geometries": [' + geom + ']}')
+        payload = json.loads('{"geometries": [' + geom + "]}")
         features = []
-        for geometry in payload['geometries']:
+        for geometry in payload["geometries"]:
             features.append({"type": "Feature", "properties": {}, "geometry": arcgis2geojson(geometry)})
         feature_collection = {"type": "FeatureCollection", "features": features}
         return feature_collection

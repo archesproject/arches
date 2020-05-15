@@ -1715,12 +1715,12 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
         m = super(ResourceInstanceListDataType, self).from_rdf(json_ld_node)
         if m is not None:
             return [m]
-            
+
     def process_api_data(self, value):
         try:
             value.upper()
             data = json.loads(value)
-            print(data, 'got it')
+            print(data, "got it")
         except Exception:
             data = value
         return data
