@@ -932,23 +932,21 @@ class IIIFManifest(APIBase):
 @method_decorator(csrf_exempt, name="dispatch")
 class Tile(APIBase):
     def post(self, request):
+        datatype_factory = DataTypeFactory()
         tileid = request.POST.get("tileid")
         nodeid = request.POST.get("nodeid")
         data = request.POST.get("data")
-        
+        resourceid = request.POST.get("resourceinstanceid", None)
         try:
-            datatype = models.Node.objects.get(nodeid=nodeid).datatype
+            node = models.Node.objects.get(nodeid=nodeid)
+            datatype = datatype_factory.get_instance(node.datatype)
         except Exception as e:
             return JSONResponse(e)
-
-        if datatype == 'geojson-feature-collection':
-            # if data['format'] == 'esri-geom':
-            data = GeoUtils().arcgisjson_to_geojson(data)
-
-        new_tile = tile_model.update_node_value(nodeid, data, tileid)
-
+        data = datatype.process_api_data(data)
+        new_tile = tile_model.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid)
         response = JSONResponse(new_tile)
         return response
+
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Node(APIBase):
