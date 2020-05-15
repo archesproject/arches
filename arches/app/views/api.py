@@ -43,6 +43,7 @@ from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
     get_restricted_instances,
     check_resource_instance_permissions,
+    get_nodegroups_by_perm,
 )
 from arches.app.utils.decorators import group_required
 from arches.app.utils.geo_utils import GeoUtils
@@ -971,11 +972,38 @@ class Tile(APIBase):
 @method_decorator(csrf_exempt, name="dispatch")
 class Node(APIBase):
     def get(self, request):
-        params = request.GET.dict()
-        result = models.Node.objects.filter(**dict(params))
-        for node in result:
-            print(request.user.has_perm("read_nodegroup", node.nodegroup))
-
+        user = request.user
+        perms = 'models.' + request.GET.get('perms', 'read_nodegroup')
+        
+        #parse node attributes from params
+        datatype=request.GET.get('datatype')
+        # description=request.GET.get('description')
+        # exportable=request.GET.get('exportable')
+        # fieldname=request.GET.get('fieldname')
+        # graph_id=request.GET.get('graph_id')
+        # is_collector=request.GET.get('is_collector')
+        # isrequired=request.GET.get('isrequired')
+        # issearchable=request.GET.get('issearchable')
+        # istopnode=request.GET.get('istopnode')
+        # name=request.GET.get('name')
+        # nodegroup_id=request.GET.get('nodegroup_id')
+        # nodeid=request.GET.get('nodeid')
+        # ontologyclass=request.GET.get('ontologyclass')
+        # sortorder=request.GET.get('sortorder')
+        
+        #try to get nodes by attribute filter and then get nodes by passed in user perms
+        try:
+            nodes = models.Node.objects.filter(datatype=datatype)
+            editable_nodegroups = [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(user, perms)]
+        except Exception as e:
+            return JSONResponse(str(e))
+        
+        #check if any nodes were returned from attribute filter and throw error if none were returned
+        if len(nodes) == 0:
+            return JSONResponse('No nodes matching those query parameters were found.')
+        
+        #filter nodes from attribute query based on user permissions
+        result = [node for node in nodes if str(node.nodegroup_id) in editable_nodegroups]
 
         return JSONResponse(result)
 
