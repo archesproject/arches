@@ -4249,7 +4249,7 @@ ul .collapse li:last-of-type {
 }
 
 .resource-search-container {
-    display: flex;
+    /* display: flex; */
 }
 
 .resource-search-container .row.widget-wrapper {
@@ -6677,7 +6677,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .clear-node-search {
-    position: absolute;
+    position: relative;
     top: 6px;
     right: 10px;
     font-size: 14px;
@@ -7597,13 +7597,24 @@ a.mega-dropdown-toggle.disabled {
     border-left: 5px solid #20ce05;
 }
 
-.table>tbody>.rr-table-row>td {
-    padding-top: 7px;
-    padding-bottom: 7px;
+.rr-table-row {
+    height: 40px;
+    display: flex;
+    border-bottom: solid 2px #e0e0e0;
 }
 
-.table>tbody>.rr-table-row {
-    height: 40px;
+.rr-table-row:nth-last-child(odd) {
+    background: rgb(236, 240, 245);
+}
+
+.rr-table-column{
+    padding-top: 8px;
+    padding-left: 10px;
+    border-left: solid 2px #e0e0e0
+}
+
+.rr-table-column:last-child {
+    border-right: solid 2px #e0e0e0
 }
 
 .unselectable {

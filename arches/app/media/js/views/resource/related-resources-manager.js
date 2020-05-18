@@ -11,6 +11,7 @@ define([
     'plugins/knockout-select2',
     'bindings/datepicker',
     'bindings/datatable'
+    
 ], function($, _, Backbone, ko, koMapping, arches, ResourceInstanceSelect, RelatedResourcesNodeList) {
     return ko.components.register('related-resources-manager', {
         viewModel: Backbone.View.extend({
@@ -34,6 +35,19 @@ define([
                 this.graphNodeSelection = ko.observableArray();
                 this.graphNodeList = ko.observableArray();
                 this.newResource = ko.observableArray();
+                this.filter = ko.observable('');
+                this.relationshipCandidates = ko.observableArray([]);
+                this.relationshipCandidateIds = ko.observable([]);
+                this.useSemanticRelationships = arches.useSemanticRelationships;
+                this.selectedOntologyClass = ko.observable();
+                this.resourceRelationships = ko.observableArray();
+                this.paginator = koMapping.fromJS({});
+                this.relationshipsInFilter = ko.computed(function(relationship) {
+                    return self.resourceRelationships().filter(function(relationship){
+                        return self.filter().toLowerCase() === '' || relationship.resource.displayname.toLowerCase().includes(self.filter().toLowerCase());
+                    });
+                });
+
                 this.fdgNodeListView = new RelatedResourcesNodeList({
                     items: self.graphNodeList
                 });
@@ -48,24 +62,6 @@ define([
                     }
                 };
 
-                this.relationshipCandidates = ko.observableArray([]);
-                this.relationshipCandidateIds = ko.observable([]);
-                this.useSemanticRelationships = arches.useSemanticRelationships;
-                this.selectedOntologyClass = ko.observable();
-                this.resourceRelationships = ko.observableArray();
-                this.paginator = koMapping.fromJS({});
-
-                this.relateResources = function() {
-                    var self = this;
-                    $.ajax(arches.urls.related_resource_candidates, {
-                        dataType: 'json',
-                        data: {resourceids: JSON.stringify(this.relationshipCandidateIds())}
-                    }).done(function(data) {
-                        self.relationshipCandidates(data);
-                        self.saveRelationships();
-                        self.relationshipCandidateIds(undefined);
-                    });
-                };
 
                 this.selectedOntologyClass.subscribe(function() {
                     if (self.selectedOntologyClass() && self.validproperties[self.selectedOntologyClass()] !== undefined) {
@@ -380,12 +376,10 @@ define([
                                 return {};
                             } else {
                                 url(arches.urls.search_results);
-                                var graphid = undefined;
-                                //if(!!params.graphid) { graphid = [ko.unwrap(params.graphid)]; }
                                 var data = { 'paging-filter': page };
-                                if (graphid && graphid.length > 0) {
+                                if (self.graph.relatable_resources.length > 0) {
                                     data['resource-type-filter'] = JSON.stringify(
-                                        graphid.map(function(id) {
+                                        self.graph.relatable_resources.map(function(id) {
                                             return {
                                                 "graphid": id,
                                                 "inverted": false
@@ -414,6 +408,16 @@ define([
                                 more: data['paging-filter'].paginator.has_next
                             };
                         }
+                    },
+                    onSelect: function(item) {
+                        $.ajax(arches.urls.related_resource_candidates, {
+                            dataType: 'json',
+                            data: { resourceids: item._id }
+                        }).done(function (data) {
+                            self.relationshipCandidates(data);
+                            self.saveRelationships();
+                            self.relationshipCandidateIds(undefined);
+                        });
                     },
                     id: function(item) {
                         return item._id;
