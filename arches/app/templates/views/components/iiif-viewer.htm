@@ -169,7 +169,7 @@
             </span>
             <!--/ko -->
             <!--ko if: !manifestLoading() -->
-            <div class="iiif-gallery-panel">
+            <div class="iiif-gallery-panel" style="overflow-x: auto;">
                 <div class="iiif-gallery-header">
                     <span class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor, text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
                     |

@@ -487,7 +487,7 @@ define([
             });
 
             viewModel.graphModel.on('select-node', function(node) {
-                viewModel.graphView.zoomTo(node);
+                // viewModel.graphView.zoomTo(node);
                 viewModel.graphTree.expandParentNode(node);
             });
 
