@@ -1256,6 +1256,7 @@ class IIIFManifest(models.Model):
         managed = True
         db_table = "iiif_manifests"
 
+
 class GroupMapSettings(models.Model):
     group = models.OneToOneField(Group, on_delete=models.CASCADE)
     min_zoom = models.IntegerField(default=1)
@@ -1264,7 +1265,7 @@ class GroupMapSettings(models.Model):
 
     def __str__(self):
         return self.group.name
-        
-    class Meta: 
+
+    class Meta:
         managed = True
         db_table = "group_map_settings"
