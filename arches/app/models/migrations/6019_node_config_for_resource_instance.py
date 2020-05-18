@@ -17,8 +17,10 @@ class Migration(migrations.Migration):
         for node in nodes.objects.filter(datatype__in=["resource-instance", "resource-instance-list"]):
             old_config = node.config
             new_config = {"graphs": []}
-            for graphid in old_config["graphid"]:
-                new_config["graphs"].append({"graphid": graphid, "ontologyProperty": "", "inverseOntologyProperty": ""})
+            if old_config["graphid"]:
+                for graphid in old_config["graphid"]:
+                    new_config["graphs"].append({"graphid": graphid, "ontologyProperty": "", "inverseOntologyProperty": ""})
+
             node.config = new_config
             node.save()
 
