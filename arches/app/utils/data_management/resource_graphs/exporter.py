@@ -143,7 +143,7 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
                 export_node["concept_export_value"] = "label"
             # export_node['value_type'] = ""
             # export_node['data_length'] = ""
-            export_node["export"] = False
+            export_node["export"] = True
 
             export_json["nodes"].append(export_node)
 
