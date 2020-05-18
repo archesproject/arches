@@ -163,7 +163,7 @@ define([
 
         params.tile = self.tile;
 
-        params.getStateProperties = function(){
+        params.defineStateProperties = function(){
             // Collects those properties that you want to set to the state.
             var wastebin = !!(ko.unwrap(params.wastebin)) ? koMapping.toJS(params.wastebin) : undefined;
             if (wastebin && ko.unwrap(wastebin.hasOwnProperty('resourceid'))) {
@@ -179,9 +179,9 @@ define([
 
 
         this.setStateProperties = function(){
-            //Sets properties in getStateProperties to the state.
+            //Sets properties in defineStateProperties to the state.
             if (params.workflow) {
-                params.workflow.state.steps[params._index] = params.getStateProperties();
+                params.workflow.state.steps[params._index] = params.defineStateProperties();
             }
         };
 
