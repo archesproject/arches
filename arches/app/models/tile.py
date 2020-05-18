@@ -359,7 +359,7 @@ class Tile(models.TileModel):
                     self.apply_provisional_edit(user, self.data, action="update", existing_model=existing_model)
                     newprovisionalvalue = self.data
                     self.data = existing_model.data
-                    
+
                     oldprovisional = self.get_provisional_edit(existing_model, user)
                     if oldprovisional is not None:
                         oldprovisionalvalue = oldprovisional["value"]
