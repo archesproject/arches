@@ -15,6 +15,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.app.utils.geo_utils import GeoUtils
 import arches.app.utils.task_management as task_management
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -31,6 +32,7 @@ from django.db import connection, transaction
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
 from edtf import parse_edtf
+
 
 # One benefit of shifting to python3.x would be to use
 # importlib.util.LazyLoader to load rdflib (and other lesser
@@ -521,6 +523,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         if tile.data[nodeid] is not None and "features" in tile.data[nodeid]:
             if len(tile.data[nodeid]["features"]) == 0:
                 tile.data[nodeid] = None
+
+    def process_api_data(self, value):
+        # TODO check for json format (geojson or esri-json) ... if value['format'] == 'esri-geom':
+        data = GeoUtils().arcgisjson_to_geojson(value)
+        return data
 
     def transform_import_values(self, value, nodeid):
         arches_geojson = {}
@@ -1708,6 +1715,15 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
         m = super(ResourceInstanceListDataType, self).from_rdf(json_ld_node)
         if m is not None:
             return [m]
+
+    def process_api_data(self, value):
+        try:
+            value.upper()
+            data = json.loads(value)
+            print(data, "got it")
+        except Exception:
+            data = value
+        return data
 
     def collects_multiple_values(self):
         return True

@@ -1,4 +1,5 @@
 import json
+from arcgis2geojson import arcgis2geojson
 from django.contrib.gis.geos import GEOSGeometry, GeometryCollection
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
@@ -53,3 +54,16 @@ class GeoUtils(object):
                 fc["features"].append(geom)
             result = fc
         return result
+
+    def arcgisjson_to_geojson(self, geom):
+        """
+        Takes a list of arcgisjson geometries and converts them to a GeoJSON feature collection. Example below:
+        '{"x":-0.11515950499995142,"y":51.534958948000053,"spatialReference":{"wkid":4326,"latestWkid":4326}},
+         {"x":-0.11337002699997356,"y":51.536050094000075,"spatialReference":{"wkid":4326,"latestWkid":4326}}'
+        """
+        payload = json.loads('{"geometries": [' + geom + "]}")
+        features = []
+        for geometry in payload["geometries"]:
+            features.append({"type": "Feature", "properties": {}, "geometry": arcgis2geojson(geometry)})
+        feature_collection = {"type": "FeatureCollection", "features": features}
+        return feature_collection
