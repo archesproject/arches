@@ -44,6 +44,14 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 this.mapFilter = this.getFilter('map-filter');
                 this.details = this.getFilter('search-result-details');
                 this.relatedResourcesManager = this.getFilter('related-resources-filter');
+                this.selectedTab.subscribe(function(tab){
+                    var self = this;
+                    if (tab === 'map-filter') {
+                        if (ko.unwrap(this.mapFilter.map)) {
+                            setTimeout(function() { self.mapFilter.map().resize(); }, 1);
+                        }
+                    }
+                }, this);
             },
 
             mouseoverInstance: function() {

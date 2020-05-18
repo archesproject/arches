@@ -359,7 +359,7 @@ class Tile(models.TileModel):
                     self.apply_provisional_edit(user, self.data, action="update", existing_model=existing_model)
                     newprovisionalvalue = self.data
                     self.data = existing_model.data
-
+                    
                     oldprovisional = self.get_provisional_edit(existing_model, user)
                     if oldprovisional is not None:
                         oldprovisionalvalue = oldprovisional["value"]
@@ -371,39 +371,42 @@ class Tile(models.TileModel):
                         "action": "create tile" if creating_new_tile else "add edit",
                     }
 
-            super(Tile, self).save(*args, **kwargs)
-            # We have to save the edit log record after calling save so that the
-            # resource's displayname changes are avaliable
-            if log is True:
-                user = {} if user is None else user
-                self.datatype_post_save_actions(request)
-                if creating_new_tile is True:
-                    self.save_edit(
-                        user=user,
-                        edit_type=edit_type,
-                        old_value={},
-                        new_value=self.data,
-                        newprovisionalvalue=newprovisionalvalue,
-                        provisional_edit_log_details=provisional_edit_log_details,
-                    )
-                else:
-                    self.save_edit(
-                        user=user,
-                        edit_type=edit_type,
-                        old_value=existing_model.data,
-                        new_value=self.data,
-                        newprovisionalvalue=newprovisionalvalue,
-                        oldprovisionalvalue=oldprovisionalvalue,
-                        provisional_edit_log_details=provisional_edit_log_details,
-                    )
+        if user is not None:
+            self.validate([])
 
-            if index:
-                self.index()
+        super(Tile, self).save(*args, **kwargs)
+        # We have to save the edit log record after calling save so that the
+        # resource's displayname changes are avaliable
+        user = {} if user is None else user
+        self.datatype_post_save_actions(request)
+        self.__postSave(request)
+        if creating_new_tile is True:
+            self.save_edit(
+                user=user,
+                edit_type=edit_type,
+                old_value={},
+                new_value=self.data,
+                newprovisionalvalue=newprovisionalvalue,
+                provisional_edit_log_details=provisional_edit_log_details,
+            )
+        else:
+            self.save_edit(
+                user=user,
+                edit_type=edit_type,
+                old_value=existing_model.data,
+                new_value=self.data,
+                newprovisionalvalue=newprovisionalvalue,
+                oldprovisionalvalue=oldprovisionalvalue,
+                provisional_edit_log_details=provisional_edit_log_details,
+            )
 
-            for tile in self.tiles:
-                tile.resourceinstance = self.resourceinstance
-                tile.parenttile = self
-                tile.save(*args, request=request, index=index, **kwargs)
+        if index:
+            self.index()
+
+        for tile in self.tiles:
+            tile.resourceinstance = self.resourceinstance
+            tile.parenttile = self
+            tile.save(*args, request=request, index=index, **kwargs)
 
     def delete(self, *args, **kwargs):
         se = SearchEngineFactory().create()
@@ -531,6 +534,11 @@ class Tile(models.TileModel):
             tile.data[nodeid] = value
             tile.save()
         else:
+            if not resourceinstanceid:
+                graph = models.Node.objects.get(pk=nodeid).graph
+                resource_instance = models.ResourceInstance(graph=graph)
+                resource_instance.save()
+                resourceinstanceid = str(resource_instance.resourceinstanceid)
             tile = Tile.get_blank_tile(nodeid, resourceinstanceid)
             if nodeid in tile.data:
                 tile.data[nodeid] = value
@@ -560,6 +568,17 @@ class Tile(models.TileModel):
                     pass
         except TypeError:
             logger.info(_("No associated functions"))
+
+    def __postSave(self, request=None):
+        try:
+            for function in self._getFunctionClassInstances():
+                try:
+                    function.postSave(self, request)
+                except NotImplementedError:
+                    pass
+        except TypeError as e:
+            logger.warn(_("No associated functions"))
+            logger.warn(e)
 
     def _getFunctionClassInstances(self):
         ret = []

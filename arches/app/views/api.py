@@ -29,6 +29,7 @@ from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.models.tile import Tile
+from arches.app.models.tile import Tile as tile_model
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.decorators import can_read_resource_instance, can_edit_resource_instance, can_read_concept
@@ -50,6 +51,7 @@ from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
 from slugify import slugify
+from urllib import parse
 from arches.celery import app
 
 logger = logging.getLogger(__name__)
@@ -928,3 +930,31 @@ class OntolgyPropery(APIBase):
                     ret.append(ontologyclass["ontology_property"])
 
         return JSONResponse(ret)
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class Tile(APIBase):
+    def post(self, request):
+        datatype_factory = DataTypeFactory()
+        tileid = request.POST.get("tileid")
+        nodeid = request.POST.get("nodeid")
+        data = request.POST.get("data")
+        resourceid = request.POST.get("resourceinstanceid", None)
+        try:
+            node = models.Node.objects.get(nodeid=nodeid)
+            datatype = datatype_factory.get_instance(node.datatype)
+        except Exception as e:
+            return JSONResponse(e)
+        data = datatype.process_api_data(data)
+        new_tile = tile_model.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid)
+        response = JSONResponse(new_tile)
+        return response
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class Node(APIBase):
+    def get(self, request):
+        params = request.GET.dict()
+        result = models.Node.objects.filter(**dict(params))
+
+        return JSONResponse(result)
