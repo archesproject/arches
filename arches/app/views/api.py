@@ -466,14 +466,8 @@ class Graphs(APIBase):
             widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
         ]
 
-        return JSONResponse(
-            {
-                "datatypes": datatypes,
-                "cards": permitted_cards,
-                "graph": graph,
-                "cardwidgets": cardwidgets
-            }
-        )
+        return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
+
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Resources(APIBase):
