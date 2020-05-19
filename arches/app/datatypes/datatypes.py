@@ -1664,6 +1664,9 @@ class ResourceInstanceDataType(BaseDataType):
             return [URIRef(archesproject[f"resources/{x}"]) for x in data]
         return URIRef(archesproject[f"resources/{data}"])
 
+    def accepts_rdf_uri(self, uri):
+        return uri.startswith("urn:uuid:") or uri.startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "resources/")
+
     def to_rdf(self, edge_info, edge):
         g = Graph()
 
