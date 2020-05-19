@@ -24,6 +24,7 @@ from revproxy.views import ProxyView
 from oauth2_provider.views import ProtectedResourceView
 from arches.app.models import models
 from arches.app.models.concept import Concept
+from arches.app.models.card import Card as CardProxyModel
 from arches.app.models.graph import Graph
 from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.resource import Resource
@@ -448,6 +449,31 @@ class MVT(APIBase):
             raise Http404()
         return HttpResponse(tile, content_type="application/x-protobuf")
 
+
+@method_decorator(csrf_exempt, name="dispatch")
+class Graphs(APIBase):
+    def get(self, request, graph_id=None):
+        perm = "read_nodegroup"
+        datatypes = models.DDataType.objects.all()
+        graph = Graph.objects.get(graphid=graph_id)
+        cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
+        permitted_cards = []
+        for card in cards:
+            if request.user.has_perm(perm, card.nodegroup):
+                card.filter_by_perm(request.user, perm)
+                permitted_cards.append(card)
+        cardwidgets = [
+            widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
+        ]
+
+        return JSONResponse(
+            {
+                "datatypes": datatypes,
+                "cards": permitted_cards,
+                "graph": graph,
+                "cardwidgets": cardwidgets
+            }
+        )
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Resources(APIBase):

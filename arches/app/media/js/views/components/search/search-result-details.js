@@ -65,21 +65,21 @@ define([
                     }));
                     self.loading(false);
                 };
-                this.setupReport = function(resId, graphId, source) {
-                    var qs = '?json=True';
+                this.setupReport = function(graphId, source) {
                     var graph = graphCache[graphId];
+                    var tileData = {
+                        "tiles": source.tiles,
+                        "related_resources": [],
+                        "displayname": source.displayname,
+                        "resourceid": source.resourceinstanceid
+                    };
                     self.loading(true);
                     if (graph) processReportData(
-                        {
-                            "tiles": source.tiles,
-                            "related_resources": [],
-                            "displayname": source.displayname,
-                            "resourceid": source.resourceinstanceid
-                        },
+                        tileData,
                         graph
                     );
                     else {
-                        $.getJSON(arches.urls.resource_report + resId + qs, function(data) {
+                        $.getJSON(arches.urls.graphs_api + graphId, function(data) {
                             var graphModel = new GraphModel({
                                 data: data.graph,
                                 datatypes: data.datatypes
@@ -93,7 +93,7 @@ define([
                                 cardwidgets: data.cardwidgets
                             };
                             graphCache[graphId] = graph;
-                            processReportData(data, graph);
+                            processReportData(tileData, graph);
                         });
                     }
                 };
