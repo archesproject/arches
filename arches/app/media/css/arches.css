@@ -74,7 +74,8 @@ textarea:focus,
 .form-control:focus,
 i.report-expander:focus,
 .select-icon:focus,
-.chosen-container-active {
+.chosen-container-active,
+.select2-container-active {
 	outline: #006600 solid 3px !important;
 }
 
