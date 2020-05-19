@@ -3127,14 +3127,14 @@ div.dropdown-menu.open {
 }
 
 #circle {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     background: red;
     border-radius: 50%;
     z-index: 10;
     position: absolute;
-    top: -9px;
-    left: -9px;
+    top: -6px;
+    left: -6px;
     color: #fff;
     font-size: 0.6em;
 }
@@ -5436,10 +5436,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .grid-list.provisional-edit-history {
-    height: 100%;
+    height: calc(100% - 93px);
     position: absolute;
     width: 100%;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .provisional-edit-history-filter {
