@@ -11153,6 +11153,13 @@ a.tree-display-tool, a.tree-display-tool:hover {
     font-size: 1.2em;
 }
 
+.password-recovery-error-container ul {
+    color: darkred;
+    list-style: none;
+    padding-left: 0;
+    margin-top: 10px;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
