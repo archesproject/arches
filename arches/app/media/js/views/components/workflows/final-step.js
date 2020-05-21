@@ -55,8 +55,6 @@ define([
             topCards.forEach(function(topCard) {
                 topCard.topCards = topCards;
             }, this);
-
-            self.report(new ReportModel(_.extend(data, {graphModel: graphModel, cards: topCards})));
             self.loading(false);
         });
 
