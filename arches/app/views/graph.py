@@ -46,6 +46,7 @@ from arches.app.views.base import BaseManagerView
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 from io import BytesIO
 from elasticsearch.exceptions import RequestError
+from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
@@ -244,7 +245,6 @@ class GraphDesignerView(GraphBaseView):
 class GraphDataView(View):
 
     action = "update_node"
-
     def get(self, request, graphid, nodeid=None):
         if self.action == "export_graph":
             graph = get_graphs_for_export([graphid])
@@ -281,23 +281,24 @@ class GraphDataView(View):
         elif self.action == "get_domain_connections":
             res = []
             graph = Graph.objects.get(graphid=graphid)
-            ontology_class = request.GET.get("ontology_class", None)
             ret = graph.get_valid_domain_ontology_classes()
             for r in ret:
                 res.append({"ontology_property": r["ontology_property"], "ontology_classes": [c for c in r["ontology_classes"]]})
             return JSONResponse(res)
 
         else:
-            graph = Graph.objects.get(graphid=graphid)
             if self.action == "get_related_nodes":
                 parent_nodeid = request.GET.get("parent_nodeid", None)
-                ret = graph.get_valid_ontology_classes(nodeid=nodeid, parent_nodeid=parent_nodeid)
-
+                key = f'valid_ontology_classes_nodeid_{nodeid}_parent_nodeid_{parent_nodeid}'
+                ret = cache.get(key)
+                if ret == None:
+                    graph = Graph.objects.get(graphid=graphid)
+                    ret = graph.get_valid_ontology_classes(nodeid=nodeid, parent_nodeid=parent_nodeid)
             elif self.action == "get_valid_domain_nodes":
+                graph = Graph.objects.get(graphid=graphid)
                 if nodeid == "":
                     nodeid = None
                 ret = graph.get_valid_domain_ontology_classes(nodeid=nodeid)
-
             return JSONResponse(ret)
 
         return HttpResponseNotFound()
