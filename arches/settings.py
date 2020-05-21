@@ -311,11 +311,11 @@ INSTALLED_APPS = (
     "corsheaders",
     "oauth2_provider",
     "django_celery_results",
-    #'debug_toolbar'
+    # 'debug_toolbar'
 )
 
 MIDDLEWARE = [
-    #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -398,7 +398,12 @@ if DEBUG is True:
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = "Crowdsource Editor"
 
-CACHES = {"default": {"BACKEND": "django.core.cache.backends.memcached.MemcachedCache", "LOCATION": "127.0.0.1:11211"}}
+CACHES = {'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+        }
+    }
+    
 DEFAULT_RESOURCE_IMPORT_USER = {"username": "admin", "userid": 1}
 
 # Example of a custom time wheel configuration:
