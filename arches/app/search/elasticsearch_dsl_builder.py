@@ -90,7 +90,7 @@ class Query(Dsl):
         self.scroll = kwargs.pop("scroll", None)
         self.prepare()
         if self.scroll is None:
-            return self.se.search(index=index, body=self.dsl)
+            return self.se.search(index=index, body=self.dsl, id=kwargs.get("id", None))
         else:
             return self.se.search(index=index, body=self.dsl, scroll=self.scroll)
 
