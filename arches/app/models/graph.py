@@ -30,6 +30,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.utils.translation import ugettext as _
 from pyld.jsonld import compact, JsonLdError
+from django.core.cache import cache
 
 class Graph(models.GraphModel):
     """
@@ -395,6 +396,7 @@ class Graph(models.GraphModel):
             for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()
             self._nodegroups_to_delete = []
+            cache.set(f'graph_{self.graphid}', JSONSerializer().serializeToPython(self))
 
         return self
 
