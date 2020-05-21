@@ -289,7 +289,7 @@ class GraphDataView(View):
         else:
             if self.action == "get_related_nodes":
                 parent_nodeid = request.GET.get("parent_nodeid", None)
-                key = f'valid_ontology_classes_nodeid_{nodeid}_parent_nodeid_{parent_nodeid}'
+                key = f"valid_ontology_classes_nodeid_{nodeid}_parent_nodeid_{parent_nodeid}"
                 ret = cache.get(key)
                 if ret == None:
                     graph = Graph.objects.get(graphid=graphid)

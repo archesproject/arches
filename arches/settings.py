@@ -398,11 +398,7 @@ if DEBUG is True:
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = "Crowdsource Editor"
 
-CACHES = {'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
-        }
-    }
+CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "unique-snowflake",}}
 
 DEFAULT_RESOURCE_IMPORT_USER = {"username": "admin", "userid": 1}
 
@@ -556,9 +552,9 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 AUTO_REFRESH_GEOM_VIEW = True
-TILE_CACHE_TIMEOUT = 600 #seconds
-CARDS_API_VIEW_TIMEOUT = 3600 #seconds
-GRAPHS_API_VIEW_TIMEOUT = 3600 #seconds
+TILE_CACHE_TIMEOUT = 600  # seconds
+CARDS_API_VIEW_TIMEOUT = 3600  # seconds
+GRAPHS_API_VIEW_TIMEOUT = 3600  # seconds
 
 RENDERERS = [
     {
