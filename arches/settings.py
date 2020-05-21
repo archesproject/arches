@@ -403,7 +403,7 @@ CACHES = {'default': {
         'LOCATION': 'unique-snowflake',
         }
     }
-    
+
 DEFAULT_RESOURCE_IMPORT_USER = {"username": "admin", "userid": 1}
 
 # Example of a custom time wheel configuration:
@@ -556,7 +556,9 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 AUTO_REFRESH_GEOM_VIEW = True
-TILE_CACHE_TIMEOUT = 600
+TILE_CACHE_TIMEOUT = 600 #seconds
+CARDS_API_VIEW_TIMEOUT = 3600 #seconds
+GRAPHS_API_VIEW_TIMEOUT = 3600 #seconds
 
 RENDERERS = [
     {
