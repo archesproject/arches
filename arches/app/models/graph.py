@@ -16,10 +16,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import uuid
 import json
+import logging
 import pyprind
+import uuid
 from copy import copy, deepcopy
+from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from arches.app.models import models
@@ -30,7 +32,8 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.utils.translation import ugettext as _
 from pyld.jsonld import compact, JsonLdError
-from django.core.cache import cache
+
+logger = logging.getLogger(__name__)
 
 class Graph(models.GraphModel):
     """
@@ -396,7 +399,10 @@ class Graph(models.GraphModel):
             for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()
             self._nodegroups_to_delete = []
-            cache.set(f'graph_{self.graphid}', JSONSerializer().serializeToPython(self))
+            try:
+                cache.set(f'graph_{self.graphid}', JSONSerializer().serializeToPython(self))
+            except KeyError as e:
+                logger.warn(e)
 
         return self
 
