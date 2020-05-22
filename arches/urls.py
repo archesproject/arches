@@ -222,7 +222,7 @@ urlpatterns = [
     url(r"^rdm/concepts/(?P<conceptid>%s|())$" % uuid_regex, api.Concepts.as_view(), name="concepts"),
     url(r"^plugins/(?P<pluginid>%s)$" % uuid_regex, PluginView.as_view(), name="plugins"),
     url(r"^plugins/(?P<slug>[-\w]+)$", PluginView.as_view(), name="plugins"),
-    url(r"^cards/(?P<resourceid>%s|())$" % uuid_regex, cache_page(settings.CARDS_API_VIEW_TIMEOUT)(api.Card.as_view()), name="api_card"),
+    url(r"^cards/(?P<resourceid>%s|())$" % uuid_regex, api.Card.as_view(), name="api_card"),
     url(r"^search_component_data/(?P<componentname>[-\w]+)$", api.SearchComponentData.as_view(), name="api_search_component_data"),
     url(r"^geojson$", api.GeoJSON.as_view(), name="geojson"),
     url(
