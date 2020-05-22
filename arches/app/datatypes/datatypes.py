@@ -1723,7 +1723,6 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
         try:
             value.upper()
             data = json.loads(value)
-            print(data, "got it")
         except Exception:
             data = value
         return data
