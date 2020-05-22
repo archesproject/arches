@@ -101,7 +101,7 @@ define(['arches'], function(arches) {
                     console.log('Can\'t resolve path \'', cardWidgetPath, '\' into a single nodeid');
                 }
                 return nodeId;
-            }
+            };
 
             if (!!queryClause.nodeId) {
                 nodeId = [queryClause.nodeId];
@@ -114,7 +114,7 @@ define(['arches'], function(arches) {
                 }
             } else if (!!queryClause.widgetLabel) {
                 nodeId = resolveWidgetLabel(queryClause.widgetLabel, graph.cards, graph.widgets);
-            };
+            }
 
             if (!!nodeId && nodeId.length === 1) {
                 nodeId = nodeId[0];
