@@ -125,7 +125,7 @@ class SearchEngine(object):
                 kwargs["body"] = {"ids": id}
                 return self.es.mget(**kwargs)
             else:
-                kwargs.pop("body", None) # remove body param
+                kwargs.pop("body", None)  # remove body param
                 kwargs["id"] = id
                 return self.es.get(**kwargs)
 
