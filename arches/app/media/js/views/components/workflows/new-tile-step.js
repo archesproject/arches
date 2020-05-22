@@ -13,7 +13,11 @@ define([
         var self = this;
         if (params.workflow) {
             if (!params.resourceid()) {
-                params.resourceid(params.workflow.state.resourceid);
+                if (params.workflow.state.steps[params._index]) {
+                    params.resourceid(params.workflow.state.steps[params._index].resourceid);
+                } else {
+                    params.resourceid(params.workflow.state.resourceid);
+                }
             }
             if (params.workflow.state.steps[params._index]) {
                 params.tileid(params.workflow.state.steps[params._index].tileid);
