@@ -504,6 +504,7 @@ class Resources(APIBase):
         if user_can_read_resources(user=request.user, resourceid=resourceid):
             allowed_formats = ["json", "json-ld"]
             format = request.GET.get("format", "json-ld")
+            include_tiles = request.GET.get("includetiles", True)
             if format not in allowed_formats:
                 return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
             try:
@@ -523,7 +524,8 @@ class Resources(APIBase):
                         return JSONResponse(status=404)
                 elif format == "json":
                     out = Resource.objects.get(pk=resourceid)
-                    out.load_tiles()
+                    if include_tiles is True:
+                        out.load_tiles()
             else:
                 #
                 # The following commented code would be what you would use if you wanted to use the rdflib module,
