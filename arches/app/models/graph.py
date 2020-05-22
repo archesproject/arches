@@ -16,10 +16,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import uuid
 import json
+import logging
 import pyprind
+import uuid
 from copy import copy, deepcopy
+from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from arches.app.models import models
@@ -30,6 +32,8 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.utils.translation import ugettext as _
 from pyld.jsonld import compact, JsonLdError
+
+logger = logging.getLogger(__name__)
 
 class Graph(models.GraphModel):
     """
@@ -395,6 +399,10 @@ class Graph(models.GraphModel):
             for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()
             self._nodegroups_to_delete = []
+            try:
+                cache.set(f"graph_{self.graphid}", JSONSerializer().serializeToPython(self))
+            except KeyError as e:
+                logger.warn(e)
 
         return self
 
@@ -1041,7 +1049,7 @@ class Graph(models.GraphModel):
     def get_valid_ontology_classes(self, nodeid=None, parent_nodeid=None):
         """
         get possible ontology properties (and related classes) a node with the given nodeid can have
-        taking into consideration it's current position in the graph
+        taking into consideration its current position in the graph
 
         Arguments:
         nodeid -- the id of the node in question
@@ -1103,7 +1111,8 @@ class Graph(models.GraphModel):
                 else:
                     # if no parent node then just use the list of ontology classes from above, there will be no properties to return
                     ret = [{"ontology_property": "", "ontology_classes": list(ontology_classes)}]
-
+        key = f"valid_ontology_classes_nodeid_{nodeid}_parent_nodeid_{parent_nodeid}"
+        cache.set(key, ret, 3600 * 24)
         return ret
 
     def get_nodegroups(self, nodegroupid=None):

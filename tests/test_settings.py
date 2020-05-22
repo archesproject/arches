@@ -46,6 +46,8 @@ BUSISNESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+CACHES = {"default": {"BACKEND": "django.core.cache.backends.dummy.DummyCache",}}
+
 ELASTICSEARCH_PREFIX = "test"
 
 # Use nose to run all tests
