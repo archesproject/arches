@@ -399,10 +399,10 @@ if DEBUG is True:
 USER_SIGNUP_GROUP = "Crowdsource Editor"
 
 CACHES = {'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake'
+            }
         }
-    }
 
 DEFAULT_RESOURCE_IMPORT_USER = {"username": "admin", "userid": 1}
 
