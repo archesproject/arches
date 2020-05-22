@@ -1111,7 +1111,7 @@ class Graph(models.GraphModel):
                 else:
                     # if no parent node then just use the list of ontology classes from above, there will be no properties to return
                     ret = [{"ontology_property": "", "ontology_classes": list(ontology_classes)}]
-        key = f'valid_ontology_classes_nodeid_{nodeid}_parent_nodeid_{parent_nodeid}'
+        key = f"valid_ontology_classes_nodeid_{nodeid}_parent_nodeid_{parent_nodeid}"
         cache.set(key, ret, 3600 * 24)
         return ret
 
