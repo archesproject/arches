@@ -1201,20 +1201,21 @@ ul.tabbed-report-tab-list {
     width: 35px;
     height: 105px;
     display: flex;
-    background-color: rgba(0,0,0, 0.75);
+    background-color: rgba(242,242,242, 0.65);
     align-items: center;
     font-size: 41px;
     justify-content: center;
-    border-bottom: solid 1px #333;
-    color: #ddd
+    border-top: 1px solid #ddd;
+    border-bottom: solid 1px #ddd;
+    color: #555;
 }
 
 .thumbnail-gallery-controls.left {
-    border-left: solid 1px #333;
+    border-left: solid 1px #ddd;
 }
 
 .thumbnail-gallery-controls.right {
-    border-right: solid 1px #333;
+    border-right: solid 1px #ddd;
 }
 
 .thumbnail-container {
@@ -1234,9 +1235,9 @@ ul.tabbed-report-tab-list {
     font-size: 14px;
     margin-left: 35px;
     width: 130px;
-    color: #fff;
-    font-weight: 500;
-    background-color: rgba(0,0,0, 0.7);
+    color: #222;
+    font-weight: 600;
+    background-color: rgba(242,242,242, 0.65);
     text-align: center;
 }
 
@@ -1470,18 +1471,18 @@ div.final-cons-step-separator > h4 {
     display: inline-flex;
     align-items: center;
     text-align: center;
-    background-color: rgba(0,0,0, 0.65);
+    background-color: rgba(142,142,142, 0.65);
     height: 105px;
     overflow-x: auto;
     overflow-y: hidden;
     width: 100%;
-    border-top: solid 1px #000;
+    border-top: solid 1px #bbb;
 }
 
 .gallery-thumbnails img {
     height: 80px;
     margin: 3px 6px;
-    border: solid 1.5px #333;
+    border: solid 1.5px #bbb;
 }
 
 .gallery-thumbnails img:hover {
