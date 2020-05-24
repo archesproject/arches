@@ -43,7 +43,7 @@ class Command(BaseCommand):
         graphs = Graph.objects.all()
         for graph in graphs: 
             print('caching', graph.name)
-            cache.set(f"graph_{graph.graphid}", JSONSerializer().serializeToPython(graph),  3600 * 24)
+            cache.set(f"graph_{graph.graphid}", JSONSerializer().serializeToPython(graph), settings.GRAPH_MODEL_CACHE_TIMEOUT)
 
     def verify_cache(self):
         graphs = Graph.objects.all()
