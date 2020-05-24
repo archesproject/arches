@@ -196,7 +196,7 @@ To create it, use:
 
         createcachetable = False
         for k, v in settings.CACHES.items():
-            if v['BACKEND'] == "django.core.cache.backends.db.DatabaseCache":
+            if v["BACKEND"] == "django.core.cache.backends.db.DatabaseCache":
                 createcachetable = True
         if createcachetable:
             management.call_command("createcachetable")

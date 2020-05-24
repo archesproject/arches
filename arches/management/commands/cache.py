@@ -35,21 +35,20 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if options["operation"] == "graphs":
             self.cache_graphs()
-        
+
         if options["operation"] == "verify_cache":
             self.verify_cache()
 
     def cache_graphs(self):
         graphs = Graph.objects.all()
-        for graph in graphs: 
-            print('caching', graph.name)
+        for graph in graphs:
+            print("caching", graph.name)
             cache.set(f"graph_{graph.graphid}", JSONSerializer().serializeToPython(graph), settings.GRAPH_MODEL_CACHE_TIMEOUT)
 
     def verify_cache(self):
         graphs = Graph.objects.all()
-        for graph in graphs: 
-            graphc = cache.get(f"graph_{graph.graphid}") 
+        for graph in graphs:
+            graphc = cache.get(f"graph_{graph.graphid}")
             graph_from_cache = JSONSerializer().serialize(graphc)
             graph_from_db = JSONSerializer().serialize(graph)
-            print(f'Cache for {graph.name} is valid: {len(graph_from_cache) == len(graph_from_db)}')
-
+            print(f"Cache for {graph.name} is valid: {len(graph_from_cache) == len(graph_from_db)}")
