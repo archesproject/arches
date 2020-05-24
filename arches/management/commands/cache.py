@@ -38,6 +38,12 @@ class Command(BaseCommand):
 
         if options["operation"] == "verify_cache":
             self.verify_cache()
+        
+        if options["operation"] == "clear":
+            self.clear()
+
+    def clear(self):
+        cache.clear()
 
     def cache_graphs(self):
         graphs = Graph.objects.all()
