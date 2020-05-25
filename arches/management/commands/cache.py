@@ -38,7 +38,7 @@ class Command(BaseCommand):
 
         if options["operation"] == "verify_cache":
             self.verify_cache()
-        
+
         if options["operation"] == "clear":
             self.clear()
 
