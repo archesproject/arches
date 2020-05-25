@@ -455,16 +455,27 @@ class Graphs(APIBase):
     def get(self, request, graph_id=None):
         perm = "read_nodegroup"
         datatypes = models.DDataType.objects.all()
-        graph = Graph.objects.get(graphid=graph_id)
-        cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
-        permitted_cards = []
-        for card in cards:
-            if request.user.has_perm(perm, card.nodegroup):
-                card.filter_by_perm(request.user, perm)
-                permitted_cards.append(card)
-        cardwidgets = [
-            widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
-        ]
+        graph = cache.get(f"graph_{graph_id}") 
+        user = request.user
+        if graph is None:
+            print('not using graph cache')
+            graph = Graph.objects.get(graphid=graph_id)
+            cache.set(f"graph_{graph_id}", JSONSerializer().serializeToPython(graph))
+        permitted_cards = cache.get(f'{user.id}_{graph_id}_permitted_cards')
+        cardwidgets = cache.get(f'{user.id}_{graph_id}_cardwidgets')
+        if permitted_cards is None or cardwidgets is None:
+            print('not using card cache')
+            cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
+            permitted_cards = []
+            for card in cards:
+                if user.has_perm(perm, card.nodegroup):
+                    card.filter_by_perm(user, perm)
+                    permitted_cards.append(card)
+            cardwidgets = [
+                widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
+            ]
+            cache.set(f'{user.id}_{graph_id}_permitted_cards', permitted_cards, 3600 * 24)
+            cache.set(f'{user.id}_{graph_id}_cardwidgets', cardwidgets, 3600 * 24)
 
         return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
 
