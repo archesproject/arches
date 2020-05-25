@@ -844,7 +844,11 @@ class Command(BaseCommand):
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
         print("caching resource models")
-        cache_graphs()
+        try:
+            cache_graphs()
+        except Exception as e:
+            print("Unable to cache graph proxy models")
+            print(e)
         if celery_worker_running:
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
