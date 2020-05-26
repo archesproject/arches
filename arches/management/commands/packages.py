@@ -744,6 +744,9 @@ class Command(BaseCommand):
         def load_functions(package_dir):
             load_extensions(package_dir, "functions", "fn")
 
+        def cache_graphs():
+            management.call_command("cache", operation="graphs")
+
         def load_apps(package_dir):
             package_apps = glob.glob(os.path.join(package_dir, "apps", "*"))
             for app in package_apps:
@@ -840,6 +843,12 @@ class Command(BaseCommand):
             css_files = glob.glob(os.path.join(css_source, "*.css"))
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
+        print("caching resource models")
+        try:
+            cache_graphs()
+        except Exception as e:
+            print("Unable to cache graph proxy models")
+            print(e)
         if celery_worker_running:
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
