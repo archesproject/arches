@@ -30,6 +30,7 @@ define([
         this.complete = params.complete || ko.observable();
         this.completeOnSave = params.completeOnSave === false ? false : true;
         this.loading(true);
+        this.customCardLabel = params.customCardLabel || false;
         var flattenTree = function(parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {
                 flatList.push(parent);
@@ -131,6 +132,7 @@ define([
                     if (ko.unwrap(params.parenttileid) && item.parent && ko.unwrap(params.parenttileid) !== item.parent.tileid) {
                         return;
                     }
+                    if (self.customCardLabel) item.model.name(ko.unwrap(self.customCardLabel));
                     self.card(item);
                     if (ko.unwrap(params.tileid)) {
                         ko.unwrap(item.tiles).forEach(function(tile) {
