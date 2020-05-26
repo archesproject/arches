@@ -11,22 +11,26 @@ define([
 ], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel) {
     function viewModel(params) {
         var self = this;
+
+        this.resourceId = ko.observable();
         if (params.workflow) {
             if (!params.resourceid()) {
                 if (params.workflow.state.steps[params._index]) {
-                    params.resourceid(params.workflow.state.steps[params._index].resourceid);
+                    this.resourceId(params.workflow.state.steps[params._index].resourceid);
+                } else {
+                    this.resourceId(params.workflow.state.resourceid);
                 }
             }
             if (params.workflow.state.steps[params._index]) {
                 params.tileid(params.workflow.state.steps[params._index].tileid);
             }
         }
+
         var url = arches.urls.api_card + (ko.unwrap(params.resourceid) || ko.unwrap(params.graphid));
         this.card = ko.observable();
         this.tile = ko.observable();
         this.loading = params.loading || ko.observable(false);
         this.alert = params.alert || ko.observable(null);
-        this.resourceId = params.resourceid || ko.observable();
         this.complete = params.complete || ko.observable();
         this.completeOnSave = params.completeOnSave === false ? false : true;
         this.loading(true);
