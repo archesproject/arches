@@ -7,23 +7,20 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('auth', '0011_update_proxy_permissions'),
-        ('models', '5605_searchexporthistory_downloadfile'),
+        ("auth", "0011_update_proxy_permissions"),
+        ("models", "5605_searchexporthistory_downloadfile"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='GroupMapSettings',
+            name="GroupMapSettings",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('min_zoom', models.IntegerField(default=1)),
-                ('max_zoom', models.IntegerField(default=10)),
-                ('default_zoom', models.IntegerField(default=5)),
-                ('group', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='auth.Group')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("min_zoom", models.IntegerField(default=1)),
+                ("max_zoom", models.IntegerField(default=10)),
+                ("default_zoom", models.IntegerField(default=5)),
+                ("group", models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to="auth.Group")),
             ],
-            options={
-                'db_table': 'user_map_settings',
-                'managed': True,
-            },
+            options={"db_table": "user_map_settings", "managed": True,},
         ),
     ]
