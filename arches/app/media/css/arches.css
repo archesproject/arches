@@ -11876,6 +11876,10 @@ a.jstree-anchor.permissions-widget {
     padding-bottom: 20px;
 }
 
+.workbench-card-sidepanel .create-resource-instance-card-component {
+    top: 75px;
+}
+
 .new-instance-model-name {
     font-size: 1.4em;
     font-weight: 600;
