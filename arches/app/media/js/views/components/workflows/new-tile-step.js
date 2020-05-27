@@ -20,6 +20,8 @@ define([
                 } else {
                     this.resourceId(params.workflow.state.resourceid);
                 }
+            } else {
+                this.resourceId = params.resourceid;
             }
             if (params.workflow.state.steps[params._index]) {
                 params.tileid(params.workflow.state.steps[params._index].tileid);
