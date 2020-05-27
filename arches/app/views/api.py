@@ -1028,8 +1028,8 @@ class Node(APIBase):
         
         #try to get nodes by attribute filter and then get nodes by passed in user perms
         try:
-            nodes = models.Node.objects.filter(datatype=datatype)
-            editable_nodegroups = [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(user, perms)]
+            nodes = models.Node.objects.filter(datatype=datatype).values()
+            permitted_nodegroups = [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(user, perms)]
         except Exception as e:
             return JSONResponse(str(e))
         
@@ -1038,9 +1038,14 @@ class Node(APIBase):
             return JSONResponse('No nodes matching query parameters found.')
         
         #filter nodes from attribute query based on user permissions
-        result = [node for node in nodes if str(node.nodegroup_id) in editable_nodegroups]
-
-        return JSONResponse(result)
+        permitted_nodes = [node for node in nodes if str(node['nodegroup_id']) in permitted_nodegroups]
+        for node in permitted_nodes:
+            try:
+                node['resourcemodelname'] = Graph.objects.get(pk=node['graph_id']).name
+            except:
+                print('no graph')
+        
+        return JSONResponse(permitted_nodes)
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Instance_Permission(APIBase):
