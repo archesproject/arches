@@ -163,12 +163,12 @@ define([
             var activeStep = val;
             var previousStep = self.previousStep();
             var resourceId;
-            if (previousStep && previousStep.hasOwnProperty('getStateProperties')) {
-                self.state.steps[previousStep._index] = previousStep.getStateProperties();
+            if (previousStep && previousStep.hasOwnProperty('defineStateProperties')) {
+                self.state.steps[previousStep._index] = previousStep.defineStateProperties();
                 self.state.steps[previousStep._index].complete = ko.unwrap(previousStep.complete);
                 self.state.activestep = val._index;
                 self.state.previousstep = previousStep._index;
-                if (!resourceId) {
+                if (!self.state.resourceid) {
                     resourceId = !!previousStep.resourceid ? ko.unwrap(previousStep.resourceid) : null;
                     self.state.resourceid = resourceId;
                 }

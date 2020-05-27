@@ -6,12 +6,12 @@ define([
 ], function(ko, _, AlertViewModel) {
     return function(params) {
         var self = this;
-        var getTiles = function(tile, tiles) {
+        this.getTiles = function(tile, tiles) {
             tiles = tiles || [tile];
             tile.cards.forEach(function(card) {
                 card.tiles().forEach(function(tile) {
                     tiles.push(tile);
-                    getTiles(tile, tiles);
+                    self.getTiles(tile, tiles);
                 });
             });
             return tiles;
@@ -68,10 +68,10 @@ define([
         this.tiles = ko.computed(function() {
             var tiles = [];
             if (self.tile) {
-                return getTiles(self.tile);
+                return self.getTiles(self.tile);
             } else {
                 self.card.tiles().forEach(function(tile) {
-                    getTiles(tile, tiles);
+                    self.getTiles(tile, tiles);
                 });
             }
             return tiles;

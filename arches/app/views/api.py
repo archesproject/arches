@@ -24,6 +24,7 @@ from revproxy.views import ProxyView
 from oauth2_provider.views import ProtectedResourceView
 from arches.app.models import models
 from arches.app.models.concept import Concept
+from arches.app.models.card import Card as CardProxyModel
 from arches.app.models.graph import Graph
 from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.resource import Resource
@@ -452,6 +453,38 @@ class MVT(APIBase):
 
 
 @method_decorator(csrf_exempt, name="dispatch")
+class Graphs(APIBase):
+    def get(self, request, graph_id=None):
+        perm = "read_nodegroup"
+        datatypes = models.DDataType.objects.all()
+        graph = cache.get(f"graph_{graph_id}")
+        user = request.user
+        if graph is None:
+            print("not using graph cache")
+            graph = Graph.objects.get(graphid=graph_id)
+            cache.set(f"graph_{graph_id}", JSONSerializer().serializeToPython(graph), settings.GRAPH_MODEL_CACHE_TIMEOUT)
+        permitted_cards = cache.get(f"{user.id}_{graph_id}_permitted_cards")
+        cardwidgets = cache.get(f"{user.id}_{graph_id}_cardwidgets")
+        if permitted_cards is None or cardwidgets is None:
+            print("not using card cache")
+            cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
+            permitted_cards = []
+            for card in cards:
+                if user.has_perm(perm, card.nodegroup):
+                    card.filter_by_perm(user, perm)
+                    permitted_cards.append(card)
+            cardwidgets = [
+                widget
+                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
+                for widget in widgets
+            ]
+            cache.set(f"{user.id}_{graph_id}_permitted_cards", permitted_cards, settings.USER_GRAPH_PERMITTED_CARDS_TIMEOUT)
+            cache.set(f"{user.id}_{graph_id}_cardwidgets", cardwidgets, settings.USER_GRAPH_CARDWIDGETS_TIMEOUT)
+
+        return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
+
+
+@method_decorator(csrf_exempt, name="dispatch")
 class Resources(APIBase):
 
     # context = [{
@@ -486,6 +519,7 @@ class Resources(APIBase):
         if user_can_read_resources(user=request.user, resourceid=resourceid):
             allowed_formats = ["json", "json-ld"]
             format = request.GET.get("format", "json-ld")
+            include_tiles = request.GET.get("includetiles", True)
             if format not in allowed_formats:
                 return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
             try:
@@ -505,7 +539,8 @@ class Resources(APIBase):
                         return JSONResponse(status=404)
                 elif format == "json":
                     out = Resource.objects.get(pk=resourceid)
-                    out.load_tiles()
+                    if include_tiles is True:
+                        out.load_tiles()
             else:
                 #
                 # The following commented code would be what you would use if you wanted to use the rdflib module,

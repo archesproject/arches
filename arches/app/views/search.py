@@ -235,6 +235,7 @@ def append_instance_permission_filter_dsl(request, search_results_object):
 def search_results(request):
     for_export = request.GET.get("export")
     total = int(request.GET.get("total", "0"))
+    resourceinstanceid = request.GET.get("id", None)
     se = SearchEngineFactory().create()
     search_results_object = {"query": Query(se)}
 
@@ -280,10 +281,16 @@ def search_results(request):
             results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
             results["hits"]["hits"] += results_scrolled["hits"]["hits"]
     else:
-        results = dsl.search(index="resources")
+        results = dsl.search(index="resources", id=resourceinstanceid)
 
     ret = {}
     if results is not None:
+        if "hits" not in results:
+            if "docs" in results:
+                results = {"hits": {"hits": results["docs"]}}
+            else:
+                results = {"hits": {"hits": [results]}}
+
         # allow filters to modify the results
         for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
             search_filter = search_filter_factory.get_filter(filter_type)
