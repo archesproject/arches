@@ -11,23 +11,32 @@ define([
 ], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel) {
     function viewModel(params) {
         var self = this;
+
+        this.resourceId = ko.observable();
         if (params.workflow) {
             if (!params.resourceid()) {
-                params.resourceid(params.workflow.state.resourceid);
+                if (params.workflow.state.steps[params._index]) {
+                    this.resourceId(params.workflow.state.steps[params._index].resourceid);
+                } else {
+                    this.resourceId(params.workflow.state.resourceid);
+                }
+            } else {
+                this.resourceId = params.resourceid;
             }
             if (params.workflow.state.steps[params._index]) {
                 params.tileid(params.workflow.state.steps[params._index].tileid);
             }
         }
-        var url = arches.urls.api_card + (ko.unwrap(params.resourceid) || ko.unwrap(params.graphid));
+
+        var url = arches.urls.api_card + (ko.unwrap(this.resourceId) || ko.unwrap(params.graphid));
         this.card = ko.observable();
         this.tile = ko.observable();
         this.loading = params.loading || ko.observable(false);
         this.alert = params.alert || ko.observable(null);
-        this.resourceId = params.resourceid || ko.observable();
         this.complete = params.complete || ko.observable();
         this.completeOnSave = params.completeOnSave === false ? false : true;
         this.loading(true);
+        this.customCardLabel = params.customCardLabel || false;
         var flattenTree = function(parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {
                 flatList.push(parent);
@@ -129,6 +138,7 @@ define([
                     if (ko.unwrap(params.parenttileid) && item.parent && ko.unwrap(params.parenttileid) !== item.parent.tileid) {
                         return;
                     }
+                    if (self.customCardLabel) item.model.name(ko.unwrap(self.customCardLabel));
                     self.card(item);
                     if (ko.unwrap(params.tileid)) {
                         ko.unwrap(item.tiles).forEach(function(tile) {
@@ -170,7 +180,7 @@ define([
                 wastebin.resourceid = ko.unwrap(params.resourceid);
             }
             return {
-                resourceid: ko.unwrap(params.resourceid),
+                resourceid: ko.unwrap(params.resourceid) || this.workflow.state.resourceid,
                 tile: !!(ko.unwrap(params.tile)) ? koMapping.toJS(params.tile().data) : undefined,
                 tileid: !!(ko.unwrap(params.tile)) ? ko.unwrap(params.tile().tileid): undefined,
                 wastebin: wastebin

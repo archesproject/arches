@@ -5,13 +5,12 @@ define([
     'arches',
     'models/report',
     'models/graph',
-    'models/card',
     'viewmodels/card',
     'report-templates',
     'views/components/search/base-filter',
     'card-components',
     'bindings/chosen'
-], function($, _, ko, arches, ReportModel, GraphModel, CardModel, CardViewModel, reportLookup, BaseFilter, cardComponents) {
+], function($, _, ko, arches, ReportModel, GraphModel, CardViewModel, reportLookup, BaseFilter, cardComponents) {
     var componentName = 'search-result-details';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -23,7 +22,7 @@ define([
                 this.options = options;
                 this.report = null;
 
-                var loaded = ko.computed(function(){
+                var loaded = ko.computed(function() {
                     return this.getFilter('search-results');
                 }, this);
                 loaded.subscribe(function(loaded) {
@@ -66,21 +65,21 @@ define([
                     }));
                     self.loading(false);
                 };
-                this.setupReport = function(resId, graphId, source) {
-                    var qs = '?json=True';
+                this.setupReport = function(graphId, source) {
                     var graph = graphCache[graphId];
+                    var tileData = {
+                        "tiles": source.tiles,
+                        "related_resources": [],
+                        "displayname": source.displayname,
+                        "resourceid": source.resourceinstanceid
+                    };
                     self.loading(true);
                     if (graph) processReportData(
-                        {
-                            "tiles": source.tiles,
-                            "related_resources": [],
-                            "displayname": source.displayname,
-                            "resourceid": source.resourceinstanceid
-                        },
+                        tileData,
                         graph
                     );
                     else {
-                        $.getJSON(arches.urls.resource_report + resId + qs, function(data) {
+                        $.getJSON(arches.urls.graphs_api + graphId, function(data) {
                             var graphModel = new GraphModel({
                                 data: data.graph,
                                 datatypes: data.datatypes
@@ -94,7 +93,7 @@ define([
                                 cardwidgets: data.cardwidgets
                             };
                             graphCache[graphId] = graph;
-                            processReportData(data, graph);
+                            processReportData(tileData, graph);
                         });
                     }
                 };

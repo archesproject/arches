@@ -57,6 +57,7 @@ from arches.app.views.auth import LoginView, SignupView, ConfirmSignupView, Chan
 from arches.app.models.system_settings import settings
 from arches.app.utils.forms import ArchesPasswordResetForm
 from arches.app.utils.forms import ArchesSetPasswordForm
+from django.views.decorators.cache import cache_page
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -213,6 +214,7 @@ urlpatterns = [
     url(r"^mobileprojects/(?:(?P<surveyid>%s))?$" % uuid_regex, api.Surveys.as_view(), name="mobileprojects"),
     url(r"^sync/(?P<surveyid>%s|())$" % uuid_regex, api.Sync.as_view(), name="sync"),
     url(r"^checksyncstatus/(?P<synclogid>%s|())$" % uuid_regex, api.CheckSyncStatus.as_view(), name="checksyncstatus"),
+    url(r"^graphs/(?P<graph_id>%s)$" % (uuid_regex), api.Graphs.as_view(), name="graphs_api"),
     url(r"^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.Resources.as_view(), name="resources_graphid"),
     url(r"^resources/(?P<slug>[-\w]+)/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources_slug"),
     url(r"^resources/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources"),

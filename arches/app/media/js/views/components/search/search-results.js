@@ -80,8 +80,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
 
             showResourceDetails: function(graphId, result) {
                 var self = this;
-                return function(resourceinstance){
-                    self.details.setupReport(resourceinstance.resourceinstanceid, graphId, result._source);
+                return function(){
+                    self.details.setupReport(graphId, result._source);
                     if (self.selectedTab() !== 'search-result-details') {
                         self.selectedTab('search-result-details');
                     }

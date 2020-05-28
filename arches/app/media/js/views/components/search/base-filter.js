@@ -1,11 +1,12 @@
 define([
     'jquery',
-    'backbone'
-], function($, Backbone) {
+    'backbone',
+    'knockout'
+], function($, Backbone, ko) {
     return Backbone.View.extend({
         constructor: function() {
             this.name = 'Base Filter';
-            
+
             // the various filters managed by this widget
             this.filter = {};
 
@@ -19,7 +20,7 @@ define([
         },
 
         getFilter: function(filterName) {
-            return this.filters[filterName]();
+            return ko.unwrap(this.filters[filterName]);
         }
     });
 });

@@ -285,8 +285,11 @@ def search_results(request):
 
     ret = {}
     if results is not None:
-        if "docs" in results:
-            results = {"hits": {"hits": results["docs"]}}
+        if "hits" not in results:
+            if "docs" in results:
+                results = {"hits": {"hits": results["docs"]}}
+            else:
+                results = {"hits": {"hits": [results]}}
 
         # allow filters to modify the results
         for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:

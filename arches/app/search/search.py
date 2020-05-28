@@ -119,8 +119,15 @@ class SearchEngine(object):
         if id:
             if isinstance(id, str):
                 id = id.split(",")
-            kwargs["body"] = {"ids": id}
-            return self.es.mget(**kwargs)
+                if len(id) == 1:
+                    id = id[0]
+            if isinstance(id, list):
+                kwargs["body"] = {"ids": id}
+                return self.es.mget(**kwargs)
+            else:
+                kwargs.pop("body", None)  # remove body param
+                kwargs["id"] = id
+                return self.es.get(**kwargs)
 
         ret = None
         try:
