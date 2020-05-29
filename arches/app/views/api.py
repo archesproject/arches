@@ -1031,11 +1031,11 @@ class Node(APIBase):
             nodes = models.Node.objects.filter(datatype=datatype).values()
             permitted_nodegroups = [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(user, perms)]
         except Exception as e:
-            return JSONResponse(str(e))
+            return JSONResponse(str(e), status=404)
         
         #check if any nodes were returned from attribute filter and throw error if none were returned
         if len(nodes) == 0:
-            return JSONResponse('No nodes matching query parameters found.')
+            return JSONResponse(_('No nodes matching query parameters found.'), status=404)
         
         #filter nodes from attribute query based on user permissions
         permitted_nodes = [node for node in nodes if str(node['nodegroup_id']) in permitted_nodegroups]
@@ -1043,9 +1043,9 @@ class Node(APIBase):
             try:
                 node['resourcemodelname'] = Graph.objects.get(pk=node['graph_id']).name
             except:
-                print('no graph')
+                return JSONResponse(_('No graph found for graphid %s' % (node['graph_id'])), status=404)
         
-        return JSONResponse(permitted_nodes)
+        return JSONResponse(permitted_nodes, status=200)
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Instance_Permission(APIBase):
