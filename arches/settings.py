@@ -553,9 +553,7 @@ CELERY_BEAT_SCHEDULE = {
 
 AUTO_REFRESH_GEOM_VIEW = True
 TILE_CACHE_TIMEOUT = 600  # seconds
-GRAPH_MODEL_CACHE_TIMEOUT = 3600 * 24 * 30  # seconds * hours * days = ~1mo
-USER_GRAPH_PERMITTED_CARDS_TIMEOUT = 3600 * 24 * 30  # seconds * hours * days = ~1mo
-USER_GRAPH_CARDWIDGETS_TIMEOUT = 3600 * 24 * 30  # seconds * hours * days = ~1mo
+GRAPH_MODEL_CACHE_TIMEOUT = None  # seconds * hours * days = ~1mo
 
 RENDERERS = [
     {
