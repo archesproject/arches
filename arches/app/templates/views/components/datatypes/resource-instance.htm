@@ -25,7 +25,7 @@
                         <a href="javascript:void(0);" data-bind="click: $data.removeRelationship, clickBubble: false">
                             <i class="fa fa-times-circle"></i>
                         </a>
-                    </td> 
+                    </td>
                     <td data-bind="click: function() { if(self.graphIsSemantic){$data.editing(true)}; }, clickBubble: false, style:{cursor: self.graphIsSemantic ? 'pointer': 'inherit'}" style="cursor: pointer;">
                         <div class="form-horizontal" data-bind="ifnot: $data.editing">
                             <span data-bind="text: self.formatLabel($data.name, $data.ontologyProperty(), $data.inverseOntologyProperty())"></span>
@@ -60,7 +60,7 @@
                             </button>
                         </div>
                     </td>
-                    
+
                 </tr>
             </tbody>
         </table>
@@ -90,6 +90,7 @@
             renderContext: 'search',
             multiple: !!datatype.datatype.includes('list'),
         }
-    } --><!-- /ko -->
+    } -->
+    <!-- /ko -->
 </div>
 <!-- /ko -->

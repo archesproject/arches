@@ -7,12 +7,12 @@ define([
     'arches',
     'views/components/widgets/resource-instance-multiselect',
     'views/resource/related-resources-node-list',
+    'utils/ontology',
     'bindings/related-resources-graph',
     'plugins/knockout-select2',
     'bindings/datepicker',
     'bindings/datatable'
-    
-], function($, _, Backbone, ko, koMapping, arches, ResourceInstanceSelect, RelatedResourcesNodeList) {
+], function ($, _, Backbone, ko, koMapping, arches, ResourceInstanceSelect, RelatedResourcesNodeList, ontologyUtils) {
     return ko.components.register('related-resources-manager', {
         viewModel: Backbone.View.extend({
             initialize: function(options) {
@@ -24,6 +24,7 @@ define([
                 if (this.graph) {
                     this.ontologyclass = options.graph.ontologyclass || options.graph.root.ontologyclass;
                 }
+                this.makeFriendly = ontologyUtils.makeFriendly;
                 this.graphNameLookup = _.indexBy(arches.resources, 'graphid');
                 this.currentResource = ko.observable();
                 this.currentResourceSubscriptions = [];
@@ -36,6 +37,7 @@ define([
                 this.graphNodeList = ko.observableArray();
                 this.newResource = ko.observableArray();
                 this.filter = ko.observable('');
+                this.selectedResourceRelationship = ko.observable();
                 this.relationshipCandidates = ko.observableArray([]);
                 this.relationshipCandidateIds = ko.observable([]);
                 this.useSemanticRelationships = arches.useSemanticRelationships;
@@ -43,10 +45,18 @@ define([
                 this.resourceRelationships = ko.observableArray();
                 this.paginator = koMapping.fromJS({});
                 this.relationshipsInFilter = ko.computed(function(relationship) {
-                    return self.resourceRelationships().filter(function(relationship){
+                    return self.resourceRelationships().filter(function(relationship) {
                         return self.filter().toLowerCase() === '' || relationship.resource.displayname.toLowerCase().includes(self.filter().toLowerCase());
                     });
                 });
+
+                this.toggleSelectedResourceRelationship = function(resourceRelationship) {
+                    if (self.selectedResourceRelationship() === resourceRelationship) {
+                        self.selectedResourceRelationship(null);
+                    } else {
+                        self.selectedResourceRelationship(resourceRelationship);
+                    }
+                };
 
                 this.fdgNodeListView = new RelatedResourcesNodeList({
                     items: self.graphNodeList
@@ -76,7 +86,7 @@ define([
                 }, this);
 
                 this.panelPosition = ko.computed(function() {
-                    var res = {x: 0, y: 0, first: [0, 0], second: [0, 0]};
+                    var res = { x: 0, y: 0, first: [0, 0], second: [0, 0] };
                     var nodes = self.graphNodeSelection();
                     if (nodes.length === 2) {
                         res.x = nodes[0].absX < nodes[1].absX ? nodes[0].absX : nodes[1].absX;
@@ -180,7 +190,7 @@ define([
                                     };
                                 };
                                 relationship['resource'] = res.length > 0 ? res[0] : '';
-                                if(!!relationship['resource']) {
+                                if (!!relationship['resource']) {
                                     relationship.iconclass = viewModel.graphNameLookup[relationship.resource.graph_id].icon;
                                 }
                                 relationshipsWithResource.push(relationship);
@@ -197,13 +207,13 @@ define([
                         get: function(newPage) {
                             var page = newPage || 1;
                             $.ajax({
-                                url: arches.urls.related_resources + resourceinstanceid,
-                                context: this,
-                                dataType: 'json',
-                                data: {
-                                    page: page
-                                }
-                            })
+                                    url: arches.urls.related_resources + resourceinstanceid,
+                                    context: this,
+                                    dataType: 'json',
+                                    data: {
+                                        page: page
+                                    }
+                                })
                                 .done(function(data) {
                                     self.graphNameLookup = _.indexBy(arches.resources, 'graphid');
                                     this.parse(data, self);
@@ -226,12 +236,12 @@ define([
                                 relationship_ids: relationshipIds
                             };
                             $.ajax({
-                                url: arches.urls.related_resources,
-                                data: payload,
-                                context: this,
-                                type: 'POST',
-                                dataType: 'json'
-                            })
+                                    url: arches.urls.related_resources,
+                                    data: payload,
+                                    context: this,
+                                    type: 'POST',
+                                    dataType: 'json'
+                                })
                                 .done(function(data) {
                                     this.parse(data, self);
                                 })
@@ -245,11 +255,11 @@ define([
                                 root_resourceinstanceid: resourceinstanceid
                             };
                             $.ajax({
-                                url: arches.urls.related_resources + '?' + $.param(payload),
-                                type: 'DELETE',
-                                context: this,
-                                dataType: 'json'
-                            })
+                                    url: arches.urls.related_resources + '?' + $.param(payload),
+                                    type: 'DELETE',
+                                    context: this,
+                                    dataType: 'json'
+                                })
                                 .done(function(data) {
                                     this.parse(data, self);
                                 })
@@ -413,7 +423,7 @@ define([
                         $.ajax(arches.urls.related_resource_candidates, {
                             dataType: 'json',
                             data: { resourceids: item._id }
-                        }).done(function (data) {
+                        }).done(function(data) {
                             self.relationshipCandidates(data);
                             self.saveRelationships();
                             self.relationshipCandidateIds(undefined);
@@ -447,8 +457,7 @@ define([
                             return item.name;
                         }
                     },
-                    initSelection: function(el, callback) {
-                    }
+                    initSelection: function(el, callback) {}
                 };
             },
 

@@ -4,8 +4,9 @@ define([
     'underscore',
     'viewmodels/widget',
     'arches',
-    'views/components/resource-summary'
-], function(ko, $, _, WidgetViewModel, arches, ResourceSummary) {
+    'views/components/resource-summary',
+    'utils/ontology'
+], function(ko, $, _, WidgetViewModel, arches, ResourceSummary, ontologyUtils) {
     var resourceLookup = {};
     require(['views/components/workflows/new-tile-step']);
     var ResourceInstanceSelectViewModel = function(params) {
@@ -15,6 +16,7 @@ define([
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
         this.graphIsSemantic = params.graph ? !!params.graph.ontologyclass : false;
+        this.makeFriendly = ontologyUtils.makeFriendly;
         self.newTileStep = ko.observable();
         this.useSemanticRelationships = arches.useSemanticRelationships;
         this.resourceReportUrl = arches.urls.resource_report;
@@ -298,16 +300,11 @@ define([
 
         this.formatLabel = function(name, ontologyProperty, inverseOntologyProperty){
             if (self.graphIsSemantic) {
-                return name + ' (' + self.makeFriendly(ontologyProperty) + '/' + self.makeFriendly(inverseOntologyProperty) + ')';
+                return name + ' (' + ontologyUtils.makeFriendly(ontologyProperty) + '/' + ontologyUtils.makeFriendly(inverseOntologyProperty) + ')';
             }
             else {
                 return name;
             }
-        };
-
-        this.makeFriendly = function(item) {
-            var parts = item.split("/");
-            return parts[parts.length-1];
         };
 
         this.getSelect2ConfigForOntologyProperties = function(value, domain, range) {
@@ -340,8 +337,8 @@ define([
                 id: function(item) {
                     return item;
                 },
-                formatResult: this.makeFriendly,
-                formatSelection: this.makeFriendly,
+                formatResult: ontologyUtils.makeFriendly,
+                formatSelection: ontologyUtils.makeFriendly,
                 initSelection: function(el, callback) {
                     callback(value());
                 }

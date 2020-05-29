@@ -812,7 +812,6 @@ class ResourceReportView(MapBaseManagerView):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class RelatedResourcesView(BaseManagerView):
     action = None
-    # alksjdflkasjdf
 
     def paginate_related_resources(self, related_resources, page, request):
         total = related_resources["total"]["value"]

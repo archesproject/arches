@@ -3,8 +3,9 @@ define([
     'underscore',
     'view-data',
     'arches',
+    'utils/ontology',
     'views/components/widgets/resource-instance-select'
-], function(ko, _, data, arches) {
+], function(ko, _, data, arches, ontolgyUtils) {
     var name = 'resource-instance-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {
@@ -104,18 +105,9 @@ define([
                     }
                 });
 
-
-                this.makeFriendly = function(item) {
-                    if (!!item) {
-                        var parts = item.split("/");
-                        return parts[parts.length-1];
-                    }
-                    return '';
-                };
-
                 this.formatLabel = function(name, ontologyProperty, inverseOntologyProperty){
                     if (self.graphIsSemantic) {
-                        return name + ' (' + self.makeFriendly(ontologyProperty) + '/' + self.makeFriendly(inverseOntologyProperty) + ')';
+                        return name + ' (' + ontolgyUtils.makeFriendly(ontologyProperty) + '/' + ontolgyUtils.makeFriendly(inverseOntologyProperty) + ')';
                     }
                     else {
                         return name;
@@ -152,8 +144,8 @@ define([
                         id: function(item) {
                             return item;
                         },
-                        formatResult: this.makeFriendly,
-                        formatSelection: this.makeFriendly,
+                        formatResult: ontolgyUtils.makeFriendly,
+                        formatSelection: ontolgyUtils.makeFriendly,
                         initSelection: function(el, callback) {
                             callback(value());
                         }
