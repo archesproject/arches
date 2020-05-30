@@ -44,7 +44,7 @@ define([
                 this.selectedOntologyClass = ko.observable();
                 this.resourceRelationships = ko.observableArray();
                 this.paginator = koMapping.fromJS({});
-                this.relationshipsInFilter = ko.computed(function(relationship) {
+                this.relationshipsInFilter = ko.computed(function() {
                     return self.resourceRelationships().filter(function(relationship) {
                         return self.filter().toLowerCase() === '' || relationship.resource.displayname.toLowerCase().includes(self.filter().toLowerCase());
                     });

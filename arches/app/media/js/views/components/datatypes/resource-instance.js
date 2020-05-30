@@ -21,6 +21,7 @@ define([
                 };
             }));
             if (!this.search) {
+                this.makeFriendly = ontolgyUtils.makeFriendly;
                 this.isEditable = true;
                 this.graphIsSemantic = !!params.graph.get('ontology_id');
                 if (params.graph) {
@@ -33,14 +34,23 @@ define([
                 }
                 this.node = params;
                 this.config = params.config;
-                this.selectedResourceType = ko.observable('');
-                this.selectedResourceType.subscribe(function(resourceType) {
+                this.selectedResourceModel = ko.observable('');
+                this.selectedResourceModel.subscribe(function(resourceType) {
                     if (resourceType.length > 0) {
                         resourceType = resourceType.concat(self.config.graphs());
                         self.config.graphs(resourceType);
-                        self.selectedResourceType([]);
+                        self.selectedResourceModel([]);
                     }
                 });
+
+                this.selectedResourceType = ko.observable(null);
+                this.toggleSelectedResource = function (resourceRelationship) {
+                    if (self.selectedResourceType() === resourceRelationship) {
+                        self.selectedResourceType(null);
+                    } else {
+                        self.selectedResourceType(resourceRelationship);
+                    }
+                };
 
                 var preventSetup = false;
                 var setupConfig = function(graph) {
@@ -53,13 +63,6 @@ define([
                     Object.defineProperty(graph, 'name', {
                         value: model.name
                     });
-                    // use this so that graph.editing won't get saved back to the node config
-                    Object.defineProperty(graph, 'editing', {
-                        value: ko.observable(false),
-                        enumerable: false,
-                        writable: true
-                    });
-
                     window.fetch(arches.urls.graph_nodes(graph.graphid))
                         .then(function(response){
                             if(response.ok) {

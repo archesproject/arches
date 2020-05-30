@@ -23,17 +23,27 @@ define([
         this.selectedResourceRelationship = ko.observable(null);
         this.showReport = ko.observable(false);
         this.filter = ko.observable('');
-        this.relationshipInFilter = function(relationship) {
-            if (self.filter().toLowerCase() === '' || relationship.resourceName().toLowerCase().includes(self.filter().toLowerCase())){
-                return true;
+        this.relationshipsInFilter = ko.computed(function() {
+            if(!self.value()) {
+                return [];
             }
-            return false;
-        };
+            return self.value().filter(function(relationship) {
+                return self.filter().toLowerCase() === '' || relationship.resourceName().toLowerCase().includes(self.filter().toLowerCase());
+            });
+        });
         this.reportResourceId = ko.observable(null);
         this.reportGraphId = ko.observable(null);
         this.initReport = function(resourceId, graphId){
             this.reportResourceId(resourceId);
             this.showReport(true);
+        };
+
+        this.toggleSelectedResourceRelationship = function(resourceRelationship) {
+            if (self.selectedResourceRelationship() === resourceRelationship) {
+                self.selectedResourceRelationship(null);
+            } else {
+                self.selectedResourceRelationship(resourceRelationship);
+            }
         };
 
         WidgetViewModel.apply(this, [params]);

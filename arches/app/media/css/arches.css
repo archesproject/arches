@@ -7758,11 +7758,16 @@ a.mega-dropdown-toggle.disabled {
 .rr-table-column {
     padding-top: 8px;
     padding-left: 10px;
-    border-left: solid 1px #e0e0e0
+    border-left: solid 1px #e0e0e0;
 }
 
 .rr-table-column:last-child {
     border-right: solid 1px #e0e0e0
+}
+
+.rr-table-column button {
+    padding: 0px;
+    color: #5f5f5f;
 }
 
 .unselectable {
