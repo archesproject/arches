@@ -9750,7 +9750,8 @@ ul.pagination {
 
 .time-wheel-wrap .chart {
     position: relative;
-    margin-top: 55px;
+    margin-top: 60px;
+    margin-left: 0px;
 }
 
 .time-wheel-wrap .chart path {
@@ -10137,10 +10138,13 @@ table.table.dataTable {
     min-width: 150px;
     border-color: #BBD1EA;
     border-top: none;
-    border-bottom: none;
+    border-right: 1px solid;
     background: #F7F9FB;
     z-index: 1000;
     margin-left: -5px;
+    border-width: 1px;
+    border-bottom: none;
+    border-right: 1px solid #BBD1EA;
 }
 
 .term-search-btn {
@@ -10240,6 +10244,7 @@ table.table.dataTable {
     border-bottom: none;
     border-right: none;
     background: #F7F9FB;
+    border-width: 1px;
     z-index: 1000;
 }
 
