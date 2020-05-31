@@ -6153,6 +6153,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     padding: 15px 25px;
 }
 
+.edit-message-container.provisional-editor {
+    /* margin-right: -42px; */
+}
+
 .workbench-card-sidepanel.expanded .edit-message-container {
     z-index: 5000;
     width: 600px;
@@ -6171,6 +6175,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 
 .edit-message-container.approved {
+    margin-right: -40px;
     background: #C8F89A;
     border-bottom: 1px solid #9CEC4F;
     border-top: 1px solid #9CEC4F;
@@ -11220,6 +11225,10 @@ a.filter-tools:hover {
     margin-left: -13px;
     margin-right: -20px;
     margin-top: -10px;
+}
+
+.msm-map-container  .control-label {
+    display: none;
 }
 
 .msm-map-container .widget-wrapper .mapboxgl-map {
