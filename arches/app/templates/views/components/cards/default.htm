@@ -223,7 +223,7 @@
 <div class="card-component" data-bind="css: card.model.cssclass">
 
     <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
-    <div class="edit-message-container">
+    <div class="edit-message-container provisional-editor">
         <span>{% trans 'Showing edits by' %}</span>
         <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
         <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->

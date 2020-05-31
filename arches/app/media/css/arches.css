@@ -6147,10 +6147,14 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     font-weight: 700;
     border-bottom: 1px solid #FFB700;
     height: 50px;
-    margin-top: -25px;
-    margin-left: -35px;
-    margin-right: -35px;
+    margin-top: -15px;
+    margin-left: -25px;
+    margin-right: -25px;
     padding: 15px 25px;
+}
+
+.edit-message-container.provisional-editor {
+    /* margin-right: -42px; */
 }
 
 .workbench-card-sidepanel.expanded .edit-message-container {
@@ -6171,6 +6175,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 
 .edit-message-container.approved {
+    margin-right: -40px;
     background: #C8F89A;
     border-bottom: 1px solid #9CEC4F;
     border-top: 1px solid #9CEC4F;
@@ -9393,7 +9398,7 @@ a.search-query-link-captions:focus {
 
 .search-candidate-title, .search-candidate-link {
     color: steelblue;
-    padding-right: 8px;
+    padding-right: 7px;
 }
 
 .search-control-container.slide {
@@ -9750,7 +9755,8 @@ ul.pagination {
 
 .time-wheel-wrap .chart {
     position: relative;
-    margin-top: 55px;
+    margin-top: 60px;
+    margin-left: 0px;
 }
 
 .time-wheel-wrap .chart path {
@@ -10137,10 +10143,13 @@ table.table.dataTable {
     min-width: 150px;
     border-color: #BBD1EA;
     border-top: none;
-    border-bottom: none;
+    border-right: 1px solid;
     background: #F7F9FB;
     z-index: 1000;
     margin-left: -5px;
+    border-width: 1px;
+    border-bottom: none;
+    border-right: 1px solid #BBD1EA;
 }
 
 .term-search-btn {
@@ -10240,6 +10249,7 @@ table.table.dataTable {
     border-bottom: none;
     border-right: none;
     background: #F7F9FB;
+    border-width: 1px;
     z-index: 1000;
 }
 
@@ -11215,6 +11225,10 @@ a.filter-tools:hover {
     margin-left: -13px;
     margin-right: -20px;
     margin-top: -10px;
+}
+
+.msm-map-container  .control-label {
+    display: none;
 }
 
 .msm-map-container .widget-wrapper .mapboxgl-map {
