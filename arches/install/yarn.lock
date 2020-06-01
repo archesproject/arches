@@ -2150,10 +2150,10 @@ normalize-url@2.0.1:
     query-string "^5.0.1"
     sort-keys "^2.0.0"
 
-nouislider@11.0.3:
-  version "11.0.3"
-  resolved "https://registry.yarnpkg.com/nouislider/-/nouislider-11.0.3.tgz#a45a31bb7846bbced498afa514a513da197d22b2"
-  integrity sha512-EmL3FHQ1vZ7wofzeLRqGZc7Lt4HpHezwfi2ODz8H2qcvltdIb4yqSo0trFN3Uk08YN7sPSQVETtH4Dg+k8xOBA==
+nouislider@14.5.0:
+  version "14.5.0"
+  resolved "https://registry.yarnpkg.com/nouislider/-/nouislider-14.5.0.tgz#36f9c30be39ff687deda42fd98ec36a5bfc45221"
+  integrity sha512-EzI2Y0pO+x20c8yHLvhmT9HXexkbncXHKcnNb6abN48a3F8QEGb73v2W6aPolQytoyjCalUrozSeHBTlpz2jfg==
 
 numeral@^2.0.6:
   version "2.0.6"
