@@ -42,6 +42,8 @@ define([
                 this.relationshipCandidateIds = ko.observable([]);
                 this.useSemanticRelationships = arches.useSemanticRelationships;
                 this.selectedOntologyClass = ko.observable();
+                this.reportResourceId = ko.observable();
+                this.reportGraphId = ko.observable(null);
                 this.resourceRelationships = ko.observableArray();
                 this.paginator = koMapping.fromJS({});
                 this.relationshipsInFilter = ko.computed(function() {
@@ -49,6 +51,7 @@ define([
                         return self.filter().toLowerCase() === '' || relationship.resource.displayname.toLowerCase().includes(self.filter().toLowerCase());
                     });
                 });
+
 
                 this.toggleSelectedResourceRelationship = function(resourceRelationship) {
                     if (self.selectedResourceRelationship() === resourceRelationship) {
@@ -71,6 +74,8 @@ define([
                         return false;
                     }
                 };
+
+
 
 
                 this.selectedOntologyClass.subscribe(function() {
@@ -461,9 +466,14 @@ define([
                 };
             },
 
-            deleteRelationships: function() {
+            deleteRelationships: function(relationship) {
+                var resourcexids;
                 var resource = this.currentResource();
-                var resourcexids = _.pluck(this.selected(), 'resourcexid');
+                if(!!relationship){
+                    resourcexids = [relationship.resourcexid];
+                }else{
+                    resourcexids = _.pluck(this.selected(), 'resourcexid');
+                }
                 resource.delete(resourcexids);
             },
 

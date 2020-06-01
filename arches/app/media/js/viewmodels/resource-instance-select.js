@@ -21,7 +21,8 @@ define([
         this.useSemanticRelationships = arches.useSemanticRelationships;
         this.resourceReportUrl = arches.urls.resource_report;
         this.selectedResourceRelationship = ko.observable(null);
-        this.showReport = ko.observable(false);
+        this.reportResourceId = ko.observable();
+        this.reportGraphId = ko.observable(null);
         this.filter = ko.observable('');
         this.relationshipsInFilter = ko.computed(function() {
             if(!self.value()) {
@@ -31,12 +32,7 @@ define([
                 return self.filter().toLowerCase() === '' || relationship.resourceName().toLowerCase().includes(self.filter().toLowerCase());
             });
         });
-        this.reportResourceId = ko.observable(null);
-        this.reportGraphId = ko.observable(null);
-        this.initReport = function(resourceId, graphId){
-            this.reportResourceId(resourceId);
-            this.showReport(true);
-        };
+ 
 
         this.toggleSelectedResourceRelationship = function(resourceRelationship) {
             if (self.selectedResourceRelationship() === resourceRelationship) {
