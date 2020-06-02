@@ -289,11 +289,8 @@ class GraphDataView(View):
         else:
             if self.action == "get_related_nodes":
                 parent_nodeid = request.GET.get("parent_nodeid", None)
-                key = f"valid_ontology_classes_nodeid_{nodeid}_parent_nodeid_{parent_nodeid}"
-                ret = cache.get(key)
-                if ret is None:
-                    graph = Graph.objects.get(graphid=graphid)
-                    ret = graph.get_valid_ontology_classes(nodeid=nodeid, parent_nodeid=parent_nodeid)
+                graph = Graph.objects.get(graphid=graphid)
+                ret = graph.get_valid_ontology_classes(nodeid=nodeid, parent_nodeid=parent_nodeid)
             elif self.action == "get_valid_domain_nodes":
                 graph = Graph.objects.get(graphid=graphid)
                 if nodeid == "":
