@@ -966,33 +966,33 @@ class Tile(APIBase):
         nodeid = request.POST.get("nodeid")
         data = request.POST.get("data")
         resourceid = request.POST.get("resourceinstanceid", None)
-        
-        #get node model return error if not found
+
+        # get node model return error if not found
         try:
             node = models.Node.objects.get(nodeid=nodeid)
         except Exception as e:
             return JSONResponse(e)
-        
-        #check if user has permissions to write to node
+
+        # check if user has permissions to write to node
         user_has_perms = request.user.has_perm("write_nodegroup", node)
-        
+
         if user_has_perms:
-            #get datatype of node
+            # get datatype of node
             try:
                 datatype = datatype_factory.get_instance(node.datatype)
             except Exception as e:
                 return JSONResponse(e)
-    
-            #filter datatype 
+
+            # filter datatype
             data = datatype.process_api_data(data)
-            
-            #update/create tile
+
+            # update/create tile
             new_tile = tile_model.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid)
-    
+
             response = JSONResponse(new_tile)
         else:
             response = JSONResponse("User does not have permission to edit this node.")
-            
+
         return response
 
 
@@ -1000,10 +1000,10 @@ class Tile(APIBase):
 class Node(APIBase):
     def get(self, request):
         user = request.user
-        perms = 'models.' + request.GET.get('perms', 'read_nodegroup')
-        
-        #parse node attributes from params
-        datatype=request.GET.get('datatype')
+        perms = "models." + request.GET.get("perms", "read_nodegroup")
+
+        # parse node attributes from params
+        datatype = request.GET.get("datatype")
         # description=request.GET.get('description')
         # exportable=request.GET.get('exportable')
         # fieldname=request.GET.get('fieldname')
@@ -1017,27 +1017,28 @@ class Node(APIBase):
         # nodeid=request.GET.get('nodeid')
         # ontologyclass=request.GET.get('ontologyclass')
         # sortorder=request.GET.get('sortorder')
-        
-        #try to get nodes by attribute filter and then get nodes by passed in user perms
+
+        # try to get nodes by attribute filter and then get nodes by passed in user perms
         try:
             nodes = models.Node.objects.filter(datatype=datatype).values()
             permitted_nodegroups = [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(user, perms)]
         except Exception as e:
             return JSONResponse(str(e), status=404)
-        
-        #check if any nodes were returned from attribute filter and throw error if none were returned
+
+        # check if any nodes were returned from attribute filter and throw error if none were returned
         if len(nodes) == 0:
-            return JSONResponse(_('No nodes matching query parameters found.'), status=404)
-        
-        #filter nodes from attribute query based on user permissions
-        permitted_nodes = [node for node in nodes if str(node['nodegroup_id']) in permitted_nodegroups]
+            return JSONResponse(_("No nodes matching query parameters found."), status=404)
+
+        # filter nodes from attribute query based on user permissions
+        permitted_nodes = [node for node in nodes if str(node["nodegroup_id"]) in permitted_nodegroups]
         for node in permitted_nodes:
             try:
-                node['resourcemodelname'] = Graph.objects.get(pk=node['graph_id']).name
+                node["resourcemodelname"] = Graph.objects.get(pk=node["graph_id"]).name
             except:
-                return JSONResponse(_('No graph found for graphid %s' % (node['graph_id'])), status=404)
-        
+                return JSONResponse(_("No graph found for graphid %s" % (node["graph_id"])), status=404)
+
         return JSONResponse(permitted_nodes, status=200)
+
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Instance_Permission(APIBase):
@@ -1045,5 +1046,5 @@ class Instance_Permission(APIBase):
         user = request.user
         perms = request.GET.get("perms")
         resourceinstanceid = request.GET.get("resourceinstanceid")
-        
+
         return JSONResponse(check_resource_instance_permissions(user, resourceinstanceid, perms))
