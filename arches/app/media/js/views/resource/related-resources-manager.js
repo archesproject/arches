@@ -67,6 +67,14 @@ define([
                     }
                 });
 
+                this.selectedOntologyClass.subscribe(function() {
+                    if (!!self.useSemanticRelationships) {
+                        self.relationshipTypes(self.validproperties[self.selectedOntologyClass()]);
+                    } else {
+                        self.relationshipTypes(options.relationship_types.values);
+                    }
+                });
+
                 this.fdgNodeListView = new RelatedResourcesNodeList({
                     items: self.graphNodeList
                 });
@@ -80,14 +88,6 @@ define([
                         return false;
                     }
                 };
-
-                this.selectedOntologyClass.subscribe(function() {
-                    if (self.selectedOntologyClass() && self.validproperties[self.selectedOntologyClass()] !== undefined) {
-                        self.relationshipTypes(self.validproperties[self.selectedOntologyClass()]);
-                    } else {
-                        self.relationshipTypes(options.relationship_types.values);
-                    }
-                });
 
                 this.showGraph.subscribe(function(val) {
                     this.graphNodeList([]);
