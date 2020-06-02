@@ -538,10 +538,13 @@ class JsonLdReader(Reader):
                 # We know now that it can go into the branch
                 # Determine if we can collapse the data into a -list or not
                 bnodeid = branch[0]["node_id"]
+
+                # This is going to be the result passed down if we recurse
                 bnode = {"data": [], "nodegroup_id": branch[0]["nodegroup_id"], "cardinality": branch[0]["cardinality"]}
 
                 if bnodeid == branch[0]["nodegroup_id"]:
-                    # parenttile_id = tile.tileid if tile else None
+                    # 2020-06-02 azaroth42 removed: parenttile_id = tile.tileid if tile else None
+                    # Used to pick the previous tile in loop which MIGHT be the parent (but might not)
                     parenttile_id = result['tile'].tileid if 'tile' in result else None
                     tile = Tile(
                         tileid=uuid.uuid4(),
