@@ -545,7 +545,7 @@ class JsonLdReader(Reader):
                 if bnodeid == branch[0]["nodegroup_id"]:
                     # 2020-06-02 azaroth42 removed: parenttile_id = tile.tileid if tile else None
                     # Used to pick the previous tile in loop which MIGHT be the parent (but might not)
-                    parenttile_id = result['tile'].tileid if 'tile' in result else None
+                    parenttile_id = result["tile"].tileid if "tile" in result else None
                     tile = Tile(
                         tileid=uuid.uuid4(),
                         resourceinstance_id=self.resource.pk,
