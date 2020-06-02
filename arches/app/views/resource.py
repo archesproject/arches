@@ -900,8 +900,8 @@ class RelatedResourcesView(BaseManagerView):
         se = SearchEngineFactory().create()
         res = dict(request.POST)
         relationship_type = res["relationship_properties[relationship_type]"][0]
-        datefrom = res["relationship_properties[datefrom]"][0]
-        dateto = res["relationship_properties[dateto]"][0]
+        datefrom = res["relationship_properties[datestarted]"][0]
+        dateto = res["relationship_properties[dateended]"][0]
         dateto = None if dateto == "" else dateto
         datefrom = None if datefrom == "" else datefrom
         notes = res["relationship_properties[notes]"][0]

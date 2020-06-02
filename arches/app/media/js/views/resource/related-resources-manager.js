@@ -17,7 +17,6 @@ define([
         viewModel: Backbone.View.extend({
             initialize: function(options) {
                 var self = this;
-                this.propertiesDialogOpen = ko.observable(false);
                 this.searchResults = options.searchResultsVm;
                 this.editingInstanceId = options.editing_instance_id;
                 this.graph = options.graph;
@@ -159,6 +158,13 @@ define([
                     return res;
                 });
 
+                this.dirty = ko.computed(function() {
+                    return self.resourceRelationships().some(function(rr) {
+                        return rr.dirty();
+                    }, self);
+                });
+                
+
                 this.newPage = function(page, e) {
                     if (page) {
                         this.currentResource().get(page);
@@ -181,6 +187,15 @@ define([
                                     if (_.contains([relationship.resourceinstanceidto, relationship.resourceinstanceidfrom], resource.resourceinstanceid)) {
                                         return resource;
                                     }
+                                });
+                                relationship = koMapping.fromJS(relationship);
+                                relationship.reset = function() {
+                                    console.log(JSON.parse(this._json()));
+                                    koMapping.fromJS(JSON.parse(this._json()), relationship);
+                                };
+                                relationship._json = ko.observable(JSON.stringify(koMapping.toJS(relationship)));
+                                relationship.dirty = ko.computed(function() {
+                                    return JSON.stringify(koMapping.toJS(relationship)) !== relationship._json();
                                 });
                                 relationship.selected = ko.observable(false);
                                 relationship.unselectable = ko.observable(false);
@@ -307,8 +322,8 @@ define([
 
                     this.relationshipTypePlaceholder = ko.observable('Select a Relationship Type');
                     this.relatedProperties = koMapping.fromJS({
-                        datefrom: '',
-                        dateto: '',
+                        datestarted: '',
+                        dateended: '',
                         relationship_type: undefined,
                         notes: ''
                     });
@@ -353,25 +368,14 @@ define([
                     }
                 };
 
-                this.propertiesDialogOpen.subscribe(function(val) {
-                    if (val === true) {
-                        setTimeout(this.resize, 1000);
-                    } else {
-                        this.relatedProperties.notes('');
-                        this.relatedProperties.dateto('');
-                        this.relatedProperties.datefrom('');
-                        this.relatedProperties.relationship_type(this.defaultRelationshipType);
-                    }
-                }, this);
-
                 var url = ko.observable(arches.urls.search_results);
                 this.url = url;
                 this.select2Config = {
                     placeholder: 'Search for resources',
                     value: this.relationshipCandidateIds,
                     clickBubble: true,
-                    multiple: true,
-                    closeOnSelect: false,
+                    multiple: false,
+                    closeOnSelect: true,
                     allowClear: true,
                     disabled: this.disabled,
                     ajax: {
@@ -431,7 +435,7 @@ define([
                         }).done(function(data) {
                             self.relationshipCandidates(data);
                             self.saveRelationships();
-                            self.relationshipCandidateIds(undefined);
+                            self.relationshipCandidateIds(null);
                         });
                     },
                     id: function(item) {
@@ -477,6 +481,11 @@ define([
                 resource.delete(resourcexids);
             },
 
+            saveRelationship: function(relationship) {
+                var resource = this.currentResource();
+                resource.save([], koMapping.toJS(relationship), [relationship.resourcexid()]);
+            },
+
             saveRelationships: function() {
                 var candidateIds = _.pluck(this.relationshipCandidates(), 'resourceinstanceid');
                 var selectedResourceXids = _.pluck(this.selected(), 'resourcexid');
@@ -493,7 +502,6 @@ define([
                     if (candidateIds.length > 0) {
                         this.relationshipCandidates.removeAll();
                     }
-                    this.propertiesDialogOpen(false);
                 }
                 this.relatedProperties.relationship_type(undefined);
             },

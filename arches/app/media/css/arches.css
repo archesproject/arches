@@ -7643,7 +7643,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .relation-properties-button {
-    padding-left: 5px
+    padding-left: 5px;
 }
 
 .related-resources-title-container {
@@ -7699,7 +7699,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .shim {
-    margin-top: -25px;
+     margin-top: -25px;
 }
 
 .resource-relation-description {

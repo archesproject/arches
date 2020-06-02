@@ -53,130 +53,16 @@
         <!--ko if: resourceRelationships().length > 0-->
         <div class="related-resources-header" data-bind="css: {'open-graph': showGraph() == true}, style: {height: resourceEditorContext === true ? '55px' : '40px'}">
             <div class="editor-elements">
-                <!--ko if: resourceEditorContext -->
-                <!--ko if: !showGraph() -->
-                <div class="">
-                    <div class="col-xs-12">
-                        <input style="width:300px; display:inline-block;" data-bind="
-                            select2Query: {
-                                select2Config: select2Config
-                            }
-                        ">
-                    </div>
-                    <!-- <button class="btn btn-mint btn-labeled fa fa-plus" style="margin-left: 20px;" data-bind="click: function(){relateResources()}, text: '{% trans 'Add' %}', css: {'disabled': relationshipCandidateIds() === undefined || relationshipCandidateIds().length === 0}"></button> -->
+                <!--ko if: resourceEditorContext && !showGraph() -->
+                <div style="min-width: 300px;">
+                    <input style="display:inline-block;" data-bind="
+                        select2Query: {
+                            select2Config: select2Config
+                        }
+                    ">
                 </div>
                 <!--/ko-->
-                <!--/ko-->
 
-                <div class="related-resource-management">
-                    <!--ko if: resourceEditorContext -->
-                    <button class="btn btn-mint btn-labeled fa fa-code-fork related-resources-delete" data-bind="click: function(){deleteRelationships()}, visible: selected().length > 0">{% trans "Delete Selected" %}</button>
-                    <div class="related-resources-relationship">
-                        <div class="mega-dropdown related-resources-crud-link" data-bind="visible: showGraph() == false">
-
-                            <!--ko if: !showGraph() -->
-
-                            <a href="#" class="mega-dropdown-toggle" data-bind="css: {'disabled':selected().length === 0}, click: function(){propertiesDialogOpen(!propertiesDialogOpen());}">
-                                <i class="ion-wrench icon-lg"></i> {% trans "relation properties" %}
-                            </a>
-
-                            <div id="rr-properties-id" class="dropdown-menu mega-dropdown-menu dropdown-shim dropdown-crud" style="padding-left: 15px;" data-bind="css: {'display-related-resource-properties': propertiesDialogOpen()}">
-                                <div class="clearfix">
-                                    <div class="settings-config-panel relative">
-
-                                        <div class="related-resources-title-container">
-                                            <h3 class="search-title">{% trans "Relationship details" %}</h3>
-                                            <div class="relation-properties-buttons">
-                                                <div class="relation-properties-button">
-                                                    <button class="btn btn-mint" data-bind="click: function(){saveRelationships()}, visible: selected().length > 0">{% trans "Save" %}</button>
-                                                </div>
-                                                <div class="relation-properties-button">
-                                                    <button type="button" class="btn btn-default" data-bind="click: function(){propertiesDialogOpen(false)}">{% trans "Close" %}</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- Relationship participants -->
-
-                                        <div class="resource-relation-description">
-                                            <div class="target-resource">
-                                                <i data-bind="css: graph.iconclass"></i><span class="relation-properties-model-name" data-bind="text: graph.name"></span><span class="resource-conjunction"> {% trans "relationship with" %}</span>
-                                            </div>
-                                            <div class="selected-resource-list relative" data-bind="foreach: {data: selected, as: 'item'}">
-                                                <div class="selected-resource">
-                                                    <i data-bind='css: item.iconclass'></i><span data-bind='text: " " + item.resource.displayname'></span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="settings-crud-panel">
-                                            <div class="col-xs-12">
-                                                <form class="widgets">
-                                                    <div class="row widget-container">
-                                                        <div class="form-group">
-                                                            <div class="row widget-wrapper">
-                                                                <div class="form-group">
-                                                                    <label class="col-xs-12 control-label widget-input-label" for="">{% trans "Relationship" %} <i class="ion-ios-checkmark-outline"></i></label>
-                                                                    <div class="col-xs-12">
-                                                                        <input style="width:30%; display:inline-block;" data-bind="select2: {
-                                                                        select2Config: {
-                                                                            clickBubble: true,
-                                                                            data: relationshipTypes,
-                                                                            value: relatedProperties.relationship_type,
-                                                                            multiple: false,
-                                                                            placeholder: relationshipTypePlaceholder
-                                                                        }
-                                                                    }">
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                        </div>
-                                                    </div>
-
-                                                    <!--ko if: self.useSemanticRelationships === false -->
-                                                    <div class="row widget-container shim">
-                                                        <div class="form-group">
-                                                            <div class="relative">
-                                                                <label class="col-xs-6 control-label widget-input-label" for=""> {% trans "From Date" %} <i class="ion-ios-checkmark-outline"></i>
-                                                            </label>
-                                                                <label class="col-xs-6 control-label widget-input-label" for=""> {% trans "To Date" %} <i class="ion-ios-checkmark-outline"></i>
-                                                            </label>
-                                                            </div>
-
-                                                            <div class="relative">
-                                                                <div class="col-xs-6">
-                                                                    <input type="text" class="form-control input-lg widget-input" placeholder="date from" data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: relatedProperties.datefrom">
-                                                                </div>
-                                                                <div class="col-xs-6">
-                                                                    <input type="text" class="form-control input-lg widget-input" placeholder="date to" data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: relatedProperties.dateto">
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row widget-container">
-                                                        <div class="form-group">
-                                                            <div class="relative">
-                                                                <label class="col-xs-12 control-label widget-input-label" for="">{% trans "Description" %} <i class="ion-ios-checkmark-outline"></i></label>
-                                                            </div>
-
-                                                            <div class="col-xs-12">
-                                                                <input type="text" id="editor1" class="form-control input-lg widget-input" data-bind="textInput: relatedProperties.notes">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <!--/ko-->
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!--/ko-->
-                        </div>
-                    </div>
-                    <!-- /ko -->
-                </div>
             </div>
             <div class="btn-group rr-display-toggle" data-bind="css: {'open-graph': showGraph() == true}">
                 <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="grid" data-bind="click: function () { showGraph(false); }, css: {'selected': !showGraph()}"><i class="ion-grid"></i></button>
@@ -195,13 +81,19 @@
                 <span style="padding: 4px;" data-bind="if: !!resourceRelationships() && resourceRelationships().hasOwnProperty('length') && resourceRelationships().length > 1">
                     <span style="font-size: 14px;"" class='file-workbench-filecount' data-bind='text: resourceRelationships().length + "{% trans ' resource relations' %}"'></span>
                 </span>
+                <!--ko if: self.dirty -->
+                <!-- <div class="relation-properties-button">
+                    <button class="btn btn-mint"
+                        data-bind="click: function(){saveRelationship()}">{% trans "Save" %}</button>
+                </div> -->
+                <!--/ko-->
             </div>
-            <div data-bind='foreach: relationshipsInFilter' style="display: flex; flex-direction: column;">
+            <div data-bind="foreach:{ data: relationshipsInFilter, as: 'relationship'}" style="display: flex; flex-direction: column;">
                 <div class='rr-table-row'>
                     <div style="display: flex; flex-direction: row; height: 40px;border-top: none; border-bottom: none;">
                         <div class='rr-table-column' style="width: 35px;">
                             <button data-bind="click: self.toggleSelectedResourceRelationship, clickBubble: false">
-                                <i data-bind="class: !!tileid ? 'fa fa-random' : 'fa fa-usb' "></i>
+                                <i data-bind="class: !!relationship.tileid() ? 'fa fa-random' : 'fa fa-usb' "></i>
                             </button>
                         </div>                        
                         <div class='rr-table-column' style="width: 35px;">
@@ -217,12 +109,18 @@
                         <div class="rr-table-column" style="flex-grow: 1;">
                             <div data-bind="text: resource.displayname"></div>
                         </div>
+                        <!-- <div class="rr-table-column" style="padding-right: 10px; border-left: none;">
+                            <div class="relation-properties-button">
+                                <button class="btn btn-mint"
+                                    data-bind="click:self.saveRelationship.bind(self), visible: relationship.dirty">{% trans "Save" %}</button>
+                            </div>
+                        </div> -->
                     </div>
-                    <div style="border-bottom: none; padding: 10px;" data-bind="visible: self.selectedResourceRelationship() === $data, css: { 'rr-table-border': self.selectedResourceRelationship() === $data} ">
-                        <div data-bind="if: !!tileid">
+                    <div style="border-bottom: none; padding: 10px;" data-bind="visible: self.selectedResourceRelationship() === relationship, css: { 'rr-table-border': self.selectedResourceRelationship() === relationship} ">
+                        <div data-bind="if: !!relationship.tileid()">
                             <div>{% trans "This is a Node to Resource Instance relationship" %}</div>
                             <div class="row">
-                                <span class="col-sm-4" style="padding-top: 8px; text-align: right;" data-bind="text: resource.displayname + ' (' + self.makeFriendly($data.resource.root_ontology_class) + ')'"></span>
+                                <span class="col-sm-4" style="padding-top: 8px; text-align: right;" data-bind="text: relationship.resource.displayname + ' (' + self.makeFriendly($data.resource.root_ontology_class) + ')'"></span>
                                 <span class="col-sm-4">
                                     <!-- <input style="width:30%; display:inline-block;" data-bind="
                                         select2Query: {
@@ -236,75 +134,77 @@
                                 {% trans "Done" %}
                             </button>
                         </div>
-                        <div data-bind="ifnot: !!tileid">
-                            <div>{% trans "This is a Resource Instance to Resource Instance relationship" %}</div>
-                            <div class="settings-crud-panel">
-                                <div class="col-xs-12">
-                                    <form class="widgets">
-                                        <div class="row widget-container">
-                                            <div class="form-group">
-                                                <div class="row widget-wrapper">
-                                                    <div class="form-group">
-                                                        <label class="col-xs-12 control-label widget-input-label" for="">{% trans "Relationship" %}
-                                                            <i class="ion-ios-checkmark-outline"></i></label>
-                                                        <div class="col-xs-12">
-                                                            <input style="width:30%; display:inline-block;" data-bind="select2: {
-                                                                                                    select2Config: {
-                                                                                                        clickBubble: true,
-                                                                                                        data: self.relationshipTypes,
-                                                                                                        value: self.relatedProperties.relationship_type,
-                                                                                                        multiple: false,
-                                                                                                        placeholder: self.relationshipTypePlaceholder
-                                                                                                    }
-                                                                                                }">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                            
+                        <div data-bind="ifnot: !!relationship.tileid()">
+                            <div class="col-xs-12">
+                                <div>{% trans "This is a Resource Instance to Resource Instance relationship" %}</div>
+                                <form class="widgets">
+                                    <div class="row widget-container" style="padding-left: 0px;">
+                                        <div class="form-group">
+                                            <label class="col-xs-12 control-label widget-input-label" for="">{% trans "Relationship" %}
+                                                <i class="ion-ios-checkmark-outline"></i></label>
+                                            <div class="col-xs-12">
+                                                <input style="width:30%; display:inline-block;" data-bind="select2: {
+                                                        select2Config: {
+                                                            clickBubble: true,
+                                                            data: self.relationshipTypes,
+                                                            value: relationship.relationshiptype,
+                                                            multiple: false,
+                                                            placeholder: self.relationshipTypePlaceholder
+                                                        }
+                                                    }">
                                             </div>
                                         </div>
-                            
-                                        <!--ko if: self.useSemanticRelationships === false -->
-                                        <div class="row widget-container shim">
-                                            <div class="form-group">
-                                                <div class="relative">
-                                                    <label class="col-xs-6 control-label widget-input-label" for=""> {% trans "From Date" %} <i
-                                                            class="ion-ios-checkmark-outline"></i>
-                                                    </label>
-                                                    <label class="col-xs-6 control-label widget-input-label" for=""> {% trans "To Date" %} <i
-                                                            class="ion-ios-checkmark-outline"></i>
-                                                    </label>
+                                    </div>
+                        
+                                    <!--ko if: self.useSemanticRelationships === false -->
+                                    <div class="row widget-container" style="padding-left: 0px;">
+                                        <div class="form-group">
+                                            <div class="relative">
+                                                <label class="col-xs-6 control-label widget-input-label" for=""> {% trans "From Date" %} <i
+                                                        class="ion-ios-checkmark-outline"></i>
+                                                </label>
+                                                <label class="col-xs-6 control-label widget-input-label" for=""> {% trans "To Date" %} <i
+                                                        class="ion-ios-checkmark-outline"></i>
+                                                </label>
+                                            </div>
+                        
+                                            <div class="relative">
+                                                <div class="col-xs-6">
+                                                    <input type="text" class="form-control input-lg widget-input" placeholder="date from"
+                                                        data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: relationship.datestarted">
                                                 </div>
-                            
-                                                <div class="relative">
-                                                    <div class="col-xs-6">
-                                                        <input type="text" class="form-control input-lg widget-input" placeholder="date from"
-                                                            data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: self.relatedProperties.datefrom">
-                                                    </div>
-                                                    <div class="col-xs-6">
-                                                        <input type="text" class="form-control input-lg widget-input" placeholder="date to"
-                                                            data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: self.relatedProperties.dateto">
-                                                    </div>
+                                                <div class="col-xs-6">
+                                                    <input type="text" class="form-control input-lg widget-input" placeholder="date to"
+                                                        data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: relationship.dateended">
                                                 </div>
                                             </div>
                                         </div>
-                            
-                                        <div class="row widget-container">
-                                            <div class="form-group">
-                                                <div class="relative">
-                                                    <label class="col-xs-12 control-label widget-input-label" for="">{% trans "Description" %} <i
-                                                            class="ion-ios-checkmark-outline"></i></label>
-                                                </div>
-                            
-                                                <div class="col-xs-12">
-                                                    <input type="text" id="editor1" class="form-control input-lg widget-input"
-                                                        data-bind="textInput: self.relatedProperties.notes">
-                                                </div>
+                                    </div>
+                        
+                                    <div class="row widget-container" style="padding-left: 0px;">
+                                        <div class="form-group">
+                                            <div class="relative">
+                                                <label class="col-xs-12 control-label widget-input-label" for="">{% trans "Description" %} <i
+                                                        class="ion-ios-checkmark-outline"></i></label>
+                                            </div>
+                        
+                                            <div class="col-xs-12">
+                                                <input type="text" id="editor1" class="form-control input-lg widget-input"
+                                                    data-bind="textInput: relationship.notes">
                                             </div>
                                         </div>
-                                        <!--/ko-->
-                                    </form>
-                                </div>
+                                    </div>
+                                    <!--/ko-->
+
+                                    <div class="relation-properties-button">
+                                        <button class="btn btn-danger btn-labeled btn-lg fa fa-trash"
+                                            data-bind="click:self.deleteRelationships.bind(self)">{% trans "Delete this entry" %}</button>
+                                        <button class="btn btn-danger btn-labeled btn-lg fa fa-times"
+                                            data-bind="click:relationship.reset, visible: relationship.dirty">{% trans "Cancel Edit" %}</button>
+                                        <button class="btn btn-mint btn-labeled btn-lg fa fa-cloud"
+                                            data-bind="click:self.saveRelationship.bind(self), visible: relationship.dirty">{% trans "Save" %}</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -402,7 +302,6 @@
             <!--/ko-->
         </div>
 
-        <!-- Message -->
         <!--/ko-->
 
 
