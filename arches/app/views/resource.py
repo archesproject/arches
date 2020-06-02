@@ -899,7 +899,7 @@ class RelatedResourcesView(BaseManagerView):
         lang = request.GET.get("lang", settings.LANGUAGE_CODE)
         se = SearchEngineFactory().create()
         res = dict(request.POST)
-        relationship_type = res["relationship_properties[relationship_type]"][0]
+        relationshiptype = res["relationship_properties[relationshiptype]"][0]
         datefrom = res["relationship_properties[datestarted]"][0]
         dateto = res["relationship_properties[dateended]"][0]
         dateto = None if dateto == "" else dateto
@@ -938,7 +938,7 @@ class RelatedResourcesView(BaseManagerView):
                     resourceinstanceidfrom=Resource(root_resourceinstanceid[0]),
                     resourceinstanceidto=Resource(instanceid),
                     notes=notes,
-                    relationshiptype=relationship_type,
+                    relationshiptype=relationshiptype,
                     datestarted=datefrom,
                     dateended=dateto,
                 )
@@ -953,7 +953,7 @@ class RelatedResourcesView(BaseManagerView):
         for relationshipid in relationships_to_update:
             rr = models.ResourceXResource.objects.get(pk=relationshipid)
             rr.notes = notes
-            rr.relationshiptype = relationship_type
+            rr.relationshiptype = relationshiptype
             rr.datestarted = datefrom
             rr.dateended = dateto
             try:

@@ -51,7 +51,6 @@ define([
                     });
                 });
 
-
                 this.toggleSelectedResourceRelationship = function(resourceRelationship) {
                     if (self.selectedResourceRelationship() === resourceRelationship) {
                         self.selectedResourceRelationship(null);
@@ -59,6 +58,14 @@ define([
                         self.selectedResourceRelationship(resourceRelationship);
                     }
                 };
+
+                this.selectedResourceRelationship.subscribe(function(resourceRelationship) {
+                    if (!!resourceRelationship){
+                        self.selectedOntologyClass(resourceRelationship.resource.root_ontology_class);
+                    } else {
+                        self.selectedOntologyClass(undefined);
+                    }
+                });
 
                 this.fdgNodeListView = new RelatedResourcesNodeList({
                     items: self.graphNodeList
@@ -73,9 +80,6 @@ define([
                         return false;
                     }
                 };
-
-
-
 
                 this.selectedOntologyClass.subscribe(function() {
                     if (self.selectedOntologyClass() && self.validproperties[self.selectedOntologyClass()] !== undefined) {
@@ -246,8 +250,8 @@ define([
                         save: function(candidateIds, relationshipProperties, relationshipIds) {
                             this.defaultRelationshipType = options.relationship_types.default;
 
-                            if (!relationshipProperties.relationship_type) {
-                                relationshipProperties.relationship_type = options.relationship_types.default;
+                            if (!relationshipProperties.relationshiptype) {
+                                relationshipProperties.relationshiptype = options.relationship_types.default;
                             }
                             var payload = {
                                 relationship_properties: relationshipProperties,
@@ -324,7 +328,7 @@ define([
                     this.relatedProperties = koMapping.fromJS({
                         datestarted: '',
                         dateended: '',
-                        relationship_type: undefined,
+                        relationshiptype: undefined,
                         notes: ''
                     });
 
@@ -491,10 +495,10 @@ define([
                 var selectedResourceXids = _.pluck(this.selected(), 'resourcexid');
                 var resource = this.currentResource();
                 this.relationshipCandidates().forEach(function(rr) {
-                    if (!this.relatedProperties.relationship_type() && rr.ontologyclass && this.validproperties[rr.ontologyclass]) {
-                        this.relatedProperties.relationship_type(this.validproperties[rr.ontologyclass][0].id);
+                    if (!this.relatedProperties.relationshiptype() && rr.ontologyclass && this.validproperties[rr.ontologyclass]) {
+                        this.relatedProperties.relationshiptype(this.validproperties[rr.ontologyclass][0].id);
                     } else {
-                        this.relatedProperties.relationship_type(this.defaultRelationshipType);
+                        this.relatedProperties.relationshiptype(this.defaultRelationshipType);
                     }
                 }, this);
                 if (candidateIds.length > 0 || selectedResourceXids.length > 0) {
@@ -503,7 +507,7 @@ define([
                         this.relationshipCandidates.removeAll();
                     }
                 }
-                this.relatedProperties.relationship_type(undefined);
+                this.relatedProperties.relationshiptype(undefined);
             },
 
             getRelatedResources: function(resourceinstance) {
