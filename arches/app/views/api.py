@@ -468,9 +468,7 @@ class Graphs(APIBase):
                 card.filter_by_perm(user, perm)
                 permitted_cards.append(card)
         cardwidgets = [
-            widget
-            for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
-            for widget in widgets
+            widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
         ]
 
         return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
