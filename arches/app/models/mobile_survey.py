@@ -305,7 +305,7 @@ class MobileSurvey(models.MobileSurveyModel):
                 )
             else:
                 err = _("Celery appears not to be running, you need to have celery running in order to sync from Arches Collector.")
-                self._sync_failed(synclog, userid, err)
+                self._sync_failed(synclog, userid, Exception(err))
         else:
             self._sync(synclog.pk, userid=userid)
         return synclog

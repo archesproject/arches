@@ -143,8 +143,11 @@ class Sync(APIBase):
                 synclog = survey.sync(userid=request.user.id, use_celery=True)
             except Exception:
                 logger.exception(_("Sync Failed"))
+            status = 200
+            if synclog.status == "FAILED":
+                status = 500
 
-            return JSONResponse(synclog)
+            return JSONResponse(synclog, status=status)
         else:
             return JSONResponse(_("Sync Failed"), status=403)
 
