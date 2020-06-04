@@ -145,7 +145,7 @@ class Command(BaseCommand):
 
                 # We have a good model, so build the pre-processed tree once
                 self.reader.graphtree = self.reader.process_graph(graphid)
-                if block and not "," in block:
+                if block and "," not in block:
                     blocks = [block]
                 else:
                     blocks = os.listdir(f"{source}/{m}")
