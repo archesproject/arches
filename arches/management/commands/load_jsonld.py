@@ -41,8 +41,10 @@ except:
 try:
     fix_js_data = settings.JSON_LD_FIX_DATA_FUNCTION
 except:
+
     def fix_js_data(data, jsdata, model):
         return jsdata
+
 
 class Command(BaseCommand):
     """
@@ -52,37 +54,15 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
 
         parser.add_argument(
-            "-s", "--source",
-            default="data/",
-            action="store",
-            dest="source",
-            help="the directory in which the data files are to be found"
+            "-s", "--source", default="data/", action="store", dest="source", help="the directory in which the data files are to be found"
         )
 
-        parser.add_argument(
-            "-f", "--force", 
-            default=False,
-            action="store_true", 
-            dest="force", 
-            help='reload records that already exist'
-        )
+        parser.add_argument("-f", "--force", default=False, action="store_true", dest="force", help="reload records that already exist")
+
+        parser.add_argument("--toobig", default=0, type=int, action="store", dest="toobig", help="Do not attempt to load records > n kb")
 
         parser.add_argument(
-            "--toobig",
-            default=0,
-            type=int,
-            action="store",
-            dest="toobig",
-            help="Do not attempt to load records > n kb"
-        )
-
-        parser.add_argument(
-            "-m",
-            "--model",
-            default="",
-            action="store",
-            dest="model",
-            help="the name of the model path to load (eg auction_of_lot)",
+            "-m", "--model", default="", action="store", dest="model", help="the name of the model path to load (eg auction_of_lot)",
         )
 
         parser.add_argument(
@@ -94,66 +74,44 @@ class Command(BaseCommand):
             help="the name of the block in the model path to load (eg 00), or slice in the form this,total (eg 1,5)",
         )
 
-        parser.add_argument(
-            "--max",
-            default=-1,
-            type=int,
-            action="store",
-            dest="max",
-            help="Maximum number of records to load per model"
-            )
+        parser.add_argument("--max", default=-1, type=int, action="store", dest="max", help="Maximum number of records to load per model")
+
+        parser.add_argument("--fast", default=0, action="store", type=int, dest="fast", help="Use bulk_save to store n records at a time")
+
+        parser.add_argument("-q", "--quiet", default=False, action="store_true", dest="quiet", help="Don't announce every record")
 
         parser.add_argument(
-            "--fast",
-            default=0,
-            action="store",
-            type=int,
-            dest="fast",
-            help="Use bulk_save to store n records at a time"
+            "--skip", default=-1, type=int, action="store", dest="skip", help="Number of records to skip before starting to load"
         )
 
-        parser.add_argument(
-            "-q", "--quiet",
-            default=False,
-            action="store_true",
-            dest="quiet",
-            help="Don't announce every record"
-        )
-
-        parser.add_argument(
-            "--skip",
-            default=-1,
-            type=int,
-            action="store",
-            dest="skip",
-            help="Number of records to skip before starting to load"
-        )
-
-        parser.add_argument(
-            "--suffix",
-            default="json",
-            action="store",
-            dest="suffix",
-            help="file suffix to load"
-            )
+        parser.add_argument("--suffix", default="json", action="store", dest="suffix", help="file suffix to load")
 
     def handle(self, *args, **options):
 
         print("Starting JSON-LD load")
-        if options['model']:
+        if options["model"]:
             print(f"Only loading {options['model']}")
-        if options['block']:
+        if options["block"]:
             print(f"Only loading {options['block']}")
-        if options['force']:
+        if options["force"]:
             print("Forcing reload of existing records")
-        if options['toobig']:
+        if options["toobig"]:
             print(f"Not loading records > {options['toobig']}kb")
-        if options['quiet']:
+        if options["quiet"]:
             print("Only announcing timing data")
         self.resources = []
-        self.load_resources(source=options['source'], force=options['force'], model=options['model'], block=options['block'], 
-            maxx=options['max'], toobig=options['toobig'], fast=options['fast'], 
-            quiet=options['quiet'], skip=options['skip'], suffix=options['suffix'])
+        self.load_resources(
+            source=options["source"],
+            force=options["force"],
+            model=options["model"],
+            block=options["block"],
+            maxx=options["max"],
+            toobig=options["toobig"],
+            fast=options["fast"],
+            quiet=options["quiet"],
+            skip=options["skip"],
+            suffix=options["suffix"],
+        )
 
     def load_resources(self, source, force, model, block, maxx, toobig, fast, quiet, skip, suffix):
 
@@ -171,11 +129,11 @@ class Command(BaseCommand):
         self.datatype_factory = DataTypeFactory()
         self.node_datatypes = {str(nodeid): datatype for nodeid, datatype in archesmodels.Node.objects.values_list("nodeid", "datatype")}
 
-        errh = open("error_log.txt", 'w')
+        errh = open("error_log.txt", "w")
         start = time.time()
         x = 0
         for m in models:
-            if not m.startswith('_') and not m.startswith('.'):
+            if not m.startswith("_") and not m.startswith("."):
                 print(f"Loading {m}")
                 graphid = graph_uuid_map.get(m, None)
                 if not graphid:
@@ -187,15 +145,15 @@ class Command(BaseCommand):
 
                 # We have a good model, so build the pre-processed tree once
                 self.reader.graphtree = self.reader.process_graph(graphid)
-                if block and not ',' in block:
+                if block and not "," in block:
                     blocks = [block]
                 else:
                     blocks = os.listdir(f"{source}/{m}")
                     blocks.sort()
-                    if ',' in block:
+                    if "," in block:
                         # {slice},{max-slices}
-                        (cslice, mslice) = block.split(',')
-                        cslice = int(cslice)-1
+                        (cslice, mslice) = block.split(",")
+                        cslice = int(cslice) - 1
                         mslice = int(mslice)
                         blocks = blocks[cslice::mslice]
 
@@ -224,7 +182,7 @@ class Command(BaseCommand):
                                     if not quiet:
                                         print(f" ... Skipping due to size:  {sz} > {toobig}")
                                     continue
-                            uu = f.replace(f".{suffix}", '')
+                            uu = f.replace(f".{suffix}", "")
                             fh = open(fn)
                             data = fh.read()
                             fh.close()
@@ -233,7 +191,7 @@ class Command(BaseCommand):
                             jsdata = fix_js_data(data, jsdata, m)
                             if len(uu) != 36 or uu[8] != "-":
                                 # extract uuid from data
-                                uu = jsdata['id'][-36:]
+                                uu = jsdata["id"][-36:]
                             if jsdata:
                                 try:
                                     if fast:
@@ -256,19 +214,18 @@ class Command(BaseCommand):
             self.save_resources()
             self.index_resources()
             self.resources = []
-        #if 0:
+        # if 0:
         #    # This should index in ES
         #    index_database.index_resources(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
 
         errh.close()
         print(f"duration: {x} in {time.time()-start} seconds")
 
-
     def save_resources(self):
         tiles = []
         for resource in self.resources:
             resource.tiles = resource.get_flattened_tiles()
-            tiles.extend(resource.tiles)        
+            tiles.extend(resource.tiles)
 
         Resource.objects.bulk_create(self.resources)
         TileModel.objects.bulk_create(tiles)
@@ -284,18 +241,19 @@ class Command(BaseCommand):
 
         for resource in self.resources:
             document, terms = resource.get_documents_to_index(
-                fetchTiles=False, datatype_factory=self.datatype_factory, node_datatypes=self.node_datatypes)
+                fetchTiles=False, datatype_factory=self.datatype_factory, node_datatypes=self.node_datatypes
+            )
             documents.append(se.create_bulk_item(index="resources", id=document["resourceinstanceid"], data=document))
             for term in terms:
                 term_list.append(se.create_bulk_item(index="terms", id=term["_id"], data=term["_source"]))
         se.bulk_index(documents)
-        se.bulk_index(term_list)        
+        se.bulk_index(term_list)
 
     def fast_import_resource(self, resourceid, graphid, data, n=1000, reload=False, quiet=True):
 
         if not reload:
             try:
-                resource_instance = Resource.objects.get(pk=resourceid)            
+                resource_instance = Resource.objects.get(pk=resourceid)
                 if not reload:
                     if not quiet:
                         print(f" ... already loaded")
@@ -321,7 +279,7 @@ class Command(BaseCommand):
 
         with transaction.atomic():
             try:
-                resource_instance = Resource.objects.get(pk=resourceid)            
+                resource_instance = Resource.objects.get(pk=resourceid)
                 if not reload:
                     print(f" ... already loaded")
                     return
@@ -338,4 +296,3 @@ class Command(BaseCommand):
                 print(f"*** Could not find model: {graphid}")
             except Exception as e:
                 raise
-
