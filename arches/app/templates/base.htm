@@ -208,6 +208,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 }
             }
         }
+
+        //Give focus to panel/popup contents after opening
+        function givepanelfocus(elType, elName) {
+            var elType, elName;
+            if(elType == 'id'){
+                if(document.getElementById(elName)) {
+                    document.getElementById(elName).focus();
+                }
+            } else {
+                if(document.getElementsByClassName(elName)[0]) {
+                    document.getElementsByClassName(elName)[0].focus();
+                }
+            }
+            return;
+        }
+
     </script>
 
     {% endblock javascript %}

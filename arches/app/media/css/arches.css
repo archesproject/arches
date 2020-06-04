@@ -75,7 +75,9 @@ textarea:focus,
 i.report-expander:focus,
 .select-icon:focus,
 .chosen-container-active,
-.select2-container-active {
+.select2-container-active,
+.workbench-card-sidepanel-header:focus,
+.sp-header-alerts:focus {
 	outline: #006600 solid 3px !important;
 }
 
@@ -1333,7 +1335,7 @@ ul.tabbed-report-tab-list {
     background: white;
     border-left: 1px solid rgb(216, 216, 216);
     padding: 16px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .workbench-card-sidepanel div .new-provisional-edit-card-container {

@@ -5,6 +5,7 @@
         {% block tabs %}
         <div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
             toggleTab('basemap');
+            givepanelfocus('class','sp-header-basemap');
         }, css: {
             'active': activeTab() === 'basemap'
         }" onkeypress="$(this).trigger('click');">
@@ -13,6 +14,7 @@
         </div>
         <div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
             toggleTab('overlays');
+            givepanelfocus('class','sp-header-overlays');
         }, css: {
             'active': activeTab() === 'overlays'
         }" onkeypress="$(this).trigger('click');">
@@ -21,6 +23,7 @@
         </div>
         <div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
             toggleTab('legend');
+            givepanelfocus('class','sp-header-legend');
         }, css: {
             'active': activeTab() === 'legend'
         }" onkeypress="$(this).trigger('click');">
@@ -34,17 +37,19 @@
             {% block sidepanel %}
             <!--ko if: activeTab() === 'basemap' -->
                 <div class="workbench-card-sidepanel-header-container">
-                    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+                    <h4 tabindex="0" class="workbench-card-sidepanel-header sp-header-basemap"
+                        data-bind="click: hideSidePanel"
+                        onkeypress="$(this).trigger('click');">
                         {% trans "Basemaps" %}
                     </h4>
                 </div>
 
                 <div class="basemap-listing-container">
                 <!--ko foreach: basemaps -->
-                    <div class="basemap-listing" data-bind="
+                    <div tabindex="0" class="basemap-listing" data-bind="
                         click: $parent.activeBasemap,
                         css: {'active-basemap': $data === $parent.activeBasemap()}
-                        ">
+                        " onkeypress="$(this).trigger('click');">
                         <i data-bind="css: icon" class="layer-listing-icon"></i>
                         <span data-bind="text: name"></span>
                     </div>
@@ -55,7 +60,9 @@
 
             <!--ko if: activeTab() === 'overlays' -->
                 <div class="workbench-card-sidepanel-header-container">
-                    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+                    <h4 tabindex="0" class="workbench-card-sidepanel-header sp-header-overlays"
+                        data-bind="click: hideSidePanel"
+                        onkeypress="$(this).trigger('click');">
                         {% trans "Overlays" %}
                     </h4>
                 </div>
@@ -83,7 +90,9 @@
 
             <!--ko if: activeTab() === 'legend' -->
                 <div class="workbench-card-sidepanel-header-container">
-                    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+                    <h4 tabindex="0" class="workbench-card-sidepanel-header sp-header-legend"
+                        data-bind="click: hideSidePanel"
+                        onkeypress="$(this).trigger('click');">
                         {% trans "Legend" %}
                     </h4>
                 </div>
