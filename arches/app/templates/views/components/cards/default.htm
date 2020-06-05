@@ -272,7 +272,7 @@
 
         <div class="card">
             {% block form_header %}
-            <h4 data-bind="text: card.model.name"></h4>
+            <h4 data-bind="text: card.model.name() + ' | ' + card.canAdd() + ' | ' + card.tiles().length "></h4>
 
             <!-- ko if: card.model.helpenabled -->
             <span>
@@ -286,6 +286,7 @@
             <!-- /ko -->
 
             {% endblock form_header %}
+            <!-- ko if: showSummary() === false -->
             <!-- ko if: card.widgets().length > 0 -->
             {% block form_widgets %}
             <form class="widgets" style="margin-bottom: 20px;">
@@ -382,6 +383,36 @@
                 <!-- /ko -->
             </div>
             {% endblock form_buttons %}
+            <!-- /ko -->
+            <!-- ko if: card.widgets().length > 0 && showSummary() === true -->
+            {% block card_summary %}
+            <ul class="tile-summary-item" data-bind="foreach: {
+                data: card.tiles,
+                as: 'tile'
+            }">
+            <li class="tile-summary">
+                <a href="#" data-bind="click: function () { tile.selected(true) }">
+                    <!-- ko if: parent.widgets().length > 0 -->
+                    <span data-bind="text: parent.widgets()[0].label || card.model.name" class="tile-summary-label"></span>:
+                    <div style="display: inline;" data-bind="component: {
+                        name: self.form.widgetLookup[parent.widgets()[0].widget_id()].name,
+                        params: {
+                            tile: tile,
+                            node: self.form.nodeLookup[parent.widgets()[0].node_id()],
+                            config: self.form.widgetLookup[parent.widgets()[0].widget_id()].config,
+                            label: self.form.widgetLookup[parent.widgets()[0].widget_id()].label,
+                            value: tile.data[parent.widgets()[0].node_id()],
+                            type: 'resource-editor',
+                            state: 'display_value'
+                        }
+                    }"></div>
+                    <!-- /ko -->
+                </a>
+                </li>
+            </ul>
+            <button data-bind="text: 'Show Form', click: function(){showForm(!showForm())}"></button>
+            {% endblock card_summary %}
+            <!-- /ko -->
 
             <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
                 <div class="relative">
