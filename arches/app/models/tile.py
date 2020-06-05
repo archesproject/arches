@@ -564,7 +564,7 @@ class Tile(models.TileModel):
         resource = models.ResourceInstance.objects.get(pk=self.resourceinstance_id)
         functionXgraphs = models.FunctionXGraph.objects.filter(
             Q(graph_id=resource.graph_id),
-            Q(config__contains={"triggering_nodegroups": [self.nodegroup_id]}) | Q(config__triggering_nodegroups__exact=[]),
+            Q(config__contains={"triggering_nodegroups": [str(self.nodegroup_id)]}) | Q(config__triggering_nodegroups__exact=[]),
             ~Q(function__classname="PrimaryDescriptorsFunction"),
         )
         for functionXgraph in functionXgraphs:
