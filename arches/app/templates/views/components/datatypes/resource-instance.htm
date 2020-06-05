@@ -18,9 +18,9 @@
         "></select>
     </div>
     <div>
-        <div class="rr-table-border" data-bind="foreach: config.graphs" style="display: flex; flex-direction: column;border-left: none; border-bottom: none; border-right: none;">
+        <div data-bind="foreach: config.graphs" style="display: flex; flex-direction: column;">
             <div class='rr-table-row'>
-                <div style="display: flex; flex-direction: row; height: 40px;border-top: none; border-bottom: none;">
+                <div style="display: flex; flex-direction: row; height: 40px;">
                     <div class='rr-table-column' style="width: 35px;">
                         <button data-bind="click: $data.removeRelationship, clickBubble: false">
                             <i class="fa fa-trash"></i>
@@ -31,10 +31,11 @@
                         <div data-bind="text: $data.name"></div>
                     </div>
                 </div>
-                <div style="border-bottom: none; padding: 10px;" data-bind="visible: self.selectedResourceType() === $data, css: { 'rr-table-border': self.selectedResourceType() === $data} ">
+                <div style="border-bottom: none; padding: 10px;" data-bind="if: self.selectedResourceType() === $data, visible: self.selectedResourceType() === $data, css: { 'rr-table-border': self.selectedResourceType() === $data} ">
                     <div class="row">
-                        <label class="col-sm-12" style="font-weight: bold;">{% trans "Default relationship to" %} <span
-                                data-bind="text: $data.name"></span></label>
+                        <label class="col-sm-12" style="font-weight: bold;">{% trans "Default relationship to" %} 
+                            <span data-bind="text: $data.name"></span>
+                        </label>
                     </div>
                     <div class="row">
                         <span class="col-sm-4" style="padding-top: 8px; text-align: right;"
@@ -51,25 +52,23 @@
                         </span>
                     </div>
                     <div class="row" style="margin-top: 20px;">
-                        <label class="col-sm-12" style="font-weight: bold;">{% trans "Default inverse relationship to" %} <span
-                                data-bind="text: $data.name"></span></label>
+                        <label class="col-sm-12" style="font-weight: bold;">{% trans "Default inverse relationship to" %} 
+                            <span data-bind="text: $data.name"></span>
+                        </label>
                     </div>
                     <div class="row">
                         <span class="col-sm-4" style="padding-top: 8px; text-align: right;"
                             data-bind="text: $data.name + ' (' + self.makeFriendly($data.ontologyClass) + ')'"></span>
-                        <span class="col-sm-4"><input style="width:30%; display:inline-block;" data-bind="
-                                                    select2Query: {
-                                                        select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass, self.node.ontologyclass())
-                                                    }
-                                                "></span>
+                        <span class="col-sm-4">
+                            <input style="width:30%; display:inline-block;" data-bind="
+                                select2Query: {
+                                    select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass, self.node.ontologyclass())
+                                }
+                            ">
+                        </span>
                         <span class="col-sm-4" style="padding-top: 8px;"
                             data-bind="text: self.node.name() + ' (' + self.makeFriendly(self.node.ontologyclass()) + ')'"></span>
                     </div>
-                    <button href="javascript:void(0);" class="btn btn-shim btn-labeled btn-lg fa fa-pencil btn-mint"
-                        style="float: right; margin-top:15px;"
-                        data-bind="click: function() { self.toggleSelectedResource($data); }, clickBubble: false">
-                        {% trans "Done" %}
-                    </button>
                 </div>
             </div>
         </div>

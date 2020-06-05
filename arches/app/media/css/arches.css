@@ -7746,7 +7746,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rr-table-border {
-    border: solid 1px #e0e0e0
+    border: solid 1px #e0e0e0;
 }
 
 .rr-table-row {
@@ -7754,6 +7754,10 @@ a.mega-dropdown-toggle.disabled {
     display: flex;
     border-bottom: solid 1px #e0e0e0;
     flex-direction: column;
+}
+
+.rr-table-row:first-child {
+    border-top: solid 1px #e0e0e0;
 }
 
 .rr-table-row:nth-last-child(odd) {

@@ -17,6 +17,7 @@ define([
         this.value = params.value || undefined;
         this.graphIsSemantic = params.graph ? !!params.graph.ontologyclass : false;
         this.makeFriendly = ontologyUtils.makeFriendly;
+        this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
         self.newTileStep = ko.observable();
         this.useSemanticRelationships = arches.useSemanticRelationships;
         this.resourceReportUrl = arches.urls.resource_report;
@@ -312,45 +313,6 @@ define([
                 return name;
             }
         };
-
-        this.getSelect2ConfigForOntologyProperties = function(value, domain, range) {
-            return {
-                value: value,
-                clickBubble: false,
-                placeholder: 'Select an Ontology Property',
-                closeOnSelect: true,
-                allowClear: false,
-                ajax: {
-                    url: function() {
-                        return arches.urls.ontology_properties;
-                    },
-                    data: function(term, page) {
-                        var data = { 
-                            'domain_ontology_class': domain,
-                            'range_ontology_class': range,
-                            'ontologyid': ''
-                        };
-                        return data;
-                    },
-                    dataType: 'json',
-                    quietMillis: 250,
-                    results: function(data, page) {
-                        return {
-                            results: data
-                        };
-                    }
-                },
-                id: function(item) {
-                    return item;
-                },
-                formatResult: ontologyUtils.makeFriendly,
-                formatSelection: ontologyUtils.makeFriendly,
-                initSelection: function(el, callback) {
-                    callback(value());
-                }
-            };
-        };
-
     };
 
     return ResourceInstanceSelectViewModel;

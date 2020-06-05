@@ -24,6 +24,7 @@ define([
                     this.ontologyclass = options.graph.ontologyclass || options.graph.root.ontologyclass;
                 }
                 this.makeFriendly = ontologyUtils.makeFriendly;
+                this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
                 this.graphNameLookup = _.indexBy(arches.resources, 'graphid');
                 this.currentResource = ko.observable();
                 this.currentResourceSubscriptions = [];
@@ -175,6 +176,21 @@ define([
                     }
                 };
 
+                var getNodeData = function(nodeid, relationship){
+                    $.ajax({
+                        url: arches.urls.api_nodes(nodeid),
+                        context: this,
+                        dataType: 'json'
+                    })
+                        .done(function (data) {
+                            relationship.node.name(data[0].name);
+                            relationship.node.ontologyclass(data[0].ontologyclass);
+                        })
+                        .fail(function (data) {
+                            console.log('Failed to get Node data', data);
+                        });
+                };
+
                 this.createResource = function(resourceinstanceid) {
                     return {
                         resourceinstanceid: resourceinstanceid,
@@ -193,8 +209,11 @@ define([
                                     }
                                 });
                                 relationship = koMapping.fromJS(relationship);
+                                relationship.node = {
+                                    'name': ko.observable(),
+                                    'ontologyclass': ko.observable()
+                                };
                                 relationship.reset = function() {
-                                    console.log(JSON.parse(this._json()));
                                     koMapping.fromJS(JSON.parse(this._json()), relationship);
                                 };
                                 relationship._json = ko.observable(JSON.stringify(koMapping.toJS(relationship)));
@@ -213,6 +232,9 @@ define([
                                         }
                                     };
                                 };
+                                if(!!relationship.nodeid()){
+                                    getNodeData(relationship.nodeid(), relationship);
+                                }
                                 relationship['resource'] = res.length > 0 ? res[0] : '';
                                 if (!!relationship['resource']) {
                                     relationship.iconclass = viewModel.graphNameLookup[relationship.resource.graph_id].icon;
@@ -514,7 +536,59 @@ define([
                 var resource = this.currentResource();
                 resource.get();
                 this.resourceRelationships(resource.resourceRelationships());
-            }
+            },
+
+            updateTile: function (options, relationship) {
+                window.fetch(arches.urls.api_tiles(relationship.tileid()), {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(function(response) {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                    })
+                    .then(function(tile) {
+                        var newResourceRelations = [];  
+                        var tiledata = tile.data;
+                        var resourceRelations = tiledata[relationship.nodeid()];
+                        resourceRelations.forEach(function(relation){
+                            if (relation.resourceXresourceId === relationship.resourcexid()){
+                                relation.ontologyProperty = relationship.relationshiptype();
+                                relation.inverseOntologyProperty = relationship.inverserelationshiptype();
+                            } else {
+                                newResourceRelations.push(relation);
+                            } 
+                        });
+                        if (!!options.delete) {
+                            tiledata[relationship.nodeid()] = newResourceRelations;
+                        }
+
+                        window.fetch(arches.urls.api_tiles(relationship.tileid()),{
+                            method: 'POST',
+                            credentials: 'include',
+                            body: JSON.stringify(tile),
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                        })
+                            .then(function (response){
+                                if (response.ok) {
+                                    relationship._json(JSON.stringify(koMapping.toJS(relationship)));
+                                }
+                            })
+                            .catch(function(err){
+                                console.log('Tile update failed', err);
+                            });
+
+                    })
+                    .catch(function (err) {
+                        console.log('Tile update failed', err);
+                    });
+            },
         }),
         template: { require: 'text!templates/views/resource/related-resources/related-resources-manager.htm' }
     });

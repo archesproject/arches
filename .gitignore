@@ -1,6 +1,6 @@
 *.pyc
 virtualenv/ENV*
-env
+env/*
 tests/elasticsearch
 tests/logs
 tests/fixtures/testing_prj/testing_prj/media/packages/*

@@ -45,9 +45,9 @@
         </div>
     </div>
     <div style="max-height: 500px; overflow-y: scroll;">
-        <div class="rr-table-border" data-bind='foreach: relationshipsInFilter' style="display: flex; flex-direction: column;border-left: none; border-bottom: none; border-right: none;">
+        <div data-bind='foreach: relationshipsInFilter' style="display: flex; flex-direction: column;">
             <div class='rr-table-row'>
-                <div style="display: flex; flex-direction: row; height: 40px;border-top: none; border-bottom: none;">
+                <div style="display: flex; flex-direction: row; height: 40px;">
                     <div class='rr-table-column' style="width: 35px;">
                         <button data-bind="click: $parent.deleteRelationship, clickBubble: false">
                             <i class="fa fa-trash"></i>
@@ -94,11 +94,6 @@
                         <span class="col-sm-4" style="padding-top: 8px;"
                             data-bind="text: self.node.name() + ' (' + self.makeFriendly(self.node.ontologyclass()) + ')'"></span>
                     </div>
-                    <button href="javascript:void(0);" class="btn btn-shim btn-labeled btn-lg fa fa-pencil btn-mint"
-                        style="float: right; margin-top:15px;"
-                        data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false">
-                        {% trans "Done" %}
-                    </button>
                 </div>
             </div>
         </div>
