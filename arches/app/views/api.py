@@ -973,7 +973,7 @@ class Tile(APIBase):
             return JSONResponse(str(e), status=404)
 
         # filter tiles from attribute query based on user permissions
-        permitted_nodegroups = [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(request.user, 'models.read_nodegroup')]
+        permitted_nodegroups = [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]
         if str(tile.nodegroup_id) in permitted_nodegroups:
             return JSONResponse(tile, status=200)
         else:
@@ -981,9 +981,9 @@ class Tile(APIBase):
 
     def post(self, request, tileid):
         tileview = TileView()
-        tileview.action = 'update_tile'
+        tileview.action = "update_tile"
         request.POST = request.POST.copy()
-        request.POST['data'] = request.body
+        request.POST["data"] = request.body
         return tileview.post(request)
 
 
