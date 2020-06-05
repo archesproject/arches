@@ -977,7 +977,7 @@ class Tile(APIBase):
         if str(tile.nodegroup_id) in permitted_nodegroups:
             return JSONResponse(tile, status=200)
         else:
-            return JSONResponse(_("Tile matching query parameters found."), status=404)
+            return JSONResponse(_("Tile not found."), status=404)
 
     def post(self, request, tileid):
         tileview = TileView()
