@@ -986,11 +986,14 @@ class Tile(APIBase):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Node(APIBase):
-    def get(self, request, nodeid):
+    def get(self, request, nodeid=None):
+        graph_cache = {}
         params = request.GET.dict()
         user = request.user
         perms = "models." + params.pop("perms", "read_nodegroup")
         params["nodeid"] = params.get("nodeid", nodeid)
+        if params["nodeid"] == None:
+            del params["nodeid"]
         # parse node attributes from params
         # datatype = params.get("datatype")
         # description=params.get('description')
@@ -1007,6 +1010,13 @@ class Node(APIBase):
         # ontologyclass=params.get('ontologyclass')
         # sortorder=params.get('sortorder')
 
+        def graphLookup(graphid):
+            try:
+                return graph_cache[graphid]
+            except:
+                graph_cache[graphid] = Graph.objects.get(pk=node["graph_id"]).name
+                return graph_cache[graphid]
+
         # try to get nodes by attribute filter and then get nodes by passed in user perms
         try:
             nodes = models.Node.objects.filter(**dict(params)).values()
@@ -1022,7 +1032,7 @@ class Node(APIBase):
         permitted_nodes = [node for node in nodes if str(node["nodegroup_id"]) in permitted_nodegroups]
         for node in permitted_nodes:
             try:
-                node["resourcemodelname"] = Graph.objects.get(pk=node["graph_id"]).name
+                node["resourcemodelname"] = graphLookup(node["graph_id"])
             except:
                 return JSONResponse(_("No graph found for graphid %s" % (node["graph_id"])), status=404)
 
