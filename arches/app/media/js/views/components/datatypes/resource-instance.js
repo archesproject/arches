@@ -45,7 +45,7 @@ define([
                 });
 
                 this.selectedResourceType = ko.observable(null);
-                this.toggleSelectedResource = function (resourceRelationship) {
+                this.toggleSelectedResource = function(resourceRelationship) {
                     if (self.selectedResourceType() === resourceRelationship) {
                         self.selectedResourceType(null);
                     } else {

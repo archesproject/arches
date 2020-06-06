@@ -995,7 +995,7 @@ class Node(APIBase):
         user = request.user
         perms = "models." + params.pop("perms", "read_nodegroup")
         params["nodeid"] = params.get("nodeid", nodeid)
-        if params["nodeid"] == None:
+        if params["nodeid"] is None:
             del params["nodeid"]
         # parse node attributes from params
         # datatype = params.get("datatype")

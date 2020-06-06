@@ -12,7 +12,7 @@ define([
     'plugins/knockout-select2',
     'bindings/datepicker',
     'bindings/datatable'
-], function ($, _, Backbone, ko, koMapping, arches, ResourceInstanceSelect, RelatedResourcesNodeList, ontologyUtils) {
+], function($, _, Backbone, ko, koMapping, arches, ResourceInstanceSelect, RelatedResourcesNodeList, ontologyUtils) {
     return ko.components.register('related-resources-manager', {
         viewModel: Backbone.View.extend({
             initialize: function(options) {
@@ -61,7 +61,7 @@ define([
                 };
 
                 this.selectedResourceRelationship.subscribe(function(resourceRelationship) {
-                    if (!!resourceRelationship){
+                    if (!!resourceRelationship) {
                         self.selectedOntologyClass(resourceRelationship.resource.root_ontology_class);
                     } else {
                         self.selectedOntologyClass(undefined);
@@ -168,7 +168,7 @@ define([
                         return rr.dirty();
                     }, self);
                 });
-                
+
 
                 this.newPage = function(page, e) {
                     if (page) {
@@ -176,17 +176,17 @@ define([
                     }
                 };
 
-                var getNodeData = function(nodeid, relationship){
+                var getNodeData = function(nodeid, relationship) {
                     $.ajax({
                         url: arches.urls.api_nodes(nodeid),
                         context: this,
                         dataType: 'json'
                     })
-                        .done(function (data) {
+                        .done(function(data) {
                             relationship.node.name(data[0].name);
                             relationship.node.ontologyclass(data[0].ontologyclass);
                         })
-                        .fail(function (data) {
+                        .fail(function(data) {
                             console.log('Failed to get Node data', data);
                         });
                 };
@@ -232,7 +232,7 @@ define([
                                         }
                                     };
                                 };
-                                if(!!relationship.nodeid()){
+                                if (!!relationship.nodeid()) {
                                     getNodeData(relationship.nodeid(), relationship);
                                 }
                                 relationship['resource'] = res.length > 0 ? res[0] : '';
@@ -253,13 +253,13 @@ define([
                         get: function(newPage) {
                             var page = newPage || 1;
                             $.ajax({
-                                    url: arches.urls.related_resources + resourceinstanceid,
-                                    context: this,
-                                    dataType: 'json',
-                                    data: {
-                                        page: page
-                                    }
-                                })
+                                url: arches.urls.related_resources + resourceinstanceid,
+                                context: this,
+                                dataType: 'json',
+                                data: {
+                                    page: page
+                                }
+                            })
                                 .done(function(data) {
                                     self.graphNameLookup = _.indexBy(arches.resources, 'graphid');
                                     this.parse(data, self);
@@ -282,12 +282,12 @@ define([
                                 relationship_ids: relationshipIds
                             };
                             $.ajax({
-                                    url: arches.urls.related_resources,
-                                    data: payload,
-                                    context: this,
-                                    type: 'POST',
-                                    dataType: 'json'
-                                })
+                                url: arches.urls.related_resources,
+                                data: payload,
+                                context: this,
+                                type: 'POST',
+                                dataType: 'json'
+                            })
                                 .done(function(data) {
                                     this.parse(data, self);
                                 })
@@ -301,11 +301,11 @@ define([
                                 root_resourceinstanceid: resourceinstanceid
                             };
                             $.ajax({
-                                    url: arches.urls.related_resources + '?' + $.param(payload),
-                                    type: 'DELETE',
-                                    context: this,
-                                    dataType: 'json'
-                                })
+                                url: arches.urls.related_resources + '?' + $.param(payload),
+                                type: 'DELETE',
+                                context: this,
+                                dataType: 'json'
+                            })
                                 .done(function(data) {
                                     this.parse(data, self);
                                 })
@@ -492,16 +492,16 @@ define([
                             return item.name;
                         }
                     },
-                    initSelection: function(el, callback) {}
+                    initSelection: function(el, callback) { }
                 };
             },
 
             deleteRelationships: function(relationship) {
                 var resourcexids;
                 var resource = this.currentResource();
-                if(!!relationship){
+                if (!!relationship) {
                     resourcexids = [relationship.resourcexid];
-                }else{
+                } else {
                     resourcexids = _.pluck(this.selected(), 'resourcexid');
                 }
                 resource.delete(resourcexids);
@@ -538,7 +538,7 @@ define([
                 this.resourceRelationships(resource.resourceRelationships());
             },
 
-            updateTile: function (options, relationship) {
+            updateTile: function(options, relationship) {
                 window.fetch(arches.urls.api_tiles(relationship.tileid()), {
                     method: 'GET',
                     credentials: 'include',
@@ -552,22 +552,22 @@ define([
                         }
                     })
                     .then(function(tile) {
-                        var newResourceRelations = [];  
+                        var newResourceRelations = [];
                         var tiledata = tile.data;
                         var resourceRelations = tiledata[relationship.nodeid()];
-                        resourceRelations.forEach(function(relation){
-                            if (relation.resourceXresourceId === relationship.resourcexid()){
+                        resourceRelations.forEach(function(relation) {
+                            if (relation.resourceXresourceId === relationship.resourcexid()) {
                                 relation.ontologyProperty = relationship.relationshiptype();
                                 relation.inverseOntologyProperty = relationship.inverserelationshiptype();
                             } else {
                                 newResourceRelations.push(relation);
-                            } 
+                            }
                         });
                         if (!!options.delete) {
                             tiledata[relationship.nodeid()] = newResourceRelations;
                         }
 
-                        window.fetch(arches.urls.api_tiles(relationship.tileid()),{
+                        window.fetch(arches.urls.api_tiles(relationship.tileid()), {
                             method: 'POST',
                             credentials: 'include',
                             body: JSON.stringify(tile),
@@ -575,17 +575,17 @@ define([
                                 'Content-Type': 'application/json'
                             },
                         })
-                            .then(function (response){
+                            .then(function(response) {
                                 if (response.ok) {
                                     relationship._json(JSON.stringify(koMapping.toJS(relationship)));
                                 }
                             })
-                            .catch(function(err){
+                            .catch(function(err) {
                                 console.log('Tile update failed', err);
                             });
 
                     })
-                    .catch(function (err) {
+                    .catch(function(err) {
                         console.log('Tile update failed', err);
                     });
             },
