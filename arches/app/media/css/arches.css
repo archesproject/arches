@@ -3894,6 +3894,8 @@ div.dropdown-menu.open {
     width: 100%;
     justify-content: space-between;
     height: 50px;
+    background: #fafafa;
+    border-bottom: 1px solid #ddd;
 }
 
 .ep-edits-title {
@@ -5897,6 +5899,8 @@ th.notif-type {
 .ep-help-close {
     float: right;
     background: #f8f8f8;
+    border-bottom: 1px solid #ddd !important;
+    border-left: 1px solid #ddd !important;
 }
 
 .ep-help-close:hover {
@@ -6322,8 +6326,8 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     top: 0px;
     right: 0px;
     font-size: 17px;
-    background: #f6f6f6;
-    border-left: 1px solid transparent;
+    background: #f8f8f8;
+    border-left: 1px solid #ddd;
 }
 
 .entry .ep-notifs-close {
@@ -11620,7 +11624,7 @@ ul.select2-choices:after {
 
 .card-component-panel h3 {
     color: #2f527a;
-    font-size: 17px;
+    font-size: 1.2em;
     font-weight: 400;
 }
 
