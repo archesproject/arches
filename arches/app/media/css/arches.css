@@ -1603,6 +1603,10 @@ div.final-cons-step-separator > h4 {
     margin-right: -120px;
 }
 
+.graph-designer .file-chart-upload-panel {
+    margin-top: -435px;
+}
+
 /* end photo gallery */
 
 .workbench-model-card-container {
