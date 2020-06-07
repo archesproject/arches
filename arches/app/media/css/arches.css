@@ -2562,6 +2562,10 @@ a.select2-search-choice-close {
     flex-basis: 450px;
 }
 
+.card-configuration.expanded + div div div div div .install-buttons {
+    margin-right: 525px;
+}
+
 .constraint-selection {
     padding-top: 10px;
     border-bottom: solid 1px #eee;
