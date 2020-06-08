@@ -16,7 +16,7 @@
 </div>
 <!-- /ko -->
 <!-- ko ifnot: self.renderContext === 'search' -->
-<div class="widget-wrapper" data-bind="visible: !newTileStep()">
+<div class="row widget-wrapper" data-bind="visible: !newTileStep()">
     <div class="form-group">
         <label class="control-label widget-input-label" data-bind="text:label">
         </label>
@@ -58,9 +58,16 @@
                             <i class="fa fa-info-circle"></i>
                         </button>
                     </div>
-                    <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false">
-                        <div data-bind="text: $data.resourceName()"></div>
-                    </div>
+                    <!-- ko if: self.graphIsSemantic -->
+                        <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false">
+                            <div data-bind="text: $data.resourceName()"></div>
+                        </div>
+                    <!-- /ko -->
+                    <!-- ko ifnot: self.graphIsSemantic -->
+                        <div class="rr-table-column" style="flex-grow: 1;">
+                            <div data-bind="text: $data.resourceName()"></div>
+                        </div>
+                    <!-- /ko -->
                 </div>
                 <div style="border-bottom: none; padding: 10px;"
                     data-bind="visible: self.selectedResourceRelationship() === $data, css: { 'rr-table-border': self.selectedResourceRelationship() === $data} ">

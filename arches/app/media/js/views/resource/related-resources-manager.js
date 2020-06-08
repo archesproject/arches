@@ -20,9 +20,17 @@ define([
                 this.searchResults = options.searchResultsVm;
                 this.editingInstanceId = options.editing_instance_id;
                 this.graph = options.graph;
+                this.ontologyclass = '';
                 if (this.graph) {
-                    this.ontologyclass = options.graph.ontologyclass || options.graph.root.ontologyclass;
+                    if(!!options.graph.ontologyclass){
+                        this.ontologyclass = options.graph.ontologyclass;
+                    }else{
+                        if(options.graph.root){
+                            this.ontologyclass = options.graph.root.ontologyclass;
+                        }
+                    }
                 }
+                this.graphIsSemantic = !!this.ontologyclass;
                 this.makeFriendly = ontologyUtils.makeFriendly;
                 this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
                 this.graphNameLookup = _.indexBy(arches.resources, 'graphid');
@@ -40,7 +48,6 @@ define([
                 this.selectedResourceRelationship = ko.observable();
                 this.relationshipCandidates = ko.observableArray([]);
                 this.relationshipCandidateIds = ko.observable([]);
-                this.useSemanticRelationships = arches.useSemanticRelationships;
                 this.selectedOntologyClass = ko.observable();
                 this.reportResourceId = ko.observable();
                 this.reportGraphId = ko.observable(null);
@@ -69,7 +76,7 @@ define([
                 });
 
                 this.selectedOntologyClass.subscribe(function() {
-                    if (!!self.useSemanticRelationships) {
+                    if (self.graphIsSemantic) {
                         self.relationshipTypes(self.validproperties[self.selectedOntologyClass()]);
                     } else {
                         self.relationshipTypes(options.relationship_types.values);
@@ -106,36 +113,6 @@ define([
                     return res;
                 });
 
-                if (!this.useSemanticRelationships) {
-                    this.columnConfig = [{
-                        width: '20px',
-                        orderable: true,
-                        className: 'data-table-selected'
-                    }, {
-                        width: '100px'
-                    }, {
-                        width: '100px'
-                    }, {
-                        width: '100px'
-                    }, {
-                        width: '100px'
-                    }, {
-                        width: '100px'
-                    }];
-                } else {
-                    this.columnConfig = [{
-                        width: '20px',
-                        orderable: true,
-                        className: 'data-table-selected'
-                    }, {
-                        width: '100px'
-                    }, {
-                        width: '100px'
-                    }, {
-                        width: '100px'
-                    }];
-                }
-
                 this.selected = ko.computed(function() {
                     var res = _.filter(
                         self.resourceRelationships(),
@@ -144,9 +121,8 @@ define([
                                 return rr;
                             }
                         }, self);
-                    if (self.useSemanticRelationships && self.resourceEditorContext === true) {
-                        // if (res.length > 0 && self.useSemanticRelationships && self.graph.root.ontologyclass) {
-                        if (res.length > 0 && self.useSemanticRelationships && self.ontologyclass) {
+                    if (self.graphIsSemantic && self.resourceEditorContext === true) {
+                        if (res.length > 0 && self.graphIsSemantic) {
                             self.selectedOntologyClass(res[0].resource.root_ontology_class);
                             self.resourceRelationships().forEach(function(rr) {
                                 if (rr.resource.root_ontology_class !== self.selectedOntologyClass()) {
@@ -225,9 +201,9 @@ define([
                                 relationship.updateSelection = function(val) {
                                     return function(rr) {
                                         var vm = viewModel;
-                                        if (!vm.useSemanticRelationships) {
+                                        if (!vm.graphIsSemantic) {
                                             rr.selected(!rr.selected());
-                                        } else if (vm.useSemanticRelationships && (vm.selectedOntologyClass() === rr.resource.root_ontology_class || !vm.selectedOntologyClass())) {
+                                        } else if (vm.graphIsSemantic && (vm.selectedOntologyClass() === rr.resource.root_ontology_class || !vm.selectedOntologyClass())) {
                                             rr.selected(!rr.selected());
                                         }
                                     };
@@ -318,7 +294,7 @@ define([
 
                 if (this.resourceEditorContext === true) {
                     this.relationshipTypes = ko.observableArray();
-                    if (!this.useSemanticRelationships || !this.ontologyclass) {
+                    if (!this.graphIsSemantic) {
                         this.relationshipTypes(options.relationship_types.values);
                     }
 
@@ -383,16 +359,6 @@ define([
                         }, this);
                     }, this);
                 }
-
-                /**
-                 * Ensure that the container for the relation properties dropdown is tall enough to scroll to the bottom of the dropdown
-                 */
-                this.resize = function() {
-                    var rrPropertiesHeight = $('#rr-properties-id').height();
-                    if (rrPropertiesHeight > 0) {
-                        self.containerBottomMargin(rrPropertiesHeight * 0.3 + (self.selected().length * 20) + 'px');
-                    }
-                };
 
                 var url = ko.observable(arches.urls.search_results);
                 this.url = url;

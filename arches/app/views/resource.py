@@ -143,7 +143,7 @@ class ResourceEditorView(MapBaseManagerView):
             .exclude(isresource=False)
             .exclude(isactive=False)
         )
-        ontologyclass = [node for node in nodes if node.istopnode is True][0].ontologyclass
+        ontologyclass = [node for node in nodes if node.istopnode is True][0].ontologyclass or ""
         relationship_type_values = get_resource_relationship_types()
 
         nodegroups = []

@@ -7777,6 +7777,8 @@ a.mega-dropdown-toggle.disabled {
 .rr-table-column button {
     padding: 0px;
     color: #5f5f5f;
+    border: none;
+    background: none;
 }
 
 .unselectable {

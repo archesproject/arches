@@ -19,7 +19,6 @@ define([
         this.makeFriendly = ontologyUtils.makeFriendly;
         this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
         self.newTileStep = ko.observable();
-        this.useSemanticRelationships = arches.useSemanticRelationships;
         this.resourceReportUrl = arches.urls.resource_report;
         this.selectedResourceRelationship = ko.observable(null);
         this.reportResourceId = ko.observable();
