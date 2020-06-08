@@ -224,6 +224,24 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             return;
         }
 
+        //Ensure opacity slider works with keyboard in Overlays panel
+        function doSlider(e){
+            var e = window.event;
+            var s = document.getElementById('overlayslider');
+            var v = s.value;
+            switch (e.keyCode) {
+                case 37:
+                    v--;
+                    break;
+                case 39:
+                    v++;
+                    break;
+            }
+            s.value = v;
+            s.dispatchEvent(new Event('change'));
+            return;
+        }
+
     </script>
 
     {% endblock javascript %}
