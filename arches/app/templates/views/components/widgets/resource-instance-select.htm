@@ -60,12 +60,12 @@
                     </div>
                     <!-- ko if: self.graphIsSemantic -->
                         <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false">
-                            <div><a target="_blank" style="text-decoration: underline;" data-bind="text: $data.resourceName(), attr:{href: $data.resourceId()}, clickBubble: false"></a></div>
+                            <div><a target="_blank" style="text-decoration: underline;" data-bind="text: $data.resourceName(), attr:{href: $parent.resourceReportUrl+$data.resourceId()}, clickBubble: false"></a></div>
                         </div>
                     <!-- /ko -->
                     <!-- ko ifnot: self.graphIsSemantic -->
                         <div class="rr-table-column" style="flex-grow: 1;">
-                            <div><a target="_blank" style="text-decoration: underline;" data-bind="text: $data.resourceName(), attr:{href: $data.resourceId()}, clickBubble: false"></a></div>
+                            <div><a target="_blank" style="text-decoration: underline;" data-bind="text: $data.resourceName(), attr:{href: $parent.resourceReportUrl+$data.resourceId()}, clickBubble: false"></a></div>
                         </div>
                     <!-- /ko -->
                 </div>
