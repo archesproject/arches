@@ -348,7 +348,18 @@ class Resource(models.ResourceInstance):
             se = SearchEngineFactory().create()
             related_resources = self.get_related_resources(lang="en-US", start=0, limit=1000, page=0)
             for rr in related_resources["resource_relationships"]:
-                models.ResourceXResource.objects.get(pk=rr["resourcexid"]).delete()
+                # delete any related resource entries, also reindex the resrouce that references this resrouce that's being deleted
+                resourceXresource = models.ResourceXResource.objects.get(pk=rr["resourcexid"])
+                resource_to_reindex = (
+                    resourceXresource.resourceinstanceidfrom_id
+                    if resourceXresource.resourceinstanceidto_id == self.resourceinstanceid
+                    else resourceXresource.resourceinstanceidto_id
+                )
+                resourceXresource.delete(deletedResourceId=self.resourceinstanceid)
+                res = Resource.objects.get(pk=resource_to_reindex)
+                res.load_tiles()
+                res.index()
+
             query = Query(se)
             bool_query = Bool()
             bool_query.filter(Terms(field="resourceinstanceid", terms=[self.resourceinstanceid]))
@@ -401,13 +412,14 @@ class Resource(models.ResourceInstance):
         for relation in resource_relations["hits"]["hits"]:
             try:
                 preflabel = get_preflabel_from_valueid(relation["_source"]["relationshiptype"], lang)
-                relation["_source"]["relationshiptype_label"] = preflabel["value"]
+                relation["_source"]["relationshiptype_label"] = preflabel["value"] or ""
             except:
-                relation["_source"]["relationshiptype_label"] = relation["_source"]["relationshiptype"]
+                relation["_source"]["relationshiptype_label"] = relation["_source"]["relationshiptype"] or ""
 
             ret["resource_relationships"].append(relation["_source"])
             instanceids.add(relation["_source"]["resourceinstanceidto"])
             instanceids.add(relation["_source"]["resourceinstanceidfrom"])
+
         if len(instanceids) > 0:
             instanceids.remove(str(self.resourceinstanceid))
 
@@ -416,8 +428,9 @@ class Resource(models.ResourceInstance):
             if related_resources:
                 for resource in related_resources["docs"]:
                     relations = get_relations(resource["_id"], 0, 0)
-                    resource["_source"]["total_relations"] = relations["hits"]["total"]
-                    ret["related_resources"].append(resource["_source"])
+                    if resource["found"]:
+                        resource["_source"]["total_relations"] = relations["hits"]["total"]
+                        ret["related_resources"].append(resource["_source"])
         return ret
 
     def copy(self):

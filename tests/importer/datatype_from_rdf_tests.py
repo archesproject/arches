@@ -108,13 +108,13 @@ class RDFImportUnitTests(ArchesTestCase):
             "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person",
         }
         resp = dt.from_rdf(jf)
-        self.assertTrue(resp == "037daf4d-054a-44d2-9c0a-108b59e39109")
+        self.assertTrue(resp["resourceId"] == "037daf4d-054a-44d2-9c0a-108b59e39109")
 
     def test_jsonld_resource_urn_uuid(self):
         dt = self.DT.get_instance("resource-instance")
         jf = {"@id": "urn:uuid:eccaa586-284b-4f98-b4db-bdf8bdc9efcb", "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person"}
         resp = dt.from_rdf(jf)
-        self.assertTrue(resp == "eccaa586-284b-4f98-b4db-bdf8bdc9efcb")
+        self.assertTrue(resp["resourceId"] == "eccaa586-284b-4f98-b4db-bdf8bdc9efcb")
 
     def test_jsonld_resource_not_a_uuid(self):
         dt = self.DT.get_instance("resource-instance")
