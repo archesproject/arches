@@ -412,9 +412,9 @@ class Resource(models.ResourceInstance):
         for relation in resource_relations["hits"]["hits"]:
             try:
                 preflabel = get_preflabel_from_valueid(relation["_source"]["relationshiptype"], lang)
-                relation["_source"]["relationshiptype_label"] = preflabel["value"]
+                relation["_source"]["relationshiptype_label"] = preflabel["value"] or ""
             except:
-                relation["_source"]["relationshiptype_label"] = relation["_source"]["relationshiptype"]
+                relation["_source"]["relationshiptype_label"] = relation["_source"]["relationshiptype"] or ""
 
             ret["resource_relationships"].append(relation["_source"])
             instanceids.add(relation["_source"]["resourceinstanceidto"])
