@@ -35,10 +35,8 @@ define([
         this.provisionalTileViewModel = params.provisionalTileViewModel;
         this.reviewer = params.reviewer;
         this.expanded = ko.observable(true);
-        this.showForm = ko.observable(false);
-        this.showSummary = ko.pureComputed(function(){
-            return self.card.canAdd() && self.showForm() === false && self.card.selected();
-        });
+        this.card.showForm(false);
+
         this.beforeMove = function(e) {
             e.cancelDrop = (e.sourceParent!==e.targetParent);
         };
