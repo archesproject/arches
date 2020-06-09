@@ -32,8 +32,36 @@ define([
                 return self.filter().toLowerCase() === '' || relationship.resourceName().toLowerCase().includes(self.filter().toLowerCase());
             });
         });
- 
 
+        var updateNameAndOntologyClass = function(values) {
+            var names = [];
+            var value = ko.unwrap(values);
+            if (!self.multiple && value && !Array.isArray(value)) {
+                value = [value];
+            }
+            if(!!value) {
+                value.forEach(function(val) {
+                    if (val) {
+                        if(!val.resourceName) {
+                            Object.defineProperty(val, 'resourceName', {value: ko.observable()});
+                        }
+                        if(!val.ontologyClass) {
+                            Object.defineProperty(val, 'ontologyClass', {value:ko.observable()});
+                        }
+                        lookupResourceInstanceData(val.resourceId())
+                            .then(function(resourceInstance) {
+                                names.push(resourceInstance["_source"].displayname);
+                                self.displayValue(names.join(', '));
+                                val.resourceName(resourceInstance["_source"].displayname);
+                                val.ontologyClass(resourceInstance["_source"].root_ontology_class);
+                            });
+                    }
+                });
+            }
+        };
+
+        self.value.subscribe(updateNameAndOntologyClass);
+ 
         this.toggleSelectedResourceRelationship = function(resourceRelationship) {
             if (self.selectedResourceRelationship() === resourceRelationship) {
                 self.selectedResourceRelationship(null);
@@ -86,24 +114,7 @@ define([
 
         if(self.renderContext !== 'search'){
             // Resolve Resource Instance Names from the incoming values
-            var names = [];
-            var value = ko.unwrap(self.value);
-            if (!self.multiple && value && !Array.isArray(value)) {
-                value = [value];
-            }
-            if(!!value) {
-                value.forEach(function(val) {
-                    if (val) {
-                        lookupResourceInstanceData(val.resourceId())
-                            .then(function(resourceInstance) {
-                                names.push(resourceInstance["_source"].displayname);
-                                self.displayValue(names.join(', '));
-                                val.resourceName(resourceInstance["_source"].displayname);
-                                val.ontologyClass(resourceInstance["_source"].root_ontology_class);
-                            });
-                    }
-                });
-            }
+            updateNameAndOntologyClass(self.value);
 
             var relatedResourceModels = ko.computed(function() {
                 var res = [];
@@ -135,10 +146,10 @@ define([
                 "resourceId": ko.observable(id),
                 "ontologyProperty": ko.observable(""),
                 "inverseOntologyProperty": ko.observable(""),
-                "resourceName": ko.observable(name),
-                "ontologyClass": ko.observable(ontologyclass),
                 "resourceXresourceId": ""
-            };
+            };            
+            Object.defineProperty(ret, 'resourceName', {value: ko.observable(name)});
+            Object.defineProperty(ret, 'ontologyClass', {value: ko.observable(ontologyclass)});
             return ret;
         };
 

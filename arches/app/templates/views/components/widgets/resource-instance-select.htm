@@ -70,7 +70,7 @@
                     <!-- /ko -->
                 </div>
                 <div style="border-bottom: none; padding: 10px;"
-                    data-bind="visible: self.selectedResourceRelationship() === $data, css: { 'rr-table-border': self.selectedResourceRelationship() === $data} ">
+                    data-bind="visible: self.selectedResourceRelationship() === $data, if: self.selectedResourceRelationship() === $data, css: { 'rr-table-border': self.selectedResourceRelationship() === $data} ">
                     <div class="row">
                         <label class="col-sm-12" style="font-weight: bold;">{% trans "Relationship to" %} <span
                                 data-bind="text: $data.resourceName"></span></label>
@@ -79,10 +79,10 @@
                         <span class="col-sm-4" style="padding-top: 8px; text-align: right;"
                             data-bind="text: self.node.name() + ' (' + self.makeFriendly(self.node.ontologyclass()) + ')'"></span>
                         <span class="col-sm-4"><input style="width:30%; display:inline-block;" data-bind="
-                                                        select2Query: {
-                                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.node.ontologyclass(), $data.ontologyClass())
-                                                        }
-                                                    "></span>
+                            select2Query: {
+                                select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.node.ontologyclass(), $data.ontologyClass())
+                            }
+                        "></span>
                         <span class="col-sm-4" style="padding-top: 8px;"
                             data-bind="text: $data.resourceName() + ' (' + self.makeFriendly($data.ontologyClass()) + ')'"></span>
                     </div>

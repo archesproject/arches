@@ -1584,9 +1584,7 @@ class ResourceInstanceDataType(BaseDataType):
         {
             "resourceId": "",
             "ontologyProperty": "",
-            "inverseOntologyProperty": "",
-            "resourceName": "",
-            "ontologyClass": ""
+            "inverseOntologyProperty": ""
         }
 
     """
@@ -1783,8 +1781,6 @@ class ResourceInstanceDataType(BaseDataType):
                 "resourceId": m.groupdict()["r"],
                 "ontologyProperty": "",
                 "inverseOntologyProperty": "",
-                "resourceName": "",
-                "ontologyClass": "",
                 "resourceXresourceId": "",
             }
 
@@ -1804,8 +1800,6 @@ class ResourceInstanceDataType(BaseDataType):
                 "resourceId": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
                 "ontologyProperty": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
                 "inverseOntologyProperty": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
-                "resourceName": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
-                "ontologyClass": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
                 "resourceXresourceId": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
             }
         }
