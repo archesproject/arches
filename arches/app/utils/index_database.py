@@ -154,7 +154,7 @@ def index_resource_relations(clear_index=True, batch_size=settings.BULK_IMPORT_B
                 "created": resource_relation[8],
                 "inverserelationshiptype": resource_relation[9],
                 "tileid": resource_relation[10],
-                "nodeid": resource_relation[11]
+                "nodeid": resource_relation[11],
             }
             resource_relations_indexer.add(index="resource_relations", id=doc["resourcexid"], data=doc)
 

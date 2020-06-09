@@ -269,7 +269,7 @@ def prepare_resource_relations_index(create=False):
                     "datestarted": {"type": "date"},
                     "dateended": {"type": "date"},
                     "tileid": {"type": "keyword"},
-                    "nodeid": {"type": "keyword"}
+                    "nodeid": {"type": "keyword"},
                 }
             }
         }
