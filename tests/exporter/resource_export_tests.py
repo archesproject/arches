@@ -69,7 +69,6 @@ class BusinessDataExportTests(ArchesTestCase):
 
         self.assertDictEqual(dict(csv_input), dict(csv_output))
 
-
     def test_json_export(self):
         def deep_sort(obj):
             """
@@ -87,7 +86,7 @@ class BusinessDataExportTests(ArchesTestCase):
                 for val in obj:
                     new_list.append(deep_sort(val))
                 try:
-                    _sorted = sorted(new_list, key=itemgetter('tileid'))
+                    _sorted = sorted(new_list, key=itemgetter("tileid"))
                 except:
                     _sorted = new_list
 
