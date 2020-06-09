@@ -1613,7 +1613,7 @@ class ResourceInstanceDataType(BaseDataType):
                     resource_document = se.search(index="resources", id=resourceid)
                     ret.append(
                         {
-                            "resourceName": resource_document["docs"][0]["_source"]["displayname"],
+                            "resourceName": resource_document["_source"]["displayname"],
                             "resourceId": resourceid,
                             "ontologyProperty": rr.relationshiptype,
                             "inverseOntologyProperty": rr.inverserelationshiptype,
@@ -1699,7 +1699,7 @@ class ResourceInstanceDataType(BaseDataType):
         data = self.get_tile_data(tile)
         nodevalue = data[str(node.nodeid)]
         items = self.disambiguate(nodevalue)
-        return ", ".join([item.resourceName for item in items])
+        return ", ".join([item["resourceName"] for item in items])
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         for relatedResourceItem in nodevalue:

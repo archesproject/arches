@@ -48,7 +48,7 @@ def create_relation(relations, resource, resourceinstanceid_from, resourceinstan
         ontologyClass = root_ontology_classes[str(resTo.graph_id)]
         se = SearchEngineFactory().create()
         resource_document = se.search(index="resources", id=resourceinstanceid_to)
-        resourceName = resource_document["docs"][0]["_source"]["displayname"]
+        resourceName = resource_document["_source"]["displayname"]
     except:
         pass
 

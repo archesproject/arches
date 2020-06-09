@@ -648,16 +648,15 @@ class ResourceDescriptors(View):
                 resource = Resource.objects.get(pk=resourceid)
                 se = SearchEngineFactory().create()
                 document = se.search(index="resources", id=resourceid)
-                document = document["docs"][0]["_source"]
                 return JSONResponse(
                     {
-                        "graphid": document["graph_id"],
+                        "graphid": document["_source"]["graph_id"],
                         "graph_name": resource.graph.name,
-                        "displaydescription": document["displaydescription"],
-                        "map_popup": document["map_popup"],
-                        "displayname": document["displayname"],
-                        "geometries": document["geometries"],
-                        "permissions": document["permissions"],
+                        "displaydescription": document["_source"]["displaydescription"],
+                        "map_popup": document["_source"]["map_popup"],
+                        "displayname": document["_source"]["displayname"],
+                        "geometries": document["_source"]["geometries"],
+                        "permissions": document["_source"]["permissions"],
                         "userid": request.user.id,
                     }
                 )

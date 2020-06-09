@@ -109,7 +109,7 @@ define([
                 var res = [];
                 if (params.node) {
                     res = params.node.config.graphs().map(function(item){
-                        var graph = arches.resources.find(function(graph){
+                        var graph = arches.graphs.find(function(graph){
                             return graph.graphid === item.graphid;
                         });
                         return {
