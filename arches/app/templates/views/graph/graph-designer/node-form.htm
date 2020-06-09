@@ -96,6 +96,22 @@
 
                         <!-- /ko -->
                         <!-- /ko -->
+
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label">
+                                        {% trans "Description" %}
+
+                                    </label>
+                                </div>
+
+                                <div class="col-xs-12 crm-selector">
+                                    <textarea placeholder="{% trans 'description' %}" rows="6" class="form-control" data-bind="textInput: node().description"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
                     </form>
                 </div>
 
