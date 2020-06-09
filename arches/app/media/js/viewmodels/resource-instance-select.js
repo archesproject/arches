@@ -1,132 +1,207 @@
 define([
     'knockout',
     'jquery',
+    'underscore',
     'viewmodels/widget',
     'arches',
-], function(ko, $, WidgetViewModel, arches) {
-    var nameLookup = {};
+    'views/components/resource-summary',
+    'utils/ontology'
+], function(ko, $, _, WidgetViewModel, arches, ResourceSummary, ontologyUtils) {
+    var resourceLookup = {};
     require(['views/components/workflows/new-tile-step']);
     var ResourceInstanceSelectViewModel = function(params) {
         var self = this;
         params.configKeys = ['placeholder'];
+        this.renderContext = params.renderContext;
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
-        this.disable = params.disable || function() {
-            return false;
-        };
-        this.graphids = params.node ? ko.unwrap(params.node.config.graphid) : [params.graphid];
-        this.graphids = this.graphids || [];
-        this.graphNames = {};
-        this.graphids.forEach(function(graphid){
-            self.graphNames[graphid] = arches.resources.find(function(resource){
-                return resource.graphid === graphid;
-            });
-        });
-
-        this.disableMessage = params.disableMessage || '';
-
-        WidgetViewModel.apply(this, [params]);
-        var displayName = ko.observable('');
+        this.graphIsSemantic = params.graph ? !!params.graph.ontologyclass : false;
+        this.makeFriendly = ontologyUtils.makeFriendly;
+        this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
         self.newTileStep = ko.observable();
-        this.valueList = ko.computed(function() {
-            var valueList = self.value();
-            displayName();
-            if (!self.multiple && valueList) {
-                valueList = [valueList];
-            }
-            if (Array.isArray(valueList)) {
-                return valueList;
-            }
-            return [];
-        });
-        this.displayValue = displayName;
+        this.resourceReportUrl = arches.urls.resource_report;
+        this.selectedResourceRelationship = ko.observable(null);
+        this.reportResourceId = ko.observable();
+        this.reportGraphId = ko.observable(null);
+        this.filter = ko.observable('');
 
-        this.removeGraphIdsFromValue = function(value) {
-            if (Array.isArray(value)) {
-                self.graphids.forEach(function(graphid){
-                    var graphindex = self.value().indexOf(graphid);
-                    if (graphindex > -1) {
-                        self.value().splice(graphindex, 1);
-                    }
-                });
-                return ko.unwrap(value).length > 0 ? ko.unwrap(value) : null;
-            } else if (self.graphids.indexOf(value) !== -1) {
-                return null;
+        this.toggleSelectedResourceRelationship = function(resourceRelationship) {
+            if (self.selectedResourceRelationship() === resourceRelationship) {
+                self.selectedResourceRelationship(null);
             } else {
-                return value;
+                self.selectedResourceRelationship(resourceRelationship);
             }
         };
-
+        
+        WidgetViewModel.apply(this, [params]);
+        
+        this.displayValue = ko.observable('');
+        
+        //
+        // this.close is only called if newTileStep is True and the user 
+        // decides not to add the new resource instance, and closes the window without adding it
+        //
         this.close = function(){
-            var cleanval = self.removeGraphIdsFromValue(this.value());
-            this.value(cleanval);
             this.newTileStep(null);
         };
-
-        this.valueObjects = ko.computed(function() {
-            return self.valueList().map(function(value) {
-                return {
-                    id: value,
-                    name: nameLookup[value],
-                    reportUrl: arches.urls.resource_report + value
-                };
-            }).filter(function(item) {
-                return item.name;
-            });
-        });
-
-        var updateName = function() {
-            var names = [];
-            self.valueList().forEach(function(val) {
-                if (val) {
-                    if (nameLookup[val]) {
-                        names.push(nameLookup[val]);
-                        displayName(names.join(', '));
-                    } else {
-                        $.ajax(arches.urls.resource_descriptors + val, {
-                            dataType: "json"
-                        }).done(function(data) {
-                            nameLookup[val] = data.displayname;
-                            names.push(data.displayname);
-                            displayName(names.join(', '));
-                        });
-                    }
+        
+        
+        var setValue = function(valueObject) {
+            if (self.multiple) {
+                valueObject = [valueObject];
+                if (self.value() !== null) {
+                    valueObject = valueObject.concat(self.value());
                 }
-            });
+                self.value(valueObject);
+            } else {
+                self.value([valueObject]);
+            }
         };
-
-        updateName();
-
-        var relatedResourceModels = ko.computed(function() {
-            var res = [];
-            if (params.node) {
-                var ids = ko.unwrap(params.node.config.graphid);
-                if (ids) {
-                    res = arches.resources.filter(function(graph) {
-                        return ids.indexOf(graph.graphid) >= 0;
-                    }).map(function(g) {
-                        return {
-                            name: g.name,
-                            _id: g.graphid,
-                            isGraph: true
-                        };
+        
+        var lookupResourceInstanceData = function(resourceid) {
+            if (resourceLookup[resourceid]) {
+                return Promise.resolve(resourceLookup[resourceid]);
+            } else {
+                return window.fetch(arches.urls.search_results + "?id=" + resourceid)
+                .then(function(response){
+                    if(response.ok) {
+                        return response.json();
+                    }
+                })
+                .then(function(json) {
+                    resourceLookup[resourceid] = json["results"]["hits"]["hits"][0];
+                    return resourceLookup[resourceid];
+                });
+            }
+        };
+        
+        if(self.renderContext !== 'search'){
+            var updateNameAndOntologyClass = function(values) {
+                var names = [];
+                var value = ko.unwrap(values);
+                if (!self.multiple && value && !Array.isArray(value)) {
+                    value = [value];
+                }
+                if(!!value) {
+                    value.forEach(function(val) {
+                        if (val) {
+                            if(!val.resourceName) {
+                                Object.defineProperty(val, 'resourceName', {value: ko.observable()});
+                            }
+                            if(!val.ontologyClass) {
+                                Object.defineProperty(val, 'ontologyClass', {value:ko.observable()});
+                            }
+                            lookupResourceInstanceData(val.resourceId())
+                                .then(function(resourceInstance) {
+                                    names.push(resourceInstance["_source"].displayname);
+                                    self.displayValue(names.join(', '));
+                                    val.resourceName(resourceInstance["_source"].displayname);
+                                    val.ontologyClass(resourceInstance["_source"].root_ontology_class);
+                                });
+                        }
                     });
                 }
-            }
-            return res;
-        }, this);
+            };
+    
+            self.value.subscribe(updateNameAndOntologyClass);
+            
+            // Resolve Resource Instance Names from the incoming values
+            updateNameAndOntologyClass(self.value);
 
+            this.relationshipsInFilter = ko.computed(function() {
+                if(!self.value()) {
+                    return [];
+                }
+                return self.value().filter(function(relationship) {
+                    return self.filter().toLowerCase() === '' || relationship.resourceName().toLowerCase().includes(self.filter().toLowerCase());
+                });
+            });
+
+            var relatedResourceModels = ko.computed(function() {
+                var res = [];
+                if (params.node) {
+                    res = params.node.config.graphs().map(function(item){
+                        var graph = arches.resources.find(function(graph){
+                            return graph.graphid === item.graphid;
+                        });
+                        graph.config = item;
+                        return graph;
+                    });
+                }
+                return res;
+            }, this);
+
+            this.lookupGraph = function(graphid) {
+                var model = relatedResourceModels().find(function(model){
+                    return model.graphid === graphid;
+                });
+                return model;
+            };
+        }
+
+        var makeObject = function(id, esSource){
+            var graph = self.lookupGraph(esSource.graph_id);
+            var ret = {
+                "resourceId": ko.observable(id),
+                "ontologyProperty": ko.observable(graph.config.ontologyProperty || ''),
+                "inverseOntologyProperty": ko.observable(graph.config.inverseOntologyProperty || ''),
+                "resourceXresourceId": ""
+            };            
+            Object.defineProperty(ret, 'resourceName', {value: ko.observable(esSource.displayname)});
+            Object.defineProperty(ret, 'ontologyClass', {value: ko.observable(esSource.root_ontology_class)});
+            return ret;
+        };
 
         var url = ko.observable(arches.urls.search_results);
         this.url = url;
+        var resourceToAdd = ko.observable("");
         this.select2Config = {
-            value: this.value,
+            value: self.renderContext === 'search' ? self.value : resourceToAdd,
             clickBubble: true,
-            multiple: this.multiple,
-            placeholder: this.placeholder,
-            closeOnSelect: false,
-            allowClear: true,
-            disabled: this.disabled,
+            multiple: self.renderContext === 'search' ? params.multiple : false,
+            placeholder: this.placeholder() || "Add new Relationship",
+            closeOnSelect: true,
+            allowClear: self.renderContext === 'search' ? true : false,
+            onSelect: function(item) {
+                if (self.renderContext !== 'search') {
+                    if (item._source) {
+                        var ret = makeObject(item._id, item._source);
+                        setValue(ret);
+                        window.setTimeout(function() {
+                            resourceToAdd("");
+                        }, 250);
+                    } else {
+                        // This section is used when creating a new resource Instance
+                        var params = {
+                            graphid: item._id,
+                            complete: ko.observable(false),
+                            resourceid: ko.observable(),
+                            tileid: ko.observable()
+                        };
+                        self.newTileStep(params);
+                        params.complete.subscribe(function() {
+                            window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
+                                .then(function(response){
+                                    if(response.ok) {
+                                        return response.json();
+                                    }
+                                    throw("error");
+                                })
+                                .then(function(json) {
+                                    var item = json.results.hits.hits[0];
+                                    var ret = makeObject(params.resourceid(), item._source);
+                                    setValue(ret);
+                                })
+                                .finally(function(){
+                                    self.newTileStep(null);
+                                    window.setTimeout(function() {
+                                        resourceToAdd("");
+                                    }, 250);
+                                });
+                        });
+                    }
+                }
+            },
             ajax: {
                 url: function() {
                     return url();
@@ -144,18 +219,17 @@ define([
                         return {};
                     } else {
                         url(arches.urls.search_results);
-                        var graphid = params.node ? ko.unwrap(params.node.config.graphid) : undefined;
-                        if(!!params.graphid) { graphid = [ko.unwrap(params.graphid)]; }
                         var data = { 'paging-filter': page };
-                        if (graphid && graphid.length > 0) {
-                            data['resource-type-filter'] = JSON.stringify(
-                                graphid.map(function(id) {
-                                    return {
-                                        "graphid": id,
-                                        "inverted": false
-                                    };
-                                })
-                            );
+                        if (!!params.node) {
+                            var graphids = ko.unwrap(params.node.config.graphs).map(function(graph) {
+                                return {
+                                    "graphid": graph.graphid,
+                                    "inverted": false
+                                };
+                            });
+                            if(graphids.length > 0) {
+                                data['resource-type-filter'] = JSON.stringify(graphids);
+                            }
                         }
                         if (term) {
                             data['term-filter'] = JSON.stringify([{
@@ -166,16 +240,21 @@ define([
                                 "id": term,
                                 "text": term,
                                 "value": term
+
                             }]);
                         }
                         return data;
                     }
                 },
-
                 results: function(data, page) {
-                    if (!data['paging-filter'].paginator.has_next) {
+                    if (!data['paging-filter'].paginator.has_next && self.renderContext !== 'search') {
                         if (relatedResourceModels()) {
-                            relatedResourceModels().forEach(function(val) {
+                            relatedResourceModels().forEach(function(graph) {
+                                var val = {
+                                    name: graph.name,
+                                    _id: graph.graphid,
+                                    isGraph: true
+                                };
                                 data.results.hits.hits.push(val);
                             });
                         }
@@ -190,21 +269,10 @@ define([
                 return item._id;
             },
             formatResult: function(item) {
-                if (self.disable(item) === false) {
-                    if (item._source) {
-                        return item._source.displayname;
-                    } else {
-                        return '<b> Create a new ' + item.name + ' . . . </b>';
-                    }
+                if (item._source) {
+                    return item._source.displayname;
                 } else {
-                    return '<span>' + item._source.displayname + ' ' + self.disableMessage + '</span>';
-                }
-            },
-            formatResultCssClass: function(item) {
-                if (self.disable(item) === false) {
-                    return '';
-                } else {
-                    return 'disabled';
+                    return '<b> Create a new ' + item.name + ' . . . </b>';
                 }
             },
             formatSelection: function(item) {
@@ -214,63 +282,49 @@ define([
                     return item.name;
                 }
             },
-            initSelection: function(el, callback) {
-                var valueList = self.valueList();
-                var setSelectionData = function() {
-                    var valueData = self.valueObjects().map(function(item) {
-                        return {
-                            _id: item.id,
-                            _source: {
-                                displayname: item.name
-                            }
-                        };
+            initSelection: function(ele, callback) {
+                if(self.renderContext === "search" && self.value() !== "") {
+                    var values = self.value();
+                    if(!Array.isArray(self.value())){
+                        values = [self.value()];
+                    }
+                    var lookups = [];
+                    values.forEach(function(val){
+                        lookups.push(lookupResourceInstanceData(val)
+                            .then(function(resourceInstance) {
+                                return resourceInstance;
+                            })
+                        );
                     });
-                    valueData = self.multiple ? valueData : valueData[0];
-                    if (valueData) {
-                        callback(valueData);
-                    }
-                };
-
-                valueList.forEach(function(value) {
-                    var names = [];
-                    if (value) {
-                        var modelIds = relatedResourceModels().map(function(model) {
-                            return model._id;
+                    Promise.all(lookups).then(function(val){
+                        var ret = val.map(function(item) {
+                            return {"_source":{"displayname": item["_source"].displayname}, "_id":item["_id"]};
                         });
-                        if (!(modelIds.indexOf(value) > -1)) {
-                            if (nameLookup[value]) {
-                                setSelectionData();
-                            } else {
-                                $.ajax(arches.urls.resource_descriptors + value, {
-                                    dataType: "json"
-                                }).done(function(data) {
-                                    nameLookup[value] = data.displayname;
-                                    names.push(data.displayname);
-                                    displayName(names.join(', '));
-                                    setSelectionData();
-                                });
-                            }
-                        } else {
-                            var params = {
-                                graphid: value,
-                                complete: ko.observable(false),
-                                resourceid: ko.observable(),
-                                tileid: ko.observable()
-                            };
-                            self.newTileStep(params);
-                            params.complete.subscribe(function() {
-                                var result = params.resourceid();
-                                if (self.multiple) {
-                                    self.valueList().push(params.resourceid());
-                                    result = self.valueList();
-                                }
-                                result = self.removeGraphIdsFromValue(result);
-                                self.newTileStep(null);
-                                self.value(result);
-                            });
+                        if(self.multiple === false) {
+                            ret = ret[0];
                         }
-                    }
-                });
+                        callback(ret);
+                    });
+                }
+            }
+        };
+
+        this.deleteRelationship = function(valueToDelete) {
+            var newValues = [];
+            self.value().forEach(function(val) {
+                if (val.resourceId !== valueToDelete.resourceId) {
+                    newValues.push(val);
+                }
+            });
+            self.value(newValues);
+        };
+
+        this.formatLabel = function(name, ontologyProperty, inverseOntologyProperty){
+            if (self.graphIsSemantic) {
+                return name + ' (' + ontologyUtils.makeFriendly(ontologyProperty) + '/' + ontologyUtils.makeFriendly(inverseOntologyProperty) + ')';
+            }
+            else {
+                return name;
             }
         };
     };

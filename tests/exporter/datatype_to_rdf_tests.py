@@ -115,17 +115,17 @@ class RDFExportUnitTests(ArchesTestCase):
 
     def test_rdf_resource(self):
         dt = self.DT.get_instance("resource-instance")
-        edge_info, edge = mock_edge(1, CIDOC_NS["some_value"], None, "", 2)
+        edge_info, edge = mock_edge(1, CIDOC_NS["some_value"], None, "", {"resourceId": 2})
         graph = dt.to_rdf(edge_info, edge)
         self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, edge_info["r_uri"]) in graph)
 
     def test_rdf_resource_list(self):
         dt = self.DT.get_instance("resource-instance-list")
-        res_inst_list = [2, 3, 4, 5]
+        res_inst_list = [{"resourceId": 2}, {"resourceId": 3}, {"resourceId": 4}, {"resourceId": 5}]
         edge_info, edge = mock_edge(1, CIDOC_NS["some_value"], None, "", res_inst_list)
         graph = dt.to_rdf(edge_info, edge)
         for res_inst in res_inst_list:
-            self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, ARCHES_NS["resources/{0}".format(res_inst)]) in graph)
+            self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, ARCHES_NS["resources/{0}".format(res_inst["resourceId"])]) in graph)
 
     def test_rdf_domain(self):
         dt = self.DT.get_instance("domain-value")
