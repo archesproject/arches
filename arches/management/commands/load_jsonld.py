@@ -31,6 +31,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.search.search_engine_factory import SearchEngineFactory
 
 from arches.app.models.system_settings import settings
+import elasticsearch
 
 
 try:
@@ -86,6 +87,8 @@ class Command(BaseCommand):
 
         parser.add_argument("--suffix", default="json", action="store", dest="suffix", help="file suffix to load")
 
+        parser.add_argument("--ignore-errors", default=False, action="store_true", dest="ignore_errors", help="Log but do not terminate on errors")
+
     def handle(self, *args, **options):
 
         print("Starting JSON-LD load")
@@ -111,9 +114,10 @@ class Command(BaseCommand):
             quiet=options["quiet"],
             skip=options["skip"],
             suffix=options["suffix"],
+            ignore_errors=options["ignore_errors"]
         )
 
-    def load_resources(self, source, force, model, block, maxx, toobig, fast, quiet, skip, suffix):
+    def load_resources(self, source, force, model, block, maxx, toobig, fast, quiet, skip, suffix, ignore_errors):
 
         self.reader = JsonLdReader()
 
@@ -122,6 +126,7 @@ class Command(BaseCommand):
         else:
             models = os.listdir(source)
             models.sort()
+            models = [m for m in models if m[0] not in ["_", "."]]
 
         print(f"Found models: {models}")
 
@@ -133,10 +138,15 @@ class Command(BaseCommand):
         start = time.time()
         x = 0
         for m in models:
-            if not m.startswith("_") and not m.startswith("."):
-                print(f"Loading {m}")
+            print(f"Loading {m}")
+            if len(m) == 36:
+                # a UUID, likely from the command line
+                graphid = m
+            else:
+                # Check settings
                 graphid = graph_uuid_map.get(m, None)
                 if not graphid:
+                    # Check slug
                     try:
                         graphid = archesmodels.GraphModel.objects.get(slug=m).pk
                     except:
@@ -193,15 +203,26 @@ class Command(BaseCommand):
                                 # extract uuid from data
                                 uu = jsdata["id"][-36:]
                             if jsdata:
-                                try:
-                                    if fast:
-                                        self.fast_import_resource(uu, graphid, jsdata, n=fast, reload=force, quiet=quiet)
-                                    else:
-                                        self.import_resource(uu, graphid, jsdata, reload=force, quiet=quiet)
-                                except Exception as e:
-                                    errh.write(f"*** Failed to load {fn}:\n     {e}\n")
-                                    errh.flush()
-                                    raise
+                                # Just keep trying if ES times out :(
+                                okay = False
+                                while not okay:
+                                    try:
+                                        if fast:
+                                            self.fast_import_resource(uu, graphid, jsdata, n=fast, reload=force, quiet=quiet)
+                                        else:
+                                            self.import_resource(uu, graphid, jsdata, reload=force, quiet=quiet)
+                                        okay = True
+                                    except elasticsearch.exceptions.ConnectionTimeout:
+                                        # Try again, so do not set okay
+                                        errh.write("*** Elasticsearch Timeout Exception ***\n")
+                                        errh.flush()
+                                        pass
+                                    except Exception as e:
+                                        errh.write(f"*** Failed to load {fn}:\n     {e}\n")
+                                        errh.flush()
+                                        if not ignore_errors:
+                                            raise
+                                        okay = True
                             else:
                                 print(" ... skipped due to bad data :(")
                             if not x % 100:
@@ -215,7 +236,7 @@ class Command(BaseCommand):
             self.index_resources()
             self.resources = []
         # if 0:
-        #    # This should index in ES
+        #    # This should index the whole thing in ES
         #    index_database.index_resources(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
 
         errh.close()
