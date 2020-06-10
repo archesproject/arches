@@ -26,7 +26,7 @@ class BaseDataType(object):
     def values_match(self, value1, value2):
         return value1 == value2
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value, **kwargs):
         """
         Transforms values from probably string/wkt representation to specified
         datatype in arches
