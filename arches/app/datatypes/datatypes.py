@@ -530,7 +530,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return data
 
     def transform_value_for_tile(self, value, **kwargs):
-        if 'format' in kwargs and kwargs['format'] == 'esrijson':
+        if "format" in kwargs and kwargs["format"] == "esrijson":
             arches_geojson = GeoUtils().arcgisjson_to_geojson(value)
         else:
             arches_geojson = {}

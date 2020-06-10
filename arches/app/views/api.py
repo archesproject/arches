@@ -946,7 +946,7 @@ class IIIFManifest(APIBase):
 
         response = JSONResponse({"results": manifests, "count": count})
         return response
-        
+
 
 class OntolgyPropery(APIBase):
     def get(self, request):
@@ -985,7 +985,7 @@ class Tile(APIBase):
         request.POST = request.POST.copy()
         request.POST["data"] = request.body
         return tileview.post(request)
-        
+
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Node(APIBase):
@@ -1050,10 +1050,10 @@ class InstancePermission(APIBase):
         user = request.user
         perms = request.GET.get("perms")
         resourceinstanceid = request.GET.get("resourceinstanceid")
-        
+
         return JSONResponse(check_resource_instance_permissions(user, resourceinstanceid, perms))
-      
-        
+
+
 @method_decorator(csrf_exempt, name="dispatch")
 class NodeValue(APIBase):
     def post(self, request):
@@ -1064,14 +1064,14 @@ class NodeValue(APIBase):
         resourceid = request.POST.get("resourceinstanceid", None)
         format = request.POST.get("format")
         operation = request.POST.get("operation")
-        
-        #get node model return error if not found
+
+        # get node model return error if not found
         try:
             node = models.Node.objects.get(nodeid=nodeid)
         except Exception as e:
             return JSONResponse(e, status=404)
-        
-        #check if user has permissions to write to node
+
+        # check if user has permissions to write to node
         user_has_perms = request.user.has_perm("write_nodegroup", node)
 
         if user_has_perms:
@@ -1080,12 +1080,12 @@ class NodeValue(APIBase):
                 datatype = datatype_factory.get_instance(node.datatype)
             except Exception as e:
                 return JSONResponse(e, status=404)
-    
-            #transform data to format expected by tile 
+
+            # transform data to format expected by tile
             data = datatype.transform_value_for_tile(data, format=format)
-            
-            #get existing data and append new data if operation='append'
-            #tile_model(tileid)
+
+            # get existing data and append new data if operation='append'
+            # tile_model(tileid)
             # data = datatype.update_value(data, action=operation)
 
             # update/create tile
@@ -1094,5 +1094,5 @@ class NodeValue(APIBase):
             response = JSONResponse(new_tile, status=200)
         else:
             response = JSONResponse(_("User does not have permission to edit this node."), status=403)
-            
+
         return response
