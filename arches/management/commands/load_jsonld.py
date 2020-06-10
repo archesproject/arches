@@ -87,7 +87,9 @@ class Command(BaseCommand):
 
         parser.add_argument("--suffix", default="json", action="store", dest="suffix", help="file suffix to load")
 
-        parser.add_argument("--ignore-errors", default=False, action="store_true", dest="ignore_errors", help="Log but do not terminate on errors")
+        parser.add_argument(
+            "--ignore-errors", default=False, action="store_true", dest="ignore_errors", help="Log but do not terminate on errors"
+        )
 
     def handle(self, *args, **options):
 
@@ -114,7 +116,7 @@ class Command(BaseCommand):
             quiet=options["quiet"],
             skip=options["skip"],
             suffix=options["suffix"],
-            ignore_errors=options["ignore_errors"]
+            ignore_errors=options["ignore_errors"],
         )
 
     def load_resources(self, source, force, model, block, maxx, toobig, fast, quiet, skip, suffix, ignore_errors):
