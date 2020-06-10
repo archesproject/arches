@@ -20,17 +20,17 @@ define([
                 this.searchResults = options.searchResultsVm;
                 this.editingInstanceId = options.editing_instance_id;
                 this.graph = options.graph;
-                this.ontologyclass = '';
+                this.rootOntologyClass  = '';
                 if (this.graph) {
                     if(!!options.graph.ontologyclass){
-                        this.ontologyclass = options.graph.ontologyclass;
+                        this.rootOntologyClass = options.graph.ontologyclass;
                     }else{
                         if(options.graph.root){
-                            this.ontologyclass = options.graph.root.ontologyclass;
+                            this.rootOntologyClass = options.graph.root.ontologyclass;
                         }
                     }
                 }
-                this.graphIsSemantic = !!this.ontologyclass;
+                this.graphIsSemantic = !!this.rootOntologyClass;
                 this.makeFriendly = ontologyUtils.makeFriendly;
                 this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
                 this.graphNameLookup = _.indexBy(arches.resources, 'graphid');
