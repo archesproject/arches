@@ -127,7 +127,7 @@ class ConceptDataType(BaseConceptDataType):
                 )
         return errors
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value):
         return value.strip()
 
     def transform_export_values(self, value, *args, **kwargs):
@@ -261,7 +261,7 @@ class ConceptListDataType(BaseConceptDataType):
                 errors += validate_concept.validate(val, row_number)
         return errors
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value):
         ret = []
         for val in csv.reader([value], delimiter=",", quotechar='"'):
             for v in val:

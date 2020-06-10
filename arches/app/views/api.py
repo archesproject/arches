@@ -1045,10 +1045,55 @@ class Node(APIBase):
 
 
 @method_decorator(csrf_exempt, name="dispatch")
-class Instance_Permission(APIBase):
+class InstancePermission(APIBase):
     def get(self, request):
         user = request.user
         perms = request.GET.get("perms")
         resourceinstanceid = request.GET.get("resourceinstanceid")
         
         return JSONResponse(check_resource_instance_permissions(user, resourceinstanceid, perms))
+      
+        
+@method_decorator(csrf_exempt, name="dispatch")
+class NodeValue(APIBase):
+    def post(self, request):
+        datatype_factory = DataTypeFactory()
+        tileid = request.POST.get("tileid")
+        nodeid = request.POST.get("nodeid")
+        data = request.POST.get("data")
+        resourceid = request.POST.get("resourceinstanceid", None)
+        format = request.POST.get("format")
+        operation = request.POST.get("operation")
+        
+        #get node model return error if not found
+        try:
+            node = models.Node.objects.get(nodeid=nodeid)
+        except Exception as e:
+            return JSONResponse(e, status=404)
+        
+        #check if user has permissions to write to node
+        user_has_perms = request.user.has_perm("write_nodegroup", node)
+
+        if user_has_perms:
+            # get datatype of node
+            try:
+                datatype = datatype_factory.get_instance(node.datatype)
+            except Exception as e:
+                return JSONResponse(e, status=404)
+    
+            #transform data to format expected by tile 
+            data = datatype.transform_value_for_tile(data, format=data.format)
+            
+            #get existing data and append new data if operation='append'
+            import ipdb; ipdb.set_trace()
+            #tile_model(tileid)
+            data = datatype.update_value(data, action=operation)
+
+            # update/create tile
+            new_tile = tile_model.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid)
+
+            response = JSONResponse(new_tile, status=200)
+        else:
+            response = JSONResponse(_("User does not have permission to edit this node."), status=403)
+            
+        return response

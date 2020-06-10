@@ -158,7 +158,7 @@ class NumberDataType(BaseDataType):
             )
         return errors
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value, **kwargs):
         return float(value)
 
     def clean(self, tile, nodeid):
@@ -225,7 +225,7 @@ class BooleanDataType(BaseDataType):
 
         return errors
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value, **kwargs):
         return bool(util.strtobool(str(value)))
 
     def append_search_filters(self, value, node, query, request):
@@ -290,7 +290,7 @@ class DateDataType(BaseDataType):
 
         return errors
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value, **kwargs):
         if type(value) == list:
             value = value[0]
 
@@ -529,7 +529,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         data = GeoUtils().arcgisjson_to_geojson(value)
         return data
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value, **kwargs):
         arches_geojson = {}
         arches_geojson["type"] = "FeatureCollection"
         arches_geojson["features"] = []
@@ -1157,7 +1157,7 @@ class FileListDataType(BaseDataType):
                             tile_to_update.provisionaledits[str(user.id)]["value"][str(node.pk)] = updated_file_records
                         tile_to_update.save()
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value, **kwargs):
         """
         # TODO: Following commented code can be used if user does not already have file in final location using django ORM:
 
@@ -1707,7 +1707,7 @@ class ResourceInstanceDataType(BaseDataType):
                     {"string": relatedResourceItem["resourceName"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
                 )
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value, **kwargs):
         return [v.strip() for v in value.split(",")]
 
     def transform_export_values(self, value, *args, **kwargs):
