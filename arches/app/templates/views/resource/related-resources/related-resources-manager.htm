@@ -116,11 +116,11 @@
                                 </div>
                                 <div class="row">
                                     <span class="col-sm-4" style="padding-top: 8px; text-align: right;"
-                                        data-bind="text: relationship.node.name() + ' (' + self.makeFriendly(relationship.node.ontologyclass()) + ')'"></span>
+                                        data-bind="text: self.currentResource().displayname + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
                                     <span class="col-sm-4">
                                         <input style="width:30%; display:inline-block;" data-bind="
                                             select2Query: {
-                                                select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, relationship.node.ontologyclass(), relationship.resource.root_ontology_class)
+                                                select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class)
                                             }
                                         ">
                                     </span>
@@ -137,12 +137,12 @@
                                     <span class="col-sm-4">
                                         <input style="width:30%; display:inline-block;" data-bind="
                                             select2Query: {
-                                                select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, relationship.resource.root_ontology_class, relationship.node.ontologyclass())
+                                                select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass)
                                             }
                                         ">
                                     </span>
                                     <span class="col-sm-4" style="padding-top: 8px;"
-                                        data-bind="text: relationship.node.name() + ' (' + self.makeFriendly(relationship.node.ontologyclass()) + ')'"></span>
+                                        data-bind="text: self.currentResource().displayname + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
                                 </div>
                                 <!-- /ko -->
                                 <!--ko if: self.currentResource().resourceinstanceid === relationship.resourceinstanceidto() -->
@@ -152,11 +152,11 @@
                                 </div>
                                 <div class="row">
                                     <span class="col-sm-4" style="padding-top: 8px; text-align: right;"
-                                        data-bind="text: self.currentResource().displayname + ' (' + self.makeFriendly(self.ontologyclass) + ')'"></span>
+                                        data-bind="text: self.currentResource().displayname + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
                                     <span class="col-sm-4">
                                         <input style="width:30%; display:inline-block;" data-bind="
                                             select2Query: {
-                                                select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, relationship.resource.root_ontology_class, relationship.node.ontologyclass())
+                                                select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class)
                                             }
                                         ">
                                     </span>
@@ -173,12 +173,12 @@
                                         <span class="col-sm-4">
                                             <input style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, relationship.node.ontologyclass(), relationship.resource.root_ontology_class)
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass)
                                                 }
                                             ">
                                         </span>
                                     <span class="col-sm-4" style="padding-top: 8px;"
-                                        data-bind="text: self.currentResource().displayname + ' (' + self.makeFriendly(self.ontologyclass) + ')'"></span>
+                                        data-bind="text: self.currentResource().displayname + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
                                 </div>
                                 <!-- /ko -->
                                 <!-- /ko -->

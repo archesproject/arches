@@ -77,10 +77,10 @@
                     </div>
                     <div class="row">
                         <span class="col-sm-4" style="padding-top: 8px; text-align: right;"
-                            data-bind="text: self.node.name() + ' (' + self.makeFriendly(self.node.ontologyclass()) + ')'"></span>
+                            data-bind="text: self.resourceInstanceDisplayName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
                         <span class="col-sm-4"><input style="width:30%; display:inline-block;" data-bind="
                             select2Query: {
-                                select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.node.ontologyclass(), $data.ontologyClass())
+                                select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass())
                             }
                         "></span>
                         <span class="col-sm-4" style="padding-top: 8px;"
@@ -93,13 +93,15 @@
                     <div class="row">
                         <span class="col-sm-4" style="padding-top: 8px; text-align: right;"
                             data-bind="text: $data.resourceName() + ' (' + self.makeFriendly($data.ontologyClass()) + ')'"></span>
-                        <span class="col-sm-4"><input style="width:30%; display:inline-block;" data-bind="
-                                                        select2Query: {
-                                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass(), self.node.ontologyclass())
-                                                        }
-                                                    "></span>
+                        <span class="col-sm-4">
+                            <input style="width:30%; display:inline-block;" data-bind="
+                                select2Query: {
+                                    select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass(), self.rootOntologyClass)
+                                }
+                            ">
+                        </span>
                         <span class="col-sm-4" style="padding-top: 8px;"
-                            data-bind="text: self.node.name() + ' (' + self.makeFriendly(self.node.ontologyclass()) + ')'"></span>
+                            data-bind="text: self.resourceInstanceDisplayName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
                     </div>
                 </div>
             </div>

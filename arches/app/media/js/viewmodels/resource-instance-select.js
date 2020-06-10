@@ -16,6 +16,8 @@ define([
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
         this.graphIsSemantic = params.graph ? !!params.graph.ontologyclass : false;
+        this.rootOntologyClass = params.graph ? params.graph.ontologyclass : undefined;
+        this.resourceInstanceDisplayName = params.form ? params.form.displayname() : '';
         this.makeFriendly = ontologyUtils.makeFriendly;
         this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
         self.newTileStep = ko.observable();
