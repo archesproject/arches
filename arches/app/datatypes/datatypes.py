@@ -530,25 +530,28 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return data
 
     def transform_value_for_tile(self, value, **kwargs):
-        arches_geojson = {}
-        arches_geojson["type"] = "FeatureCollection"
-        arches_geojson["features"] = []
-        geometry = GEOSGeometry(value, srid=4326)
-        if geometry.geom_type == "GeometryCollection":
-            for geom in geometry:
+        if 'format' in kwargs and kwargs['format'] == 'esrijson':
+            arches_geojson = GeoUtils().arcgisjson_to_geojson(value)
+        else:
+            arches_geojson = {}
+            arches_geojson["type"] = "FeatureCollection"
+            arches_geojson["features"] = []
+            geometry = GEOSGeometry(value, srid=4326)
+            if geometry.geom_type == "GeometryCollection":
+                for geom in geometry:
+                    arches_json_geometry = {}
+                    arches_json_geometry["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
+                    arches_json_geometry["type"] = "Feature"
+                    arches_json_geometry["id"] = str(uuid.uuid4())
+                    arches_json_geometry["properties"] = {}
+                    arches_geojson["features"].append(arches_json_geometry)
+            else:
                 arches_json_geometry = {}
-                arches_json_geometry["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
+                arches_json_geometry["geometry"] = JSONDeserializer().deserialize(geometry.json)
                 arches_json_geometry["type"] = "Feature"
                 arches_json_geometry["id"] = str(uuid.uuid4())
                 arches_json_geometry["properties"] = {}
                 arches_geojson["features"].append(arches_json_geometry)
-        else:
-            arches_json_geometry = {}
-            arches_json_geometry["geometry"] = JSONDeserializer().deserialize(geometry.json)
-            arches_json_geometry["type"] = "Feature"
-            arches_json_geometry["id"] = str(uuid.uuid4())
-            arches_json_geometry["properties"] = {}
-            arches_geojson["features"].append(arches_json_geometry)
 
         return arches_geojson
 

@@ -1082,15 +1082,14 @@ class NodeValue(APIBase):
                 return JSONResponse(e, status=404)
     
             #transform data to format expected by tile 
-            data = datatype.transform_value_for_tile(data, format=data.format)
+            data = datatype.transform_value_for_tile(data, format=format)
             
             #get existing data and append new data if operation='append'
-            import ipdb; ipdb.set_trace()
             #tile_model(tileid)
-            data = datatype.update_value(data, action=operation)
+            # data = datatype.update_value(data, action=operation)
 
             # update/create tile
-            new_tile = tile_model.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid)
+            new_tile = TileProxyModel.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid)
 
             response = JSONResponse(new_tile, status=200)
         else:
