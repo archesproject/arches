@@ -143,7 +143,7 @@ class ResourceEditorView(MapBaseManagerView):
             .exclude(isresource=False)
             .exclude(isactive=False)
         )
-        ontologyclass = [node for node in nodes if node.istopnode is True][0].ontologyclass
+        ontologyclass = [node for node in nodes if node.istopnode is True][0].ontologyclass or ""
         relationship_type_values = get_resource_relationship_types()
 
         nodegroups = []
@@ -841,8 +841,8 @@ class RelatedResourcesView(BaseManagerView):
 
     def get(self, request, resourceid=None):
         if self.action == "get_candidates":
-            resourceids = json.loads(request.GET.get("resourceids", "[]"))
-            resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
+            resourceid = request.GET.get("resourceids", "")
+            resources = Resource.objects.filter(resourceinstanceid=resourceid)
             ret = []
             for rr in resources:
                 res = JSONSerializer().serializeToPython(rr)
@@ -898,9 +898,9 @@ class RelatedResourcesView(BaseManagerView):
         lang = request.GET.get("lang", settings.LANGUAGE_CODE)
         se = SearchEngineFactory().create()
         res = dict(request.POST)
-        relationship_type = res["relationship_properties[relationship_type]"][0]
-        datefrom = res["relationship_properties[datefrom]"][0]
-        dateto = res["relationship_properties[dateto]"][0]
+        relationshiptype = res["relationship_properties[relationshiptype]"][0]
+        datefrom = res["relationship_properties[datestarted]"][0]
+        dateto = res["relationship_properties[dateended]"][0]
         dateto = None if dateto == "" else dateto
         datefrom = None if datefrom == "" else datefrom
         notes = res["relationship_properties[notes]"][0]
@@ -937,7 +937,7 @@ class RelatedResourcesView(BaseManagerView):
                     resourceinstanceidfrom=Resource(root_resourceinstanceid[0]),
                     resourceinstanceidto=Resource(instanceid),
                     notes=notes,
-                    relationshiptype=relationship_type,
+                    relationshiptype=relationshiptype,
                     datestarted=datefrom,
                     dateended=dateto,
                 )
@@ -952,7 +952,7 @@ class RelatedResourcesView(BaseManagerView):
         for relationshipid in relationships_to_update:
             rr = models.ResourceXResource.objects.get(pk=relationshipid)
             rr.notes = notes
-            rr.relationshiptype = relationship_type
+            rr.relationshiptype = relationshiptype
             rr.datestarted = datefrom
             rr.dateended = dateto
             try:

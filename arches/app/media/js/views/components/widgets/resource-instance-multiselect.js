@@ -6,6 +6,7 @@ define([
     return ko.components.register('resource-instance-multiselect-widget', {
         viewModel: function(params) {
             params.multiple = true;
+            params.datatype = 'resource-instance-list';
             ResourceInstanceSelectViewModel.apply(this, [params]);
         },
         template: {
