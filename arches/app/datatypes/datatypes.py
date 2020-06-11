@@ -1744,7 +1744,9 @@ class ResourceInstanceDataType(BaseDataType):
         print(query.dsl)
 
     def get_rdf_uri(self, node, data, which="r"):
-        if type(data) == list:
+        if not data:
+            return URIRef("")
+        elif type(data) == list:
             return [URIRef(archesproject[f"resources/{x['resourceId']}"]) for x in data]
         return URIRef(archesproject[f"resources/{data['resourceId']}"])
 

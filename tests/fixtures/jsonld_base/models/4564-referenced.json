@@ -75,9 +75,9 @@
                 }, 
                 {
                     "config": {
-                        "graphid": [
-                            "2c03ddcc-bfa8-11e9-b4dc-0242ac160002", 
-                            "0c6269e8-bfa8-11e9-bd39-0242ac160002"
+                        "graphs": [
+                            {"graphid": "2c03ddcc-bfa8-11e9-b4dc-0242ac160002", "name": "?"}, 
+                            {"graphid": "0c6269e8-bfa8-11e9-bd39-0242ac160002", "name": "??"}
                         ]
                     }, 
                     "datatype": "resource-instance", 
