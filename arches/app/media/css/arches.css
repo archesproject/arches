@@ -77,7 +77,8 @@ i.report-expander:focus,
 .chosen-container-active,
 .select2-container-active,
 .workbench-card-sidepanel-header:focus,
-.sp-header-alerts:focus {
+.sp-header-alerts:focus,
+.timeline-entry:focus {
 	outline: #006600 solid 3px !important;
 }
 
