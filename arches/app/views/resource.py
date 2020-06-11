@@ -108,6 +108,7 @@ def get_instance_creator(resource_instance, user=None):
     return {"creatorid": creatorid, "user_can_edit_instance_permissions": can_edit}
 
 
+@method_decorator(group_required("Resource Editor"), name="dispatch")
 class ResourceEditorView(MapBaseManagerView):
     action = None
 
