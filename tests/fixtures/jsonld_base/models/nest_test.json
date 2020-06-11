@@ -530,8 +530,12 @@
                 },
                 {
                     "config": {
-                        "graphid": [
-                            "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71"
+                        "graphs": [
+                            {
+                                "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
+                                "ontologyProperty": "",
+                                "inverseOntologyProperty": ""
+                            }
                         ]
                     },
                     "datatype": "resource-instance",
@@ -664,8 +668,12 @@
                 },
                 {
                     "config": {
-                        "graphid": [
-                            "9b596906-1540-11ea-b353-acde48001122"
+                        "graphs": [
+                            {
+                                "graphid": "9b596906-1540-11ea-b353-acde48001122",
+                                "ontologyProperty": "",
+                                "inverseOntologyProperty": ""
+                            }
                         ]
                     },
                     "datatype": "resource-instance",
