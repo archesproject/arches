@@ -16,6 +16,7 @@ define([
             });
             return tiles;
         };
+        this.inResourceEditor = location.pathname.includes(params.pageVm.urls.resource_editor);
         this.configKeys = params.configKeys || [];
         this.showIds = params.showIds || false;
         this.state = params.state || 'form';
@@ -31,6 +32,12 @@ define([
             }
             this.tile = this.card.newTile;
         }
+        this.revealForm = function(card){
+            if (!card.selected()) {card.selected(true);}
+            setTimeout(function(){
+                card.showForm(true);
+            }, 50);
+        };
         this.form = params.form;
         this.provisionalTileViewModel = params.provisionalTileViewModel;
         this.reviewer = params.reviewer;

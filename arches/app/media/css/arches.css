@@ -7888,9 +7888,17 @@ a.mega-dropdown-toggle.disabled {
     padding-left: 15px;
 }
 
+.rp-edit-buttons {
+    min-width: 34px;
+    display: inline-flex;
+    justify-content: space-between;
+    margin-right: 10%;
+    color: #0257a2;
+}
+
 .rp-tile-separator {
     border: 1px solid #ddd;
-    margin-right: 15%;
+    margin-right: 9%;
 }
 
 @media (min-width: 992px) {
