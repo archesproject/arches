@@ -328,7 +328,8 @@ dl.inline-flex dd {
 
 .one-page-header .navbar-brand h1,
 .list-header, .ep-form-alert-text,
-button.fa-trash:focus {
+button.fa-trash:focus,
+#rr-splash button:focus {
     color: #fff !important;
 }
 
