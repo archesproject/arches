@@ -281,6 +281,10 @@ define([
                 },
                 owner: this
             }),
+            showForm: ko.observable(false),
+            showSummary: ko.pureComputed(function(){
+                return self.canAdd() && self.showForm() === false && self.selected();
+            }),
             canAdd: ko.pureComputed({
                 read: function() {
                     return this.cardinality === 'n' || this.tiles().length === 0;

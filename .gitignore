@@ -38,3 +38,4 @@ djcp.sh
 .DS_Store
 pip-wheel-metadata
 .eggs
+*.code-workspace
