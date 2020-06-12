@@ -12,10 +12,13 @@ define([
     var ResourceInstanceSelectViewModel = function(params) {
         var self = this;
         params.configKeys = ['placeholder'];
+        this.preview = arches.graphs.length > 0;
         this.renderContext = params.renderContext;
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
         this.graphIsSemantic = params.graph ? !!params.graph.ontologyclass : false;
+        this.rootOntologyClass = params.graph ? params.graph.ontologyclass : undefined;
+        this.resourceInstanceDisplayName = params.form && params.form.displayname ? params.form.displayname() : '';
         this.makeFriendly = ontologyUtils.makeFriendly;
         this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
         self.newTileStep = ko.observable();
@@ -119,9 +122,10 @@ define([
 
             var relatedResourceModels = ko.computed(function() {
                 var res = [];
+                var graphlist = this.preview ? arches.graphs : arches.resources;
                 if (params.node) {
                     res = params.node.config.graphs().map(function(item){
-                        var graph = arches.resources.find(function(graph){
+                        var graph = graphlist.find(function(graph){
                             return graph.graphid === item.graphid;
                         });
                         graph.config = item;
@@ -172,33 +176,35 @@ define([
                         }, 250);
                     } else {
                         // This section is used when creating a new resource Instance
-                        var params = {
-                            graphid: item._id,
-                            complete: ko.observable(false),
-                            resourceid: ko.observable(),
-                            tileid: ko.observable()
-                        };
-                        self.newTileStep(params);
-                        params.complete.subscribe(function() {
-                            window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
-                                .then(function(response){
-                                    if(response.ok) {
-                                        return response.json();
-                                    }
-                                    throw("error");
-                                })
-                                .then(function(json) {
-                                    var item = json.results.hits.hits[0];
-                                    var ret = makeObject(params.resourceid(), item._source);
-                                    setValue(ret);
-                                })
-                                .finally(function(){
-                                    self.newTileStep(null);
-                                    window.setTimeout(function() {
-                                        resourceToAdd("");
-                                    }, 250);
-                                });
-                        });
+                        if(!self.preview){
+                            var params = {
+                                graphid: item._id,
+                                complete: ko.observable(false),
+                                resourceid: ko.observable(),
+                                tileid: ko.observable()
+                            };
+                            self.newTileStep(params);
+                            params.complete.subscribe(function() {
+                                window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
+                                    .then(function(response){
+                                        if(response.ok) {
+                                            return response.json();
+                                        }
+                                        throw("error");
+                                    })
+                                    .then(function(json) {
+                                        var item = json.results.hits.hits[0];
+                                        var ret = makeObject(params.resourceid(), item._source);
+                                        setValue(ret);
+                                    })
+                                    .finally(function(){
+                                        self.newTileStep(null);
+                                        window.setTimeout(function() {
+                                            resourceToAdd("");
+                                        }, 250);
+                                    });
+                            });
+                        }
                     }
                 }
             },

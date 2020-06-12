@@ -1649,6 +1649,9 @@ class ResourceInstanceDataType(BaseDataType):
 
     def pre_tile_save(self, tile, nodeid):
         tiledata = tile.data[str(nodeid)]
+        # Ensure tiledata is a list (with JSON-LD import it comes in as an object)
+        if type(tiledata) != list and tiledata is not None:
+            tiledata = [tiledata]
         if tiledata is None or tiledata == []:
             # resource relationship has been removed
             try:
@@ -1703,6 +1706,8 @@ class ResourceInstanceDataType(BaseDataType):
         return ", ".join([item["resourceName"] for item in items])
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        if type(nodevalue) != list:
+            nodevalue = [nodevalue]
         for relatedResourceItem in nodevalue:
             document["ids"].append({"id": relatedResourceItem["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
             if "resourceName" in relatedResourceItem and relatedResourceItem["resourceName"] not in document["strings"]:
@@ -1739,7 +1744,9 @@ class ResourceInstanceDataType(BaseDataType):
         print(query.dsl)
 
     def get_rdf_uri(self, node, data, which="r"):
-        if type(data) == list:
+        if not data:
+            return URIRef("")
+        elif type(data) == list:
             return [URIRef(archesproject[f"resources/{x['resourceId']}"]) for x in data]
         return URIRef(archesproject[f"resources/{data['resourceId']}"])
 

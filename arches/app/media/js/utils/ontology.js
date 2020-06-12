@@ -36,9 +36,15 @@ define(['arches'], function(arches) {
                     },
                     dataType: 'json',
                     quietMillis: 250,
-                    results: function(data, page) {
+                    results: function(data, page, query) {
+                        var ret = data;
+                        if(query.term !== ""){
+                            ret = data.filter(function(item){
+                                return item.toUpperCase().includes(query.term.toUpperCase());
+                            });
+                        }
                         return {
-                            results: data
+                            results: ret
                         };
                     }
                 },

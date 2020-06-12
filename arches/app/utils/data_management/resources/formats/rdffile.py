@@ -317,9 +317,8 @@ class JsonLdReader(Reader):
             node["datatype_type"] = n.datatype
             node["extra_class"] = []
             if node["datatype"].references_resource_type():
-                if "graphid" in n.config and n.config["graphid"]:
-                    graph_ids = n.config["graphid"]
-                    for gid in graph_ids:
+                if "graphs" in n.config and n.config["graphs"]:
+                    for gid in [x["graphid"] for x in n.config["graphs"]]:
                         node["extra_class"].append(self.root_ontologyclass_lookup[gid])
 
             node["config"] = {}
