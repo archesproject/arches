@@ -1650,7 +1650,7 @@ class ResourceInstanceDataType(BaseDataType):
     def pre_tile_save(self, tile, nodeid):
         tiledata = tile.data[str(nodeid)]
         # Ensure tiledata is a list (with JSON-LD import it comes in as an object)
-        if type(tiledata) != list:
+        if type(tiledata) != list and tiledata is not None:
             tiledata = [tiledata]
         if tiledata is None or tiledata == []:
             # resource relationship has been removed
