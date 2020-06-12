@@ -103,7 +103,8 @@ i.report-expander:focus,
 .btn-mint:focus,
 .btn-primary:focus,
 .btn.viewstate-btn.active:focus,
-.btn-display-toggle:focus {
+.btn-display-toggle:focus,
+.mpm-manager button:focus {
 	outline: cyan solid 3px !important;
 	text-decoration: underline;
 }
