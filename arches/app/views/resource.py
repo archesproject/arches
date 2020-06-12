@@ -44,7 +44,7 @@ from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_delete_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.app.utils.permission_backend import user_is_resource_reviewer, user_can_delete_resources
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
@@ -146,7 +146,6 @@ class ResourceEditorView(MapBaseManagerView):
         )
         ontologyclass = [node for node in nodes if node.istopnode is True][0].ontologyclass or ""
         relationship_type_values = get_resource_relationship_types()
-
         nodegroups = []
         editable_nodegroups = []
         for node in nodes:
@@ -219,7 +218,7 @@ class ResourceEditorView(MapBaseManagerView):
             card["is_writable"] = False
             if str(card["nodegroup_id"]) in editable_nodegroup_ids:
                 card["is_writable"] = True
-
+        user_can_delete_resource = user_can_delete_resources(request.user, resourceid)
         context = self.get_context_data(
             main_script=main_script,
             resourceid=resourceid,
@@ -246,6 +245,7 @@ class ResourceEditorView(MapBaseManagerView):
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             user_is_reviewer=json.dumps(user_is_reviewer),
+            user_can_delete_resource=user_can_delete_resource,
             creator=json.dumps(creator),
             user_created_instance=json.dumps(user_created_instance),
             report_templates=templates,
