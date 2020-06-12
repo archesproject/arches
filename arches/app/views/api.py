@@ -1048,10 +1048,15 @@ class Node(APIBase):
 class InstancePermission(APIBase):
     def get(self, request):
         user = request.user
-        perms = request.GET.get("perms")
+        perm = request.GET.get("perms")
         resourceinstanceid = request.GET.get("resourceinstanceid")
-
-        return JSONResponse(check_resource_instance_permissions(user, resourceinstanceid, perms))
+        if perm == "view_resourceinstance":
+            result = user_can_read_resources(user, resourceinstanceid)
+        elif perm == "change_resourceinstance":
+            result = user_can_edit_resources(user, resourceinstanceid)
+        elif perm == "delete_resourceinstance":
+            result = user_can_delete_resources(user, resourceinstanceid)
+        return JSONResponse(result)
 
 
 @method_decorator(csrf_exempt, name="dispatch")
