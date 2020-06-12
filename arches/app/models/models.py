@@ -675,7 +675,10 @@ class ResourceXResource(models.Model):
         deletedResourceId = kwargs.pop("deletedResourceId", None)
         if deletedResourceId and self.tileid and self.nodeid:
             newTileData = []
-            for relatedresourceItem in self.tileid.data[str(self.nodeid_id)]:
+            data = self.tileid.data[str(self.nodeid_id)]
+            if type(data) != list:
+                data = [data]
+            for relatedresourceItem in data:
                 if relatedresourceItem["resourceId"] != str(deletedResourceId):
                     newTileData.append(relatedresourceItem)
             self.tileid.data[str(self.nodeid_id)] = newTileData
