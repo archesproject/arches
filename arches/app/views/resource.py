@@ -44,7 +44,7 @@ from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_delete_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.app.utils.permission_backend import user_is_resource_reviewer, user_can_delete_resources
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
@@ -108,6 +108,7 @@ def get_instance_creator(resource_instance, user=None):
     return {"creatorid": creatorid, "user_can_edit_instance_permissions": can_edit}
 
 
+@method_decorator(group_required("Resource Editor"), name="dispatch")
 class ResourceEditorView(MapBaseManagerView):
     action = None
 
@@ -143,9 +144,8 @@ class ResourceEditorView(MapBaseManagerView):
             .exclude(isresource=False)
             .exclude(isactive=False)
         )
-        ontologyclass = [node for node in nodes if node.istopnode is True][0].ontologyclass
+        ontologyclass = [node for node in nodes if node.istopnode is True][0].ontologyclass or ""
         relationship_type_values = get_resource_relationship_types()
-
         nodegroups = []
         editable_nodegroups = []
         for node in nodes:
@@ -218,7 +218,7 @@ class ResourceEditorView(MapBaseManagerView):
             card["is_writable"] = False
             if str(card["nodegroup_id"]) in editable_nodegroup_ids:
                 card["is_writable"] = True
-
+        user_can_delete_resource = user_can_delete_resources(request.user, resourceid)
         context = self.get_context_data(
             main_script=main_script,
             resourceid=resourceid,
@@ -245,6 +245,7 @@ class ResourceEditorView(MapBaseManagerView):
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             user_is_reviewer=json.dumps(user_is_reviewer),
+            user_can_delete_resource=user_can_delete_resource,
             creator=json.dumps(creator),
             user_created_instance=json.dumps(user_created_instance),
             report_templates=templates,
@@ -841,8 +842,8 @@ class RelatedResourcesView(BaseManagerView):
 
     def get(self, request, resourceid=None):
         if self.action == "get_candidates":
-            resourceids = json.loads(request.GET.get("resourceids", "[]"))
-            resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
+            resourceid = request.GET.get("resourceids", "")
+            resources = Resource.objects.filter(resourceinstanceid=resourceid)
             ret = []
             for rr in resources:
                 res = JSONSerializer().serializeToPython(rr)
@@ -898,9 +899,9 @@ class RelatedResourcesView(BaseManagerView):
         lang = request.GET.get("lang", settings.LANGUAGE_CODE)
         se = SearchEngineFactory().create()
         res = dict(request.POST)
-        relationship_type = res["relationship_properties[relationship_type]"][0]
-        datefrom = res["relationship_properties[datefrom]"][0]
-        dateto = res["relationship_properties[dateto]"][0]
+        relationshiptype = res["relationship_properties[relationshiptype]"][0]
+        datefrom = res["relationship_properties[datestarted]"][0]
+        dateto = res["relationship_properties[dateended]"][0]
         dateto = None if dateto == "" else dateto
         datefrom = None if datefrom == "" else datefrom
         notes = res["relationship_properties[notes]"][0]
@@ -937,7 +938,7 @@ class RelatedResourcesView(BaseManagerView):
                     resourceinstanceidfrom=Resource(root_resourceinstanceid[0]),
                     resourceinstanceidto=Resource(instanceid),
                     notes=notes,
-                    relationshiptype=relationship_type,
+                    relationshiptype=relationshiptype,
                     datestarted=datefrom,
                     dateended=dateto,
                 )
@@ -952,7 +953,7 @@ class RelatedResourcesView(BaseManagerView):
         for relationshipid in relationships_to_update:
             rr = models.ResourceXResource.objects.get(pk=relationshipid)
             rr.notes = notes
-            rr.relationshiptype = relationship_type
+            rr.relationshiptype = relationshiptype
             rr.datestarted = datefrom
             rr.dateended = dateto
             try:

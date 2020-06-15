@@ -46,7 +46,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
                     </div>
                     <div class="tree-display-tools-panel">
-                        <a class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
+                        <a class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand!' %}</a>
             <a class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
                     </div>
                 </div>
@@ -250,7 +250,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- ko if: selectedCard().cardinality === 'n' && selectedTile().tileid  -->
                         <span class="add-new-crumb current-crumb" data-bind="click: function() {
-                            selectedCard().selected(true);
+                            selectedCard().selected(true); setTimeout(function(){selectedCard().showForm(true)}, 50);
                         }">
                             <i class="fa fa-plus"></i>
                             {% trans 'Add New' %}

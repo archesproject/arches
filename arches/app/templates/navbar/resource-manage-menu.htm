@@ -20,6 +20,7 @@
                 </li>
 
                 <!-- Menu Item -->
+                {% if user_can_delete_resource %}
                 <li id="card-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceId()}">
                     <a href="" target="" class="" data-bind="click: deleteResource">
                         <div class="media-body">
@@ -28,6 +29,7 @@
                         </div>
                     </a>
                 </li>
+                {% endif %}
 
                 <!-- Menu Item -->
                 <li id="history-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceId()}">

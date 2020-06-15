@@ -642,6 +642,7 @@ class ResourceXResource(models.Model):
         null=True,
         related_name="resxres_resource_instance_ids_from",
         on_delete=models.CASCADE,
+        db_constraint=False,
     )
     resourceinstanceidto = models.ForeignKey(
         "ResourceInstance",
@@ -650,19 +651,39 @@ class ResourceXResource(models.Model):
         null=True,
         related_name="resxres_resource_instance_ids_to",
         on_delete=models.CASCADE,
+        db_constraint=False,
     )
     notes = models.TextField(blank=True, null=True)
     relationshiptype = models.TextField(blank=True, null=True)
+    inverserelationshiptype = models.TextField(blank=True, null=True)
+    tileid = models.ForeignKey(
+        "TileModel", db_column="tileid", blank=True, null=True, related_name="resxres_tile_id", on_delete=models.CASCADE,
+    )
+    nodeid = models.ForeignKey("Node", db_column="nodeid", blank=True, null=True, related_name="resxres_node_id", on_delete=models.CASCADE,)
     datestarted = models.DateField(blank=True, null=True)
     dateended = models.DateField(blank=True, null=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
 
-    def delete(self):
+    def delete(self, *args, **kwargs):
         from arches.app.search.search_engine_factory import SearchEngineFactory
 
         se = SearchEngineFactory().create()
         se.delete(index="resource_relations", id=self.resourcexid)
+
+        # update the resource-instance tile by removing any references to a deleted resource
+        deletedResourceId = kwargs.pop("deletedResourceId", None)
+        if deletedResourceId and self.tileid and self.nodeid:
+            newTileData = []
+            data = self.tileid.data[str(self.nodeid_id)]
+            if type(data) != list:
+                data = [data]
+            for relatedresourceItem in data:
+                if relatedresourceItem["resourceId"] != str(deletedResourceId):
+                    newTileData.append(relatedresourceItem)
+            self.tileid.data[str(self.nodeid_id)] = newTileData
+            self.tileid.save()
+
         super(ResourceXResource, self).delete()
 
     def save(self):

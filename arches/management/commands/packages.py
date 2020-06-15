@@ -513,13 +513,18 @@ class Command(BaseCommand):
         def load_resource_to_resource_constraints(package_dir):
             config_paths = glob.glob(os.path.join(package_dir, "package_config.json"))
             if len(config_paths) > 0:
-                configs = json.load(open(config_paths[0]))
-                for relationship in configs["permitted_resource_relationships"]:
-                    (obj, created) = models.Resource2ResourceConstraint.objects.update_or_create(
-                        resourceclassfrom_id=uuid.UUID(relationship["resourceclassfrom_id"]),
-                        resourceclassto_id=uuid.UUID(relationship["resourceclassto_id"]),
-                        resource2resourceid=uuid.UUID(relationship["resource2resourceid"]),
-                    )
+                try:
+                    configs = json.load(open(config_paths[0]))
+                    for relationship in configs["permitted_resource_relationships"]:
+                        (obj, created) = models.Resource2ResourceConstraint.objects.update_or_create(
+                            resourceclassfrom_id=uuid.UUID(relationship["resourceclassfrom_id"]),
+                            resourceclassto_id=uuid.UUID(relationship["resourceclassto_id"]),
+                            resource2resourceid=uuid.UUID(relationship["resource2resourceid"]),
+                        )
+                except json.decoder.JSONDecodeError as e:
+                    logger.warn("Invalid syntax in package_config.json. Please inspect and then re-run command.")
+                    logger.warn(e)
+                    sys.exit()
 
         @transaction.atomic
         def load_preliminary_sql(package_dir):
