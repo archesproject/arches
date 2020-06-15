@@ -1710,7 +1710,9 @@ class ResourceInstanceDataType(BaseDataType):
             nodevalue = [nodevalue]
         if nodevalue:
             for relatedResourceItem in nodevalue:
-                document["ids"].append({"id": relatedResourceItem["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
+                document["ids"].append(
+                    {"id": relatedResourceItem["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+                )
                 if "resourceName" in relatedResourceItem and relatedResourceItem["resourceName"] not in document["strings"]:
                     document["strings"].append(
                         {"string": relatedResourceItem["resourceName"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
