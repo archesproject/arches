@@ -1447,5 +1447,4 @@ def get_concept_label_from_valueid(valueid):
 def get_preflabel_from_valueid(valueid, lang):
     concept_label = SearchEngineInstance.search(index="concepts", id=valueid)
     if concept_label["found"]:
-        return get_preflabel_from_conceptid(
-            get_concept_label_from_valueid(valueid)["conceptid"], lang)
+        return get_preflabel_from_conceptid(get_concept_label_from_valueid(valueid)["conceptid"], lang)
