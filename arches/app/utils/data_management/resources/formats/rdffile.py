@@ -299,7 +299,6 @@ class JsonLdReader(Reader):
 
         self.searchengine = SearchEngineFactory().create()
 
-
     def validate_concept_in_collection(self, value, collection):
         cdata = Concept().get_child_collections(collection, columns="conceptidto")
         ids = [str(x[0]) for x in cdata]
@@ -538,7 +537,7 @@ class JsonLdReader(Reader):
 
                 if not self.is_semantic_node(branch[0]):
                     graph_node = branch[0]
-                    if isinstance(graph_node['datatype'], BaseConceptDataType):
+                    if isinstance(graph_node["datatype"], BaseConceptDataType):
                         node_value = graph_node["datatype"].from_rdf(vi, searchengine=self.searchengine)
                     else:
                         node_value = graph_node["datatype"].from_rdf(vi)
