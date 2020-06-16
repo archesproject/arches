@@ -9,21 +9,24 @@ details = {
     "name": "Sample Function",
     "type": "node",
     "description": "Just a sample demonstrating node group selection",
-    "defaultconfig": {"selected_nodegroup": ""},
+    "defaultconfig": {"triggering_nodegroups": []},
     "classname": "SampleFunction",
     "component": "views/components/functions/sample-function",
 }
 
 
 class SampleFunction(BaseFunction):
-    def save(self):
-        print("calling save")
+    def save(self, tile, request):
+        print("running before tile save")
 
-    def on_import(self):
+    def post_save(self, tile, request):
+        print("running after tile save")
+
+    def on_import(self, tile, request):
         print("calling on import")
 
-    def get(self):
+    def get(self, tile, request):
         print("calling get")
 
-    def delete(self):
+    def delete(self, tile, request):
         print("calling delete")
