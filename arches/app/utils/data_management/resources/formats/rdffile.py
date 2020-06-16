@@ -23,6 +23,8 @@ from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS
 from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand, set_document_loader
 
+from arches.app.datatypes.concept_types import BaseConceptDataType
+from arches.app.search.search_engine_factory import SearchEngineFactory
 
 # Stop code from looking up the contexts online for every operation
 docCache = {}
@@ -295,6 +297,9 @@ class JsonLdReader(Reader):
         self.logger.debug("Found {0} Non-unique root classes".format(len(self.non_unique_classes)))
         self.logger.debug("Found {0} Resource Model Root classes".format(len(self.resource_model_root_classes)))
 
+        self.searchengine = SearchEngineFactory().create()
+
+
     def validate_concept_in_collection(self, value, collection):
         cdata = Concept().get_child_collections(collection, columns="conceptidto")
         ids = [str(x[0]) for x in cdata]
@@ -424,6 +429,7 @@ class JsonLdReader(Reader):
         return False
 
     def data_walk(self, data_node, tree_node, result, tile=None):
+
         for k, v in data_node.items():
             if k in ["@id", "@type"]:
                 continue
@@ -532,7 +538,10 @@ class JsonLdReader(Reader):
 
                 if not self.is_semantic_node(branch[0]):
                     graph_node = branch[0]
-                    node_value = graph_node["datatype"].from_rdf(vi)
+                    if isinstance(graph_node['datatype'], BaseConceptDataType):
+                        node_value = graph_node["datatype"].from_rdf(vi, searchengine=self.searchengine)
+                    else:
+                        node_value = graph_node["datatype"].from_rdf(vi)
 
                 # We know now that it can go into the branch
                 # Determine if we can collapse the data into a -list or not
