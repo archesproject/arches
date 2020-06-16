@@ -1132,8 +1132,6 @@
                     "addToMap": false,
                     "advancedStyle": "",
                     "advancedStyling": false,
-                    "autoManageCache": false,
-                    "cacheTiles": false,
                     "clusterDistance": 20,
                     "clusterMaxZoom": 5,
                     "clusterMinPoints": 3,

@@ -5,7 +5,7 @@
 
             <div class="settings-panel-heading">
                 <div class="graph-designer-title">
-                    <div data-bind="text: (node() && node().name()) ? node().name() : '{% trans "Unnamed node" %}'"></div>
+                    <div data-bind="text: (node() && node().name()) ? node().name() : '{% trans 'Unnamed node' %}'"></div>
                     <span class="graph-crm-class">
                         (
                         <!-- ko if: hasOntology -->
@@ -19,7 +19,7 @@
             </div>
 
             <!-- Settings Forms -->
-            <div>
+            <div class="top-node-panel">
 
                 <div class="graph-designer-header">{% trans 'Node Identifiers' %}</div>
                 <!-- ko if: node() -->
@@ -29,14 +29,31 @@
                         <div class="row widget-container">
                             <div class="form-group">
                                 <div class="relative">
+                                    <!-- ko if: isFuncNode() -->
+                                    <h4 class="function-node-alert" data-bind="text: isFuncNode()"></h4>
+                                    <!-- /ko -->
                                     <label class="col-xs-12 control-label widget-input-label">
                                         {% trans "Node Name" %}
-
                                     </label>
                                 </div>
 
                                 <div class="col-xs-12">
-                                    <input type="text" placeholder="{% trans "Enter node name here..." %}"class="form-control" style="" placeholder="{% trans "node name" %}" data-bind="value:node().name, valueUpdate: 'keyup'">
+                                    <input type="text" placeholder="{% trans 'Enter node name here...' %}"class="form-control" style="" placeholder="{% trans 'node name' %}" data-bind="value:node().name, valueUpdate: 'keyup'">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ko if: !node().istopnode -->
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label">
+                                        <span style="display:flex"><div class="node-form ontology">{% trans "Relationship to" %}</div><div class="node-form node-name" data-bind="text: graphModel.getParentNode(node()).name"></div><div style="margin-top: 1px;">({% trans "parent" %})</div></span>
+                                    </label>
+                                </div>
+
+                                <div class="col-xs-12 crm-selector">
+                                    <select class="design" data-bind="value: node().parentproperty, options: node().validproperties, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: '{% trans "Choose a property" %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
                                 </div>
                             </div>
                         </div>
@@ -52,22 +69,7 @@
                                 </div>
 
                                 <div class="col-xs-12 crm-selector">
-                                    <select class="" data-bind="value: node().ontologyclass, options: node().validclasses, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: '{% trans "Choose a class" %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- ko if: !node().istopnode -->
-                        <div class="row widget-container">
-                            <div class="form-group">
-                                <div class="relative">
-                                    <label class="col-xs-12 control-label widget-input-label">
-                                        <span style="display:flex"><div class="node-form ontology">{% trans "Relationship to" %}</div><div class="node-form node-name" data-bind="text: graphModel.getParentNode(node()).name"></div><div>({% trans "parent" %})</div></span>
-                                    </label>
-                                </div>
-
-                                <div class="col-xs-12 crm-selector">
-                                    <select class="design" data-bind="value: node().parentproperty, options: node().validproperties, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: '{% trans "Choose a property" %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                    <select class="" data-bind="value: node().ontologyclass, options: node().validclasses, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: '{% trans 'Choose a class'%}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
                                 </div>
                             </div>
                         </div>
@@ -94,13 +96,29 @@
 
                         <!-- /ko -->
                         <!-- /ko -->
+
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label">
+                                        {% trans "Description" %}
+
+                                    </label>
+                                </div>
+
+                                <div class="col-xs-12 crm-selector">
+                                    <textarea placeholder="{% trans 'description' %}" rows="6" class="form-control" data-bind="textInput: node().description"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
                     </form>
                 </div>
 
-                <div class="graph-designer-header">{% trans 'Node Data Type and Settings' %}</div>
+                <div class="graph-designer-header">{% trans 'Node Data Type and Configuration' %}</div>
                 <div class="graph-settings-panel-body fade in">
                     <form class="widgets">
-                        <div class="row widget-container">
+                        <div class="row widget-container data-type">
                             <div class="form-group">
                                 <div class="relative">
                                     <label class="col-xs-12 control-label widget-input-label">
@@ -109,13 +127,13 @@
                                 </div>
 
                                 <div class="col-xs-12 crm-selector">
-                                    <select class="design" data-bind="disable: disableDatatype(), value: node().datatype, options: datatypes, optionsCaption: '{% trans "Choose a data type" %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                    <select class="design" data-bind="disable: disableDatatype(), value: node().datatype, options: datatypes, optionsCaption: '{% trans 'Choose a data type' %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
                                 </div>
                             </div>
                         </div>
 
                         <!-- ko if: node().datatypeConfigComponent -->
-                        <div class="row widget-container">
+                        <div class="row widget-container data-type-config">
                             <div class="form-group">
                                 <div class="col-xs-12 crm-selector">
                                     <div data-bind='component: {
@@ -126,7 +144,12 @@
                             </div>
                         </div>
                         <!-- /ko -->
+                    </form>
+                </div>
 
+                <div class="graph-designer-header" style="margin-top: 20px;">{% trans 'Node Settings' %}</div>
+                <div class="graph-settings-panel-body fade in">
+                    <form>
                         <!-- ko if: node().datatypeIsSearchable() -->
                         <div class="row widget-container graph-settings-switch">
                             <div class="form-group">
@@ -167,6 +190,30 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- ko if: node() && node().datatypeDataBearing() -->
+                        <div class="row widget-container graph-settings-switch">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label">
+                                        <span class="switch switch-small arches-switch" data-bind="css: {'on': node().exportable()}, click: function(){node().exportable(!node().exportable())}"><small></small></span>
+                                    </label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <p class="control-label graph-settings-switch-label">
+                                    {% trans "Export via Search Results" %}
+                                    </p>
+                                    <span class="graph-settings-switch-subtitle">
+                                        {% trans "Provide a field name for shapefiles. " %} <strong>{% trans "Name will be truncated to 10 characters to meet shapefile requirements." %}</strong>
+                                    </span>
+                                    <div class="exportable-field-name">
+                                        <input class="form-control input-md widget-input" placeholder="{% trans 'shapefile fieldname' %}" type="text" data-bind="textInput: node().fieldname, disable: !node().exportable(), css: {'disabled': !node().exportable()}"></input>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--/ko-->
 
                         <!-- ko if: node() && !isResourceTopNode() && displayMakeCard() === true -->
                         <div class="row widget-container graph-settings-switch">

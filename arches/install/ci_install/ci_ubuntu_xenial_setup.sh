@@ -21,13 +21,13 @@ function install_postgres {
     sudo service postgresql restart
 
     sudo -u postgres psql -d postgres -c "CREATE EXTENSION postgis;"
-    sudo -u postgres createdb -E UTF8 -T template0 --locale=en_US.utf8 template_postgis_20
-    sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='template_postgis_20'"
-    sudo -u postgres psql -d template_postgis_20 -c "CREATE EXTENSION postgis;"
-    sudo -u postgres psql -d template_postgis_20 -c "GRANT ALL ON geometry_columns TO PUBLIC;"
-    sudo -u postgres psql -d template_postgis_20 -c "GRANT ALL ON geography_columns TO PUBLIC;"
-    sudo -u postgres psql -d template_postgis_20 -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
-    sudo -u postgres createdb training -T template_postgis_20
+    sudo -u postgres createdb -E UTF8 -T template0 --locale=en_US.utf8 template_postgis
+    sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='template_postgis'"
+    sudo -u postgres psql -d template_postgis -c "CREATE EXTENSION postgis;"
+    sudo -u postgres psql -d template_postgis -c "GRANT ALL ON geometry_columns TO PUBLIC;"
+    sudo -u postgres psql -d template_postgis -c "GRANT ALL ON geography_columns TO PUBLIC;"
+    sudo -u postgres psql -d template_postgis -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
+    sudo -u postgres createdb training -T template_postgis
 }
 
 function install_couchdb {

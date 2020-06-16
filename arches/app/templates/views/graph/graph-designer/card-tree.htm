@@ -11,15 +11,26 @@
         <div class="tree-display-tools-panel">
             <a class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
             <a class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
+            <!--ko ifnot: showIds -->
+            <a class="tree-display-tool" data-bind="click: toggleIds"><i class="ion-information-circled"></i>{% trans ' Show IDs' %}</a>
+            <!--/ko-->
+            <!--ko if: showIds -->
+            <a class="tree-display-tool" data-bind="click: toggleIds"><i class="ion-information-circled"></i>{% trans ' Hide IDs' %}</a>
+            <!--/ko-->
         </div>
     </div>
     <div class="left-panel-overflow designer-card-tree">
         <ul class="jstree-container-ul jstree-children" aria-expanded="true">
             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
                 <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
-                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root'}">
+                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root', 'func-node': isFuncNode()}">
                     <strong>
-                        <i data-bind="css: (graphiconclass() != (null || '') ? graphiconclass() : 'fa fa-question')" role="presentation"></i>
+                        <!-- ko if: !isFuncNode -->
+                        <i data-bind="css: graphiconclass != (null || '') ? graphiconclass : 'fa fa-question'" role="presentation"></i>
+                        <!-- /ko -->
+                        <!-- ko if: isFuncNode -->
+                        <i class="fa fa-code" role="presentation"></i>
+                        <!-- /ko -->
                         <span data-bind="text: graphname"></span>
                     </strong>
                      {% trans "(edit report)" %}
@@ -38,7 +49,9 @@
                             card: card,
                             tile: null,
                             loading: self.loading,
-                            form: self
+                            form: self,
+                            pageVm: $root,
+                            showIds: self.showIds
                         }
                     }, css: {
                         'jstree-last': $index() === ($parent.topCards().length - 1)

@@ -43,6 +43,7 @@ define([
             self.selected = ko.observable(false);
             self.filtered = ko.observable(false);
             self.name = ko.observable('');
+            self.description = ko.observable(null);
             self.nodeGroupId = ko.observable('');
             var datatype = ko.observable('');
             self.datatype = ko.computed({
@@ -61,6 +62,17 @@ define([
                 },
                 owner: this
             });
+
+            self.datatypeDataBearing = ko.computed(function() {
+                var result = false;
+                if (self.datatype()) {
+                    if (self.datatypelookup[self.datatype()]) {
+                        result = !!self.datatypelookup[self.datatype()].defaultwidget_id;
+                    }
+                }
+                return result;
+            });
+
             self.datatypeIsSearchable = ko.computed(function() {
                 var searchable = false;
                 var datatype = self.datatypelookup[self.datatype()];
@@ -86,6 +98,8 @@ define([
             self.config = {};
             self.issearchable = ko.observable(true);
             self.isrequired = ko.observable(true);
+            self.fieldname = ko.observable();
+            self.exportable = ko.observable(false);
 
             self.parse(options.source);
 
@@ -160,11 +174,14 @@ define([
                     name: self.name,
                     datatype: self.datatype,
                     nodegroup_id: self.nodeGroupId,
+                    description: self.description,
                     ontologyclass: self.ontologyclass,
                     parentproperty: self.parentproperty,
                     config: config,
                     issearchable: self.issearchable,
-                    isrequired: self.isrequired
+                    isrequired: self.isrequired,
+                    fieldname: self.fieldname,
+                    exportable: self.exportable
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj));
             });
@@ -233,10 +250,13 @@ define([
             self.name(ko.unwrap(source.name));
             self.nodeGroupId(source.nodegroup_id);
             self.datatype(source.datatype);
+            self.description(source.description);
             self.ontologyclass(source.ontologyclass);
             self.parentproperty(source.parentproperty);
             self.issearchable(source.issearchable);
             self.isrequired(source.isrequired);
+            self.fieldname(source.fieldname);
+            self.exportable(source.exportable);
 
             if (source.config) {
                 self.setupConfig(source.config);

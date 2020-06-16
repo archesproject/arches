@@ -46,6 +46,14 @@ define([
         );
     };
 
+    var getDatatypeLookup = function(params){
+        var res = {};
+        params.graphModel.get('nodes')()
+            .map(function(n){return [n.nodeid, n.datatype()];})
+            .forEach(function(v){res[v[0]] = v[1];});
+        return res;
+    };
+
     var TileViewModel = function(params) {
         var CardViewModel = require('viewmodels/card');
         var self = this;
@@ -62,6 +70,7 @@ define([
 
         this.data = koMapping.fromJS(params.tile.data);
         this.provisionaledits = ko.observable(params.tile.provisionaledits);
+        this.datatypeLookup = getDatatypeLookup(params);
 
         _.extend(this, {
             filter: filter,
@@ -154,10 +163,10 @@ define([
                     "tiles": children
                 });
             },
-            save: function(onFail) {
+            save: function(onFail, onSuccess) {
                 loading(true);
                 delete self.formData.data;
-                if (params.provisionalTileViewModel.selectedProvisionalEdit()) {
+                if (params.provisionalTileViewModel && params.provisionalTileViewModel.selectedProvisionalEdit()) {
                     self.formData.append('accepted_provisional', JSON.stringify(params.provisionalTileViewModel.selectedProvisionalEdit()));
                     params.provisionalTileViewModel.acceptProvisionalEdit();
                 }
@@ -167,7 +176,7 @@ define([
                         self.getData()
                     )
                 );
-                $.ajax({
+                return $.ajax({
                     type: 'POST',
                     url: arches.urls.tile,
                     processData: false,
@@ -188,6 +197,7 @@ define([
                             return self._tileData() !== koMapping.toJSON(self.data);
                         }, self);
                         self.parent.tiles.push(self);
+                        self.parent.newTile = undefined;
                         self.parent.expanded(true);
                         selection(self);
                     }
@@ -208,6 +218,9 @@ define([
                         handler(req, self);
                     });
                     updateDisplayName(params.resourceId, params.displayname);
+                    if (typeof onSuccess === 'function') {
+                        onSuccess(tileData);
+                    }
                 }).fail(function(response) {
                     if (typeof onFail === 'function') {
                         onFail(response);
@@ -216,7 +229,7 @@ define([
                     loading(false);
                 });
             },
-            deleteTile: function(onFail) {
+            deleteTile: function(onFail, onSuccess) {
                 loading(true);
                 $.ajax({
                     type: "DELETE",
@@ -225,6 +238,9 @@ define([
                 }).done(function(response) {
                     params.card.tiles.remove(self);
                     selection(params.card);
+                    if (typeof onSuccess === 'function') {
+                        onSuccess(response);
+                    }
                 }).fail(function(response) {
                     if (typeof onFail === 'function') {
                         onFail(response);
@@ -238,7 +254,7 @@ define([
             if (selected) this.expanded(true);
         }, this);
         this.expanded.subscribe(function(expanded) {
-            if (expanded && this.parent) this.parent.expanded(true);
+            if (expanded && this.parent && typeof this.parent != "function") this.parent.expanded(true);
         }, this);
         this.isChildSelected = ko.pureComputed(function() {
             return isChildSelected(this);

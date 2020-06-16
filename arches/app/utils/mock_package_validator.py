@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 from arches.management.commands import utils
 
@@ -35,14 +35,14 @@ validation_errors = Validation_Errors()
 
 
 # def append_error(text, error_type):
-# 	# Use this function to append error text to an error_type_list that can be printed to a log file. 
-# 	# text = the error text you would like to append. 
+# 	# Use this function to append error text to an error_type_list that can be printed to a log file.
+# 	# text = the error text you would like to append.
 # 	# error_type = the error type list from the validation_errors object.
 # 	error_type_list = getattr(validation_errors, error_type)
 # 	error_type_list.append(text)
 
 
 def validate_resource(resource):
-	pass
-	# Use this function to call specific validation functions.
-	# example_validation_function(resource)
+    pass
+    # Use this function to call specific validation functions.
+    # example_validation_function(resource)

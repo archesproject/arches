@@ -85,21 +85,20 @@ define([
         }, this);
 
         if (self.form && this.defaultValue() === 'Date of Data Entry') {
-            var today = new Date();
-            var dd = today.getDate();
-            var mm = today.getMonth()+1;
-            var yyyy = today.getFullYear();
-
-            if(dd<10) {
-                dd = '0'+dd;
+            if (this.value() === 'Date of Data Entry') {
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth()+1;
+                var yyyy = today.getFullYear();
+                if(dd<10) {
+                    dd = '0'+dd;
+                }
+                if(mm<10) {
+                    mm = '0'+mm;
+                }
+                today = yyyy + '-' + mm + '-' + dd;
+                self.value(today);
             }
-
-            if(mm<10) {
-                mm = '0'+mm;
-            }
-
-            today = yyyy + '-' + mm + '-' + dd;
-            self.value(today);
         }
 
         this.disposables.push(this.getdefault);

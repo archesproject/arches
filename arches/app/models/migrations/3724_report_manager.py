@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 import django.contrib.postgres.fields.jsonb
 from django.db import migrations, models
@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='graphmodel',
             name='config',
-            field=django.contrib.postgres.fields.jsonb.JSONField(db_column='config', default={}),
+            field=django.contrib.postgres.fields.jsonb.JSONField(db_column='config', default=dict),
         ),
         migrations.AddField(
             model_name='graphmodel',

@@ -1,0 +1,233 @@
+{
+    "business_data": {
+        "resources": [
+            {
+                "resourceinstance": {
+                    "graph_id": "96867672-fbef-11e9-9ca4-3af9d3b32b71",
+                    "legacyid": null,
+                    "resourceinstanceid": "6edd753e-fbf0-11e9-9ca4-3af9d3b32b71"
+                },
+                "tiles": [
+                    {
+                        "data": {
+                            "57b68760-fbf0-11e9-9ca4-3af9d3b32b71": [
+                                "3a35d4fe-15ea-47b9-8ad7-f66ff78428a7",
+                                "bdc4d9a9-7658-4735-9691-2f47923fdda2"
+                            ],
+                            "ff3a0152-fbef-11e9-9ca4-3af9d3b32b71": [
+                                "6aab307f-43c6-4962-aaa3-abc13b889594",
+                                "70d5af6c-d61a-4495-b371-4ad379b35813"
+                            ]
+                        },
+                        "nodegroup_id": "ff3a0152-fbef-11e9-9ca4-3af9d3b32b71",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "6edd753e-fbf0-11e9-9ca4-3af9d3b32b71",
+                        "sortorder": 0,
+                        "tileid": "3ac65aeb-c97d-4a55-8f8e-421c47ec191b"
+                    },
+                    {
+                        "data": {
+                            "cf29292a-fbef-11e9-9ca4-3af9d3b32b71": [
+                                "d2908ab9-19a6-4a82-953d-5ebe8d164e85",
+                                "fa7dcb78-cd32-4902-bc6d-798fa38a99f0"
+                            ],
+                            "eb98199a-fbef-11e9-9ca4-3af9d3b32b71": "2361509b-2d03-4774-a20d-8e796787d448"
+                        },
+                        "nodegroup_id": "cf29292a-fbef-11e9-9ca4-3af9d3b32b71",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "6edd753e-fbf0-11e9-9ca4-3af9d3b32b71",
+                        "sortorder": 0,
+                        "tileid": "ae0bdf54-9b7f-489c-ab2f-1be5c35506b5"
+                    },
+                    {
+                        "data": {
+                            "a1f32b2c-fbef-11e9-9ca4-3af9d3b32b71": "946e7b38-889a-4826-94a8-ae1dd1c8c2d0",
+                            "bb5523ae-fbef-11e9-9ca4-3af9d3b32b71": "911072cc-df43-4e4e-bd17-d69aa64fe6ba"
+                        },
+                        "nodegroup_id": "a1f32b2c-fbef-11e9-9ca4-3af9d3b32b71",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "6edd753e-fbf0-11e9-9ca4-3af9d3b32b71",
+                        "sortorder": 0,
+                        "tileid": "192e4e09-34ad-41bf-acc2-49d9a4101a1b"
+                    }
+                ]
+            },
+            {
+                "resourceinstance": {
+                    "graph_id": "96867672-fbef-11e9-9ca4-3af9d3b32b71",
+                    "legacyid": null,
+                    "resourceinstanceid": "a16ea9a4-fbf1-11e9-9ca4-3af9d3b32b71"
+                },
+                "tiles": [
+                    {
+                        "data": {
+                            "ea67329e-fbf0-11e9-9ca4-3af9d3b32b71": [
+                                {
+                                    "resourceId": "24d0d25a-fa75-11e9-b369-3af9d3b32b71",
+                                    "ontologyProperty": "",
+                                    "inverseOntologyProperty": ""
+                                }
+                            ],
+                            "fb3edee6-fbf0-11e9-9ca4-3af9d3b32b71": [
+                                {
+                                    "resourceId": "12bbf5bc-fa85-11e9-91b8-3af9d3b32b71",
+                                    "ontologyProperty": "",
+                                    "inverseOntologyProperty": ""
+                                }
+                            ]
+                        },
+                        "nodegroup_id": "ea67329e-fbf0-11e9-9ca4-3af9d3b32b71",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "a16ea9a4-fbf1-11e9-9ca4-3af9d3b32b71",
+                        "sortorder": 0,
+                        "tileid": "a58ec28f-0b93-4bc1-8ee7-6139696ad463"
+                    }
+                ]
+            },
+            {
+                "resourceinstance": {
+                    "graph_id": "96867672-fbef-11e9-9ca4-3af9d3b32b71",
+                    "legacyid": null,
+                    "resourceinstanceid": "b588fae8-fbf1-11e9-9ca4-3af9d3b32b71"
+                },
+                "tiles": [
+                    {
+                        "data": {
+                            "2c164f36-fbf1-11e9-9ca4-3af9d3b32b71": [
+                                {
+                                    "resourceId": "24d0d25a-fa75-11e9-b369-3af9d3b32b71",
+                                    "ontologyProperty": "",
+                                    "inverseOntologyProperty": ""
+                                },
+                                {
+                                    "resourceId": "12bbf5bc-fa85-11e9-91b8-3af9d3b32b71",
+                                    "ontologyProperty": "",
+                                    "inverseOntologyProperty": ""
+                                }
+                            ],
+                            "3ae10790-fbf1-11e9-9ca4-3af9d3b32b71": [
+                                {
+                                    "resourceId": "396dcffa-fa8a-11e9-b6e7-3af9d3b32b71",
+                                    "ontologyProperty": "",
+                                    "inverseOntologyProperty": ""
+                                },
+                                {
+                                    "resourceId": "9c400558-fa8a-11e9-b6e7-3af9d3b32b71",
+                                    "ontologyProperty": "",
+                                    "inverseOntologyProperty": ""
+                                }
+                            ]
+                        },
+                        "nodegroup_id": "2c164f36-fbf1-11e9-9ca4-3af9d3b32b71",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "b588fae8-fbf1-11e9-9ca4-3af9d3b32b71",
+                        "sortorder": 0,
+                        "tileid": "77cb87dd-8ce1-4558-82bd-ee90515ac366"
+                    }
+                ]
+            },
+            {
+                "resourceinstance": {
+                    "graph_id": "96867672-fbef-11e9-9ca4-3af9d3b32b71",
+                    "legacyid": null,
+                    "resourceinstanceid": "d323639a-fbf1-11e9-9ca4-3af9d3b32b71"
+                },
+                "tiles": [
+                    {
+                        "data": {
+                            "090300d4-fbf1-11e9-9ca4-3af9d3b32b71": [
+                                {
+                                    "resourceId": "24d0d25a-fa75-11e9-b369-3af9d3b32b71",
+                                    "ontologyProperty": "",
+                                    "inverseOntologyProperty": ""
+                                },
+                                {
+                                    "resourceId": "396dcffa-fa8a-11e9-b6e7-3af9d3b32b71",
+                                    "ontologyProperty": "",
+                                    "inverseOntologyProperty": ""
+                                }
+                            ],
+                            "1a6fb150-fbf1-11e9-9ca4-3af9d3b32b71": [
+                                {
+                                    "resourceId": "12bbf5bc-fa85-11e9-91b8-3af9d3b32b71",
+                                    "ontologyProperty": "",
+                                    "inverseOntologyProperty": ""
+                                }
+                            ]
+                        },
+                        "nodegroup_id": "090300d4-fbf1-11e9-9ca4-3af9d3b32b71",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "d323639a-fbf1-11e9-9ca4-3af9d3b32b71",
+                        "sortorder": 0,
+                        "tileid": "d658375c-1f74-486a-b156-1d857c26f75c"
+                    }
+                ]
+            },
+            {
+                "resourceinstance": {
+                    "graph_id": "96867672-fbef-11e9-9ca4-3af9d3b32b71",
+                    "legacyid": null,
+                    "resourceinstanceid": "bbc1651a-fbf3-11e9-9ca4-3af9d3b32b71"
+                },
+                "tiles": [
+                    {
+                        "data": {
+                            "7a24a644-fbf3-11e9-9ca4-3af9d3b32b71": "946e7b38-889a-4826-94a8-ae1dd1c8c2d0",
+                            "90fe18dc-fbf3-11e9-9ca4-3af9d3b32b71": [
+                                "911072cc-df43-4e4e-bd17-d69aa64fe6ba",
+                                "0797783b-8663-4a12-9105-653d5180139f"
+                            ]
+                        },
+                        "nodegroup_id": "7a24a644-fbf3-11e9-9ca4-3af9d3b32b71",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "bbc1651a-fbf3-11e9-9ca4-3af9d3b32b71",
+                        "sortorder": 0,
+                        "tileid": "cb4f471a-8656-40a3-949d-cd2d099ee83a"
+                    }
+                ]
+            },
+            {
+                "resourceinstance": {
+                    "graph_id": "96867672-fbef-11e9-9ca4-3af9d3b32b71",
+                    "legacyid": null,
+                    "resourceinstanceid": "d1d2ce8e-fbf3-11e9-9ca4-3af9d3b32b71"
+                },
+                "tiles": [
+                    {
+                        "data": {
+                            "014a634e-fbf3-11e9-9ca4-3af9d3b32b71": [
+                                "946e7b38-889a-4826-94a8-ae1dd1c8c2d0",
+                                "babd6b3c-82b4-47c9-9112-86332320c48e"
+                            ],
+                            "f3250ee0-fbf2-11e9-9ca4-3af9d3b32b71": [
+                                {
+                                    "resourceId": "12345678-abcd-11e9-9cbb-3af9d3b32b71",
+                                    "ontologyProperty": "",
+                                    "inverseOntologyProperty": ""
+                                },
+                                {
+                                    "resourceId": "12bbf5bc-fa85-11e9-91b8-3af9d3b32b71",
+                                    "ontologyProperty": "",
+                                    "inverseOntologyProperty": ""
+                                }
+                            ]
+                        },
+                        "nodegroup_id": "f3250ee0-fbf2-11e9-9ca4-3af9d3b32b71",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "d1d2ce8e-fbf3-11e9-9ca4-3af9d3b32b71",
+                        "sortorder": 0,
+                        "tileid": "6a3eba2f-ffbf-4abc-8737-f137f2fc0f92"
+                    }
+                ]
+            }
+        ]
+    }
+}

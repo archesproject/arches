@@ -1,0 +1,32 @@
+{
+    "business_data": {
+        "resources": [
+            {
+                "resourceinstance": {
+                    "graph_id": "e3d4505e-bfa7-11e9-b4dc-0242ac160002",
+                    "legacyid": null,
+                    "resourceinstanceid": "dc277c1a-fc32-11e9-9201-3af9d3b32b71"
+                },
+                "tiles": [
+                    {
+                        "data": {
+                            "fc3c8080-bfa7-11e9-b4dc-0242ac160002": [
+                                {
+                                    "resourceId": "cba81b1a-fc32-11e9-9201-3af9d3b32b71",
+                                    "ontologyProperty": "",
+                                    "inverseOntologyProperty": ""
+                                }
+                            ]
+                        },
+                        "nodegroup_id": "fc3c8080-bfa7-11e9-b4dc-0242ac160002",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "dc277c1a-fc32-11e9-9201-3af9d3b32b71",
+                        "sortorder": 0,
+                        "tileid": "5d754f75-1e0a-4b21-a118-ad006c5b3b32"
+                    }
+                ]
+            }
+        ]
+    }
+}

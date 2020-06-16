@@ -5,6 +5,7 @@ define([
     'knockout-mapping',
     'views/base-manager',
     'viewmodels/alert',
+    'viewmodels/alert-json',
     'models/graph',
     'models/report',
     'views/graph/graph-manager/graph',
@@ -22,9 +23,8 @@ define([
     'bindings/resizable-sidepanel',
     'datatype-config-components',
     'views/components/simple-switch'
-], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, ReportModel, GraphView, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, data, arches, GraphSettingsViewModel, CardViewModel, viewData, reportLookup) {
+], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, GraphView, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, data, arches, GraphSettingsViewModel, CardViewModel, viewData, reportLookup) {
     var GraphDesignerView = BaseManagerView.extend({
-
         initialize: function(options) {
             var viewModel = options.viewModel;
             viewModel.graphid = ko.observable(data.graphid);
@@ -36,6 +36,7 @@ define([
             viewModel.ontologies = ko.observable(data['ontologies']);
             viewModel.ontologyClasses = ko.observable(data['ontologyClasses']);
             viewModel.cardComponents = data.cardComponents;
+            viewModel.appliedFunctions = ko.observable(data['appliedFunctions']);
 
             var resources = ko.utils.arrayFilter(viewData.graphs, function(graph) {
                 return graph.isresource;
@@ -80,7 +81,7 @@ define([
                             if (status === 'success') {
                                 window.location = arches.urls.graph;
                             } else {
-                                viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+                                viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                             }
                         }
                     });
@@ -136,7 +137,7 @@ define([
                             if (status === 'success') {
                                 viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
                             } else {
-                                viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+                                viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                             }
                         }
                     });
@@ -175,19 +176,12 @@ define([
                 viewModel.alert(null);
                 viewModel.loading(false);
                 if (response.status !== 200) {
-                    var errorMessageTitle = arches.requestFailed.title;
-                    var errorMessageText = arches.requestFailed.text;
-                    viewModel.alert(null);
-                    if (response.responseJSON) {
-                        errorMessageTitle = response.responseJSON.title;
-                        errorMessageText = response.responseJSON.message;
-                    }
-                    viewModel.alert(new AlertViewModel('ep-alert-red', errorMessageTitle, errorMessageText));
+                    viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                 }
             });
 
             viewModel.graphModel.on('error', function(response) {
-                viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+                viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
             });
 
             viewModel.selectedNode = viewModel.graphModel.get('selectedNode');
@@ -197,7 +191,7 @@ define([
                     viewModel.loading(true);
                     node.save(function(data) {
                         if (data.responseJSON.success === false || data.status === 500) {
-                            viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
+                            viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', data.responseJSON));
                         }
                         else {
                             viewModel.cardTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
@@ -216,12 +210,14 @@ define([
 
             viewModel.cardTree = new CardTreeViewModel({
                 graph: viewModel.graph,
+                appliedFunctions: viewModel.appliedFunctions,
                 graphModel: viewModel.graphModel
             });
 
             viewModel.permissionTree = new CardTreeViewModel({
                 graph: viewModel.graph,
                 graphModel: viewModel.graphModel,
+                appliedFunctions: viewModel.appliedFunctions,
                 multiselect: true
             });
 
@@ -254,6 +250,7 @@ define([
                 graphModel: viewModel.graphModel,
                 loading: viewModel.loading,
                 node: viewModel.selectedNode,
+                appliedFunctions: viewModel.appliedFunctions,
                 restrictedNodegroups: data.restrictedNodegroups
             });
 
@@ -282,8 +279,8 @@ define([
                 rootNodeColor: ko.observable(''),
                 "ontology_namespaces": data.ontology_namespaces,
                 onReset: function() {
-                    var graph = ko.mapping.toJS(viewModel.graphSettingsViewModel.graph);
-                    viewModel.report.configJSON(graph.config);
+                    var graph = koMapping.toJS(viewModel.graphSettingsViewModel.graph);
+                    viewModel.report.resetConfigs(graph.config);
                     viewModel.report.get('template_id')(graph["template_id"]);
                 }
             });
@@ -295,10 +292,12 @@ define([
             }));
 
             viewModel.report.configJSON.subscribe(function(config) {
-                var graph = ko.mapping.toJS(viewModel.graphSettingsViewModel.graph);
-                graph.config = config;
-                ko.mapping.fromJS(graph, viewModel.graphSettingsViewModel.graph);
+                var graph = koMapping.toJS(viewModel.graphSettingsViewModel.graph);
+                graph.config = koMapping.toJS(config);
+                koMapping.fromJS(graph, viewModel.graphSettingsViewModel.graph);
             });
+
+            viewModel.report.configJSON.extend({deferred: true});
 
             viewModel.report.get('template_id').subscribe(function(val) {
                 viewModel.graphSettingsViewModel.graph["template_id"](val);
@@ -315,6 +314,7 @@ define([
                 graphSettings: viewModel.graphSettingsViewModel,
                 cardTree: viewModel.cardTree,
                 permissionTree: viewModel.permissionTree,
+                appliedFunctions: viewModel.appliedFunctions,
                 restrictedNodegroups: data.restrictedNodegroups
             });
 
@@ -487,7 +487,7 @@ define([
             });
 
             viewModel.graphModel.on('select-node', function(node) {
-                viewModel.graphView.zoomTo(node);
+                // viewModel.graphView.zoomTo(node);
                 viewModel.graphTree.expandParentNode(node);
             });
 

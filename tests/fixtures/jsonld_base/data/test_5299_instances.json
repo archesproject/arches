@@ -1,0 +1,37 @@
+{
+    "business_data": {
+        "resources": [
+            {
+                "resourceinstance": {
+                    "graph_id": "0cadd978-071a-11ea-8d9a-acde48001122",
+                    "legacyid": null,
+                    "resourceinstanceid": "c76f74ba-071a-11ea-8c2d-acde48001122"
+                },
+                "tiles": [
+                    {
+                        "data": {
+                            "77f7d79c-071a-11ea-8dfe-acde48001122": "#ff00ff"
+                        },
+                        "nodegroup_id": "77f7d79c-071a-11ea-8dfe-acde48001122",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "c76f74ba-071a-11ea-8c2d-acde48001122",
+                        "sortorder": 0,
+                        "tileid": "32f8678f-6117-43e6-9a68-0b96f0aa0e2c"
+                    },
+                    {
+                        "data": {
+                            "6ace2508-071a-11ea-8dfe-acde48001122": "Production"
+                        },
+                        "nodegroup_id": "1ae420ba-071a-11ea-8d9a-acde48001122",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "c76f74ba-071a-11ea-8c2d-acde48001122",
+                        "sortorder": 0,
+                        "tileid": "1580cf8b-1ead-42b7-a22a-cc92bff0aafb"
+                    }
+                ]
+            }
+        ]
+    }
+}

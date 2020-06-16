@@ -1,0 +1,67 @@
+{% load staticfiles %}
+{% load i18n %}
+{% block header %}
+
+<!-- Title -->
+<span>
+    <!--ko with: notifsList -->
+    <div>
+        <button class="btn btn-lg btn-notifs-dismiss-all"
+            data-bind="click:function(){$data.dismiss();}, css: {disabled: $data.items().length === 0}" >{% trans 'Dismiss All' %}</button>
+    </div>
+    <!-- /ko -->
+    {% endblock %}
+
+    {% block filter %}
+    {% endblock %}
+</span>
+
+{% block list_wrapper %}
+<div class="list-wrapper">
+    <div class="grid-list provisional-edit-history">
+        <!--ko with: notifsList -->
+        <!-- ko if: items().length === 0 -->
+        <div class="new-provisional-edit-history">
+            {% trans "You're up-to-date and do not have any notifications. When you trigger a notification (for example, when you request a large download) it will display here." %}
+        </div>
+        <!-- /ko -->
+        <!-- ko if: items().length > 0 -->
+        <!-- ko foreach: items -->
+        <div class="notifications-container" >
+            {% block listitem %}
+
+            <div>
+                <div class='entry'><i data-bind=""></i>
+                    <div class='entry-label'>{% trans 'Download ready ' %}</div>
+                    <span class='time-label' data-bind="text: displaytime" ></span>
+                </div>
+
+                <div class="notification-message">
+                    {% trans "Your search " %} <span class="" data-bind="text: message"> </span> {% trans " is ready for download.  You have 24 hours to access this file, after which we'll automatically remove it." %}
+                </div>
+
+                <!-- ko if: $data["link"] -->
+                <div class='entry'>
+                    <button data-bind="click: function(){$parent.getExportFile(this)}" class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'>{% trans 'Download File' %}</button>
+                    <div style="padding-left: 10px;" data-bind="text: info"></div>
+                </div>
+                <!-- /ko -->
+            </div>
+
+            <div class='entry relative'>
+                <a href="javascript:void(0);" data-bind="click: function(){$parent.dismiss($data.id);}" class="ep-notifs-toggle ep-notifs-close">
+                    <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Dismiss" %}'>
+                        <i class="fa fa-times-circle fa-sm"></i>
+                    </div>
+                </a>
+            </div>
+
+            {% endblock %}
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+        <!-- /ko -->
+
+    </div>
+</div>
+{% endblock list_wrapper %}

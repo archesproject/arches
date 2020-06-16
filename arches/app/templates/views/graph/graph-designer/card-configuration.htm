@@ -57,7 +57,8 @@
                 params: {
                     state: 'config',
                     preview: self.preview,
-                    card: $data
+                    card: $data,
+                    pageVm: $root
                 }
             } --> <!-- /ko -->
         </div>
@@ -109,6 +110,28 @@
                         </div>
                     </div>
                 </div>
+
+
+                <!--ko if: model.widgets().length > 0 -->
+                <div class="panel-section-title dark-colored-text pad-top">
+                    {% trans "Unique Values" %}
+                </div>
+
+                <div class="form-divider">
+                    <!--ko if: model.constraints().length > 0 -->
+                    <div class="constraint-selection" data-bind="foreach: {data: model.constraints(), as: 'constraintvm'}">
+                        <div class="dropdown">
+                            <input class="" style="display:inline-block;"
+                            data-bind="select2Query: {
+                                select2Config: getSelect2ConstraintConfig('{% trans "Select Nodes" %}')
+                            }">
+                        </div>
+                        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: constraintvm.constraint.uniquetoallinstances, config:{label: 'Unique to all resource instances?'}}}"></div>
+                    </div>
+                    <!--/ko-->
+                </div>
+                <!--/ko-->
+
             </div>
         </div>
     </div>

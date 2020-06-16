@@ -1,4 +1,7 @@
 from django.db.migrations.operations.base import Operation
+from django.db import Error
+import logging
+
 
 class CreateExtension(Operation):
     """
@@ -8,15 +11,30 @@ class CreateExtension(Operation):
 
     def __init__(self, name):
         self.name = name
+        self.logger = logging.getLogger(__name__)
 
     def state_forwards(self, app_label, state):
         pass
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        schema_editor.execute("CREATE EXTENSION IF NOT EXISTS \"%s\"" % self.name)
+        try:
+            schema_editor.execute('CREATE EXTENSION IF NOT EXISTS "%s"' % self.name)
+        except Error as e:
+            self.logger.warning(
+                'Operation to create extension "%s" failed. Must be executed by Postgres superuser \
+account before running Arches.'
+                % self.name
+            )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        schema_editor.execute("DROP EXTENSION IF EXISTS \"%s\"" % self.name)
+        try:
+            schema_editor.execute('DROP EXTENSION IF EXISTS "%s"' % self.name)
+        except Error as e:
+            self.logger.warning(
+                'Operation to drop extension "%s" failed. Must be executed by Postgres superuser \
+account.'
+                % self.name
+            )
 
     def describe(self):
         return "Creates extension %s" % self.name
@@ -28,7 +46,7 @@ class CreateFunction(Operation):
 
     """
 
-    def __init__(self, name, body, returntype, arguments=[], declarations=[], language='plpgsql'):
+    def __init__(self, name, body, returntype, arguments=[], declarations=[], language="plpgsql"):
         """
         Keyword arguments:
         name -- name of the function
@@ -52,8 +70,8 @@ class CreateFunction(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         sql = """
-        CREATE FUNCTION %(name)s(%(arguments)s) 
-            RETURNS %(returntype)s 
+        CREATE OR REPLACE FUNCTION %(name)s(%(arguments)s)
+            RETURNS %(returntype)s
             LANGUAGE %(language)s
             AS $$
             DECLARE
@@ -63,18 +81,23 @@ class CreateFunction(Operation):
             END;
             $$;
         """
-        sql = sql % {'name': self.name, 'arguments': ', '.join(self.arguments), 
-            'declarations': ';\n\t\t'.join(self.declarations) + ';', 'language': self.language, 
-            'body': self.body, 'returntype': self.returntype}
-        sql = sql.replace(';;', ';')
+        sql = sql % {
+            "name": self.name,
+            "arguments": ", ".join(self.arguments),
+            "declarations": ";\n\t\t".join(self.declarations) + ";",
+            "language": self.language,
+            "body": self.body,
+            "returntype": self.returntype,
+        }
+        sql = sql.replace(";;", ";")
 
         schema_editor.execute(sql)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         sql = """
-        DROP FUNCTION IF EXISTS %(name)s(%(arguments)s) 
+        DROP FUNCTION IF EXISTS %(name)s(%(arguments)s)
         """
-        sql = sql % {'name': self.name, 'arguments': ', '.join(self.arguments)}
+        sql = sql % {"name": self.name, "arguments": ", ".join(self.arguments)}
 
         schema_editor.execute(sql)
 
@@ -82,8 +105,8 @@ class CreateFunction(Operation):
         return "Creates a function named %s" % self.name
         return "Creates extension %s" % self.name
 
-class CreateAutoPopulateUUIDField(Operation):
 
+class CreateAutoPopulateUUIDField(Operation):
     def __init__(self, table, columns):
         self.table = table
         self.columns = columns

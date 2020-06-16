@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import os
 import uuid
@@ -31,24 +31,21 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument('operation', nargs='?')
+        parser.add_argument("operation", nargs="?")
 
-        parser.add_argument('-s', '--source', action='store', dest='fn_source', default='',
-            help='Function file to be loaded')
+        parser.add_argument("-s", "--source", action="store", dest="fn_source", default="", help="Function file to be loaded")
 
-        parser.add_argument('-n', '--name', action='store', dest='fn_name', default='',
-            help='The name of the function to unregister')
+        parser.add_argument("-n", "--name", action="store", dest="fn_name", default="", help="The name of the function to unregister")
 
     def handle(self, *args, **options):
-        if options['operation'] == 'register':
-            self.register(source=options['fn_source'])
+        if options["operation"] == "register":
+            self.register(source=options["fn_source"])
 
-        if options['operation'] == 'unregister':
-            self.unregister(fn_name=options['fn_name'])
+        if options["operation"] == "unregister":
+            self.unregister(fn_name=options["fn_name"])
 
-        if options['operation'] == 'list':
+        if options["operation"] == "list":
             self.list()
-
 
     def start(self, dest_dir):
         """
@@ -63,24 +60,25 @@ class Command(BaseCommand):
         """
 
         import imp
-        fn_config = imp.load_source('', source)
+
+        fn_config = imp.load_source("", source)
         details = fn_config.details
 
         try:
-            uuid.UUID(details['functionid'])
+            uuid.UUID(details["functionid"])
         except:
-            details['functionid'] = unicode(uuid.uuid4())
-            print "Registering function with functionid:", details['functionid']
+            details["functionid"] = str(uuid.uuid4())
+            print("Registering function with functionid: {}".format(details["functionid"]))
 
         fn = models.Function(
-            functionid = details['functionid'],
-            name = details['name'],
-            functiontype = details['type'],
-            description = details['description'],
-            defaultconfig = details['defaultconfig'],
-            modulename = os.path.basename(source),
-            classname = details['classname'],
-            component = details['component']
+            functionid=details["functionid"],
+            name=details["name"],
+            functiontype=details["type"],
+            description=details["description"],
+            defaultconfig=details["defaultconfig"],
+            modulename=os.path.basename(source),
+            classname=details["classname"],
+            component=details["component"],
         )
 
         fn.save()
@@ -94,7 +92,7 @@ class Command(BaseCommand):
             fn = models.Function.objects.filter(name=fn_name)
             fn[0].delete()
         except Exception as e:
-            print e
+            print(e)
 
     def list(self):
         """
@@ -104,9 +102,9 @@ class Command(BaseCommand):
         try:
             fn = models.Function.objects.all()
             for function in fn:
-                print function.name
+                print(function.name)
         except Exception as e:
-            print e
+            print(e)
 
     def validate(self):
         """

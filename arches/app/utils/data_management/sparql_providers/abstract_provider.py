@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,24 +14,24 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 from SPARQLWrapper import SPARQLWrapper, JSON
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
-class Abstract_Provider(SPARQLWrapper):
 
+class Abstract_Provider(SPARQLWrapper):
     def __init__(self, endpoint, **kwargs):
         super(Abstract_Provider, self).__init__(endpoint, **kwargs)
-        self.name = 'abstract_provider'
-        self.allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
+        self.name = "abstract_provider"
+        self.allowed_languages = models.DLanguage.objects.values_list("pk", flat=True)
 
-    def get_concepts(self, uris):     
+    def get_concepts(self, uris):
         """
         Returns a list of concepts given a list of identifiers
 
-        """ 
+        """
 
         pass
 
@@ -75,5 +75,5 @@ class Abstract_Provider(SPARQLWrapper):
         """
 
         self.setQuery(query)
-        #print query
+        # print query
         return self.queryAndConvert()

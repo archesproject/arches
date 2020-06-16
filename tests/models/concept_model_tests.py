@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 from tests import test_settings
 from tests.base_test import ArchesTestCase
@@ -27,7 +27,6 @@ from arches.app.models.concept import ConceptValue
 
 
 class ConceptModelTests(ArchesTestCase):
-
     def test_create_concept(self):
         """
         Test of basic CRUD on a Concept model
@@ -35,34 +34,37 @@ class ConceptModelTests(ArchesTestCase):
         """
 
         concept_in = Concept()
-        concept_in.nodetype = 'Concept'
-        concept_in.values = [ConceptValue({
-            #id: '',
-            #conceptid: '',
-            'type': 'prefLabel',
-            'category': 'label',
-            'value': 'test pref label',
-            'language': 'en-US'
-        })]
+        concept_in.nodetype = "Concept"
+        concept_in.values = [
+            ConceptValue(
+                {
+                    # id: '',
+                    # conceptid: '',
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "test pref label",
+                    "language": "en-US",
+                }
+            )
+        ]
         concept_in.save()
 
         concept_out = Concept().get(id=concept_in.id)
 
         self.assertEqual(concept_out.id, concept_in.id)
-        self.assertEqual(concept_out.values[0].value, 'test pref label')
+        self.assertEqual(concept_out.values[0].value, "test pref label")
 
-        label = concept_in.values[0] 
-        label.value = 'updated pref label'
+        label = concept_in.values[0]
+        label.value = "updated pref label"
         concept_in.values[0] = label
         concept_in.save()
         concept_out = Concept().get(id=concept_in.id)
 
-        self.assertEqual(concept_out.values[0].value, 'updated pref label')
+        self.assertEqual(concept_out.values[0].value, "updated pref label")
 
         concept_out.delete(delete_self=True)
         with self.assertRaises(models.Concept.DoesNotExist):
             deleted_concept = Concept().get(id=concept_out.id)
-
 
     def test_prefer_preflabel_over_altlabel(self):
         """
@@ -72,35 +74,15 @@ class ConceptModelTests(ArchesTestCase):
 
         concept = Concept()
         concept.values = [
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'test pref label en-US',
-                'language': 'en-US'
-            }),
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'test pref label en',
-                'language': 'en'
-            }),
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'test pref label es-SP',
-                'language': 'es-SP'
-            }),
-            ConceptValue({
-                'type': 'altLabel',
-                'category': 'label',
-                'value': 'test alt label en-US',
-                'language': 'en-US'
-            })
+            ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label en-US", "language": "en-US"}),
+            ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label en", "language": "en"}),
+            ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label es-SP", "language": "es-SP"}),
+            ConceptValue({"type": "altLabel", "category": "label", "value": "test alt label en-US", "language": "en-US"}),
         ]
 
-        self.assertEqual(concept.get_preflabel(lang='en-US').value, 'test pref label en-US')
-        self.assertEqual(concept.get_preflabel(lang='en').value, 'test pref label en')
-        self.assertEqual(concept.get_preflabel().value, 'test pref label %s' % (test_settings.LANGUAGE_CODE))
+        self.assertEqual(concept.get_preflabel(lang="en-US").value, "test pref label en-US")
+        self.assertEqual(concept.get_preflabel(lang="en").value, "test pref label en")
+        self.assertEqual(concept.get_preflabel().value, "test pref label %s" % (test_settings.LANGUAGE_CODE))
 
     def test_prefer_preflabel_with_just_lang_code_match_over_exact_match_with_altlabel(self):
         """
@@ -111,27 +93,12 @@ class ConceptModelTests(ArchesTestCase):
 
         concept = Concept()
         concept.values = [
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'test pref label en',
-                'language': 'en'
-            }),
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'test pref label es',
-                'language': 'es-SP'
-            }),
-            ConceptValue({
-                'type': 'altLabel',
-                'category': 'label',
-                'value': 'test alt label en-US',
-                'language': 'en-US'
-            })
+            ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label en", "language": "en"}),
+            ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label es", "language": "es-SP"}),
+            ConceptValue({"type": "altLabel", "category": "label", "value": "test alt label en-US", "language": "en-US"}),
         ]
 
-        self.assertEqual(concept.get_preflabel(lang='en-US').value, 'test pref label en')
+        self.assertEqual(concept.get_preflabel(lang="en-US").value, "test pref label en")
 
     def test_get_altlabel_when_no_preflabel_exists(self):
         """
@@ -141,21 +108,11 @@ class ConceptModelTests(ArchesTestCase):
 
         concept = Concept()
         concept.values = [
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'test pref label es',
-                'language': 'es-SP'
-            }),
-            ConceptValue({
-                'type': 'altLabel',
-                'category': 'label',
-                'value': 'test alt label en-US',
-                'language': 'en-US'
-            })
+            ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label es", "language": "es-SP"}),
+            ConceptValue({"type": "altLabel", "category": "label", "value": "test alt label en-US", "language": "en-US"}),
         ]
 
-        self.assertEqual(concept.get_preflabel(lang='en-US').value, 'test alt label en-US')
+        self.assertEqual(concept.get_preflabel(lang="en-US").value, "test alt label en-US")
 
     def test_get_altlabel_when_no_preflabel_exists_and_altlabel_only_specifies_lang_code(self):
         """
@@ -166,21 +123,11 @@ class ConceptModelTests(ArchesTestCase):
 
         concept = Concept()
         concept.values = [
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'test pref label es',
-                'language': 'es'
-            }),
-            ConceptValue({
-                'type': 'altLabel',
-                'category': 'label',
-                'value': 'test alt label en',
-                'language': 'en'
-            })
+            ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label es", "language": "es"}),
+            ConceptValue({"type": "altLabel", "category": "label", "value": "test alt label en", "language": "en"}),
         ]
 
-        self.assertEqual(concept.get_preflabel(lang='en-US').value, 'test alt label en')
+        self.assertEqual(concept.get_preflabel(lang="en-US").value, "test alt label en")
 
     def test_get_region_specific_preflabel_when_language_only_version_does_not_exist(self):
         """
@@ -191,27 +138,12 @@ class ConceptModelTests(ArchesTestCase):
 
         concept = Concept()
         concept.values = [
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'test pref label en-US',
-                'language': 'en-US'
-            }),
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'test pref label es',
-                'language': 'es-SP'
-            }),
-            ConceptValue({
-                'type': 'altLabel',
-                'category': 'label',
-                'value': 'test alt label en-US',
-                'language': 'en-US'
-            })
+            ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label en-US", "language": "en-US"}),
+            ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label es", "language": "es-SP"}),
+            ConceptValue({"type": "altLabel", "category": "label", "value": "test alt label en-US", "language": "en-US"}),
         ]
 
-        self.assertEqual(concept.get_preflabel(lang='en').value, 'test pref label en-US')
+        self.assertEqual(concept.get_preflabel(lang="en").value, "test pref label en-US")
 
     def test_get_label_no_exact_match(self):
         """
@@ -221,27 +153,13 @@ class ConceptModelTests(ArchesTestCase):
 
         concept = Concept()
         concept.values = [
-            ConceptValue({
-                'type': 'prefLabel', 
-                'value': 'bier', 
-                'language': 'nl'
-            }),
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'beer',
-                'language': 'es-SP'
-            }),
-            ConceptValue({
-                'type': 'altLabel',
-                'category': 'label',
-                'value': 'test alt label en-US',
-                'language': 'en-US'
-            })
+            ConceptValue({"type": "prefLabel", "value": "bier", "language": "nl"}),
+            ConceptValue({"type": "prefLabel", "category": "label", "value": "beer", "language": "es-SP"}),
+            ConceptValue({"type": "altLabel", "category": "label", "value": "test alt label en-US", "language": "en-US"}),
         ]
 
-        pl = concept.get_preflabel('fr-BE')
+        pl = concept.get_preflabel("fr-BE")
 
-        self.assertEquals(pl.type,'prefLabel')
-        self.assertEquals(pl.value,'bier' or 'beer')
-        self.assertEquals(pl.language,'nl' or 'es-SP')
+        self.assertEqual(pl.type, "prefLabel")
+        self.assertEqual(pl.value, "bier" or "beer")
+        self.assertEqual(pl.language, "nl" or "es-SP")

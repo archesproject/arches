@@ -7,8 +7,9 @@ define([
     'knockout',
     'knockout-mapping',
     'card-components',
+    'viewmodels/card-constraints',
     'utils/dispose'
-], function(_, arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, cardComponentLookup, dispose) {
+], function(_, arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, cardComponentLookup, CardConstraintsViewModel, dispose) {
     var CardModel = AbstractModel.extend({
         /**
         * A backbone model to manage card data
@@ -45,6 +46,8 @@ define([
             this.sortorder = ko.observable();
             this.disabled = ko.observable();
             this.component_id = ko.observable();
+            this.constraints = ko.observableArray();
+            this.appliedFunctions = attributes.appliedFunctions;
 
             this.set('cards', this.cards);
             this.set('nodes', this.nodes);
@@ -69,6 +72,8 @@ define([
             this.set('disabled', this.disabled);
             this.set('component_id', this.component_id);
             this.set('config', {});
+            this.set('constraints', this.constraints);
+            this.set('appliedFunctions', this.appliedFunctions);
 
             this.cardComponentLookup = cardComponentLookup;
             this.configKeys = ko.observableArray();
@@ -110,12 +115,32 @@ define([
             this._card = ko.observable('{}');
 
             this.dirty = ko.computed(function() {
-                return JSON.stringify(_.extend(JSON.parse(self._card()), self.toJSON())) !== self._card();
+                return JSON.stringify(
+                    _.extend(
+                        JSON.parse(self._card()),
+                        self.toJSON())
+                ) !== self._card();
             });
 
             this.isContainer = ko.computed(function() {
                 return !!self.get('cards')().length;
             });
+
+            this.setConstraints = function(arr) {
+                var self = this;
+                if (arr) {
+                    arr.forEach(function(constraint){
+                        var constraintViewModel = new CardConstraintsViewModel({
+                            constraint: koMapping.fromJS(constraint),
+                            widgets: self.widgets()
+                        });
+                        constraintViewModel.constraint.nodes.subscribe(function(){
+                            self.toJSON();
+                        }, self);
+                        self.constraints.push(constraintViewModel);
+                    });
+                }
+            };
 
             this.sourceData = attributes;
             this.parse(attributes);
@@ -163,6 +188,8 @@ define([
          */
         parse: function(attributes) {
             var self = this;
+            // console.log(attributes.data.constraints[0].nodes)
+            // console.log(attributes.data.constraints[0].nodes)
             this._attributes = attributes;
 
             _.each(attributes.data, function(value, key) {
@@ -173,7 +200,7 @@ define([
                     self.configKeys.removeAll();
                     _.each(value, function(configVal, configKey) {
                         if (!ko.isObservable(configVal)) {
-                            configVal = ko.observable(configVal);
+                            configVal = koMapping.fromJS(configVal);
                         }
                         config[configKey] = configVal;
                         configKeys.push(configKey);
@@ -202,6 +229,15 @@ define([
                     this.set('id', value);
                     this.get(key)(value);
                     break;
+                case 'constraints':
+                    if (this.constraints().length === 0) {
+                        this.setConstraints(value);
+                    } else {
+                        this.constraints().forEach(function(constraint, i){
+                            constraint.update(value[i]);
+                        });
+                    }
+                    break;
                 case 'name':
                 case 'nodegroup_id':
                 case 'instructions':
@@ -225,7 +261,6 @@ define([
                     this.set(key, value);
                 }
             }, this);
-
             this._card(JSON.stringify(this.toJSON()));
         },
 
@@ -278,7 +313,7 @@ define([
                 });
                 if (originalWidgetData) {
                     widget.configKeys().forEach(function(configKey){
-                        widget.config[configKey](originalWidgetData.config[configKey]);
+                        koMapping.fromJS(originalWidgetData.config[configKey], widget.config[configKey]);
                     });
                     widget.label(originalWidgetData.label);
                     widget.widget_id(originalWidgetData.widget_id);
@@ -295,7 +330,12 @@ define([
                  key !== 'widgets' && key !== 'datatypes' && key !== 'data' && key !== 'helpactive' &&
                  key !== 'config') {
                     if (ko.isObservable(this.attributes[key])) {
-                        if (key === 'cards') {
+                        if (key === 'constraints') {
+                            ret[key] = [];
+                            this.attributes[key]().forEach(function(constraint) {
+                                ret[key].push(constraint.toJSON());
+                            }, this);
+                        } else if (key === 'cards') {
                             ret[key] = [];
                             this.attributes[key]().forEach(function(card) {
                                 ret[key].push(card.toJSON());

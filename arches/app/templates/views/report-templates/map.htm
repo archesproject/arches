@@ -4,17 +4,11 @@
 {% block header %}
 <div>
   <!-- ko if: featureCount() > 0 || report.preview -->
-  <!-- ko component: {
-      name: 'map-widget',
-      params: {
-          config: report.configJSON,
-          node: null,
-          value: featureCollection,
-          type: 'report-header',
-          graph: report.graph
-      }
-  } --><!-- /ko -->
-  <!--/ko-->
+  <div data-bind="component: {
+      name: 'report-header-map',
+      params: $data
+  }" class="report-map-header-component"></div>
+  <!-- /ko -->
 </div>
 {% endblock header %}
 

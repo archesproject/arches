@@ -79,7 +79,7 @@ define([
                 var value = allBindingsAccessor().value;
                 var picker = $(element).data("DateTimePicker");
                 if (ko.isObservable(value)) {
-                    if (value() === "") {
+                    if (value() === "" || event.date === false) {
                       value(null);
                     }else if (event.date.isValid()) {
                         value(event.date.format(format));

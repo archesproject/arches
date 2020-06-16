@@ -7,28 +7,36 @@ services:
         dockerfile: ./Dockerfile
       command: run_tests
       environment:
+        # - ARCHES_PROJECT=insert_project_name
+        - INSTALL_DEFAULT_GRAPHS=True
+        - INSTALL_DEFAULT_CONCEPTS=True
         - PGUSERNAME=postgres
         - PGPASSWORD=postgres
         - PGDBNAME=arches
-        - PGHOST=db
+        - PGHOST=sut_db
         - PGPORT=5432
-        - ESHOST=elasticsearch
-        - ESPORT=9200
-        - COUCHDB_HOST=couchdb
+        - COUCHDB_HOST=sut_couchdb
         - COUCHDB_PORT=5984
         - COUCHDB_USER=admin
         - COUCHDB_PASS=password
+        - ESHOST=sut_es
+        - ESPORT=9200
+        # - ELASTICSEARCH_PREFIX=insert_project_name
         - DJANGO_MODE=PROD
         - DJANGO_DEBUG=False
+        # - DJANGO_REMOTE_DEBUG=False
         - DOMAIN_NAMES=localhost
+        - PYTHONUNBUFFERED=0
         - TZ=PST
+      ports:
+        - '8000:8000'
       depends_on:
-        - db
-        - elasticsearch
-        - couchdb
+        - sut_db
+        - sut_es
+        - sut_couchdb
 
-    db:
-      container_name: db
+    sut_db:
+      container_name: sut_db
       image: mdillon/postgis:9.6-alpine
       ports:
         - '5432:5432'
@@ -36,17 +44,18 @@ services:
         - POSTGRES_PASSWORD=postgres
         - TZ=PST
 
-    elasticsearch:
-      container_name: elasticsearch
-      image: elasticsearch:5.2
+    sut_es:
+      container_name: sut_es
+      image: docker.elastic.co/elasticsearch/elasticsearch:6.7.1
       ports:
         - "9200:9200"
         - "9300:9300"
       environment:
+        - discovery.type=single-node
         - TZ=PST
 
-    couchdb:
-      container_name: couchdb
+    sut_couchdb:
+      container_name: sut_couchdb
       image: couchdb:2.1.1
       ports:
         - "5984:5984"

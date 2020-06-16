@@ -1,0 +1,27 @@
+{
+    "business_data": {
+        "resources": [
+            {
+                "resourceinstance": {
+                    "graph_id": "f348bbda-0721-11ea-b628-acde48001122",
+                    "legacyid": null,
+                    "resourceinstanceid": "7f90ff58-0722-11ea-b628-acde48001122"
+                },
+                "tiles": [
+                    {
+                        "data": {
+                            "2d956d38-0722-11ea-b628-acde48001122": "Note",
+                            "667abff4-0722-11ea-b628-acde48001122": "2019-11-01"
+                        },
+                        "nodegroup_id": "fdbc4f50-0721-11ea-b628-acde48001122",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "7f90ff58-0722-11ea-b628-acde48001122",
+                        "sortorder": 0,
+                        "tileid": "caced9b0-f717-4557-9c64-ef87f646c9c1"
+                    }
+                ]
+            }
+        ]
+    }
+}

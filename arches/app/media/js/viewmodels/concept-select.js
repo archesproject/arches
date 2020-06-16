@@ -9,6 +9,7 @@ define([
         var self = this;
         params.configKeys = ['placeholder', 'defaultValue'];
         this.multiple = params.multiple || false;
+        this.allowClear = true;
 
         WidgetViewModel.apply(this, [params]);
 
@@ -114,6 +115,12 @@ define([
             formatSelection: function(item) {
                 return item.text;
             },
+            clear: function() {
+                self.value('');
+            },
+            isEmpty: ko.computed(function() {
+                return self.value() === '' || !self.value();
+            }, this),
             initSelection: function(el, callback) {
                 var valueList = self.valueList();
                 var setSelectionData = function() {

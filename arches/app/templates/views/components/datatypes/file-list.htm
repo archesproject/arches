@@ -1,0 +1,15 @@
+{% load i18n %}
+<!-- ko ifnot: $data.search -->
+<div class="row">
+    <div class="form-group">
+        <div class="relative">
+            <label class="col-xs-12 control-label widget-input-label">
+                <p class="control-label node-widget-label">
+                    {% trans "Maximum Number of Files" %}
+                </p>
+                <input class="form-control input-md widget-input widget-file" placeholder="1" type="number" data-bind="textInput: maxFiles"></input>
+            </label>
+        </div>
+    </div>
+</div>
+<!-- /ko -->

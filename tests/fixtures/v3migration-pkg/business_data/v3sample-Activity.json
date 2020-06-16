@@ -1,0 +1,719 @@
+{
+    "business_data": {
+        "resources": [
+            {
+                "resourceinstance": {
+                    "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6", 
+                    "legacyid": "340543fc-8525-4183-94eb-e4acb4547fbf", 
+                    "resourceinstanceid": "340543fc-8525-4183-94eb-e4acb4547fbf"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "292ae090-943a-11e8-960d-94659cf754d0": "Li Ling Divine Festival", 
+                            "292ae093-943a-11e8-b3a7-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "292ae090-943a-11e8-960d-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "340543fc-8525-4183-94eb-e4acb4547fbf", 
+                        "sortorder": 0, 
+                        "tileid": "6b4e9471-83d7-11e9-bd7e-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "5b58f255-943a-11e8-84d8-94659cf754d0": "6e67fa52-0189-4093-b908-c74fb0da3eeb", 
+                            "5b58f256-943a-11e8-a401-94659cf754d0": "<p>\"Li Ling Divine Festival is on her birthday on the 15th of April every lunar year. &nbsp;According to the indigenous villagers [of Pokfulam Village], there was a rumor in earlier times that there was some spectors haunting in the village. &nbsp;The villagers felt uncomfortable and uneasy. &nbsp;In one night, a villager dreamt that a lady, with the name \"Li Ling Divine\" promised to expel all the evil things for villagers. &nbsp;Later on, villagers no longer heard those strange sounds or feel the existence of any specter figures. &nbsp;Besides expressing gratitude to Li Ling Divine for keeping the evil things out of the village, the villages were also looking for eternal peace, thus a pagoda was built in the village to worship Li Ling Divine.</p><p>There is another hearsay that a villager dreamt of Li Ling Divine and she told the villager to build a pagoda for expelling the evil. &nbsp;Then the villagers together with local community \"Luen Hing Tong (\u806f\u6176\u5802)\" built the pagoda and named as Li Ling Divine Pagoda for worship. &nbsp;The side story is that Li Ling Divine can help the villagers to solve problems and expel evils via a spirit medium, a lady villager (normally a virgin). &nbsp;Thereafter, Li Ling Divine is worshipped for her divine beings. &nbsp;Such a divine being is common in Hakka Clan.</p><p>...The myth about female deity \"Li Ling\" and Li Ling Pagoda as well as other female deities have its significant importance in Hakka Clan. &nbsp;The believe in divine beings reveals the Hakka Clan's social behavior, belief, spiritual bailment and their ways of solve problems.\"</p><p>[Source:&nbsp;<span style=\"line-height: 1.42857;\">Ko, Nigel. 2007. \"Hidden Street in Disregarded Village: The Cultural Significance of \"Wai Chai\", Pokfulam Village.\" Master of Science in Conservation, Department of Architecture, University of Hong Kong.]</span></p>\n\n\n\n\n\n\n\n<p><br></p><p><br></p><p><br></p>"
+                        }, 
+                        "nodegroup_id": "5b58f252-943a-11e8-ab05-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "340543fc-8525-4183-94eb-e4acb4547fbf", 
+                        "sortorder": 0, 
+                        "tileid": "6b4e9473-83d7-11e9-b4c5-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6", 
+                    "legacyid": "1c10c4a7-20ba-497b-9ea0-f3a5723c238b", 
+                    "resourceinstanceid": "1c10c4a7-20ba-497b-9ea0-f3a5723c238b"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "292ae090-943a-11e8-960d-94659cf754d0": "Pokfulam Fire Dragon Dance", 
+                            "292ae093-943a-11e8-b3a7-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "292ae090-943a-11e8-960d-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1c10c4a7-20ba-497b-9ea0-f3a5723c238b", 
+                        "sortorder": 0, 
+                        "tileid": "6b849892-83d7-11e9-b069-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "1a7e9f01-943a-11e8-ae35-94659cf754d0": [
+                                "f4eb9fcd-f028-4674-aaf9-c0d01573864f", 
+                                "1cbcf1f1-6cc1-4ac4-b97c-54aff58be736"
+                            ]
+                        }, 
+                        "nodegroup_id": "1a7e9f01-943a-11e8-ae35-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1c10c4a7-20ba-497b-9ea0-f3a5723c238b", 
+                        "sortorder": 0, 
+                        "tileid": "6b849894-83d7-11e9-bd7a-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "4b17b8ee-943a-11e8-8be1-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1c10c4a7-20ba-497b-9ea0-f3a5723c238b", 
+                        "sortorder": 0, 
+                        "tileid": "3911de9e-5bd1-44ba-9e03-65d8a80eb775"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "4b17b8e2-943a-11e8-8622-94659cf754d0", 
+                        "parenttile_id": "3911de9e-5bd1-44ba-9e03-65d8a80eb775", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1c10c4a7-20ba-497b-9ea0-f3a5723c238b", 
+                        "sortorder": 0, 
+                        "tileid": "6b86e282-83d7-11e9-880b-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "4b17b8e5-943a-11e8-9b48-94659cf754d0", 
+                        "parenttile_id": "3911de9e-5bd1-44ba-9e03-65d8a80eb775", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1c10c4a7-20ba-497b-9ea0-f3a5723c238b", 
+                        "sortorder": 0, 
+                        "tileid": "6b86e283-83d7-11e9-81b7-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "4b17b8e8-943a-11e8-a2fe-94659cf754d0", 
+                        "parenttile_id": "3911de9e-5bd1-44ba-9e03-65d8a80eb775", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1c10c4a7-20ba-497b-9ea0-f3a5723c238b", 
+                        "sortorder": 0, 
+                        "tileid": "6b86e284-83d7-11e9-a826-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "4b17b8eb-943a-11e8-8045-94659cf754d0": {
+                                "features": [
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                [
+                                                    114.136445299089, 
+                                                    22.2608630634307
+                                                ], 
+                                                [
+                                                    114.136705473363, 
+                                                    22.2608903687333
+                                                ], 
+                                                [
+                                                    114.136721566617, 
+                                                    22.2609549085184
+                                                ], 
+                                                [
+                                                    114.136684015691, 
+                                                    22.260959873116
+                                                ], 
+                                                [
+                                                    114.136684015691, 
+                                                    22.2610070367846
+                                                ], 
+                                                [
+                                                    114.13682349056, 
+                                                    22.2610566827344
+                                                ], 
+                                                [
+                                                    114.136810079515, 
+                                                    22.2610988817778
+                                                ], 
+                                                [
+                                                    114.136885181367, 
+                                                    22.2611162578509
+                                                ], 
+                                                [
+                                                    114.136997834146, 
+                                                    22.261079023406
+                                                ], 
+                                                [
+                                                    114.137000516355, 
+                                                    22.2611932090055
+                                                ], 
+                                                [
+                                                    114.137051478326, 
+                                                    22.2611882444161
+                                                ], 
+                                                [
+                                                    114.137102440297, 
+                                                    22.2615233538016
+                                                ], 
+                                                [
+                                                    114.13695760101, 
+                                                    22.2615382475334
+                                                ], 
+                                                [
+                                                    114.13685031265, 
+                                                    22.2614066861806
+                                                ], 
+                                                [
+                                                    114.136785939634, 
+                                                    22.2612478194766
+                                                ], 
+                                                [
+                                                    114.136654511392, 
+                                                    22.2612105850668
+                                                ], 
+                                                [
+                                                    114.136681333482, 
+                                                    22.261138598513
+                                                ]
+                                            ], 
+                                            "type": "LineString"
+                                        }, 
+                                        "id": "2ac90fb9-44b0-485b-80cc-9c680bed11c0", 
+                                        "properties": {}, 
+                                        "type": "Feature"
+                                    }, 
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                [
+                                                    114.136501625478, 
+                                                    22.2603839786178
+                                                ], 
+                                                [
+                                                    114.136287048757, 
+                                                    22.261170868352
+                                                ], 
+                                                [
+                                                    114.136370197236, 
+                                                    22.2611882444161
+                                                ], 
+                                                [
+                                                    114.13644261688, 
+                                                    22.2608630634307
+                                                ]
+                                            ], 
+                                            "type": "LineString"
+                                        }, 
+                                        "id": "50aecc60-4b4f-4ea2-ab4d-3194d57ff4b1", 
+                                        "properties": {}, 
+                                        "type": "Feature"
+                                    }, 
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                [
+                                                    114.136619642675, 
+                                                    22.2595474379924
+                                                ], 
+                                                [
+                                                    114.136614278257, 
+                                                    22.2597360944751
+                                                ], 
+                                                [
+                                                    114.136547223031, 
+                                                    22.2602350399998
+                                                ], 
+                                                [
+                                                    114.136611596048, 
+                                                    22.260240004623
+                                                ], 
+                                                [
+                                                    114.136667922437, 
+                                                    22.259867657398
+                                                ], 
+                                                [
+                                                    114.13676716417, 
+                                                    22.2597733292771
+                                                ], 
+                                                [
+                                                    114.136858359277, 
+                                                    22.2598602104434
+                                                ], 
+                                                [
+                                                    114.136820808351, 
+                                                    22.2599098568
+                                                ], 
+                                                [
+                                                    114.136946872174, 
+                                                    22.2600587957639
+                                                ], 
+                                                [
+                                                    114.137000516355, 
+                                                    22.2600414195596
+                                                ], 
+                                                [
+                                                    114.137038067281, 
+                                                    22.2601059597361
+                                                ], 
+                                                [
+                                                    114.13715072006, 
+                                                    22.2600662427079
+                                                ], 
+                                                [
+                                                    114.137571826875, 
+                                                    22.2599967378815
+                                                ], 
+                                                [
+                                                    114.137574509084, 
+                                                    22.2600712073371
+                                                ], 
+                                                [
+                                                    114.137571826875, 
+                                                    22.2601183713051
+                                                ], 
+                                                [
+                                                    114.137499407232, 
+                                                    22.2601332651864
+                                                ], 
+                                                [
+                                                    114.137502089441, 
+                                                    22.2602151815054
+                                                ], 
+                                                [
+                                                    114.137268737256, 
+                                                    22.2602896508448
+                                                ], 
+                                                [
+                                                    114.137193635404, 
+                                                    22.2602896508448
+                                                ], 
+                                                [
+                                                    114.137051478326, 
+                                                    22.2602896508448
+                                                ], 
+                                                [
+                                                    114.136976376474, 
+                                                    22.2603194385694
+                                                ], 
+                                                [
+                                                    114.136855677068, 
+                                                    22.2604063193968
+                                                ], 
+                                                [
+                                                    114.136751070916, 
+                                                    22.2603442616685
+                                                ], 
+                                                [
+                                                    114.13665987581, 
+                                                    22.2602648277361
+                                                ], 
+                                                [
+                                                    114.136541858613, 
+                                                    22.2602524161801
+                                                ], 
+                                                [
+                                                    114.136504307687, 
+                                                    22.2603839786177
+                                                ]
+                                            ], 
+                                            "type": "LineString"
+                                        }, 
+                                        "id": "45ac5de4-221b-4d53-9bca-87e6d3900a87", 
+                                        "properties": {}, 
+                                        "type": "Feature"
+                                    }, 
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                [
+                                                    114.136611596048, 
+                                                    22.2587245452298
+                                                ], 
+                                                [
+                                                    114.136616960466, 
+                                                    22.2595461968305
+                                                ]
+                                            ], 
+                                            "type": "LineString"
+                                        }, 
+                                        "id": "561075af-e49a-41c7-9c9f-81da10c05746", 
+                                        "properties": {}, 
+                                        "type": "Feature"
+                                    }, 
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                [
+                                                    114.136619642675, 
+                                                    22.2578668946837
+                                                ], 
+                                                [
+                                                    114.136598185003, 
+                                                    22.2579885299579
+                                                ], 
+                                                [
+                                                    114.136611596048, 
+                                                    22.2587108923679
+                                                ]
+                                            ], 
+                                            "type": "LineString"
+                                        }, 
+                                        "id": "2922f7b4-b546-4276-a790-20eed01157f7", 
+                                        "properties": {}, 
+                                        "type": "Feature"
+                                    }, 
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                [
+                                                    114.138360396325, 
+                                                    22.2547217173277
+                                                ], 
+                                                [
+                                                    114.13769520849, 
+                                                    22.2561416482923
+                                                ], 
+                                                [
+                                                    114.137308970392, 
+                                                    22.2569757269002
+                                                ], 
+                                                [
+                                                    114.136793986261, 
+                                                    22.2575417059827
+                                                ], 
+                                                [
+                                                    114.136643782556, 
+                                                    22.2578693770372
+                                                ]
+                                            ], 
+                                            "type": "LineString"
+                                        }, 
+                                        "id": "3f7e0f48-c924-402b-8933-7d8bba3bdb13", 
+                                        "properties": {}, 
+                                        "type": "Feature"
+                                    }, 
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                [
+                                                    114.13769520849, 
+                                                    22.251335669995
+                                                ], 
+                                                [
+                                                    114.138113633096, 
+                                                    22.2517229346871
+                                                ], 
+                                                [
+                                                    114.139154330194, 
+                                                    22.2517229346871
+                                                ], 
+                                                [
+                                                    114.139540568292, 
+                                                    22.2518222331535
+                                                ], 
+                                                [
+                                                    114.140409604013, 
+                                                    22.2526265481369
+                                                ], 
+                                                [
+                                                    114.139186516702, 
+                                                    22.253689031218
+                                                ], 
+                                                [
+                                                    114.138371125161, 
+                                                    22.2547117876899
+                                                ]
+                                            ], 
+                                            "type": "LineString"
+                                        }, 
+                                        "id": "a3803591-ee33-4805-a4b6-021ddadf5880", 
+                                        "properties": {}, 
+                                        "type": "Feature"
+                                    }, 
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                [
+                                                    114.135538712442, 
+                                                    22.2501043597561
+                                                ], 
+                                                [
+                                                    114.136085883081, 
+                                                    22.2497468805623
+                                                ], 
+                                                [
+                                                    114.136536494195, 
+                                                    22.2497170905882
+                                                ], 
+                                                [
+                                                    114.136729613244, 
+                                                    22.2498561104127
+                                                ], 
+                                                [
+                                                    114.13674034208, 
+                                                    22.2506902264618
+                                                ], 
+                                                [
+                                                    114.136954918802, 
+                                                    22.2508391752335
+                                                ], 
+                                                [
+                                                    114.137105122506, 
+                                                    22.2508590350578
+                                                ], 
+                                                [
+                                                    114.137319699228, 
+                                                    22.2509583341368
+                                                ], 
+                                                [
+                                                    114.137684479654, 
+                                                    22.2513257401171
+                                                ]
+                                            ], 
+                                            "type": "LineString"
+                                        }, 
+                                        "id": "ff1c1ef0-f725-4f4a-ace5-19c4221abee4", 
+                                        "properties": {}, 
+                                        "type": "Feature"
+                                    }, 
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                [
+                                                    114.133071080148, 
+                                                    22.2521946017757
+                                                ], 
+                                                [
+                                                    114.133156910836, 
+                                                    22.2524527767725
+                                                ], 
+                                                [
+                                                    114.133274928033, 
+                                                    22.2523832681664
+                                                ], 
+                                                [
+                                                    114.133371487558, 
+                                                    22.252234321037
+                                                ], 
+                                                [
+                                                    114.133414402902, 
+                                                    22.2523634085583
+                                                ], 
+                                                [
+                                                    114.133575335443, 
+                                                    22.2522144614078
+                                                ], 
+                                                [
+                                                    114.133779183328, 
+                                                    22.2520754439244
+                                                ], 
+                                                [
+                                                    114.133929387033, 
+                                                    22.251886777119
+                                                ], 
+                                                [
+                                                    114.134315625131, 
+                                                    22.2517179697619
+                                                ], 
+                                                [
+                                                    114.134530201852, 
+                                                    22.2512314062411
+                                                ], 
+                                                [
+                                                    114.134852066934, 
+                                                    22.2506753315759
+                                                ], 
+                                                [
+                                                    114.13497008413, 
+                                                    22.250754770949
+                                                ], 
+                                                [
+                                                    114.135495797097, 
+                                                    22.2501291846663
+                                                ]
+                                            ], 
+                                            "type": "LineString"
+                                        }, 
+                                        "id": "67269d37-ab21-41f8-ba15-dddc7e325c12", 
+                                        "properties": {}, 
+                                        "type": "Feature"
+                                    }
+                                ], 
+                                "type": "FeatureCollection"
+                            }
+                        }, 
+                        "nodegroup_id": "4b17b8eb-943a-11e8-8045-94659cf754d0", 
+                        "parenttile_id": "3911de9e-5bd1-44ba-9e03-65d8a80eb775", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1c10c4a7-20ba-497b-9ea0-f3a5723c238b", 
+                        "sortorder": 0, 
+                        "tileid": "6b86e285-83d7-11e9-b5ad-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "4b17b8df-943a-11e8-b585-94659cf754d0", 
+                        "parenttile_id": "3911de9e-5bd1-44ba-9e03-65d8a80eb775", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1c10c4a7-20ba-497b-9ea0-f3a5723c238b", 
+                        "sortorder": 0, 
+                        "tileid": "6b86e286-83d7-11e9-9107-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "5b58f255-943a-11e8-84d8-94659cf754d0": "c419dd74-9133-45f3-a5f2-b13fa42282e7", 
+                            "5b58f256-943a-11e8-a401-94659cf754d0": "<ol><li><span style=\"font-size: 12px;\"><span style=\"line-height: 21.4285px; color: rgb(99, 99, 99); background-color: rgb(255, 255, 255);\">Ko, Nigel. 2007. \"Hidden Street in Disregarded Village: The Cultural Significance of \"Wai Chai\", Pokfulam Village.\" Master of Science in Conservation, Department of Architecture, University of Hong Kong.</span></span></li><li><span style=\"line-height: 21.4285px; font-size: 12px; color: rgb(99, 99, 99); background-color: rgb(255, 255, 255);\">Kwok, Eva. 2008. \"The Last Village: Cultural Memories of the Tangible and Intangible Heritage of Pokfulam Village on Hong Kong Island.\" Master of Science in Conservation, Department of Architecture, The University of Hong Kong.</span></li><li><span style=\"line-height: 21.4285px; font-size: 12px; color: rgb(99, 99, 99); background-color: rgb(255, 255, 255);\">Pokfulam Village Atlas, prepared by students of the Landscape Architecture Division, The University of Hong Kong, 2013-2014.</span></li></ol>"
+                        }, 
+                        "nodegroup_id": "5b58f252-943a-11e8-ab05-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1c10c4a7-20ba-497b-9ea0-f3a5723c238b", 
+                        "sortorder": 0, 
+                        "tileid": "2d75cde6-5015-4cc1-829e-473c68a37bc1"
+                    }, 
+                    {
+                        "data": {
+                            "5b58f255-943a-11e8-84d8-94659cf754d0": "282abb61-ebe9-43f8-b18e-8a749b5f4398", 
+                            "5b58f256-943a-11e8-a401-94659cf754d0": "<span style=\"font-size: 12px;\"><span style=\"color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);\">This unique tradition can only be found in two locations in Hong Kong: </span><span style=\"color: rgb(0, 0, 255);\">Pokfulam Village</span> <span style=\"color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);\">and </span><span style=\"color: rgb(0, 0, 255); background-color: rgb(255, 255, 255);\">Tai Hang</span><span style=\"color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);\">. &nbsp;The dance, dating back over a century, is traditionally prepared, performed, and managed by the villagers, who believe it brings peace, stability and good fortune to the village and local people. &nbsp;The Pokfulam Fire Dragon Dance begins at the</span> <span style=\"color: rgb(0, 0, 255); background-color: rgb(255, 255, 255);\">Li Ling Divine Pagoda</span><span style=\"color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);\">, to pay respects to the spirit of </span><span style=\"color: rgb(0, 0, 255); background-color: rgb(255, 255, 255);\">Li Ling Divine</span><span style=\"color: rgb(0, 0, 0);\">, before winding its way through the village and then down along Pokfulam Road towards Wa Fu Housing Estates. &nbsp;The Fire Dragon, crafted from hay and incense and carried by trained performers, blesses communities as it dances its way to the final endpoint, </span><span style=\"color: rgb(0, 0, 255); background-color: rgb(255, 255, 255);\">Waterfall Bay</span><span style=\"color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);\">, where it enters the water in the final ritual of&nbsp;<span style=\"line-height: 1.42857;\">\u9f8d\u6b78\u5009\u6d77 </span><span style=\"line-height: 18.5714px;\">which means \"fire dragon returning to the sea\".</span></span></span>"
+                        }, 
+                        "nodegroup_id": "5b58f252-943a-11e8-ab05-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1c10c4a7-20ba-497b-9ea0-f3a5723c238b", 
+                        "sortorder": 0, 
+                        "tileid": "6b86e288-83d7-11e9-9449-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6", 
+                    "legacyid": "6ce53fff-db7e-4952-a9d0-341bb07a9e40", 
+                    "resourceinstanceid": "6ce53fff-db7e-4952-a9d0-341bb07a9e40"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "292ae090-943a-11e8-960d-94659cf754d0": "Craftmanship of the Fire Dragon"
+                        }, 
+                        "nodegroup_id": "292ae090-943a-11e8-960d-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "6ce53fff-db7e-4952-a9d0-341bb07a9e40", 
+                        "sortorder": 0, 
+                        "tileid": "6b895381-83d7-11e9-b808-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "1a7e9f01-943a-11e8-ae35-94659cf754d0": [
+                                "f4eb9fcd-f028-4674-aaf9-c0d01573864f", 
+                                "1cbcf1f1-6cc1-4ac4-b97c-54aff58be736"
+                            ]
+                        }, 
+                        "nodegroup_id": "1a7e9f01-943a-11e8-ae35-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "6ce53fff-db7e-4952-a9d0-341bb07a9e40", 
+                        "sortorder": 0, 
+                        "tileid": "6b895383-83d7-11e9-a075-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "5b58f255-943a-11e8-84d8-94659cf754d0": "c419dd74-9133-45f3-a5f2-b13fa42282e7", 
+                            "5b58f256-943a-11e8-a401-94659cf754d0": "<ol><li><span style=\"line-height: 21.4285px; font-size: 12px; color: rgb(99, 99, 99);\">Ko, Nigel. 2007. \"Hidden Street in Disregarded Village: The Cultural Significance of \"Wai Chai\", Pokfulam Village.\" Master of Science in Conservation, Department of Architecture, University of Hong Kong.</span><br></li></ol>"
+                        }, 
+                        "nodegroup_id": "5b58f252-943a-11e8-ab05-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "6ce53fff-db7e-4952-a9d0-341bb07a9e40", 
+                        "sortorder": 0, 
+                        "tileid": "245d3bc5-42e9-48ef-8d27-4776ea80e5d4"
+                    }, 
+                    {
+                        "data": {
+                            "5b58f255-943a-11e8-84d8-94659cf754d0": "282abb61-ebe9-43f8-b18e-8a749b5f4398", 
+                            "5b58f256-943a-11e8-a401-94659cf754d0": "<p><span style=\"font-size: 12px;\"><span style=\"background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);\">The craftsmanship of the Pokfulam Fire Dragon requires weeks of preparation before its use in the traditional dance during the </span><span style=\"color: rgb(0, 0, 255);\">Mid-Autumn Festival</span><span style=\"color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);\">. &nbsp;The crafting begins with shaping of the dragon's head from bamboo and rattan, which is heated and bent into the desired form. &nbsp;Steel wire is used to affix more shaped rattan pieces to elongate the structure, forming the rest of the dragon's body. &nbsp;Hay is then twisted and wrapped around the body in such a way to allow incense to be later tucked into the the layers.</span></span></p><p><span style=\"font-size: 12px;\"><span style=\"line-height: 18.5714px; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);\">Note: &nbsp;In the</span><span style=\"color: rgb(51, 51, 51); line-height: 18.5714px;\"> </span><span style=\"line-height: 18.5714px; color: rgb(0, 0, 255); background-color: rgb(255, 255, 255);\">Pokfulam Fire Dragon Dance</span><span style=\"line-height: 18.5714px; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);\">, villagers originally used local hay grown for cows of the nearby </span><span style=\"line-height: 18.5714px; color: rgb(0, 0, 255); background-color: rgb(255, 255, 255);\">Dairy Farm Company Limited</span><span style=\"line-height: 18.5714px; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);\">, but today \"Pearl Hay\" is used from Mainland China. &nbsp;Presently, the main craftsman of the Pokfulam Fire Dragon is a local villager,</span><span style=\"color: rgb(51, 51, 51); line-height: 18.5714px;\"> </span><span style=\"color: rgb(0, 0, 255); background-color: rgb(255, 255, 255);\"><span style=\"line-height: 18.5714px;\">Mr. Ng Kong Kin (</span><span style=\"line-height: 18.5714px;\">\u5433\u6c5f\u4e7e</span><span style=\"line-height: 18.5714px;\">)</span></span><span style=\"line-height: 18.5714px; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);\">, who has been overseeing the crafting for the past 50 years.</span></span></p>"
+                        }, 
+                        "nodegroup_id": "5b58f252-943a-11e8-ab05-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "6ce53fff-db7e-4952-a9d0-341bb07a9e40", 
+                        "sortorder": 0, 
+                        "tileid": "6b895385-83d7-11e9-a794-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6", 
+                    "legacyid": "b9d6fcef-549c-4d4d-a3d2-616bddae30ea", 
+                    "resourceinstanceid": "b9d6fcef-549c-4d4d-a3d2-616bddae30ea"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "292ae090-943a-11e8-960d-94659cf754d0": "Gui Jie \u9b3c\u8282", 
+                            "292ae093-943a-11e8-b3a7-94659cf754d0": "466260e8-4825-48d2-b8aa-7d1befefe74b"
+                        }, 
+                        "nodegroup_id": "292ae090-943a-11e8-960d-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "b9d6fcef-549c-4d4d-a3d2-616bddae30ea", 
+                        "sortorder": 0, 
+                        "tileid": "33ad79a7-c6cb-4880-a8d8-a760f48400f4"
+                    }, 
+                    {
+                        "data": {
+                            "292ae090-943a-11e8-960d-94659cf754d0": "Zhongyuan Jie \u4e2d\u5143\u8282", 
+                            "292ae093-943a-11e8-b3a7-94659cf754d0": "466260e8-4825-48d2-b8aa-7d1befefe74b"
+                        }, 
+                        "nodegroup_id": "292ae090-943a-11e8-960d-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "b9d6fcef-549c-4d4d-a3d2-616bddae30ea", 
+                        "sortorder": 0, 
+                        "tileid": "cf80ce3d-ac90-411d-95ea-d9d3d0685b69"
+                    }, 
+                    {
+                        "data": {
+                            "292ae090-943a-11e8-960d-94659cf754d0": "Hungry Ghost Festival", 
+                            "292ae093-943a-11e8-b3a7-94659cf754d0": "466260e8-4825-48d2-b8aa-7d1befefe74b"
+                        }, 
+                        "nodegroup_id": "292ae090-943a-11e8-960d-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "b9d6fcef-549c-4d4d-a3d2-616bddae30ea", 
+                        "sortorder": 0, 
+                        "tileid": "7b2e3f95-6692-45ef-a17d-43cfbc882dcf"
+                    }, 
+                    {
+                        "data": {
+                            "292ae090-943a-11e8-960d-94659cf754d0": "Yue Lan Festival \u76c2\u862d\u76c6\u7bc0", 
+                            "292ae093-943a-11e8-b3a7-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "292ae090-943a-11e8-960d-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "b9d6fcef-549c-4d4d-a3d2-616bddae30ea", 
+                        "sortorder": 0, 
+                        "tileid": "6b8bc480-83d7-11e9-93aa-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "5b58f255-943a-11e8-84d8-94659cf754d0": "9557d09b-7155-47d0-aff2-980d2a3f386e", 
+                            "5b58f256-943a-11e8-a401-94659cf754d0": "<p>\"The Chinese believe that the gates of Hell open during the Seventh Moon of the Chinese Calendar, and that the ghosts are free to wander around.&nbsp; To comfort and take care of the ghosts who may be the ancestors of the living or the ghosts without descendants, a set of elaborate rituals are undertaken during this month.</p><p>Yue Lan (\u76c2\u862d) literally is the \"Bowl of Orchid\", but it has nothing to do with the orchid.&nbsp; The name is translated from the Sanskrit \"Ullambana\", which means \"being held upside down\" or simply \"saving those hung by the feet in the underworld\".&nbsp; The Ullambana Sutra tells a story about how Muk Lin (\u76ee\u9023), a disciple of the Buddha, saved his mother.&nbsp; Muk Lin's mother was reborn among the Hungry Ghosts, one of the six paths of reincarnation, and was not able to eat as food turned to burning coals before it entered her mouth.&nbsp; Buddha told Muk Lin to prepare basins of offerings like fruit, incense, oil and candles in the Pravarana Day, the Fifteenth Day of the Seventh Moon.&nbsp; Pravarana Day was the Festival that monks received these offerings and prayed for the donor's family.&nbsp; Muk Lin followed these instructions and his mother was liberated by the power of the devout monks.&nbsp; Buddha then instructed that his followers should similarly practice filial piety by offering up such Ullambana basins so that their ancestors could be brought over to paradise.&nbsp; Influenced of Muk Lin's story, the focus of the festival shifted gradually to the salvation of the Hungry Ghosts during the Song Dynasty (960 - 1279AD).&nbsp; During this period, the Yue Lan Festival became so popular that people made paper basins for holding bundles of rice-sprouts as offerings.&nbsp; It was later transformed into the practice of rice giving as in the Yue Lan Festival nowadays.</p><p>The general concept of Yue Lan Festival is based on Buddhism, but the influence of Taoism is obvious.&nbsp; One of the Taoist \"Yuan Festival\" is the \"Zhong Yuan Festival\" (\u4e2d\u5143\u8282) which falls on the Fifteenth Day of the Seventh Moon for paying attribute to \"Tei Kwun\" (\u5730\u541b), the Earthly Official who is controlling the dead.&nbsp; What Yue Lan Festival celebrates now is the combination of Buddhist and Taoist traditions, a ritualistic expression of contemplation and salvation for lonely and starving souls.</p><p>The Yue Lan Festival in Hong Kong is the Fourteenth Day of the Seventh Month, one day after the Buddhist and Taoist Festival, for which it is believed that the number fourteen is divisible by seven, a number closely connected to rituals for the dead in Cantonese culture.&nbsp; Nowadays people may not be fully understood the story or the meanings behind the Yue Lan Festival.&nbsp; But they are delighted to be involved in the festival to enjoy the opera performance, to feed the hungry ghosts, to show their filial piety to ancestors and to help the poor on earth.\"</p><p>[text from: Wong, K. D. [\u738b\u570b\u8208]. (2004). Sustaining the intangible cultural heritage : the traditions of Yue Lan Festival in the redevelopment of Ngau Tau Kok Estate. (Thesis). University of Hong Kong, Pokfulam, Hong Kong SAR.]</p>"
+                        }, 
+                        "nodegroup_id": "5b58f252-943a-11e8-ab05-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "b9d6fcef-549c-4d4d-a3d2-616bddae30ea", 
+                        "sortorder": 0, 
+                        "tileid": "6b8bc482-83d7-11e9-997c-94659cf754d0"
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -58,14 +58,20 @@ define([
         * @param {boolean} options.graphModel - a reference to the selected {@link GraphModel}
         */
         initialize: function(options) {
+            var self = this;
             this.graphModel = options.graphModel;
             this.graphSettings = options.graphSettings;
             this.cardTree = options.cardTree;
+            this.appliedFunctions = options.appliedFunctions;
             this.permissionTree = options.permissionTree;
             this.items = this.graphModel.get('nodes');
             this.branchListVisible = ko.observable(false);
             this.scrollTo = ko.observable();
             this.restrictedNodegroups = options.restrictedNodegroups;
+            this.showIds = ko.observable(false);
+            this.toggleIds = function() {
+                self.showIds(!self.showIds());
+            };
             TreeView.prototype.initialize.apply(this, arguments);
         },
 
@@ -83,6 +89,39 @@ define([
                 }
                 return name;
             }, this);
+        },
+
+        /**
+         * Returns a boolean to indicate whether this node participates in descriptor function
+         * @param {object} node - a node in the tree 
+         */
+        isFuncNode: function(node) {
+            var appFuncs = null, appFuncDesc = false, appFuncName = false;
+            if(this.appliedFunctions()) {
+                appFuncs = this.appliedFunctions();
+                for(var i = 0; i < appFuncs.length; i++) {
+                    if(appFuncs[i]['function_id'] == "60000000-0000-0000-0000-000000000001") {
+                        if(appFuncs[i]['config']['description']['nodegroup_id']) {
+                            appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
+                        }
+                        if(appFuncs[i]['config']['name']['nodegroup_id']) {
+                            appFuncName = appFuncs[i]['config']['name']['nodegroup_id'];
+                        }
+                        if(node['id'] === appFuncDesc || node['id'] === appFuncName) {
+                            return true;
+                        } else {
+                            if(node['children']) {
+                                node['children'].forEach( function(child) {
+                                    if(child['id'] === appFuncDesc || child['id'] === appFuncName) {
+                                        return true;
+                                    }
+                                }); 
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
         },
 
         /**

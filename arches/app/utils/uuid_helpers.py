@@ -5,5 +5,5 @@ def uuid_get_or_create(id):
     try:
         uuid.UUID(id)
         return uuid.UUID(id), False
-    except(ValueError, TypeError):
+    except (ValueError, TypeError):
         return uuid.uuid4(), True

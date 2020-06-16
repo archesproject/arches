@@ -1,0 +1,14 @@
+{% load i18n %}
+
+<div class="resource-selector-button pull-right">
+    <div class="btn-group btn-group-xs">
+        <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true"> {% trans "Resource Type" %} <i class="dropdown-caret fa fa-caret-down"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-right">
+            <li><a href="#" data-bind="click: selectModelType.bind($data, null)">{% trans "All resources" %}</a></li>
+            <!-- ko foreach: $root.resources -->
+            <li><a href="#" data-bind="text: name().length > 55 ? name().substring(55, length) + '...' : name(), click: $parent.selectModelType.bind($parent)"></a></li>
+            <!-- /ko -->
+        </ul>
+    </div>
+</div>

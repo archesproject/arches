@@ -104,7 +104,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <div class="resource-grid-tools-container" data-bind="clickBubble: false, hover: hover">
                     <div class="btn-group" style="float:right;">
-                        <button class="btn btn-sm btn-mint dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false"> {% trans "Manage" %} <i class="ion-ios-more"></i></button>
+                        <button class="btn btn-sm btn-mint dropdown-toggle graph-btn" data-toggle="dropdown" type="button" aria-expanded="false"> {% trans "Manage" %} <i class="ion-ios-more"></i></button>
                         <ul class="dropdown-menu dropdown-menu-right manage-menu" data-bind="event: {mouseleave: $parent.leaveDropdown}">
                             <li>
                                 <a href="#" data-bind="click:function() { $parent.navigate($parent.arches.urls.graph_designer(graphid)) }, attr: { href: $parent.arches.urls.graph_designer(graphid) }"><i class="fa fa-sitemap"></i> {% trans "Manage Graph" %}</a>

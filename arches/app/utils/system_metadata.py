@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,12 +14,13 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import platform
 import subprocess
 from django.db import connection, transaction
 from arches.app.models.system_settings import settings
+
 
 def system_metadata():
     os_type = platform.system()
@@ -31,14 +32,19 @@ def system_metadata():
         cursor.execute(sql)
         db = cursor.fetchall()[0][0]
     except:
-        db = 'No DB version found.'
+        db = "No DB version found."
 
     try:
-        full_tag = subprocess.Popen("git log --pretty=format:'%h %ai' --abbrev-commit --date=short -1", cwd=settings.PACKAGE_ROOT,
-        shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        full_tag = subprocess.Popen(
+            "git log --pretty=format:'%h %ai' --abbrev-commit --date=short -1",
+            cwd=settings.PACKAGE_ROOT,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
         tag = full_tag.stdout.readline().strip()
     except:
-        tag = 'git not found.'
+        tag = "git not found."
 
-    metadata = {'os': os_type, 'os version': os_release, 'db': db, 'git hash': tag}
+    metadata = {"os": os_type, "os version": os_release, "db": db, "git hash": tag}
     return metadata

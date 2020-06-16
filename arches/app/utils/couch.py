@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,17 +14,11 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
-import json
 import couchdb
-from urlparse import urlparse, urljoin
-from arches.app.models import models
 from arches.app.models.system_settings import settings
-from arches.app.utils.response import JSONResponse
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from django.http import HttpRequest, HttpResponseNotFound
-import arches.app.views.search as search
+
 
 class Couch(object):
     def __init__(self):
@@ -40,13 +34,14 @@ class Couch(object):
     def delete_db(self, name):
         return self.couch.delete(name)
 
-    def update_doc(self, db, doc, doc_id=None):
+    def update_doc(self, db, doc, doc_id):
         try:
             x = db.get(doc_id)
             x.update(doc)
             db.save(x)
         except:
             db[doc_id] = doc
+        return db.get(doc_id)
 
     def read_doc(self, db, doc_id, rev=None):
         if rev is None:
@@ -59,4 +54,4 @@ class Couch(object):
             return False
 
     def all_docs(self, db):
-        return db.view('_all_docs', include_docs=True, conflicts=True)
+        return db.view("_all_docs", include_docs=True, conflicts=True)

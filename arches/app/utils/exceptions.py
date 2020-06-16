@@ -1,4 +1,3 @@
-
 class MultipleNodesFoundException(Exception):
     def __init__(self, name, nodes):
         self.nodes = nodes

@@ -1,0 +1,343 @@
+{% extends "views/components/iiif-viewer.htm" %}
+{% load i18n %}
+
+{% block tabs %}
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('editor');
+}, css: {
+    'active': activeTab() === 'editor'
+}">
+    <i class="fa fa-pencil"></i>
+    <span class="map-sidebar-text">{% trans "Edit" %}</span>
+</div>
+{{ block.super }}
+{% endblock tabs %}
+
+{% block sidepanel %}
+<!--ko if: activeTab() === 'editor' -->
+    <div class="workbench-header-buffer">
+        <div class="workbench-card-sidepanel-header-container">
+            <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
+        </div>
+    </div>
+    <div data-bind="css: card.model.cssclass">
+
+        <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
+        <div class="edit-message-container">
+            <span>{% trans 'Showing edits by' %}</span>
+            <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
+            <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
+            <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">{% trans 'Return to approved edits' %}</a>
+            <!-- /ko-->
+            <!-- ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
+            <span>{% trans ' This is a new contribution by a provisional editor.' %}</span>
+            <!-- /ko-->
+        </div>
+        <!-- /ko-->
+
+        <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 && !provisionalTileViewModel.selectedProvisionalEdit()-->
+        <div class="edit-message-container approved">
+            <div>{% trans 'Currently showing the most recent approved edits' %}</div>
+        </div>
+        <!-- /ko-->
+
+
+
+        <div class="new-provisional-edit-card-container">
+            <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
+            <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
+            <div class='new-provisional-edits-list'>
+                <div class='new-provisional-edits-header'>
+                    <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
+                    <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){
+                            provisionalTileViewModel.deleteAllProvisionalEdits();
+                        }">{% trans 'Delete all edits' %}</div>
+                </div>
+                <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
+                <div class='new-provisional-edit-entry' data-bind="css: {
+                        'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()
+                    }, click: function(){
+                        $parent.provisionalTileViewModel.selectProvisionalEdit(pe);
+                    }">
+                    <div class='title'>
+                        <div class='field'>
+                            <span data-bind="text : pe.username"></span>
+                        </div>
+                        <a href='' class='field fa fa-times-circle new-delete-provisional-edit' data-bind="click : function(){
+                            $parent.provisionalTileViewModel.rejectProvisionalEdit(pe);
+                        }"></a>
+                    </div>
+                    <div class="field timestamp">
+                        <span data-bind="text : pe.displaydate">@</span>
+                        <span data-bind="text : pe.displaytimestamp"></span>
+                    </div>
+                </div>
+                <!-- /ko -->
+            </div>
+            <!-- /ko-->
+            <!-- /ko-->
+
+            <div class="card">
+                {% block form_header %}
+                <!-- ko if: card.model.helpenabled -->
+                <span>
+                    <a class="pull-right card-help help editable-help" data-bind="click: function () {
+                        card.model.get('helpactive')(true)
+                    }" style="cursor:pointer;">
+                        {% trans "Help" %}
+                        <i class="fa fa-question-circle"></i>
+                    </a>
+                </span>
+                <!-- /ko -->
+                <h5 data-bind="text: card.model.instructions"></h5>
+                {% endblock form_header %}
+                <!-- ko if: card.widgets().length > 0 -->
+                {% block form_widgets %}
+                <form class="widgets" style="margin-bottom: 20px;">
+                    <div data-bind="foreach: {
+                            data:card.widgets, as: 'widget'
+                        }">
+                        <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) === 'annotation' -->
+                        <div class="row widget-wrapper">
+                            <div class="form-group">
+                                <label class="control-label widget-input-label" for="" data-bind="text:widget.label"></label>
+                                <i data-bind="css: {'ion-asterisk widget-label-required': self.form.nodeLookup[widget.node_id()].isrequired}"></i>
+
+                                <div class="col-xs-12">
+                                    <div class="style-tools-collapser" data-bind=" click: function() {
+                                        self.showStylingTools(!self.showStylingTools());
+                                    }">
+                                        <span data-bind="text: self.showStylingTools() ? '{% trans "Hide Style Tools" %}' : '{% trans "Show Style Tools" %}'"></span>
+                                        <i class="fa" data-bind="{
+                                            css: {
+                                                'fa-caret-down' : !self.showStylingTools(),
+                                                'fa-caret-up' : self.showStylingTools(),
+                                            }
+                                        }"></i>
+                                    </div>
+                                    <div class="form-horizontal" data-bind="if: self.showStylingTools">
+                                        <div class="style-tools-panel">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label">{% trans "Line Color" %}</label>
+                                                <div class="col-sm-8">
+                                                    <div class="colorpicker-component input-group">
+                                                        <input placeholder="{% trans "Line Color " %}" class="form-control input-md widget-input" data-bind="colorPicker: {color: self.lineColor, format:'hex'}">
+                                                        <span class="input-group-addon style-tools-color-visualizer" data-bind="style: {background: self.lineColor}"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label">{% trans "Fill color" %}</label>
+                                                <div class="col-sm-8">
+                                                    <div class="colorpicker-component input-group">
+                                                        <input placeholder="{% trans "Fill Color " %}" class="form-control input-md widget-input" data-bind="colorPicker: {color: self.fillColor, format:'hex'}">
+                                                        <span class="input-group-addon style-tools-color-visualizer" data-bind="style: {background: self.fillColor}"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label">{% trans "Line Width" %}</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: self.lineWidth">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label">{% trans "Line Opacity" %}</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: self.lineOpacity">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label">{% trans "Point Radius" %}</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: self.pointRadius">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label">{% trans "Fill Opacity" %}</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: self.fillOpacity">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="map-card-feature-list">
+                                        <div class="add-new-feature" data-bind="visible: !self.disableDrawing()">
+                                            <select data-placeholder="{% trans "Add a new feature..." %}" data-bind="
+                                                value: self.featureLookup[widget.node_id()].selectedTool,
+                                                valueAllowUnset: true,
+                                                options: [
+                                                    {
+                                                        value: '',
+                                                        text: ''
+                                                    },
+                                                    {
+                                                        value: 'draw_point',
+                                                        text: 'Add point'
+                                                    },
+                                                    {
+                                                        value: 'draw_line_string',
+                                                        text: 'Add line'
+                                                    },
+                                                    {
+                                                        value: 'draw_polygon',
+                                                        text: 'Add polygon'
+                                                    }
+                                                ],
+                                                optionsText: 'text',
+                                                optionsValue: 'value',
+                                                chosen: {
+                                                    'width': '100%',
+                                                    'disable_search_threshold': 10,
+                                                    'allow_single_deselect': true
+                                                }
+                                            "></select>
+                                        </div>
+                                        <div class="add-new-feature" data-bind="visible: self.disableDrawing">
+                                            <select data-placeholder="{% trans "Add a new feature..." %}" data-bind="
+                                                value: self.featureLookup[widget.node_id()].selectedTool,
+                                                valueAllowUnset: true,
+                                                options: [
+                                                    {
+                                                        value: '',
+                                                        text: ''
+                                                    },
+                                                    {
+                                                        value: 'draw_point',
+                                                        text: 'Add point'
+                                                    },
+                                                    {
+                                                        value: 'draw_line_string',
+                                                        text: 'Add line'
+                                                    },
+                                                    {
+                                                        value: 'draw_polygon',
+                                                        text: 'Add polygon'
+                                                    }
+                                                ],
+                                                optionsText: 'text',
+                                                optionsValue: 'value',
+                                                chosen: {
+                                                    disabled: true,
+                                                    'width': '100%',
+                                                    'disable_search_threshold': 10,
+                                                    'allow_single_deselect': true
+                                                }
+                                            "></select>
+                                        </div>
+                                    </div>
+                                    <table class="table">
+                                        <tbody>
+                                            <!-- ko foreach: {data: self.featureLookup[widget.node_id()].features, as: 'feature'} -->
+                                            <tr class="map-card-feature-item" data-bind="css: {'active': self.selectedFeatureIds().indexOf(feature.id) >= 0}, click: function() { self.showFeature(feature); }">
+                                                <td>
+                                                    <span class="map-card-feature-name" data-bind="text: feature.geometry.type"></span>
+                                                </td>
+                                                <td class="map-card-feature-tool">
+                                                    <a href="javascript:void(0);" data-bind="click: function() { self.editFeature(feature); }, clickBubble: false">
+                                                        <i class="fa fa-pencil map-card-feature-edit"></i>
+                                                        {% trans "Edit" %}
+                                                    </a>
+                                                </td>
+                                                <td class="map-card-feature-tool">
+                                                    <a href="javascript:void(0);" data-bind="click: function() { self.deleteFeature(feature); }, clickBubble: false">
+                                                        <i class="fa fa-trash map-card-feature-delete"></i>
+                                                        {% trans "Delete" %}
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <!-- /ko -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /ko -->
+                        <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) !== 'annotation' -->
+                        <div data-bind='component: {
+                            name: self.form.widgetLookup[widget.widget_id()].name,
+                            params: {
+                                formData: self.tile.formData,
+                                tile: self.tile,
+                                form: self.form,
+                                config: widget.configJSON,
+                                label: widget.label(),
+                                value: self.tile.data[widget.node_id()],
+                                node: self.form.nodeLookup[widget.node_id()],
+                                expanded: self.expanded,
+                                graph: self.form.graph,
+                                type: "resource-editor",
+                                disabled: !self.card.isWritable && !self.preview
+                            }
+                        }, css:{
+                            "active": widget.selected,
+                            "hover": widget.hovered,
+                            "widget-preview": self.preview
+                        }, click: function(data, e) {
+                            if (!widget.selected() && self.preview) widget.selected(true);
+                        }, event: {
+                            mouseover: function(){
+                                if (self.preview) widget.hovered(true);
+                            },
+                            mouseout: function(){
+                                if (self.preview) widget.hovered(null);
+                            }
+                        }, visible: widget.visible'></div>
+                        <!-- /ko -->
+                    </div>
+                </form>
+                {% endblock form_widgets %}
+                <!-- /ko -->
+                {% block form_buttons %}
+                <div class="install-buttons">
+                    <!-- ko if: tile.tileid && self.deleteTile -->
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: self.deleteTile, css: {
+                        disabled: !card.isWritable && !self.preview,
+                        'btn-warning': card.isWritable
+                    }">{% trans 'Delete' %}</button>
+                    <!-- /ko -->
+                    <!-- ko if: tile.dirty() -->
+                        <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
+                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">{% trans 'Cancel' %}</button>
+                        <!-- /ko -->
+                        <!-- ko if: tile.tileid -->
+                        <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
+                            disabled: !card.isWritable && !self.preview,
+                            'btn-mint': card.isWritable
+                        }">{% trans 'Save' %}</button>
+                        <!-- /ko -->
+                    <!-- /ko -->
+                    <!-- ko if: !tile.tileid -->
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
+                        disabled: !card.isWritable && !self.preview,
+                        'btn-mint': card.isWritable
+                    }">{% trans 'Add'  %}</button>
+                    <!-- /ko -->
+                </div>
+                {% endblock form_buttons %}
+
+                <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
+                    <div class="relative">
+                        <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () {
+                            card.model.get('helpactive')(false);
+                        }"></a>
+                    </div>
+                    <div id="add-basemap-wizard-help-content">
+                        <div>
+                            <div class="panel-heading">
+                                <h3 class="panel-title help-panel-title" style="">
+                                    <span data-bind="html: card.model.get('helptitle')"></span>
+                                </h3>
+                            </div>
+                            <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: card.model.get('helptext')">
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+<!--/ko -->
+{{ block.super }}
+{% endblock sidepanel %}

@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,14 +14,19 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
-import uuid, importlib
+import uuid
+import importlib
 import datetime
 import json
 import pytz
+import logging
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.db.models import Q
+from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from arches.app.models import models
@@ -29,9 +34,12 @@ from arches.app.models.resource import Resource
 from arches.app.models.resource import EditLog
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
 from arches.app.datatypes.datatypes import DataTypeFactory
+
+logger = logging.getLogger(__name__)
 
 
 class Tile(models.TileModel):
@@ -82,36 +90,46 @@ class Tile(models.TileModel):
 
         if args:
             if isinstance(args[0], dict):
-                for key, value in args[0].iteritems():
-                    if not (key == 'tiles'):
+                for key, value in args[0].items():
+                    if not (key == "tiles"):
                         setattr(self, key, value)
 
-                if self.tileid is None or self.tileid == '':
+                if self.tileid is None or self.tileid == "":
                     self.tileid = uuid.uuid4()
 
-                if 'tiles' in args[0]:
-                    for tile_obj in args[0]['tiles']:
+                if "tiles" in args[0]:
+                    for tile_obj in args[0]["tiles"]:
                         tile = Tile(tile_obj)
                         tile.parenttile = self
                         self.tiles.append(tile)
 
-    def save_edit(self, user={}, note='', edit_type='', old_value=None, new_value=None, newprovisionalvalue=None, oldprovisionalvalue=None, provisional_edit_log_details=None):
+    def save_edit(
+        self,
+        user={},
+        note="",
+        edit_type="",
+        old_value=None,
+        new_value=None,
+        newprovisionalvalue=None,
+        oldprovisionalvalue=None,
+        provisional_edit_log_details=None,
+    ):
         timestamp = datetime.datetime.now()
         edit = EditLog()
         edit.resourceclassid = self.resourceinstance.graph_id
         edit.resourceinstanceid = self.resourceinstance.resourceinstanceid
         edit.nodegroupid = self.nodegroup_id
         edit.tileinstanceid = self.tileid
-        if provisional_edit_log_details != None:
-            edit.provisional_user_username = getattr(provisional_edit_log_details['provisional_editor'], 'username', '')
-            edit.provisional_userid = getattr(provisional_edit_log_details['provisional_editor'], 'id', '')
-            edit.provisional_edittype = provisional_edit_log_details['action']
-            user = provisional_edit_log_details['user']
-        edit.userid = getattr(user, 'id', '')
-        edit.user_email = getattr(user, 'email', '')
-        edit.user_firstname = getattr(user, 'first_name', '')
-        edit.user_lastname = getattr(user, 'last_name', '')
-        edit.user_username = getattr(user, 'username', '')
+        if provisional_edit_log_details is not None:
+            edit.provisional_user_username = getattr(provisional_edit_log_details["provisional_editor"], "username", "")
+            edit.provisional_userid = getattr(provisional_edit_log_details["provisional_editor"], "id", "")
+            edit.provisional_edittype = provisional_edit_log_details["action"]
+            user = provisional_edit_log_details["user"]
+        edit.userid = getattr(user, "id", "")
+        edit.user_email = getattr(user, "email", "")
+        edit.user_firstname = getattr(user, "first_name", "")
+        edit.user_lastname = getattr(user, "last_name", "")
+        edit.user_username = getattr(user, "username", "")
         edit.resourcedisplayname = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid).displayname
         edit.oldvalue = old_value
         edit.newvalue = new_value
@@ -123,38 +141,38 @@ class Tile(models.TileModel):
 
     def tile_collects_data(self):
         result = True
-        if self.tiles != None and len(self.tiles) > 0:
+        if self.tiles is not None and len(self.tiles) > 0:
             nodes = models.Node.objects.filter(nodegroup=self.nodegroup)
-            if len(nodes) == 1 and nodes[0].datatype == 'semantic':
+            if len(nodes) == 1 and nodes[0].datatype == "semantic":
                 result = False
         return result
 
-    def apply_provisional_edit(self, user, data, action='create', status='review', existing_model=None):
+    def apply_provisional_edit(self, user, data, action="create", status="review", existing_model=None):
         """
         Creates or updates the json stored in a tile's provisionaledits db_column
 
         """
         if self.tile_collects_data() is True and data != {}:
 
-            utc_date_format = '%Y-%m-%dT%H:%M:%S.%fZ'
-            timestamp_utc = unicode(datetime.datetime.now(pytz.utc).strftime(utc_date_format))
+            utc_date_format = "%Y-%m-%dT%H:%M:%S.%fZ"
+            timestamp_utc = str(datetime.datetime.now(pytz.utc).strftime(utc_date_format))
 
-            provisionaledit =  {
+            provisionaledit = {
                 "value": data,
                 "status": status,
                 "action": action,
                 "reviewer": None,
                 "timestamp": timestamp_utc,
-                "reviewtimestamp": None
+                "reviewtimestamp": None,
             }
 
+            # if this tile has been previously saved and already has provisional edits on it then
             if existing_model is not None and existing_model.provisionaledits is not None:
                 provisionaledits = existing_model.provisionaledits
                 provisionaledits[str(user.id)] = provisionaledit
             else:
-                provisionaledits = {
-                    str(user.id): provisionaledit
-                    }
+                # this is a new tile so there is no provisional edits object on the tile
+                provisionaledits = {str(user.id): provisionaledit}
             self.provisionaledits = provisionaledits
 
     def is_provisional(self):
@@ -190,173 +208,240 @@ class Tile(models.TileModel):
                 edit = edits[str(user.id)]
         return edit
 
+    def check_for_constraint_violation(self, request):
+        card = models.CardModel.objects.get(nodegroup=self.nodegroup)
+        constraints = models.ConstraintModel.objects.filter(card=card)
+        if constraints.count() > 0:
+            for constraint in constraints:
+                if constraint.uniquetoallinstances is True:
+                    tiles = models.TileModel.objects.filter(nodegroup=self.nodegroup)
+                else:
+                    tiles = models.TileModel.objects.filter(
+                        Q(resourceinstance_id=self.resourceinstance.resourceinstanceid) & Q(nodegroup=self.nodegroup)
+                    )
+                nodes = [node for node in constraint.nodes.all()]
+                for tile in tiles:
+                    if str(self.tileid) != str(tile.tileid):
+                        match = False
+                        duplicate_values = []
+                        for node in nodes:
+                            datatype_factory = DataTypeFactory()
+                            datatype = datatype_factory.get_instance(node.datatype)
+                            nodeid = str(node.nodeid)
+                            if datatype.values_match(tile.data[nodeid], self.data[nodeid]):
+                                match = True
+                                duplicate_values.append(datatype.get_display_value(tile, node))
+                            else:
+                                match = False
+                                break
+                        if match is True:
+                            message = _(
+                                "This card violates a unique constraint. \
+                                The following value is already saved: "
+                            )
+                            raise TileValidationError(message + (", ").join(duplicate_values))
+
     def check_for_missing_nodes(self, request):
         missing_nodes = []
-        for nodeid, value in self.data.iteritems():
-            datatype_factory = DataTypeFactory()
-            node = models.Node.objects.get(nodeid=nodeid)
-            datatype = datatype_factory.get_instance(node.datatype)
-            datatype.clean(self, nodeid)
-            if request is not None:
-                datatype.handle_request(self, request, node)
-                if self.data[nodeid] == None and node.isrequired == True:
-                    if len(node.cardxnodexwidget_set.all()) > 0:
-                        missing_nodes.append(node.cardxnodexwidget_set.all()[0].label)
-                    else:
-                        missing_nodes.append(node.name)
+        for nodeid, value in self.data.items():
+            try:
+                datatype_factory = DataTypeFactory()
+                node = models.Node.objects.get(nodeid=nodeid)
+                datatype = datatype_factory.get_instance(node.datatype)
+                datatype.clean(self, nodeid)
+                if request is not None:
+                    if self.data[nodeid] is None and node.isrequired is True:
+                        if len(node.cardxnodexwidget_set.all()) > 0:
+                            missing_nodes.append(node.cardxnodexwidget_set.all()[0].label)
+                        else:
+                            missing_nodes.append(node.name)
+            except Exception as e:
+                warning = _(
+                    f"Error checking for missing node. Nodeid: {nodeid} with value: {value}, not in nodes. \
+                    You may have a node in your business data that no longer exists in any graphs."
+                )
+                logger.warning(warning)
         if missing_nodes != []:
-            message = _('This card requires values for the following:')
-            raise ValidationError(message, (', ').join(missing_nodes))
+            message = _("This card requires values for the following: ")
+            message += (", ").join(missing_nodes)
+            raise TileValidationError(message)
 
     def validate(self, errors=None):
-        for nodeid, value in self.data.iteritems():
+        for nodeid, value in self.data.items():
             datatype_factory = DataTypeFactory()
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = datatype_factory.get_instance(node.datatype)
-            error = datatype.validate(value)
+            error = datatype.validate(value, node=node)
             for error_instance in error:
-                if error_instance['type'] == 'ERROR':
-                    print(str(error_instance)+" rejected tile with pk: "+ str(self.pk))
-                    raise TileValidationError(_("Your tile: {0} ".format(error_instance["message"])))
-            if errors != None:
+                if error_instance["type"] == "ERROR":
+                    raise TileValidationError(_("{0}".format(error_instance["message"])))
+            if errors is not None:
                 errors += error
         return errors
 
+    def get_tile_data(self, user_id=None):
+        data = self.data
+
+        if user_id is not None:
+            user_id = str(user_id)
+            user = User.objects.get(pk=user_id)
+            user_is_reviewer = user_is_resource_reviewer(user)
+            if user_is_reviewer is False and self.provisionaledits is not None and user_id in self.provisionaledits:
+                data = self.provisionaledits[user_id]["value"]
+
+        return data
+
+    def datatype_post_save_actions(self, request=None):
+        userid = None
+        if request is not None:
+            userid = str(request.user.id)
+            if hasattr(request.user, "userprofile") is not True:
+                models.UserProfile.objects.create(user=request.user)
+        tile_data = self.get_tile_data(userid)
+        for nodeid, value in list(tile_data.items()):
+            datatype_factory = DataTypeFactory()
+            node = models.Node.objects.get(nodeid=nodeid)
+            datatype = datatype_factory.get_instance(node.datatype)
+            if request is not None:
+                datatype.handle_request(self, request, node)
+
     def save(self, *args, **kwargs):
-        request = kwargs.pop('request', None)
-        index = kwargs.pop('index', True)
-        user = kwargs.pop('user', None)
-        log = kwargs.pop('log', True)
-        provisional_edit_log_details = kwargs.pop('provisional_edit_log_details', None)
-        self.__preSave(request)
+        request = kwargs.pop("request", None)
+        index = kwargs.pop("index", True)
+        user = kwargs.pop("user", None)
+        log = kwargs.pop("log", True)
+        provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)
         missing_nodes = []
         creating_new_tile = True
         user_is_reviewer = False
         newprovisionalvalue = None
         oldprovisionalvalue = None
-        self.check_for_missing_nodes(request)
 
         try:
             if user is None and request is not None:
                 user = request.user
-            user_is_reviewer = user.groups.filter(name='Resource Reviewer').exists()
-        except AttributeError: #no user - probably importing data
+            user_is_reviewer = user_is_resource_reviewer(user)
+        except AttributeError:  # no user - probably importing data
             user = None
 
-        creating_new_tile = models.TileModel.objects.filter(pk=self.tileid).exists() == False
-        edit_type = 'tile create' if (creating_new_tile == True) else 'tile edit'
 
-        if creating_new_tile == False:
-            existing_model = models.TileModel.objects.get(pk=self.tileid)
+        # if user is not None:
+        #     self.validate([])
 
-        if user is not None:
-            if user_is_reviewer == False and creating_new_tile == False:
-                self.apply_provisional_edit(user, self.data, action='update', existing_model=existing_model)
-                newprovisionalvalue = self.data
-                oldprovisional = self.get_provisional_edit(existing_model, user)
-                if oldprovisional is not None:
-                    oldprovisionalvalue = oldprovisional['value']
+        with transaction.atomic():
 
-                self.data = existing_model.data
-                if provisional_edit_log_details == None:
-                    provisional_edit_log_details={"user": user, "action": "add edit",  "provisional_editor": user}
+            datatype_factory = DataTypeFactory()
+            for nodeid, value in self.data.items():
+                node = models.Node.objects.get(nodeid=nodeid)
+                datatype = datatype_factory.get_instance(node.datatype)
+                datatype.pre_tile_save(self, nodeid)
 
-            if creating_new_tile == True:
-                if self.is_provisional() == False and user_is_reviewer == False:
-                    self.apply_provisional_edit(user, data=self.data, action='create')
+            self.__preSave(request)
+            self.check_for_missing_nodes(request)
+            self.check_for_constraint_violation(request)
+
+            creating_new_tile = models.TileModel.objects.filter(pk=self.tileid).exists() is False
+            edit_type = "tile create" if (creating_new_tile is True) else "tile edit"
+
+            if creating_new_tile is False:
+                existing_model = models.TileModel.objects.get(pk=self.tileid)
+
+            # this section moves the data over from self.data to self.provisionaledits if certain users permissions are in force
+            # then self.data is restored from the previously saved tile data
+            if user is not None and user_is_reviewer is False:
+                if creating_new_tile is True:
+                    self.apply_provisional_edit(user, data=self.data, action="create")
                     newprovisionalvalue = self.data
                     self.data = {}
-                    if provisional_edit_log_details == None:
-                        provisional_edit_log_details={"user": user, "action": "create tile",  "provisional_editor": user}
+
+                else:
+                    # the user has previously edited this tile
+                    self.apply_provisional_edit(user, self.data, action="update", existing_model=existing_model)
+                    newprovisionalvalue = self.data
+                    self.data = existing_model.data
+
+                    oldprovisional = self.get_provisional_edit(existing_model, user)
+                    if oldprovisional is not None:
+                        oldprovisionalvalue = oldprovisional["value"]
+
+                if provisional_edit_log_details is None:
+                    provisional_edit_log_details = {
+                        "user": user,
+                        "provisional_editor": user,
+                        "action": "create tile" if creating_new_tile else "add edit",
+                    }
+
+        if user is not None:
+            self.validate([])
 
         super(Tile, self).save(*args, **kwargs)
-        #We have to save the edit log record after calling save so that the
-        #resource's displayname changes are avaliable
-        if log == True:
-            if (user == None):
-                user = {}
-                if creating_new_tile == True:
-                    self.save_edit(user=user, edit_type=edit_type, old_value={}, new_value=self.data, newprovisionalvalue=newprovisionalvalue, provisional_edit_log_details=provisional_edit_log_details)
-                else:
-                    self.save_edit(
-                        user=user,
-                        edit_type=edit_type,
-                        old_value=existing_model.data,
-                        new_value=self.data,
-                        newprovisionalvalue=newprovisionalvalue,
-                        oldprovisionalvalue=oldprovisionalvalue,
-                        provisional_edit_log_details=provisional_edit_log_details
-                    )
+        # We have to save the edit log record after calling save so that the
+        # resource's displayname changes are avaliable
+        user = {} if user is None else user
+        self.datatype_post_save_actions(request)
+        self.__postSave(request)
+        if creating_new_tile is True:
+            self.save_edit(
+                user=user,
+                edit_type=edit_type,
+                old_value={},
+                new_value=self.data,
+                newprovisionalvalue=newprovisionalvalue,
+                provisional_edit_log_details=provisional_edit_log_details,
+            )
+        else:
+            self.save_edit(
+                user=user,
+                edit_type=edit_type,
+                old_value=existing_model.data,
+                new_value=self.data,
+                newprovisionalvalue=newprovisionalvalue,
+                oldprovisionalvalue=oldprovisionalvalue,
+                provisional_edit_log_details=provisional_edit_log_details,
+            )
 
-                if index:
-                    self.index()
+        if index:
+            self.index()
 
-                for tile in self.tiles:
-                    tile.resourceinstance = self.resourceinstance
-                    tile.parenttile = self
-                    tile.save(*args, request=request, index=index, **kwargs)
-            else:
-                try:
-                    self.validate([])
-                    if creating_new_tile == True:
-                            self.save_edit(user=user, edit_type=edit_type, old_value={}, new_value=self.data, newprovisionalvalue=newprovisionalvalue, provisional_edit_log_details=provisional_edit_log_details)
-                    else:
-                        self.save_edit(
-                            user=user,
-                            edit_type=edit_type,
-                            old_value=existing_model.data,
-                            new_value=self.data,
-                            newprovisionalvalue=newprovisionalvalue,
-                            oldprovisionalvalue=oldprovisionalvalue,
-                            provisional_edit_log_details=provisional_edit_log_details
-                        )
-
-                    if index:
-                        self.index()
-
-                    for tile in self.tiles:
-                        tile.resourceinstance = self.resourceinstance
-                        tile.parenttile = self
-                        tile.save(*args, request=request, index=index, **kwargs)
-                except TileValidationError:
-                    print(TileValidationError.message)
+        for tile in self.tiles:
+            tile.resourceinstance = self.resourceinstance
+            tile.parenttile = self
+            tile.save(*args, request=request, index=index, **kwargs)
 
     def delete(self, *args, **kwargs):
         se = SearchEngineFactory().create()
-        request = kwargs.pop('request', None)
-        provisional_edit_log_details = kwargs.pop('provisional_edit_log_details', None)
+        request = kwargs.pop("request", None)
+        provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)
         for tile in self.tiles:
             tile.delete(*args, request=request, **kwargs)
         try:
             user = request.user
-            user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
-        except AttributeError: #no user
+            user_is_reviewer = user_is_resource_reviewer(user)
+        except AttributeError:  # no user
             user = None
+            user_is_reviewer = True
 
         if user_is_reviewer is True or self.user_owns_provisional(user):
             query = Query(se)
             bool_query = Bool()
-            bool_query.filter(Terms(field='tileid', terms=[self.tileid]))
+            bool_query.filter(Terms(field="tileid", terms=[self.tileid]))
             query.add_query(bool_query)
-            results = query.search(index='strings', doc_type='term')['hits']['hits']
+            results = query.search(index="terms")["hits"]["hits"]
 
             for result in results:
-                se.delete(index='strings', doc_type='term', id=result['_id'])
+                se.delete(index="terms", id=result["_id"])
 
             self.__preDelete(request)
             self.save_edit(
-                user=request.user,
-                edit_type='tile delete',
-                old_value=self.data,
-                provisional_edit_log_details=provisional_edit_log_details)
+                user=request.user, edit_type="tile delete", old_value=self.data, provisional_edit_log_details=provisional_edit_log_details
+            )
             super(Tile, self).delete(*args, **kwargs)
             resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
             resource.index()
 
         else:
-            self.apply_provisional_edit(user, data={}, action='delete')
+            self.apply_provisional_edit(user, data={}, action="delete")
             super(Tile, self).save(*args, **kwargs)
-
 
     def index(self):
         """
@@ -369,10 +454,12 @@ class Tile(models.TileModel):
     # # flatten out the nested tiles into a single array
     def get_flattened_tiles(self):
         tiles = []
+
         def flatten_tiles(obj):
             for tile in obj.tiles:
                 tiles.append(flatten_tiles(tile))
             return obj
+
         tiles.append(flatten_tiles(self))
         return tiles
 
@@ -387,12 +474,12 @@ class Tile(models.TileModel):
 
     def is_blank(self):
         if self.data != {}:
-            if len([item for item in self.data.values() if item != None]) > 0:
+            if len([item for item in list(self.data.values()) if item is not None]) > 0:
                 return False
 
         child_tiles_are_blank = True
         for tile in self.tiles:
-            if tile.is_blank() == False:
+            if tile.is_blank() is False:
                 child_tiles_are_blank = False
                 break
 
@@ -430,24 +517,77 @@ class Tile(models.TileModel):
 
         return tile
 
+    @staticmethod
+    def update_node_value(nodeid, value, tileid=None, nodegroupid=None, resourceinstanceid=None):
+        """
+        Updates the value of a node in a tile. Creates the tile and parent tiles if they do not yet
+        exist.
+
+        """
+
+        if tileid and models.TileModel.objects.filter(pk=tileid).exists():
+            tile = models.TileModel.objects.get(pk=tileid)
+            tile.data[nodeid] = value
+            tile.save()
+        elif models.TileModel.objects.filter(Q(resourceinstance_id=resourceinstanceid), Q(nodegroup_id=nodegroupid)).count() == 1:
+            tile = models.TileModel.objects.filter(Q(resourceinstance_id=resourceinstanceid), Q(nodegroup_id=nodegroupid))[0]
+            tile.data[nodeid] = value
+            tile.save()
+        else:
+            if not resourceinstanceid:
+                graph = models.Node.objects.get(pk=nodeid).graph
+                resource_instance = models.ResourceInstance(graph=graph)
+                resource_instance.save()
+                resourceinstanceid = str(resource_instance.resourceinstanceid)
+            tile = Tile.get_blank_tile(nodeid, resourceinstanceid)
+            if nodeid in tile.data:
+                tile.data[nodeid] = value
+                tile.save()
+            else:
+                tile.save()
+                if nodegroupid and resourceinstanceid:
+                    tile = Tile.update_node_value(nodeid, value, nodegroupid=nodegroupid, resourceinstanceid=resourceinstanceid)
+        return tile
+
     def __preSave(self, request=None):
-        for function in self.__getFunctionClassInstances():
-            try:
-                function.save(self, request)
-            except NotImplementedError:
-                pass
+        try:
+            for function in self._getFunctionClassInstances():
+                try:
+                    function.save(self, request)
+                except NotImplementedError:
+                    pass
+        except TypeError:
+            logger.info(_("No associated functions"))
 
     def __preDelete(self, request):
-        for function in self.__getFunctionClassInstances():
-            try:
-                function.delete(self, request)
-            except NotImplementedError:
-                pass
+        try:
+            for function in self._getFunctionClassInstances():
+                try:
+                    function.delete(self, request)
+                except NotImplementedError:
+                    pass
+        except TypeError:
+            logger.info(_("No associated functions"))
 
-    def __getFunctionClassInstances(self):
+    def __postSave(self, request=None):
+        try:
+            for function in self._getFunctionClassInstances():
+                try:
+                    function.postSave(self, request)
+                except NotImplementedError:
+                    pass
+        except TypeError as e:
+            logger.warn(_("No associated functions"))
+            logger.warn(e)
+
+    def _getFunctionClassInstances(self):
         ret = []
         resource = models.ResourceInstance.objects.get(pk=self.resourceinstance_id)
-        functionXgraphs = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[str(self.nodegroup_id)])
+        functionXgraphs = models.FunctionXGraph.objects.filter(
+            Q(graph_id=resource.graph_id),
+            Q(config__contains={"triggering_nodegroups": [str(self.nodegroup_id)]}) | Q(config__triggering_nodegroups__exact=[]),
+            ~Q(function__classname="PrimaryDescriptorsFunction"),
+        )
         for functionXgraph in functionXgraphs:
             func = functionXgraph.function.get_class_module()(functionXgraph.config, self.nodegroup_id)
             ret.append(func)
@@ -456,7 +596,7 @@ class Tile(models.TileModel):
     def filter_by_perm(self, user, perm):
         if user:
             if self.nodegroup_id is not None and user.has_perm(perm, self.nodegroup):
-                self.tiles = filter(lambda tile: tile.filter_by_perm(user, perm), self.tiles)
+                self.tiles = [tile for tile in self.tiles if tile.filter_by_perm(user, perm)]
             else:
                 return None
         return self
@@ -468,7 +608,7 @@ class Tile(models.TileModel):
         """
 
         ret = JSONSerializer().handle_model(self)
-        ret['tiles'] = self.tiles
+        ret["tiles"] = self.tiles
 
         return ret
 

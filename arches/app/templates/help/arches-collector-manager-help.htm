@@ -7,16 +7,21 @@
             &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
         </a>
         <div class="ep-help-topic-content">
-            <p>{% blocktrans %}As a database administrator, you will use the Arches Collector Manager to create and manage the projects that data collection users will access through the <a href="https://arches.readthedocs.io/en/stable/using-arches-collector.html" target="_blank">Arches Collector</a> mobile app.{% endblocktrans %}</p>
+            <p>{% blocktrans %}As a database administrator, you will use the Arches Collector Manager to create and manage the projects that data collection users will access through the <a href="https://arches.readthedocs.io/en/stable/using-arches-collector" target="_blank">Arches Collector</a> mobile app.{% endblocktrans %}</p>
             <p>{% blocktrans %}When you begin creating a new project, you'll be brought to the project summary, which shows you how many users are participating, when data was last synced, and more.{% endblocktrans %}</p>
-            <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/start-new-project.png"></img></p>
+            <p>
+                <span class="ep-help-img-link">
+                    <a href="{{ STATIC_URL }}img/help/start-new-project.jpg" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+                    </a>
+                </span>
+                <img class="reloadable-img" src="{{ STATIC_URL }}img/help/start-new-project.jpg"></img></p>
             <p>{% blocktrans %}Once you have finished setting all of the parameters for your project, you will return to the summary page to activate it for the first time.{% endblocktrans %}</p>
             <p>
                 <span class="ep-help-img-link">
-                    <a href="{{ STATIC_URL }}img/help/activate-project.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+                    <a href="{{ STATIC_URL }}img/help/activate-mobile-project.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
                     </a>
                 </span>
-                <img class="reloadable-img" src="{{ STATIC_URL }}img/help/activate-project.gif"></img>
+                <img class="reloadable-img" src="{{ STATIC_URL }}img/help/activate-mobile-project.gif"></img>
             </p>
             <p>{% blocktrans %}This initial activation saves the contents of your project to a staging database, from which Arches Collector users will download it and begin collecting data.{% endblocktrans %}</p>
             <p><strong>{% blocktrans %}IMPORTANT: In order for Arches Collector users to connect to this Arches instance a system admin must first <a href="https://arches.readthedocs.io/en/stable/api/#registering-an-application-with-arches" target="_blank">register an application</a>.{% endblocktrans %}</strong></p>
@@ -79,7 +84,7 @@
                 </a>
                 <div class="ep-help-topic-content">
                      <p>{% blocktrans %}Define the basemap layer(s) that will be available to users while they collect data with Arches Collector.{% endblocktrans %}</p>
-                     <p>{% blocktrans %}If you expect data collection to happen in areas that do not have reliable cellular/wifi data connections, use this parameter to link to an MBTiles file that users will download when they download this project. You can learn more about creating this file in our external <a href="https://arches.readthedocs.io/en/stable/arches-collector-manager.html">Arches Collector Manager</a> documentation.{% endblocktrans %}</p>
+                     <p>{% blocktrans %}If you expect data collection to happen in areas that do not have reliable cellular/wifi data connections, use this parameter to link to an MBTiles file that users will download when they download this project. You can learn more about creating this file in our external <a href="https://arches.readthedocs.io/en/stable/arches-collector-manager/" target="_blank">Arches Collector Manager</a> documentation.{% endblocktrans %}</p>
                 </div>
             </div>
             <div>

@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 
 def find_candidates(search_string):
@@ -22,51 +22,27 @@ def find_candidates(search_string):
     # return data as follows:
     return [
         {
-            'id': 1,
-            'text': '100 Main St., San Francisco CA 94109',
-            'geometry': {
-                "type": "Point",
-                "coordinates": [
-                    -118.45089,
-                    34.08702
-                ]
-            },
-            'score': 99
+            "id": 1,
+            "text": "100 Main St., San Francisco CA 94109",
+            "geometry": {"type": "Point", "coordinates": [-118.45089, 34.08702]},
+            "score": 99,
         },
         {
-            'id': 2,
-            'text': '101 Main St., San Francisco CA 94109',
-            'geometry': {
-                "type": "Point",
-                "coordinates": [
-                    -118.45089,
-                    34.08702
-                ]
-            },
-            'score': 99
+            "id": 2,
+            "text": "101 Main St., San Francisco CA 94109",
+            "geometry": {"type": "Point", "coordinates": [-118.45089, 34.08702]},
+            "score": 99,
         },
         {
-            'id': 3,
-            'text': '102 Main St., San Francisco CA 94109',
-            'geometry': {
-                "type": "Point",
-                "coordinates": [
-                    -118.45089,
-                    34.08702
-                ]
-            },
-            'score': 99
+            "id": 3,
+            "text": "102 Main St., San Francisco CA 94109",
+            "geometry": {"type": "Point", "coordinates": [-118.45089, 34.08702]},
+            "score": 99,
         },
         {
-            'id': 4,
-            'text': '103 Main St., San Francisco CA 94109',
-            'geometry': {
-                "type": "Point",
-                "coordinates": [
-                    -118.45089,
-                    34.08702
-                ]
-            },
-            'score': 99
-        }
+            "id": 4,
+            "text": "103 Main St., San Francisco CA 94109",
+            "geometry": {"type": "Point", "coordinates": [-118.45089, 34.08702]},
+            "score": 99,
+        },
     ]

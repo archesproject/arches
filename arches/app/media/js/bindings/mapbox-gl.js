@@ -81,6 +81,10 @@ define([
                     map.setBearing(val);
                 }, this);
             }
+
+            ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+                map.remove();
+            });
         }
     };
 

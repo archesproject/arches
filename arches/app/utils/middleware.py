@@ -9,74 +9,36 @@ from django.utils.translation import ugettext as _
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import Http401Response
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from jose import jwt, jws, JWSError
 
-HTTP_HEADER_ENCODING = 'iso-8859-1'
+HTTP_HEADER_ENCODING = "iso-8859-1"
+
 
 class SetAnonymousUser(MiddlewareMixin):
     def process_request(self, request):
-        # for OAuth authentication to work, we can't automatically assign 
-        # the anonymous user to the request, otherwise the anonymous user is 
+        # for OAuth authentication to work, we can't automatically assign
+        # the anonymous user to the request, otherwise the anonymous user is
         # used for all OAuth resourse requests
-        if request.path != reverse('oauth2:authorize') and request.user.is_anonymous():
+        if request.path != reverse("oauth2:authorize") and request.user.is_anonymous:
             try:
-                request.user = User.objects.get(username='anonymous')
-            except:
+                request.user = User.objects.get(username="anonymous")
+            except Exception:
                 pass
 
 
-class JWTAuthenticationMiddleware(MiddlewareMixin):
-    """
-    tries to setup the user on the request object based on the JSON web token passed in with the request
-
-    """
-
-    def get_user_from_token(self, token):
-        decoded_json = jws.verify(token, settings.JWT_KEY, algorithms=[settings.JWT_ALGORITHM])
-        decoded_dict = JSONDeserializer().deserialize(decoded_json)
-
-        username = decoded_dict.get('username', None)
-        expiration = decoded_dict.get('expiration', None)
-
-        user = None
-        try:
-            user = User.objects.get(username=username)
-            if not user.is_active:
-                raise Exception()
-        except:
-            raise AuthenticationFailed(_('User inactive or deleted.\n\n'))
-
-        if int(expiration) < int(time.time()):
-            raise AuthenticationFailed(_('Token Expired.\n\n'))
-
-        return user or AnonymousUser()
-
+class ModifyAuthorizationHeader(MiddlewareMixin):
     def process_request(self, request):
-        assert hasattr(request, 'token'), (
-            "The JSON authentication middleware requires token middleware "
-            "to be installed. Edit your MIDDLEWARE setting to insert "
-            "'arches.app.utils.middleware.TokenMiddleware' before "
-            "'arches.app.utils.middleware.JWTAuthenticationMiddleware'."
-        )
-
-        # if there is a session and the user isn't anonymous then don't modify request.user
-        if request.user.is_anonymous() and request.token is not '':
-            # try to get the user info from the token if it exists
-            try:
-                user = self.get_user_from_token(request.token)
-                request.user = SimpleLazyObject(lambda: user)
-            except AuthenticationFailed as err:
-                response = Http401Response(err.message, www_auth_header='Bearer', content_type='text/plain')
-                return response
-            except JWSError as err:
-                response = Http401Response(err.message, www_auth_header='Bearer', content_type='text/plain')
-                return response
+        # for OAuth authentication to work, we must use the standard
+        # HTTP_AUTHORIZATION header. So, if the request has the alternate
+        # HTTP_X_AUTHORIZATION header, update the request to use the standard
+        if request.META.get("HTTP_X_AUTHORIZATION", None) is not None:
+            request.META["HTTP_AUTHORIZATION"] = request.META.get("HTTP_X_AUTHORIZATION")
+            del request.META["HTTP_X_AUTHORIZATION"]
 
 
 class TokenMiddleware(MiddlewareMixin):
     """
     puts the Bearer token found in the request header onto the request object
-    
+
     pulled from http://www.django-rest-framework.org
 
     """
@@ -86,7 +48,7 @@ class TokenMiddleware(MiddlewareMixin):
         Return request's 'Authorization:' header, as a bytestring.
         Hide some test client ickyness where the header can be unicode.
         """
-        auth = request.META.get('HTTP_AUTHORIZATION', b'').replace('Bearer ', '')
+        auth = request.META.get("HTTP_AUTHORIZATION", b"").replace("Bearer ", "")
         if isinstance(auth, text_type):
             # Work around django test client oddness
             auth = auth.encode(HTTP_HEADER_ENCODING)

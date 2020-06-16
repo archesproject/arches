@@ -1,0 +1,104 @@
+{% extends "views/components/map.htm" %}
+{% load i18n %}
+
+{% block tabs %}
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('filter');
+}, css: {
+    'active': activeTab() === 'filter'
+}">
+    <i class="fa fa-pencil"></i>
+    <span class="map-sidebar-text">{% trans "Filter" %}</span>
+</div>
+{{ block.super }}
+{% endblock tabs %}
+
+{% block sidepanel %}
+<!--ko if: activeTab() === 'filter' -->
+    <div class="workbench-card-sidepanel-header-container">
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Map Search" %}</h4>
+    </div>
+
+    <!-- ko if: geoJSONString() === undefined -->
+    <div class="spatial-filter-container">
+        
+        <!-- Buffer Definition -->
+        <div class="buffer-control form-control">
+            <h5 class="">{% trans "Buffer" %}</h5>
+            <div class="form-inline">
+                <label for="buffer-input">{% trans "Distance" %}</label>
+                <input type="number" min=0.0 id="buffer-input" placeholder="{% trans " buffer " %}" class="buffer-input" data-bind="textInput: buffer">
+                <select class="form-control" style="vertical-align: top;" data-bind="options: bufferUnits, optionsText:'name', optionsValue:'val', value: bufferUnit"></select>
+            </div>
+        </div>
+
+        <!-- Geometry -->
+        <div class="add-new-feature buffer-control" style="">
+            <h5 class="">{% trans "Select a filter" %}</h5>
+            <select data-placeholder="{% trans "Draw a..." %}" data-bind="
+                value: drawMode,
+                valueAllowUnset: true,
+                options: spatialFilterTypes,
+                optionsText: 'title',
+                optionsValue: 'drawMode',
+                chosen: {
+                    'width': '100%',
+                    'disable_search_threshold': 10,
+                    'allow_single_deselect': true
+                }
+            "></select>
+        </div>
+        
+    </div>
+    <!-- /ko-->
+
+    <!-- ko if: geoJSONString() !== undefined -->
+    <div class="geojson-card">
+        <div class="geojson-editor" data-bind="codemirror: {
+            value: geoJSONString,
+            mode: { name: 'javascript', json: true },
+            lineNumbers: true
+        }"></div>
+        <div class="install-buttons">
+            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
+                geoJSONString(undefined);
+            }">{% trans 'Cancel' %}</button>
+            <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" data-bind="css: {
+                disabled: geoJSONErrors().length !== 0
+            }, click: updateGeoJSON">{% trans 'Accept GeoJSON' %}</button>
+        </div>
+        <!-- ko if: geoJSONErrors().length !== 0 -->
+        <div class="geojson-error-list">
+            {% trans "GeoJSON has the following errors that must be resolved:" %}
+            <ul>
+                <!-- ko foreach: geoJSONErrors() -->
+                <li data-bind="text: message"></li>
+                <!-- /ko-->
+            </ul>
+        </div>
+        <!-- /ko-->
+    </div>
+    <!-- /ko-->
+    <div class="map-card-zoom-tool">
+        <a href="javascript:void(0);" data-bind="click: function(){
+            editGeoJSON(filter.feature_collection);}">
+            <i class="fa fa-pencil map-card-feature-edit"></i>
+            {% trans "Edit GeoJSON" %}
+        </a>
+        |
+        <a href="javascript:void(0);" data-bind="click: fitToAggregationBounds">
+            <i class="fa fa-search map-card-feature-edit"></i>
+            {% trans "Zoom to all features" %}
+        </a>
+        |
+        <a href="javascript:void(0);" data-bind="click: clear">
+            <i class="fa fa-trash map-card-feature-edit"></i>
+            {% trans "Clear spatial filter" %}
+        </a>
+
+    </div>
+
+
+<!--/ko -->
+{{ block.super }}
+{% endblock sidepanel %}

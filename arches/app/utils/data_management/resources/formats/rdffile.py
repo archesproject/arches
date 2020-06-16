@@ -2,32 +2,63 @@ import os
 import re
 import json
 import uuid
+import requests
 import datetime
-from django.core.urlresolvers import reverse
-from format import Writer, Reader
+import logging
+from io import StringIO
+from django.urls import reverse
+from .format import Writer, Reader
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.graph import Graph as GraphProxy
 from arches.app.models.tile import Tile
+from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export
 from rdflib import Namespace
 from rdflib import URIRef, Literal
-from rdflib import Graph
+from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS
-from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand
+from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand, set_document_loader
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+
+# Stop code from looking up the contexts online for every operation
+docCache = {}
+
+
+def fetch(url):
+    resp = requests.get(url)
+    return resp.json()
+
+
+def use_cache(url):
+    if docCache[url]["expires"] is not None and docCache[url]["expires"] < datetime.datetime.now():
+        return False
+    else:
+        return True
+
+
+def load_document_and_cache(url):
+    if url in docCache and use_cache(url):
+        return docCache[url]
+
+    doc = {"expires": None, "contextUrl": None, "documentUrl": None, "document": ""}
+    data = fetch(url)
+    doc["document"] = data
+    doc["expires"] = datetime.datetime.now() + datetime.timedelta(minutes=settings.JSONLD_CONTEXT_CACHE_TIMEOUT)
+    docCache[url] = doc
+    return doc
+
+
+set_document_loader(load_document_and_cache)
 
 
 class RdfWriter(Writer):
-
     def __init__(self, **kwargs):
-        self.format = kwargs.pop('format', 'xml')
+        self.format = kwargs.pop("format", "xml")
+        self.logger = logging.getLogger(__name__)
         super(RdfWriter, self).__init__(**kwargs)
 
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
@@ -37,17 +68,17 @@ class RdfWriter(Writer):
         g = self.get_rdf_graph()
         g.serialize(destination=dest, format=self.format)
 
-        full_file_name = os.path.join('{0}.{1}'.format(self.file_name, 'rdf'))
-        return [{'name': full_file_name, 'outputfile': dest}]
+        full_file_name = os.path.join("{0}.{1}".format(self.file_name, "rdf"))
+        return [{"name": full_file_name, "outputfile": dest}]
 
     def get_rdf_graph(self):
         archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
-        graph_uri = URIRef(archesproject[reverse('graph', args=[self.graph_id]).lstrip('/')])
+        graph_uri = URIRef(archesproject[reverse("graph", args=[self.graph_id]).lstrip("/")])
+        self.logger.debug("Using `{0}` for Arches URI namespace".format(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT))
+        self.logger.debug("Using `{0}` for Graph URI".format(graph_uri))
 
-
-        dt_factory = DataTypeFactory()
         g = Graph()
-        g.bind('archesproject', archesproject, False)
+        g.bind("archesproject", archesproject, False)
         graph_cache = {}
 
         def get_nodegroup_edges_by_collector_node(node):
@@ -66,86 +97,117 @@ class RdfWriter(Writer):
         def get_graph_parts(graphid):
             if graphid not in graph_cache:
                 graph_cache[graphid] = {
-                    'rootedges': [],
-                    'subgraphs': {},
-                    'nodedatatypes': {},
+                    "rootedges": [],
+                    "subgraphs": {},
+                    "nodedatatypes": {},
                 }
                 graph = models.GraphModel.objects.get(pk=graphid)
                 nodegroups = set()
                 for node in graph.node_set.all():
-                    graph_cache[graphid]['nodedatatypes'][str(node.nodeid)] = node.datatype
+                    graph_cache[graphid]["nodedatatypes"][str(node.nodeid)] = node.datatype
                     if node.nodegroup:
                         nodegroups.add(node.nodegroup)
                     if node.istopnode:
                         for edge in get_nodegroup_edges_by_collector_node(node):
                             if edge.rangenode.nodegroup is None:
-                                graph_cache[graphid]['rootedges'].append(edge)
+                                graph_cache[graphid]["rootedges"].append(edge)
                 for nodegroup in nodegroups:
-                    graph_cache[graphid]['subgraphs'][nodegroup] = {
-                        'edges': [],
-                        'inedge': None,
-                        'parentnode_nodegroup': None
-                    }
-                    graph_cache[graphid]['subgraphs'][nodegroup][
-                        'inedge'] = models.Edge.objects.get(rangenode_id=nodegroup.pk)
-                    graph_cache[graphid]['subgraphs'][nodegroup]['parentnode_nodegroup'] = graph_cache[
-                        graphid]['subgraphs'][nodegroup]['inedge'].domainnode.nodegroup
-                    graph_cache[graphid]['subgraphs'][nodegroup][
-                        'edges'] = get_nodegroup_edges_by_collector_node(models.Node.objects.get(pk=nodegroup.pk))
+                    graph_cache[graphid]["subgraphs"][nodegroup] = {"edges": [], "inedge": None, "parentnode_nodegroup": None}
+                    graph_cache[graphid]["subgraphs"][nodegroup]["inedge"] = models.Edge.objects.get(rangenode_id=nodegroup.pk)
+                    graph_cache[graphid]["subgraphs"][nodegroup]["parentnode_nodegroup"] = graph_cache[graphid]["subgraphs"][nodegroup][
+                        "inedge"
+                    ].domainnode.nodegroup
+                    graph_cache[graphid]["subgraphs"][nodegroup]["edges"] = get_nodegroup_edges_by_collector_node(
+                        models.Node.objects.get(pk=nodegroup.pk)
+                    )
 
             return graph_cache[graphid]
 
         def add_edge_to_graph(graph, domainnode, rangenode, edge, tile, graph_info):
             pkg = {}
-            pkg['d_datatype'] = graph_info['nodedatatypes'].get(str(edge.domainnode.pk))
-            pkg['r_datatype'] = graph_info['nodedatatypes'].get(str(edge.rangenode.pk))
-            pkg['d_uri'] = domainnode
-            pkg['r_uri'] = rangenode
-            pkg['range_tile_data'] = None
-            pkg['domain_tile_data'] = None
-            if str(edge.rangenode_id) in tile.data:
-                pkg['range_tile_data'] = tile.data[str(edge.rangenode_id)]
-            if str(edge.domainnode_id) in tile.data:
-                pkg['domain_tile_data'] = tile.data[str(edge.domainnode_id)]
-
-            # Don't add the type if the domain datatype is a literal
-            dom_dt = dt_factory.get_instance(pkg['d_datatype'])
+            pkg["d_datatype"] = graph_info["nodedatatypes"].get(str(edge.domainnode.pk))
+            dom_dt = self.datatype_factory.get_instance(pkg["d_datatype"])
+            # Don't process any further if the domain datatype is a literal
             if dom_dt.is_a_literal_in_rdf():
-                # Return to not process any range data of an edge where
-                # the domain will be a Literal in the RDF
                 return
 
-            # Domain node is not a literal value in the RDF representation, so will have a type:
-            graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            pkg["r_datatype"] = graph_info["nodedatatypes"].get(str(edge.rangenode.pk))
+            pkg["range_tile_data"] = None
+            pkg["domain_tile_data"] = None
+            if str(edge.rangenode_id) in tile.data:
+                pkg["range_tile_data"] = tile.data[str(edge.rangenode_id)]
+            if str(edge.domainnode_id) in tile.data:
+                pkg["domain_tile_data"] = tile.data[str(edge.domainnode_id)]
+
+            rng_dt = self.datatype_factory.get_instance(pkg["r_datatype"])
+            pkg["d_uri"] = dom_dt.get_rdf_uri(domainnode, pkg["domain_tile_data"], "d")
+            pkg["r_uri"] = rng_dt.get_rdf_uri(rangenode, pkg["range_tile_data"], "r")
+
+            # Concept on a node that is not required, but not present
+            # Nothing to do here
+            if pkg["r_uri"] is None and pkg["range_tile_data"] is None:
+                return
+
+            # FIXME:  Why is this not in datatype.to_rdf()
+
+            # Domain node is NOT a literal value in the RDF representation, so will have a type:
+            if type(pkg["d_uri"]) == list:
+                for duri in pkg["d_uri"]:
+                    graph.add((duri, RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            else:
+                graph.add((pkg["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
 
             # Use the range node's datatype.to_rdf() method to generate an RDF representation of it
             # and add its triples to the core graph
-            dt = dt_factory.get_instance(pkg['r_datatype'])
-            graph += dt.to_rdf(pkg, edge)
 
+            # FIXME: some datatypes have their URI calculated from _tile_data (e.g. concept)
+            # ... if there is a list of these, then all of the permutations will happen
+            # ... as the matrix below re-processes all URIs against all _tile_data entries :(
+            if type(pkg["d_uri"]) == list:
+                mpkg = pkg.copy()
+                for d in pkg["d_uri"]:
+                    mpkg["d_uri"] = d
+                    if type(pkg["r_uri"]) == list:
+                        npkg = mpkg.copy()
+                        for r in pkg["r_uri"]:
+                            # compute matrix of n * m
+                            npkg["r_uri"] = r
+                            graph += rng_dt.to_rdf(npkg, edge)
+                    else:
+                        # iterate loop on m * 1
+                        graph += rng_dt.to_rdf(mpkg, edge)
+            elif type(pkg["r_uri"]) == list:
+                npkg = pkg.copy()
+                for r in pkg["r_uri"]:
+                    # compute matrix of 1 * m
+                    npkg["r_uri"] = r
+                    graph += rng_dt.to_rdf(npkg, edge)
+            else:
+                # both are single, 1 * 1
+                graph += rng_dt.to_rdf(pkg, edge)
 
-        for resourceinstanceid, tiles in self.resourceinstances.iteritems():
+        for resourceinstanceid, tiles in self.resourceinstances.items():
             graph_info = get_graph_parts(self.graph_id)
 
             # add the edges for the group of nodes that include the root (this group of nodes has no nodegroup)
-            for edge in graph_cache[self.graph_id]['rootedges']:
+            for edge in graph_cache[self.graph_id]["rootedges"]:
                 domainnode = archesproject[str(edge.domainnode.pk)]
                 rangenode = archesproject[str(edge.rangenode.pk)]
                 add_edge_to_graph(g, domainnode, rangenode, edge, None, graph_info)
 
             for tile in tiles:
                 # add all the edges for a given tile/nodegroup
-                for edge in graph_info['subgraphs'][tile.nodegroup]['edges']:
+                for edge in graph_info["subgraphs"][tile.nodegroup]["edges"]:
                     domainnode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.domainnode.pk))]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
                     add_edge_to_graph(g, domainnode, rangenode, edge, tile, graph_info)
 
                 # add the edge from the parent node to this tile's root node
                 # where the tile has no parent tile, which means the domain node has no tile_id
-                if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] is None:
-                    edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
+                if graph_info["subgraphs"][tile.nodegroup]["parentnode_nodegroup"] is None:
+                    edge = graph_info["subgraphs"][tile.nodegroup]["inedge"]
                     if edge.domainnode.istopnode:
-                        domainnode = archesproject[reverse('resources', args=[resourceinstanceid]).lstrip('/')]
+                        domainnode = archesproject[reverse("resources", args=[resourceinstanceid]).lstrip("/")]
                     else:
                         domainnode = archesproject[str(edge.domainnode.pk)]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
@@ -153,8 +215,8 @@ class RdfWriter(Writer):
 
                 # add the edge from the parent node to this tile's root node
                 # where the tile has a parent tile
-                if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] is not None:
-                    edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
+                if graph_info["subgraphs"][tile.nodegroup]["parentnode_nodegroup"] is not None:
+                    edge = graph_info["subgraphs"][tile.nodegroup]["inedge"]
                     domainnode = archesproject["tile/%s/node/%s" % (str(tile.parenttile.pk), str(edge.domainnode.pk))]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
                     add_edge_to_graph(g, domainnode, rangenode, edge, tile, graph_info)
@@ -162,24 +224,21 @@ class RdfWriter(Writer):
 
 
 class JsonLdWriter(RdfWriter):
-
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
         g = self.get_rdf_graph()
-        value = g.serialize(format='nt')
-        js = from_rdf(value, {'format': 'application/nquads', 'useNativeTypes': True})
+        value = g.serialize(format="nquads").decode("utf-8")
+
+        # print(f"Got graph: {value}")
+        js = from_rdf(value, {"format": "application/nquads", "useNativeTypes": True})
 
         assert len(resourceinstanceids) == 1  # currently, this should be limited to a single top resource
 
         archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
-        resource_inst_uri = archesproject[reverse('resources', args=[resourceinstanceids[0]]).lstrip('/')]
+        resource_inst_uri = archesproject[reverse("resources", args=[resourceinstanceids[0]]).lstrip("/")]
 
         context = self.graph_model.jsonldcontext
-        framing = {
-            "@omitDefault": True,
-            "@omitGraph": False,
-            "@id": str(resource_inst_uri)
-        }
+        framing = {"@omitDefault": True, "@omitGraph": False, "@id": str(resource_inst_uri)}
 
         if context:
             framing["@context"] = context
@@ -189,372 +248,356 @@ class JsonLdWriter(RdfWriter):
         try:
             context = JSONDeserializer().deserialize(context)
         except ValueError:
-            if context == '':
+            if context == "":
                 context = {}
-            context = {
-                "@context": context
-            }
+            context = {"@context": context}
         except AttributeError:
-            context = {
-                "@context": {}
-            }
+            context = {"@context": {}}
 
         # Currently omitGraph is not processed by pyLd, but data is compacted
         # simulate omitGraph:
-        if '@graph' in js and len(js['@graph']) == 1:
+        if "@graph" in js and len(js["@graph"]) == 1:
             # merge up
-            for (k, v) in js['@graph'][0].items():
+            for (k, v) in list(js["@graph"][0].items()):
                 js[k] = v
-            del js['@graph']
+            del js["@graph"]
 
-        out = json.dumps(js, indent=kwargs.get('indent', None), sort_keys=True)
+        out = json.dumps(js, indent=kwargs.get("indent", None), sort_keys=True)
         dest = StringIO(out)
 
-        full_file_name = os.path.join('{0}.{1}'.format(self.file_name, 'jsonld'))
-        return [{'name': full_file_name, 'outputfile': dest}]
+        full_file_name = os.path.join("{0}.{1}".format(self.file_name, "jsonld"))
+        return [{"name": full_file_name, "outputfile": dest}]
 
 
 class JsonLdReader(Reader):
-
     def __init__(self):
+        super(JsonLdReader, self).__init__()
         self.tiles = {}
-        self.errors = {}
         self.resources = []
+        self.resource = None
         self.use_ids = False
-        self.datatype_factory = DataTypeFactory()
         self.resource_model_root_classes = set()
         self.non_unique_classes = set()
-        self.graph_id_lookup = {}
+        self.root_ontologyclass_lookup = {}
+        self.graphtree = None
+        self.logger = logging.getLogger(__name__)
         for graph in models.GraphModel.objects.filter(isresource=True):
             node = models.Node.objects.get(graph_id=graph.pk, istopnode=True)
-            self.graph_id_lookup[node.ontologyclass] = graph.pk
+            self.root_ontologyclass_lookup[str(graph.pk)] = node.ontologyclass
             if node.ontologyclass in self.resource_model_root_classes:
-                #make a note of non-unique root classes
+                # make a note of non-unique root classes
                 self.non_unique_classes.add(node.ontologyclass)
             else:
                 self.resource_model_root_classes.add(node.ontologyclass)
         self.resource_model_root_classes = self.resource_model_root_classes - self.non_unique_classes
-        self.ontologyproperties = models.Edge.objects.values_list('ontologyproperty', flat=True).distinct()
+        self.ontologyproperties = models.Edge.objects.values_list("ontologyproperty", flat=True).distinct()
+        self.logger.info("Initialized JsonLdReader")
+        self.logger.debug("Found {0} Non-unique root classes".format(len(self.non_unique_classes)))
+        self.logger.debug("Found {0} Resource Model Root classes".format(len(self.resource_model_root_classes)))
 
-    def get_graph_id(self, root_ontologyclass):
-        if root_ontologyclass in self.resource_model_root_classes:
-            return self.graph_id_lookup[root_ontologyclass]
-        # if not isinstance(strs_to_test, list):
-        #     strs_to_test = [strs_to_test]
-        # for str_to_test in strs_to_test:
-        #     match = re.match(r'.*?%sgraph/(?P<graphid>%s)' %
-        #                      (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), str_to_test)
-        #     if match:
-        #         return match.group('graphid')
-        return None
+    def validate_concept_in_collection(self, value, collection):
+        cdata = Concept().get_child_collections(collection, columns="conceptidto")
+        ids = [str(x[0]) for x in cdata]
+        for c in cdata:
+            cids = [x.value for x in models.Value.objects.all().filter(concept_id__exact=c[0], valuetype__category="identifiers")]
+            ids.extend(cids)
+        if value.startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT):
+            value = value.rsplit("/", 1)[-1]
+        return str(value) in ids
 
-    def get_resource_id(self, strs_to_test):
-        if not isinstance(strs_to_test, list):
-            strs_to_test = [strs_to_test]
-        for str_to_test in strs_to_test:
-            match = re.match(r'.*?%sresources/(?P<resourceid>%s)' %
-                             (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), str_to_test)
+    def process_graph(self, graphid):
+        root_node = None
+        nodes = {}
+        graph = GraphProxy.objects.get(graphid=graphid)
+        for nodeid, n in graph.nodes.items():
+            node = {}
+            if n.istopnode:
+                root_node = node
+            node["datatype"] = self.datatype_factory.get_instance(n.datatype)
+            node["datatype_type"] = n.datatype
+            node["extra_class"] = []
+            if node["datatype"].references_resource_type():
+                if "graphs" in n.config and n.config["graphs"]:
+                    for gid in [x["graphid"] for x in n.config["graphs"]]:
+                        node["extra_class"].append(self.root_ontologyclass_lookup[gid])
+
+            node["config"] = {}
+            if n.config and "rdmCollection" in n.config:
+                node["config"]["collection_id"] = str(n.config["rdmCollection"])
+            node["required"] = n.isrequired
+            node["node_id"] = str(n.nodeid)
+            node["name"] = n.name
+            node["class"] = n.ontologyclass
+            node["nodegroup_id"] = str(n.nodegroup_id)
+            node["cardinality"] = n.nodegroup.cardinality if n.nodegroup else None
+            node["out_edges"] = []
+            node["children"] = {}
+            nodes[str(n.nodeid)] = node
+
+        for edegid, e in graph.edges.items():
+            dn = e.domainnode_id
+            rng = e.rangenode_id
+            prop = e.ontologyproperty
+            nodes[str(dn)]["out_edges"].append({"range": str(rng), "prop": str(prop)})
+
+        def model_walk(node, nodes):
+            for e in node["out_edges"]:
+                rng = nodes[e["range"]]
+                for oclass in set([rng["class"], *rng["extra_class"]]):
+                    key = f"{e['prop']} {oclass}"
+                    if key in node["children"]:
+                        node["children"][key].append(rng)
+                    else:
+                        node["children"][key] = [rng]
+                model_walk(rng, nodes)
+            del node["out_edges"]
+
+        model_walk(root_node, nodes)
+        return root_node
+
+    def get_resource_id(self, value):
+        # Allow local URI or urn:uuid:UUID
+        match = re.match(r".*?%sresources/(?P<resourceid>%s)" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), value)
+        if match:
+            return match.group("resourceid")
+        else:
+            match = re.match(r"urn:uuid:(%s)" % settings.UUID_REGEX, value)
             if match:
-                return match.group('resourceid')
+                return match.groups()[0]
+            else:
+                self.logger.debug("Valid resourceid not found within `{0}`".format(value))
         return None
 
     def read_resource(self, data, use_ids=False, resourceid=None, graphid=None):
+        if graphid is None and self.graphtree is None:
+            raise Exception("No graphid supplied to read_resource")
+        elif self.graphtree is None:
+            self.graphtree = self.process_graph(graphid)
+
+        # Ensure we've reset from any previous call
+        self.errors = {}
+        self.resources = []
+        self.resource = None
         self.use_ids = use_ids
         if not isinstance(data, list):
             data = [data]
+        # Force use_ids if there is more than one record being passed in
+        if len(data) > 1:
+            self.use_ids = True
 
-        for jsonld in data:
-            self.errors = {}
-            # FIXME: This should use a cache of the context
-            jsonld = expand(jsonld)[0]
-            if graphid is None:
-                graphid = self.get_graph_id(jsonld["@type"][0])
-            if graphid:
-                graph = GraphProxy.objects.get(graphid=graphid)
-                graphtree = graph.get_tree()
-                if use_ids == True:
-                    resourceinstanceid = self.get_resource_id(jsonld["@id"])
-                    if resourceinstanceid is None:
-                        raise Exception(
-                            'The @id of the resource was not supplied, or was null, or the URI was not correctly formatted')
-                    resource = Resource.objects.get(pk=resourceinstanceid)
+        for jsonld_document in data:
+            jsonld_document = expand(jsonld_document)[0]
+
+            # Possibly bail very early
+            if jsonld_document["@type"][0] != self.graphtree["class"]:
+                raise ValueError("Instance does not have same top level class as model")
+
+            if self.use_ids:
+                resourceinstanceid = self.get_resource_id(jsonld_document["@id"])
+                if resourceinstanceid is None:
+                    self.logger.error("The @id of the resource was not supplied, was null or URI was not correctly formatted")
+                    raise Exception("The @id of the resource was not supplied, was null or URI was not correctly formatted")
+                self.logger.debug("Using resource instance ID found: {0}".format(resourceinstanceid))
+            else:
+                self.logger.debug("`use_ids` setting is set to False, ignoring @id from the data if any")
+
+            self.resource = Resource()
+            if resourceid is not None:
+                self.resource.pk = resourceid
+            self.resource.graph_id = graphid
+            self.resources.append(self.resource)
+
+            ### --- Process Instance ---
+            # now walk the instance and align to the tree
+            result = {"data": [jsonld_document["@id"]]}
+            self.data_walk(jsonld_document, self.graphtree, result)
+
+    def is_semantic_node(self, graph_node):
+        return self.datatype_factory.datatypes[graph_node["datatype_type"]].defaultwidget is None
+
+    def is_concept_node(self, uri):
+        pcs = settings.PREFERRED_CONCEPT_SCHEMES[:]
+        pcs.append(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "concepts/")
+        for p in pcs:
+            if uri.startswith(p):
+                return True
+        return False
+
+    def data_walk(self, data_node, tree_node, result, tile=None):
+        for k, v in data_node.items():
+            if k in ["@id", "@type"]:
+                continue
+            # always a list
+            for vi in v:
+                if "@value" in vi:
+                    # We're a literal value
+                    value = vi["@value"]
+                    clss = vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal")
+                    uri = None
+                    is_literal = True
                 else:
-                    resource = Resource()
-                    resource.graph_id = graphid
-                    resource.pk = resourceid
-
-                self.resolve_node_ids(jsonld, graph=graphtree, resource=resource)
-                self.resources.append(resource)
-
-        return data
-
-    class AmbiguousGraphException(Exception):
-
-        def __init__(self):
-            # self.expression = expression
-            self.message = 'The target graph is ambiguous, please supply node ids in the jsonld to disabmiguate.'
-
-    class DataDoesNotMatchGraphException(Exception):
-
-        def __init__(self):
-            # self.expression = expression
-            self.message = 'A node in the supplied data does not match any node in the target graph. '
-
-            # check that the current json-ld @type is unique among nodes within the graph at that level of depth
-            # if it's unique apply the node id from the graph to the json-ld value
-            # if it's not unique then:
-            #     check the children @types and compare to teh graphs children, repeat until you find a match
-
-    def findOntologyProperties(self, o):
-        keys = []
-        try:
-            for key in o.keys():
-                if key in self.ontologyproperties:
-                    keys.append(key)
-        except:
-            pass
-
-        return keys
-
-    def findBranch(self, nodes, ontology_property, jsonld):
-        """
-            EXAMPLE JSONLD GRAPH:
-            --------------------
-            {
-                "@id": "http://localhost:8000/tile/eed92cf9-b9cd-4e99-9e88-8fb34a0be257/node/e456023d-fa36-11e6-9e3e-026d961c88e6",
-                "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
-                "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as": [
-                    {
-                        "@id": "http://localhost:8000/tile/9fcd9141-930c-4303-b176-78480efbd3d9/node/e4560237-fa36-11e6-9e3e-026d961c88e6",
-                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E17_Type_Assignment",
-                        "http://www.cidoc-crm.org/cidoc-crm/P42_assigned": [
-                            {
-                                "@id": "http://localhost:8000/tile/9fcd9141-930c-4303-b176-78480efbd3d9/node/e456024f-fa36-11e6-9e3e-026d961c88e6",
-                                "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
-                                "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": "[u'dfc1fa9b-e3c8-459d-a3fa-d65e1443b9e7']"
-                            },
-                            {
-                                "@id": "http://localhost:8000/tile/9fcd9141-930c-4303-b176-78480efbd3d9/node/e4560246-fa36-11e6-9e3e-026d961c88e6",
-                                "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
-                                "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": "a18ed9a3-4924-4cf0-a9a7-82d8c3aefbe0"
-                            }
-                        ],
-                    }
-                ]
-            }
-        """
-        if not isinstance(jsonld, list):
-            jsonld = [jsonld]
-
-        for jsonld_graph in jsonld:
-            # print ""
-            # print ""
-            # print "searching for branch %s --> %s" %
-            # (ontology_property.split('/')[-1], jsonld_graph['@type'].split('/')[-1])
-            found = []
-            nodes_copy = set()
-            invalid_nodes = set()
-
-            # print jsonld_graph
-            # try:
-            #     nodeid = jsonld_graph['@archesNodeId']
-            #     print "-------"
-            #     print nodeid
-            #     # import ipdb
-            #     # ipdb.set_trace()
-            #     for node in nodes:
-            #         print str(node['node'].pk)
-            #         if str(node['node'].pk) == nodeid:
-            #             valid_nodes = set([(node['node'].name, node['node'].pk)])
-            #             print 'made it'
-
-            # except KeyError:
-
-            # try to find a node in the graph among a bunch of sibling nodes that has the same incoming edge (propertyclass) as
-            # the edge/node combination we're searching for from the json-ld graph
-
-            # print "Trying to match jsonld_graph:"
-            # print jsonld_graph
-            for node in nodes:
-                # print "node['node'].ontologyclass == jsonld_graph['@type']"
-                # print node['node'].ontologyclass == jsonld_graph['@type']
-                # print node['node'].ontologyclass
-                # print jsonld_graph
-                if '@type' in jsonld_graph:
-                    if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == jsonld_graph['@type'][0]:
-                        # print "found %s" % node['node'].name
-                        nodes_copy.add((node['node'].name, node['node'].pk))
-                        found.append(node)
-                    else:
-                        invalid_nodes.add((node['node'].name, node['node'].pk))
-                        pass
-                if '@value' in jsonld_graph:
-                    if node['parent_edge'].ontologyproperty == ontology_property:
-                        # print node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == str(RDFS.Literal)
-                        # print node['node'].name
-                        # print node['node'].ontologyclass
-                        # print node['parent_edge'].ontologyproperty
-                        # print ontology_property
-                        # print "found %s" % node['node'].name
-                        nodes_copy.add((node['node'].name, node['node'].pk))
-                        found.append(node)
-
-            # print 'found %s branches' % len(found)
-            if len(found) == 0:
-                print 'branch not found for %r' % jsonld_graph
-                raise self.DataDoesNotMatchGraphException()
-
-            # if len(self.findOntologyProperties(jsonld_graph)) == 0:
-            # print 'at a leaf -- unwinding'
-
-            def json_data_is_valid(node, json_ld_node):
-                datatype = self.datatype_factory.get_instance(node.datatype)
-                value = datatype.from_rdf(json_ld_node)
-                # print 'in json_data_is_valid'
-                # print datatype.validate(value)
-                return len(datatype.validate(value)) == 0
-
-            if len(found) > 1:
-                for found_node in found:
-                    # here we follow the algorithm supplied by the Getty
-                    # If the range in the model is a domain-value, and the incoming data is of the right format and part of the domain-value's enumeration, then accept that node.
-                    # If the range in the model is a number, string, or date, and the incoming data is of the right format, then accept that node.
-                    # If the range in the model is a file-list, and the referenced file already exists, then accept that node.
-                    # If the range in the model is a concept, then consider if the incoming data is a concept that is part of the collection for the node. If it is, then accept that node. If it is a concept, and not part of the collection, then fail. If it is not a concept, then continue.
-                    for datatype in ['domain-value', 'number', 'string', 'date', 'file-list', 'concept']:
-                        if found_node['node'].datatype == datatype and json_data_is_valid(found_node['node'], jsonld_graph):
-                            return found_node
-
-                    # If the range is semantic, then check the class of the incoming node is the same
-                    # class as the model's node. If it does, then recursively test the edges of the
-                    # semantic node to determine if it is a candidate (peek-ahead). Remove from the
-                    # candidate list if it is not.
-                    if found_node['node'].datatype == 'semantic':
-                        for ontology_prop in self.findOntologyProperties(jsonld_graph):
-                            try:
-                                # print 'now searching children of %s node' % found_node['node'].name
-                                branch = self.findBranch(found_node['children'], ontology_prop, jsonld_graph[ontology_prop])
-                            except self.DataDoesNotMatchGraphException as e:
-                                found_node['remove'] = True
-                                invalid_nodes.add((found_node['node'].name, found_node['node'].pk))
-                            except self.AmbiguousGraphException as e:
-                                # print 'threw AmbiguousGraphException'
-                                # print nodes_copy
-                                pass
-
-                    # If the range in the model is a resource-instance, then check that the incoming
-                    # node has the same class as the top node of any of the referenced models. If more
-                    # than one model has the same top level class, then fail as the model is ambiguous.
-                    # If there is exactly one possible model, then accept that node.
-                    if found_node['node'].datatype == 'resource-instance':
-                        if found_node['node'].ontologyclass in self.resource_model_root_classes:
-                            return found_node
-
-            # ORIGINAL CODE - this is probably more flexable to have this here as this allows for non-semantic nodes to have child nodes
-            # for ontology_prop in self.findOntologyProperties(jsonld_graph):
-            #     for found_node in found:
-            #         try:
-            #             # print 'now searching children of %s node' % found_node['node'].name
-            #             branch = self.findBranch(found_node['children'], ontology_prop, jsonld_graph[ontology_prop])
-            #         except self.DataDoesNotMatchGraphException as e:
-            #             found_node['remove'] = True
-            #             invalid_nodes.add((found_node['node'].name, found_node['node'].pk))
-            #         except self.AmbiguousGraphException as e:
-            #             # print 'threw AmbiguousGraphException'
-            #             # print nodes_copy
-            #             pass
-
-            valid_nodes = nodes_copy.difference(invalid_nodes)
-
-            if len(valid_nodes) == 1:
-                # print 'branch found'
-                # print valid_nodes
-                valid_node = valid_nodes.pop()
-                for node in nodes:
-                    if node['node'].pk == valid_node[1]:
-                        return node
-            elif len(valid_nodes) > 1:
-                raise self.AmbiguousGraphException()
-            else:
-                raise self.DataDoesNotMatchGraphException()
-
-    def resolve_node_ids(self, jsonld, ontology_prop=None, graph=None, parent_node=None, tileid=None, parent_tileid=None, resource=None):
-        # print "-------------------"
-        if not isinstance(jsonld, list):
-            jsonld = [jsonld]
-
-        # print "-------"
-        # print "INCOMING TO resolve_node_ids: %r" % jsonld
-        parent_tileid = tileid
-        for jsonld_node in jsonld:
-            if parent_node is not None:
-                try:
-                    # print 'find branch'
-                    # print jsonld_node
-
-                    branch = None
-                    if self.use_ids:
-                        try:
-                            match = re.match(r'.*?/tile/(?P<tileid>%s)/node/(?P<nodeid>%s)' %
-                                             (settings.UUID_REGEX, settings.UUID_REGEX), str(jsonld_node['@id']))
-                            if match:
-                                tileid = match.group('tileid')
-                                for node in parent_node['children']:
-                                    if str(node['node'].pk) == match.group('nodeid'):
-                                        branch = node
-                        except:
-                            pass
-
-                    if branch is None:
-                        branch = self.findBranch(parent_node['children'], ontology_prop, jsonld_node)
-                        if branch['node'].nodegroup != parent_node['node'].nodegroup:
-                            tileid = uuid.uuid4()
-
-                except self.DataDoesNotMatchGraphException as e:
-                    # print 'DataDoesNotMatchGraphException'
-                    self.errors['DataDoesNotMatchGraphException'] = e
-                    branch = None
-
-                except self.AmbiguousGraphException as e:
-                    # print 'AmbiguousGraphException'
-                    self.errors['AmbiguousGraphException'] = e
-                    branch = None
-            else:
-                branch = graph
-
-            ontology_properties = self.findOntologyProperties(jsonld_node)
-
-            if branch is not None:
-                if branch != graph:
-                    # jsonld_node['@archesid'] = '%stile/%s/node/%s' % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, tileid, branch['node'].nodeid)
-
-                    if tileid not in self.tiles:
-                        self.tiles[tileid] = Tile(tileid=tileid, parenttile_id=parent_tileid,
-                                                  nodegroup_id=branch['node'].nodegroup_id, data={})
-                        if parent_tileid is None:
-                            resource.tiles.append(self.tiles[tileid])
+                    # We're an entity
+                    uri = vi.get("@id", "")
+                    try:
+                        clss = vi["@type"][0]
+                    except:
+                        # {"@id": "http://something/.../"}
+                        # with no @type. This is typically an external concept URI
+                        # Look for it in the children of current node
+                        possible_cls = []
+                        for tn in tree_node["children"]:
+                            if tn.startswith(k):
+                                possible_cls.append(tn.replace(k, "")[1:])
+                        if len(possible_cls) == 1:
+                            clss = possible_cls[0]
                         else:
-                            self.tiles[parent_tileid].tiles.append(self.tiles[tileid])
+                            raise ValueError(f"Multiple possible branches and no @type given: {vi}")
 
-                    if (branch['node'].datatype != 'semantic'):
-                        # if (branch['node'].datatype == 'number'):
-                        #     print 'number'
-                        #     import ipdb
-                        #     ipdb.set_trace()
-                        datatype = self.datatype_factory.get_instance(branch['node'].datatype)
-                        # print 'finding value'
-                        # print jsonld_node
-                        # print branch['node'].datatype
-                        value = datatype.from_rdf(jsonld_node)
-                        # print ('value found! : ', value)
-                        self.tiles[tileid].data[str(branch['node'].nodeid)] = value
-                        ontology_properties = self.findOntologyProperties(jsonld_node)
+                    value = None
+                    is_literal = False
 
-                if len(ontology_properties) > 0:
-                    for ontology_property in ontology_properties:
-                        # print "Recursing on %s" % ontology_property
-                        # print jsonld_node['@type']
-                        # print ontology_property
-                        self.resolve_node_ids(jsonld_node[ontology_property], ontology_prop=ontology_property,
-                                              graph=None, parent_node=branch, tileid=tileid, parent_tileid=parent_tileid, resource=resource)
-        return jsonld
+                # Find precomputed possible branches by prop/class combination
+                key = f"{k} {clss}"
+                if key in tree_node["datatype"].ignore_keys():
+                    # these are handled by the datatype itself
+                    continue
+                elif not key in tree_node["children"] and is_literal:
+                    # grumble grumble
+                    # model has xsd:string, default is rdfs:Literal
+                    key = f"{k} http://www.w3.org/2001/XMLSchema#string"
+                    if not key in tree_node["children"]:
+                        raise ValueError(f"property/class combination does not exist in model: {k} {clss}")
+                elif not key in tree_node["children"]:
+                    raise ValueError(f"property/class combination does not exist in model: {k} {clss}")
+
+                options = tree_node["children"][key]
+                possible = []
+                ignore = []
+
+                for o in options:
+                    # print(f"Considering:\n  {vi}\n  {o['name']}")
+                    if is_literal and o["datatype"].is_a_literal_in_rdf():
+                        if len(o["datatype"].validate(value)) == 0:
+                            possible.append([o, value])
+                        else:
+                            print(f"Could not validate {value} as a {o['datatype']}")
+                    elif not is_literal and not o["datatype"].is_a_literal_in_rdf():
+                        if self.is_concept_node(uri):
+                            collid = o["config"]["collection_id"]
+                            try:
+                                if self.validate_concept_in_collection(uri, collid):
+                                    possible.append([o, uri])
+                                else:
+                                    print(f"Concept URI {uri} not in Collection {collid}")
+                            except:
+                                print(f"Errored testing concept {uri} in collection {collid}")
+                        elif self.is_semantic_node(o):
+                            possible.append([o, ""])
+                        elif o["datatype"].accepts_rdf_uri(uri):
+                            # print(f"datatype for {o['name']} accepts uri")
+                            possible.append([o, uri])
+                        else:
+                            # This is when the current option doesn't match, but could be
+                            # non-ambiguous resource-instance vs semantic node
+                            continue
+                    else:
+                        raise ValueError("No possible match?")
+
+                # print(f"Possible is: {[x[0]['name'] for x in possible]}")
+
+                if not possible:
+                    # print(f"Tried: {options}")
+                    raise ValueError(f"Data does not match any actual node, despite prop/class combination {k} {clss}:\n{vi}")
+                elif len(possible) > 1:
+                    # descend into data to check if there are further clarifying features
+                    possible2 = []
+                    for p in possible:
+                        try:
+                            # Don't really create data, so pass anonymous result dict
+                            self.data_walk(vi, p[0], {}, tile)
+                            possible2.append(p)
+                        except:
+                            # Not an option
+                            pass
+                    if not possible2:
+                        raise ValueError("Considering branches, data does not match any node, despite a prop/class combination")
+                    elif len(possible2) > 1:
+                        raise ValueError(
+                            f"Even after considering branches, data still matches more than one node: {[x[0]['name'] for x in possible2]}"
+                        )
+                    else:
+                        branch = possible2[0]
+                else:
+                    branch = possible[0]
+
+                if not self.is_semantic_node(branch[0]):
+                    graph_node = branch[0]
+                    node_value = graph_node["datatype"].from_rdf(vi)
+
+                # We know now that it can go into the branch
+                # Determine if we can collapse the data into a -list or not
+                bnodeid = branch[0]["node_id"]
+                create_new_tile = False
+
+                if branch[0]["node_id"] == branch[0]["nodegroup_id"]:
+                    create_new_tile = True
+                bnode = {"data": [], "nodegroup_id": branch[0]["nodegroup_id"], "cardinality": branch[0]["cardinality"]}
+                if create_new_tile:
+                    parenttile_id = tile.tileid if tile else None
+                    tile = Tile(
+                        tileid=uuid.uuid4(),
+                        resourceinstance_id=self.resource.pk,
+                        parenttile_id=parenttile_id,
+                        nodegroup_id=branch[0]["nodegroup_id"],
+                        data={},
+                    )
+                    self.resource.tiles.append(tile)
+                elif "tile" in result and result["tile"]:
+                    tile = result["tile"]
+
+                bnode["tile"] = tile
+
+                if bnodeid in result:
+                    if branch[0]["datatype"].collects_multiple_values():
+                        # append to previous tile
+                        if type(node_value) != list:
+                            node_value = [node_value]
+                        bnode = result[bnodeid][0]
+                        bnode["data"].append(branch[1])
+                        if not self.is_semantic_node(branch[0]):
+                            try:
+                                n = bnode["tile"].data[bnodeid]
+                            except:
+                                n = []
+                                bnode["tile"].data[bnodeid] = n
+                            if type(n) != list:
+                                bnode["tile"].data[bnodeid] = [n]
+                            bnode["tile"].data[bnodeid].extend(node_value)
+                    elif branch[0]["cardinality"] != "n":
+                        bnode = result[bnodeid][0]
+                        if node_value == bnode["tile"].data[bnodeid]:
+                            # No-op, attempt to readd same value
+                            pass
+                        else:
+                            raise ValueError(f"Attempt to add a value to cardinality 1, non-list node {k} {clss}:\n {vi}")
+                    else:
+                        bnode["data"].append(branch[1])
+                        if not self.is_semantic_node(branch[0]):
+                            # print(f"Adding to existing (n): {node_value}")
+                            tile.data[bnodeid] = node_value
+                        result[bnodeid].append(bnode)
+                else:
+                    if not self.is_semantic_node(branch[0]):
+                        tile.data[bnodeid] = node_value
+                    bnode["data"].append(branch[1])
+                    result[bnodeid] = [bnode]
+
+                if not is_literal:
+                    # Walk down non-literal branches in the data
+                    self.data_walk(vi, branch[0], bnode, tile)
+
+        # Finally, after processing all of the branches for this node, check required nodes are present
+        for path in tree_node["children"].values():
+            for kid in path:
+                if kid["required"] and not f"{kid['node_id']}" in result:
+                    raise ValueError(f"Required field not present: {kid['name']}")

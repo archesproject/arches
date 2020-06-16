@@ -1,0 +1,12 @@
+{% extends "views/components/map-popup.htm" %}
+{% load i18n %}
+
+{% block footer %}
+<a data-bind="if: mapCard.isSelectable(feature), click: function () {
+    mapCard.selectFeature(feature);
+}" href="javascript:void(0)">
+    <i class="ion-ios-refresh-empty"></i>
+    <span data-bind="text: mapCard.selectText"></span>
+</a>
+{{ block.super }}
+{% endblock footer %}

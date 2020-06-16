@@ -90,6 +90,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
                 <div class="ep-card-crud-container">
                     <div class="panel">
+                        <!-- ko if: !selection() -->
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><span data-bind="text: 'You have no layers loaded here.'"></span></h3>
+                        </div>
+                        <!-- /ko -->
+
                         <!-- ko if: selection()  && selection().nodeid -->
                         <div class="panel-heading">
                             <h3 class="panel-title"><i data-bind="css: selection().config.layerIcon() || selection().layer.icon"></i> <span data-bind="text: selection().config.layerName() || selection().layer.name"></span></h3>
@@ -191,12 +197,25 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <label class="col-sm-3 control-label" data-bind="text: selection().isoverlay ? '{% trans "Add to search map by default:" %}' : '{% trans "Default search basemap:" %}'"></label>
+                                                                <label class="col-sm-3 control-label" data-bind="text: selection().isoverlay ? '{% trans "Add to map by default:" %}' : '{% trans "Default basemap:" %}'"></label>
                                                                 <div class="col-sm-9">
                                                                     <span class="switch switch-small service-switch-shim" data-bind="css: {
                                                                             'on': selection().addtomap()
                                                                         }, click: function () {
                                                                             selection().addtomap(!selection().addtomap());
+                                                                        }">
+                                                                        <small></small>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="form-group" data-bind="if: selection().isoverlay">
+                                                                <label class="col-sm-3 control-label">{% trans "Only show on search map:" %}</label>
+                                                                <div class="col-sm-9">
+                                                                    <span class="switch switch-small service-switch-shim" data-bind="css: {
+                                                                            'on': selection().searchonly()
+                                                                        }, click: function () {
+                                                                            selection().searchonly(!selection().searchonly());
                                                                         }">
                                                                         <small></small>
                                                                     </span>
@@ -236,6 +255,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                     </div>
                                                                 </div>
                                                             </div>
+
+                                                            <!-- ko if: selection() && selection().isoverlay -->
+                                                            <!-- ko with: selection() -->
+                                                            <div class="form-group">
+                                                                <div style="padding:15px;">
+                                                                    <div class="row" style="padding-bottom: 10px;">
+                                                                        {% trans "Legend content:" %}
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <textarea rows="10" cols="80" data-bind="ckeditor: legend, ckeditorOptions: {},  valueUpdate: 'afterkeydown'"></textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- /ko -->
+                                                            <!-- /ko -->
                                                         </div>
                                                     </div>
                                                 </div>

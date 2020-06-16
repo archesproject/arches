@@ -1,0 +1,115 @@
+{% load i18n %}
+
+<div class="workbench-card-wrapper">
+    <div class="workbench-card-sidebar">
+        {% block tabs %}
+        <div class="workbench-card-sidebar-tab" data-bind="click: function() {
+            toggleTab('basemap');
+        }, css: {
+            'active': activeTab() === 'basemap'
+        }">
+            <i class="fa fa-globe"></i>
+            <span class="map-sidebar-text">{% trans "Basemap" %}</span>
+        </div>
+        <div class="workbench-card-sidebar-tab" data-bind="click: function() {
+            toggleTab('overlays');
+        }, css: {
+            'active': activeTab() === 'overlays'
+        }">
+            <i class="fa fa-list"></i>
+            <span class="map-sidebar-text">{% trans "Overlays" %}</span>
+        </div>
+        <div class="workbench-card-sidebar-tab" data-bind="click: function() {
+            toggleTab('legend');
+        }, css: {
+            'active': activeTab() === 'legend'
+        }">
+            <i class="fa fa-list-alt"></i>
+            <span class="map-sidebar-text">{% trans "Legend" %}</span>
+        </div>
+        {% endblock tabs %}
+    </div>
+    <!--ko if: activeTab() -->
+        <div class="workbench-card-sidepanel" data-bind="css:{'expanded': expandSidePanel()}">
+            {% block sidepanel %}
+            <!--ko if: activeTab() === 'basemap' -->
+                <div class="workbench-card-sidepanel-header-container">
+                    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+                        {% trans "Basemaps" %}
+                    </h4>
+                </div>
+
+                <div class="basemap-listing-container">
+                <!--ko foreach: basemaps -->
+                    <div class="basemap-listing" data-bind="
+                        click: $parent.activeBasemap,
+                        css: {'active-basemap': $data === $parent.activeBasemap()}
+                        ">
+                        <i data-bind="css: icon" class="layer-listing-icon"></i>
+                        <span data-bind="text: name"></span>
+                    </div>
+                <!--/ko -->
+                </div>
+
+            <!--/ko -->
+
+            <!--ko if: activeTab() === 'overlays' -->
+                <div class="workbench-card-sidepanel-header-container">
+                    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+                        {% trans "Overlays" %}
+                    </h4>
+                </div>
+                <div class="overlays-listing-container" data-bind="sortable: {
+                    data: overlays
+                }">
+                    <div class="overlay-listing" data-bind="css: {'active-overlay': onMap}">
+                        <div class="overlay-name" data-bind="
+                            click: function() {
+                                onMap(!onMap());
+                            }
+                        ">
+                            <i data-bind="css: icon" class="layer-listing-icon"></i>
+                            <span data-bind="text: name"></span>
+                        </div>
+                        <div class="overlay-opacity-control">
+                            <i class="fa fa-adjust"></i>
+                            <div class="overlay-opacity-slider">
+                                <input type="range" min="0" max="100" step="1" data-bind="value: opacity, valueUpdate: 'input'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <!--/ko -->
+
+            <!--ko if: activeTab() === 'legend' -->
+                <div class="workbench-card-sidepanel-header-container">
+                    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+                        {% trans "Legend" %}
+                    </h4>
+                </div>
+
+                <div class="legend-listing-container" data-bind="sortable: {
+                    data: overlays
+                }">
+                    <div class="legend-listing" data-bind="css: {'hidden': !onMap()}">
+                        <div class="legend-name">
+                            <i data-bind="css: icon" class="layer-listing-icon"></i>
+                            <span data-bind="text: name"></span>
+                        </div>
+                        <!--ko if: legend -->
+                        <div class="legend-content" data-bind="html: legend"></div>
+                        <!--/ko -->
+                    </div>
+                </div>
+            <!--/ko -->
+            {% endblock sidepanel %}
+        </div>
+    <!--/ko -->
+    <div class="workbench-card-container" data-bind="mapboxgl: {
+            mapOptions: mapOptions,
+            afterRender: setupMap
+        }, css: {
+            'workbench-card-container-sidepanel-active': activeTab()
+        }">
+    </div>
+</div>

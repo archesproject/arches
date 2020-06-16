@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import os
 import uuid
@@ -31,26 +31,24 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument('operation', nargs='?')
+        parser.add_argument("operation", nargs="?")
 
-        parser.add_argument('-s', '--source', action='store', dest='source', default='',
-            help='Widget json file to be loaded')
+        parser.add_argument("-s", "--source", action="store", dest="source", default="", help="Widget json file to be loaded")
 
-        parser.add_argument('-n', '--name', action='store', dest='name', default='',
-            help='The name of the widget to unregister')
+        parser.add_argument("-n", "--name", action="store", dest="name", default="", help="The name of the widget to unregister")
 
     def handle(self, *args, **options):
-        if options['operation'] == 'register':
-            self.register(source=options['source'])
+        if options["operation"] == "register":
+            self.register(source=options["source"])
 
-        if options['operation'] == 'unregister':
-            self.unregister(name=options['name'])
+        if options["operation"] == "unregister":
+            self.unregister(name=options["name"])
 
-        if options['operation'] == 'list':
+        if options["operation"] == "list":
             self.list()
 
-        if options['operation'] == 'update':
-            self.update(source=options['source'])
+        if options["operation"] == "update":
+            self.update(source=options["source"])
 
     def register(self, source):
         """
@@ -65,18 +63,18 @@ class Command(BaseCommand):
             details = json.load(f)
 
         try:
-            uuid.UUID(details['widgetid'])
+            uuid.UUID(details["widgetid"])
         except:
-            details['widgetid'] = unicode(uuid.uuid4())
-            print "Registering widget with widgetid:", details['widgetid']
+            details["widgetid"] = str(uuid.uuid4())
+            print("Registering widget with widgetid: {}".format(details["widgetid"]))
 
         instance = models.Widget(
-            widgetid = details['widgetid'],
-            name = details['name'],
-            datatype = details['datatype'],
-            helptext = details['helptext'],
-            defaultconfig = details['defaultconfig'],
-            component = details['component']
+            widgetid=details["widgetid"],
+            name=details["name"],
+            datatype=details["datatype"],
+            helptext=details["helptext"],
+            defaultconfig=details["defaultconfig"],
+            component=details["component"],
         )
 
         instance.save()
@@ -94,10 +92,10 @@ class Command(BaseCommand):
             details = json.load(f)
 
         instance = models.Widget.objects.get(name=details["name"])
-        instance.datatype = details['datatype']
-        instance.helptext = details['helptext']
-        instance.defaultconfig = details['defaultconfig']
-        instance.component = details['component']
+        instance.datatype = details["datatype"]
+        instance.helptext = details["helptext"]
+        instance.defaultconfig = details["defaultconfig"]
+        instance.component = details["component"]
         instance.save()
 
     def unregister(self, name):
@@ -109,7 +107,7 @@ class Command(BaseCommand):
             instances = models.Widget.objects.filter(name=name)
             instances[0].delete()
         except Exception as e:
-            print e
+            print(e)
 
     def list(self):
         """
@@ -119,6 +117,6 @@ class Command(BaseCommand):
         try:
             instances = models.Widget.objects.all()
             for instance in instances:
-                print instance.name
+                print(instance.name)
         except Exception as e:
-            print e
+            print(e)

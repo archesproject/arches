@@ -37,25 +37,27 @@ define([
                         var node = _.find(params.graph.get('nodes')(), function(node) {
                             return node.id === self.config.nodeid();
                         });
-                        $.ajax({
-                            dataType: "json",
-                            url: arches.urls.graph + node.graph.get('graphid') + '/get_related_nodes/' + node.id,
-                            data: {
-                                parent_nodeid: params.id
-                            },
-                            success: function (response) {
-                                self.properties(
-                                    properties.concat(
-                                        _.map(response, function (prop) {
-                                            return {
-                                                name: node.getFriendlyOntolgyName(prop.ontology_property),
-                                                id: prop.ontology_property
-                                            }
-                                        })
-                                    )
-                                );
-                            }
-                        });
+                        if (node) {
+                            $.ajax({
+                                dataType: "json",
+                                url: arches.urls.graph + node.graph.get('graphid') + '/get_related_nodes/' + node.id,
+                                data: {
+                                    parent_nodeid: params.id
+                                },
+                                success: function (response) {
+                                    self.properties(
+                                        properties.concat(
+                                            _.map(response, function (prop) {
+                                                return {
+                                                    name: node.getFriendlyOntolgyName(prop.ontology_property),
+                                                    id: prop.ontology_property
+                                                }
+                                            })
+                                        )
+                                    );
+                                }
+                            });
+                        }
                     } else {
                         self.properties(properties);
                     }

@@ -1,0 +1,147 @@
+{
+    "graph": [
+        {
+            "author": " ",
+            "cards": [
+                {
+                    "active": true,
+                    "cardid": "cdfcb5a6-f6b5-11e9-8f09-a4d18cec433a",
+                    "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
+                    "config": null,
+                    "constraints": [
+                        {
+                            "card_id": "cdfcb5a6-f6b5-11e9-8f09-a4d18cec433a",
+                            "constraintid": "8bdd48cd-5119-4101-87c5-431200171587",
+                            "nodes": [],
+                            "uniquetoallinstances": false
+                        }
+                    ],
+                    "cssclass": null,
+                    "description": null,
+                    "graph_id": "bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
+                    "helpenabled": false,
+                    "helptext": null,
+                    "helptitle": null,
+                    "instructions": null,
+                    "is_editable": false,
+                    "name": "Note",
+                    "nodegroup_id": "cdfc22b2-f6b5-11e9-8f09-a4d18cec433a",
+                    "sortorder": null,
+                    "visible": true
+                }
+            ],
+            "cards_x_nodes_x_widgets": [
+                {
+                    "card_id": "cdfcb5a6-f6b5-11e9-8f09-a4d18cec433a",
+                    "config": {
+                        "defaultValue": "",
+                        "label": "note",
+                        "maxLength": null,
+                        "placeholder": "Enter text",
+                        "width": "100%"
+                    },
+                    "id": "d954388e-f6b5-11e9-8f09-a4d18cec433a",
+                    "label": "note",
+                    "node_id": "cdfc22b2-f6b5-11e9-8f09-a4d18cec433a",
+                    "sortorder": 0,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000001"
+                }
+            ],
+            "color": null,
+            "config": {},
+            "deploymentdate": null,
+            "deploymentfile": null,
+            "description": "",
+            "edges": [
+                {
+                    "description": null,
+                    "domainnode_id": "bf73484c-f6b5-11e9-8f09-a4d18cec433a",
+                    "edgeid": "cdfd49e4-f6b5-11e9-8f09-a4d18cec433a",
+                    "graph_id": "bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
+                    "name": null,
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P3_has_note",
+                    "rangenode_id": "cdfc22b2-f6b5-11e9-8f09-a4d18cec433a"
+                }
+            ],
+            "functions_x_graphs": [],
+            "graphid": "bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
+            "iconclass": "",
+            "is_editable": false,
+            "isactive": true,
+            "isresource": true,
+            "jsonldcontext": null,
+            "name": "test_1_basic_object",
+            "nodegroups": [
+                {
+                    "cardinality": "1",
+                    "legacygroupid": null,
+                    "nodegroupid": "cdfc22b2-f6b5-11e9-8f09-a4d18cec433a",
+                    "parentnodegroup_id": null
+                }
+            ],
+            "nodes": [
+                {
+                    "config": null,
+                    "datatype": "semantic",
+                    "description": "",
+                    "graph_id": "bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": true,
+                    "name": "test_1_basic_object",
+                    "nodegroup_id": null,
+                    "nodeid": "bf73484c-f6b5-11e9-8f09-a4d18cec433a",
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
+                    "parentproperty": "",
+                    "sortorder": 0
+                },
+                {
+                    "config": null,
+                    "datatype": "string",
+                    "description": null,
+                    "graph_id": "bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
+                    "is_collector": true,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "note",
+                    "nodegroup_id": "cdfc22b2-f6b5-11e9-8f09-a4d18cec433a",
+                    "nodeid": "cdfc22b2-f6b5-11e9-8f09-a4d18cec433a",
+                    "ontologyclass": "http://www.w3.org/2000/01/rdf-schema#Literal",
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P3_has_note",
+                    "sortorder": 0
+                }
+            ],
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+            "relatable_resource_model_ids": [],
+            "resource_2_resource_constraints": [],
+            "root": {
+                "config": null,
+                "datatype": "semantic",
+                "description": "",
+                "graph_id": "bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
+                "is_collector": false,
+                "isrequired": false,
+                "issearchable": true,
+                "istopnode": true,
+                "name": "test_1_basic_object",
+                "nodegroup_id": null,
+                "nodeid": "bf73484c-f6b5-11e9-8f09-a4d18cec433a",
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
+                "sortorder": 0
+            },
+            "slug": null,
+            "subtitle": "",
+            "template_id": "50000000-0000-0000-0000-000000000001",
+            "version": ""
+        }
+    ],
+    "metadata": {
+        "db": "PostgreSQL 11.5 on x86_64-apple-darwin16.7.0, compiled by Apple LLVM version 8.1.0 (clang-802.0.42), 64-bit",
+        "git hash": "7d41aaecb 2019-10-24 14:00:00 -0700",
+        "os": "Darwin",
+        "os version": "18.6.0"
+    }
+}

@@ -1,0 +1,88 @@
+{% extends "views/components/cards/default.htm" %}
+{% load i18n %}
+
+
+{% block form %}
+{% include 'views/components/file-workbench.htm' %}
+{% endblock form %}
+
+{% block editor_tree %}
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}, scrollTo: card.scrollTo, container: '.resource-editor-tree'">
+    <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
+    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode(),'unsaved-edit': card.isDirty() === true}, event: {
+        mousedown: function(d, e) {
+            e.stopPropagation();
+            card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true);
+        }
+    }">
+        <!-- ko if: !card.isFuncNode() -->
+        <i class="fa fa-file-o" role="presentation" data-bind="css:{'filtered': card.highlight(), 'has-provisional-edits fa-file': card.doesChildHaveProvisionalEdits()}"></i>
+        <!-- /ko -->
+        <!-- ko if: card.isFuncNode() -->
+        <i class="fa fa-code" role="presentation" data-bind="css:{'filtered': card.highlight(), 'has-provisional-edits fa-file': card.doesChildHaveProvisionalEdits()}"></i>
+        <!-- /ko -->
+        <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
+        <!-- ko if: card.canAdd() -->
+        <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}" data-toggle="tooltip" data-original-title="{% trans "Add New" %}"></i>
+        <!-- /ko -->
+    </a>
+    <ul class="jstree-children" aria-expanded="true">
+        <div data-bind="sortable: {
+            data: card.tiles,
+            options: {
+                start: self.startDrag
+            },
+            beforeMove: self.beforeMove,
+            afterMove: card.reorderTiles
+        }">
+            <li role="treeitem" class="jstree-node" style="user-select: none;" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}, event: {'dragstart': function () { console.log('dragging...') }}, event: { auxclick: $parent.card.stageTile, contextmenu: function(a, e){e.preventDefault}}">
+                <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
+                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.form.selection($data);}, css:{'staged': $parent.staging.indexOf($data.tileid) > -1, 'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight(), 'unsaved-edit': !!$data.dirty()}">
+                    <i class="fa " role="presentation" data-bind="css:{'has-provisional-edits': doesChildHaveProvisionalEdits() || $data.hasprovisionaledits(),'fa-pencil':$data.dirty()===true,'fa-file':!$data.dirty()}"></i>
+                    <strong style="margin-right: 10px;">
+                        {% block editor_tree_node_content %}
+                        <!-- ko if: card.widgets().length > 0 && card.widgets()[$parent.displayWidgetIndex].visible -->
+                        <span data-bind="text: card.widgets()[$parent.displayWidgetIndex].label || card.model.name"></span>:
+                        <div style="display: inline;" data-bind="component: {
+                            name: self.form.widgetLookup[card.widgets()[$parent.displayWidgetIndex].widget_id()].name,
+                            params: {
+                                tile: $data,
+                                node: self.form.nodeLookup[card.widgets()[$parent.displayWidgetIndex].node_id()],
+                                config: self.form.widgetLookup[card.widgets()[$parent.displayWidgetIndex].widget_id()].config,
+                                label: self.form.widgetLookup[card.widgets()[$parent.displayWidgetIndex].widget_id()].label,
+                                value: $data.data[card.widgets()[$parent.displayWidgetIndex].node_id()],
+                                type: 'resource-editor',
+                                state: 'display_value',
+                                disabled: !card.isWritable && !self.preview
+                            }
+                        }"></div>
+                        <!-- /ko -->
+                        <!-- ko if: card.widgets().length === 0 || !card.widgets()[$parent.displayWidgetIndex].visible -->
+                        <span data-bind="text: card.model.name"></span>
+                        <!-- /ko -->
+                        {% endblock editor_tree_node_content %}
+                    </strong>
+                </a>
+                <!-- ko if: cards.length > 0 -->
+                <ul class="jstree-children" aria-expanded="true" data-bind="foreach: {
+                        data: cards,
+                        as: 'card'
+                    }">
+                    <!-- ko component: {
+                        name: self.form.cardComponentLookup[card.model.component_id()].componentname,
+                        params: {
+                            state: 'editor-tree',
+                            card: card,
+                            tile: null,
+                            loading: self.loading,
+                            form: self.form,
+                            pageVm: $root
+                        }
+                    } --> <!-- /ko -->
+                </ul>
+                <!-- /ko -->
+            </li>
+        </div>
+    </ul>
+</li>
+{% endblock editor_tree %}

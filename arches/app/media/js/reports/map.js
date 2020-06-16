@@ -1,4 +1,4 @@
-define(['underscore', 'knockout', 'knockout-mapping', 'viewmodels/report', 'views/components/widgets/map'], function(_, ko, koMapping, ReportViewModel) {
+define(['underscore', 'knockout', 'knockout-mapping', 'viewmodels/report', 'reports/map-header'], function(_, ko, koMapping, ReportViewModel) {
     return ko.components.register('map-report', {
         viewModel: function(params) {
             var self = this;

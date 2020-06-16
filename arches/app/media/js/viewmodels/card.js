@@ -7,9 +7,10 @@ define([
     'models/card-widget',
     'arches',
     'require',
+    'uuid',
     'utils/dispose',
     'viewmodels/tile'
-], function($, _, ko, koMapping, CardModel, CardWidgetModel, arches, require, dispose) {
+], function($, _, ko, koMapping, CardModel, CardWidgetModel, arches, require, uuid, dispose) {
     /**
     * A viewmodel used for generic cards
     *
@@ -35,6 +36,13 @@ define([
             }
         });
         return childSelected;
+    };
+
+    var isDirty = function(){
+        if(self.tile) {
+            return true;
+        }
+        return false;
     };
 
     var doesChildHaveProvisionalEdits = function(parent) {
@@ -67,10 +75,20 @@ define([
         var loading = params.loading || ko.observable();
         var perms = ko.observableArray();
         var permsLiteral = ko.observableArray();
+        var allowProvisionalEditRerender = ko.observable(true);
         var nodegroups = params.graphModel.get('nodegroups');
         var multiselect = params.multiselect || false;
         var isWritable = params.card.is_writable || false;
         var selection;
+        var emptyConstraint = [{
+            uniquetoallinstances: false,
+            nodes:[],
+            cardid: self.cardid,
+            constraintid:  uuid.generate()
+        }];
+
+        var appliedFunctions = params.appliedFunctions;
+
         if (params.multiselect) {
             selection = params.selection || ko.observableArray([]);
         } else {
@@ -79,12 +97,12 @@ define([
         var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
             return ko.unwrap(group.nodegroupid) === ko.unwrap(params.card.nodegroup_id);
         });
-
         var cardModel = new CardModel({
             data: _.extend(params.card, {
                 widgets: params.cardwidgets,
                 nodes: params.graphModel.get('nodes'),
-                nodegroup: nodegroup
+                nodegroup: nodegroup,
+                constraints: params.constraints
             }),
             datatypelookup: params.graphModel.get('datatypelookup'),
         });
@@ -129,12 +147,16 @@ define([
         _.extend(this, nodegroup, {
             isWritable: isWritable,
             model: cardModel,
+            appliedFunctions: appliedFunctions,
+            allowProvisionalEditRerender: allowProvisionalEditRerender,
             multiselect: params.multiselect,
             widgets: cardModel.widgets,
             parent: params.tile,
             parentCard: params.parentCard,
             expanded: ko.observable(false),
+            topCards: params.topCards,
             perms: perms,
+            constraints: params.constraints || emptyConstraint,
             permsLiteral: permsLiteral,
             scrollTo: ko.pureComputed(function() {
                 return scrollTo() === this;
@@ -144,7 +166,7 @@ define([
                 var provisionalindex;
                 var summary = _.map(this.tiles(), function(tile){
                     var dataEmpty = _.keys(koMapping.toJS(tile.data)).length === 0;
-                    if (tile.provisionaledits() !== null && dataEmpty) {
+                    if (ko.unwrap(tile.provisionaledits) !== null && dataEmpty) {
                         return 2;
                     } else if (tile.provisionaledits() !== null && !dataEmpty) {
                         return 1;
@@ -222,7 +244,8 @@ define([
                     cardwidgets: params.cardwidgets,
                     perms: perms,
                     permsLiteral: permsLiteral,
-                    parentCard: self
+                    parentCard: self,
+                    topCards: params.topCards
                 });
             })),
             hasprovisionaledits: ko.computed(function() {
@@ -257,6 +280,10 @@ define([
                     }
                 },
                 owner: this
+            }),
+            showForm: ko.observable(false),
+            showSummary: ko.pureComputed(function(){
+                return self.canAdd() && self.showForm() === false && self.selected();
             }),
             canAdd: ko.pureComputed({
                 read: function() {
@@ -303,10 +330,10 @@ define([
                 });
             },
             getNewTile: function() {
-                return new TileViewModel({
+                if (!this.newTile) this.newTile = new TileViewModel({
                     tile: {
                         tileid: '',
-                        resourceinstance_id: params.resourceId(),
+                        resourceinstance_id: ko.unwrap(params.resourceId),
                         nodegroup_id: ko.unwrap(self.model.nodegroup_id),
                         parenttile_id: self.parent ? self.parent.tileid : null,
                         data: _.reduce(self.widgets(), function(data, widget) {
@@ -329,6 +356,29 @@ define([
                     loading: loading,
                     cardwidgets: params.cardwidgets,
                 });
+                return this.newTile;
+            },
+            isFuncNode: function() {
+                var appFuncDesc = false, appFuncName = false, nodegroupId = null;
+                if(params.appliedFunctions && params.card) {
+                    for(var i=0; i < self.appliedFunctions.length; i++) {
+                        if(self.appliedFunctions[i]['function_id'] == "60000000-0000-0000-0000-000000000001") {
+                            if(self.appliedFunctions[i]['config']['description']['nodegroup_id']) {
+                                appFuncDesc = self.appliedFunctions[i]['config']['description']['nodegroup_id'];
+                            }
+                            if(self.appliedFunctions[i]['config']['name']['nodegroup_id']) {
+                                appFuncName = self.appliedFunctions[i]['config']['name']['nodegroup_id'];
+                            }
+                            nodegroupId = params.card.nodegroup_id;
+                            if(nodegroupId === appFuncDesc) {
+                                return "(This card data will define the resource description.)";
+                            } else if(nodegroupId === appFuncName) {
+                                return "(This card data will define the resource name.)";
+                            }
+                        }
+                    }
+                }
+                return false;
             }
         });
 
@@ -351,6 +401,28 @@ define([
                 item.parent.expanded(true);
                 expandParents(item.parent);
             }
+        };
+
+        this.isDirty = function(){
+            // Returns true if a tile is dirty and dirty state is not triggered by default values.
+            if(self.newTile) {
+                if(self.newTile.dirty()) {
+                    var res = {};
+                    self.widgets().forEach(function(w){
+                        res[w.node.nodeid] = ko.unwrap(w.config.defaultValue);
+                    });
+                    for (var k in self.newTile.data) {
+                        if (Object.keys(res).indexOf(k) > -1) {
+                            if ((res[k]||null) == (self.newTile.data[k]()||null) !== true) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
         };
 
         this.selectChildCards = function(value) {

@@ -204,6 +204,18 @@ a.filtered > span:hover {
     color: #425965;
 }
 
+.jstree-default .func-node {
+    background: #72D3C9;
+    color: #01766A;
+    border-width: 2px;
+}
+
+.jstree-default .unsaved-edit {
+    background: #ffdb70;
+    color: #fff;
+    border-width: 2px;
+}
+
 .jstree-default .child-selected.filtered {
     background: #3acaa1;
     color: #fff;
@@ -225,6 +237,19 @@ a.filtered > span:hover {
 
 .jstree-node-action-icon {
     display: none;
+}
+
+.jstree-leading-icon + .tooltip {
+    margin-left: 25px;
+}
+
+.jstree-leading-icon + .tooltip.top .tooltip-arrow  {
+    margin-left: -28px;
+}
+
+.jstree-leading-icon {
+    padding-right: 2px;
+    padding-left: 5px;
 }
 
 .jstree-clicked .jstree-node-action-icon {

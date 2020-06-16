@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 import os
 from django.db import migrations, models
@@ -8,7 +8,7 @@ from django.core import management
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4384_adds_rerender_widget_config'),
+        ('models', '2963_tile_fk_on_file_model'),
     ]
 
     operations = [
