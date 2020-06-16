@@ -6307,6 +6307,10 @@ div.hide-file-list > div > div > div > div > form > div > div:nth-child(3) {
     display: inline-block;
 }
 
+h2.resource-grid-title {
+   margin-top: 0; 
+}
+
 .resource-tools a.resource-grid-title.active {
     color: #333;
     background: #ddd;
