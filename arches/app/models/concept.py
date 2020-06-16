@@ -25,7 +25,7 @@ from django.db import transaction, connection
 from django.db.models import Q
 from arches.app.models import models
 from arches.app.models.system_settings import settings
-from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.search_engine_factory import SearchEngineInstance
 from arches.app.search.elasticsearch_dsl_builder import Term, Query, Bool, Match, Terms
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
@@ -1394,7 +1394,7 @@ def get_preflabel_from_conceptid(conceptid, lang, searchengine=None):
         "id": "",
     }
     if not searchengine:
-        searchengine = SearchEngineFactory().create()
+        searchengine = SearchEngineInstance
     query = Query(searchengine)
     bool_query = Bool()
     bool_query.must(Match(field="type", query="prefLabel", type="phrase"))
@@ -1417,7 +1417,7 @@ def get_preflabel_from_conceptid(conceptid, lang, searchengine=None):
 def get_valueids_from_concept_label(label, conceptid=None, lang=None, searchengine=None):
 
     if not searchengine:
-        searchengine = SearchEngineFactory().create()
+        searchengine = SearchEngineInstance
 
     def exact_val_match(val, conceptid=None):
         # exact term match, don't care about relevance ordering.
@@ -1445,7 +1445,7 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None, searchengi
 
 def get_concept_label_from_valueid(valueid, searchengine=None):
     if not searchengine:
-        searchengine = SearchEngineFactory().create()
+        searchengine = SearchEngineInstance
     concept_label = searchengine.search(index="concepts", id=valueid)
     if concept_label["found"]:
         return concept_label["_source"]
@@ -1453,7 +1453,7 @@ def get_concept_label_from_valueid(valueid, searchengine=None):
 
 def get_preflabel_from_valueid(valueid, lang, searchengine=None):
     if not searchengine:
-        searchengine = SearchEngineFactory().create()
+        searchengine = SearchEngineInstance
     concept_label = searchengine.search(index="concepts", id=valueid)
     if concept_label["found"]:
         return get_preflabel_from_conceptid(
