@@ -16,7 +16,6 @@ details = {
 
 
 class SampleFunction(BaseFunction):
-    
     def save(self, tile, request):
         print("running before tile save")
 
