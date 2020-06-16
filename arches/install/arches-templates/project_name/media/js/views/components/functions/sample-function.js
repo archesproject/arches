@@ -1,7 +1,8 @@
-define(['knockout',
+define(['jquery',
+    'knockout',
     'viewmodels/function',
     'bindings/chosen'],
-function(ko, FunctionViewModel, chosen) {
+function($, ko, FunctionViewModel, chosen) {
     return ko.components.register('views/components/functions/sample-function', {
         viewModel: function(params) {
             FunctionViewModel.apply(this, arguments);
