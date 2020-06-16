@@ -308,6 +308,10 @@ define([
                         this.resourceRelationships(val);
                         if (val.length === 0) {
                             this.displaySplash(true);
+                            setTimeout(
+                                function() {
+                                    $('.select2-choices').click();
+                                }, 2000);
                         }
                     }, this);
                     this.currentResource().paging.subscribe(function(val) {

@@ -78,7 +78,8 @@ i.report-expander:focus,
 .select2-container-active,
 .workbench-card-sidepanel-header:focus,
 .sp-header-alerts:focus,
-.timeline-entry:focus {
+.timeline-entry:focus,
+.rr-splash-help-link:focus {
 	outline: #006600 solid 3px !important;
 }
 
@@ -104,7 +105,8 @@ i.report-expander:focus,
 .btn-primary:focus,
 .btn.viewstate-btn.active:focus,
 .btn-display-toggle:focus,
-.mpm-manager button:focus {
+.mpm-manager button:focus,
+#rr-splash button:focus {
 	outline: cyan solid 3px !important;
 	text-decoration: underline;
 }
@@ -10772,6 +10774,10 @@ a.jstree-anchor.permissions-widget {
     margin: 20px 0 50px 0;
     font-size: 28px;
     color: steelblue;
+}
+
+.rr-splash-help-link:focus {
+    text-decoration: underline;
 }
 
 .rr-splash-help-link:hover {
