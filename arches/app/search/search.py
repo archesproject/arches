@@ -27,13 +27,10 @@ from elasticsearch.exceptions import RequestError
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
-import inspect
 
 class SearchEngine(object):
     def __init__(self, **kwargs):
         #
-        txt = " / ".join([x[3] for x in inspect.stack()])
-        print(f"!!! SearchEngine initialized by {txt}")
         serializer = JSONSerializer()
         serializer.mimetype = "application/json"
         serializer.dumps = serializer.serialize

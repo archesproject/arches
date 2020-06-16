@@ -181,7 +181,7 @@ class ConceptDataType(BaseConceptDataType):
             g.add((edge_info["r_uri"], URIRef(RDFS.label), Literal(c.value)))
         return g
 
-    def from_rdf(self, json_ld_node, searchengine=None):
+    def from_rdf(self, json_ld_node):
         # Expects a label and a concept URI within the json_ld_node, might not always get them both
 
         try:
@@ -215,7 +215,7 @@ class ConceptDataType(BaseConceptDataType):
         if label_node:
             label, lang = get_value_from_jsonld(label_node)
             if label:
-                values = get_valueids_from_concept_label(label, concept_id, lang, searchengine=searchengine)
+                values = get_valueids_from_concept_label(label, concept_id, lang)
                 if values:
                     return values[0]["id"]
                 else:
@@ -230,7 +230,7 @@ class ConceptDataType(BaseConceptDataType):
             label = None
 
         if concept_id and label is None:
-            value = get_preflabel_from_conceptid(concept_id, lang=lang, searchengine=searchengine)
+            value = get_preflabel_from_conceptid(concept_id, lang=lang)
             if value["id"]:
                 return value["id"]
             else:
@@ -314,13 +314,13 @@ class ConceptListDataType(BaseConceptDataType):
                 g += c.to_rdf(concept_info, edge)
         return g
 
-    def from_rdf(self, json_ld_node, searchengine=None):
+    def from_rdf(self, json_ld_node):
         # returns a list of concept ids
         ctype = ConceptDataType()
         if isinstance(json_ld_node, list):
-            return [ctype.from_rdf(item, searchengine=searchengine) for item in json_ld_node]
+            return [ctype.from_rdf(item) for item in json_ld_node]
         else:
-            return [ctype.from_rdf(json_ld_node, searchengine=searchengine)]
+            return [ctype.from_rdf(json_ld_node)]
 
     def collects_multiple_values(self):
         return True

@@ -1383,7 +1383,7 @@ class ConceptValue(object):
             return None
 
 
-def get_preflabel_from_conceptid(conceptid, lang, searchengine=None):
+def get_preflabel_from_conceptid(conceptid, lang):
     ret = None
     default = {
         "category": "",
@@ -1393,9 +1393,7 @@ def get_preflabel_from_conceptid(conceptid, lang, searchengine=None):
         "type": "",
         "id": "",
     }
-    if not searchengine:
-        searchengine = SearchEngineInstance
-    query = Query(searchengine)
+    query = Query(SearchEngineInstance)
     bool_query = Bool()
     bool_query.must(Match(field="type", query="prefLabel", type="phrase"))
     bool_query.filter(Terms(field="conceptid", terms=[conceptid]))
@@ -1414,10 +1412,7 @@ def get_preflabel_from_conceptid(conceptid, lang, searchengine=None):
     return default if ret is None else ret
 
 
-def get_valueids_from_concept_label(label, conceptid=None, lang=None, searchengine=None):
-
-    if not searchengine:
-        searchengine = SearchEngineInstance
+def get_valueids_from_concept_label(label, conceptid=None, lang=None):
 
     def exact_val_match(val, conceptid=None):
         # exact term match, don't care about relevance ordering.
@@ -1432,7 +1427,7 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None, searchengi
                 }
             }
 
-    concept_label_results = searchengine.search(index="concepts", body=exact_val_match(label, conceptid))
+    concept_label_results = SearchEngineInstance.search(index="concepts", body=exact_val_match(label, conceptid))
     if concept_label_results is None:
         print("Found no matches for label:'{0}' and concept_id: '{1}'".format(label, conceptid))
         return
@@ -1443,19 +1438,14 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None, searchengi
     ]
 
 
-def get_concept_label_from_valueid(valueid, searchengine=None):
-    if not searchengine:
-        searchengine = SearchEngineInstance
-    concept_label = searchengine.search(index="concepts", id=valueid)
+def get_concept_label_from_valueid(valueid):
+    concept_label = SearchEngineInstance.search(index="concepts", id=valueid)
     if concept_label["found"]:
         return concept_label["_source"]
 
 
-def get_preflabel_from_valueid(valueid, lang, searchengine=None):
-    if not searchengine:
-        searchengine = SearchEngineInstance
-    concept_label = searchengine.search(index="concepts", id=valueid)
+def get_preflabel_from_valueid(valueid, lang):
+    concept_label = SearchEngineInstance.search(index="concepts", id=valueid)
     if concept_label["found"]:
         return get_preflabel_from_conceptid(
-            get_concept_label_from_valueid(valueid, searchengine=searchengine)["conceptid"], lang, searchengine=searchengine
-        )
+            get_concept_label_from_valueid(valueid)["conceptid"], lang)
