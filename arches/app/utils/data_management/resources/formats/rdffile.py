@@ -23,6 +23,7 @@ from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS
 from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand, set_document_loader
 
+
 # Stop code from looking up the contexts online for every operation
 docCache = {}
 
@@ -423,7 +424,6 @@ class JsonLdReader(Reader):
         return False
 
     def data_walk(self, data_node, tree_node, result, tile=None):
-
         for k, v in data_node.items():
             if k in ["@id", "@type"]:
                 continue
