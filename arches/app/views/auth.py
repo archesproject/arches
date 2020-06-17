@@ -266,10 +266,7 @@ class ServerSettingView(View):
         password = request.POST.get("password", None)
         user = authenticate(username=username, password=password)
         if user:
-            server_settings = {
-                "version": __version__,
-                "clientid": settings.MOBILE_OAUTH_CLIENT_ID
-            }
+            server_settings = {"version": __version__, "clientid": settings.MOBILE_OAUTH_CLIENT_ID}
             response = JSONResponse(server_settings)
         else:
             response = Http401Response()

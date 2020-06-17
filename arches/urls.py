@@ -53,7 +53,15 @@ from arches.app.views.tile import TileData
 from arches.app.views.notifications import NotificationView
 from arches.app.views.map import MapLayerManagerView, TileserverProxyView
 from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources, MobileSurveyDesignerView
-from arches.app.views.auth import LoginView, SignupView, ConfirmSignupView, ChangePasswordView, GetClientIdView, UserProfileView, ServerSettingView
+from arches.app.views.auth import (
+    LoginView,
+    SignupView,
+    ConfirmSignupView,
+    ChangePasswordView,
+    GetClientIdView,
+    UserProfileView,
+    ServerSettingView,
+)
 from arches.app.models.system_settings import settings
 from arches.app.utils.forms import ArchesPasswordResetForm
 from arches.app.utils.forms import ArchesSetPasswordForm
