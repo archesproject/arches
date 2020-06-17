@@ -35,7 +35,7 @@ class BaseDataType(object):
         
     def update(self, tile, data, nodeid, action):
         """
-        Updates the tile.data value of a given datatype and returns the udpated 
+        Updates the tile.data value of a given datatype and returns the udpated
         value
         """
         pass
