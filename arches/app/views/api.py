@@ -1093,7 +1093,7 @@ class NodeValue(APIBase):
             data = datatype.transform_value_for_tile(data, format=format)
 
             # get existing data and append new data if operation='append'
-            if operation == 'append':
+            if operation == "append":
                 tile = models.TileModel.objects.get(tileid=tileid)
                 data = datatype.update(tile, data, nodeid, action=operation)
 
