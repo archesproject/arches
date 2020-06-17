@@ -32,14 +32,14 @@ class BaseDataType(object):
         datatype in arches
         """
         return value
-        
+
     def update(self, tile, data, nodeid, action):
         """
         Updates the tile.data value of a given datatype and returns the updated
         value
         """
         pass
-    
+
     def transform_export_values(self, value, *args, **kwargs):
         """
         Transforms values from probably string/wkt representation to specified
