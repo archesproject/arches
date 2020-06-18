@@ -33,13 +33,19 @@ from arches.app.models.tile import Tile as TileProxyModel
 from arches.app.views.tile import TileData as TileView
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse
-from arches.app.utils.decorators import can_read_resource_instance, can_edit_resource_instance, can_read_concept
+from arches.app.utils.decorators import (
+    can_read_resource_instance,
+    can_edit_resource_instance,
+    can_delete_resource_instance,
+    can_read_concept,
+)
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
 from arches.app.utils.permission_backend import (
     user_can_read_resources,
     user_can_edit_resources,
+    user_can_delete_resources,
     user_can_read_concepts,
     user_is_resource_reviewer,
     get_restricted_instances,
@@ -1048,14 +1054,11 @@ class Node(APIBase):
 class InstancePermission(APIBase):
     def get(self, request):
         user = request.user
-        perm = request.GET.get("perms")
+        result = {}
         resourceinstanceid = request.GET.get("resourceinstanceid")
-        if perm == "view_resourceinstance":
-            result = user_can_read_resources(user, resourceinstanceid)
-        elif perm == "change_resourceinstance":
-            result = user_can_edit_resources(user, resourceinstanceid)
-        elif perm == "delete_resourceinstance":
-            result = user_can_delete_resources(user, resourceinstanceid)
+        result["read"] = user_can_read_resources(user, resourceinstanceid)
+        result["edit"] = user_can_edit_resources(user, resourceinstanceid)
+        result["delete"] = user_can_delete_resources(user, resourceinstanceid)
         return JSONResponse(result)
 
 
@@ -1090,8 +1093,9 @@ class NodeValue(APIBase):
             data = datatype.transform_value_for_tile(data, format=format)
 
             # get existing data and append new data if operation='append'
-            # tile_model(tileid)
-            # data = datatype.update_value(data, action=operation)
+            if operation == "append":
+                tile = models.TileModel.objects.get(tileid=tileid)
+                data = datatype.update(tile, data, nodeid, action=operation)
 
             # update/create tile
             new_tile = TileProxyModel.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid)

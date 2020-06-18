@@ -561,6 +561,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             wkt_geoms.append(GEOSGeometry(json.dumps(feature["geometry"])))
         return GeometryCollection(wkt_geoms)
 
+    def update(self, tile, data, nodeid=None, action=None):
+        updated_data = tile.data[nodeid]["features"] + data["features"]
+        return udpated_data
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         document["geometries"].append({"geom": nodevalue, "nodegroup_id": tile.nodegroup_id, "provisional": provisional, "tileid": tile.pk})
         bounds = self.get_bounds_from_value(nodevalue)
