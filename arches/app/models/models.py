@@ -459,6 +459,7 @@ class Node(models.Model):
     istopnode = models.BooleanField()
     ontologyclass = models.TextField(blank=True, null=True)
     datatype = models.TextField()
+    branchId = models.TextField(blank=True, null=True)
     nodegroup = models.ForeignKey(NodeGroup, db_column="nodegroupid", blank=True, null=True, on_delete=models.CASCADE)
     graph = models.ForeignKey(GraphModel, db_column="graphid", blank=True, null=True, on_delete=models.CASCADE)
     config = JSONField(blank=True, null=True, db_column="config")
