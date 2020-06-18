@@ -4,7 +4,7 @@
 
 import django.contrib.postgres.fields.jsonb
 from django.db import migrations
-import arches.app.utils.index_database as index_database
+# import arches.app.utils.index_database as index_database
 
 class Migration(migrations.Migration):
 

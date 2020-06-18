@@ -25,7 +25,7 @@ from django.db import transaction, connection
 from django.db.models import Q
 from arches.app.models import models
 from arches.app.models.system_settings import settings
-from arches.app.search.search_engine_factory import SearchEngineInstance
+from arches.app.search.search_engine_instance import SearchEngineInstance
 from arches.app.search.elasticsearch_dsl_builder import Term, Query, Bool, Match, Terms
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
@@ -862,7 +862,6 @@ class Concept(object):
             subconcept.index(scheme=scheme)
 
     def bulk_index(self):
-        se = SearchEngineFactory().create()
         concept_docs = []
 
         if self.nodetype == "ConceptScheme":
@@ -872,10 +871,10 @@ class Concept(object):
                 concept = Concept().get(id=topConcept["conceptid"])
                 scheme = concept.get_context()
                 topConcept["top_concept"] = scheme.id
-                concept_docs.append(se.create_bulk_item(index="concepts", id=topConcept["id"], data=topConcept))
+                concept_docs.append(SearchEngineInstance.create_bulk_item(index="concepts", id=topConcept["id"], data=topConcept))
                 for childConcept in concept.get_child_concepts_for_indexing(topConcept["conceptid"]):
                     childConcept["top_concept"] = scheme.id
-                    concept_docs.append(se.create_bulk_item(index="concepts", id=childConcept["id"], data=childConcept))
+                    concept_docs.append(SearchEngineInstance.create_bulk_item(index="concepts", id=childConcept["id"], data=childConcept))
 
         if self.nodetype == "Concept":
             concept = Concept().get(id=self.id, values=["label"])
@@ -883,15 +882,14 @@ class Concept(object):
             concept.index(scheme)
             for childConcept in concept.get_child_concepts_for_indexing(self.id):
                 childConcept["top_concept"] = scheme.id
-                concept_docs.append(se.create_bulk_item(index="concepts", id=childConcept["id"], data=childConcept))
+                concept_docs.append(SearchEngineInstance.create_bulk_item(index="concepts", id=childConcept["id"], data=childConcept))
 
-        se.bulk_index(concept_docs)
+        SearchEngineInstance.bulk_index(concept_docs)
 
     def delete_index(self, delete_self=False):
         def delete_concept_values_index(concepts_to_delete):
-            se = SearchEngineFactory().create()
             for concept in concepts_to_delete.values():
-                query = Query(se, start=0, limit=10000)
+                query = Query(SearchEngineInstance, start=0, limit=10000)
                 term = Term(field="conceptid", term=concept.id)
                 query.add_query(term)
                 query.delete(index="concepts")
@@ -1357,7 +1355,6 @@ class ConceptValue(object):
 
     def index(self, scheme=None):
         if self.category == "label":
-            se = SearchEngineFactory().create()
             data = JSONSerializer().serializeToPython(self)
             if scheme is None:
                 scheme = self.get_scheme_id()
@@ -1365,18 +1362,16 @@ class ConceptValue(object):
                 raise Exception("Index of label failed.  Index type (scheme id) could not be derived from the label.")
 
             data["top_concept"] = scheme.id
-            se.index_data(index="concepts", body=data, idfield="id")
+            SearchEngineInstance.index_data(index="concepts", body=data, idfield="id")
 
     def delete_index(self):
-        se = SearchEngineFactory().create()
-        query = Query(se, start=0, limit=10000)
+        query = Query(SearchEngineInstance, start=0, limit=10000)
         term = Term(field="id", term=self.id)
         query.add_query(term)
         query.delete(index="concepts")
 
     def get_scheme_id(self):
-        se = SearchEngineFactory().create()
-        result = se.search(index="concepts", id=self.id)
+        result = SearchEngineInstance.search(index="concepts", id=self.id)
         if result["found"]:
             return Concept(result["top_concept"])
         else:
