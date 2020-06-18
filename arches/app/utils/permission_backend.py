@@ -316,7 +316,7 @@ def user_can_read_resources(user, resourceid=None):
     if user.is_authenticated:
         if user.is_superuser:
             return True
-        if resourceid not in [None, '']:
+        if resourceid not in [None, ""]:
             result = check_resource_instance_permissions(user, resourceid, "view_resourceinstance")
             if result is not None:
                 if result["permitted"] == "unknown":
@@ -339,7 +339,7 @@ def user_can_edit_resources(user, resourceid=None):
     if user.is_authenticated:
         if user.is_superuser:
             return True
-        if resourceid not in [None, '']:
+        if resourceid not in [None, ""]:
             result = check_resource_instance_permissions(user, resourceid, "change_resourceinstance")
             if result is not None:
                 if result["permitted"] == "unknown":
@@ -363,7 +363,7 @@ def user_can_delete_resources(user, resourceid=None):
     if user.is_authenticated:
         if user.is_superuser:
             return True
-        if resourceid not in [None, '']:
+        if resourceid not in [None, ""]:
             result = check_resource_instance_permissions(user, resourceid, "delete_resourceinstance")
             if result is not None:
                 if result["permitted"] == "unknown":
