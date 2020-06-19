@@ -93,6 +93,7 @@ class GraphSettingsView(GraphBaseView):
                 "name",
                 "author",
                 "description",
+                "branch_id",
                 "isresource",
                 "ontology_id",
                 "version",

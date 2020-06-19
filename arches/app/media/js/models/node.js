@@ -176,7 +176,7 @@ define([
                     datatype: self.datatype,
                     nodegroup_id: self.nodeGroupId,
                     description: self.description,
-                    branchId: self.branchId,
+                    branch_id: self.branchId,
                     ontologyclass: self.ontologyclass,
                     parentproperty: self.parentproperty,
                     config: config,
@@ -253,7 +253,7 @@ define([
             self.nodeGroupId(source.nodegroup_id);
             self.datatype(source.datatype);
             self.description(source.description);
-            self.branchId(source.branchId);
+            self.branchId(source.branch_id);
             self.ontologyclass(source.ontologyclass);
             self.parentproperty(source.parentproperty);
             self.issearchable(source.issearchable);

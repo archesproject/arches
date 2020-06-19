@@ -277,6 +277,7 @@ define([
                 ontologyClass: ko.observable(''),
                 iconFilter: ko.observable(''),
                 rootNodeColor: ko.observable(''),
+                branchId: ko.observable(''),
                 "ontology_namespaces": data.ontology_namespaces,
                 onReset: function() {
                     var graph = koMapping.toJS(viewModel.graphSettingsViewModel.graph);

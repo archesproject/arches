@@ -178,7 +178,7 @@ class Graph(models.GraphModel):
             node.nodeid = nodeobj.get("nodeid", None)
             node.name = nodeobj.get("name", "")
             node.description = nodeobj.get("description", "")
-            node.branchId = nodeobj.get("branchId", "")
+            node.branch_id = nodeobj.get("branch_id", "")
             node.istopnode = nodeobj.get("istopnode", "")
             node.ontologyclass = nodeobj.get("ontologyclass", "")
             node.datatype = nodeobj.get("datatype", "")
