@@ -520,8 +520,8 @@ class Graph(models.GraphModel):
 
             # Copy the description of the branch and its identifier to the
             # new node in the current model / branch
-            branch_copy.root.branch_id = branch_graph.branch_id;
-            branch_copy.root.description = branch_graph.description;
+            branch_copy.root.branch_id = branch_graph.branch_id
+            branch_copy.root.description = branch_graph.description
 
             newEdge = models.Edge(domainnode=nodeToAppendTo, rangenode=branch_copy.root, ontologyproperty=property, graph=self)
             branch_copy.add_edge(newEdge)

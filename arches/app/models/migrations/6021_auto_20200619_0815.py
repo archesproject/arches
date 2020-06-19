@@ -6,23 +6,11 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '6020_bi_directional_node_to_resource'),
+        ("models", "6020_bi_directional_node_to_resource"),
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='graphmodel',
-            name='branch_id',
-            field=models.TextField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='node',
-            name='branch_id',
-            field=models.TextField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='node',
-            name='import_id',
-            field=models.TextField(blank=True, null=True),
-        ),
+        migrations.AddField(model_name="graphmodel", name="branch_id", field=models.TextField(blank=True, null=True),),
+        migrations.AddField(model_name="node", name="branch_id", field=models.TextField(blank=True, null=True),),
+        migrations.AddField(model_name="node", name="import_id", field=models.TextField(blank=True, null=True),),
     ]
