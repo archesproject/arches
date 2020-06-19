@@ -788,9 +788,7 @@ class Graph(models.GraphModel):
         """
         node["nodeid"] = uuid.UUID(str(node.get("nodeid")))
         old_node = self.nodes.pop(node["nodeid"])
-        print(f"incoming: {node}")
         new_node = self.add_node(node)
-        print(f"new node: {new_node.branchId}")
         new_card = None
 
         for edge_id, edge in self.edges.items():
