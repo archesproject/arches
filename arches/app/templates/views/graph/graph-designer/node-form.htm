@@ -43,6 +43,20 @@
                             </div>
                         </div>
 
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label">
+                                        {% trans "Node Import Identifier" %}
+                                    </label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <input type="text" placeholder="{% trans 'Enter node identifier here...' %}"class="form-control" style="" placeholder="{% trans 'node name' %}" data-bind="value:node().importId">
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- ko if: !node().istopnode -->
                         <div class="row widget-container">
                             <div class="form-group">

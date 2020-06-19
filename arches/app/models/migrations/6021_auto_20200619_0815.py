@@ -20,4 +20,9 @@ class Migration(migrations.Migration):
             name='branch_id',
             field=models.TextField(blank=True, null=True),
         ),
+        migrations.AddField(
+            model_name='node',
+            name='import_id',
+            field=models.TextField(blank=True, null=True),
+        ),
     ]
