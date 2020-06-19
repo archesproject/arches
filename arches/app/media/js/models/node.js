@@ -45,6 +45,7 @@ define([
             self.name = ko.observable('');
             self.description = ko.observable(null);
             self.branchId = ko.observable('');
+            self.slug = ko.observable('');
             self.nodeGroupId = ko.observable('');
             var datatype = ko.observable('');
             self.datatype = ko.computed({
@@ -177,6 +178,7 @@ define([
                     nodegroup_id: self.nodeGroupId,
                     description: self.description,
                     branch_id: self.branchId,
+                    slug: self.slug,
                     ontologyclass: self.ontologyclass,
                     parentproperty: self.parentproperty,
                     config: config,
@@ -254,6 +256,7 @@ define([
             self.datatype(source.datatype);
             self.description(source.description);
             self.branchId(source.branch_id);
+            self.slug(source.slug);
             self.ontologyclass(source.ontologyclass);
             self.parentproperty(source.parentproperty);
             self.issearchable(source.issearchable);
