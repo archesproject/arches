@@ -171,7 +171,7 @@
 <dt data-bind="text: label"></dt>
 <!-- ko foreach: value -->
 <dd>
-    <a data-bind="text: resourceName, attr: { href: $parent.resourceReportUrl+resourceId }" target="_blank"></a>
+    <a data-bind="text: resourceName, attr: { href: $parent.resourceReportUrl+resourceId() }" target="_blank"></a>
 </dd>
 <!-- /ko -->
 <!-- ko if: !!value() && value().length === 0 -->
