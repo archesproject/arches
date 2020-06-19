@@ -50,9 +50,8 @@ define([
                 self.graph.ontology_id(null);
             }
 
-            var graphJS = koMapping.toJS(self.graph)
             return JSON.stringify({
-                graph: graphJS,
+                graph: koMapping.toJS(self.graph),
                 relatable_resource_ids: relatableResourceIds,
                 ontology_class: ontologyClass(),
             });

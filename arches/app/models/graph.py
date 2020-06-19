@@ -179,6 +179,7 @@ class Graph(models.GraphModel):
             node.name = nodeobj.get("name", "")
             node.description = nodeobj.get("description", "")
             node.branch_id = nodeobj.get("branch_id", "")
+            node.import_id = nodeobj.get("import_id", "")
             node.istopnode = nodeobj.get("istopnode", "")
             node.ontologyclass = nodeobj.get("ontologyclass", "")
             node.datatype = nodeobj.get("datatype", "")
