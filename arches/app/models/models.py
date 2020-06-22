@@ -1276,3 +1276,17 @@ class IIIFManifest(models.Model):
     class Meta:
         managed = True
         db_table = "iiif_manifests"
+
+
+class GroupMapSettings(models.Model):
+    group = models.OneToOneField(Group, on_delete=models.CASCADE)
+    min_zoom = models.IntegerField(default=0)
+    max_zoom = models.IntegerField(default=20)
+    default_zoom = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.group.name
+
+    class Meta:
+        managed = True
+        db_table = "group_map_settings"

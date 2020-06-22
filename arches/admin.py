@@ -38,6 +38,7 @@ admin.site.register(
         models.GraphModel,
         models.SearchComponent,
         models.IIIFManifest,
+        models.GroupMapSettings,
     ]
 )
 
