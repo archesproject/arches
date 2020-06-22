@@ -21,6 +21,6 @@ class Migration(migrations.Migration):
                 ("default_zoom", models.IntegerField(default=0)),
                 ("group", models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to="auth.Group")),
             ],
-            options={"db_table": "user_map_settings", "managed": True,},
+            options={"db_table": "group_map_settings", "managed": True,},
         ),
     ]
