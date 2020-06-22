@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("auth", "0011_update_proxy_permissions"),
-        ("models", "5605_searchexporthistory_downloadfile"),
+        ("models", "6020_bi_directional_node_to_resource"),
     ]
 
     operations = [
@@ -16,9 +16,9 @@ class Migration(migrations.Migration):
             name="GroupMapSettings",
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("min_zoom", models.IntegerField(default=1)),
-                ("max_zoom", models.IntegerField(default=10)),
-                ("default_zoom", models.IntegerField(default=5)),
+                ("min_zoom", models.IntegerField(default=0)),
+                ("max_zoom", models.IntegerField(default=20)),
+                ("default_zoom", models.IntegerField(default=0)),
                 ("group", models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to="auth.Group")),
             ],
             options={"db_table": "user_map_settings", "managed": True,},
