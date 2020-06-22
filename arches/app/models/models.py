@@ -1280,9 +1280,9 @@ class IIIFManifest(models.Model):
 
 class GroupMapSettings(models.Model):
     group = models.OneToOneField(Group, on_delete=models.CASCADE)
-    min_zoom = models.IntegerField(default=1)
-    max_zoom = models.IntegerField(default=10)
-    default_zoom = models.IntegerField(default=5)
+    min_zoom = models.IntegerField(default=0)
+    max_zoom = models.IntegerField(default=20)
+    default_zoom = models.IntegerField(default=0)
 
     def __str__(self):
         return self.group.name
