@@ -56,12 +56,16 @@ class CardModel(models.Model):
     config = JSONField(blank=True, null=True, db_column="config")
 
     def is_editable(self):
-        result = True
-        tiles = TileModel.objects.filter(nodegroup=self.nodegroup).count()
-        result = False if tiles > 0 else True
         if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
-            result = True
-        return result
+            return True
+        else:
+            try:
+                TileModel.objects.filter(nodegroup=self.nodegroup)[0]
+                return False
+            except:
+                return True
+            # print(f"what about: {test}")
+            # return TileModel.objects.filter(nodegroup=self.nodegroup).count() > 0
 
     class Meta:
         managed = True
