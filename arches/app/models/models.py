@@ -59,11 +59,7 @@ class CardModel(models.Model):
         if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
             return True
         else:
-            try:
-                TileModel.objects.filter(nodegroup=self.nodegroup)[0]
-                return False
-            except:
-                return True
+            return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
 
     class Meta:
         managed = True
@@ -402,13 +398,12 @@ class GraphModel(models.Model):
         return False
 
     def is_editable(self):
-        result = True
-        if self.isresource:
-            resource_instances = ResourceInstance.objects.filter(graph_id=self.graphid).count()
-            result = False if resource_instances > 0 else True
-            if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
-                result = True
-        return result
+        if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
+            return True
+        elif self.isresource:
+            return not ResourceInstance.objects.filter(graph_id=self.graphid).exists()
+        else:
+            return True
 
     def __str__(self):
         return self.name
