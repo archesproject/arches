@@ -64,8 +64,6 @@ class CardModel(models.Model):
                 return False
             except:
                 return True
-            # print(f"what about: {test}")
-            # return TileModel.objects.filter(nodegroup=self.nodegroup).count() > 0
 
     class Meta:
         managed = True
