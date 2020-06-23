@@ -325,8 +325,8 @@ class GraphDataView(View):
                     ret = Graph.new(name=name, is_resource=isresource, author=author)
 
                 elif self.action == "update_node":
-                    old_node_data = graph.nodes.get(uuid.UUID(data['nodeid']))
-                    nodegroup_changed = str(old_node_data.nodegroup_id) != data['nodegroup_id']
+                    old_node_data = graph.nodes.get(uuid.UUID(data["nodeid"]))
+                    nodegroup_changed = str(old_node_data.nodegroup_id) != data["nodegroup_id"]
                     updated_values = graph.update_node(data)
                     if "nodeid" in data and nodegroup_changed is False:
                         graph.save(nodeid=data["nodeid"])
