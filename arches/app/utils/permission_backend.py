@@ -307,7 +307,7 @@ def check_resource_instance_permissions(user, resourceid, permission):
     return result
 
 
-def user_can_read_resources(user, resourceid=None):
+def user_can_read_resource(user, resourceid=None):
     """
     Requires that a user be able to read an instance and read a single nodegroup of a resource
 
@@ -330,7 +330,7 @@ def user_can_read_resources(user, resourceid=None):
     return False
 
 
-def user_can_edit_resources(user, resourceid=None):
+def user_can_edit_resource(user, resourceid=None):
     """
     Requires that a user be able to edit an instance and delete a single nodegroup of a resource
 
@@ -355,7 +355,7 @@ def user_can_edit_resources(user, resourceid=None):
     return False
 
 
-def user_can_delete_resources(user, resourceid=None):
+def user_can_delete_resource(user, resourceid=None):
     """
     Requires that a user be permitted to delete an instance
 

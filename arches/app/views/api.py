@@ -43,9 +43,9 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
 from arches.app.utils.permission_backend import (
-    user_can_read_resources,
-    user_can_edit_resources,
-    user_can_delete_resources,
+    user_can_read_resource,
+    user_can_edit_resource,
+    user_can_delete_resource,
     user_can_read_concepts,
     user_is_resource_reviewer,
     get_restricted_instances,
@@ -517,7 +517,7 @@ class Resources(APIBase):
     # }]
 
     def get(self, request, resourceid=None, slug=None, graphid=None):
-        if user_can_read_resources(user=request.user, resourceid=resourceid):
+        if user_can_read_resource(user=request.user, resourceid=resourceid):
             allowed_formats = ["json", "json-ld"]
             format = request.GET.get("format", "json-ld")
             include_tiles = request.GET.get("includetiles", True)
@@ -611,7 +611,7 @@ class Resources(APIBase):
     #         indent = None
 
     #     try:
-    #         if user_can_edit_resources(user=request.user):
+    #         if user_can_edit_resource(user=request.user):
     #             data = JSONDeserializer().deserialize(request.body)
     #             reader = JsonLdReader()
     #             reader.read_resource(data, use_ids=True)
@@ -649,7 +649,7 @@ class Resources(APIBase):
         except Exception:
             indent = None
 
-        if not user_can_edit_resources(user=request.user, resourceid=resourceid):
+        if not user_can_edit_resource(user=request.user, resourceid=resourceid):
             return JSONResponse(status=403)
         else:
             with transaction.atomic():
@@ -691,7 +691,7 @@ class Resources(APIBase):
             indent = None
 
         try:
-            if user_can_edit_resources(user=request.user, resourceid=resourceid):
+            if user_can_edit_resource(user=request.user, resourceid=resourceid):
                 data = JSONDeserializer().deserialize(request.body)
                 reader = JsonLdReader()
                 if slug is not None:
@@ -721,7 +721,7 @@ class Resources(APIBase):
             return JSONResponse({"error": "resource data could not be saved: %s" % e}, status=500, reason=e)
 
     def delete(self, request, resourceid, slug=None, graphid=None):
-        if user_can_edit_resources(user=request.user, resourceid=resourceid) and user_can_delete_resources(
+        if user_can_edit_resource(user=request.user, resourceid=resourceid) and user_can_delete_resource(
             user=request.user, resourceid=resourceid
         ):
             try:
@@ -1056,9 +1056,9 @@ class InstancePermission(APIBase):
         user = request.user
         result = {}
         resourceinstanceid = request.GET.get("resourceinstanceid")
-        result["read"] = user_can_read_resources(user, resourceinstanceid)
-        result["edit"] = user_can_edit_resources(user, resourceinstanceid)
-        result["delete"] = user_can_delete_resources(user, resourceinstanceid)
+        result["read"] = user_can_read_resource(user, resourceinstanceid)
+        result["edit"] = user_can_edit_resource(user, resourceinstanceid)
+        result["delete"] = user_can_delete_resource(user, resourceinstanceid)
         return JSONResponse(result)
 
 
