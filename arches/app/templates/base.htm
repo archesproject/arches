@@ -177,21 +177,30 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             }
         }, true);
 
-        //Detect click of scroll to top button
+        //Detect clicks
         document.addEventListener('click', function (event) {
-            // If the clicked element isn't the scroll to top link, bail
-            if (!event.target.matches('#scroll-top, #scroll-top>*')) return;
-
-            // Don't follow the link
-            event.preventDefault();
-
-            //Do the scroll to top
-            var scrollContainer = document.querySelector('.back-to-top-me');
-            scrollContainer.scrollTo({
-                top: 0,
-                left: 0,
-                behavior: 'smooth'
-            });
+            
+            //scroll to top button
+            if (event.target.matches('#scroll-top, #scroll-top>*')){
+                event.preventDefault();
+                var scrollContainer = document.querySelector('.back-to-top-me');
+                scrollContainer.scrollTo({
+                    top: 0,
+                    left: 0,
+                    behavior: 'smooth'
+                });
+            
+            //search filter top buttons
+            } else if (event.target.matches('.search-type-btn, .search-type-btn>*')) {
+                //close displayed popup
+                if(document.getElementsByClassName('workbench-card-sidepanel-header')[0]) {
+                    document.getElementsByClassName('workbench-card-sidepanel-header')[0].click();
+                }
+            
+            // Return if no matches
+            } else {
+                return;
+            }
         }, false);
 
         //Override the show/hide of the scroll to top button
