@@ -1,4 +1,4 @@
-from arches.app.models.models import Node
+from arches.app.models.models import Node, TileModel
 from arches.app.models.system_settings import settings
 from guardian.backends import check_support
 from guardian.backends import ObjectPermissionBackend
@@ -367,7 +367,12 @@ def user_can_delete_resources(user, resourceid=None):
             result = check_resource_instance_permissions(user, resourceid, "delete_resourceinstance")
             if result is not None:
                 if result["permitted"] == "unknown":
-                    return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or user_can_edit_model_nodegroups(
+                    nodegroups = get_nodegroups_by_perm(user, "models.delete_nodegroup")
+                    tiles = TileModel.objects.filter(resourceinstance_id=resourceid)
+                    protected_tiles = {str(tile.nodegroup_id) for tile in tiles} - {str(nodegroup.nodegroupid) for nodegroup in nodegroups}
+                    if len(protected_tiles) > 0:
+                        return False
+                    return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or user_can_delete_model_nodegroups(
                         user, result["resource"]
                     )
                 else:
