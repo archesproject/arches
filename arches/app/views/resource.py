@@ -73,7 +73,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@method_decorator(can_edit_resource_instance, name="dispatch")  # TODO Confirm if decorator is needed
+@method_decorator(can_edit_resource_instance, name="dispatch")
 class ResourceListView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
         context = self.get_context_data(main_script="views/resource")
