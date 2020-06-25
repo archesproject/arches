@@ -44,7 +44,12 @@ from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_delete_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.permission_backend import user_is_resource_reviewer, user_can_delete_resource, user_can_edit_resource, user_can_read_resource
+from arches.app.utils.permission_backend import (
+    user_is_resource_reviewer,
+    user_can_delete_resource,
+    user_can_edit_resource,
+    user_can_read_resource,
+)
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
@@ -68,7 +73,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@method_decorator(can_edit_resource_instance, name="dispatch") #TODO Confirm if decorator is needed
+@method_decorator(can_edit_resource_instance, name="dispatch")  # TODO Confirm if decorator is needed
 class ResourceListView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
         context = self.get_context_data(main_script="views/resource")
@@ -261,7 +266,6 @@ class ResourceEditorView(MapBaseManagerView):
             context["nav"]["help"] = {"title": _("Using the Resource Editor"), "template": "resource-editor-help"}
 
         return render(request, view_template, context)
-
 
     def delete(self, request, resourceid=None):
         delete_error = _("Unable to Delete Resource")
