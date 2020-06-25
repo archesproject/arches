@@ -112,6 +112,7 @@ def get_instance_creator(resource_instance, user=None):
 class ResourceEditorView(MapBaseManagerView):
     action = None
 
+    @method_decorator(can_edit_resource_instance, name="dispatch")
     def get(
         self,
         request,
@@ -126,8 +127,6 @@ class ResourceEditorView(MapBaseManagerView):
 
         creator = None
         user_created_instance = None
-        if not user_can_edit_resource(request.user, resourceid):
-            raise PermissionDenied
         if resourceid is None:
             resource_instance = None
             graph = models.GraphModel.objects.get(pk=graphid)

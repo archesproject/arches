@@ -20,7 +20,7 @@ import warnings
 import functools
 import logging
 import datetime
-from django.shortcuts import redirect
+from django.core.exceptions import PermissionDenied
 from arches.app.utils.permission_backend import get_editable_resource_types
 from arches.app.utils.permission_backend import get_resource_types_by_perm
 from arches.app.utils.permission_backend import user_can_read_resource
@@ -80,7 +80,7 @@ def can_edit_resource_instance(function):
         if user_can_edit_resource(request.user, resourceid=resourceid):
             return function(request, *args, **kwargs)
         else:
-            return redirect(f'/auth/?next={request.path}')
+            raise PermissionDenied
         return function(request, *args, **kwargs)
 
     return wrapper
@@ -98,7 +98,7 @@ def can_read_resource_instance(function):
         if user_can_read_resource(request.user, resourceid=resourceid):
             return function(request, *args, **kwargs)
         else:
-            return redirect(f'/auth/?next={request.path}')
+            raise PermissionDenied
         return function(request, *args, **kwargs)
 
     return wrapper
@@ -116,7 +116,7 @@ def can_delete_resource_instance(function):
         if user_can_delete_resource(request.user, resourceid=resourceid):
             return function(request, *args, **kwargs)
         else:
-            return redirect(f'/auth/?next={request.path}')
+            raise PermissionDenied
         return function(request, *args, **kwargs)
 
     return wrapper
