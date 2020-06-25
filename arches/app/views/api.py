@@ -1,15 +1,20 @@
+import importlib
 import json
 import logging
 import os
 import re
 import sys
 import uuid
-import importlib
 from io import StringIO
+from oauth2_provider.views import ProtectedResourceView
+from pyld.jsonld import compact, frame, from_rdf
+from rdflib import RDF
+from rdflib.namespace import SKOS, DCTERMS
+from revproxy.views import ProxyView
+from slugify import slugify
+from urllib import parse
 from django.shortcuts import render
 from django.views.generic import View
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 from django.db import transaction, connection
 from django.db.models import Q
 from django.http import Http404, HttpResponse
@@ -17,11 +22,10 @@ from django.http.request import QueryDict
 from django.core import management
 from django.core.cache import cache
 from django.urls import reverse
-from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.core.files.base import ContentFile
-from revproxy.views import ProxyView
-from oauth2_provider.views import ProtectedResourceView
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.card import Card as CardProxyModel
@@ -34,33 +38,26 @@ from arches.app.views.tile import TileData as TileView
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.decorators import (
-    can_read_resource_instance,
-    can_edit_resource_instance,
-    can_delete_resource_instance,
     can_read_concept,
+    group_required
 )
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
 from arches.app.utils.permission_backend import (
-    user_can_read_resources,
-    user_can_edit_resources,
-    user_can_delete_resources,
+    user_can_read_resource,
+    user_can_edit_resource,
+    user_can_delete_resource,
     user_can_read_concepts,
     user_is_resource_reviewer,
     get_restricted_instances,
     check_resource_instance_permissions,
     get_nodegroups_by_perm,
 )
-from arches.app.utils.decorators import group_required
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory
-from pyld.jsonld import compact, frame, from_rdf
-from rdflib import RDF
-from rdflib.namespace import SKOS, DCTERMS
-from slugify import slugify
-from urllib import parse
+
 from arches.celery import app
 
 logger = logging.getLogger(__name__)
@@ -517,7 +514,7 @@ class Resources(APIBase):
     # }]
 
     def get(self, request, resourceid=None, slug=None, graphid=None):
-        if user_can_read_resources(user=request.user, resourceid=resourceid):
+        if user_can_read_resource(user=request.user, resourceid=resourceid):
             allowed_formats = ["json", "json-ld"]
             format = request.GET.get("format", "json-ld")
             include_tiles = request.GET.get("includetiles", True)
@@ -611,7 +608,7 @@ class Resources(APIBase):
     #         indent = None
 
     #     try:
-    #         if user_can_edit_resources(user=request.user):
+    #         if user_can_edit_resource(user=request.user):
     #             data = JSONDeserializer().deserialize(request.body)
     #             reader = JsonLdReader()
     #             reader.read_resource(data, use_ids=True)
@@ -649,7 +646,7 @@ class Resources(APIBase):
         except Exception:
             indent = None
 
-        if not user_can_edit_resources(user=request.user, resourceid=resourceid):
+        if not user_can_edit_resource(user=request.user, resourceid=resourceid):
             return JSONResponse(status=403)
         else:
             with transaction.atomic():
@@ -691,7 +688,7 @@ class Resources(APIBase):
             indent = None
 
         try:
-            if user_can_edit_resources(user=request.user, resourceid=resourceid):
+            if user_can_edit_resource(user=request.user, resourceid=resourceid):
                 data = JSONDeserializer().deserialize(request.body)
                 reader = JsonLdReader()
                 if slug is not None:
@@ -721,7 +718,7 @@ class Resources(APIBase):
             return JSONResponse({"error": "resource data could not be saved: %s" % e}, status=500, reason=e)
 
     def delete(self, request, resourceid, slug=None, graphid=None):
-        if user_can_edit_resources(user=request.user, resourceid=resourceid) and user_can_delete_resources(
+        if user_can_edit_resource(user=request.user, resourceid=resourceid) and user_can_delete_resource(
             user=request.user, resourceid=resourceid
         ):
             try:
@@ -1056,9 +1053,9 @@ class InstancePermission(APIBase):
         user = request.user
         result = {}
         resourceinstanceid = request.GET.get("resourceinstanceid")
-        result["read"] = user_can_read_resources(user, resourceinstanceid)
-        result["edit"] = user_can_edit_resources(user, resourceinstanceid)
-        result["delete"] = user_can_delete_resources(user, resourceinstanceid)
+        result["read"] = user_can_read_resource(user, resourceinstanceid)
+        result["edit"] = user_can_edit_resource(user, resourceinstanceid)
+        result["delete"] = user_can_delete_resource(user, resourceinstanceid)
         return JSONResponse(result)
 
 

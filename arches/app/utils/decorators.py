@@ -20,14 +20,14 @@ import warnings
 import functools
 import logging
 import datetime
+from django.core.exceptions import PermissionDenied
 from arches.app.utils.permission_backend import get_editable_resource_types
 from arches.app.utils.permission_backend import get_resource_types_by_perm
-from arches.app.utils.permission_backend import user_can_read_resources
-from arches.app.utils.permission_backend import user_can_edit_resources
+from arches.app.utils.permission_backend import user_can_read_resource
+from arches.app.utils.permission_backend import user_can_edit_resource
+from arches.app.utils.permission_backend import user_can_delete_resource
 from arches.app.utils.permission_backend import user_can_read_concepts
-from arches.app.utils.permission_backend import user_can_delete_resources
 from django.contrib.auth.decorators import user_passes_test
-from django.core.exceptions import PermissionDenied
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -77,7 +77,7 @@ def can_edit_resource_instance(function):
     @functools.wraps(function)
     def wrapper(request, *args, **kwargs):
         resourceid = kwargs["resourceid"] if "resourceid" in kwargs else None
-        if user_can_edit_resources(request.user, resourceid=resourceid):
+        if user_can_edit_resource(request.user, resourceid=resourceid):
             return function(request, *args, **kwargs)
         else:
             raise PermissionDenied
@@ -95,7 +95,7 @@ def can_read_resource_instance(function):
     @functools.wraps(function)
     def wrapper(request, *args, **kwargs):
         resourceid = kwargs["resourceid"] if "resourceid" in kwargs else None
-        if user_can_read_resources(request.user, resourceid=resourceid):
+        if user_can_read_resource(request.user, resourceid=resourceid):
             return function(request, *args, **kwargs)
         else:
             raise PermissionDenied
@@ -113,7 +113,7 @@ def can_delete_resource_instance(function):
     @functools.wraps(function)
     def wrapper(request, *args, **kwargs):
         resourceid = kwargs["resourceid"] if "resourceid" in kwargs else None
-        if user_can_delete_resources(request.user, resourceid=resourceid):
+        if user_can_delete_resource(request.user, resourceid=resourceid):
             return function(request, *args, **kwargs)
         else:
             raise PermissionDenied
