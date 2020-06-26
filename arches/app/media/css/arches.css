@@ -6769,7 +6769,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .clear-node-search {
-    position: relative;
+    position: absolute;
     top: 6px;
     right: 10px;
     font-size: 14px;
