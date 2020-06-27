@@ -45,7 +45,7 @@
 <!-- /ko -->
 
 <!--ko if: !displaySplash()-->
-<div id="related-resources-drag-panel" style="height: calc(100vh - 102px); overflow-y: hidden;" class="search-container related-resources-container">
+<div id="related-resources-drag-panel" style="overflow-y: hidden;" class="search-container related-resources-container">
 
     <!-- Target -->
     <div id="rr-manager-content-id" class="rr-drag-panel-target" data-bind="style: {'margin-bottom': containerBottomMargin }">
@@ -92,7 +92,7 @@
             <div class="rr-table rr-summary-page">
                 <div data-bind="foreach:{ data: relationshipsInFilter, as: 'relationship'}" style="display: flex; flex-direction: column;">
                     <div class='rr-table-row'>
-                        <div style="display: flex; flex-direction: row; height: 40px;">
+                        <div class='rr-table-row-initial'>
                             <div class='rr-table-column' style="width: 35px;">
                                 <button data-bind="click: self.toggleSelectedResourceRelationship, clickBubble: false">
                                     <i data-bind="class: !!relationship.tileid() ? 'fa fa-random' : 'fa fa-usb' "></i>
@@ -112,7 +112,7 @@
                                 <div><a target="_blank" style="text-decoration: underline;" data-bind="text: resource.displayname, attr:{href: resource.resourceinstanceid}" ></a></div>
                             </div>
                         </div>
-                        <div style="border-bottom: none; padding: 20px;" data-bind="if: self.selectedResourceRelationship() === relationship, visible:  self.selectedResourceRelationship() === relationship, css: { 'rr-table-border': self.selectedResourceRelationship() === relationship} ">
+                        <div class="rr-table-row-panel" data-bind="if: self.selectedResourceRelationship() === relationship, visible:  self.selectedResourceRelationship() === relationship, css: { 'rr-table-border': self.selectedResourceRelationship() === relationship} ">
                             <div data-bind="if: !!relationship.tileid()">
                                 <div>{% trans "This is a Node to Resource Instance relationship" %}</div>
                                 <div class="widget-container" style="padding-left: 0px;">
