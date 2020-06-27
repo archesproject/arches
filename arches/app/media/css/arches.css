@@ -7757,40 +7757,108 @@ a.mega-dropdown-toggle.disabled {
     border-left: 5px solid #20ce05;
 }
 
+#related-resources-drag-panel .card-header {
+    margin: -1px -30px 0px -30px;
+}
+
+#related-resources-drag-panel .card-header h2 {
+    margin-top: 5px;
+    color: #f1f1f1;
+    font-size: 17px;
+    font-weight: 400;
+}
+
+.rr-table {
+    max-height: 306px;
+    overflow-y: scroll;
+    border: 1px solid #ddd;
+}
+
+.rr-table.rr-summary-page {
+    max-height: 684px;
+}
+
+.rr-table::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 9px;
+    border-left: 1px solid #ddd;
+}
+
+.rr-table::-webkit-scrollbar-thumb {
+    border-radius: 2px;
+    background-color: rgba(0, 0, 0, .1);
+    -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+}
+
 .rr-table-border {
     border: solid 1px #e0e0e0;
 }
 
 .rr-table-row {
-    min-height: 40px;
+    min-height: 36px;
     display: flex;
-    border-bottom: solid 1px #e0e0e0;
+    border-bottom: solid 1px #ddd;
     flex-direction: column;
 }
 
-.rr-table-row:first-child {
-    border-top: solid 1px #e0e0e0;
+.rr-table-row:hover {
+    background: #F6F6FE;
+    border-color: #B0AFE3;
+}
+
+.rr-table-row:hover .rr-table-column {
+    border-color: #B0AFE3;
+    border-right: none;
 }
 
 .rr-table-row:nth-last-child(odd) {
-    background: rgb(236, 240, 245);
+    background: #F5FAFE;
+}
+
+.rr-table-row:nth-last-child(odd):hover {
+    background: #F6F6FE;
+    border-color: #B0AFE3;
+}
+
+.rr-table-row:nth-last-child {
+    border-bottom: none;
+}
+
+.rr-table-row:last-child {
+    border-bottom: none;
+}
+
+.rr-table-row-panel {
+    background: #fff;
+    border: none; 
+    border-top: 1px solid #ddd;
+    padding: 10px;
 }
 
 .rr-table-column {
     padding-top: 8px;
-    padding-left: 10px;
-    border-left: solid 1px #e0e0e0;
+    padding-right: 10px;
+    border-left: solid 1px #ddd;
+}
+
+.rr-table-column:first-child {
+    border-left: none;
 }
 
 .rr-table-column:last-child {
-    border-right: solid 1px #e0e0e0
+    border-right: none;   
 }
 
 .rr-table-column button {
     padding: 0px;
+    width: 36px;
     color: #5f5f5f;
     border: none;
     background: none;
+}
+
+.rr-table-column button i {
+    margin-left: 0px;
 }
 
 .unselectable {
@@ -12037,9 +12105,9 @@ a.jstree-anchor.permissions-widget {
 }
 
 .rr-splash-img {
-    margin-top: -3px;
-    margin-left: -2px;
-    height: 110%;
+    margin-top: 3px;
+    margin-left: 2px;
+    height: 90%;
 }
 
 .surveys {
