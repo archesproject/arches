@@ -7769,13 +7769,16 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rr-table {
-    max-height: 306px;
+    max-height: 400px;
     overflow-y: scroll;
+    overflow-x: hidden;
     border: 1px solid #ddd;
+    max-width: 600px;
 }
 
 .rr-table.rr-summary-page {
     max-height: 556px;
+    max-width: 100%;
 }
 
 .rr-table::-webkit-scrollbar {
@@ -7867,6 +7870,11 @@ a.mega-dropdown-toggle.disabled {
 
 .rr-table-column button i {
     margin-left: 0px;
+}
+
+.rr-relationship-icon {
+    font-size: 17px;
+    padding-left: 49%;
 }
 
 .unselectable {
