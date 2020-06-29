@@ -7872,6 +7872,10 @@ a.mega-dropdown-toggle.disabled {
     margin-left: 0px;
 }
 
+.rr-table-column a {
+    color: steelblue;
+}
+
 .rr-relationship-icon {
     font-size: 17px;
     padding-left: 49%;
