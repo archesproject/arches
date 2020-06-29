@@ -4,7 +4,7 @@
 {% endblock form %}
 <!-- /ko -->
 
-<!-- ko if: !configForm  && state === 'report' -->
+<!-- ko if: !configForm  && state === 'report' && displayValue() -->
 {% block report %}
 <dt data-bind="text: label"></dt>
 <dd data-bind="text: displayValue() || '{% trans "None" %}'"></dd>

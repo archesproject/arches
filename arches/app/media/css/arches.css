@@ -7849,13 +7849,13 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rp-report-section.rp-report-section-root {
-    padding-top: 30px;
+    padding-top: 10px;
     background-color: #fff;
     display: flex;
 }
 
 .rp-report-section {
-    padding: 0px 0px 35px 0px;
+    padding: 0px 0px 10px 0px;
     background: #fff;
     border-bottom: solid 1px lightgray;
 }
@@ -7876,13 +7876,13 @@ a.mega-dropdown-toggle.disabled {
     font-size: 17px;
     font-weight: 500;
     margin-top: 2px;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
     padding: 14px 0 5px 0px;
     color: #666;
 }
 
 .rp-card-section {
-    padding-bottom: 10px;
+    padding-bottom: 3px;
     padding-top: 0px;
     position: relative;
     padding-left: 15px;
@@ -7899,6 +7899,8 @@ a.mega-dropdown-toggle.disabled {
 .rp-tile-separator {
     border: 1px solid #ddd;
     margin-right: 9%;
+    margin-top: 2px;
+    margin-bottom: 6px;
 }
 
 @media (min-width: 992px) {
@@ -7914,9 +7916,9 @@ a.mega-dropdown-toggle.disabled {
     /* width: 250px; */
     font-size: 15px;
     font-weight: 500;
-    margin-top: 2px;
-    margin-bottom: 5px;
-    padding: 0px 0 5px 0px;
+    margin-top: 5px;
+    margin-bottom: 2px;
+    padding: 0px 0 2px 0px;
     color: #666;
     white-space: nowrap;
     overflow: hidden;
@@ -7924,7 +7926,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rp-report-tile {
-    padding-bottom: 15px;
+    padding-bottom: 5px;
     padding-left: 8px;
     margin-top: 0px;
 }
@@ -7948,8 +7950,8 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rp-report-container-tile {
-    padding-bottom: 15px;
-    padding-top: 15px;
+    padding-bottom: 5px;
+    padding-top: 5px;
 }
 
 .rp-report-tile dt {
@@ -11240,7 +11242,7 @@ a.filter-tools:hover {
 
 .report-related-resources .rp-card-section .rp-report-container-tile {
     padding-top: 0px;
-    padding-bottom: 10px;
+    padding-bottom: 4px;
     margin-top: -5px;
 }
 
