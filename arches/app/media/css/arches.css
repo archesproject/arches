@@ -7898,6 +7898,22 @@ a.mega-dropdown-toggle.disabled {
     color: #999;
 }
 
+.rr-widget-filter-panel {
+    margin-top: -5px;
+    height: 40px;
+    background: #f2f2f2;
+    padding: 6px;
+    max-width: 600px;
+    border: 1px solid #ddd;
+    border-bottom: none;
+}
+
+.rr-widget-filter-panel .clear-node-search {
+    position: absolute;
+    left: 205px;
+    top: 5px;
+}
+
 .form-data-card-library {
     display: flex;
     flex-direction: column;
