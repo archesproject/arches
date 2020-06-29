@@ -39,9 +39,8 @@ class BaseManagerView(TemplateView):
             if self.request.user.has_perm("view_plugin", plugin):
                 context["plugins"].append(plugin)
 
-
         createable = get_createable_resource_types(self.request.user)
-        createable.sort(key=lambda x: x.name);
+        createable.sort(key=lambda x: x.name)
         context["createable_resources"] = JSONSerializer().serialize(
             createable,
             exclude=[
@@ -55,7 +54,7 @@ class BaseManagerView(TemplateView):
                 "deploymentdate",
                 "deploymentfile",
                 "author",
-            ]
+            ],
         )
 
         context["notifications"] = models.UserXNotification.objects.filter(recipient=self.request.user, isread=False)
