@@ -41,7 +41,6 @@ define([
                     }, this);
                     var graphs = response.graphs.sort(function(a,b) {return a.name > b.name ? 1 : -1});
                     _.each(graphs, function(graph) {
-                        console.log(graph);
                         if (graph.isresource && graph.isactive) {
                             var graphCards = _.filter(response.cards, function(card) {
                                 return card.graph_id === graph.graphid && card.nodes.length > 0;
