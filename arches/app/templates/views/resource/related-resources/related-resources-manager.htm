@@ -119,8 +119,8 @@
                                     <!--ko if: self.graphIsSemantic -->
                                     <!--ko if: self.currentResource().resourceinstanceid === relationship.resourceinstanceidfrom() -->
                                     <div class="row">
-                                        <label class="col-sm-12" style="font-weight: bold;">{% trans "Relationship to" %} <span
-                                                data-bind="text: resource.displayname"></span></label>
+                                        <label class="col-sm-12" style="font-weight: bold;"><span class=""
+                                            data-bind="text: self.currentResource().displayname"></span>{% trans "'s relationship to" %} <span                                   data-bind="text: resource.displayname"></span></label>
                                     </div>
                                     <div class="row">
                                         <span class="col-sm-4" style="padding-top: 8px; text-align: right;"
@@ -136,8 +136,8 @@
                                             data-bind="text: resource.displayname + ' (' + self.makeFriendly(relationship.resource.root_ontology_class) + ')'"></span>
                                     </div>
                                     <div class="row" style="margin-top: 20px;">
-                                        <label class="col-sm-12" style="font-weight: bold;">{% trans "Inverse Relationship to" %} <span
-                                                data-bind="text: resource.displayname"></span></label>
+                                        <label class="col-sm-12" style="font-weight: bold;"><span
+                                                data-bind="text: resource.displayname"></span>{% trans "'s relationship to " %} <span class=""                            data-bind="text: self.currentResource().displayname"></span></label>
                                     </div>
                                     <div class="row">
                                         <span class="col-sm-4" style="padding-top: 8px; text-align: right;"
