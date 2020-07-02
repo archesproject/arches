@@ -304,7 +304,7 @@ class GeoJSON(APIBase):
         if limit is not None:
             start = (page - 1) * limit
             end = start + limit
-            last_page = tiles.count() < end
+            last_page = len(tiles) < end
             tiles = tiles[start:end]
         for tile in tiles:
             data = tile.data
