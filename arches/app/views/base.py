@@ -40,7 +40,7 @@ class BaseManagerView(TemplateView):
                 context["plugins"].append(plugin)
 
         createable = get_createable_resource_types(self.request.user)
-        createable.sort(key=lambda x: x.name)
+        createable.sort(key=lambda x: x.name.lower())
         context["createable_resources"] = JSONSerializer().serialize(
             createable,
             exclude=[
