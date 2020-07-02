@@ -1452,7 +1452,7 @@ class Graph(models.GraphModel):
             
         #check that slug does not already exist
         slugs = models.GraphModel.objects.exclude(slug__isnull=True).values_list("slug", flat=True) 
-        if self.slug != None and self.slug in slugs:
+        if self.slug is not None and self.slug in slugs:
             try:
                 self.slug = None
             except:
