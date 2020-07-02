@@ -562,8 +562,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return GeometryCollection(wkt_geoms)
 
     def update(self, tile, data, nodeid=None, action=None):
-        updated_data = tile.data[nodeid]["features"] + data["features"]
-        return udpated_data
+        new_features_array = tile.data[nodeid]["features"] + data["features"]
+        tile.data[nodeid]["features"] = new_features_array
+        updated_data = tile.data[nodeid]
+        return updated_data
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         document["geometries"].append({"geom": nodevalue, "nodegroup_id": tile.nodegroup_id, "provisional": provisional, "tileid": tile.pk})

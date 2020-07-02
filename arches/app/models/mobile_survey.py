@@ -143,7 +143,13 @@ class MobileSurvey(models.MobileSurveyModel):
                             graph_ids.append(str(graphuuid))
                         node["config"]["options"] = []
                         for resource_instance in Resource.objects.filter(graph_id__in=graph_ids):
-                            node["config"]["options"].append({"id": str(resource_instance.pk), "name": resource_instance.displayname})
+                            node["config"]["options"].append(
+                                {
+                                    "id": str(resource_instance.pk),
+                                    "name": resource_instance.displayname,
+                                    "graphid": str(resource_instance.graph_id),
+                                }
+                            )
 
         for subcard in parentcard.cards:
             self.collect_card_widget_node_data(graph_obj, graph, subcard, nodegroupids)
