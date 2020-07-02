@@ -1452,6 +1452,14 @@ class Graph(models.GraphModel):
         except JsonLdError:
             raise GraphValidationError(_("The json-ld context you supplied wasn't formatted correctly."), 1006)
 
+        # check that slug does not already exist
+        slugs = models.GraphModel.objects.exclude(slug__isnull=True).values_list("slug", flat=True)
+        if self.slug is not None and self.slug in slugs:
+            try:
+                self.slug = None
+            except:
+                raise GraphValidationError(_("The slug for this model/branch already exists."), 1007)
+
 
 class GraphValidationError(Exception):
     def __init__(self, message, code=None):
