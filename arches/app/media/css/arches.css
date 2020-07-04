@@ -2256,7 +2256,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     border-color: #ddd;
 }
 
-.resource-instance-wrapper .select2-container.select2-container-active.select2-dropdown-open {
+.select2-container.select2-container-active.select2-dropdown-open {
     border: 1px solid steelblue;
 }
 
