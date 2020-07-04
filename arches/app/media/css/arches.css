@@ -25,6 +25,10 @@ img {
     image-orientation: from-image;
 }
 
+[class^="col-"]:not(.pad-no) {
+    padding-left: 0px;
+}
+
 .regular-link {
     color: #337ab7;
     text-decoration: none;
@@ -6254,7 +6258,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .edit-message-container.approved {
-    margin-right: -40px;
     background: #C8F89A;
     border-bottom: 1px solid #9CEC4F;
     border-top: 1px solid #9CEC4F;
@@ -6269,7 +6272,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     display: flex;
     flex-direction: column;
     position: relative;
-    margin-right: -50px;
+    margin-right: -25px;
     width: 250px;
     padding: 5px 5px 0px 5px;
     border-left: 1px solid #ddd;
@@ -7843,7 +7846,7 @@ a.mega-dropdown-toggle.disabled {
     background: #fff;
     border: none; 
     border-top: 1px solid #ddd;
-    padding: 20px;
+    padding: 20px 30px;
 }
 
 .rr-table-column {
