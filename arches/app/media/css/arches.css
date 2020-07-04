@@ -2256,6 +2256,10 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     border-color: #ddd;
 }
 
+.resource-instance-wrapper .select2-container.select2-container-active.select2-dropdown-open {
+    border: 1px solid steelblue;
+}
+
 .mpm-resource-selection .select2-container {
     height: 32px;
 }
@@ -2333,7 +2337,7 @@ a.select2-choice {
 }
 
 .select2-drop-active {
-    border: 1px solid #e1e5ea;
+    border: 1px solid steelblue;
     border-top: none;
     box-shadow: none;
 }
@@ -7866,7 +7870,7 @@ a.mega-dropdown-toggle.disabled {
 .rr-table-column button {
     padding: 0px;
     width: 36px;
-    color: #5f5f5f;
+    color: #25476a;
     border: none;
     background: none;
 }
