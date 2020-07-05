@@ -12051,6 +12051,7 @@ ul.select2-choices:after {
     overflow-y: auto;
     height: 100%;
     background: #ecf0f5;
+    padding-bottom: 50px;
 }
 
 a.jstree-anchor strong {
@@ -12966,6 +12967,7 @@ a.jstree-anchor.permissions-widget {
     .mapboxgl-map {
         display: none;
     }
+
     .print-map {
         display: block;
         width: 100%;
