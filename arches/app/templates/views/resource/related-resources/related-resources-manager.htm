@@ -92,17 +92,17 @@
                 <div data-bind="foreach:{ data: relationshipsInFilter, as: 'relationship'}" style="display: flex; flex-direction: column;">
                     <div class='rr-table-row'>
                         <div class='rr-table-row-initial'>
-                            <div class='rr-table-column' style="width: 35px;">
+                            <div class='rr-table-column' style="width: 36px;">
                                 <button data-bind="click: self.toggleSelectedResourceRelationship, clickBubble: false">
                                     <i data-bind="class: !!relationship.tileid() ? 'fa fa-random' : 'fa fa-usb' "></i>
                                 </button>
                             </div>                        
-                            <div class='rr-table-column' style="width: 35px;">
+                            <div class='rr-table-column' style="width: 36px;">
                                 <button data-bind="click: !!relationship.tileid() ?  self.updateTile.bind(self, {'delete':true}) : self.deleteRelationships.bind(self), clickBubble: false">
                                     <i class="fa fa-trash"></i>
                                 </button>
                             </div>
-                            <div class='rr-table-column' style="width: 35px;">
+                            <div class='rr-table-column' style="width: 36px;">
                                 <button data-bind="click:function(){self.reportResourceId(resource.resourceinstanceid);}, clickBubble: false">
                                     <i class="fa fa-info-circle"></i>
                                 </button>
@@ -375,7 +375,7 @@
                 <div class="layer-list search">
 
                     <div class="list-filter fdg-node-filter">
-                        <input type="text" class="form-control" style="z-index:100" placeholder="{% trans " Find a resource " %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
+                        <input type="text" class="form-control" style="z-index:100; border-color: #bbb;" placeholder="{% trans " Find a resource " %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
                         <span class="clear-node-search" style="position: absolute;" data-bind="click: $data.clearSearch"><i class="fa fa-times-circle"></i></span>
                     </div>
 
