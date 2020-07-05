@@ -50,23 +50,21 @@
     <!-- Target -->
     <div id="rr-manager-content-id" class="rr-drag-panel-target" data-bind="style: {'margin-bottom': containerBottomMargin }">
 
-        <div class="card-header">
-            <h2 class="">
-                Related Resources
-            </h2>
-        </div> 
-
         <!--ko if: resourceRelationships().length > 0-->
         <div class="related-resources-header" data-bind="css: {'open-graph': showGraph() == true}, style: {height: resourceEditorContext === true ? '55px' : '40px'}">
             
             <div class="editor-elements">
                 <!--ko if: resourceEditorContext && !showGraph() -->
-                <div style="min-width: 300px;">
-                    <input style="display:inline-block;" data-bind="
-                        select2Query: {
-                            select2Config: select2Config
-                        }
-                    ">
+                <div class="">
+                    <h2 class="">{% trans "Related Resources" %}</h2>
+                    <h3 class="">{% trans "Select resources and relate it to this one" %}</h3>
+                    <div style="min-width: 300px;">
+                        <input style="display:inline-block;" data-bind="
+                            select2Query: {
+                                select2Config: select2Config
+                            }
+                        ">
+                    </div>
                 </div>
                 <!--/ko-->
 
@@ -311,10 +309,10 @@
 
 
         <!--ko if: resourceEditorContext === undefined && !currentResource() -->
-        <div id="rr-splash" class="rr-splash" style="margin: 0px 310px 0px 40px;">
+        <div id="rr-splash" class="rr-splash" style="margin: 50px 310px 0px 40px;">
             <!-- Image -->
             <div class="img-lg img-circle rr-splash-img-container">
-                <img class="rr-splash-img" src="{% static " /img/Workflow.png " %}" alt="Saved Search">
+                <img class="rr-splash-img" src="{% static '/img/Workflow.png' %}" alt="Saved Search">
             </div>
 
             <!-- Splash Title -->
@@ -378,7 +376,7 @@
 
                     <div class="list-filter fdg-node-filter">
                         <input type="text" class="form-control" style="z-index:100" placeholder="{% trans " Find a resource " %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
-                        <span class="clear-node-search" data-bind="click: $data.clearSearch"><i class="fa fa-times-circle"></i></span>
+                        <span class="clear-node-search" style="position: absolute;" data-bind="click: $data.clearSearch"><i class="fa fa-times-circle"></i></span>
                     </div>
 
                 </div>

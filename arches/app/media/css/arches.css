@@ -4928,14 +4928,21 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 }
 
 .layer-list .fdg-node-filter {
-    margin-right: 20px;
-    margin-left: 20px;
+    margin-right: 18px;
+    margin-left: 10px;
+    margin-top: -2px;
+    position: relative;
 }
 
 .layer-list.search {
-    background: #f4f4f4;
-    border-bottom: 1px solid #ddd;
+    background: #e4e4e4;
+    margin-left: -1px;
+    border: 1px solid #bbb;
+    border-top: transparent;
     padding-top: 10px;
+    position: sticky;
+    top: 0px;
+    z-index: 10;
 }
 
 .node-current {
@@ -6776,7 +6783,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .clear-node-search {
-    position: relative;
+    position: absolute;
     top: 6px;
     right: 10px;
     font-size: 14px;
@@ -10108,7 +10115,7 @@ table.table.dataTable {
     top: 0;
     margin-top: 15px;
     height: 40px;
-    margin-bottom: 12px;
+    margin-bottom: 35px;
     width: 100%;
     z-index: 2;
 }
@@ -10123,6 +10130,19 @@ table.table.dataTable {
     width: 100%;
     z-index: 2;
 }
+
+.related-resources-header .editor-elements h2 {
+    font-size: 16px;
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
+.related-resources-header .editor-elements h3 {
+    font-size: 13px;
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
 
 .related-resources-header .btn-group>.btn:hover {
     z-index: 0;
@@ -10708,6 +10728,10 @@ a.search-facet-item:not(.active):hover {
 a.search-facet-item:hover,
 a.search-facet-item:focus {
     background-color: #f8f8f8;
+}
+
+.search-facet-item.header {
+    background: #e4e4e4;
 }
 
 div.search-facet-item.disabled {
