@@ -100,6 +100,7 @@ class GraphSettingsView(GraphBaseView):
                 "isactive",
                 "color",
                 "jsonldcontext",
+                "slug",
                 "config",
                 "template_id",
             ]:
