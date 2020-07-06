@@ -2190,6 +2190,14 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     width: 100px;
 }
 
+.form-contol {
+    height: 36px;
+}
+
+.form-control.input-lg.widget-input {
+    height: 36px;
+}
+
 .date .form-control {
     height: 36px;
 }
