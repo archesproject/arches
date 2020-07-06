@@ -30,7 +30,7 @@ from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Terms, MaxAgg, Aggregation
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, MaxAgg, Aggregation
 from arches.app.search.search_export import SearchResultsExporter
 from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
@@ -228,7 +228,8 @@ def append_instance_permission_filter_dsl(request, search_results_object):
     if request.user.is_superuser is False:
         has_access = Bool()
         terms = Terms(field="permissions.users_with_no_access", terms=[str(request.user.id)])
-        has_access.must_not(terms)
+        nested_term_filter = Nested(path="permissions", query=terms)
+        has_access.must_not(nested_term_filter)
         search_results_object["query"].add_query(has_access)
 
 

@@ -38,10 +38,9 @@ from arches.app.models.models import ResourceInstance, Node
 from arches.app.models.resource import Resource
 from arches.app.utils.permission_backend import get_editable_resource_types
 from arches.app.utils.permission_backend import get_resource_types_by_perm
-from arches.app.utils.permission_backend import user_can_read_resources
-from arches.app.utils.permission_backend import user_can_edit_resources
+from arches.app.utils.permission_backend import user_can_read_resource
+from arches.app.utils.permission_backend import user_can_edit_resource
 from arches.app.utils.permission_backend import user_can_read_concepts
-from arches.app.utils.permission_backend import user_can_delete_resources
 from arches.app.utils.permission_backend import user_has_resource_model_permissions
 from arches.app.utils.permission_backend import get_restricted_users
 from arches.app.search.mappings import (
@@ -120,12 +119,12 @@ class PermissionTests(ArchesTestCase):
 
         """
 
-        implicit_permission = user_can_read_resources(self.user, self.resource_instance_id)
+        implicit_permission = user_can_read_resource(self.user, self.resource_instance_id)
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
         assign_perm("change_resourceinstance", self.group, resource)
-        can_access_without_view_permission = user_can_read_resources(self.user, self.resource_instance_id)
+        can_access_without_view_permission = user_can_read_resource(self.user, self.resource_instance_id)
         assign_perm("view_resourceinstance", self.group, resource)
-        can_access_with_view_permission = user_can_read_resources(self.user, self.resource_instance_id)
+        can_access_with_view_permission = user_can_read_resource(self.user, self.resource_instance_id)
         self.assertTrue(
             implicit_permission is True and can_access_without_view_permission is False and can_access_with_view_permission is True
         )

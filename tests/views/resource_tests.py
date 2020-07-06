@@ -196,7 +196,7 @@ class CommandLineTests(ArchesTestCase):
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
         assign_perm("change_resourceinstance", group, resource)
         response = self.client.delete(url)
-        self.assertTrue(response.status_code == 403)
+        self.assertTrue(response.status_code == 500)
 
     def test_user_cannot_access_with_no_access(self):
         """
@@ -216,7 +216,7 @@ class CommandLineTests(ArchesTestCase):
         view = self.client.get(view_url)
         edit = self.client.get(edit_url)
         delete = self.client.delete(edit_url)
-        self.assertTrue(view.status_code == 403 and edit.status_code == 403 and delete.status_code == 403)
+        self.assertTrue(view.status_code == 403 and edit.status_code == 403 and delete.status_code == 500)
 
     def test_user_can_view_with_permission(self):
         """

@@ -562,8 +562,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return GeometryCollection(wkt_geoms)
 
     def update(self, tile, data, nodeid=None, action=None):
-        updated_data = tile.data[nodeid]["features"] + data["features"]
-        return udpated_data
+        new_features_array = tile.data[nodeid]["features"] + data["features"]
+        tile.data[nodeid]["features"] = new_features_array
+        updated_data = tile.data[nodeid]
+        return updated_data
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         document["geometries"].append({"geom": nodevalue, "nodegroup_id": tile.nodegroup_id, "provisional": provisional, "tileid": tile.pk})
@@ -1723,17 +1725,10 @@ class ResourceInstanceDataType(BaseDataType):
                     )
 
     def transform_value_for_tile(self, value, **kwargs):
-        return [v.strip() for v in value.split(",")]
+        return json.loads(value)
 
     def transform_export_values(self, value, *args, **kwargs):
-        result = value
-        try:
-            if not isinstance(value, str):  # changed from basestring to str for python3 branch
-                result = ",".join(value)
-        except Exception:
-            pass
-
-        return result
+        return json.dumps(value)
 
     def append_search_filters(self, value, node, query, request):
         try:

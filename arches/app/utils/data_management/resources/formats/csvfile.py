@@ -237,7 +237,7 @@ class CsvWriter(Writer):
             relations_file.append({"name": csv_name, "outputfile": dest})
 
             relations = ResourceXResource.objects.filter(
-                Q(resourceinstanceidfrom__in=resourceids) | Q(resourceinstanceidto__in=resourceids)
+                Q(resourceinstanceidfrom__in=resourceids) | Q(resourceinstanceidto__in=resourceids), tileid__isnull=True
             ).values(*csv_header)
             for relation in relations:
                 relation["datestarted"] = relation["datestarted"] if relation["datestarted"] is not None else ""
