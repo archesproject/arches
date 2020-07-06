@@ -1,14 +1,14 @@
 {% load i18n %}
 <!-- ko ifnot: $data.search -->
 <!--ko let: {self: $data} -->
-<div class="node-widget-label concept-label" style="width:650px;">
+<div class="node-widget-label concept-label" style="width:500px;">
     <div class="control-label">
         {% trans "Resource Model" %}
     </div>
     <div style="padding-bottom: 10px;">
         <select multiple data-bind="
             disabled: isEditable === false || disabled,
-            placeholder: '{% trans "Select a resource model" %}',
+            placeholder: 'Select a resource model',
             selectedOptions: selectedResourceModel,
             options: resourceModels,
             optionsText: 'name',
@@ -17,57 +17,67 @@
             }
         "></select>
     </div>
-    <div>
+    <div class="rr-table" style="">
         <div data-bind="foreach: config.graphs" style="display: flex; flex-direction: column;">
             <div class='rr-table-row'>
-                <div style="display: flex; flex-direction: row; height: 40px;">
-                    <div class='rr-table-column' style="width: 35px;">
+                <div style="display: flex; flex-direction: row; height: 36px;">
+                    <div class='rr-table-column icon-column' style="width: 36px;">
                         <button data-bind="click: $data.removeRelationship, clickBubble: false">
                             <i class="fa fa-trash"></i>
                         </button>
                     </div>
-                    <div class="rr-table-column" style="flex-grow: 1;"
+                    <div class="rr-table-column" style="flex-grow: 1; padding-left: 10px;"
                        data-bind="click: function() { if(self.graphIsSemantic){self.toggleSelectedResource($data)}; }, clickBubble: false, style:{cursor: self.graphIsSemantic ? 'pointer': 'inherit'}" style="cursor: pointer;">
                         <div data-bind="text: $data.name"></div>
                     </div>
                 </div>
-                <div style="border-bottom: none; padding: 10px;" data-bind="if: self.selectedResourceType() === $data, visible: self.selectedResourceType() === $data, css: { 'rr-table-border': self.selectedResourceType() === $data} ">
+                <div class="rr-table-row-panel" data-bind="if: self.selectedResourceType() === $data, visible: self.selectedResourceType() === $data, css: { 'rr-table-border': self.selectedResourceType() === $data} ">
                     <div class="row">
-                        <label class="col-sm-12" style="font-weight: bold;">{% trans "Default relationship to" %} 
-                            <span data-bind="text: $data.name"></span>
-                        </label>
-                    </div>
-                    <div class="row">
-                        <span class="col-sm-4" style="padding-top: 8px; text-align: right;"
-                            data-bind="text: self.graphName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
-                        <span class="col-sm-4">
-                            <input style="width:30%; display:inline-block;" data-bind="
-                                select2Query: {
-                                    select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass)
-                                }
-                            ">
-                        </span>
-                        <span class="col-sm-4" style="padding-top: 8px;"
-                            data-bind="text: $data.name + ' (' + self.makeFriendly($data.ontologyClass) + ')'">
-                        </span>
-                    </div>
-                    <div class="row" style="margin-top: 20px;">
-                        <label class="col-sm-12" style="font-weight: bold;">{% trans "Default inverse relationship to" %} 
-                            <span data-bind="text: $data.name"></span>
-                        </label>
-                    </div>
-                    <div class="row">
-                        <span class="col-sm-4" style="padding-top: 8px; text-align: right;"
-                            data-bind="text: $data.name + ' (' + self.makeFriendly($data.ontologyClass) + ')'"></span>
-                        <span class="col-sm-4">
-                            <input style="width:30%; display:inline-block;" data-bind="
-                                select2Query: {
-                                    select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass, self.rootOntologyClass)
-                                }
-                            ">
-                        </span>
-                        <span class="col-sm-4" style="padding-top: 8px;"
-                            data-bind="text: self.graphName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
+                        <div class="row" style="margin-bottom: 10px;">
+                            <label class="col-xs-12" style="font-weight: bold;">{% trans "Default relationship to" %} 
+                                <span data-bind="text: $data.name"></span>
+                            </label>
+                        
+                            <div class="row" style="padding: 0px 12px; margin-bottom: 10px;">
+                                <span class="col-xs-12" style="font-weight: bold;"
+                                    data-bind="text: self.graphName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'">    
+                                </span>
+                                
+                                <span class="col-xs-12">
+                                    <input style="width:100%; display:inline-block; margin: 3px 0px;" data-bind="
+                                        select2Query: {
+                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass)
+                                        }
+                                    ">
+                                </span>
+                                
+                                <span class="col-xs-12" data-bind="text: $data.name + ' (' + self.makeFriendly($data.ontologyClass) + ')'">
+                                </span>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <label class="col-xs-12" style="font-weight: bold;">{% trans "Default inverse relationship to" %} 
+                                <span data-bind="text: $data.name"></span>
+                            </label>
+                        
+                            <div class="row" style="padding: 0px 12px; margin-bottom: 10px;">
+                                <span class="col-xs-12" style=""
+                                    data-bind="text: $data.name + ' (' + self.makeFriendly($data.ontologyClass) + ')'">    
+                                </span>
+                                
+                                <span class="col-xs-12">
+                                    <input style="width:100%; display:inline-block; margin: 3px 0px;" data-bind="
+                                        select2Query: {
+                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass, self.rootOntologyClass)
+                                        }
+                                    ">
+                                </span>
+                                
+                                <span class="col-xs-12" data-bind="text: self.graphName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
