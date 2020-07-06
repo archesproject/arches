@@ -37,4 +37,5 @@ class SearchEngineFactory(object):
         _temp = __import__(modulename, globals(), locals(), [classname])  # in py3, level must be >= 0
         return getattr(_temp, classname)(hosts=hosts, prefix=prefix, **connection_options)
 
+
 SearchEngineInstance = SearchEngineFactory().create()
