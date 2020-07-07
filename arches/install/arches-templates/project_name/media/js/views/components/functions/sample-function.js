@@ -9,7 +9,7 @@ function($, ko, FunctionViewModel, chosen) {
             var nodegroups = {};
             this.triggering_nodegroups = params.config.triggering_nodegroups;
             this.cards = ko.observableArray();
-            this.graph.cards. forEach(function(card){
+            this.graph.cards.forEach(function(card){
                 this.cards.push(card);
                 nodegroups[card.nodegroup_id] = true;
             }, this);
