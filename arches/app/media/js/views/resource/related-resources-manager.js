@@ -37,7 +37,7 @@ define([
                 this.currentResource = ko.observable();
                 this.currentResourceSubscriptions = [];
                 this.resourceEditorContext = options.resourceEditorContext;
-                this.containerBottomMargin = ko.observable(700);
+                this.containerBottomMargin = ko.observable(0);
                 this.showRelatedProperties = ko.observable(false);
                 this.showGraph = ko.observable(this.editingInstanceId === undefined);
                 this.displaySplash = ko.observable(false);
