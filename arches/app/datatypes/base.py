@@ -59,12 +59,6 @@ class BaseDataType(object):
         """
         return None
 
-    def process_api_data(self, value):
-        """
-        Transforms data from an api request
-        """
-        return value
-
     def get_map_layer(self, node=None):
         """
         Gets the array of map layers to add to the map for a given node
