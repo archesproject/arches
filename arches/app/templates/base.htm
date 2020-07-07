@@ -211,8 +211,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 scrollContainer.onscroll = function() {
                     if(scrollContainer.scrollTop >= 600) {
                         scrolllink.classList.add("in");
+                        scrolllink.setAttribute("aria-hidden", "false");
                     } else {
                         scrolllink.classList.remove("in");
+                        scrolllink.setAttribute("aria-hidden", "true");
                     }
                 }
             }
