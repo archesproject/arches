@@ -360,7 +360,7 @@
             resources: [{% autoescape off %}{% for resource in resource_graphs %}{
               'maplayerid': '{{resource.graphid}}',
               'graphid': '{{resource.graphid}}',
-              'name': '{{ resource.name }}',
+              'name': '{{ resource.name | escapejs }}',
               'icon': '{{ resource.iconclass }}',
             },{% endfor %}{% endautoescape %}],
             userEmail: '{{ user.email }}',
