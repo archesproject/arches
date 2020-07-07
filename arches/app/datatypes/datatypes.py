@@ -1145,7 +1145,6 @@ class FileListDataType(BaseDataType):
                 for file_json in current_tile_data[str(node.pk)]:
                     if file_json["name"] == file_data.name and file_json["url"] is None:
                         file_json["file_id"] = str(file_model.pk)
-                        file_json["url"] = str(file_model.path.url)
                         file_json["url"] = "/files/" + str(file_model.fileid)
                         file_json["status"] = "uploaded"
                         resave_tile = True
