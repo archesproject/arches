@@ -25,7 +25,7 @@ from django.db import transaction, connection
 from django.db.models import Q
 from arches.app.models import models
 from arches.app.models.system_settings import settings
-from arches.app.search.search_engine_instance import SearchEngineInstance
+from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.elasticsearch_dsl_builder import Term, Query, Bool, Match, Terms
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
@@ -871,10 +871,10 @@ class Concept(object):
                 concept = Concept().get(id=topConcept["conceptid"])
                 scheme = concept.get_context()
                 topConcept["top_concept"] = scheme.id
-                concept_docs.append(SearchEngineInstance.create_bulk_item(index="concepts", id=topConcept["id"], data=topConcept))
+                concept_docs.append(se.create_bulk_item(index="concepts", id=topConcept["id"], data=topConcept))
                 for childConcept in concept.get_child_concepts_for_indexing(topConcept["conceptid"]):
                     childConcept["top_concept"] = scheme.id
-                    concept_docs.append(SearchEngineInstance.create_bulk_item(index="concepts", id=childConcept["id"], data=childConcept))
+                    concept_docs.append(se.create_bulk_item(index="concepts", id=childConcept["id"], data=childConcept))
 
         if self.nodetype == "Concept":
             concept = Concept().get(id=self.id, values=["label"])
@@ -882,14 +882,14 @@ class Concept(object):
             concept.index(scheme)
             for childConcept in concept.get_child_concepts_for_indexing(self.id):
                 childConcept["top_concept"] = scheme.id
-                concept_docs.append(SearchEngineInstance.create_bulk_item(index="concepts", id=childConcept["id"], data=childConcept))
+                concept_docs.append(se.create_bulk_item(index="concepts", id=childConcept["id"], data=childConcept))
 
-        SearchEngineInstance.bulk_index(concept_docs)
+        se.bulk_index(concept_docs)
 
     def delete_index(self, delete_self=False):
         def delete_concept_values_index(concepts_to_delete):
             for concept in concepts_to_delete.values():
-                query = Query(SearchEngineInstance, start=0, limit=10000)
+                query = Query(se, start=0, limit=10000)
                 term = Term(field="conceptid", term=concept.id)
                 query.add_query(term)
                 query.delete(index="concepts")
@@ -1362,16 +1362,16 @@ class ConceptValue(object):
                 raise Exception("Index of label failed.  Index type (scheme id) could not be derived from the label.")
 
             data["top_concept"] = scheme.id
-            SearchEngineInstance.index_data(index="concepts", body=data, idfield="id")
+            se.index_data(index="concepts", body=data, idfield="id")
 
     def delete_index(self):
-        query = Query(SearchEngineInstance, start=0, limit=10000)
+        query = Query(se, start=0, limit=10000)
         term = Term(field="id", term=self.id)
         query.add_query(term)
         query.delete(index="concepts")
 
     def get_scheme_id(self):
-        result = SearchEngineInstance.search(index="concepts", id=self.id)
+        result = se.search(index="concepts", id=self.id)
         if result["found"]:
             return Concept(result["top_concept"])
         else:
@@ -1388,7 +1388,7 @@ def get_preflabel_from_conceptid(conceptid, lang):
         "type": "",
         "id": "",
     }
-    query = Query(SearchEngineInstance)
+    query = Query(se)
     bool_query = Bool()
     bool_query.must(Match(field="type", query="prefLabel", type="phrase"))
     bool_query.filter(Terms(field="conceptid", terms=[conceptid]))
@@ -1422,7 +1422,7 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
                 }
             }
 
-    concept_label_results = SearchEngineInstance.search(index="concepts", body=exact_val_match(label, conceptid))
+    concept_label_results = se.search(index="concepts", body=exact_val_match(label, conceptid))
     if concept_label_results is None:
         print("Found no matches for label:'{0}' and concept_id: '{1}'".format(label, conceptid))
         return
@@ -1434,12 +1434,12 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
 
 
 def get_concept_label_from_valueid(valueid):
-    concept_label = SearchEngineInstance.search(index="concepts", id=valueid)
+    concept_label = se.search(index="concepts", id=valueid)
     if concept_label["found"]:
         return concept_label["_source"]
 
 
 def get_preflabel_from_valueid(valueid, lang):
-    concept_label = SearchEngineInstance.search(index="concepts", id=valueid)
+    concept_label = se.search(index="concepts", id=valueid)
     if concept_label["found"]:
         return get_preflabel_from_conceptid(get_concept_label_from_valueid(valueid)["conceptid"], lang)
