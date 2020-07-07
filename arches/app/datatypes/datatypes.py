@@ -524,11 +524,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             if len(tile.data[nodeid]["features"]) == 0:
                 tile.data[nodeid] = None
 
-    def process_api_data(self, value):
-        # TODO check for json format (geojson or esri-json) ... if value['format'] == 'esri-geom':
-        data = GeoUtils().arcgisjson_to_geojson(value)
-        return data
-
     def transform_value_for_tile(self, value, **kwargs):
         if "format" in kwargs and kwargs["format"] == "esrijson":
             arches_geojson = GeoUtils().arcgisjson_to_geojson(value)
@@ -1150,7 +1145,6 @@ class FileListDataType(BaseDataType):
                 for file_json in current_tile_data[str(node.pk)]:
                     if file_json["name"] == file_data.name and file_json["url"] is None:
                         file_json["file_id"] = str(file_model.pk)
-                        file_json["url"] = str(file_model.path.url)
                         file_json["url"] = "/files/" + str(file_model.fileid)
                         file_json["status"] = "uploaded"
                         resave_tile = True
@@ -1823,14 +1817,6 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
         m = super(ResourceInstanceListDataType, self).from_rdf(json_ld_node)
         if m is not None:
             return [m]
-
-    def process_api_data(self, value):
-        try:
-            value.upper()
-            data = json.loads(value)
-        except Exception:
-            data = value
-        return data
 
     def collects_multiple_values(self):
         return True
