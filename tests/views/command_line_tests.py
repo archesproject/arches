@@ -44,7 +44,7 @@ class CommandLineTests(TestCase):
         self.survey_id = "d309d38e-29b9-45c0-b0f5-542f34a4576a"
         self.expected_resource_count = 2
         self.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
-        self.c = Client()
+        self.client = Client()
 
     def tearDown(self):
         management.call_command("mobile", operation="delete_surveys", id=self.survey_id)
@@ -114,10 +114,10 @@ class CommandLineTests(TestCase):
         }
         payload = JSONSerializer().serialize(data)
         content_type = "application/x-www-form-urlencoded"
-        self.c.login(username="admin", password="admin")
+        self.client.login(username="admin", password="admin")
         resp = {"success": False}
         try:
-            raw_resp = self.c.post(reverse("collector_designer", kwargs={"surveyid": self.survey_id}), payload, content_type)
+            raw_resp = self.client.post(reverse("collector_designer", kwargs={"surveyid": self.survey_id}), payload, content_type)
             resp = JSONDeserializer().deserialize(raw_resp.content)
         except couchdb.http.Unauthorized:
             # try again
