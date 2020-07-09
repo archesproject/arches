@@ -13,6 +13,7 @@ from guardian.shortcuts import (
     remove_perm,
     assign_perm,
 )
+from guardian.models import GroupObjectPermission, UserObjectPermission
 from guardian.exceptions import WrongAppError
 from django.contrib.auth.models import User, Group, Permission
 from arches.app.models.models import ResourceInstance
@@ -83,11 +84,19 @@ def get_restricted_users(resource):
     return result
 
 
-def get_restricted_instances(user, search_engine):
-    if user.is_superuser is False:
+def get_restricted_instances(user, search_engine=None, allresources=False):
+    if allresources is False and user.is_superuser is True:
+        return []
+
+    if allresources is True:
+        restricted_group_instances = {perm['object_pk'] for perm in GroupObjectPermission.objects.filter(permission__codename='no_access_to_resourceinstance').values('object_pk')}
+        restricted_user_instances = {perm['object_pk'] for perm in UserObjectPermission.objects.filter(permission__codename='no_access_to_resourceinstance').values('object_pk')}
+        all_restricted_instances = list(restricted_group_instances | restricted_user_instances)
+        return all_restricted_instances
+    else:
+        terms = Terms(field="permissions.users_with_no_access", terms=[str(user.id)])
         query = Query(search_engine, start=0, limit=settings.SEARCH_RESULT_LIMIT)
         has_access = Bool()
-        terms = Terms(field="permissions.users_with_no_access", terms=[str(user.id)])
         nested_term_filter = Nested(path="permissions", query=terms)
         has_access.must(nested_term_filter)
         query.add_query(has_access)
@@ -101,8 +110,6 @@ def get_restricted_instances(user, search_engine):
                 results["hits"]["hits"] += results_scrolled["hits"]["hits"]
         restricted_ids = [res["_id"] for res in results["hits"]["hits"]]
         return restricted_ids
-    else:
-        return []
 
 
 def get_groups_for_object(perm, obj):

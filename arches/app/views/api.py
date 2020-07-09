@@ -57,6 +57,8 @@ from arches.app.utils.permission_backend import (
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.search.search_engine_factory import SearchEngineFactory
+
 
 from arches.celery import app
 
@@ -241,6 +243,8 @@ class Surveys(APIBase):
 
 
 class GeoJSON(APIBase):
+    se = SearchEngineFactory().create()
+
     def get_name(self, resource):
         module = importlib.import_module("arches.app.functions.primary_descriptors")
         PrimaryDescriptorsFunction = getattr(module, "PrimaryDescriptorsFunction")()
@@ -286,7 +290,7 @@ class GeoJSON(APIBase):
         property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups)
         property_node_map = {}
         property_nodes = models.Node.objects.filter(nodegroup_id__in=nodegroups).order_by("sortorder")
-        restricted_resource_ids = get_restricted_instances(request.user)
+        restricted_resource_ids = get_restricted_instances(request.user, self.se)
         for node in property_nodes:
             property_node_map[str(node.nodeid)] = {"node": node}
             if node.fieldname is None or node.fieldname == "":
@@ -365,10 +369,6 @@ class MVT(APIBase):
         if hasattr(request.user, "userprofile") is not True:
             models.UserProfile.objects.create(user=request.user)
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
-        resource_ids = get_restricted_instances(request.user)
-        if len(resource_ids) == 0:
-            resource_ids.append("10000000-0000-0000-0000-000000000001")  # This must have a uuid that will never be a resource id.
-        resource_ids = tuple(resource_ids)
         try:
             node = models.Node.objects.get(nodeid=nodeid, nodegroup_id__in=viewable_nodegroups)
         except models.Node.DoesNotExist:
@@ -377,6 +377,10 @@ class MVT(APIBase):
         cache_key = f"mvt_{nodeid}_{zoom}_{x}_{y}"
         tile = cache.get(cache_key)
         if tile is None:
+            resource_ids = get_restricted_instances(request.user, allresources=True)
+            if len(resource_ids) == 0:
+                resource_ids.append("10000000-0000-0000-0000-000000000001")  # This must have a uuid that will never be a resource id.
+            resource_ids = tuple(resource_ids)
             with connection.cursor() as cursor:
                 if int(zoom) <= int(config["clusterMaxZoom"]):
                     arc = self.EARTHCIRCUM / ((1 << int(zoom)) * self.PIXELSPERTILE)
