@@ -46,6 +46,7 @@ except:
     def fix_js_data(data, jsdata, model):
         return jsdata
 
+
 class Command(BaseCommand):
     """
     Command for importing JSON-LD data into Arches
@@ -91,7 +92,12 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "--strip-issearchable", default=False, action="store_true", dest="strip_search", help="If a node is set to not be exposed to advanced search, then don't even index it")
+            "--strip-issearchable",
+            default=False,
+            action="store_true",
+            dest="strip_search",
+            help="If a node is set to not be exposed to advanced search, then don't even index it",
+        )
 
     def handle(self, *args, **options):
 
@@ -113,9 +119,9 @@ class Command(BaseCommand):
 
         self.reader = JsonLdReader()
         self.jss = JSONSerializer()
-        source = options['source']
-        if options['model']:
-            models = [options['model']]
+        source = options["source"]
+        if options["model"]:
+            models = [options["model"]]
         else:
             models = os.listdir(source)
             models.sort()
@@ -125,15 +131,20 @@ class Command(BaseCommand):
         # This is boilerplate for any use of get_documents_to_index()
         # Need to add issearchable for strip_search option
         # Only calculate it once per load
-        self.datatype_factory = DataTypeFactory()      
-        if options['strip_search']:
+        self.datatype_factory = DataTypeFactory()
+        if options["strip_search"]:
             dt_instance_hash = {}
-            self.node_info = {str(nodeid): \
-                {"datatype": dt_instance_hash.setdefault(datatype, self.datatype_factory.get_instance(datatype)), 
-                 "issearchable": srch} \
-                for nodeid, datatype, srch in archesmodels.Node.objects.values_list("nodeid", "datatype", "issearchable")}        
+            self.node_info = {
+                str(nodeid): {
+                    "datatype": dt_instance_hash.setdefault(datatype, self.datatype_factory.get_instance(datatype)),
+                    "issearchable": srch,
+                }
+                for nodeid, datatype, srch in archesmodels.Node.objects.values_list("nodeid", "datatype", "issearchable")
+            }
         else:
-            self.node_datatypes = {str(nodeid): datatype for nodeid, datatype in archesmodels.Node.objects.values_list("nodeid", "datatype")}
+            self.node_datatypes = {
+                str(nodeid): datatype for nodeid, datatype in archesmodels.Node.objects.values_list("nodeid", "datatype")
+            }
 
         errh = open("error_log.txt", "w")
         start = time.time()
@@ -150,7 +161,7 @@ class Command(BaseCommand):
                     continue
             # We have a good model, so build the pre-processed tree once
             self.reader.graphtree = self.reader.process_graph(graphid)
-            block = options['block']
+            block = options["block"]
             if block and "," not in block:
                 blocks = [block]
             else:
@@ -168,22 +179,22 @@ class Command(BaseCommand):
                     files = os.listdir(f"{source}/{m}/{b}")
                     files.sort()
                     for f in files:
-                        if not f.endswith(options['suffix']):
+                        if not f.endswith(options["suffix"]):
                             continue
 
-                        if options['maxx'] > 0 and x >= options['maxx']:
+                        if options["maxx"] > 0 and x >= options["maxx"]:
                             raise StopIteration()
                         x += 1
-                        if x < options['skip']:
+                        if x < options["skip"]:
                             # Do it this way to keep the counts correct
                             continue
                         fn = f"{source}/{m}/{b}/{f}"
                         # Check file size of record
-                        if not options['quiet']:
+                        if not options["quiet"]:
                             print(f"About to import {fn}")
-                        if options['toobig']:
+                        if options["toobig"]:
                             sz = os.os.path.getsize(fn)
-                            if sz > options['toobig']:
+                            if sz > options["toobig"]:
                                 if not quiet:
                                     print(f" ... Skipping due to size:  {sz} > {options['toobig']}")
                                 continue
@@ -201,17 +212,22 @@ class Command(BaseCommand):
                             uu = jsdata["id"][-36:]
                         if jsdata:
                             try:
-                                if options['fast']:
-                                    self.fast_import_resource(uu, graphid, jsdata, n=options['fast'], 
-                                        reload=options['force'], quiet=options['quiet'], 
-                                        strip_search=options['strip_search'])
+                                if options["fast"]:
+                                    self.fast_import_resource(
+                                        uu,
+                                        graphid,
+                                        jsdata,
+                                        n=options["fast"],
+                                        reload=options["force"],
+                                        quiet=options["quiet"],
+                                        strip_search=options["strip_search"],
+                                    )
                                 else:
-                                    self.import_resource(uu, graphid, jsdata, 
-                                        reload=options['force'], quiet=options['quiet'])
+                                    self.import_resource(uu, graphid, jsdata, reload=options["force"], quiet=options["quiet"])
                             except Exception as e:
                                 errh.write(f"*** Failed to load {fn}:\n     {e}\n")
                                 errh.flush()
-                                if not options['ignore_errors']:
+                                if not options["ignore_errors"]:
                                     raise
                         else:
                             print(" ... skipped due to bad data :(")
@@ -221,9 +237,9 @@ class Command(BaseCommand):
                 break
             except:
                 raise
-        if options['fast'] and self.resources:
+        if options["fast"] and self.resources:
             self.save_resources()
-            self.index_resources(options['strip_search'])
+            self.index_resources(options["strip_search"])
             self.resources = []
         errh.close()
         print(f"duration: {x} in {time.time()-start} seconds")
@@ -290,12 +306,14 @@ class Command(BaseCommand):
                 document, terms = monkey_get_documents_to_index(resource, node_info=self.node_info)
             else:
                 document, terms = resource.get_documents_to_index(
-                    fetchTiles=False, datatype_factory=self.datatype_factory, node_datatypes=self.node_datatypes)
+                    fetchTiles=False, datatype_factory=self.datatype_factory, node_datatypes=self.node_datatypes
+                )
             documents.append(se.create_bulk_item(index="resources", id=document["resourceinstanceid"], data=document))
             for term in terms:
                 term_list.append(se.create_bulk_item(index="terms", id=term["_id"], data=term["_source"]))
         se.bulk_index(documents)
-        se.bulk_index(term_list)                
+        se.bulk_index(term_list)
+
 
 def monkey_get_documents_to_index(self, node_info):
     document = {}
@@ -328,8 +346,8 @@ def monkey_get_documents_to_index(self, node_info):
     for tile in document["tiles"]:
         for nodeid, nodevalue in tile.data.items():
             # filter out not issearchable
-            if nodevalue not in ["", [], {}, None] and node_info[nodeid]['issearchable']:
-                datatype_instance = node_info[nodeid]['datatype']
+            if nodevalue not in ["", [], {}, None] and node_info[nodeid]["issearchable"]:
+                datatype_instance = node_info[nodeid]["datatype"]
                 datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
                 node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
                 for index, term in enumerate(node_terms):
