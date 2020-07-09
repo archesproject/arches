@@ -33,8 +33,6 @@ APP_ROOT = ""
 # and run in specific cases at the discretion of the developer.
 LOAD_V3_DATA_DURING_TESTS = False
 
-SEARCH_BACKEND = "tests.base_test.TestSearchEngine"
-
 RESOURCE_GRAPH_LOCATIONS = (os.path.join(TEST_ROOT, "fixtures", "resource_graphs"),)
 
 ONTOLOGY_FIXTURES = os.path.join(TEST_ROOT, "fixtures", "ontologies", "test_ontology")

@@ -1,15 +1,20 @@
+import importlib
 import json
 import logging
 import os
 import re
 import sys
 import uuid
-import importlib
 from io import StringIO
+from oauth2_provider.views import ProtectedResourceView
+from pyld.jsonld import compact, frame, from_rdf
+from rdflib import RDF
+from rdflib.namespace import SKOS, DCTERMS
+from revproxy.views import ProxyView
+from slugify import slugify
+from urllib import parse
 from django.shortcuts import render
 from django.views.generic import View
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 from django.db import transaction, connection
 from django.db.models import Q
 from django.http import Http404, HttpResponse
@@ -17,11 +22,10 @@ from django.http.request import QueryDict
 from django.core import management
 from django.core.cache import cache
 from django.urls import reverse
-from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.core.files.base import ContentFile
-from revproxy.views import ProxyView
-from oauth2_provider.views import ProtectedResourceView
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.card import Card as CardProxyModel
@@ -29,32 +33,31 @@ from arches.app.models.graph import Graph
 from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
-from arches.app.models.tile import Tile
-from arches.app.models.tile import Tile as tile_model
+from arches.app.models.tile import Tile as TileProxyModel
+from arches.app.views.tile import TileData as TileView
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse
-from arches.app.utils.decorators import can_read_resource_instance, can_edit_resource_instance, can_read_concept
+from arches.app.utils.decorators import (
+    can_read_concept,
+    group_required
+)
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
 from arches.app.utils.permission_backend import (
-    user_can_read_resources,
-    user_can_edit_resources,
+    user_can_read_resource,
+    user_can_edit_resource,
+    user_can_delete_resource,
     user_can_read_concepts,
     user_is_resource_reviewer,
     get_restricted_instances,
     check_resource_instance_permissions,
     get_nodegroups_by_perm,
 )
-from arches.app.utils.decorators import group_required
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory
-from pyld.jsonld import compact, frame, from_rdf
-from rdflib import RDF
-from rdflib.namespace import SKOS, DCTERMS
-from slugify import slugify
-from urllib import parse
+
 from arches.celery import app
 
 logger = logging.getLogger(__name__)
@@ -301,7 +304,7 @@ class GeoJSON(APIBase):
         if limit is not None:
             start = (page - 1) * limit
             end = start + limit
-            last_page = tiles.count() < end
+            last_page = len(tiles) < end
             tiles = tiles[start:end]
         for tile in tiles:
             data = tile.data
@@ -511,7 +514,7 @@ class Resources(APIBase):
     # }]
 
     def get(self, request, resourceid=None, slug=None, graphid=None):
-        if user_can_read_resources(user=request.user, resourceid=resourceid):
+        if user_can_read_resource(user=request.user, resourceid=resourceid):
             allowed_formats = ["json", "json-ld"]
             format = request.GET.get("format", "json-ld")
             include_tiles = request.GET.get("includetiles", True)
@@ -605,7 +608,7 @@ class Resources(APIBase):
     #         indent = None
 
     #     try:
-    #         if user_can_edit_resources(user=request.user):
+    #         if user_can_edit_resource(user=request.user):
     #             data = JSONDeserializer().deserialize(request.body)
     #             reader = JsonLdReader()
     #             reader.read_resource(data, use_ids=True)
@@ -643,7 +646,7 @@ class Resources(APIBase):
         except Exception:
             indent = None
 
-        if not user_can_edit_resources(user=request.user, resourceid=resourceid):
+        if not user_can_edit_resource(user=request.user, resourceid=resourceid):
             return JSONResponse(status=403)
         else:
             with transaction.atomic():
@@ -685,7 +688,7 @@ class Resources(APIBase):
             indent = None
 
         try:
-            if user_can_edit_resources(user=request.user, resourceid=resourceid):
+            if user_can_edit_resource(user=request.user, resourceid=resourceid):
                 data = JSONDeserializer().deserialize(request.body)
                 reader = JsonLdReader()
                 if slug is not None:
@@ -715,7 +718,7 @@ class Resources(APIBase):
             return JSONResponse({"error": "resource data could not be saved: %s" % e}, status=500, reason=e)
 
     def delete(self, request, resourceid, slug=None, graphid=None):
-        if user_can_edit_resources(user=request.user, resourceid=resourceid) and user_can_delete_resources(
+        if user_can_edit_resource(user=request.user, resourceid=resourceid) and user_can_delete_resource(
             user=request.user, resourceid=resourceid
         ):
             try:
@@ -785,19 +788,6 @@ class Concepts(APIBase):
                 return JSONResponse(status=500, reason=e)
 
         return JSONResponse(ret, indent=indent)
-
-
-def get_resource_relationship_types():
-    resource_relationship_types = Concept().get_child_collections("00000000-0000-0000-0000-000000000005")
-    default_relationshiptype_valueid = None
-    for relationship_type in resource_relationship_types:
-        if relationship_type[0] == "00000000-0000-0000-0000-000000000007":
-            default_relationshiptype_valueid = relationship_type[2]
-    relationship_type_values = {
-        "values": [{"id": str(c[2]), "text": str(c[1])} for c in resource_relationship_types],
-        "default": str(default_relationshiptype_valueid),
-    }
-    return relationship_type_values
 
 
 class Card(APIBase):
@@ -916,15 +906,15 @@ class Images(APIBase):
             image_file, file_created = models.File.objects.get_or_create(pk=fileid)
             image_file.path.save(file_name, ContentFile(file_data.read()))
 
-            tile = Tile.objects.get(pk=tileid)
+            tile = TileProxyModel.objects.get(pk=tileid)
             tile_data = tile.get_tile_data(request.user.pk)
             for image in tile_data[nodeid]:
                 if image["file_id"] == fileid:
                     image["url"] = image_file.path.url
                     image["size"] = image_file.path.size
-                    # I don't really want to run all the code Tile.save(),
+                    # I don't really want to run all the code TileProxyModel.save(),
                     # so I just call it's super class
-                    super(Tile, tile).save()
+                    super(TileProxyModel, tile).save()
                     tile.index()
 
             # to use base64 use the below code
@@ -932,8 +922,8 @@ class Images(APIBase):
             # with open("foo.jpg", "w+b") as f:
             #     f.write(base64.b64decode(request.POST.get('data')))
 
-        except Tile.DoesNotExist:
-            # it's ok if the Tile doesn't exist, that just means that there is some
+        except TileProxyModel.DoesNotExist:
+            # it's ok if the TileProxyModel doesn't exist, that just means that there is some
             # latency in the updating of the db from couch
             # see process_mobile_data in the FileListDatatype for how image thumbnails get
             # pushed to the db and files saved
@@ -961,69 +951,83 @@ class IIIFManifest(APIBase):
         return response
 
 
+class OntolgyPropery(APIBase):
+    def get(self, request):
+        domain_ontology_class = request.GET.get("domain_ontology_class", None)
+        range_ontology_class = request.GET.get("range_ontology_class", None)
+        ontologyid = request.GET.get("ontologyid", "sdl")
+
+        ret = []
+        if domain_ontology_class and range_ontology_class:
+            ontology_classes = models.OntologyClass.objects.get(source=domain_ontology_class)
+            for ontologyclass in ontology_classes.target["down"]:
+                if range_ontology_class in ontologyclass["ontology_classes"]:
+                    ret.append(ontologyclass["ontology_property"])
+
+        return JSONResponse(ret)
+
+
 @method_decorator(csrf_exempt, name="dispatch")
 class Tile(APIBase):
-    def post(self, request):
-        datatype_factory = DataTypeFactory()
-        tileid = request.POST.get("tileid")
-        nodeid = request.POST.get("nodeid")
-        data = request.POST.get("data")
-        resourceid = request.POST.get("resourceinstanceid", None)
-
-        # get node model return error if not found
+    def get(self, request, tileid):
         try:
-            node = models.Node.objects.get(nodeid=nodeid)
+            tile = models.TileModel.objects.get(tileid=tileid)
         except Exception as e:
-            return JSONResponse(e)
+            return JSONResponse(str(e), status=404)
 
-        # check if user has permissions to write to node
-        user_has_perms = request.user.has_perm("write_nodegroup", node)
-
-        if user_has_perms:
-            # get datatype of node
-            try:
-                datatype = datatype_factory.get_instance(node.datatype)
-            except Exception as e:
-                return JSONResponse(e)
-
-            # filter datatype
-            data = datatype.process_api_data(data)
-
-            # update/create tile
-            new_tile = tile_model.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid)
-
-            response = JSONResponse(new_tile)
+        # filter tiles from attribute query based on user permissions
+        permitted_nodegroups = [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]
+        if str(tile.nodegroup_id) in permitted_nodegroups:
+            return JSONResponse(tile, status=200)
         else:
-            response = JSONResponse("User does not have permission to edit this node.")
+            return JSONResponse(_("Tile not found."), status=404)
 
-        return response
+    def post(self, request, tileid):
+        tileview = TileView()
+        tileview.action = "update_tile"
+        request.POST = request.POST.copy()
+        request.POST["data"] = request.body
+        return tileview.post(request)
 
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Node(APIBase):
-    def get(self, request):
+    def get(self, request, nodeid=None):
+        graph_cache = {}
+        params = request.GET.dict()
         user = request.user
-        perms = "models." + request.GET.get("perms", "read_nodegroup")
-
+        perms = "models." + params.pop("perms", "read_nodegroup")
+        params["nodeid"] = params.get("nodeid", nodeid)
+        try:
+            uuid.UUID(params["nodeid"])
+        except ValueError as e:
+            del params["nodeid"]
         # parse node attributes from params
-        datatype = request.GET.get("datatype")
-        # description=request.GET.get('description')
-        # exportable=request.GET.get('exportable')
-        # fieldname=request.GET.get('fieldname')
-        # graph_id=request.GET.get('graph_id')
-        # is_collector=request.GET.get('is_collector')
-        # isrequired=request.GET.get('isrequired')
-        # issearchable=request.GET.get('issearchable')
-        # istopnode=request.GET.get('istopnode')
-        # name=request.GET.get('name')
-        # nodegroup_id=request.GET.get('nodegroup_id')
-        # nodeid=request.GET.get('nodeid')
-        # ontologyclass=request.GET.get('ontologyclass')
-        # sortorder=request.GET.get('sortorder')
+        # datatype = params.get("datatype")
+        # description=params.get('description')
+        # exportable=params.get('exportable')
+        # fieldname=params.get('fieldname')
+        # graph_id=params.get('graph_id')
+        # is_collector=params.get('is_collector')
+        # isrequired=params.get('isrequired')
+        # issearchable=params.get('issearchable')
+        # istopnode=params.get('istopnode')
+        # name=params.get('name')
+        # nodegroup_id=params.get('nodegroup_id')
+        # nodeid=params.get('nodeid')
+        # ontologyclass=params.get('ontologyclass')
+        # sortorder=params.get('sortorder')
+
+        def graphLookup(graphid):
+            try:
+                return graph_cache[graphid]
+            except:
+                graph_cache[graphid] = Graph.objects.get(pk=node["graph_id"]).name
+                return graph_cache[graphid]
 
         # try to get nodes by attribute filter and then get nodes by passed in user perms
         try:
-            nodes = models.Node.objects.filter(datatype=datatype).values()
+            nodes = models.Node.objects.filter(**dict(params)).values()
             permitted_nodegroups = [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(user, perms)]
         except Exception as e:
             return JSONResponse(str(e), status=404)
@@ -1036,7 +1040,7 @@ class Node(APIBase):
         permitted_nodes = [node for node in nodes if str(node["nodegroup_id"]) in permitted_nodegroups]
         for node in permitted_nodes:
             try:
-                node["resourcemodelname"] = Graph.objects.get(pk=node["graph_id"]).name
+                node["resourcemodelname"] = graphLookup(node["graph_id"])
             except:
                 return JSONResponse(_("No graph found for graphid %s" % (node["graph_id"])), status=404)
 
@@ -1044,10 +1048,57 @@ class Node(APIBase):
 
 
 @method_decorator(csrf_exempt, name="dispatch")
-class Instance_Permission(APIBase):
+class InstancePermission(APIBase):
     def get(self, request):
         user = request.user
-        perms = request.GET.get("perms")
+        result = {}
         resourceinstanceid = request.GET.get("resourceinstanceid")
+        result["read"] = user_can_read_resource(user, resourceinstanceid)
+        result["edit"] = user_can_edit_resource(user, resourceinstanceid)
+        result["delete"] = user_can_delete_resource(user, resourceinstanceid)
+        return JSONResponse(result)
 
-        return JSONResponse(check_resource_instance_permissions(user, resourceinstanceid, perms))
+
+@method_decorator(csrf_exempt, name="dispatch")
+class NodeValue(APIBase):
+    def post(self, request):
+        datatype_factory = DataTypeFactory()
+        tileid = request.POST.get("tileid")
+        nodeid = request.POST.get("nodeid")
+        data = request.POST.get("data")
+        resourceid = request.POST.get("resourceinstanceid", None)
+        format = request.POST.get("format")
+        operation = request.POST.get("operation")
+
+        # get node model return error if not found
+        try:
+            node = models.Node.objects.get(nodeid=nodeid)
+        except Exception as e:
+            return JSONResponse(e, status=404)
+
+        # check if user has permissions to write to node
+        user_has_perms = request.user.has_perm("write_nodegroup", node)
+
+        if user_has_perms:
+            # get datatype of node
+            try:
+                datatype = datatype_factory.get_instance(node.datatype)
+            except Exception as e:
+                return JSONResponse(e, status=404)
+
+            # transform data to format expected by tile
+            data = datatype.transform_value_for_tile(data, format=format)
+
+            # get existing data and append new data if operation='append'
+            if operation == "append":
+                tile = models.TileModel.objects.get(tileid=tileid)
+                data = datatype.update(tile, data, nodeid, action=operation)
+
+            # update/create tile
+            new_tile = TileProxyModel.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid)
+
+            response = JSONResponse(new_tile, status=200)
+        else:
+            response = JSONResponse(_("User does not have permission to edit this node."), status=403)
+
+        return response

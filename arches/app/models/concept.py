@@ -25,7 +25,7 @@ from django.db import transaction, connection
 from django.db.models import Q
 from arches.app.models import models
 from arches.app.models.system_settings import settings
-from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.elasticsearch_dsl_builder import Term, Query, Bool, Match, Terms
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
@@ -862,7 +862,6 @@ class Concept(object):
             subconcept.index(scheme=scheme)
 
     def bulk_index(self):
-        se = SearchEngineFactory().create()
         concept_docs = []
 
         if self.nodetype == "ConceptScheme":
@@ -889,7 +888,6 @@ class Concept(object):
 
     def delete_index(self, delete_self=False):
         def delete_concept_values_index(concepts_to_delete):
-            se = SearchEngineFactory().create()
             for concept in concepts_to_delete.values():
                 query = Query(se, start=0, limit=10000)
                 term = Term(field="conceptid", term=concept.id)
@@ -1357,7 +1355,6 @@ class ConceptValue(object):
 
     def index(self, scheme=None):
         if self.category == "label":
-            se = SearchEngineFactory().create()
             data = JSONSerializer().serializeToPython(self)
             if scheme is None:
                 scheme = self.get_scheme_id()
@@ -1368,14 +1365,12 @@ class ConceptValue(object):
             se.index_data(index="concepts", body=data, idfield="id")
 
     def delete_index(self):
-        se = SearchEngineFactory().create()
         query = Query(se, start=0, limit=10000)
         term = Term(field="id", term=self.id)
         query.add_query(term)
         query.delete(index="concepts")
 
     def get_scheme_id(self):
-        se = SearchEngineFactory().create()
         result = se.search(index="concepts", id=self.id)
         if result["found"]:
             return Concept(result["top_concept"])
@@ -1393,7 +1388,6 @@ def get_preflabel_from_conceptid(conceptid, lang):
         "type": "",
         "id": "",
     }
-    se = SearchEngineFactory().create()
     query = Query(se)
     bool_query = Bool()
     bool_query.must(Match(field="type", query="prefLabel", type="phrase"))
@@ -1414,7 +1408,6 @@ def get_preflabel_from_conceptid(conceptid, lang):
 
 
 def get_valueids_from_concept_label(label, conceptid=None, lang=None):
-    se = SearchEngineFactory().create()
 
     def exact_val_match(val, conceptid=None):
         # exact term match, don't care about relevance ordering.
@@ -1441,14 +1434,12 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
 
 
 def get_concept_label_from_valueid(valueid):
-    se = SearchEngineFactory().create()
     concept_label = se.search(index="concepts", id=valueid)
     if concept_label["found"]:
         return concept_label["_source"]
 
 
 def get_preflabel_from_valueid(valueid, lang):
-    se = SearchEngineFactory().create()
     concept_label = se.search(index="concepts", id=valueid)
     if concept_label["found"]:
         return get_preflabel_from_conceptid(get_concept_label_from_valueid(valueid)["conceptid"], lang)

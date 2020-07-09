@@ -43,6 +43,8 @@ define([
             self.selected = ko.observable(false);
             self.filtered = ko.observable(false);
             self.name = ko.observable('');
+            self.description = ko.observable(null);
+            self.slug = ko.observable(null);
             self.nodeGroupId = ko.observable('');
             var datatype = ko.observable('');
             self.datatype = ko.computed({
@@ -173,6 +175,8 @@ define([
                     name: self.name,
                     datatype: self.datatype,
                     nodegroup_id: self.nodeGroupId,
+                    description: self.description,
+                    slug: self.slug,
                     ontologyclass: self.ontologyclass,
                     parentproperty: self.parentproperty,
                     config: config,
@@ -248,6 +252,8 @@ define([
             self.name(ko.unwrap(source.name));
             self.nodeGroupId(source.nodegroup_id);
             self.datatype(source.datatype);
+            self.description(source.description);
+            self.slug(source.slug);
             self.ontologyclass(source.ontologyclass);
             self.parentproperty(source.parentproperty);
             self.issearchable(source.issearchable);

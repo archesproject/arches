@@ -53,7 +53,15 @@ from arches.app.views.tile import TileData
 from arches.app.views.notifications import NotificationView
 from arches.app.views.map import MapLayerManagerView, TileserverProxyView
 from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources, MobileSurveyDesignerView
-from arches.app.views.auth import LoginView, SignupView, ConfirmSignupView, ChangePasswordView, GetClientIdView, UserProfileView
+from arches.app.views.auth import (
+    LoginView,
+    SignupView,
+    ConfirmSignupView,
+    ChangePasswordView,
+    GetClientIdView,
+    UserProfileView,
+    ServerSettingView,
+)
 from arches.app.models.system_settings import settings
 from arches.app.utils.forms import ArchesPasswordResetForm
 from arches.app.utils.forms import ArchesSetPasswordForm
@@ -74,6 +82,7 @@ urlpatterns = [
     url(r"^auth/confirm_signup$", ConfirmSignupView.as_view(), name="confirm_signup"),
     url(r"^auth/get_client_id$", GetClientIdView.as_view(), name="get_client_id"),
     url(r"^auth/user_profile$", UserProfileView.as_view(), name="user_profile"),
+    url(r"^auth/server_settings$", ServerSettingView.as_view(), name="server_settings"),
     url(r"^auth/", LoginView.as_view(), name="auth"),
     url(r"^rdm/(?P<conceptid>%s|())$" % uuid_regex, RDMView.as_view(), name="rdm"),
     url(r"^admin/reindex/resources$", ReIndexResources.as_view(), name="reindex"),
@@ -126,6 +135,7 @@ urlpatterns = [
         name="permission_manager_data",
     ),
     url(r"^graph/(?P<graphid>%s|())$" % uuid_regex, GraphManagerView.as_view(), name="graph"),
+    url(r"^graph/(?P<graphid>%s)/nodes$" % uuid_regex, GraphDataView.as_view(action="get_nodes"), name="graph_nodes"),
     url(r"^graph/(?P<graphid>%s)/append_branch$" % uuid_regex, GraphDataView.as_view(action="append_branch"), name="append_branch"),
     url(r"^graph/(?P<graphid>%s)/append_node$" % uuid_regex, GraphDataView.as_view(action="append_node"), name="append_node"),
     url(r"^graph/(?P<graphid>%s)/move_node$" % uuid_regex, GraphDataView.as_view(action="move_node"), name="move_node"),
@@ -217,9 +227,10 @@ urlpatterns = [
     url(r"^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.Resources.as_view(), name="resources_graphid"),
     url(r"^resources/(?P<slug>[-\w]+)/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources_slug"),
     url(r"^resources/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources"),
-    url(r"^api/tiles/$", api.Tile.as_view(), name="api_tiles"),
-    url(r"^api/nodes/$", api.Node.as_view(), name="api_nodes"),
-    url(r"^api/instance_permissions/$", api.Instance_Permission.as_view(), name="api_instance_permissions"),
+    url(r"^api/tiles/(?P<tileid>%s|())$" % (uuid_regex), api.Tile.as_view(), name="api_tiles"),
+    url(r"^api/nodes/(?P<nodeid>%s|())$" % (uuid_regex), api.Node.as_view(), name="api_nodes"),
+    url(r"^api/instance_permissions/$", api.InstancePermission.as_view(), name="api_instance_permissions"),
+    url(r"^api/node_value/$", api.NodeValue.as_view(), name="api_node_value"),
     url(r"^rdm/concepts/(?P<conceptid>%s|())$" % uuid_regex, api.Concepts.as_view(), name="concepts"),
     url(r"^plugins/(?P<pluginid>%s)$" % uuid_regex, PluginView.as_view(), name="plugins"),
     url(r"^plugins/(?P<slug>[-\w]+)$", PluginView.as_view(), name="plugins"),
@@ -232,6 +243,7 @@ urlpatterns = [
         name="mvt",
     ),
     url(r"^images$", api.Images.as_view(), name="images"),
+    url(r"^ontology_properties$", api.OntolgyPropery.as_view(), name="ontology_properties"),
     url(r"^tileserver/(?P<path>.*)$", TileserverProxyView.as_view()),
     url(r"^history/$", ResourceActivityStreamCollectionView.as_view(), name="as_stream_collection"),
     url(r"^history/(?P<page>[0-9]+)$", ResourceActivityStreamPageView.as_view(), name="as_stream_page"),

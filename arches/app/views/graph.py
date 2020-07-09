@@ -100,6 +100,7 @@ class GraphSettingsView(GraphBaseView):
                 "isactive",
                 "color",
                 "jsonldcontext",
+                "slug",
                 "config",
                 "template_id",
             ]:
@@ -286,16 +287,21 @@ class GraphDataView(View):
                 res.append({"ontology_property": r["ontology_property"], "ontology_classes": [c for c in r["ontology_classes"]]})
             return JSONResponse(res)
 
-        else:
-            if self.action == "get_related_nodes":
-                parent_nodeid = request.GET.get("parent_nodeid", None)
-                graph = Graph.objects.get(graphid=graphid)
-                ret = graph.get_valid_ontology_classes(nodeid=nodeid, parent_nodeid=parent_nodeid)
-            elif self.action == "get_valid_domain_nodes":
-                graph = Graph.objects.get(graphid=graphid)
-                if nodeid == "":
-                    nodeid = None
-                ret = graph.get_valid_domain_ontology_classes(nodeid=nodeid)
+        elif self.action == "get_nodes":
+            graph = Graph.objects.get(graphid=graphid)
+            return JSONResponse(graph.nodes)
+
+        elif self.action == "get_related_nodes":
+            parent_nodeid = request.GET.get("parent_nodeid", None)
+            graph = Graph.objects.get(graphid=graphid)
+            ret = graph.get_valid_ontology_classes(nodeid=nodeid, parent_nodeid=parent_nodeid)
+            return JSONResponse(ret)
+
+        elif self.action == "get_valid_domain_nodes":
+            graph = Graph.objects.get(graphid=graphid)
+            if nodeid == "":
+                nodeid = None
+            ret = graph.get_valid_domain_ontology_classes(nodeid=nodeid)
             return JSONResponse(ret)
 
         return HttpResponseNotFound()
@@ -320,8 +326,10 @@ class GraphDataView(View):
                     ret = Graph.new(name=name, is_resource=isresource, author=author)
 
                 elif self.action == "update_node":
+                    old_node_data = graph.nodes.get(uuid.UUID(data["nodeid"]))
+                    nodegroup_changed = str(old_node_data.nodegroup_id) != data["nodegroup_id"]
                     updated_values = graph.update_node(data)
-                    if "nodeid" in data:
+                    if "nodeid" in data and nodegroup_changed is False:
                         graph.save(nodeid=data["nodeid"])
                     else:
                         graph.save()
@@ -354,12 +362,14 @@ class GraphDataView(View):
 
                 elif self.action == "export_branch":
                     clone_data = graph.copy(root=data)
+                    clone_data["copy"].slug = None
                     clone_data["copy"].save()
                     ret = {"success": True, "graphid": clone_data["copy"].pk}
 
                 elif self.action == "clone_graph":
                     clone_data = graph.copy()
                     ret = clone_data["copy"]
+                    ret.slug = None
                     ret.save()
                     ret.copy_functions(graph, [clone_data["nodes"], clone_data["nodegroups"]])
 

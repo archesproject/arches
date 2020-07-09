@@ -31,12 +31,9 @@ from arches.app.models.tile import Tile
 from arches.app.models.models import DDataType
 from arches.app.models.models import ResourceInstance
 from arches.app.models.models import FunctionXGraph
-from arches.app.models.models import ResourceXResource
 from arches.app.models.models import NodeGroup
-from arches.app.models.models import ResourceXResource
 from arches.app.models.models import Concept
 from arches.app.models.models import Value
-from arches.app.models.models import ResourceXResource
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer

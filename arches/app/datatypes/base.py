@@ -26,12 +26,19 @@ class BaseDataType(object):
     def values_match(self, value1, value2):
         return value1 == value2
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value, **kwargs):
         """
         Transforms values from probably string/wkt representation to specified
         datatype in arches
         """
         return value
+
+    def update(self, tile, data, nodeid, action):
+        """
+        Updates the tile.data value of a given datatype and returns the updated
+        value
+        """
+        pass
 
     def transform_export_values(self, value, *args, **kwargs):
         """
@@ -51,12 +58,6 @@ class BaseDataType(object):
         Transforms data from a mobile device to an Arches friendly format
         """
         return None
-
-    def process_api_data(self, value):
-        """
-        Transforms data from an api request
-        """
-        return value
 
     def get_map_layer(self, node=None):
         """
@@ -199,6 +200,13 @@ class BaseDataType(object):
         """
         pass
 
+    def pre_tile_save(self, tile, nodeid):
+        """
+        Called during tile.save operation but before the tile is actually saved to the database
+
+        """
+        pass
+
     def is_a_literal_in_rdf(self):
         """
         Convenience method to determine whether or not this datatype's `to_rdf` method will express
@@ -293,3 +301,6 @@ class BaseDataType(object):
         if default_mapping:
             ret = {"properties": {"tiles": {"type": "nested", "properties": {"data": {"properties": {str(nodeid): default_mapping}}},}}}
         return ret
+
+    def disambiguate(self, value):
+        return value

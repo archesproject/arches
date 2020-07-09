@@ -776,8 +776,12 @@
                 },
                 {
                     "config": {
-                        "graphid": [
-                            "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71"
+                        "graphs": [
+                            {
+                                "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
+                                "ontologyProperty": "",
+                                "inverseOntologyProperty": ""
+                            }
                         ]
                     },
                     "datatype": "resource-instance",
@@ -796,8 +800,12 @@
                 },
                 {
                     "config": {
-                        "graphid": [
-                            "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71"
+                        "graphs": [
+                            {
+                                "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
+                                "ontologyProperty": "",
+                                "inverseOntologyProperty": ""
+                            }
                         ]
                     },
                     "datatype": "resource-instance-list",
@@ -816,8 +824,12 @@
                 },
                 {
                     "config": {
-                        "graphid": [
-                            "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71"
+                        "graphs": [
+                            {
+                                "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
+                                "ontologyProperty": "",
+                                "inverseOntologyProperty": ""
+                            }
                         ]
                     },
                     "datatype": "resource-instance-list",
@@ -872,8 +884,12 @@
                 },
                 {
                     "config": {
-                        "graphid": [
-                            "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71"
+                        "graphs": [
+                            {
+                                "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
+                                "ontologyProperty": "",
+                                "inverseOntologyProperty": ""
+                            }
                         ]
                     },
                     "datatype": "resource-instance-list",
@@ -892,8 +908,12 @@
                 },
                 {
                     "config": {
-                        "graphid": [
-                            "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71"
+                        "graphs": [
+                            {
+                                "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
+                                "ontologyProperty": "",
+                                "inverseOntologyProperty": ""
+                            }
                         ]
                     },
                     "datatype": "resource-instance",
@@ -912,8 +932,12 @@
                 },
                 {
                     "config": {
-                        "graphid": [
-                            "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71"
+                        "graphs": [
+                            {
+                                "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
+                                "ontologyProperty": "",
+                                "inverseOntologyProperty": ""
+                            }
                         ]
                     },
                     "datatype": "resource-instance-list",
@@ -932,8 +956,12 @@
                 },
                 {
                     "config": {
-                        "graphid": [
-                            "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71"
+                        "graphs": [
+                            {
+                                "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
+                                "ontologyProperty": "",
+                                "inverseOntologyProperty": ""
+                            }
                         ]
                     },
                     "datatype": "resource-instance",

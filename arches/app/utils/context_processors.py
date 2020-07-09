@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import json
 from arches import __version__
+from arches.app.models.models import GroupMapSettings
 from arches.app.models.system_settings import settings
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -35,13 +36,23 @@ def map_info(request):
     else:
         hex_bin_bounds = (0, 0, 1, 1)
         default_center = {"coordinates": [6.602384, 0.245926]}  # an island off the coast of Africa
+    query = GroupMapSettings.objects.filter(group=request.user.groups.all()[0])
+    if query.exists():
+        group_map_settings = query.first()
+        min_zoom = group_map_settings.min_zoom
+        max_zoom = group_map_settings.max_zoom
+        default_zoom = group_map_settings.default_zoom
+    else:
+        min_zoom = settings.MAP_MIN_ZOOM
+        max_zoom = settings.MAP_MAX_ZOOM
+        default_zoom = settings.DEFAULT_MAP_ZOOM
     return {
         "map_info": {
             "x": default_center["coordinates"][0],
             "y": default_center["coordinates"][1],
-            "zoom": settings.DEFAULT_MAP_ZOOM,
-            "map_min_zoom": settings.MAP_MIN_ZOOM,
-            "map_max_zoom": settings.MAP_MAX_ZOOM,
+            "zoom": default_zoom,
+            "map_min_zoom": min_zoom,
+            "map_max_zoom": max_zoom,
             "mapbox_api_key": settings.MAPBOX_API_KEY,
             "hex_bin_size": settings.HEX_BIN_SIZE if settings.HEX_BIN_SIZE is not None else 100,
             "mapbox_sprites": settings.MAPBOX_SPRITES,
