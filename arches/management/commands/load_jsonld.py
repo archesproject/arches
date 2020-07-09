@@ -26,26 +26,25 @@ from django.db import transaction
 from arches.app.models.resource import Resource
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
 from arches.app.models.models import TileModel
-import arches.app.utils.index_database as index_database
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.search.search_engine_factory import SearchEngineFactory
-
+from arches.app.search.search_engine_factory import SearchEngineInstance
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.models.system_settings import settings
-import elasticsearch
 
 
+# This is a map of graph directory name to graph UUID
 try:
     graph_uuid_map = settings.MODEL_NAME_UUID_MAP
 except:
     graph_uuid_map = {}
 
+# This is a function that will mutate the data before being loaded
 try:
     fix_js_data = settings.JSON_LD_FIX_DATA_FUNCTION
 except:
 
     def fix_js_data(data, jsdata, model):
         return jsdata
-
 
 class Command(BaseCommand):
     """
@@ -75,7 +74,7 @@ class Command(BaseCommand):
             help="the name of the block in the model path to load (eg 00), or slice in the form this,total (eg 1,5)",
         )
 
-        parser.add_argument("--max", default=-1, type=int, action="store", dest="max", help="Maximum number of records to load per model")
+        parser.add_argument("--max", default=-1, type=int, action="store", dest="maxx", help="Maximum number of records to load per model")
 
         parser.add_argument("--fast", default=0, action="store", type=int, dest="fast", help="Use bulk_save to store n records at a time")
 
@@ -91,6 +90,9 @@ class Command(BaseCommand):
             "--ignore-errors", default=False, action="store_true", dest="ignore_errors", help="Log but do not terminate on errors"
         )
 
+        parser.add_argument(
+            "--strip-issearchable", default=False, action="store_true", dest="strip_search", help="If a node is set to not be exposed to advanced search, then don't even index it")
+
     def handle(self, *args, **options):
 
         print("Starting JSON-LD load")
@@ -105,201 +107,150 @@ class Command(BaseCommand):
         if options["quiet"]:
             print("Only announcing timing data")
         self.resources = []
-        self.load_resources(
-            source=options["source"],
-            force=options["force"],
-            model=options["model"],
-            block=options["block"],
-            maxx=options["max"],
-            toobig=options["toobig"],
-            fast=options["fast"],
-            quiet=options["quiet"],
-            skip=options["skip"],
-            suffix=options["suffix"],
-            ignore_errors=options["ignore_errors"],
-        )
+        self.load_resources(options)
 
-    def load_resources(self, source, force, model, block, maxx, toobig, fast, quiet, skip, suffix, ignore_errors):
+    def load_resources(self, options):
 
         self.reader = JsonLdReader()
-
-        if model:
-            models = [model]
+        self.jss = JSONSerializer()
+        source = options['source']
+        if options['model']:
+            models = [options['model']]
         else:
             models = os.listdir(source)
             models.sort()
             models = [m for m in models if m[0] not in ["_", "."]]
+        print(f"Found possible models: {models}")
 
-        print(f"Found models: {models}")
-
-        self.searchengine_factory = SearchEngineFactory().create()
-        self.datatype_factory = DataTypeFactory()
-        self.node_datatypes = {str(nodeid): datatype for nodeid, datatype in archesmodels.Node.objects.values_list("nodeid", "datatype")}
+        # This is boilerplate for any use of get_documents_to_index()
+        # Need to add issearchable for strip_search option
+        # Only calculate it once per load
+        self.datatype_factory = DataTypeFactory()      
+        if options['strip_search']:
+            dt_instance_hash = {}
+            self.node_info = {str(nodeid): \
+                {"datatype": dt_instance_hash.setdefault(datatype, self.datatype_factory.get_instance(datatype)), 
+                 "issearchable": srch} \
+                for nodeid, datatype, srch in archesmodels.Node.objects.values_list("nodeid", "datatype", "issearchable")}        
+        else:
+            self.node_datatypes = {str(nodeid): datatype for nodeid, datatype in archesmodels.Node.objects.values_list("nodeid", "datatype")}
 
         errh = open("error_log.txt", "w")
         start = time.time()
         x = 0
         for m in models:
             print(f"Loading {m}")
-            if len(m) == 36:
-                # a UUID, likely from the command line
-                graphid = m
-            else:
-                # Check settings
-                graphid = graph_uuid_map.get(m, None)
-                if not graphid:
-                    # Check slug
-                    try:
-                        graphid = archesmodels.GraphModel.objects.get(slug=m).pk
-                    except:
-                        print(f"Couldn't find a model definition for {m}; skipping")
-                        continue
-
-                # We have a good model, so build the pre-processed tree once
-                self.reader.graphtree = self.reader.process_graph(graphid)
-                if block and "," not in block:
-                    blocks = [block]
-                else:
-                    blocks = os.listdir(f"{source}/{m}")
-                    blocks.sort()
-                    if "," in block:
-                        # {slice},{max-slices}
-                        (cslice, mslice) = block.split(",")
-                        cslice = int(cslice) - 1
-                        mslice = int(mslice)
-                        blocks = blocks[cslice::mslice]
-
-                x = 0
+            graphid = graph_uuid_map.get(m, None)
+            if not graphid:
+                # Check slug
                 try:
-                    for b in blocks:
-                        files = os.listdir(f"{source}/{m}/{b}")
-                        files.sort()
-                        for f in files:
-                            if not f.endswith(suffix):
-                                continue
-
-                            if maxx > 0 and x >= maxx:
-                                raise StopIteration()
-                            x += 1
-                            if x < skip:
-                                # Do it this way to keep the counts correct
-                                continue
-                            fn = f"{source}/{m}/{b}/{f}"
-                            # Check file size of record
-                            if not quiet:
-                                print(f"About to import {fn}")
-                            if toobig:
-                                sz = os.os.path.getsize(fn)
-                                if sz > toobig:
-                                    if not quiet:
-                                        print(f" ... Skipping due to size:  {sz} > {toobig}")
-                                    continue
-                            uu = f.replace(f".{suffix}", "")
-                            fh = open(fn)
-                            data = fh.read()
-                            fh.close()
-                            data = data.replace("T00:00:00Z", "")
-                            jsdata = json.loads(data)
-                            jsdata = fix_js_data(data, jsdata, m)
-                            if len(uu) != 36 or uu[8] != "-":
-                                # extract uuid from data
-                                uu = jsdata["id"][-36:]
-                            if jsdata:
-                                # Just keep trying if ES times out :(
-                                okay = False
-                                while not okay:
-                                    try:
-                                        if fast:
-                                            self.fast_import_resource(uu, graphid, jsdata, n=fast, reload=force, quiet=quiet)
-                                        else:
-                                            self.import_resource(uu, graphid, jsdata, reload=force, quiet=quiet)
-                                        okay = True
-                                    except elasticsearch.exceptions.ConnectionTimeout:
-                                        # Try again, so do not set okay
-                                        errh.write("*** Elasticsearch Timeout Exception ***\n")
-                                        errh.flush()
-                                        pass
-                                    except Exception as e:
-                                        errh.write(f"*** Failed to load {fn}:\n     {e}\n")
-                                        errh.flush()
-                                        if not ignore_errors:
-                                            raise
-                                        okay = True
-                            else:
-                                print(" ... skipped due to bad data :(")
-                            if not x % 100:
-                                print(f" ... {x} in {time.time()-start}")
-                except StopIteration as e:
-                    break
+                    graphid = archesmodels.GraphModel.objects.get(slug=m).pk
                 except:
-                    raise
-        if fast and self.resources:
-            self.save_resources()
-            self.index_resources()
-            self.resources = []
-        # if 0:
-        #    # This should index the whole thing in ES
-        #    index_database.index_resources(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
+                    print(f"Couldn't find a model definition for {m}; skipping")
+                    continue
+            # We have a good model, so build the pre-processed tree once
+            self.reader.graphtree = self.reader.process_graph(graphid)
+            block = options['block']
+            if block and "," not in block:
+                blocks = [block]
+            else:
+                blocks = os.listdir(f"{source}/{m}")
+                blocks.sort()
+                if "," in block:
+                    # {slice},{max-slices}
+                    (cslice, mslice) = block.split(",")
+                    cslice = int(cslice) - 1
+                    mslice = int(mslice)
+                    blocks = blocks[cslice::mslice]
+            x = 0
+            try:
+                for b in blocks:
+                    files = os.listdir(f"{source}/{m}/{b}")
+                    files.sort()
+                    for f in files:
+                        if not f.endswith(options['suffix']):
+                            continue
 
+                        if options['maxx'] > 0 and x >= options['maxx']:
+                            raise StopIteration()
+                        x += 1
+                        if x < options['skip']:
+                            # Do it this way to keep the counts correct
+                            continue
+                        fn = f"{source}/{m}/{b}/{f}"
+                        # Check file size of record
+                        if not options['quiet']:
+                            print(f"About to import {fn}")
+                        if options['toobig']:
+                            sz = os.os.path.getsize(fn)
+                            if sz > options['toobig']:
+                                if not quiet:
+                                    print(f" ... Skipping due to size:  {sz} > {options['toobig']}")
+                                continue
+                        uu = f.replace(f".{options['suffix']}", "")
+                        fh = open(fn)
+                        data = fh.read()
+                        fh.close()
+                        # FIXME Timezone / DateTime Workaround
+                        # FIXME The following line should be removed when #5669 / #6346 are closed
+                        data = data.replace("T00:00:00Z", "")
+                        jsdata = json.loads(data)
+                        jsdata = fix_js_data(data, jsdata, m)
+                        if len(uu) != 36 or uu[8] != "-":
+                            # extract uuid from data if filename is not a UUID
+                            uu = jsdata["id"][-36:]
+                        if jsdata:
+                            try:
+                                if options['fast']:
+                                    self.fast_import_resource(uu, graphid, jsdata, n=options['fast'], 
+                                        reload=options['force'], quiet=options['quiet'], 
+                                        strip_search=options['strip_search'])
+                                else:
+                                    self.import_resource(uu, graphid, jsdata, 
+                                        reload=options['force'], quiet=options['quiet'])
+                            except Exception as e:
+                                errh.write(f"*** Failed to load {fn}:\n     {e}\n")
+                                errh.flush()
+                                if not options['ignore_errors']:
+                                    raise
+                        else:
+                            print(" ... skipped due to bad data :(")
+                        if not x % 100:
+                            print(f" ... {x} in {time.time()-start}")
+            except StopIteration as e:
+                break
+            except:
+                raise
+        if options['fast'] and self.resources:
+            self.save_resources()
+            self.index_resources(options['strip_search'])
+            self.resources = []
         errh.close()
         print(f"duration: {x} in {time.time()-start} seconds")
 
-    def save_resources(self):
-        tiles = []
-        for resource in self.resources:
-            resource.tiles = resource.get_flattened_tiles()
-            tiles.extend(resource.tiles)
-
-        Resource.objects.bulk_create(self.resources)
-        TileModel.objects.bulk_create(tiles)
-
-        for resource in self.resources:
-            resource.save_edit(edit_type="create")
-
-    def index_resources(self):
-
-        se = self.searchengine_factory
-        documents = []
-        term_list = []
-
-        for resource in self.resources:
-            document, terms = resource.get_documents_to_index(
-                fetchTiles=False, datatype_factory=self.datatype_factory, node_datatypes=self.node_datatypes
-            )
-            documents.append(se.create_bulk_item(index="resources", id=document["resourceinstanceid"], data=document))
-            for term in terms:
-                term_list.append(se.create_bulk_item(index="terms", id=term["_id"], data=term["_source"]))
-        se.bulk_index(documents)
-        se.bulk_index(term_list)
-
-    def fast_import_resource(self, resourceid, graphid, data, n=1000, reload=False, quiet=True):
-
-        if not reload:
-            try:
-                resource_instance = Resource.objects.get(pk=resourceid)
-                if not reload:
-                    if not quiet:
-                        print(f" ... already loaded")
-                    return
-                else:
-                    resource_instance.delete()
-            except archesmodels.ResourceInstance.DoesNotExist:
-                # thrown by get when resource doesn't exist
-                pass
-
+    def fast_import_resource(self, resourceid, graphid, data, n=1000, reload=False, quiet=True, strip_search=False):
+        try:
+            resource_instance = Resource.objects.get(pk=resourceid)
+            if not reload:
+                if not quiet:
+                    print(f" ... already loaded")
+                return
+            else:
+                resource_instance.delete()
+        except archesmodels.ResourceInstance.DoesNotExist:
+            # thrown when resource doesn't exist
+            pass
         try:
             self.reader.read_resource(data, resourceid=resourceid, graphid=graphid)
             self.resources.extend(self.reader.resources)
         except Exception as e:
             raise
-
         if len(self.resources) >= n:
             self.save_resources()
-            self.index_resources()
+            self.index_resources(strip_search)
             self.resources = []
 
     def import_resource(self, resourceid, graphid, data, reload=False, quiet=False):
-
         with transaction.atomic():
             try:
                 resource_instance = Resource.objects.get(pk=resourceid)
@@ -309,7 +260,7 @@ class Command(BaseCommand):
                 else:
                     resource_instance.delete()
             except archesmodels.ResourceInstance.DoesNotExist:
-                # thrown by get when resource doesn't exist
+                # thrown when resource doesn't exist
                 pass
             try:
                 self.reader.read_resource(data, resourceid=resourceid, graphid=graphid)
@@ -319,3 +270,80 @@ class Command(BaseCommand):
                 print(f"*** Could not find model: {graphid}")
             except Exception as e:
                 raise
+
+    def save_resources(self):
+        tiles = []
+        for resource in self.resources:
+            resource.tiles = resource.get_flattened_tiles()
+            tiles.extend(resource.tiles)
+        Resource.objects.bulk_create(self.resources)
+        TileModel.objects.bulk_create(tiles)
+        for resource in self.resources:
+            resource.save_edit(edit_type="create")
+
+    def index_resources(self, strip_search=False):
+        se = SearchEngineInstance
+        documents = []
+        term_list = []
+        for resource in self.resources:
+            if strip_search:
+                document, terms = monkey_get_documents_to_index(resource, node_info=self.node_info)
+            else:
+                document, terms = resource.get_documents_to_index(
+                    fetchTiles=False, datatype_factory=self.datatype_factory, node_datatypes=self.node_datatypes)
+            documents.append(se.create_bulk_item(index="resources", id=document["resourceinstanceid"], data=document))
+            for term in terms:
+                term_list.append(se.create_bulk_item(index="terms", id=term["_id"], data=term["_source"]))
+        se.bulk_index(documents)
+        se.bulk_index(term_list)                
+
+def monkey_get_documents_to_index(self, node_info):
+    document = {}
+    document["displaydescription"] = None
+    document["resourceinstanceid"] = str(self.resourceinstanceid)
+    document["graph_id"] = str(self.graph_id)
+    document["map_popup"] = None
+    document["displayname"] = None
+    document["root_ontology_class"] = self.get_root_ontology()
+    document["legacyid"] = self.legacyid
+    document["displayname"] = self.displayname
+    document["displaydescription"] = self.displaydescription
+    document["map_popup"] = self.map_popup
+    document["tiles"] = self.tiles
+    document["permissions"] = {"users_without_read_perm": []}
+    document["permissions"]["users_without_edit_perm"] = []
+    document["permissions"]["users_without_delete_perm"] = []
+    document["permissions"]["users_with_no_access"] = []
+    document["strings"] = []
+    document["dates"] = []
+    document["domains"] = []
+    document["geometries"] = []
+    document["points"] = []
+    document["numbers"] = []
+    document["date_ranges"] = []
+    document["ids"] = []
+    document["provisional_resource"] = "false"
+
+    terms = []
+    for tile in document["tiles"]:
+        for nodeid, nodevalue in tile.data.items():
+            # filter out not issearchable
+            if nodevalue not in ["", [], {}, None] and node_info[nodeid]['issearchable']:
+                datatype_instance = node_info[nodeid]['datatype']
+                datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
+                node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
+                for index, term in enumerate(node_terms):
+                    terms.append(
+                        {
+                            "_id": f"{nodeid}{tile.tileid}{index}",
+                            "_source": {
+                                "value": term,
+                                "nodeid": nodeid,
+                                "nodegroupid": tile.nodegroup_id,
+                                "tileid": tile.tileid,
+                                "resourceinstanceid": tile.resourceinstance_id,
+                                "provisional": False,
+                            },
+                        }
+                    )
+    return document, terms
