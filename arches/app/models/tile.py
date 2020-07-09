@@ -335,7 +335,6 @@ class Tile(models.TileModel):
                 node = models.Node.objects.get(nodeid=nodeid)
                 datatype = datatype_factory.get_instance(node.datatype)
                 datatype.pre_tile_save(self, nodeid)
-
             self.__preSave(request)
             self.check_for_missing_nodes(request)
             self.check_for_constraint_violation(request)
@@ -573,7 +572,7 @@ class Tile(models.TileModel):
         try:
             for function in self._getFunctionClassInstances():
                 try:
-                    function.postSave(self, request)
+                    function.post_save(self, request)
                 except NotImplementedError:
                     pass
         except TypeError as e:

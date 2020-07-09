@@ -33,6 +33,13 @@ class BaseDataType(object):
         """
         return value
 
+    def update(self, tile, data, nodeid, action):
+        """
+        Updates the tile.data value of a given datatype and returns the updated
+        value
+        """
+        pass
+
     def transform_export_values(self, value, *args, **kwargs):
         """
         Transforms values from probably string/wkt representation to specified
@@ -51,12 +58,6 @@ class BaseDataType(object):
         Transforms data from a mobile device to an Arches friendly format
         """
         return None
-
-    def process_api_data(self, value):
-        """
-        Transforms data from an api request
-        """
-        return value
 
     def get_map_layer(self, node=None):
         """

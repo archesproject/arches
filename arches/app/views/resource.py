@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import json
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.models import User, Group, Permission
 from django.db import transaction
 from django.forms.models import model_to_dict
@@ -44,7 +44,12 @@ from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_delete_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.permission_backend import user_is_resource_reviewer, user_can_delete_resources
+from arches.app.utils.permission_backend import (
+    user_is_resource_reviewer,
+    user_can_delete_resource,
+    user_can_edit_resource,
+    user_can_read_resource,
+)
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
@@ -127,7 +132,6 @@ class ResourceEditorView(MapBaseManagerView):
 
         creator = None
         user_created_instance = None
-
         if resourceid is None:
             resource_instance = None
             graph = models.GraphModel.objects.get(pk=graphid)
@@ -218,7 +222,7 @@ class ResourceEditorView(MapBaseManagerView):
             card["is_writable"] = False
             if str(card["nodegroup_id"]) in editable_nodegroup_ids:
                 card["is_writable"] = True
-        user_can_delete_resource = user_can_delete_resources(request.user, resourceid)
+        can_delete = user_can_delete_resource(request.user, resourceid)
         context = self.get_context_data(
             main_script=main_script,
             resourceid=resourceid,
@@ -245,7 +249,7 @@ class ResourceEditorView(MapBaseManagerView):
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             user_is_reviewer=json.dumps(user_is_reviewer),
-            user_can_delete_resource=user_can_delete_resource,
+            user_can_delete_resource=can_delete,
             creator=json.dumps(creator),
             user_created_instance=json.dumps(user_created_instance),
             report_templates=templates,
@@ -263,20 +267,29 @@ class ResourceEditorView(MapBaseManagerView):
 
         return render(request, view_template, context)
 
-    @method_decorator(can_delete_resource_instance, name="dispatch")
     def delete(self, request, resourceid=None):
-        if resourceid is not None:
-            ret = Resource.objects.get(pk=resourceid)
-            try:
-                deleted = ret.delete(user=request.user)
-            except ModelInactiveError as e:
-                message = _("Unable to delete. Please verify the model status is active")
-                return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
-            if deleted is True:
-                return JSONResponse(ret)
-            else:
-                return JSONErrorResponse("Unable to Delete Resource", "Provisional users cannot delete resources with authoritative data")
-        return HttpResponseNotFound()
+        delete_error = _("Unable to Delete Resource")
+        delete_msg = _("User does not have permissions to delete this instance because the instance or its data is restricted")
+        try:
+            if resourceid is not None:
+                if user_can_delete_resource(request.user, resourceid) is False:
+                    return JSONErrorResponse(delete_error, delete_msg)
+                ret = Resource.objects.get(pk=resourceid)
+                try:
+                    deleted = ret.delete(user=request.user)
+                except ModelInactiveError as e:
+                    message = _("Unable to delete. Please verify the model status is active")
+                    return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
+                except PermissionDenied:
+                    return JSONErrorResponse(delete_error, delete_msg)
+                if deleted is True:
+                    return JSONResponse(ret)
+                else:
+                    return JSONErrorResponse(delete_error, delete_msg)
+            return HttpResponseNotFound()
+        except PermissionDenied:
+            return JSONErrorResponse(delete_error, delete_msg)
+
 
     def copy(self, request, resourceid=None):
         resource_instance = Resource.objects.get(pk=resourceid)

@@ -25,6 +25,8 @@ define([
                 this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
                 this.isEditable = true;
                 this.graphIsSemantic = !!params.graph.get('ontology_id');
+                this.rootOntologyClass = params.graph.get('root').ontologyclass();
+                this.graphName = params.graph.get('root').name();
                 if (params.graph) {
                     var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId();});
                     if (cards.length) {

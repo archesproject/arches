@@ -5,8 +5,6 @@ import uuid
 import datetime
 from django.db.models import Q
 from django.db import migrations, models
-from arches.app.search.search_engine_factory import SearchEngineFactory
-
 
 def setup(apps):
     nodes = apps.get_model("models", "Node")

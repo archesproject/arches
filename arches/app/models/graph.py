@@ -516,6 +516,8 @@ class Graph(models.GraphModel):
         if skip_validation or self.can_append(branch_graph, nodeToAppendTo):
             branch_copy = branch_graph.copy()["copy"]
             branch_copy.root.istopnode = False
+            # Copy the description of the branch to the new node
+            branch_copy.root.description = branch_graph.description
 
             newEdge = models.Edge(domainnode=nodeToAppendTo, rangenode=branch_copy.root, ontologyproperty=property, graph=self)
             branch_copy.add_edge(newEdge)
@@ -1449,6 +1451,11 @@ class Graph(models.GraphModel):
             out = compact({}, context)
         except JsonLdError:
             raise GraphValidationError(_("The json-ld context you supplied wasn't formatted correctly."), 1006)
+
+        if self.slug is not None:
+            graphs_with_matching_slug = models.GraphModel.objects.exclude(slug__isnull=True).filter(slug=self.slug)
+            if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
+                raise GraphValidationError(_(f"Another resource modal already uses the slug '{self.slug}'"), 1007)
 
 
 class GraphValidationError(Exception):
