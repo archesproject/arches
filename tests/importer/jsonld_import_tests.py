@@ -1055,8 +1055,6 @@ class JsonLDImportTests(ArchesTestCase):
 
         # TODO - more asserts to make sure data is saved correctly
 
-
-
     def test_g_6235_parenttile(self):
 
         data = """
@@ -1098,8 +1096,7 @@ class JsonLDImportTests(ArchesTestCase):
 
         # And validate that all three of E52, E33 and E41 are there
 
-        prod = js['http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by']
+        prod = js["http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by"]
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by" in prod)
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span" in prod)
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by" in prod)
-
