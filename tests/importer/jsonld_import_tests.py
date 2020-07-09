@@ -1059,26 +1059,26 @@ class JsonLDImportTests(ArchesTestCase):
 
         data = """
 {
-  "@id": "http://localhost:8000/resources/05f314d0-7a7b-4408-8d9b-f0b61f1fb27d", 
-  "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object", 
+  "@id": "http://localhost:8000/resources/05f314d0-7a7b-4408-8d9b-f0b61f1fb27d",
+  "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
   "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by": {
-    "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production", 
+    "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
     "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by": {
-      "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
+      "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation",
       "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "a"
-    }, 
+    },
     "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": {
-      "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
+      "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span",
       "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
         "@type": "http://www.w3.org/2001/XMLSchema#dateTime", "@value": "2020-07-08"}
-      }, 
+      },
     "http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by": {
-      "@type": "http://www.cidoc-crm.org/cidoc-crm/E33_Linguistic_Object", 
+      "@type": "http://www.cidoc-crm.org/cidoc-crm/E33_Linguistic_Object",
       "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "b"
     }
-  }, 
+  },
   "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by": {
-    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
+    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation",
     "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "test 1"
   }
 }
