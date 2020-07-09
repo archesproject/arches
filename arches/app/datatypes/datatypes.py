@@ -1784,7 +1784,7 @@ class ResourceInstanceDataType(BaseDataType):
         m = p.search(res_inst_uri)
         if m is not None:
             # return m.groupdict()["r"]
-            return [{"resourceId": m.groupdict()["r"], "ontologyProperty": "", "inverseOntologyProperty": "", "resourceXresourceId": "",}]
+            return [{"resourceId": m.groupdict()["r"], "ontologyProperty": "", "inverseOntologyProperty": "", "resourceXresourceId": ""}]
 
     def ignore_keys(self):
         return ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]
