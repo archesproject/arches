@@ -378,9 +378,6 @@ class MVT(APIBase):
         tile = cache.get(cache_key)
         if tile is None:
             with connection.cursor() as cursor:
-                # TODO: when we upgrade to PostGIS 3, we can get feature state
-                # working by adding the feature_id_name arg:
-                # https://github.com/postgis/postgis/pull/303
                 if int(zoom) <= int(config["clusterMaxZoom"]):
                     arc = self.EARTHCIRCUM / ((1 << int(zoom)) * self.PIXELSPERTILE)
                     distance = arc * int(config["clusterDistance"])
