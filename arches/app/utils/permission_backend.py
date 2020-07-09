@@ -89,8 +89,14 @@ def get_restricted_instances(user, search_engine=None, allresources=False):
         return []
 
     if allresources is True:
-        restricted_group_instances = {perm['object_pk'] for perm in GroupObjectPermission.objects.filter(permission__codename='no_access_to_resourceinstance').values('object_pk')}
-        restricted_user_instances = {perm['object_pk'] for perm in UserObjectPermission.objects.filter(permission__codename='no_access_to_resourceinstance').values('object_pk')}
+        restricted_group_instances = {
+            perm["object_pk"]
+            for perm in GroupObjectPermission.objects.filter(permission__codename="no_access_to_resourceinstance").values("object_pk")
+        }
+        restricted_user_instances = {
+            perm["object_pk"]
+            for perm in UserObjectPermission.objects.filter(permission__codename="no_access_to_resourceinstance").values("object_pk")
+        }
         all_restricted_instances = list(restricted_group_instances | restricted_user_instances)
         return all_restricted_instances
     else:
