@@ -265,7 +265,10 @@ class DateDataType(BaseDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
         if value is not None:
-            date_formats = ["-%Y", "%Y", "%Y-%m-%d", "%B-%m-%d", "%Y-%m-%d %H:%M:%S"]
+            if hasattr(settings, "DATE_FORMATS"):
+                date_formats = settings.DATE_FORMATS["Python"]
+            else:
+                date_formats = ["-%Y", "%Y", "%Y-%m", "%Y-%m-%d", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S.%f%z"]
             valid = False
             for mat in date_formats:
                 if valid == False:
@@ -357,7 +360,14 @@ class DateDataType(BaseDataType):
             pass
 
     def default_es_mapping(self):
-        return {"type": "date"}
+        if hasattr(settings, "DATE_FORMATS"):
+            es_date_formats = "||".join(settings.DATE_FORMATS["Elasticsearch"])
+        else:
+            es_date_formats = "-yyyy||yyyy||yyyy-MM||yyyy-MM-dd||yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssZ||yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        return {
+            "type": "date",
+            "format": es_date_formats
+        }
 
 
 class EDTFDataType(BaseDataType):
