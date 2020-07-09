@@ -17,7 +17,7 @@ from guardian.exceptions import WrongAppError
 from django.contrib.auth.models import User, Group, Permission
 from arches.app.models.models import ResourceInstance
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms
+from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms, Nested
 
 
 class PermissionBackend(ObjectPermissionBackend):
@@ -83,13 +83,13 @@ def get_restricted_users(resource):
     return result
 
 
-def get_restricted_instances(user):
+def get_restricted_instances(user, search_engine):
     if user.is_superuser is False:
-        se = SearchEngineFactory().create()
-        query = Query(se, start=0, limit=settings.SEARCH_RESULT_LIMIT)
+        query = Query(search_engine, start=0, limit=settings.SEARCH_RESULT_LIMIT)
         has_access = Bool()
         terms = Terms(field="permissions.users_with_no_access", terms=[str(user.id)])
-        has_access.must(terms)
+        nested_term_filter = Nested(path="permissions", query=terms)
+        has_access.must(nested_term_filter)
         query.add_query(has_access)
         results = query.search(index="resources", scroll="1m")
         scroll_id = results["_scroll_id"]

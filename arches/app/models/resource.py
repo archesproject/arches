@@ -42,7 +42,7 @@ from arches.app.utils.exceptions import (
     InvalidNodeNameException,
     MultipleNodesFoundException,
 )
-from arches.app.utils.permission_backend import user_is_resource_reviewer, get_users_for_object, get_restricted_users
+from arches.app.utils.permission_backend import user_is_resource_reviewer, get_users_for_object, get_restricted_users, get_restricted_instances
 from arches.app.datatypes.datatypes import DataTypeFactory
 
 logger = logging.getLogger(__name__)
@@ -375,7 +375,7 @@ class Resource(models.ResourceInstance):
         return permit_deletion
 
     def get_related_resources(
-        self, lang="en-US", limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0,
+        self, lang="en-US", limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0, user=None
     ):
         """
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
@@ -409,6 +409,7 @@ class Resource(models.ResourceInstance):
         ret["total"] = resource_relations["hits"]["total"]
         instanceids = set()
 
+        restricted_instances = get_restricted_instances(user, se) if user is not None else []
         for relation in resource_relations["hits"]["hits"]:
             try:
                 preflabel = get_preflabel_from_valueid(relation["_source"]["relationshiptype"], lang)
@@ -416,9 +417,14 @@ class Resource(models.ResourceInstance):
             except:
                 relation["_source"]["relationshiptype_label"] = relation["_source"]["relationshiptype"] or ""
 
-            ret["resource_relationships"].append(relation["_source"])
-            instanceids.add(relation["_source"]["resourceinstanceidto"])
-            instanceids.add(relation["_source"]["resourceinstanceidfrom"])
+            resourceid_to = relation["_source"]["resourceinstanceidto"]
+            resourceid_from = relation["_source"]["resourceinstanceidfrom"]
+            if resourceid_to not in restricted_instances and resourceid_from not in restricted_instances:
+                ret["resource_relationships"].append(relation["_source"])
+                instanceids.add(resourceid_to)
+                instanceids.add(resourceid_from)
+            else:
+                ret['total']['value'] -= 1
 
         if len(instanceids) > 0:
             instanceids.remove(str(self.resourceinstanceid))
