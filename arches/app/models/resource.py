@@ -42,7 +42,12 @@ from arches.app.utils.exceptions import (
     InvalidNodeNameException,
     MultipleNodesFoundException,
 )
-from arches.app.utils.permission_backend import user_is_resource_reviewer, get_users_for_object, get_restricted_users, get_restricted_instances
+from arches.app.utils.permission_backend import (
+    user_is_resource_reviewer,
+    get_users_for_object,
+    get_restricted_users,
+    get_restricted_instances,
+)
 from arches.app.datatypes.datatypes import DataTypeFactory
 
 logger = logging.getLogger(__name__)
@@ -424,7 +429,7 @@ class Resource(models.ResourceInstance):
                 instanceids.add(resourceid_to)
                 instanceids.add(resourceid_from)
             else:
-                ret['total']['value'] -= 1
+                ret["total"]["value"] -= 1
 
         if len(instanceids) > 0:
             instanceids.remove(str(self.resourceinstanceid))
