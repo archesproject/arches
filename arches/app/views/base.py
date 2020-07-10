@@ -46,8 +46,6 @@ class BaseManagerView(TemplateView):
             exclude=[
                 "functions",
                 "ontology",
-                "subtitle",
-                "color",
                 "isactive",
                 "isresource",
                 "version",
