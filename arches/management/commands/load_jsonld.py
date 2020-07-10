@@ -59,8 +59,12 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-ow", "--overwrite", default="ignore", action="store", dest="force", 
-            help="if overwrite, overwrite records that exist; if ignore, then skip; if error, then halt"
+            "-ow",
+            "--overwrite",
+            default="ignore",
+            action="store",
+            dest="force",
+            help="if overwrite, overwrite records that exist; if ignore, then skip; if error, then halt",
         )
 
         parser.add_argument("--toobig", default=0, type=int, action="store", dest="toobig", help="Do not attempt to load records > n kb")
@@ -189,7 +193,7 @@ class Command(BaseCommand):
                     for f in files:
                         if not f.endswith(options["suffix"]):
                             continue
-                        elif f.startswith('.') or f.startswith('_'):
+                        elif f.startswith(".") or f.startswith("_"):
                             continue
 
                         if options["max"] > 0 and loaded_model >= options["max"]:
@@ -230,16 +234,10 @@ class Command(BaseCommand):
                                         n=options["fast"],
                                         reload=options["force"],
                                         quiet=options["quiet"],
-                                        strip_search=options["strip_search"]
+                                        strip_search=options["strip_search"],
                                     )
                                 else:
-                                    l = self.import_resource(
-                                        uu, 
-                                        graphid, 
-                                        jsdata, 
-                                        reload=options["force"], 
-                                        quiet=options["quiet"]
-                                    )
+                                    l = self.import_resource(uu, graphid, jsdata, reload=options["force"], quiet=options["quiet"])
                                 loaded += l
                                 loaded_model += l
                             except Exception as e:
