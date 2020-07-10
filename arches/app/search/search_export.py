@@ -97,7 +97,7 @@ class SearchResultsExporter(object):
         """
         Writes a list of file like objects out to a zip file
         """
-        zip_stream = zip_utils.create_zip_file(files_for_export)
+        zip_stream = zip_utils.create_zip_file(files_for_export, "outputfile")
         today = datetime.datetime.now().isoformat()
         name = f"{settings.APP_NAME}_{today}.zip"
         search_history_obj = models.SearchExportHistory.objects.get(pk=export_info.searchexportid)
