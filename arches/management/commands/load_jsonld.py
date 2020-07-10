@@ -58,7 +58,10 @@ class Command(BaseCommand):
             "-s", "--source", default="data/", action="store", dest="source", help="the directory in which the data files are to be found"
         )
 
-        parser.add_argument("-f", "--force", default=False, action="store_true", dest="force", help="reload records that already exist")
+        parser.add_argument(
+            "-ow", "--overwrite", default="ignore", action="store", dest="force", 
+            help="if overwrite, overwrite records that exist; if ignore, then skip; if error, then halt"
+        )
 
         parser.add_argument("--toobig", default=0, type=int, action="store", dest="toobig", help="Do not attempt to load records > n kb")
 
@@ -75,7 +78,7 @@ class Command(BaseCommand):
             help="the name of the block in the model path to load (eg 00), or slice in the form this,total (eg 1,5)",
         )
 
-        parser.add_argument("--max", default=-1, type=int, action="store", dest="maxx", help="Maximum number of records to load per model")
+        parser.add_argument("--max", default=-1, type=int, action="store", dest="max", help="Maximum number of records to load per model")
 
         parser.add_argument("--fast", default=0, action="store", type=int, dest="fast", help="Use bulk_save to store n records at a time")
 
@@ -85,7 +88,7 @@ class Command(BaseCommand):
             "--skip", default=-1, type=int, action="store", dest="skip", help="Number of records to skip before starting to load"
         )
 
-        parser.add_argument("--suffix", default="json", action="store", dest="suffix", help="file suffix to load")
+        parser.add_argument("--suffix", default="json", action="store", dest="suffix", help="file suffix to load if not .json")
 
         parser.add_argument(
             "--ignore-errors", default=False, action="store_true", dest="ignore_errors", help="Log but do not terminate on errors"
@@ -106,8 +109,8 @@ class Command(BaseCommand):
             print(f"Only loading {options['model']}")
         if options["block"]:
             print(f"Only loading {options['block']}")
-        if options["force"]:
-            print("Forcing reload of existing records")
+        if options["force"] == "overwrite":
+            print("Overwriting existing records")
         if options["toobig"]:
             print(f"Not loading records > {options['toobig']}kb")
         if options["quiet"]:
@@ -148,7 +151,9 @@ class Command(BaseCommand):
 
         errh = open("error_log.txt", "w")
         start = time.time()
-        x = 0
+        seen = 0
+        loaded = 0
+
         for m in models:
             print(f"Loading {m}")
             graphid = graph_uuid_map.get(m, None)
@@ -167,13 +172,16 @@ class Command(BaseCommand):
             else:
                 blocks = os.listdir(f"{source}/{m}")
                 blocks.sort()
+                blocks = [b for b in blocks if b[0] not in ["_", "."]]
                 if "," in block:
                     # {slice},{max-slices}
                     (cslice, mslice) = block.split(",")
                     cslice = int(cslice) - 1
                     mslice = int(mslice)
                     blocks = blocks[cslice::mslice]
-            x = 0
+
+            loaded_model = 0
+
             try:
                 for b in blocks:
                     files = os.listdir(f"{source}/{m}/{b}")
@@ -181,11 +189,13 @@ class Command(BaseCommand):
                     for f in files:
                         if not f.endswith(options["suffix"]):
                             continue
+                        elif f.startswith('.') or f.startswith('_'):
+                            continue
 
-                        if options["maxx"] > 0 and x >= options["maxx"]:
+                        if options["max"] > 0 and loaded_model >= options["max"]:
                             raise StopIteration()
-                        x += 1
-                        if x < options["skip"]:
+                        seen += 1
+                        if seen <= options["skip"]:
                             # Do it this way to keep the counts correct
                             continue
                         fn = f"{source}/{m}/{b}/{f}"
@@ -213,17 +223,25 @@ class Command(BaseCommand):
                         if jsdata:
                             try:
                                 if options["fast"]:
-                                    self.fast_import_resource(
+                                    l = self.fast_import_resource(
                                         uu,
                                         graphid,
                                         jsdata,
                                         n=options["fast"],
                                         reload=options["force"],
                                         quiet=options["quiet"],
-                                        strip_search=options["strip_search"],
+                                        strip_search=options["strip_search"]
                                     )
                                 else:
-                                    self.import_resource(uu, graphid, jsdata, reload=options["force"], quiet=options["quiet"])
+                                    l = self.import_resource(
+                                        uu, 
+                                        graphid, 
+                                        jsdata, 
+                                        reload=options["force"], 
+                                        quiet=options["quiet"]
+                                    )
+                                loaded += l
+                                loaded_model += l
                             except Exception as e:
                                 errh.write(f"*** Failed to load {fn}:\n     {e}\n")
                                 errh.flush()
@@ -231,8 +249,8 @@ class Command(BaseCommand):
                                     raise
                         else:
                             print(" ... skipped due to bad data :(")
-                        if not x % 100:
-                            print(f" ... {x} in {time.time()-start}")
+                        if not seen % 100:
+                            print(f" ... seen {seen} / loaded {loaded} in {time.time()-start}")
             except StopIteration as e:
                 break
             except:
@@ -242,15 +260,18 @@ class Command(BaseCommand):
             self.index_resources(options["strip_search"])
             self.resources = []
         errh.close()
-        print(f"duration: {x} in {time.time()-start} seconds")
+        print(f"Total Time: seen {seen} / loaded {loaded} in {time.time()-start} seconds")
 
-    def fast_import_resource(self, resourceid, graphid, data, n=1000, reload=False, quiet=True, strip_search=False):
+    def fast_import_resource(self, resourceid, graphid, data, n=1000, reload="ignore", quiet=True, strip_search=False):
         try:
             resource_instance = Resource.objects.get(pk=resourceid)
-            if not reload:
+            if reload == "ignore":
                 if not quiet:
                     print(f" ... already loaded")
-                return
+                return 0
+            elif reload == "error":
+                print(f"*** Record exists for {resourceid}, and -ow is error")
+                raise FileExistsError(resourceid)
             else:
                 resource_instance.delete()
         except archesmodels.ResourceInstance.DoesNotExist:
@@ -265,27 +286,35 @@ class Command(BaseCommand):
             self.save_resources()
             self.index_resources(strip_search)
             self.resources = []
+        return 1
 
-    def import_resource(self, resourceid, graphid, data, reload=False, quiet=False):
+    def import_resource(self, resourceid, graphid, data, reload="ignore", quiet=False):
         with transaction.atomic():
             try:
                 resource_instance = Resource.objects.get(pk=resourceid)
-                if not reload:
-                    print(f" ... already loaded")
+                if reload == "ignore":
+                    if not quiet:
+                        print(f" ... already loaded")
                     return
+                elif reload == "error":
+                    print(f"*** Record exists for {resourceid}, and -ow is error")
+                    raise FileExistsError(resourceid)
                 else:
                     resource_instance.delete()
             except archesmodels.ResourceInstance.DoesNotExist:
                 # thrown when resource doesn't exist
                 pass
+
             try:
                 self.reader.read_resource(data, resourceid=resourceid, graphid=graphid)
                 for resource in self.reader.resources:
                     resource.save(request=None)
             except archesmodels.ResourceInstance.DoesNotExist:
                 print(f"*** Could not find model: {graphid}")
+                return 0
             except Exception as e:
                 raise
+        return 1
 
     def save_resources(self):
         tiles = []
