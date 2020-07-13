@@ -54,16 +54,16 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
     <!--=== Header ===-->
     <nav class="v5-splash-navbar navbar" role="navigation">
-        
+
         <nav class="navbar">
             <div class="container-fluid">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>                        
+                        <span class="icon-bar"></span>
                     </button>
-                    
+
                     <div class="relative" style="padding: 8px 10px 8px 100px; width: 300px;">
                         <div class="navbar-brand-v5-icon-container" style="">
                             <img class="navbar-brand-v5-icon" src="{% static 'img/landing/arches_logo_dark.png' %}" style="" alt="Arches Logo">
@@ -73,17 +73,17 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="collapse navbar-collapse" id="myNavbar">
                     <ul class="nav navbar-nav">
                         <li class="">
                             <a href="#info-block-0">{% trans "Arches Features" %}</a>
                         </li>
-                        
+
                         <li class="">
                             <a href="{% url 'search_home' %}">{% trans "Search Arches" %}</a>
                         </li>
-                        
+
                         {% if user|can_create_resource_instance and user.username != 'anonymous' %}
                         <li class="">
                             <a href="{% url 'resource' %}" target="_blank">{% trans "Manage" %}</a>
@@ -116,7 +116,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <section id="info-block-0" class="app-info-block intro-section relative" style="">
         <!-- Vertical Nav -->
         <div class="vertical-nav-container-background"></div>
-        
+
         <div id="cd-vertical-nav" class="vertical-nav-container">
             <ul class="vertical-nav-list">
                 <li class="active">
@@ -209,7 +209,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
             <!-- Sub-section -->
             <div class="row app-info-sub-block">
-                
+
                 <!-- Arches Data Type Block -->
                 <div class="col-lg-6">
                     <div class="sub-block-container">
@@ -228,23 +228,23 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <p class="sub-block-description">
                             {% trans "Use Arches' Permissions Manager to set up data access rules for all your user groups and individual accounts.  You can define read/write/delete and no-access permissions." %}
                         </p>
-                        <img class="sub-block-image" src="{% static 'img/landing/premissions_manager.png' %}" style="" alt="Permissions Manager">
+                        <img class="sub-block-image" src="{% static 'img/landing/permissions_manager.png' %}" style="" alt="Permissions Manager">
                     </div>
                 </div>
 
             </div>
             <!-- End Sub-section -->
 
-      
+
         </div>
     </section>
     <!-- End Info Block 1 -->
-    
+
 
     <!-- Info Block 2 -->
     <section id="info-block-2" class="app-info-block relative">
         <div class="">
-      
+
             <!-- Heading Info -->
             <div class="sub-section">
                 <div class="col-lg-7">
@@ -257,17 +257,17 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                     </div>
                 </div>
             </div>
-            
+
             <!-- Content -->
             <div class="splash-img">
                 <img class="search-screen" src="{% static 'img/landing/consultation_workflow.jpg' %}" style="" alt="Arches Workflows">
             </div>
-            
+
         </div>
     </section>
     <!-- End Info Block 2 -->
 
-    
+
     <!-- Info Block 3 -->
     <section id="info-block-3" class="app-info-block relative">
         <div class="">
@@ -320,7 +320,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
             <!-- Heading Info -->
             <div class="sub-section">
-                
+
             </div>
 
             <!-- Content -->
@@ -357,7 +357,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
             <!-- branding column -->
             <div class="col-lg-4">
-                
+
                 <h2 class="app-footer-heading">{% trans "Sample Institution Name" %}</h2>
 
                 <div class="organization-address">
@@ -371,7 +371,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             <!-- Info Column -->
             <div class="col-lg-8">
                 <h2 class="app-footer-heading">{% trans "Guides and Documentation" %}</h2>
-            
+
                 <!-- Links -->
                 <div class="splash-links">
                     <div class="row" style="padding-left: 80px;">
@@ -489,7 +489,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 event.preventDefault();
                 smoothScroll($(this.hash));
             });
-        
+
 
             function updateNavigation() {
                 contentSections.each(function(){
