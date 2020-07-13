@@ -636,8 +636,8 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .splash-img img {
-    max-width: 90%;
-    height: auto;
+    width: 90%;
+    height: 90%;
 }
 
 .search-screen {
