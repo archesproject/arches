@@ -557,12 +557,12 @@ class Resources(APIBase):
                             graph = Graph.objects.get(graphid=resource.graph.graphid)
                             graph_nodes = graph.nodes.copy()
                             for t in resource.tiles:
-                                for nid in list(t.data.keys()): # better to compare nodegroups?
+                                for nid in list(t.data.keys()):  # better to compare nodegroups?
                                     if uuid.UUID(nid) in graph_nodes.keys():
                                         datatype = datatype_factory.get_instance(graph_nodes[uuid.UUID(nid)].datatype)
                                         value = datatype.get_display_value(t, graph_nodes[uuid.UUID(nid)])
                                         out["disambiguated"][graph_nodes[uuid.UUID(nid)].name] = value
-                                        del graph_nodes[uuid.UUID(nid)] # shrink list for efficiency
+                                        del graph_nodes[uuid.UUID(nid)]  # shrink list for efficiency
 
             else:
                 #
