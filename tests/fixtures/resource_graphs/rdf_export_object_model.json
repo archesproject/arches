@@ -606,9 +606,11 @@
                 }, 
                 {
                     "config": {
-                        "graphid": [
-                            "c35fe0a1-df30-11e8-b280-a4d18cec433a"
-                        ]
+                         "graphs": [{
+                            "graphid":"c35fe0a1-df30-11e8-b280-a4d18cec433a",
+                            "ontologyProperty": "",
+                            "inverseOntologyProperty": ""
+                        }]
                     }, 
                     "datatype": "resource-instance", 
                     "description": null, 
@@ -626,9 +628,11 @@
                 }, 
                 {
                     "config": {
-                        "graphid": [
-                            "c35fe0a1-df30-11e8-b280-a4d18cec433a"
-                        ]
+                        "graphs": [{
+                            "graphid": "c35fe0a1-df30-11e8-b280-a4d18cec433a",
+                            "ontologyProperty": "",
+                            "inverseOntologyProperty": ""
+                        }]
                     }, 
                     "datatype": "resource-instance", 
                     "description": null, 
@@ -732,10 +736,12 @@
                 }, 
                 {
                     "config": {
-                        "graphid": [
-                            "fd0a5907-e11b-11e8-821b-a4d18cec433a"
-                        ]
-                    }, 
+                        "graphs": [{
+                            "graphid": "fd0a5907-e11b-11e8-821b-a4d18cec433a",
+                            "ontologyProperty": "",
+                            "inverseOntologyProperty": ""
+                        }]
+                    },
                     "datatype": "resource-instance", 
                     "description": null, 
                     "graph_id": "c35fe0a1-df30-11e8-b280-a4d18cec433a", 
@@ -788,10 +794,12 @@
                 }, 
                 {
                     "config": {
-                        "graphid": [
-                            "fd0a5907-e11b-11e8-821b-a4d18cec433a"
-                        ]
-                    }, 
+                        "graphs": [{
+                            "graphid": "fd0a5907-e11b-11e8-821b-a4d18cec433a",
+                            "ontologyProperty": "",
+                            "inverseOntologyProperty": ""
+                        }]
+                    },
                     "datatype": "resource-instance-list", 
                     "description": null, 
                     "graph_id": "c35fe0a1-df30-11e8-b280-a4d18cec433a", 
@@ -856,10 +864,12 @@
                 }, 
                 {
                     "config": {
-                        "graphid": [
-                            "c35fe0a1-df30-11e8-b280-a4d18cec433a"
-                        ]
-                    }, 
+                        "graphs": [{
+                            "graphid": "c35fe0a1-df30-11e8-b280-a4d18cec433a",
+                            "ontologyProperty": "",
+                            "inverseOntologyProperty": ""
+                        }]
+                    },
                     "datatype": "resource-instance-list", 
                     "description": null, 
                     "graph_id": "c35fe0a1-df30-11e8-b280-a4d18cec433a", 

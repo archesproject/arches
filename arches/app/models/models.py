@@ -56,12 +56,10 @@ class CardModel(models.Model):
     config = JSONField(blank=True, null=True, db_column="config")
 
     def is_editable(self):
-        result = True
-        tiles = TileModel.objects.filter(nodegroup=self.nodegroup).count()
-        result = False if tiles > 0 else True
         if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
-            result = True
-        return result
+            return True
+        else:
+            return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
 
     class Meta:
         managed = True
@@ -400,13 +398,12 @@ class GraphModel(models.Model):
         return False
 
     def is_editable(self):
-        result = True
-        if self.isresource:
-            resource_instances = ResourceInstance.objects.filter(graph_id=self.graphid).count()
-            result = False if resource_instances > 0 else True
-            if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
-                result = True
-        return result
+        if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
+            return True
+        elif self.isresource:
+            return not ResourceInstance.objects.filter(graph_id=self.graphid).exists()
+        else:
+            return True
 
     def __str__(self):
         return self.name
@@ -675,7 +672,10 @@ class ResourceXResource(models.Model):
         deletedResourceId = kwargs.pop("deletedResourceId", None)
         if deletedResourceId and self.tileid and self.nodeid:
             newTileData = []
-            for relatedresourceItem in self.tileid.data[str(self.nodeid_id)]:
+            data = self.tileid.data[str(self.nodeid_id)]
+            if type(data) != list:
+                data = [data]
+            for relatedresourceItem in data:
                 if relatedresourceItem["resourceId"] != str(deletedResourceId):
                     newTileData.append(relatedresourceItem)
             self.tileid.data[str(self.nodeid_id)] = newTileData
@@ -1273,3 +1273,17 @@ class IIIFManifest(models.Model):
     class Meta:
         managed = True
         db_table = "iiif_manifests"
+
+
+class GroupMapSettings(models.Model):
+    group = models.OneToOneField(Group, on_delete=models.CASCADE)
+    min_zoom = models.IntegerField(default=0)
+    max_zoom = models.IntegerField(default=20)
+    default_zoom = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.group.name
+
+    class Meta:
+        managed = True
+        db_table = "group_map_settings"

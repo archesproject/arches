@@ -13,19 +13,15 @@
                             "dc742246-fb5f-11e9-98e3-3af9d3b32b71": [
                                 {
                                     "resourceId": "24d0d25a-fa75-11e9-b369-3af9d3b32b71",
-                                    "resourceName": "",
                                     "ontologyProperty": "",
-                                    "inverseOntologyProperty": "",
-                                    "ontologyClass": ""
+                                    "inverseOntologyProperty": ""
                                 }
                             ],
                             "f59a17da-fb5f-11e9-98e3-3af9d3b32b71": [
                                 {
                                     "resourceId": "12bbf5bc-fa85-11e9-91b8-3af9d3b32b71",
-                                    "resourceName": "",
                                     "ontologyProperty": "",
-                                    "inverseOntologyProperty": "",
-                                    "ontologyClass": ""
+                                    "inverseOntologyProperty": ""
                                 }
                             ]
                         },

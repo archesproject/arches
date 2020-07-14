@@ -135,7 +135,8 @@ def index_resource_relations(clear_index=True, batch_size=settings.BULK_IMPORT_B
 
     with se.BulkIndexer(batch_size=batch_size, refresh=True) as resource_relations_indexer:
         sql = """
-            SELECT resourcexid, resourceinstanceidfrom, notes, relationshiptype, resourceinstanceidto
+            SELECT resourcexid, notes, datestarted, dateended, relationshiptype, resourceinstanceidfrom, 
+            resourceinstanceidto, modified, created, inverserelationshiptype, tileid, nodeid
             FROM public.resource_x_resource;
         """
 
@@ -143,10 +144,17 @@ def index_resource_relations(clear_index=True, batch_size=settings.BULK_IMPORT_B
         for resource_relation in cursor.fetchall():
             doc = {
                 "resourcexid": resource_relation[0],
-                "resourceinstanceidfrom": resource_relation[1],
-                "notes": resource_relation[2],
-                "relationshiptype": resource_relation[3],
-                "resourceinstanceidto": resource_relation[4],
+                "notes": resource_relation[1],
+                "datestarted": resource_relation[2],
+                "dateended": resource_relation[3],
+                "relationshiptype": resource_relation[4],
+                "resourceinstanceidfrom": resource_relation[5],
+                "resourceinstanceidto": resource_relation[6],
+                "modified": resource_relation[7],
+                "created": resource_relation[8],
+                "inverserelationshiptype": resource_relation[9],
+                "tileid": resource_relation[10],
+                "nodeid": resource_relation[11],
             }
             resource_relations_indexer.add(index="resource_relations", id=doc["resourcexid"], data=doc)
 

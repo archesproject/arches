@@ -428,12 +428,13 @@ class JsonLDImportTests(ArchesTestCase):
             kwargs={"graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71", "resourceid": "abcd1234-1234-1129-b6e7-3af9d3b32b71"},
         )
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        print(f"Test 4: {response.content}")
         self.assertEqual(response.status_code, 201)
         js = response.json()
         if type(js) == list:
             js = js[0]
 
-        print(f"Got json for test 4: {js}")
+        # print(f"Got json for test 4: {js}")
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/abcd1234-1234-1129-b6e7-3af9d3b32b71")
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P130_shows_features_of" in js)
@@ -637,8 +638,6 @@ class JsonLDImportTests(ArchesTestCase):
             self.assertTrue(not (hasnote and isres))
 
     def test_8_4564_resinst_models(self):
-        # 2019-11-01 - This fails as the model uses Actor, not Group, per #4564
-        # and the import does not look at the referenced model's class
 
         with open(os.path.join("tests/fixtures/jsonld_base/models/4564-person.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
@@ -663,7 +662,6 @@ class JsonLDImportTests(ArchesTestCase):
             kwargs={"graphid": "2c03ddcc-bfa8-11e9-b4dc-0242ac160002", "resourceid": "923a5fa8-bfa8-11e9-bd39-0242ac160002"},
         )
         response = self.client.put(url, data=aux_data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
-        # this should have worked
         self.assertTrue(response.status_code == 201)
 
         data = """
@@ -957,6 +955,7 @@ class JsonLDImportTests(ArchesTestCase):
         else:
             self.assertTrue(rtb1["@id"].startswith("http://localhost:8000/resources"))
 
+
     def test_f_big_nest_mess(self):
 
         data = """
@@ -971,7 +970,7 @@ class JsonLDImportTests(ArchesTestCase):
           "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
           "http://www.cidoc-crm.org/cidoc-crm/P14_carried_out_by": {
             "@id": "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122",
-            "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object"
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person"
           },
           "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "asdf",
           "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": {

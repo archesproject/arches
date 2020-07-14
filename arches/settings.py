@@ -310,7 +310,7 @@ INSTALLED_APPS = (
     "revproxy",
     "corsheaders",
     "oauth2_provider",
-    "django_celery_results",
+    "django_celery_results"
     # 'debug_toolbar'
 )
 
@@ -327,7 +327,7 @@ MIDDLEWARE = [
     "oauth2_provider.middleware.OAuth2TokenMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "arches.app.utils.middleware.SetAnonymousUser",
 ]
 
@@ -553,8 +553,7 @@ CELERY_BEAT_SCHEDULE = {
 
 AUTO_REFRESH_GEOM_VIEW = True
 TILE_CACHE_TIMEOUT = 600  # seconds
-CARDS_API_VIEW_TIMEOUT = 3600  # seconds
-GRAPHS_API_VIEW_TIMEOUT = 3600  # seconds
+GRAPH_MODEL_CACHE_TIMEOUT = None  # seconds * hours * days = ~1mo
 
 RENDERERS = [
     {

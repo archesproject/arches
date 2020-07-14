@@ -10,7 +10,7 @@ class BaseFunction(object):
         raise NotImplementedError
 
     # occurrs after Tile.save
-    def postSave(self, *args, **kwargs):
+    def post_save(self, *args, **kwargs):
         raise NotImplementedError
 
     def delete(self, *args, **kwargs):

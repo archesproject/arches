@@ -3,8 +3,9 @@ define([
     'underscore',
     'view-data',
     'arches',
+    'utils/ontology',
     'views/components/widgets/resource-instance-select'
-], function(ko, _, data, arches) {
+], function(ko, _, data, arches, ontologyUtils) {
     var name = 'resource-instance-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {
@@ -13,15 +14,19 @@ define([
             this.resourceModels = [{
                 graphid: null,
                 name: ''
-            }].concat(_.map(data.createableResources, function (graph) {
+            }].concat(_.map(data.createableResources, function(graph) {
                 return {
                     graphid: graph.graphid,
                     name: graph.name
                 };
             }));
             if (!this.search) {
+                this.makeFriendly = ontologyUtils.makeFriendly;
+                this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
                 this.isEditable = true;
                 this.graphIsSemantic = !!params.graph.get('ontology_id');
+                this.rootOntologyClass = params.graph.get('root').ontologyclass();
+                this.graphName = params.graph.get('root').name();
                 if (params.graph) {
                     var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId();});
                     if (cards.length) {
@@ -32,14 +37,23 @@ define([
                 }
                 this.node = params;
                 this.config = params.config;
-                this.selectedResourceType = ko.observable('');
-                this.selectedResourceType.subscribe(function(resourceType) {
+                this.selectedResourceModel = ko.observable('');
+                this.selectedResourceModel.subscribe(function(resourceType) {
                     if (resourceType.length > 0) {
                         resourceType = resourceType.concat(self.config.graphs());
                         self.config.graphs(resourceType);
-                        self.selectedResourceType([]);
+                        self.selectedResourceModel([]);
                     }
                 });
+
+                this.selectedResourceType = ko.observable(null);
+                this.toggleSelectedResource = function(resourceRelationship) {
+                    if (self.selectedResourceType() === resourceRelationship) {
+                        self.selectedResourceType(null);
+                    } else {
+                        self.selectedResourceType(resourceRelationship);
+                    }
+                };
 
                 var preventSetup = false;
                 var setupConfig = function(graph) {
@@ -52,13 +66,6 @@ define([
                     Object.defineProperty(graph, 'name', {
                         value: model.name
                     });
-                    // use this so that graph.editing won't get saved back to the node config
-                    Object.defineProperty(graph, 'editing', {
-                        value: ko.observable(false),
-                        enumerable: false,
-                        writable: true
-                    });
-
                     window.fetch(arches.urls.graph_nodes(graph.graphid))
                         .then(function(response){
                             if(response.ok) {
@@ -104,60 +111,13 @@ define([
                     }
                 });
 
-
-                this.makeFriendly = function(item) {
-                    if (!!item) {
-                        var parts = item.split("/");
-                        return parts[parts.length-1];
-                    }
-                    return '';
-                };
-
                 this.formatLabel = function(name, ontologyProperty, inverseOntologyProperty){
                     if (self.graphIsSemantic) {
-                        return name + ' (' + self.makeFriendly(ontologyProperty) + '/' + self.makeFriendly(inverseOntologyProperty) + ')';
+                        return name + ' (' + ontologyUtils.makeFriendly(ontologyProperty) + '/' + ontologyUtils.makeFriendly(inverseOntologyProperty) + ')';
                     }
                     else {
                         return name;
                     }
-                };
-
-                this.getSelect2ConfigForOntologyProperties = function(value, domain, range) {
-                    return {
-                        value: value,
-                        clickBubble: false,
-                        placeholder: 'Select an Ontology Property',
-                        closeOnSelect: true,
-                        allowClear: false,
-                        ajax: {
-                            url: function() {
-                                return arches.urls.ontology_properties;
-                            },
-                            data: function(term, page) {
-                                var data = { 
-                                    'domain_ontology_class': domain,
-                                    'range_ontology_class': range,
-                                    'ontologyid': ''
-                                };
-                                return data;
-                            },
-                            dataType: 'json',
-                            quietMillis: 250,
-                            results: function(data, page) {
-                                return {
-                                    results: data
-                                };
-                            }
-                        },
-                        id: function(item) {
-                            return item;
-                        },
-                        formatResult: this.makeFriendly,
-                        formatSelection: this.makeFriendly,
-                        initSelection: function(el, callback) {
-                            callback(value());
-                        }
-                    };
                 };
 
             } else {

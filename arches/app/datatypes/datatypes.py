@@ -18,7 +18,7 @@ from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.utils.geo_utils import GeoUtils
 import arches.app.utils.task_management as task_management
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Terms, Exists, RangeDSLException
-from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.utils.translation import ugettext as _
@@ -158,7 +158,7 @@ class NumberDataType(BaseDataType):
             )
         return errors
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value, **kwargs):
         return float(value)
 
     def clean(self, tile, nodeid):
@@ -225,7 +225,7 @@ class BooleanDataType(BaseDataType):
 
         return errors
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value, **kwargs):
         return bool(util.strtobool(str(value)))
 
     def append_search_filters(self, value, node, query, request):
@@ -290,7 +290,7 @@ class DateDataType(BaseDataType):
 
         return errors
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value, **kwargs):
         if type(value) == list:
             value = value[0]
 
@@ -524,31 +524,29 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             if len(tile.data[nodeid]["features"]) == 0:
                 tile.data[nodeid] = None
 
-    def process_api_data(self, value):
-        # TODO check for json format (geojson or esri-json) ... if value['format'] == 'esri-geom':
-        data = GeoUtils().arcgisjson_to_geojson(value)
-        return data
-
-    def transform_import_values(self, value, nodeid):
-        arches_geojson = {}
-        arches_geojson["type"] = "FeatureCollection"
-        arches_geojson["features"] = []
-        geometry = GEOSGeometry(value, srid=4326)
-        if geometry.geom_type == "GeometryCollection":
-            for geom in geometry:
+    def transform_value_for_tile(self, value, **kwargs):
+        if "format" in kwargs and kwargs["format"] == "esrijson":
+            arches_geojson = GeoUtils().arcgisjson_to_geojson(value)
+        else:
+            arches_geojson = {}
+            arches_geojson["type"] = "FeatureCollection"
+            arches_geojson["features"] = []
+            geometry = GEOSGeometry(value, srid=4326)
+            if geometry.geom_type == "GeometryCollection":
+                for geom in geometry:
+                    arches_json_geometry = {}
+                    arches_json_geometry["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
+                    arches_json_geometry["type"] = "Feature"
+                    arches_json_geometry["id"] = str(uuid.uuid4())
+                    arches_json_geometry["properties"] = {}
+                    arches_geojson["features"].append(arches_json_geometry)
+            else:
                 arches_json_geometry = {}
-                arches_json_geometry["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
+                arches_json_geometry["geometry"] = JSONDeserializer().deserialize(geometry.json)
                 arches_json_geometry["type"] = "Feature"
                 arches_json_geometry["id"] = str(uuid.uuid4())
                 arches_json_geometry["properties"] = {}
                 arches_geojson["features"].append(arches_json_geometry)
-        else:
-            arches_json_geometry = {}
-            arches_json_geometry["geometry"] = JSONDeserializer().deserialize(geometry.json)
-            arches_json_geometry["type"] = "Feature"
-            arches_json_geometry["id"] = str(uuid.uuid4())
-            arches_json_geometry["properties"] = {}
-            arches_geojson["features"].append(arches_json_geometry)
 
         return arches_geojson
 
@@ -557,6 +555,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         for feature in value["features"]:
             wkt_geoms.append(GEOSGeometry(json.dumps(feature["geometry"])))
         return GeometryCollection(wkt_geoms)
+
+    def update(self, tile, data, nodeid=None, action=None):
+        new_features_array = tile.data[nodeid]["features"] + data["features"]
+        tile.data[nodeid]["features"] = new_features_array
+        updated_data = tile.data[nodeid]
+        return updated_data
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         document["geometries"].append({"geom": nodevalue, "nodegroup_id": tile.nodegroup_id, "provisional": provisional, "tileid": tile.pk})
@@ -1141,7 +1145,6 @@ class FileListDataType(BaseDataType):
                 for file_json in current_tile_data[str(node.pk)]:
                     if file_json["name"] == file_data.name and file_json["url"] is None:
                         file_json["file_id"] = str(file_model.pk)
-                        file_json["url"] = str(file_model.path.url)
                         file_json["url"] = "/files/" + str(file_model.fileid)
                         file_json["status"] = "uploaded"
                         resave_tile = True
@@ -1157,7 +1160,7 @@ class FileListDataType(BaseDataType):
                             tile_to_update.provisionaledits[str(user.id)]["value"][str(node.pk)] = updated_file_records
                         tile_to_update.save()
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value, **kwargs):
         """
         # TODO: Following commented code can be used if user does not already have file in final location using django ORM:
 
@@ -1584,9 +1587,7 @@ class ResourceInstanceDataType(BaseDataType):
         {
             "resourceId": "",
             "ontologyProperty": "",
-            "inverseOntologyProperty": "",
-            "resourceName": "",
-            "ontologyClass": ""
+            "inverseOntologyProperty": ""
         }
 
     """
@@ -1607,13 +1608,14 @@ class ResourceInstanceDataType(BaseDataType):
                         resourceXresourceId = resourceXresource
                     else:
                         resourceXresourceId = resourceXresource["resourceXresourceId"]
+                    if not resourceXresourceId:
+                        continue
                     rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
                     resourceid = str(rr.resourceinstanceidto_id)
-                    se = SearchEngineFactory().create()
                     resource_document = se.search(index="resources", id=resourceid)
                     ret.append(
                         {
-                            "resourceName": resource_document["docs"][0]["_source"]["displayname"],
+                            "resourceName": resource_document["_source"]["displayname"],
                             "resourceId": resourceid,
                             "ontologyProperty": rr.relationshiptype,
                             "inverseOntologyProperty": rr.inverserelationshiptype,
@@ -1648,6 +1650,9 @@ class ResourceInstanceDataType(BaseDataType):
 
     def pre_tile_save(self, tile, nodeid):
         tiledata = tile.data[str(nodeid)]
+        # Ensure tiledata is a list (with JSON-LD import it comes in as an object)
+        if type(tiledata) != list and tiledata is not None:
+            tiledata = [tiledata]
         if tiledata is None or tiledata == []:
             # resource relationship has been removed
             try:
@@ -1699,28 +1704,26 @@ class ResourceInstanceDataType(BaseDataType):
         data = self.get_tile_data(tile)
         nodevalue = data[str(node.nodeid)]
         items = self.disambiguate(nodevalue)
-        return ", ".join([item.resourceName for item in items])
+        return ", ".join([item["resourceName"] for item in items])
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        for relatedResourceItem in nodevalue:
-            document["ids"].append({"id": relatedResourceItem["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
-            if "resourceName" in relatedResourceItem and relatedResourceItem["resourceName"] not in document["strings"]:
-                document["strings"].append(
-                    {"string": relatedResourceItem["resourceName"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+        if type(nodevalue) != list and nodevalue is not None:
+            nodevalue = [nodevalue]
+        if nodevalue:
+            for relatedResourceItem in nodevalue:
+                document["ids"].append(
+                    {"id": relatedResourceItem["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
                 )
+                if "resourceName" in relatedResourceItem and relatedResourceItem["resourceName"] not in document["strings"]:
+                    document["strings"].append(
+                        {"string": relatedResourceItem["resourceName"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+                    )
 
-    def transform_import_values(self, value, nodeid):
-        return [v.strip() for v in value.split(",")]
+    def transform_value_for_tile(self, value, **kwargs):
+        return json.loads(value)
 
     def transform_export_values(self, value, *args, **kwargs):
-        result = value
-        try:
-            if not isinstance(value, str):  # changed from basestring to str for python3 branch
-                result = ",".join(value)
-        except Exception:
-            pass
-
-        return result
+        return json.dumps(value)
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -1738,7 +1741,9 @@ class ResourceInstanceDataType(BaseDataType):
         print(query.dsl)
 
     def get_rdf_uri(self, node, data, which="r"):
-        if type(data) == list:
+        if not data:
+            return URIRef("")
+        elif type(data) == list:
             return [URIRef(archesproject[f"resources/{x['resourceId']}"]) for x in data]
         return URIRef(archesproject[f"resources/{data['resourceId']}"])
 
@@ -1779,14 +1784,7 @@ class ResourceInstanceDataType(BaseDataType):
         m = p.search(res_inst_uri)
         if m is not None:
             # return m.groupdict()["r"]
-            return {
-                "resourceId": m.groupdict()["r"],
-                "ontologyProperty": "",
-                "inverseOntologyProperty": "",
-                "resourceName": "",
-                "ontologyClass": "",
-                "resourceXresourceId": "",
-            }
+            return [{"resourceId": m.groupdict()["r"], "ontologyProperty": "", "inverseOntologyProperty": "", "resourceXresourceId": ""}]
 
     def ignore_keys(self):
         return ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]
@@ -1804,27 +1802,12 @@ class ResourceInstanceDataType(BaseDataType):
                 "resourceId": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
                 "ontologyProperty": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
                 "inverseOntologyProperty": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
-                "resourceName": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
-                "ontologyClass": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
                 "resourceXresourceId": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
             }
         }
 
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
-    def from_rdf(self, json_ld_node):
-        m = super(ResourceInstanceListDataType, self).from_rdf(json_ld_node)
-        if m is not None:
-            return [m]
-
-    def process_api_data(self, value):
-        try:
-            value.upper()
-            data = json.loads(value)
-            print(data, "got it")
-        except Exception:
-            data = value
-        return data
 
     def collects_multiple_values(self):
         return True

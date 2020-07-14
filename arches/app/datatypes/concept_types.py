@@ -29,8 +29,11 @@ class BaseConceptDataType(BaseDataType):
         try:
             return self.value_lookup[valueid]
         except:
-            self.value_lookup[valueid], created = models.Value.objects.get_or_create(pk=valueid)
-            return self.value_lookup[valueid]
+            try:
+                self.value_lookup[valueid] = models.Value.objects.get(pk=valueid)
+                return self.value_lookup[valueid]
+            except ObjectDoesNotExist:
+                return models.Value()
 
     def get_concept_export_value(self, valueid, concept_export_value_type=None):
         ret = ""
@@ -127,7 +130,7 @@ class ConceptDataType(BaseConceptDataType):
                 )
         return errors
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value):
         return value.strip()
 
     def transform_export_values(self, value, *args, **kwargs):
@@ -261,7 +264,7 @@ class ConceptListDataType(BaseConceptDataType):
                 errors += validate_concept.validate(val, row_number)
         return errors
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value):
         ret = []
         for val in csv.reader([value], delimiter=",", quotechar='"'):
             for v in val:

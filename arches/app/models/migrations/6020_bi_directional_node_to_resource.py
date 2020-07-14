@@ -5,8 +5,6 @@ import uuid
 import datetime
 from django.db.models import Q
 from django.db import migrations, models
-from arches.app.search.search_engine_factory import SearchEngineFactory
-
 
 def setup(apps):
     nodes = apps.get_model("models", "Node")
@@ -41,23 +39,10 @@ def create_relation(relations, resource, resourceinstanceid_from, resourceinstan
         created=datetime.datetime.now(),
     )
 
-    ontologyClass = ""
-    resourceName = ""
-    try:
-        resTo = resource.objects.get(pk=resourceinstanceid_to)
-        ontologyClass = root_ontology_classes[str(resTo.graph_id)]
-        se = SearchEngineFactory().create()
-        resource_document = se.search(index="resources", id=resourceinstanceid_to)
-        resourceName = resource_document["docs"][0]["_source"]["displayname"]
-    except:
-        pass
-
     ret = {
         "resourceId": resourceinstanceid_to,
         "ontologyProperty": "",
         "inverseOntologyProperty": "",
-        "resourceName": resourceName,
-        "ontologyClass": ontologyClass,
         "resourceXresourceId": str(relationid),
     }
     return ret

@@ -335,7 +335,6 @@ class Tile(models.TileModel):
                 node = models.Node.objects.get(nodeid=nodeid)
                 datatype = datatype_factory.get_instance(node.datatype)
                 datatype.pre_tile_save(self, nodeid)
-
             self.__preSave(request)
             self.check_for_missing_nodes(request)
             self.check_for_constraint_violation(request)
@@ -573,7 +572,7 @@ class Tile(models.TileModel):
         try:
             for function in self._getFunctionClassInstances():
                 try:
-                    function.postSave(self, request)
+                    function.post_save(self, request)
                 except NotImplementedError:
                     pass
         except TypeError as e:
@@ -585,7 +584,7 @@ class Tile(models.TileModel):
         resource = models.ResourceInstance.objects.get(pk=self.resourceinstance_id)
         functionXgraphs = models.FunctionXGraph.objects.filter(
             Q(graph_id=resource.graph_id),
-            Q(config__contains={"triggering_nodegroups": [self.nodegroup_id]}) | Q(config__triggering_nodegroups__exact=[]),
+            Q(config__contains={"triggering_nodegroups": [str(self.nodegroup_id)]}) | Q(config__triggering_nodegroups__exact=[]),
             ~Q(function__classname="PrimaryDescriptorsFunction"),
         )
         for functionXgraph in functionXgraphs:

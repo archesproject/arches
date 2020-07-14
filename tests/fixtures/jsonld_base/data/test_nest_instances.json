@@ -67,19 +67,15 @@
                             "ea67329e-fbf0-11e9-9ca4-3af9d3b32b71": [
                                 {
                                     "resourceId": "24d0d25a-fa75-11e9-b369-3af9d3b32b71",
-                                    "resourceName": "",
                                     "ontologyProperty": "",
-                                    "inverseOntologyProperty": "",
-                                    "ontologyClass": ""
+                                    "inverseOntologyProperty": ""
                                 }
                             ],
                             "fb3edee6-fbf0-11e9-9ca4-3af9d3b32b71": [
                                 {
                                     "resourceId": "12bbf5bc-fa85-11e9-91b8-3af9d3b32b71",
-                                    "resourceName": "",
                                     "ontologyProperty": "",
-                                    "inverseOntologyProperty": "",
-                                    "ontologyClass": ""
+                                    "inverseOntologyProperty": ""
                                 }
                             ]
                         },
@@ -104,33 +100,25 @@
                             "2c164f36-fbf1-11e9-9ca4-3af9d3b32b71": [
                                 {
                                     "resourceId": "24d0d25a-fa75-11e9-b369-3af9d3b32b71",
-                                    "resourceName": "",
                                     "ontologyProperty": "",
-                                    "inverseOntologyProperty": "",
-                                    "ontologyClass": ""
+                                    "inverseOntologyProperty": ""
                                 },
                                 {
                                     "resourceId": "12bbf5bc-fa85-11e9-91b8-3af9d3b32b71",
-                                    "resourceName": "",
                                     "ontologyProperty": "",
-                                    "inverseOntologyProperty": "",
-                                    "ontologyClass": ""
+                                    "inverseOntologyProperty": ""
                                 }
                             ],
                             "3ae10790-fbf1-11e9-9ca4-3af9d3b32b71": [
                                 {
                                     "resourceId": "396dcffa-fa8a-11e9-b6e7-3af9d3b32b71",
-                                    "resourceName": "",
                                     "ontologyProperty": "",
-                                    "inverseOntologyProperty": "",
-                                    "ontologyClass": ""
+                                    "inverseOntologyProperty": ""
                                 },
                                 {
                                     "resourceId": "9c400558-fa8a-11e9-b6e7-3af9d3b32b71",
-                                    "resourceName": "",
                                     "ontologyProperty": "",
-                                    "inverseOntologyProperty": "",
-                                    "ontologyClass": ""
+                                    "inverseOntologyProperty": ""
                                 }
                             ]
                         },
@@ -155,26 +143,20 @@
                             "090300d4-fbf1-11e9-9ca4-3af9d3b32b71": [
                                 {
                                     "resourceId": "24d0d25a-fa75-11e9-b369-3af9d3b32b71",
-                                    "resourceName": "",
                                     "ontologyProperty": "",
-                                    "inverseOntologyProperty": "",
-                                    "ontologyClass": ""
+                                    "inverseOntologyProperty": ""
                                 },
                                 {
                                     "resourceId": "396dcffa-fa8a-11e9-b6e7-3af9d3b32b71",
-                                    "resourceName": "",
                                     "ontologyProperty": "",
-                                    "inverseOntologyProperty": "",
-                                    "ontologyClass": ""
+                                    "inverseOntologyProperty": ""
                                 }
                             ],
                             "1a6fb150-fbf1-11e9-9ca4-3af9d3b32b71": [
                                 {
                                     "resourceId": "12bbf5bc-fa85-11e9-91b8-3af9d3b32b71",
-                                    "resourceName": "",
                                     "ontologyProperty": "",
-                                    "inverseOntologyProperty": "",
-                                    "ontologyClass": ""
+                                    "inverseOntologyProperty": ""
                                 }
                             ]
                         },
@@ -227,17 +209,13 @@
                             "f3250ee0-fbf2-11e9-9ca4-3af9d3b32b71": [
                                 {
                                     "resourceId": "12345678-abcd-11e9-9cbb-3af9d3b32b71",
-                                    "resourceName": "",
                                     "ontologyProperty": "",
-                                    "inverseOntologyProperty": "",
-                                    "ontologyClass": ""
+                                    "inverseOntologyProperty": ""
                                 },
                                 {
                                     "resourceId": "12bbf5bc-fa85-11e9-91b8-3af9d3b32b71",
-                                    "resourceName": "",
                                     "ontologyProperty": "",
-                                    "inverseOntologyProperty": "",
-                                    "ontologyClass": ""
+                                    "inverseOntologyProperty": ""
                                 }
                             ]
                         },
