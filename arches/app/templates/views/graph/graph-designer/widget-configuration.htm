@@ -12,25 +12,25 @@
 
     <div id="widget-crud-settings" class="tab-pane fade in active">
 
-        <div class="node-config-item" style="">
-            <div class="control-label">
+        <div class="node-config-item">
+            <label class="control-label" for="widgetlabel">
                 {% trans "Widget Label" %}
-            </div>
+            </label>
             <div class="pad-no">
-                <input type="" placeholder="{% trans "Widget Label" %}" id="" class="form-control input-md widget-input" data-bind="textInput: label">
+                <input id="widgetlabel" type="" placeholder="{% trans "Widget Label" %}" id="" class="form-control input-md widget-input" data-bind="textInput: label">
             </div>
         </div>
 
-        <div class="node-config-item" style="">
-            <div class="control-label">
+        <div class="node-config-item">
+            <label class="control-label" for="template">
                 {% trans "Template" %}
-            </div>
+            </label>
             <div class="pad-no">
-                <select class="design" data-bind="value: widget_id, options: widgetList(), optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select id="template" class="design" data-bind="value: widget_id, options: widgetList(), optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
 
-        <div class="node-config-item" style="">
+        <div class="node-config-item">
             <div class="control-label">
                 {% trans "Visibility" %}
             </div>

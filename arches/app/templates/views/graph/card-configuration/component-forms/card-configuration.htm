@@ -3,7 +3,7 @@
 <!-- Title Block -->
 <div>
     <div class="">
-        <h4 class="title-block-title" style=""> {% trans "Card Manager" %} </h4>
+        <h4 class="title-block-title"> {% trans "Card Manager" %} </h4>
     </div>
 </div>
 
@@ -16,7 +16,7 @@
         <!-- Card Container Property -->
         {% if graph.isresource and graph.ontology_id %}
         <!-- ko if: !($root.card.isContainer()) -->
-        <div class="node-widget-label" style="">
+        <div class="node-widget-label">
             <div class="control-label">
                 {% trans "Relation to Resource" %}
             </div>
@@ -27,7 +27,7 @@
         <!-- /ko -->
         {% endif %}
 
-        <div class="node-widget-label" style="">
+        <div class="node-widget-label">
             <div class="control-label">
                 {% trans "Card Tab Title" %}
             </div>
@@ -36,7 +36,7 @@
             </div>
         </div>
 
-        <div class="node-widget-label" style="">
+        <div class="node-widget-label">
             <div class="control-label">
                 {% trans "Instructions" %}
             </div>
@@ -46,7 +46,7 @@
         </div>
 
         <div class="form-divider">
-            <h4 class="title-block-title" style=""> {% trans "Settings" %} </h4>
+            <h4 class="title-block-title"> {% trans "Settings" %} </h4>
         </div>
 
         <!-- Card Visibility -->
@@ -66,12 +66,12 @@
         <div class="tertiary-panel help-text-crud" style="display: none;" data-bind="visible: card().get('helpenabled')">
             <div class="tertiary-panel-content">
                 <div class="">
-                    <h4 class="title-block-title" style=""> {% trans "Card-Level Help" %} </h4>
+                    <h4 class="title-block-title"> {% trans "Card-Level Help" %} </h4>
                 </div>
 
                 <!-- Help CRUD -->
                 <div class="pad-all">
-                    <div class="node-widget-label" style="">
+                    <div class="node-widget-label">
                         <div class="control-label">
                             {% trans "Help Panel Title" %}
                         </div>
@@ -81,7 +81,7 @@
                     </div>
 
                     <!--Rich text editor-->
-                    <div class="node-widget-label" style="">
+                    <div class="node-widget-label">
                         <div class="control-label">
                             {% trans "Help Content" %}
                         </div>

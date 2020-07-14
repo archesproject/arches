@@ -8,12 +8,12 @@
 
 {% block listitem %}
     <div data-bind="attr:{'title': $data.groups}">
-        <div class="library-icon" style="">
+        <div class="library-icon">
             <span class="icon-wrap icon-wrap-sm icon-circle" data-bind="css: $data.type === 'group' ? 'bg-purple' : 'bg-mint'">
                 <i data-bind="attr: {class: 'fa fa-' + $data.type}"></i>
             </span>
         </div>
-        <div class="library-card-main" style="">
+        <div class="library-card-main">
             <a class="name">
                 <div data-bind="text: $data.name"></div>
                 <div class="user-groups" data-bind="text: $data.groups"></div>

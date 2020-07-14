@@ -13,42 +13,41 @@
     <!-- Card Container Base Settings Form -->
     <div id="card-crud-settings" class="tab-pane fade in active">
         <div class="node-config-item">
-            <div class="control-label">
+            <label class="control-label" for="cardtype">
                 {% trans "Card Type" %}
-            </div>
+            </label>
             <div>
-                <select class="resources" data-bind="value: model.component_id, options: $parent.cardComponents, optionsText: 'name', optionsValue: 'componentid', optionsCaption: '{% trans "Choose a card component..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select id="cardtype" class="resources" data-bind="value: model.component_id, options: $parent.cardComponents, optionsText: 'name', optionsValue: 'componentid', optionsCaption: '{% trans "Choose a card component..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
 
-        <div class="">
+        <div>
             <div class="node-config-item">
-                <div class="control-label">
+                <label class="control-label" for="cardtitle">
                     {% trans "Card Title" %}
-                </div>
+                </label>
                 <div>
-                    <input type="" placeholder="{% trans "Card name" %}" class="form-control input-md widget-input" data-bind="textInput: model.name">
+                    <input id="cardtitle" type="" placeholder="{% trans "Card name" %}" class="form-control input-md widget-input" data-bind="textInput: model.name">
                 </div>
             </div>
 
             <div class="node-config-item">
-                <div class="control-label">
+                <label class="control-label" for="subtitle">
                     {% trans "Subtitle" %}
-                </div>
+                </label>
                 <div>
-                    <input type="" placeholder="{% trans " " %}" class="form-control input-md widget-input" data-bind="textInput: model.instructions">
+                    <input id="subtitle" type="" placeholder="{% trans " " %}" class="form-control input-md widget-input" data-bind="textInput: model.instructions">
                 </div>
             </div>
 
             <div class="node-config-item">
-                <div class="control-label">
+                <label class="control-label" for="cssclasses">
                     {% trans "CSS Classes (Optional)" %}
-                </div>
+                </label>
                 <div>
-                    <input type="" placeholder="{% trans " " %}" class="form-control input-md widget-input" data-bind="textInput: model.cssclass">
+                    <input id="cssclasses" type="" placeholder="{% trans " " %}" class="form-control input-md widget-input" data-bind="textInput: model.cssclass">
                 </div>
             </div>
-
         </div>
 
         <div>
@@ -84,7 +83,7 @@
                 <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.helpenabled, config:{label: '{% trans "Enable Card-level help" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
 
                 <!-- Tertiary Panel For Card Help Text-->
-                <div class="" style="display: none;" data-bind="visible: model.helpenabled">
+                <div style="display: none;" data-bind="visible: model.helpenabled">
                     <div class="tertiary-panel-content">
 
                         <!-- Help CRUD -->
@@ -100,17 +99,15 @@
 
                             <!--Rich text editor-->
                             <div class="node-widget-label">
-                                <div class="control-label">
+                                <label class="control-label" for="helppanelcontent">
                                     {% trans "Content" %}
-                                </div>
-                                <textarea rows="10" cols="80" data-bind="ckeditor: model.helptext, ckeditorOptions: {}, valueUpdate: 'afterkeydown'"></textarea>
+                                </label>
+                                <textarea id="helppanelcontent" rows="10" cols="80" data-bind="ckeditor: model.helptext, ckeditorOptions: {}, valueUpdate: 'afterkeydown'"></textarea>
                             </div>
-
-
                         </div>
+
                     </div>
                 </div>
-
 
                 <!--ko if: model.widgets().length > 0 -->
                 <div class="panel-section-title dark-colored-text pad-top">

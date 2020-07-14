@@ -82,7 +82,7 @@
            <!-- Filter -->
            <div class="overlay-filter-container">
                <div class="list-filter fdg-node-filter">
-                   <input type="text" class="form-control overlay-filter" style="" placeholder="{% trans "Find an Overlay" %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
+                   <input type="text" class="form-control overlay-filter" placeholder="{% trans "Find an Overlay" %}" aria-label="{% trans "Find an Overlay" %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
                    <span class="clear-node-search" data-bind="click: $data.clearSearch"><i class="fa fa-times-circle"></i></span>
                </div>
            </div>
@@ -158,7 +158,7 @@
                                 <!--ko if: context !== 'search-filter' -->
                                 <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Add GeoJSON" %}' data-bind="click: function(){geojsonInput(!geojsonInput())}, css: {'active': geojsonInput}"><span class="sr-only">{% trans "Add GeoJSON" %}</span><i class="ion-code-working"></i></a>
                                 <div class="map-tool-container map-tool-item geojson" data-bind="fadeVisible: geojsonInput, delay:100, fade: 200">
-                                    <textarea id="" placeholder="{% trans " Enter GeoJSON " %}" class="form-control input-md widget-input map-json-tool-input" data-bind="textInput: geojsonString, valueUpdate: 'keyup'"></textarea>
+                                    <textarea placeholder="{% trans " Enter GeoJSON " %}" class="form-control input-md widget-input map-json-tool-input" data-bind="textInput: geojsonString, valueUpdate: 'keyup'"></textarea>
                                     <a class="clear-geojson-button" disabled data-bind="click: function(){geojsonString(''); geoJsonStringValid(true)}, css:{'enabled': geojsonString || geojsonString() !== ''}"><span>{% trans 'clear' %}</span></a>
                                 </div>
                                 <!-- /ko -->
@@ -168,7 +168,7 @@
                                 <div class="map-tool-container form-control map-query-tool-input buffer" data-bind="visible: _.contains(drawModes, drawMode()) || xyInput.active()">
                                     <div class="form-group form-inline">
                                       <label for="buffer-input">{% trans "Buffer" %}</label>
-                                      <input type="number" min=0.0 id="buffer-input" placeholder="{% trans " buffer " %}" class="buffer" data-bind="textInput: buffer">
+                                      <input type="number" min=0.0 id="buffer-input" placeholder="{% trans " buffer " %}" aria-label="{% trans " buffer " %}" class="buffer" data-bind="textInput: buffer">
                                       <select class="form-control"  data-bind="options: bufferUnits, optionsText:'name', optionsValue:'val', value: bufferUnit"></select>
                                     </div>
                                 </div>
@@ -317,16 +317,16 @@
         <div id="map-widget-container" class="relative">
 
             <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapControls.mapControlsExpanded, 'hide-maptools': mapControls.mapControlsHidden}">
-                <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: mapControls.toggleMapTools"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>
+                <a id="map-tools" href="#" style="display: inline;" data-bind="click: mapControls.toggleMapTools"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>
             </div>
 
             <div id="map-widget-toolbar" class="map-widget-toolbar relative" data-bind="fadeVisible: mapControls.mapControlsExpanded, delay:200, fade:400">
-              <ul class="map-widget-toolbar-list" style="">
+              <ul class="map-widget-toolbar-list">
                 <li class="map-widget-toolbar-item text-center basemaps-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('basemaps')}, css : {'active': !mapControls.mapControlPanels.basemaps()}">
-                    <a id="" href="" class="map-widget-icon">{% trans "Basemaps" %}</a>
+                    <a href="#" class="map-widget-icon">{% trans "Basemaps" %}</a>
                 </li>
                 <li id="btn-overlays" class="map-widget-toolbar-item text-center overlays-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('overlays')}, css : { 'active': !mapControls.mapControlPanels.overlays()}">
-                    <a id="overlays" href="" class="map-widget-icon">{% trans "Overlays" %}</a>
+                    <a id="overlays" href="#" class="map-widget-icon">{% trans "Overlays" %}</a>
                 </li>
 
                 <!-- TODO Uncomment this block once legend available -->
@@ -348,7 +348,7 @@
                         <i class="ion-checkmark-circled" data-bind="css:{'basemap-unselected': name !== self.basemap()}"></i>
                     </div>
                     <div class="map-overlay-name">
-                        <a id="" class="" href=""><span data-bind="text: name, css: {'basemap-unselected': name !== self.basemap()}"><span></a>
+                        <a href="#"><span data-bind="text: name, css: {'basemap-unselected': name !== self.basemap()}"><span></a>
                     </div>
                 </div>
                 <!-- /ko -->
@@ -366,7 +366,7 @@
                         <i data-bind="css: icon"></i>
                     </div>
                     <div class="map-overlay-name" data-bind="click: toggleOverlayVisibility">
-                        <a class="" href=""><span data-bind="text:name"><span></a>
+                        <a href="#"><span data-bind="text:name"><span></a>
                     </div>
                     <div class="map-overlay-item-tools">
                         <a href="#" class="overlay-toggle" data-bind="click: toggleOverlayTools, css:{'overlay-invisible':invisible}">
@@ -423,7 +423,7 @@
                         <i data-bind="css: icon, style: {color: color}"></i>
                     </div>
                     <div class="map-overlay-name">
-                        <a class="" href=""><span data-bind="text:name"><span></a>
+                        <a href="#"><span data-bind="text:name"><span></a>
                     </div>
                 </div>
             </div>
@@ -490,25 +490,25 @@
                     {% trans "Map Center Longitude" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" id="" placeholder="{% trans " Longitude (x coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerX, valueUpdate: 'keyup'">
+                    <input type="number" placeholder="{% trans " Longitude (x coordinate) " %}" aria-label="{% trans " Longitude (x coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerX, valueUpdate: 'keyup'">
                 </div>
                 <div class="control-label">
                     {% trans "Map Center Latitude" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" id="" placeholder="{% trans " Latitude (y coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerY, valueUpdate: 'keyup'">
+                    <input type="number" placeholder="{% trans " Latitude (y coordinate) " %}" aria-label="{% trans " Latitude (y coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerY, valueUpdate: 'keyup'">
                 </div>
                 <div class="control-label">
                     {% trans "Pitch" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" id="" placeholder="{% trans " Pitch (Degrees) " %}" class="form-control input-md widget-input" data-bind="value: pitch, valueUpdate: 'keyup'">
+                    <input type="number" placeholder="{% trans " Pitch (Degrees) " %}" aria-label="{% trans " Pitch (Degrees) " %}" class="form-control input-md widget-input" data-bind="value: pitch, valueUpdate: 'keyup'">
                 </div>
                 <div class="control-label">
                     {% trans "Bearing" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" id="" placeholder="{% trans " Bearing (Degrees) " %}" class="form-control input-md widget-input" data-bind="value: bearing, valueUpdate: 'keyup'">
+                    <input type="number" placeholder="{% trans " Bearing (Degrees) " %}" aria-label="{% trans " Bearing (Degrees) " %}" class="form-control input-md widget-input" data-bind="value: bearing, valueUpdate: 'keyup'">
                 </div>
             </div>
         </div>
@@ -529,19 +529,19 @@
                     {% trans "Default Zoom" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: zoom, valueUpdate: 'keyup'">
+                    <input type="number" min=1 max=20 placeholder="{% trans " Zoom Level " %}" aria-label="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: zoom, valueUpdate: 'keyup'">
                 </div>
                 <div class="control-label">
                     {% trans "Min Zoom" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: minZoom, valueUpdate: 'keyup'">
+                    <input type="number" min=1 max=20 placeholder="{% trans " Zoom Level " %}" aria-label="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: minZoom, valueUpdate: 'keyup'">
                 </div>
                 <div class="control-label">
                     {% trans "Max Zoom" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: maxZoom, valueUpdate: 'keyup'">
+                    <input type="number" min=1 max=20 placeholder="{% trans " Zoom Level " %}" aria-label="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: maxZoom, valueUpdate: 'keyup'">
                 </div>
             </div>
         </div>
@@ -562,13 +562,13 @@
                     {% trans "Default Geocoder" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options: geocodingProviders, optionsText:'name', optionsValue:'geocoderid', value: geocodeProvider, chosen: {width: '100%'}"></select>
+                    <select placeholder="{% trans " Geocoder " %}" aria-label="{% trans " Geocoder " %}" data-bind="options: geocodingProviders, optionsText:'name', optionsValue:'geocoderid', value: geocodeProvider, chosen: {width: '100%'}"></select>
                 </div>
                 <div class="control-label">
                     {% trans "Geocoder Placehoder" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="text" placeholder="{% trans " Geocoder Placehoder " %}" class="form-control input-md widget-input" data-bind="value: geocodePlaceholder, valueUpdate: 'keyup'">
+                    <input type="text" placeholder="{% trans " Geocoder Placehoder " %}" aria-label="{% trans " Geocoder Placehoder " %}" class="form-control input-md widget-input" data-bind="value: geocodePlaceholder, valueUpdate: 'keyup'">
                 </div>
                 <div class="control-label">
                     {% trans "Geocoder Availability" %}
@@ -598,19 +598,19 @@
 
                 <div class="col-xs-12 pad-no crud-widget-container">
                   <div class="colorpicker-component input-group">
-                    <input placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: featureColor, format:'rgba'}">
+                    <input placeholder="{% trans " Map Feature Color " %}" aria-label="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: featureColor, format:'rgba'}">
                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: featureColor}"></i></span>
                   </div>
                 </div>
 
                 <div class="control-label">{% trans "Point Size" %}</div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" min="1" placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="value: featurePointSize, valueUpdate: 'keyup'">
+                    <input type="number" min="1" placeholder="{% trans " Point Size " %}" aria-label="{% trans " Point Size " %}" class="form-control input-lg widget-input" data-bind="value: featurePointSize, valueUpdate: 'keyup'">
                 </div>
 
                 <div class="control-label">{% trans "Line Width" %}</div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" min="1" placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="value: featureLineWidth, valueUpdate: 'keyup'">
+                    <input type="number" min="1" placeholder="{% trans " Line Width " %}" aria-label="{% trans " Line Width " %}" class="form-control input-lg widget-input" data-bind="value: featureLineWidth, valueUpdate: 'keyup'">
                 </div>
 
                 <div class="control-label">{% trans "Available Geometry Types" %}</div>
@@ -641,7 +641,7 @@
                     {% trans "Select Location" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container" style="height: 200px;">
-                    <select type="" id="" placeholder="{% trans " Default Value " %}" data-bind="options: defaultValueOptions, optionsText:'name', optionsValue:'defaultOptionid', value: defaultValueType, chosen: {width: '100%', allow_single_deselect: true, disable_search: true}"></select>
+                    <select placeholder="{% trans " Default Value " %}" aria-label="{% trans " Select Location " %}" data-bind="options: defaultValueOptions, optionsText:'name', optionsValue:'defaultOptionid', value: defaultValueType, chosen: {width: '100%', allow_single_deselect: true, disable_search: true}"></select>
                 </div>
             </div>
         </div>

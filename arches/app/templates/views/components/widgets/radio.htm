@@ -18,7 +18,7 @@
                     },
                     click: function () {
                         $parent.setOptionSelection($data, true);
-                    }">
+                    }" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                     <input type="radio" data-bind="checked: $parent.value,
                         attr: {
                             value: id,
@@ -45,7 +45,7 @@
                 },
                 click: function () {
                     $parent.setOptionSelection($data, true);
-                }">
+                }" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                 <input type="radio" data-bind="checked: $parent.defaultValue,
                     attr: {
                         value: id,

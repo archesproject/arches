@@ -30,7 +30,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="graph-list-header" data-bind="css: {'alert-active': (alert() && alert().active())}">
 
         <!-- Toolbar -->
-        <div class="relative resource-toolbar" style="">
+        <div class="relative resource-toolbar">
 
             <!-- Search -->
             <div class="edit-panel-search-bar">
@@ -41,7 +41,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div          <!-- Find resource -->
                 <div class="find-widget" style="display: none;" data-bind="visible: showFind()">
                     <div>
-                        <select data-bind="chosen: {width: '100%'}, value: graphId, options: resources, optionsText: 'name', optionsValue: 'graphid', optionsCaption: '{% trans "Select a resource..." %}', optionsAfterRender: setResourceOptionDisable"></select>
+                        <select data-bind="chosen: {width: '100%'}, value: graphId, options: resources, optionsText: 'name', optionsValue: 'graphid', optionsCaption: '{% trans "Select a resource..." %}', optionsAfterRender: setResourceOptionDisable" aria-label="{% trans "Select a resource..." %}"></select>
                     </div>
                 </div>
             </div>
@@ -64,7 +64,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- ko foreach: createableResources -->
             <div class="card-grid-item" data-bind="css: { 'disabled': disable_instance_creation}">
                 <!-- Abstract -->
-                <div class="panel-body library-card-body">
+                <div class="panel-body library-card-body" tabindex="0">
                     <!-- card Name -->
                     <div class="panel-heading">
                         <h2 class="panel-title library-card-panel-title"><i class="text-center" data-bind="css: iconclass"></i> <span data-bind="text:name" ></span></h2>
@@ -82,7 +82,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- ko if: !disable_instance_creation-->
                     <div class="pull-right">
                         <a href="#" class="btn btn-primary btn-labeled fa fa-plus" role="button" data-bind="
-                        attr: { href: $parent.arches.urls.add_resource(graphid), 'data-arches-graphid': graphid},
+                        attr: { href: $parent.arches.urls.add_resource(graphid), 'data-arches-graphid': graphid, 'aria-label':'Create resource - '+name},
                         css: { 'disabled': disable_instance_creation }">
                         {% trans "Create Resource" %}</a>
                     </div>

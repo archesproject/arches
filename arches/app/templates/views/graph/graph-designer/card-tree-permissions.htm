@@ -3,23 +3,23 @@
 <div class="jstree jstree-default">
     <div class="header">
         <div class="list-filter" data-bind="" style="text-align: center;">
-            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter">
+            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" aria-label="{% trans 'Find a card...' %}" data-bind="textInput: filter">
 
             <!-- Clear Search -->
             <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
         </div>
         <div class="tree-display-tools-panel">
-            <a class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
-            <a class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
-            <a class="tree-display-tool" data-bind="click: selectAllCards"><i class="ion-checkmark"></i>{% trans ' Select All' %}</a>
-            <a class="tree-display-tool" data-bind="click: clearSelection"><i class="ion-close"></i>{% trans ' Clear All' %}</a>
+            <a href="#" class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
+            <a href="#" class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
+            <a href="#" class="tree-display-tool" data-bind="click: selectAllCards"><i class="ion-checkmark"></i>{% trans ' Select All' %}</a>
+            <a href="#" class="tree-display-tool" data-bind="click: clearSelection"><i class="ion-close"></i>{% trans ' Clear All' %}</a>
         </div>
     </div>
     <div class="left-panel-overflow">
-        <ul class="jstree-container-ul jstree-children" aria-expanded="true">
+        <ul class="jstree-container-ul jstree-children" aria-expanded="true" role="tree">
             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
-                <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
-                <a class="jstree-anchor" href="#" tabindex="-1">
+                <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}" onkeypress="$(this).trigger('click');"></i>
+                <a class="jstree-anchor" href="#">
                     <strong>
                         <i data-bind="css: graphiconclass" role="presentation"></i>
                         <span data-bind="text: graphname"></span>

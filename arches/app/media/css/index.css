@@ -27,6 +27,10 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     padding: 18px 20px;
 }
 
+.navbar-nav>li>a:focus {
+    color: #041B33;
+}
+
 .navbar-nav>li> .application-login {
     color: #13ce67;
     border-radius: 2px;
@@ -103,7 +107,7 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     position: fixed;
     top: 0px;
     width: 100%;
-    z-index: 500;
+    z-index: 3500;
     background-color: #041B33;
     border: none;
     border-radius: 0px;
@@ -173,6 +177,13 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     background-color: rgba(0, 0, 0, 0.174);
 }
 
+.v5-splash-caption {
+    left: 8vw !important;
+    top: 66vh !important;
+    white-space: normal;
+    background: rgba(0,0,0,.5);
+}
+
 .v5-splash-caption h2 {
     font-size: 55px;
     font-weight: 300;
@@ -216,8 +227,16 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     /*font-family: "Open Sans",Arial,sans-serif;*/
 }
 
-.application-name h2 {
+.application-name {
+    position: absolute;
+    top: 5px;
+    left: 80px;
+}
+
+.application-name h1 {
     color: #fff;
+    font-size: 24px;
+    line-height: 33px;
 }
 
 .navbar-brand-disco h2 {
@@ -346,7 +365,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .image-attribution {
     position: absolute; 
-    top: 94%; 
+    bottom: 0.3vh;
     right: 15px; 
     color: #bbb; 
     padding: 10px; 
@@ -388,7 +407,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .app-info-block-text {
-    color: #6c757d;
+    color: #555;
     font-size: 16px;
 }
 
@@ -408,7 +427,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .sub-block-description {
     font-size: 15px;
-    color: #777;
+    color: #555;
     padding: 20px 0px 30px 0px;
 }
 
@@ -459,7 +478,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .copyright-container {
-    height: 80px;
+    min-height: 80px;
     background: #041B33;
     color: #fff;
     padding: 30px 120px 30px 120px;
@@ -472,10 +491,12 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .link-spacing {
     margin-right: 20px;
+    color: #91A7CF;
 }
 
 .app-footer-arches-link {
     float: right;
+    color: #91A7CF;
 }
 
 .datatype-box {
@@ -496,7 +517,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .vertical-nav-container-background {
     position: fixed;
     right: 21px;
-    top: 325px;
+    top: 40vh;
     z-index: 2500;
     width: 22px;
     background: #041B33;
@@ -509,7 +530,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .vertical-nav-container {
     position: fixed;
     right: 25px;
-    top: 345px;
+    top: calc(41vh + 11px);
     z-index: 3000;
     padding: 5px;
 }
@@ -544,7 +565,8 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     background: #ddd;
 }
 
-.vertical-nav-list-link:hover .vertical-nav-list-ref {
+.vertical-nav-list-link:hover .vertical-nav-list-ref,
+.vertical-nav-list-link:focus .vertical-nav-list-ref {
     display: inline-flex;
     margin-top: -2px;
     margin-right: 20px;
@@ -552,7 +574,8 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     padding: 0px 5px;
     font-size: 13px;
     font-weight: 400;
-    color: #041B33;
+    color: #fff;
+    background-color: #041B33;
     float: right;
     width: 100px;
     justify-content: flex-end;
@@ -564,24 +587,30 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .down-button {
     position: absolute;
-    bottom: 70px;
+    bottom: 4vh;
     left: 48%;
     z-index: 100;
+    color: #fff;
+    background: #2a2a2a;
+    border: 1px solid #fff;
+    border-radius: 50%;
 }
 
 .down-button-icon {
-    color: #fff;
-    background: #041B33;
     font-size: 43px;
     padding-top: 4px;
     padding-left: 10px;
-    border: 1px solid #fff;
-    border-radius: 50%;
     height: 50px;
     width: 50px;
     align-items: center;
     justify-content: center;
     opacity: .7;
+}
+
+.down-button:hover,
+.down-button:focus {
+    color: #13ce67;
+    border: 1px solid #13ce67;
 }
 
 .data-type-icon {
@@ -607,7 +636,8 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .splash-img img {
-    max-width: 90%;
+    width: 90%;
+    height: 90%;
 }
 
 .search-screen {
@@ -640,16 +670,17 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .wide-box .box-highlight p {
-    color: #777;
+    color: #555;
 }
 
 .mobile-description-container p {
     font-size: 17px;
-    color: #777;
+    color: #555;
 }
 
 .splash-links {
     margin-top: 20px;
+    padding-left: 80px;
 }
 
 .splash-link-address {
@@ -666,6 +697,10 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .icon-bar {
     background: #fff;
+}
+
+.logo-name-container {
+    padding: 8px 10px 8px 10px;
 }
 
 @media (min-width: 768px) {
@@ -685,7 +720,6 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
         display:block !important;
         background: #000;
         margin-top: 11px;
-        margin-right: 80px;
     }
     .navbar-header {
         float:none;
@@ -702,9 +736,24 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 @media (max-width: 320px) { 
+    .application-name {
+        left: 60px;
+    }
     .app-info-block {
         padding: 20px 10px;
-    } 
+    }
+    .iphone {
+        width: 100%;
+    }
+    .organization-address, .app-footer-heading, .splash-links .row {
+        padding: 0 10px;
+    }
+    .splash-links {
+        padding-left: 10px;
+    }
+    .box-highlight {
+        padding: 10px;
+    }
 }
 
 @media (max-width: 481px) {
@@ -726,6 +775,9 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     .app-info-block {
         padding: 20px 10px;
     }
+    .app-info-block.intro-section h2 {
+        font-size: 8em;
+    }
     .wide-box {
          padding: 0px; 
          margin-left: 5px; 
@@ -734,6 +786,14 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     }
     .mobile-description-container {
         padding: 140px 10px 40px 10px;
+    }
+    .v5-splash-caption {
+        left: 6vw !important;
+        top: 60vh !important;
+    }
+    .v5-splash-caption p {
+        line-height: inherit;
+        font-size: 3em;
     }
 }
 

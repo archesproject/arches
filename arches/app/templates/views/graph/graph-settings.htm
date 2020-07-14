@@ -216,7 +216,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                 </div>
 
                                                                 <div style="position: absolute; left: 130px; top: 21px;">
-                                                                    <input type="text" class="form-control" style="width: 500px; height: 36px;" placeholder="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
+                                                                    <input type="text" class="form-control" style="width: 500px; height: 36px;" placeholder="{% trans "Find an icon" %}" aria-label="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
 
                                                                     <!-- Remove Search -->
                                                                     <span class="clear-search" style="position: absolute; left: 480px; top: 5px; color: #123; font-size: 17px;"><i class="fa fa-times-circle"></i></span>
@@ -312,10 +312,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                     <div class="col-xs-12">
                                                         <div class="pad-hor">
-                                                            <label data-bind="css: { 'active': graph.isactive() }, click: function () { graph.isactive(true) }" class="form-radio form-normal form-text">
+                                                            <label data-bind="css: { 'active': graph.isactive() }, click: function () { graph.isactive(true) }" class="form-radio form-normal form-text" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                                                                 <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="true"> {% trans "Active" %}
                                                             </label>
-                                                            <label data-bind="css: { 'active': !graph.isactive() }, click: function () { graph.isactive(false) }" class="form-radio form-normal form-text">
+                                                            <label data-bind="css: { 'active': !graph.isactive() }, click: function () { graph.isactive(false) }" class="form-radio form-normal form-text" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                                                                 <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="false"> {% trans "Inactive" %}
                                                             </label>
                                                         </div>
