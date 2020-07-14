@@ -525,6 +525,13 @@ class Resources(APIBase):
             except Exception:
                 indent = None
 
+            try:
+                disambiguate = request.GET.get("disambiguate", None)
+            except Exception:
+                disambiguate = None
+            if disambiguate is not None:
+                disambiguate = bool(disambiguate)
+
             if resourceid:
                 if format == "json-ld":
                     try:
