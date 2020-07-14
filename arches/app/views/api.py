@@ -543,7 +543,9 @@ class Resources(APIBase):
                         logger.error(_("The specified resource '{0}' does not exist. JSON-LD export failed.".format(resourceid)))
                         return JSONResponse(status=404)
                 elif format == "json":
-                    out = Resource.objects.get(pk=resourceid)
+                    out = dict()
+                    resource = Resource.objects.get(pk=resourceid)
+                    out[resourceid] = resource
                     if include_tiles is True:
                         out.load_tiles()
             else:
