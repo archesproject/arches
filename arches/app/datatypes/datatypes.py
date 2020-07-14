@@ -1719,12 +1719,15 @@ class ResourceInstanceDataType(BaseDataType):
                     document["strings"].append(
                         {"string": relatedResourceItem["resourceName"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
                     )
-
+    
     def transform_value_for_tile(self, value, **kwargs):
-        return ast.literal_eval(value)
+        try:
+            return json.loads(value)
+        except ValueError:
+            return ast.literal_eval(value)
 
     def transform_export_values(self, value, *args, **kwargs):
-        return value
+        return json.dumps(value)
 
     def append_search_filters(self, value, node, query, request):
         try:
