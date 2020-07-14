@@ -1719,7 +1719,7 @@ class ResourceInstanceDataType(BaseDataType):
                     document["strings"].append(
                         {"string": relatedResourceItem["resourceName"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
                     )
-    
+
     def transform_value_for_tile(self, value, **kwargs):
         try:
             return json.loads(value)
