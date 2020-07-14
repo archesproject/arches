@@ -140,7 +140,7 @@ class Sync(APIBase):
 
         can_sync = userCanAccessMobileSurvey(request, surveyid)
         if can_sync:
-            synclog = {"logid": "", "message": "", "status": "", "survey_id": surveyid, "userid": request.user.id}
+            synclog = models.MobileSyncLog(logid=None, survey_id=surveyid, userid=request.user.id)
             try:
                 survey = MobileSurvey.objects.get(id=surveyid)
                 synclog = survey.sync(userid=request.user.id, use_celery=True)
