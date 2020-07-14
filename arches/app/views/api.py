@@ -547,7 +547,23 @@ class Resources(APIBase):
                     resource = Resource.objects.get(pk=resourceid)
                     out[resourceid] = resource
                     if include_tiles is True:
-                        out.load_tiles()
+                        resource.load_tiles()
+
+                        if disambiguate:
+                            out["disambiguated"] = dict()
+                            datatype_factory = DataTypeFactory()
+
+                            # lookup all nodes from its corresponding graph, then compare that list against nodeid in tile.data.keys
+                            graph = Graph.objects.get(graphid=resource.graph.graphid)
+                            graph_nodes = graph.nodes.copy()
+                            for t in resource.tiles:
+                                for nid in list(t.data.keys()): # better to compare nodegroups?
+                                    if uuid.UUID(nid) in graph_nodes.keys():
+                                        datatype = datatype_factory.get_instance(graph_nodes[uuid.UUID(nid)].datatype)
+                                        value = datatype.get_display_value(t, graph_nodes[uuid.UUID(nid)])
+                                        out["disambiguated"][graph_nodes[uuid.UUID(nid)].name] = value
+                                        del graph_nodes[uuid.UUID(nid)] # shrink list for efficiency
+
             else:
                 #
                 # The following commented code would be what you would use if you wanted to use the rdflib module,
