@@ -1724,6 +1724,7 @@ class ResourceInstanceDataType(BaseDataType):
         try:
             return json.loads(value)
         except ValueError:
+            # do this if json (invalid) is formatted with single quotes, re #6390
             return ast.literal_eval(value)
 
     def transform_export_values(self, value, *args, **kwargs):
