@@ -4,6 +4,7 @@ import decimal
 import base64
 import re
 import logging
+import ast
 from distutils import util
 from datetime import datetime
 from mimetypes import MimeTypes
@@ -1720,10 +1721,10 @@ class ResourceInstanceDataType(BaseDataType):
                     )
 
     def transform_value_for_tile(self, value, **kwargs):
-        return json.loads(value)
+        return ast.literal_eval(value)
 
     def transform_export_values(self, value, *args, **kwargs):
-        return json.dumps(value)
+        return value
 
     def append_search_filters(self, value, node, query, request):
         try:
