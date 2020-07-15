@@ -1188,7 +1188,7 @@ class Graph(models.GraphModel):
 
                 is_editable = card.is_editable()
             else:
-                if card.nodegroup.parentnodegroup is None:
+                if card.nodegroup.parentnodegroup_id is None:
                     card.name = self.name
                     card.description = self.description
                 else:
