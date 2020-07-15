@@ -1095,11 +1095,16 @@ will be very jumbled."""
         if data_dest != "":
             if not graphs:
                 if not graphtype:
-                    graphs = [str(graph['graphid']) for graph in models.GraphModel.objects.values('graphid')]
-                elif graphtype == 'branch':
-                    graphs = [str(graph['graphid']) for graph in models.GraphModel.objects.filter(isresource=False).values('graphid')]
-                elif graphtype == 'resource':
-                    graphs = [str(graph['graphid']) for graph in models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).values('graphid')]
+                    graphs = [str(graph["graphid"]) for graph in models.GraphModel.objects.values("graphid")]
+                elif graphtype == "branch":
+                    graphs = [str(graph["graphid"]) for graph in models.GraphModel.objects.filter(isresource=False).values("graphid")]
+                elif graphtype == "resource":
+                    graphs = [
+                        str(graph["graphid"])
+                        for graph in models.GraphModel.objects.filter(isresource=True)
+                        .exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                        .values("graphid")
+                    ]
             else:
                 graphs = [graph.strip() for graph in graphs.split(",")]
             for graph in ResourceGraphExporter.get_graphs_for_export(graphids=graphs)["graph"]:
