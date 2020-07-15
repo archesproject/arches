@@ -409,7 +409,10 @@ class JsonLdReader(Reader):
 
             ### --- Process Instance ---
             # now walk the instance and align to the tree
-            result = {"data": [jsonld_document["@id"]]}
+            if '@id' in jsonld_document:
+                result = {"data": [jsonld_document["@id"]]}
+            else:
+                result = {"data": [None]}
             self.data_walk(jsonld_document, self.graphtree, result)
 
     def is_semantic_node(self, graph_node):
