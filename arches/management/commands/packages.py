@@ -213,9 +213,7 @@ class Command(BaseCommand):
             will export all grouped business data to one csv file.",
         )
 
-        parser.add_argument(
-            "-type", "--graphtype", action="store", dest="type", help="indicates the type of graph intended for export"
-        )
+        parser.add_argument("-type", "--graphtype", action="store", dest="type", help="indicates the type of graph intended for export")
 
         parser.add_argument(
             "-y", "--yes", action="store_true", dest="yes", help='used to force a yes answer to any user input "continue? y/n" prompt'
@@ -1097,11 +1095,11 @@ will be very jumbled."""
         if data_dest != "":
             if not graphs:
                 if not graphtype:
-                    graphs = [str(graph['graphid']) for graph in models.GraphModel.objects.values('graphid')]
-                elif graphtype == 'branch':
-                    graphs = [str(graph['graphid']) for graph in models.GraphModel.objects.filter(isresource=False).values('graphid')]
-                elif graphtype == 'resource':
-                    graphs = [str(graph['graphid']) for graph in models.GraphModel.objects.filter(isresource=True).values('graphid')]
+                    graphs = [str(graph["graphid"]) for graph in models.GraphModel.objects.values("graphid")]
+                elif graphtype == "branch":
+                    graphs = [str(graph["graphid"]) for graph in models.GraphModel.objects.filter(isresource=False).values("graphid")]
+                elif graphtype == "resource":
+                    graphs = [str(graph["graphid"]) for graph in models.GraphModel.objects.filter(isresource=True).values("graphid")]
             else:
                 graphs = [graph.strip() for graph in graphs.split(",")]
             for graph in ResourceGraphExporter.get_graphs_for_export(graphids=graphs)["graph"]:
