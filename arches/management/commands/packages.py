@@ -213,9 +213,7 @@ class Command(BaseCommand):
             will export all grouped business data to one csv file.",
         )
 
-        parser.add_argument(
-            "-type", "--graphtype", action="store", dest="type", help="indicates the type of graph intended for export"
-        )
+        parser.add_argument("-type", "--graphtype", action="store", dest="type", help="indicates the type of graph intended for export")
 
         parser.add_argument(
             "-y", "--yes", action="store_true", dest="yes", help='used to force a yes answer to any user input "continue? y/n" prompt'
