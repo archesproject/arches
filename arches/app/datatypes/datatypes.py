@@ -1721,10 +1721,14 @@ class ResourceInstanceDataType(BaseDataType):
                     )
 
     def transform_value_for_tile(self, value, **kwargs):
-        return ast.literal_eval(value)
+        try:
+            return json.loads(value)
+        except ValueError:
+            # do this if json (invalid) is formatted with single quotes, re #6390
+            return ast.literal_eval(value)
 
     def transform_export_values(self, value, *args, **kwargs):
-        return value
+        return json.dumps(value)
 
     def append_search_filters(self, value, node, query, request):
         try:

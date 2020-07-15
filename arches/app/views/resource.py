@@ -690,7 +690,7 @@ class ResourceReportView(MapBaseManagerView):
             models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         )
         related_resource_summary = [{"graphid": str(g.graphid), "name": g.name, "resources": []} for g in resource_models]
-        related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=1000)
+        related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=1000, user=request.user)
         related_resources = related_resources_search_results["related_resources"]
         relationships = related_resources_search_results["resource_relationships"]
         resource_relationship_type_values = {i["id"]: i["text"] for i in get_resource_relationship_types()["values"]}
@@ -878,7 +878,7 @@ class RelatedResourcesView(BaseManagerView):
         except ObjectDoesNotExist:
             resource = Resource()
         page = 1 if request.GET.get("page") == "" else int(request.GET.get("page", 1))
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page, user=request.user)
 
         if related_resources is not None:
             ret = self.paginate_related_resources(related_resources, page, request)
@@ -900,7 +900,7 @@ class RelatedResourcesView(BaseManagerView):
         se.es.indices.refresh(index=se._add_prefix("resource_relations"))
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
         page = 1 if request.GET.get("page") == "" else int(request.GET.get("page", 1))
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page, user=request.user)
         ret = []
 
         if related_resources is not None:
@@ -979,7 +979,7 @@ class RelatedResourcesView(BaseManagerView):
         se.es.indices.refresh(index=se._add_prefix("resource_relations"))
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
         page = 1 if request.GET.get("page") == "" else int(request.GET.get("page", 1))
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page, user=request.user)
         ret = []
 
         if related_resources is not None:
