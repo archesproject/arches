@@ -8019,7 +8019,23 @@ a.mega-dropdown-toggle.disabled {
     display: inline-flex;
     justify-content: space-between;
     margin-right: 10%;
-    color: #0257a2;
+    color: #0478E1;
+}
+
+.rp-edit-buttons i {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    height: 36px;
+    width: 36px;
+    margin-right: 2px;
+    margin-left: 2px;
+    background: #f8f8f8;
+}
+
+.rp-edit-buttons i:hover {
+    cursor: pointer;
+    background: #fff;
+    color: #0257a2
 }
 
 .rp-tile-separator {
