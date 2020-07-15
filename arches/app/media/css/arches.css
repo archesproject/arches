@@ -7894,6 +7894,10 @@ a.mega-dropdown-toggle.disabled {
     margin-left: 0px;
 }
 
+.rr-table-column.icon-column:hover {
+    background: #D9D9F5;
+}
+
 .rr-table-column a {
     color: steelblue;
 }
@@ -8019,7 +8023,7 @@ a.mega-dropdown-toggle.disabled {
     display: inline-flex;
     justify-content: space-between;
     margin-right: 10%;
-    color: #0478E1;
+    color: #597DBF;
 }
 
 .rp-edit-buttons i {
@@ -8029,13 +8033,13 @@ a.mega-dropdown-toggle.disabled {
     width: 36px;
     margin-right: 2px;
     margin-left: 2px;
-    background: #f8f8f8;
+    background: #D8FAF6;
 }
 
 .rp-edit-buttons i:hover {
     cursor: pointer;
     background: #fff;
-    color: #0257a2
+    color: #3A5FA4;
 }
 
 .rp-tile-separator {
@@ -10711,7 +10715,7 @@ table.table.dataTable {
     width: calc(100% - 275px);
     height: calc(100vh - 115px);
     overflow-y: auto;
-    padding: 20px;
+    padding: 2px 20px;
     background: white;
     border-right: 0.5px #e0e0e0 solid;
 }
