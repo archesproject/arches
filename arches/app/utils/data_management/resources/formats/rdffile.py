@@ -16,7 +16,6 @@ from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export
 from rdflib import Namespace
 from rdflib import URIRef, Literal
 from rdflib import ConjunctiveGraph as Graph
