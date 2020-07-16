@@ -7963,10 +7963,12 @@ a.mega-dropdown-toggle.disabled {
 
 .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .create-instance-panel {
     background: #fff;
+    min-height: 60%;
 }
 
 .create-resource-instance-card-component.rr-table-pop .create-instance-panel {
     background: #fff;
+    min-height: 60%;
 }
 
 .new-provisional-edit-card-container .rr-table-instance-label {
