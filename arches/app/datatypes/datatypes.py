@@ -1196,15 +1196,8 @@ class FileListDataType(BaseDataType):
             except Exception:
                 pass
             tile_file = {}
-            tile_file["file_id"] = str(uuid.uuid4())
             tile_file["status"] = ""
             tile_file["name"] = file_path.split("/")[-1]
-            tile_file["url"] = settings.MEDIA_URL + "uploadedfiles/" + str(tile_file["name"])
-            # tile_file['index'] =  0
-            # tile_file['height'] =  960
-            # tile_file['content'] =  None
-            # tile_file['width'] =  1280
-            # tile_file['accepted'] =  True
             tile_file["type"] = mime.guess_type(file_path)[0]
             tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
             file_path = "uploadedfiles/" + str(tile_file["name"])
