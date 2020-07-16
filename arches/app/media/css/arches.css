@@ -7918,6 +7918,50 @@ a.mega-dropdown-toggle.disabled {
     white-space: nowrap;
 }
 
+.create-resource-instance-card-component.rr-table-pop {
+    height: 100%;
+    width: 100%;
+    padding: 80px;
+    background: rgba(0,0,0,0.5);
+    top: 0px;
+    left: 0px;
+    border: 1px solid #000;
+}
+
+.create-resource-instance-card-component.rr-table-pop .rp-edit-buttons {
+    display: none;
+}
+
+.workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop {
+    padding: 20px;
+    top: 0px;
+    z-index: 30;
+    height: 100vh;
+}
+
+.workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .card-component {
+    margin-top: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    border-radius: 0px;
+    height: calc(100% - 70px);
+    overflow-y: auto;
+}
+
+.workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .card-component .install-buttons {
+    right: 21px;
+    width: 357px;
+    bottom: 20px;
+}
+
+.workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .create-instance-panel {
+    background: #fff;
+}
+
+.create-resource-instance-card-component.rr-table-pop .create-instance-panel {
+    background: #fff;
+}
+
 .new-provisional-edit-card-container .rr-table-instance-label {
     width: 510px;
 }
@@ -12284,23 +12328,30 @@ a.jstree-anchor.permissions-widget {
 }
 
 .new-instance-model-name {
-    font-size: 1.4em;
+    font-size: 15px;
     font-weight: 600;
     color: #004577;
-    padding: 20px 40px;
-    margin-top: 0px;
     width: 100%;
 }
 
 .create-instance-header {
-    display: flex;
-    justify-content: space-between;
-    background: #f4f4f4;
+    height: 50px;
+    background: #f1f1f1;
+    position: relative;
+    border-bottom: 1px solid #ddd;
+    padding: 17px;
+    font-size: 15px;
 }
 
 .create-instance-header .close-new-step {
-    padding: 12px;
-    font-size: 20px;
+    position: absolute;
+    right: 10px;
+    top: 15px;
+    font-size: 17px;
+}
+
+.create-instance-header .close-new-step:hover {
+    cursor: pointer;
 }
 
 .create-resource-instance-card-component .card-component {
