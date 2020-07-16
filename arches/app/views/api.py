@@ -518,8 +518,8 @@ class Resources(APIBase):
         if user_can_read_resource(user=request.user, resourceid=resourceid):
             allowed_formats = ["json", "json-ld"]
             format = request.GET.get("format", "json-ld")
-            include_tiles = True if request.GET.get("includetiles", 'true').lower() == 'true' else False
-            disambiguate = False if request.GET.get("disambiguate", 'false').lower() == 'false' else True
+            include_tiles = True if request.GET.get("includetiles", "true").lower() == "true" else False
+            disambiguate = False if request.GET.get("disambiguate", "false").lower() == "false" else True
             if format not in allowed_formats:
                 return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
             try:
