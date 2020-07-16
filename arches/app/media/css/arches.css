@@ -7911,6 +7911,22 @@ a.mega-dropdown-toggle.disabled {
     padding-left: 49%;
 }
 
+.rr-table-instance-label {
+    width: 430px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.new-provisional-edit-card-container .rr-table-instance-label {
+    width: 510px;
+}
+
+.workbench-card-sidepanel .rr-table-instance-label {
+    width: 260px;
+}
+
+
 .unselectable {
     color: #ff0000;
 }

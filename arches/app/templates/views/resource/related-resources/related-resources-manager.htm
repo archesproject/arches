@@ -108,7 +108,9 @@
                                 </button>
                             </div>
                             <div class="rr-table-column" style="flex-grow: 1;">
-                                <div><a target="_blank" style="text-decoration: underline; padding-left: 10px;" data-bind="text: resource.displayname, attr:{href: resource.resourceinstanceid}" ></a></div>
+                                <div class="rr-table-instance-label">
+                                    <a target="_blank" style="text-decoration: underline; padding-left: 10px;" data-bind="text: resource.displayname, attr:{href: resource.resourceinstanceid}" ></a>
+                                </div>
                             </div>
                         </div>
                         <div class="rr-table-row-panel" data-bind="if: self.selectedResourceRelationship() === relationship, visible:  self.selectedResourceRelationship() === relationship, css: { 'rr-table-border': self.selectedResourceRelationship() === relationship} ">
