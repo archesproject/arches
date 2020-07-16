@@ -370,42 +370,42 @@ class Tile(models.TileModel):
                         "action": "create tile" if creating_new_tile else "add edit",
                     }
 
-        if user is not None:
-            self.validate([])
+            if user is not None:
+                self.validate([])
 
-        super(Tile, self).save(*args, **kwargs)
-        # We have to save the edit log record after calling save so that the
-        # resource's displayname changes are avaliable
-        user = {} if user is None else user
-        self.datatype_post_save_actions(request)
-        self.__postSave(request)
-        if creating_new_tile is True:
-            self.save_edit(
-                user=user,
-                edit_type=edit_type,
-                old_value={},
-                new_value=self.data,
-                newprovisionalvalue=newprovisionalvalue,
-                provisional_edit_log_details=provisional_edit_log_details,
-            )
-        else:
-            self.save_edit(
-                user=user,
-                edit_type=edit_type,
-                old_value=existing_model.data,
-                new_value=self.data,
-                newprovisionalvalue=newprovisionalvalue,
-                oldprovisionalvalue=oldprovisionalvalue,
-                provisional_edit_log_details=provisional_edit_log_details,
-            )
+            super(Tile, self).save(*args, **kwargs)
+            # We have to save the edit log record after calling save so that the
+            # resource's displayname changes are avaliable
+            user = {} if user is None else user
+            self.datatype_post_save_actions(request)
+            self.__postSave(request)
+            if creating_new_tile is True:
+                self.save_edit(
+                    user=user,
+                    edit_type=edit_type,
+                    old_value={},
+                    new_value=self.data,
+                    newprovisionalvalue=newprovisionalvalue,
+                    provisional_edit_log_details=provisional_edit_log_details,
+                )
+            else:
+                self.save_edit(
+                    user=user,
+                    edit_type=edit_type,
+                    old_value=existing_model.data,
+                    new_value=self.data,
+                    newprovisionalvalue=newprovisionalvalue,
+                    oldprovisionalvalue=oldprovisionalvalue,
+                    provisional_edit_log_details=provisional_edit_log_details,
+                )
 
-        if index:
-            self.index()
+            if index:
+                self.index()
 
-        for tile in self.tiles:
-            tile.resourceinstance = self.resourceinstance
-            tile.parenttile = self
-            tile.save(*args, request=request, index=index, **kwargs)
+            for tile in self.tiles:
+                tile.resourceinstance = self.resourceinstance
+                tile.parenttile = self
+                tile.save(*args, request=request, index=index, **kwargs)
 
     def delete(self, *args, **kwargs):
         se = SearchEngineFactory().create()
