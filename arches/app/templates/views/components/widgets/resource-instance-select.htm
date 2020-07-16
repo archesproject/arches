@@ -48,13 +48,13 @@
         <div class="rr-table">
             <div data-bind='foreach: relationshipsInFilter' style="display: flex; flex-direction: column;">
                 <div class='rr-table-row'>
-                    <div style="display: flex; flex-direction: row; height: 36px;">
-                        <div class='rr-table-column icon-column' style="width: 36px;">
+                    <div class="rr-table-row-initial">
+                        <div class='rr-table-column icon-column'>
                             <button data-bind="click: $parent.deleteRelationship, clickBubble: false">
                                 <i class="fa fa-trash"></i>
                             </button>
                         </div>
-                        <div class='rr-table-column' style="width: 36px;">
+                        <div class='rr-table-column icon-column'>
                             <button data-bind="click:function(){self.reportResourceId($data.resourceId());}, clickBubble: false">
                                 <i class="fa fa-info-circle"></i>
                             </button>

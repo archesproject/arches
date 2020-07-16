@@ -7894,6 +7894,10 @@ a.mega-dropdown-toggle.disabled {
     margin-left: 0px;
 }
 
+.rr-table-column.icon-column {
+    width: 36px;
+}
+
 .rr-table-column.icon-column:hover {
     background: #D9D9F5;
 }
