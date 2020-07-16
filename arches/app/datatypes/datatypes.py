@@ -1210,13 +1210,13 @@ class FileListDataType(BaseDataType):
     def pre_tile_save(self, tile, nodeid):
         # TODO If possible this method should probably replace 'handle request' and perhaps 'process mobile data'
         for file in tile.data[nodeid]:
-            try: 
-                file_model = models.File.objects.get(pk=file['file_id'])
+            try:
+                file_model = models.File.objects.get(pk=file["file_id"])
                 if not file_model.tile_id:
                     file_model.tile = tile
                     file_model.save()
             except ObjectDoesNotExist:
-                logger.warning(_("A file is not available for this tile")) 
+                logger.warning(_("A file is not available for this tile"))
 
     def transform_export_values(self, value, *args, **kwargs):
         return ",".join([settings.MEDIA_URL + "uploadedfiles/" + str(file["name"]) for file in value])
