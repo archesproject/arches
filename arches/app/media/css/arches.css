@@ -27,6 +27,7 @@ img {
 
 [class^="col-"]:not(.pad-no) {
     padding-left: 0px;
+    padding-right: 0px;
 }
 
 .regular-link {
@@ -7944,14 +7945,20 @@ a.mega-dropdown-toggle.disabled {
     margin-left: 0px;
     margin-right: 0px;
     border-radius: 0px;
-    height: calc(100% - 70px);
+    height: 100vh;
     overflow-y: auto;
+}
+
+.create-resource-instance-card-component.rr-table-pop .card-component {
+    margin-top: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    border-radius: 0px;
 }
 
 .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .card-component .install-buttons {
     right: 21px;
     width: 357px;
-    bottom: 20px;
 }
 
 .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .create-instance-panel {
@@ -7991,6 +7998,7 @@ a.mega-dropdown-toggle.disabled {
     font-weight: 300;
     color: #999;
 }
+
 
 .rr-widget-filter-panel {
     margin-top: -5px;
