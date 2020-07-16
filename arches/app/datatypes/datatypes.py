@@ -1193,7 +1193,7 @@ class FileListDataType(BaseDataType):
                 file_stats = os.stat(file_path)
                 tile_file["lastModified"] = file_stats.st_mtime
                 tile_file["size"] = file_stats.st_size
-            except Exception as e:
+            except Exception:
                 pass
             tile_file = {}
             tile_file["file_id"] = str(uuid.uuid4())
