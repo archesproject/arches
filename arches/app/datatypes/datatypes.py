@@ -1207,10 +1207,12 @@ class FileListDataType(BaseDataType):
             # tile_file['accepted'] =  True
             tile_file["type"] = mime.guess_type(file_path)[0]
             tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
-            tile_data.append(tile_file)
             file_path = "uploadedfiles/" + str(tile_file["name"])
-            fileid = tile_file["file_id"]
-            models.File.objects.get_or_create(fileid=fileid, path=file_path)
+            tile_file["file_id"] = str(uuid.uuid4())
+            models.File.objects.get_or_create(fileid=tile_file["file_id"], path=file_path)
+            tile_file["url"] = "/files/" + tile_file["file_id"]
+            tile_data.append(tile_file)
+        return json.loads(json.dumps(tile_data))
 
         result = json.loads(json.dumps(tile_data))
         return result
