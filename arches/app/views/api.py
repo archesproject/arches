@@ -518,20 +518,14 @@ class Resources(APIBase):
         if user_can_read_resource(user=request.user, resourceid=resourceid):
             allowed_formats = ["json", "json-ld"]
             format = request.GET.get("format", "json-ld")
-            include_tiles = request.GET.get("includetiles", True)
+            include_tiles = True if request.GET.get("includetiles", 'true').lower() == 'true' else False
+            disambiguate = False if request.GET.get("disambiguate", 'false').lower() == 'false' else True
             if format not in allowed_formats:
                 return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
             try:
                 indent = int(request.GET.get("indent", None))
             except Exception:
                 indent = None
-
-            try:
-                disambiguate = request.GET.get("disambiguate", None)
-            except Exception:
-                disambiguate = None
-            if disambiguate is not None:
-                disambiguate = bool(disambiguate)
 
             if resourceid:
                 if format == "json-ld":
@@ -544,26 +538,30 @@ class Resources(APIBase):
                         logger.error(_("The specified resource '{0}' does not exist. JSON-LD export failed.".format(resourceid)))
                         return JSONResponse(status=404)
                 elif format == "json":
-                    out = dict()
                     resource = Resource.objects.get(pk=resourceid)
-                    out[resourceid] = resource
+                    out = resource
+
                     if include_tiles is True:
                         resource.load_tiles()
 
-                        if disambiguate:
-                            out["disambiguated"] = dict()
-                            datatype_factory = DataTypeFactory()
+                    if disambiguate:
+                        if not include_tiles:
+                            resource.load_tiles()
+                        out = dict()
+                        out[resourceid] = resource
+                        out["disambiguated"] = dict()
+                        datatype_factory = DataTypeFactory()
 
-                            # lookup all nodes from its corresponding graph, then compare that list against nodeid in tile.data.keys
-                            graph = Graph.objects.get(graphid=resource.graph.graphid)
-                            graph_nodes = graph.nodes.copy()
-                            for t in resource.tiles:
-                                for nid in list(t.data.keys()):  # better to compare nodegroups?
-                                    if uuid.UUID(nid) in graph_nodes.keys():
-                                        datatype = datatype_factory.get_instance(graph_nodes[uuid.UUID(nid)].datatype)
-                                        value = datatype.get_display_value(t, graph_nodes[uuid.UUID(nid)])
-                                        out["disambiguated"][graph_nodes[uuid.UUID(nid)].name] = value
-                                        del graph_nodes[uuid.UUID(nid)]  # shrink list for efficiency
+                        # lookup all nodes from its corresponding graph, then compare that list against nodeid in tile.data.keys
+                        graph = Graph.objects.get(graphid=resource.graph.graphid)
+                        graph_nodes = graph.nodes.copy()
+                        for t in resource.tiles:
+                            for nid in list(t.data.keys()):  # better to compare nodegroups?
+                                if uuid.UUID(nid) in graph_nodes.keys():
+                                    datatype = datatype_factory.get_instance(graph_nodes[uuid.UUID(nid)].datatype)
+                                    value = datatype.get_display_value(t, graph_nodes[uuid.UUID(nid)])
+                                    out["disambiguated"][graph_nodes[uuid.UUID(nid)].name] = value
+                                    del graph_nodes[uuid.UUID(nid)]  # shrink list for efficiency
 
             else:
                 #
