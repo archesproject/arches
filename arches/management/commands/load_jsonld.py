@@ -293,7 +293,7 @@ class Command(BaseCommand):
                 if reload == "ignore":
                     if not quiet:
                         print(f" ... already loaded")
-                    return
+                    return 0
                 elif reload == "error":
                     print(f"*** Record exists for {resourceid}, and -ow is error")
                     raise FileExistsError(resourceid)
