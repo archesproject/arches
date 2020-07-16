@@ -1225,6 +1225,8 @@ class FileListDataType(BaseDataType):
             except ObjectDoesNotExist:
                 logger.warning(_("A file is not available for this tile")) 
 
+    def transform_export_values(self, value, *args, **kwargs):
+        return ",".join([settings.MEDIA_URL + "uploadedfiles/" + str(file["name"]) for file in value])
 
     def is_a_literal_in_rdf(self):
         return False
