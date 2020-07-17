@@ -27,6 +27,7 @@ img {
 
 [class^="col-"]:not(.pad-no) {
     padding-left: 0px;
+    padding-right: 0px;
 }
 
 .regular-link {
@@ -7894,6 +7895,10 @@ a.mega-dropdown-toggle.disabled {
     margin-left: 0px;
 }
 
+.rr-table-column.icon-column {
+    width: 36px;
+}
+
 .rr-table-column.icon-column:hover {
     background: #D9D9F5;
 }
@@ -7906,6 +7911,80 @@ a.mega-dropdown-toggle.disabled {
     font-size: 17px;
     padding-left: 49%;
 }
+
+.rr-table-instance-label {
+    width: 430px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.create-resource-instance-card-component.rr-table-pop {
+    height: 100%;
+    width: 100%;
+    padding: 80px;
+    background: rgba(0,0,0,0.5);
+    top: 0px;
+    left: 0px;
+    border: 1px solid #000;
+}
+
+.create-resource-instance-card-component.rr-table-pop .rp-edit-buttons {
+    display: none;
+}
+
+.workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop {
+    padding: 20px;
+    top: 0px;
+    z-index: 30;
+    height: 100vh;
+}
+
+.workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .card-component {
+    margin-top: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    border-radius: 0px;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.create-resource-instance-card-component.rr-table-pop .card-component {
+    margin-top: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    border-radius: 0px;
+}
+
+.workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .card-component .install-buttons {
+    right: 21px;
+    width: 357px;
+}
+
+.workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .create-instance-panel {
+    background: #fff;
+    min-height: 67%;
+}
+
+.workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .create-instance-panel .loading-mask {
+    left: 100%;
+    width: 450px;
+    display: none;
+}
+
+.create-resource-instance-card-component.rr-table-pop .create-instance-panel {
+    background: #fff;
+    min-height: 60%;
+}
+
+.new-provisional-edit-card-container .rr-table-instance-label {
+    width: 510px;
+}
+
+.workbench-card-sidepanel .rr-table-instance-label {
+    width: 260px;
+}
+
 
 .unselectable {
     color: #ff0000;
@@ -7927,6 +8006,7 @@ a.mega-dropdown-toggle.disabled {
     font-weight: 300;
     color: #999;
 }
+
 
 .rr-widget-filter-panel {
     margin-top: -5px;
@@ -12264,23 +12344,30 @@ a.jstree-anchor.permissions-widget {
 }
 
 .new-instance-model-name {
-    font-size: 1.4em;
+    font-size: 15px;
     font-weight: 600;
     color: #004577;
-    padding: 20px 40px;
-    margin-top: 0px;
     width: 100%;
 }
 
 .create-instance-header {
-    display: flex;
-    justify-content: space-between;
-    background: #f4f4f4;
+    height: 50px;
+    background: #f1f1f1;
+    position: relative;
+    border-bottom: 1px solid #ddd;
+    padding: 17px;
+    font-size: 15px;
 }
 
 .create-instance-header .close-new-step {
-    padding: 12px;
-    font-size: 20px;
+    position: absolute;
+    right: 10px;
+    top: 15px;
+    font-size: 17px;
+}
+
+.create-instance-header .close-new-step:hover {
+    cursor: pointer;
 }
 
 .create-resource-instance-card-component .card-component {
