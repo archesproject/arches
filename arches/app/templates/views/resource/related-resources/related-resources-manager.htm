@@ -93,8 +93,8 @@
                     <div class='rr-table-row'>
                         <div class='rr-table-row-initial'>
                             <div class='rr-table-column icon-column'>
-                                <button data-bind="click: self.toggleSelectedResourceRelationship, clickBubble: false">
-                                    <i data-bind="class: !!relationship.tileid() ? 'fa fa-random' : 'fa fa-usb' "></i>
+                                <button data-bind="click: function(){window.open(resource.resourceinstanceid)}, clickBubble: false">
+                                    <i class="fa fa-pencil"></i>
                                 </button>
                             </div>                        
                             <div class='rr-table-column icon-column'>
@@ -107,10 +107,8 @@
                                     <i class="fa fa-info-circle"></i>
                                 </button>
                             </div>
-                            <div class="rr-table-column" style="flex-grow: 1;">
-                                <div class="rr-table-instance-label">
-                                    <a target="_blank" style="text-decoration: underline; padding-left: 10px;" data-bind="text: resource.displayname, attr:{href: resource.resourceinstanceid}" ></a>
-                                </div>
+                            <div class="rr-table-column" style="flex-grow: 1;" data-bind="click: self.toggleSelectedResourceRelationship, clickBubble: false">
+                                <div class="rr-table-instance-label" style="padding-left: 10px;" data-bind="text: resource.displayname"></div>
                             </div>
                         </div>
                         <div class="rr-table-row-panel" data-bind="if: self.selectedResourceRelationship() === relationship, visible:  self.selectedResourceRelationship() === relationship, css: { 'rr-table-border': self.selectedResourceRelationship() === relationship} ">

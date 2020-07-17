@@ -7857,8 +7857,8 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rr-table-row-initial {
-    display: flex; 
-    flex-direction: row; 
+    display: flex;
+    flex-direction: row;
     height: 36px;
 }
 
@@ -7893,10 +7893,12 @@ a.mega-dropdown-toggle.disabled {
 
 .rr-table-column button i {
     margin-left: 0px;
+    padding: 12px;
 }
 
 .rr-table-column.icon-column {
     width: 36px;
+    padding: 0px;
 }
 
 .rr-table-column.icon-column:hover {
