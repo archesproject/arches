@@ -94,7 +94,7 @@ define([
                             if(!val.ontologyClass) {
                                 Object.defineProperty(val, 'ontologyClass', {value:ko.observable()});
                             }
-                            lookupResourceInstanceData(val.resourceId())
+                            lookupResourceInstanceData(ko.unwrap(val.resourceId))
                                 .then(function(resourceInstance) {
                                     names.push(resourceInstance["_source"].displayname);
                                     self.displayValue(names.join(', '));
