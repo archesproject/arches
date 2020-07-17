@@ -7966,6 +7966,12 @@ a.mega-dropdown-toggle.disabled {
     min-height: 67%;
 }
 
+.workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .create-instance-panel .loading-mask {
+    left: 100%;
+    width: 450px;
+    display: none;
+}
+
 .create-resource-instance-card-component.rr-table-pop .create-instance-panel {
     background: #fff;
     min-height: 60%;
