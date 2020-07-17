@@ -1193,27 +1193,33 @@ class FileListDataType(BaseDataType):
                 file_stats = os.stat(file_path)
                 tile_file["lastModified"] = file_stats.st_mtime
                 tile_file["size"] = file_stats.st_size
-            except Exception as e:
+            except Exception:
                 pass
             tile_file = {}
-            tile_file["file_id"] = str(uuid.uuid4())
             tile_file["status"] = ""
             tile_file["name"] = file_path.split("/")[-1]
-            tile_file["url"] = settings.MEDIA_URL + "uploadedfiles/" + str(tile_file["name"])
-            # tile_file['index'] =  0
-            # tile_file['height'] =  960
-            # tile_file['content'] =  None
-            # tile_file['width'] =  1280
-            # tile_file['accepted'] =  True
             tile_file["type"] = mime.guess_type(file_path)[0]
             tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
-            tile_data.append(tile_file)
             file_path = "uploadedfiles/" + str(tile_file["name"])
-            fileid = tile_file["file_id"]
-            models.File.objects.get_or_create(fileid=fileid, path=file_path)
+            tile_file["file_id"] = str(uuid.uuid4())
+            models.File.objects.get_or_create(fileid=tile_file["file_id"], path=file_path)
+            tile_file["url"] = "/files/" + tile_file["file_id"]
+            tile_data.append(tile_file)
+        return json.loads(json.dumps(tile_data))
 
-        result = json.loads(json.dumps(tile_data))
-        return result
+    def pre_tile_save(self, tile, nodeid):
+        # TODO If possible this method should probably replace 'handle request' and perhaps 'process mobile data'
+        for file in tile.data[nodeid]:
+            try:
+                file_model = models.File.objects.get(pk=file["file_id"])
+                if not file_model.tile_id:
+                    file_model.tile = tile
+                    file_model.save()
+            except ObjectDoesNotExist:
+                logger.warning(_("A file is not available for this tile"))
+
+    def transform_export_values(self, value, *args, **kwargs):
+        return ",".join([settings.MEDIA_URL + "uploadedfiles/" + str(file["name"]) for file in value])
 
     def is_a_literal_in_rdf(self):
         return False
