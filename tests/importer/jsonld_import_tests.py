@@ -172,6 +172,24 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in js)
         self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"] == "test!")
 
+    def test_1b_basic_post(self):
+
+        data = """{
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
+            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "test!"
+            }"""
+
+        url = reverse("resources_graphid", kwargs={"graphid": "bf734b4e-f6b5-11e9-8f09-a4d18cec433a", "resourceid": ""},)
+        response = self.client.post(url, data=data, content_type="application/json", HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        self.assertEqual(response.status_code, 201)
+        js = response.json()
+        if type(js) == list:
+            js = js[0]
+
+        self.assertTrue("@id" in js)
+        self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in js)
+        self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"] == "test!")
+
     def test_2_complex_import_data(self):
         # Note that this tests #5136, as the P101 -> P2 is a concept with a concept
 
