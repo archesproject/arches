@@ -20,6 +20,7 @@ define([
                 this.searchResults = options.searchResultsVm;
                 this.editingInstanceId = options.editing_instance_id;
                 this.graph = options.graph;
+                this.loading = options.loading;
                 this.rootOntologyClass  = '';
                 if (this.graph) {
                     if(!!options.graph.ontologyclass){
@@ -505,6 +506,8 @@ define([
             },
 
             updateTile: function(options, relationship) {
+                var self = this;
+                self.loading(true);
                 window.fetch(arches.urls.api_tiles(relationship.tileid()), {
                     method: 'GET',
                     credentials: 'include',
@@ -544,15 +547,23 @@ define([
                             .then(function(response) {
                                 if (response.ok) {
                                     relationship._json(JSON.stringify(koMapping.toJS(relationship)));
+                                    if (!!options.delete) {
+                                        window.setTimeout(function() {
+                                            self.newPage(1);
+                                            self.loading(false);
+                                        }, 1000);
+                                    }
                                 }
                             })
                             .catch(function(err) {
                                 console.log('Tile update failed', err);
+                                self.loading(false);
                             });
 
                     })
                     .catch(function(err) {
                         console.log('Tile update failed', err);
+                        self.loading(false);
                     });
             },
         }),
