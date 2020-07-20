@@ -54,6 +54,7 @@ define([
                 this.reportGraphId = ko.observable(null);
                 this.resourceRelationships = ko.observableArray();
                 this.paginator = koMapping.fromJS({});
+                this.totalRelationships = ko.observable(0);
                 this.relationshipsInFilter = ko.computed(function() {
                     return self.resourceRelationships().filter(function(relationship) {
                         return self.filter().toLowerCase() === '' || relationship.resource.displayname.toLowerCase().includes(self.filter().toLowerCase());
@@ -169,6 +170,7 @@ define([
                 };
 
                 this.createResource = function(resourceinstanceid) {
+                    var self = this;
                     return {
                         resourceinstanceid: resourceinstanceid,
                         relatedresources: ko.observableArray(),
@@ -226,6 +228,7 @@ define([
                             this.resourceRelationships(sorted);
                             this.displayname = rr.resource_instance.displayname;
                             this.graphid = rr.resource_instance.graph_id;
+                            self.totalRelationships(rr.total.value);
                         },
                         get: function(newPage) {
                             var page = newPage || 1;

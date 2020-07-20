@@ -50,7 +50,6 @@
     <!-- Target -->
     <div id="rr-manager-content-id" class="rr-drag-panel-target" data-bind="style: {'margin-bottom': containerBottomMargin }">
 
-        <!--ko if: resourceRelationships().length > 0-->
         <div class="related-resources-header" data-bind="css: {'open-graph': showGraph() == true}, style: {height: resourceEditorContext === true ? '55px' : '40px'}">
             
             <div class="editor-elements">
@@ -83,8 +82,8 @@
                         data-bind="textInput: filter"></input>
                     <span class="clear-node-search" style="top: 5px;" data-bind="visible: filter().length > 0, click: function() { filter('');}"><i class="fa fa-times-circle"></i></span>
                 </div>
-                <span style="padding: 4px;" data-bind="if: !!resourceRelationships() && resourceRelationships().hasOwnProperty('length') && resourceRelationships().length > 1">
-                    <span style="font-size: 13px;"" class='file-workbench-filecount' data-bind='text: resourceRelationships().length + "{% trans ' resource relations' %}"'></span>
+                <span style="padding: 4px;" data-bind="if: totalRelationships() > 1">
+                    <span style="font-size: 13px;"" class='file-workbench-filecount' data-bind='text: totalRelationships() + "{% trans ' resource relations' %}"'></span>
                 </span>
             </div>
 
@@ -304,8 +303,6 @@
             <div class="rr-panel-note">{%trans "This resource is not related to any other resources" %}</div>
             <!--/ko-->
         </div>
-
-        <!--/ko-->
 
 
         <!--ko if: resourceEditorContext === undefined && !currentResource() -->
