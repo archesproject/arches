@@ -1204,6 +1204,7 @@ class FileListDataType(BaseDataType):
             tile_file["file_id"] = str(uuid.uuid4())
             models.File.objects.get_or_create(fileid=tile_file["file_id"], path=file_path)
             tile_file["url"] = "/files/" + tile_file["file_id"]
+            tile_file["accepted"] = True
             tile_data.append(tile_file)
         return json.loads(json.dumps(tile_data))
 
