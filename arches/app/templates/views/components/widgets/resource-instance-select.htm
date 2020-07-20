@@ -38,17 +38,25 @@
     </div>
     
     <div class="rr-widget">
-        <div class="rr-widget-filter-panel" data-bind="if: value() !== null && value().length > 5">
+        <!-- ko if: value() !== null && value().length > 5-->
+        <div class="rr-widget-filter-panel">
             <div class="list-filter">
                 <input type="text" class="form-control" style="width: 225px; height:28px;" placeholder="{% trans 'filter...' %}" data-bind="textInput: filter"></input>
                 <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter('');}"><i class="fa fa-times-circle"></i></span>
             </div>
         </div>
+        <!-- /ko -->
     
+        <!-- ko if: relationshipsInFilter().length > 0-->
         <div class="rr-table">
             <div data-bind='foreach: relationshipsInFilter' style="display: flex; flex-direction: column;">
                 <div class='rr-table-row'>
                     <div class="rr-table-row-initial">
+                        <div class='rr-table-column icon-column'>
+                            <button data-bind="click: function(){window.open($parent.resourceReportUrl+ko.unwrap($data.resourceId))}, clickBubble: false">
+                                <i class="fa fa-pencil"></i>
+                            </button>
+                        </div>
                         <div class='rr-table-column icon-column'>
                             <button data-bind="click: $parent.deleteRelationship, clickBubble: false">
                                 <i class="fa fa-trash"></i>
@@ -61,15 +69,13 @@
                         </div>
                         <!-- ko if: self.graphIsSemantic -->
                             <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false">
-                                <div class="rr-table-instance-label">
-                                    <a target="_blank" style="text-decoration: underline; padding-left: 10px;" data-bind="text: $data.resourceName(), attr:{href: $parent.resourceReportUrl+ko.unwrap($data.resourceId)}, clickBubble: false"></a>
+                                <div class="rr-table-instance-label" style="padding-left: 10px;" data-bind="text: $data.resourceName()">
                                 </div>
                             </div>
                         <!-- /ko -->
                         <!-- ko ifnot: self.graphIsSemantic -->
                             <div class="rr-table-column" style="flex-grow: 1;">
-                                <div class="rr-table-instance-label">
-                                    <a target="_blank" style="text-decoration: underline; padding-left: 10px;" data-bind="text: $data.resourceName(), attr:{href: $parent.resourceReportUrl+ko.unwrap($data.resourceId)}, clickBubble: false"></a>
+                                <div class="rr-table-instance-label" style="padding-left: 10px;" data-bind="text: $data.resourceName()">
                                 </div>
                             </div>
                         <!-- /ko -->
@@ -127,6 +133,7 @@
                 </div>
             </div>
         </div>
+        <!-- /ko -->
     </div>
 
     <div data-bind="if: !!value() && value().hasOwnProperty('length') && value().length > 1">

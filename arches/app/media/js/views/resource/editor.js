@@ -274,7 +274,8 @@ define([
                         resourceEditorContext: true,
                         editing_instance_id: vm.resourceId(),
                         relationship_types: vm.relationship_types,
-                        graph: vm.graph
+                        graph: vm.graph,
+                        loading: vm.loading
                     };
                     vm.selection('related-resources');
                 });
