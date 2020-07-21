@@ -223,12 +223,13 @@ class RdfWriter(Writer):
 
 
 class JsonLdWriter(RdfWriter):
-    def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
+
+    def build_json(self, graph_id=None, resourceinstanceids=None, **kwargs):
+        # Build the JSON separately serializing it, so we can use internally
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
         g = self.get_rdf_graph()
         value = g.serialize(format="nquads").decode("utf-8")
 
-        # print(f"Got graph: {value}")
         js = from_rdf(value, {"format": "application/nquads", "useNativeTypes": True})
 
         assert len(resourceinstanceids) == 1  # currently, this should be limited to a single top resource
@@ -260,10 +261,12 @@ class JsonLdWriter(RdfWriter):
             for (k, v) in list(js["@graph"][0].items()):
                 js[k] = v
             del js["@graph"]
+        return js
 
+    def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
+        js = self.build_json(graph_id, resourceinstanceids, **kwargs)
         out = json.dumps(js, indent=kwargs.get("indent", None), sort_keys=True)
         dest = StringIO(out)
-
         full_file_name = os.path.join("{0}.{1}".format(self.file_name, "jsonld"))
         return [{"name": full_file_name, "outputfile": dest}]
 
