@@ -23,6 +23,7 @@ define([
         this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
         self.newTileStep = ko.observable();
         this.resourceReportUrl = arches.urls.resource_report;
+        this.resourceEditorUrl = arches.urls.resource_editor;
         this.selectedResourceRelationship = ko.observable(null);
         this.reportResourceId = ko.observable();
         this.reportGraphId = ko.observable(null);
