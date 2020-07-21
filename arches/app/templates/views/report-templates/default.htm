@@ -1,5 +1,6 @@
 {% load i18n %}
 <!-- ko if: !configForm -->
+<!-- ko if: !summary -->
 {% block report %}
 <!-- Report Title Bar -->
 <div class="relative report-title-bar">
@@ -89,6 +90,44 @@
 
 
 {% endblock report %}
+<!-- /ko -->
+<!-- ko if: summary -->
+{% block summary %}
+<div class="relative report-title-bar">
+
+    <!-- Title Block -->
+    <div class="report-toolbar-preview ep-form-toolbar">
+        <h4 class="report-toolbar-title"><span data-bind="text: report.get('name')"></span> - <span data-bind="text: report.get('displayname') "></span></h4>
+
+        <!-- Tools -->
+        <div class="ep-form-toolbar-tools mar-no flex">
+            <p class="report-print-date">{% trans "Report Date:" %} <span data-bind="text: reportDate"></span></p>
+        </div>
+    </div>
+</div>
+<div class="rp-report-container-preview">
+    <div class="rp-report-section relative rp-report-section-root">
+        <div class="rp-report-section-title">
+            <!-- ko if: report.cards.length > 0 -->
+                <!--ko let: { card: report.cards[0] }-->
+                <div class="rp-card-section">
+                    <!-- ko component: {
+                        name: card.model.cardComponentLookup[card.model.component_id()].componentname,
+                        params: {
+                        state: 'report',
+                        preview: report.preview,
+                        card: card,
+                        pageVm: $root
+                    }
+                    } --> <!-- /ko -->
+                </div>
+                <!--/ko-->
+            <!-- /ko -->
+        </div>
+    </div>
+</div>
+{% endblock summary %}
+<!-- /ko -->
 <!-- /ko -->
 
 

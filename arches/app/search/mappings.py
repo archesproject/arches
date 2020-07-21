@@ -261,10 +261,15 @@ def prepare_resource_relations_index(create=False):
                     "resourcexid": {"type": "keyword"},
                     "notes": {"type": "text"},
                     "relationshiptype": {"type": "keyword"},
+                    "inverserelationshiptype": {"type": "keyword"},
                     "resourceinstanceidfrom": {"type": "keyword"},
                     "resourceinstanceidto": {"type": "keyword"},
                     "created": {"type": "keyword"},
                     "modified": {"type": "keyword"},
+                    "datestarted": {"type": "date"},
+                    "dateended": {"type": "date"},
+                    "tileid": {"type": "keyword"},
+                    "nodeid": {"type": "keyword"},
                 }
             }
         }

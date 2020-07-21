@@ -39,11 +39,15 @@ define([
                             self.newFacet(card);
                         };
                     }, this);
-                    _.each(response.graphs, function(graph) {
+                    var graphs = response.graphs.sort(function(a,b) {
+                        return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;});
+                    _.each(graphs, function(graph) {
                         if (graph.isresource && graph.isactive) {
                             var graphCards = _.filter(response.cards, function(card) {
                                 return card.graph_id === graph.graphid && card.nodes.length > 0;
                             });
+                            graphCards.sort(function(a,b) {
+                                return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;});
                             if (graphCards.length > 0) {
                                 _.each(graphCards, function(card) {
                                     card.getGraph = function() {

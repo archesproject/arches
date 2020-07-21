@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import json
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.models import User, Group, Permission
 from django.db import transaction
 from django.forms.models import model_to_dict
@@ -44,7 +44,12 @@ from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_delete_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.permission_backend import user_is_resource_reviewer, remove_resource_instance_permissions, add_permission_to_all
+from arches.app.utils.permission_backend import (
+    user_is_resource_reviewer,
+    user_can_delete_resource,
+    user_can_edit_resource,
+    user_can_read_resource,
+)
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
@@ -94,18 +99,21 @@ def get_resource_relationship_types():
     return relationship_type_values
 
 
-def get_instance_creator(resource_instance, user):
-    try:
-        creatorid = int(
+def get_instance_creator(resource_instance, user=None):
+    creatorid = None
+    can_edit = None
+    if models.EditLog.objects.filter(resourceinstanceid=resource_instance.resourceinstanceid).filter(edittype="create").exists():
+        creatorid = (
             models.EditLog.objects.filter(resourceinstanceid=resource_instance.resourceinstanceid).filter(edittype="create")[0].userid
         )
-        return creatorid, user.id == creatorid or user.is_superuser
+    if creatorid is None or creatorid == "":
+        creatorid = settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
+    if user:
+        can_edit = user.id == int(creatorid) or user.is_superuser
+    return {"creatorid": creatorid, "user_can_edit_instance_permissions": can_edit}
 
-    except Exception:
-        logger.error("Cannot find instance creator when retrieving instance permissions")
-        return None, None
 
-
+@method_decorator(group_required("Resource Editor"), name="dispatch")
 class ResourceEditorView(MapBaseManagerView):
     action = None
 
@@ -124,7 +132,6 @@ class ResourceEditorView(MapBaseManagerView):
 
         creator = None
         user_created_instance = None
-
         if resourceid is None:
             resource_instance = None
             graph = models.GraphModel.objects.get(pk=graphid)
@@ -132,16 +139,17 @@ class ResourceEditorView(MapBaseManagerView):
         else:
             resource_instance = Resource.objects.get(pk=resourceid)
             graph = resource_instance.graph
-            creator, user_created_instance = get_instance_creator(resource_instance, request.user)
+            instance_creator = get_instance_creator(resource_instance, request.user)
+            creator = instance_creator["creatorid"]
+            user_created_instance = instance_creator["user_can_edit_instance_permissions"]
         nodes = graph.node_set.all()
         resource_graphs = (
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
             .exclude(isactive=False)
         )
-        ontologyclass = [node for node in nodes if node.istopnode is True][0].ontologyclass
+        ontologyclass = [node for node in nodes if node.istopnode is True][0].ontologyclass or ""
         relationship_type_values = get_resource_relationship_types()
-
         nodegroups = []
         editable_nodegroups = []
         for node in nodes:
@@ -214,7 +222,7 @@ class ResourceEditorView(MapBaseManagerView):
             card["is_writable"] = False
             if str(card["nodegroup_id"]) in editable_nodegroup_ids:
                 card["is_writable"] = True
-
+        can_delete = user_can_delete_resource(request.user, resourceid)
         context = self.get_context_data(
             main_script=main_script,
             resourceid=resourceid,
@@ -241,6 +249,7 @@ class ResourceEditorView(MapBaseManagerView):
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             user_is_reviewer=json.dumps(user_is_reviewer),
+            user_can_delete_resource=can_delete,
             creator=json.dumps(creator),
             user_created_instance=json.dumps(user_created_instance),
             report_templates=templates,
@@ -258,20 +267,29 @@ class ResourceEditorView(MapBaseManagerView):
 
         return render(request, view_template, context)
 
-    @method_decorator(can_delete_resource_instance, name="dispatch")
     def delete(self, request, resourceid=None):
-        if resourceid is not None:
-            ret = Resource.objects.get(pk=resourceid)
-            try:
-                deleted = ret.delete(user=request.user)
-            except ModelInactiveError as e:
-                message = _("Unable to delete. Please verify the model status is active")
-                return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
-            if deleted is True:
-                return JSONResponse(ret)
-            else:
-                return JSONErrorResponse("Unable to Delete Resource", "Provisional users cannot delete resources with authoritative data")
-        return HttpResponseNotFound()
+        delete_error = _("Unable to Delete Resource")
+        delete_msg = _("User does not have permissions to delete this instance because the instance or its data is restricted")
+        try:
+            if resourceid is not None:
+                if user_can_delete_resource(request.user, resourceid) is False:
+                    return JSONErrorResponse(delete_error, delete_msg)
+                ret = Resource.objects.get(pk=resourceid)
+                try:
+                    deleted = ret.delete(user=request.user)
+                except ModelInactiveError as e:
+                    message = _("Unable to delete. Please verify the model status is active")
+                    return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
+                except PermissionDenied:
+                    return JSONErrorResponse(delete_error, delete_msg)
+                if deleted is True:
+                    return JSONResponse(ret)
+                else:
+                    return JSONErrorResponse(delete_error, delete_msg)
+            return HttpResponseNotFound()
+        except PermissionDenied:
+            return JSONErrorResponse(delete_error, delete_msg)
+
 
     def copy(self, request, resourceid=None):
         resource_instance = Resource.objects.get(pk=resourceid)
@@ -292,11 +310,12 @@ class ResourcePermissionDataView(View):
     def post(self, request):
         resourceid = request.POST.get("instanceid", None)
         action = request.POST.get("action", None)
+        graphid = request.POST.get("graphid", None)
         result = None
         if action == "restrict":
-            result = self.make_instance_private(resourceid)
+            result = self.make_instance_private(resourceid, graphid)
         elif action == "open":
-            result = self.make_instance_public(resourceid)
+            result = self.make_instance_public(resourceid, graphid)
         else:
             data = JSONDeserializer().deserialize(request.body)
             self.apply_permissions(data, request.user)
@@ -351,24 +370,27 @@ class ResourcePermissionDataView(View):
         result = {"identities": identities}
         result["permissions"] = ordered_perms
         result["limitedaccess"] = (len(get_users_with_perms(resource_instance)) + len(get_groups_with_perms(resource_instance))) > 1
-        try:
-            createorid = (
-                models.EditLog.objects.filter(resourceinstanceid=resource_instance.resourceinstanceid).filter(edittype="create")[0].userid
-            )
-            result["creatorid"] = createorid
-        except Exception:
-            logger.error("Cannot find instance creator when retrieving instance permissions")
-            result["creatorid"] = None
+        instance_creator = get_instance_creator(resource_instance)
+        result["creatorid"] = instance_creator["creatorid"]
         return result
 
-    def make_instance_private(self, instanceid):
-        remove_resource_instance_permissions(instanceid)
-        resource_instance = add_permission_to_all(instanceid, "no_access_to_resourceinstance")
-        return self.get_instance_permissions(resource_instance)
+    def make_instance_private(self, resourceinstanceid, graphid=None):
+        resource = Resource(resourceinstanceid)
+        resource.graph_id = graphid if graphid else str(models.ResourceInstance.objects.get(pk=resourceinstanceid).graph_id)
+        resource.add_permission_to_all("no_access_to_resourceinstance")
+        instance_creator = get_instance_creator(resource)
+        user = User.objects.get(pk=instance_creator["creatorid"])
+        assign_perm("view_resourceinstance", user, resource)
+        assign_perm("change_resourceinstance", user, resource)
+        assign_perm("delete_resourceinstance", user, resource)
+        remove_perm("no_access_to_resourceinstance", user, resource)
+        return self.get_instance_permissions(resource)
 
-    def make_instance_public(self, instanceid):
-        resource_instance = remove_resource_instance_permissions(instanceid)
-        return self.get_instance_permissions(resource_instance)
+    def make_instance_public(self, resourceinstanceid, graphid=None):
+        resource = Resource(resourceinstanceid)
+        resource.graph_id = graphid if graphid else str(models.ResourceInstance.objects.get(pk=resourceinstanceid).graph_id)
+        resource.remove_resource_instance_permissions()
+        return self.get_instance_permissions(resource)
 
     def apply_permissions(self, data, user, revert=False):
         with transaction.atomic():
@@ -380,7 +402,9 @@ class ResourcePermissionDataView(View):
                     else:
                         identityModel = User.objects.get(pk=identity["id"])
 
-                    creator, user_can_modify_permissions = get_instance_creator(resource_instance, user)
+                    instance_creator = get_instance_creator(resource_instance, user)
+                    creator = instance_creator["creatorid"]
+                    user_can_modify_permissions = instance_creator["user_can_edit_instance_permissions"]
 
                     if user_can_modify_permissions:
                         # first remove all the current permissions
@@ -397,8 +421,7 @@ class ResourcePermissionDataView(View):
                                     assign_perm(perm["codename"], identityModel, resource_instance)
 
                 resource = Resource(str(resource_instance.resourceinstanceid))
-                resource.graphid = resource_instance.graph_id
-                resource.graph = resource_instance.graph
+                resource.graph_id = resource_instance.graph_id
                 resource.index()
 
 
@@ -647,6 +670,8 @@ class ResourceDescriptors(View):
                         "map_popup": document["_source"]["map_popup"],
                         "displayname": document["_source"]["displayname"],
                         "geometries": document["_source"]["geometries"],
+                        "permissions": document["_source"]["permissions"],
+                        "userid": request.user.id,
                     }
                 )
             except Exception as e:
@@ -665,7 +690,7 @@ class ResourceReportView(MapBaseManagerView):
             models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         )
         related_resource_summary = [{"graphid": str(g.graphid), "name": g.name, "resources": []} for g in resource_models]
-        related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=1000)
+        related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=1000, user=request.user)
         related_resources = related_resources_search_results["related_resources"]
         relationships = related_resources_search_results["resource_relationships"]
         resource_relationship_type_values = {i["id"]: i["text"] for i in get_resource_relationship_types()["values"]}
@@ -688,23 +713,54 @@ class ResourceReportView(MapBaseManagerView):
 
         tiles = Tile.objects.filter(resourceinstance=resource).order_by("sortorder")
 
-        graph = Graph.objects.get(graphid=resource.graph_id)
-        cards = Card.objects.filter(graph=graph).order_by("sortorder")
-        permitted_cards = []
         permitted_tiles = []
 
         perm = "read_nodegroup"
-
-        for card in cards:
-            if request.user.has_perm(perm, card.nodegroup):
-                card.filter_by_perm(request.user, perm)
-                permitted_cards.append(card)
 
         for tile in tiles:
             if request.user.has_perm(perm, tile.nodegroup):
                 tile.filter_by_perm(request.user, perm)
                 permitted_tiles.append(tile)
 
+        if request.GET.get("json", False) and request.GET.get("exclude_graph", False):
+            return JSONResponse(
+                {
+                    "tiles": permitted_tiles,
+                    "related_resources": related_resource_summary,
+                    "displayname": displayname,
+                    "resourceid": resourceid,
+                }
+            )
+
+        datatypes = models.DDataType.objects.all()
+        graph = Graph.objects.get(graphid=resource.graph_id)
+        cards = Card.objects.filter(graph_id=resource.graph_id).order_by("sortorder")
+        permitted_cards = []
+        for card in cards:
+            if request.user.has_perm(perm, card.nodegroup):
+                card.filter_by_perm(request.user, perm)
+                permitted_cards.append(card)
+        cardwidgets = [
+            widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
+        ]
+
+        if request.GET.get("json", False) and not request.GET.get("exclude_graph", False):
+            return JSONResponse(
+                {
+                    "datatypes": datatypes,
+                    "cards": permitted_cards,
+                    "tiles": permitted_tiles,
+                    "graph": graph,
+                    "related_resources": related_resource_summary,
+                    "displayname": displayname,
+                    "resourceid": resourceid,
+                    "cardwidgets": cardwidgets,
+                }
+            )
+
+        widgets = models.Widget.objects.all()
+        templates = models.ReportTemplate.objects.all()
+        card_components = models.CardComponent.objects.all()
         try:
             map_layers = models.MapLayer.objects.all()
             map_markers = models.MapMarker.objects.all()
@@ -712,15 +768,6 @@ class ResourceReportView(MapBaseManagerView):
             geocoding_providers = models.Geocoder.objects.all()
         except AttributeError:
             raise Http404(_("No active report template is available for this resource."))
-
-        cardwidgets = [
-            widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
-        ]
-
-        datatypes = models.DDataType.objects.all()
-        widgets = models.Widget.objects.all()
-        templates = models.ReportTemplate.objects.all()
-        card_components = models.CardComponent.objects.all()
 
         context = self.get_context_data(
             main_script="views/resource/report",
@@ -972,8 +1019,8 @@ class RelatedResourcesView(BaseManagerView):
 
     def get(self, request, resourceid=None):
         if self.action == "get_candidates":
-            resourceids = json.loads(request.GET.get("resourceids", "[]"))
-            resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
+            resourceid = request.GET.get("resourceids", "")
+            resources = Resource.objects.filter(resourceinstanceid=resourceid)
             ret = []
             for rr in resources:
                 res = JSONSerializer().serializeToPython(rr)
@@ -995,7 +1042,7 @@ class RelatedResourcesView(BaseManagerView):
         except ObjectDoesNotExist:
             resource = Resource()
         page = 1 if request.GET.get("page") == "" else int(request.GET.get("page", 1))
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page, user=request.user)
 
         if related_resources is not None:
             ret = self.paginate_related_resources(related_resources, page, request)
@@ -1017,7 +1064,7 @@ class RelatedResourcesView(BaseManagerView):
         se.es.indices.refresh(index=se._add_prefix("resource_relations"))
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
         page = 1 if request.GET.get("page") == "" else int(request.GET.get("page", 1))
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page, user=request.user)
         ret = []
 
         if related_resources is not None:
@@ -1029,9 +1076,9 @@ class RelatedResourcesView(BaseManagerView):
         lang = request.GET.get("lang", settings.LANGUAGE_CODE)
         se = SearchEngineFactory().create()
         res = dict(request.POST)
-        relationship_type = res["relationship_properties[relationship_type]"][0]
-        datefrom = res["relationship_properties[datefrom]"][0]
-        dateto = res["relationship_properties[dateto]"][0]
+        relationshiptype = res["relationship_properties[relationshiptype]"][0]
+        datefrom = res["relationship_properties[datestarted]"][0]
+        dateto = res["relationship_properties[dateended]"][0]
         dateto = None if dateto == "" else dateto
         datefrom = None if datefrom == "" else datefrom
         notes = res["relationship_properties[notes]"][0]
@@ -1068,7 +1115,7 @@ class RelatedResourcesView(BaseManagerView):
                     resourceinstanceidfrom=Resource(root_resourceinstanceid[0]),
                     resourceinstanceidto=Resource(instanceid),
                     notes=notes,
-                    relationshiptype=relationship_type,
+                    relationshiptype=relationshiptype,
                     datestarted=datefrom,
                     dateended=dateto,
                 )
@@ -1083,7 +1130,7 @@ class RelatedResourcesView(BaseManagerView):
         for relationshipid in relationships_to_update:
             rr = models.ResourceXResource.objects.get(pk=relationshipid)
             rr.notes = notes
-            rr.relationshiptype = relationship_type
+            rr.relationshiptype = relationshiptype
             rr.datestarted = datefrom
             rr.dateended = dateto
             try:
@@ -1096,7 +1143,7 @@ class RelatedResourcesView(BaseManagerView):
         se.es.indices.refresh(index=se._add_prefix("resource_relations"))
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
         page = 1 if request.GET.get("page") == "" else int(request.GET.get("page", 1))
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page, user=request.user)
         ret = []
 
         if related_resources is not None:

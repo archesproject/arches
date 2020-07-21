@@ -46,6 +46,7 @@ from arches.app.views.base import BaseManagerView
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 from io import BytesIO
 from elasticsearch.exceptions import RequestError
+from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +100,7 @@ class GraphSettingsView(GraphBaseView):
                 "isactive",
                 "color",
                 "jsonldcontext",
+                "slug",
                 "config",
                 "template_id",
             ]:
@@ -244,7 +246,6 @@ class GraphDesignerView(GraphBaseView):
 class GraphDataView(View):
 
     action = "update_node"
-
     def get(self, request, graphid, nodeid=None):
         if self.action == "export_graph":
             graph = get_graphs_for_export([graphid])
@@ -281,23 +282,26 @@ class GraphDataView(View):
         elif self.action == "get_domain_connections":
             res = []
             graph = Graph.objects.get(graphid=graphid)
-            ontology_class = request.GET.get("ontology_class", None)
             ret = graph.get_valid_domain_ontology_classes()
             for r in ret:
                 res.append({"ontology_property": r["ontology_property"], "ontology_classes": [c for c in r["ontology_classes"]]})
             return JSONResponse(res)
 
-        else:
+        elif self.action == "get_nodes":
             graph = Graph.objects.get(graphid=graphid)
-            if self.action == "get_related_nodes":
-                parent_nodeid = request.GET.get("parent_nodeid", None)
-                ret = graph.get_valid_ontology_classes(nodeid=nodeid, parent_nodeid=parent_nodeid)
+            return JSONResponse(graph.nodes)
 
-            elif self.action == "get_valid_domain_nodes":
-                if nodeid == "":
-                    nodeid = None
-                ret = graph.get_valid_domain_ontology_classes(nodeid=nodeid)
+        elif self.action == "get_related_nodes":
+            parent_nodeid = request.GET.get("parent_nodeid", None)
+            graph = Graph.objects.get(graphid=graphid)
+            ret = graph.get_valid_ontology_classes(nodeid=nodeid, parent_nodeid=parent_nodeid)
+            return JSONResponse(ret)
 
+        elif self.action == "get_valid_domain_nodes":
+            graph = Graph.objects.get(graphid=graphid)
+            if nodeid == "":
+                nodeid = None
+            ret = graph.get_valid_domain_ontology_classes(nodeid=nodeid)
             return JSONResponse(ret)
 
         return HttpResponseNotFound()
@@ -322,8 +326,10 @@ class GraphDataView(View):
                     ret = Graph.new(name=name, is_resource=isresource, author=author)
 
                 elif self.action == "update_node":
+                    old_node_data = graph.nodes.get(uuid.UUID(data["nodeid"]))
+                    nodegroup_changed = str(old_node_data.nodegroup_id) != data["nodegroup_id"]
                     updated_values = graph.update_node(data)
-                    if "nodeid" in data:
+                    if "nodeid" in data and nodegroup_changed is False:
                         graph.save(nodeid=data["nodeid"])
                     else:
                         graph.save()
@@ -356,12 +362,14 @@ class GraphDataView(View):
 
                 elif self.action == "export_branch":
                     clone_data = graph.copy(root=data)
+                    clone_data["copy"].slug = None
                     clone_data["copy"].save()
                     ret = {"success": True, "graphid": clone_data["copy"].pk}
 
                 elif self.action == "clone_graph":
                     clone_data = graph.copy()
                     ret = clone_data["copy"]
+                    ret.slug = None
                     ret.save()
                     ret.copy_functions(graph, [clone_data["nodes"], clone_data["nodegroups"]])
 
@@ -437,70 +445,6 @@ class GraphDataView(View):
 @method_decorator(group_required("Graph Editor"), name="dispatch")
 class CardView(GraphBaseView):
     action = "update_card"
-
-    def get(self, request, cardid):
-        try:
-            card = Card.objects.get(cardid=cardid)
-            self.graph = Graph.objects.get(graphid=card.graph_id)
-        except (Card.DoesNotExist):
-            # assume the cardid is actually a graph id
-            card = Card.objects.get(cardid=Graph.objects.get(graphid=cardid).get_root_card().cardid)
-            self.graph = Graph.objects.get(graphid=card.graph_id)
-            if self.graph.isresource is True:
-                return redirect("card_manager", graphid=cardid)
-
-        card.confirm_enabled_state(request.user, card.nodegroup)
-        for c in card.cards:
-            c.confirm_enabled_state(request.user, c.nodegroup)
-
-        datatypes = models.DDataType.objects.all()
-        widgets = models.Widget.objects.all()
-        geocoding_providers = models.Geocoder.objects.all()
-        map_layers = models.MapLayer.objects.all()
-        map_markers = models.MapMarker.objects.all()
-        map_sources = models.MapSource.objects.all()
-        resource_graphs = (
-            Graph.objects.exclude(pk=card.graph_id)
-            .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-            .exclude(isresource=False)
-            .exclude(isactive=False)
-        )
-        lang = request.GET.get("lang", settings.LANGUAGE_CODE)
-        concept_collections = Concept().concept_tree(mode="collections", lang=lang)
-        ontology_properties = []
-        card_root_node = models.Node.objects.get(nodeid=card.nodegroup_id)
-        for item in self.graph.get_valid_ontology_classes(nodeid=card.nodegroup_id):
-            if card_root_node.ontologyclass in item["ontology_classes"]:
-                ontology_properties.append(item["ontology_property"])
-        ontology_properties = sorted(ontology_properties, key=lambda item: item)
-
-        context = self.get_context_data(
-            main_script="views/graph/card-configuration-manager",
-            graph_id=self.graph.graphid,
-            card=JSONSerializer().serialize(card),
-            datatypes_json=JSONSerializer().serialize(datatypes),
-            geocoding_providers=geocoding_providers,
-            datatypes=datatypes,
-            widgets=widgets,
-            widgets_json=JSONSerializer().serialize(widgets),
-            map_layers=map_layers,
-            map_markers=map_markers,
-            map_sources=map_sources,
-            resource_graphs=resource_graphs,
-            concept_collections=concept_collections,
-            ontology_properties=JSONSerializer().serialize(ontology_properties),
-        )
-
-        context["graphid"] = self.graph.graphid
-        context["graph"] = JSONSerializer().serializeToPython(self.graph)
-        context["graph_json"] = json.dumps(context["graph"])
-        context["root_node"] = self.graph.node_set.get(istopnode=True)
-
-        context["nav"]["title"] = self.graph.name
-        context["nav"]["menu"] = True
-        context["nav"]["help"] = {"title": _("Configuring Cards and Widgets"), "template": "card-designer-help"}
-
-        return render(request, "views/graph/card-configuration-manager.htm", context)
 
     def post(self, request, cardid=None):
         data = JSONDeserializer().deserialize(request.body)

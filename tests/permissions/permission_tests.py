@@ -29,20 +29,19 @@ from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.core import management
 from django.urls import reverse
-from arches.app.models.models import ResourceInstance, Node
 from django.test.client import RequestFactory, Client
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
+from arches.app.models.models import ResourceInstance, Node
+from arches.app.models.resource import Resource
 from arches.app.utils.permission_backend import get_editable_resource_types
 from arches.app.utils.permission_backend import get_resource_types_by_perm
-from arches.app.utils.permission_backend import user_can_read_resources
-from arches.app.utils.permission_backend import user_can_edit_resources
+from arches.app.utils.permission_backend import user_can_read_resource
+from arches.app.utils.permission_backend import user_can_edit_resource
 from arches.app.utils.permission_backend import user_can_read_concepts
-from arches.app.utils.permission_backend import user_can_delete_resources
 from arches.app.utils.permission_backend import user_has_resource_model_permissions
-from arches.app.utils.permission_backend import remove_resource_instance_permissions
 from arches.app.utils.permission_backend import get_restricted_users
 from arches.app.search.mappings import (
     prepare_terms_index,
@@ -67,7 +66,9 @@ class PermissionTests(ArchesTestCase):
         self.resource_instance_id = "f562c2fa-48d3-4798-a723-10209806c068"
         self.user = User.objects.get(username="ben")
         self.group = Group.objects.get(pk=2)
-        remove_resource_instance_permissions(self.resource_instance_id)
+        resource = Resource(pk=self.resource_instance_id)
+        resource.graph_id = self.data_type_graphid
+        resource.remove_resource_instance_permissions()
 
     def tearDown(self):
         ResourceInstance.objects.filter(graph_id=self.data_type_graphid).delete()
@@ -118,12 +119,12 @@ class PermissionTests(ArchesTestCase):
 
         """
 
-        implicit_permission = user_can_read_resources(self.user, self.resource_instance_id)
+        implicit_permission = user_can_read_resource(self.user, self.resource_instance_id)
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
         assign_perm("change_resourceinstance", self.group, resource)
-        can_access_without_view_permission = user_can_read_resources(self.user, self.resource_instance_id)
+        can_access_without_view_permission = user_can_read_resource(self.user, self.resource_instance_id)
         assign_perm("view_resourceinstance", self.group, resource)
-        can_access_with_view_permission = user_can_read_resources(self.user, self.resource_instance_id)
+        can_access_with_view_permission = user_can_read_resource(self.user, self.resource_instance_id)
         self.assertTrue(
             implicit_permission is True and can_access_without_view_permission is False and can_access_with_view_permission is True
         )

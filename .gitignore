@@ -1,5 +1,6 @@
 *.pyc
 virtualenv/ENV*
+env
 tests/elasticsearch
 tests/logs
 tests/fixtures/testing_prj/testing_prj/media/packages/*
@@ -37,3 +38,4 @@ djcp.sh
 .DS_Store
 pip-wheel-metadata
 .eggs
+*.code-workspace

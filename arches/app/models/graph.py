@@ -16,10 +16,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import uuid
 import json
+import logging
 import pyprind
+import uuid
 from copy import copy, deepcopy
+from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from arches.app.models import models
@@ -30,6 +32,8 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.utils.translation import ugettext as _
 from pyld.jsonld import compact, JsonLdError
+
+logger = logging.getLogger(__name__)
 
 class Graph(models.GraphModel):
     """
@@ -395,6 +399,10 @@ class Graph(models.GraphModel):
             for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()
             self._nodegroups_to_delete = []
+            try:
+                cache.set(f"graph_{self.graphid}", JSONSerializer().serializeToPython(self), settings.GRAPH_MODEL_CACHE_TIMEOUT)
+            except KeyError as e:
+                logger.warn(e)
 
         return self
 
@@ -508,6 +516,8 @@ class Graph(models.GraphModel):
         if skip_validation or self.can_append(branch_graph, nodeToAppendTo):
             branch_copy = branch_graph.copy()["copy"]
             branch_copy.root.istopnode = False
+            # Copy the description of the branch to the new node
+            branch_copy.root.description = branch_graph.description
 
             newEdge = models.Edge(domainnode=nodeToAppendTo, rangenode=branch_copy.root, ontologyproperty=property, graph=self)
             branch_copy.add_edge(newEdge)
@@ -1041,7 +1051,7 @@ class Graph(models.GraphModel):
     def get_valid_ontology_classes(self, nodeid=None, parent_nodeid=None):
         """
         get possible ontology properties (and related classes) a node with the given nodeid can have
-        taking into consideration it's current position in the graph
+        taking into consideration its current position in the graph
 
         Arguments:
         nodeid -- the id of the node in question
@@ -1103,7 +1113,6 @@ class Graph(models.GraphModel):
                 else:
                     # if no parent node then just use the list of ontology classes from above, there will be no properties to return
                     ret = [{"ontology_property": "", "ontology_classes": list(ontology_classes)}]
-
         return ret
 
     def get_nodegroups(self, nodegroupid=None):
@@ -1179,7 +1188,7 @@ class Graph(models.GraphModel):
 
                 is_editable = card.is_editable()
             else:
-                if card.nodegroup.parentnodegroup is None:
+                if card.nodegroup.parentnodegroup_id is None:
                     card.name = self.name
                     card.description = self.description
                 else:
@@ -1442,6 +1451,11 @@ class Graph(models.GraphModel):
             out = compact({}, context)
         except JsonLdError:
             raise GraphValidationError(_("The json-ld context you supplied wasn't formatted correctly."), 1006)
+
+        if self.slug is not None:
+            graphs_with_matching_slug = models.GraphModel.objects.exclude(slug__isnull=True).filter(slug=self.slug)
+            if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
+                raise GraphValidationError(_(f"Another resource modal already uses the slug '{self.slug}'"), 1007)
 
 
 class GraphValidationError(Exception):

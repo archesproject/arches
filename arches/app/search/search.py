@@ -107,20 +107,26 @@ class SearchEngine(object):
     def search(self, **kwargs):
         """
         Search for an item in the index.
-        Pass an index and id to get a specific document
+        Pass an index and id (or list of ids) to get a specific document(s)
         Pass a body with a query dsl to perform a search
 
         """
 
         kwargs = self._add_prefix(**kwargs)
         body = kwargs.get("body", None)
-        id = kwargs.get("id", None)
+        id = kwargs.pop("id", None)
 
         if id:
+            if isinstance(id, str):
+                id = id.split(",")
+                if len(id) == 1:
+                    id = id[0]
             if isinstance(id, list):
-                kwargs.setdefault("body", {"ids": kwargs.pop("id")})
+                kwargs["body"] = {"ids": id}
                 return self.es.mget(**kwargs)
             else:
+                kwargs.pop("body", None)  # remove body param
+                kwargs["id"] = id
                 return self.es.get(**kwargs)
 
         ret = None

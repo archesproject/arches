@@ -4,6 +4,7 @@ import decimal
 import base64
 import re
 import logging
+import ast
 from distutils import util
 from datetime import datetime
 from mimetypes import MimeTypes
@@ -15,9 +16,10 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.app.utils.geo_utils import GeoUtils
 import arches.app.utils.task_management as task_management
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists, RangeDSLException
-from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Terms, Exists, RangeDSLException
+from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.utils.translation import ugettext as _
@@ -31,6 +33,7 @@ from django.db import connection, transaction
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
 from edtf import parse_edtf
+
 
 # One benefit of shifting to python3.x would be to use
 # importlib.util.LazyLoader to load rdflib (and other lesser
@@ -156,7 +159,7 @@ class NumberDataType(BaseDataType):
             )
         return errors
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value, **kwargs):
         return float(value)
 
     def clean(self, tile, nodeid):
@@ -223,7 +226,7 @@ class BooleanDataType(BaseDataType):
 
         return errors
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value, **kwargs):
         return bool(util.strtobool(str(value)))
 
     def append_search_filters(self, value, node, query, request):
@@ -288,7 +291,7 @@ class DateDataType(BaseDataType):
 
         return errors
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value, **kwargs):
         if type(value) == list:
             value = value[0]
 
@@ -522,26 +525,29 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             if len(tile.data[nodeid]["features"]) == 0:
                 tile.data[nodeid] = None
 
-    def transform_import_values(self, value, nodeid):
-        arches_geojson = {}
-        arches_geojson["type"] = "FeatureCollection"
-        arches_geojson["features"] = []
-        geometry = GEOSGeometry(value, srid=4326)
-        if geometry.geom_type == "GeometryCollection":
-            for geom in geometry:
+    def transform_value_for_tile(self, value, **kwargs):
+        if "format" in kwargs and kwargs["format"] == "esrijson":
+            arches_geojson = GeoUtils().arcgisjson_to_geojson(value)
+        else:
+            arches_geojson = {}
+            arches_geojson["type"] = "FeatureCollection"
+            arches_geojson["features"] = []
+            geometry = GEOSGeometry(value, srid=4326)
+            if geometry.geom_type == "GeometryCollection":
+                for geom in geometry:
+                    arches_json_geometry = {}
+                    arches_json_geometry["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
+                    arches_json_geometry["type"] = "Feature"
+                    arches_json_geometry["id"] = str(uuid.uuid4())
+                    arches_json_geometry["properties"] = {}
+                    arches_geojson["features"].append(arches_json_geometry)
+            else:
                 arches_json_geometry = {}
-                arches_json_geometry["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
+                arches_json_geometry["geometry"] = JSONDeserializer().deserialize(geometry.json)
                 arches_json_geometry["type"] = "Feature"
                 arches_json_geometry["id"] = str(uuid.uuid4())
                 arches_json_geometry["properties"] = {}
                 arches_geojson["features"].append(arches_json_geometry)
-        else:
-            arches_json_geometry = {}
-            arches_json_geometry["geometry"] = JSONDeserializer().deserialize(geometry.json)
-            arches_json_geometry["type"] = "Feature"
-            arches_json_geometry["id"] = str(uuid.uuid4())
-            arches_json_geometry["properties"] = {}
-            arches_geojson["features"].append(arches_json_geometry)
 
         return arches_geojson
 
@@ -550,6 +556,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         for feature in value["features"]:
             wkt_geoms.append(GEOSGeometry(json.dumps(feature["geometry"])))
         return GeometryCollection(wkt_geoms)
+
+    def update(self, tile, data, nodeid=None, action=None):
+        new_features_array = tile.data[nodeid]["features"] + data["features"]
+        tile.data[nodeid]["features"] = new_features_array
+        updated_data = tile.data[nodeid]
+        return updated_data
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         document["geometries"].append({"geom": nodevalue, "nodegroup_id": tile.nodegroup_id, "provisional": provisional, "tileid": tile.pk})
@@ -1134,7 +1146,6 @@ class FileListDataType(BaseDataType):
                 for file_json in current_tile_data[str(node.pk)]:
                     if file_json["name"] == file_data.name and file_json["url"] is None:
                         file_json["file_id"] = str(file_model.pk)
-                        file_json["url"] = str(file_model.path.url)
                         file_json["url"] = "/files/" + str(file_model.fileid)
                         file_json["status"] = "uploaded"
                         resave_tile = True
@@ -1150,7 +1161,7 @@ class FileListDataType(BaseDataType):
                             tile_to_update.provisionaledits[str(user.id)]["value"][str(node.pk)] = updated_file_records
                         tile_to_update.save()
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value, **kwargs):
         """
         # TODO: Following commented code can be used if user does not already have file in final location using django ORM:
 
@@ -1182,27 +1193,34 @@ class FileListDataType(BaseDataType):
                 file_stats = os.stat(file_path)
                 tile_file["lastModified"] = file_stats.st_mtime
                 tile_file["size"] = file_stats.st_size
-            except Exception as e:
+            except Exception:
                 pass
             tile_file = {}
-            tile_file["file_id"] = str(uuid.uuid4())
             tile_file["status"] = ""
             tile_file["name"] = file_path.split("/")[-1]
-            tile_file["url"] = settings.MEDIA_URL + "uploadedfiles/" + str(tile_file["name"])
-            # tile_file['index'] =  0
-            # tile_file['height'] =  960
-            # tile_file['content'] =  None
-            # tile_file['width'] =  1280
-            # tile_file['accepted'] =  True
             tile_file["type"] = mime.guess_type(file_path)[0]
             tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
-            tile_data.append(tile_file)
             file_path = "uploadedfiles/" + str(tile_file["name"])
-            fileid = tile_file["file_id"]
-            models.File.objects.get_or_create(fileid=fileid, path=file_path)
+            tile_file["file_id"] = str(uuid.uuid4())
+            models.File.objects.get_or_create(fileid=tile_file["file_id"], path=file_path)
+            tile_file["url"] = "/files/" + tile_file["file_id"]
+            tile_file["accepted"] = True
+            tile_data.append(tile_file)
+        return json.loads(json.dumps(tile_data))
 
-        result = json.loads(json.dumps(tile_data))
-        return result
+    def pre_tile_save(self, tile, nodeid):
+        # TODO If possible this method should probably replace 'handle request' and perhaps 'process mobile data'
+        for file in tile.data[nodeid]:
+            try:
+                file_model = models.File.objects.get(pk=file["file_id"])
+                if not file_model.tile_id:
+                    file_model.tile = tile
+                    file_model.save()
+            except ObjectDoesNotExist:
+                logger.warning(_("A file is not available for this tile"))
+
+    def transform_export_values(self, value, *args, **kwargs):
+        return ",".join([settings.MEDIA_URL + "uploadedfiles/" + str(file["name"]) for file in value])
 
     def is_a_literal_in_rdf(self):
         return False
@@ -1489,9 +1507,6 @@ class DomainListDataType(BaseDomainDataType):
                 errors = errors + domainDataType.validate(value, row_number)
         return errors
 
-    def transform_import_values(self, value, nodeid):
-        return [v.strip() for v in value.split(",")]
-
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
         node = models.Node.objects.get(nodeid=nodeid)
@@ -1575,21 +1590,45 @@ class DomainListDataType(BaseDomainDataType):
 
 
 class ResourceInstanceDataType(BaseDataType):
-    def get_id_list(self, nodevalue):
-        id_list = nodevalue
-        if type(nodevalue) is str:
-            id_list = [nodevalue]
-        return id_list
+    """
+        tile data comes from the client looking like this:
+        {
+            "resourceId": "",
+            "ontologyProperty": "",
+            "inverseOntologyProperty": ""
+        }
 
-    def get_resource_names(self, nodevalue):
-        resource_names = set([])
+    """
+
+    def get_id_list(self, nodevalue):
+        if not isinstance(nodevalue, list):
+            nodevalue = [nodevalue]
+        return nodevalue
+
+    def disambiguate(self, nodevalue):
+        ret = []
         if nodevalue is not None:
-            se = SearchEngineFactory().create()
-            id_list = self.get_id_list(nodevalue)
-            for resourceid in id_list:
+            resourceXresourceList = self.get_id_list(nodevalue)
+            for resourceXresource in resourceXresourceList:
+                resourceid = None
                 try:
+                    if isinstance(resourceXresource, str):
+                        resourceXresourceId = resourceXresource
+                    else:
+                        resourceXresourceId = resourceXresource["resourceXresourceId"]
+                    if not resourceXresourceId:
+                        continue
+                    rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
+                    resourceid = str(rr.resourceinstanceidto_id)
                     resource_document = se.search(index="resources", id=resourceid)
-                    resource_names.add(resource_document["_source"]["displayname"])
+                    ret.append(
+                        {
+                            "resourceName": resource_document["_source"]["displayname"],
+                            "resourceId": resourceid,
+                            "ontologyProperty": rr.relationshiptype,
+                            "inverseOntologyProperty": rr.inverserelationshiptype,
+                        }
+                    )
                 except NotFoundError as e:
                     logger.info(
                         f"Resource {resourceid} not available. This message may appear during resource load, \
@@ -1597,13 +1636,14 @@ class ResourceInstanceDataType(BaseDataType):
                     )
         else:
             logger.warning(_("No resource relationship available"))
-        return resource_names
+        return ret
 
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
         if value is not None:
-            id_list = self.get_id_list(value)
-            for resourceid in id_list:
+            resourceXresourceIds = self.get_id_list(value)
+            for resourceXresourceId in resourceXresourceIds:
+                resourceid = resourceXresourceId["resourceId"]
                 try:
                     models.ResourceInstance.objects.get(pk=resourceid)
                 except ObjectDoesNotExist:
@@ -1616,37 +1656,92 @@ class ResourceInstanceDataType(BaseDataType):
                     )
         return errors
 
+    def pre_tile_save(self, tile, nodeid):
+        tiledata = tile.data[str(nodeid)]
+        # Ensure tiledata is a list (with JSON-LD import it comes in as an object)
+        if type(tiledata) != list and tiledata is not None:
+            tiledata = [tiledata]
+        if tiledata is None or tiledata == []:
+            # resource relationship has been removed
+            try:
+                for rr in models.ResourceXResource.objects.filter(tileid_id=tile.pk, nodeid_id=nodeid):
+                    rr.delete()
+            except:
+                pass
+        else:
+
+            resourceXresourceSaved = set()
+            for related_resource in tiledata:
+                resourceXresourceId = (
+                    None
+                    if ("resourceXresourceId" not in related_resource or related_resource["resourceXresourceId"] == "")
+                    else related_resource["resourceXresourceId"]
+                )
+                defaults = {
+                    "resourceinstanceidfrom_id": tile.resourceinstance_id,
+                    "resourceinstanceidto_id": related_resource["resourceId"],
+                    "notes": "",
+                    "relationshiptype": related_resource["ontologyProperty"],
+                    "inverserelationshiptype": related_resource["inverseOntologyProperty"],
+                    "tileid_id": tile.pk,
+                    "nodeid_id": nodeid,
+                }
+
+                try:
+                    rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
+                    for key, value in defaults.items():
+                        setattr(rr, key, value)
+                    rr.save()
+                except models.ResourceXResource.DoesNotExist:
+                    rr = models.ResourceXResource(**defaults)
+                    rr.save()
+                related_resource["resourceXresourceId"] = str(rr.pk)
+                resourceXresourceSaved.add(rr.pk)
+
+            # get a list of all resourceXresources with the same tile and node
+            # if there are any ids in that list that aren't in the resourceXresourceSaved
+            # then those need to be removed from the db
+            resourceXresourceInDb = set(
+                models.ResourceXResource.objects.filter(tileid_id=tile.pk, nodeid_id=nodeid).values_list("pk", flat=True)
+            )
+            to_delete = resourceXresourceInDb - resourceXresourceSaved
+            for rr in models.ResourceXResource.objects.filter(pk__in=to_delete):
+                rr.delete()
+
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
         nodevalue = data[str(node.nodeid)]
-        resource_names = self.get_resource_names(nodevalue)
-        return ", ".join(resource_names)
+        items = self.disambiguate(nodevalue)
+        return ", ".join([item["resourceName"] for item in items])
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        resource_names = self.get_resource_names(nodevalue)
-        for value in resource_names:
-            document["ids"].append({"id": nodevalue, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
-            if value not in document["strings"]:
-                document["strings"].append({"string": value, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
+        if type(nodevalue) != list and nodevalue is not None:
+            nodevalue = [nodevalue]
+        if nodevalue:
+            for relatedResourceItem in nodevalue:
+                document["ids"].append(
+                    {"id": relatedResourceItem["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+                )
+                if "resourceName" in relatedResourceItem and relatedResourceItem["resourceName"] not in document["strings"]:
+                    document["strings"].append(
+                        {"string": relatedResourceItem["resourceName"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+                    )
 
-    def transform_import_values(self, value, nodeid):
-        return [v.strip() for v in value.split(",")]
+    def transform_value_for_tile(self, value, **kwargs):
+        try:
+            return json.loads(value)
+        except ValueError:
+            # do this if json (invalid) is formatted with single quotes, re #6390
+            return ast.literal_eval(value)
 
     def transform_export_values(self, value, *args, **kwargs):
-        result = value
-        try:
-            if not isinstance(value, str):  # changed from basestring to str for python3 branch
-                result = ",".join(value)
-        except Exception:
-            pass
-
-        return result
+        return json.dumps(value)
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value["val"] != "":
-                search_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
-                # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(value['val']))
+            if value["val"] != "" and value["val"] != []:
+                # search_query = Match(field="tiles.data.%s.resourceId" % (str(node.pk)), type="phrase", query=value["val"])
+                search_query = Terms(field="tiles.data.%s.resourceId.keyword" % (str(node.pk)), terms=value["val"])
                 if "!" in value["op"]:
                     query.must_not(search_query)
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
@@ -1655,10 +1750,17 @@ class ResourceInstanceDataType(BaseDataType):
         except KeyError as e:
             pass
 
+        print(query.dsl)
+
     def get_rdf_uri(self, node, data, which="r"):
-        if type(data) == list:
-            return [URIRef(archesproject[f"resources/{x}"]) for x in data]
-        return URIRef(archesproject[f"resources/{data}"])
+        if not data:
+            return URIRef("")
+        elif type(data) == list:
+            return [URIRef(archesproject[f"resources/{x['resourceId']}"]) for x in data]
+        return URIRef(archesproject[f"resources/{data['resourceId']}"])
+
+    def accepts_rdf_uri(self, uri):
+        return uri.startswith("urn:uuid:") or uri.startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "resources/")
 
     def to_rdf(self, edge_info, edge):
         g = Graph()
@@ -1676,7 +1778,7 @@ class ResourceInstanceDataType(BaseDataType):
             for res_inst in res_insts:
                 rangenode = self.get_rdf_uri(None, res_inst)
                 try:
-                    res_inst_obj = models.ResourceInstance.objects.get(pk=res_inst)
+                    res_inst_obj = models.ResourceInstance.objects.get(pk=res_inst["resourceId"])
                     r_type = res_inst_obj.graph.node_set.get(istopnode=True).ontologyclass
                 except models.ResourceInstance.DoesNotExist:
                     # This should never happen excpet if trying to export when the
@@ -1693,7 +1795,8 @@ class ResourceInstanceDataType(BaseDataType):
         p = re.compile(r"(?P<r>[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})/?$")
         m = p.search(res_inst_uri)
         if m is not None:
-            return m.groupdict()["r"]
+            # return m.groupdict()["r"]
+            return [{"resourceId": m.groupdict()["r"], "ontologyProperty": "", "inverseOntologyProperty": "", "resourceXresourceId": ""}]
 
     def ignore_keys(self):
         return ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]
@@ -1705,12 +1808,18 @@ class ResourceInstanceDataType(BaseDataType):
 
         return True
 
+    def default_es_mapping(self):
+        return {
+            "properties": {
+                "resourceId": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
+                "ontologyProperty": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
+                "inverseOntologyProperty": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
+                "resourceXresourceId": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
+            }
+        }
+
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
-    def from_rdf(self, json_ld_node):
-        m = super(ResourceInstanceListDataType, self).from_rdf(json_ld_node)
-        if m is not None:
-            return [m]
 
     def collects_multiple_values(self):
         return True

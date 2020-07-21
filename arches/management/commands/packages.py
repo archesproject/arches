@@ -213,6 +213,8 @@ class Command(BaseCommand):
             will export all grouped business data to one csv file.",
         )
 
+        parser.add_argument("-type", "--graphtype", action="store", dest="type", help="indicates the type of graph intended for export")
+
         parser.add_argument(
             "-y", "--yes", action="store_true", dest="yes", help='used to force a yes answer to any user input "continue? y/n" prompt'
         )
@@ -250,7 +252,7 @@ class Command(BaseCommand):
             self.import_graphs(options["source"])
 
         if options["operation"] == "export_graphs":
-            self.export_graphs(options["dest_dir"], options["graphs"])
+            self.export_graphs(options["dest_dir"], options["graphs"], options["type"])
 
         if options["operation"] == "import_business_data":
 
@@ -513,13 +515,18 @@ class Command(BaseCommand):
         def load_resource_to_resource_constraints(package_dir):
             config_paths = glob.glob(os.path.join(package_dir, "package_config.json"))
             if len(config_paths) > 0:
-                configs = json.load(open(config_paths[0]))
-                for relationship in configs["permitted_resource_relationships"]:
-                    (obj, created) = models.Resource2ResourceConstraint.objects.update_or_create(
-                        resourceclassfrom_id=uuid.UUID(relationship["resourceclassfrom_id"]),
-                        resourceclassto_id=uuid.UUID(relationship["resourceclassto_id"]),
-                        resource2resourceid=uuid.UUID(relationship["resource2resourceid"]),
-                    )
+                try:
+                    configs = json.load(open(config_paths[0]))
+                    for relationship in configs["permitted_resource_relationships"]:
+                        (obj, created) = models.Resource2ResourceConstraint.objects.update_or_create(
+                            resourceclassfrom_id=uuid.UUID(relationship["resourceclassfrom_id"]),
+                            resourceclassto_id=uuid.UUID(relationship["resourceclassto_id"]),
+                            resource2resourceid=uuid.UUID(relationship["resource2resourceid"]),
+                        )
+                except json.decoder.JSONDecodeError as e:
+                    logger.warn("Invalid syntax in package_config.json. Please inspect and then re-run command.")
+                    logger.warn(e)
+                    sys.exit()
 
         @transaction.atomic
         def load_preliminary_sql(package_dir):
@@ -744,6 +751,9 @@ class Command(BaseCommand):
         def load_functions(package_dir):
             load_extensions(package_dir, "functions", "fn")
 
+        def cache_graphs():
+            management.call_command("cache", operation="graphs")
+
         def load_apps(package_dir):
             package_apps = glob.glob(os.path.join(package_dir, "apps", "*"))
             for app in package_apps:
@@ -840,6 +850,12 @@ class Command(BaseCommand):
             css_files = glob.glob(os.path.join(css_source, "*.css"))
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
+        print("caching resource models")
+        try:
+            cache_graphs()
+        except Exception as e:
+            print("Unable to cache graph proxy models")
+            print(e)
         if celery_worker_running:
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
@@ -1071,13 +1087,29 @@ will be very jumbled."""
                         archesfile = JSONDeserializer().deserialize(f)
                         ResourceGraphImporter(archesfile["graph"], overwrite_graphs)
 
-    def export_graphs(self, data_dest="", graphs=""):
+    def export_graphs(self, data_dest="", graphs="", graphtype=""):
         """
         Exports graphs to arches.json.
 
         """
         if data_dest != "":
-            graphs = [graph.strip() for graph in graphs.split(",")]
+            if not graphs:
+                if not graphtype:
+                    graphs = [
+                        str(graph["graphid"])
+                        for graph in models.GraphModel.objects.exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).values("graphid")
+                    ]
+                elif graphtype == "branch":
+                    graphs = [str(graph["graphid"]) for graph in models.GraphModel.objects.filter(isresource=False).values("graphid")]
+                elif graphtype == "resource":
+                    graphs = [
+                        str(graph["graphid"])
+                        for graph in models.GraphModel.objects.filter(isresource=True)
+                        .exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                        .values("graphid")
+                    ]
+            else:
+                graphs = [graph.strip() for graph in graphs.split(",")]
             for graph in ResourceGraphExporter.get_graphs_for_export(graphids=graphs)["graph"]:
                 graph_name = graph["name"].replace("/", "-")
                 with open(os.path.join(data_dest, graph_name + ".json"), "wb") as f:
@@ -1101,7 +1133,7 @@ will be very jumbled."""
         if data_dest != "":
             data = resource_exporter.export(graph_id=graph)
             for file in data:
-                with open(os.path.join(data_dest, file["name"]), "wb") as f:
+                with open(os.path.join(data_dest, file["name"]), "w") as f:
                     f.write(file["outputfile"].getvalue())
         else:
             utils.print_message("No destination directory specified. Please rerun this command with the '-d' parameter populated.")

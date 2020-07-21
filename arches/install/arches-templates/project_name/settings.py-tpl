@@ -94,6 +94,7 @@ WSGI_APPLICATION = '{{ project_name }}.wsgi.application'
 STATIC_ROOT = '/var/www/media'
 
 RESOURCE_IMPORT_LOG = os.path.join(APP_ROOT, 'logs', 'resource_import.log')
+DEFAULT_RESOURCE_IMPORT_USER = {'username': 'admin', 'userid': 1}
 
 LOGGING = {
     'version': 1,
@@ -134,22 +135,17 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 # Unique session cookie ensures that logins are treated separately for each app
 SESSION_COOKIE_NAME = '{{ project_name }}'
 
+# For more info on configuring your cache: https://docs.djangoproject.com/en/2.2/topics/cache/
 CACHES = {
-    # 'default': {
-    #     'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-    #     'LOCATION': os.path.join(APP_ROOT, 'tmp', 'djangocache'),
-    #     'OPTIONS': {
-    #         'MAX_ENTRIES': 1000
-    #     }
-    # }
     'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     }
 }
 
 #Identify the usernames and duration (seconds) for which you want to cache the time wheel
 CACHE_BY_USER = {'anonymous': 3600 * 24}
+TILE_CACHE_TIMEOUT = 600 #seconds
+GRAPH_MODEL_CACHE_TIMEOUT = None
 
 MOBILE_OAUTH_CLIENT_ID = ''  #'9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
 MOBILE_DEFAULT_ONLINE_BASEMAP = {'default': 'mapbox://styles/mapbox/streets-v9'}

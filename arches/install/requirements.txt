@@ -1,11 +1,11 @@
-Django==2.2.9
+Django==2.2.13
 psycopg2-binary==2.8.4
 elasticsearch>=7.0.0,<8.0.0
 rdflib==4.2.2
 django-guardian==2.1.0
 python-memcached==1.59
-celery==4.4.0
-django-celery-results==1.1.2
+celery==4.4.4
+django-celery-results==1.2.1
 mapbox-vector-tile==1.2.0
 SPARQLWrapper==1.8.4
 django-recaptcha==2.0.5
@@ -22,3 +22,4 @@ pyshp==2.1.0
 requests[security]>=2.18.1
 python-slugify==4.0.0
 pillow==7.0.0
+arcgis2geojson==2.0.0

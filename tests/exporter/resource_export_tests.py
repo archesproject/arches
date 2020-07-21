@@ -85,7 +85,10 @@ class BusinessDataExportTests(ArchesTestCase):
                 new_list = []
                 for val in obj:
                     new_list.append(deep_sort(val))
-                _sorted = new_list
+                try:
+                    _sorted = sorted(new_list, key=itemgetter("tileid"))
+                except:
+                    _sorted = new_list
 
             else:
                 _sorted = obj

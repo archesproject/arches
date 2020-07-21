@@ -30,7 +30,7 @@ from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Terms, MaxAgg, Aggregation
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, MaxAgg, Aggregation
 from arches.app.search.search_export import SearchResultsExporter
 from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
@@ -56,6 +56,9 @@ class SearchView(MapBaseManagerView):
         geocoding_providers = models.Geocoder.objects.all()
         search_components = models.SearchComponent.objects.all()
         datatypes = models.DDataType.objects.all()
+        widgets = models.Widget.objects.all()
+        templates = models.ReportTemplate.objects.all()
+        card_components = models.CardComponent.objects.all()
 
         context = self.get_context_data(
             map_layers=map_layers,
@@ -63,6 +66,9 @@ class SearchView(MapBaseManagerView):
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             search_components=search_components,
+            widgets=widgets,
+            report_templates=templates,
+            card_components=card_components,
             main_script="views/search",
             resource_graphs=resource_graphs,
             datatypes=datatypes,
@@ -220,15 +226,17 @@ def export_results(request):
 
 def append_instance_permission_filter_dsl(request, search_results_object):
     if request.user.is_superuser is False:
-        search_query = Bool()
+        has_access = Bool()
         terms = Terms(field="permissions.users_with_no_access", terms=[str(request.user.id)])
-        search_query.must_not(terms)
-        search_results_object["query"].add_query(search_query)
+        nested_term_filter = Nested(path="permissions", query=terms)
+        has_access.must_not(nested_term_filter)
+        search_results_object["query"].add_query(has_access)
 
 
 def search_results(request):
     for_export = request.GET.get("export")
     total = int(request.GET.get("total", "0"))
+    resourceinstanceid = request.GET.get("id", None)
     se = SearchEngineFactory().create()
     search_results_object = {"query": Query(se)}
 
@@ -253,6 +261,7 @@ def search_results(request):
     dsl.include("permissions.users_without_read_perm")
     dsl.include("permissions.users_without_edit_perm")
     dsl.include("permissions.users_without_delete_perm")
+    dsl.include("permissions.users_with_no_access")
     dsl.include("geometries")
     dsl.include("displayname")
     dsl.include("displaydescription")
@@ -273,10 +282,16 @@ def search_results(request):
             results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
             results["hits"]["hits"] += results_scrolled["hits"]["hits"]
     else:
-        results = dsl.search(index="resources")
+        results = dsl.search(index="resources", id=resourceinstanceid)
 
     ret = {}
     if results is not None:
+        if "hits" not in results:
+            if "docs" in results:
+                results = {"hits": {"hits": results["docs"]}}
+            else:
+                results = {"hits": {"hits": [results]}}
+
         # allow filters to modify the results
         for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
             search_filter = search_filter_factory.get_filter(filter_type)
@@ -291,7 +306,7 @@ def search_results(request):
         ret["reviewer"] = user_is_resource_reviewer(request.user)
         ret["timestamp"] = datetime.now()
         ret["total_results"] = dsl.count(index="resources")
-
+        ret["userid"] = request.user.id
         return JSONResponse(ret)
 
     else:
