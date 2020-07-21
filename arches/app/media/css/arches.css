@@ -1377,7 +1377,8 @@ div.workflow-panel {
 
 .workflow-select-wf-icon {
     color: white;
-    font-size: 40px;
+    font-size: 28px;
+    padding-top: 0px;
 }
 
 .workflow-select-title {
@@ -1386,12 +1387,13 @@ div.workflow-panel {
 }
 
 .workflow-select-wf-circle {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     display: inline-block;
     text-align: center;
-    padding: 18px;
+    padding: 18px 12px;
     border-radius: 40px;
+    border: 1px solid #747474;
 }
 
 .workflow-select-desc {
@@ -1423,7 +1425,7 @@ div.workflow-panel {
     text-align: center;
     border: 1px solid #777;
     border-radius: 1px;
-    margin: 10px;
+    margin: 5px;
     opacity: 0.85;
 }
 
@@ -2253,11 +2255,12 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 
 .select2-container {
     width: 100% !important;
+    border: 1px solid #ddd;
 }
 
 .form-group div input {
     max-width: 600px;
-    border: 1px solid #ddd;
+    border: 1px solid #eee;
 }
 
 .resource-instance-wrapper .select2-container {
@@ -5348,6 +5351,7 @@ span.editable-card i.fa.fa-align-justify:hover {
     padding: 18px;
     border-radius: 50%;
     background: #BFE0F7;
+    border: 1px solid #454545;
 }
 
 .r-select-circle.loader-button {
@@ -7712,7 +7716,8 @@ a.mega-dropdown-toggle.disabled {
     background: white;
     border: 1px solid white;
     border-radius: 2px;
-    padding: 0px 25px;
+    padding: 0px 12px 0px 7px;
+    margin-top: -1px;
 }
 
 #container .table-bordered td,
@@ -7980,11 +7985,11 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .new-provisional-edit-card-container .rr-table-instance-label {
-    width: 510px;
+    width: 475px;
 }
 
 .workbench-card-sidepanel .rr-table-instance-label {
-    width: 260px;
+    width: 220px;
 }
 
 
@@ -10230,6 +10235,10 @@ table.table.dataTable {
     z-index: 2;
 }
 
+.tab-pane.active .related-resources-header {
+    display: none;
+}
+
 .related-resources-header .editor-elements {
     display: flex;
     justify-content: space-between;
@@ -10797,7 +10806,7 @@ table.table.dataTable {
     width: calc(100% - 275px);
     height: calc(100vh - 115px);
     overflow-y: auto;
-    padding: 2px 20px;
+    padding: 2px;
     background: white;
     border-right: 0.5px #e0e0e0 solid;
 }
@@ -12524,6 +12533,8 @@ a.jstree-anchor.permissions-widget {
 
 .search-result-details-splash {
     padding-top: 50px;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 
 .search-result-details-splash .rr-splash {
@@ -12741,7 +12752,7 @@ a.jstree-anchor.permissions-widget {
     background: #e9e9e9;
     margin-top: -15px;
     margin-left: -20px;
-    padding: 15px 10px;
+    padding: 15px 10px 150px 10px;
     height: 100%;
     position: fixed;
     overflow-y: scroll;
