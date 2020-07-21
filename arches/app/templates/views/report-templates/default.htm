@@ -11,8 +11,11 @@
 
         <!-- Tools -->
         <div class="ep-form-toolbar-tools mar-no flex">
+            <p class="report-print-date"><a data-bind="attr: {href: '/graph_report/'+report.get('resourceid')}">Data Report</a></p>
             <p class="report-print-date">{% trans "Report Date:" %} <span data-bind="text: reportDate"></span></p>
         </div>
+
+
     </div>
 </div>
 

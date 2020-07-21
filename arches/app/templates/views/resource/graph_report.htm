@@ -1,0 +1,211 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base-manager.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block loading_mask %}
+{% endblock loading_mask %}
+
+{% block title %}
+{{ block.super }}
+{% endblock title %}
+
+{% block main_content %}
+<style>
+
+.language-json {
+  margin-left: 10px;
+  margin-right: 10px;
+  background: white;
+  margin-bottom: 10px;
+  padding: 5px;
+  text-align: left;
+  border-radius: 6px;    
+  border: 1px dashed black;
+}
+
+#json-code {
+    background: white;
+}
+
+.mermaid {
+  margin-left: 10px;
+  margin-right: 10px;
+  background: white;
+  margin-bottom: 10px;
+  padding: 3px;
+  text-align: center;
+  border-radius: 6px;
+  border: 1px dashed black;
+}
+
+.mermaid a div {
+    color: blue;
+}
+
+svg {
+  max-width: 110%;
+}
+
+svg .node {
+        font-size: 15px;
+        line-height: 17px;
+        font-stretch: normal;
+        padding-right: 6px;
+}
+
+svg .edgeLabel {
+        font-size: 12px;
+        line-height: 17px;
+        font-stretch: normal;
+        background: white;
+}
+
+span.edgeLabel {
+        padding-left: 2px;
+        padding-right: 10px;
+}
+
+</style>
+
+<p></p>
+<div class="rp-card-section">
+<h2 class="rp-tile-title">Data Diagram for {{displayname}}</h2>
+<br/>
+<div class="mermaid" id="mermaid_{{ mmid }}">
+{{ data }}
+</div>
+<div class="mermaid_svg" id="mermaid_{{ mmid }}_svg"></div>
+</div>
+
+<p><hr style="border-top: 3px solid #ccc;"/></p>
+
+<div class="rp-card-section">
+<h2 class="rp-tile-title">JSON-LD Data for {{displayname}}</h2>
+<br/>
+<pre class="language-json">
+<code id="json-code">
+{{jsonld}}    
+</code>
+</pre>
+</div>
+
+<script src="{{ STATIC_URL }}js/reports/mermaid.min.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+
+{% endblock main_content %}
+
+{% block pre_require_js %}
+{{ block.super }}
+<script>{% autoescape off %}
+// script goes here
+
+mermaid.initialize({
+  startOnLoad: false,    
+  theme: 'neutral',
+  flowchart: { curve: 'basis' }
+});
+
+const svgContainer = document.querySelector(".mermaid");
+
+var render_mm = function(what) {
+
+    var cbfn = function(svgCode, bindFn) {
+        what.innerHTML = svgCode;
+
+        var svgImage = document.getElementById(what.id + "_svg");
+        // var scale = 1;
+        var scale = svgImage.clientWidth / svgImage.viewBox.baseVal.width;
+        // var viewBox = {x:0,y:0,w:svgImage.clientWidth,h:svgImage.clientHeight};
+        var viewBox = {x:0,y:0,w:svgImage.clientWidth/scale,h:svgImage.clientHeight/scale};
+        // svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+        const svgSize = {w:svgImage.clientWidth,h:svgImage.clientHeight};
+
+        var isPanning = false;
+        var startPoint = {x:0,y:0};
+        var endPoint = {x:0,y:0};;
+
+        svgContainer.onmousewheel = function(e) {
+           e.preventDefault();
+           var w = viewBox.w;
+           var h = viewBox.h;
+           var mx = e.offsetX;//mouse x  
+           var my = e.offsetY;    
+           var dw = w*Math.sign(e.deltaY)*0.05;
+           var dh = h*Math.sign(e.deltaY)*0.05;
+           var dx = dw*mx/svgSize.w;
+           var dy = dh*my/svgSize.h;
+           viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w-dw,h:viewBox.h-dh};
+           scale = svgSize.w/viewBox.w;
+           svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+        }
+
+
+        svgContainer.onmousedown = function(e){
+           isPanning = true;
+           startPoint = {x:e.x,y:e.y};   
+        }
+
+        svgContainer.onmousemove = function(e){
+           if (isPanning){
+          endPoint = {x:e.x,y:e.y};
+          var dx = (startPoint.x - endPoint.x)/scale;
+          var dy = (startPoint.y - endPoint.y)/scale;
+          var movedViewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
+          svgImage.setAttribute('viewBox', `${movedViewBox.x} ${movedViewBox.y} ${movedViewBox.w} ${movedViewBox.h}`);
+           }
+        }
+
+        svgContainer.onmouseup = function(e){
+           if (isPanning){ 
+          endPoint = {x:e.x,y:e.y};
+          var dx = (startPoint.x - endPoint.x)/scale;
+          var dy = (startPoint.y - endPoint.y)/scale;
+          viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
+          svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+          isPanning = false;
+           }
+        }
+
+        svgContainer.onmouseleave = function(e){
+         isPanning = false;
+        }
+
+
+    }
+
+    var txt = what.innerHTML.replace(/&gt;/g, ">");
+    mermaid.mermaidAPI.render(what.id + "_svg", txt, cbfn)
+
+};
+
+render_mm(svgContainer);
+
+jsc = document.getElementById('json-code');
+jsc.innerHTML = jsc.innerHTML.replace(/&quot;/g,'"');
+hljs.initHighlightingOnLoad();
+
+//var jsonld = ;
+//js_elm = document.getElementById('jsonld_div')
+//js_elm.innerHTML = JSON.stringify(jsonld, null, '  ');
+
+{% endautoescape %}</script>
+{% endblock pre_require_js %}
