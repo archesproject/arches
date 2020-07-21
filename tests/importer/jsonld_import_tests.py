@@ -179,11 +179,7 @@ class JsonLDImportTests(ArchesTestCase):
             "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "test!"
             }"""
 
-        url = reverse(
-            "resources_graphid",
-            kwargs={"graphid": "bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
-            "resourceid": ""},
-        )
+        url = reverse("resources_graphid", kwargs={"graphid": "bf734b4e-f6b5-11e9-8f09-a4d18cec433a", "resourceid": ""},)
         response = self.client.post(url, data=data, content_type="application/json", HTTP_AUTHORIZATION=f"Bearer {self.token}")
         self.assertEqual(response.status_code, 201)
         js = response.json()

@@ -408,7 +408,7 @@ class JsonLdReader(Reader):
 
             ### --- Process Instance ---
             # now walk the instance and align to the tree
-            if '@id' in jsonld_document:
+            if "@id" in jsonld_document:
                 result = {"data": [jsonld_document["@id"]]}
             else:
                 result = {"data": [None]}

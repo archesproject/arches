@@ -23,6 +23,7 @@ define([
         this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
         self.newTileStep = ko.observable();
         this.resourceReportUrl = arches.urls.resource_report;
+        this.resourceEditorUrl = arches.urls.resource_editor;
         this.selectedResourceRelationship = ko.observable(null);
         this.reportResourceId = ko.observable();
         this.reportGraphId = ko.observable(null);
@@ -94,7 +95,7 @@ define([
                             if(!val.ontologyClass) {
                                 Object.defineProperty(val, 'ontologyClass', {value:ko.observable()});
                             }
-                            lookupResourceInstanceData(val.resourceId())
+                            lookupResourceInstanceData(ko.unwrap(val.resourceId))
                                 .then(function(resourceInstance) {
                                     names.push(resourceInstance["_source"].displayname);
                                     self.displayValue(names.join(', '));
