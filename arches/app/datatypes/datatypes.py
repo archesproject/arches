@@ -4,6 +4,7 @@ import decimal
 import base64
 import re
 import logging
+from pathlib import Path
 import ast
 from distutils import util
 from datetime import datetime
@@ -1161,6 +1162,25 @@ class FileListDataType(BaseDataType):
                             tile_to_update.provisionaledits[str(user.id)]["value"][str(node.pk)] = updated_file_records
                         tile_to_update.save()
 
+    def get_compatible_renderers(self, file_data):
+        extension = Path(file_data['name']).suffix.strip('.')
+        compatible_renderers = []
+        for renderer in settings.RENDERERS:
+            if extension == renderer['ext']:
+                compatible_renderers.append(renderer['id'])
+            else:
+                excluded_extensions = renderer['exclude'].split(',')
+                if extension not in excluded_extensions:
+                    renderer_mime = renderer['type'].split('/')
+                    file_mime = file_data['type'].split('/')
+                    if len(renderer_mime) == 2:
+                        renderer_class, renderer_type = renderer_mime[0], renderer_mime[1]
+                        if len(file_mime) == 2:
+                            file_class = file_mime[0]
+                            if renderer_class == file_class and renderer_type == '*':
+                                compatible_renderers.append(renderer['id'])
+        return compatible_renderers
+
     def transform_value_for_tile(self, value, **kwargs):
         """
         # TODO: Following commented code can be used if user does not already have file in final location using django ORM:
@@ -1205,6 +1225,9 @@ class FileListDataType(BaseDataType):
             models.File.objects.get_or_create(fileid=tile_file["file_id"], path=file_path)
             tile_file["url"] = "/files/" + tile_file["file_id"]
             tile_file["accepted"] = True
+            compatible_renderers = self.get_compatible_renderers(tile_file)
+            if len(compatible_renderers) == 1:
+                tile_file['renderer'] = compatible_renderers[0]
             tile_data.append(tile_file)
         return json.loads(json.dumps(tile_data))
 
