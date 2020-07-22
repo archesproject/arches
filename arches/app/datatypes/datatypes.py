@@ -4,6 +4,7 @@ import decimal
 import base64
 import re
 import logging
+import os
 from pathlib import Path
 import ast
 from distutils import util
