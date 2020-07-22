@@ -1167,7 +1167,7 @@ class FileListDataType(BaseDataType):
         extension = Path(file_data["name"]).suffix.strip(".")
         compatible_renderers = []
         for renderer in settings.RENDERERS:
-            if extension == renderer["ext"]:
+            if extension.lower() == renderer["ext"].lower():
                 compatible_renderers.append(renderer["id"])
             else:
                 excluded_extensions = renderer["exclude"].split(",")
@@ -1178,7 +1178,7 @@ class FileListDataType(BaseDataType):
                         renderer_class, renderer_type = renderer_mime[0], renderer_mime[1]
                         if len(file_mime) == 2:
                             file_class = file_mime[0]
-                            if renderer_class == file_class and renderer_type == "*":
+                            if renderer_class.lower() == file_class.lower() and renderer_type == "*":
                                 compatible_renderers.append(renderer["id"])
         return compatible_renderers
 
