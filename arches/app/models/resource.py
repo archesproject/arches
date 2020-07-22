@@ -360,10 +360,13 @@ class Resource(models.ResourceInstance):
                     if resourceXresource.resourceinstanceidto_id == self.resourceinstanceid
                     else resourceXresource.resourceinstanceidto_id
                 )
-                resourceXresource.delete(deletedResourceId=self.resourceinstanceid)
-                res = Resource.objects.get(pk=resource_to_reindex)
-                res.load_tiles()
-                res.index()
+                try:
+                    resourceXresource.delete(deletedResourceId=self.resourceinstanceid)                
+                    res = Resource.objects.get(pk=resource_to_reindex)
+                    res.load_tiles()
+                    res.index()
+                except:
+                    pass
 
             query = Query(se)
             bool_query = Bool()
@@ -374,7 +377,10 @@ class Resource(models.ResourceInstance):
                 se.delete(index="terms", id=result["_id"])
             se.delete(index="resources", id=self.resourceinstanceid)
 
-            self.save_edit(edit_type="delete", user=user, note=self.displayname)
+            try:   
+                self.save_edit(edit_type="delete", user=user, note=self.displayname)
+            except:
+                pass
             super(Resource, self).delete()
 
         return permit_deletion
