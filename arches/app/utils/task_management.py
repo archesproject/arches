@@ -11,6 +11,11 @@ logger = logging.getLogger(__name__)
 def check_if_celery_available():
     result = None
     try:
+        if not settings.CELERY_BROKER_URL:
+            return False
+    except:
+        pass
+    try:
         conn = Connection(settings.CELERY_BROKER_URL)
         conn.ensure_connection(max_retries=2)
     except Exception as e:
