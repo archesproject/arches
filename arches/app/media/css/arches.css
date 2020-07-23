@@ -10549,7 +10549,7 @@ ul.select2-choices:after {
 }
 
 .card-component-wrapper-editor {
-    padding-bottom: 50px;
+    height: calc(100% - 50px);
     overflow-y: auto;
 }
 
