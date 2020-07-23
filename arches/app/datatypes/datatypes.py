@@ -265,53 +265,51 @@ class DateDataType(BaseDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
         if value is not None:
-            if hasattr(settings, "DATE_FORMATS"):
-                date_formats = settings.DATE_FORMATS["Python"]
-            else:
-                date_formats = ["-%Y", "%Y", "%Y-%m", "%Y-%m-%d", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S.%f%z"]
-            valid = False
-            for mat in date_formats:
-                if valid == False:
-                    try:
-                        if datetime.strptime(value, mat):
-                            valid = True
-                    except:
-                        valid = False
+            valid_date_format, valid = self.get_valid_date_format(value)
             if valid == False:
-                if hasattr(settings, "DATE_IMPORT_EXPORT_FORMAT"):
-                    date_format = settings.DATE_IMPORT_EXPORT_FORMAT
-                else:
-                    date_format = date_formats
-
                 errors.append(
                     {
                         "type": "ERROR",
-                        "message": f"{value} {row_number} is not in the correct format, make sure it is in this format: \
-                            {date_format} or set the date format in settings.DATE_IMPORT_EXPORT_FORMAT. This data was not imported.",
+                        "message": f"{value} {row_number} is not in the correct format, make sure it is in settings.DATE_FORMATS\
+                         or set the date format in settings.DATE_IMPORT_EXPORT_FORMAT. This data was not imported.",
                     }
                 )
 
         return errors
 
+    def get_valid_date_format(self, value): # Do I have to pass *args or **kwargs???
+        valid = False
+        if hasattr(settings, "DATE_FORMATS"):
+            date_formats = settings.DATE_FORMATS["Python"]
+        else:
+            date_formats = ["-%Y", "%Y", "%Y-%m", "%Y-%m-%d", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S.%f%z"]
+        if hasattr(settings, "DATE_IMPORT_EXPORT_FORMAT"):
+            if settings.DATE_IMPORT_EXPORT_FORMAT not in date_formats:
+                date_formats.append(settings.DATE_IMPORT_EXPORT_FORMAT)
+        for date_format in date_formats:
+            if valid == False:
+                try:
+                    datetime.strptime(value, date_format)
+                    valid = True
+                    valid_date_format = date_format
+                except:
+                    valid = False
+                    valid_date_format = ""
+        return valid_date_format, valid
+
     def transform_value_for_tile(self, value, **kwargs):
         if type(value) == list:
             value = value[0]
-
-        try:
-            if hasattr(settings, "DATE_IMPORT_EXPORT_FORMAT"):
-                v = datetime.strptime(str(value), settings.DATE_IMPORT_EXPORT_FORMAT)
-                value = str(datetime.strftime(v, "%Y-%m-%d"))
-            else:
-                value = str(datetime(value).date())
-        except:
-            pass
-
+        valid_date_format, valid = self.get_valid_date_format(value)
+        if valid:
+            value = datetime.strptime(value, fmt).astimezone().isoformat(timespec='milliseconds')
         return value
 
     def transform_export_values(self, value, *args, **kwargs):
         if hasattr(settings, "DATE_IMPORT_EXPORT_FORMAT"):
-            v = datetime.strptime(value, "%Y-%m-%d")
-            value = datetime.strftime(v, settings.DATE_IMPORT_EXPORT_FORMAT)
+            valid_date_format, valid = self.get_valid_date_format(value)
+            if valid:
+                value = datetime.strptime(value, valid_date_format).strftime(settings.DATE_IMPORT_EXPORT_FORMAT)
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -363,7 +361,7 @@ class DateDataType(BaseDataType):
         if hasattr(settings, "DATE_FORMATS"):
             es_date_formats = "||".join(settings.DATE_FORMATS["Elasticsearch"])
         else:
-            es_date_formats = "-yyyy||yyyy||yyyy-MM||yyyy-MM-dd||yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssZ||yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+            es_date_formats = "-yyyy||yyyy||yyyy-MM||yyyy-MM-dd||yyyy-MM-dd'T'HH:mm:ssZ||yyyy-MM-dd'T'HH:mm:ssZZZZZ||yyyy-MM-dd'T'HH:mm:ss.SSSZ||yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
         return {
             "type": "date",
             "format": es_date_formats
