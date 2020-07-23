@@ -277,7 +277,7 @@ class DateDataType(BaseDataType):
 
         return errors
 
-    def get_valid_date_format(self, value): # Do I have to pass *args or **kwargs???
+    def get_valid_date_format(self, value):  # Do I have to pass *args or **kwargs???
         valid = False
         if hasattr(settings, "DATE_FORMATS"):
             date_formats = settings.DATE_FORMATS["Python"]
@@ -302,7 +302,7 @@ class DateDataType(BaseDataType):
             value = value[0]
         valid_date_format, valid = self.get_valid_date_format(value)
         if valid:
-            value = datetime.strptime(value, fmt).astimezone().isoformat(timespec='milliseconds')
+            value = datetime.strptime(value, fmt).astimezone().isoformat(timespec="milliseconds")
         return value
 
     def transform_export_values(self, value, *args, **kwargs):
@@ -362,10 +362,7 @@ class DateDataType(BaseDataType):
             es_date_formats = "||".join(settings.DATE_FORMATS["Elasticsearch"])
         else:
             es_date_formats = "-yyyy||yyyy||yyyy-MM||yyyy-MM-dd||yyyy-MM-dd'T'HH:mm:ssZ||yyyy-MM-dd'T'HH:mm:ssZZZZZ||yyyy-MM-dd'T'HH:mm:ss.SSSZ||yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
-        return {
-            "type": "date",
-            "format": es_date_formats
-        }
+        return {"type": "date", "format": es_date_formats}
 
 
 class EDTFDataType(BaseDataType):
