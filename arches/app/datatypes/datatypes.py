@@ -362,7 +362,8 @@ class DateDataType(BaseDataType):
         if hasattr(settings, "DATE_FORMATS"):
             es_date_formats = "||".join(settings.DATE_FORMATS["Elasticsearch"])
         else:
-            es_date_formats = "-yyyy||yyyy||yyyy-MM||yyyy-MM-dd||yyyy-MM-dd'T'HH:mm:ssZ||yyyy-MM-dd'T'HH:mm:ssZZZZZ||yyyy-MM-dd'T'HH:mm:ss.SSSZ||yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
+            es_date_formats = "-yyyy||yyyy||yyyy-MM||yyyy-MM-dd||yyyy-MM-dd'T'HH:mm:ssZ||yyyy-MM-dd'T'HH:mm:ssZZZZZ\
+                            ||yyyy-MM-dd'T'HH:mm:ss.SSSZ||yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
         return {"type": "date", "format": es_date_formats}
 
 
