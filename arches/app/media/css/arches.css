@@ -11682,4 +11682,7 @@ a.tree-display-tool, a.tree-display-tool:hover {
         display: none;
         height: 0;
     }
+    .workbench-card-sidebar {
+        height: 100%;
+    }
 }
