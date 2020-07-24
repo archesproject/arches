@@ -279,19 +279,16 @@ class DateDataType(BaseDataType):
 
     def get_valid_date_format(self, value):
         valid = False
-        if hasattr(settings, "DATE_FORMATS"):
-            date_formats = settings.DATE_FORMATS["Python"]
-        else:
-            date_formats = ["-%Y", "%Y", "%Y-%m", "%Y-%m-%d", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S.%f%z"]
+        valid_date_format = ""
+        date_formats = settings.DATE_FORMATS["Python"]
         for date_format in date_formats:
             if valid is False:
                 try:
                     datetime.strptime(value, date_format)
                     valid = True
                     valid_date_format = date_format
-                except:
-                    valid = False
-                    valid_date_format = ""
+                except ValueError:
+                    pass
         return valid_date_format, valid
 
     def transform_value_for_tile(self, value, **kwargs):
@@ -301,9 +298,8 @@ class DateDataType(BaseDataType):
         if valid:
             value = datetime.strptime(value, valid_date_format).astimezone().isoformat(timespec="milliseconds")
         else:
-            if hasattr(settings, "DATE_IMPORT_EXPORT_FORMAT"):
-                v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
-                value = v.astimezone().isoformat(timespec="milliseconds")
+            v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
+            value = v.astimezone().isoformat(timespec="milliseconds")
         return value
 
     def transform_export_values(self, value, *args, **kwargs):
@@ -359,11 +355,7 @@ class DateDataType(BaseDataType):
             pass
 
     def default_es_mapping(self):
-        if hasattr(settings, "DATE_FORMATS"):
-            es_date_formats = "||".join(settings.DATE_FORMATS["Elasticsearch"])
-        else:
-            es_date_formats = "-yyyy||yyyy||yyyy-MM||yyyy-MM-dd||yyyy-MM-dd'T'HH:mm:ssZ||yyyy-MM-dd'T'HH:mm:ssZZZZZ\
-                            ||yyyy-MM-dd'T'HH:mm:ss.SSSZ||yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
+        es_date_formats = "||".join(settings.DATE_FORMATS["Elasticsearch"])
         return {"type": "date", "format": es_date_formats}
 
 
