@@ -277,17 +277,14 @@ class DateDataType(BaseDataType):
 
         return errors
 
-    def get_valid_date_format(self, value):  # Do I have to pass *args or **kwargs???
+    def get_valid_date_format(self, value):
         valid = False
         if hasattr(settings, "DATE_FORMATS"):
             date_formats = settings.DATE_FORMATS["Python"]
         else:
             date_formats = ["-%Y", "%Y", "%Y-%m", "%Y-%m-%d", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S.%f%z"]
-        if hasattr(settings, "DATE_IMPORT_EXPORT_FORMAT"):
-            if settings.DATE_IMPORT_EXPORT_FORMAT not in date_formats:
-                date_formats.append(settings.DATE_IMPORT_EXPORT_FORMAT)
         for date_format in date_formats:
-            if valid == False:
+            if valid is False:
                 try:
                     datetime.strptime(value, date_format)
                     valid = True
@@ -302,7 +299,11 @@ class DateDataType(BaseDataType):
             value = value[0]
         valid_date_format, valid = self.get_valid_date_format(value)
         if valid:
-            value = datetime.strptime(value, fmt).astimezone().isoformat(timespec="milliseconds")
+            value = datetime.strptime(value, valid_date_format).astimezone().isoformat(timespec="milliseconds")
+        else:
+            if hasattr(settings, "DATE_IMPORT_EXPORT_FORMAT"):
+                v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
+                value = v.astimezone().isoformat(timespec="milliseconds")
         return value
 
     def transform_export_values(self, value, *args, **kwargs):
