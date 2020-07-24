@@ -33,6 +33,11 @@ from arches.app.models.models import TileModel
 from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.mappings import (
+    TERMS_INDEX,
+    RESOURCE_RELATIONS_INDEX,
+    RESOURCES_INDEX
+)
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
 from arches.app.utils import import_class_from_string
 from guardian.shortcuts import assign_perm, remove_perm
@@ -200,10 +205,10 @@ class Resource(models.ResourceInstance):
                 fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
             )
 
-            documents.append(se.create_bulk_item(index="resources", id=document["resourceinstanceid"], data=document))
+            documents.append(se.create_bulk_item(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document))
 
             for term in terms:
-                term_list.append(se.create_bulk_item(index="terms", id=term["_id"], data=term["_source"]))
+                term_list.append(se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]))
 
         se.bulk_index(documents)
         se.bulk_index(term_list)
@@ -221,7 +226,7 @@ class Resource(models.ResourceInstance):
             document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes)
             document["root_ontology_class"] = self.get_root_ontology()
             doc = JSONSerializer().serializeToPython(document)
-            se.index_data(index="resources", body=doc, id=self.pk)
+            se.index_data(index=RESOURCES_INDEX, body=doc, id=self.pk)
             for term in terms:
                 se.index_data("terms", body=term["_source"], id=term["_id"])
 
@@ -369,10 +374,10 @@ class Resource(models.ResourceInstance):
             bool_query = Bool()
             bool_query.filter(Terms(field="resourceinstanceid", terms=[self.resourceinstanceid]))
             query.add_query(bool_query)
-            results = query.search(index="terms")["hits"]["hits"]
+            results = query.search(index=TERMS_INDEX)["hits"]["hits"]
             for result in results:
-                se.delete(index="terms", id=result["_id"])
-            se.delete(index="resources", id=self.resourceinstanceid)
+                se.delete(index=TERMS_INDEX, id=result["_id"])
+            se.delete(index=RESOURCES_INDEX, id=self.resourceinstanceid)
 
             self.save_edit(edit_type="delete", user=user, note=self.displayname)
             super(Resource, self).delete()
@@ -408,7 +413,7 @@ class Resource(models.ResourceInstance):
             bool_filter.should(Terms(field="resourceinstanceidfrom", terms=resourceinstanceid))
             bool_filter.should(Terms(field="resourceinstanceidto", terms=resourceinstanceid))
             query.add_query(bool_filter)
-            return query.search(index="resource_relations")
+            return query.search(index=RESOURCE_RELATIONS_INDEX)
 
         resource_relations = get_relations(self.resourceinstanceid, start, limit)
         ret["total"] = resource_relations["hits"]["total"]
@@ -435,7 +440,7 @@ class Resource(models.ResourceInstance):
             instanceids.remove(str(self.resourceinstanceid))
 
         if len(instanceids) > 0:
-            related_resources = se.search(index="resources", id=list(instanceids))
+            related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
                 for resource in related_resources["docs"]:
                     relations = get_relations(resource["_id"], 0, 0)

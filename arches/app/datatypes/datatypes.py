@@ -20,6 +20,9 @@ from arches.app.utils.geo_utils import GeoUtils
 import arches.app.utils.task_management as task_management
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Terms, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
+from arches.app.search.mappings import (
+    RESOURCES_INDEX
+)
 from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.utils.translation import ugettext as _
@@ -1620,7 +1623,7 @@ class ResourceInstanceDataType(BaseDataType):
                         continue
                     rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
                     resourceid = str(rr.resourceinstanceidto_id)
-                    resource_document = se.search(index="resources", id=resourceid)
+                    resource_document = se.search(index=RESOURCES_INDEX, id=resourceid)
                     ret.append(
                         {
                             "resourceName": resource_document["_source"]["displayname"],

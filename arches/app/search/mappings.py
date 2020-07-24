@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from arches.app.models import models
-from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.db.utils import ProgrammingError
 
@@ -232,6 +231,7 @@ def prepare_search_index(create=False):
         },
     }
     try:
+        from arches.app.datatypes.datatypes import DataTypeFactory
         datatype_factory = DataTypeFactory()
         data = index_settings["mappings"]["_doc"]["properties"]["tiles"]["properties"]["data"]["properties"]
         for node in models.Node.objects.all():

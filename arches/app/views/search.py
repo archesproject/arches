@@ -34,6 +34,9 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nest
 from arches.app.search.search_export import SearchResultsExporter
 from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
+from arches.app.search.mappings import (
+    RESOURCES_INDEX
+)
 from arches.app.views.base import MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer
@@ -271,7 +274,7 @@ def search_results(request):
         dsl.include("tiles")
 
     if for_export is True:
-        results = dsl.search(index="resources", scroll="1m")
+        results = dsl.search(index=RESOURCES_INDEX, scroll="1m")
         scroll_id = results["_scroll_id"]
 
         if total <= settings.SEARCH_EXPORT_LIMIT:
@@ -282,7 +285,7 @@ def search_results(request):
             results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
             results["hits"]["hits"] += results_scrolled["hits"]["hits"]
     else:
-        results = dsl.search(index="resources", id=resourceinstanceid)
+        results = dsl.search(index=RESOURCES_INDEX, id=resourceinstanceid)
 
     ret = {}
     if results is not None:
@@ -305,7 +308,7 @@ def search_results(request):
 
         ret["reviewer"] = user_is_resource_reviewer(request.user)
         ret["timestamp"] = datetime.now()
-        ret["total_results"] = dsl.count(index="resources")
+        ret["total_results"] = dsl.count(index=RESOURCES_INDEX)
         ret["userid"] = request.user.id
         return JSONResponse(ret)
 
