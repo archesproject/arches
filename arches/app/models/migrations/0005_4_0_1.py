@@ -8,9 +8,7 @@ from django.core import management
 from arches.app.models.system_settings import settings
 from arches.app.models.concept import Concept
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.mappings import (
-    CONCEPTS_INDEX
-)
+from arches.app.search.mappings import CONCEPTS_INDEX
 from arches.app.search.elasticsearch_dsl_builder import Term, Query
 from rdflib import Graph, RDF, RDFS
 

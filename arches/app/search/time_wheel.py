@@ -20,9 +20,7 @@ from arches.app.search.elasticsearch_dsl_builder import (
     NestedAgg,
 )
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.mappings import (
-    RESOURCES_INDEX
-)
+from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.models.system_settings import settings
 from django.core.cache import cache
 

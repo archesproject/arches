@@ -7,12 +7,7 @@ from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Term
 from arches.app.search.base_index import get_index
-from arches.app.search.mappings import (
-    TERMS_INDEX,
-    CONCEPTS_INDEX,
-    RESOURCE_RELATIONS_INDEX,
-    RESOURCES_INDEX
-)
+from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCE_RELATIONS_INDEX, RESOURCES_INDEX
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils import import_class_from_string
 from datetime import datetime

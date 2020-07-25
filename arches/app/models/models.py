@@ -664,9 +664,7 @@ class ResourceXResource(models.Model):
 
     def delete(self, *args, **kwargs):
         from arches.app.search.search_engine_factory import SearchEngineFactory
-        from arches.app.search.mappings import (
-            RESOURCE_RELATIONS_INDEX
-        )
+        from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
 
         se = SearchEngineFactory().create()
         se.delete(index=RESOURCE_RELATIONS_INDEX, id=self.resourcexid)
@@ -688,9 +686,7 @@ class ResourceXResource(models.Model):
 
     def save(self):
         from arches.app.search.search_engine_factory import SearchEngineFactory
-        from arches.app.search.mappings import (
-            RESOURCE_RELATIONS_INDEX
-        )
+        from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
 
         se = SearchEngineFactory().create()
         if not self.created:

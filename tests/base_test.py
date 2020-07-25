@@ -36,7 +36,7 @@ from arches.app.search.mappings import (
     prepare_search_index,
     delete_search_index,
     prepare_resource_relations_index,
-    delete_resource_relations_index
+    delete_resource_relations_index,
 )
 
 # these tests can be run from the command line via

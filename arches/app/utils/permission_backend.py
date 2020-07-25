@@ -19,9 +19,7 @@ from django.contrib.auth.models import User, Group, Permission
 from arches.app.models.models import ResourceInstance
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms, Nested
-from arches.app.search.mappings import (
-    RESOURCES_INDEX
-)
+from arches.app.search.mappings import RESOURCES_INDEX
 
 
 class PermissionBackend(ObjectPermissionBackend):

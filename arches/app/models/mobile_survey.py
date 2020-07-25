@@ -43,9 +43,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Terms, Query
-from arches.app.search.mappings import (
-    RESOURCES_INDEX
-)
+from arches.app.search.mappings import RESOURCES_INDEX
 import arches.app.views.search as search
 import arches.app.utils.task_management as task_management
 
