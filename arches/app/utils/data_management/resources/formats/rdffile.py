@@ -223,7 +223,6 @@ class RdfWriter(Writer):
 
 
 class JsonLdWriter(RdfWriter):
-
     def build_json(self, graph_id=None, resourceinstanceids=None, **kwargs):
         # Build the JSON separately serializing it, so we can use internally
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
@@ -315,10 +314,10 @@ class JsonLdReader(Reader):
             node["config"] = {}
             if n.config and "rdmCollection" in n.config:
                 node["config"]["collection_id"] = str(n.config["rdmCollection"])
-            elif n.config and 'graphs' in n.config:
-                for entry in n.config['graphs']:
-                    entry['rootclass'] = self.root_ontologyclass_lookup[entry['graphid']]
-                node['config']['graphs'] = n.config['graphs']
+            elif n.config and "graphs" in n.config:
+                for entry in n.config["graphs"]:
+                    entry["rootclass"] = self.root_ontologyclass_lookup[entry["graphid"]]
+                node["config"]["graphs"] = n.config["graphs"]
             node["required"] = n.isrequired
             node["node_id"] = str(n.nodeid)
             node["name"] = n.name
@@ -533,18 +532,25 @@ class JsonLdReader(Reader):
                     node_value = graph_node["datatype"].from_rdf(vi)
 
                     # For resource-instances, the datatype doesn't know the ontology prop config
-                    if graph_node['datatype'].references_resource_type():
-                        if 'graphs' in branch[0]['config']:
-                            gs = branch[0]['config']['graphs']
-                            for g in gs:
-                                # Now test current node's class against graph's class
-                                # This isn't a guarantee, but close enough
-                                if vi['@type'][0] == g['rootclass']:
-                                    if 'ontologyProperty' in g:
-                                        node_value[0]['ontologyProperty'] = g['ontologyProperty']
-                                    if 'inverseOntologyProperty' in g:
-                                        node_value[0]['inverseOntologyProperty'] = g['inverseOntologyProperty']
-                                    break                             
+                    if graph_node["datatype"].references_resource_type():
+                        if "graphs" in branch[0]["config"]:
+                            gs = branch[0]["config"]["graphs"]
+                            if len(gs) == 1:
+                                # just select it
+                                if "ontologyProperty" in gs[0]:
+                                    node_value[0]["ontologyProperty"] = gs[0]["ontologyProperty"]
+                                if "inverseOntologyProperty" in gs[0]:
+                                    node_value[0]["inverseOntologyProperty"] = gs[0]["inverseOntologyProperty"]                                
+                            else:
+                                for g in gs:
+                                    # Now test current node's class against graph's class
+                                    # This isn't a guarantee, but close enough
+                                    if vi["@type"][0] == g["rootclass"]:
+                                        if "ontologyProperty" in g:
+                                            node_value[0]["ontologyProperty"] = g["ontologyProperty"]
+                                        if "inverseOntologyProperty" in g:
+                                            node_value[0]["inverseOntologyProperty"] = g["inverseOntologyProperty"]
+                                        break
 
                 # We know now that it can go into the branch
                 # Determine if we can collapse the data into a -list or not
