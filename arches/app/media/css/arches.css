@@ -10974,6 +10974,10 @@ a.jstree-anchor.permissions-widget {
     height: 400px;
 }
 
+.report-map-header-component .workbench-card-wrapper {
+    height: 100%;
+}
+
 .exporter-note {
 	position: absolute;
 	padding-left: 16px;
