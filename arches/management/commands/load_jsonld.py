@@ -147,9 +147,7 @@ class Command(BaseCommand):
             }
             for nodeid, datatype, srch in archesmodels.Node.objects.values_list("nodeid", "datatype", "issearchable")
         }
-        self.node_datatypes = {
-            str(nodeid): datatype for nodeid, datatype in archesmodels.Node.objects.values_list("nodeid", "datatype")
-        }
+        self.node_datatypes = {str(nodeid): datatype for nodeid, datatype in archesmodels.Node.objects.values_list("nodeid", "datatype")}
 
         errh = open("error_log.txt", "w")
         start = time.time()
@@ -321,7 +319,7 @@ class Command(BaseCommand):
         TileModel.objects.bulk_create(tiles)
         for t in tiles:
             for nodeid in t.data.keys():
-                datatype = self.node_info[nodeid]['datatype']
+                datatype = self.node_info[nodeid]["datatype"]
                 datatype.pre_tile_save(t, nodeid)
         for resource in self.resources:
             resource.save_edit(edit_type="create")
