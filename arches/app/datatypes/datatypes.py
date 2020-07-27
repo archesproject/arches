@@ -267,50 +267,49 @@ class DateDataType(BaseDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
         if value is not None:
-            date_formats = ["-%Y", "%Y", "%Y-%m-%d", "%B-%m-%d", "%Y-%m-%d %H:%M:%S"]
-            valid = False
-            for mat in date_formats:
-                if valid == False:
-                    try:
-                        if datetime.strptime(value, mat):
-                            valid = True
-                    except:
-                        valid = False
+            valid_date_format, valid = self.get_valid_date_format(value)
             if valid == False:
-                if hasattr(settings, "DATE_IMPORT_EXPORT_FORMAT"):
-                    date_format = settings.DATE_IMPORT_EXPORT_FORMAT
-                else:
-                    date_format = date_formats
-
                 errors.append(
                     {
                         "type": "ERROR",
-                        "message": f"{value} {row_number} is not in the correct format, make sure it is in this format: \
-                            {date_format} or set the date format in settings.DATE_IMPORT_EXPORT_FORMAT. This data was not imported.",
+                        "message": f"{value} {row_number} is not in the correct format, make sure it is in settings.DATE_FORMATS\
+                         or set the date format in settings.DATE_IMPORT_EXPORT_FORMAT. This data was not imported.",
                     }
                 )
 
         return errors
 
+    def get_valid_date_format(self, value):
+        valid = False
+        valid_date_format = ""
+        date_formats = settings.DATE_FORMATS["Python"]
+        for date_format in date_formats:
+            if valid is False:
+                try:
+                    datetime.strptime(value, date_format)
+                    valid = True
+                    valid_date_format = date_format
+                except ValueError:
+                    pass
+        return valid_date_format, valid
+
     def transform_value_for_tile(self, value, **kwargs):
         if type(value) == list:
             value = value[0]
-
-        try:
-            if hasattr(settings, "DATE_IMPORT_EXPORT_FORMAT"):
-                v = datetime.strptime(str(value), settings.DATE_IMPORT_EXPORT_FORMAT)
-                value = str(datetime.strftime(v, "%Y-%m-%d"))
-            else:
-                value = str(datetime(value).date())
-        except:
-            pass
-
+        valid_date_format, valid = self.get_valid_date_format(value)
+        if valid:
+            value = datetime.strptime(value, valid_date_format).astimezone().isoformat(timespec="milliseconds")
+        else:
+            v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
+            value = v.astimezone().isoformat(timespec="milliseconds")
         return value
 
     def transform_export_values(self, value, *args, **kwargs):
-        if hasattr(settings, "DATE_IMPORT_EXPORT_FORMAT"):
-            v = datetime.strptime(value, "%Y-%m-%d")
-            value = datetime.strftime(v, settings.DATE_IMPORT_EXPORT_FORMAT)
+        valid_date_format, valid = self.get_valid_date_format(value)
+        if valid:
+            value = datetime.strptime(value, valid_date_format).strftime(settings.DATE_IMPORT_EXPORT_FORMAT)
+        else:
+            logger.warning(_(f"{value} is an invalid date format"))
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -359,7 +358,8 @@ class DateDataType(BaseDataType):
             pass
 
     def default_es_mapping(self):
-        return {"type": "date"}
+        es_date_formats = "||".join(settings.DATE_FORMATS["Elasticsearch"])
+        return {"type": "date", "format": es_date_formats}
 
 
 class EDTFDataType(BaseDataType):

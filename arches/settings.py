@@ -423,7 +423,22 @@ TIMEWHEEL_DATE_TIERS = None
 # Identify the usernames and duration (seconds) for which you want to cache the timewheel
 CACHE_BY_USER = {"anonymous": 3600 * 24}
 
-DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d"
+DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d"  # Custom date format for dates imported from and exported to csv
+
+DATE_FORMATS = {
+    "Python": ["-%Y", "%Y", "%Y-%m", "%Y-%m-%d", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S.%f%z"],
+    "JavaScript": ["-YYYY", "YYYY", "YYYY-MM", "YYYY-MM-DD", "YYYY-MM-DDTHH:mm:ssZ", "YYYY-MM-DDTHH:mm:ss.sssZ"],
+    "Elasticsearch": [
+        "-yyyy",
+        "yyyy",
+        "yyyy-MM",
+        "yyyy-MM-dd",
+        "yyyy-MM-dd'T'HH:mm:ssZ",
+        "yyyy-MM-dd'T'HH:mm:ssZZZZZ",
+        "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
+        "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ",
+    ],
+}
 
 API_MAX_PAGE_SIZE = 500
 
