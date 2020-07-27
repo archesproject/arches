@@ -139,19 +139,17 @@ class Command(BaseCommand):
         # Need to add issearchable for strip_search option
         # Only calculate it once per load
         self.datatype_factory = DataTypeFactory()
-        if options["strip_search"]:
-            dt_instance_hash = {}
-            self.node_info = {
-                str(nodeid): {
-                    "datatype": dt_instance_hash.setdefault(datatype, self.datatype_factory.get_instance(datatype)),
-                    "issearchable": srch,
-                }
-                for nodeid, datatype, srch in archesmodels.Node.objects.values_list("nodeid", "datatype", "issearchable")
+        dt_instance_hash = {}
+        self.node_info = {
+            str(nodeid): {
+                "datatype": dt_instance_hash.setdefault(datatype, self.datatype_factory.get_instance(datatype)),
+                "issearchable": srch,
             }
-        else:
-            self.node_datatypes = {
-                str(nodeid): datatype for nodeid, datatype in archesmodels.Node.objects.values_list("nodeid", "datatype")
-            }
+            for nodeid, datatype, srch in archesmodels.Node.objects.values_list("nodeid", "datatype", "issearchable")
+        }
+        self.node_datatypes = {
+            str(nodeid): datatype for nodeid, datatype in archesmodels.Node.objects.values_list("nodeid", "datatype")
+        }
 
         errh = open("error_log.txt", "w")
         start = time.time()
@@ -321,6 +319,10 @@ class Command(BaseCommand):
             tiles.extend(resource.tiles)
         Resource.objects.bulk_create(self.resources)
         TileModel.objects.bulk_create(tiles)
+        for t in tiles:
+            for nodeid in t.data.keys():
+                datatype = self.node_info[nodeid]['datatype']
+                datatype.pre_tile_save(t, nodeid)
         for resource in self.resources:
             resource.save_edit(edit_type="create")
 
