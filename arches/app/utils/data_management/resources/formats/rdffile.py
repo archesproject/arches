@@ -540,7 +540,7 @@ class JsonLdReader(Reader):
                                 if "ontologyProperty" in gs[0]:
                                     node_value[0]["ontologyProperty"] = gs[0]["ontologyProperty"]
                                 if "inverseOntologyProperty" in gs[0]:
-                                    node_value[0]["inverseOntologyProperty"] = gs[0]["inverseOntologyProperty"]                                
+                                    node_value[0]["inverseOntologyProperty"] = gs[0]["inverseOntologyProperty"]
                             else:
                                 for g in gs:
                                     # Now test current node's class against graph's class
