@@ -11670,9 +11670,6 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .rp-report-section {
         border-bottom: 1px solid rgba(128, 128, 128, 0.5);
     }
-    .mapboxgl-map {
-        display: none;
-    }
     .print-map {
         display: block;
         width: 100%;
@@ -11683,6 +11680,6 @@ a.tree-display-tool, a.tree-display-tool:hover {
         height: 0;
     }
     .workbench-card-sidebar {
-        height: 100%;
+        height: 100% !important;
     }
 }
