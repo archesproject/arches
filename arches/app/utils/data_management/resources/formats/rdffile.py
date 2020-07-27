@@ -535,15 +535,22 @@ class JsonLdReader(Reader):
                     if graph_node["datatype"].references_resource_type():
                         if "graphs" in branch[0]["config"]:
                             gs = branch[0]["config"]["graphs"]
-                            for g in gs:
-                                # Now test current node's class against graph's class
-                                # This isn't a guarantee, but close enough
-                                if vi["@type"][0] == g["rootclass"]:
-                                    if "ontologyProperty" in g:
-                                        node_value[0]["ontologyProperty"] = g["ontologyProperty"]
-                                    if "inverseOntologyProperty" in g:
-                                        node_value[0]["inverseOntologyProperty"] = g["inverseOntologyProperty"]
-                                    break
+                            if len(gs) == 1:
+                                # just select it
+                                if "ontologyProperty" in gs[0]:
+                                    node_value[0]["ontologyProperty"] = gs[0]["ontologyProperty"]
+                                if "inverseOntologyProperty" in gs[0]:
+                                    node_value[0]["inverseOntologyProperty"] = gs[0]["inverseOntologyProperty"]                                
+                            else:
+                                for g in gs:
+                                    # Now test current node's class against graph's class
+                                    # This isn't a guarantee, but close enough
+                                    if vi["@type"][0] == g["rootclass"]:
+                                        if "ontologyProperty" in g:
+                                            node_value[0]["ontologyProperty"] = g["ontologyProperty"]
+                                        if "inverseOntologyProperty" in g:
+                                            node_value[0]["inverseOntologyProperty"] = g["inverseOntologyProperty"]
+                                        break
 
                 # We know now that it can go into the branch
                 # Determine if we can collapse the data into a -list or not
