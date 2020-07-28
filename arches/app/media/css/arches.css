@@ -11638,7 +11638,10 @@ a.tree-display-tool, a.tree-display-tool:hover {
 }
 
 @media print {
-    header, nav, footer, button, aside, .print-btn, .ep-tools, .geocode-container, .geometry-tools-container, .geometry-editing-notifications, #map-widget-container>.map-widget-container {
+    header, nav, footer, button, aside, .print-btn, .ep-tools, .geocode-container, .geometry-tools-container, .geometry-editing-notifications, #map-widget-container>.map-widget-container,
+    .mapboxgl-ctrl-top-left,
+    .mapboxgl-ctrl-top-right,
+    .workbench-card-sidebar {
         display: none;
     }
     #content-container {
@@ -11685,5 +11688,8 @@ a.tree-display-tool, a.tree-display-tool:hover {
     }
     .workbench-card-wrapper {
         height: 100%;
+    }
+    .rp-report-section-root {
+        padding-top: 20px;
     }
 }
