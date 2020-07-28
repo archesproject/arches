@@ -1421,7 +1421,7 @@ class Graph(models.GraphModel):
                                 be related via Property '{edge.ontologyproperty}'."
                         ),
                         1003,
-                    )                    
+                    )
                 elif not property_found:
                     raise GraphValidationError(
                         _("'{0}' is not found in the {1} ontology or is not a valid ontology property for Entity domain '{2}'.").format(
