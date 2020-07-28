@@ -890,9 +890,6 @@ class Command(BaseCommand):
     def setup_indexes(self):
         management.call_command("es", operation="setup_indexes")
 
-    def drop_resources(self, packages_name):
-        drop_all_resources()
-
     def delete_indexes(self):
         management.call_command("es", operation="delete_indexes")
 
