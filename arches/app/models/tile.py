@@ -37,6 +37,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
+from arches.app.search.mappings import TERMS_INDEX
 from arches.app.datatypes.datatypes import DataTypeFactory
 
 logger = logging.getLogger(__name__)
@@ -425,10 +426,10 @@ class Tile(models.TileModel):
             bool_query = Bool()
             bool_query.filter(Terms(field="tileid", terms=[self.tileid]))
             query.add_query(bool_query)
-            results = query.search(index="terms")["hits"]["hits"]
+            results = query.search(index=TERMS_INDEX)["hits"]["hits"]
 
             for result in results:
-                se.delete(index="terms", id=result["_id"])
+                se.delete(index=TERMS_INDEX, id=result["_id"])
 
             self.__preDelete(request)
             self.save_edit(

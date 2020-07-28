@@ -33,18 +33,12 @@ from django.test.client import Client
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
-from arches.app.search.mappings import (
-    prepare_terms_index,
-    delete_terms_index,
-    prepare_concepts_index,
-    delete_concepts_index,
-    prepare_search_index,
-    delete_search_index,
-)
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from guardian.shortcuts import assign_perm
-
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Query, Term
+from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCE_RELATIONS_INDEX, RESOURCES_INDEX
 
 # these tests can be run from the command line via
 # python manage.py test tests/views/search_tests.py --pattern="*.py" --settings="tests.test_settings"
@@ -53,13 +47,10 @@ from guardian.shortcuts import assign_perm
 class SearchTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
-        delete_terms_index()
-        delete_concepts_index()
-        delete_search_index()
-
-        prepare_terms_index(create=True)
-        prepare_concepts_index(create=True)
-        prepare_search_index(create=True)
+        se = SearchEngineFactory().create()
+        q = Query(se=se)
+        for indexname in [TERMS_INDEX, CONCEPTS_INDEX, RESOURCE_RELATIONS_INDEX, RESOURCES_INDEX]:
+            q.delete(index=indexname, refresh=True)
 
         cls.client = Client()
         cls.client.login(username="admin", password="admin")
@@ -158,9 +149,6 @@ class SearchTests(ArchesTestCase):
     @classmethod
     def tearDownClass(cls):
         cls.user.delete()
-        delete_terms_index()
-        delete_concepts_index()
-        delete_search_index()
 
     def test_temporal_only_search_1(self):
         """
