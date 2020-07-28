@@ -899,31 +899,36 @@ class Command(BaseCommand):
     def export_business_data(
         self, data_dest=None, file_format=None, config_file=None, graph=None, single_file=False,
     ):
+        graphid = graph
         try:
             resource_exporter = ResourceExporter(file_format, configs=config_file, single_file=single_file)
-        except KeyError as e:
+        except KeyError:
             utils.print_message("{0} is not a valid export file format.".format(file_format))
             sys.exit()
-        except MissingConfigException as e:
+        except MissingConfigException:
             utils.print_message("No mapping file specified. Please rerun this command with the '-c' parameter populated.")
             sys.exit()
 
+        if graphid == '*':
+            graphids = [str(graph.graphid) for graph in models.GraphModel.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)] 
+        else:
+            graphids = [graphid]
+        
         if data_dest != "":
-            try:
-                data = resource_exporter.export(graph_id=graph, resourceinstanceids=None)
-            except MissingGraphException as e:
+            for graph in graphids:
+                try:
+                    data = resource_exporter.export(graph_id=graph, resourceinstanceids=None)
+                except MissingGraphException as e:
+                    print(utils.print_message("No resource graph specified. Please rerun this command with the '-g' parameter populated."))
+                    sys.exit()
 
-                print(utils.print_message("No resource graph specified. Please rerun this command with the '-g' parameter populated."))
-
-                sys.exit()
-
-            for file in data:
-                with open(os.path.join(data_dest, file["name"]), "w") as f:
-                    bufsize = 16 * 1024
-                    file["outputfile"].seek(0)
-                    shutil.copyfileobj(file["outputfile"], f, bufsize)
-                # with open(os.path.join(data_dest, file['name']), 'wb') as f:
-                #     f.write(file['outputfile'].getvalue())
+                for file in data:
+                    with open(os.path.join(data_dest, file["name"].replace('/', '-')), "w") as f:
+                        bufsize = 16 * 1024
+                        file["outputfile"].seek(0)
+                        shutil.copyfileobj(file["outputfile"], f, bufsize)
+                    # with open(os.path.join(data_dest, file['name']), 'wb') as f:
+                    #     f.write(file['outputfile'].getvalue())
         else:
             utils.print_message("No destination directory specified. Please rerun this command with the '-d' parameter populated.")
             sys.exit()
