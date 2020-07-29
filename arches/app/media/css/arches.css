@@ -11689,6 +11689,9 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .workbench-card-wrapper {
         height: 100%;
     }
+    .workbench-card-container {
+        margin-right: 0;
+    }
     .rp-report-section-root {
         padding-top: 20px;
     }
