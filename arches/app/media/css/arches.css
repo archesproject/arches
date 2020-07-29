@@ -79,7 +79,8 @@ i.report-expander:focus,
 .workbench-card-sidepanel-header:focus,
 .sp-header-alerts:focus,
 .timeline-entry:focus,
-.rr-splash-help-link:focus {
+.rr-splash-help-link:focus,
+.tabbed-report-tab-list li {
 	outline: #006600 solid 3px !important;
 }
 
