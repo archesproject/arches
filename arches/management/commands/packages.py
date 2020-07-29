@@ -897,9 +897,12 @@ class Command(BaseCommand):
         self, data_dest=None, file_format=None, config_file=None, graphid=None, single_file=False,
     ):
         graphids = []
-        if graphid is False and file_format == 'json':
-            graphids = [str(graph.graphid) for graph in models.GraphModel.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)] 
-        if graphid is False and file_format != 'json':
+        if graphid is False and file_format == "json":
+            graphids = [
+                str(graph.graphid)
+                for graph in models.GraphModel.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            ]
+        if graphid is False and file_format != "json":
             utils.print_message("Exporting data for all graphs is currently only supported for the json format")
             sys.exit()
         if graphid:
@@ -907,10 +910,12 @@ class Command(BaseCommand):
         if os.path.exists(data_dest):
             for graphid in graphids:
                 try:
-                    resource_exporter = ResourceExporter(file_format, configs=config_file, single_file=single_file) # New exporter needed for each graphid, else previous data is appended with each subsequent graph
+                    resource_exporter = ResourceExporter(
+                        file_format, configs=config_file, single_file=single_file
+                    )  # New exporter needed for each graphid, else previous data is appended with each subsequent graph
                     data = resource_exporter.export(graph_id=graphid, resourceinstanceids=None)
                     for file in data:
-                        with open(os.path.join(data_dest, file["name"].replace('/', '-')), "w") as f:
+                        with open(os.path.join(data_dest, file["name"].replace("/", "-")), "w") as f:
                             file["outputfile"].seek(0)
                             shutil.copyfileobj(file["outputfile"], f, 16 * 1024)
                 except KeyError:
@@ -920,7 +925,9 @@ class Command(BaseCommand):
                     utils.print_message("No mapping file specified. Please rerun this command with the '-c' parameter populated.")
                     sys.exit()
         else:
-            utils.print_message("The destination is unspecified or invalid. Please rerun this command with the '-d' parameter populated with a valid path.")
+            utils.print_message(
+                "The destination is unspecified or invalid. Please rerun this command with the '-d' parameter populated with a valid path."
+            )
             sys.exit()
 
     def import_reference_data(self, data_source, overwrite="ignore", stage="stage", bulk_load=False):
