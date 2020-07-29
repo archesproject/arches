@@ -80,7 +80,7 @@ i.report-expander:focus,
 .sp-header-alerts:focus,
 .timeline-entry:focus,
 .rr-splash-help-link:focus,
-.tabbed-report-tab-list li {
+.tabbed-report-tab-list li:focus {
 	outline: #006600 solid 3px !important;
 }
 
