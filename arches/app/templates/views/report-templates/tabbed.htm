@@ -7,7 +7,7 @@
 <div>
     <ul class="tabbed-report-tab-list">
     <!-- ko foreach: {data: tabs, as: 'tab'}  -->
-    <li data-bind="click: function(){ $parent.setActiveTab($index()) }, css: { 'active': ko.unwrap($parent.activeTabIndex) === $index() }" class="report-tab">
+    <li data-bind="click: function(){ $parent.setActiveTab($index()) }, css: { 'active': ko.unwrap($parent.activeTabIndex) === $index() }" class="report-tab" onkeypress="$(this).trigger('click');" tabindex="0">
         <a><span><i data-bind="attr: {class: ('fa '+ ko.unwrap(tab.icon))}"></i></span></a>
     </li>
     <!-- /ko -->
