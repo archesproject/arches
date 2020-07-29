@@ -467,9 +467,7 @@ class Graphs(APIBase):
         graph = cache.get(f"graph_{graph_id}")
         user = request.user
         if graph is None:
-            print("not using graph cache")
             graph = Graph.objects.get(graphid=graph_id)
-            cache.set(f"graph_{graph_id}", JSONSerializer().serializeToPython(graph), settings.GRAPH_MODEL_CACHE_TIMEOUT)
         cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
         permitted_cards = []
         for card in cards:
