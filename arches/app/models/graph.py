@@ -400,10 +400,6 @@ class Graph(models.GraphModel):
             for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()
             self._nodegroups_to_delete = []
-            try:
-                cache.set(f"graph_{self.graphid}", JSONSerializer().serializeToPython(self), settings.GRAPH_MODEL_CACHE_TIMEOUT)
-            except KeyError as e:
-                logger.warn(e)
 
         return self
 
