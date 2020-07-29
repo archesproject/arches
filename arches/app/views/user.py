@@ -122,7 +122,7 @@ class UserManagerView(BaseManagerView):
 
             context["user_surveys"] = JSONSerializer().serialize(user_details["user_surveys"], sort_keys=False)
             context["identities"] = JSONSerializer().serialize(user_details["identities"], sort_keys=False)
-            context["resources"] = JSONSerializer().serialize(user_details["resources"], sort_keys=False)
+            context["resources"] = JSONSerializer().serialize(user_details["resources"], sort_keys=False, exclude=["is_editable"])
 
             return render(request, "views/user-profile-manager.htm", context)
 
