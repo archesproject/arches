@@ -452,6 +452,13 @@ define([
                 expandParents(this);
             }
         }, this);
+        
+        this.copyTile = function(tile) {
+            newTile = this.getNewTile()
+            newTile.tileid = uuid.generate()
+            newTile.data = tile.data
+            this.tiles.push(newTile)
+        };
 
         this.disposables = [];
         this.disposables.push(higlightSubscription);
