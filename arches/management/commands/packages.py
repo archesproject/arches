@@ -890,42 +890,44 @@ class Command(BaseCommand):
     def setup_indexes(self):
         management.call_command("es", operation="setup_indexes")
 
-    def drop_resources(self, packages_name):
-        drop_all_resources()
-
     def delete_indexes(self):
         management.call_command("es", operation="delete_indexes")
 
     def export_business_data(
-        self, data_dest=None, file_format=None, config_file=None, graph=None, single_file=False,
+        self, data_dest=None, file_format=None, config_file=None, graphid=None, single_file=False,
     ):
-        try:
-            resource_exporter = ResourceExporter(file_format, configs=config_file, single_file=single_file)
-        except KeyError as e:
-            utils.print_message("{0} is not a valid export file format.".format(file_format))
+        graphids = []
+        if graphid is False and file_format == "json":
+            graphids = [
+                str(graph.graphid)
+                for graph in models.GraphModel.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            ]
+        if graphid is False and file_format != "json":
+            utils.print_message("Exporting data for all graphs is currently only supported for the json format")
             sys.exit()
-        except MissingConfigException as e:
-            utils.print_message("No mapping file specified. Please rerun this command with the '-c' parameter populated.")
-            sys.exit()
-
-        if data_dest != "":
-            try:
-                data = resource_exporter.export(graph_id=graph, resourceinstanceids=None)
-            except MissingGraphException as e:
-
-                print(utils.print_message("No resource graph specified. Please rerun this command with the '-g' parameter populated."))
-
-                sys.exit()
-
-            for file in data:
-                with open(os.path.join(data_dest, file["name"]), "w") as f:
-                    bufsize = 16 * 1024
-                    file["outputfile"].seek(0)
-                    shutil.copyfileobj(file["outputfile"], f, bufsize)
-                # with open(os.path.join(data_dest, file['name']), 'wb') as f:
-                #     f.write(file['outputfile'].getvalue())
+        if graphid:
+            graphids.append(graphid)
+        if os.path.exists(data_dest):
+            for graphid in graphids:
+                try:
+                    resource_exporter = ResourceExporter(
+                        file_format, configs=config_file, single_file=single_file
+                    )  # New exporter needed for each graphid, else previous data is appended with each subsequent graph
+                    data = resource_exporter.export(graph_id=graphid, resourceinstanceids=None)
+                    for file in data:
+                        with open(os.path.join(data_dest, file["name"].replace("/", "-")), "w") as f:
+                            file["outputfile"].seek(0)
+                            shutil.copyfileobj(file["outputfile"], f, 16 * 1024)
+                except KeyError:
+                    utils.print_message("{0} is not a valid export file format.".format(file_format))
+                    sys.exit()
+                except MissingConfigException:
+                    utils.print_message("No mapping file specified. Please rerun this command with the '-c' parameter populated.")
+                    sys.exit()
         else:
-            utils.print_message("No destination directory specified. Please rerun this command with the '-d' parameter populated.")
+            utils.print_message(
+                "The destination is unspecified or invalid. Please rerun this command with the '-d' parameter populated with a valid path."
+            )
             sys.exit()
 
     def import_reference_data(self, data_source, overwrite="ignore", stage="stage", bulk_load=False):
