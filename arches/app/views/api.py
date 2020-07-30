@@ -467,9 +467,7 @@ class Graphs(APIBase):
         graph = cache.get(f"graph_{graph_id}")
         user = request.user
         if graph is None:
-            print("not using graph cache")
             graph = Graph.objects.get(graphid=graph_id)
-            cache.set(f"graph_{graph_id}", JSONSerializer().serializeToPython(graph), settings.GRAPH_MODEL_CACHE_TIMEOUT)
         cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
         permitted_cards = []
         for card in cards:
@@ -479,7 +477,8 @@ class Graphs(APIBase):
         cardwidgets = [
             widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
         ]
-
+        graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"])
+        permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
         return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
 
 
