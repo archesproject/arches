@@ -27,13 +27,13 @@
 <!--/ko-->
 
 <!-- ko if: reportResourceId-->
-<div class="create-resource-instance-card-component" style="height: initial; width: initial;">
-    <div class="create-instance-header" style="display: flex; justify-content: space-between;">
+<div class="create-resource-instance-card-component rr-table-pop">
+    <div class="create-instance-header" style="display: flex; justify-content: space-between;">{% trans "Related Resource Summary" %}
         <div data-bind="click: function(){reportResourceId(null)}, clickBubble: false" class="close-new-step">
             <i class="fa fa-times-circle"></i>
         </div>
     </div>
-    <div data-bind="component: {
+    <div class="create-instance-panel" data-bind="component: {
         name: 'resource-summary',
         params: {
             resourceId: reportResourceId,
@@ -50,7 +50,6 @@
     <!-- Target -->
     <div id="rr-manager-content-id" class="rr-drag-panel-target" data-bind="style: {'margin-bottom': containerBottomMargin }">
 
-        <!--ko if: resourceRelationships().length > 0-->
         <div class="related-resources-header" data-bind="css: {'open-graph': showGraph() == true}, style: {height: resourceEditorContext === true ? '55px' : '40px'}">
             
             <div class="editor-elements">
@@ -83,8 +82,8 @@
                         data-bind="textInput: filter"></input>
                     <span class="clear-node-search" style="top: 5px;" data-bind="visible: filter().length > 0, click: function() { filter('');}"><i class="fa fa-times-circle"></i></span>
                 </div>
-                <span style="padding: 4px;" data-bind="if: !!resourceRelationships() && resourceRelationships().hasOwnProperty('length') && resourceRelationships().length > 1">
-                    <span style="font-size: 13px;"" class='file-workbench-filecount' data-bind='text: resourceRelationships().length + "{% trans ' resource relations' %}"'></span>
+                <span style="padding: 4px;" data-bind="if: totalRelationships() > 1">
+                    <span style="font-size: 13px;"" class='file-workbench-filecount' data-bind='text: totalRelationships() + "{% trans ' resource relations' %}"'></span>
                 </span>
             </div>
 
@@ -92,23 +91,23 @@
                 <div data-bind="foreach:{ data: relationshipsInFilter, as: 'relationship'}" style="display: flex; flex-direction: column;">
                     <div class='rr-table-row'>
                         <div class='rr-table-row-initial'>
-                            <div class='rr-table-column' style="width: 36px;">
-                                <button data-bind="click: self.toggleSelectedResourceRelationship, clickBubble: false">
-                                    <i data-bind="class: !!relationship.tileid() ? 'fa fa-random' : 'fa fa-usb' "></i>
+                            <div class='rr-table-column icon-column'>
+                                <button data-bind="click: function(){window.open(resource.resourceinstanceid)}, clickBubble: false">
+                                    <i class="fa fa-pencil"></i>
                                 </button>
                             </div>                        
-                            <div class='rr-table-column' style="width: 36px;">
+                            <div class='rr-table-column icon-column'>
                                 <button data-bind="click: !!relationship.tileid() ?  self.updateTile.bind(self, {'delete':true}) : self.deleteRelationships.bind(self), clickBubble: false">
                                     <i class="fa fa-trash"></i>
                                 </button>
                             </div>
-                            <div class='rr-table-column' style="width: 36px;">
+                            <div class='rr-table-column icon-column'>
                                 <button data-bind="click:function(){self.reportResourceId(resource.resourceinstanceid);}, clickBubble: false">
                                     <i class="fa fa-info-circle"></i>
                                 </button>
                             </div>
-                            <div class="rr-table-column" style="flex-grow: 1;">
-                                <div><a target="_blank" style="text-decoration: underline; padding-left: 10px;" data-bind="text: resource.displayname, attr:{href: resource.resourceinstanceid}" ></a></div>
+                            <div class="rr-table-column" style="flex-grow: 1;" data-bind="click: self.toggleSelectedResourceRelationship, clickBubble: false">
+                                <div class="rr-table-instance-label" style="padding-left: 10px;" data-bind="text: resource.displayname"></div>
                             </div>
                         </div>
                         <div class="rr-table-row-panel" data-bind="if: self.selectedResourceRelationship() === relationship, visible:  self.selectedResourceRelationship() === relationship, css: { 'rr-table-border': self.selectedResourceRelationship() === relationship} ">
@@ -122,7 +121,7 @@
                                             data-bind="text: self.currentResource().displayname"></span>{% trans "'s relationship to" %} <span                                   data-bind="text: resource.displayname"></span></label>
                                     </div>
                                     <div class="row">
-                                        <span class="col-sm-4" style="padding-top: 8px; text-align: right;"
+                                        <span class="col-sm-4" style="padding-right: 5px;text-align: right;"
                                             data-bind="text: self.currentResource().displayname + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
                                         <span class="col-sm-4">
                                             <input style="width:30%; display:inline-block;" data-bind="
@@ -131,7 +130,7 @@
                                                 }
                                             ">
                                         </span>
-                                        <span class="col-sm-4" style="padding-top: 8px;"
+                                        <span class="col-sm-4" style="padding-left: 5px;"
                                             data-bind="text: resource.displayname + ' (' + self.makeFriendly(relationship.resource.root_ontology_class) + ')'"></span>
                                     </div>
                                     <div class="row" style="margin-top: 20px;">
@@ -139,7 +138,7 @@
                                                 data-bind="text: resource.displayname"></span>{% trans "'s relationship to " %} <span class=""                            data-bind="text: self.currentResource().displayname"></span></label>
                                     </div>
                                     <div class="row">
-                                        <span class="col-sm-4" style="padding-top: 8px; text-align: right;"
+                                        <span class="col-sm-4" style="padding-right: 5px; text-align: right;"
                                             data-bind="text: resource.displayname + ' (' + self.makeFriendly(relationship.resource.root_ontology_class) + ')'"></span>
                                         <span class="col-sm-4">
                                             <input style="width:30%; display:inline-block;" data-bind="
@@ -148,7 +147,7 @@
                                                 }
                                             ">
                                         </span>
-                                        <span class="col-sm-4" style="padding-top: 8px;"
+                                        <span class="col-sm-4" style="padding-left: 5px;"
                                             data-bind="text: self.currentResource().displayname + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
                                     </div>
                                     <!-- /ko -->
@@ -158,7 +157,7 @@
                                                 data-bind="text: resource.displayname"></span></label>
                                     </div>
                                     <div class="row">
-                                        <span class="col-sm-4" style="padding-top: 8px; text-align: right;"
+                                        <span class="col-sm-4" style="padding-right: 5px; text-align: right;"
                                             data-bind="text: self.currentResource().displayname + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
                                         <span class="col-sm-4">
                                             <input style="width:30%; display:inline-block;" data-bind="
@@ -167,7 +166,7 @@
                                                 }
                                             ">
                                         </span>
-                                        <span class="col-sm-4" style="padding-top: 8px;"
+                                        <span class="col-sm-4" style="padding-left: 5px;"
                                         data-bind="text: resource.displayname + ' (' + self.makeFriendly(relationship.resource.root_ontology_class) + ')'"></span>
                                     </div>
                                     <div class="row" style="margin-top: 20px;">
@@ -175,7 +174,7 @@
                                             data-bind="text: resource.displayname"></span></label>
                                         </div>
                                         <div class="row">
-                                            <span class="col-sm-4" style="padding-top: 8px; text-align: right;"
+                                            <span class="col-sm-4" style="padding-right: 5px; text-align: right;"
                                             data-bind="text: resource.displayname + ' (' + self.makeFriendly(relationship.resource.root_ontology_class) + ')'"></span>
                                             <span class="col-sm-4">
                                                 <input style="width:30%; display:inline-block;" data-bind="
@@ -184,7 +183,7 @@
                                                     }
                                                 ">
                                             </span>
-                                        <span class="col-sm-4" style="padding-top: 8px;"
+                                        <span class="col-sm-4" style="padding-left: 5px;"
                                             data-bind="text: self.currentResource().displayname + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
                                     </div>
                                     <!-- /ko -->
@@ -304,8 +303,6 @@
             <div class="rr-panel-note">{%trans "This resource is not related to any other resources" %}</div>
             <!--/ko-->
         </div>
-
-        <!--/ko-->
 
 
         <!--ko if: resourceEditorContext === undefined && !currentResource() -->

@@ -27,6 +27,7 @@ img {
 
 [class^="col-"]:not(.pad-no) {
     padding-left: 0px;
+    padding-right: 0px;
 }
 
 .regular-link {
@@ -1376,7 +1377,8 @@ div.workflow-panel {
 
 .workflow-select-wf-icon {
     color: white;
-    font-size: 40px;
+    font-size: 28px;
+    padding-top: 0px;
 }
 
 .workflow-select-title {
@@ -1385,12 +1387,13 @@ div.workflow-panel {
 }
 
 .workflow-select-wf-circle {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     display: inline-block;
     text-align: center;
-    padding: 18px;
+    padding: 18px 12px;
     border-radius: 40px;
+    border: 1px solid #747474;
 }
 
 .workflow-select-desc {
@@ -1422,7 +1425,7 @@ div.workflow-panel {
     text-align: center;
     border: 1px solid #777;
     border-radius: 1px;
-    margin: 10px;
+    margin: 5px;
     opacity: 0.85;
 }
 
@@ -2252,11 +2255,12 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 
 .select2-container {
     width: 100% !important;
+    border: 1px solid #ddd;
 }
 
 .form-group div input {
     max-width: 600px;
-    border: 1px solid #ddd;
+    border: 1px solid #eee;
 }
 
 .resource-instance-wrapper .select2-container {
@@ -3356,7 +3360,7 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .settings-panel {
-    padding: 10px 20px 55px 25px;
+    padding: 10px 20px 150px 25px;
 }
 
 .settings-panel-heading {
@@ -5347,6 +5351,7 @@ span.editable-card i.fa.fa-align-justify:hover {
     padding: 18px;
     border-radius: 50%;
     background: #BFE0F7;
+    border: 1px solid #454545;
 }
 
 .r-select-circle.loader-button {
@@ -7711,7 +7716,8 @@ a.mega-dropdown-toggle.disabled {
     background: white;
     border: 1px solid white;
     border-radius: 2px;
-    padding: 0px 25px;
+    padding: 0px 12px 0px 7px;
+    margin-top: -1px;
 }
 
 #container .table-bordered td,
@@ -7856,8 +7862,8 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rr-table-row-initial {
-    display: flex; 
-    flex-direction: row; 
+    display: flex;
+    flex-direction: row;
     height: 36px;
 }
 
@@ -7892,6 +7898,16 @@ a.mega-dropdown-toggle.disabled {
 
 .rr-table-column button i {
     margin-left: 0px;
+    padding: 12px;
+}
+
+.rr-table-column.icon-column {
+    width: 36px;
+    padding: 0px;
+}
+
+.rr-table-column.icon-column:hover {
+    background: #D9D9F5;
 }
 
 .rr-table-column a {
@@ -7902,6 +7918,80 @@ a.mega-dropdown-toggle.disabled {
     font-size: 17px;
     padding-left: 49%;
 }
+
+.rr-table-instance-label {
+    width: 430px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.create-resource-instance-card-component.rr-table-pop {
+    height: 100%;
+    width: 100%;
+    padding: 80px;
+    background: rgba(0,0,0,0.5);
+    top: 0px;
+    left: 0px;
+    border: 1px solid #000;
+}
+
+.create-resource-instance-card-component.rr-table-pop .rp-edit-buttons {
+    display: none;
+}
+
+.workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop {
+    padding: 20px;
+    top: 0px;
+    z-index: 30;
+    height: 100vh;
+}
+
+.workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .card-component {
+    margin-top: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    border-radius: 0px;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.create-resource-instance-card-component.rr-table-pop .card-component {
+    margin-top: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    border-radius: 0px;
+}
+
+.workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .card-component .install-buttons {
+    right: 21px;
+    width: 357px;
+}
+
+.workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .create-instance-panel {
+    background: #fff;
+    min-height: 67%;
+}
+
+.workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .create-instance-panel .loading-mask {
+    left: 100%;
+    width: 450px;
+    display: none;
+}
+
+.create-resource-instance-card-component.rr-table-pop .create-instance-panel {
+    background: #fff;
+    min-height: 60%;
+}
+
+.new-provisional-edit-card-container .rr-table-instance-label {
+    width: 475px;
+}
+
+.workbench-card-sidepanel .rr-table-instance-label {
+    width: 220px;
+}
+
 
 .unselectable {
     color: #ff0000;
@@ -7923,6 +8013,7 @@ a.mega-dropdown-toggle.disabled {
     font-weight: 300;
     color: #999;
 }
+
 
 .rr-widget-filter-panel {
     margin-top: -5px;
@@ -8019,7 +8110,23 @@ a.mega-dropdown-toggle.disabled {
     display: inline-flex;
     justify-content: space-between;
     margin-right: 10%;
-    color: #0257a2;
+    color: #597DBF;
+}
+
+.rp-edit-buttons i {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    height: 36px;
+    width: 36px;
+    margin-right: 2px;
+    margin-left: 2px;
+    background: #D8FAF6;
+}
+
+.rp-edit-buttons i:hover {
+    cursor: pointer;
+    background: #fff;
+    color: #3A5FA4;
 }
 
 .rp-tile-separator {
@@ -10128,6 +10235,10 @@ table.table.dataTable {
     z-index: 2;
 }
 
+.tab-pane.active .related-resources-header {
+    display: none;
+}
+
 .related-resources-header .editor-elements {
     display: flex;
     justify-content: space-between;
@@ -10695,7 +10806,7 @@ table.table.dataTable {
     width: calc(100% - 275px);
     height: calc(100vh - 115px);
     overflow-y: auto;
-    padding: 20px;
+    padding: 2px;
     background: white;
     border-right: 0.5px #e0e0e0 solid;
 }
@@ -12244,23 +12355,30 @@ a.jstree-anchor.permissions-widget {
 }
 
 .new-instance-model-name {
-    font-size: 1.4em;
+    font-size: 15px;
     font-weight: 600;
     color: #004577;
-    padding: 20px 40px;
-    margin-top: 0px;
     width: 100%;
 }
 
 .create-instance-header {
-    display: flex;
-    justify-content: space-between;
-    background: #f4f4f4;
+    height: 50px;
+    background: #f1f1f1;
+    position: relative;
+    border-bottom: 1px solid #ddd;
+    padding: 17px;
+    font-size: 15px;
 }
 
 .create-instance-header .close-new-step {
-    padding: 12px;
-    font-size: 20px;
+    position: absolute;
+    right: 10px;
+    top: 15px;
+    font-size: 17px;
+}
+
+.create-instance-header .close-new-step:hover {
+    cursor: pointer;
 }
 
 .create-resource-instance-card-component .card-component {
@@ -12415,6 +12533,8 @@ a.jstree-anchor.permissions-widget {
 
 .search-result-details-splash {
     padding-top: 50px;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 
 .search-result-details-splash .rr-splash {
@@ -12632,7 +12752,7 @@ a.jstree-anchor.permissions-widget {
     background: #e9e9e9;
     margin-top: -15px;
     margin-left: -20px;
-    padding: 15px 10px;
+    padding: 15px 10px 150px 10px;
     height: 100%;
     position: fixed;
     overflow-y: scroll;

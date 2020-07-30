@@ -20,6 +20,7 @@ define([
                 this.searchResults = options.searchResultsVm;
                 this.editingInstanceId = options.editing_instance_id;
                 this.graph = options.graph;
+                this.loading = options.loading;
                 this.rootOntologyClass  = '';
                 if (this.graph) {
                     if(!!options.graph.ontologyclass){
@@ -53,6 +54,7 @@ define([
                 this.reportGraphId = ko.observable(null);
                 this.resourceRelationships = ko.observableArray();
                 this.paginator = koMapping.fromJS({});
+                this.totalRelationships = ko.observable(0);
                 this.relationshipsInFilter = ko.computed(function() {
                     return self.resourceRelationships().filter(function(relationship) {
                         return self.filter().toLowerCase() === '' || relationship.resource.displayname.toLowerCase().includes(self.filter().toLowerCase());
@@ -168,6 +170,7 @@ define([
                 };
 
                 this.createResource = function(resourceinstanceid) {
+                    var self = this;
                     return {
                         resourceinstanceid: resourceinstanceid,
                         relatedresources: ko.observableArray(),
@@ -225,6 +228,7 @@ define([
                             this.resourceRelationships(sorted);
                             this.displayname = rr.resource_instance.displayname;
                             this.graphid = rr.resource_instance.graph_id;
+                            self.totalRelationships(rr.total.value);
                         },
                         get: function(newPage) {
                             var page = newPage || 1;
@@ -505,6 +509,8 @@ define([
             },
 
             updateTile: function(options, relationship) {
+                var self = this;
+                self.loading(true);
                 window.fetch(arches.urls.api_tiles(relationship.tileid()), {
                     method: 'GET',
                     credentials: 'include',
@@ -544,15 +550,23 @@ define([
                             .then(function(response) {
                                 if (response.ok) {
                                     relationship._json(JSON.stringify(koMapping.toJS(relationship)));
+                                    if (!!options.delete) {
+                                        window.setTimeout(function() {
+                                            self.newPage(1);
+                                            self.loading(false);
+                                        }, 1000);
+                                    }
                                 }
                             })
                             .catch(function(err) {
                                 console.log('Tile update failed', err);
+                                self.loading(false);
                             });
 
                     })
                     .catch(function(err) {
                         console.log('Tile update failed', err);
+                        self.loading(false);
                     });
             },
         }),

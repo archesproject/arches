@@ -1,4 +1,5 @@
 import math
+from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.search.elasticsearch_dsl_builder import (
     Bool,
@@ -18,10 +19,10 @@ from arches.app.search.elasticsearch_dsl_builder import (
     FiltersAgg,
     NestedAgg,
 )
-from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from django.core.cache import cache
+from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.models.system_settings import settings
+from django.core.cache import cache
 
 
 class TimeWheel(object):
@@ -32,7 +33,7 @@ class TimeWheel(object):
         nested_agg.add_aggregation(MinAgg(field="dates.date"))
         nested_agg.add_aggregation(MaxAgg(field="dates.date"))
         query.add_aggregation(nested_agg)
-        results = query.search(index="resources")
+        results = query.search(index=RESOURCES_INDEX)
 
         if (
             results is not None
@@ -109,7 +110,7 @@ class TimeWheel(object):
             add_date_tier(date_tiers, min_date, max_date)
 
             root = d3Item(name="root")
-            results = {"buckets": [query.search(index="resources")["aggregations"]]}
+            results = {"buckets": [query.search(index=RESOURCES_INDEX)["aggregations"]]}
             results_with_ranges = self.appendDateRanges(results, range_lookup)
             self.transformESAggToD3Hierarchy(results_with_ranges, root)
             if user.username in settings.CACHE_BY_USER:

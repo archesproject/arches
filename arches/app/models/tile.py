@@ -37,6 +37,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
+from arches.app.search.mappings import TERMS_INDEX
 from arches.app.datatypes.datatypes import DataTypeFactory
 
 logger = logging.getLogger(__name__)
@@ -370,42 +371,42 @@ class Tile(models.TileModel):
                         "action": "create tile" if creating_new_tile else "add edit",
                     }
 
-        if user is not None:
-            self.validate([])
+            if user is not None:
+                self.validate([])
 
-        super(Tile, self).save(*args, **kwargs)
-        # We have to save the edit log record after calling save so that the
-        # resource's displayname changes are avaliable
-        user = {} if user is None else user
-        self.datatype_post_save_actions(request)
-        self.__postSave(request)
-        if creating_new_tile is True:
-            self.save_edit(
-                user=user,
-                edit_type=edit_type,
-                old_value={},
-                new_value=self.data,
-                newprovisionalvalue=newprovisionalvalue,
-                provisional_edit_log_details=provisional_edit_log_details,
-            )
-        else:
-            self.save_edit(
-                user=user,
-                edit_type=edit_type,
-                old_value=existing_model.data,
-                new_value=self.data,
-                newprovisionalvalue=newprovisionalvalue,
-                oldprovisionalvalue=oldprovisionalvalue,
-                provisional_edit_log_details=provisional_edit_log_details,
-            )
+            super(Tile, self).save(*args, **kwargs)
+            # We have to save the edit log record after calling save so that the
+            # resource's displayname changes are avaliable
+            user = {} if user is None else user
+            self.datatype_post_save_actions(request)
+            self.__postSave(request)
+            if creating_new_tile is True:
+                self.save_edit(
+                    user=user,
+                    edit_type=edit_type,
+                    old_value={},
+                    new_value=self.data,
+                    newprovisionalvalue=newprovisionalvalue,
+                    provisional_edit_log_details=provisional_edit_log_details,
+                )
+            else:
+                self.save_edit(
+                    user=user,
+                    edit_type=edit_type,
+                    old_value=existing_model.data,
+                    new_value=self.data,
+                    newprovisionalvalue=newprovisionalvalue,
+                    oldprovisionalvalue=oldprovisionalvalue,
+                    provisional_edit_log_details=provisional_edit_log_details,
+                )
 
-        if index:
-            self.index()
+            if index:
+                self.index()
 
-        for tile in self.tiles:
-            tile.resourceinstance = self.resourceinstance
-            tile.parenttile = self
-            tile.save(*args, request=request, index=index, **kwargs)
+            for tile in self.tiles:
+                tile.resourceinstance = self.resourceinstance
+                tile.parenttile = self
+                tile.save(*args, request=request, index=index, **kwargs)
 
     def delete(self, *args, **kwargs):
         se = SearchEngineFactory().create()
@@ -425,10 +426,10 @@ class Tile(models.TileModel):
             bool_query = Bool()
             bool_query.filter(Terms(field="tileid", terms=[self.tileid]))
             query.add_query(bool_query)
-            results = query.search(index="terms")["hits"]["hits"]
+            results = query.search(index=TERMS_INDEX)["hits"]["hits"]
 
             for result in results:
-                se.delete(index="terms", id=result["_id"])
+                se.delete(index=TERMS_INDEX, id=result["_id"])
 
             self.__preDelete(request)
             self.save_edit(

@@ -29,6 +29,7 @@ from arches.app.models.system_settings import settings
 from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS, get_preflabel_from_valueid
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, SimpleQueryString
+from arches.app.search.mappings import CONCEPTS_INDEX
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
@@ -402,7 +403,7 @@ def search(request):
     query = Query(se, start=0, limit=100)
     phrase = Match(field="value", query=searchString.lower(), type="phrase_prefix")
     query.add_query(phrase)
-    results = query.search(index="concepts")
+    results = query.search(index=CONCEPTS_INDEX)
 
     ids = []
     if removechildren is not None:
@@ -422,7 +423,7 @@ def search(request):
                 query = Query(se, start=0, limit=100)
                 phrase = Match(field="conceptid", query=top_concept, type="phrase")
                 query.add_query(phrase)
-                scheme = query.search(index="concepts")
+                scheme = query.search(index=CONCEPTS_INDEX)
                 for label in scheme["hits"]["hits"]:
                     if label["_source"]["type"] == "prefLabel":
                         cached_scheme_names[top_concept] = label["_source"]["value"]
@@ -515,7 +516,7 @@ def concept_tree(request, mode):
 
 def get_concept_label_from_valueid(valueid):
     se = SearchEngineFactory().create()
-    concept_label = se.search(index="concepts", id=valueid)
+    concept_label = se.search(index=CONCEPTS_INDEX, id=valueid)
     if concept_label["found"]:
         return concept_label["_source"]
 
@@ -529,7 +530,7 @@ def get_preflabel_from_conceptid(conceptid, lang):
     bool_query.must(Match(field="type", query="prefLabel", type="phrase"))
     bool_query.filter(Terms(field="conceptid", terms=[conceptid]))
     query.add_query(bool_query)
-    preflabels = query.search(index="concepts")["hits"]["hits"]
+    preflabels = query.search(index=CONCEPTS_INDEX)["hits"]["hits"]
     for preflabel in preflabels:
         default = preflabel["_source"]
         # get the label in the preferred language, otherwise get the label in the default language
