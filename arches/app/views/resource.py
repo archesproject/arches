@@ -812,7 +812,7 @@ class ResourceReportView(MapBaseManagerView):
             ),
             resourceid=resourceid,
             displayname=displayname,
-            version=app_settings(request)['app_settings']['VERSION'],
+            version=app_settings(request)["app_settings"]["VERSION"],
         )
 
         if graph.iconclass:
