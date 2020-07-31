@@ -32,13 +32,9 @@ define([
             var ids = [];
             self.widgets.forEach(function(widget) {
                 var id = widget.node_id();
-                var value = koMapping.toJS(self.tile.data[id]);
+                var value = ko.unwrap(self.tile.data[id]) ? koMapping.toJS(self.tile.data[id]().map(function(item){return item.resourceId})) : null;
                 if (value) {
-                    if (Array.isArray(value)) {
-                        ids = ids.concat(value);
-                    } else {
-                        ids.push(value);
-                    }
+                    ids = ids.concat(value);
                 }
             });
             return ids;
@@ -111,8 +107,14 @@ define([
             var resourceinstanceid = ko.unwrap(popupData.resourceinstanceid);
             var type = ko.unwrap(self.form.nodeLookup[id].datatype);
             zoomToData = false;
+            var val = [{
+                inverseOntologyProperty: "",
+                ontologyProperty: "",
+                resourceId: resourceinstanceid,
+                resourceXresourceId: "",
+              }];
             if (type === 'resource-instance') {
-                self.tile.data[id](resourceinstanceid);
+                self.tile.data[id](val);
             } else {
                 var value = koMapping.toJS(self.tile.data[id]);
                 if (!value) {
