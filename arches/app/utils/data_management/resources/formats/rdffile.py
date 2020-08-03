@@ -533,6 +533,8 @@ class JsonLdReader(Reader):
                 if not self.is_semantic_node(branch[0]):
                     graph_node = branch[0]
                     node_value = graph_node["datatype"].from_rdf(vi)
+                    # node_value might be None if the validation of the datatype fails
+                    # XXX Should we check this here, or raise in the datatype?
 
                 # We know now that it can go into the branch
                 # Determine if we can collapse the data into a -list or not
@@ -541,8 +543,10 @@ class JsonLdReader(Reader):
                 # This is going to be the result passed down if we recurse
                 bnode = {"data": [], "nodegroup_id": branch[0]["nodegroup_id"], "cardinality": branch[0]["cardinality"]}
 
-                if bnodeid == branch[0]["nodegroup_id"]:
-                    # 2020-06-02 azaroth42 removed: parenttile_id = tile.tileid if tile else None
+                if branch[0]['datatype'].collects_multiple_values() and tile and bnodeid == branch[0]['nodegroup_id']:
+                    # iterating through a root node *-list type
+                    pass
+                elif bnodeid == branch[0]["nodegroup_id"]:
                     # Used to pick the previous tile in loop which MIGHT be the parent (but might not)
                     parenttile_id = result["tile"].tileid if "tile" in result else None
                     tile = Tile(
