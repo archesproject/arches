@@ -79,7 +79,8 @@ i.report-expander:focus,
 .workbench-card-sidepanel-header:focus,
 .sp-header-alerts:focus,
 .timeline-entry:focus,
-.rr-splash-help-link:focus {
+.rr-splash-help-link:focus,
+.tabbed-report-tab-list li:focus {
 	outline: #006600 solid 3px !important;
 }
 
@@ -10974,6 +10975,10 @@ a.jstree-anchor.permissions-widget {
     height: 400px;
 }
 
+.report-map-header-component .workbench-card-wrapper {
+    height: 100%;
+}
+
 .exporter-note {
 	position: absolute;
 	padding-left: 16px;
@@ -11634,7 +11639,10 @@ a.tree-display-tool, a.tree-display-tool:hover {
 }
 
 @media print {
-    header, nav, footer, button, aside, .print-btn, .ep-tools, .geocode-container, .geometry-tools-container, .geometry-editing-notifications, #map-widget-container>.map-widget-container {
+    header, nav, footer, button, aside, .print-btn, .ep-tools, .geocode-container, .geometry-tools-container, .geometry-editing-notifications, #map-widget-container>.map-widget-container,
+    .mapboxgl-ctrl-top-left,
+    .mapboxgl-ctrl-top-right,
+    .workbench-card-sidebar {
         display: none;
     }
     #content-container {
@@ -11670,9 +11678,6 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .rp-report-section {
         border-bottom: 1px solid rgba(128, 128, 128, 0.5);
     }
-    .mapboxgl-map {
-        display: none;
-    }
     .print-map {
         display: block;
         width: 100%;
@@ -11682,7 +11687,13 @@ a.tree-display-tool, a.tree-display-tool:hover {
         display: none;
         height: 0;
     }
-    .workbench-card-sidebar {
+    .workbench-card-wrapper {
         height: 100%;
+    }
+    .workbench-card-container {
+        margin-right: 0;
+    }
+    .rp-report-section-root {
+        padding-top: 20px;
     }
 }
