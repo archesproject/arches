@@ -354,7 +354,10 @@ class Resource(models.ResourceInstance):
             related_resources = self.get_related_resources(lang="en-US", start=0, limit=1000, page=0)
             for rr in related_resources["resource_relationships"]:
                 # delete any related resource entries, also reindex the resrouce that references this resrouce that's being deleted
-                resourceXresource = models.ResourceXResource.objects.get(pk=rr["resourcexid"])
+                try:
+                    resourceXresource = models.ResourceXResource.objects.get(pk=rr["resourcexid"])
+                except:
+                    continue
                 resource_to_reindex = (
                     resourceXresource.resourceinstanceidfrom_id
                     if resourceXresource.resourceinstanceidto_id == self.resourceinstanceid
