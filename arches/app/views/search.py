@@ -31,7 +31,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Terms, MaxAgg, Aggregation
-from arches.app.search.search_export import SearchResultsExporter
+import arches.app.search.search_export
 from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.views.base import MapBaseManagerView
@@ -203,7 +203,7 @@ def export_results(request):
             message = _(f"Your search exceeds the {download_limit} instance download limit. Please refine your search")
             return JSONResponse({"success": False, "message": message})
     else:
-        exporter = SearchResultsExporter(search_request=request)
+        exporter = search_export.SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format)
         if len(export_files) == 0 and format == "shp":
             message = _(
