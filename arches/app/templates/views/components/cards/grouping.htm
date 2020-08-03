@@ -96,7 +96,7 @@
                 afterMove: self.afterMove
             }" class="jstree-children card-designer-tree" aria-expanded="true">
         <div>
-            <!-- ko let: {widget:$parent.widgetLookup[widgetId]} -->
+            <!-- ko let: {widget:$parent.cardXNodeXWidgetLookup[widgetId]} -->
             <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
                     'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0
                 }">
@@ -186,7 +186,7 @@
             <div data-bind="foreach: {data: sortedWidgetIds, as: 'widgetid'}">
                 <form class="widgets" style="margin-bottom: 20px;">
                     <div data-bind="foreach: {
-                            data:$parent.widgetLookup[widgetid], as: 'widget'
+                            data:$parent.cardXNodeXWidgetLookup[widgetid], as: 'widget'
                         }">
                         <div data-bind='component: {
                             name: self.form.widgetLookup[widget.widget_id()].name,

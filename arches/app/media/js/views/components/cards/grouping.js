@@ -24,7 +24,7 @@ define([
         var self = this;
         this.saving = false;
         this.tiles = [];
-        this.widgetLookup = {};
+        this.cardXNodeXWidgetLookup = {};
 
         params.configKeys = ['groupedCardIds', 'sortedWidgetIds'];
         CardComponentViewModel.apply(this, [params]);
@@ -77,15 +77,15 @@ define([
 
         var updatedSortedWidgetsList = function(cards) {
             this.newWidgetIdList = [];
-            this.widgetLookup = {};
+            this.cardXNodeXWidgetLookup = {};
             cards.forEach(function(card){
                 card.widgets().forEach(function(widget) {
-                    this.widgetLookup[widget.id()] = widget;
-                    this.newWidgetIdList.push(widget.id());
+                    this.cardXNodeXWidgetLookup[widget.widget_id()] = widget;
+                    this.newWidgetIdList.push(widget.widget_id());
                 }, this);
             }, this);
 
-            _.each(this.widgetLookup, function(widget, widgetid) {
+            _.each(this.cardXNodeXWidgetLookup, function(widget, widgetid) {
                 if(!(_.contains(this.sortedWidgetIds(), widgetid))) {
                     this.sortedWidgetIds().push(widgetid);
                 }
@@ -137,7 +137,7 @@ define([
         }, this);
 
         this.getDataForDisplay = function(widgetid) {
-            var widget = self.widgetLookup[widgetid];
+            var widget = self.cardXNodeXWidgetLookup[widgetid];
             var tile = self.groupedTiles().find(function(tile) {
                 return Object.keys(tile.data).includes(widget.node.nodeid);
             });
