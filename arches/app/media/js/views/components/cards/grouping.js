@@ -24,8 +24,14 @@ define([
         var self = this;
         this.saving = false;
         this.tiles = [];
-        this.cardXNodeXWidgetLookup = {};
+        this.widgetInstanceDataLookup = {};
 
+
+        /*
+            'sortedWidgetIds' originally referred to entries in the
+            card_x_node_x_widget table. This has been changed, and
+            this list now contains `node_id`s instead.
+        */ 
         params.configKeys = ['groupedCardIds', 'sortedWidgetIds'];
         CardComponentViewModel.apply(this, [params]);
 
@@ -76,22 +82,23 @@ define([
         }, this);
 
         var updatedSortedWidgetsList = function(cards) {
-            this.newWidgetIdList = [];
-            this.cardXNodeXWidgetLookup = {};
+            this.widgetInstanceDataIdList = [];
+            this.widgetInstanceDataLookup = {};
+
             cards.forEach(function(card){
                 card.widgets().forEach(function(widget) {
-                    this.cardXNodeXWidgetLookup[widget.widget_id()] = widget;
-                    this.newWidgetIdList.push(widget.widget_id());
+                    this.widgetInstanceDataLookup[widget.node_id()] = widget;
+                    this.widgetInstanceDataIdList.push(widget.node_id());
                 }, this);
             }, this);
 
-            _.each(this.cardXNodeXWidgetLookup, function(widget, widgetid) {
+            _.each(this.widgetInstanceDataLookup, function(widget, widgetid) {
                 if(!(_.contains(this.sortedWidgetIds(), widgetid))) {
                     this.sortedWidgetIds().push(widgetid);
                 }
             }, this);
 
-            this.sortedWidgetIds(_.without(this.sortedWidgetIds(), ..._.difference(this.sortedWidgetIds(), this.newWidgetIdList)));
+            this.sortedWidgetIds(_.without(this.sortedWidgetIds(), ..._.difference(this.sortedWidgetIds(), this.widgetInstanceDataIdList)));
         };
 
         updatedSortedWidgetsList.call(this, this.groupedCards());
@@ -137,7 +144,7 @@ define([
         }, this);
 
         this.getDataForDisplay = function(widgetid) {
-            var widget = self.cardXNodeXWidgetLookup[widgetid];
+            var widget = self.widgetInstanceDataLookup[widgetid];
             var tile = self.groupedTiles().find(function(tile) {
                 return Object.keys(tile.data).includes(widget.node.nodeid);
             });
