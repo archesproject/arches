@@ -32,7 +32,7 @@ define([
             var ids = [];
             self.widgets.forEach(function(widget) {
                 var id = widget.node_id();
-                var value = ko.unwrap(self.tile.data[id]) ? koMapping.toJS(self.tile.data[id]().map(function(item){return item.resourceId})) : null;
+                var value = ko.unwrap(self.tile.data[id]) ? koMapping.toJS(self.tile.data[id]().map(function(item){return item.resourceId;})) : null;
                 if (value) {
                     ids = ids.concat(value);
                 }
@@ -112,16 +112,16 @@ define([
                 ontologyProperty: "",
                 resourceId: resourceinstanceid,
                 resourceXresourceId: "",
-              }];
+            }];
             if (type === 'resource-instance') {
                 self.tile.data[id](val);
             } else {
                 var value = koMapping.toJS(self.tile.data[id]);
                 if (!value) {
-                    self.tile.data[id]([resourceinstanceid]);
-                } else if (value.indexOf(resourceinstanceid) < 0) {
-                    value.push(resourceinstanceid);
-                    self.tile.data[id](value);
+                    self.tile.data[id](val);
+                } else if (value.map(function(rr){return rr.resourceId;}).indexOf(resourceinstanceid) < 0) {
+                    var values = value.concat(val);
+                    self.tile.data[id](values);
                 }
             }
         };
