@@ -974,7 +974,7 @@ class IIIFManifest(APIBase):
         return response
 
 
-class OntolgyPropery(APIBase):
+class OntolgyProperty(APIBase):
     def get(self, request):
         domain_ontology_class = request.GET.get("domain_ontology_class", None)
         range_ontology_class = request.GET.get("range_ontology_class", None)
