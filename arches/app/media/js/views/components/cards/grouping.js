@@ -82,13 +82,13 @@ define([
         }, this);
 
         var updatedSortedWidgetsList = function(cards) {
-            this.widgetInstanceDataIdList = [];
+            this.widgetNodeIdList = [];
             this.widgetInstanceDataLookup = {};
 
             cards.forEach(function(card){
                 card.widgets().forEach(function(widget) {
                     this.widgetInstanceDataLookup[widget.node_id()] = widget;
-                    this.widgetInstanceDataIdList.push(widget.node_id());
+                    this.widgetNodeIdList.push(widget.node_id());
                 }, this);
             }, this);
 
@@ -98,7 +98,7 @@ define([
                 }
             }, this);
 
-            this.sortedWidgetIds(_.without(this.sortedWidgetIds(), ..._.difference(this.sortedWidgetIds(), this.widgetInstanceDataIdList)));
+            this.sortedWidgetIds(_.without(this.sortedWidgetIds(), ..._.difference(this.sortedWidgetIds(), this.widgetNodeIdList)));
         };
 
         updatedSortedWidgetsList.call(this, this.groupedCards());
