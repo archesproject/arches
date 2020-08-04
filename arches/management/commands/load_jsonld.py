@@ -120,7 +120,7 @@ class Command(BaseCommand):
         if options["quiet"]:
             print("Only announcing timing data")
 
-        if options['strip_search'] and not options['fast']:
+        if options["strip_search"] and not options["fast"]:
             print("ERROR: stripping fields not exposed to advanced search only works in fast mode")
             return
 
