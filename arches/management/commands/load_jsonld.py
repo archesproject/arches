@@ -119,6 +119,11 @@ class Command(BaseCommand):
             print(f"Not loading records > {options['toobig']}kb")
         if options["quiet"]:
             print("Only announcing timing data")
+
+        if options['strip_search'] and not options['fast']:
+            print("ERROR: stripping fields not exposed to advanced search only works in fast mode")
+            return
+
         self.resources = []
         self.load_resources(options)
 
