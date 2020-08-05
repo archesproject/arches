@@ -1713,13 +1713,14 @@ class ResourceInstanceDataType(BaseDataType):
                     "nodeid_id": nodeid,
                 }
                 if related_resource["ontologyProperty"] == "" or related_resource["inverseOntologyProperty"] == "":
-                    target_graphid = str(models.ResourceInstance.objects.get(pk=related_resource["resourceId"]).graph_id)
-                    for graph in models.Node.objects.get(pk=nodeid).config["graphs"]:
-                        if graph["graphid"] == target_graphid:
-                            if related_resource["ontologyProperty"] == "":
-                                defaults["relationshiptype"] = graph["ontologyProperty"]
-                            if related_resource["inverseOntologyProperty"] == "":
-                                defaults["inverserelationshiptype"] = graph["inverseOntologyProperty"]
+                    if models.ResourceInstance.objects.filter(pk=related_resource["resourceId"]).exists():
+                        target_graphid = str(models.ResourceInstance.objects.get(pk=related_resource["resourceId"]).graph_id)
+                        for graph in models.Node.objects.get(pk=nodeid).config["graphs"]:
+                            if graph["graphid"] == target_graphid:
+                                if related_resource["ontologyProperty"] == "":
+                                    defaults["relationshiptype"] = graph["ontologyProperty"]
+                                if related_resource["inverseOntologyProperty"] == "":
+                                    defaults["inverserelationshiptype"] = graph["inverseOntologyProperty"]
                 try:
                     rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
                     for key, value in defaults.items():
