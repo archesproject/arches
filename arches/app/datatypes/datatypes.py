@@ -1744,7 +1744,7 @@ class ResourceInstanceDataType(BaseDataType):
 
     def post_tile_delete(self, tile, nodeid):
         for related in tile.data[nodeid]:
-            se.delete(index=RESOURCE_RELATIONS_INDEX, id=related['resourceXresourceId'])
+            se.delete(index=RESOURCE_RELATIONS_INDEX, id=related["resourceXresourceId"])
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
