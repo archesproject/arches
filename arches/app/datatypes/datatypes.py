@@ -215,7 +215,7 @@ class NumberDataType(BaseDataType):
             pass
 
     def default_es_mapping(self):
-        return {"type": "long"}
+        return {"type": "double"}
 
 
 class BooleanDataType(BaseDataType):
