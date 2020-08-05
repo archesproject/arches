@@ -108,7 +108,6 @@ define([
             };
     
             self.value.subscribe(updateNameAndOntologyClass);
-            
             // Resolve Resource Instance Names from the incoming values
             updateNameAndOntologyClass(self.value);
 
