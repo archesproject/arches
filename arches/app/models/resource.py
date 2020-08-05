@@ -354,17 +354,20 @@ class Resource(models.ResourceInstance):
             se = SearchEngineFactory().create()
             related_resources = self.get_related_resources(lang="en-US", start=0, limit=1000, page=0)
             for rr in related_resources["resource_relationships"]:
-                # delete any related resource entries, also reindex the resrouce that references this resrouce that's being deleted
-                resourceXresource = models.ResourceXResource.objects.get(pk=rr["resourcexid"])
-                resource_to_reindex = (
-                    resourceXresource.resourceinstanceidfrom_id
-                    if resourceXresource.resourceinstanceidto_id == self.resourceinstanceid
-                    else resourceXresource.resourceinstanceidto_id
-                )
-                resourceXresource.delete(deletedResourceId=self.resourceinstanceid)
-                res = Resource.objects.get(pk=resource_to_reindex)
-                res.load_tiles()
-                res.index()
+                # delete any related resource entries, also reindex the resource that references this resource that's being deleted
+                try:
+                    resourceXresource = models.ResourceXResource.objects.get(pk=rr["resourcexid"])
+                    resource_to_reindex = (
+                        resourceXresource.resourceinstanceidfrom_id
+                        if resourceXresource.resourceinstanceidto_id == self.resourceinstanceid
+                        else resourceXresource.resourceinstanceidto_id
+                    )
+                    resourceXresource.delete(deletedResourceId=self.resourceinstanceid)
+                    res = Resource.objects.get(pk=resource_to_reindex)
+                    res.load_tiles()
+                    res.index()
+                except ObjectDoesNotExist:
+                    se.delete(index=RESOURCE_RELATIONS_INDEX, id=rr["resourcexid"])
 
             query = Query(se)
             bool_query = Bool()
