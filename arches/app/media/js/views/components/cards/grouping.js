@@ -143,8 +143,8 @@ define([
             }, this);
         }, this);
 
-        this.getDataForDisplay = function(widgetid) {
-            var widget = self.widgetInstanceDataLookup[widgetid];
+        this.getDataForDisplay = function(nodeId) {
+            var widget = self.widgetInstanceDataLookup[nodeId];
             var tile = self.groupedTiles().find(function(tile) {
                 return Object.keys(tile.data).includes(widget.node.nodeid);
             });
