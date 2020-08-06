@@ -32,6 +32,7 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
+from arches import __version__
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
@@ -811,6 +812,7 @@ class ResourceReportView(MapBaseManagerView):
             ),
             resourceid=resourceid,
             displayname=displayname,
+            version=__version__,
         )
 
         if graph.iconclass:
