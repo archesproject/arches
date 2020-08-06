@@ -37,9 +37,6 @@ define([
                     ids = ids.concat(value);
                 }
             });
-            if (self.tile) {
-                ids.push(self.tile.resourceinstance_id);
-            }
             return ids;
         });
         var updateResourceBounds = function(ids) {
