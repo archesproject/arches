@@ -452,12 +452,15 @@ define([
                 expandParents(this);
             }
         }, this);
-        
+
         this.copyTile = function(tile) {
-            newTile = this.getNewTile()
-            newTile.tileid = uuid.generate()
-            newTile.data = tile.data
-            this.tiles.push(newTile)
+            var newTile = self.getNewTile();
+            newTile.noDefaults = true;
+            self.showForm(true);
+            ko.mapping.fromJS(
+                ko.mapping.toJS(tile.data),
+                newTile.data
+            );
         };
 
         this.disposables = [];
