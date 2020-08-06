@@ -437,8 +437,8 @@ DATE_FORMATS = {
         "yyyy-MM-dd",
         "yyyy-MM",
         "yyyy",
-        "-yyyy"
-    ]
+        "-yyyy",
+    ],
 }
 
 API_MAX_PAGE_SIZE = 500
