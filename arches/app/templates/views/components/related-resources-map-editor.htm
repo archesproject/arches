@@ -76,7 +76,35 @@
             <!-- /ko-->
             <!-- /ko-->
 
-            <div class="card">
+            <!-- ko if: geoJSONString() !== undefined -->
+            <div class="card" style="padding-top: 45px;">
+                <div class="geojson-editor" data-bind="codemirror: {
+                    value: geoJSONString,
+                    mode: { name: 'javascript', json: true },
+                    lineNumbers: true
+                }"></div>
+                <div class="install-buttons">
+                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
+                        geoJSONString(undefined);
+                    }">{% trans 'Cancel' %}</button>
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" data-bind="css: {
+                        disabled: geoJSONErrors().length !== 0
+                    }, click: updateGeoJSON">{% trans 'Update Features' %}</button>
+                </div>
+                <!-- ko if: geoJSONErrors().length !== 0 -->
+                <div class="geojson-error-list">
+                    {% trans "GeoJSON has the following errors that must be resolved:" %}
+                    <ul>
+                        <!-- ko foreach: geoJSONErrors() -->
+                        <li data-bind="text: message"></li>
+                        <!-- /ko-->
+                    </ul>
+                </div>
+                <!-- /ko-->
+            </div>
+            <!-- /ko-->
+
+            <div class="card" style="padding-top: 45px;" data-bind="visible: geoJSONString() === undefined">
                 {% block form_header %}
                 <!-- ko if: card.model.helpenabled -->
                 <span>
