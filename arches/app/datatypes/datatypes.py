@@ -22,7 +22,7 @@ from arches.app.utils.geo_utils import GeoUtils
 import arches.app.utils.task_management as task_management
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Terms, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
-from arches.app.search.mappings import RESOURCES_INDEX
+from arches.app.search.mappings import RESOURCES_INDEX, RESOURCE_RELATIONS_INDEX
 from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.utils.translation import ugettext as _
@@ -215,7 +215,7 @@ class NumberDataType(BaseDataType):
             pass
 
     def default_es_mapping(self):
-        return {"type": "long"}
+        return {"type": "double"}
 
 
 class BooleanDataType(BaseDataType):
@@ -1712,7 +1712,15 @@ class ResourceInstanceDataType(BaseDataType):
                     "tileid_id": tile.pk,
                     "nodeid_id": nodeid,
                 }
-
+                if related_resource["ontologyProperty"] == "" or related_resource["inverseOntologyProperty"] == "":
+                    if models.ResourceInstance.objects.filter(pk=related_resource["resourceId"]).exists():
+                        target_graphid = str(models.ResourceInstance.objects.get(pk=related_resource["resourceId"]).graph_id)
+                        for graph in models.Node.objects.get(pk=nodeid).config["graphs"]:
+                            if graph["graphid"] == target_graphid:
+                                if related_resource["ontologyProperty"] == "":
+                                    defaults["relationshiptype"] = graph["ontologyProperty"]
+                                if related_resource["inverseOntologyProperty"] == "":
+                                    defaults["inverserelationshiptype"] = graph["inverseOntologyProperty"]
                 try:
                     rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
                     for key, value in defaults.items():
@@ -1733,6 +1741,10 @@ class ResourceInstanceDataType(BaseDataType):
             to_delete = resourceXresourceInDb - resourceXresourceSaved
             for rr in models.ResourceXResource.objects.filter(pk__in=to_delete):
                 rr.delete()
+
+    def post_tile_delete(self, tile, nodeid):
+        for related in tile.data[nodeid]:
+            se.delete(index=RESOURCE_RELATIONS_INDEX, id=related["resourceXresourceId"])
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
