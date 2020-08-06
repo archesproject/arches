@@ -5,38 +5,41 @@ define([
     'knockout-mapping',
     'geojson-extent',
     'viewmodels/card-component',
-    'views/components/map',
+    'viewmodels/map-editor',
     'views/components/cards/select-feature-layers',
     'text!templates/views/components/cards/related-resources-map-popup.htm'
-], function($, arches, ko, koMapping, geojsonExtent, CardComponentViewModel, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function($, arches, ko, koMapping, geojsonExtent, CardComponentViewModel, MapEditorViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         this.widgets = [];
-
-        params.configKeys = ['selectSource', 'selectSourceLayer'];
-
+        params.configKeys = ['selectRelatedSource', 'selectRelatedSourceLayer'];
         CardComponentViewModel.apply(this, [params]);
 
         if (self.form && self.tile) self.card.widgets().forEach(function(widget) {
             var id = widget.node_id();
             var type = ko.unwrap(self.form.nodeLookup[id].datatype);
-            if (type === 'resource-instance' || type === 'resource-instance-list') {
+            if (type === 'resource-instance' || type === 'resource-instance-list' || type === 'geojson-feature-collection') {
                 self.widgets.push(widget);
             }
         });
 
+        this.relatedResourceWidgets = this.widgets.filter(function(widget){return widget.datatype.datatype === 'resource-instance' || widget.datatype.datatype === 'resource-instance-list';});
+
         var resourceBounds = ko.observable();
-        var selectSource = this.selectSource();
-        var selectSourceLayer = this.selectSourceLayer();
+        var selectRelatedSource = this.selectRelatedSource();
+        var selectRelatedSourceLayer = this.selectRelatedSourceLayer();
         var selectedResourceIds = ko.computed(function() {
             var ids = [];
-            self.widgets.forEach(function(widget) {
+            self.relatedResourceWidgets.forEach(function(widget) {
                 var id = widget.node_id();
                 var value = ko.unwrap(self.tile.data[id]) ? koMapping.toJS(self.tile.data[id]().map(function(item){return item.resourceId;})) : null;
                 if (value) {
                     ids = ids.concat(value);
                 }
             });
+            if (self.tile) {
+                ids.push(self.tile.resourceinstance_id);
+            }
             return ids;
         });
         var updateResourceBounds = function(ids) {
@@ -61,7 +64,7 @@ define([
             }
             zoomToData = true;
         });
-        var selectFeatureLayers = selectFeatureLayersFactory('', selectSource, selectSourceLayer, selectedResourceIds(), true);
+        var selectFeatureLayers = selectFeatureLayersFactory('', selectRelatedSource, selectRelatedSourceLayer, selectedResourceIds(), true);
 
         var sources = [];
         for (var sourceName in arches.mapSources) {
@@ -69,9 +72,9 @@ define([
                 sources.push(sourceName);
             }
         }
-        var updateSelectLayers = function() {
-            var source = self.selectSource();
-            var sourceLayer = self.selectSourceLayer();
+        var updateResourceSelectLayers = function() {
+            var source = self.selectRelatedSource();
+            var sourceLayer = self.selectRelatedSourceLayer();
             selectFeatureLayers = sources.indexOf(source) > 0 ?
                 selectFeatureLayersFactory('', source, sourceLayer, selectedResourceIds(), true) :
                 [];
@@ -81,9 +84,9 @@ define([
                 )
             );
         };
-        selectedResourceIds.subscribe(updateSelectLayers);
-        this.selectSource.subscribe(updateSelectLayers);
-        this.selectSourceLayer.subscribe(updateSelectLayers);
+        selectedResourceIds.subscribe(updateResourceSelectLayers);
+        this.selectRelatedSource.subscribe(updateResourceSelectLayers);
+        this.selectRelatedSourceLayer.subscribe(updateResourceSelectLayers);
 
         params.activeTab = 'editor';
 
@@ -97,9 +100,7 @@ define([
         );
 
         params.fitBounds = resourceBounds;
-
-        MapComponentViewModel.apply(this, [params]);
-
+        MapEditorViewModel.apply(this, [params]);
         this.popupTemplate = popupTemplate;
 
         this.relateResource = function(popupData, widget) {
