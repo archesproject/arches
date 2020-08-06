@@ -91,12 +91,12 @@
     <!-- ko if: card.cards().length > 0 || card.widgets().length > 0 -->
     <ul data-bind="sortable: {
                 data: sortedWidgetIds,
-                as: 'widgetId',
+                as: 'nodeId',
                 beforeMove: self.beforeMove,
                 afterMove: self.afterMove
             }" class="jstree-children card-designer-tree" aria-expanded="true">
         <div>
-            <!-- ko let: {widget:$parent.widgetInstanceDataLookup[widgetId]} -->
+            <!-- ko let: {widget:$parent.widgetInstanceDataLookup[nodeId]} -->
             <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
                     'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0
                 }">
