@@ -135,7 +135,9 @@ define([
                         features: features
                     });
                 } else {
-                    self.tile.data[id].features(features);
+                    if (self.tile.data[id]) {
+                        self.tile.data[id].features(features);
+                    }
                 }
             });
         };
