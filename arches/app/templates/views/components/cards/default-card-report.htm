@@ -67,28 +67,6 @@
                 </div>
             <!-- /ko -->
             <!-- /ko -->
-            <!-- /ko -->
-
-        <!-- ko if: card.tiles().length === 0 && !self.preview -->
-        <div class="row rp-report-tile rp-no-data">
-            <!-- ko ifnot: card.model.get('cardid') -->
-            {% trans "Sorry, you don't have access to this information" %}
-            <!-- /ko -->
-            <!-- ko if: card.model.get('cardid') -->
-            <div style="display: inline-flex; width: 100%; justify-content: space-between;" data-bind="event : { dblclick: function(){$parent.revealForm(card)}}">
-            <div>
-            <span>{% trans "No data added yet for " %}</span>
-            <span data-bind="text: card.model.get('name')"></span>
-            </div>
-            <!-- ko if: $parent.inResourceEditor -->
-            <div class="rp-edit-buttons" style="justify-content: flex-end;">
-            <i class="fa fa-plus-circle" data-bind="click: function(){$parent.revealForm(card)}"></i>
-
-            </div>
-            <!-- /ko -->
-            </div>
-            <!-- /ko -->
-        </div>
-        <!-- /ko -->
     </div>
 </div>
+<!-- /ko -->
