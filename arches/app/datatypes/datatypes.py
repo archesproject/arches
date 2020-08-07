@@ -1717,9 +1717,9 @@ class ResourceInstanceDataType(BaseDataType):
                         target_graphid = str(models.ResourceInstance.objects.get(pk=related_resource["resourceId"]).graph_id)
                         for graph in models.Node.objects.get(pk=nodeid).config["graphs"]:
                             if graph["graphid"] == target_graphid:
-                                if related_resource["ontologyProperty"] == "":
+                                if related_resource["ontologyProperty"] == "" and "ontologyProperty" in graph:
                                     defaults["relationshiptype"] = graph["ontologyProperty"]
-                                if related_resource["inverseOntologyProperty"] == "":
+                                if related_resource["inverseOntologyProperty"] == "" and "inverseOntologyProperty" in graph:
                                     defaults["inverserelationshiptype"] = graph["inverseOntologyProperty"]
                 try:
                     rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
