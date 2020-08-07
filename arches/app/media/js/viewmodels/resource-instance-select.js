@@ -126,9 +126,8 @@ define([
                 var graphlist = this.preview ? arches.graphs : arches.resources;
                 if (params.node && params.state !== 'report') {
                     /*
-                        when this function is called, graphs can either be a function
-                        or an array of objects with graphid and name keys. Let's only
-                        invoke graphs if it's a function.
+                        when this function is called, params.node.config.graphs can either be 
+                        a function or an array of objects. Let's only invoke graphs if it's a function.
                     */ 
                     if (typeof params.node.config.graphs === 'function') {
                         res = params.node.config.graphs().map(function(item){
