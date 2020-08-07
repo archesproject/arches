@@ -207,6 +207,13 @@ class BaseDataType(object):
         """
         pass
 
+    def post_tile_delete(self, tile, nodeid):
+        """
+        Called following the tile.delete operation
+
+        """
+        pass
+
     def is_a_literal_in_rdf(self):
         """
         Convenience method to determine whether or not this datatype's `to_rdf` method will express

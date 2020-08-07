@@ -453,6 +453,16 @@ define([
             }
         }, this);
 
+        this.copyTile = function(tile) {
+            var newTile = self.getNewTile();
+            newTile.noDefaults = true;
+            self.showForm(true);
+            ko.mapping.fromJS(
+                ko.mapping.toJS(tile.data),
+                newTile.data
+            );
+        };
+
         this.disposables = [];
         this.disposables.push(higlightSubscription);
         this.disposables.push(widgetsSubscription);

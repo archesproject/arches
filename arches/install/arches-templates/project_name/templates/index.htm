@@ -69,7 +69,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                             <img class="navbar-brand-v5-icon" src="{% static 'img/landing/arches_logo_dark.png' %}" style="" alt="Arches Logo">
                         </div>
                         <div class="application-name" style="position: absolute; top: 5px; left: 160px;">
-                            <h2>{% trans "Arches | v5" %}</h2>
+                            <h2>{% blocktrans %}Arches | {{version}}{% endblocktrans %}</h2>
                         </div>
                     </div>
                 </div>
@@ -159,7 +159,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <!-- LAYERS -->
                         <!-- NEW LAYER -->
                         <div class="tp-caption sft start text-bold v5-splash-caption" style="left: 150px;" delay="4500"  data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
-                            <h2>{% trans "Arches v5.0" %}</h2>
+                            <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
                             <p>{% trans "A web and mobile platform for" %}</p>
                             <p>{% trans "managing your most important resource information" %}</p>
                         </div>

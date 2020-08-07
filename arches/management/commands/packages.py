@@ -908,6 +908,7 @@ class Command(BaseCommand):
         if graphid:
             graphids.append(graphid)
         if os.path.exists(data_dest):
+            safe_characters = (" ", ".", "_", "-")
             for graphid in graphids:
                 try:
                     resource_exporter = ResourceExporter(
@@ -915,7 +916,13 @@ class Command(BaseCommand):
                     )  # New exporter needed for each graphid, else previous data is appended with each subsequent graph
                     data = resource_exporter.export(graph_id=graphid, resourceinstanceids=None)
                     for file in data:
-                        with open(os.path.join(data_dest, file["name"].replace("/", "-")), "w") as f:
+                        with open(
+                            os.path.join(
+                                data_dest,
+                                "".join(char if (char.isalnum() or char in safe_characters) else "-" for char in file["name"]).rstrip(),
+                            ),
+                            "w",
+                        ) as f:
                             file["outputfile"].seek(0)
                             shutil.copyfileobj(file["outputfile"], f, 16 * 1024)
                 except KeyError:
