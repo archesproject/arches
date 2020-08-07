@@ -270,6 +270,7 @@ class Graph(models.GraphModel):
             card.helpenabled = cardobj.get("helpenabled", "")
             card.helptitle = cardobj.get("helptitle", "")
             card.helptext = cardobj.get("helptext", "")
+            card.cssclass = cardobj.get("cssclass", "")
             card.active = cardobj.get("active", "")
             card.visible = cardobj.get("visible", "")
             card.sortorder = cardobj.get("sortorder", "")
@@ -399,10 +400,6 @@ class Graph(models.GraphModel):
             for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()
             self._nodegroups_to_delete = []
-            try:
-                cache.set(f"graph_{self.graphid}", JSONSerializer().serializeToPython(self), settings.GRAPH_MODEL_CACHE_TIMEOUT)
-            except KeyError as e:
-                logger.warn(e)
 
         return self
 
@@ -516,6 +513,8 @@ class Graph(models.GraphModel):
         if skip_validation or self.can_append(branch_graph, nodeToAppendTo):
             branch_copy = branch_graph.copy()["copy"]
             branch_copy.root.istopnode = False
+            # Copy the description of the branch to the new node
+            branch_copy.root.description = branch_graph.description
 
             newEdge = models.Edge(domainnode=nodeToAppendTo, rangenode=branch_copy.root, ontologyproperty=property, graph=self)
             branch_copy.add_edge(newEdge)
@@ -1166,7 +1165,7 @@ class Graph(models.GraphModel):
             if card.nodegroup.parentnodegroup is None:
                 return card
 
-    def get_cards(self):
+    def get_cards(self, check_if_editable=True):
         """
         get the card data (if any) associated with this graph
 
@@ -1183,10 +1182,10 @@ class Graph(models.GraphModel):
                         card.description = self.nodes[card.nodegroup_id].description
                     except KeyError as e:
                         print("Error: card.description not accessible, nodegroup_id not in self.nodes: ", e)
-
-                is_editable = card.is_editable()
+                if check_if_editable:
+                    is_editable = card.is_editable()
             else:
-                if card.nodegroup.parentnodegroup is None:
+                if card.nodegroup.parentnodegroup_id is None:
                     card.name = self.name
                     card.description = self.description
                 else:
@@ -1232,7 +1231,10 @@ class Graph(models.GraphModel):
         else:
             ret.pop("relatable_resource_model_ids", None)
 
-        ret["cards"] = self.get_cards() if "cards" not in exclude else ret.pop("cards", None)
+        check_if_editable = "is_editable" not in exclude
+        ret["is_editable"] = self.is_editable() if check_if_editable else ret.pop("is_editable", None)
+        ret["cards"] = self.get_cards(check_if_editable=check_if_editable) if "cards" not in exclude else ret.pop("cards", None)
+
         if "widgets" not in exclude:
             ret["widgets"] = self.get_widgets()
         ret["nodegroups"] = self.get_nodegroups() if "nodegroups" not in exclude else ret.pop("nodegroups", None)
@@ -1449,6 +1451,11 @@ class Graph(models.GraphModel):
             out = compact({}, context)
         except JsonLdError:
             raise GraphValidationError(_("The json-ld context you supplied wasn't formatted correctly."), 1006)
+
+        if self.slug is not None:
+            graphs_with_matching_slug = models.GraphModel.objects.exclude(slug__isnull=True).filter(slug=self.slug)
+            if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
+                raise GraphValidationError(_(f"Another resource modal already uses the slug '{self.slug}'"), 1007)
 
 
 class GraphValidationError(Exception):

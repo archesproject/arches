@@ -252,6 +252,7 @@
                 api_nodes: function (nodeid) {
                     return "{% url 'api_nodes' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid)
                 },
+                api_node_value: "{% url 'api_node_value' %}",
                 api_resources: function(resourceid){return "{% url 'resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceid)},
                 api_search_component_data: "{% url 'api_search_component_data' 'aaaa'%}".replace('aaaa', ''),
                 geojson: "{% url 'geojson' %}",
@@ -360,7 +361,7 @@
             resources: [{% autoescape off %}{% for resource in resource_graphs %}{
               'maplayerid': '{{resource.graphid}}',
               'graphid': '{{resource.graphid}}',
-              'name': '{{ resource.name }}',
+              'name': '{{ resource.name | escapejs }}',
               'icon': '{{ resource.iconclass }}',
             },{% endfor %}{% endautoescape %}],
             userEmail: '{{ user.email }}',

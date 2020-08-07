@@ -59,12 +59,6 @@ class BaseDataType(object):
         """
         return None
 
-    def process_api_data(self, value):
-        """
-        Transforms data from an api request
-        """
-        return value
-
     def get_map_layer(self, node=None):
         """
         Gets the array of map layers to add to the map for a given node
@@ -209,6 +203,13 @@ class BaseDataType(object):
     def pre_tile_save(self, tile, nodeid):
         """
         Called during tile.save operation but before the tile is actually saved to the database
+
+        """
+        pass
+
+    def post_tile_delete(self, tile, nodeid):
+        """
+        Called following the tile.delete operation
 
         """
         pass

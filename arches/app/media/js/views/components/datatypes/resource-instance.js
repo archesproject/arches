@@ -23,7 +23,7 @@ define([
             if (!this.search) {
                 this.makeFriendly = ontologyUtils.makeFriendly;
                 this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
-                this.isEditable = true;
+                this.isEditable = params.isEditable;
                 this.graphIsSemantic = !!params.graph.get('ontology_id');
                 this.rootOntologyClass = params.graph.get('root').ontologyclass();
                 this.graphName = params.graph.get('root').name();

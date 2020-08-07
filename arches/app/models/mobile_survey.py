@@ -43,6 +43,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Terms, Query
+from arches.app.search.mappings import RESOURCES_INDEX
 import arches.app.views.search as search
 import arches.app.utils.task_management as task_management
 
@@ -143,7 +144,13 @@ class MobileSurvey(models.MobileSurveyModel):
                             graph_ids.append(str(graphuuid))
                         node["config"]["options"] = []
                         for resource_instance in Resource.objects.filter(graph_id__in=graph_ids):
-                            node["config"]["options"].append({"id": str(resource_instance.pk), "name": resource_instance.displayname})
+                            node["config"]["options"].append(
+                                {
+                                    "id": str(resource_instance.pk),
+                                    "name": resource_instance.displayname,
+                                    "graphid": str(resource_instance.graph_id),
+                                }
+                            )
 
         for subcard in parentcard.cards:
             self.collect_card_widget_node_data(graph_obj, graph, subcard, nodegroupids)
@@ -487,7 +494,7 @@ class MobileSurvey(models.MobileSurveyModel):
                 query = Query(se, start=0, limit=settings.SEARCH_RESULT_LIMIT)
                 ids_query = Terms(field="_id", terms=ids)
                 query.add_query(ids_query)
-                results = query.search(index="resources")
+                results = query.search(index=RESOURCES_INDEX)
                 if results is not None:
                     for result in results["hits"]["hits"]:
                         all_instances[result["_id"]] = result["_source"]
