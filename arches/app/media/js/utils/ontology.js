@@ -15,7 +15,7 @@ define(['arches'], function(arches) {
             return '';
         },
 
-        getSelect2ConfigForOntologyProperties: function(value, domain, range, placeholder='Select an Ontology Property', allowClear=false) {
+        getSelect2ConfigForOntologyProperties: function(value, domain, range, placeholder, allowClear=false) {
             return {
                 value: value,
                 clickBubble: false,
