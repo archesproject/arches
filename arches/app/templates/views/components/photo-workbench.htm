@@ -24,19 +24,19 @@
 
 {% block content_management %}
 <!-- ko if: card.widgets().length > 0 -->
-<div class="">
+<div style="height: inherit;">
 
-    <div class="card-display-panel">
-        <div>
+    <div style="height: inherit" class="card-display-panel">
+        <div style="height: inherit">
             <div id="hidden-dz-previews" style="display:none"></div>
             <!--ko if: displayContent() -->
-            <div class="preview" style="width: 100%; height: 100%">
-                <img class="dz-img" style = "width: 100%; height: 100%" data-bind="attr: {src: ko.unwrap(displayContent)}" ></img>
+            <div style="height: inherit">
+                <img class="dz-img" style="width: 100%; height: 100%" data-bind="attr: {src: ko.unwrap(displayContent)}" ></img>
             </div>
             <!--/ko-->
         </div>
     </div>
-    <div data-bind="style: {display: !!self.displayContent() ? 'inherit' : 'none'}">
+    <div style="position: sticky; bottom: 0px;" data-bind="style: {display: !!self.displayContent() ? 'inherit' : 'none'}">
     <div class="thumbnail-gallery-container" data-bind="slide: showThumbnails, duration: 100, direction: {direction: 'down'}, easing: 'slide'">
         <div class='show-thumbnails-btn open' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: '{% trans "close" %}'"></div>
         <div class="thumbnail-container" data-bind="gallery: photoGallery.pan, duration: 400, scrolldistance: 100, thumbnailclass: 'gallery-thumbnails'">
