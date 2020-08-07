@@ -125,15 +125,22 @@ define([
                 var res = [];
                 var graphlist = this.preview ? arches.graphs : arches.resources;
                 if (params.node && params.state !== 'report') {
-                    res = params.node.config.graphs().map(function(item){
-                        var graph = graphlist.find(function(graph){
-                            return graph.graphid === item.graphid;
+                    /*
+                        when this function is called, graphs can either be a function
+                        or an array of objects with graphid and name keys. Let's only
+                        invoke graphs if it's a function.
+                    */ 
+                    if (typeof params.node.config.graphs === 'function') {
+                        res = params.node.config.graphs().map(function(item){
+                            var graph = graphlist.find(function(graph){
+                                return graph.graphid === item.graphid;
+                            });
+                            if (graph) { // graph may not exist in arches.resources if it is 'inactive'
+                                graph.config = item;
+                                return graph;
+                            }
                         });
-                        if (graph) { // graph may not exist in arches.resources if it is 'inactive'
-                            graph.config = item;
-                            return graph;
-                        }
-                    });
+                    }
                 }
                 return res;
             }, this);
