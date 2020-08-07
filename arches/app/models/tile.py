@@ -22,6 +22,7 @@ import datetime
 import json
 import pytz
 import logging
+from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -435,9 +436,17 @@ class Tile(models.TileModel):
             self.save_edit(
                 user=request.user, edit_type="tile delete", old_value=self.data, provisional_edit_log_details=provisional_edit_log_details
             )
-            super(Tile, self).delete(*args, **kwargs)
-            resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
-            resource.index()
+            try:
+                super(Tile, self).delete(*args, **kwargs)
+                datatype_factory = DataTypeFactory()
+                for nodeid, value in self.data.items():
+                    node = models.Node.objects.get(nodeid=nodeid)
+                    datatype = datatype_factory.get_instance(node.datatype)
+                    datatype.post_tile_delete(self, nodeid)
+                resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
+                resource.index()
+            except IntegrityError:
+                logger.error
 
         else:
             self.apply_provisional_edit(user, data={}, action="delete")
