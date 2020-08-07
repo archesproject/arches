@@ -17,8 +17,10 @@ define([
         var padding = 40;
         var drawFeatures;
         var resourceId = params.tile ? params.tile.resourceinstance_id : '';
-
-        this.widgets = params.widgets || [];
+        if (this.widgets === undefined) { // could be [], so checking specifically for undefined
+            this.widgets = params.widgets || [];
+        }
+        this.geojsonWidgets = this.widgets.filter(function(widget){ return widget.datatype.datatype === 'geojson-feature-collection'; });
         this.newNodeId = null;
         this.featureLookup = {};
         this.selectedFeatureIds = ko.observableArray();
@@ -75,7 +77,7 @@ define([
             } else if (tool) self.draw.changeMode(tool);
         };
 
-        self.widgets.forEach(function(widget) {
+        self.geojsonWidgets.forEach(function(widget) {
             var id = ko.unwrap(widget.node_id);
             self.featureLookup[id] = {
                 features: ko.computed(function() {
@@ -121,7 +123,7 @@ define([
             _.each(self.featureLookup, function(value) {
                 value.selectedTool(null);
             });
-            self.widgets.forEach(function(widget) {
+            self.geojsonWidgets.forEach(function(widget) {
                 var id = ko.unwrap(widget.node_id);
                 var features = [];
                 featureCollection.features.forEach(function(feature){
@@ -133,14 +135,16 @@ define([
                         features: features
                     });
                 } else {
-                    self.tile.data[id].features(features);
+                    if (self.tile.data[id]) {
+                        self.tile.data[id].features(features);
+                    }
                 }
             });
         };
 
         var getDrawFeatures = function() {
             var drawFeatures = [];
-            self.widgets.forEach(function(widget) {
+            self.geojsonWidgets.forEach(function(widget) {
                 var id = ko.unwrap(widget.node_id);
                 var featureCollection = koMapping.toJS(self.tile.data[id]);
                 if (featureCollection) {
@@ -177,7 +181,7 @@ define([
         }, params.sources);
         var extendedLayers = [];
         if (params.layers) {
-            extendedLayers = params.layers;
+            extendedLayers = ko.unwrap(params.layers);
         }
         var geojsonLayers = [{
             "id": "geojson-editor-polygon-fill",
@@ -444,7 +448,7 @@ define([
             params.additionalDrawOptions = [];
         }
 
-        self.widgets.forEach(function(widget) {
+        self.geojsonWidgets.forEach(function(widget) {
             if (widget.config.geometryTypes) {
                 widget.drawTools = ko.pureComputed(function() {
                     var options = [{
