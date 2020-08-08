@@ -57,12 +57,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
         </h4>
 
-
-        <div class="btn-group btn-group-toggle" data-bind="visible: activeTab() === 'graph'">
-            <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'design' }, click: function(){viewState('design');}">{% trans "Design" %}</button>
-            <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'preview' }, click: showPreview">{% trans "Preview" %}</button>
-        </div>
-
         <div class="graph-settings-crud">
 
             <span data-bind="visible: graphSettingsVisible()" style="display: none;">
@@ -193,9 +187,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!--/ko-->
                 </div>
 
-                <div class="tab-pane fade in flex" style="position: relative;" data-bind="visible: viewState() === 'preview'">
+                <!-- <div class="tab-pane fade in flex" style="position: relative;" data-bind="visible: viewState() === 'preview'">
                     <div id="graph" class="flex"></div>
-                </div>
+                </div> -->
             </div>
 
             <!--ko if: activeTab() === 'card' -->
