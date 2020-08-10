@@ -116,7 +116,7 @@ class GraphSettingsView(GraphBaseView):
         node.name = graph.name
         graph.root.name = node.name
 
-        if graph.isresource is False:
+        if graph.isresource is False and "root" in data["graph"]:
             node.config = data["graph"]["root"]["config"]
 
         try:
