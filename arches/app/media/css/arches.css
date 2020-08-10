@@ -11518,7 +11518,7 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .search-container .card-form-preview-container .search-map-container {
         height: 50vh;
     }
-    .card-form-preview-container {
+    .function-manager-container .card-form-preview-container {
         height: calc(53vh + 5px);
     }
 }
