@@ -117,7 +117,7 @@ class GraphSettingsView(GraphBaseView):
         graph.root.name = node.name
 
         if graph.isresource is False:
-            node.config = data['graph']['root']['config']
+            node.config = data["graph"]["root"]["config"]
 
         try:
             with transaction.atomic():
