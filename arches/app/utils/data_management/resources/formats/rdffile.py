@@ -561,7 +561,7 @@ class JsonLdReader(Reader):
                 # This is going to be the result passed down if we recurse
                 bnode = {"data": [], "nodegroup_id": branch[0]["nodegroup_id"], "cardinality": branch[0]["cardinality"]}
 
-                if branch[0]['datatype'].collects_multiple_values() and tile and bnodeid == branch[0]['nodegroup_id']:
+                if branch[0]["datatype"].collects_multiple_values() and tile and str(tile.nodegroup.pk) == branch[0]['nodegroup_id']:
                     # iterating through a root node *-list type
                     pass
                 elif bnodeid == branch[0]["nodegroup_id"]:
