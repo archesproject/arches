@@ -4,6 +4,9 @@ import decimal
 import base64
 import re
 import logging
+import os
+from pathlib import Path
+import ast
 from distutils import util
 from datetime import datetime
 from mimetypes import MimeTypes
@@ -19,6 +22,7 @@ from arches.app.utils.geo_utils import GeoUtils
 import arches.app.utils.task_management as task_management
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Terms, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
+from arches.app.search.mappings import RESOURCES_INDEX, RESOURCE_RELATIONS_INDEX
 from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.utils.translation import ugettext as _
@@ -211,7 +215,7 @@ class NumberDataType(BaseDataType):
             pass
 
     def default_es_mapping(self):
-        return {"type": "long"}
+        return {"type": "double"}
 
 
 class BooleanDataType(BaseDataType):
@@ -265,50 +269,49 @@ class DateDataType(BaseDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
         if value is not None:
-            date_formats = ["-%Y", "%Y", "%Y-%m-%d", "%B-%m-%d", "%Y-%m-%d %H:%M:%S"]
-            valid = False
-            for mat in date_formats:
-                if valid == False:
-                    try:
-                        if datetime.strptime(value, mat):
-                            valid = True
-                    except:
-                        valid = False
+            valid_date_format, valid = self.get_valid_date_format(value)
             if valid == False:
-                if hasattr(settings, "DATE_IMPORT_EXPORT_FORMAT"):
-                    date_format = settings.DATE_IMPORT_EXPORT_FORMAT
-                else:
-                    date_format = date_formats
-
                 errors.append(
                     {
                         "type": "ERROR",
-                        "message": f"{value} {row_number} is not in the correct format, make sure it is in this format: \
-                            {date_format} or set the date format in settings.DATE_IMPORT_EXPORT_FORMAT. This data was not imported.",
+                        "message": f"{value} {row_number} is not in the correct format, make sure it is in settings.DATE_FORMATS\
+                         or set the date format in settings.DATE_IMPORT_EXPORT_FORMAT. This data was not imported.",
                     }
                 )
 
         return errors
 
+    def get_valid_date_format(self, value):
+        valid = False
+        valid_date_format = ""
+        date_formats = settings.DATE_FORMATS["Python"]
+        for date_format in date_formats:
+            if valid is False:
+                try:
+                    datetime.strptime(value, date_format)
+                    valid = True
+                    valid_date_format = date_format
+                except ValueError:
+                    pass
+        return valid_date_format, valid
+
     def transform_value_for_tile(self, value, **kwargs):
         if type(value) == list:
             value = value[0]
-
-        try:
-            if hasattr(settings, "DATE_IMPORT_EXPORT_FORMAT"):
-                v = datetime.strptime(str(value), settings.DATE_IMPORT_EXPORT_FORMAT)
-                value = str(datetime.strftime(v, "%Y-%m-%d"))
-            else:
-                value = str(datetime(value).date())
-        except:
-            pass
-
+        valid_date_format, valid = self.get_valid_date_format(value)
+        if valid:
+            value = datetime.strptime(value, valid_date_format).astimezone().isoformat(timespec="milliseconds")
+        else:
+            v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
+            value = v.astimezone().isoformat(timespec="milliseconds")
         return value
 
     def transform_export_values(self, value, *args, **kwargs):
-        if hasattr(settings, "DATE_IMPORT_EXPORT_FORMAT"):
-            v = datetime.strptime(value, "%Y-%m-%d")
-            value = datetime.strftime(v, settings.DATE_IMPORT_EXPORT_FORMAT)
+        valid_date_format, valid = self.get_valid_date_format(value)
+        if valid:
+            value = datetime.strptime(value, valid_date_format).strftime(settings.DATE_IMPORT_EXPORT_FORMAT)
+        else:
+            logger.warning(_(f"{value} is an invalid date format"))
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -357,7 +360,8 @@ class DateDataType(BaseDataType):
             pass
 
     def default_es_mapping(self):
-        return {"type": "date"}
+        es_date_formats = "||".join(settings.DATE_FORMATS["Elasticsearch"])
+        return {"type": "date", "format": es_date_formats}
 
 
 class EDTFDataType(BaseDataType):
@@ -1160,6 +1164,25 @@ class FileListDataType(BaseDataType):
                             tile_to_update.provisionaledits[str(user.id)]["value"][str(node.pk)] = updated_file_records
                         tile_to_update.save()
 
+    def get_compatible_renderers(self, file_data):
+        extension = Path(file_data["name"]).suffix.strip(".")
+        compatible_renderers = []
+        for renderer in settings.RENDERERS:
+            if extension.lower() == renderer["ext"].lower():
+                compatible_renderers.append(renderer["id"])
+            else:
+                excluded_extensions = renderer["exclude"].split(",")
+                if extension not in excluded_extensions:
+                    renderer_mime = renderer["type"].split("/")
+                    file_mime = file_data["type"].split("/")
+                    if len(renderer_mime) == 2:
+                        renderer_class, renderer_type = renderer_mime[0], renderer_mime[1]
+                        if len(file_mime) == 2:
+                            file_class = file_mime[0]
+                            if renderer_class.lower() == file_class.lower() and renderer_type == "*":
+                                compatible_renderers.append(renderer["id"])
+        return compatible_renderers
+
     def transform_value_for_tile(self, value, **kwargs):
         """
         # TODO: Following commented code can be used if user does not already have file in final location using django ORM:
@@ -1192,27 +1215,38 @@ class FileListDataType(BaseDataType):
                 file_stats = os.stat(file_path)
                 tile_file["lastModified"] = file_stats.st_mtime
                 tile_file["size"] = file_stats.st_size
-            except Exception as e:
+            except Exception:
                 pass
             tile_file = {}
-            tile_file["file_id"] = str(uuid.uuid4())
             tile_file["status"] = ""
             tile_file["name"] = file_path.split("/")[-1]
-            tile_file["url"] = settings.MEDIA_URL + "uploadedfiles/" + str(tile_file["name"])
-            # tile_file['index'] =  0
-            # tile_file['height'] =  960
-            # tile_file['content'] =  None
-            # tile_file['width'] =  1280
-            # tile_file['accepted'] =  True
             tile_file["type"] = mime.guess_type(file_path)[0]
             tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
-            tile_data.append(tile_file)
             file_path = "uploadedfiles/" + str(tile_file["name"])
-            fileid = tile_file["file_id"]
-            models.File.objects.get_or_create(fileid=fileid, path=file_path)
+            tile_file["file_id"] = str(uuid.uuid4())
+            models.File.objects.get_or_create(fileid=tile_file["file_id"], path=file_path)
+            tile_file["url"] = "/files/" + tile_file["file_id"]
+            tile_file["accepted"] = True
+            compatible_renderers = self.get_compatible_renderers(tile_file)
+            if len(compatible_renderers) == 1:
+                tile_file["renderer"] = compatible_renderers[0]
+            tile_data.append(tile_file)
+        return json.loads(json.dumps(tile_data))
 
-        result = json.loads(json.dumps(tile_data))
-        return result
+    def pre_tile_save(self, tile, nodeid):
+        # TODO If possible this method should probably replace 'handle request' and perhaps 'process mobile data'
+        if tile.data[nodeid]:
+            for file in tile.data[nodeid]:
+                try:
+                    file_model = models.File.objects.get(pk=file["file_id"])
+                    if not file_model.tile_id:
+                        file_model.tile = tile
+                        file_model.save()
+                except ObjectDoesNotExist:
+                    logger.warning(_("A file is not available for this tile"))
+
+    def transform_export_values(self, value, *args, **kwargs):
+        return ",".join([settings.MEDIA_URL + "uploadedfiles/" + str(file["name"]) for file in value])
 
     def is_a_literal_in_rdf(self):
         return False
@@ -1612,7 +1646,7 @@ class ResourceInstanceDataType(BaseDataType):
                         continue
                     rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
                     resourceid = str(rr.resourceinstanceidto_id)
-                    resource_document = se.search(index="resources", id=resourceid)
+                    resource_document = se.search(index=RESOURCES_INDEX, id=resourceid)
                     ret.append(
                         {
                             "resourceName": resource_document["_source"]["displayname"],
@@ -1678,7 +1712,21 @@ class ResourceInstanceDataType(BaseDataType):
                     "tileid_id": tile.pk,
                     "nodeid_id": nodeid,
                 }
-
+                if related_resource["ontologyProperty"] == "" or related_resource["inverseOntologyProperty"] == "":
+                    if models.ResourceInstance.objects.filter(pk=related_resource["resourceId"]).exists():
+                        target_graphid = str(models.ResourceInstance.objects.get(pk=related_resource["resourceId"]).graph_id)
+                        for graph in models.Node.objects.get(pk=nodeid).config["graphs"]:
+                            if graph["graphid"] == target_graphid:
+                                if related_resource["ontologyProperty"] == "":
+                                    try:
+                                        defaults["relationshiptype"] = graph["ontologyProperty"]
+                                    except:
+                                        pass
+                                if related_resource["inverseOntologyProperty"] == "":
+                                    try:
+                                        defaults["inverserelationshiptype"] = graph["inverseOntologyProperty"]
+                                    except:
+                                        pass
                 try:
                     rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
                     for key, value in defaults.items():
@@ -1700,6 +1748,10 @@ class ResourceInstanceDataType(BaseDataType):
             for rr in models.ResourceXResource.objects.filter(pk__in=to_delete):
                 rr.delete()
 
+    def post_tile_delete(self, tile, nodeid):
+        for related in tile.data[nodeid]:
+            se.delete(index=RESOURCE_RELATIONS_INDEX, id=related["resourceXresourceId"])
+
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
         nodevalue = data[str(node.nodeid)]
@@ -1720,7 +1772,11 @@ class ResourceInstanceDataType(BaseDataType):
                     )
 
     def transform_value_for_tile(self, value, **kwargs):
-        return json.loads(value)
+        try:
+            return json.loads(value)
+        except ValueError:
+            # do this if json (invalid) is formatted with single quotes, re #6390
+            return ast.literal_eval(value)
 
     def transform_export_values(self, value, *args, **kwargs):
         return json.dumps(value)

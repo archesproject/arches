@@ -16,7 +16,6 @@ from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export
 from rdflib import Namespace
 from rdflib import URIRef, Literal
 from rdflib import ConjunctiveGraph as Graph
@@ -409,7 +408,10 @@ class JsonLdReader(Reader):
 
             ### --- Process Instance ---
             # now walk the instance and align to the tree
-            result = {"data": [jsonld_document["@id"]]}
+            if "@id" in jsonld_document:
+                result = {"data": [jsonld_document["@id"]]}
+            else:
+                result = {"data": [None]}
             self.data_walk(jsonld_document, self.graphtree, result)
 
     def is_semantic_node(self, graph_node):

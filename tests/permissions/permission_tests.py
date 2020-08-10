@@ -43,16 +43,6 @@ from arches.app.utils.permission_backend import user_can_edit_resource
 from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.permission_backend import user_has_resource_model_permissions
 from arches.app.utils.permission_backend import get_restricted_users
-from arches.app.search.mappings import (
-    prepare_terms_index,
-    prepare_concepts_index,
-    delete_terms_index,
-    delete_concepts_index,
-    prepare_search_index,
-    delete_search_index,
-    prepare_resource_relations_index,
-    delete_resource_relations_index,
-)
 
 # these tests can be run from the command line via
 # python manage.py test tests/permissions/permission_tests.py --pattern="*.py" --settings="tests.test_settings"
@@ -103,8 +93,6 @@ class PermissionTests(ArchesTestCase):
     def setUpClass(cls):
         test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
-        delete_resource_relations_index()
-        prepare_resource_relations_index(create=True)
         cls.add_users()
 
 

@@ -96,6 +96,7 @@ define([
             this.viewModel.total = ko.observable();
             _.extend(this, this.viewModel.sharedStateObject);
             this.viewModel.sharedStateObject.total = this.viewModel.total;
+            this.viewModel.sharedStateObject.loading = this.viewModel.loading;
             this.queryString = ko.computed(function() {
                 return JSON.stringify(this.query());
             }, this);

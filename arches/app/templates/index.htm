@@ -69,7 +69,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                             <img src="{% static 'img/landing/Arches_logo_white.png' %}" style="height: 25px;" alt="Arches Logo">
                         </div>
                         <div class="application-name" style="position: absolute; top: 5px; left: 250px;">
-                            <h2>{% trans "Arches | v5" %}</h2>
+                            <h2>{% blocktrans %}Arches | {{version}}{% endblocktrans %}</h2>
                         </div>
                     </div>
                 </div>
@@ -158,7 +158,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <!-- LAYERS -->
                         <!-- NEW LAYER -->
                         <div class="tp-caption sft start text-bold v5-splash-caption" style="left: 150px;" delay="4500"  data-hoffset="0" data-y="50" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
-                            <h2>{% trans "Arches v5.0" %}</h2>
+                            <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
                             <p>{% trans "A web and mobile platform for" %}</p>
                             <p>{% trans "managing your most important resource information" %}</p>
                         </div>
@@ -360,10 +360,10 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 <h2 class="app-footer-heading">{% trans "Sample Institution Name" %}</h2>
 
                 <div class="organization-address">
-                  Sample Address<br>
-                  Getty Conservation Institute<br>
-                  1200 Getty Center Drive<br>
-                  Los Angeles, CA  90049<br>
+                  {% trans "Sample Address" %}<br>
+                  {% trans "Getty Conservation Institute" %}<br>
+                  {% trans "1200 Getty Center Drive" %}<br>
+                  {% trans "Los Angeles, CA  90049" %}<br>
                 </div>
             </div>
 
@@ -435,7 +435,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
         <div class="app-footer-links">
             <a class="link-spacing" href="">{% trans "Terms & Conditions" %}</a>
             <a class="link-spacing" href="">{% trans "Privacy Policy" %}</a>
-            <a class="app-footer-arches-link" href="http://www.archesproject.org" target="_blank">Powered by Arches</a>
+            <a class="app-footer-arches-link" href="http://www.archesproject.org" target="_blank">{% trans "Powered by Arches" %}</a>
         </div>
     </div>
     <!-- End Copyright Container -->

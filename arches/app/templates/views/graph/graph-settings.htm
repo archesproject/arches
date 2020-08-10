@@ -154,7 +154,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
 
                                                         <div class="col-xs-12">
-                                                            <select class="design" {% if node_count > 1 %}disabled{% endif %} data-bind="value: graph.ontology_id, valueAllowUnset: true, options: ontologies, optionsText: 'name', optionsValue:'ontologyid', optionsCaption: '{% trans "No ontology" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                                                            <select class="design" {% if node_count > 1 %}disabled{% endif %} data-bind="value: graph.ontology_id, valueAllowUnset: true, options: ontologies, optionsText: 'name', optionsValue:'ontologyid', optionsCaption: {% trans 'No ontology' %}, chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                                                         </div>
                                                     </div>
                                                 </div>

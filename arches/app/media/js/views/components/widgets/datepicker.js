@@ -44,6 +44,9 @@ define([
 
         // these options should be set in the global admin page
         this.dateFormatOptions = ko.observableArray([{
+            'id': 'YYYY-MM-DD HH:mm:ssZ',
+            'name': 'ISO 8601 (YYYY-MM-DD HH:mm:ssZ)'
+        }, {
             'id': 'YYYY-MM-DD',
             'name': 'ISO 8601 (YYYY-MM-DD)'
         }, {

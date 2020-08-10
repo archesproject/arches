@@ -664,9 +664,10 @@ class ResourceXResource(models.Model):
 
     def delete(self, *args, **kwargs):
         from arches.app.search.search_engine_factory import SearchEngineFactory
+        from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
 
         se = SearchEngineFactory().create()
-        se.delete(index="resource_relations", id=self.resourcexid)
+        se.delete(index=RESOURCE_RELATIONS_INDEX, id=self.resourcexid)
 
         # update the resource-instance tile by removing any references to a deleted resource
         deletedResourceId = kwargs.pop("deletedResourceId", None)
@@ -685,13 +686,14 @@ class ResourceXResource(models.Model):
 
     def save(self):
         from arches.app.search.search_engine_factory import SearchEngineFactory
+        from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
 
         se = SearchEngineFactory().create()
         if not self.created:
             self.created = datetime.datetime.now()
         self.modified = datetime.datetime.now()
         document = model_to_dict(self)
-        se.index_data(index="resource_relations", body=document, idfield="resourcexid")
+        se.index_data(index=RESOURCE_RELATIONS_INDEX, body=document, idfield="resourcexid")
         super(ResourceXResource, self).save()
 
     class Meta:
