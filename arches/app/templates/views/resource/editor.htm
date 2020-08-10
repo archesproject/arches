@@ -226,7 +226,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <!-- /ko -->
                             <!-- /ko -->
                             <!-- ko if: !selectedTile().tileid -->
-                            New <span data-bind="text: selectedCard().model.name"></span>
+                            {% trans "New" %} <span data-bind="text: selectedCard().model.name"></span>
                             <!-- /ko -->
                         </span>
                         <!-- ko if: selectedTile().tileid && selectedTile().cards.length > 0 -->
@@ -234,7 +234,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- ko if: addableCards().length > 0 -->
                         <span class="dropdown">
                             <a class="dropdown-toggle" href="javascript:void(0)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                Add new... <i class="fa fa-caret-down"></i>
+                                {% trans "Add new" %}... <i class="fa fa-caret-down"></i>
                             </a>
                             <ul class="dropdown-menu" style="padding-bottom: 5px;">
                                 <!-- ko foreach: { data: addableCards(), as: 'card' } -->

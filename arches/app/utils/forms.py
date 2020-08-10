@@ -106,7 +106,7 @@ class ArchesUserProfileForm(ArchesUserCreationForm):
 
 
 class ArchesPasswordResetForm(PasswordResetForm):
-    email = forms.CharField(widget=forms.EmailInput(attrs={"placeholder": "Email", "class": "form-control input-lg"}))
+    email = forms.CharField(widget=forms.EmailInput(attrs={"placeholder": _("Email"), "class": "form-control input-lg"}))
 
 
 class ArchesSetPasswordForm(SetPasswordForm):
