@@ -10448,11 +10448,14 @@ ul.select2-choices:after {
     height:100%;
     z-index: 3;
     font-size: 10px;
+    position: relative;
+    width: 13px;
 }
 
 .sidepanel-draggable div {
     cursor: col-resize;
-    position: relative;top: 50%;
+    position: absolute;
+    top: 50%;
     transform: translateY(-50%);
     margin: 1px;
 }
@@ -11517,6 +11520,9 @@ a.tree-display-tool, a.tree-display-tool:hover {
     }
     .search-container .card-form-preview-container .search-map-container {
         height: 50vh;
+    }
+    .function-manager-container .card-form-preview-container {
+        height: calc(53vh + 5px);
     }
 }
 
