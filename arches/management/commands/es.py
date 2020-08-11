@@ -79,6 +79,7 @@ class Command(BaseCommand):
             "--batch_size",
             action="store",
             dest="batch_size",
+            type=int,
             default=settings.BULK_IMPORT_BATCH_SIZE,
             help="The number of records to index as a group, the larger the number to more memory required",
         )
