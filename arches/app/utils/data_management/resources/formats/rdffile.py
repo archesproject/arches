@@ -570,7 +570,7 @@ class JsonLdReader(Reader):
                 elif "tile" in result and result["tile"]:
                     tile = result["tile"]
 
-                if not hasattr(tile, '_json_ld'):
+                if not hasattr(tile, "_json_ld"):
                     tile._json_ld = vi
 
                 bnode["tile"] = tile
@@ -622,13 +622,12 @@ class JsonLdReader(Reader):
                         tile_ng_hash[t.nodegroup_id].append(t)
                     except KeyError:
                         tile_ng_hash[t.nodegroup_id] = [t]
-                for (k,v) in tile_ng_hash.items():
+                for (k, v) in tile_ng_hash.items():
                     if len(v) > 1:
                         for func in sortfuncs:
                             v.sort(key=func)
                         for t, i in zip(v, range(len(v))):
                             t.sortorder = i
-
 
         # Finally, after processing all of the branches for this node, check required nodes are present
         for path in tree_node["children"].values():
