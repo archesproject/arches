@@ -79,7 +79,7 @@ class BaseDataType(object):
         source_config = {"type": "vector", "tiles": [tileserver_url]}
         count = None
         if preview == True:
-            count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
+            count = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).count()
             if count == 0:
                 source_config = {
                     "type": "geojson",
