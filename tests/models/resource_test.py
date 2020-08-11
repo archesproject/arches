@@ -29,16 +29,6 @@ from guardian.shortcuts import assign_perm, get_perms
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
-from arches.app.search.mappings import (
-    prepare_terms_index,
-    delete_terms_index,
-    prepare_concepts_index,
-    delete_concepts_index,
-    prepare_search_index,
-    delete_search_index,
-    prepare_resource_relations_index,
-    delete_resource_relations_index,
-)
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resource_graph_importer
 from arches.app.utils.exceptions import InvalidNodeNameException, MultipleNodesFoundException
@@ -54,16 +44,6 @@ class ResourceTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         models.ResourceInstance.objects.all().delete()
-
-        delete_terms_index()
-        delete_concepts_index()
-        delete_search_index()
-        delete_resource_relations_index()
-
-        prepare_terms_index(create=True)
-        prepare_concepts_index(create=True)
-        prepare_search_index(create=True)
-        prepare_resource_relations_index(create=True)
 
         cls.client = Client()
         cls.client.login(username="admin", password="admin")
@@ -150,10 +130,6 @@ class ResourceTests(ArchesTestCase):
     @classmethod
     def tearDownClass(cls):
         cls.user.delete()
-        delete_terms_index()
-        delete_concepts_index()
-        delete_search_index()
-        delete_resource_relations_index()
 
     def test_get_node_value_string(self):
         """

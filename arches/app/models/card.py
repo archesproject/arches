@@ -196,7 +196,6 @@ class Card(models.CardModel):
                 node.save()
             for card in self.cards:
                 card.save()
-            cache.set(f"card_{self.cardid}", JSONSerializer().serializeToPython(self))
 
         return self
 
