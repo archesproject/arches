@@ -35,12 +35,19 @@ define([
         params.configKeys = ['groupedCardIds', 'sortedWidgetIds'];
         CardComponentViewModel.apply(this, [params]);
 
+        /*
+            `sortable.js` expects `sortedWidgetIds` to be a 
+            ko.observableArray. Let's ensure this.
+        */
+        this.sortedWidgetIds = ko.observableArray();
+
         var cards;
         if (params.state === 'report') {
             cards = flattenTree(params.pageVm.report.cards, []);
         } else {
             cards = !!params.card.parent ? params.card.parent.cards : flattenTree(params.card.topCards, []);
         }
+
         this.cardLookup = {};
         this.subscriptions = {};
         this.siblingCards = ko.observableArray();
@@ -82,23 +89,25 @@ define([
         }, this);
 
         var updatedSortedWidgetsList = function(cards) {
-            this.widgetNodeIdList = [];
+            widgetNodeIdList = [];
             this.widgetInstanceDataLookup = {};
 
             cards.forEach(function(card){
                 card.widgets().forEach(function(widget) {
                     this.widgetInstanceDataLookup[widget.node_id()] = widget;
-                    this.widgetNodeIdList.push(widget.node_id());
+                    widgetNodeIdList.push(widget.node_id());
                 }, this);
             }, this);
 
             _.each(this.widgetInstanceDataLookup, function(widget, widgetid) {
                 if(!(_.contains(this.sortedWidgetIds(), widgetid))) {
-                    this.sortedWidgetIds().push(widgetid);
+                    this.sortedWidgetIds.push(widgetid);
                 }
             }, this);
 
-            this.sortedWidgetIds(_.without(this.sortedWidgetIds(), ..._.difference(this.sortedWidgetIds(), this.widgetNodeIdList)));
+            this.sortedWidgetIds([
+                ..._.without(this.sortedWidgetIds(), ..._.difference(this.sortedWidgetIds(), widgetNodeIdList))
+            ]);
         };
 
         updatedSortedWidgetsList.call(this, this.groupedCards());
