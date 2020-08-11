@@ -223,7 +223,6 @@ class RdfWriter(Writer):
 
 
 class JsonLdWriter(RdfWriter):
-
     def build_json(self, graph_id=None, resourceinstanceids=None, **kwargs):
         # Build the JSON separately serializing it, so we can use internally
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
