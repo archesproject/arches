@@ -663,10 +663,9 @@ class ResourceXResource(models.Model):
     modified = models.DateTimeField()
 
     def delete(self, *args, **kwargs):
-        from arches.app.search.search_engine_factory import SearchEngineFactory
+        from arches.app.search.search_engine_factory import SearchEngineInstance as se
         from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
 
-        se = SearchEngineFactory().create()
         se.delete(index=RESOURCE_RELATIONS_INDEX, id=self.resourcexid)
 
         # update the resource-instance tile by removing any references to a deleted resource
@@ -685,10 +684,9 @@ class ResourceXResource(models.Model):
         super(ResourceXResource, self).delete()
 
     def save(self):
-        from arches.app.search.search_engine_factory import SearchEngineFactory
+        from arches.app.search.search_engine_factory import SearchEngineInstance as se
         from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
 
-        se = SearchEngineFactory().create()
         if not self.created:
             self.created = datetime.datetime.now()
         self.modified = datetime.datetime.now()
