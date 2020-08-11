@@ -41,7 +41,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="ep-form-toolbar">
 
         <div class="col-md-12 col-lg-5">
-            <h4 class="ep-form-toolbar-title">
+            <h2 class="ep-form-toolbar-title">
                 <!-- Menu Item -->
                 <div class="graph-selector" data-bind="">
                     <!-- ko if: groupedGraphs -->
@@ -56,7 +56,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- /ko -->
                     </script>
                 </div>
-            </h4>
+            </h2>
         </div>
 
         <div class="col-md-12 col-lg-3 text-center">
@@ -125,18 +125,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="graph-designer-tab-container">
                 <ul class="nav nav-tabs">
                     <li data-bind="css: { active: activeTab() === 'graph' }, click: function(){activeTab('graph');}">
-                        <a class="graph-designer-tab ion-android-share-alt" aria-expanded="true">
+                        <a href="#" class="graph-designer-tab ion-android-share-alt" aria-expanded="true">
                             {% trans 'Graph' %}
                         </a>
                     </li>
                     <li data-bind="css: { active: activeTab() === 'card' }, click: function(){activeTab('card');}">
-                        <a class="graph-designer-tab ion-clipboard" aria-expanded="false">
+                        <a href="#" class="graph-designer-tab ion-clipboard" aria-expanded="false">
                             {% trans 'Cards' %}
                         </a>
                     </li>
                     <!--ko if: graph.isresource() -->
                     <li data-bind="css: { active: activeTab() === 'permissions' }, click: function(){activeTab('permissions');}">
-                        <a class="graph-designer-tab ion-lock-combination" aria-expanded="false">
+                        <a href="#" class="graph-designer-tab ion-lock-combination" aria-expanded="false">
                             {% trans 'Permissions' %}
                         </a>
                     </li>
@@ -166,7 +166,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
 
         <!-- Main Content Panel -->
-        <div class="flex node-configuration">
+        <div class="flex node-configuration back-to-top-me">
             <div class="flex" data-bind="visible: activeTab() === 'graph'">
                 <!--Branch Library -->
                 <div id="branch-library" class="middle-column-container graph-designer branch-library" data-bind="visible: graphTree.branchListVisible" style="display: none;">
@@ -206,7 +206,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="flex panel-config" data-bind="visible: activeTab() === 'card'">
                 <!--Middle Panel -->
                 <!-- ko if: cardTree.selection -->
-                <div class="middle-column-container graph-designer branch-library card-configuration" data-bind="css: {'expanded': selectedCard() && selectedCard().model.helpenabled() && cardTree.selection().constructor.name === 'CardViewModel' }" style="">
+                <div class="middle-column-container graph-designer branch-library card-configuration" data-bind="css: {'expanded': selectedCard() && selectedCard().model.helpenabled() && cardTree.selection().constructor.name === 'CardViewModel' }">
                     <!-- ko if: typeof cardTree.selection()!=='string' -->
                         <!-- ko if: cardTree.selection().constructor.name === 'CardViewModel' -->
                         <div data-bind="with: cardTree.selection()">
@@ -224,12 +224,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% trans "Report Configuration" %}
                     </div>
                     <div class="tab-content listing-container form-divider">
-                        <div class="node-config-item" style="">
-                            <div class="control-label">
+                        <div class="node-config-item">
+                            <label class="control-label" for="templatedesign">
                                 {% trans "Template" %}
-                            </div>
+                            </label>
                             <div class="pad-no">
-                                <select class="design" data-bind="value: report.get('template_id'), options: reportTemplates, optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                                <select id="templatedesign" class="design" data-bind="value: report.get('template_id'), options: reportTemplates, optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                             </div>
                         </div>
 

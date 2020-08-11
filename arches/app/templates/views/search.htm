@@ -34,7 +34,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 }"></div>
 
                 <!-- Inline Filters (for QA and Resource Type) -->
-                <div class="search-inline-filters">
+                <div class="search-inline-filters" aria-label="Search results filter buttons">
 
                     <div class="resource-filter" data-bind="component: {
                             name: 'resource-type-filter',
@@ -54,7 +54,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="search-control-container" data-bind="css: { 'slide': !sharedStateObject.resultsExpanded() }">
                 <!-- Title Block -->
                 <div class="search-count-container">
-                    <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
+                    <h2 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total(), attr: {'aria-label' : 'Search results, displaying ' + total() + ' items'}"></h2>
                 </div>
 
                 <div class="search-results-container">
@@ -110,7 +110,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                         <!-- ko if: filter.type === 'filter' && filter.enabled -->
                         <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}">
-                            <div style="height: calc(100vh - 100px)" data-bind="component: {
+                            <div class="search-map-container" data-bind="component: {
                                 name: filter.componentname,
                                 params: $parent.sharedStateObject
                             }"></div>

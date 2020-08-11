@@ -21,6 +21,10 @@
 @import url(../css/tree/tree.css);
 @import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 
+html, body {
+    overflow-y: hidden;
+}
+
 body, .title-v1 p, .ep-tools-login, .ep-tools-right, .search-label, .counters h3 {
     font-size: 1.3em;
 }
@@ -69,7 +73,14 @@ input:focus,
 textarea:focus,
 .form-control:focus,
 i.report-expander:focus,
-.select-icon:focus {
+.select-icon:focus,
+.chosen-container-active,
+.select2-container-active,
+.workbench-card-sidepanel-header:focus,
+.sp-header-alerts:focus,
+.timeline-entry:focus,
+.rr-splash-help-link:focus,
+.tabbed-report-tab-list li:focus {
 	outline: #006600 solid 3px !important;
 }
 
@@ -80,8 +91,7 @@ i.report-expander:focus,
 }
 
 .dataTable th:focus,
-.dataTable td:focus,
-.resource-grid-item a:focus {
+.dataTable td:focus {
 	box-shadow: inset 0 0 0 3px #006600;
     outline: none;
 }
@@ -95,7 +105,9 @@ i.report-expander:focus,
 .btn-mint:focus,
 .btn-primary:focus,
 .btn.viewstate-btn.active:focus,
-.btn-display-toggle:focus {
+.btn-display-toggle:focus,
+.mpm-manager button:focus,
+#rr-splash button:focus {
 	outline: cyan solid 3px !important;
 	text-decoration: underline;
 }
@@ -319,7 +331,9 @@ dl.inline-flex dd {
 }
 
 .one-page-header .navbar-brand h1,
-.list-header, .ep-form-alert-text {
+.list-header, .ep-form-alert-text,
+button.fa-trash:focus,
+#rr-splash button:focus {
     color: #fff !important;
 }
 
@@ -1250,11 +1264,18 @@ ul.tabbed-report-tab-list {
 
 .workbench-card-wrapper {
     flex: 1;
-    height: 100%;
+    height: calc(100vh - 100px);
     position: relative;
     background-color: #eee;
     border-top: 1px solid #ddd;
+}
+
+.search-container .workbench-card-wrapper {
     top: 51px;
+}
+
+.search-container .card-form-preview-container .search-map-container {
+    height: calc(100vh - 101px);
 }
 
 .card-component-wrapper-editor .workbench-card-wrapper {
@@ -1321,7 +1342,7 @@ ul.tabbed-report-tab-list {
     background: white;
     border-left: 1px solid rgb(216, 216, 216);
     padding: 16px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .workbench-card-sidepanel div .new-provisional-edit-card-container {
@@ -1346,7 +1367,7 @@ ul.tabbed-report-tab-list {
     content: "\f00d";
     font-family: FontAwesome;
     margin-right: 6px;
-    color: rgb(158, 158, 158);
+    color: #000;
     font-weight:lighter;
 }
 
@@ -1371,7 +1392,6 @@ ul.tabbed-report-tab-list {
 
 .basemap-listing, .overlay-listing {
     font-size: 14px;
-    color: rgb(158, 158, 158);
 }
 
 .basemap-listing-container {
@@ -1599,7 +1619,6 @@ ul.tabbed-report-tab-list {
 
 .panel-heading {
     height: auto;
-    min-height: 50px;
     border-bottom: 1px solid #dddddd;
 }
 
@@ -1667,6 +1686,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 
 .list-wrapper {
+    overflow-x: hidden;
     overflow-y: auto;
     height: calc(100% - 60px); /*60px accounts for header so list scrolls to bottom*/
 }
@@ -3116,13 +3136,17 @@ div.dropdown-menu.open {
 }
 
 #circle {
-    width: 8px;
-    height: 8px;
+    width: 12px;
+    height: 12px;
     background: red;
     border-radius: 50%;
     z-index: 10;
     position: absolute;
-  }
+    top: -6px;
+    left: -6px;
+    color: #fff;
+    font-size: 0.6em;
+}
 
 .ep-edits-header {
     display: inline-flex;
@@ -3209,11 +3233,6 @@ ul .collapse li:first-of-type {
     border-top: 1px solid #ddd;
 }
 
-.resource-grid-main-container {
-    height: 90px;
-    background: #ebeef0;
-}
-
 .report-image-grid .resource-grid-item:last-of-type .resource-grid-tools-container .btn-group ul {
     margin-top: -331px;
 }
@@ -3272,7 +3291,7 @@ ul .collapse li:first-of-type {
     color: #999;
     background: #ebeef0;
     border: 1px solid #ddd;
-    margin-bottom: 10px;
+    margin: 5px 10px 10px 10px;
 }
 
 .resource-grid-icon-highlight {
@@ -3281,10 +3300,14 @@ ul .collapse li:first-of-type {
     border-color: #bbb;
 }
 
-.resource-grid-item:hover {
+.resource-grid-item a {
+    display: inline-block;
+    width: 100%;
+}
+
+.resource-grid-item a:hover,
+.resource-grid-item a:focus {
     cursor: pointer;
-    border-left: 1px solid #d5d5d5;
-    border-right: 1px solid #d5d5d5;
     opacity: 1.0;
     background: #f9f9f9;
 }
@@ -3328,8 +3351,8 @@ ul .collapse li:first-of-type {
 
 .eh-timeline-panel {
     overflow-y: auto;
-    height: calc(100vh - 60px);
     background: #ebeef0;
+    height: calc(100vh - 100px);
 }
 
 .eh-timeline-time {
@@ -3685,12 +3708,11 @@ ul .collapse li:first-of-type {
 }
 
 .library-card-body {
-    height: 116px;
-    padding: 5px 10px 25px;
+    padding: 5px 10px 10px;
     color: #595959;
     margin-top: 0;
     overflow-y: auto;
-    min-height: 145px;
+    height: 145px;
 }
 
 .library-card-body p {
@@ -3854,6 +3876,8 @@ ul .collapse li:first-of-type {
 
 #container.cls-container.arches-login {
     background: rgb(236,238,241);
+    height: 100vh;
+    overflow-y: auto;
 }
 
 .arches-login > .cls-header {
@@ -3939,7 +3963,7 @@ ul .collapse li:first-of-type {
     margin-top: 65px;
     font-size: 14px;
     width: auto;
-    max-width: fit-content;
+    max-width: 330px;
     border: 1px solid rgba(0,0,0,.2);
 }
 
@@ -3954,8 +3978,6 @@ ul .collapse li:first-of-type {
 
 .profile-summary-page .password-success {
 	color: green;
-	position: absolute;
-	top: 50px;
 }
 
 .profile-toolbar {
@@ -3993,6 +4015,11 @@ ul .collapse li:first-of-type {
     line-height: 1.1;
     border-bottom: solid 0.5px #babebf;
     font-weight: 300;
+}
+
+.change-password-form.popover legend {
+    font-size: 0.9em;
+    padding: 0 0 10px 0;
 }
 
 .change-password-buttons {
@@ -4727,7 +4754,7 @@ ul.jqtree_common li.jqtree-folder {
     position: absolute;
     top: 50px;
     bottom: 0;
-    z-index: 4000;
+    z-index: 2500;
 }
 
 .ep-menu-panel {
@@ -4826,7 +4853,7 @@ ul.jqtree_common li.jqtree-folder {
     border-left: 1px solid #ddd;
     font-size: 17px;
     padding-left: 16px;
-    padding-right: 20px;
+    padding-right: 16px;
     min-width: 50px;
     max-width: inherit;
 }
@@ -5151,9 +5178,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .ep-card-crud-container:last-of-type {
-    margin-bottom: 200px;
-    height: calc(100vh - 111px);
-    overflow-y: auto;
     overflow-x: hidden;
 }
 
@@ -5421,10 +5445,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .grid-list.provisional-edit-history {
-    height: 100%;
+    height: calc(100% - 93px);
     position: absolute;
     width: 100%;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .provisional-edit-history-filter {
@@ -5608,7 +5632,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     -webkit-flex: 1;
     flex: 1;
     background: #ebeef0;
-    overflow-y: hidden;
+    overflow-y: auto;
     overflow-x: hidden;
 }
 
@@ -6279,9 +6303,13 @@ div.hide-file-list > div > div > div > div > form > div > div:nth-child(3) {
 
 .resource-grid-title {
     font-weight: normal;
-    padding: 3px 20px 0 20px;
+    padding: 8px 20px 0 20px;
     font-size: 1.416em;
     display: inline-block;
+}
+
+h2.resource-grid-title {
+   margin-top: 0; 
 }
 
 .resource-tools a.resource-grid-title.active {
@@ -7240,7 +7268,7 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 #mainnav-container {
-    z-index: 15;
+    z-index: 3000;
 }
 
 #navbar {
@@ -7720,10 +7748,10 @@ a.clear-geojson-button:hover {
 }
 
 .href-button {
-    color: #f4f4f4;
+    color: #fff;
     font-size: 11px;
     padding: 5px 0;
-    background: #5393C8;
+    background: #2B4E6D;
     border: 1px solid #1561A1;
     display: inline-block;
     width: 100%;
@@ -7731,7 +7759,7 @@ a.clear-geojson-button:hover {
 
 .href-button:hover {
     color: #fff;
-    background: #1266AB;
+    background: #0F5B99;
 }
 
 .href-button:focus {
@@ -8193,7 +8221,6 @@ a.clear-geojson-button:hover {
 }
 
 .saved-search-grid {
-    height: calc(100vh - 105px);
     width: 100%;
     min-height: 100%;
     overflow-y: auto;
@@ -8205,7 +8232,6 @@ a.clear-geojson-button:hover {
 }
 
 .ss-grid-item {
-    position: absolute;
     border: 1px solid #ddd;
     width: 224px;
     height: 164px;
@@ -8219,6 +8245,7 @@ a.clear-geojson-button:hover {
     -o-background-size: cover;
     background-size: cover;
     background-color: white;
+    margin: 5px;
 }
 
 .search-caption-activeWrap {
@@ -8291,12 +8318,10 @@ a.search-query-link-captions:hover {
 
 a.search-query-link-captions:active {
     font-weight: 600;
-    color: #fff;
 }
 
 a.search-query-link-captions:focus {
     font-weight: 600;
-    color: #fff;
 }
 
 .search-query-desc {
@@ -8670,12 +8695,17 @@ ul.pagination {
 }
 
 .time-wheel-title {
-    font-size: 17px;
+    font-size: 1.3em;
     margin-top: 30px;
 }
 
 .time-search-container .time-wheel-title:first-child {
     margin-top: 3px;
+}
+
+.time-search-container .filter-title {
+    margin-top: 7px;
+    font-size: 1.3em;
 }
 
 .time-wheel-title .pull-right {
@@ -9090,7 +9120,7 @@ table.table.dataTable {
     height: 100%;
     padding: 0;
     margin-left: 2px;
-    font-size: 0.84em;
+    font-size: 0.85em;
     font-weight: 600;
     color: #545454;
     min-width: 80px;
@@ -9123,12 +9153,12 @@ table.table.dataTable {
 }
 
 .resource_search_widget_dropdown ul .select2-disabled div span span button.active {
-    background: #8EAFE3;
+    background: #223D62;
 }
 
 .resource_search_widget_dropdown ul .select2-disabled div span span button.term-search-btn:not(.active) {
     background: #BBD1EA;
-    color: #658CC9;
+    color: #223D62;
 }
 
 .resource_search_widget_dropdown ul .select2-disabled div span span button:not(.active):hover {
@@ -9160,7 +9190,7 @@ table.table.dataTable {
 }
 
 .term-search-btn.active {
-    color: #4330A4;
+    color: #BBD1EA;
 }
 
 .search-type-btn i {
@@ -9207,7 +9237,7 @@ table.table.dataTable {
 
 .search-popup-panel {
     position: absolute;
-    top: 51px;
+    top: 52px;
     right: 0;
     z-index: 900;
     background-color: #fff;
@@ -9746,6 +9776,8 @@ a.filter-tools:hover {
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow-y: auto;
+    height: calc(100vh - 110px);
 }
 
 .mpm-summary-panel {
@@ -9854,6 +9886,7 @@ a.filter-tools:hover {
     position: absolute;
     right: 10px;
     top: 10px;
+    color: #000;
 }
 
 .mobile-project-manager-editor .tab-content {
@@ -10252,7 +10285,7 @@ a.filter-tools:hover {
 .project-metadata-item {
 	display: inline-block;
     padding: 6px 10px 10px 10px;
-    color: #758697;
+    color: #4D5766 !important;
 }
 
 .project-details {
@@ -10415,11 +10448,14 @@ ul.select2-choices:after {
     height:100%;
     z-index: 3;
     font-size: 10px;
+    position: relative;
+    width: 13px;
 }
 
 .sidepanel-draggable div {
     cursor: col-resize;
-    position: relative;top: 50%;
+    position: absolute;
+    top: 50%;
     transform: translateY(-50%);
     margin: 1px;
 }
@@ -10517,12 +10553,12 @@ ul.select2-choices:after {
 }
 
 .card-component-wrapper-editor {
-    padding-bottom: 50px;
+    height: calc(100% - 50px);
     overflow-y: auto;
 }
 
 .card-header {
-    height: 50px;
+    min-height: 50px;
     padding: 10px 20px;
     background: #f4f4f4;
 }
@@ -10748,6 +10784,10 @@ a.jstree-anchor.permissions-widget {
     color: steelblue;
 }
 
+.rr-splash-help-link:focus {
+    text-decoration: underline;
+}
+
 .rr-splash-help-link:hover {
     cursor: pointer;
 }
@@ -10938,6 +10978,10 @@ a.jstree-anchor.permissions-widget {
     height: 400px;
 }
 
+.report-map-header-component .workbench-card-wrapper {
+    height: 100%;
+}
+
 .exporter-note {
 	position: absolute;
 	padding-left: 16px;
@@ -10981,6 +11025,11 @@ a.jstree-anchor.permissions-widget {
 
 .rdm-maincontent .arches-box-grey-border {
     margin-bottom: 0;
+}
+
+#scroll-top {
+    right: 30px;
+    z-index: 9999;
 }
 
 #scroll-top.in:hover {
@@ -11054,7 +11103,6 @@ a.tree-display-tool, a.tree-display-tool:hover {
 
 .card-form-preview-container .panel-title {
     white-space: normal;
-    line-height: 1.4em;
 }
 
 .left-column-crud-container.form-list .library-card {
@@ -11075,6 +11123,65 @@ a.tree-display-tool, a.tree-display-tool:hover {
 
 .graph-designer .workbench-card-wrapper {
     top: 0;
+}
+
+.btn-warning,
+.btn-warning:focus,
+.btn-hover-warning:hover,
+.btn-hover-warning:active,
+.btn-hover-warning.active,
+.btn.btn-active-warning:active,
+.btn.btn-active-warning.active,
+.dropdown.open>.btn.btn-active-warning,
+.btn-group.open .dropdown-toggle.btn.btn-active-warning {
+    color: #292929;
+}
+
+.icon-search-container .icon-search-field {
+    width: 25vw;
+    height: 35px;
+}
+
+.icon-list {
+	height: 300px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding: 15px;
+	border: 1px solid #e9e9e9;
+}
+
+.reqlabel {
+    width: 100%;
+    text-align: left;
+}
+
+.reqtxt {
+    position: relative;
+    top: -1px;
+    right: 0;
+}
+
+.password-reset-form #id_email,
+.password-reset-form #id_new_password1,
+.password-reset-form #id_new_password2 {
+    width: 100%;
+    padding: 10px 16px;
+    line-height: 1.3333333;
+}
+
+#login-form .alert h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: inherit;
+    font-weight: 600;
+    font-size: 1.2em;
+}
+
+.password-recovery-error-container ul {
+    color: darkred;
+    list-style: none;
+    padding-left: 0;
+    margin-top: 10px;
 }
 
 @keyframes loader {
@@ -11156,7 +11263,6 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .rp-no-data {
         margin-left: 200px;
         position: relative;
-        top: -20px;
         left: 90px;
     }
 
@@ -11180,6 +11286,9 @@ a.tree-display-tool, a.tree-display-tool:hover {
     }
     .rp-report-container-preview {
         padding: 0 5px 35px 5px;
+    }
+    .workbench-card-sidepanel {
+        right: 0;
     }
 }
 
@@ -11213,14 +11322,19 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .resource-grid-title {
         font-size: 1.1em;
     }
+    .resource-grid-title {
+        padding-left: 5px;
+    }
     .resource-grid-main p {
         max-width: 53vw;
+        padding-left: 5px;
     }
     .resource-manager-container,
     .arches-designer-container {
         overflow-y: auto;
-        height: calc(100vh - 143px);
+        height: 78vh;
         width: 100%;
+        padding: 5px 10px 0 0 !important;
     }
     .report-map-header-component {
         height: 50vh;
@@ -11257,9 +11371,6 @@ a.tree-display-tool, a.tree-display-tool:hover {
         flex: none;
         overflow: hidden;
     }
-    .mapboxgl-map {
-        overflow: inherit;
-    }
     .search-attribute-widget {
         width: 100%;
         padding-right: 15px;
@@ -11267,10 +11378,16 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .card-component-panel {
         flex: none;
         width: 100%;
-        height: calc(60vh - 50px);
+        height: 54vh;
+    }
+    .card-component {
+        padding: 15px 15px;
     }
     .rp-report-container-preview {
         padding: 0 0 35px 0;
+    }
+    .rp-card-section {
+        padding: 5px;
     }
     .search-type-btn {
         height: 20px;
@@ -11324,7 +11441,7 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .search-count-container .search-title {
         font-size: 1.1em;
     }
-    .ep-help {
+    .ep-help, .ep-notifs, .ep-edits {
         z-index: 4100;
         width: 100%;
     }
@@ -11349,17 +11466,63 @@ a.tree-display-tool, a.tree-display-tool:hover {
         height: auto;
     }
     .node-configuration {
-        height: 43vh;
+        height: 47vh;
     }
     .report-image-grid {
         margin-bottom: 0;
     }
     .ep-card-crud-container {
-        height: 52.3vh !important;
-        margin: 10px 0;
+        height: calc(55vh - 8px);
+        margin: 0;
     }
     .form-group div input {
         max-width: 52vw;
+    }
+    #login-form .form-group div input {
+        max-width: 100% !important;
+    }
+    .mobile-project-manager-editor .flex {
+        display: block;
+    }
+    .msm-designer-panel {
+        height: 53vh;
+    }
+    #summary-card.mpm-card .card-content {
+        margin: 0;
+    }
+    .msm-edit-buttons button:before {
+        display: none;
+    }
+    .resource_search_widget_dropdown ul .select2-disabled div span span button {
+        width: auto;
+        height: auto;
+        padding: 7px;
+    }
+    .overlay-listing .overlay-name {
+        width: 100%;
+        white-space: normal;
+    }
+    .map-server-basemap-button {
+        top: -24px;
+    }
+    .graph-list-header .graph-add-btn {
+        top: 16px;
+    }
+    .resource-toolbar {
+        height: 86px;
+    }
+    .eh-timeline {
+        margin-left: 0;
+        padding: 0 10px 0;
+    }
+    .profile-list {
+        padding: 0 20px 20px;
+    }
+    .search-container .card-form-preview-container .search-map-container {
+        height: 50vh;
+    }
+    .function-manager-container .card-form-preview-container {
+        height: calc(53vh + 5px);
     }
 }
 
@@ -11367,9 +11530,6 @@ a.tree-display-tool, a.tree-display-tool:hover {
     article.search-container {
         flex: 1;
         flex-direction: column-reverse;
-    }
-    article.search-container .search-map-container {
-        height: 50vh;
     }
     .search-results-panel {
         max-width: inherit;
@@ -11397,7 +11557,20 @@ a.tree-display-tool, a.tree-display-tool:hover {
         margin-top: 0;
     }
     .search-facets {
+        height: 41vh;
+    }
+    #content-container .content-panel .node-configuration .flex,
+    .graph-settings-panel-body .widgets .widget-container div div > input,
+    .graph-settings-panel-body .widgets .widget-container div div .chosen-disabled {
+        width: 100% !important;
+        min-width: inherit;
+    }
+    .search-container .card-form-preview-container .search-map-container {
         height: 47vh;
+        overflow: hidden;
+    }
+    .search-container .workbench-card-wrapper {
+        height: calc(42vh - 5px)
     }
 }
 
@@ -11434,7 +11607,7 @@ a.tree-display-tool, a.tree-display-tool:hover {
         min-width: inherit;
     }
     .search-popup-panel {
-        top: 0;
+        top: 52px;
         width: 100%;
         max-height: 41vh;
     }
@@ -11457,10 +11630,25 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .calendar.picker select {
         width: 100%;
     }
+    .category-title {
+        padding: 5px;
+    }
+    .form-list {
+        padding-bottom: 0;
+    }
+    .panel-title {
+        line-height: inherit;
+    }
+    .ep-card-crud-container {
+        height: calc(55vh - 8px);
+    }
 }
 
 @media print {
-    header, nav, footer, button, aside, .print-btn, .ep-tools, .geocode-container, .geometry-tools-container, .geometry-editing-notifications, #map-widget-container>.map-widget-container {
+    header, nav, footer, button, aside, .print-btn, .ep-tools, .geocode-container, .geometry-tools-container, .geometry-editing-notifications, #map-widget-container>.map-widget-container,
+    .mapboxgl-ctrl-top-left,
+    .mapboxgl-ctrl-top-right,
+    .workbench-card-sidebar {
         display: none;
     }
     #content-container {
@@ -11496,9 +11684,6 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .rp-report-section {
         border-bottom: 1px solid rgba(128, 128, 128, 0.5);
     }
-    .mapboxgl-map {
-        display: none;
-    }
     .print-map {
         display: block;
         width: 100%;
@@ -11507,5 +11692,14 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .print-hide {
         display: none;
         height: 0;
+    }
+    .workbench-card-wrapper {
+        height: 100%;
+    }
+    .workbench-card-container {
+        margin-right: 0;
+    }
+    .rp-report-section-root {
+        padding-top: 20px;
     }
 }

@@ -5,7 +5,7 @@
     <div>
 
         <!-- Title Bar -->
-        <div id="" class="relative fade in" style="display: block;">
+        <div class="relative fade in" style="display: block;">
 
             <!-- Title Block -->
             <div class="profile-toolbar">
@@ -14,7 +14,7 @@
         </div>
 
         <!-- Profile Summary -->
-        <div class="profile-summary-page">
+        <div class="profile-summary-page back-to-top-me">
 
             <!--Commented out profile image due to accessibility issues 27/06/19
                 <div class="profile-report relative">
@@ -23,7 +23,7 @@
 
                 <div class="">
                     <div class="profile-full-name">
-                        {{user.first_name}}
+                        {{user.first_name}} {{user.last_name}}
                     </div>
                     <div class="profile-e-mail">
                         {{user.username}}
@@ -35,9 +35,8 @@
             <div class="profile-sections">
 
                 <!-- My Account Info -->
-                <section id="" class="profile-list">
+                <section class="profile-list">
                     <div class="account-wrapper">
-
 
                         <div class="row relative">
 
@@ -50,7 +49,7 @@
 
                             <div class="col-sm-9">
 
-                                    <!-- ko if: showEditUserForm() === false -->
+                                <!-- ko if: showEditUserForm() === false -->
                                     <div class="row">
                                         <div class="col-sm-5">
                                             <div class="relative">
@@ -72,131 +71,131 @@
                                         </div>
                                     </div>
 
-                                        <div class="row">
-                                            <div class="col-sm-5">
-                                                <div class="relative">
-                                                    <h4 class="text-main">{% trans 'Contact email' %}</h4>
-                                                    <p class="profile-label-shim">{{ user.email }}</p>
-                                                </div>
+                                    <div class="row">
+                                        <div class="col-sm-5">
+                                            <div class="relative">
+                                                <h4 class="text-main">{% trans 'Contact email' %}</h4>
+                                                <p class="profile-label-shim">{{ user.email }}</p>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <div class="row">
-                                            <div class="col-sm-5">
-                                                <div class="relative">
-                                                    <h4 class="text-main">{% trans 'Phone' %}</h4>
-                                                    <p class="profile-label-shim">{{ user.userprofile.phone }}</p>
-                                                </div>
+                                    <div class="row">
+                                        <div class="col-sm-5">
+                                            <div class="relative">
+                                                <h4 class="text-main">{% trans 'Phone' %}</h4>
+                                                <p class="profile-label-shim">{{ user.userprofile.phone }}</p>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <div class="row">
-                                            <div class="col-sm-5">
-                                                <div>
-                                                    <button class="btn btn-primary btn-active-purple btn-profile" data-bind='click: toggleEditUserForm' aria-label="Edit">{% trans 'Edit' %}</button>
-                                                </div>
+                                    <div class="row">
+                                        <div class="col-sm-5">
+                                            <div>
+                                                <button class="btn btn-primary btn-active-purple btn-profile" data-bind='click: toggleEditUserForm' aria-label="Edit">{% trans 'Edit' %}</button>
                                             </div>
                                         </div>
-                                    <!-- /ko -->
+                                    </div>
+                                <!-- /ko -->
 
-                                    <!-- ko if: showEditUserForm() === true -->
+                                <!-- ko if: showEditUserForm() === true -->
                                     <form method="post">
                                         {% csrf_token %}
-                                    <div class="row">
+                                        <div class="row">
 
-                                        <div class="col-sm-5">
-                                            <div class="form-group">
-                                                <label class="control-label account-label" for="username">{% trans 'Arches user name' %}</label>
-                                                <input id="username" disabled type="text" class="form-control input-lg account-input" placeholder="Fist name" name="username" value="{{ user.username }}">
+                                            <div class="col-sm-5">
+                                                <div class="form-group">
+                                                    <label class="control-label account-label" for="username">{% trans 'Arches user name' %}</label>
+                                                    <input id="username" disabled type="text" class="form-control input-lg account-input" placeholder="Fist name" name="username" value="{{ user.username }}">
+                                                </div>
+                                            </div>
+
+                                            <!-- Password -->
+                                            <div class="col-sm-7">
+                                                <p class="account-tips">
+                                                    {% trans 'This is the unique email or name that you use to log on to Arches.' %}
+                                                </p>
                                             </div>
                                         </div>
 
-                                        <!-- Password -->
-                                        <div class="col-sm-7">
-                                            <p class="account-tips">
-                                                {% trans 'This is the unique email or name that you use to log on to Arches.' %}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <hr style="border-color: #eee;">
-                                    <div class="row">
-                                        <div class="col-sm-5">
-                                            <div class="form-group">
-                                                <label for="first_name" class="control-label account-label">{% trans 'First name' %}</label>
-                                                <input id="first_name" type="text" class="form-control input-lg account-input" placeholder="{% trans 'First name' %}" name="first_name" value="{{ user.first_name }}" autocomplete="given-name">
-                                                {% if form.first_name.errors %}
-                                                {% for error in form.first_name.errors %}
-                                                    <div style="color:darkred">{{ error|escape }}</div>
-                                                {% endfor %}
-                                                {% endif %}
+                                        <hr style="border-color: #eee;">
+                                        <div class="row">
+                                            <div class="col-sm-5">
+                                                <div class="form-group">
+                                                    <label for="first_name" class="control-label account-label">{% trans 'First name' %}</label>
+                                                    <input id="first_name" type="text" class="form-control input-lg account-input" placeholder="{% trans 'First name' %}" name="first_name" value="{{ user.first_name }}" autocomplete="given-name">
+                                                    {% if form.first_name.errors %}
+                                                    {% for error in form.first_name.errors %}
+                                                        <div style="color:darkred">{{ error|escape }}</div>
+                                                    {% endfor %}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-7">
+                                                <p class="account-tips">
+                                                    {% trans 'Arches uses your name and phone number to make it easier for other users to find and work with you.' %}
+                                                </p>
                                             </div>
                                         </div>
-                                        <div class="col-sm-7">
-                                            <p class="account-tips">
-                                                {% trans 'Arches uses your name and phone number to make it easier for other users to find and work with you.' %}
-                                            </p>
-                                        </div>
-                                    </div>
 
-                                    <!-- Account Last Name -->
-                                    <div class="row">
-                                        <!-- Names -->
-                                        <div class="col-sm-5">
-                                            <div class="form-group">
-                                                <label for="last_name" class="control-label account-label">{% trans 'Last name' %}</label>
-                                                <input id="last_name" type="text" class="form-control input-lg account-input" placeholder="{% trans 'Last name' %}" name="last_name" value="{{ user.last_name }}" autocomplete="family-name">
-                                                {% if form.last_name.errors %}
-                                                {% for error in form.last_name.errors %}
-                                                    <div style="color:darkred">{{ error|escape }}</div>
-                                                {% endfor %}
-                                                {% endif %}
+                                        <!-- Account Last Name -->
+                                        <div class="row">
+                                            <!-- Names -->
+                                            <div class="col-sm-5">
+                                                <div class="form-group">
+                                                    <label for="last_name" class="control-label account-label">{% trans 'Last name' %}</label>
+                                                    <input id="last_name" type="text" class="form-control input-lg account-input" placeholder="{% trans 'Last name' %}" name="last_name" value="{{ user.last_name }}" autocomplete="family-name">
+                                                    {% if form.last_name.errors %}
+                                                    {% for error in form.last_name.errors %}
+                                                        <div style="color:darkred">{{ error|escape }}</div>
+                                                    {% endfor %}
+                                                    {% endif %}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <!-- Phone -->
-                                    <div class="row">
-                                        <!-- Names -->
-                                        <div class="col-sm-5">
-                                            <div class="form-group">
-                                                <label for="phone" class="control-label account-label">{% trans 'Phone Number (optional)' %}</label>
-                                                <input id="phone" type="text" class="form-control input-lg account-input" placeholder="e.g. +1 415 555-1234" name="phone" value="{{ user.userprofile.phone }}" autocomplete="tel">
+                                        <!-- Phone -->
+                                        <div class="row">
+                                            <!-- Names -->
+                                            <div class="col-sm-5">
+                                                <div class="form-group">
+                                                    <label for="phone" class="control-label account-label">{% trans 'Phone Number (optional)' %}</label>
+                                                    <input id="phone" type="text" class="form-control input-lg account-input" placeholder="e.g. +1 415 555-1234" name="phone" value="{{ user.userprofile.phone }}" autocomplete="tel">
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <hr style="border-color: #eee;">
+                                        <hr style="border-color: #eee;">
 
-                                    <!-- Contact Email -->
-                                    <div class="row">
-                                        <!-- Names -->
-                                        <div class="col-sm-5">
-                                            <div class="form-group">
-                                                <label for="email" class="control-label account-label">{% trans 'Contact Email' %}</label>
-                                                <input id="email" type="email" class="form-control input-lg account-input" placeholder="jsmith@company.com" name="email" value="{{ user.email }}" autocomplete="email">
-                                                {% if form.email.errors %}
-                                                {% for error in form.email.errors %}
-                                                    <div style="color:darkred">{{ error|escape }}</div>
-                                                {% endfor %}
-                                                {% endif %}
+                                        <!-- Contact Email -->
+                                        <div class="row">
+                                            <!-- Names -->
+                                            <div class="col-sm-5">
+                                                <div class="form-group">
+                                                    <label for="email" class="control-label account-label">{% trans 'Contact Email' %}</label>
+                                                    <input id="email" type="email" class="form-control input-lg account-input" placeholder="jsmith@company.com" name="email" value="{{ user.email }}" autocomplete="email">
+                                                    {% if form.email.errors %}
+                                                    {% for error in form.email.errors %}
+                                                        <div style="color:darkred">{{ error|escape }}</div>
+                                                    {% endfor %}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <p class="account-tips">
+                                                    {% trans 'Arches uses your e-maill to alert you to projects and tasks assigned to you.' %}
+                                                </p>
                                             </div>
                                         </div>
-                                        <div class="col-sm-5">
-                                            <p class="account-tips">
-                                                {% trans 'Arches uses your e-maill to alert you to projects and tasks assigned to you.' %}
-                                            </p>
-                                        </div>
-                                    </div>
 
-                                    <!--Form action buttons-->
-                                    <div class="row">
-                                        <div class="col-sm-5">
-                                            <button class="btn btn-primary btn-active-purple btn-profile mar-btm" type="submit" formaction="{% url 'user_profile_manager' %}" aria-label="Save">{% trans 'Save' %}</button>
-                                            <button class="btn btn-danger btn-active-dark btn-profile mar-btm" data-bind='click: toggleEditUserForm' aria-label="Cancel">{% trans 'Cancel' %}</button>
+                                        <!--Form action buttons-->
+                                        <div class="row">
+                                            <div class="col-sm-5">
+                                                <button class="btn btn-primary btn-active-purple btn-profile mar-btm" type="submit" formaction="{% url 'user_profile_manager' %}" aria-label="Save">{% trans 'Save' %}</button>
+                                                <button class="btn btn-danger btn-active-dark btn-profile mar-btm" data-bind='click: toggleEditUserForm' aria-label="Cancel">{% trans 'Cancel' %}</button>
+                                            </div>
                                         </div>
-                                    </div>
-                                </form>
+                                    </form>
                                 <!-- /ko -->
                             </div>
                         </div>
@@ -296,7 +295,7 @@
                             <!-- Find a survey -->
                             <div class="col-sm-9 col-sm-offset-3 relative">
                                 <div class="project-search-widget">
-                                    <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
+                                    <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" aria-label="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
                                     <span class="clear-node-search" data-bind="visible: mobileSurveyFilter().length > 0, click: function() { mobileSurveyFilter(''); }"><i class="fa fa-times-circle"></i></span>
                                 </div>
                             </div>
@@ -320,11 +319,11 @@
                                                     </li>
                                                 </ul>
                                             </div>
-                                            <h3 class="project-panel-title" data-bind="text: vm.mobilesurvey.name() === '' ? '{% trans "Unnamed Survey" %}' : vm.mobilesurvey.name()"></h3>
+                                            <h4 class="project-panel-title" data-bind="text: vm.mobilesurvey.name() === '' ? '{% trans "Unnamed Survey" %}' : vm.mobilesurvey.name()"></h4>
 
                                             <div class="">
                                                 <div class="project-details">
-                                                    <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.mobilesurvey.toggleShowDetails();}">{% trans 'View Details' %}</a>
+                                                    <a href="#" id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.mobilesurvey.toggleShowDetails();}">{% trans 'View Details' %}</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -409,8 +408,6 @@
 
 </div>
 
-<!-- SCROLL TOP BUTTON -->
-<button id="scroll-top" class="btn page-upm" aria-label="Go to top of page"><i class="fa fa-chevron-up"></i></button>
 {% endblock main_content %}
 {% block pre_require_js %}
 {{ block.super }}

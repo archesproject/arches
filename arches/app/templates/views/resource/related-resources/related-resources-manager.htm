@@ -54,7 +54,7 @@
                 <div class="layer-list search">
 
                     <div class="list-filter fdg-node-filter">
-                        <input type="text" class="form-control" style="z-index=100" placeholder="{% trans " Find a resource " %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
+                        <input type="text" class="form-control" style="z-index=100" placeholder="{% trans " Find a resource " %}" aria-label="{% trans " Find a resource " %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
                         <span class="clear-node-search" data-bind="click: $data.clearSearch"><i class="fa fa-times-circle"></i></span>
                     </div>
 
@@ -190,7 +190,7 @@
                                             <!--ko if: useSemanticRelationships === false -->
                                             <div class="row widget-container shim">
                                                 <div class="form-group">
-                                                    <div class="relative" style="">
+                                                    <div class="relative">
                                                         <label class="col-xs-6 control-label widget-input-label" for=""> {% trans "From Date" %} <i class="ion-ios-checkmark-outline"></i>
                                                         </label>
                                                         <label class="col-xs-6 control-label widget-input-label" for=""> {% trans "To Date" %} <i class="ion-ios-checkmark-outline"></i>
@@ -307,7 +307,7 @@
                 <div data-bind="with: paginator">
                     <div class="text-center">
                         <ul class="pagination">
-                            <li><a data-bind="css: {'disabled': !has_previous()}, click: $parent.newPage.bind($parent, previous_page_number())" href="#">«</a></li>
+                            <li><a data-bind="css: {'disabled': !has_previous()}, click: $parent.newPage.bind($parent, previous_page_number())" href="#" aria-label="Previous">«</a></li>
                             <!-- ko foreach: { data: pages, as: 'page' } -->
                                 <!-- ko if: page -->
                                 <li class="page" data-bind="click: $parents[1].newPage.bind($parents[1]), css: {'current active': (page == $parent.current_page())}">
@@ -318,7 +318,7 @@
                                 <li class="disabled"><a href="#">...</a></li>
                                 <!-- /ko -->
                             <!-- /ko -->
-                            <li><a data-bind="css: { 'disabled': !has_next()}, click: $parent.newPage.bind($parent, next_page_number())" href="#">»</a></li>
+                            <li><a data-bind="css: { 'disabled': !has_next()}, click: $parent.newPage.bind($parent, next_page_number())" href="#" aria-label="Next">»</a></li>
                         </ul>
                     </div>
                 </div>
@@ -357,7 +357,7 @@
 
 
             <!-- Help Hyperlink -->
-            <div class="rr-splash-help-link" data-bind="click: function(){$parent.helpTemplate('report-manager-help'); $parent.helpOpen(true);}">{% trans "Show Me How" %}</div>
+            <div class="rr-splash-help-link" tabindex="0" data-bind="click: function(){$parent.helpTemplate('report-manager-help'); $parent.helpOpen(true);}" onkeypress="$(this).trigger('click');">{% trans "Show Me How" %}</div>
         </div>
         <!--/ko-->
 

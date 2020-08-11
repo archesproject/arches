@@ -65,7 +65,7 @@
 
                             <div class="list-group" style="margin-top: 5px;" data-bind="sortable: {data: parentTile.tiles[card.get('nodegroup_id')], afterMove: form.reorderTiles.bind(form, parentTile.tiles[card.get('nodegroup_id')]), as: 'innerTile', connectClass: 'list-group', options: {'placeholder': 'ui-sortable-placeholder sortable-placeholder', forcePlaceholderSize: true}}">
 
-                                <div class="list-group-item crud-record-item" style="" data-bind="css: {'selected-provisional-tile': innerTile === form.selectedProvisionalTile()}">
+                                <div class="list-group-item crud-record-item" data-bind="css: {'selected-provisional-tile': innerTile === form.selectedProvisionalTile()}">
                                     <h5 style="cursor: pointer; padding: 6px 6px 6px 10px;" class="list-group-item-heading text-thin" data-bind="click: form.toggleTile">
                                         <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Show/Hide" %}'></i>
                                         <span style="position: relative; top: -2px;">
@@ -278,12 +278,12 @@
 
                         <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.get('helpactive')">
                             <div class="relative">
-                                <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () { card.get('helpactive')(false) }"></a>
+                                <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" data-bind="click: function () { card.get('helpactive')(false) }"></a>
                             </div>
                             <div id="add-basemap-wizard-help-content">
                                 <div>
                                     <div class="panel-heading">
-                                        <h3 class="panel-title help-panel-title" style="">
+                                        <h3 class="panel-title help-panel-title">
                                             <span class="help-text-small">{% trans "Help" %}</span><span data-bind="html: card.get('helptitle')"></span>
                                         </h3>
                                     </div>

@@ -56,7 +56,7 @@
                                     </div>
 
                                     <!-- Form -->
-                                    <div class="col-xs-12 card-form-container" style="">
+                                    <div class="col-xs-12 card-form-container">
 
                                         <form class="widgets row" style="margin-bottom: 20px;" data-bind="sortable: {
                                                 data:card.get('widgets'),
@@ -101,7 +101,7 @@
 
                     <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: self.helpPreviewActive">
                         <div class="relative">
-                            <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () { self.helpPreviewActive(false) }"></a>
+                            <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" data-bind="click: function () { self.helpPreviewActive(false) }"></a>
                         </div>
                         <div id="add-basemap-wizard-help-content">
                             <div>

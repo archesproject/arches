@@ -8,39 +8,39 @@
 {% block config %}
 <div>
     <div class="node-config-item">
-        <label class="control-label" for="">Select drawings map source (optional)</label>
-        <input type="text" data-bind="textInput: selectSource" class="form-control input-lg widget-input">
+        <label class="control-label" for="drawingsmapsource">Select drawings map source (optional)</label>
+        <input id="drawingsmapsource" type="text" data-bind="textInput: selectSource" class="form-control input-lg widget-input">
     </div>
     <div class="node-config-item">
-        <label class="control-label" for="">Select drawings map source layer (optional)</label>
-        <input type="text" data-bind="textInput: selectSourceLayer" class="form-control input-lg widget-input">
+        <label class="control-label" for="drawingsmapsourcelayer">Select drawings map source layer (optional)</label>
+        <input id="drawingsmapsourcelayer" type="text" data-bind="textInput: selectSourceLayer" class="form-control input-lg widget-input">
     </div>
     <div class="node-config-item">
-        <label class="control-label" for="">Select drawings text (optional)</label>
-        <input type="text" data-bind="textInput: selectText" class="form-control input-lg widget-input">
+        <label class="control-label" for="drawingstext">Select drawings text (optional)</label>
+        <input id="drawingstext" type="text" data-bind="textInput: selectText" class="form-control input-lg widget-input">
     </div>
     <div class="node-config-item">
-        <div class="control-label">
+        <label class="control-label" for="centerlongitude">
             {% trans "Map Center Longitude" %}
-        </div>
+        </label>
         <div class="col-xs-12 pad-no crud-widget-container">
-            <input type="number" id="" placeholder="{% trans " Longitude (x coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerX, valueUpdate: 'keyup'">
+            <input type="number" id="centerlongitude" placeholder="{% trans " Longitude (x coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerX, valueUpdate: 'keyup'">
         </div>
     </div>
     <div class="node-config-item">
-        <div class="control-label">
+        <label class="control-label" for="centerlatitude">
             {% trans "Map Center Latitude" %}
-        </div>
+        </label>
         <div class="col-xs-12 pad-no crud-widget-container">
-            <input type="number" id="" placeholder="{% trans " Latitude (y coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerY, valueUpdate: 'keyup'">
+            <input type="number" id="centerlatitude" placeholder="{% trans " Latitude (y coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerY, valueUpdate: 'keyup'">
         </div>
     </div>
     <div class="node-config-item">
-        <div class="control-label">
+        <label class="control-label" for="defaultzoom">
             {% trans "Default Zoom" %}
-        </div>
+        </label>
         <div class="col-xs-12 pad-no crud-widget-container">
-            <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: zoom, valueUpdate: 'keyup'">
+            <input type="number" min=1 max=20 id="defaultzoom" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: zoom, valueUpdate: 'keyup'">
         </div>
     </div>
 </div>
