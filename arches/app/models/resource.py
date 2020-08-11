@@ -375,7 +375,7 @@ class Resource(models.ResourceInstance):
                 se.delete(index=TERMS_INDEX, id=result["_id"])
             se.delete(index=RESOURCES_INDEX, id=self.resourceinstanceid)
 
-            try:   
+            try:
                 self.save_edit(edit_type="delete", user=user, note=self.displayname)
             except:
                 pass
