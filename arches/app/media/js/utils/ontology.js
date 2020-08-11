@@ -15,13 +15,13 @@ define(['arches'], function(arches) {
             return '';
         },
 
-        getSelect2ConfigForOntologyProperties: function(value, domain, range, placeholder, allowClear=false) {
+        getSelect2ConfigForOntologyProperties: function(value, domain, range, placeholder, allowClear) {
             return {
                 value: value,
                 clickBubble: false,
                 placeholder: placeholder,
                 closeOnSelect: true,
-                allowClear: allowClear,
+                allowClear: allowClear || false,
                 ajax: {
                     url: function() {
                         return arches.urls.ontology_properties;
