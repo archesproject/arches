@@ -384,6 +384,12 @@ class JsonLdReader(Reader):
         if len(data) > 1:
             self.use_ids = True
 
+        # Maybe calculate sort order for this node's tiles
+        try:
+            self.shouldSortTiles = settings.JSON_LD_SORT
+        except:
+            self.shouldSortTiles = False
+
         for jsonld_document in data:
             jsonld_document = expand(jsonld_document)[0]
 
@@ -426,6 +432,7 @@ class JsonLdReader(Reader):
         return False
 
     def data_walk(self, data_node, tree_node, result, tile=None):
+        my_tiles = []
         for k, v in data_node.items():
             if k in ["@id", "@type"]:
                 continue
@@ -559,11 +566,14 @@ class JsonLdReader(Reader):
                         data={},
                     )
                     self.resource.tiles.append(tile)
+                    my_tiles.append(tile)
                 elif "tile" in result and result["tile"]:
                     tile = result["tile"]
 
-                bnode["tile"] = tile
+                if not hasattr(tile, '_json_ld'):
+                    tile._json_ld = vi
 
+                bnode["tile"] = tile
                 if bnodeid in result:
                     if branch[0]["datatype"].collects_multiple_values():
                         # append to previous tile
@@ -602,6 +612,23 @@ class JsonLdReader(Reader):
                 if not is_literal:
                     # Walk down non-literal branches in the data
                     self.data_walk(vi, branch[0], bnode, tile)
+
+        if self.shouldSortTiles:
+            sortfuncs = settings.JSON_LD_SORT_FUNCTIONS
+            if my_tiles:
+                tile_ng_hash = {}
+                for t in my_tiles:
+                    try:
+                        tile_ng_hash[t.nodegroup_id].append(t)
+                    except KeyError:
+                        tile_ng_hash[t.nodegroup_id] = [t]
+                for (k,v) in tile_ng_hash.items():
+                    if len(v) > 1:
+                        for func in sortfuncs:
+                            v.sort(key=func)
+                        for t, i in zip(v, range(len(v))):
+                            t.sortorder = i
+
 
         # Finally, after processing all of the branches for this node, check required nodes are present
         for path in tree_node["children"].values():
