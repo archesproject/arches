@@ -30,7 +30,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="panel-body">
                 <h3 class="login-panel-header arches-signin">{% trans "Create Account" %}</h3>
                 <p class="arches-signin-subtext">
-                    Register to access data modeling, editing, and discovery tools. 
+                    {% trans "Register to access data modeling, editing, and discovery tools." %}
                 </p>
                 <form class="change-password-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
                     {% csrf_token %}
@@ -150,7 +150,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
 
             <div class="panel-footer">
-                Learn more about <a href="archesproject.org">{% trans "Arches" %}</a>
+                {% trans "Learn more about <a href='archesproject.org'>Arches</a>" %}
             </div>
 
         </div>

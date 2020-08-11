@@ -31,14 +31,19 @@
 {% block report %}
 <dt data-bind="text: label"></dt>
 <dd class='number-widget-report'>
+    <!-- ko if: value -->
     <div data-bind="text: prefix(), css: {'number-prefix': prefix()}"></div>
-    <!-- ko if: format -->
-    <div data-bind="formattedNumber: value(), format: format"></div>
-    <!-- /ko -->
-    <!-- ko ifnot: format -->
-    <div data-bind="text: value()"></div>
-    <!-- /ko -->
+        <!-- ko if: format -->
+        <div data-bind="formattedNumber: value(), format: format || '{% trans "None" %}'"></div>
+        <!-- /ko -->
+        <!-- ko ifnot: format -->
+        <div data-bind="text: value()"></div>
+        <!-- /ko -->
     <div data-bind="text: suffix(), css: {'number-suffix': suffix()}"></div>
+    <!-- /ko -->
+    <!-- ko ifnot: value -->
+    <div data-bind="text: '{% trans "None" %}'"></div>
+    <!-- /ko -->
 </dd>
 {% endblock report %}
 
@@ -92,7 +97,7 @@
     <input type="number" placeholder="{% trans "Default Value" %}" id="" class="form-control input-md widget-input" data-bind="value: defaultValue, valueUpdate: 'keyup'">
 </div>
 <div class="control-label">
-  {% trans "Format" %} <a href="http://numeraljs.com/#format" target="_blank">(view valid formats)</a>
+  {% trans "Format" %} <a href="http://numeraljs.com/#format" target="_blank">{% trans "(view valid formats)" %}</a>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
   <input type="" placeholder="{% trans "Format" %}" id="" class="form-control input-md widget-input" data-bind="value: format, valueUpdate: 'keyup'">

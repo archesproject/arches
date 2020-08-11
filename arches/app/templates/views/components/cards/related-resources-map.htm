@@ -8,12 +8,12 @@
 {% block config %}
 <div>
     <div class="node-config-item">
-        <label class="control-label" for="">Select drawings map source (optional)</label>
-        <input type="text" data-bind="textInput: selectSource" class="form-control input-md widget-input">
+        <label class="control-label" for="">{% trans "Select drawings map source (optional)" %}</label>
+        <input type="text" data-bind="textInput: selectRelatedSource" class="form-control input-md widget-input">
     </div>
     <div class="node-config-item">
-        <label class="control-label" for="">Select drawings map source layer (optional)</label>
-        <input type="text" data-bind="textInput: selectSourceLayer" class="form-control input-md widget-input">
+        <label class="control-label" for="">{% trans "Select drawings map source layer (optional)" %}</label>
+        <input type="text" data-bind="textInput: selectRelatedSourceLayer" class="form-control input-md widget-input">
     </div>
 </div>
 {% endblock config %}

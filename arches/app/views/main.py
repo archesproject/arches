@@ -18,8 +18,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import urllib.request, urllib.error, urllib.parse
 from urllib.parse import urlparse
-from django.shortcuts import render
+from arches import __version__
 from arches.app.models.system_settings import settings
+from django.shortcuts import render
 from django.http import HttpResponseNotFound, HttpResponse
 
 
@@ -33,6 +34,7 @@ def index(request):
             "app_title": settings.APP_TITLE,
             "copyright_text": settings.COPYRIGHT_TEXT,
             "copyright_year": settings.COPYRIGHT_YEAR,
+            "version": __version__,
         },
     )
 

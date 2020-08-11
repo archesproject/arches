@@ -33,10 +33,10 @@
                         }
                     ">
             </div>
-            
+
         </div>
     </div>
-    
+
     <div class="rr-widget">
         <!-- ko if: value() !== null && value().length > 5-->
         <div class="rr-widget-filter-panel">
@@ -46,7 +46,7 @@
             </div>
         </div>
         <!-- /ko -->
-    
+
         <!-- ko if: relationshipsInFilter().length > 0-->
         <div class="rr-table">
             <div data-bind='foreach: relationshipsInFilter' style="display: flex; flex-direction: column;">
@@ -82,7 +82,7 @@
                     </div>
                     <div class="rr-table-row-panel"
                         data-bind="visible: self.selectedResourceRelationship() === $data, if: self.selectedResourceRelationship() === $data, css: { 'rr-table-border': self.selectedResourceRelationship() === $data} ">
-                        
+
                         <div class="row">
                             <!-- Relationship from instance to rr -->
                             <div class="row" style="margin-bottom: 10px;">
@@ -93,14 +93,14 @@
                                     <span class="col-xs-12" style="text-align: left;"
                                         data-bind="text: self.resourceInstanceDisplayName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'">
                                     </span>
-                                    
+
                                     <!-- Property -->
                                     <span class="col-xs-12">
                                         <input style="max-width:100%; display:inline-block; margin: 3px 0px;" data-bind="
                                         select2Query: {
-                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass())}">
+                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass(), '{% trans 'Select an Ontology Property' %}')}">
                                     </span>
-                                    
+
                                     <!-- rr name -->
                                     <span class="col-xs-12" data-bind="text: $data.resourceName() + ' (' + self.makeFriendly($data.ontologyClass()) + ')'"></span>
                                 </div>
@@ -115,14 +115,14 @@
                                     <span class="col-xs-12" style="text-align: left;"
                                         data-bind="text: $data.resourceName() + ' (' + self.makeFriendly($data.ontologyClass()) + ')'">
                                     </span>
-                                    
+
                                     <!-- Property -->
                                     <span class="col-xs-12">
                                         <input style="width:100%; display:inline-block; margin: 3px 0px;" data-bind="
                                         select2Query: {
-                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass(), self.rootOntologyClass)}">
+                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass(), self.rootOntologyClass, '{% trans 'Select an Ontology Property' %}')}">
                                     </span>
-                                    
+
                                     <!-- Instance name -->
                                     <span class="col-xs-12" data-bind="text: self.resourceInstanceDisplayName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'">
                                     </span>
