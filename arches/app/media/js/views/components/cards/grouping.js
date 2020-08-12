@@ -26,7 +26,6 @@ define([
         this.tiles = [];
         this.widgetInstanceDataLookup = {};
 
-
         /*
             'sortedWidgetIds' originally referred to entries in the
             card_x_node_x_widget table. This has been changed, and
@@ -58,7 +57,7 @@ define([
 
         this.groupedCards = ko.computed(function(){
             var gc = _.map([this.card.model.id].concat(this.groupedCardIds()), function(cardid) {
-                var card = this.cardLookup[cardid];
+                var card = this.cardLookup[cardid]; 
                 var subscription = card.model.cardinality.subscribe(function(cardinality){
                     if (cardinality !== '1') {
                         card.model.cardinality('1');
@@ -83,22 +82,27 @@ define([
         }, this);
 
         var updatedSortedWidgetsList = function(cards) {
-            widgetNodeIdList = this.sortedWidgetIds();
             this.widgetInstanceDataLookup = {};
+
+            var sortedWidgetIds = this.sortedWidgetIds();
+            var widgetNodeIdList = [];
 
             cards.forEach(function(card){
                 card.widgets().forEach(function(widget) {
                     this.widgetInstanceDataLookup[widget.node_id()] = widget;
+                    widgetNodeIdList.push(widget.node_id());
                 }, this);
             }, this);
 
-            _.each(this.widgetInstanceDataLookup, function(widget, nodeId) {
-                if(!(_.contains(widgetNodeIdList, nodeId))) {
-                    widgetNodeIdList.push(nodeId);
+            _.each(this.widgetInstanceDataLookup, function(widget, widgetid) {
+                if(!(_.contains(sortedWidgetIds, widgetid))) {
+                    sortedWidgetIds.push(widgetid);
                 }
             }, this);
 
-            this.sortedWidgetIds(widgetNodeIdList);
+            this.sortedWidgetIds([
+                ..._.without(sortedWidgetIds, ..._.difference(sortedWidgetIds, widgetNodeIdList))
+            ]);
         };
 
         updatedSortedWidgetsList.call(this, this.groupedCards());
