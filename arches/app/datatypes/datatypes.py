@@ -63,7 +63,7 @@ class DataTypeFactory(object):
         d_datatype = self.datatypes[datatype]
         try:
             datatype_instance = self.datatype_instances[d_datatype.classname]
-        except:
+        except KeyError:
             class_method = get_class_from_modulename(d_datatype.modulename, d_datatype.classname, settings.DATATYPE_LOCATIONS)
             datatype_instance = class_method(d_datatype)
             self.datatype_instances[d_datatype.classname] = datatype_instance
