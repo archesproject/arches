@@ -35,12 +35,6 @@ define([
         params.configKeys = ['groupedCardIds', 'sortedWidgetIds'];
         CardComponentViewModel.apply(this, [params]);
 
-        /*
-            `sortable.js` expects `sortedWidgetIds` to be a 
-            ko.observableArray. Let's ensure this.
-        */
-        this.sortedWidgetIds = ko.observableArray();
-
         var cards;
         if (params.state === 'report') {
             cards = flattenTree(params.pageVm.report.cards, []);
@@ -89,25 +83,22 @@ define([
         }, this);
 
         var updatedSortedWidgetsList = function(cards) {
-            widgetNodeIdList = [];
+            widgetNodeIdList = this.sortedWidgetIds();
             this.widgetInstanceDataLookup = {};
 
             cards.forEach(function(card){
                 card.widgets().forEach(function(widget) {
                     this.widgetInstanceDataLookup[widget.node_id()] = widget;
-                    widgetNodeIdList.push(widget.node_id());
                 }, this);
             }, this);
 
-            _.each(this.widgetInstanceDataLookup, function(widget, widgetid) {
-                if(!(_.contains(this.sortedWidgetIds(), widgetid))) {
-                    this.sortedWidgetIds.push(widgetid);
+            _.each(this.widgetInstanceDataLookup, function(widget, node_id) {
+                if(!(_.contains(widgetNodeIdList, node_id))) {
+                    widgetNodeIdList.push(node_id);
                 }
             }, this);
 
-            this.sortedWidgetIds([
-                ..._.without(this.sortedWidgetIds(), ..._.difference(this.sortedWidgetIds(), widgetNodeIdList))
-            ]);
+            this.sortedWidgetIds(widgetNodeIdList);
         };
 
         updatedSortedWidgetsList.call(this, this.groupedCards());
@@ -172,7 +163,7 @@ define([
         };
 
         this.afterMove = function(e) {
-            // do nothing
+            params.card.model.save();
         };
 
         this.getTile = function(cardid) {
