@@ -4,7 +4,7 @@ from arches.app.models import models
 from arches.app.models.models import Value
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
-from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.elasticsearch_dsl_builder import Query, Term
 from arches.app.search.base_index import get_index
 from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCE_RELATIONS_INDEX, RESOURCES_INDEX
@@ -40,7 +40,6 @@ def index_resources(clear_index=True, index_name=None, batch_size=settings.BULK_
 
     """
 
-    se = SearchEngineFactory().create()
     if clear_index and index_name is None:
         q = Query(se=se)
         q.delete(index=TERMS_INDEX)
@@ -68,7 +67,6 @@ def index_resources_by_type(resource_types, clear_index=True, index_name=None, b
     """
 
     status = ""
-    se = SearchEngineFactory().create()
     datatype_factory = DataTypeFactory()
     node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
 
@@ -129,7 +127,6 @@ def index_resource_relations(clear_index=True, batch_size=settings.BULK_IMPORT_B
     print("Indexing resource to resource relations")
 
     cursor = connection.cursor()
-    se = SearchEngineFactory().create()
     if clear_index:
         q = Query(se=se)
         q.delete(index=RESOURCE_RELATIONS_INDEX)
@@ -180,7 +177,6 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
     start = datetime.now()
     print("Indexing concepts")
     cursor = connection.cursor()
-    se = SearchEngineFactory().create()
     if clear_index:
         q = Query(se=se)
         q.delete(index=CONCEPTS_INDEX)
