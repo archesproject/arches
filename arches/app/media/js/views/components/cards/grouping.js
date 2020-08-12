@@ -92,9 +92,9 @@ define([
                 }, this);
             }, this);
 
-            _.each(this.widgetInstanceDataLookup, function(widget, node_id) {
-                if(!(_.contains(widgetNodeIdList, node_id))) {
-                    widgetNodeIdList.push(node_id);
+            _.each(this.widgetInstanceDataLookup, function(widget, nodeId) {
+                if(!(_.contains(widgetNodeIdList, nodeId))) {
+                    widgetNodeIdList.push(nodeId);
                 }
             }, this);
 
