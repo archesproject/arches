@@ -53,22 +53,29 @@ PIXELSPERTILE = 256
 
 logger = logging.getLogger(__name__)
 
-
 class DataTypeFactory(object):
+    _datatypes = None
+    _datatype_instances = {}
+
     def __init__(self):
-        self.datatypes = {datatype.datatype: datatype for datatype in models.DDataType.objects.all()}
-        self.datatype_instances = {}
+        if DataTypeFactory._datatypes is None:
+            DataTypeFactory._datatypes = {datatype.datatype: datatype for datatype in models.DDataType.objects.all()}
+        self.datatypes = DataTypeFactory._datatypes
+        self.datatype_instances = DataTypeFactory._datatype_instances
 
     def get_instance(self, datatype):
-        d_datatype = self.datatypes[datatype]
         try:
-            datatype_instance = self.datatype_instances[d_datatype.classname]
+            d_datatype = DataTypeFactory._datatypes[datatype]
+        except KeyError: 
+            DataTypeFactory._datatypes = {datatype.datatype: datatype for datatype in models.DDataType.objects.all()}
+            d_datatype = DataTypeFactory._datatypes[datatype]
+        try:
+            datatype_instance = DataTypeFactory._datatype_instances[d_datatype.classname]
         except KeyError:
             class_method = get_class_from_modulename(d_datatype.modulename, d_datatype.classname, settings.DATATYPE_LOCATIONS)
             datatype_instance = class_method(d_datatype)
-            self.datatype_instances[d_datatype.classname] = datatype_instance
+            DataTypeFactory._datatype_instances[d_datatype.classname] = datatype_instance
         return datatype_instance
-
 
 class StringDataType(BaseDataType):
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
