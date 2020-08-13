@@ -613,7 +613,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             return None
         elif node.config is None:
             return None
-        count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
+        count = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).count()
         if not preview and (count < 1 or not node.config["layerActivated"]):
             return None
 

@@ -76,7 +76,7 @@ class MapLayerManagerView(MapBaseManagerView):
             datatype = datatype_factory.get_instance(node.datatype)
             map_layer = datatype.get_map_layer(node=node, preview=True)
             if map_layer is not None:
-                count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
+                count = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).count()
                 if count > 0:
                     map_layer["bounds"] = get_resource_bounds(node)
                 else:
