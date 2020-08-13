@@ -69,6 +69,7 @@ class DataTypeFactory(object):
         except KeyError:
             DataTypeFactory._datatypes = {datatype.datatype: datatype for datatype in models.DDataType.objects.all()}
             d_datatype = DataTypeFactory._datatypes[datatype]
+            self.datatypes = DataTypeFactory._datatypes
         try:
             datatype_instance = DataTypeFactory._datatype_instances[d_datatype.classname]
         except KeyError:
