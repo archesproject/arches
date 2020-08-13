@@ -114,7 +114,8 @@ def prepare_search_index(create=False):
     index_settings = {
         "settings": {
             "analysis": {"analyzer": {"folding": {"tokenizer": "standard", "filter": ["lowercase", "asciifolding"]}}},
-            "index.mapping.total_fields.limit": 20000,
+            "index.mapping.total_fields.limit": 50000,
+            "index.mapping.nested_objects.limit": 50000,
         },
         "mappings": {
             "_doc": {
