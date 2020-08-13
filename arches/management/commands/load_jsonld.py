@@ -154,7 +154,6 @@ class Command(BaseCommand):
         }
         self.node_datatypes = {str(nodeid): datatype for nodeid, datatype in archesmodels.Node.objects.values_list("nodeid", "datatype")}
 
-        errh = open("error_log.txt", "w")
         start = time.time()
         seen = 0
         loaded = 0
@@ -242,8 +241,7 @@ class Command(BaseCommand):
                                 loaded += l
                                 loaded_model += l
                             except Exception as e:
-                                errh.write(f"*** Failed to load {fn}:\n     {e}\n")
-                                errh.flush()
+                                print(f"*** Failed to load {fn}:\n     {e}\n")
                                 if not options["ignore_errors"]:
                                     raise
                         else:
@@ -258,7 +256,6 @@ class Command(BaseCommand):
             self.save_resources()
             self.index_resources(options["strip_search"])
             self.resources = []
-        errh.close()
         print(f"Total Time: seen {seen} / loaded {loaded} in {time.time()-start} seconds")
 
     def fast_import_resource(self, resourceid, graphid, data, n=1000, reload="ignore", quiet=True, strip_search=False):
@@ -279,7 +276,8 @@ class Command(BaseCommand):
         try:
             self.reader.read_resource(data, resourceid=resourceid, graphid=graphid)
             self.resources.extend(self.reader.resources)
-        except Exception as e:
+        except:
+            print(f"Exception raised while reading {resourceid}...")
             raise
         if len(self.resources) >= n:
             self.save_resources()
