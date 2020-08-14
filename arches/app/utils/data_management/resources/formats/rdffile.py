@@ -551,6 +551,9 @@ class JsonLdReader(Reader):
                                         if "inverseOntologyProperty" in g:
                                             node_value[0]["inverseOntologyProperty"] = g["inverseOntologyProperty"]
                                         break
+                else:
+                    # Might get checked in a cardinality n branch that shouldn't be repeated
+                    node_value = None
 
                 # We know now that it can go into the branch
                 # Determine if we can collapse the data into a -list or not
