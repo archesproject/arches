@@ -1404,21 +1404,25 @@ class Graph(models.GraphModel):
                         1002,
                     )
                 property_found = False
+                okay = False
                 ontology_classes = self.ontology.ontologyclasses.get(source=edge.domainnode.ontologyclass)
                 for classes in ontology_classes.target["down"]:
                     if classes["ontology_property"] == edge.ontologyproperty:
                         property_found = True
-                        if edge.rangenode.ontologyclass not in classes["ontology_classes"]:
-                            raise GraphValidationError(
-                                _(
-                                    f"Your graph isn't semantically valid. Entity domain '{edge.domainnode.ontologyclass}' and \
-                                        Entity range '{edge.rangenode.ontologyclass}' cannot \
-                                        be related via Property '{edge.ontologyproperty}'."
-                                ),
-                                1003,
-                            )
+                        if edge.rangenode.ontologyclass in classes["ontology_classes"]:
+                            okay = True
+                            break
 
-                if not property_found:
+                if not okay:
+                    raise GraphValidationError(
+                        _(
+                            f"Your graph isn't semantically valid. Entity domain '{edge.domainnode.ontologyclass}' and \
+                                Entity range '{edge.rangenode.ontologyclass}' cannot \
+                                be related via Property '{edge.ontologyproperty}'."
+                        ),
+                        1003,
+                    )
+                elif not property_found:
                     raise GraphValidationError(
                         _("'{0}' is not found in the {1} ontology or is not a valid ontology property for Entity domain '{2}'.").format(
                             edge.ontologyproperty, self.ontology.name, edge.domainnode.ontologyclass
