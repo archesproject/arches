@@ -596,7 +596,7 @@ RENDERERS = [
     },
 ]
 
-###  JSON LD sortorder generating functions
+# --- JSON LD sortorder generating functions --- #
 #
 # The functions in the array below will be called in the order given with the json-ld of the node
 #   that should have sortorder set on the resulting tile.  The config below sorts (meaninglessly)
@@ -623,7 +623,7 @@ RENDERERS = [
 JSON_LD_SORT = False
 JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 
-### JSON LD run-time data manipulation
+# --- JSON LD run-time data manipulation --- #
 #
 # This function will be applied to the data to be loaded, immediately before it is sent to the
 #   Reader to be processed. This can correct any errors in the data, or potentially do some
