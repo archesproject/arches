@@ -76,6 +76,7 @@ class DataTypeFactory(object):
             class_method = get_class_from_modulename(d_datatype.modulename, d_datatype.classname, settings.DATATYPE_LOCATIONS)
             datatype_instance = class_method(d_datatype)
             DataTypeFactory._datatype_instances[d_datatype.classname] = datatype_instance
+            self.datatype_instances = DataTypeFactory._datatype_instances
         return datatype_instance
 
 class StringDataType(BaseDataType):
