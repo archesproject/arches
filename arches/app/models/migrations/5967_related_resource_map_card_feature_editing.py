@@ -14,14 +14,14 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             """
-            update card_components 
-            set defaultconfig = defaultconfig::jsonb || '{"selectRelatedSource":"", "selectRelatedSourceLayer":""}'::jsonb 
+            update card_components
+            set defaultconfig = defaultconfig::jsonb || '{"selectRelatedSource":"", "selectRelatedSourceLayer":""}'::jsonb
             where name = 'Related Resources Map Card';
             """,
             """
-            update card_components set defaultconfig = defaultconfig::jsonb - 'selectRelatedSource' 
+            update card_components set defaultconfig = defaultconfig::jsonb - 'selectRelatedSource'
             where name = 'Related Resources Map Card';
-            update card_components set defaultconfig = defaultconfig::jsonb - 'selectRelatedSourceLayer' 
+            update card_components set defaultconfig = defaultconfig::jsonb - 'selectRelatedSourceLayer'
             where name = 'Related Resources Map Card';
             """,
         )
