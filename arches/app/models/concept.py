@@ -149,7 +149,7 @@ class Concept(object):
 
             if include is not None:
                 if len(include) > 0 and len(exclude) > 0:
-                    raise Exception("Only include values for include or exclude, but not both")
+                    raise Exception(_("Only include values for include or exclude, but not both"))
                 include = (
                     include if len(include) != 0 else models.DValueType.objects.distinct("category").values_list("category", flat=True)
                 )
@@ -829,7 +829,7 @@ class Concept(object):
         elif isinstance(value, Concept):
             self.subconcepts.append(value)
         else:
-            raise Exception("Invalid subconcept definition: %s" % (value))
+            raise Exception(_("Invalid subconcept definition: %s") % (value))
 
     def addrelatedconcept(self, value):
         if isinstance(value, dict):
@@ -837,7 +837,7 @@ class Concept(object):
         elif isinstance(value, Concept):
             self.relatedconcepts.append(value)
         else:
-            raise Exception("Invalid related concept definition: %s" % (value))
+            raise Exception(_("Invalid related concept definition: %s") % (value))
 
     def addvalue(self, value):
         if isinstance(value, dict):
@@ -848,7 +848,7 @@ class Concept(object):
         elif isinstance(value, models.Value):
             self.values.append(ConceptValue(value))
         else:
-            raise Exception("Invalid value definition: %s" % (value))
+            raise Exception(_("Invalid value definition: %s") % (value))
 
     def index(self, scheme=None):
         if scheme is None:
@@ -1252,7 +1252,7 @@ class Concept(object):
 
     def make_collection(self):
         if len(self.values) == 0:
-            raise Exception("Need to include values when creating a collection")
+            raise Exception(_("Need to include values when creating a collection"))
         values = JSONSerializer().serializeToPython(self.values)
         for value in values:
             value["id"] = ""
@@ -1360,7 +1360,7 @@ class ConceptValue(object):
             if scheme is None:
                 scheme = self.get_scheme_id()
             if scheme is None:
-                raise Exception("Index of label failed.  Index type (scheme id) could not be derived from the label.")
+                raise Exception(_("Index of label failed.  Index type (scheme id) could not be derived from the label."))
 
             data["top_concept"] = scheme.id
             se.index_data(index=CONCEPTS_INDEX, body=data, idfield="id")

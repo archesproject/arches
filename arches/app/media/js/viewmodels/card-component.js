@@ -23,6 +23,7 @@ define([
         this.preview = params.preview;
         this.loading = params.loading || ko.observable(false);
         this.card = params.card;
+        this.card.hideEmptyNodes = params.hideEmptyNodes;
         this.card.showIds = this.showIds;
         this.tile = params.tile;
         this.reportExpanded = ko.observable(true);
