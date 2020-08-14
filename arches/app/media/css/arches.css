@@ -1221,6 +1221,7 @@ ul.tabbed-report-tab-list {
     border-top: 1px solid #ddd;
     border-bottom: solid 1px #ddd;
     color: #555;
+    cursor: pointer;
 }
 
 .thumbnail-gallery-controls.left {
@@ -11456,6 +11457,7 @@ a.filter-tools:hover {
 .number-widget-report {
     display: flex;
     flex-direction: row;
+    margin-bottom: 5px;
 }
 
 .number-prefix {

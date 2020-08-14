@@ -613,7 +613,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             return None
         elif node.config is None:
             return None
-        count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
+        count = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).count()
         if not preview and (count < 1 or not node.config["layerActivated"]):
             return None
 
@@ -1718,9 +1718,15 @@ class ResourceInstanceDataType(BaseDataType):
                         for graph in models.Node.objects.get(pk=nodeid).config["graphs"]:
                             if graph["graphid"] == target_graphid:
                                 if related_resource["ontologyProperty"] == "":
-                                    defaults["relationshiptype"] = graph["ontologyProperty"]
+                                    try:
+                                        defaults["relationshiptype"] = graph["ontologyProperty"]
+                                    except:
+                                        pass
                                 if related_resource["inverseOntologyProperty"] == "":
-                                    defaults["inverserelationshiptype"] = graph["inverseOntologyProperty"]
+                                    try:
+                                        defaults["inverserelationshiptype"] = graph["inverseOntologyProperty"]
+                                    except:
+                                        pass
                 try:
                     rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
                     for key, value in defaults.items():
@@ -1743,8 +1749,9 @@ class ResourceInstanceDataType(BaseDataType):
                 rr.delete()
 
     def post_tile_delete(self, tile, nodeid):
-        for related in tile.data[nodeid]:
-            se.delete(index=RESOURCE_RELATIONS_INDEX, id=related["resourceXresourceId"])
+        if tile.data and tile.data[nodeid]:
+            for related in tile.data[nodeid]:
+                se.delete(index=RESOURCE_RELATIONS_INDEX, id=related["resourceXresourceId"])
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
