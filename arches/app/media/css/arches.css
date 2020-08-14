@@ -6636,6 +6636,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .panel-config {
     flex-direction: row-reverse;
+    min-width: 600px;
 }
 
 .panel-config .middle-column-container {
@@ -6650,6 +6651,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .panel-config .middle-column-container.card-configuration {
     margin-top: 50px;
+    flex: 1;
 }
 
 .panel-config .toggle-container {
@@ -10236,6 +10238,10 @@ table.table.dataTable {
     z-index: 2;
 }
 
+.tab-pane.graph-designer {
+    flex: 2;
+}
+
 .tab-pane.active .related-resources-header {
     display: none;
 }
@@ -11361,7 +11367,6 @@ a.filter-tools:hover {
 .graph-designer-tab-container {
     background: #C9D4E1;
     font-weight: 600;
-    min-width: 400px;
 }
 
 .graph-designer-tab-container .nav-tabs>li.active>a {
@@ -12009,16 +12014,17 @@ ul.select2-choices:after {
     color: rgb(190, 190, 190);
 }
 
+.left-panel-inner-container {
+    min-width: 300px; 
+}
+
 .left-panel {
-    width: 300px;
-    overflow-x: auto;
-    overflow-y: hidden;
+    overflow: auto;
     z-index: 3;
 }
 
 .left-panel-overflow {
     height: calc(100vh - 225px);
-    overflow-y: auto;
     background: #ecf0f5;
 }
 
