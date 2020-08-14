@@ -1023,7 +1023,7 @@ class GraphTests(ArchesTestCase):
         with self.assertRaises(GraphValidationError) as cm:
             graph.save()
         the_exception = cm.exception
-        self.assertEqual(the_exception.code, 1004)
+        self.assertEqual(the_exception.code, 1003)
 
     def test_graph_validation_of_branch_with_ontology_appended_to_graph_with_no_ontology(self):
         """
