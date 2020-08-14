@@ -24,10 +24,10 @@
 
 {% block content_management %}
 <!-- ko if: card.widgets().length > 0 -->
-<div style="height: inherit;">
+<div style="height: inherit; overflow: auto;">
 
-    <div class="card-display-panel">
-        <div style="height: inherit">
+    <div style="min-height: 100%; height: fit-content;">
+        <div style="height: inherit;">
             <div id="hidden-dz-previews" style="display:none"></div>
             <!--ko if: displayContent() -->
             <div style="height: inherit">
