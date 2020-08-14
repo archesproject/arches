@@ -26,7 +26,7 @@
 <!-- ko if: card.widgets().length > 0 -->
 <div style="height: inherit;">
 
-    <div style="height: inherit" class="card-display-panel">
+    <div class="card-display-panel">
         <div style="height: inherit">
             <div id="hidden-dz-previews" style="display:none"></div>
             <!--ko if: displayContent() -->
@@ -81,12 +81,14 @@
                            <span>{% trans "Select Photographs" %}</span>
                        </button>
                        <br>
-                       <div style="padding: 10px">{% trans "Adding photos to this record is " %}
-                           <span><strong>{% trans "optional." %}</strong></span>
-                           <br>
-                           {% trans "You may upload as many photos as you wish, but the maximum size of any single file is " %}
-                           <span>{% trans "8MB" %}</span>
-                       </div>
+                       <div style="padding: 10px">
+                            <p>
+                                {% trans "Adding photos to this record is <span><strong>optional.</strong></span>" %}
+                            </p>
+                            <p>
+                                {% trans "You may upload as many photos as you wish, but the maximum size of any single file is <span>8MB</span>" %}
+                            </p>
+                        </div>
 
                    </div>
                    <div class="file-upload-footer">
@@ -120,15 +122,17 @@
                    </div>
                    <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
                        <i class="fa fa-file"></i>
-                       <span>{% trans "Select Documents" %}</span>
+                       <span>{% trans "Select Photographs" %}</span>
                    </button>
                    <br>
-                   <div style="padding: 10px">{% trans "Adding documents to this record is " %}
-                       <span><strong>{% trans "optional." %}</strong></span>
-                       <br>
-                       {% trans "You may upload as many documents as you wish, but the maximum size of any single file is " %}
-                       <span>{% trans "8MB" %}</span>
-                   </div>
+                   <div style="padding: 10px">
+                        <p>
+                            {% trans "Adding photos to this record is <span><strong>optional.</strong></span>" %}
+                        </p>
+                        <p>
+                            {% trans "You may upload as many photos as you wish, but the maximum size of any single file is <span>8MB</span>" %}
+                        </p>
+                    </div>
 
                </div>
                <div class="file-upload-footer">
