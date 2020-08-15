@@ -277,24 +277,13 @@ class JsonLdReader(Reader):
         self.resources = []
         self.resource = None
         self.use_ids = False
-        self.resource_model_root_classes = set()
-        self.non_unique_classes = set()
         self.root_ontologyclass_lookup = {}
         self.graphtree = None
         self.logger = logging.getLogger(__name__)
         for graph in models.GraphModel.objects.filter(isresource=True):
             node = models.Node.objects.get(graph_id=graph.pk, istopnode=True)
             self.root_ontologyclass_lookup[str(graph.pk)] = node.ontologyclass
-            if node.ontologyclass in self.resource_model_root_classes:
-                # make a note of non-unique root classes
-                self.non_unique_classes.add(node.ontologyclass)
-            else:
-                self.resource_model_root_classes.add(node.ontologyclass)
-        self.resource_model_root_classes = self.resource_model_root_classes - self.non_unique_classes
-        self.ontologyproperties = models.Edge.objects.values_list("ontologyproperty", flat=True).distinct()
         self.logger.info("Initialized JsonLdReader")
-        self.logger.debug("Found {0} Non-unique root classes".format(len(self.non_unique_classes)))
-        self.logger.debug("Found {0} Resource Model Root classes".format(len(self.resource_model_root_classes)))
 
     def validate_concept_in_collection(self, value, collection):
         cdata = Concept().get_child_collections(collection, columns="conceptidto")
@@ -325,6 +314,10 @@ class JsonLdReader(Reader):
             node["config"] = {}
             if n.config and "rdmCollection" in n.config:
                 node["config"]["collection_id"] = str(n.config["rdmCollection"])
+            elif n.config and "graphs" in n.config:
+                for entry in n.config["graphs"]:
+                    entry["rootclass"] = self.root_ontologyclass_lookup[entry["graphid"]]
+                node["config"]["graphs"] = n.config["graphs"]
             node["required"] = n.isrequired
             node["node_id"] = str(n.nodeid)
             node["name"] = n.name
@@ -477,9 +470,9 @@ class JsonLdReader(Reader):
                     # model has xsd:string, default is rdfs:Literal
                     key = f"{k} http://www.w3.org/2001/XMLSchema#string"
                     if not key in tree_node["children"]:
-                        raise ValueError(f"property/class combination does not exist in model: {k} {clss}")
+                        raise ValueError(f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}")
                 elif not key in tree_node["children"]:
-                    raise ValueError(f"property/class combination does not exist in model: {k} {clss}")
+                    raise ValueError(f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}")
 
                 options = tree_node["children"][key]
                 possible = []
@@ -546,6 +539,30 @@ class JsonLdReader(Reader):
                     node_value = graph_node["datatype"].from_rdf(vi)
                     # node_value might be None if the validation of the datatype fails
                     # XXX Should we check this here, or raise in the datatype?
+
+                    # For resource-instances, the datatype doesn't know the ontology prop config
+                    if graph_node["datatype"].references_resource_type():
+                        if "graphs" in branch[0]["config"]:
+                            gs = branch[0]["config"]["graphs"]
+                            if len(gs) == 1:
+                                # just select it
+                                if "ontologyProperty" in gs[0]:
+                                    node_value[0]["ontologyProperty"] = gs[0]["ontologyProperty"]
+                                if "inverseOntologyProperty" in gs[0]:
+                                    node_value[0]["inverseOntologyProperty"] = gs[0]["inverseOntologyProperty"]
+                            else:
+                                for g in gs:
+                                    # Now test current node's class against graph's class
+                                    # This isn't a guarantee, but close enough
+                                    if vi["@type"][0] == g["rootclass"]:
+                                        if "ontologyProperty" in g:
+                                            node_value[0]["ontologyProperty"] = g["ontologyProperty"]
+                                        if "inverseOntologyProperty" in g:
+                                            node_value[0]["inverseOntologyProperty"] = g["inverseOntologyProperty"]
+                                        break
+                else:
+                    # Might get checked in a cardinality n branch that shouldn't be repeated
+                    node_value = None
 
                 # We know now that it can go into the branch
                 # Determine if we can collapse the data into a -list or not
