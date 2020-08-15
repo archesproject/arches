@@ -123,23 +123,15 @@ define([
             var relatedResourceModels = ko.computed(function() {
                 var res = [];
                 var graphlist = this.preview ? arches.graphs : arches.resources;
+
                 if (params.node && params.state !== 'report') {
-                    /*
-                        when this function is called, params.node.config.graphs can either be 
-                        a function or an array of objects. Let's only invoke graphs if it's a function.
-                    */ 
-                    if (typeof params.node.config.graphs === 'function') {
-                        res = params.node.config.graphs().map(function(item){
-                            var graph = graphlist.find(function(graph){
-                                return graph.graphid === item.graphid;
-                            });
-                            if (graph) { // graph may not exist in arches.resources if it is 'inactive'
-                                graph.config = item;
-                                return graph;
-                            }
+                    res = ko.unwrap(params.node.config.graphs).map(function(item){
+                        var graph = graphlist.find(function(graph){
+                            return graph.graphid === item.graphid;
                         });
-                    }
+                    });
                 }
+                
                 return res;
             }, this);
 

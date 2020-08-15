@@ -103,6 +103,10 @@ class JsonLDImportTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
+        with open(os.path.join("tests/fixtures/jsonld_base/models/6235_parenttile_id.json"), "rU") as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile["graph"])
+
     def setUp(self):
         pass
 
@@ -1068,3 +1072,49 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/c3b693cc-1542-11ea-b353-acde48001122")
 
         # TODO - more asserts to make sure data is saved correctly
+
+    def test_g_6235_parenttile(self):
+
+        data = """
+{
+  "@id": "http://localhost:8000/resources/05f314d0-7a7b-4408-8d9b-f0b61f1fb27d",
+  "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
+  "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by": {
+    "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
+    "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by": {
+      "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation",
+      "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "a"
+    },
+    "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": {
+      "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span",
+      "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
+        "@type": "http://www.w3.org/2001/XMLSchema#dateTime", "@value": "2020-07-08"}
+      },
+    "http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by": {
+      "@type": "http://www.cidoc-crm.org/cidoc-crm/E33_Linguistic_Object",
+      "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "b"
+    }
+  },
+  "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by": {
+    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation",
+    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "test 1"
+  }
+}
+"""
+        url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": "0bc001c2-c163-11ea-8354-3af9d3b32b71", "resourceid": "05f314d0-7a7b-4408-8d9b-f0b61f1fb27d"},
+        )
+
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        self.assertEqual(response.status_code, 201)
+        js = response.json()
+        if type(js) == list:
+            js = js[0]
+
+        # And validate that all three of E52, E33 and E41 are there
+
+        prod = js["http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by"]
+        self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by" in prod)
+        self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span" in prod)
+        self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by" in prod)
