@@ -574,7 +574,7 @@ class JsonLdReader(Reader):
                 if branch[0]["datatype"].collects_multiple_values() and tile and str(tile.nodegroup.pk) == branch[0]["nodegroup_id"]:
                     # iterating through a root node *-list type
                     pass
-                elif bnodeid == branch[0]["nodegroup_id"]:0
+                elif bnodeid == branch[0]["nodegroup_id"]:
                     # Used to pick the previous tile in loop which MIGHT be the parent (but might not)
                     parenttile_id = result["tile"].tileid if "tile" in result else None
                     tile = Tile(
