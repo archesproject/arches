@@ -129,9 +129,9 @@ define([
                         var graph = graphlist.find(function(graph){
                             return graph.graphid === item.graphid;
                         });
-                        if (graph) { // graph may not exist in arches.resources if it is 'inactive'	
-                            graph.config = item;	
-                            return graph;	
+                        if (graph) { // graph may not exist in arches.resources if it is 'inactive'
+                            graph.config = item;
+                            return graph;
                         }
                     });
                 }
