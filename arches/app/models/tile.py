@@ -22,6 +22,7 @@ import datetime
 import json
 import pytz
 import logging
+from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -37,6 +38,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
+from arches.app.search.mappings import TERMS_INDEX
 from arches.app.datatypes.datatypes import DataTypeFactory
 
 logger = logging.getLogger(__name__)
@@ -87,6 +89,7 @@ class Tile(models.TileModel):
         # self.sortorder
         # end from models.TileModel
         self.tiles = []
+        self.datatype_factory = DataTypeFactory()
 
         if args:
             if isinstance(args[0], dict):
@@ -225,8 +228,7 @@ class Tile(models.TileModel):
                         match = False
                         duplicate_values = []
                         for node in nodes:
-                            datatype_factory = DataTypeFactory()
-                            datatype = datatype_factory.get_instance(node.datatype)
+                            datatype = self.datatype_factory.get_instance(node.datatype)
                             nodeid = str(node.nodeid)
                             if datatype.values_match(tile.data[nodeid], self.data[nodeid]):
                                 match = True
@@ -245,9 +247,8 @@ class Tile(models.TileModel):
         missing_nodes = []
         for nodeid, value in self.data.items():
             try:
-                datatype_factory = DataTypeFactory()
                 node = models.Node.objects.get(nodeid=nodeid)
-                datatype = datatype_factory.get_instance(node.datatype)
+                datatype = self.datatype_factory.get_instance(node.datatype)
                 datatype.clean(self, nodeid)
                 if request is not None:
                     if self.data[nodeid] is None and node.isrequired is True:
@@ -268,9 +269,8 @@ class Tile(models.TileModel):
 
     def validate(self, errors=None):
         for nodeid, value in self.data.items():
-            datatype_factory = DataTypeFactory()
             node = models.Node.objects.get(nodeid=nodeid)
-            datatype = datatype_factory.get_instance(node.datatype)
+            datatype = self.datatype_factory.get_instance(node.datatype)
             error = datatype.validate(value, node=node)
             for error_instance in error:
                 if error_instance["type"] == "ERROR":
@@ -299,9 +299,8 @@ class Tile(models.TileModel):
                 models.UserProfile.objects.create(user=request.user)
         tile_data = self.get_tile_data(userid)
         for nodeid, value in list(tile_data.items()):
-            datatype_factory = DataTypeFactory()
             node = models.Node.objects.get(nodeid=nodeid)
-            datatype = datatype_factory.get_instance(node.datatype)
+            datatype = self.datatype_factory.get_instance(node.datatype)
             if request is not None:
                 datatype.handle_request(self, request, node)
 
@@ -329,11 +328,9 @@ class Tile(models.TileModel):
         #     self.validate([])
 
         with transaction.atomic():
-
-            datatype_factory = DataTypeFactory()
             for nodeid, value in self.data.items():
                 node = models.Node.objects.get(nodeid=nodeid)
-                datatype = datatype_factory.get_instance(node.datatype)
+                datatype = self.datatype_factory.get_instance(node.datatype)
                 datatype.pre_tile_save(self, nodeid)
             self.__preSave(request)
             self.check_for_missing_nodes(request)
@@ -425,18 +422,25 @@ class Tile(models.TileModel):
             bool_query = Bool()
             bool_query.filter(Terms(field="tileid", terms=[self.tileid]))
             query.add_query(bool_query)
-            results = query.search(index="terms")["hits"]["hits"]
+            results = query.search(index=TERMS_INDEX)["hits"]["hits"]
 
             for result in results:
-                se.delete(index="terms", id=result["_id"])
+                se.delete(index=TERMS_INDEX, id=result["_id"])
 
             self.__preDelete(request)
             self.save_edit(
                 user=request.user, edit_type="tile delete", old_value=self.data, provisional_edit_log_details=provisional_edit_log_details
             )
-            super(Tile, self).delete(*args, **kwargs)
-            resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
-            resource.index()
+            try:
+                super(Tile, self).delete(*args, **kwargs)
+                for nodeid, value in self.data.items():
+                    node = models.Node.objects.get(nodeid=nodeid)
+                    datatype = self.datatype_factory.get_instance(node.datatype)
+                    datatype.post_tile_delete(self, nodeid)
+                resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
+                resource.index()
+            except IntegrityError:
+                logger.error
 
         else:
             self.apply_provisional_edit(user, data={}, action="delete")
@@ -464,9 +468,8 @@ class Tile(models.TileModel):
 
     def after_update_all(self):
         nodegroup = models.NodeGroup.objects.get(pk=self.nodegroup_id)
-        datatype_factory = DataTypeFactory()
         for node in nodegroup.node_set.all():
-            datatype = datatype_factory.get_instance(node.datatype)
+            datatype = self.datatype_factory.get_instance(node.datatype)
             datatype.after_update_all()
         for tile in self.tiles:
             tile.after_update_all()

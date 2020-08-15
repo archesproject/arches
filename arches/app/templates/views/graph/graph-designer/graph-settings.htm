@@ -98,7 +98,7 @@
                         </div>
 
                         <!-- ko ifnot: graph.isresource() -->
-                        <div class="row widget-container">
+                        <div class="row widget-container data-type">
                             <div class="form-group">
                                 <div class="relative">
                                     <label class="col-xs-12 control-label widget-input-label">
@@ -107,10 +107,23 @@
                                 </div>
 
                                 <div class="col-xs-12 crm-selector">
-                                    <select class="design" data-bind="value: graphSettingsViewModel.graph.root.datatype, options: datatypes, optionsCaption: '{% trans "Choose a data type" %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                    <select class="design" data-bind="value: graphSettingsViewModel.graph.root.datatype, options: datatypes, optionsCaption: '{% trans 'Choose a data type' %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- ko if: graphSettingsViewModel.rootnode.datatypeConfigComponent -->
+                        <div class="row widget-container data-type-config">
+                            <div class="form-group">
+                                <div class="col-xs-12 crm-selector">
+                                    <div data-bind='component: {
+                                        name: graphSettingsViewModel.rootnode.datatypeConfigComponent,
+                                        params: _.extend(graphSettingsViewModel.rootnode, {isEditable: true})}' style="width: 500px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /ko -->
 
                         <div class="row widget-container graph-settings-switch">
                             <div class="form-group">

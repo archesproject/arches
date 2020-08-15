@@ -28,7 +28,8 @@
                                             label: widget.get("label")(),
                                             node: widget.node,
                                             value: tile.data[widget.node.nodeid],
-                                            state: "report"
+                                            state: "report",
+                                            hideEmptyNodes: tile.parent.hideEmptyNodes
                                         }
                                     } --><!-- /ko -->
                                     <!-- /ko -->
@@ -39,6 +40,9 @@
                     {% endblock report_widgets %}
                     <!-- ko if: $parent.inResourceEditor -->
                     <div class="rp-edit-buttons">
+                        <!-- ko if: tile.parent.selected() && tile.parent.cardinality == 'n' -->
+                        <i class="fa fa-copy" data-bind="click: function(){tile.parent.copyTile(tile)}"></i>
+                        <!-- /ko -->
                         <i class="fa fa-pencil" data-bind="click: function(){tile.selected(true)}"></i>
                         <i class="fa fa-trash" data-bind="click: function(){console.log(tile); tile.deleteTile()}"></i>
                     </div>
@@ -79,7 +83,7 @@
             <!-- ko if: $parent.inResourceEditor -->
             <div class="rp-edit-buttons" style="justify-content: flex-end;">
             <i class="fa fa-plus-circle" data-bind="click: function(){$parent.revealForm(card)}"></i>
-            
+
             </div>
             <!-- /ko -->
             </div>

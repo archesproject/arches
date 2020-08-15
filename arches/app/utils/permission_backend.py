@@ -19,6 +19,7 @@ from django.contrib.auth.models import User, Group, Permission
 from arches.app.models.models import ResourceInstance
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms, Nested
+from arches.app.search.mappings import RESOURCES_INDEX
 
 
 class PermissionBackend(ObjectPermissionBackend):
@@ -106,7 +107,7 @@ def get_restricted_instances(user, search_engine=None, allresources=False):
         nested_term_filter = Nested(path="permissions", query=terms)
         has_access.must(nested_term_filter)
         query.add_query(has_access)
-        results = query.search(index="resources", scroll="1m")
+        results = query.search(index=RESOURCES_INDEX, scroll="1m")
         scroll_id = results["_scroll_id"]
         total = results["hits"]["total"]["value"]
         if total > settings.SEARCH_RESULT_LIMIT:

@@ -49,7 +49,7 @@ define([
             if (self.graph.ontology_id() === undefined) {
                 self.graph.ontology_id(null);
             }
-
+            self.graph.root.config = koMapping.toJS(self.rootnode.config);
             return JSON.stringify({
                 graph: koMapping.toJS(self.graph),
                 relatable_resource_ids: relatableResourceIds,

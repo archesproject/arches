@@ -32,18 +32,20 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
+from arches import __version__
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource, ModelInactiveError
 from arches.app.models.system_settings import settings
-from arches.app.utils.pagination import get_paginator
+from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_delete_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.pagination import get_paginator
 from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
     user_can_delete_resource,
@@ -53,10 +55,10 @@ from arches.app.utils.permission_backend import (
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
+from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from elasticsearch import Elasticsearch
 from guardian.shortcuts import (
     assign_perm,
@@ -661,7 +663,7 @@ class ResourceDescriptors(View):
             try:
                 resource = Resource.objects.get(pk=resourceid)
                 se = SearchEngineFactory().create()
-                document = se.search(index="resources", id=resourceid)
+                document = se.search(index=RESOURCES_INDEX, id=resourceid)
                 return JSONResponse(
                     {
                         "graphid": document["_source"]["graph_id"],
@@ -810,6 +812,7 @@ class ResourceReportView(MapBaseManagerView):
             ),
             resourceid=resourceid,
             displayname=displayname,
+            version=__version__,
         )
 
         if graph.iconclass:

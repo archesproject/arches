@@ -236,15 +236,23 @@ define([
 
         this.reportFiles = ko.computed(function() {
             return self.uploadedFiles().filter(function(file) {
-                var ext = ko.unwrap(file.type).split('/').pop();
-                return ko.unwrap(file.type).indexOf('image') < 0 || self.unsupportedImageTypes.indexOf(ext) > -1;
+                var fileType = ko.unwrap(file.type);
+                if (fileType) {
+                    var ext = fileType.split('/').pop();
+                    return fileType.indexOf('image') < 0 || self.unsupportedImageTypes.indexOf(ext) > -1;
+                }
+                return true;
             });
         });
 
         this.reportImages = ko.computed(function() {
             return self.uploadedFiles().filter(function(file) {
-                var ext = ko.unwrap(file.type).split('/').pop();
-                return ko.unwrap(file.type).indexOf('image') >= 0 && self.unsupportedImageTypes.indexOf(ext) <= 0;
+                var fileType = ko.unwrap(file.type);
+                if (fileType) {
+                    var ext = fileType.split('/').pop();
+                    return fileType.indexOf('image') >= 0 && self.unsupportedImageTypes.indexOf(ext) <= 0;
+                }
+                return false;
             });
         });
     };

@@ -502,7 +502,7 @@ define([
                 this.relatedProperties.relationshiptype(undefined);
             },
 
-            getRelatedResources: function(resourceinstance) {
+            getRelatedResources: function() {
                 var resource = this.currentResource();
                 resource.get();
                 this.resourceRelationships(resource.resourceRelationships());

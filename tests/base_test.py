@@ -20,8 +20,6 @@ import os
 from django.test import TestCase
 from arches.app.models.graph import Graph
 from arches.app.models.models import Ontology
-from arches.app.search.search import SearchEngine
-from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
@@ -30,6 +28,16 @@ from tests import test_settings
 from django.db import connection
 from django.contrib.auth.models import User
 from django.core import management
+from arches.app.search.mappings import (
+    prepare_terms_index,
+    delete_terms_index,
+    prepare_concepts_index,
+    delete_concepts_index,
+    prepare_search_index,
+    delete_search_index,
+    prepare_resource_relations_index,
+    delete_resource_relations_index,
+)
 
 # these tests can be run from the command line via
 # python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
@@ -65,6 +73,11 @@ def setUpTestPackage():
     sql = sql.format(user_id=1, oauth_client_id=OAUTH_CLIENT_ID, oauth_client_secret=OAUTH_CLIENT_SECRET)
     cursor.execute(sql)
 
+    prepare_terms_index(create=True)
+    prepare_concepts_index(create=True)
+    prepare_search_index(create=True)
+    prepare_resource_relations_index(create=True)
+
 
 def tearDownTestPackage():
     """
@@ -72,11 +85,10 @@ def tearDownTestPackage():
     this is called from __init__.py
     """
 
-    se = SearchEngineFactory().create()
-    se.delete_index(index="terms")
-    se.delete_index(index="concepts")
-    se.delete_index(index="resources")
-    se.delete_index(index="resource_relations")
+    delete_terms_index()
+    delete_concepts_index()
+    delete_search_index()
+    delete_resource_relations_index()
 
 
 def setUpModule():
