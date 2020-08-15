@@ -470,6 +470,14 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(feats[0]["@id"] in rids)
         self.assertTrue(feats[1]["@id"] in rids)
 
+        # test that the default ontologyProperties and inverseOntologyProperties are used
+        tiles = TileModel.objects.filter(resourceinstance_id="abcd1234-1234-1129-b6e7-3af9d3b32b71")
+        for tile in tiles:
+            if "ae93f844-fa6d-11e9-b369-3af9d3b32b71" in tile.data:
+                self.assertEqual(tile.data["ae93f844-fa6d-11e9-b369-3af9d3b32b71"][0]["ontologyProperty"], "http://www.cidoc-crm.org/cidoc-crm/P62_depicts")
+                self.assertEqual(tile.data["ae93f844-fa6d-11e9-b369-3af9d3b32b71"][0]["inverseOntologyProperty"], "http://www.cidoc-crm.org/cidoc-crm/P62i_is_depicted_by")
+
+
     def test_5_5098_resinst_branch(self):
         # 2019-11-01 - Conversely this fails, as it is in a branch
 
