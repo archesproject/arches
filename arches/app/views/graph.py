@@ -116,6 +116,9 @@ class GraphSettingsView(GraphBaseView):
         node.name = graph.name
         graph.root.name = node.name
 
+        if graph.isresource is False and "root" in data["graph"]:
+            node.config = data["graph"]["root"]["config"]
+
         try:
             with transaction.atomic():
                 graph.save()
@@ -137,7 +140,7 @@ class GraphManagerView(GraphBaseView):
             context = self.get_context_data(main_script="views/graph", root_nodes=JSONSerializer().serialize(root_nodes))
             context["graph_models"] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             context["graphs"] = JSONSerializer().serialize(context["graph_models"], exclude=["functions"])
-            context["nav"]["title"] = "Arches Designer"
+            context["nav"]["title"] = _("Arches Designer")
             context["nav"]["icon"] = "fa-bookmark"
 
             context["nav"]["help"] = {"title": _("Using the Arches Designer"), "template": "arches-designer-help"}

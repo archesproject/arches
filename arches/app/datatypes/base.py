@@ -86,7 +86,7 @@ class BaseDataType(object):
         source_config = {"type": "vector", "tiles": [tileserver_url]}
         count = None
         if preview == True:
-            count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
+            count = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).count()
             if count == 0:
                 source_config = {
                     "type": "geojson",
@@ -203,6 +203,13 @@ class BaseDataType(object):
     def pre_tile_save(self, tile, nodeid):
         """
         Called during tile.save operation but before the tile is actually saved to the database
+
+        """
+        pass
+
+    def post_tile_delete(self, tile, nodeid):
+        """
+        Called following the tile.delete operation
 
         """
         pass

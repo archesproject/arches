@@ -34,23 +34,23 @@
                 <div class="rr-table-row-panel" data-bind="if: self.selectedResourceType() === $data, visible: self.selectedResourceType() === $data, css: { 'rr-table-border': self.selectedResourceType() === $data} ">
                     <div class="row">
                         <div class="row" style="margin-bottom: 10px;">
-                            <label class="col-xs-12" style="font-weight: bold;">{% trans "Default relationship to" %} 
+                            <label class="col-xs-12" style="font-weight: bold;">{% trans "Default relationship to" %}
                                 <span data-bind="text: $data.name"></span>
                             </label>
-                        
+
                             <div class="row" style="padding: 0px 12px; margin-bottom: 10px;">
                                 <span class="col-xs-12" style="font-weight: bold;"
-                                    data-bind="text: self.graphName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'">    
+                                    data-bind="text: self.graphName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'">
                                 </span>
-                                
+
                                 <span class="col-xs-12">
                                     <input style="width:100%; display:inline-block; margin: 3px 0px;" data-bind="
                                         select2Query: {
-                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass)
+                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass, '{% trans 'Select an Ontology Property' %}', true)
                                         }
                                     ">
                                 </span>
-                                
+
                                 <span class="col-xs-12" data-bind="text: $data.name + ' (' + self.makeFriendly($data.ontologyClass) + ')'">
                                 </span>
                             </div>
@@ -58,23 +58,23 @@
 
 
                         <div class="row">
-                            <label class="col-xs-12" style="font-weight: bold;">{% trans "Default inverse relationship to" %} 
+                            <label class="col-xs-12" style="font-weight: bold;">{% trans "Default inverse relationship to" %}
                                 <span data-bind="text: $data.name"></span>
                             </label>
-                        
+
                             <div class="row" style="padding: 0px 12px; margin-bottom: 10px;">
                                 <span class="col-xs-12" style=""
-                                    data-bind="text: $data.name + ' (' + self.makeFriendly($data.ontologyClass) + ')'">    
+                                    data-bind="text: $data.name + ' (' + self.makeFriendly($data.ontologyClass) + ')'">
                                 </span>
-                                
+
                                 <span class="col-xs-12">
                                     <input style="width:100%; display:inline-block; margin: 3px 0px;" data-bind="
                                         select2Query: {
-                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass, self.rootOntologyClass)
+                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass, self.rootOntologyClass, '{% trans 'Select an Ontology Property' %}', true)
                                         }
                                     ">
                                 </span>
-                                
+
                                 <span class="col-xs-12" data-bind="text: self.graphName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
                             </div>
                         </div>
@@ -96,7 +96,7 @@
 </div>
 <div class="col-md-8 col-lg-9 resource-instance-search">
     <!-- ko component: {
-        name:  datatype.datatype.includes('list') ? 'resource-instance-multiselect-widget' : 'resource-instance-select-widget', 
+        name:  datatype.datatype.includes('list') ? 'resource-instance-multiselect-widget' : 'resource-instance-select-widget',
         params: {
             config: {
                 placeholder: '{% trans "Select a resource" %}'

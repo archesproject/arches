@@ -426,13 +426,14 @@ CACHE_BY_USER = {"anonymous": 3600 * 24}
 DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d"  # Custom date format for dates imported from and exported to csv
 
 DATE_FORMATS = {
-    "Python": ["-%Y", "%Y", "%Y-%m", "%Y-%m-%d", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S.%f%z"],
-    "JavaScript": ["-YYYY", "YYYY", "YYYY-MM", "YYYY-MM-DD", "YYYY-MM-DDTHH:mm:ssZ", "YYYY-MM-DDTHH:mm:ss.sssZ"],
+    "Python": ["-%Y", "%Y", "%Y-%m", "%Y-%m-%d", "%Y-%m-%d %H:%M:%S%z", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S.%f%z"],
+    "JavaScript": ["-YYYY", "YYYY", "YYYY-MM", "YYYY-MM-DD", "YYYY-MM-DD HH:mm:ssZ", "YYYY-MM-DDTHH:mm:ssZ", "YYYY-MM-DDTHH:mm:ss.sssZ"],
     "Elasticsearch": [
         "-yyyy",
         "yyyy",
         "yyyy-MM",
         "yyyy-MM-dd",
+        "yyyy-MM-dd HH:mm:ssZZZZZ",
         "yyyy-MM-dd'T'HH:mm:ssZ",
         "yyyy-MM-dd'T'HH:mm:ssZZZZZ",
         "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
@@ -592,8 +593,46 @@ RENDERERS = [
         "ext": "pdf",
         "type": "application/pdf",
         "exclude": "tif,tiff,psd",
-    }
+    },
 ]
+
+# --- JSON LD sortorder generating functions --- #
+#
+# The functions in the array below will be called in the order given with the json-ld of the node
+#   that should have sortorder set on the resulting tile.  The config below sorts (meaninglessly)
+#   by URI, however more complex, use case specific functions can be implemented based on local
+#   ontology choice and requirements. Examples might be to sort by some value, language (as shown),
+#   type, classification or any other feature.
+# Set JSON_LD_SORT to True to enable the sorting
+#
+# Example: This would sort fields by P72_has_language, and apply an order based on the referenced
+#          entity in the lookup hash
+#
+# JSON_LD_SORT_LANGUAGE = {None: 10000, 'urn:uuid:38729dbe-6d1c-48ce-bf47-e2a18945600e': 0,
+#    "urn:uuid:a1d82c77-ebd6-4215-ab85-2c0b6a68a0e8": 1,
+#    'urn:uuid:7e6c493b-6434-4b3a-9513-02df44b78d24': 2}
+# JSON_LD_SORT_LANGUAGE_PROP = 'http://www.cidoc-crm.org/cidoc-crm/P72_has_language'
+#
+# def langsort(x):
+#    langs = x._json_ld.get(JSON_LD_SORT_LANGUAGE_PROP,[{'@id': None}])
+#    if not langs or not '@id' in langs[0]:
+#        langs = [{'@id':None}]
+#    scores = [JSON_LD_SORT_LANGUAGE.get(x['@id'], 10000) for x in langs]
+#    return min(scores)
+
+JSON_LD_SORT = False
+JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
+
+# --- JSON LD run-time data manipulation --- #
+#
+# This function will be applied to the data to be loaded, immediately before it is sent to the
+#   Reader to be processed. This can correct any errors in the data, or potentially do some
+#   significant series of transformations to get the data into the right form for Arches
+
+
+def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
+    return jsdata
+
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###

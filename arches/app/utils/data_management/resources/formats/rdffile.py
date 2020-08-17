@@ -223,12 +223,12 @@ class RdfWriter(Writer):
 
 
 class JsonLdWriter(RdfWriter):
-    def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
+    def build_json(self, graph_id=None, resourceinstanceids=None, **kwargs):
+        # Build the JSON separately serializing it, so we can use internally
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
         g = self.get_rdf_graph()
         value = g.serialize(format="nquads").decode("utf-8")
 
-        # print(f"Got graph: {value}")
         js = from_rdf(value, {"format": "application/nquads", "useNativeTypes": True})
 
         assert len(resourceinstanceids) == 1  # currently, this should be limited to a single top resource
@@ -260,10 +260,12 @@ class JsonLdWriter(RdfWriter):
             for (k, v) in list(js["@graph"][0].items()):
                 js[k] = v
             del js["@graph"]
+        return js
 
+    def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
+        js = self.build_json(graph_id, resourceinstanceids, **kwargs)
         out = json.dumps(js, indent=kwargs.get("indent", None), sort_keys=True)
         dest = StringIO(out)
-
         full_file_name = os.path.join("{0}.{1}".format(self.file_name, "jsonld"))
         return [{"name": full_file_name, "outputfile": dest}]
 
@@ -275,24 +277,13 @@ class JsonLdReader(Reader):
         self.resources = []
         self.resource = None
         self.use_ids = False
-        self.resource_model_root_classes = set()
-        self.non_unique_classes = set()
         self.root_ontologyclass_lookup = {}
         self.graphtree = None
         self.logger = logging.getLogger(__name__)
         for graph in models.GraphModel.objects.filter(isresource=True):
             node = models.Node.objects.get(graph_id=graph.pk, istopnode=True)
             self.root_ontologyclass_lookup[str(graph.pk)] = node.ontologyclass
-            if node.ontologyclass in self.resource_model_root_classes:
-                # make a note of non-unique root classes
-                self.non_unique_classes.add(node.ontologyclass)
-            else:
-                self.resource_model_root_classes.add(node.ontologyclass)
-        self.resource_model_root_classes = self.resource_model_root_classes - self.non_unique_classes
-        self.ontologyproperties = models.Edge.objects.values_list("ontologyproperty", flat=True).distinct()
         self.logger.info("Initialized JsonLdReader")
-        self.logger.debug("Found {0} Non-unique root classes".format(len(self.non_unique_classes)))
-        self.logger.debug("Found {0} Resource Model Root classes".format(len(self.resource_model_root_classes)))
 
     def validate_concept_in_collection(self, value, collection):
         cdata = Concept().get_child_collections(collection, columns="conceptidto")
@@ -323,6 +314,10 @@ class JsonLdReader(Reader):
             node["config"] = {}
             if n.config and "rdmCollection" in n.config:
                 node["config"]["collection_id"] = str(n.config["rdmCollection"])
+            elif n.config and "graphs" in n.config:
+                for entry in n.config["graphs"]:
+                    entry["rootclass"] = self.root_ontologyclass_lookup[entry["graphid"]]
+                node["config"]["graphs"] = n.config["graphs"]
             node["required"] = n.isrequired
             node["node_id"] = str(n.nodeid)
             node["name"] = n.name
@@ -384,6 +379,12 @@ class JsonLdReader(Reader):
         if len(data) > 1:
             self.use_ids = True
 
+        # Maybe calculate sort order for this node's tiles
+        try:
+            self.shouldSortTiles = settings.JSON_LD_SORT
+        except:
+            self.shouldSortTiles = False
+
         for jsonld_document in data:
             jsonld_document = expand(jsonld_document)[0]
 
@@ -426,6 +427,7 @@ class JsonLdReader(Reader):
         return False
 
     def data_walk(self, data_node, tree_node, result, tile=None):
+        my_tiles = []
         for k, v in data_node.items():
             if k in ["@id", "@type"]:
                 continue
@@ -468,9 +470,9 @@ class JsonLdReader(Reader):
                     # model has xsd:string, default is rdfs:Literal
                     key = f"{k} http://www.w3.org/2001/XMLSchema#string"
                     if not key in tree_node["children"]:
-                        raise ValueError(f"property/class combination does not exist in model: {k} {clss}")
+                        raise ValueError(f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}")
                 elif not key in tree_node["children"]:
-                    raise ValueError(f"property/class combination does not exist in model: {k} {clss}")
+                    raise ValueError(f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}")
 
                 options = tree_node["children"][key]
                 possible = []
@@ -535,17 +537,46 @@ class JsonLdReader(Reader):
                 if not self.is_semantic_node(branch[0]):
                     graph_node = branch[0]
                     node_value = graph_node["datatype"].from_rdf(vi)
+                    # node_value might be None if the validation of the datatype fails
+                    # XXX Should we check this here, or raise in the datatype?
+
+                    # For resource-instances, the datatype doesn't know the ontology prop config
+                    if graph_node["datatype"].references_resource_type():
+                        if "graphs" in branch[0]["config"]:
+                            gs = branch[0]["config"]["graphs"]
+                            if len(gs) == 1:
+                                # just select it
+                                if "ontologyProperty" in gs[0]:
+                                    node_value[0]["ontologyProperty"] = gs[0]["ontologyProperty"]
+                                if "inverseOntologyProperty" in gs[0]:
+                                    node_value[0]["inverseOntologyProperty"] = gs[0]["inverseOntologyProperty"]
+                            else:
+                                for g in gs:
+                                    # Now test current node's class against graph's class
+                                    # This isn't a guarantee, but close enough
+                                    if vi["@type"][0] == g["rootclass"]:
+                                        if "ontologyProperty" in g:
+                                            node_value[0]["ontologyProperty"] = g["ontologyProperty"]
+                                        if "inverseOntologyProperty" in g:
+                                            node_value[0]["inverseOntologyProperty"] = g["inverseOntologyProperty"]
+                                        break
+                else:
+                    # Might get checked in a cardinality n branch that shouldn't be repeated
+                    node_value = None
 
                 # We know now that it can go into the branch
                 # Determine if we can collapse the data into a -list or not
                 bnodeid = branch[0]["node_id"]
-                create_new_tile = False
 
-                if branch[0]["node_id"] == branch[0]["nodegroup_id"]:
-                    create_new_tile = True
+                # This is going to be the result passed down if we recurse
                 bnode = {"data": [], "nodegroup_id": branch[0]["nodegroup_id"], "cardinality": branch[0]["cardinality"]}
-                if create_new_tile:
-                    parenttile_id = tile.tileid if tile else None
+
+                if branch[0]["datatype"].collects_multiple_values() and tile and str(tile.nodegroup.pk) == branch[0]["nodegroup_id"]:
+                    # iterating through a root node *-list type
+                    pass
+                elif bnodeid == branch[0]["nodegroup_id"]:
+                    # Used to pick the previous tile in loop which MIGHT be the parent (but might not)
+                    parenttile_id = result["tile"].tileid if "tile" in result else None
                     tile = Tile(
                         tileid=uuid.uuid4(),
                         resourceinstance_id=self.resource.pk,
@@ -554,11 +585,14 @@ class JsonLdReader(Reader):
                         data={},
                     )
                     self.resource.tiles.append(tile)
+                    my_tiles.append(tile)
                 elif "tile" in result and result["tile"]:
                     tile = result["tile"]
 
-                bnode["tile"] = tile
+                if not hasattr(tile, "_json_ld"):
+                    tile._json_ld = vi
 
+                bnode["tile"] = tile
                 if bnodeid in result:
                     if branch[0]["datatype"].collects_multiple_values():
                         # append to previous tile
@@ -597,6 +631,22 @@ class JsonLdReader(Reader):
                 if not is_literal:
                     # Walk down non-literal branches in the data
                     self.data_walk(vi, branch[0], bnode, tile)
+
+        if self.shouldSortTiles:
+            sortfuncs = settings.JSON_LD_SORT_FUNCTIONS
+            if my_tiles:
+                tile_ng_hash = {}
+                for t in my_tiles:
+                    try:
+                        tile_ng_hash[t.nodegroup_id].append(t)
+                    except KeyError:
+                        tile_ng_hash[t.nodegroup_id] = [t]
+                for (k, v) in tile_ng_hash.items():
+                    if len(v) > 1:
+                        for func in sortfuncs:
+                            v.sort(key=func)
+                        for t, i in zip(v, range(len(v))):
+                            t.sortorder = i
 
         # Finally, after processing all of the branches for this node, check required nodes are present
         for path in tree_node["children"].values():

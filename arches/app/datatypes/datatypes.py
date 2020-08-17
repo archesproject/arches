@@ -22,7 +22,7 @@ from arches.app.utils.geo_utils import GeoUtils
 import arches.app.utils.task_management as task_management
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Terms, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
-from arches.app.search.mappings import RESOURCES_INDEX
+from arches.app.search.mappings import RESOURCES_INDEX, RESOURCE_RELATIONS_INDEX
 from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.utils.translation import ugettext as _
@@ -53,22 +53,31 @@ PIXELSPERTILE = 256
 
 logger = logging.getLogger(__name__)
 
-
 class DataTypeFactory(object):
+    _datatypes = None
+    _datatype_instances = {}
+
     def __init__(self):
-        self.datatypes = {datatype.datatype: datatype for datatype in models.DDataType.objects.all()}
-        self.datatype_instances = {}
+        if DataTypeFactory._datatypes is None:
+            DataTypeFactory._datatypes = {datatype.datatype: datatype for datatype in models.DDataType.objects.all()}
+        self.datatypes = DataTypeFactory._datatypes
+        self.datatype_instances = DataTypeFactory._datatype_instances
 
     def get_instance(self, datatype):
-        d_datatype = self.datatypes[datatype]
         try:
-            datatype_instance = self.datatype_instances[d_datatype.classname]
-        except:
+            d_datatype = DataTypeFactory._datatypes[datatype]
+        except KeyError:
+            DataTypeFactory._datatypes = {datatype.datatype: datatype for datatype in models.DDataType.objects.all()}
+            d_datatype = DataTypeFactory._datatypes[datatype]
+            self.datatypes = DataTypeFactory._datatypes
+        try:
+            datatype_instance = DataTypeFactory._datatype_instances[d_datatype.classname]
+        except KeyError:
             class_method = get_class_from_modulename(d_datatype.modulename, d_datatype.classname, settings.DATATYPE_LOCATIONS)
             datatype_instance = class_method(d_datatype)
-            self.datatype_instances[d_datatype.classname] = datatype_instance
+            DataTypeFactory._datatype_instances[d_datatype.classname] = datatype_instance
+            self.datatype_instances = DataTypeFactory._datatype_instances
         return datatype_instance
-
 
 class StringDataType(BaseDataType):
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
@@ -215,7 +224,7 @@ class NumberDataType(BaseDataType):
             pass
 
     def default_es_mapping(self):
-        return {"type": "long"}
+        return {"type": "double"}
 
 
 class BooleanDataType(BaseDataType):
@@ -613,7 +622,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             return None
         elif node.config is None:
             return None
-        count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
+        count = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).count()
         if not preview and (count < 1 or not node.config["layerActivated"]):
             return None
 
@@ -1712,7 +1721,21 @@ class ResourceInstanceDataType(BaseDataType):
                     "tileid_id": tile.pk,
                     "nodeid_id": nodeid,
                 }
-
+                if related_resource["ontologyProperty"] == "" or related_resource["inverseOntologyProperty"] == "":
+                    if models.ResourceInstance.objects.filter(pk=related_resource["resourceId"]).exists():
+                        target_graphid = str(models.ResourceInstance.objects.get(pk=related_resource["resourceId"]).graph_id)
+                        for graph in models.Node.objects.get(pk=nodeid).config["graphs"]:
+                            if graph["graphid"] == target_graphid:
+                                if related_resource["ontologyProperty"] == "":
+                                    try:
+                                        defaults["relationshiptype"] = graph["ontologyProperty"]
+                                    except:
+                                        pass
+                                if related_resource["inverseOntologyProperty"] == "":
+                                    try:
+                                        defaults["inverserelationshiptype"] = graph["inverseOntologyProperty"]
+                                    except:
+                                        pass
                 try:
                     rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
                     for key, value in defaults.items():
@@ -1733,6 +1756,11 @@ class ResourceInstanceDataType(BaseDataType):
             to_delete = resourceXresourceInDb - resourceXresourceSaved
             for rr in models.ResourceXResource.objects.filter(pk__in=to_delete):
                 rr.delete()
+
+    def post_tile_delete(self, tile, nodeid):
+        if tile.data and tile.data[nodeid]:
+            for related in tile.data[nodeid]:
+                se.delete(index=RESOURCE_RELATIONS_INDEX, id=related["resourceXresourceId"])
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)

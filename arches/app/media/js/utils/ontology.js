@@ -1,7 +1,7 @@
 define(['arches'], function(arches) {
     var ontologyUtils = {
         /**
-         * makeFriendly - makes a shortened name from an fully qalified name 
+         * makeFriendly - makes a shortened name from an fully qalified name
          * (eg: "http://www.cidoc-crm.org/cidoc-crm/E74_Group")
          *
          * @param  {ontolgoyName} the request method name
@@ -15,13 +15,13 @@ define(['arches'], function(arches) {
             return '';
         },
 
-        getSelect2ConfigForOntologyProperties: function(value, domain, range) {
+        getSelect2ConfigForOntologyProperties: function(value, domain, range, placeholder, allowClear) {
             return {
                 value: value,
                 clickBubble: false,
-                placeholder: 'Select an Ontology Property',
+                placeholder: placeholder,
                 closeOnSelect: true,
-                allowClear: false,
+                allowClear: allowClear || false,
                 ajax: {
                     url: function() {
                         return arches.urls.ontology_properties;
