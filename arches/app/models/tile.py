@@ -89,6 +89,7 @@ class Tile(models.TileModel):
         # self.sortorder
         # end from models.TileModel
         self.tiles = []
+        self.datatype_factory = DataTypeFactory()
 
         if args:
             if isinstance(args[0], dict):
@@ -227,8 +228,7 @@ class Tile(models.TileModel):
                         match = False
                         duplicate_values = []
                         for node in nodes:
-                            datatype_factory = DataTypeFactory()
-                            datatype = datatype_factory.get_instance(node.datatype)
+                            datatype = self.datatype_factory.get_instance(node.datatype)
                             nodeid = str(node.nodeid)
                             if datatype.values_match(tile.data[nodeid], self.data[nodeid]):
                                 match = True
@@ -247,9 +247,8 @@ class Tile(models.TileModel):
         missing_nodes = []
         for nodeid, value in self.data.items():
             try:
-                datatype_factory = DataTypeFactory()
                 node = models.Node.objects.get(nodeid=nodeid)
-                datatype = datatype_factory.get_instance(node.datatype)
+                datatype = self.datatype_factory.get_instance(node.datatype)
                 datatype.clean(self, nodeid)
                 if request is not None:
                     if self.data[nodeid] is None and node.isrequired is True:
@@ -270,9 +269,8 @@ class Tile(models.TileModel):
 
     def validate(self, errors=None):
         for nodeid, value in self.data.items():
-            datatype_factory = DataTypeFactory()
             node = models.Node.objects.get(nodeid=nodeid)
-            datatype = datatype_factory.get_instance(node.datatype)
+            datatype = self.datatype_factory.get_instance(node.datatype)
             error = datatype.validate(value, node=node)
             for error_instance in error:
                 if error_instance["type"] == "ERROR":
@@ -301,9 +299,8 @@ class Tile(models.TileModel):
                 models.UserProfile.objects.create(user=request.user)
         tile_data = self.get_tile_data(userid)
         for nodeid, value in list(tile_data.items()):
-            datatype_factory = DataTypeFactory()
             node = models.Node.objects.get(nodeid=nodeid)
-            datatype = datatype_factory.get_instance(node.datatype)
+            datatype = self.datatype_factory.get_instance(node.datatype)
             if request is not None:
                 datatype.handle_request(self, request, node)
 
@@ -331,11 +328,9 @@ class Tile(models.TileModel):
         #     self.validate([])
 
         with transaction.atomic():
-
-            datatype_factory = DataTypeFactory()
             for nodeid, value in self.data.items():
                 node = models.Node.objects.get(nodeid=nodeid)
-                datatype = datatype_factory.get_instance(node.datatype)
+                datatype = self.datatype_factory.get_instance(node.datatype)
                 datatype.pre_tile_save(self, nodeid)
             self.__preSave(request)
             self.check_for_missing_nodes(request)
@@ -438,10 +433,9 @@ class Tile(models.TileModel):
             )
             try:
                 super(Tile, self).delete(*args, **kwargs)
-                datatype_factory = DataTypeFactory()
                 for nodeid, value in self.data.items():
                     node = models.Node.objects.get(nodeid=nodeid)
-                    datatype = datatype_factory.get_instance(node.datatype)
+                    datatype = self.datatype_factory.get_instance(node.datatype)
                     datatype.post_tile_delete(self, nodeid)
                 resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
                 resource.index()
@@ -474,9 +468,8 @@ class Tile(models.TileModel):
 
     def after_update_all(self):
         nodegroup = models.NodeGroup.objects.get(pk=self.nodegroup_id)
-        datatype_factory = DataTypeFactory()
         for node in nodegroup.node_set.all():
-            datatype = datatype_factory.get_instance(node.datatype)
+            datatype = self.datatype_factory.get_instance(node.datatype)
             datatype.after_update_all()
         for tile in self.tiles:
             tile.after_update_all()

@@ -19,7 +19,7 @@ define(['knockout', 'knockout-mapping', 'underscore', 'moment', 'bindings/let', 
             });
         });
         
-        this.hideEmptyNodes = ko.observable(false);
+        this.hideEmptyNodes = ko.observable(true);
 
         this.configJSON = ko.computed(function(){
             self.configKeys.forEach(function(config) {
