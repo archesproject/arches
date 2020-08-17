@@ -305,7 +305,8 @@ define([
                     perms: ko.observableArray(),
                     permsLiteral: ko.observableArray(),
                     parentCard: parent,
-                    constraints: getBlankConstraint(data.card)
+                    constraints: getBlankConstraint(data.card),
+                    topCards: self.topCards,
                 });
                 parentcards.push(newCardViewModel);
 
