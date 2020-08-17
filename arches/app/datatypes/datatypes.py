@@ -1712,30 +1712,33 @@ class ResourceInstanceDataType(BaseDataType):
                     if ("resourceXresourceId" not in related_resource or related_resource["resourceXresourceId"] == "")
                     else related_resource["resourceXresourceId"]
                 )
+                related_resourceid = related_resource["resourceId"]
                 defaults = {
                     "resourceinstanceidfrom_id": tile.resourceinstance_id,
-                    "resourceinstanceidto_id": related_resource["resourceId"],
+                    "resourceinstanceidto_id": related_resourceid,
                     "notes": "",
-                    "relationshiptype": related_resource["ontologyProperty"],
-                    "inverserelationshiptype": related_resource["inverseOntologyProperty"],
                     "tileid_id": tile.pk,
                     "nodeid_id": nodeid,
                 }
-                if related_resource["ontologyProperty"] == "" or related_resource["inverseOntologyProperty"] == "":
-                    if models.ResourceInstance.objects.filter(pk=related_resource["resourceId"]).exists():
-                        target_graphid = str(models.ResourceInstance.objects.get(pk=related_resource["resourceId"]).graph_id)
+                if "ontologyProperty" not in related_resource or "inverseOntologyProperty" not in related_resource:
+                    if models.ResourceInstance.objects.filter(pk=related_resourceid).exists():
+                        target_graphid = str(models.ResourceInstance.objects.get(pk=related_resourceid).graph_id)
                         for graph in models.Node.objects.get(pk=nodeid).config["graphs"]:
                             if graph["graphid"] == target_graphid:
-                                if related_resource["ontologyProperty"] == "":
+                                if "ontologyProperty" not in related_resource:
                                     try:
                                         defaults["relationshiptype"] = graph["ontologyProperty"]
-                                    except:
+                                    except KeyError:
                                         pass
-                                if related_resource["inverseOntologyProperty"] == "":
+                                if "inverseOntologyProperty" not in related_resource:
                                     try:
                                         defaults["inverserelationshiptype"] = graph["inverseOntologyProperty"]
-                                    except:
+                                    except KeyError:
                                         pass
+                else:
+                    defaults["relationshiptype"] = related_resource["ontologyProperty"]
+                    defaults["inverserelationshiptype"] = related_resource["inverseOntologyProperty"]
+
                 try:
                     rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
                     for key, value in defaults.items():
