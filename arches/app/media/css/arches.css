@@ -1193,15 +1193,6 @@ ul.tabbed-report-tab-list {
     stroke: #eee ! important;
 }
 
-.gallery-controls {
-    margin: 35px 110px 35px 35px;
-}
-
-.gallery-controls.new-tile.sidebar {
-    margin: 25px;
-}
-
-
 /* photo gallery */
 
 .gallery-container .tab-container .tab-content {
@@ -1235,13 +1226,12 @@ ul.tabbed-report-tab-list {
 .thumbnail-container {
     display: flex;
     justify-content: space-between;
-    width: calc(100% - 438px);
+    width: inherit;
 }
 
 .workbench-card-container-sidepanel-active .thumbnail-container {
     display: flex;
     justify-content: space-between;
-    width: calc(100% - 475px);
 }
 
 .show-thumbnails-btn {
@@ -1272,9 +1262,6 @@ ul.tabbed-report-tab-list {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    position: fixed;
-    bottom: 0px;
-    width: 100%;
 }
 
 .workflow-step-body .thumbnail-gallery-container {
@@ -1506,14 +1493,6 @@ div.final-cons-step-separator>h4 {
     border: 1.5px solid #FFF;
 }
 
-.gallery .preview img {
-    border: solid 1px #333;
-    width: 100%;
-    height: auto;
-    margin: 0 auto !important;
-    display: block !important;
-}
-
 .gallery-thumbnails .dz-cancel {
     color: black;
     background-color: #ccc;
@@ -1534,7 +1513,6 @@ div.final-cons-step-separator>h4 {
 
 .gallery-controls {
     display: flex;
-    position: absolute;
     right: 0px;
     top: 0px;
     height: 100%;
@@ -1613,15 +1591,6 @@ div.final-cons-step-separator>h4 {
     background-color: #ffffff;
     width: 100%;
 }
-
-.workbench-card-sidepanel .file-chart-upload-panel {
-    margin-right: -120px;
-}
-
-.graph-designer .file-chart-upload-panel {
-    margin-top: -435px;
-}
-
 
 /* end photo gallery */
 
@@ -1729,6 +1698,7 @@ div.final-cons-step-separator>h4 {
     flex: 1;
     height: 100%;
     position: relative;
+    overflow: hidden;
     background-color: #fafafa;
     border-top: 1px solid #ddd;
 }
@@ -7451,13 +7421,11 @@ span.file-upload-clear-filter {
 }
 
 .file-chart-upload-panel {
-    position: relative;
-    margin-right: -40px;
-    margin-left: 100px;
-    margin-top: -35px;
+    height: inherit;
 }
 
 .file-select-window {
+    min-width: 350px;
     border: 1px solid #c4c4c4;
     border-radius: 2px;
 }
@@ -9344,6 +9312,11 @@ a.clear-geojson-button:hover {
 
 .dz-img {
     object-fit: contain;
+}
+
+.dz-img-main {
+    width: 100%;
+    height: 100%;
 }
 
 .geocoder-results {
@@ -12646,6 +12619,7 @@ a.jstree-anchor.permissions-widget {
 
 .workbench-card-wrapper .workbench-card-container-wrapper {
     height: 100%;
+    width: calc(100% - 75px);
 }
 
 .workbench-card-container.gallery-visible {
