@@ -9314,6 +9314,11 @@ a.clear-geojson-button:hover {
     object-fit: contain;
 }
 
+.dz-img-main {
+    width: 100%;
+    height: 100%;
+}
+
 .geocoder-results {
     max-height: 410px;
     width: 250px;

@@ -26,44 +26,39 @@
 <!-- ko if: card.widgets().length > 0 -->
 <div style="height: inherit; overflow: auto;">
 
-    <div style="min-height: inherit; height: fit-content;">
-        <div style="height: inherit;">
-            <div id="hidden-dz-previews" style="display:none"></div>
-            <!--ko if: displayContent() -->
-            <div style="height: inherit">
-                <img class="dz-img" style="width: 100%; height: 100%" data-bind="attr: {src: ko.unwrap(displayContent)}" ></img>
-            </div>
-            <!--/ko-->
-        </div>
-    </div>
-    <div style="position: sticky; bottom: 0px;" data-bind="style: {display: !!self.displayContent() ? 'inherit' : 'none'}">
-    <div class="thumbnail-gallery-container" data-bind="slide: showThumbnails, duration: 100, direction: {direction: 'down'}, easing: 'slide'">
-        <div class='show-thumbnails-btn open' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: '{% trans "close" %}'"></div>
-        <div class="thumbnail-container" data-bind="gallery: photoGallery.pan, duration: 400, scrolldistance: 100, thumbnailclass: 'gallery-thumbnails'">
-            <div class="thumbnail-gallery-controls left" data-bind="click: function(){photoGallery.updatePan('left')}"><i class="fa fa-angle-left"></i></div>
-            <div class="gallery-thumbnails">
-                <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
-                <div style='position: relative'>
-                    <!--ko if: $parent.getUrl(tile) -->
-                    <div data-bind="click: $parent.removeTile, visible: ko.unwrap(selected)">
-                        <button class="btn btn-xs dz-cancel"><i class="ion ion-close"></i></button>
-                    </div>
-                    <img class="dz-img" data-bind="attr: {src: $parent.getUrl(tile).url !== undefined ? $parent.getUrl(tile).url : '' }, click: $parent.photoGallery.selectItem">
-                    <!--/ko-->
-                    <!--ko if: $parent.getUrl(tile) === undefined -->
-                    <div data-bind="click: $parent.removeTile, visible: ko.unwrap(selected)">
-                        <button class="btn btn-xs dz-cancel"><i class="ion ion-close"></i></button>
-                    </div>
-                    <img class="dz-img" data-bind="attr: {src: '' }, click: $parent.photoGallery.selectItem">
-                    <!--/ko-->
-                </div>
-                <!-- /ko -->
-            </div>
-            <div class="thumbnail-gallery-controls right" data-bind="click: function(){photoGallery.updatePan('right')}"><i class="fa fa-angle-right"></i></div>
-        </div>
+    <div style="min-height: 100%;" data-bind="style: {display: !!self.displayContent() ? 'inherit' : 'none'}">
+        <div id="hidden-dz-previews" style="display:none"></div>
+        <img class="dz-img dz-img-main" data-bind="attr: {src: ko.unwrap(displayContent)}" ></img>
     </div>
 
-    <div class='show-thumbnails-btn closed' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: '{% trans "View Gallery" %}', fadeVisible: showThumbnails, delay:400, fade: 200"></div>
+    <div style="position: sticky; bottom: 0px;" data-bind="style: {display: !!self.displayContent() ? 'inherit' : 'none'}">
+        <div class="thumbnail-gallery-container" data-bind="slide: showThumbnails, duration: 100, direction: {direction: 'down'}, easing: 'slide'">
+            <div class='show-thumbnails-btn open' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: '{% trans "close" %}'"></div>
+            <div class="thumbnail-container" data-bind="gallery: photoGallery.pan, duration: 400, scrolldistance: 100, thumbnailclass: 'gallery-thumbnails'">
+                <div class="thumbnail-gallery-controls left" data-bind="click: function(){photoGallery.updatePan('left')}"><i class="fa fa-angle-left"></i></div>
+                <div class="gallery-thumbnails">
+                    <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
+                    <div style='position: relative'>
+                        <!--ko if: $parent.getUrl(tile) -->
+                        <div data-bind="click: $parent.removeTile, visible: ko.unwrap(selected)">
+                            <button class="btn btn-xs dz-cancel"><i class="ion ion-close"></i></button>
+                        </div>
+                        <img class="dz-img" data-bind="attr: {src: $parent.getUrl(tile).url !== undefined ? $parent.getUrl(tile).url : '' }, click: $parent.photoGallery.selectItem">
+                        <!--/ko-->
+                        <!--ko if: $parent.getUrl(tile) === undefined -->
+                        <div data-bind="click: $parent.removeTile, visible: ko.unwrap(selected)">
+                            <button class="btn btn-xs dz-cancel"><i class="ion ion-close"></i></button>
+                        </div>
+                        <img class="dz-img" data-bind="attr: {src: '' }, click: $parent.photoGallery.selectItem">
+                        <!--/ko-->
+                    </div>
+                    <!-- /ko -->
+                </div>
+                <div class="thumbnail-gallery-controls right" data-bind="click: function(){photoGallery.updatePan('right')}"><i class="fa fa-angle-right"></i></div>
+            </div>
+        </div>
+
+        <div class='show-thumbnails-btn closed' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: '{% trans "View Gallery" %}', fadeVisible: showThumbnails, delay:400, fade: 200"></div>
     </div>
 
     <!--ko if: self.displayContent() === undefined -->
