@@ -36,6 +36,7 @@ define([
         this.tile = params.tile || null;
         this.widget = params.widget || null;
         this.results = params.results || null;
+        this.hideEmptyNodes = params.hideEmptyNodes;
         this.displayValue = ko.computed(function() {
             return ko.unwrap(self.value);
         });

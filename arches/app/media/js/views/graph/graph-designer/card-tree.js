@@ -229,6 +229,8 @@ define([
                 return updatedCards;
             },
             updateCards: function(selectedNodegroupId, data) {
+                self.updateNode(self.topCards(), data.updated_values.node);
+                
                 if (data.updated_values.card) {
                     var card = data.updated_values.card;
                     var defaultCardName = data.default_card_name;
@@ -246,7 +248,6 @@ define([
                     card.parentnodegroupId = _.filter(data.nodegroups, function(ng){return data.updated_values.card.nodegroup_id === ng.nodegroupid;})[0].parentnodegroup_id;
                     self.updateCard(self.topCards(), card, data);
                 } else {
-                    self.updateNode(self.topCards(), data.updated_values.node);
                     if (data.updated_values.node.nodegroup_id !== data.updated_values.node.nodeid) {
                         var oldCard = _.find(self.flattenTree(self.topCards(), []), function(card) {
                             return card.nodegroupid === data['updated_values'].node.nodeid;
@@ -304,7 +305,8 @@ define([
                     perms: ko.observableArray(),
                     permsLiteral: ko.observableArray(),
                     parentCard: parent,
-                    constraints: getBlankConstraint(data.card)
+                    constraints: getBlankConstraint(data.card),
+                    topCards: self.topCards,
                 });
                 parentcards.push(newCardViewModel);
 
