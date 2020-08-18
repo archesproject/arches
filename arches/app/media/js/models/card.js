@@ -304,13 +304,20 @@ define([
                 }
             }, this);
 
-            // let's iterate over each widget, and remove any orphaned ones
+            // let's iterate over each widget, and remove any orphans
+            var widgetsToDelete = [];
+            
             ko.unwrap(this.get('widgets')).forEach(function(widget) {
                 if (!nodeIds.includes(widget.node_id())) {
-                    self.get('widgets').remove(widget);
+                    widgetsToDelete.push(widget);
                 }
             });
 
+            widgetsToDelete.forEach(function(widget) {
+                this.get('widgets').remove(widget);  
+            }, this);
+            
+            // let's sort the widgets according to sortorder
             this.get('widgets').sort(function(w, ww) {
                 return w.get('sortorder')() - ww.get('sortorder')();
             });
