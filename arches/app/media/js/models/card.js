@@ -268,25 +268,32 @@ define([
             var self = this;
             var attributes = this.sourceData;
 
+            var nodeIds = [];
+
             var widgetNodeIds = ko.unwrap(this.get('widgets')).map(function(widget) {
                 return ko.unwrap(widget.node_id);
             });
 
+            // let's iterate over each node, and add any new widgets
             ko.unwrap(this.nodes).forEach(function(node) {
-                var widget;
+                nodeIds.push(node.id);
+
                 // TODO: it would be nice to normalize the nodegroup_id names (right now we have several different versions)
-                if((ko.unwrap(node.nodeGroupId) || ko.unwrap(node.nodegroup_id)) === ko.unwrap(attributes.data.nodegroup_id) && widgetNodeIds.indexOf(node.nodeid) < 0){
+                var nodeGroupId = ko.unwrap(node.nodeGroupId) || ko.unwrap(node.nodegroup_id);
+
+                if (nodeGroupId === ko.unwrap(attributes.data.nodegroup_id) && !widgetNodeIds.includes(node.nodeid)) {
                     var datatype = attributes.datatypelookup[ko.unwrap(node.datatype)];
+
                     var nodeDatatypeSubscription = node.datatype.subscribe(function(){
                         this._card(JSON.stringify(this.toJSON()));
                     }, this);
                     this.disposables.push(nodeDatatypeSubscription);
-
+    
                     if (datatype.defaultwidget_id) {
                         var cardWidgetData = _.find(attributes.data.widgets, function(widget) {
                             return widget.node_id === node.nodeid;
                         });
-                        widget = new CardWidgetModel(cardWidgetData, {
+                        var widget = new CardWidgetModel(cardWidgetData, {
                             node: node,
                             card: this,
                             datatype: datatype,
@@ -294,21 +301,13 @@ define([
                         });
                         this.get('widgets').push(widget);
                     }
-                } else if (widgetNodeIds.indexOf(node.nodeid) >= 0 && (ko.unwrap(node.nodeGroupId) || ko.unwrap(node.nodegroup_id)) !== ko.unwrap(attributes.data.nodegroup_id)) {
-                    widget = ko.unwrap(this.get('widgets')).find(function(widget) {
-                        return ko.unwrap(widget.node_id) === node.nodeid;
-                    });
-                    this.get('widgets').remove(widget);
                 }
             }, this);
 
-            var nodeIds = ko.unwrap(this.nodes).map(function(node) {
-                return node.id;
-            });
-
+            // let's iterate over each widget, and remove any orphaned ones
             ko.unwrap(this.get('widgets')).forEach(function(widget) {
                 if (!nodeIds.includes(widget.node_id())) {
-                    self.get('widgets').remove(widget)
+                    self.get('widgets').remove(widget);
                 }
             });
 
