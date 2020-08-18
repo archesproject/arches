@@ -160,26 +160,6 @@ def on_chord_error(request, exc, traceback):
     notify_completion(msg, user)
 
 
-# from celery.signals import worker_init
-# @worker_init.connect
-# def limit_chord_unlock_tasks(sender, **kwargs):
-#     """
-#     Set max_retries for chord.unlock tasks to avoid infinitely looping
-#     tasks. (see celery/celery#1700 or celery/celery#2725)
-#     """
-#     task = sender.app.tasks['celery.chord_unlock']
-#     if task.max_retries is None:
-#         retries = getattr(worker.app.conf, 'CHORD_UNLOCK_MAX_RETRIES', 1)
-#         task.max_retries = retries
-
-
-# from celery import maybe_signature
-# @shared_task(bind=True)
-# def unlock_chord(self, group, callback, interval=1, max_retries=None):
-#     if group.ready():
-#         return maybe_signature(callback).delay(group.join())
-#     raise self.retry(countdown=interval, max_retries=max_retries)
-
 def create_user_task_record(taskid, taskname, userid):
     try:
         user = User.objects.get(id=userid)
