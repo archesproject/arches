@@ -11992,7 +11992,7 @@ ul.select2-choices:after {
 }
 
 .left-panel {
-    overflow: auto;
+    overflow: hidden;
     z-index: 3;
 }
 
