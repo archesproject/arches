@@ -305,11 +305,9 @@ define([
             }, this);
 
             // let's iterate over each widget, and remove any orphans
-            var widgetsToDelete = [];
-            
-            ko.unwrap(this.get('widgets')).forEach(function(widget) {
+            var widgetsToDelete = ko.unwrap(this.get('widgets')).filter(function(widget) {
                 if (!nodeIds.includes(widget.node_id())) {
-                    widgetsToDelete.push(widget);
+                    return widget;
                 }
             });
 
