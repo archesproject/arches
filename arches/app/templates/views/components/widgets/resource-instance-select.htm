@@ -38,7 +38,7 @@
     </div>
     
     <div class="rr-widget">
-        <!-- ko if: value() !== null && value().length > 5-->
+        <!-- ko if: !!value() && value().length > 5-->
         <div class="rr-widget-filter-panel">
             <div class="list-filter">
                 <input type="text" class="form-control" style="width: 225px; height:28px;" placeholder="{% trans 'filter...' %}" data-bind="textInput: filter"></input>
