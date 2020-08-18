@@ -123,6 +123,7 @@ define([
             var relatedResourceModels = ko.computed(function() {
                 var res = [];
                 var graphlist = this.preview ? arches.graphs : arches.resources;
+
                 if (params.node && params.state !== 'report') {
                     res = ko.unwrap(params.node.config.graphs).map(function(item){
                         var graph = graphlist.find(function(graph){
@@ -134,6 +135,7 @@ define([
                         }
                     });
                 }
+                
                 return res;
             }, this);
 

@@ -23,8 +23,8 @@
         <!-- /ko -->
     </a>
     <ul class="jstree-children" aria-expanded="true">
-        <!-- ko foreach: {data: sortedWidgetIds, as: 'widgetid'} -->
-        <!-- ko let: $parent.getDataForDisplay(widgetid) --> 
+        <!-- ko foreach: {data: sortedWidgetIds, as: 'nodeId'} -->
+        <!-- ko let: $parent.getDataForDisplay(nodeId) --> 
         <!-- the let statement above returns an object of the form {widget: null, tile: null: tileData: null, card: null} -->
             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.cards.length > 0 && expanded), 'jstree-closed' : (card.cards.length > 0 && !expanded()), 'jstree-leaf': card.cards.length === 0}">
                 <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
@@ -91,12 +91,12 @@
     <!-- ko if: card.cards().length > 0 || card.widgets().length > 0 -->
     <ul data-bind="sortable: {
                 data: sortedWidgetIds,
-                as: 'widgetId',
+                as: 'nodeId',
                 beforeMove: self.beforeMove,
                 afterMove: self.afterMove
             }" class="jstree-children card-designer-tree" aria-expanded="true">
         <div>
-            <!-- ko let: {widget:$parent.widgetLookup[widgetId]} -->
+            <!-- ko let: {widget:$parent.widgetInstanceDataLookup[nodeId]} -->
             <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
                     'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0
                 }">
@@ -183,10 +183,10 @@
             {% endblock form_header %}
             <!-- ko if: card.widgets().length > 0 -->
             {% block form_widgets %}
-            <div data-bind="foreach: {data: sortedWidgetIds, as: 'widgetid'}">
+            <div data-bind="foreach: {data: sortedWidgetIds, as: 'nodeId'}">
                 <form class="widgets" style="margin-bottom: 20px;">
                     <div data-bind="foreach: {
-                            data:$parent.widgetLookup[widgetid], as: 'widget'
+                            data:$parent.widgetInstanceDataLookup[nodeId], as: 'widget'
                         }">
                         <div data-bind='component: {
                             name: self.form.widgetLookup[widget.widget_id()].name,
@@ -308,8 +308,8 @@
             <!-- ko if: hasTiles -->
             <i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': reportExpanded(), 'fa-angle-right': !reportExpanded()}, click: function () { reportExpanded(!reportExpanded()) }"></i>
             <!-- ko if: reportExpanded() -->
-            <!-- ko foreach: { data: sortedWidgetIds, as: 'widgetid' } -->
-            <!-- ko let: $parent.getDataForDisplay(widgetid) --> 
+            <!-- ko foreach: { data: sortedWidgetIds, as: 'nodeId' } -->
+            <!-- ko let: $parent.getDataForDisplay(nodeId) --> 
             <!-- the let statement above returns an object of the form {widget: null, tile: null: tileData: null, card: null} -->
                 <div class="rp-card-section" data-bind="css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}">
 
