@@ -12,6 +12,7 @@ from arches.app.models import models
 from arches.app.search.search_export import SearchResultsExporter
 import arches.app.utils.zip as zip_utils
 from django.utils.translation import ugettext as _
+from django.conf import settings
 
 
 @shared_task
@@ -66,6 +67,8 @@ def export_search_results(self, userid, request_values, format):
     exporter = SearchResultsExporter(search_request=new_request)
     files, export_info = exporter.export(format)
     exportid = exporter.write_export_zipfile(files, export_info)
+    search_history_obj = models.SearchExportHistory.objects.get(pk=exportid)
+
 
     context = dict(
         greeting="Hello,\nYour request to download a set of search results is now ready.",
@@ -74,6 +77,7 @@ def export_search_results(self, userid, request_values, format):
         closing="Thank you",
         email=email,
         name=export_name,
+        email_link=str(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT) + "/files/" + str(search_history_obj.downloadfile),
     )
     response = {"taskid": self.request.id, "msg": export_name, "notiftype_name": "Search Export Download Ready", "context": context}
 
