@@ -196,11 +196,15 @@ define([
 
         deleteNode: function(node, e) {
             e.stopImmediatePropagation();
-            this.graphModel.deleteNode(node);
-            if (node.isCollector()) {
-                this.cardTree.deleteCard(node.nodeGroupId());
-                this.permissionTree.deleteCard(node.nodeGroupId());
-            }
+
+            this.graphModel.deleteNode(node, function(_response, status) {
+                if (status === 'success') {
+                    if (node.isCollector()) {
+                        this.cardTree.deleteCard(node.nodeGroupId());
+                        this.permissionTree.deleteCard(node.nodeGroupId());
+                    }
+                }
+            }, this);
         },
 
         exportBranch: function(node, e) {
