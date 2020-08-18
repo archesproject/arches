@@ -36,6 +36,7 @@ define([
         this.tile = params.tile || null;
         this.widget = params.widget || null;
         this.results = params.results || null;
+        this.hideEmptyNodes = params.hideEmptyNodes;
         this.displayValue = ko.computed(function() {
             return ko.unwrap(self.value);
         });
@@ -82,7 +83,7 @@ define([
 
         if (ko.isObservable(this.defaultValue)) {
             var defaultValue = this.defaultValue();
-            if (this.tile && ko.unwrap(this.tile.tileid) == "" && defaultValue != null && defaultValue != "") {
+            if (this.tile && !this.tile.noDefaults && ko.unwrap(this.tile.tileid) == "" && defaultValue != null && defaultValue != "") {
                 this.value(defaultValue);
             }
 

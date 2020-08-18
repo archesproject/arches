@@ -1,4 +1,4 @@
-define(['knockout', 'knockout-mapping', 'underscore', 'moment', 'bindings/let'], function(ko, koMapping, _, moment) {
+define(['knockout', 'knockout-mapping', 'underscore', 'moment', 'bindings/let', 'views/components/simple-switch'], function(ko, koMapping, _, moment) {
     var ReportViewModel = function(params) {
         var self = this;
         this.report = params.report || null;
@@ -18,6 +18,8 @@ define(['knockout', 'knockout-mapping', 'underscore', 'moment', 'bindings/let'],
                 return _.keys(ko.unwrap(tile.provisionaledits)).length > 0;
             });
         });
+        
+        this.hideEmptyNodes = ko.observable(true);
 
         this.configJSON = ko.computed(function(){
             self.configKeys.forEach(function(config) {

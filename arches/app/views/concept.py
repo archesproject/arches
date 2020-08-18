@@ -27,7 +27,7 @@ from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS, get_preflabel_from_valueid
-from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, SimpleQueryString
 from arches.app.search.mappings import CONCEPTS_INDEX
 from arches.app.utils.decorators import group_required
@@ -397,7 +397,6 @@ def get_pref_label(request):
 
 
 def search(request):
-    se = SearchEngineFactory().create()
     searchString = request.GET["q"]
     removechildren = request.GET.get("removechildren", None)
     query = Query(se, start=0, limit=100)
@@ -515,7 +514,6 @@ def concept_tree(request, mode):
 
 
 def get_concept_label_from_valueid(valueid):
-    se = SearchEngineFactory().create()
     concept_label = se.search(index=CONCEPTS_INDEX, id=valueid)
     if concept_label["found"]:
         return concept_label["_source"]
@@ -524,7 +522,6 @@ def get_concept_label_from_valueid(valueid):
 def get_preflabel_from_conceptid(conceptid, lang):
     ret = None
     default = {"category": "", "conceptid": "", "language": "", "value": "", "type": "", "id": ""}
-    se = SearchEngineFactory().create()
     query = Query(se)
     bool_query = Bool()
     bool_query.must(Match(field="type", query="prefLabel", type="phrase"))

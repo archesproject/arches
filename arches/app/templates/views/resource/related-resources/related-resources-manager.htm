@@ -51,7 +51,7 @@
     <div id="rr-manager-content-id" class="rr-drag-panel-target" data-bind="style: {'margin-bottom': containerBottomMargin }">
 
         <div class="related-resources-header" data-bind="css: {'open-graph': showGraph() == true}, style: {height: resourceEditorContext === true ? '55px' : '40px'}">
-            
+
             <div class="editor-elements">
                 <!--ko if: resourceEditorContext && !showGraph() -->
                 <div class="">
@@ -83,7 +83,7 @@
                     <span class="clear-node-search" style="top: 5px;" data-bind="visible: filter().length > 0, click: function() { filter('');}"><i class="fa fa-times-circle"></i></span>
                 </div>
                 <span style="padding: 4px;" data-bind="if: totalRelationships() > 1">
-                    <span style="font-size: 13px;"" class='file-workbench-filecount' data-bind='text: totalRelationships() + "{% trans ' resource relations' %}"'></span>
+                    <span style="font-size: 13px;" class='file-workbench-filecount' data-bind='text: totalRelationships() + "{% trans ' resource relations' %}"'></span>
                 </span>
             </div>
 
@@ -95,7 +95,7 @@
                                 <button data-bind="click: function(){window.open(resource.resourceinstanceid)}, clickBubble: false">
                                     <i class="fa fa-pencil"></i>
                                 </button>
-                            </div>                        
+                            </div>
                             <div class='rr-table-column icon-column'>
                                 <button data-bind="click: !!relationship.tileid() ?  self.updateTile.bind(self, {'delete':true}) : self.deleteRelationships.bind(self), clickBubble: false">
                                     <i class="fa fa-trash"></i>
@@ -126,7 +126,7 @@
                                         <span class="col-sm-4">
                                             <input style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class)
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, '{% trans 'Select an Ontology Property' %}')
                                                 }
                                             ">
                                         </span>
@@ -143,7 +143,7 @@
                                         <span class="col-sm-4">
                                             <input style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass)
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, '{% trans 'Select an Ontology Property' %}')
                                                 }
                                             ">
                                         </span>
@@ -162,7 +162,7 @@
                                         <span class="col-sm-4">
                                             <input style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class)
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, '{% trans 'Select an Ontology Property' %}')
                                                 }
                                             ">
                                         </span>
@@ -179,7 +179,7 @@
                                             <span class="col-sm-4">
                                                 <input style="width:30%; display:inline-block;" data-bind="
                                                     select2Query: {
-                                                        select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass)
+                                                        select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, '{% trans 'Select an Ontology Property' %}')
                                                     }
                                                 ">
                                             </span>
@@ -219,7 +219,7 @@
                                         </div>
                                     </div>
                                 </div>
-                    
+
                                 <!--ko if: self.graphIsSemantic === false -->
                                 <div class="row widget-container" style="padding-left: 0px;">
                                     <div class="form-group">
@@ -231,7 +231,7 @@
                                                     class="ion-ios-checkmark-outline"></i>
                                             </label>
                                         </div>
-                    
+
                                         <div class="relative">
                                             <div class="col-xs-6">
                                                 <input type="text" class="form-control input-lg widget-input" placeholder="date from"
@@ -244,14 +244,14 @@
                                         </div>
                                     </div>
                                 </div>
-                    
+
                                 <div class="row widget-container" style="padding-left: 0px;">
                                     <div class="form-group">
                                         <div class="relative">
                                             <label class="col-xs-12 control-label widget-input-label" for="">{% trans "Description" %} <i
                                                     class="ion-ios-checkmark-outline"></i></label>
                                         </div>
-                    
+
                                         <div class="col-xs-12">
                                             <input type="text" id="editor1" class="form-control input-lg widget-input"
                                                 data-bind="textInput: relationship.notes">

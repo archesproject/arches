@@ -108,7 +108,6 @@ define([
             };
     
             self.value.subscribe(updateNameAndOntologyClass);
-            
             // Resolve Resource Instance Names from the incoming values
             updateNameAndOntologyClass(self.value);
 
@@ -124,8 +123,9 @@ define([
             var relatedResourceModels = ko.computed(function() {
                 var res = [];
                 var graphlist = this.preview ? arches.graphs : arches.resources;
+
                 if (params.node && params.state !== 'report') {
-                    res = params.node.config.graphs().map(function(item){
+                    res = ko.unwrap(params.node.config.graphs).map(function(item){
                         var graph = graphlist.find(function(graph){
                             return graph.graphid === item.graphid;
                         });
@@ -135,6 +135,7 @@ define([
                         }
                     });
                 }
+                
                 return res;
             }, this);
 

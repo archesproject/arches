@@ -24,46 +24,41 @@
 
 {% block content_management %}
 <!-- ko if: card.widgets().length > 0 -->
-<div class="">
+<div style="height: inherit; overflow: auto;">
 
-    <div class="card-display-panel">
-        <div>
-            <div id="hidden-dz-previews" style="display:none"></div>
-            <!--ko if: displayContent() -->
-            <div class="preview" style="width: 100%; height: 100%">
-                <img class="dz-img" style = "width: 100%; height: 100%" data-bind="attr: {src: ko.unwrap(displayContent)}" ></img>
-            </div>
-            <!--/ko-->
-        </div>
+    <div style="min-height: 100%;" data-bind="style: {display: !!self.displayContent() ? 'inherit' : 'none'}">
+        <div id="hidden-dz-previews" style="display:none"></div>
+        <img class="dz-img dz-img-main" data-bind="attr: {src: ko.unwrap(displayContent)}" ></img>
     </div>
-    <div data-bind="style: {display: !!self.displayContent() ? 'inherit' : 'none'}">
-    <div class="thumbnail-gallery-container" data-bind="slide: showThumbnails, duration: 100, direction: {direction: 'down'}, easing: 'slide'">
-        <div class='show-thumbnails-btn open' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: '{% trans "close" %}'"></div>
-        <div class="thumbnail-container" data-bind="gallery: photoGallery.pan, duration: 400, scrolldistance: 100, thumbnailclass: 'gallery-thumbnails'">
-            <div class="thumbnail-gallery-controls left" data-bind="click: function(){photoGallery.updatePan('left')}"><i class="fa fa-angle-left"></i></div>
-            <div class="gallery-thumbnails">
-                <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
-                <div style='position: relative'>
-                    <!--ko if: $parent.getUrl(tile) -->
-                    <div data-bind="click: $parent.removeTile, visible: ko.unwrap(selected)">
-                        <button class="btn btn-xs dz-cancel"><i class="ion ion-close"></i></button>
+
+    <div style="position: sticky; bottom: 0px;" data-bind="style: {display: !!self.displayContent() ? 'inherit' : 'none'}">
+        <div class="thumbnail-gallery-container" data-bind="slide: showThumbnails, duration: 100, direction: {direction: 'down'}, easing: 'slide'">
+            <div class='show-thumbnails-btn open' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: '{% trans "close" %}'"></div>
+            <div class="thumbnail-container" data-bind="gallery: photoGallery.pan, duration: 400, scrolldistance: 100, thumbnailclass: 'gallery-thumbnails'">
+                <div class="thumbnail-gallery-controls left" data-bind="click: function(){photoGallery.updatePan('left')}"><i class="fa fa-angle-left"></i></div>
+                <div class="gallery-thumbnails">
+                    <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
+                    <div style='position: relative'>
+                        <!--ko if: $parent.getUrl(tile) -->
+                        <div data-bind="click: $parent.removeTile, visible: ko.unwrap(selected)">
+                            <button class="btn btn-xs dz-cancel"><i class="ion ion-close"></i></button>
+                        </div>
+                        <img class="dz-img" data-bind="attr: {src: $parent.getUrl(tile).url !== undefined ? $parent.getUrl(tile).url : '' }, click: $parent.photoGallery.selectItem">
+                        <!--/ko-->
+                        <!--ko if: $parent.getUrl(tile) === undefined -->
+                        <div data-bind="click: $parent.removeTile, visible: ko.unwrap(selected)">
+                            <button class="btn btn-xs dz-cancel"><i class="ion ion-close"></i></button>
+                        </div>
+                        <img class="dz-img" data-bind="attr: {src: '' }, click: $parent.photoGallery.selectItem">
+                        <!--/ko-->
                     </div>
-                    <img class="dz-img" data-bind="attr: {src: $parent.getUrl(tile).url !== undefined ? $parent.getUrl(tile).url : '' }, click: $parent.photoGallery.selectItem">
-                    <!--/ko-->
-                    <!--ko if: $parent.getUrl(tile) === undefined -->
-                    <div data-bind="click: $parent.removeTile, visible: ko.unwrap(selected)">
-                        <button class="btn btn-xs dz-cancel"><i class="ion ion-close"></i></button>
-                    </div>
-                    <img class="dz-img" data-bind="attr: {src: '' }, click: $parent.photoGallery.selectItem">
-                    <!--/ko-->
+                    <!-- /ko -->
                 </div>
-                <!-- /ko -->
+                <div class="thumbnail-gallery-controls right" data-bind="click: function(){photoGallery.updatePan('right')}"><i class="fa fa-angle-right"></i></div>
             </div>
-            <div class="thumbnail-gallery-controls right" data-bind="click: function(){photoGallery.updatePan('right')}"><i class="fa fa-angle-right"></i></div>
         </div>
-    </div>
 
-    <div class='show-thumbnails-btn closed' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: '{% trans "View Gallery" %}', fadeVisible: showThumbnails, delay:400, fade: 200"></div>
+        <div class='show-thumbnails-btn closed' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: '{% trans "View Gallery" %}', fadeVisible: showThumbnails, delay:400, fade: 200"></div>
     </div>
 
     <!--ko if: self.displayContent() === undefined -->
@@ -81,12 +76,14 @@
                            <span>{% trans "Select Photographs" %}</span>
                        </button>
                        <br>
-                       <div style="padding: 10px">{% trans "Adding photos to this record is " %}
-                           <span><strong>{% trans "optional." %}</strong></span>
-                           <br>
-                           {% trans "You may upload as many photos as you wish, but the maximum size of any single file is " %}
-                           <span>8MB</span>
-                       </div>
+                       <div style="padding: 10px">
+                            <p>
+                                {% trans "Adding photos to this record is <span><strong>optional.</strong></span>" %}
+                            </p>
+                            <p>
+                                {% trans "You may upload as many photos as you wish, but the maximum size of any single file is <span>8MB</span>" %}
+                            </p>
+                        </div>
 
                    </div>
                    <div class="file-upload-footer">
@@ -120,15 +117,17 @@
                    </div>
                    <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
                        <i class="fa fa-file"></i>
-                       <span>{% trans "Select Documents" %}</span>
+                       <span>{% trans "Select Photographs" %}</span>
                    </button>
                    <br>
-                   <div style="padding: 10px">{% trans "Adding documents to this record is " %}
-                       <span><strong>{% trans "optional." %}</strong></span>
-                       <br>
-                       {% trans "You may upload as many documents as you wish, but the maximum size of any single file is " %}
-                       <span>8MB</span>
-                   </div>
+                   <div style="padding: 10px">
+                        <p>
+                            {% trans "Adding photos to this record is <span><strong>optional.</strong></span>" %}
+                        </p>
+                        <p>
+                            {% trans "You may upload as many photos as you wish, but the maximum size of any single file is <span>8MB</span>" %}
+                        </p>
+                    </div>
 
                </div>
                <div class="file-upload-footer">

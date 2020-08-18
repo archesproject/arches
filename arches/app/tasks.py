@@ -69,10 +69,10 @@ def export_search_results(self, userid, request_values, format):
     exportid = exporter.write_export_zipfile(files, export_info)
 
     context = dict(
-        greeting="Hello,\nYour request to download a set of search results is now ready.",
+        greeting=_("Hello,\nYour request to download a set of search results is now ready."),
         link=exportid,
-        button_text="Download Now",
-        closing="Thank you",
+        button_text=_("Download Now"),
+        closing=_("Thank you"),
         email=email,
         name=export_name,
     )
@@ -99,14 +99,14 @@ def import_business_data(self, data_source="", overwrite="", bulk_load=False, cr
 @shared_task
 def package_load_complete(*args, msg=None):
     if msg is None:
-        msg = "Resources have completed loading."
+        msg = _("Resources have completed loading.")
     notifytype_name = "Package Load Complete"
     user = User.objects.get(id=1)
     context = dict(
-        greeting="Hello,\nYour package has successfully loaded into your Arches project.",
+        greeting=_("Hello,\nYour package has successfully loaded into your Arches project."),
         link="",
-        link_text="Log me in",
-        closing="Thank you",
+        link_text=_("Log me in"),
+        closing=_("Thank you"),
         email="",
     )
     notify_completion(msg, user, notifytype_name, context)
