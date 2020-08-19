@@ -75,7 +75,7 @@ define([
                     (root);
             }
 
-            function d3ClickManager() {
+            var d3ClickManager = function() {
                 // we want to a distinguish single/double click
                 // details http://bl.ocks.org/couchand/6394506
                 var dispatcher = d3.dispatch('click', 'dblclick');
@@ -223,18 +223,6 @@ define([
                 path.append("title")
                     .text(d => `${d.ancestors().map(d => d.data.name).reverse().join("/")}\n${format(d.value)}`);
     
-                var label = g.append("g")
-                    .attr("pointer-events", "none")
-                    .attr("text-anchor", "middle")
-                    .style("user-select", "none")
-                    .selectAll("text")
-                    .data(root.descendants().slice(1))
-                    .join("text")
-                    .attr("dy", "0.35em")
-                    .attr("fill-opacity", d => +labelVisible(d.current))
-                    .attr("transform", d => labelTransform(d.current))
-                    .text(d => d.data.name);
-    
                 var parent = g.append("circle")
                     .datum(root)
                     .attr("r", radius)
@@ -268,27 +256,13 @@ define([
                         .attr("fill-opacity", d => arcVisible(d.target) ? (d.children ? 0.6 : 0.4) : 0)
                         .attrTween("d", d => () => arc(d.current));
     
-                    label.filter(function(d) {
-                        return +this.getAttribute("fill-opacity") || labelVisible(d.target);
-                    }).transition(t)
-                        .attr("fill-opacity", d => +labelVisible(d.target))
-                        .attrTween("transform", d => () => labelTransform(d.current));
                 }
                 
                 function arcVisible(d) {
                     return true;
                     return d.y1 <= depth && d.y0 >= 1 && d.x1 > d.x0;
                 }
-    
-                function labelVisible(d) {
-                    return d.y1 <= depth && d.y0 >= 1 && (d.y1 - d.y0) * (d.x1 - d.x0) > 0.03;
-                }
-    
-                function labelTransform(d) {
-                    var x = (d.x0 + d.x1) / 2 * 180 / Math.PI;
-                    var y = (d.y0 + d.y1) / 2 * radius;
-                    return `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`;
-                }
+
             }
 
         }
