@@ -19,10 +19,6 @@ define([
                 .attr("class", "container")
                 .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-            // g.append("svg:circle")
-            //     .attr("r", "0")
-            //     .style("opacity", 0);
-
             ko.utils.domData.set(element, 'vis', g);
         },
 
@@ -31,17 +27,12 @@ define([
             // also see http://bl.ocks.org/ropeladder/83915942ac42f17c087a82001418f2ee for the click/dblclick code
 
             var colortheme = d3.scaleOrdinal(d3.schemeCategory10);
-            var x = d3.scaleLinear()
-                .range([0, 2 * Math.PI]);
-            var y = d3.scaleSqrt()
-                .range([0, radius]);
             var $el = $(element);
             var opts = ko.unwrap(valueAccessor());
             var configJSON = opts.config();
             var breadCrumb = opts.breadCrumb;
             var selectedPeriod = opts.selectedPeriod;
             var total = 0;
-            var data = null;
             var depth = 0;
 
             // Breadcrumb dimensions: width, height, spacing, width of tip/tail.
@@ -83,54 +74,6 @@ define([
                     .size([2 * Math.PI, root.height + 1])
                     (root);
             }
-
-            // // var partition = d3.partition()
-            // //     // .sort(function(d, e) {
-            // //     //     return d.start - e.start;
-            // //     // })
-            // //     .value(function(d) {
-            // //         return d.size;
-            // //     });
-
-            // var arc = d3.arc()
-            //     .startAngle(d => d.x0)
-            //     .endAngle(d => d.x1)
-            //     .padAngle(d => Math.min((d.x1 - d.x0) / 2, 0.005))
-            //     .padRadius(radius * 1.5)
-            //     .innerRadius(d => d.y0 * radius)
-            //     .outerRadius(d => Math.max(d.y0 * radius, d.y1 * radius - 1))
-
-            // // var arc = d3.arc()
-            // //     .startAngle(function(d) {
-            // //         return Math.max(0, Math.min(2 * Math.PI, x(d.x)));
-            // //     })
-            // //     .endAngle(function(d) {
-            // //         return Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx)));
-            // //     })
-            // //     .innerRadius(function(d) {
-            // //         return Math.max(0, y(d.y));
-            // //     })
-            // //     .outerRadius(function(d) {
-            // //         return Math.max(0, y(d.y + d.dy));
-            // //     });
-
-
-            // var arcTween = function(d) {
-            //     var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
-            //         yd = d3.interpolate(y.domain(), [d.y, 1]),
-            //         yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
-            //     return function(d, i) {
-            //         return i ?
-            //             function(t) {
-            //                 return arc(d);
-            //             } :
-            //             function(t) {
-            //                 x.domain(xd(t));
-            //                 y.domain(yd(t)).range(yr(t));
-            //                 return arc(d);
-            //             };
-            //     };
-            // };
 
             function d3ClickManager() {
                 // we want to a distinguish single/double click
@@ -192,90 +135,6 @@ define([
                 dblclick(d);
             });
 
-            //     function rebind(target, source) {
-            //         var i = 1,
-            //             n = arguments.length,
-            //             method;
-            //         while (++i < n) target[method = arguments[i]] = d3_rebind(target, source, source[method]);
-            //         return target;
-            //     };
-
-            //     function d3_rebind(target, source, method) {
-            //         return function() {
-            //             var value = method.apply(source, arguments);
-            //             return value === source ? target : value;
-            //         };
-            //     }
-            //     return rebind(cc, event, 'on');
-
-            // }
-            // var cc = d3ClickManager();
-
-            // var updateChart = function (data) {
-
-            //     // DATA JOIN - Join new data with old elements, if any.
-            //     var gs = vis.selectAll("g").data(data);
-
-            //     // ENTER
-            //     var g = gs.enter()
-            //         .append("g")
-            //         .on("mouseover", highlightPeriod)
-            //         .call(cc);
-
-            //     // click and dblclick step on each other so we need this
-            //     cc.on("click", function(d) {
-            //         selectedPeriod(d);
-            //     })
-            //     .on("dblclick", dblclick)
-
-            //     // UPDATE
-            //     var path = g.append("path");
-
-            //     gs.select('path')
-            //         .style("fill", function(d) {
-            //             return colortheme((d.children ? d : d.parent).name);
-            //         })
-            //         .each(function(d) {
-            //           this.x0 = d.x;
-            //           this.dx0 = d.dx;
-            //         })
-            //         .transition().duration(500)
-            //         .attr("d", arc);
-
-
-            //     // EXIT - Remove old elements as needed.
-            //     gs.exit().transition().duration(500).style("fill-opacity", 1e-6).remove();
-
-            // }
-
-            // function dblclick(d) {
-            //     // console.log(d)
-            //     // fade out all text elements
-            //     if (d.size !== undefined) {
-            //       d.size += 100;
-            //     };
-
-            //     vis.selectAll('path').transition()
-            //       .duration(750)
-            //       .attrTween("d", arcTween(d))
-            //       .each("end", function(e, i) {
-            //           // check if the animated element's data e lies within the visible angle span given in d
-            //           if (e.x >= d.x && e.x < (d.x + d.dx)) {
-            //               // get a selection of the associated text element
-            //               var arcText = d3.select(this.parentNode).select("text");
-            //               // fade in the text element and recalculate positions
-            //               arcText.transition().duration(750)
-            //                   .attr("opacity", 1)
-            //                   .attr("transform", function() {
-            //                       return "rotate(" + computeTextRotation(e) + ")"
-            //                   })
-            //                   .attr("x", function(d) {
-            //                       return y(d.y);
-            //                   });
-            //           }
-            //     });
-            // }
-
             function highlightPeriod(d) {
                 count = d.data.size;
                 if (d.data.size < 1) {
@@ -308,18 +167,8 @@ define([
             }
 
             function clearHighlight(){
-                // Deactivate all segments during transition.
-                // d3.selectAll("path").on("mouseover", null);
-
-                // Transition each segment to full opacity and then reactivate it.
                 d3.selectAll("path")
-                    //.transition()
-                    //.duration(1000)
-                    .style("opacity", 1)
-                    // .each("end", function() {
-                    //     d3.select(this).on("mouseover", highlightPeriod);
-                    // });
-
+                    .style("opacity", 1);
                 breadCrumb(total + ' date values')
             }
 
@@ -329,9 +178,6 @@ define([
                 }
             })
 
-            // if(data){
-            //     updateChart(data);
-            // }
             if(!!configJSON){
                 var root = partition(configJSON);
                 total = configJSON.size;
@@ -340,13 +186,6 @@ define([
                 root.each(function(d) {
                     d.current = d;
                 });
-    
-                // const svg = d3.create("svg")
-                //     .attr("viewBox", [0, 0, width, width])
-                //     .style("font", "10px sans-serif");
-    
-                // const g = svg.append("g")
-                //     .attr("transform", `translate(${width / 2},${width / 2})`);
 
                 var arc = d3.arc()
                     .startAngle(function(d){
@@ -359,12 +198,6 @@ define([
                         return Math.min((d.x1 - d.x0) / 2, 0.005);
                     })
                     .padRadius(radius * 1.5)
-                    // .innerRadius(function(d) {
-                    //     return Math.max(0, y(d.y0));
-                    // })
-                    // .outerRadius(function(d) {
-                    //     return Math.max(0, y(d.y0 + d.dy));
-                    // });
                     .innerRadius(function(d) {
                         return d.y0 * radius;
                     })
@@ -372,20 +205,6 @@ define([
                         return Math.max(d.y0 * radius, d.y1 * radius - 1);
                     })
 
-                // var arc = d3.arc()
-                //     .startAngle(function(d) {
-                //         return Math.max(0, Math.min(2 * Math.PI, x(d.x0)));
-                //     })
-                //     .endAngle(function(d) {
-                //         return Math.max(0, Math.min(2 * Math.PI, x(d.x0 + d.dx)));
-                //     })
-                //     .innerRadius(function(d) {
-                //         return Math.max(0, y(d.y0));
-                //     })
-                //     .outerRadius(function(d) {
-                //         return Math.max(0, y(d.y0 + d.dy));
-                //     });
-    
                 var path = g.append("g")
                     .selectAll("path")
                     .data(root.descendants().slice(1))
