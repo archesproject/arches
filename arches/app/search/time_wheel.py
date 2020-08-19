@@ -113,7 +113,7 @@ class TimeWheel(object):
             results = {"buckets": [query.search(index=RESOURCES_INDEX)["aggregations"]]}
             results_with_ranges = self.appendDateRanges(results, range_lookup)
             self.transformESAggToD3Hierarchy(results_with_ranges, root)
-            
+
             # calculate total number of docs
             for child in root.children:
                 root.size = root.size + child.size
