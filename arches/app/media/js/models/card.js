@@ -279,9 +279,9 @@ define([
                 nodeIds.push(node.id);
 
                 // TODO: it would be nice to normalize the nodegroup_id names (right now we have several different versions)
-                var nodeGroupId = ko.unwrap(node.nodeGroupId) || ko.unwrap(node.nodegroup_id);
+                var nodegroupId = ko.unwrap(node.nodeGroupId) || ko.unwrap(node.nodegroup_id);
 
-                if (nodeGroupId === ko.unwrap(attributes.data.nodegroup_id) && !widgetNodeIds.includes(node.nodeid)) {
+                if (nodegroupId === ko.unwrap(attributes.data.nodegroup_id) && !widgetNodeIds.includes(node.nodeid)) {
                     var datatype = attributes.datatypelookup[ko.unwrap(node.datatype)];
 
                     var nodeDatatypeSubscription = node.datatype.subscribe(function(){
@@ -306,10 +306,12 @@ define([
 
             // let's iterate over each widget, and remove any orphans
             var widgetsToDelete = ko.unwrap(this.get('widgets')).filter(function(widget) {
-                if (!nodeIds.includes(widget.node_id())) {
+                var widgetNodegroupId = ko.unwrap(widget.node.nodeGroupId) || ko.unwrap(widget.node.nodegroup_id);
+
+                if (ko.unwrap(this.nodegroup_id) !== widgetNodegroupId || !nodeIds.includes(widget.node_id())) {
                     return widget;
                 }
-            });
+            }, this);
 
             widgetsToDelete.forEach(function(widget) {
                 this.get('widgets').remove(widget);  
