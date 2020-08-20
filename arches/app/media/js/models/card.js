@@ -267,7 +267,6 @@ define([
         parseNodes: function() {
             var self = this;
             var attributes = this.sourceData;
-
             var nodeIds = [];
 
             var widgetNodeIds = ko.unwrap(this.get('widgets')).map(function(widget) {
