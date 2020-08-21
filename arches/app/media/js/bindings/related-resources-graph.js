@@ -142,6 +142,7 @@ define([
                 $(window).trigger("resize");
                 simulation.nodes(data.nodes);
                 simulation.force("link").links(data.links);
+                simulation.restart();
 
                 var link = vis.selectAll("line")
                     .data(data.links)
@@ -575,6 +576,7 @@ define([
                 var h = $el.parent().height();
                 svg.attr("width", w);
                 svg.attr("height", h);
+                svg.attr("viewBox", [0, 0, w, h]);
             }).trigger("resize");
 
 
