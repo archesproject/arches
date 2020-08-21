@@ -196,7 +196,10 @@ define([
 
         deleteNode: function(node, e) {
             e.stopImmediatePropagation();
+
+            $(e.target).tooltip('destroy');
             this.graphModel.deleteNode(node);
+            
             if (node.isCollector()) {
                 this.cardTree.deleteCard(node.nodeGroupId());
                 this.permissionTree.deleteCard(node.nodeGroupId());
