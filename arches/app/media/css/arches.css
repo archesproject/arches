@@ -11989,7 +11989,6 @@ ul.select2-choices:after {
 
 .left-panel-inner-container {
     min-width: 300px; 
-    overflow-y: auto;	
 }
 
 .left-panel {
@@ -11999,7 +11998,9 @@ ul.select2-choices:after {
 
 .left-panel-overflow {
     height: calc(100vh - 225px);
+    width: inherit;
     background: #ecf0f5;
+    overflow-y: auto;
 }
 
 .left-panel-overflow > * {
