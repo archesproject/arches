@@ -3384,10 +3384,6 @@ ul.nav.nav-tabs.nav-justified {
     background: #fbfbfb;
 }
 
-.graph-designer.resource-editor .jstree {
-    height: 100%;
-}
-
 .graph-designer-graph-content {
     width: 100%;
 }
@@ -6606,7 +6602,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .panel-config {
     flex-direction: row-reverse;
-    min-width: 600px;
 }
 
 .panel-config .middle-column-container {
@@ -11416,10 +11411,6 @@ a.filter-tools:hover {
     height: 100%;
 }
 
-.left-panel-overflow.mobile-designer-tree {
-    height: inherit;
-}
-
 .msm-basemap-subtitle {
     font-size: 13px;
     color: #888;
@@ -11989,6 +11980,7 @@ ul.select2-choices:after {
 
 .left-panel-inner-container {
     min-width: 300px; 
+    height: 100%;
 }
 
 .left-panel {
@@ -11996,8 +11988,11 @@ ul.select2-choices:after {
     z-index: 3;
 }
 
-.left-panel-overflow {
+.designer-tree {
     height: calc(100vh - 225px);
+}
+
+.left-panel-overflow {
     width: inherit;
     background: #ecf0f5;
     overflow-y: auto;
@@ -12039,10 +12034,9 @@ ul.select2-choices:after {
 }
 
 .card-component-panel {
+    width: 100%;
     padding: 0px;
     border-radius: 3px;
-    flex: 1 0 250px;
-    width: 250px;
     background-color: white;
     z-index: 10;
 }
@@ -12153,8 +12147,8 @@ ul.select2-choices:after {
 }
 
 .resource-editor-tree {
+    height: calc(100vh - 125px);
     overflow-y: auto;
-    height: 100%;
     background: #ecf0f5;
     padding-bottom: 50px;
 }
