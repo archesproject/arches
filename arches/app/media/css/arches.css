@@ -6602,6 +6602,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .panel-config {
     flex-direction: row-reverse;
+    min-width: max-content;
 }
 
 .panel-config .middle-column-container {
@@ -6616,7 +6617,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .panel-config .middle-column-container.card-configuration {
     margin-top: 50px;
-    flex: 1;
 }
 
 .panel-config .toggle-container {
@@ -10204,10 +10204,6 @@ table.table.dataTable {
     margin-bottom: 35px;
     width: 100%;
     z-index: 2;
-}
-
-.tab-pane.graph-designer {
-    flex: 2;
 }
 
 .tab-pane.active .related-resources-header {
