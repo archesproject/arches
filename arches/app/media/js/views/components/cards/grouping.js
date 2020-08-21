@@ -56,29 +56,32 @@ define([
         }, this);
 
         this.groupedCards = ko.computed(function(){
-            var gc = _.map([this.card.model.id].concat(this.groupedCardIds()), function(cardid) {
+            return _.reduce([this.card.model.id].concat(this.groupedCardIds()), function(acc, cardid) {
                 var card = this.cardLookup[cardid]; 
-                var subscription = card.model.cardinality.subscribe(function(cardinality){
-                    if (cardinality !== '1') {
-                        card.model.cardinality('1');
-                        var errorTitle = 'Settings Conflict: Remove this card from grouped card?';
-                        var errorMesssage = 'The cardinality of this card can\'t be changed until you remove it from being grouped with the "' + self.card.model.name() + '" card.  Do you want to remove this card from being grouped with the "' + self.card.model.name() + '" card';
-                        params.pageVm.alert(new AlertViewModel('ep-alert-red', errorTitle, errorMesssage, function(){}, function(){
-                            var newgroup = _.filter(self.groupedCardIds(), function(cardid) {
-                                return cardid !== card.model.id;
-                            });
-                            self.groupedCardIds(newgroup);
-                            self.subscriptions[cardid].dispose();
-                            card.model.cardinality('n');
-                            self.card.model.save();
-                        }));
-                    }
-                }, this);
-                this.subscriptions[cardid] = subscription;
-                return card;
-            }, this);
 
-            return gc;
+                if (card) {
+                    var subscription = card.model.cardinality.subscribe(function(cardinality){
+                        if (cardinality !== '1') {
+                            card.model.cardinality('1');
+                            var errorTitle = 'Settings Conflict: Remove this card from grouped card?';
+                            var errorMesssage = 'The cardinality of this card can\'t be changed until you remove it from being grouped with the "' + self.card.model.name() + '" card.  Do you want to remove this card from being grouped with the "' + self.card.model.name() + '" card';
+                            params.pageVm.alert(new AlertViewModel('ep-alert-red', errorTitle, errorMesssage, function(){}, function(){
+                                var newgroup = _.filter(self.groupedCardIds(), function(cardid) {
+                                    return cardid !== card.model.id;
+                                });
+                                self.groupedCardIds(newgroup);
+                                self.subscriptions[cardid].dispose();
+                                card.model.cardinality('n');
+                                self.card.model.save();
+                            }));
+                        }
+                    }, this);
+
+                    this.subscriptions[cardid] = subscription;
+                    acc.push(card);
+                }
+                return acc;
+            }, [], this);
         }, this);
 
         var updatedSortedWidgetsList = function(cards) {
