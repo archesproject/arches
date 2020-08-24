@@ -179,6 +179,13 @@ define([
             if (wastebin && ko.unwrap(wastebin.hasOwnProperty('resourceid'))) {
                 wastebin.resourceid = ko.unwrap(params.resourceid);
             }
+            if (wastebin && ko.unwrap(wastebin.hasOwnProperty('tile'))) {
+                if (!!ko.unwrap(params.tile)) {
+                    wastebin.tile = koMapping.toJS(params.tile().data);
+                    wastebin.tile.tileid = (ko.unwrap(params.tile)).tileid;
+                    wastebin.tile.resourceinstance_id = (ko.unwrap(params.tile)).resourceinstance_id;
+                }
+            }
             return {
                 resourceid: ko.unwrap(params.resourceid) || this.workflow.state.resourceid,
                 tile: !!(ko.unwrap(params.tile)) ? koMapping.toJS(params.tile().data) : undefined,
