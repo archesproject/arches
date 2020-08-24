@@ -64,7 +64,7 @@
 
     {% endblock body %}
 
-    <!-- ko if: report.related_resources.map(x => typeof(x.related) != 'undefined' ?  x.related.length : 0).reduce((a,b) => a+b) > 0 || !hideEmptyNodes() -->
+    <!-- ko if: report.related_resources.length && report.related_resources.map(x => typeof(x.related) != 'undefined' ?  x.related.length : 0).reduce((a,b) => a+b) > 0 || !hideEmptyNodes() -->
     <div class="rp-report-section relative report-related-resources">
         <div class="rp-report-section-title">
             <h4 class="rp-section-title">{% trans 'Related Resources' %}</h4>
