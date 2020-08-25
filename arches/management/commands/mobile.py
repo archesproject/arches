@@ -89,7 +89,7 @@ class Command(BaseCommand):
                 datatype_instance = datatype_factory.get_instance(datatype.datatype)
                 datatype_instance.after_update_all()
             except BrokenPipeError as e:
-                logger.info("Celery not working: tasks unavailable during import.")
+                logger.info("Celery not working: tasks unavailable")
 
     def delete_associated_surveys(self):
         couch = Couch()
