@@ -184,8 +184,8 @@ define([
              * 
              * -- If not every step's generated tile belongs to the same resource or you want to selectively delete a tile from a step, {tile:null} should be declared in every step's params' wastebin where you want the tile from that step to be deleted on quit.
              * 
-             * Overloading this method:
-             * Keep in mind that anything extending newTileStep that overloads this method should include similar logic to handle for wastebin if there is a wastebin use case for that particular step in the workflow.
+             * Overriding this method:
+             * Keep in mind that anything extending newTileStep that overrides this method should include similar logic to handle for wastebin if there is a wastebin use case for that particular step in the workflow.
             **/
             var wastebin = !!(ko.unwrap(params.wastebin)) ? koMapping.toJS(params.wastebin) : undefined;
             if (wastebin && ko.unwrap(wastebin.hasOwnProperty('resourceid'))) {
