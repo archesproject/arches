@@ -24,7 +24,9 @@ from urllib.parse import urlparse, urljoin
 from arches.management.commands import utils
 from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.models import MobileSyncLog
+from arches.app.models.models import DDataType
 from arches.app.models.system_settings import settings
+from arches.app.datatypes.datatypes import DataTypeFactory
 from django.core.management.base import BaseCommand, CommandError
 from arches.app.utils.couch import Couch
 
@@ -79,6 +81,15 @@ class Command(BaseCommand):
         logger.info("Syncing {0} from CouchDB to PostgreSQL".format(mobile_survey.name))
         mobile_survey.push_edits_to_db(synclog, user)
         synclog.save()
+        
+        datatype_factory = DataTypeFactory()
+        datatypes = DDataType.objects.all()
+        for datatype in datatypes:
+            try:
+                datatype_instance = datatype_factory.get_instance(datatype.datatype)
+                datatype_instance.after_update_all()
+            except BrokenPipeError as e:
+                logger.info("Celery not working: tasks unavailable during import.")
 
     def delete_associated_surveys(self):
         couch = Couch()
