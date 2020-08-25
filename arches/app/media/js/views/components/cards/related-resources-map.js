@@ -106,9 +106,10 @@ define([
             var resourceinstanceid = ko.unwrap(popupData.resourceinstanceid);
             var type = ko.unwrap(self.form.nodeLookup[id].datatype);
             zoomToData = false;
+            var graphconfig = widget.node.config.graphs().find(function(graph){return graph.graphid === popupData.graphid();});
             var val = [{
-                inverseOntologyProperty: "",
-                ontologyProperty: "",
+                ontologyProperty: ko.observable(graphconfig.ontologyProperty || ''),
+                inverseOntologyProperty: ko.observable(graphconfig.ontologyProperty || ''),
                 resourceId: resourceinstanceid,
                 resourceXresourceId: "",
             }];
