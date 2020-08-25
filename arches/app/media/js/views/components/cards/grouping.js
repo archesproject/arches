@@ -84,7 +84,7 @@ define([
         var updatedSortedWidgetsList = function(cards) {
             this.widgetInstanceDataLookup = {};
 
-            var sortedWidgetIds = this.sortedWidgetIds();
+            var sortedWidgetIds = ko.unwrap(this.sortedWidgetIds);
             var widgetNodeIdList = [];
 
             cards.forEach(function(card){
@@ -109,6 +109,12 @@ define([
 
         this.groupedCards.subscribe(function(cards) {
             updatedSortedWidgetsList.call(this, cards);
+        }, this);
+
+        ko.unwrap(this.groupedCards).forEach(function(card) {
+            card.widgets.subscribe(function(_widget) {
+                updatedSortedWidgetsList.call(this, cards);
+            }, this);
         }, this);
 
         if (!!params.preview) {
