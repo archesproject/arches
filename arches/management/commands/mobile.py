@@ -81,7 +81,7 @@ class Command(BaseCommand):
         logger.info("Syncing {0} from CouchDB to PostgreSQL".format(mobile_survey.name))
         mobile_survey.push_edits_to_db(synclog, user)
         synclog.save()
-        
+
         datatype_factory = DataTypeFactory()
         datatypes = DDataType.objects.all()
         for datatype in datatypes:
