@@ -37,6 +37,7 @@ from arches.app.utils.response import JSONResponse
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 
 
+
 class UserManagerView(BaseManagerView):
     action = ""
 
@@ -166,10 +167,10 @@ class UserManagerView(BaseManagerView):
                 try:
                     admin_info = settings.ADMINS[0][1] if settings.ADMINS else ""
                     message = _(
-                        "Your arches profile was just changed.  If this was unexpected, please contact your Arches administrator at %s."
+                        "Your " + settings.APP_NAME + " profile was just changed.  If this was unexpected, please contact your " + settings.APP_NAME + " administrator at %s."
                         % (admin_info)
                     )
-                    user.email_user(_("You're Arches Profile Has Changed"), message)
+                    user.email_user(_("Your " + settings.APP_NAME + " Profile Has Changed"), message)
                 except Exception as e:
                     print(e)
                 request.user = user
