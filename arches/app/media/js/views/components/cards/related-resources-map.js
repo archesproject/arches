@@ -6,9 +6,10 @@ define([
     'geojson-extent',
     'viewmodels/card-component',
     'viewmodels/map-editor',
+    'viewmodels/map-filter',
     'views/components/cards/select-feature-layers',
     'text!templates/views/components/cards/related-resources-map-popup.htm'
-], function($, arches, ko, koMapping, geojsonExtent, CardComponentViewModel, MapEditorViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function($, arches, ko, koMapping, geojsonExtent, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         this.widgets = [];
@@ -24,7 +25,7 @@ define([
         });
 
         this.relatedResourceWidgets = this.widgets.filter(function(widget){return widget.datatype.datatype === 'resource-instance' || widget.datatype.datatype === 'resource-instance-list';});
-
+        this.showRelatedQuery = ko.observable(false);
         var resourceBounds = ko.observable();
         var selectRelatedSource = this.selectRelatedSource();
         var selectRelatedSourceLayer = this.selectRelatedSourceLayer();
@@ -130,6 +131,17 @@ define([
             });
             return selectLayerIds.indexOf(feature.layer.id) >= 0;
         };
+
+        this.mapFilter = new MapFilterViewModel({
+            map: this.map
+        });
+
+        this.drawAvailable.subscribe(function(val){
+            if (val) {
+                self.mapFilter.draw = self.draw;
+            }
+        });
+
     };
     ko.components.register('related-resources-map-card', {
         viewModel: viewModel,

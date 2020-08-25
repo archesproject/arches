@@ -104,7 +104,52 @@
             </div>
             <!-- /ko-->
 
-            <div class="card" style="padding-top: 45px;" data-bind="visible: geoJSONString() === undefined">
+            <!-- ko if: showRelatedQuery() -->
+            <div class="card" style="padding-top: 45px;">
+
+                <div class="spatial-filter-container">
+        
+                    <!-- Buffer Definition -->
+                    <div class="buffer-control form-control">
+                        <h5 class="">{% trans "Buffer" %}</h5>
+                        <div class="form-inline">
+                            <label for="buffer-input">{% trans "Distance" %}</label>
+                            <input type="number" min=0.0 id="buffer-input" placeholder="{% trans " buffer " %}" class="buffer-input" data-bind="textInput: mapFilter.buffer">
+                            <select class="form-control" style="vertical-align: top;" data-bind="options: mapFilter.bufferUnits, optionsText:'name', optionsValue:'val', value: mapFilter.bufferUnit"></select>
+                        </div>
+                    </div>
+            
+                    <!-- Geometry -->
+                    <div class="add-new-feature buffer-control" style="">
+                        <h5 class="">{% trans "Select a filter" %}</h5>
+                        <select data-placeholder="{% trans "Draw a..." %}" data-bind="
+                            value: mapFilter.drawMode,
+                            valueAllowUnset: true,
+                            options: mapFilter.spatialFilterTypes,
+                            optionsText: 'title',
+                            optionsValue: 'drawMode',
+                            chosen: {
+                                'width': '100%',
+                                'disable_search_threshold': 10,
+                                'allow_single_deselect': true
+                            }
+                        "></select>
+                    </div>
+                    
+                </div>
+
+                <div class="install-buttons">
+                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
+                        showRelatedQuery(false);
+                    }">{% trans 'Cancel' %}</button>
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" data-bind="css: {
+                        disabled: false
+                    }, click: console.log('stuff')">{% trans 'Update Features' %}</button>
+                </div>
+            </div>
+            <!-- /ko-->
+
+            <div class="card" style="padding-top: 45px;" data-bind="visible: geoJSONString() === undefined && showRelatedQuery() === false">
                 {% block form_header %}
                 <!-- ko if: card.model.helpenabled -->
                 <span>
@@ -201,6 +246,13 @@
                                             </tbody>
                                         </table>
                                         <div class="map-card-zoom-tool">
+                                            <a href="javascript:void(0);" data-bind="click: function() {
+                                                self.showRelatedQuery(true);
+                                            }">
+                                                <i class="fa fa-pencil map-card-feature-edit"></i>
+                                                {% trans "Get Related" %}
+                                            </a>
+                                            |
                                             <a href="javascript:void(0);" data-bind="click: function() {
                                                 self.editGeoJSON(self.featureLookup[widget.node_id()].features(), widget.node_id());
                                             }">
