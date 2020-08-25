@@ -111,9 +111,9 @@ define([
             updatedSortedWidgetsList.call(this, cards);
         }, this);
 
-        ko.unwrap(this.groupedCards).forEach(function(card) {
-            card.widgets.subscribe(function(_widget) {
-                updatedSortedWidgetsList.call(this, cards);
+        _.each(this.groupedCards(), function(card) {
+            card.widgets.subscribe(function() {
+                updatedSortedWidgetsList.call(this, this.groupedCards());
             }, this);
         }, this);
 
