@@ -84,7 +84,7 @@ define([
         var updatedSortedWidgetsList = function(cards) {
             this.widgetInstanceDataLookup = {};
 
-            var sortedWidgetIds = ko.unwrap(this.sortedWidgetIds);
+            var sortedWidgetIds = this.sortedWidgetIds();
             var widgetNodeIdList = [];
 
             cards.forEach(function(card){
