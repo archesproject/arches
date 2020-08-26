@@ -1,4 +1,4 @@
-define(['underscore', 'knockout'], function(_, ko) {
+define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw) {
     /**
      * A viewmodel used for a generic geocoder
      *
@@ -14,6 +14,7 @@ define(['underscore', 'knockout'], function(_, ko) {
         this.buffer = ko.observable(0);
         this.bufferUnit = ko.observable('m');
         this.filter = params.filter || {};
+        this.filter.inverted = ko.observable(false);
         this.bufferUnits = [{
             name: 'meters',
             val: 'm'
@@ -26,9 +27,6 @@ define(['underscore', 'knockout'], function(_, ko) {
             "features": []
         });
 
-        this.filter.feature_collection.subscribe(function(val){
-            console.log(val);
-        });
         this.searchGeometries = ko.observableArray(null);
         params.sources = {
             "geojson-search-buffer-data": {
@@ -141,17 +139,47 @@ define(['underscore', 'knockout'], function(_, ko) {
         }, this);
         
         this.useMaxBuffer = function (unit, buffer, maxBuffer) {
-            res = false;
+            var res = false;
             if (unit === 'ft') {
                 res = (buffer * 0.3048) > maxBuffer
             } else {
                 res = buffer > maxBuffer
             }
             return res;
-        },
+        };
+
+        this.setupDraw = function() {
+            var self = this;
+            if (!this.draw) {
+                var modes = MapboxDraw.modes;
+                modes.static = {
+                    toDisplayFeatures: function(state, geojson, display) {
+                        display(geojson);
+                    }
+                };
+                this.draw = new MapboxDraw({
+                    displayControlsDefault: false,
+                    modes: modes
+                });
+                this.map().addControl(this.draw);
+            }
+            this.map().on('draw.create', function(e) {
+                self.draw.getAll().features.forEach(function(feature){
+                    if(feature.id !== e.features[0].id){
+                        self.draw.delete(feature.id);
+                    }
+                })
+                self.searchGeometries(e.features);
+                self.updateFilter();
+                self.drawMode(undefined);
+            });
+            this.map().on('draw.update', function(e) {
+                self.searchGeometries(e.features);
+                self.updateFilter();
+            });
+        };
 
         this.updateFilter = function(){
-            console.log('updating filter')
             if (this.buffer() < 0) {
                 this.buffer(0);
             }

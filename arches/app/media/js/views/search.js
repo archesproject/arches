@@ -117,7 +117,6 @@ define([
             }
 
             this.viewModel.loading(true);
-
             this.updateRequest = $.ajax({
                 type: "GET",
                 url: arches.urls.search_results,
