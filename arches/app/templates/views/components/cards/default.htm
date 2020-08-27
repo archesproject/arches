@@ -367,6 +367,14 @@
             <!-- /ko -->
             {% block form_buttons %}
             <div class="install-buttons">
+                <!-- ko if: !!ko.unwrap(card.altButtons) -->
+                    <!-- ko foreach: {data: card.altButtons, as: 'button'} -->
+                    <button data-bind="text: button.label, click: button.onClick($parent), attr: {'class': button.classes}, css: {disabled: (!$parent.card.isWritable && !self.preview)}, visible: button.visible($parent)" ></button>
+                    <!-- /ko -->
+                <!-- /ko -->
+                
+                <!-- ko if: !ko.unwrap(card.altButtons) -->
+
                 <!-- ko if: tile.tileid && self.deleteTile -->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: self.deleteTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }">{% trans 'Delete this record' %}</button>
                 <!-- /ko -->
