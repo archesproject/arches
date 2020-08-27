@@ -11994,6 +11994,7 @@ ul.select2-choices:after {
     width: inherit;
     background: #ecf0f5;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .left-panel-overflow > * {
@@ -12147,6 +12148,7 @@ ul.select2-choices:after {
 .resource-editor-tree {
     height: calc(100vh - 125px);
     overflow-y: auto;
+    overflow-x: hidden;
     background: #ecf0f5;
     padding-bottom: 50px;
 }
