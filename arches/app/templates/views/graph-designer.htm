@@ -116,46 +116,47 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <!-- Left Panel -->
         <div class="left-panel graph-designer" data-bind="resizableSidepanel:true">
-
-            <!--Nav Tabs-->
-            <div class="graph-designer-tab-container">
-                <ul class="nav nav-tabs">
-                    <li data-bind="css: { active: activeTab() === 'graph' }, click: function(){activeTab('graph');}">
-                        <a class="graph-designer-tab ion-android-share-alt" aria-expanded="true">
-                            {% trans 'Graph' %}
-                        </a>
-                    </li>
-                    <li data-bind="css: { active: activeTab() === 'card' }, click: function(){activeTab('card');}">
-                        <a class="graph-designer-tab ion-clipboard" aria-expanded="false">
-                            {% trans 'Cards' %}
-                        </a>
-                    </li>
-                    <!--ko if: graph.isresource() -->
-                    <li data-bind="css: { active: activeTab() === 'permissions' }, click: function(){activeTab('permissions');}">
-                        <a class="graph-designer-tab ion-lock-combination" aria-expanded="false">
-                            {% trans 'Permissions' %}
-                        </a>
-                    </li>
-                    <!--/ko-->
-                </ul>
-            </div>
-
-            <div class="tab-content" >
-                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
-                    <div class="" data-bind="with: graphTree">
-                        {% include 'views/graph/graph-designer/graph-tree.htm' %}
-                    </div>
+            <div class="left-panel-inner-container">
+                <!--Nav Tabs-->
+                <div class="graph-designer-tab-container">
+                    <ul class="nav nav-tabs">
+                        <li data-bind="css: { active: activeTab() === 'graph' }, click: function(){activeTab('graph');}">
+                            <a class="graph-designer-tab ion-android-share-alt" aria-expanded="true">
+                                {% trans 'Graph' %}
+                            </a>
+                        </li>
+                        <li data-bind="css: { active: activeTab() === 'card' }, click: function(){activeTab('card');}">
+                            <a class="graph-designer-tab ion-clipboard" aria-expanded="false">
+                                {% trans 'Cards' %}
+                            </a>
+                        </li>
+                        <!--ko if: graph.isresource() -->
+                        <li data-bind="css: { active: activeTab() === 'permissions' }, click: function(){activeTab('permissions');}">
+                            <a class="graph-designer-tab ion-lock-combination" aria-expanded="false">
+                                {% trans 'Permissions' %}
+                            </a>
+                        </li>
+                        <!--/ko-->
+                    </ul>
                 </div>
 
-                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">
-                    <div class="jstree jstree-default" data-bind="visible: true, with: cardTree" style="display: none;">
-                        {% include 'views/graph/graph-designer/card-tree.htm' %}
+                <div class="tab-content">
+                    <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
+                        <div class="" data-bind="with: graphTree">
+                            {% include 'views/graph/graph-designer/graph-tree.htm' %}
+                        </div>
                     </div>
-                </div>
-
-                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'permissions' }">
-                    <div class="jstree jstree-default" data-bind="visible: true, with: permissionTree" style="display: none;">
-                        {% include 'views/graph/graph-designer/card-tree-permissions.htm' %}
+    
+                    <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">
+                        <div class="jstree jstree-default" data-bind="visible: true, with: cardTree" style="display: none;">
+                            {% include 'views/graph/graph-designer/card-tree.htm' %}
+                        </div>
+                    </div>
+    
+                    <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'permissions' }">
+                        <div class="jstree jstree-default" data-bind="visible: true, with: permissionTree" style="display: none;">
+                            {% include 'views/graph/graph-designer/card-tree-permissions.htm' %}
+                        </div>
                     </div>
                 </div>
             </div>
