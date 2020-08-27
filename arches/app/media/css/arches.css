@@ -1387,6 +1387,7 @@ div.workflow-panel {
 .workflow-select-desc {
     font-size: 12px;
     padding-top: 10px;
+    font-weight: 600;
 }
 
 .workflow-select-card-container-title {
@@ -5267,7 +5268,8 @@ span.editable-card i.fa.fa-align-justify:hover {
 .r-select-card {
     background: #8BC3EB;
     padding: 10px;
-    color: #fff;
+    color: #440EA2;
+    font-weight: 500;
     height: 200px;
     opacity: .8;
     text-align: center;
@@ -5289,7 +5291,7 @@ span.editable-card i.fa.fa-align-justify:hover {
 .r-select-title {
     font-size: 19px;
     font-weight: 500;
-    color: #fff;
+    color: #440EA2;
     text-align: center;
     overflow-wrap: break-word;
 }
@@ -10516,7 +10518,7 @@ table.table.dataTable {
 }
 
 .search-dropdown {
-    max-height: 36px;
+    /*max-height: 36px;*/
 }
 
 .search-toolbar {
@@ -10788,7 +10790,7 @@ table.table.dataTable {
 .faceted-search-card-container {
     border: 1px solid #ddd;
     padding: 20px;
-    margin-bottom: 10px;
+    margin: 10px;
     background: #f9f9f9;
 }
 
