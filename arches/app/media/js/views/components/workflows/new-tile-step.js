@@ -35,6 +35,7 @@ define([
         this.alert = params.alert || ko.observable(null);
         this.complete = params.complete || ko.observable();
         this.completeOnSave = params.completeOnSave === false ? false : true;
+        this.altButtons =  params.altButtons || ko.observable(null);
         this.loading(true);
         this.customCardLabel = params.customCardLabel || false;
         var flattenTree = function(parents, flatList) {
