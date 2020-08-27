@@ -140,6 +140,7 @@ define([
                         return;
                     }
                     if (self.customCardLabel) item.model.name(ko.unwrap(self.customCardLabel));
+                    item.altButtons = self.altButtons;
                     self.card(item);
                     if (ko.unwrap(params.tileid)) {
                         ko.unwrap(item.tiles).forEach(function(tile) {
