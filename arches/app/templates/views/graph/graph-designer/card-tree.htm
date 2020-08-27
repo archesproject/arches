@@ -8,7 +8,7 @@
             <!-- Clear Search -->
             <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
         </div>
-        <div class="tree-display-tools-panel">
+        <div>
             <a class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
             <a class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
             <!--ko ifnot: showIds -->
@@ -19,7 +19,7 @@
             <!--/ko-->
         </div>
     </div>
-    <div class="left-panel-overflow designer-card-tree">
+    <div class="left-panel-overflow designer-tree designer-card-tree">
         <ul class="jstree-container-ul jstree-children" aria-expanded="true">
             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
                 <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
