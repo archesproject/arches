@@ -156,6 +156,9 @@ define([
                     data: payload,
                     method: 'GET'
                 }).done(function(data){
+                    self.relatedResourceWidgets.forEach(function(widget) {
+                        self.tile.data[widget.node.nodeid].removeAll();
+                    });
                     data.results.hits.hits.forEach(function(hit) {
                         var resourceInstance = hit._source;
                         self.relateResource(
