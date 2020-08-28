@@ -78,12 +78,13 @@
                 <!--ko if: rr.related.length > 0 -->
                 <div class="rp-report-container-tile">
                 <div class="row rp-report-tile">
-                    <!-- ko foreach: { data: rr.related } -->
+                    <!-- ko foreach: { data: rr.related.slice(0, rr.loadCount()) } -->
                         <dl class="dl-horizontal">
                             <dt><a data-bind="text: $data.displayname, attr: {href: $data.link}"></a></dt>
                             <dd data-bind="text: '( ' + $data.relationship + ' )'"></dd>
                         </dl>
                     <!-- /ko -->
+                    <div class="load-relations-report" data-bind="click: function(){ if(rr.related.slice(0, rr.loadCount()).length <= rr.related.length - 5) {rr.loadCount(ko.unwrap(rr.loadCount) + 5);} else {rr.loadCount(rr.related.length);}}, visible: rr.loadCount() < rr.related.length" >{% trans "Load More" %}</div>
                 </div>
                 </div>
                 <!-- /ko -->
