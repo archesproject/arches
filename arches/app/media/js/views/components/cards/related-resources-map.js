@@ -168,6 +168,15 @@ define([
             }
         });
 
+        this.appendBufferToTileFeatures = function(val){
+            var bufferFeature = {geometry: self.map().getSource('geojson-search-buffer-data').serialize().data};
+            bufferFeature.type = 'Feature';
+            bufferFeature.properties = {};
+            var bufferFeatureId = self.draw.add(bufferFeature)[0];
+            self.draw.setFeatureProperty(bufferFeatureId, 'nodeId', val);
+            ko.unwrap(self.tile.data[val]).features.push(bufferFeature);
+        };
+
         this.drawAvailable.subscribe(function(val){
             var bufferSrcId = 'geojson-search-buffer-data';
             self.widget = self.widgets.find(function(widget){

@@ -142,7 +142,10 @@
                 }">
                 <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) === 'geojson-feature-collection' -->
                     <h5 data-bind="text: widget.label"></h5>
-                    <button class="btn btn-sm btn-primary">{% trans 'Add buffer' %}</button>
+                    <button class="btn btn-sm btn-primary" data-bind="
+                        click: function(){self.appendBufferToTileFeatures(widget.node_id());}, 
+                        disable: !ko.unwrap(self.mapFilter.buffer) || !ko.unwrap(self.mapFilter.searchGeometries).length
+                        ">{% trans 'Add buffer' %}</button>
                     <!-- ko foreach: {data: self.featureLookup[widget.node_id()].features, as: 'feature'} -->
                     <div class="basemap-listing" style="display:flex" data-bind="
                     click: function(){self.mapFilter.makeSearchFeature(feature)},
