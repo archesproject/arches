@@ -8,7 +8,7 @@ define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw)
      */
     var MapFilterViewModel = function(params) {
         var self = this;
-
+        this.searchContext = params.searchContext ||  ko.observable(true);
         this.map = params.map;
         this.draw = params.draw;
         this.buffer = ko.observable(0);
@@ -22,6 +22,13 @@ define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw)
             name: 'feet',
             val: 'ft'
         }];
+
+        this.searchContext.subscribe(function(val) {
+            if (val === false) {
+                self.clear();
+            }
+        });
+
         this.filter.feature_collection = ko.observable({
             "type": "FeatureCollection",
             "features": []
@@ -130,16 +137,15 @@ define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw)
         );
 
         this.clear = function() {
-            this.filter.feature_collection({
-                "type": "FeatureCollection",
-                "features": []
-            });
             this.map().getSource('geojson-search-buffer-data').setData({
                 "type": "FeatureCollection",
                 "features": []
             });
-            this.getFilter('term-filter').removeTag('Map Filter Enabled');
-            this.draw.deleteAll();
+            this.draw.getAll().features.forEach(function(feature){
+                if (feature.properties.searchGeom) {
+                    self.draw.delete(feature.id);
+                }
+            });
             this.searchGeometries([]);
         };
 
@@ -204,19 +210,35 @@ define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw)
                 this.map().addControl(this.draw);
             }
             this.map().on('draw.create', function(e) {
-                self.draw.getAll().features.forEach(function(feature){
-                    if(feature.id !== e.features[0].id){
-                        self.draw.delete(feature.id);
-                    }
-                })
-                self.searchGeometries(e.features);
-                self.updateFilter();
-                self.drawMode(undefined);
+                if (self.searchContext()) {
+                    self.draw.getAll().features.forEach(function(feature){
+                        if(feature.id !== e.features[0].id) {
+                            if (feature.properties.searchGeom) {
+                                self.draw.delete(feature.id);
+                            }
+                        } else {
+                            self.draw.setFeatureProperty(feature.id, 'nodeId', null)
+                            self.draw.setFeatureProperty(feature.id, 'searchGeom', true);
+                        }
+                    });
+                    self.searchGeometries(e.features);
+                    self.updateFilter();
+                    self.drawMode(undefined);
+                }
             });
             this.map().on('draw.update', function(e) {
-                self.searchGeometries(e.features);
-                self.updateFilter();
+                if (self.searchContext()) {
+                    self.searchGeometries(e.features);
+                    self.updateFilter();
+                }
             });
+        };
+
+        this.makeSearchFeature = function(feature) {
+            if (self.searchContext()) {
+                self.searchGeometries([feature]);
+                self.updateFilter();
+            }
         };
 
         this.updateFilter = function(){
@@ -225,7 +247,6 @@ define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw)
             }
 
             var useMaxBuffer = this.useMaxBuffer(this.bufferUnit(), this.buffer(), this.maxBuffer);
-            var buffer = this.buffer();
             if (useMaxBuffer) {
                 max = this.bufferUnit() === 'ft' ? 328084 : this.maxBuffer;
                 this.buffer(max);

@@ -120,7 +120,7 @@
                     </div>
             
                     <!-- Geometry -->
-                    <div class="add-new-feature buffer-control" style="">
+                    <!-- <div class="add-new-feature buffer-control" style="">
                         <h5 class="">{% trans "Select a filter" %}</h5>
                         <select data-placeholder="{% trans "Draw a..." %}" data-bind="
                             value: mapFilter.drawMode,
@@ -134,17 +134,30 @@
                                 'allow_single_deselect': true
                             }
                         "></select>
-                    </div>
+                    </div> -->
                     
                 </div>
+                <div data-bind="foreach: {
+                    data:card.widgets, as: 'widget'
+                }">
+                <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) === 'geojson-feature-collection' -->
+                    <h5 data-bind="text: widget.label"></h5>
+                    <button class="btn btn-sm btn-primary">{% trans 'Add buffer' %}</button>
+                    <!-- ko foreach: {data: self.featureLookup[widget.node_id()].features, as: 'feature'} -->
+                    <div class="basemap-listing" style="display:flex" data-bind="
+                    click: function(){self.mapFilter.makeSearchFeature(feature)},
+                    css: {'active-basemap': self.mapFilter.searchGeometries().length && self.mapFilter.searchGeometries().find(function(x){return x.id === feature.id})};">
+                            <div data-bind="text: feature.geometry.type"></div>
+                    </div>
+                    <!-- /ko -->
+                    <!-- /ko -->
 
+                </div>
+                
                 <div class="install-buttons">
                     <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
                         showRelatedQuery(false);
-                    }">{% trans 'Cancel' %}</button>
-                    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" data-bind="css: {
-                        disabled: false
-                    }, click: console.log('stuff')">{% trans 'Update Features' %}</button>
+                    }">{% trans 'Close' %}</button>
                 </div>
             </div>
             <!-- /ko-->
@@ -246,13 +259,15 @@
                                             </tbody>
                                         </table>
                                         <div class="map-card-zoom-tool">
+                                            <!-- ko if: ko.unwrap(self.featureLookup[widget.node_id()].features) && self.featureLookup[widget.node_id()].features().length > 0 -->
                                             <a href="javascript:void(0);" data-bind="click: function() {
                                                 self.showRelatedQuery(true);
                                             }">
                                                 <i class="fa fa-pencil map-card-feature-edit"></i>
-                                                {% trans "Get Related" %}
+                                                {% trans "Find" %}
                                             </a>
                                             |
+                                            <!--/ko-->
                                             <a href="javascript:void(0);" data-bind="click: function() {
                                                 self.editGeoJSON(self.featureLookup[widget.node_id()].features(), widget.node_id());
                                             }">

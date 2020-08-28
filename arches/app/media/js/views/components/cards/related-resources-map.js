@@ -134,39 +134,53 @@ define([
         };
 
         this.mapFilter = new MapFilterViewModel({
-            map: this.map
+            map: this.map,
+            searchContext: self.showRelatedQuery
         });
 
         this.mapFilter.filter.feature_collection.subscribe(function(val){
-            var resourceFilter = {"graphid":"12581535-3a08-11ea-b9b7-027f24e6fd6b","name":"Master Plan Zone","inverted":false}
-            var payload = {
-                "format": "tilecsv",
-                "map-filter": JSON.stringify(val),
-                "resource-type-filter": JSON.stringify([resourceFilter]),
-                "paging-filter": 1,
-                "precision": 6,
-                "tiles": true,
-                "total": 0
-            };
-            $.ajax({
-                url: arches.urls.search_results,
-                data: payload,
-                method: 'GET'
-            }).done(function(data){
-                var widget = self.widgets.find(function(widget){return widget.datatype.datatype === 'resource-instance'});
-                data.results.hits.hits.forEach(function(hit) {
-                    var resourceInstance = hit._source;
-                    self.relateResource(
-                        {resourceinstanceid: resourceInstance.resourceinstanceid, graphid: resourceInstance.graph_id},
-                        widget);
+            if (self.widget && self.widget.node.config.graphs().length) {
+                var resourceFilter = self.widget.node.config.graphs()[0];
+                resourceFilter.inverted = false;
+                var payload = {
+                    "format": "tilecsv",
+                    "map-filter": JSON.stringify(val),
+                    "resource-type-filter": JSON.stringify([resourceFilter]),
+                    "paging-filter": 1,
+                    "precision": 6,
+                    "tiles": true,
+                    "total": 0
+                };
+                $.ajax({
+                    url: arches.urls.search_results,
+                    data: payload,
+                    method: 'GET'
+                }).done(function(data){
+                    data.results.hits.hits.forEach(function(hit) {
+                        var resourceInstance = hit._source;
+                        self.relateResource(
+                            {resourceinstanceid: resourceInstance.resourceinstanceid, graphid: resourceInstance.graph_id},
+                            self.widget);
+                    });
+                    var buffer = data['map-filter'].search_buffer;
+                    self.map().getSource('geojson-search-buffer-data').setData(buffer);
                 });
-            });
+            }
         });
 
         this.drawAvailable.subscribe(function(val){
+            var bufferSrcId = 'geojson-search-buffer-data';
+            self.widget = self.widgets.find(function(widget){
+                return widget.datatype.datatype === 'resource-instance' || widget.datatype.datatype === 'resource-instance-list';
+            });
             if (val) {
                 self.mapFilter.draw = self.draw;
                 self.mapFilter.setupDraw();
+                self.map().addSource(bufferSrcId, self.mapFilter.sources[bufferSrcId])
+                self.mapFilter.layers().forEach(function(layer){
+                    self.map().addLayer(layer);
+                    extendedLayers.push(layer);
+                });
             }
         });
 
