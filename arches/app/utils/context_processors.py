@@ -36,7 +36,10 @@ def map_info(request):
     else:
         hex_bin_bounds = (0, 0, 1, 1)
         default_center = {"coordinates": [6.602384, 0.245926]}  # an island off the coast of Africa
-    query = GroupMapSettings.objects.filter(group=request.user.groups.all()[0])
+    if request.user.groups.count() == 0:
+        query = GroupMapSettings.objects.none()
+    else:
+        query = GroupMapSettings.objects.filter(group=request.user.groups.all()[0])
     if query.exists():
         group_map_settings = query.first()
         min_zoom = group_map_settings.min_zoom
