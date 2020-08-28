@@ -28,7 +28,7 @@ define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw)
         });
 
         this.searchGeometries = ko.observableArray(null);
-        params.sources = {
+        this.sources = {
             "geojson-search-buffer-data": {
                 "type": "geojson",
                 "generateId": true,
@@ -39,7 +39,7 @@ define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw)
             }
         };
 
-        params.layers = ko.observable(
+        this.layers = ko.observable(
             [
                 {
                     "id": "geojson-search-buffer-outline-base",
@@ -53,7 +53,7 @@ define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw)
                         "line-join": "round"
                     },
                     "paint": {
-                        "line-color": "#fff",
+                        "line-color": "#aa0000",
                         "line-width": 4
                     }
                 },
@@ -69,23 +69,63 @@ define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw)
                         "line-join": "round"
                     },
                     "paint": {
-                        "line-color": "#3bb2d0",
+                        "line-color": "#aa0000",
+                        "line-width": 2
+                    }
+                },
+                {
+                    "id": "geojson-search-buffer-line",
+                    "source": "geojson-search-buffer-data",
+                    "type": "line",
+                    "filter": [
+                        "==", "$type", "LineString"
+                    ],
+                    "layout": {
+                        "line-cap": "round",
+                        "line-join": "round"
+                    },
+                    "paint": {
+                        "line-color": "#aa0000",
                         "line-width": 2
                     }
                 },
                 {
                     "id": "geojson-search-buffer",
                     "type": "fill",
+                    "filter": [
+                        "==", ["geometry-type"], "Polygon"
+                    ],
                     "layout": {
                         "visibility": "visible"
                     },
                     "paint": {
-                        "fill-color": "#3bb2d0",
-                        "fill-outline-color": "#3bb2d0",
+                        "fill-color": "#aa3322",
+                        "fill-outline-color": "#aa0000",
                         "fill-opacity": 0.2
                     },
                     "source": "geojson-search-buffer-data"
-                }
+                },
+                {
+                    "id": "geojson-search-buffer-point-stroke",
+                    "type": "circle",
+                    "filter": ["==", "$type", "Point"],
+                    "paint": {
+                        "circle-radius": 6,
+                        "circle-opacity": 1,
+                        "circle-color": "#fff"
+                    },
+                    "source": "geojson-search-buffer-data",
+                },
+                {
+                    "id": "geojson-search-buffer-point",
+                    "type": "circle",
+                    "filter": ["==", "$type", "Point"],
+                    "paint": {
+                        "circle-radius": 5,
+                        "circle-color": "#aa0000"
+                    },
+                    "source": "geojson-search-buffer-data",
+                },
             ]
         );
 
