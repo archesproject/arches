@@ -126,7 +126,7 @@ define(['arches',
                 });
             };
             _.each(this.get('related_resources'), function(rr){
-                var res = {'graph_name': rr.name, 'related':[]};
+                var res = {'graph_name': rr.name, 'related':[], 'loadCount':ko.observable(5)};
                 _.each(rr.resources, function(resource) {
                     _.each(resource.relationships, function(relationship){
                         res.related.push({'displayname':resource.displayname,'link': arches.urls.resource_report + resource.instance_id, 'relationship': relationship});
