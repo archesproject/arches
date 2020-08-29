@@ -105,16 +105,15 @@
             <!-- /ko-->
 
             <!-- ko if: showRelatedQuery() -->
-            <div class="card" style="padding-top: 45px;">
+            <div class="card" style="padding-top: 55px;">
 
-                <div class="spatial-filter-container">
+                <div>
         
                     <!-- Buffer Definition -->
-                    <div class="buffer-control form-control">
-                        <h5 class="">{% trans "Buffer" %}</h5>
+                    <div class="buffer-control" style="padding-left: 0px">
                         <div class="form-inline">
-                            <label for="buffer-input">{% trans "Distance" %}</label>
-                            <input type="number" min=0.0 id="buffer-input" placeholder="{% trans " buffer " %}" class="buffer-input" data-bind="textInput: mapFilter.buffer">
+                            <label for="buffer-input">{% trans "Buffer" %}</label>
+                            <input type="number" min=0.0 id="buffer-input" placeholder="{% trans " buffer " %}" class="buffer-input form-control input-md" style="height: 34px" data-bind="textInput: mapFilter.buffer">
                             <select class="form-control" style="vertical-align: top;" data-bind="options: mapFilter.bufferUnits, optionsText:'name', optionsValue:'val', value: mapFilter.bufferUnit"></select>
                         </div>
                     </div>
@@ -141,13 +140,16 @@
                     data:card.widgets, as: 'widget'
                 }">
                 <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) === 'geojson-feature-collection' -->
-                    <h5 data-bind="text: widget.label"></h5>
+                    <div style="display: flex; justify-content: space-between; margin: 10px;">
+                    <div class="control-label widget-input-label" data-bind="text: widget.label"></div>
                     <button class="btn btn-sm btn-primary" data-bind="
                         click: function(){self.appendBufferToTileFeatures(widget.node_id());}, 
                         disable: !ko.unwrap(self.mapFilter.buffer) || !ko.unwrap(self.mapFilter.searchGeometries).length
-                        ">{% trans 'Add buffer' %}</button>
+                        ">{% trans 'Add buffer to features' %}</button>
+                    </div>
+        
                     <!-- ko foreach: {data: self.featureLookup[widget.node_id()].features, as: 'feature'} -->
-                    <div class="basemap-listing" style="display:flex" data-bind="
+                    <div class="basemap-listing" style="display: flex; min-height: 0px" data-bind="
                     click: function(){self.mapFilter.makeSearchFeature(feature)},
                     css: {'active-basemap': self.mapFilter.searchGeometries().length && self.mapFilter.searchGeometries().find(function(x){return x.id === feature.id})};">
                             <div data-bind="text: feature.geometry.type"></div>

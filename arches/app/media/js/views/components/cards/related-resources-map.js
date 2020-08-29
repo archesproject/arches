@@ -15,7 +15,6 @@ define([
         this.widgets = [];
         params.configKeys = ['selectRelatedSource', 'selectRelatedSourceLayer'];
         CardComponentViewModel.apply(this, [params]);
-
         if (self.form && self.tile) self.card.widgets().forEach(function(widget) {
             var id = widget.node_id();
             var type = ko.unwrap(self.form.nodeLookup[id].datatype);
@@ -157,7 +156,9 @@ define([
                     method: 'GET'
                 }).done(function(data){
                     self.relatedResourceWidgets.forEach(function(widget) {
-                        self.tile.data[widget.node.nodeid].removeAll();
+                        if (ko.unwrap(self.tile.data[widget.node.nodeid])) {
+                            self.tile.data[widget.node.nodeid]([]);
+                        }
                     });
                     data.results.hits.hits.forEach(function(hit) {
                         var resourceInstance = hit._source;
