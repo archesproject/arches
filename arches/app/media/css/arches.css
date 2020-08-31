@@ -8986,6 +8986,10 @@ a.clear-geojson-button:hover {
     text-overflow: ellipsis;
 }
 
+.mapboxgl-canvas:focus {
+    outline: none;
+}
+
 .map-widget-tool:nth-child(1) {
     padding-left: 0px;
     width: 50px;
@@ -10787,7 +10791,7 @@ table.table.dataTable {
 .faceted-search-card-container {
     border: 1px solid #ddd;
     padding: 20px;
-    margin: 10px;
+    margin: 15px;
     background: #f9f9f9;
 }
 
@@ -10879,7 +10883,8 @@ a.search-facet-item.disabled {
 }
 
 .facet-btn-group {
-    width: 100%;
+    display: block;
+    margin: 10px 15px 50px 15px;
 }
 
 .facet-btn {
@@ -10893,13 +10898,27 @@ a.search-facet-item.disabled {
 }
 
 .facet-label {
-    margin-left: 15px;
+    margin-left: 5px;
     margin-bottom: 5px;
 }
 
 .facet-body {
     padding-top: 5px;
     padding-bottom: 45px;
+    margin-left: 10px;
+}
+
+.facet-body .col-md-4.col-lg-3 {
+    padding-right: 5px;
+
+}
+
+.facet-body div div .select2-container {
+    border: none;
+}
+
+.facet-body  .chosen-container-single .chosen-single {
+    height: 36px;
 }
 
 .related-resources-header .resource-instance-wrapper {
