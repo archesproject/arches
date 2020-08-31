@@ -130,8 +130,8 @@ define([
                 .call(d3.zoom()
                     .extent([[0, 0], [width, height]])
                     .scaleExtent([1, 8])
-                    .on("zoom", function() {
-                        vis.attr("transform", d3.event.transform);
+                    .on("zoom", function(event) {
+                        vis.attr("transform", event.transform);
                     }));
 
             var vis = svg.append('svg:g');
@@ -148,7 +148,7 @@ define([
                     .data(data.links)
                     .join("line")
                     .attr("class", "link")
-                    .on("mouseover", function(d) {
+                    .on("mouseover", function(event, d) {
                         var hoveredNodes = [];
                         var linkMap = linkMap;
                         d3.select(this).attr("class", "linkMouseover");
@@ -171,7 +171,7 @@ define([
                         });
                         nodeSelection(hoveredNodes);
                     })
-                    .on("mouseout", function(d) {
+                    .on("mouseout", function(event, d) {
                         d3.select(this).attr("class", "link");
                         vis.selectAll("circle").attr("class", function(d1) {
                             var className = 'node-' + (d1.isRoot ? 'current' : 'ancestor');
@@ -199,7 +199,7 @@ define([
                     .attr("class", function(d) {
                         return 'node-' + (d.isRoot ? 'current' : 'ancestor');
                     })
-                    .on("mouseover", function(d) {
+                    .on("mouseover", function(event, d) {
                         vis.selectAll("circle")
                             .attr("class", function(d1) {
                                 var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
@@ -228,7 +228,7 @@ define([
                                 return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
                             });
                     })
-                    .on('mouseout', function(d) {
+                    .on('mouseout', function(event, d) {
                         vis.selectAll("circle")
                             .attr("class", function(d1) {
                                 var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
@@ -250,8 +250,8 @@ define([
                         vis.selectAll("line")
                             .attr('class', 'link');
                     })
-                    .on("click", function(d) {
-                        if (!d3.event.defaultPrevented) {
+                    .on("click", function(event, d) {
+                        if (!event.defaultPrevented) {
                             d.loadcount(d.loadcount()+1);
                         }
                         vis.selectAll("circle")
@@ -286,19 +286,19 @@ define([
                         .on("drag", dragged)
                         .on("end", dragended));
 
-                    function dragstarted(d) {
-                        if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+                    function dragstarted(event, d) {
+                        if (!event.active) simulation.alphaTarget(0.3).restart();
                         d.fx = d.x;
                         d.fy = d.y;
                     }
                     
-                    function dragged(d) {
-                        d.fx = d3.event.x;
-                        d.fy = d3.event.y;
+                    function dragged(event, d) {
+                        d.fx = event.x;
+                        d.fy = event.y;
                     }
                     
-                    function dragended(d) {
-                        if (!d3.event.active) simulation.alphaTarget(0);
+                    function dragended(event, d) {
+                        if (!event.active) simulation.alphaTarget(0);
                         d.fx = null;
                         d.fy = null;
                     }    

@@ -50,10 +50,10 @@ define([
             })
 
             var g = ko.utils.domData.get(element, 'vis');
-            g.on("mouseleave", function () {
+            g.on("mouseleave", function (event) {
                 var d = selectedPeriod();
                 if (d) {
-                    highlightPeriod(d);
+                    highlightPeriod(event, d);
                 } else {
                     clearHighlight();
                 }
@@ -85,13 +85,13 @@ define([
                     function dist(a, b) {
                         return Math.sqrt(Math.pow(a[0] - b[0], 2), Math.pow(a[1] - b[1], 2));
                     }
-                    selection.on('mousedown', function() {
-                        down = d3.mouse(document.body);
+                    selection.on('mousedown', function(event) {
+                        down = d3.pointer(event);
                         last = +new Date();
                         args = arguments;
                     });
-                    selection.on('mouseup', function() {
-                        if (dist(down, d3.mouse(document.body)) > tolerance) {
+                    selection.on('mouseup', function(event) {
+                        if (dist(down, d3.pointer(event)) > tolerance) {
                             return;
                         } else {
                             if (wait) {
@@ -128,14 +128,14 @@ define([
                 return d3rebind(cc, dispatcher, 'on');
             }
             var clickmanager = d3ClickManager();
-            clickmanager.on("click", function(d) {
+            clickmanager.on("click", function(event, d) {
                 selectedPeriod(d);
             })
-            .on("dblclick", function(d) {
+            .on("dblclick", function(event, d) {
                 dblclick(d);
             });
 
-            function highlightPeriod(d) {
+            function highlightPeriod(event, d) {
                 count = d.data.size;
                 if (d.data.size < 1) {
                     count = "< 1";
