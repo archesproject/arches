@@ -43,6 +43,7 @@
     <div class="rp-report-section relative rp-report-section-root">
         <div class="rp-report-section-title">
             <!-- ko foreach: { data: report.cards, as: 'card' } -->
+                <!-- ko if: $parent.hideEmptyNodes() === false || card.tiles().length > 0 -->
                 <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
                 <div class="rp-card-section">
                     <!-- ko component: {
@@ -56,48 +57,50 @@
                         }
                     } --> <!-- /ko -->
                 </div>
+                <!-- /ko -->
             <!-- /ko -->
         </div>
     </div>
 
     {% endblock body %}
 
+    <!-- ko if: report.related_resources.length && report.related_resources.map(x => typeof(x.related) != 'undefined' ?  x.related.length : 0).reduce((a,b) => a+b) > 0 || !hideEmptyNodes() -->
     <div class="rp-report-section relative report-related-resources">
         <div class="rp-report-section-title">
             <h4 class="rp-section-title">{% trans 'Related Resources' %}</h4>
         </div>
         <!-- ko foreach: { data: report.related_resources, as: 'rr' } -->
-        <!-- ko if: rr.related.length > 0 -->
-        <div class="rp-card-section">
-            <h5 class="rp-tile-title">
-                <span class="rp-tile-title-float" data-bind="text:rr.graph_name"></span>
-            </h5>
-            <!--ko if: rr.related.length > 0 -->
-            <div class="rp-report-container-tile">
-            <div class="row rp-report-tile">
-                <!-- ko foreach: { data: rr.related } -->
-                    <dl class="dl-horizontal">
-                        <dt><a data-bind="text: $data.displayname, attr: {href: $data.link}"></a></dt>
-                        <dd data-bind="text: '( ' + $data.relationship + ' )'"></dd>
-                    </dl>
+            <!-- ko if: rr.related.length > 0 -->
+            <div class="rp-card-section">
+                <h5 class="rp-tile-title">
+                    <span class="rp-tile-title-float" data-bind="text: rr.graph_name"></span>
+                </h5>
+                <!--ko if: rr.related.length > 0 -->
+                <div class="rp-report-container-tile">
+                <div class="row rp-report-tile">
+                    <!-- ko foreach: { data: rr.related } -->
+                        <dl class="dl-horizontal">
+                            <dt><a data-bind="text: $data.displayname, attr: {href: $data.link}"></a></dt>
+                            <dd data-bind="text: '( ' + $data.relationship + ' )'"></dd>
+                        </dl>
+                    <!-- /ko -->
+                </div>
+                </div>
                 <!-- /ko -->
-            </div>
+                <!--ko if: rr.related.length === 0 -->
+                <div class="rp-report-container-tile">
+                    <div class="row rp-report-tile rp-no-data">{% trans 'No relationships added' %}</div>
+                </div>
+                <!--/ko-->
             </div>
             <!-- /ko -->
-            <!--ko if: rr.related.length === 0 -->
-            <div class="rp-report-container-tile">
-                <div class="row rp-report-tile rp-no-data">{% trans 'No relationships added' %}</div>
-            </div>
-            <!--/ko-->
-        </div>
         <!-- /ko -->
-        <!-- /ko -->
-    </div>
+    </div>  
+    <!-- /ko -->    
 </div>
-
-
 {% endblock report %}
 <!-- /ko -->
+
 <!-- ko if: summary -->
 {% block summary %}
 <div class="relative report-title-bar">
@@ -135,6 +138,7 @@
 </div>
 {% endblock summary %}
 <!-- /ko -->
+<!-- end of not configForm -->
 <!-- /ko -->
 
 

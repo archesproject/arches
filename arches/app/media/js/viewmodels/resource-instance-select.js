@@ -149,10 +149,12 @@ define([
 
         var makeObject = function(id, esSource){
             var graph = self.lookupGraph(esSource.graph_id);
+            var ontologyProperty = graph ? graph.config.ontologyProperty : '';
+            var inverseOntologyProperty = graph ? graph.config.inverseOntologyProperty : '';
             var ret = {
                 "resourceId": ko.observable(id),
-                "ontologyProperty": ko.observable(graph.config.ontologyProperty || ''),
-                "inverseOntologyProperty": ko.observable(graph.config.inverseOntologyProperty || ''),
+                "ontologyProperty": ko.observable(ontologyProperty || ''),
+                "inverseOntologyProperty": ko.observable(inverseOntologyProperty || ''),
                 "resourceXresourceId": ""
             };            
             Object.defineProperty(ret, 'resourceName', {value: ko.observable(esSource.displayname)});
