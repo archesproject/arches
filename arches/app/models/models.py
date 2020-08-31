@@ -1041,8 +1041,8 @@ class UserProfile(models.Model):
 @receiver(post_save, sender=User)
 def create_permissions_for_new_users(sender, instance, created, **kwargs):
     if created:
-        ct = ContentType.objects.get(app_label='models', model='resourceinstance')
-        resourceInstanceIds = list(GroupObjectPermission.objects.filter(content_type=ct).values_list('object_pk', flat=True).distinct())
+        ct = ContentType.objects.get(app_label="models", model="resourceinstance")
+        resourceInstanceIds = list(GroupObjectPermission.objects.filter(content_type=ct).values_list("object_pk", flat=True).distinct())
         for resourceInstanceId in resourceInstanceIds:
             resourceInstanceId = uuid.UUID(resourceInstanceId)
         resources = ResourceInstance.objects.filter(pk__in=resourceInstanceIds)
