@@ -219,8 +219,10 @@ class ChangePasswordView(View):
 class PasswordResetView(auth_views.PasswordResetView):
     form_class = ArchesPasswordResetForm
 
+
 class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
     form_class = ArchesSetPasswordForm
+
 
 @method_decorator(csrf_exempt, name="dispatch")
 class UserProfileView(View):

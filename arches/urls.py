@@ -62,7 +62,7 @@ from arches.app.views.auth import (
     UserProfileView,
     ServerSettingView,
     PasswordResetView,
-    PasswordResetConfirmView
+    PasswordResetConfirmView,
 )
 from arches.app.models.system_settings import settings
 from django.views.decorators.cache import cache_page
