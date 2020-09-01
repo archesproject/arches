@@ -39,7 +39,7 @@ define([
             var currentResource = options.currentResource;
 
             var selectNode = function(d) {
-                vis.selectAll("circle")
+                nodesElement.selectAll("circle")
                     .attr("class", function(d1) {
                         var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                         if (d1 === d) {
@@ -49,7 +49,7 @@ define([
                         }
                         return className;
                     });
-                vis.selectAll("line")
+                linksElement.selectAll("line")
                     .attr('class', function(l) {
                         return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
                     });
@@ -58,11 +58,11 @@ define([
             };
 
             var clearHover = function(d) {
-                vis.selectAll("line")
+                linksElement.selectAll("line")
                     .attr('class', function(l) {
                         return 'link';
                     });
-                vis.selectAll("circle").attr("class", function(d1) {
+                nodesElement.selectAll("circle").attr("class", function(d1) {
                     var className = 'node-' + (d1.isRoot ? 'current' : 'ancestor');
                     if (d1.selected()) {
                         className += '-selected';
@@ -72,7 +72,7 @@ define([
             };
 
             var hoverNode = function(d) {
-                vis.selectAll("circle")
+                nodesElement.selectAll("circle")
                     .attr("class", function(d1) {
                         var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                         if (d1 === d) {
@@ -91,7 +91,7 @@ define([
                         }
                         return className;
                     });
-                vis.selectAll("line")
+                linksElement.selectAll("line")
                     .attr('class', function(l) {
                         return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
                     });
@@ -104,7 +104,7 @@ define([
                         selectNode(item);
                     } else {
                         nodeSelection.removeAll();
-                        vis.selectAll("circle")
+                        nodesElement.selectAll("circle")
                             .attr("class", function(d1) {
                                 return 'node-' + (d1.isRoot ? 'current' : 'ancestor');
                             });
@@ -131,10 +131,12 @@ define([
                     .extent([[0, 0], [width, height]])
                     .scaleExtent([1, 8])
                     .on("zoom", function(event) {
-                        vis.attr("transform", event.transform);
+                        groupElement.attr("transform", event.transform);
                     }));
 
-            var vis = svg.append('svg:g');
+            var groupElement = svg.append('svg:g');
+            var linksElement = groupElement.append('svg:g');
+            var nodesElement = groupElement.append('svg:g');
 
             var update = function() {
                 var linkMap = linkMap;
@@ -144,7 +146,7 @@ define([
                 simulation.force("link").links(data.links);
                 simulation.restart();
 
-                var link = vis.selectAll("line")
+                var link = linksElement.selectAll("line")
                     .data(data.links)
                     .join("line")
                     .attr("class", "link")
@@ -152,7 +154,7 @@ define([
                         var hoveredNodes = [];
                         var linkMap = linkMap;
                         d3.select(this).attr("class", "linkMouseover");
-                        vis.selectAll("circle").attr("class", function(d1) {
+                        nodesElement.selectAll("circle").attr("class", function(d1) {
                             var matrix;
                             var className = 'node-' + (d1.isRoot ? 'current' : 'ancestor');
                             if (d.source === d1 || d.target === d1) {
@@ -173,7 +175,7 @@ define([
                     })
                     .on("mouseout", function(event, d) {
                         d3.select(this).attr("class", "link");
-                        vis.selectAll("circle").attr("class", function(d1) {
+                        nodesElement.selectAll("circle").attr("class", function(d1) {
                             var className = 'node-' + (d1.isRoot ? 'current' : 'ancestor');
                             if (d1.selected()) {
                                 className += '-selected';
@@ -185,7 +187,7 @@ define([
                 link.exit()
                     .remove();
 
-                var node = vis.selectAll("circle")
+                var node = nodesElement.selectAll("circle")
                     .data(data.nodes, function(d) {
                         return d.id;
                     })
@@ -200,7 +202,7 @@ define([
                         return 'node-' + (d.isRoot ? 'current' : 'ancestor');
                     })
                     .on("mouseover", function(event, d) {
-                        vis.selectAll("circle")
+                        nodesElement.selectAll("circle")
                             .attr("class", function(d1) {
                                 var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                                 if (d1 === d) {
@@ -223,13 +225,13 @@ define([
                                 }
                                 return className;
                             });
-                        vis.selectAll("line")
+                        linksElement.selectAll("line")
                             .attr('class', function(l) {
                                 return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
                             });
                     })
                     .on('mouseout', function(event, d) {
-                        vis.selectAll("circle")
+                        nodesElement.selectAll("circle")
                             .attr("class", function(d1) {
                                 var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                                 if (d1.selected()) {
@@ -247,14 +249,14 @@ define([
                         if (selectedState() === false) {
                             nodeSelection.removeAll();
                         }
-                        vis.selectAll("line")
+                        linksElement.selectAll("line")
                             .attr('class', 'link');
                     })
                     .on("click", function(event, d) {
                         if (!event.defaultPrevented) {
                             d.loadcount(d.loadcount()+1);
                         }
-                        vis.selectAll("circle")
+                        nodesElement.selectAll("circle")
                             .attr("class", function(d1) {
                                 var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                                 if (d1 === d) {
@@ -275,7 +277,7 @@ define([
                                 }
                                 return className;
                             });
-                        vis.selectAll("line")
+                        linksElement.selectAll("line")
                             .attr('class', function(l) {
                                 return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
                             });
@@ -307,7 +309,7 @@ define([
                     texts.remove();
                 }
 
-                texts = vis.selectAll("text.nodeLabels")
+                texts = nodesElement.selectAll("text.nodeLabels")
                     .data(data.nodes)
                     .join("text")
                     .attr("class", function(d){

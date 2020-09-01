@@ -4929,7 +4929,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     stroke: #454545;
     stroke-width: 2px;
     fill: #dcecfa;
-    opacity: 1.;
+    opacity: 1;
     cursor: pointer;
 }
 
@@ -5003,6 +5003,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     fill: rgb(220, 236, 250);
     opacity: 1;
     cursor: pointer;
+    z-index: 200000;
 }
 
 .relatedlink {
