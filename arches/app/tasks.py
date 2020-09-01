@@ -12,7 +12,7 @@ from arches.app.models import models
 from arches.app.search.search_export import SearchResultsExporter
 import arches.app.utils.zip as zip_utils
 from django.utils.translation import ugettext as _
-from django.conf import settings
+from arches.app.models.system_settings import settings
 
 
 @shared_task
