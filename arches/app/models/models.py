@@ -1041,6 +1041,7 @@ class UserProfile(models.Model):
 @receiver(post_save, sender=User)
 def create_permissions_for_new_users(sender, instance, created, **kwargs):
     from arches.app.models.resource import Resource
+
     if created:
         ct = ContentType.objects.get(app_label="models", model="resourceinstance")
         resourceInstanceIds = list(GroupObjectPermission.objects.filter(content_type=ct).values_list("object_pk", flat=True).distinct())
@@ -1050,7 +1051,6 @@ def create_permissions_for_new_users(sender, instance, created, **kwargs):
         assign_perm("no_access_to_resourceinstance", instance, resources)
         for resource in resources:
             Resource(resource.resourceinstanceid).index()
-
 
 
 class UserXTask(models.Model):
