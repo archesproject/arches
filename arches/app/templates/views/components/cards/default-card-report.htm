@@ -53,7 +53,7 @@
                     {% block report_cards %}
                     <div class="rp-report-container-tile" data-bind="visible: tile.parent.cards().length > 0">
                         <!-- ko foreach: { data: self.preview ? tile.parent.cards : tile.cards, as: 'card' } -->
-                            <!-- ko if: card.tiles().length > 0 || tile.parent.hideEmptyNodes() === false -->
+                            <!-- ko if: card.tiles().length > 0 || ko.unwrap(tile.parent.hideEmptyNodes) === false -->
                                 <!-- ko component: {
                                     name: tile.parent.model.cardComponentLookup[tile.parent.model.component_id()].componentname,
                                     params: {
@@ -62,7 +62,7 @@
                                         card: card,
                                         showHeaderLine: self.card.model.get("widgets")().length > 0 || $index !== 0,
                                         pageVm: $root,
-                                        hideEmptyNodes: tile.parent.hideEmptyNodes
+                                        hideEmptyNodes: tile.parent.hideEmptyNodes || false
                                     }
                                 } --> <!-- /ko -->
                             <!-- /ko -->
