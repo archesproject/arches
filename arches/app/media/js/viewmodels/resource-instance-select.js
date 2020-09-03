@@ -16,8 +16,22 @@ define([
         this.renderContext = params.renderContext;
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
-        this.graphIsSemantic = params.graph ? !!params.graph.ontologyclass : false;
-        this.rootOntologyClass = params.graph ? params.graph.ontologyclass : undefined;
+        this.rootOntologyClass = '';
+        // depending on where the widget is being rendered there are several ways to get the ontologyclass 
+        if(params.state !== 'display_value'){
+            if(!!params.node.graph.get('root')){
+                this.rootOntologyClass = params.node.graph.get('root').ontologyclass();
+            }else if(!!params.graph && !!params.graph.ontologyclass){
+                this.rootOntologyClass = params.graph.ontologyclass;
+            }else {
+                $.getJSON('/graphs/' + params.node.get('graph_id'))
+                    .done(function(data){
+                        self.rootOntologyClass = data.graph.root.ontologyclass;
+                        self.graphIsSemantic = !!self.rootOntologyClass;
+                    });
+            }
+        }
+        this.graphIsSemantic = !!this.rootOntologyClass;
         this.resourceInstanceDisplayName = params.form && params.form.displayname ? params.form.displayname() : '';
         this.makeFriendly = ontologyUtils.makeFriendly;
         this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
@@ -123,6 +137,7 @@ define([
             var relatedResourceModels = ko.computed(function() {
                 var res = [];
                 var graphlist = this.preview ? arches.graphs : arches.resources;
+
                 if (params.node && params.state !== 'report') {
                     res = ko.unwrap(params.node.config.graphs).map(function(item){
                         var graph = graphlist.find(function(graph){
@@ -134,6 +149,7 @@ define([
                         }
                     });
                 }
+                
                 return res;
             }, this);
 
@@ -147,10 +163,12 @@ define([
 
         var makeObject = function(id, esSource){
             var graph = self.lookupGraph(esSource.graph_id);
+            var ontologyProperty = graph ? graph.config.ontologyProperty : '';
+            var inverseOntologyProperty = graph ? graph.config.inverseOntologyProperty : '';
             var ret = {
                 "resourceId": ko.observable(id),
-                "ontologyProperty": ko.observable(graph.config.ontologyProperty || ''),
-                "inverseOntologyProperty": ko.observable(graph.config.inverseOntologyProperty || ''),
+                "ontologyProperty": ko.observable(ontologyProperty || ''),
+                "inverseOntologyProperty": ko.observable(inverseOntologyProperty || ''),
                 "resourceXresourceId": ""
             };            
             Object.defineProperty(ret, 'resourceName', {value: ko.observable(esSource.displayname)});

@@ -24,8 +24,13 @@ define([
         var self = this;
         this.saving = false;
         this.tiles = [];
-        this.widgetLookup = {};
+        this.widgetInstanceDataLookup = {};
 
+        /*
+            'sortedWidgetIds' originally referred to entries in the
+            card_x_node_x_widget table. This has been changed, and
+            this list now contains `node_id`s instead.
+        */ 
         params.configKeys = ['groupedCardIds', 'sortedWidgetIds'];
         CardComponentViewModel.apply(this, [params]);
 
@@ -35,6 +40,7 @@ define([
         } else {
             cards = !!params.card.parent ? params.card.parent.cards : flattenTree(params.card.topCards, []);
         }
+
         this.cardLookup = {};
         this.subscriptions = {};
         this.siblingCards = ko.observableArray();
@@ -51,7 +57,7 @@ define([
 
         this.groupedCards = ko.computed(function(){
             var gc = _.map([this.card.model.id].concat(this.groupedCardIds()), function(cardid) {
-                var card = this.cardLookup[cardid];
+                var card = this.cardLookup[cardid]; 
                 var subscription = card.model.cardinality.subscribe(function(cardinality){
                     if (cardinality !== '1') {
                         card.model.cardinality('1');
@@ -76,28 +82,39 @@ define([
         }, this);
 
         var updatedSortedWidgetsList = function(cards) {
-            this.newWidgetIdList = [];
-            this.widgetLookup = {};
+            this.widgetInstanceDataLookup = {};
+
+            var sortedWidgetIds = this.sortedWidgetIds();
+            var widgetNodeIdList = [];
+
             cards.forEach(function(card){
                 card.widgets().forEach(function(widget) {
-                    this.widgetLookup[widget.id()] = widget;
-                    this.newWidgetIdList.push(widget.id());
+                    this.widgetInstanceDataLookup[widget.node_id()] = widget;
+                    widgetNodeIdList.push(widget.node_id());
                 }, this);
             }, this);
 
-            _.each(this.widgetLookup, function(widget, widgetid) {
-                if(!(_.contains(this.sortedWidgetIds(), widgetid))) {
-                    this.sortedWidgetIds().push(widgetid);
+            _.each(this.widgetInstanceDataLookup, function(widget, widgetid) {
+                if(!(_.contains(sortedWidgetIds, widgetid))) {
+                    sortedWidgetIds.push(widgetid);
                 }
             }, this);
 
-            this.sortedWidgetIds(_.without(this.sortedWidgetIds(), ..._.difference(this.sortedWidgetIds(), this.newWidgetIdList)));
+            this.sortedWidgetIds([
+                ..._.without(sortedWidgetIds, ..._.difference(sortedWidgetIds, widgetNodeIdList))
+            ]);
         };
 
         updatedSortedWidgetsList.call(this, this.groupedCards());
 
         this.groupedCards.subscribe(function(cards) {
             updatedSortedWidgetsList.call(this, cards);
+        }, this);
+
+        _.each(this.groupedCards(), function(card) {
+            card.widgets.subscribe(function() {
+                updatedSortedWidgetsList.call(this, this.groupedCards());
+            }, this);
         }, this);
 
         if (!!params.preview) {
@@ -136,8 +153,8 @@ define([
             }, this);
         }, this);
 
-        this.getDataForDisplay = function(widgetid) {
-            var widget = self.widgetLookup[widgetid];
+        this.getDataForDisplay = function(nodeId) {
+            var widget = self.widgetInstanceDataLookup[nodeId];
             var tile = self.groupedTiles().find(function(tile) {
                 return Object.keys(tile.data).includes(widget.node.nodeid);
             });
@@ -156,7 +173,7 @@ define([
         };
 
         this.afterMove = function(e) {
-            // do nothing
+            params.card.model.save();
         };
 
         this.getTile = function(cardid) {
