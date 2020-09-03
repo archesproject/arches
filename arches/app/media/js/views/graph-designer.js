@@ -8,7 +8,6 @@ define([
     'viewmodels/alert-json',
     'models/graph',
     'models/report',
-    'views/graph/graph-manager/graph',
     'views/graph/graph-designer/graph-tree',
     'views/graph/graph-designer/node-form',
     'views/graph/graph-manager/branch-list',
@@ -23,7 +22,7 @@ define([
     'bindings/resizable-sidepanel',
     'datatype-config-components',
     'views/components/simple-switch'
-], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, GraphView, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, data, arches, GraphSettingsViewModel, CardViewModel, viewData, reportLookup) {
+], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, data, arches, GraphSettingsViewModel, CardViewModel, viewData, reportLookup) {
     var GraphDesignerView = BaseManagerView.extend({
         initialize: function(options) {
             var viewModel = options.viewModel;
@@ -170,9 +169,6 @@ define([
             viewModel.datatypes = _.keys(viewModel.graphModel.get('datatypelookup'));
 
             viewModel.graphModel.on('changed', function(model, response) {
-                if (viewModel.graphView) {
-                    viewModel.graphView.redraw(true);
-                }
                 viewModel.alert(null);
                 viewModel.loading(false);
                 if (response.status !== 200) {
@@ -477,39 +473,9 @@ define([
                 }
             });
 
-            viewModel.graphView = new GraphView({
-                el: $('#graph'),
-                graphModel: viewModel.graphModel,
-                nodeSize: 15,
-                nodeSizeOver: 20,
-                labelOffset: 10,
-                loading: this.loading
-            });
-
             viewModel.graphModel.on('select-node', function(node) {
-                // viewModel.graphView.zoomTo(node);
                 viewModel.graphTree.expandParentNode(node);
             });
-
-            viewModel.showPreview = function() {
-                viewModel.viewState('preview');
-                viewModel.graphView.resize();
-            };
-
-            /**
-            * update the sizing of elements on window resize
-            */
-            var resize = function() {
-                $('.grid').height($(window).height() - 208);
-                $('#graph').height($(window).height() - 100);
-                if (!!viewModel.graphView) {
-                    viewModel.graphView.resize();
-                }
-            };
-
-            $(window).resize(resize);
-
-            resize();
 
             BaseManagerView.prototype.initialize.apply(this, arguments);
         }
