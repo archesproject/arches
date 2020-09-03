@@ -450,7 +450,7 @@ define([
                                 newNodeId += 1;
                             } else if (rootNode.relationCount) {
                                 total_loaded = rootNode.relationCount.loaded + rr.resource_relationships.length;
-                                rootNode.relationCount.loaded = total_loaded <= rr.total.value ? total_loaded : total_loaded - 1;
+                                rootNode.relationCount.loaded = total_loaded <= rr.total.value ? total_loaded : rr.total.value;
                             } else {
                                 rootNode.relationCount = {
                                     total: rr.total.value,
@@ -484,7 +484,6 @@ define([
                                     newNodeId += 1;
                                 }
                             };
-
                             _.each(rr.related_resources, getRelated);
 
                             _.each(rr.resource_relationships, function(resource_relationships) {
@@ -587,7 +586,7 @@ define([
                     }
                     item.selectedSubscription = item.selected.subscribe(updateSelected(item), this);
                     item.hoveredSubscription = item.hovered.subscribe(updateHovered(item), this);
-                    if (item.isRoot) {
+                    if (item.isRoot && item.loadcount() === 0) {
                         item.loadcount(1);
                     }
                     item.loadcountSubscription = item.loadcount.subscribe(getMoreData(item), this);
