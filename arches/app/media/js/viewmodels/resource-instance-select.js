@@ -20,7 +20,7 @@ define([
         // depending on where the widget is being rendered there are several ways to get the ontologyclass 
         if(params.state !== 'display_value'){
             if(!!params.node.graph.get('root')){
-                this.rootOntologyClass = params.node.graph.get('root').ontologyclass()
+                this.rootOntologyClass = params.node.graph.get('root').ontologyclass();
             }else if(!!params.graph && !!params.graph.ontologyclass){
                 this.rootOntologyClass = params.graph.ontologyclass;
             }else {
