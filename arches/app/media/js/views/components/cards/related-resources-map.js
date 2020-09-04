@@ -139,12 +139,10 @@ define([
 
         this.mapFilter.filter.feature_collection.subscribe(function(val){
             if (self.widget && self.widget.node.config.graphs().length) {
-                var resourceFilter = self.widget.node.config.graphs()[0];
-                resourceFilter.inverted = false;
+                var graphs = self.widget.node.config.graphs().map(function(v){if (v.graphid){return v.graphid;}});
                 var payload = {
                     "format": "tilecsv",
                     "map-filter": JSON.stringify(val),
-                    "resource-type-filter": JSON.stringify([resourceFilter]),
                     "paging-filter": 1,
                     "precision": 6,
                     "tiles": true,
@@ -162,9 +160,11 @@ define([
                     });
                     data.results.hits.hits.forEach(function(hit) {
                         var resourceInstance = hit._source;
-                        self.relateResource(
-                            {resourceinstanceid: resourceInstance.resourceinstanceid, graphid: resourceInstance.graph_id},
-                            self.widget);
+                        if (graphs.indexOf(resourceInstance.graph_id) > -1) {
+                            self.relateResource(
+                                {resourceinstanceid: resourceInstance.resourceinstanceid, graphid: resourceInstance.graph_id},
+                                self.widget);
+                        }
                     });
                     var buffer = data['map-filter'].search_buffer;
                     self.map().getSource('geojson-search-buffer-data').setData(buffer);
