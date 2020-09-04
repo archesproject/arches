@@ -27,7 +27,8 @@ class Migration(migrations.Migration):
             """
             update d_data_types set defaultconfig = null where datatype = 'date';
             update nodes set config = null where datatype = 'date';
-            update widgets set defaultconfig = jsonb_set(defaultconfig, '{dateFormat}', '"YYYY-MM-DD"') where widgetid = '10000000-0000-0000-0000-000000000004';
+            update widgets set defaultconfig = jsonb_set(defaultconfig, '{dateFormat}', '"YYYY-MM-DD"')
+            where widgetid = '10000000-0000-0000-0000-000000000004';
             """,
         )
     ]
