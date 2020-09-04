@@ -12,12 +12,11 @@ define([
     'views/rdm/modals/import-concept-form',
     'views/rdm/modals/add-child-form',
     'views/rdm/modals/add-image-form',
-    'views/concept-graph',
     'viewmodels/alert',
     'viewmodels/alert-json',
 ], function($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor,
     RelatedConcept, RelatedMember, ManageParentForm, ImportConcept, AddChildForm,
-    AddImageForm, ConceptGraph, AlertViewModel, JsonErrorAlertViewModel) {
+    AddImageForm, AlertViewModel, JsonErrorAlertViewModel) {
     return Backbone.View.extend({
         events: {
             'click .concept-report-content *[data-action="viewconcept"]': 'conceptSelected',
@@ -74,9 +73,6 @@ define([
                                 self.$el.find(".concept-tree").toggle(300);
                                 self.$el.find(".concept-graph").toggle(300);
                                 self.$el.find(".graph-toggle").toggle();
-                            });
-                            new ConceptGraph({
-                                el: self.$el.find(".concept-graph")
                             });
                             if (showGraph) {
                                 self.$el.find(".graph-toggle").toggle();
