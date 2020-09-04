@@ -41,7 +41,7 @@
         {% trans "Report" %}
     </a>
     {% if request.user|can_edit_resource_instance %}
-    <!--ko if: permissions.users_without_edit_perm().indexOf(userid()) === -1 -->
+    <!--ko if: ko.unwrap(permissions).users_without_edit_perm.indexOf(userid()) === -1 -->
     <a data-bind="click: function () {
         window.open(editURL + resourceinstanceid());
     }" href="javascript:void(0)">
