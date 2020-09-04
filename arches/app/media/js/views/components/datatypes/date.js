@@ -1,28 +1,11 @@
-define(['knockout'], function (ko) {
+define(['knockout'], function(ko) {
     var name = 'date-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {
             var self = this;
             this.search = params.search;
             if (!this.search) {
-                this.viewMode = params.config.viewMode;
                 this.dateFormat = params.config.dateFormat;
-                // these options are also listed in the widget and should be centralized
-                this.viewModeOptions = ko.observableArray([{
-                    'id': 'days',
-                    'name': 'Days'
-                }, {
-                    'id': 'months',
-                    'name': 'Months'
-                }, {
-                    'id': 'years',
-                    'name': 'Years'
-                }, {
-                    'id': 'decades',
-                    'name': 'Decades'
-                }]);
-    
-                // these options are also listed in the widget and should be centralized
                 this.dateFormatOptions = ko.observableArray([{
                     'id': 'YYYY-MM-DD HH:mm:ssZ',
                     'name': 'ISO 8601 Time (YYYY-MM-DD HH:mm:ssZ)'
@@ -36,10 +19,6 @@ define(['knockout'], function (ko) {
                     'id': 'YYYY',
                     'name': 'CE Year (YYYY)'
                 }]);
-    
-                this.onViewModeSelection = function(val, e) {
-                    this.viewMode(e.currentTarget.value);
-                };
         
                 this.onDateFormatSelection = function(val, e) {
                     this.dateFormat(e.currentTarget.value);
@@ -49,18 +28,17 @@ define(['knockout'], function (ko) {
             if (this.search) {
                 var config = params.node.config || params.datatype.defaultconfig;
                 var filter = params.filterValue();
-                this.viewMode = config.viewMode;
                 this.dateFormat = config.dateFormat;
                 this.op = ko.observable(filter.op || '');
                 this.searchValue = ko.observable(filter.val || '');
-                this.filterValue = ko.computed(function () {
+                this.filterValue = ko.computed(function() {
                     return {
                         op: self.op(),
                         val: self.searchValue()
                     }
                 }).extend({ throttle: 750 });
                 params.filterValue(this.filterValue());
-                this.filterValue.subscribe(function (val) {
+                this.filterValue.subscribe(function(val) {
                     params.filterValue(val);
                 });
             }
