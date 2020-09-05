@@ -176,6 +176,10 @@ define([
 
         params.tile = self.tile;
 
+        if(ko.unwrap(params.getJSONOnLoad) !== false) {
+            this.getJSON();
+        }
+
         params.defineStateProperties = function(){
             // Collects those properties that you want to set to the state.
             var wastebin = !!(ko.unwrap(params.wastebin)) ? koMapping.toJS(params.wastebin) : undefined;
