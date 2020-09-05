@@ -28,7 +28,10 @@ define([
             }
         }
 
-        var url = arches.urls.api_card + (ko.unwrap(this.resourceId) || ko.unwrap(params.graphid));
+        this.seedCardGraphId = function() { // override for different cases
+            return (ko.unwrap(this.resourceId) || ko.unwrap(params.graphid));
+        };
+
         this.card = ko.observable();
         this.tile = ko.observable();
         this.loading = params.loading || ko.observable(false);
