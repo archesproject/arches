@@ -138,7 +138,7 @@ define([
         });
 
         this.mapFilter.filter.feature_collection.subscribe(function(val){
-            if (self.widget && self.widget.node.config.graphs().length) {
+            if (self.widget && self.widget.node.config.graphs().length && val.features && val.features.length > 0) {
                 var graphs = self.widget.node.config.graphs().map(function(v){if (v.graphid){return v.graphid;}});
                 var payload = {
                     "format": "tilecsv",
