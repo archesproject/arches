@@ -62,7 +62,6 @@ define([
             zoomToData = true;
         });
         var selectFeatureLayers = selectFeatureLayersFactory('', selectRelatedSource, selectRelatedSourceLayer, selectedResourceIds(), true);
-
         var sources = [];
         for (var sourceName in arches.mapSources) {
             if (arches.mapSources.hasOwnProperty(sourceName)) {
@@ -188,7 +187,7 @@ define([
             if (val) {
                 self.mapFilter.draw = self.draw;
                 self.mapFilter.setupDraw();
-                self.map().addSource(bufferSrcId, self.mapFilter.sources[bufferSrcId])
+                self.map().addSource(bufferSrcId, self.mapFilter.sources[bufferSrcId]);
                 self.mapFilter.layers().forEach(function(layer){
                     self.map().addLayer(layer);
                     extendedLayers.push(layer);
