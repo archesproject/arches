@@ -143,7 +143,6 @@ define([
                 var payload = {
                     "format": "tilecsv",
                     "map-filter": JSON.stringify(val),
-                    "paging-filter": 1,
                     "precision": 6,
                     "tiles": true,
                     "total": 0
