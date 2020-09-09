@@ -17,12 +17,31 @@ class Migration(migrations.Migration):
             update card_components
             set defaultconfig = defaultconfig::jsonb || '{"selectRelatedSource":"", "selectRelatedSourceLayer":""}'::jsonb
             where name = 'Related Resources Map Card';
+
+            update cards set config = config || jsonb_build_object('selectRelatedSource', config->'selectSource')
+            where componentid = '2d2e0ca3-089c-4f4c-96a5-fb7eb53963bd';
+
+            update cards set config = config || jsonb_build_object('selectRelatedSourceLayer', config->'selectSourceLayer')
+            where componentid = '2d2e0ca3-089c-4f4c-96a5-fb7eb53963bd';
+
+            update cards set config = config::jsonb - 'selectSourceLayer' where componentid = '2d2e0ca3-089c-4f4c-96a5-fb7eb53963bd';
+            update cards set config = config::jsonb - 'selectSource' where componentid = '2d2e0ca3-089c-4f4c-96a5-fb7eb53963bd';
             """,
             """
             update card_components set defaultconfig = defaultconfig::jsonb - 'selectRelatedSource'
             where name = 'Related Resources Map Card';
+
             update card_components set defaultconfig = defaultconfig::jsonb - 'selectRelatedSourceLayer'
             where name = 'Related Resources Map Card';
+
+            update cards set config = config || jsonb_build_object('selectSource', config->'selectRelatedSource')
+            where componentid = '2d2e0ca3-089c-4f4c-96a5-fb7eb53963bd';
+
+            update cards set config = config || jsonb_build_object('selectSourceLayer', config->'selectRelatedSourceLayer')
+            where componentid = '2d2e0ca3-089c-4f4c-96a5-fb7eb53963bd';
+
+            update cards set config = config::jsonb - 'selectRelatedSourceLayer' where componentid = '2d2e0ca3-089c-4f4c-96a5-fb7eb53963bd';
+            update cards set config = config::jsonb - 'selectRelatedSource' where componentid = '2d2e0ca3-089c-4f4c-96a5-fb7eb53963bd';
             """,
         )
     ]

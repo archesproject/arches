@@ -5,7 +5,7 @@
 <!-- /ko -->
 
 <!-- ko if: !configForm  && state === 'report' -->
-<!-- ko if: ko.unwrap(hideEmptyNodes) == false || ko.unwrap(hideEmptyNodes) == true && displayValue() -->
+<!-- ko if: !ko.unwrap(hideEmptyNodes) || ko.unwrap(hideEmptyNodes) === true && displayValue() -->
 {% block report %}
 <dt data-bind="text: label"></dt>
 <dd data-bind="text: displayValue() || '{% trans "None" %}'"></dd>

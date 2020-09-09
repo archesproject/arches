@@ -29,7 +29,10 @@ from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
+from django.contrib.contenttypes.models import ContentType
 from django.core.validators import validate_slug
+from guardian.models import GroupObjectPermission
+from guardian.shortcuts import assign_perm
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -1033,6 +1036,21 @@ class UserProfile(models.Model):
     class Meta:
         managed = True
         db_table = "user_profile"
+
+
+@receiver(post_save, sender=User)
+def create_permissions_for_new_users(sender, instance, created, **kwargs):
+    from arches.app.models.resource import Resource
+
+    if created:
+        ct = ContentType.objects.get(app_label="models", model="resourceinstance")
+        resourceInstanceIds = list(GroupObjectPermission.objects.filter(content_type=ct).values_list("object_pk", flat=True).distinct())
+        for resourceInstanceId in resourceInstanceIds:
+            resourceInstanceId = uuid.UUID(resourceInstanceId)
+        resources = ResourceInstance.objects.filter(pk__in=resourceInstanceIds)
+        assign_perm("no_access_to_resourceinstance", instance, resources)
+        for resource in resources:
+            Resource(resource.resourceinstanceid).index()
 
 
 class UserXTask(models.Model):
