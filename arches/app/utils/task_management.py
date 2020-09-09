@@ -28,7 +28,7 @@ def check_if_celery_available():
                 logger.warning(_("Failed to connect to celery due to a BrokenPipeError"))
                 logger.exception(e)
     if result is None:
-        logger.warning(_("A celery broker is running, but a celery worker is not available"))
+        logger.info(_("A celery broker is running, but a celery worker is not available"))
         result = False  # ping returns True or None, assigning False here so we return only a boolean value
     else:
         result = True

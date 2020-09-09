@@ -6,22 +6,24 @@ define([
 ], function(ko, _, AlertViewModel) {
     return function(params) {
         var self = this;
-        var getTiles = function(tile, tiles) {
+        this.getTiles = function(tile, tiles) {
             tiles = tiles || [tile];
             tile.cards.forEach(function(card) {
                 card.tiles().forEach(function(tile) {
                     tiles.push(tile);
-                    getTiles(tile, tiles);
+                    self.getTiles(tile, tiles);
                 });
             });
             return tiles;
         };
+        this.inResourceEditor = location.pathname.includes(params.pageVm.urls.resource_editor);
         this.configKeys = params.configKeys || [];
         this.showIds = params.showIds || false;
         this.state = params.state || 'form';
         this.preview = params.preview;
         this.loading = params.loading || ko.observable(false);
         this.card = params.card;
+        this.card.hideEmptyNodes = params.hideEmptyNodes;
         this.card.showIds = this.showIds;
         this.tile = params.tile;
         this.reportExpanded = ko.observable(true);
@@ -31,10 +33,18 @@ define([
             }
             this.tile = this.card.newTile;
         }
+        this.revealForm = function(card){
+            if (!card.selected()) {card.selected(true);}
+            setTimeout(function(){
+                card.showForm(true);
+            }, 50);
+        };
         this.form = params.form;
         this.provisionalTileViewModel = params.provisionalTileViewModel;
         this.reviewer = params.reviewer;
         this.expanded = ko.observable(true);
+        this.card.showForm(false);
+
         this.beforeMove = function(e) {
             e.cancelDrop = (e.sourceParent!==e.targetParent);
         };
@@ -68,15 +78,15 @@ define([
         this.tiles = ko.computed(function() {
             var tiles = [];
             if (self.tile) {
-                return getTiles(self.tile);
+                return self.getTiles(self.tile);
             } else {
                 self.card.tiles().forEach(function(tile) {
-                    getTiles(tile, tiles);
+                    self.getTiles(tile, tiles);
                 });
             }
             return tiles;
         }, this);
-        this.saveTile = function() {
+        this.saveTile = function(callback) {
             self.loading(true);
             self.tile.save(function(response) {
                 self.loading(false);
@@ -94,9 +104,18 @@ define([
                 }
             }, function() {
                 self.loading(false);
+                if (typeof self.onSaveSuccess === 'function') self.onSaveSuccess();
                 if (params.form.onSaveSuccess) {
                     params.form.onSaveSuccess(self.tile);
                 }
+                if (typeof callback === 'function') callback();
+            });
+        };
+        this.saveTileAddNew = function() {
+            self.saveTile(function() {
+                window.setTimeout(function() {
+                    self.card.selected(true);
+                }, 1);
             });
         };
         this.deleteTile = function() {

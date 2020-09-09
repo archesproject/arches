@@ -617,9 +617,11 @@
                 }, 
                 {
                     "config": {
-                        "graphid": [
-                            "c35fe0a1-df30-11e8-b280-a4d18cec433a"
-                        ]
+                        "graphs": [{
+                            "graphid": "c35fe0a1-df30-11e8-b280-a4d18cec433a",
+                            "ontologyProperty": "",
+                            "inverseOntologyProperty": ""
+                        }]
                     }, 
                     "datatype": "resource-instance-list", 
                     "description": null, 

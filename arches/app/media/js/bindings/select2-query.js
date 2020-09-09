@@ -8,6 +8,7 @@ define([
         init: function(el, valueAccessor, allBindingsAccessor) {
             var allBindings = allBindingsAccessor().select2Query;
             var select2Config = ko.utils.unwrapObservable(allBindings.select2Config);
+            select2Config = Object.assign({}, select2Config);
             select2Config = _.defaults(select2Config, {
                 clickBubble: true,
                 multiple: false,
@@ -31,21 +32,27 @@ define([
                 }
             }
 
-            select2Config.value = value();
+            //select2Config.value = value();
             $(el).select2(select2Config);
 
-            $(el).select2("val", value());
+            if (value) {
+                $(el).select2("val", value());
+                value.subscribe(function(newVal) {
+                    select2Config.value = newVal;
+                    $(el).select2("val", newVal);
+                }, this);
+                $(el).on("change", function(val) {
+                    if (val.val === "") {
+                        val.val = null;
+                    }
+                    return value(val.val);
+                });
+            }
 
             if (ko.unwrap(select2Config.disabled)) {
                 $(el).select2("disable");
             }
 
-            $(el).on("change", function(val) {
-                if (val.val === "") {
-                    val.val = null;
-                }
-                return value(val.val);
-            });
             $(el).on("select2-opening", function() {
                 if (select2Config.clickBubble) {
                     $(el).parent().trigger('click');
@@ -63,10 +70,6 @@ define([
                 });
             }
 
-            value.subscribe(function(newVal) {
-                select2Config.value = newVal;
-                $(el).select2("val", newVal);
-            }, this);
         }
     };
 

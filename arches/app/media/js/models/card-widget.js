@@ -82,13 +82,15 @@ define([
                             if (key === 'label') {
                                 this.get('label')(value[key]);
                             }
-                            var oldJSON = koMapping.toJSON(config[key]);
-                            var newJSON = value[key] ? koMapping.toJSON(value[key]) : value[key];
-                            if (config[key] && oldJSON !== newJSON) {
-                                koMapping.fromJSON(
-                                    newJSON,
-                                    config[key]
-                                );
+                            if (config[key]) {
+                                var oldJSON = koMapping.toJSON(config[key]);
+                                var newJSON = value[key] ? koMapping.toJSON(value[key]) : value[key];
+                                if (config[key] && oldJSON !== newJSON) {
+                                    koMapping.fromJSON(
+                                        newJSON,
+                                        config[key]
+                                    );
+                                }
                             }
                         }
                     }
@@ -100,7 +102,6 @@ define([
             this.disposables.push(this.configJSON);
 
             this.dispose = function() {
-                //console.log('disposing CardWidgetModel');
                 dispose(self);
             };
 

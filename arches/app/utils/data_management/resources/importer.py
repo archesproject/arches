@@ -31,12 +31,9 @@ from arches.app.models.tile import Tile
 from arches.app.models.models import DDataType
 from arches.app.models.models import ResourceInstance
 from arches.app.models.models import FunctionXGraph
-from arches.app.models.models import ResourceXResource
 from arches.app.models.models import NodeGroup
-from arches.app.models.models import ResourceXResource
 from arches.app.models.models import Concept
 from arches.app.models.models import Value
-from arches.app.models.models import ResourceXResource
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -178,12 +175,9 @@ class BusinessDataImporter(object):
         create_collections=False,
         use_multiprocessing=False,
     ):
-        import arches.app.utils.task_management as task_management
-        import arches.app.tasks as tasks
         reader = None
         start = time()
         cursor = connection.cursor()
-        celery_worker_running = task_management.check_if_celery_available()
 
         try:
             if file_format is None:
@@ -193,11 +187,8 @@ class BusinessDataImporter(object):
             if mapping is None:
                 mapping = self.mapping
             if file_format == "json":
-                if celery_worker_running is True:
-                    res = tasks.import_resource_instances.apply_async((file_format, business_data, mapping), link_error=tasks.log_error.s())
-                else:
-                    reader = ArchesFileReader()
-                    reader.import_business_data(business_data, mapping)
+                reader = ArchesFileReader()
+                reader.import_business_data(business_data, mapping)
             elif file_format == "jsonl":
                 with open(self.file[0], "rU") as openf:
                     lines = openf.readlines()
@@ -213,21 +204,15 @@ class BusinessDataImporter(object):
                             reader.import_business_data({"resources": [archesresource]})
             elif file_format == "csv" or file_format == "shp" or file_format == "zip":
                 if mapping is not None:
-                    if celery_worker_running is True:
-                        res = tasks.import_resource_instances.apply_async(
-                            (file_format, business_data, mapping, overwrite, bulk, create_concepts, create_collections),
-                            link_error=tasks.log_error.s(),
-                        )
-                    else:
-                        reader = CsvReader()
-                        reader.import_business_data(
-                            business_data=business_data,
-                            mapping=mapping,
-                            overwrite=overwrite,
-                            bulk=bulk,
-                            create_concepts=create_concepts,
-                            create_collections=create_collections,
-                        )
+                    reader = CsvReader()
+                    reader.import_business_data(
+                        business_data=business_data,
+                        mapping=mapping,
+                        overwrite=overwrite,
+                        bulk=bulk,
+                        create_concepts=create_concepts,
+                        create_collections=create_collections,
+                    )
                 else:
                     print("*" * 80)
                     print(
@@ -235,7 +220,6 @@ class BusinessDataImporter(object):
                         with the '-c' paramater or place one in the same directory as your business data."
                     )
                     print("*" * 80)
-                    sys.exit()
 
             elapsed = time() - start
             print("Time to import_business_data = {0}".format(datetime.timedelta(seconds=elapsed)))

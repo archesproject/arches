@@ -1,16 +1,20 @@
+import importlib
 import json
 import logging
 import os
 import re
 import sys
 import uuid
-import importlib
-import arches.app.utils.task_management as task_management
 from io import StringIO
+from oauth2_provider.views import ProtectedResourceView
+from pyld.jsonld import compact, frame, from_rdf
+from rdflib import RDF
+from rdflib.namespace import SKOS, DCTERMS
+from revproxy.views import ProxyView
+from slugify import slugify
+from urllib import parse
 from django.shortcuts import render
 from django.views.generic import View
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 from django.db import transaction, connection
 from django.db.models import Q
 from django.http import Http404, HttpResponse
@@ -18,35 +22,44 @@ from django.http.request import QueryDict
 from django.core import management
 from django.core.cache import cache
 from django.urls import reverse
-from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.core.files.base import ContentFile
-from revproxy.views import ProxyView
-from oauth2_provider.views import ProtectedResourceView
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from arches.app.models import models
 from arches.app.models.concept import Concept
+from arches.app.models.card import Card as CardProxyModel
 from arches.app.models.graph import Graph
 from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
+from arches.app.models.tile import Tile as TileProxyModel
+from arches.app.views.tile import TileData as TileView
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse
-from arches.app.utils.decorators import can_read_resource_instance, can_edit_resource_instance, can_read_concept
+from arches.app.utils.decorators import (
+    can_read_concept,
+    group_required
+)
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
-from arches.app.utils.permission_backend import user_can_read_resources
-from arches.app.utils.permission_backend import user_can_edit_resources
-from arches.app.utils.permission_backend import user_can_read_concepts
-from arches.app.utils.permission_backend import user_is_resource_reviewer
-from arches.app.utils.decorators import group_required
+from arches.app.utils.permission_backend import (
+    user_can_read_resource,
+    user_can_edit_resource,
+    user_can_delete_resource,
+    user_can_read_concepts,
+    user_is_resource_reviewer,
+    get_restricted_instances,
+    check_resource_instance_permissions,
+    get_nodegroups_by_perm,
+)
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory
-from pyld.jsonld import compact, frame, from_rdf
-from rdflib import RDF
-from rdflib.namespace import SKOS, DCTERMS
-from slugify import slugify
+from arches.app.search.search_engine_factory import SearchEngineFactory
+
+
 from arches.celery import app
 
 logger = logging.getLogger(__name__)
@@ -126,26 +139,28 @@ class APIBase(View):
 
 class Sync(APIBase):
     def get(self, request, surveyid=None):
-        import arches.app.tasks as tasks
 
         can_sync = userCanAccessMobileSurvey(request, surveyid)
         if can_sync:
+            synclog = models.MobileSyncLog(logid=None, survey_id=surveyid, userid=request.user.id)
             try:
-                logger.info("Starting sync for user {0}".format(request.user.username))
-                celery_worker_running = task_management.check_if_celery_available()
-                if celery_worker_running is True:
-                    res = tasks.sync.apply_async(
-                        (surveyid, request.user.id), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
-                    )
-                else:
-                    management.call_command("mobile", operation="sync_survey", id=surveyid, user=request.user.id)
-                logger.info("Sync complete for user {0}".format(request.user.username))
+                survey = MobileSurvey.objects.get(id=surveyid)
+                synclog = survey.sync(userid=request.user.id, use_celery=True)
             except Exception:
                 logger.exception(_("Sync Failed"))
+            status = 200
+            if synclog.status == "FAILED":
+                status = 500
 
-            return JSONResponse(_("Sync Failed"))
+            return JSONResponse(synclog, status=status)
         else:
             return JSONResponse(_("Sync Failed"), status=403)
+
+
+class CheckSyncStatus(APIBase):
+    def get(self, request, synclogid=None):
+        synclog = models.MobileSyncLog.objects.get(pk=synclogid)
+        return JSONResponse(synclog)
 
 
 class Surveys(APIBase):
@@ -228,6 +243,8 @@ class Surveys(APIBase):
 
 
 class GeoJSON(APIBase):
+    se = SearchEngineFactory().create()
+
     def get_name(self, resource):
         module = importlib.import_module("arches.app.functions.primary_descriptors")
         PrimaryDescriptorsFunction = getattr(module, "PrimaryDescriptorsFunction")()
@@ -273,6 +290,7 @@ class GeoJSON(APIBase):
         property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups)
         property_node_map = {}
         property_nodes = models.Node.objects.filter(nodegroup_id__in=nodegroups).order_by("sortorder")
+        restricted_resource_ids = get_restricted_instances(request.user, self.se)
         for node in property_nodes:
             property_node_map[str(node.nodeid)] = {"node": node}
             if node.fieldname is None or node.fieldname == "":
@@ -286,11 +304,11 @@ class GeoJSON(APIBase):
         if tileid is not None:
             tiles = tiles.filter(tileid=tileid)
         tiles = tiles.order_by("sortorder")
+        tiles = [tile for tile in tiles if str(tile.resourceinstance_id) not in restricted_resource_ids]
         if limit is not None:
             start = (page - 1) * limit
             end = start + limit
-            tile_count = tiles.count()
-            last_page = tiles.count() < end
+            last_page = len(tiles) < end
             tiles = tiles[start:end]
         for tile in tiles:
             data = tile.data
@@ -359,10 +377,11 @@ class MVT(APIBase):
         cache_key = f"mvt_{nodeid}_{zoom}_{x}_{y}"
         tile = cache.get(cache_key)
         if tile is None:
+            resource_ids = get_restricted_instances(request.user, allresources=True)
+            if len(resource_ids) == 0:
+                resource_ids.append("10000000-0000-0000-0000-000000000001")  # This must have a uuid that will never be a resource id.
+            resource_ids = tuple(resource_ids)
             with connection.cursor() as cursor:
-                # TODO: when we upgrade to PostGIS 3, we can get feature state
-                # working by adding the feature_id_name arg:
-                # https://github.com/postgis/postgis/pull/303
                 if int(zoom) <= int(config["clusterMaxZoom"]):
                     arc = self.EARTHCIRCUM / ((1 << int(zoom)) * self.PIXELSPERTILE)
                     distance = arc * int(config["clusterDistance"])
@@ -378,7 +397,7 @@ class MVT(APIBase):
                                     nodeid,
                                     geom
                                 FROM mv_geojson_geoms
-                                WHERE nodeid = %s
+                                WHERE nodeid = %s and resourceinstanceid not in %s
                             ) m
                         )
 
@@ -416,7 +435,7 @@ class MVT(APIBase):
                             WHERE cid IS NOT NULL
                             GROUP BY cid
                         ) as tile;""",
-                        [distance, min_points, nodeid, nodeid, zoom, x, y, zoom, x, y],
+                        [distance, min_points, nodeid, resource_ids, nodeid, zoom, x, y, zoom, x, y],
                     )
                 else:
                     cursor.execute(
@@ -430,14 +449,37 @@ class MVT(APIBase):
                             ) AS geom,
                             1 AS total
                         FROM mv_geojson_geoms
-                        WHERE nodeid = %s) AS tile;""",
-                        [nodeid, zoom, x, y, nodeid],
+                        WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
+                        [nodeid, zoom, x, y, nodeid, resource_ids],
                     )
                 tile = bytes(cursor.fetchone()[0])
                 cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
         if not len(tile):
             raise Http404()
         return HttpResponse(tile, content_type="application/x-protobuf")
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class Graphs(APIBase):
+    def get(self, request, graph_id=None):
+        perm = "read_nodegroup"
+        datatypes = models.DDataType.objects.all()
+        graph = cache.get(f"graph_{graph_id}")
+        user = request.user
+        if graph is None:
+            graph = Graph.objects.get(graphid=graph_id)
+        cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
+        permitted_cards = []
+        for card in cards:
+            if user.has_perm(perm, card.nodegroup):
+                card.filter_by_perm(user, perm)
+                permitted_cards.append(card)
+        cardwidgets = [
+            widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
+        ]
+        graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"])
+        permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
+        return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -472,9 +514,11 @@ class Resources(APIBase):
     # }]
 
     def get(self, request, resourceid=None, slug=None, graphid=None):
-        if user_can_read_resources(user=request.user):
+        if user_can_read_resource(user=request.user, resourceid=resourceid):
             allowed_formats = ["json", "json-ld"]
             format = request.GET.get("format", "json-ld")
+            include_tiles = True if request.GET.get("includetiles", "true").lower() == "true" else False
+            disambiguate = False if request.GET.get("disambiguate", "false").lower() == "false" else True
             if format not in allowed_formats:
                 return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
             try:
@@ -485,15 +529,39 @@ class Resources(APIBase):
             if resourceid:
                 if format == "json-ld":
                     try:
+                        models.ResourceInstance.objects.get(pk=resourceid)  # check for existance
                         exporter = ResourceExporter(format=format)
                         output = exporter.writer.write_resources(resourceinstanceids=[resourceid], indent=indent, user=request.user)
                         out = output[0]["outputfile"].getvalue()
                     except models.ResourceInstance.DoesNotExist:
-                        logger.exception(_("The specified resource '{0}' does not exist. JSON-LD export failed.".format(resourceid)))
+                        logger.error(_("The specified resource '{0}' does not exist. JSON-LD export failed.".format(resourceid)))
                         return JSONResponse(status=404)
                 elif format == "json":
-                    out = Resource.objects.get(pk=resourceid)
-                    out.load_tiles()
+                    resource = Resource.objects.get(pk=resourceid)
+                    out = resource
+
+                    if include_tiles is True:
+                        resource.load_tiles()
+
+                    if disambiguate:
+                        if not include_tiles:
+                            resource.load_tiles()
+                        out = dict()
+                        out[resourceid] = resource
+                        out["disambiguated"] = dict()
+                        datatype_factory = DataTypeFactory()
+
+                        # lookup all nodes from its corresponding graph, then compare that list against nodeid in tile.data.keys
+                        graph = Graph.objects.get(graphid=resource.graph.graphid)
+                        graph_nodes = graph.nodes.copy()
+                        for t in resource.tiles:
+                            for nid in list(t.data.keys()):  # better to compare nodegroups?
+                                if uuid.UUID(nid) in graph_nodes.keys():
+                                    datatype = datatype_factory.get_instance(graph_nodes[uuid.UUID(nid)].datatype)
+                                    value = datatype.get_display_value(t, graph_nodes[uuid.UUID(nid)])
+                                    out["disambiguated"][graph_nodes[uuid.UUID(nid)].name] = value
+                                    del graph_nodes[uuid.UUID(nid)]  # shrink list for efficiency
+
             else:
                 #
                 # The following commented code would be what you would use if you wanted to use the rdflib module,
@@ -563,7 +631,7 @@ class Resources(APIBase):
     #         indent = None
 
     #     try:
-    #         if user_can_edit_resources(user=request.user):
+    #         if user_can_edit_resource(user=request.user):
     #             data = JSONDeserializer().deserialize(request.body)
     #             reader = JsonLdReader()
     #             reader.read_resource(data, use_ids=True)
@@ -601,7 +669,7 @@ class Resources(APIBase):
         except Exception:
             indent = None
 
-        if not user_can_edit_resources(user=request.user):
+        if not user_can_edit_resource(user=request.user, resourceid=resourceid):
             return JSONResponse(status=403)
         else:
             with transaction.atomic():
@@ -643,7 +711,7 @@ class Resources(APIBase):
             indent = None
 
         try:
-            if user_can_edit_resources(user=request.user):
+            if user_can_edit_resource(user=request.user, resourceid=resourceid):
                 data = JSONDeserializer().deserialize(request.body)
                 reader = JsonLdReader()
                 if slug is not None:
@@ -673,7 +741,9 @@ class Resources(APIBase):
             return JSONResponse({"error": "resource data could not be saved: %s" % e}, status=500, reason=e)
 
     def delete(self, request, resourceid, slug=None, graphid=None):
-        if user_can_edit_resources(user=request.user):
+        if user_can_edit_resource(user=request.user, resourceid=resourceid) and user_can_delete_resource(
+            user=request.user, resourceid=resourceid
+        ):
             try:
                 resource_instance = Resource.objects.get(pk=resourceid)
                 resource_instance.delete()
@@ -741,19 +811,6 @@ class Concepts(APIBase):
                 return JSONResponse(status=500, reason=e)
 
         return JSONResponse(ret, indent=indent)
-
-
-def get_resource_relationship_types():
-    resource_relationship_types = Concept().get_child_collections("00000000-0000-0000-0000-000000000005")
-    default_relationshiptype_valueid = None
-    for relationship_type in resource_relationship_types:
-        if relationship_type[0] == "00000000-0000-0000-0000-000000000007":
-            default_relationshiptype_valueid = relationship_type[2]
-    relationship_type_values = {
-        "values": [{"id": str(c[2]), "text": str(c[1])} for c in resource_relationship_types],
-        "default": str(default_relationshiptype_valueid),
-    }
-    return relationship_type_values
 
 
 class Card(APIBase):
@@ -872,20 +929,24 @@ class Images(APIBase):
             image_file, file_created = models.File.objects.get_or_create(pk=fileid)
             image_file.path.save(file_name, ContentFile(file_data.read()))
 
-            tile = models.TileModel.objects.get(pk=tileid)
-            for image in tile.data[nodeid]:
+            tile = TileProxyModel.objects.get(pk=tileid)
+            tile_data = tile.get_tile_data(request.user.pk)
+            for image in tile_data[nodeid]:
                 if image["file_id"] == fileid:
                     image["url"] = image_file.path.url
                     image["size"] = image_file.path.size
-                    tile.save()
+                    # I don't really want to run all the code TileProxyModel.save(),
+                    # so I just call it's super class
+                    super(TileProxyModel, tile).save()
+                    tile.index()
 
             # to use base64 use the below code
             # import base64
             # with open("foo.jpg", "w+b") as f:
             #     f.write(base64.b64decode(request.POST.get('data')))
 
-        except models.TileModel.DoesNotExist:
-            # it's ok if the Tile doesn't exist, that just means that there is some
+        except TileProxyModel.DoesNotExist:
+            # it's ok if the TileProxyModel doesn't exist, that just means that there is some
             # latency in the updating of the db from couch
             # see process_mobile_data in the FileListDatatype for how image thumbnails get
             # pushed to the db and files saved
@@ -894,3 +955,173 @@ class Images(APIBase):
             return JSONResponse(status=500)
 
         return JSONResponse()
+
+
+class IIIFManifest(APIBase):
+    def get(self, request):
+        query = request.GET.get("query", None)
+        start = int(request.GET.get("start", 0))
+        limit = request.GET.get("limit", None)
+
+        manifests = models.IIIFManifest.objects.all()
+        if query is not None:
+            manifests = manifests.filter(Q(label__icontains=query) | Q(description__icontains=query))
+        count = manifests.count()
+        if limit is not None:
+            manifests = manifests[start : start + int(limit)]
+
+        response = JSONResponse({"results": manifests, "count": count})
+        return response
+
+
+class OntologyProperty(APIBase):
+    def get(self, request):
+        domain_ontology_class = request.GET.get("domain_ontology_class", None)
+        range_ontology_class = request.GET.get("range_ontology_class", None)
+        ontologyid = request.GET.get("ontologyid", "sdl")
+
+        ret = []
+        if domain_ontology_class and range_ontology_class:
+            ontology_classes = models.OntologyClass.objects.get(source=domain_ontology_class)
+            for ontologyclass in ontology_classes.target["down"]:
+                if range_ontology_class in ontologyclass["ontology_classes"]:
+                    ret.append(ontologyclass["ontology_property"])
+
+        return JSONResponse(ret)
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class Tile(APIBase):
+    def get(self, request, tileid):
+        try:
+            tile = models.TileModel.objects.get(tileid=tileid)
+        except Exception as e:
+            return JSONResponse(str(e), status=404)
+
+        # filter tiles from attribute query based on user permissions
+        permitted_nodegroups = [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]
+        if str(tile.nodegroup_id) in permitted_nodegroups:
+            return JSONResponse(tile, status=200)
+        else:
+            return JSONResponse(_("Tile not found."), status=404)
+
+    def post(self, request, tileid):
+        tileview = TileView()
+        tileview.action = "update_tile"
+        request.POST = request.POST.copy()
+        request.POST["data"] = request.body
+        return tileview.post(request)
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class Node(APIBase):
+    def get(self, request, nodeid=None):
+        graph_cache = {}
+        params = request.GET.dict()
+        user = request.user
+        perms = "models." + params.pop("perms", "read_nodegroup")
+        params["nodeid"] = params.get("nodeid", nodeid)
+        try:
+            uuid.UUID(params["nodeid"])
+        except ValueError as e:
+            del params["nodeid"]
+        # parse node attributes from params
+        # datatype = params.get("datatype")
+        # description=params.get('description')
+        # exportable=params.get('exportable')
+        # fieldname=params.get('fieldname')
+        # graph_id=params.get('graph_id')
+        # is_collector=params.get('is_collector')
+        # isrequired=params.get('isrequired')
+        # issearchable=params.get('issearchable')
+        # istopnode=params.get('istopnode')
+        # name=params.get('name')
+        # nodegroup_id=params.get('nodegroup_id')
+        # nodeid=params.get('nodeid')
+        # ontologyclass=params.get('ontologyclass')
+        # sortorder=params.get('sortorder')
+
+        def graphLookup(graphid):
+            try:
+                return graph_cache[graphid]
+            except:
+                graph_cache[graphid] = Graph.objects.get(pk=node["graph_id"]).name
+                return graph_cache[graphid]
+
+        # try to get nodes by attribute filter and then get nodes by passed in user perms
+        try:
+            nodes = models.Node.objects.filter(**dict(params)).values()
+            permitted_nodegroups = [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(user, perms)]
+        except Exception as e:
+            return JSONResponse(str(e), status=404)
+
+        # check if any nodes were returned from attribute filter and throw error if none were returned
+        if len(nodes) == 0:
+            return JSONResponse(_("No nodes matching query parameters found."), status=404)
+
+        # filter nodes from attribute query based on user permissions
+        permitted_nodes = [node for node in nodes if str(node["nodegroup_id"]) in permitted_nodegroups]
+        for node in permitted_nodes:
+            try:
+                node["resourcemodelname"] = graphLookup(node["graph_id"])
+            except:
+                return JSONResponse(_("No graph found for graphid %s" % (node["graph_id"])), status=404)
+
+        return JSONResponse(permitted_nodes, status=200)
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class InstancePermission(APIBase):
+    def get(self, request):
+        user = request.user
+        result = {}
+        resourceinstanceid = request.GET.get("resourceinstanceid")
+        result["read"] = user_can_read_resource(user, resourceinstanceid)
+        result["edit"] = user_can_edit_resource(user, resourceinstanceid)
+        result["delete"] = user_can_delete_resource(user, resourceinstanceid)
+        return JSONResponse(result)
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class NodeValue(APIBase):
+    def post(self, request):
+        datatype_factory = DataTypeFactory()
+        tileid = request.POST.get("tileid")
+        nodeid = request.POST.get("nodeid")
+        data = request.POST.get("data")
+        resourceid = request.POST.get("resourceinstanceid", None)
+        format = request.POST.get("format")
+        operation = request.POST.get("operation")
+
+        # get node model return error if not found
+        try:
+            node = models.Node.objects.get(nodeid=nodeid)
+        except Exception as e:
+            return JSONResponse(e, status=404)
+
+        # check if user has permissions to write to node
+        user_has_perms = request.user.has_perm("write_nodegroup", node)
+
+        if user_has_perms:
+            # get datatype of node
+            try:
+                datatype = datatype_factory.get_instance(node.datatype)
+            except Exception as e:
+                return JSONResponse(e, status=404)
+
+            # transform data to format expected by tile
+            data = datatype.transform_value_for_tile(data, format=format)
+
+            # get existing data and append new data if operation='append'
+            if operation == "append":
+                tile = models.TileModel.objects.get(tileid=tileid)
+                data = datatype.update(tile, data, nodeid, action=operation)
+
+            # update/create tile
+            new_tile = TileProxyModel.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid)
+
+            response = JSONResponse(new_tile, status=200)
+        else:
+            response = JSONResponse(_("User does not have permission to edit this node."), status=403)
+
+        return response

@@ -26,12 +26,19 @@ class BaseDataType(object):
     def values_match(self, value1, value2):
         return value1 == value2
 
-    def transform_import_values(self, value, nodeid):
+    def transform_value_for_tile(self, value, **kwargs):
         """
         Transforms values from probably string/wkt representation to specified
         datatype in arches
         """
         return value
+
+    def update(self, tile, data, nodeid, action):
+        """
+        Updates the tile.data value of a given datatype and returns the updated
+        value
+        """
+        pass
 
     def transform_export_values(self, value, *args, **kwargs):
         """
@@ -79,7 +86,7 @@ class BaseDataType(object):
         source_config = {"type": "vector", "tiles": [tileserver_url]}
         count = None
         if preview == True:
-            count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
+            count = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).count()
             if count == 0:
                 source_config = {
                     "type": "geojson",
@@ -193,6 +200,20 @@ class BaseDataType(object):
         """
         pass
 
+    def pre_tile_save(self, tile, nodeid):
+        """
+        Called during tile.save operation but before the tile is actually saved to the database
+
+        """
+        pass
+
+    def post_tile_delete(self, tile, nodeid):
+        """
+        Called following the tile.delete operation
+
+        """
+        pass
+
     def is_a_literal_in_rdf(self):
         """
         Convenience method to determine whether or not this datatype's `to_rdf` method will express
@@ -202,6 +223,9 @@ class BaseDataType(object):
         True: `to_rdf()` turns the range node tile data into a suitable Literal value
         False:  `to_rdf()` uses the data to construct something more complex.
         """
+        return False
+
+    def accepts_rdf_uri(self, uri):
         return False
 
     def get_rdf_uri(self, node, data, which="r"):
@@ -284,3 +308,6 @@ class BaseDataType(object):
         if default_mapping:
             ret = {"properties": {"tiles": {"type": "nested", "properties": {"data": {"properties": {str(nodeid): default_mapping}}},}}}
         return ret
+
+    def disambiguate(self, value):
+        return value

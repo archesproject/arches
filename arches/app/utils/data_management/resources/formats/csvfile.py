@@ -27,6 +27,8 @@ from arches.app.utils.data_management.resource_graphs import exporter as GraphEx
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
+import arches.app.utils.task_management as task_management
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models import Q
 from django.utils.translation import ugettext as _
@@ -235,7 +237,7 @@ class CsvWriter(Writer):
             relations_file.append({"name": csv_name, "outputfile": dest})
 
             relations = ResourceXResource.objects.filter(
-                Q(resourceinstanceidfrom__in=resourceids) | Q(resourceinstanceidto__in=resourceids)
+                Q(resourceinstanceidfrom__in=resourceids) | Q(resourceinstanceidto__in=resourceids), tileid__isnull=True
             ).values(*csv_header)
             for relation in relations:
                 relation["datestarted"] = relation["datestarted"] if relation["datestarted"] is not None else ""
@@ -388,6 +390,7 @@ class CsvReader(Reader):
         self, business_data=None, mapping=None, overwrite="append", bulk=False, create_concepts=False, create_collections=False
     ):
         # errors = businessDataValidator(self.business_data)
+        celery_worker_running = task_management.check_if_celery_available()
 
         print("Starting import of business data")
         self.start = time()
@@ -465,7 +468,8 @@ class CsvReader(Reader):
                         Please add a 'ResourceID' column with a unique resource identifier."
                     )
                     print("*" * 80)
-                    sys.exit()
+                    if celery_worker_running is False:  # prevents celery chord from breaking on WorkerLostError
+                        sys.exit()
                 graphid = mapping["resource_model_id"]
                 blanktilecache = {}
                 populated_nodegroups = {}
@@ -536,7 +540,8 @@ class CsvReader(Reader):
                         Please sort your csv file by ResourceID and try import again."
                     )
                     print("*" * 80)
-                    sys.exit()
+                    if celery_worker_running is False:  # prevents celery chord from breaking on WorkerLostError
+                        sys.exit()
 
                 def create_reference_data(new_concepts, create_collections):
                     errors = []
@@ -725,7 +730,7 @@ class CsvReader(Reader):
                                 if collection_id is not None:
                                     value = concept_lookup.lookup_labelid_from_label(value, collection_id)
                         try:
-                            value = datatype_instance.transform_import_values(value, nodeid)
+                            value = datatype_instance.transform_value_for_tile(value)
                             errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
                         except Exception as e:
                             errors.append(
@@ -830,7 +835,7 @@ class CsvReader(Reader):
                         if list(source_data[0].keys()):
                             try:
                                 target_resource_model = all_nodes.get(nodeid=list(source_data[0].keys())[0]).graph_id
-                            except Exception as e:
+                            except ObjectDoesNotExist as e:
                                 print("*" * 80)
                                 print(
                                     "ERROR: No resource model found. Please make sure the resource model \
@@ -838,7 +843,8 @@ class CsvReader(Reader):
                                 )
                                 print(e)
                                 print("*" * 80)
-                                sys.exit()
+                                if celery_worker_running is False:  # prevents celery chord from breaking on WorkerLostError
+                                    sys.exit()
 
                         target_tile = get_blank_tile(source_data)
                         if "TileID" in row and row["TileID"] is not None:

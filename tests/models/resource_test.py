@@ -20,24 +20,15 @@ import json
 import os
 import time
 
+from tests import test_settings
 from django.contrib.auth.models import User, Group
+from django.core import management
 from django.urls import reverse
 from django.test.client import Client
-from guardian.shortcuts import assign_perm
-
+from guardian.shortcuts import assign_perm, get_perms
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
-from arches.app.search.mappings import (
-    prepare_terms_index,
-    delete_terms_index,
-    prepare_concepts_index,
-    delete_concepts_index,
-    prepare_search_index,
-    delete_search_index,
-    prepare_resource_relations_index,
-    delete_resource_relations_index,
-)
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resource_graph_importer
 from arches.app.utils.exceptions import InvalidNodeNameException, MultipleNodesFoundException
@@ -52,19 +43,11 @@ from tests.base_test import ArchesTestCase
 class ResourceTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
-        delete_terms_index()
-        delete_concepts_index()
-        delete_search_index()
-
-        prepare_terms_index(create=True)
-        prepare_concepts_index(create=True)
-        prepare_search_index(create=True)
-        prepare_resource_relations_index(create=True)
+        models.ResourceInstance.objects.all().delete()
 
         cls.client = Client()
         cls.client.login(username="admin", password="admin")
 
-        models.ResourceInstance.objects.all().delete()
         with open(os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
         resource_graph_importer(archesfile["graph"])
@@ -147,10 +130,6 @@ class ResourceTests(ArchesTestCase):
     @classmethod
     def tearDownClass(cls):
         cls.user.delete()
-        delete_terms_index()
-        delete_concepts_index()
-        delete_search_index()
-        delete_resource_relations_index()
 
     def test_get_node_value_string(self):
         """
@@ -220,5 +199,21 @@ class ResourceTests(ArchesTestCase):
         Test re-index a resource by type
         """
 
+        time.sleep(1)
         result = index_resources_by_type([self.search_model_graphid], clear_index=True, batch_size=4000)
+
         self.assertEqual(result, "Passed")
+
+    def test_creator_has_permissions(self):
+        """
+        Test user that created instance has full permissions
+        """
+
+        user = User.objects.create_user(username="sam", email="sam@samsclub.com", password="Test12345!")
+        user.save()
+        group = Group.objects.get(name="Resource Editor")
+        group.user_set.add(user)
+        test_resource = Resource(graph_id=self.search_model_graphid)
+        test_resource.save(user=user)
+        perms = set(get_perms(user, test_resource))
+        self.assertEqual(perms, {"view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"})

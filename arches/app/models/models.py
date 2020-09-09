@@ -29,7 +29,10 @@ from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
+from django.contrib.contenttypes.models import ContentType
 from django.core.validators import validate_slug
+from guardian.models import GroupObjectPermission
+from guardian.shortcuts import assign_perm
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -56,12 +59,10 @@ class CardModel(models.Model):
     config = JSONField(blank=True, null=True, db_column="config")
 
     def is_editable(self):
-        result = True
-        tiles = TileModel.objects.filter(nodegroup=self.nodegroup).count()
-        result = False if tiles > 0 else True
         if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
-            result = True
-        return result
+            return True
+        else:
+            return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
 
     class Meta:
         managed = True
@@ -240,14 +241,11 @@ class EditLog(models.Model):
 class MobileSyncLog(models.Model):
     logid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     survey = models.ForeignKey("MobileSurveyModel", on_delete=models.CASCADE, related_name="surveyid")
-    user = models.IntegerField(null=True)  # not a ForeignKey so we can track deletions
+    userid = models.IntegerField(null=True)  # not a ForeignKey so we can track deletions
     started = models.DateTimeField(auto_now_add=True, null=True)
     finished = models.DateTimeField(auto_now=True, null=True)
-    tilescreated = models.IntegerField(default=0, null=True)
-    tilesupdated = models.IntegerField(default=0, null=True)
-    tilesdeleted = models.IntegerField(default=0, null=True)
-    resourcescreated = models.IntegerField(default=0, null=True)
-    note = models.TextField(blank=True, null=True)
+    message = models.TextField(blank=True, null=True)
+    status = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
@@ -403,13 +401,12 @@ class GraphModel(models.Model):
         return False
 
     def is_editable(self):
-        result = True
-        if self.isresource:
-            resource_instances = ResourceInstance.objects.filter(graph_id=self.graphid).count()
-            result = False if resource_instances > 0 else True
-            if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
-                result = True
-        return result
+        if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
+            return True
+        elif self.isresource:
+            return not ResourceInstance.objects.filter(graph_id=self.graphid).exists()
+        else:
+            return True
 
     def __str__(self):
         return self.name
@@ -645,6 +642,7 @@ class ResourceXResource(models.Model):
         null=True,
         related_name="resxres_resource_instance_ids_from",
         on_delete=models.CASCADE,
+        db_constraint=False,
     )
     resourceinstanceidto = models.ForeignKey(
         "ResourceInstance",
@@ -653,30 +651,50 @@ class ResourceXResource(models.Model):
         null=True,
         related_name="resxres_resource_instance_ids_to",
         on_delete=models.CASCADE,
+        db_constraint=False,
     )
     notes = models.TextField(blank=True, null=True)
     relationshiptype = models.TextField(blank=True, null=True)
+    inverserelationshiptype = models.TextField(blank=True, null=True)
+    tileid = models.ForeignKey(
+        "TileModel", db_column="tileid", blank=True, null=True, related_name="resxres_tile_id", on_delete=models.CASCADE,
+    )
+    nodeid = models.ForeignKey("Node", db_column="nodeid", blank=True, null=True, related_name="resxres_node_id", on_delete=models.CASCADE,)
     datestarted = models.DateField(blank=True, null=True)
     dateended = models.DateField(blank=True, null=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
 
-    def delete(self):
-        from arches.app.search.search_engine_factory import SearchEngineFactory
+    def delete(self, *args, **kwargs):
+        from arches.app.search.search_engine_factory import SearchEngineInstance as se
+        from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
 
-        se = SearchEngineFactory().create()
-        se.delete(index="resource_relations", id=self.resourcexid)
+        se.delete(index=RESOURCE_RELATIONS_INDEX, id=self.resourcexid)
+
+        # update the resource-instance tile by removing any references to a deleted resource
+        deletedResourceId = kwargs.pop("deletedResourceId", None)
+        if deletedResourceId and self.tileid and self.nodeid:
+            newTileData = []
+            data = self.tileid.data[str(self.nodeid_id)]
+            if type(data) != list:
+                data = [data]
+            for relatedresourceItem in data:
+                if relatedresourceItem["resourceId"] != str(deletedResourceId):
+                    newTileData.append(relatedresourceItem)
+            self.tileid.data[str(self.nodeid_id)] = newTileData
+            self.tileid.save()
+
         super(ResourceXResource, self).delete()
 
     def save(self):
-        from arches.app.search.search_engine_factory import SearchEngineFactory
+        from arches.app.search.search_engine_factory import SearchEngineInstance as se
+        from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
 
-        se = SearchEngineFactory().create()
         if not self.created:
             self.created = datetime.datetime.now()
         self.modified = datetime.datetime.now()
         document = model_to_dict(self)
-        se.index_data(index="resource_relations", body=document, idfield="resourcexid")
+        se.index_data(index=RESOURCE_RELATIONS_INDEX, body=document, idfield="resourcexid")
         super(ResourceXResource, self).save()
 
     class Meta:
@@ -693,6 +711,7 @@ class ResourceInstance(models.Model):
     class Meta:
         managed = True
         db_table = "resource_instances"
+        permissions = (("no_access_to_resourceinstance", "No Access"),)
 
 
 class SearchComponent(models.Model):
@@ -1019,6 +1038,21 @@ class UserProfile(models.Model):
         db_table = "user_profile"
 
 
+@receiver(post_save, sender=User)
+def create_permissions_for_new_users(sender, instance, created, **kwargs):
+    from arches.app.models.resource import Resource
+
+    if created:
+        ct = ContentType.objects.get(app_label="models", model="resourceinstance")
+        resourceInstanceIds = list(GroupObjectPermission.objects.filter(content_type=ct).values_list("object_pk", flat=True).distinct())
+        for resourceInstanceId in resourceInstanceIds:
+            resourceInstanceId = uuid.UUID(resourceInstanceId)
+        resources = ResourceInstance.objects.filter(pk__in=resourceInstanceIds)
+        assign_perm("no_access_to_resourceinstance", instance, resources)
+        for resource in resources:
+            Resource(resource.resourceinstanceid).index()
+
+
 class UserXTask(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     taskid = models.UUIDField(serialize=False, blank=True, null=True)
@@ -1035,7 +1069,8 @@ class UserXTask(models.Model):
 
 class NotificationType(models.Model):
     """
-    Creates a 'type' of notification that would be associated with a specific trigger, e.g. Search Export Complete or Consultation Complete
+    Creates a 'type' of notification that would be associated with a specific trigger, e.g. Search Export Complete or Package Load Complete
+    Must be created manually using Django ORM or SQL.
     """
 
     typeid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
@@ -1050,6 +1085,11 @@ class NotificationType(models.Model):
 
 
 class Notification(models.Model):
+    """
+    A Notification instance that may optionally have a NotificationType. Can spawn N UserXNotification instances
+    Must be created manually using Django ORM.
+    """
+
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     created = models.DateTimeField(auto_now_add=True)
     # created.editable = True
@@ -1065,7 +1105,11 @@ class Notification(models.Model):
 
 class UserXNotification(models.Model):
     """
-    1 Notification instance (and its optional 1 NotificationType instance) can spawn N UserXNotification instances
+    A UserXNotification instance depends on an existing Notification instance and a User.
+    If its Notification instance has a NotificationType, this Type can be overriden for this particular User with a UserXNotificationType.
+    Must be created manually using Django ORM.
+    Only one UserXNotification created per medium of notification (e.g. emailnotify, webnotify).
+    Property 'isread' refers to either webnotify or emailnotify, not both, behaves differently.
     """
 
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
@@ -1080,8 +1124,11 @@ class UserXNotification(models.Model):
 
 class UserXNotificationType(models.Model):
     """
-    Creates a user-setting to override existing default notification settings (emailnotify, webnotify, etc.)
-    for specific a NotificationType instance
+    A UserXNotificationType instance only exists as an override of an existing NotificationType and is user-specific and
+    notification-settings-specific (e.g. emailnotify, webnotify, etc.)
+    Can be created in UI: see arches user profile editor to create a UserXNotificationType instance against an existing NotificationTypes
+    Else to create manually check 'notification_types' table in db for reference.
+    UserXNotificationTypes are automatically queried and applied as filters in get() requests for UserXNotifications in views/notifications
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
@@ -1231,3 +1278,30 @@ class Plugin(models.Model):
     class Meta:
         managed = True
         db_table = "plugins"
+
+
+class IIIFManifest(models.Model):
+    label = models.TextField()
+    url = models.TextField()
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.label
+
+    class Meta:
+        managed = True
+        db_table = "iiif_manifests"
+
+
+class GroupMapSettings(models.Model):
+    group = models.OneToOneField(Group, on_delete=models.CASCADE)
+    min_zoom = models.IntegerField(default=0)
+    max_zoom = models.IntegerField(default=20)
+    default_zoom = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.group.name
+
+    class Meta:
+        managed = True
+        db_table = "group_map_settings"

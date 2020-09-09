@@ -61,6 +61,7 @@ define([
         this.mouseoverInstanceId = ko.observable();
         this.mapLinkData = ko.observable(null);
         this.userIsReviewer = ko.observable(false);
+        this.userid = null;
         this.searchResults = {'timestamp': ko.observable()};
         this.selectPopup = function(componentname) {
             if(this.selectedPopup() !== '' && componentname === this.selectedPopup()) {
@@ -95,6 +96,7 @@ define([
             this.viewModel.total = ko.observable();
             _.extend(this, this.viewModel.sharedStateObject);
             this.viewModel.sharedStateObject.total = this.viewModel.total;
+            this.viewModel.sharedStateObject.loading = this.viewModel.loading;
             this.queryString = ko.computed(function() {
                 return JSON.stringify(this.query());
             }, this);
@@ -134,6 +136,7 @@ define([
                     }, this);
                     this.viewModel.sharedStateObject.searchResults.timestamp(response.timestamp);
                     this.viewModel.sharedStateObject.userIsReviewer(response.reviewer);
+                    this.viewModel.sharedStateObject.userid = response.userid;
                     this.viewModel.total(response.total_results);
                     this.viewModel.alert(false);
                 },

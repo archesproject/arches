@@ -67,11 +67,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div data-bind="attr: {href: '#', title: name, target: '_blank'}" href="#">
                     <div class="r-select-card">
                         <h4 class="r-select-title" data-bind="text: name"></h4>
-                        <div class="r-select-circle">
-                            <span><i data-bind="attr:{class: ('fa '+ iconclass +' r-select-icon')}"></i></span>
+                        <div class="r-select-circle" data-bind="attr:{style: ('background: ' + color)}">
+                            <span>
+                                <i data-bind="attr:{class: ('fa '+ iconclass +' r-select-icon')}"></i>
+                            </span>
                         </div>
                         <div class="r-desc-container">
-                            <p data-bind="text: description" class="r-select-desc"></p> 
+                            <p data-bind="text: subtitle" class="r-select-desc"></p> 
                         </div>  
                     </div>
                 </div>

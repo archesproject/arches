@@ -30,12 +30,14 @@ from django.utils.http import urlencode
 from django.core.mail import EmailMultiAlternatives
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import views as auth_views
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 import django.contrib.auth.password_validation as validation
+from arches import __version__
 from arches.app.utils.response import JSONResponse, Http401Response
-from arches.app.utils.forms import ArchesUserCreationForm
+from arches.app.utils.forms import ArchesUserCreationForm, ArchesPasswordResetForm, ArchesSetPasswordForm
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.arches_crypto import AESCipher
@@ -214,6 +216,14 @@ class ChangePasswordView(View):
         return JSONResponse(messages)
 
 
+class PasswordResetView(auth_views.PasswordResetView):
+    form_class = ArchesPasswordResetForm
+
+
+class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    form_class = ArchesSetPasswordForm
+
+
 @method_decorator(csrf_exempt, name="dispatch")
 class UserProfileView(View):
     def post(self, request):
@@ -239,22 +249,35 @@ class UserProfileView(View):
 @method_decorator(csrf_exempt, name="dispatch")
 class GetClientIdView(View):
     def post(self, request):
-        username = request.POST.get("username", None)
-        password = request.POST.get("password", None)
-        user = authenticate(username=username, password=password)
         if settings.MOBILE_OAUTH_CLIENT_ID == "":
             message = _("Make sure to set your MOBILE_OAUTH_CLIENT_ID in settings.py")
             response = HttpResponse(message, status=500)
             logger.warning(message)
         else:
+            username = request.POST.get("username", None)
+            password = request.POST.get("password", None)
+            user = authenticate(username=username, password=password)
             if user:
-                if hasattr(user, "userprofile") is not True:
-                    models.UserProfile.objects.create(user=user)
-                is_reviewer = user_is_resource_reviewer(user)
-                user = JSONSerializer().serializeToPython(user)
-                user["password"] = None
-                user["is_reviewer"] = is_reviewer
-                response = JSONResponse({"user": user, "clientid": settings.MOBILE_OAUTH_CLIENT_ID})
+                response = JSONResponse({"clientid": settings.MOBILE_OAUTH_CLIENT_ID})
             else:
                 response = Http401Response()
+        return response
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class ServerSettingView(View):
+    def post(self, request):
+        if settings.MOBILE_OAUTH_CLIENT_ID == "":
+            message = _("Make sure to set your MOBILE_OAUTH_CLIENT_ID in settings.py")
+            logger.warning(message)
+
+        username = request.POST.get("username", None)
+        password = request.POST.get("password", None)
+        user = authenticate(username=username, password=password)
+        if user:
+            server_settings = {"version": __version__, "clientid": settings.MOBILE_OAUTH_CLIENT_ID}
+            response = JSONResponse(server_settings)
+        else:
+            response = Http401Response()
+
         return response

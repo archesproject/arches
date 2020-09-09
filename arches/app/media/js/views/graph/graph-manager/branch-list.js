@@ -45,6 +45,8 @@ define([
                 var filtered_items = _.filter(this.items(), function(item){ 
                     return !item.filtered(); 
                 }, this);
+                filtered_items.sort(function(a,b) {
+                    return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;});
                 return filtered_items;
             }, this)
 

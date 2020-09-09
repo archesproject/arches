@@ -142,12 +142,11 @@ class MobileSurveyDesignerView(MapBaseManagerView):
                 history["lastsync"] = lastsync
             for entry in sync_log_records:
                 history["edits"] = len(resourceedits)
-                if entry["user"] not in history["editors"]:
-                    history["editors"][entry["user"]] = {"edits": entry["tilesupdated"], "lastsync": entry["finished"]}
+                if entry["userid"] not in history["editors"]:
+                    history["editors"][entry["userid"]] = {"lastsync": entry["finished"]}
                 else:
-                    history["editors"][entry["user"]]["edits"] += entry["tilesupdated"]
-                    if entry["finished"] > history["editors"][entry["user"]]["lastsync"]:
-                        history["editors"][entry["user"]]["lastsync"] = entry["finished"]
+                    if entry["finished"] > history["editors"][entry["userid"]]["lastsync"]:
+                        history["editors"][entry["userid"]]["lastsync"] = entry["finished"]
             for id, editor in iter(list(history["editors"].items())):
                 editor["lastsync"] = datetime.strftime(editor["lastsync"], "%Y-%m-%d %H:%M:%S")
             return history
@@ -210,7 +209,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         else:
             survey = MobileSurvey(
                 id=surveyid,
-                name=_(""),
+                name="",
                 datadownloadconfig={"download": False, "count": 100, "resources": [], "custom": None},
                 onlinebasemaps=settings.MOBILE_DEFAULT_ONLINE_BASEMAP,
             )

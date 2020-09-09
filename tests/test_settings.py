@@ -33,8 +33,6 @@ APP_ROOT = ""
 # and run in specific cases at the discretion of the developer.
 LOAD_V3_DATA_DURING_TESTS = False
 
-SEARCH_BACKEND = "tests.base_test.TestSearchEngine"
-
 RESOURCE_GRAPH_LOCATIONS = (os.path.join(TEST_ROOT, "fixtures", "resource_graphs"),)
 
 ONTOLOGY_FIXTURES = os.path.join(TEST_ROOT, "fixtures", "ontologies", "test_ontology")
@@ -45,6 +43,8 @@ BUSISNESS_DATA_FILES = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
+
+CACHES = {"default": {"BACKEND": "django.core.cache.backends.dummy.DummyCache",}}
 
 ELASTICSEARCH_PREFIX = "test"
 

@@ -21,7 +21,7 @@ from django.contrib.auth import views as auth_views
 from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from arches.app.views import concept, main, map, search, graph, api
-from arches.app.views.admin import ReIndexResources
+from arches.app.views.admin import ReIndexResources, FileView
 from arches.app.views.graph import (
     GraphDesignerView,
     GraphSettingsView,
@@ -35,7 +35,6 @@ from arches.app.views.graph import (
     NodegroupView,
 )
 from arches.app.views.resource import (
-    ResourceEditorView,
     ResourceListView,
     ResourceData,
     ResourceCards,
@@ -44,8 +43,9 @@ from arches.app.views.resource import (
     ResourceDescriptors,
     ResourceEditLogView,
     ResourceTiles,
+    ResourcePermissionDataView,
 )
-from arches.app.views.resource import NewResourceEditorView, ResourceActivityStreamPageView, ResourceActivityStreamCollectionView
+from arches.app.views.resource import ResourceEditorView, ResourceActivityStreamPageView, ResourceActivityStreamCollectionView
 from arches.app.views.plugin import PluginView
 from arches.app.views.concept import RDMView
 from arches.app.views.user import UserManagerView
@@ -53,10 +53,19 @@ from arches.app.views.tile import TileData
 from arches.app.views.notifications import NotificationView
 from arches.app.views.map import MapLayerManagerView, TileserverProxyView
 from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources, MobileSurveyDesignerView
-from arches.app.views.auth import LoginView, SignupView, ConfirmSignupView, ChangePasswordView, GetClientIdView, UserProfileView
+from arches.app.views.auth import (
+    LoginView,
+    SignupView,
+    ConfirmSignupView,
+    ChangePasswordView,
+    GetClientIdView,
+    UserProfileView,
+    ServerSettingView,
+    PasswordResetView,
+    PasswordResetConfirmView,
+)
 from arches.app.models.system_settings import settings
-from arches.app.utils.forms import ArchesPasswordResetForm
-from arches.app.utils.forms import ArchesSetPasswordForm
+from django.views.decorators.cache import cache_page
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -64,6 +73,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 uuid_regex = settings.UUID_REGEX
+
 
 urlpatterns = [
     url(r"^$", main.index, name="root"),
@@ -73,9 +83,11 @@ urlpatterns = [
     url(r"^auth/confirm_signup$", ConfirmSignupView.as_view(), name="confirm_signup"),
     url(r"^auth/get_client_id$", GetClientIdView.as_view(), name="get_client_id"),
     url(r"^auth/user_profile$", UserProfileView.as_view(), name="user_profile"),
+    url(r"^auth/server_settings$", ServerSettingView.as_view(), name="server_settings"),
     url(r"^auth/", LoginView.as_view(), name="auth"),
     url(r"^rdm/(?P<conceptid>%s|())$" % uuid_regex, RDMView.as_view(), name="rdm"),
     url(r"^admin/reindex/resources$", ReIndexResources.as_view(), name="reindex"),
+    url(r"^files/(?P<fileid>%s)$" % uuid_regex, FileView.as_view(), name="file_access"),
     url(r"^concepts/(?P<conceptid>%s)/manage_parents/$" % uuid_regex, concept.manage_parents, name="concept_manage_parents"),
     url(r"^concepts/(?P<conceptid>%s)/confirm_delete/$" % uuid_regex, concept.confirm_delete, name="confirm_delete"),
     url(r"^concepts/(?P<conceptid>%s)/make_collection/$" % uuid_regex, concept.make_collection, name="make_collection"),
@@ -104,11 +116,11 @@ urlpatterns = [
     url(r"^buffer/$", search.buffer, name="buffer"),
     url(
         r"^settings/",
-        NewResourceEditorView.as_view(),
+        ResourceEditorView.as_view(),
         {
             "resourceid": settings.RESOURCE_INSTANCE_ID,
-            "view_template": "views/resource/new-editor.htm",
-            "main_script": "views/resource/new-editor",
+            "view_template": "views/resource/editor.htm",
+            "main_script": "views/resource/editor",
             "nav_menu": False,
         },
         name="config",
@@ -117,12 +129,14 @@ urlpatterns = [
     url(r"^graph/import/", GraphDataView.as_view(action="import_graph"), name="import_graph"),
     url(r"^graph/reorder_nodes$", GraphDataView.as_view(action="reorder_nodes"), name="reorder_nodes"),
     url(r"^graph/permissions$", PermissionDataView.as_view(), name="permission_data"),
+    url(r"^resource/permissions$", ResourcePermissionDataView.as_view(), name="resource_permission_data"),
     url(
         r"^graph/permissions/permission_manager_data$",
         PermissionDataView.as_view(action="get_permission_manager_data"),
         name="permission_manager_data",
     ),
     url(r"^graph/(?P<graphid>%s|())$" % uuid_regex, GraphManagerView.as_view(), name="graph"),
+    url(r"^graph/(?P<graphid>%s)/nodes$" % uuid_regex, GraphDataView.as_view(action="get_nodes"), name="graph_nodes"),
     url(r"^graph/(?P<graphid>%s)/append_branch$" % uuid_regex, GraphDataView.as_view(action="append_branch"), name="append_branch"),
     url(r"^graph/(?P<graphid>%s)/append_node$" % uuid_regex, GraphDataView.as_view(action="append_node"), name="append_node"),
     url(r"^graph/(?P<graphid>%s)/move_node$" % uuid_regex, GraphDataView.as_view(action="move_node"), name="move_node"),
@@ -162,15 +176,9 @@ urlpatterns = [
     url(r"^graph_settings/(?P<graphid>%s)$" % uuid_regex, GraphSettingsView.as_view(), name="graph_settings"),
     url(r"^components/datatypes/(?P<template>[a-zA-Z_-]*)", DatatypeTemplateView.as_view(), name="datatype_template"),
     url(r"^resource$", ResourceListView.as_view(), name="resource"),
-    url(
-        r"^resource/(?P<resourceid>%s)/(?P<graphid>%s)/add_resource$" % (uuid_regex, uuid_regex),
-        ResourceEditorView.as_view(),
-        name="old_add_resource",
-    ),
-    url(r"^resource-old/(?P<resourceid>%s)$" % uuid_regex, ResourceEditorView.as_view(), name="old_resource_editor"),
-    url(r"^resource/(?P<resourceid>%s)$" % uuid_regex, NewResourceEditorView.as_view(), name="resource_editor"),
-    url(r"^add-resource/(?P<graphid>%s)$" % uuid_regex, NewResourceEditorView.as_view(), name="add_resource"),
-    url(r"^resource/(?P<resourceid>%s)/copy$" % uuid_regex, NewResourceEditorView.as_view(action="copy"), name="resource_copy"),
+    url(r"^resource/(?P<resourceid>%s)$" % uuid_regex, ResourceEditorView.as_view(), name="resource_editor"),
+    url(r"^add-resource/(?P<graphid>%s)$" % uuid_regex, ResourceEditorView.as_view(), name="add_resource"),
+    url(r"^resource/(?P<resourceid>%s)/copy$" % uuid_regex, ResourceEditorView.as_view(action="copy"), name="resource_copy"),
     url(r"^resource/(?P<resourceid>%s)/history$" % uuid_regex, ResourceEditLogView.as_view(), name="resource_edit_log"),
     url(r"^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$" % (uuid_regex, uuid_regex), ResourceData.as_view(), name="resource_data"),
     url(r"^resource/(?P<resourceid>%s)/cards$" % uuid_regex, ResourceCards.as_view(), name="resource_cards"),
@@ -194,6 +202,7 @@ urlpatterns = [
     url(r"^tiles/reorder_tiles$", TileData.as_view(action="reorder_tiles"), name="reorder_tiles"),
     url(r"^tiles/tile_history$", TileData.as_view(action="tile_history"), name="tile_history"),
     url(r"^tiles/delete_provisional_tile$", TileData.as_view(action="delete_provisional_tile"), name="delete_provisional_tile"),
+    url(r"^tiles/download_files$", TileData.as_view(action="download_files"), name="download_files"),
     url(r"^templates/(?P<template>[a-zA-Z_\-./]*)", main.templates, name="templates"),
     url(r"^map_layer_manager/(?P<maplayerid>%s)$" % uuid_regex, MapLayerManagerView.as_view(), name="map_layer_update"),
     url(r"^map_layer_manager/*", MapLayerManagerView.as_view(), name="map_layer_manager"),
@@ -214,9 +223,15 @@ urlpatterns = [
     url(r"^couchdb/(?P<path>.*)$", api.CouchdbProxy.as_view()),
     url(r"^mobileprojects/(?:(?P<surveyid>%s))?$" % uuid_regex, api.Surveys.as_view(), name="mobileprojects"),
     url(r"^sync/(?P<surveyid>%s|())$" % uuid_regex, api.Sync.as_view(), name="sync"),
+    url(r"^checksyncstatus/(?P<synclogid>%s|())$" % uuid_regex, api.CheckSyncStatus.as_view(), name="checksyncstatus"),
+    url(r"^graphs/(?P<graph_id>%s)$" % (uuid_regex), api.Graphs.as_view(), name="graphs_api"),
     url(r"^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.Resources.as_view(), name="resources_graphid"),
     url(r"^resources/(?P<slug>[-\w]+)/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources_slug"),
     url(r"^resources/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources"),
+    url(r"^api/tiles/(?P<tileid>%s|())$" % (uuid_regex), api.Tile.as_view(), name="api_tiles"),
+    url(r"^api/nodes/(?P<nodeid>%s|())$" % (uuid_regex), api.Node.as_view(), name="api_nodes"),
+    url(r"^api/instance_permissions/$", api.InstancePermission.as_view(), name="api_instance_permissions"),
+    url(r"^api/node_value/$", api.NodeValue.as_view(), name="api_node_value"),
     url(r"^rdm/concepts/(?P<conceptid>%s|())$" % uuid_regex, api.Concepts.as_view(), name="concepts"),
     url(r"^plugins/(?P<pluginid>%s)$" % uuid_regex, PluginView.as_view(), name="plugins"),
     url(r"^plugins/(?P<slug>[-\w]+)$", PluginView.as_view(), name="plugins"),
@@ -229,6 +244,7 @@ urlpatterns = [
         name="mvt",
     ),
     url(r"^images$", api.Images.as_view(), name="images"),
+    url(r"^ontology_properties$", api.OntologyProperty.as_view(), name="ontology_properties"),
     url(r"^tileserver/(?P<path>.*)$", TileserverProxyView.as_view()),
     url(r"^history/$", ResourceActivityStreamCollectionView.as_view(), name="as_stream_collection"),
     url(r"^history/(?P<page>[0-9]+)$", ResourceActivityStreamPageView.as_view(), name="as_stream_page"),
@@ -239,21 +255,19 @@ urlpatterns = [
     url(r"^admin/", admin.site.urls),
     url(
         r"^password_reset/$",
-        auth_views.PasswordResetView.as_view(),
+        PasswordResetView.as_view(),
         name="password_reset",
-        kwargs={"password_reset_form": ArchesPasswordResetForm},
     ),
     url(r"^password_reset/done/$", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     url(
         r"^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$",
-        auth_views.PasswordResetConfirmView.as_view(),
+        PasswordResetConfirmView.as_view(),
         name="password_reset_confirm",
-        kwargs={"set_password_form": ArchesSetPasswordForm},
     ),
     url(r"^reset/done/$", auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
     url(r"^o/", include("oauth2_provider.urls", namespace="oauth2")),
+    url(r"^iiifmanifest$", api.IIIFManifest.as_view(), name="iiifmanifest"),
 ]
-
 
 if settings.DEBUG:
     try:

@@ -93,8 +93,11 @@ define([
                 self.selectedTile().parent.widgets().forEach(
                     function(w){
                         var defaultconfig = w.widgetLookup[w.widget_id()].defaultconfig;
-                        if (JSON.parse(defaultconfig).rerender === true) {
+                        if (JSON.parse(defaultconfig).rerender === true && self.selectedTile().parent.allowProvisionalEditRerender() === true) {
                             self.selectedTile().parent.widgets()[0].label.valueHasMutated();
+                        } 
+                        if (self.selectedTile().parent.triggerUpdate) {
+                            self.selectedTile().parent.triggerUpdate();
                         }
                     });
             }
@@ -106,7 +109,7 @@ define([
         };
 
         self.tileIsFullyProvisional = ko.computed(function() {
-            return self.selectedProvisionalEdit() && self.selectedProvisionalEdit().isfullyprovisional() === true;
+            return self.selectedProvisionalEdit() && ko.unwrap(self.selectedProvisionalEdit().isfullyprovisional) === true;
         });
 
         self.updateProvisionalEdits(self.selectedTile);

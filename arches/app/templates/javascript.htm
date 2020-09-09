@@ -27,7 +27,7 @@
             'backbone': '{{ STATIC_URL }}packages/backbone/backbone-min',
             'underscore': '{{ STATIC_URL }}packages/underscore/underscore-min',
             'jquery-validate': '{{ STATIC_URL }}packages/jquery-validation/dist/jquery.validate.min',
-            'd3': '{{ STATIC_URL }}packages/d3/d3.min',
+            'd3': '{{ STATIC_URL }}packages/d3/dist/d3.min',
             'dropzone': '{{ STATIC_URL }}packages/dropzone/dist/min/dropzone-amd-module.min',
             'ckeditor': '{{ STATIC_URL }}packages/ckeditor/ckeditor',
             'ckeditor-jquery': '{{ STATIC_URL }}packages/ckeditor/adapters/jquery',
@@ -61,6 +61,7 @@
             'leaflet': '{{ STATIC_URL }}packages/leaflet/dist/leaflet',
             'leaflet-iiif': '{{ STATIC_URL }}packages/leaflet-iiif/leaflet-iiif',
             'leaflet-draw': '{{ STATIC_URL }}packages/leaflet-draw/dist/leaflet.draw',
+            'leaflet-fullscreen': '{{ STATIC_URL }}packages/leaflet.fullscreen/Control.FullScreen',
             'metismenu': '{{ STATIC_URL }}packages/metismenu/dist/metisMenu.min',
             'knockstrap': '{{ STATIC_URL }}packages/knockstrap/build/knockstrap.min',
             'jqtree': '{{ STATIC_URL }}packages/jqtree/tree.jquery',
@@ -138,6 +139,9 @@
             'leaflet-draw': {
                 deps: ['leaflet']
             },
+            'leaflet-fullscreen': {
+                deps: ['leaflet']
+            },
             'ckeditor': {
                 deps: ['jquery']
             },
@@ -186,6 +190,7 @@
                 buffer: "{% url 'buffer'%}",
                 config: "{% url 'config' %}",
                 node: "{% url 'node' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                graph_nodes: function(graphid){return "{% url 'graph_nodes' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 nodegroup: "{% url 'nodegroup' %}",
                 node_layer: "{% url 'node_layer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 graph: "{% url 'graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
@@ -213,11 +218,13 @@
                 reorder_nodes: "{% url 'reorder_nodes' %}",
                 delete_provisional_tile: "{% url 'delete_provisional_tile' %}",
                 tile_history: "{% url 'tile_history' %}",
+                download_files: "{% url 'download_files' %}",
                 apply_functions: "{% url 'apply_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 remove_functions: "{% url 'remove_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 time_wheel_config: "{% url 'time_wheel_config' %}",
                 reindex: "{% url 'reindex' %}",
                 permission_data: "{% url 'permission_data' %}",
+                resource_permission_data: "{% url 'resource_permission_data' %}",
                 permission_manager_data: "{% url 'permission_manager_data' %}",
                 get_user_names: "{% url 'get_user_names' %}",
                 feature_popup_content: "{% url 'feature_popup_content' %}",
@@ -237,11 +244,22 @@
                 mvt: function(nodeid){return decodeURI("{% url 'mvt' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' '{z}' '{x}' '{y}' %}").replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid)},
                 collector_manager: "{% url 'collector_manager' %}",
                 help_template: "{% url 'help_templates' %}",
+                graphs_api: "{% url 'graphs_api' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 api_card: "{% url 'api_card' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                api_tiles: function (tileid) {
+                    return "{% url 'api_tiles' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', tileid)
+                },
+                api_nodes: function (nodeid) {
+                    return "{% url 'api_nodes' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid)
+                },
+                api_node_value: "{% url 'api_node_value' %}",
                 api_resources: function(resourceid){return "{% url 'resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceid)},
                 api_search_component_data: "{% url 'api_search_component_data' 'aaaa'%}".replace('aaaa', ''),
                 geojson: "{% url 'geojson' %}",
                 icons: "{% url 'icons' %}",
+                ontology_properties: "{% url 'ontology_properties' %}",
+                iiifmanifest: "{% url 'iiifmanifest' %}",
+                {% block urls %}{% endblock urls %}
             },
             geocoderPlaceHolder: "{% trans 'Find an address...' %}",
             confirmNav: {
@@ -343,7 +361,7 @@
             resources: [{% autoescape off %}{% for resource in resource_graphs %}{
               'maplayerid': '{{resource.graphid}}',
               'graphid': '{{resource.graphid}}',
-              'name': '{{ resource.name }}',
+              'name': '{{ resource.name | escapejs }}',
               'icon': '{{ resource.iconclass }}',
             },{% endfor %}{% endautoescape %}],
             userEmail: '{{ user.email }}',
@@ -431,6 +449,7 @@
                 'text': '{{ renderer.title }}',
                 'type': '{{ renderer.type }}',
                 'ext': '{{ renderer.ext }}',
+                'exclude': '{{ renderer.exclude }}',
                  },
                 {% endfor %}{% endautoescape %}];
     });
@@ -511,5 +530,3 @@
 
 {% block project_modules %}
 {% endblock project_modules %}
-
-
