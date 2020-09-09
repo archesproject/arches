@@ -22,6 +22,12 @@ define([
                     facets: ko.observableArray()
                 };
                 this.cardNameDict = {};
+                var createLookup = function(list, idKey) {
+                    return _.reduce(list, function(lookup, item) {
+                        lookup[item[idKey]] = item;
+                        return lookup;
+                    }, {});
+                };
                 self.widgetLookup = null;
 
                 $.ajax({
@@ -33,6 +39,10 @@ define([
                     _.each(response.datatypes, function(datatype) {
                         this.datatypelookup[datatype.datatype] = datatype;
                     }, this);
+                    self.widgetLookup = createLookup(
+                        response.cardwidgets,
+                        'node_id'
+                    );
                     _.each(response.cards, function(card) {
                         self.cardNameDict[card.nodegroup_id] = card.name;
                         card.nodes = _.filter(response.nodes, function(node) {
