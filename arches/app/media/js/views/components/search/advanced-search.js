@@ -49,6 +49,15 @@ define([
                             return node.nodegroup_id === card.nodegroup_id;
                         });
                         card.addFacet = function() {
+                            _.each(card.nodes, function(node) {
+                                if (self.cardNameDict[node.nodegroup_id] && node.nodeid === node.nodegroup_id) {
+                                    node.label = self.cardNameDict[node.nodegroup_id];
+                                } else if (node.nodeid !== node.nodegroup_id) {
+                                    node.label = self.widgetLookup[node.nodeid].label;
+                                } else {
+                                    node.label = node.name;
+                                }
+                            });
                             self.newFacet(card);
                         };
                     }, this);
