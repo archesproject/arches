@@ -22,6 +22,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
             },
 
             initialize: function(options) {
+                this.params = options.params;
                 options.name = 'Search Results';
                 BaseFilter.prototype.initialize.call(this, options);
 
