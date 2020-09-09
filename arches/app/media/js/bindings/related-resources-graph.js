@@ -27,22 +27,19 @@ define([
             };
             var texts;
             var selectedNode;
-            var force = d3.layout.force()
-                .charge(-500)
-                .linkDistance(200)
-                .gravity(0.05)
-                .friction(0.55)
-                .linkStrength(function(l, i) {
-                    return 1;
-                })
-                .theta(0.8)
-                .size([width, height]);
 
+            var simulation = d3.forceSimulation(data.nodes)
+                .force("link", d3.forceLink(data.links).id(d => d.id).distance(function(d){
+                    return 200;
+                }))
+                .force("charge", d3.forceManyBody().strength(-500))
+                .force("center", d3.forceCenter(width / 2, height / 2)); 
+                
             var nodeList = options.nodeList;
             var currentResource = options.currentResource;
 
             var selectNode = function(d) {
-                vis.selectAll("circle")
+                nodesElement.selectAll("circle")
                     .attr("class", function(d1) {
                         var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                         if (d1 === d) {
@@ -52,7 +49,7 @@ define([
                         }
                         return className;
                     });
-                vis.selectAll("line")
+                linksElement.selectAll("line")
                     .attr('class', function(l) {
                         return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
                     });
@@ -61,11 +58,11 @@ define([
             };
 
             var clearHover = function(d) {
-                vis.selectAll("line")
+                linksElement.selectAll("line")
                     .attr('class', function(l) {
                         return 'link';
                     });
-                vis.selectAll("circle").attr("class", function(d1) {
+                nodesElement.selectAll("circle").attr("class", function(d1) {
                     var className = 'node-' + (d1.isRoot ? 'current' : 'ancestor');
                     if (d1.selected()) {
                         className += '-selected';
@@ -75,7 +72,7 @@ define([
             };
 
             var hoverNode = function(d) {
-                vis.selectAll("circle")
+                nodesElement.selectAll("circle")
                     .attr("class", function(d1) {
                         var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                         if (d1 === d) {
@@ -94,7 +91,7 @@ define([
                         }
                         return className;
                     });
-                vis.selectAll("line")
+                linksElement.selectAll("line")
                     .attr('class', function(l) {
                         return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
                     });
@@ -107,7 +104,7 @@ define([
                         selectNode(item);
                     } else {
                         nodeSelection.removeAll();
-                        vis.selectAll("circle")
+                        nodesElement.selectAll("circle")
                             .attr("class", function(d1) {
                                 return 'node-' + (d1.isRoot ? 'current' : 'ancestor');
                             });
@@ -128,37 +125,36 @@ define([
                 };
             };
 
-            var redraw = function() {
-                vis.attr("transform",
-                    "translate(" + d3.event.translate + ")" +
-                    " scale(" + d3.event.scale + ")");
-            };
-
             var svg = d3.select(element).append("svg:svg")
-                .attr("width", width)
-                .attr("height", height)
-                .call(d3.behavior.zoom().on("zoom", redraw));
+                .attr("viewBox", [0, 0, width, height])
+                .call(d3.zoom()
+                    .extent([[0, 0], [width, height]])
+                    .scaleExtent([1, 8])
+                    .on("zoom", function(event) {
+                        groupElement.attr("transform", event.transform);
+                    }));
 
-            var vis = svg.append('svg:g');
+            var groupElement = svg.append('svg:g');
+            var linksElement = groupElement.append('svg:g');
+            var nodesElement = groupElement.append('svg:g');
 
             var update = function() {
-                $(window).trigger("resize");
-                data = {
-                    nodes: force.nodes(data.nodes).nodes(),
-                    links: force.links(data.links).links()
-                };
                 var linkMap = linkMap;
+        
+                $(window).trigger("resize");
+                simulation.nodes(data.nodes);
+                simulation.force("link").links(data.links);
+                simulation.restart();
 
-                var link = vis.selectAll("line")
-                    .data(data.links);
-                link.enter()
-                    .insert("line", "circle")
+                var link = linksElement.selectAll("line")
+                    .data(data.links)
+                    .join("line")
                     .attr("class", "link")
-                    .on("mouseover", function(d) {
+                    .on("mouseover", function(event, d) {
                         var hoveredNodes = [];
                         var linkMap = linkMap;
                         d3.select(this).attr("class", "linkMouseover");
-                        vis.selectAll("circle").attr("class", function(d1) {
+                        nodesElement.selectAll("circle").attr("class", function(d1) {
                             var matrix;
                             var className = 'node-' + (d1.isRoot ? 'current' : 'ancestor');
                             if (d.source === d1 || d.target === d1) {
@@ -177,9 +173,9 @@ define([
                         });
                         nodeSelection(hoveredNodes);
                     })
-                    .on("mouseout", function(d) {
+                    .on("mouseout", function(event, d) {
                         d3.select(this).attr("class", "link");
-                        vis.selectAll("circle").attr("class", function(d1) {
+                        nodesElement.selectAll("circle").attr("class", function(d1) {
                             var className = 'node-' + (d1.isRoot ? 'current' : 'ancestor');
                             if (d1.selected()) {
                                 className += '-selected';
@@ -191,18 +187,11 @@ define([
                 link.exit()
                     .remove();
 
-                var drag = force.drag()
-                    .on("dragstart", function(d) {
-                        d3.event.sourceEvent.stopPropagation();
-                        d3.event.sourceEvent.preventDefault();
-                    });
-
-                var node = vis.selectAll("circle")
+                var node = nodesElement.selectAll("circle")
                     .data(data.nodes, function(d) {
                         return d.id;
-                    });
-                node.enter()
-                    .append("circle")
+                    })
+                    .join("circle")
                     .style('fill', function(d) {
                         return d.color;
                     })
@@ -212,8 +201,8 @@ define([
                     .attr("class", function(d) {
                         return 'node-' + (d.isRoot ? 'current' : 'ancestor');
                     })
-                    .on("mouseover", function(d) {
-                        vis.selectAll("circle")
+                    .on("mouseover", function(event, d) {
+                        nodesElement.selectAll("circle")
                             .attr("class", function(d1) {
                                 var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                                 if (d1 === d) {
@@ -236,13 +225,13 @@ define([
                                 }
                                 return className;
                             });
-                        vis.selectAll("line")
+                        linksElement.selectAll("line")
                             .attr('class', function(l) {
                                 return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
                             });
                     })
-                    .on('mouseout', function(d) {
-                        vis.selectAll("circle")
+                    .on('mouseout', function(event, d) {
+                        nodesElement.selectAll("circle")
                             .attr("class", function(d1) {
                                 var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                                 if (d1.selected()) {
@@ -260,15 +249,14 @@ define([
                         if (selectedState() === false) {
                             nodeSelection.removeAll();
                         }
-                        vis.selectAll("line")
+                        linksElement.selectAll("line")
                             .attr('class', 'link');
                     })
-
-                    .on("click", function(d) {
-                        if (!d3.event.defaultPrevented) {
+                    .on("click", function(event, d) {
+                        if (!event.defaultPrevented) {
                             d.loadcount(d.loadcount()+1);
                         }
-                        vis.selectAll("circle")
+                        nodesElement.selectAll("circle")
                             .attr("class", function(d1) {
                                 var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                                 if (d1 === d) {
@@ -289,24 +277,41 @@ define([
                                 }
                                 return className;
                             });
-                        vis.selectAll("line")
+                        linksElement.selectAll("line")
                             .attr('class', function(l) {
                                 return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
                             });
                         updateNodeInfo(d);
                     })
-                    .call(drag);
-                node.exit()
-                    .remove();
+                    .call(d3.drag()
+                        .on("start", dragstarted)
+                        .on("drag", dragged)
+                        .on("end", dragended));
+
+                    function dragstarted(event, d) {
+                        if (!event.active) simulation.alphaTarget(0.3).restart();
+                        d.fx = d.x;
+                        d.fy = d.y;
+                    }
+                    
+                    function dragged(event, d) {
+                        d.fx = event.x;
+                        d.fy = event.y;
+                    }
+                    
+                    function dragended(event, d) {
+                        if (!event.active) simulation.alphaTarget(0);
+                        d.fx = null;
+                        d.fy = null;
+                    }    
 
                 if (texts) {
                     texts.remove();
                 }
 
-                texts = vis.selectAll("text.nodeLabels")
-                    .data(data.nodes);
-
-                texts.enter().append("text")
+                texts = nodesElement.selectAll("text.nodeLabels")
+                    .data(data.nodes)
+                    .join("text")
                     .attr("class", function(d){
                         return d.isRoot ? 'root-node-label' : 'nodeLabels';
                     })
@@ -315,7 +320,7 @@ define([
                         return d.name;
                     });
 
-                force.on("tick", function() {
+                simulation.on("tick", function() {
                     link.attr("x1", function(d) {
                             return d.source.x;
                         })
@@ -346,7 +351,6 @@ define([
 
                 });
 
-                force.start();
             };
 
             var updateNodeInfo = function(d) {
@@ -450,7 +454,7 @@ define([
                                 newNodeId += 1;
                             } else if (rootNode.relationCount) {
                                 total_loaded = rootNode.relationCount.loaded + rr.resource_relationships.length;
-                                rootNode.relationCount.loaded = total_loaded <= rr.total.value ? total_loaded : total_loaded - 1;
+                                rootNode.relationCount.loaded = total_loaded <= rr.total.value ? total_loaded : rr.total.value;
                             } else {
                                 rootNode.relationCount = {
                                     total: rr.total.value,
@@ -484,7 +488,6 @@ define([
                                     newNodeId += 1;
                                 }
                             };
-
                             _.each(rr.related_resources, getRelated);
 
                             _.each(rr.resource_relationships, function(resource_relationships) {
@@ -574,7 +577,7 @@ define([
                 var h = $el.parent().height();
                 svg.attr("width", w);
                 svg.attr("height", h);
-                force.size([w, h]);
+                svg.attr("viewBox", [0, 0, w, h]);
             }).trigger("resize");
 
 
@@ -587,7 +590,7 @@ define([
                     }
                     item.selectedSubscription = item.selected.subscribe(updateSelected(item), this);
                     item.hoveredSubscription = item.hovered.subscribe(updateHovered(item), this);
-                    if (item.isRoot) {
+                    if (item.isRoot && item.loadcount() === 0) {
                         item.loadcount(1);
                     }
                     item.loadcountSubscription = item.loadcount.subscribe(getMoreData(item), this);

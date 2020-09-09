@@ -3082,6 +3082,19 @@ a.disabled {
 
 /*RDM classes
 ------------------------------------*/
+.rdm-concept-panel {
+    padding: 20px 25px;
+    margin-left: 5px;
+}
+
+.modal-body {
+    margin: 15px;
+}
+
+.modal-body .col-xs-6 {
+    padding-right: 10px !important;
+}
+
 .arches-RDM-URI {
     color: #494949;
     margin-top: 5px;
