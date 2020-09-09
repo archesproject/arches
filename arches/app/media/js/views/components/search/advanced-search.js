@@ -21,6 +21,8 @@ define([
                 this.filter = {
                     facets: ko.observableArray()
                 };
+                this.cardNameDict = {};
+                self.widgetLookup = null;
 
                 $.ajax({
                     type: "GET",
@@ -32,6 +34,7 @@ define([
                         this.datatypelookup[datatype.datatype] = datatype;
                     }, this);
                     _.each(response.cards, function(card) {
+                        self.cardNameDict[card.nodegroup_id] = card.name;
                         card.nodes = _.filter(response.nodes, function(node) {
                             return node.nodegroup_id === card.nodegroup_id;
                         });
