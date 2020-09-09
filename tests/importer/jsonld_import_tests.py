@@ -990,7 +990,6 @@ class JsonLDImportTests(ArchesTestCase):
         else:
             self.assertTrue(rtb1["@id"].startswith("http://localhost:8000/resources"))
 
-
     def test_f_big_nest_mess(self):
 
         data = """

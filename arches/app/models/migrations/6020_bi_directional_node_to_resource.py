@@ -6,6 +6,7 @@ import datetime
 from django.db.models import Q
 from django.db import migrations, models
 
+
 def setup(apps):
     nodes = apps.get_model("models", "Node")
     tiles = apps.get_model("models", "Tile")

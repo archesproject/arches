@@ -95,7 +95,6 @@ class PermissionTests(ArchesTestCase):
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
         cls.add_users()
 
-
     @classmethod
     def tearDownClass(cls):
         pass
