@@ -37,7 +37,10 @@ from arches.app.models.tile import Tile as TileProxyModel
 from arches.app.views.tile import TileData as TileView
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse
-from arches.app.utils.decorators import can_read_concept, group_required
+from arches.app.utils.decorators import (
+    can_read_concept,
+    group_required
+)
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
