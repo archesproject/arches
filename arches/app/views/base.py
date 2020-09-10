@@ -57,19 +57,10 @@ class BaseManagerView(TemplateView):
         createable = get_createable_resource_types(self.request.user)
         createable.sort(key=lambda x: x.name.lower())
 
-        context['creatable_resource_valid_ontologies'] = CreatableResourceValidDomainOntologyClasses(createable).ontologies
-        context['createable_resources'] = JSONSerializer().serialize(
+        context["creatable_resource_valid_ontologies"] = CreatableResourceValidDomainOntologyClasses(createable).ontologies
+        context["createable_resources"] = JSONSerializer().serialize(
             createable,
-            exclude=[
-                "functions",
-                "ontology",
-                "isactive",
-                "isresource",
-                "version",
-                "deploymentdate",
-                "deploymentfile",
-                "author",
-            ],
+            exclude=["functions", "ontology", "isactive", "isresource", "version", "deploymentdate", "deploymentfile", "author",],
         )
 
         context["notifications"] = models.UserXNotification.objects.filter(recipient=self.request.user, isread=False)
