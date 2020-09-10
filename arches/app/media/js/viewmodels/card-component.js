@@ -27,6 +27,7 @@ define([
         this.card.showIds = this.showIds;
         this.tile = params.tile;
         this.reportExpanded = ko.observable(true);
+        this.hideEmptyNodes = params.hideEmptyNodes;
         if (this.preview) {
             if (!this.card.newTile) {
                 this.card.newTile = this.card.getNewTile();
