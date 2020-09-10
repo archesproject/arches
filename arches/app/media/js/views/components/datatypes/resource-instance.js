@@ -13,13 +13,18 @@ define([
             this.search = params.search;
 
             var validResourceModels = data.createableResources.filter(function(resource) {
-                var hasValidOntologyClasses = data.creatableResourceValidOntologies[resource.graphid].some(function(ontology) {
-                    if (ontology['ontology_property'] === params.parentproperty()) {
-                        return ontology['ontology_classes'].some(function(ontologyClass) {
-                            return ontologyClass === params.ontologyclass()
-                        });
-                    }
-                });
+                var hasValidOntologyClasses = true
+
+                // only filter resources if parent ontology and relationship are defined
+                if (params.ontologyclass() && params.parentproperty()) {
+                    hasValidOntologyClasses = data.creatableResourceValidOntologies[resource.graphid].some(function(ontology) {
+                        if (ontology['ontology_property'] === params.parentproperty()) {
+                            return ontology['ontology_classes'].some(function(ontologyClass) {
+                                return ontologyClass === params.ontologyclass()
+                            });
+                        }
+                    });
+                }
 
                 if (hasValidOntologyClasses) {
                     return({
