@@ -11,15 +11,29 @@ define([
         viewModel: function(params) {
             var self = this;
             this.search = params.search;
+
+            var validResourceModels = data.createableResources.filter(function(resource) {
+                var hasValidOntologyClasses = data.creatableResourceValidOntologies[resource.graphid].some(function(ontology) {
+                    if (ontology['ontology_property'] === params.parentproperty()) {
+                        return ontology['ontology_classes'].some(function(ontologyClass) {
+                            return ontologyClass === params.ontologyclass()
+                        });
+                    }
+                });
+
+                if (hasValidOntologyClasses) {
+                    return({
+                        graphid: resource.graphid,
+                        name: resource.name
+                    });
+                };
+            });
+
             this.resourceModels = [{
                 graphid: null,
                 name: ''
-            }].concat(_.map(data.createableResources, function(graph) {
-                return {
-                    graphid: graph.graphid,
-                    name: graph.name
-                };
-            }));
+            }].concat(validResourceModels);
+
             if (!this.search) {
                 this.makeFriendly = ontologyUtils.makeFriendly;
                 this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
