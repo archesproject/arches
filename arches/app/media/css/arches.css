@@ -9887,6 +9887,10 @@ ul.pagination {
     margin-top: 10px;
 }
 
+.hide-datepicker-time-option .bootstrap-datetimepicker-widget table td span {
+    display: none;
+}
+
 .calendar.picker {
     max-width: 175px;
     min-width: 175px;
