@@ -13,14 +13,14 @@ define([
             this.search = params.search;
 
             var validResourceModels = data.createableResources.filter(function(resource) {
-                var hasValidOntologyClasses = true
+                var hasValidOntologyClasses = true;
 
                 // only filter resources if parent ontology and relationship are defined
                 if (params.ontologyclass() && params.parentproperty()) {
                     hasValidOntologyClasses = data.creatableResourceValidOntologies[resource.graphid].some(function(ontology) {
                         if (ontology['ontology_property'] === params.parentproperty()) {
                             return ontology['ontology_classes'].some(function(ontologyClass) {
-                                return ontologyClass === params.ontologyclass()
+                                return ontologyClass === params.ontologyclass();
                             });
                         }
                     });
@@ -31,7 +31,7 @@ define([
                         graphid: resource.graphid,
                         name: resource.name
                     });
-                };
+                }
             });
 
             this.resourceModels = [{

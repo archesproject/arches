@@ -69,7 +69,7 @@ class BaseManagerView(TemplateView):
                 "deploymentdate",
                 "deploymentfile",
                 "author",
-            ],
+            ], 
         )
 
         context["notifications"] = models.UserXNotification.objects.filter(recipient=self.request.user, isread=False)
