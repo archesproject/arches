@@ -1,6 +1,6 @@
 {
     "name": "{{ project_name }}",
     "dependencies": {
-        "arches": "archesproject/arches#5913_package_management"
+        "arches": "archesproject/arches#{{ arches_version }}"
     }
 }
