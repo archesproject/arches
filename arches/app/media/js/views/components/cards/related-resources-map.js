@@ -176,7 +176,7 @@ define([
             bufferFeature.properties = {};
             var bufferFeatureId = self.draw.add(bufferFeature)[0];
             self.draw.setFeatureProperty(bufferFeatureId, 'nodeId', val);
-            ko.unwrap(self.tile.data[val]).features.push(bufferFeature);
+            self.updateTiles();
         };
 
         this.drawAvailable.subscribe(function(val){
