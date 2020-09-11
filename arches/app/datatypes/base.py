@@ -176,6 +176,9 @@ class BaseDataType(object):
         elif provisionaledits is not None and len(list(provisionaledits.keys())) == 1:
             userid = list(provisionaledits.keys())[0]
             return provisionaledits[userid]["value"]
+        else:
+            logger.error("No authoritative data exists for tile. Invalid provisional edit.")
+            raise TileValidationError("Invalid provisional edit")
 
     def get_display_value(self, tile, node):
         """
