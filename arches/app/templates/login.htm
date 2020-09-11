@@ -45,7 +45,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 					<form id="login-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
 						<fieldset>
 							<legend class="arches-signin-subtext">
-								Enter your email or username and password below to access your data modeling, editing, and discovery tools.
+								<p>Enter your email or username and password below to access your data modeling, editing, and discovery tools.</p>
 							</legend>
 							{% csrf_token %}
 							<input type="hidden" name="next" value="{{ next }}" />
