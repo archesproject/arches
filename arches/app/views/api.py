@@ -521,7 +521,14 @@ class Resources(APIBase):
     def get(self, request, resourceid=None, slug=None, graphid=None):
         if user_can_read_resource(user=request.user, resourceid=resourceid):
             allowed_formats = ["json", "json-ld"]
-            format = request.GET.get("format", "json-ld")
+            format = request.GET.get("format", "json")
+
+
+
+            foo = request.GET.get("foo", False)
+
+
+
             include_tiles = True if request.GET.get("includetiles", "true").lower() == "true" else False
             disambiguate = False if request.GET.get("disambiguate", "false").lower() == "false" else True
             if format not in allowed_formats:
@@ -547,6 +554,66 @@ class Resources(APIBase):
 
                     if include_tiles is True:
                         resource.load_tiles()
+
+
+
+                    if foo:
+                        def add_to_name_based_node_dict(node_dict, node_name, node_val):
+                            previous_val = node_dict.get(node_name)
+
+                            # let's handle multiple identical node_names
+                            if isinstance(previous_val, dict):
+                                node_dict[node_name] = [previous_val, node_val]
+                            elif isinstance(previous_val, list):
+                                node_dict[node_name].append(node_val)
+                            elif not previous_val:
+                                node_dict[node_name] = node_val
+                            else:
+                                raise ValueError("Unexpected Type")
+
+
+                        def get_name_based_graph_node(node_id, tile):
+                            val = tile.data[node_id]
+
+                            return {
+                                '@node_id': node_id,
+                                '@value': val,
+                            }
+
+
+                        name_based_graph = {}
+                        root_nodes = {}
+
+                        for tile in resource.tiles:
+                            child_nodes = {}
+
+                            for node_id in tile.data.keys():
+                                name_based_graph_node = get_name_based_graph_node(node_id, tile)
+                                node = models.Node.objects.get(pk=node_id)
+
+                                if str(tile.nodegroup_id) == node_id: # if root node
+                                    add_to_name_based_node_dict(name_based_graph, node.name, name_based_graph_node)
+                                    root_nodes[node_id] = name_based_graph_node
+                                else:
+                                    # let's build a dict to handle the edge case of root node not being first
+                                    nodegroup_id = str(node.nodegroup_id)
+
+                                    if not child_nodes.get(nodegroup_id):
+                                        child_nodes[nodegroup_id] = {}
+
+                                    add_to_name_based_node_dict(child_nodes[nodegroup_id], node.name, name_based_graph_node)
+
+                            for nodegroup_id in child_nodes.keys():
+                                root_nodes[nodegroup_id].update(child_nodes[nodegroup_id])
+
+                        # import pdb; pdb.set_trace()
+                        out = name_based_graph
+
+
+
+
+
+
 
                     if disambiguate:
                         if not include_tiles:
@@ -625,7 +692,7 @@ class Resources(APIBase):
                     ],
                 }
 
-            return JSONResponse(out, indent=indent)
+            return JSONResponse(out, indent=4)
         else:
             return JSONResponse(status=403)
 
