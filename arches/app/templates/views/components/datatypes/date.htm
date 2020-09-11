@@ -11,6 +11,16 @@
 </div>
 
 <div class="col-md-8 col-lg-9">
-    <input type="" placeholder="{% trans "Date" %}" class="form-control input-md widget-input" data-bind="value: searchValue, datepicker: {format: 'YYYY-MM-DD', viewMode: viewMode, minDate: false, maxDate: false}">
+    <input type="" placeholder="{% trans "Date" %}" class="form-control input-md widget-input" data-bind="value: searchValue, datepicker: {format: dateFormat, viewMode: 'days', minDate: false, maxDate: false}">
+</div>
+<!-- /ko -->
+
+
+<!-- ko ifnot: $data.search -->
+<div class="control-label">
+{% trans "Date Format" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+<select type="" id="" placeholder="{% trans " Date Format " %}" data-bind="options:dateFormatOptions, optionsText:'name', optionsValue:'id', event: {change: onDateFormatSelection}, value: dateFormat, chosen: {width: '100%', disable_search: true}"></select>
 </div>
 <!-- /ko -->
