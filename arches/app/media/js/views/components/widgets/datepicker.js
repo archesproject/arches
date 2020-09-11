@@ -26,8 +26,14 @@ define([
         params.configKeys = ['minDate', 'maxDate', 'viewMode', 'dateFormat', 'defaultValue'];
         WidgetViewModel.apply(this, [params]);
 
-        this.placeholder = this.config().placeholder;
+        if (self.node.config && ko.unwrap(self.node.config.dateFormat)) {
+            this.dateFormat(ko.unwrap(self.node.config.dateFormat));
+        }
+        if (!ko.unwrap(this.dateFormat)) {
+            this.dateFormat = ko.observable(self.node.datatypeLookup.date.config);
+        } 
 
+        this.placeholder = this.config().placeholder;
         this.viewModeOptions = ko.observableArray([{
             'id': 'days',
             'name': 'Days'
@@ -42,27 +48,8 @@ define([
             'name': 'Decades'
         }]);
 
-        // these options should be set in the global admin page
-        this.dateFormatOptions = ko.observableArray([{
-            'id': 'YYYY-MM-DD HH:mm:ssZ',
-            'name': 'ISO 8601 (YYYY-MM-DD HH:mm:ssZ)'
-        }, {
-            'id': 'YYYY-MM-DD',
-            'name': 'ISO 8601 (YYYY-MM-DD)'
-        }, {
-            'id': 'YYYY-MM',
-            'name': 'ISO 8601 Month (YYYY-MM)'
-        }, {
-            'id': 'YYYY',
-            'name': 'CE Year (YYYY)'
-        }]);
-
         this.onViewModeSelection = function(val, e) {
             this.viewMode(e.currentTarget.value);
-        };
-
-        this.onDateFormatSelection = function(val, e) {
-            this.dateFormat(e.currentTarget.value);
         };
 
         this.on = this.config().on || 'Date of Data Entry';
