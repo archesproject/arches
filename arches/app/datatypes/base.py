@@ -1,7 +1,7 @@
 import json, urllib
 from django.urls import reverse
 from arches.app.models import models
-from arches.app.models.tile import TileValidationError
+# from arches.app.models.tile import TileValidationError
 import logging
 
 logger = logging.getLogger(__name__)
@@ -178,7 +178,7 @@ class BaseDataType(object):
             return provisionaledits[userid]["value"]
         else:
             logger.error("No authoritative data exists for tile. Invalid provisional edit.")
-            raise TileValidationError("Invalid provisional edit")
+            raise Exception("Invalid provisional edit")
 
     def get_display_value(self, tile, node):
         """
