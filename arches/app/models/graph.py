@@ -1370,8 +1370,19 @@ class Graph(models.GraphModel):
 
             return fieldname
 
-        fieldnames = {}
-        for node_id, node in self.nodes.items():
+        def validate_identifier(identifier, name, identifiers):
+            if identifier == "" or identifier is None:
+                identifier = name
+            if identifier in identifiers:
+                raise GraphValidationError(_(f"Field name must be unique to the graph; '{fieldname}' already exists."), 1009)
+            else:
+                identifiers.add(identifier)
+            
+            return identifier
+            
+        identifiers = set()
+        fieldnames = set()
+        for node in self.nodes.values():
             if node.exportable is True:
                 node.fieldname = validate_fieldname(node.fieldname, fieldnames)
             node.identifier = validate_identifier(node.identifier, node.name, identifiers)
