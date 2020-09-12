@@ -1363,11 +1363,10 @@ class Graph(models.GraphModel):
                 raise GraphValidationError(_("Field name cannot begin with an underscore or number"), 1011)
             if len(fieldname) > 10:
                 fieldname = fieldname[:10]
-            try:
-                dupe = fieldnames[fieldname]
+            if fieldname in fieldnames:
                 raise GraphValidationError(_(f"Field name must be unique to the graph; '{fieldname}' already exists."), 1009)
-            except KeyError:
-                fieldnames[fieldname] = True
+            else:
+                fieldnames.add(fieldname)
 
             return fieldname
 
