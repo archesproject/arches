@@ -1355,7 +1355,7 @@ class Graph(models.GraphModel):
                     )
 
         def validate_fieldname(fieldname, fieldnames):
-            if node.fieldname == "":
+            if fieldname == "" or fieldname is None:
                 raise GraphValidationError(_("Field name must not be blank."), 1008)
             if fieldname.replace("_", "").isalnum() is False:
                 raise GraphValidationError(_("Field name must contain only alpha-numeric characters or underscores."), 1010)
