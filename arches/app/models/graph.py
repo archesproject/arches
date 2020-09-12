@@ -1373,11 +1373,8 @@ class Graph(models.GraphModel):
         fieldnames = {}
         for node_id, node in self.nodes.items():
             if node.exportable is True:
-                if node.fieldname is not None:
-                    validated_fieldname = validate_fieldname(node.fieldname, fieldnames)
-                    if validated_fieldname != node.fieldname:
-                        node.fieldname = validated_fieldname
-                        node.save()
+                node.fieldname = validate_fieldname(node.fieldname, fieldnames)
+            node.identifier = validate_identifier(node.identifier, node.name, identifiers)
 
         # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
         if self.ontology is not None:
