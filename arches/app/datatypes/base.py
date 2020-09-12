@@ -1,10 +1,12 @@
 import json, urllib
 from django.urls import reverse
 from arches.app.models import models
+
 # from arches.app.models.tile import TileValidationError
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 class BaseDataType(object):
     def __init__(self, model=None):
