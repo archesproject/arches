@@ -6,13 +6,9 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '6492_add_date_datatype_configs'),
+        ("models", "6492_add_date_datatype_configs"),
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='node',
-            name='identifier',
-            field=models.TextField(blank=True, null=True),
-        ),
+        migrations.AddField(model_name="node", name="identifier", field=models.TextField(blank=True, null=True),),
     ]

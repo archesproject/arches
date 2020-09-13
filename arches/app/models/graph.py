@@ -1378,9 +1378,9 @@ class Graph(models.GraphModel):
                 raise GraphValidationError(_(f"Identifier must be unique to the graph; '{identifier}' already exists."), 1009)
             else:
                 identifiers.add(identifier)
-            
+
             return identifier
-            
+
         identifiers = set()
         fieldnames = set()
         for node in self.nodes.values():
