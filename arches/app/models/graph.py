@@ -1374,7 +1374,7 @@ class Graph(models.GraphModel):
             if identifier == "" or identifier is None:
                 identifier = name
             if identifier in identifiers:
-                raise GraphValidationError(_(f"Field name must be unique to the graph; '{fieldname}' already exists."), 1009)
+                raise GraphValidationError(_(f"Identifier must be unique to the graph; '{identifier}' already exists."), 1009)
             else:
                 identifiers.add(identifier)
             
