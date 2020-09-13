@@ -43,6 +43,7 @@ define([
             self.selected = ko.observable(false);
             self.filtered = ko.observable(false);
             self.name = ko.observable('');
+            self.identifier = ko.observable('');
             self.description = ko.observable(null);
             self.slug = ko.observable(null);
             self.nodeGroupId = ko.observable('');
@@ -183,6 +184,7 @@ define([
                     issearchable: self.issearchable,
                     isrequired: self.isrequired,
                     fieldname: self.fieldname,
+                    identifier: self.identifier,
                     exportable: self.exportable
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj));
@@ -259,6 +261,7 @@ define([
             self.issearchable(source.issearchable);
             self.isrequired(source.isrequired);
             self.fieldname(source.fieldname);
+            self.identifier(source.identifier);
             self.exportable(source.exportable);
 
             if (source.config) {
