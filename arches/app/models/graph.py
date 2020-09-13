@@ -187,6 +187,7 @@ class Graph(models.GraphModel):
             node.isrequired = nodeobj.get("isrequired", False)
             node.exportable = nodeobj.get("exportable", False)
             node.fieldname = nodeobj.get("fieldname", "")
+            node.identifier = nodeobj.get("identifier", "")
 
             node.nodeid = uuid.UUID(str(node.nodeid))
 
