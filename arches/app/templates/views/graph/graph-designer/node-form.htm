@@ -43,6 +43,20 @@
                             </div>
                         </div>
 
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label">
+                                        {% trans "Node Identifier" %}
+                                    </label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <input type="text" placeholder="{% trans 'Enter a string unique to this graph' %}"class="form-control" style="" data-bind="textInput: node().identifier">
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- ko if: hasOntology -->
                         <!-- ko if: !node().istopnode -->
                         <div class="row widget-container">
