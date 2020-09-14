@@ -315,12 +315,16 @@
 
                                     <!-- Login -->
                                     {% if nav.login %}
-                                    <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="ep-tools ep-tools-login">
+                                    {% if user.username == 'anonymous' %}
+                                        <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="ep-tools ep-tools-login">
+                                    {% else %}
+                                        <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="ep-tools ep-tools-login" aria-label="{% trans "Logout" %}">
+                                    {% endif %}
                                         <div class="top-btn-container" data-placement="bottom" data-toggle="tooltip" data-original-title="{% if user.username != 'anonymous' %}Logout{% else %}Login{% endif %}">
                                             {% if user.username == 'anonymous' %}
                                             <p class="hidden-xs welcome-msg">{% trans "Login" %}</p>
                                             {% else %}
-                                            <i class="fa fa-sign-out" aria-hidden="true" aria-label="{% trans "Logout" %}"></i>
+                                            <i class="fa fa-sign-out" aria-hidden="true"></i>
                                             <div class="top-btn-txt hidden-xs">
                                                 <span>{% trans "Logout" %}<br>{{ user.first_name|default:user.username }}</span>
                                             </div>
