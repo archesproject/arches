@@ -575,15 +575,6 @@ class Resources(APIBase):
                             else:
                                 node_dict[node_name] = [previous_val, node_val]
 
-                        def get_ancestor_node(tile):
-                            root_tile = tile 
-
-                            while root_tile.parenttile:
-                                root_tile = root_tile.parenttile
-
-                            return models.Node.objects.get(pk=root_tile.nodegroup_id)
-
-
                         def get_direct_child_nodes(node):
                             child_nodes = node.get_child_nodes_and_edges()[0]
                             grandchild_nodes = {}
@@ -594,72 +585,90 @@ class Resources(APIBase):
                                     if not grandchild_nodes.get(str(grandchild_node.pk)):
                                         grandchild_nodes[str(grandchild_node.pk)] = True
                             
-                            # if node is in grandchild_nodes, it cannot be a direct child
+                            # if node is in grandchild_nodes it cannot be a direct child
                             return list(
                                 (child_node for child_node in child_nodes if not grandchild_nodes.get(str(child_node.pk)))
                             )
 
 
-                        def quux(node, parent_tree, tile_reference):
+                        def quux(node, tile, parent_tree, tile_reference):
                             datatype = datatype_factory.get_instance(node.datatype)
                             direct_child_nodes = get_direct_child_nodes(node)
-
+                            
                             associated_tiles = tile_reference.get(str(node.pk))
 
                             current_tree = {}
 
                             if associated_tiles:
-                                for tile in associated_tiles:
-                                    display_value = datatype.get_display_value(
-                                        tile=tile,
-                                        node=node,
-                                    )
+                                for associated_tile in associated_tiles:
+                                    if associated_tile == tile or associated_tile.parenttile == tile:
+                                        display_value = datatype.get_display_value(
+                                            tile=associated_tile,
+                                            node=node,
+                                        )
 
-                                    hhh = {
-                                        '@node_id': str(node.pk),
-                                        '@value': display_value,
-                                    }
+                                        hhh = {
+                                            '@node_id': str(node.pk),
+                                            '@tile_id': str(associated_tile.pk),
+                                            '@value': display_value,
+                                        }
 
-                                    add_node(current_tree, node.name, hhh)
+                                        add_node(current_tree, node.name, hhh)
+
+                                        for child_node in direct_child_nodes:
+                                            quux(child_node, associated_tile, hhh, tile_reference)
                             else:
                                 hhh = {
                                     '@node_id': str(node.pk),
+                                    '@tile_id': str(tile.pk),
                                     '@value': None,
                                 }
 
                                 add_node(current_tree, node.name, hhh)
 
+                                for child_node in direct_child_nodes:
+                                    quux(child_node, tile, hhh, tile_reference)
+
                             add_node(parent_tree, node.name, current_tree.get(node.name))
-
-                            for child_node in direct_child_nodes:
-                                quux(child_node, hhh, tile_reference)
-
                             return parent_tree
 
 
-                        name_based_graph = {}
-                        top_nodes = {}
+
+                        # creates a dict of node_ids -> (tiles that contain node)                  
                         node_tile_reference = {}
 
-                        
-                        # let's create a dict of node_ids to tiles that contain each node                   
                         for tile in resource.tiles:
                             for node_id in tile.data.keys():
                                 tile_list = node_tile_reference.get(node_id, [])
                                 tile_list.append(tile)
                                 node_tile_reference[node_id] = tile_list
 
+                        # creates a dict of top-level node_ids -> (name-based subtree)
+                        root_nodes = {}
+
                         for tile in resource.tiles:
-                            anc_node = get_ancestor_node(tile)
+                            root_tile = tile 
 
-                            if not (top_nodes.get(str(anc_node.pk))): # if we haven't built the tree
-                                top_nodes[str(anc_node.pk)] = {
-                                    'name': anc_node.name,
-                                    'graph': list(quux(anc_node, {}, node_tile_reference).values())[0],  # sheds node_name key
-                                }
+                            while root_tile.parenttile:
+                                root_tile = root_tile.parenttile
 
-                        for sub_graph in top_nodes.values():
-                            add_node(name_based_graph, sub_graph['name'], sub_graph['graph'])
+                            root_tile_node = models.Node.objects.get(pk=root_tile.nodegroup_id)
+                            root_tile_node_id = str(root_tile_node.pk)
+
+                            if not (root_nodes.get(root_tile_node_id)):
+                                root_nodes[root_tile_node_id] = quux(
+                                    root_tile_node,
+                                    root_tile,
+                                    {}, 
+                                    node_tile_reference,
+                                )
+
+                        # adds subtrees to main tree, respecting potentially identical node names
+                        name_based_graph = {}
+
+                        for subtree in root_nodes.values():
+                            node_name, node_tree = subtree.popitem()
+                            add_node(name_based_graph, node_name, node_tree)
 
                         out = name_based_graph
 
