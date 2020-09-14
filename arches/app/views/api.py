@@ -526,11 +526,17 @@ class Resources(APIBase):
 
 
             foo = request.GET.get("foo", False)
-
+            datatype_factory = DataTypeFactory()
 
 
             include_tiles = True if request.GET.get("includetiles", "true").lower() == "true" else False
             disambiguate = False if request.GET.get("disambiguate", "false").lower() == "false" else True
+
+
+
+
+
+
             if format not in allowed_formats:
                 return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
             try:
@@ -558,57 +564,104 @@ class Resources(APIBase):
 
 
                     if foo:
-                        def add_to_name_based_node_dict(node_dict, node_name, node_val):
+                        def add_node(node_dict, node_name, node_val):
                             previous_val = node_dict.get(node_name)
 
                             # let's handle multiple identical node_names
-                            if isinstance(previous_val, dict):
-                                node_dict[node_name] = [previous_val, node_val]
+                            if not previous_val:
+                                node_dict[node_name] = node_val
                             elif isinstance(previous_val, list):
                                 node_dict[node_name].append(node_val)
-                            elif not previous_val:
-                                node_dict[node_name] = node_val
                             else:
-                                raise ValueError("Unexpected Type")
+                                node_dict[node_name] = [previous_val, node_val]
+
+                        def get_ancestor_node(tile):
+                            root_tile = tile 
+
+                            while root_tile.parenttile:
+                                root_tile = root_tile.parenttile
+
+                            return models.Node.objects.get(pk=root_tile.nodegroup_id)
 
 
-                        def get_name_based_graph_node(node_id, tile):
-                            val = tile.data[node_id]
+                        def get_direct_child_nodes(node):
+                            child_nodes = node.get_child_nodes_and_edges()[0]
+                            grandchild_nodes = {}
 
-                            return {
-                                '@node_id': node_id,
-                                '@value': val,
-                            }
+                            # get all nodes that exist in child subtrees
+                            for child_node in child_nodes:
+                                for grandchild_node in child_node.get_child_nodes_and_edges()[0]:
+                                    if not grandchild_nodes.get(str(grandchild_node.pk)):
+                                        grandchild_nodes[str(grandchild_node.pk)] = True
+                            
+                            # if node is in grandchild_nodes, it cannot be a direct child
+                            return list(
+                                (child_node for child_node in child_nodes if not grandchild_nodes.get(str(child_node.pk)))
+                            )
+
+
+                        def quux(node, parent_tree, tile_reference):
+                            datatype = datatype_factory.get_instance(node.datatype)
+                            direct_child_nodes = get_direct_child_nodes(node)
+
+                            associated_tiles = tile_reference.get(str(node.pk))
+
+                            current_tree = {}
+
+                            if associated_tiles:
+                                for tile in associated_tiles:
+                                    display_value = datatype.get_display_value(
+                                        tile=tile,
+                                        node=node,
+                                    )
+
+                                    hhh = {
+                                        '@node_id': str(node.pk),
+                                        '@value': display_value,
+                                    }
+
+                                    add_node(current_tree, node.name, hhh)
+                            else:
+                                hhh = {
+                                    '@node_id': str(node.pk),
+                                    '@value': None,
+                                }
+
+                                add_node(current_tree, node.name, hhh)
+
+                            add_node(parent_tree, node.name, current_tree.get(node.name))
+
+                            for child_node in direct_child_nodes:
+                                quux(child_node, hhh, tile_reference)
+
+                            return parent_tree
 
 
                         name_based_graph = {}
-                        root_nodes = {}
+                        top_nodes = {}
+                        node_tile_reference = {}
+
+                        
+                        # let's create a dict of node_ids to tiles that contain each node                   
+                        for tile in resource.tiles:
+                            for node_id in tile.data.keys():
+                                tile_list = node_tile_reference.get(node_id, [])
+                                tile_list.append(tile)
+                                node_tile_reference[node_id] = tile_list
 
                         for tile in resource.tiles:
-                            child_nodes = {}
+                            anc_node = get_ancestor_node(tile)
 
-                            for node_id in tile.data.keys():
-                                name_based_graph_node = get_name_based_graph_node(node_id, tile)
-                                node = models.Node.objects.get(pk=node_id)
+                            if not (top_nodes.get(str(anc_node.pk))): # if we haven't built the tree
+                                top_nodes[str(anc_node.pk)] = {
+                                    'name': anc_node.name,
+                                    'graph': list(quux(anc_node, {}, node_tile_reference).values())[0],  # sheds node_name key
+                                }
 
-                                if str(tile.nodegroup_id) == node_id: # if root node
-                                    add_to_name_based_node_dict(name_based_graph, node.name, name_based_graph_node)
-                                    root_nodes[node_id] = name_based_graph_node
-                                else:
-                                    # let's build a dict to handle the edge case of root node not being first
-                                    nodegroup_id = str(node.nodegroup_id)
+                        for sub_graph in top_nodes.values():
+                            add_node(name_based_graph, sub_graph['name'], sub_graph['graph'])
 
-                                    if not child_nodes.get(nodegroup_id):
-                                        child_nodes[nodegroup_id] = {}
-
-                                    add_to_name_based_node_dict(child_nodes[nodegroup_id], node.name, name_based_graph_node)
-
-                            for nodegroup_id in child_nodes.keys():
-                                root_nodes[nodegroup_id].update(child_nodes[nodegroup_id])
-
-                        # import pdb; pdb.set_trace()
                         out = name_based_graph
-
 
 
 
@@ -621,7 +674,6 @@ class Resources(APIBase):
                         out = dict()
                         out[resourceid] = resource
                         out["disambiguated"] = dict()
-                        datatype_factory = DataTypeFactory()
 
                         # lookup all nodes from its corresponding graph, then compare that list against nodeid in tile.data.keys
                         graph = Graph.objects.get(graphid=resource.graph.graphid)

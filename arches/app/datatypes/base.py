@@ -179,7 +179,8 @@ class BaseDataType(object):
         Returns a list of concept values for a given node
         """
         data = self.get_tile_data(tile)
-        return str(data[str(node.nodeid)])
+        if data:
+            return str(data[str(node.nodeid)])
 
     def get_search_terms(self, nodevalue, nodeid=None):
         """
