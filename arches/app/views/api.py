@@ -590,48 +590,37 @@ class Resources(APIBase):
                                 (child_node for child_node in child_nodes if not grandchild_nodes.get(str(child_node.pk)))
                             )
 
+                        def get_name_based_display_value(node, tile, datatype):
+                            display_value = datatype.get_display_value(
+                                tile=tile,
+                                node=node,
+                            )
 
-                        def quux(node, tile, parent_tree, tile_reference):
+                            return {
+                                '@node_id': str(node.pk),
+                                '@tile_id': str(tile.pk),
+                                '@value': display_value,
+                            }
+                            
+
+                        def build_name_based_tree(node, tile, parent_tree, tile_reference):
                             datatype = datatype_factory.get_instance(node.datatype)
                             direct_child_nodes = get_direct_child_nodes(node)
-                            
-                            associated_tiles = tile_reference.get(str(node.pk))
 
                             current_tree = {}
 
-                            if associated_tiles:
-                                for associated_tile in associated_tiles:
-                                    if associated_tile == tile or associated_tile.parenttile == tile:
-                                        display_value = datatype.get_display_value(
-                                            tile=associated_tile,
-                                            node=node,
-                                        )
+                            for associated_tile in tile_reference.get(str(node.pk), [tile]):
+                                if associated_tile == tile or associated_tile.parenttile == tile:
+                                    name_based_display_value = get_name_based_display_value(node, associated_tile, datatype)
 
-                                        hhh = {
-                                            '@node_id': str(node.pk),
-                                            '@tile_id': str(associated_tile.pk),
-                                            '@value': display_value,
-                                        }
+                                    add_node(current_tree, node.name, name_based_display_value)
 
-                                        add_node(current_tree, node.name, hhh)
-
-                                        for child_node in direct_child_nodes:
-                                            quux(child_node, associated_tile, hhh, tile_reference)
-                            else:
-                                hhh = {
-                                    '@node_id': str(node.pk),
-                                    '@tile_id': str(tile.pk),
-                                    '@value': None,
-                                }
-
-                                add_node(current_tree, node.name, hhh)
-
-                                for child_node in direct_child_nodes:
-                                    quux(child_node, tile, hhh, tile_reference)
+                                    for child_node in direct_child_nodes:
+                                        build_name_based_tree(child_node, associated_tile, name_based_display_value, tile_reference)
 
                             add_node(parent_tree, node.name, current_tree.get(node.name))
-                            return parent_tree
 
+                            return parent_tree
 
 
                         # creates a dict of node_ids -> (tiles that contain node)                  
@@ -656,7 +645,7 @@ class Resources(APIBase):
                             root_tile_node_id = str(root_tile_node.pk)
 
                             if not (root_nodes.get(root_tile_node_id)):
-                                root_nodes[root_tile_node_id] = quux(
+                                root_nodes[root_tile_node_id] = build_name_based_tree(
                                     root_tile_node,
                                     root_tile,
                                     {}, 
