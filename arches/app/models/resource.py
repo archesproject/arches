@@ -36,6 +36,7 @@ from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.mappings import TERMS_INDEX, RESOURCE_RELATIONS_INDEX, RESOURCES_INDEX
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
 from arches.app.utils import import_class_from_string
+from arches.app.utils.label_based_graph import LabelBasedGraph
 from guardian.shortcuts import assign_perm, remove_perm
 from guardian.exceptions import NotUserNorGroup
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -449,7 +450,7 @@ class Resource(models.ResourceInstance):
 
     def copy(self):
         """
-        Returns a copy of this resource instance includeing a copy of all tiles associated with this resource instance
+        Returns a copy of this resource instance including a copy of all tiles associated with this resource instance
 
         """
         # need this here to prevent a circular import error
@@ -495,6 +496,42 @@ class Resource(models.ResourceInstance):
         ret["tiles"] = self.tiles
 
         return JSONSerializer().serializeToPython(ret)
+
+    def generate_name_based_graph(self):
+        """
+        """
+
+        node_tile_reference = {}
+
+        for tile in self.tiles:
+            for node_id in tile.data.keys():
+                tile_list = node_tile_reference.get(node_id, [])
+                tile_list.append(tile)
+                node_tile_reference[node_id] = tile_list
+
+        root_nodes = {}
+
+        for tile in self.tiles:
+            root_tile = tile.get_root_tile()
+            
+            if not root_nodes.get(str(root_tile.nodegroup_id)):
+                root_nodes[str(root_tile.nodegroup_id)] = LabelBasedGraph.from_tile(
+                    tile=root_tile,
+                    node_tile_reference=node_tile_reference,
+                )
+
+        root_graph = {}
+
+        for label_based_graph in root_nodes.values():
+            root_node_name, graph = label_based_graph.popitem()
+            LabelBasedGraph._add_node(
+                graph=root_graph, 
+                node_name=root_node_name, 
+                node_val=graph,
+            )
+
+        return root_graph
+                
 
     def get_node_values(self, node_name):
         """

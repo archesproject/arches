@@ -522,20 +522,8 @@ class Resources(APIBase):
         if user_can_read_resource(user=request.user, resourceid=resourceid):
             allowed_formats = ["json", "json-ld"]
             format = request.GET.get("format", "json")
-
-
-
-            foo = request.GET.get("foo", False)
-            datatype_factory = DataTypeFactory()
-
-
             include_tiles = True if request.GET.get("includetiles", "true").lower() == "true" else False
             disambiguate = False if request.GET.get("disambiguate", "false").lower() == "false" else True
-
-
-
-
-
 
             if format not in allowed_formats:
                 return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
@@ -561,112 +549,12 @@ class Resources(APIBase):
                     if include_tiles is True:
                         resource.load_tiles()
 
+                    if request.GET.get("foo"):
+                        indent = 4
+                        out = resource.generate_name_based_graph()
 
-
-                    if foo:
-                        def add_node(node_dict, node_name, node_val):
-                            previous_val = node_dict.get(node_name)
-
-                            # let's handle multiple identical node_names
-                            if not previous_val:
-                                node_dict[node_name] = node_val
-                            elif isinstance(previous_val, list):
-                                node_dict[node_name].append(node_val)
-                            else:
-                                node_dict[node_name] = [previous_val, node_val]
-
-                        def get_direct_child_nodes(node):
-                            child_nodes = node.get_child_nodes_and_edges()[0]
-                            grandchild_nodes = {}
-
-                            # get all nodes that exist in child subtrees
-                            for child_node in child_nodes:
-                                for grandchild_node in child_node.get_child_nodes_and_edges()[0]:
-                                    if not grandchild_nodes.get(str(grandchild_node.pk)):
-                                        grandchild_nodes[str(grandchild_node.pk)] = True
-                            
-                            # if node is in grandchild_nodes it cannot be a direct child
-                            return list(
-                                (child_node for child_node in child_nodes if not grandchild_nodes.get(str(child_node.pk)))
-                            )
-
-                        def get_name_based_display_value(node, tile, datatype):
-                            display_value = datatype.get_display_value(
-                                tile=tile,
-                                node=node,
-                            )
-
-                            return {
-                                '@node_id': str(node.pk),
-                                '@tile_id': str(tile.pk),
-                                '@value': display_value,
-                            }
-                            
-
-                        def build_name_based_tree(node, tile, parent_tree, tile_reference):
-                            datatype = datatype_factory.get_instance(node.datatype)
-                            direct_child_nodes = get_direct_child_nodes(node)
-
-                            current_tree = {}
-
-                            for associated_tile in tile_reference.get(str(node.pk), [tile]):
-                                if associated_tile == tile or associated_tile.parenttile == tile:
-                                    name_based_display_value = get_name_based_display_value(node, associated_tile, datatype)
-
-                                    add_node(current_tree, node.name, name_based_display_value)
-
-                                    for child_node in direct_child_nodes:
-                                        build_name_based_tree(child_node, associated_tile, name_based_display_value, tile_reference)
-
-                            add_node(parent_tree, node.name, current_tree.get(node.name))
-
-                            return parent_tree
-
-
-                        # creates a dict of node_ids -> (tiles that contain node)                  
-                        node_tile_reference = {}
-
-                        for tile in resource.tiles:
-                            for node_id in tile.data.keys():
-                                tile_list = node_tile_reference.get(node_id, [])
-                                tile_list.append(tile)
-                                node_tile_reference[node_id] = tile_list
-
-                        # creates a dict of top-level node_ids -> (name-based subtree)
-                        root_nodes = {}
-
-                        for tile in resource.tiles:
-                            root_tile = tile 
-
-                            while root_tile.parenttile:
-                                root_tile = root_tile.parenttile
-
-                            root_tile_node = models.Node.objects.get(pk=root_tile.nodegroup_id)
-                            root_tile_node_id = str(root_tile_node.pk)
-
-                            if not (root_nodes.get(root_tile_node_id)):
-                                root_nodes[root_tile_node_id] = build_name_based_tree(
-                                    root_tile_node,
-                                    root_tile,
-                                    {}, 
-                                    node_tile_reference,
-                                )
-
-                        # adds subtrees to main tree, respecting potentially identical node names
-                        name_based_graph = {}
-
-                        for subtree in root_nodes.values():
-                            node_name, node_tree = subtree.popitem()
-                            add_node(name_based_graph, node_name, node_tree)
-
-                        out = name_based_graph
-
-
-
-
-
-
-                    if disambiguate:
+                    elif disambiguate:
+                        datatype_factory = DataTypeFactory()
                         if not include_tiles:
                             resource.load_tiles()
                         out = dict()
@@ -742,7 +630,7 @@ class Resources(APIBase):
                     ],
                 }
 
-            return JSONResponse(out, indent=4)
+            return JSONResponse(out, indent=indent)
         else:
             return JSONResponse(status=403)
 

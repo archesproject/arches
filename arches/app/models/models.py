@@ -470,7 +470,7 @@ class Node(models.Model):
 
     def get_child_nodes_and_edges(self):
         """
-        gather up the child nodes and edges of this node
+        gather up all child nodes and edges of this node
 
         returns a tuple of nodes and edges
 
@@ -485,6 +485,28 @@ class Node(models.Model):
             nodes.extend(child_nodes)
             edges.extend(child_edges)
         return (nodes, edges)
+
+
+    def get_direct_child_nodes(self):
+        """
+        gets all child nodes exactly one level lower in graph
+
+        returns a list of nodes
+        """
+        child_nodes = self.get_child_nodes_and_edges()[0]
+        grandchild_nodes = {}
+
+        # get all nodes that exist in child subtrees
+        for child_node in child_nodes:
+            for grandchild_node in child_node.get_child_nodes_and_edges()[0]:
+                if not grandchild_nodes.get(str(grandchild_node.pk)):
+                    grandchild_nodes[str(grandchild_node.pk)] = grandchild_node
+        
+        # if node is in grandchild_nodes it cannot be a direct child
+        return list(
+            child_node for child_node in child_nodes if not grandchild_nodes.get(str(child_node.pk))
+        )
+
 
     @property
     def is_collector(self):
@@ -829,6 +851,19 @@ class TileModel(models.Model):  # Tile
     class Meta:
         managed = True
         db_table = "tiles"
+
+    def get_root_tile(self):
+        """
+        gets the Tile furthest up the inheritance chain
+
+        returns Tile
+        """
+        root_tile = self 
+
+        while root_tile.parenttile:
+            root_tile = root_tile.parenttile
+
+        return root_tile
 
     def save(self, *args, **kwargs):
         if self.sortorder is None or (self.provisionaledits is not None and self.data == {}):
