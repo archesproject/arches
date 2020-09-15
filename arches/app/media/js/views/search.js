@@ -62,11 +62,11 @@ define([
             Object.values(this.filters).forEach(function(value){
                 if (value()){
                     if (value().clear){
-                        value().clear()
-                    };
+                        value().clear();
+                    }
                 }
-            }, this)
-        }        
+            }, this);
+        };
         this.mouseoverInstanceId = ko.observable();
         this.mapLinkData = ko.observable(null);
         this.userIsReviewer = ko.observable(false);
