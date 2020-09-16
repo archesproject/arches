@@ -68,14 +68,14 @@ define([
             }, this);
         };
         this.filterApplied = ko.pureComputed(function(){
-            return (
-                this.query()['term-filter'] || 
-                this.query()['map-filter'] || 
-                this.query()['resource-type-filter'] ||
-                this.query()['time-filter'] ||
-                this.query()['provisional-filter'] ||
-                this.query()['advanced-search']
-            )
+            var notFilters = ['paging-filter', 'related-resources-filter', 'saved-searches', 'search-export', 'search-result-details', 'search-results'];
+            var trueFilters = Object.keys(this.filters).filter(function(f){
+                return notFilters.indexOf(f) === -1;
+            })
+            var res = trueFilters.filter(function(f){
+                return this.query()[f];
+            }, this)
+            return res.length > 0;
         }, this);
         this.mouseoverInstanceId = ko.observable();
         this.mapLinkData = ko.observable(null);
