@@ -494,7 +494,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <span class="toggle-container">
                                     <!--ko ifnot: locked-->
                                     <span class="switch switch-small" data-bind="css: {'on': mobilesurvey.datadownloadconfig.download()}, click: function(){
-                                        mobilesurvey.datadownloadconfig.download(!mobilesurvey.datadownloadconfig.download());}"><small></small></span>
+                                        mobilesurvey.datadownloadconfig.download(!mobilesurvey.datadownloadconfig.download());}" tabindex="0" onkeypress="$(this).trigger('click');"><small></small></span>
                                     <!--/ko-->
                                     <!--ko if: locked-->
                                     <span class="switch switch-small disabled" data-bind="css: {'on': mobilesurvey.datadownloadconfig.download()}"><small></small></span>
@@ -535,10 +535,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                             <!-- Download Selector -->
                             <div class="msm-download-selector pad-top" style="display: block;">
-                                <div id="standard-download" class="category-title" href="" data-bind="css: {active: mobilesurvey.showCustomDataDownload() === false }, click: function(){ mobilesurvey.showCustomDataDownload(false)}">
+                                <div id="standard-download" class="category-title" href="" data-bind="css: {active: mobilesurvey.showCustomDataDownload() === false }, click: function(){ mobilesurvey.showCustomDataDownload(false)}" tabindex="0" onkeypress="$(this).trigger('click');">
                                     {% trans 'Download Records' %}
                                 </div>
-                                <div id="custom-download" class="category-title" href="" data-bind="css: {active: mobilesurvey.showCustomDataDownload() === true}, click: function(){ mobilesurvey.showCustomDataDownload(true)}">
+                                <div id="custom-download" class="category-title" href="" data-bind="css: {active: mobilesurvey.showCustomDataDownload() === true}, click: function(){ mobilesurvey.showCustomDataDownload(true)}" tabindex="0" onkeypress="$(this).trigger('click');">
                                     {% trans 'Custom Download' %}
                                 </div>
                             </div>
