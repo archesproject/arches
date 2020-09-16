@@ -175,9 +175,28 @@ define([
 
         params.defineStateProperties = function(){
             // Collects those properties that you want to set to the state.
+            /** 
+             * Wastebin
+             * Note that wastebin as set on the workflow step params is inclusive; only things identified by those keys (e.g. tile, resourceid) will be deleted on quit. Otherwise if no wastebin params given, nothing will be deleted on quit.
+             * 
+             * -- If the workflow edits/creates one and only one new resource, resourceid need only be named in the first step's params' wastebin like so: wastebin: {resourceid:null}
+             * This will automatically cascade/delete all tiles generated from this resource.
+             * 
+             * -- If not every step's generated tile belongs to the same resource or you want to selectively delete a tile from a step, {tile:null} should be declared in every step's params' wastebin where you want the tile from that step to be deleted on quit.
+             * 
+             * Overriding this method:
+             * Keep in mind that anything extending newTileStep that overrides this method should include similar logic to handle for wastebin if there is a wastebin use case for that particular step in the workflow.
+            **/
             var wastebin = !!(ko.unwrap(params.wastebin)) ? koMapping.toJS(params.wastebin) : undefined;
             if (wastebin && ko.unwrap(wastebin.hasOwnProperty('resourceid'))) {
                 wastebin.resourceid = ko.unwrap(params.resourceid);
+            }
+            if (wastebin && ko.unwrap(wastebin.hasOwnProperty('tile'))) {
+                if (!!ko.unwrap(params.tile)) {
+                    wastebin.tile = koMapping.toJS(params.tile().data);
+                    wastebin.tile.tileid = (ko.unwrap(params.tile)).tileid;
+                    wastebin.tile.resourceinstance_id = (ko.unwrap(params.tile)).resourceinstance_id;
+                }
             }
             return {
                 resourceid: ko.unwrap(params.resourceid) || this.workflow.state.resourceid,

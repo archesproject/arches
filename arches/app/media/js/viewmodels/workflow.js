@@ -71,10 +71,10 @@ define([
             var warnings = []
             self.state.steps.forEach(function(step) {
                 if (step.wastebin && step.wastebin.resourceid) {
-                    warnings.push(step.wastebin.description)
+                    warnings.push(step.wastebin.description);
                     resourcesToDelete.push(step.wastebin);
                 } else if (step.wastebin && step.wastebin.tile) {
-                    warnings.push(step.wastebin.description)
+                    warnings.push(step.wastebin.description);
                     tilesToDelete.push(step.wastebin);
                 }
             });
