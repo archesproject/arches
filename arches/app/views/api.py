@@ -521,7 +521,7 @@ class Resources(APIBase):
     def get(self, request, resourceid=None, slug=None, graphid=None):
         if user_can_read_resource(user=request.user, resourceid=resourceid):
             allowed_formats = ["json", "json-ld"]
-            format = request.GET.get("format", "json")
+            format = request.GET.get("format", "json-ld")
             include_tiles = True if request.GET.get("includetiles", "true").lower() == "true" else False
             disambiguate = False if request.GET.get("disambiguate", "false").lower() == "false" else True
 
@@ -550,16 +550,17 @@ class Resources(APIBase):
                         resource.load_tiles()
 
                     if request.GET.get("foo"):
+                        format = "json"
                         indent = 4
                         out = resource.generate_name_based_graph()
 
                     elif disambiguate:
-                        datatype_factory = DataTypeFactory()
                         if not include_tiles:
                             resource.load_tiles()
                         out = dict()
                         out[resourceid] = resource
                         out["disambiguated"] = dict()
+                        datatype_factory = DataTypeFactory()
 
                         # lookup all nodes from its corresponding graph, then compare that list against nodeid in tile.data.keys
                         graph = Graph.objects.get(graphid=resource.graph.graphid)

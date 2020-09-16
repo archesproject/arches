@@ -470,7 +470,7 @@ class Node(models.Model):
 
     def get_child_nodes_and_edges(self):
         """
-        gather up all child nodes and edges of this node
+        gather up the child nodes and edges of this node
 
         returns a tuple of nodes and edges
 
