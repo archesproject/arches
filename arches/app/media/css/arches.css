@@ -9785,15 +9785,23 @@ a.search-query-link-captions:focus {
 }
 
 .search-count-container {
-    padding: 10px 20px 0px 20px;
+    padding: 10px 20px;
     background: #f4f4f4;
     border-bottom: 1px solid #ddd;
+    text-align-last: justify;
+    height: 40px;
+    display: inline-flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .search-title {
     font-size: 17px;
     font-weight: 500;
     margin-top: 0px;
+    display: inline-block;
+    margin-bottom: 0px;
 }
 
 .search-candidate-title,

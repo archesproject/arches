@@ -58,6 +58,15 @@ define([
         this.selectedPopup = ko.observable('');
         this.resultsExpanded = ko.observable(true);
         this.query = ko.observable(getQueryObject());
+        this.clearQuery = function(){
+            Object.values(this.filters).forEach(function(value){
+                if (value()){
+                    if (value().clear){
+                        value().clear();
+                    }
+                }
+            }, this);
+        };
         this.mouseoverInstanceId = ko.observable();
         this.mapLinkData = ko.observable(null);
         this.userIsReviewer = ko.observable(false);
