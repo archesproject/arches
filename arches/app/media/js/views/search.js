@@ -67,6 +67,16 @@ define([
                 }
             }, this);
         };
+        this.filterApplied = ko.pureComputed(function(){
+            return (
+                this.query()['term-filter'] || 
+                this.query()['map-filter'] || 
+                this.query()['resource-type-filter'] ||
+                this.query()['time-filter'] ||
+                this.query()['provisional-filter'] ||
+                this.query()['advanced-search']
+            )
+        }, this);
         this.mouseoverInstanceId = ko.observable();
         this.mapLinkData = ko.observable(null);
         this.userIsReviewer = ko.observable(false);
