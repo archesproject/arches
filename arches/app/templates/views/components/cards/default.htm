@@ -373,7 +373,7 @@
                     <!-- /ko -->
                 <!-- /ko -->
                 
-                <!-- ko if: !ko.unwrap(card.altButtons) -->
+                <!-- ko if: !ko.unwrap(card.hideDefaultButtons) -->
 
                 <!-- ko if: tile.tileid && self.deleteTile -->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: self.deleteTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }">{% trans 'Delete this record' %}</button>
