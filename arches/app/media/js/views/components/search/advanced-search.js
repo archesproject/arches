@@ -15,7 +15,7 @@ define([
                 var self = this;
                 options.name = 'Advanced Search Filter';
                 BaseFilter.prototype.initialize.call(this, options);
-                this.tagId = "Advanced Search"
+                this.tagId = "Advanced Search";
                 this.searchableGraphs = ko.observableArray();
                 this.datatypelookup = {};
                 this.facetFilterText = ko.observable('');
@@ -96,7 +96,7 @@ define([
 
                     if (this.getFilter('term-filter').hasTag(this.tagId) === false) {
                         this.getFilter('term-filter').addTag(this.tagId, this.name, ko.observable(false));
-                    };
+                    }
                 } else {
                     delete queryObj[componentName];
                     this.getFilter('term-filter').removeTag(this.tagId);
