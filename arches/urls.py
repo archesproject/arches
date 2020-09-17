@@ -61,10 +61,10 @@ from arches.app.views.auth import (
     GetClientIdView,
     UserProfileView,
     ServerSettingView,
+    PasswordResetView,
+    PasswordResetConfirmView,
 )
 from arches.app.models.system_settings import settings
-from arches.app.utils.forms import ArchesPasswordResetForm
-from arches.app.utils.forms import ArchesSetPasswordForm
 from django.views.decorators.cache import cache_page
 
 # Uncomment the next two lines to enable the admin:
@@ -73,6 +73,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 uuid_regex = settings.UUID_REGEX
+
 
 urlpatterns = [
     url(r"^$", main.index, name="root"),
@@ -254,16 +255,14 @@ urlpatterns = [
     url(r"^admin/", admin.site.urls),
     url(
         r"^password_reset/$",
-        auth_views.PasswordResetView.as_view(),
+        PasswordResetView.as_view(),
         name="password_reset",
-        kwargs={"password_reset_form": ArchesPasswordResetForm},
     ),
     url(r"^password_reset/done/$", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     url(
         r"^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$",
-        auth_views.PasswordResetConfirmView.as_view(),
+        PasswordResetConfirmView.as_view(),
         name="password_reset_confirm",
-        kwargs={"set_password_form": ArchesSetPasswordForm},
     ),
     url(r"^reset/done/$", auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
     url(r"^o/", include("oauth2_provider.urls", namespace="oauth2")),

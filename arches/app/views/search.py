@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+import logging
 from datetime import datetime
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
@@ -43,6 +44,7 @@ import arches.app.utils.task_management as task_management
 import arches.app.tasks as tasks
 from io import StringIO
 
+logger = logging.getLogger(__name__)
 
 class SearchView(MapBaseManagerView):
     def get(self, request):
@@ -252,6 +254,7 @@ def search_results(request):
                 search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional)
         append_instance_permission_filter_dsl(request, search_results_object)
     except Exception as err:
+        logger.exception(err)
         return JSONErrorResponse(message=err)
 
     dsl = search_results_object.pop("query", None)

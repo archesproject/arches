@@ -331,7 +331,10 @@ class DateDataType(BaseDataType):
     def append_search_filters(self, value, node, query, request):
         try:
             if value["val"] != "" and value["val"] is not None:
-                date_value = datetime.strptime(value["val"], "%Y-%m-%d").isoformat()
+                try:
+                    date_value = datetime.strptime(value["val"], "%Y-%m-%d %H:%M:%S%z").astimezone().isoformat()
+                except ValueError:
+                    date_value = value["val"]
                 if value["op"] != "eq":
                     operators = {"gte": None, "lte": None, "lt": None, "gt": None}
                     operators[value["op"]] = date_value
@@ -339,7 +342,7 @@ class DateDataType(BaseDataType):
                     operators = {"gte": date_value, "lte": date_value}
                 search_query = Range(field="tiles.data.%s" % (str(node.pk)), **operators)
                 query.must(search_query)
-        except KeyError as e:
+        except KeyError:
             pass
 
     def after_update_all(self):

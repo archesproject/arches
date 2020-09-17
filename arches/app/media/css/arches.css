@@ -1387,6 +1387,7 @@ div.workflow-panel {
 .workflow-select-desc {
     font-size: 12px;
     padding-top: 10px;
+    font-weight: 600;
 }
 
 .workflow-select-card-container-title {
@@ -3384,10 +3385,6 @@ ul.nav.nav-tabs.nav-justified {
     background: #fbfbfb;
 }
 
-.graph-designer.resource-editor .jstree {
-    height: 100%;
-}
-
 .graph-designer-graph-content {
     width: 100%;
 }
@@ -4932,7 +4929,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     stroke: #454545;
     stroke-width: 2px;
     fill: #dcecfa;
-    opacity: 1.;
+    opacity: 1;
     cursor: pointer;
 }
 
@@ -5006,6 +5003,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     fill: rgb(220, 236, 250);
     opacity: 1;
     cursor: pointer;
+    z-index: 200000;
 }
 
 .relatedlink {
@@ -5267,7 +5265,8 @@ span.editable-card i.fa.fa-align-justify:hover {
 .r-select-card {
     background: #8BC3EB;
     padding: 10px;
-    color: #fff;
+    color: #440EA2;
+    font-weight: 500;
     height: 200px;
     opacity: .8;
     text-align: center;
@@ -5289,7 +5288,7 @@ span.editable-card i.fa.fa-align-justify:hover {
 .r-select-title {
     font-size: 19px;
     font-weight: 500;
-    color: #fff;
+    color: #440EA2;
     text-align: center;
     overflow-wrap: break-word;
 }
@@ -6606,6 +6605,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .panel-config {
     flex-direction: row-reverse;
+    min-width: max-content;
 }
 
 .panel-config .middle-column-container {
@@ -8987,6 +8987,10 @@ a.clear-geojson-button:hover {
     text-overflow: ellipsis;
 }
 
+.mapboxgl-canvas:focus {
+    outline: none;
+}
+
 .map-widget-tool:nth-child(1) {
     padding-left: 0px;
     width: 50px;
@@ -9883,6 +9887,10 @@ ul.pagination {
     margin-top: 10px;
 }
 
+.hide-datepicker-time-option .bootstrap-datetimepicker-widget table td span {
+    display: none;
+}
+
 .calendar.picker {
     max-width: 175px;
     min-width: 175px;
@@ -10516,7 +10524,7 @@ table.table.dataTable {
 }
 
 .search-dropdown {
-    max-height: 36px;
+    /*max-height: 36px;*/
 }
 
 .search-toolbar {
@@ -10788,7 +10796,7 @@ table.table.dataTable {
 .faceted-search-card-container {
     border: 1px solid #ddd;
     padding: 20px;
-    margin-bottom: 10px;
+    margin: 15px;
     background: #f9f9f9;
 }
 
@@ -10880,7 +10888,8 @@ a.search-facet-item.disabled {
 }
 
 .facet-btn-group {
-    width: 100%;
+    display: block;
+    margin: 10px 15px 50px 15px;
 }
 
 .facet-btn {
@@ -10894,13 +10903,27 @@ a.search-facet-item.disabled {
 }
 
 .facet-label {
-    margin-left: 15px;
+    margin-left: 5px;
     margin-bottom: 5px;
 }
 
 .facet-body {
     padding-top: 5px;
     padding-bottom: 45px;
+    margin-left: 10px;
+}
+
+.facet-body .col-md-4.col-lg-3 {
+    padding-right: 5px;
+
+}
+
+.facet-body div div .select2-container {
+    border: none;
+}
+
+.facet-body  .chosen-container-single .chosen-single {
+    height: 36px;
 }
 
 .related-resources-header .resource-instance-wrapper {
@@ -11334,7 +11357,6 @@ a.filter-tools:hover {
 .graph-designer-tab-container {
     background: #C9D4E1;
     font-weight: 600;
-    min-width: 400px;
 }
 
 .graph-designer-tab-container .nav-tabs>li.active>a {
@@ -11409,10 +11431,6 @@ a.filter-tools:hover {
 
 .msm-tree {
     height: 100%;
-}
-
-.left-panel-overflow.mobile-designer-tree {
-    height: inherit;
 }
 
 .msm-basemap-subtitle {
@@ -11982,17 +12000,29 @@ ul.select2-choices:after {
     color: rgb(190, 190, 190);
 }
 
+.left-panel-inner-container {
+    min-width: 300px; 
+    height: 100%;
+}
+
 .left-panel {
-    width: 300px;
-    overflow-x: auto;
-    overflow-y: hidden;
+    overflow: hidden;
     z-index: 3;
 }
 
-.left-panel-overflow {
+.designer-tree {
     height: calc(100vh - 225px);
-    overflow-y: auto;
+}
+
+.left-panel-overflow {
+    width: inherit;
     background: #ecf0f5;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.left-panel-overflow > * {
+    background: inherit;
 }
 
 .main-panel {
@@ -12027,10 +12057,9 @@ ul.select2-choices:after {
 }
 
 .card-component-panel {
+    width: 100%;
     padding: 0px;
     border-radius: 3px;
-    flex: 1 0 250px;
-    width: 250px;
     background-color: white;
     z-index: 10;
 }
@@ -12141,8 +12170,9 @@ ul.select2-choices:after {
 }
 
 .resource-editor-tree {
+    height: calc(100vh - 125px);
     overflow-y: auto;
-    height: 100%;
+    overflow-x: hidden;
     background: #ecf0f5;
     padding-bottom: 50px;
 }

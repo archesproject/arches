@@ -113,9 +113,15 @@ class TimeWheel(object):
             results = {"buckets": [query.search(index=RESOURCES_INDEX)["aggregations"]]}
             results_with_ranges = self.appendDateRanges(results, range_lookup)
             self.transformESAggToD3Hierarchy(results_with_ranges, root)
+
+            # calculate total number of docs
+            for child in root.children:
+                root.size = root.size + child.size
+
             if user.username in settings.CACHE_BY_USER:
                 key = "time_wheel_config_{0}".format(user.username)
                 cache.set(key, root, settings.CACHE_BY_USER[user.username])
+
             return root
 
     def transformESAggToD3Hierarchy(self, results, d3ItemInstance):
@@ -132,7 +138,10 @@ class TimeWheel(object):
             elif key == "key":
                 pass
             else:
-                d3ItemInstance.children.append(self.transformESAggToD3Hierarchy(value, d3Item(name=key)))
+                item = self.transformESAggToD3Hierarchy(value, d3Item(name=key))
+                # only append items if they have a document count > 0
+                if item.size > 0:
+                    d3ItemInstance.children.append(item)
 
         d3ItemInstance.children = sorted(d3ItemInstance.children, key=lambda item: item.start)
 

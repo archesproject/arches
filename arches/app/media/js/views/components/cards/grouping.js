@@ -111,6 +111,12 @@ define([
             updatedSortedWidgetsList.call(this, cards);
         }, this);
 
+        _.each(this.groupedCards(), function(card) {
+            card.widgets.subscribe(function() {
+                updatedSortedWidgetsList.call(this, this.groupedCards());
+            }, this);
+        }, this);
+
         if (!!params.preview) {
             _.each(this.groupedCards(), function(card) {
                 if (card.tiles().length === 0) {
