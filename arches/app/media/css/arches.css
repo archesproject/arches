@@ -337,6 +337,10 @@ button.fa-trash:focus,
     color: #fff !important;
 }
 
+.page-header {
+    padding: 5px;
+}
+
 /*Remove pointer from Mega drop panel button*/
 
 .open.mega-dropdown>.mega-dropdown-toggle:before {
@@ -4879,7 +4883,6 @@ ul.jqtree_common li.jqtree-folder {
 .ep-tools-title {
     height: 50px;
     margin-right: 0;
-    float: left;
     overflow: hidden;
 }
 
@@ -4888,9 +4891,8 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .ep-graph-title {
-    font-size: 1.6em;
+    font-size: 1.3em;
     padding-left: 15px;
-    padding-top: 5px;
 }
 
 .ep-graph-title-icon {
@@ -11290,6 +11292,9 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .workbench-card-sidepanel {
         right: 0;
     }
+    h1.page-header span {
+        font-size: 1em !important;
+    }
 }
 
 @media screen and (max-width: 639px) {
@@ -11358,8 +11363,6 @@ a.tree-display-tool, a.tree-display-tool:hover {
     }
     .ep-tools-title h1 {
         font-size: 1.1em;
-        padding-top: 17px;
-        padding-left: 55px;
     }
     .ep-graph-title-icon {
         display: none;
@@ -11466,7 +11469,7 @@ a.tree-display-tool, a.tree-display-tool:hover {
         height: auto;
     }
     .node-configuration {
-        height: 47vh;
+        height: calc(43vh - 4px);
     }
     .report-image-grid {
         margin-bottom: 0;
@@ -11577,6 +11580,10 @@ a.tree-display-tool, a.tree-display-tool:hover {
 @media screen and (max-width: 991px) {
     h1.page-header.text-overflow.ep-graph-title {
         white-space: normal;
+        padding: 5px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
     }
     .find-widget {
         width: 68vw;
