@@ -15,6 +15,7 @@ define([
                 var self = this;
                 options.name = 'Advanced Search Filter';
                 BaseFilter.prototype.initialize.call(this, options);
+                this.tagId = "Advanced Search"
                 this.searchableGraphs = ko.observableArray();
                 this.datatypelookup = {};
                 this.facetFilterText = ko.observable('');
@@ -92,8 +93,13 @@ define([
                         advanced.push(value);
                     });
                     queryObj[componentName] = JSON.stringify(advanced);
+
+                    if (this.getFilter('term-filter').hasTag(this.tagId) === false) {
+                        this.getFilter('term-filter').addTag(this.tagId, this.name, ko.observable(false));
+                    };
                 } else {
                     delete queryObj[componentName];
+                    this.getFilter('term-filter').removeTag(this.tagId);
                 }
                 this.query(queryObj);
             },
@@ -115,6 +121,10 @@ define([
                 var query = this.query();
                 if (componentName in query) {
                     var facets = JSON.parse(query[componentName]);
+
+                    if (facets.length > 0) {
+                        this.getFilter('term-filter').addTag("Advanced Search", this.name, ko.observable(false));    
+                    }
                     _.each(facets, function(facet) {
                         var nodeIds = _.filter(Object.keys(facet), function(key) {
                             return key !== 'op';
