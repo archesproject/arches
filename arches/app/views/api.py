@@ -521,7 +521,7 @@ class Resources(APIBase):
     def get(self, request, resourceid=None, slug=None, graphid=None):
         if user_can_read_resource(user=request.user, resourceid=resourceid):
             allowed_formats = ["json", "json-ld"]
-            format = request.GET.get("format", "json-ld")
+            format = request.GET.get("format", "json")
             include_tiles = True if request.GET.get("includetiles", "true").lower() == "true" else False
             disambiguate = False if request.GET.get("disambiguate", "false").lower() == "false" else True
 
@@ -550,8 +550,6 @@ class Resources(APIBase):
                         resource.load_tiles()
 
                     if request.GET.get("foo"):
-                        format = "json"
-                        indent = 4
                         out = resource.generate_name_based_graph()
 
                     elif disambiguate:
@@ -631,7 +629,7 @@ class Resources(APIBase):
                     ],
                 }
 
-            return JSONResponse(out, indent=indent)
+            return JSONResponse(out, indent=4)
         else:
             return JSONResponse(status=403)
 

@@ -1,6 +1,7 @@
 from unittest import mock, TestCase
 
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.models import models
 from arches.app.utils.label_based_graph import LabelBasedGraph
 
 class add_node(TestCase):
@@ -61,29 +62,29 @@ class from_tile(TestCase):
 
                 mock_graph.assert_called_once()
 
-@mock.patch('arches.app.utils.label_based_graph.DataTypeFactory', wraps=DataTypeFactory)  # always mock the RELATIVE path
+@mock.patch('arches.app.utils.label_based_graph.models.Node', wraps=models.Node)  # always mock the RELATIVE path
 class build_graph(TestCase):
-    def test_with_node_tile_reference(self, mock_DataTypeFactory):
+    def test_handles_single_node(self, mock_Node):
+        mock_Node.get_direct_child_nodes.return_value = []
         print('foo')
 
-    def test_handles_single_node(self, mock_DataTypeFactory):
+    def test_handles_grouped_node(self, mock_Node):
         print('foo')
 
-    def test_handles_grouped_node(self, mock_DataTypeFactory):
+    def test_handles_empty_semantic_node(self, mock_Node):
         print('foo')
 
-    def test_handles_empty_semantic_node(self, mock_DataTypeFactory):
+    def test_handles_node_grouped_in_separate_card(self, mock_Node):
         print('foo')
 
-    def test_handles_node_grouped_in_separate_card(self, mock_DataTypeFactory):
+    def test_handles_empty_semantic_node_grouped_in_separate_card(self, mock_Node):
         print('foo')
 
-    def test_handles_empty_semantic_grouped_in_separate_card(self, mock_DataTypeFactory):
+    def test_handles_node_with_multiple_values(self, mock_Node):
         print('foo')
 
-    def test_handles_node_with_multiple_values(self, mock_DataTypeFactory):
+    def test_handles_node_with_multiple_values_grouped_in_separate_card(self, mock_Node):
         print('foo')
 
-    def test_handles_node_with_multiple_values_grouped_in_separate_card(self, mock_DataTypeFactory):
+    def test_handles_node_with_multiple_associated_tiles(self, mock_Node):
         print('foo')
-

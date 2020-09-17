@@ -180,7 +180,7 @@ class ResourceTests(ArchesTestCase):
             for mock_tile in test_resource.tiles:
                 mock_tile.get_root_tile.assert_called_once()
 
-            self.assertEqual(mock_label_based_graph._add_node.call_count, 2)
+            self.assertEqual(mock_label_based_graph.add_node.call_count, 2)
 
     def test_get_node_value_string(self):
         """
