@@ -36,6 +36,7 @@ define([
         this.complete = params.complete || ko.observable();
         this.completeOnSave = params.completeOnSave === false ? false : true;
         this.altButtons =  params.altButtons || ko.observable(null);
+        this.hideDefaultButtons = params.hideDefaultButtons || ko.observable(false);
         this.loading(true);
         this.customCardLabel = params.customCardLabel || false;
         var flattenTree = function(parents, flatList) {
@@ -141,6 +142,7 @@ define([
                     }
                     if (self.customCardLabel) item.model.name(ko.unwrap(self.customCardLabel));
                     item.altButtons = self.altButtons;
+                    item.hideDefaultButtons = self.hideDefaultButtons;
                     self.card(item);
                     if (ko.unwrap(params.tileid)) {
                         ko.unwrap(item.tiles).forEach(function(tile) {
