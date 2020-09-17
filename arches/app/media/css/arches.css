@@ -4892,7 +4892,6 @@ ul.jqtree_common li.jqtree-folder {
 
 .ep-graph-title {
     font-size: 1.3em;
-    padding-left: 15px;
 }
 
 .ep-graph-title-icon {
@@ -11363,6 +11362,10 @@ a.tree-display-tool, a.tree-display-tool:hover {
     }
     .ep-tools-title h1 {
         font-size: 1.1em;
+        padding-left: 51px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
     }
     .ep-graph-title-icon {
         display: none;
