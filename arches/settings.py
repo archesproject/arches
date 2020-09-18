@@ -170,7 +170,6 @@ USE_TZ = False
 # also see get_language_from_request in django.utils.translation.trans_real.py
 # to see how the language code is derived in the actual code
 
-
 ####### TO GENERATE .PO FILES DO THE FOLLOWING ########
 # run the following commands
 # language codes used in the command should be in the form (which is slightly different 
@@ -181,8 +180,8 @@ USE_TZ = False
 # django-admin.py compilemessages
 
 
-# default language of that application
-# code need to be all lower case with the form:
+# default language of the application
+# language code needs to be all lower case with the form:
 # {langcode}-{regioncode} eg: en, en-gb ....
 # a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = "en"
