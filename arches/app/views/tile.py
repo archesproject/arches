@@ -215,12 +215,11 @@ class TileData(View):
         if json is not None:
             ret = []
             data = JSONDeserializer().deserialize(json)
-            resource_instance = models.ResourceInstance.objects.get(pk=data["resourceinstance_id"])
-            is_active = resource_instance.graph.isactive
-
             with transaction.atomic():
                 try:
                     tile = Tile.objects.get(tileid=data["tileid"])
+                    resource_instance = tile.resourceinstance
+                    is_active = resource_instance.graph.isactive
                 except ObjectDoesNotExist:
                     return JSONErrorResponse(_("This tile is no longer available"), _("It was likely already deleted by another user"))
                 user_is_reviewer = user_is_resource_reviewer(request.user)

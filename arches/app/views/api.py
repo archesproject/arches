@@ -259,6 +259,7 @@ class GeoJSON(APIBase):
         set_precision = GeoUtils().set_precision
         resourceid = request.GET.get("resourceid", None)
         nodeid = request.GET.get("nodeid", None)
+        nodeids = request.GET.get("nodeids", None)
         tileid = request.GET.get("tileid", None)
         nodegroups = request.GET.get("nodegroups", [])
         precision = request.GET.get("precision", None)
@@ -282,8 +283,12 @@ class GeoJSON(APIBase):
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
         nodegroups = [i for i in nodegroups if i in viewable_nodegroups]
         nodes = models.Node.objects.filter(datatype="geojson-feature-collection", nodegroup_id__in=viewable_nodegroups)
-        if nodeid is not None:
-            nodes = nodes.filter(nodeid=nodeid)
+        node_filter = []
+        if nodeids:
+            node_filter += nodeids.split(",")
+        if nodeid:
+            node_filter.append(nodeid)
+        nodes = nodes.filter(nodeid__in=node_filter)
         nodes = nodes.order_by("sortorder")
         features = []
         i = 1
