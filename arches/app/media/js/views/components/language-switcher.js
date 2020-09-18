@@ -1,4 +1,4 @@
-define(['knockout', 'select2'], function (ko) {
+define(['knockout', 'select2'], function(ko) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -13,7 +13,6 @@ define(['knockout', 'select2'], function (ko) {
     */
     return ko.components.register('views/components/language-switcher', {
         viewModel: function(params) {
-            var self = this;
             this.formid = Math.random();
             this.value = ko.observable(params.current_language);
             this.value.subscribe(function(val){
