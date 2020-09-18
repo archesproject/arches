@@ -140,12 +140,15 @@ define([
             if (self.widget && self.widget.node.config.graphs().length && val.features && val.features.length > 0) {
                 var graphs = self.widget.node.config.graphs().map(function(v){if (v.graphid){return v.graphid;}});
                 var payload = {
-                    "format": "tilecsv",
                     "map-filter": JSON.stringify(val),
                     "precision": 6,
-                    "tiles": true,
-                    "total": 0
-                };
+                    "pages": 5,
+                    "resource-type-filter": JSON.stringify(graphs.map(function(graph) {
+                        return {
+                            "graphid": graph,
+                            "inverted":false
+                        };
+                    }))};
                 $.ajax({
                     url: arches.urls.search_results,
                     data: payload,
