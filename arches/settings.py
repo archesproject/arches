@@ -173,7 +173,7 @@ USE_TZ = False
 
 ####### TO GENERATE .PO FILES DO THE FOLLOWING ########
 # run the following commands
-# language codes used in the command should be in the form (which is slightly different 
+# language codes used in the command should be in the form (which is slightly different
 # form the form used in the LANGUAGE_CODE and LANGUAGES settings below):
 # --local={countrycode}_{REGIONCODE} <-- countrycode is lowercase, regioncode is uppercase, also notice the underscore instead of hyphen
 # commsnads to run (to generate files for "British English, German, and Spanish"):
@@ -187,16 +187,16 @@ USE_TZ = False
 # a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = "en"
 
-# list of languages to display in the language switcher, 
+# list of languages to display in the language switcher,
 # if left empty or with a single entry then the switch won't be displayed
 # language codes need to be all lower case with the form:
 # {langcode}-{regioncode} eg: en, en-gb ....
 # a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES = [
-#   ('de', _('German')),
-#   ('en', _('English')),
-#   ('en-gb', _('British English')),
-#   ('es', _('Spanish')),
+    #   ('de', _('German')),
+    #   ('en', _('English')),
+    #   ('en-gb', _('British English')),
+    #   ('es', _('Spanish')),
 ]
 
 # override this to permenantly display/hide the language switcher
@@ -341,7 +341,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     #'arches.app.utils.middleware.TokenMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "arches.app.utils.middleware.ModifyAuthorizationHeader",
