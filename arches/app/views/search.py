@@ -238,6 +238,7 @@ def append_instance_permission_filter_dsl(request, search_results_object):
 
 def search_results(request):
     for_export = request.GET.get("export")
+    pages = request.GET.get("pages", None)
     total = int(request.GET.get("total", "0"))
     resourceinstanceid = request.GET.get("id", None)
     se = SearchEngineFactory().create()
@@ -273,16 +274,15 @@ def search_results(request):
     dsl.include("provisional_resource")
     if request.GET.get("tiles", None) is not None:
         dsl.include("tiles")
-
-    if for_export is True:
+    if for_export or pages:
         results = dsl.search(index=RESOURCES_INDEX, scroll="1m")
         scroll_id = results["_scroll_id"]
-
-        if total <= settings.SEARCH_EXPORT_LIMIT:
-            pages = (total // settings.SEARCH_RESULT_LIMIT) + 1
-        if total > settings.SEARCH_EXPORT_LIMIT:
-            pages = int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT) - 1
-        for page in range(pages):
+        if not pages:
+            if total <= settings.SEARCH_EXPORT_LIMIT:
+                pages = (total // settings.SEARCH_RESULT_LIMIT) + 1
+            if total > settings.SEARCH_EXPORT_LIMIT:
+                pages = int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT) - 1
+        for page in range(int(pages)):
             results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
             results["hits"]["hits"] += results_scrolled["hits"]["hits"]
     else:
