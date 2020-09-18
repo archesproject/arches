@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import inspect
-
+from django.utils.translation import gettext_lazy as _
 
 try:
     from corsheaders.defaults import default_headers
@@ -163,23 +163,44 @@ USE_I18N = True
 TIME_ZONE = "America/Chicago"
 USE_TZ = False
 
-# Default Language code for this installation. All choices can be found here:
-# http://www.i18nguy.com/unicode/language-identifiers.html
 
 # see https://docs.djangoproject.com/en/1.9/topics/i18n/translation/#how-django-discovers-language-preference
 # to see how LocaleMiddleware tries to determine the user's language preference
 # (make sure to check your accept headers as they will override the LANGUAGE_CODE setting!)
 # also see get_language_from_request in django.utils.translation.trans_real.py
 # to see how the language code is derived in the actual code
-#
-# make sure to uncomment the Middleware class 'LocaleMiddleware'
-#
-# https://docs.djangoproject.com/en/1.9/ref/django-admin/#makemessages
-#
-# run
-# django-admin.py makemessages --ignore=virtualenv/* --local=en --extension=htm,py
+
+
+####### TO GENERATE .PO FILES DO THE FOLLOWING ########
+# run the following commands
+# language codes used in the command should be in the form (which is slightly different 
+# form the form used in the LANGUAGE_CODE and LANGUAGES settings below):
+# --local={countrycode}_{REGIONCODE} <-- countrycode is lowercase, regioncode is uppercase, also notice the underscore instead of hyphen
+# commsnads to run (to generate files for "British English, German, and Spanish"):
+# django-admin.py makemessages --ignore=env/* --local=de --local=en --local=en_GB --local=es  --extension=htm,py
 # django-admin.py compilemessages
-LANGUAGE_CODE = "en-US"
+
+
+# default language of that application
+# code need to be all lower case with the form:
+# {langcode}-{regioncode} eg: en, en-gb ....
+# a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGE_CODE = "en"
+
+# list of languages to display in the language switcher, 
+# if left empty or with a single entry then the switch won't be displayed
+# language codes need to be all lower case with the form:
+# {langcode}-{regioncode} eg: en, en-gb ....
+# a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGES = [
+#   ('de', _('German')),
+#   ('en', _('English')),
+#   ('en-gb', _('British English')),
+#   ('es', _('Spanish')),
+]
+
+# override this to permenantly display/hide the language switcher
+SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
 
 # the path where your translation strings are stored
 LOCALE_PATHS = [
@@ -320,7 +341,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     #'arches.app.utils.middleware.TokenMiddleware',
-    # 'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "arches.app.utils.middleware.ModifyAuthorizationHeader",

@@ -8,7 +8,8 @@ define([
     'bindings/datatable',
     'uuid',
     'core-js',
-    'dom-4'
+    'dom-4',
+    'views/components/language-switcher'
 ], function($, _, ko, Backbone, PageView, data) {
 
     var BaseManager = PageView.extend({
