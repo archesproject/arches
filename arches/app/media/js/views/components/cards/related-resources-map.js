@@ -136,9 +136,20 @@ define([
             searchContext: self.showRelatedQuery
         });
 
+        this.intersectionSummary = ko.observable({});
+        this.targetGraphs = ko.observableArray();
         this.mapFilter.filter.feature_collection.subscribe(function(val){
             if (self.widget && self.widget.node.config.graphs().length && val.features && val.features.length > 0) {
+                self.targetGraphs.removeAll();
                 var graphs = self.widget.node.config.graphs().map(function(v){if (v.graphid){return v.graphid;}});
+                self.targetGraphs(graphs);
+                graphs.forEach(function(val){
+                    if (!self.intersectionSummary()[val]) {
+                        var resource = arches.resources.find(function(resource){return resource.graphid === val;});
+                        self.intersectionSummary()[val] = resource;
+                        self.intersectionSummary()[val].results = ko.observableArray([]);
+                    }
+                }, this);
                 var payload = {
                     "map-filter": JSON.stringify(val),
                     "precision": 6,
@@ -154,6 +165,9 @@ define([
                     data: payload,
                     method: 'GET'
                 }).done(function(data){
+                    graphs.forEach(function(graph){
+                        self.intersectionSummary()[graph].results.removeAll();
+                    });
                     self.relatedResourceWidgets.forEach(function(widget) {
                         if (ko.unwrap(self.tile.data[widget.node.nodeid])) {
                             self.tile.data[widget.node.nodeid]([]);
@@ -166,7 +180,9 @@ define([
                                 {resourceinstanceid: resourceInstance.resourceinstanceid, graphid: resourceInstance.graph_id},
                                 self.widget);
                         }
+                        self.intersectionSummary()[resourceInstance.graph_id].results.push(resourceInstance);
                     });
+                    self.intersectionSummary.valueHasMutated();
                     var buffer = data['map-filter'].search_buffer;
                     self.map().getSource('geojson-search-buffer-data').setData(buffer);
                 });

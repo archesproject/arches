@@ -141,18 +141,42 @@
                 }">
                 <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) === 'geojson-feature-collection' -->
                     <div style="display: flex; justify-content: space-between; margin: 10px;">
-                    <div class="control-label widget-input-label" data-bind="text: widget.label"></div>
+                    <!-- <div class="control-label widget-input-label" data-bind="text: widget.label"></div> -->
                     <button class="btn btn-sm btn-primary" data-bind="
                         click: function(){self.appendBufferToTileFeatures(widget.node_id());}, 
                         disable: !ko.unwrap(self.mapFilter.buffer) || !ko.unwrap(self.mapFilter.searchGeometries).length
                         ">{% trans 'Add buffer to features' %}</button>
                     </div>
         
+                    <!--ko if: self.featureLookup[widget.node_id()].features -->
+                    <div style='border-bottom: solid 1px #ddd; padding-top: 12px; padding-bottom: 3px;'>
+                    <div class='control-label widget-input-label'>{% trans "Select a feature to perform intersection" %}</div>
+                    </div>
+                    <!-- /ko -->
                     <!-- ko foreach: {data: self.featureLookup[widget.node_id()].features, as: 'feature'} -->
                     <div class="basemap-listing" style="display: flex; min-height: 0px" data-bind="
                     click: function(){self.mapFilter.makeSearchFeature(feature)},
                     css: {'active-basemap': self.mapFilter.searchGeometries().length && self.mapFilter.searchGeometries().find(function(x){return x.id === feature.id})};">
                             <div data-bind="text: feature.geometry.type"></div>
+                    </div>
+                    <!-- /ko -->
+                    <!-- ko foreach: {data: self.targetGraphs, as: 'ggg'} -->
+                    <div style="margin-top: 12px; border: solid 1px #eee; min-height: 0px">
+                            <!--ko if: self.intersectionSummary()[ggg] -->
+                            <div style="
+                                display: inline-flex;
+                                justify-content: space-between;
+                                width: 100%;
+                                padding: 10px;
+                                background-color: aliceblue;
+                            ">
+                            <div data-bind="text: self.intersectionSummary()[ggg].name"></div>
+                            <div data-bind="text: 'Total: ' + self.intersectionSummary()[ggg].results().length"></div>
+                        </div>
+                        <!-- ko foreach: {data: self.intersectionSummary()[ggg].results(), as: 'result'} -->
+                        <div style="padding: 3px 0 0 12px;" data-bind="text: result.displayname"></div>
+                        <!-- /ko -->
+                            <!-- /ko -->
                     </div>
                     <!-- /ko -->
                     <!-- /ko -->
