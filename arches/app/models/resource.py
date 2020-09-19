@@ -501,7 +501,6 @@ class Resource(models.ResourceInstance):
         Generates a name-based hierarchical JSON graph of simplified node data
         """
         return label_based_graph.LabelBasedGraph.from_resource(self)
-                
 
     def get_node_values(self, node_name):
         """
