@@ -1,90 +1,301 @@
+from collections import ChainMap
+from copy import deepcopy
+
 from unittest import mock, TestCase
 
-from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
-from arches.app.utils.label_based_graph import LabelBasedGraph
+from arches.app.models.tile import Tile
+from arches.app.utils.label_based_graph import LabelBasedGraph, LabelBasedNode, NODE_ID_KEY, TILE_ID_KEY, VALUE_KEY
+class LabelBasedGraphTests(TestCase):
+    # fine to skip setup/teardown as long as read-only
+    node_1 = LabelBasedNode(
+        name='name',
+        value={
+            VALUE_KEY: 'value',
+        },
+    )
 
-class add_node(TestCase):
-    def test_no_previous_values(self):
+    node_2 = LabelBasedNode(
+        name='name',
+        value={
+            VALUE_KEY: None,
+        },
+    )
+
+    def test_add_node_no_previous_values(self):
         graph = {}
 
-        LabelBasedGraph._add_node(
+        LabelBasedGraph.add_node(
             graph=graph,
-            node_name='test_name',
-            node_val='test_val',
+            node=self.node_1,
         ),
 
         self.assertEqual(
             graph,
-            {'test_name': 'test_val'},
+            {self.node_1.name: self.node_1.value},
         )
 
-    def test_previous_value_list(self):
+    def test_add_node_previous_value_list(self):
         graph = {
-            'test_name': ['test_val']
+            self.node_1.name: [self.node_1.value],
         }
 
-        LabelBasedGraph._add_node(
+        LabelBasedGraph.add_node(
             graph=graph,
-            node_name='test_name',
-            node_val='test_val_2',
+            node=self.node_2,
         ),
 
         self.assertEqual(
             graph,
-            {'test_name': ['test_val', 'test_val_2']},
+            {
+                self.node_1.name: [self.node_1.value, self.node_2.value]
+            },
         )
 
-    def test_previous_value_other_types(self):
+    def test_add_node_previous_value_other_types(self):
         graph = {
-            'test_name': 'test_val',
+            self.node_1.name: self.node_1.value,
         }
 
-        LabelBasedGraph._add_node(
+        LabelBasedGraph.add_node(
             graph=graph,
-            node_name='test_name',
-            node_val='test_val_2',
+            node=self.node_2,
         ),
 
         self.assertEqual(
             graph,
-            {'test_name': ['test_val', 'test_val_2']},
+            {
+                self.node_1.name: [self.node_1.value, self.node_2.value]
+            },
         )
 
-class from_tile(TestCase):
-    def test_smoke(self):
-        with mock.patch('arches.app.utils.label_based_graph.models.Node', return_value=None): # always mock the RELATIVE path
-            with mock.patch.object(LabelBasedGraph, '_build_graph', return_value=None) as mock_graph:
+    def test_is_node_empty(self):
+        self.assertFalse(
+            LabelBasedGraph.is_node_empty(self.node_1)  
+        )
+
+    def test_is_node_empty_with_empty_node(self):
+        self.assertTrue(
+            LabelBasedGraph.is_node_empty(self.node_2)  # empty node
+        )
+
+    @mock.patch.object(LabelBasedGraph, '_generate_node_tile_reference', side_effect=None)
+    @mock.patch.object(LabelBasedGraph, '_build_graph', side_effect=None)
+    def test_from_tile(self, mock__build_graph, mock__generate_node_tile_reference):
+        with mock.patch('arches.app.utils.label_based_graph.models.Node', return_value = None):
                 LabelBasedGraph.from_tile(
                     tile=mock.Mock(nodegroup_id=1),
-                    node_tile_reference='node_tile_reference',
                 )
 
-                mock_graph.assert_called_once()
+                mock__generate_node_tile_reference.assert_called_once()
+                mock__build_graph.assert_called_once()
 
-@mock.patch('arches.app.utils.label_based_graph.models.Node', wraps=models.Node)  # always mock the RELATIVE path
-class build_graph(TestCase):
-    def test_handles_single_node(self, mock_Node):
-        mock_Node.get_direct_child_nodes.return_value = []
-        print('foo')
+    @mock.patch.object(LabelBasedGraph, '_build_graph', side_effect=None)
+    def test_from_tile_with_node_tile_reference(self, mock__build_graph):
+        with mock.patch('arches.app.utils.label_based_graph.models.Node', return_value=None):
+                LabelBasedGraph.from_tile(
+                    tile=mock.Mock(nodegroup_id=1),
+                    node_tile_reference=mock.Mock(),
+                )
 
-    def test_handles_grouped_node(self, mock_Node):
-        print('foo')
+                mock__build_graph.assert_called_once()
 
-    def test_handles_empty_semantic_node(self, mock_Node):
-        print('foo')
+    @mock.patch.object(LabelBasedGraph, '_generate_node_tile_reference', side_effect=None)
+    def test_from_resource(self, mock__generate_node_tile_reference):
+        test_resource = mock.Mock(
+            load_tiles=mock.Mock(),
+            tiles=[
+                mock.Mock(
+                    wraps=Tile(nodegroup_id=1),
+                    data={
+                        'mock_node_1': None,
+                    },
+                ),
+                mock.Mock(
+                    wraps=Tile(nodegroup_id=2),
+                    data={
+                        'mock_node_2': None,
+                    },
+                ),
+                mock.Mock(
+                    wraps=Tile(nodegroup_id=2),  # tests that idential root tiles only have graph built once
+                    data={
+                        'mock_node_3': None,
+                    },
+                ),
+            ],
+        )
 
-    def test_handles_node_grouped_in_separate_card(self, mock_Node):
-        print('foo')
+        # always mock the RELATIVE path
+        with mock.patch('arches.app.utils.label_based_graph.LabelBasedGraph', wraps=LabelBasedGraph) as mock_label_based_graph:
+            child_name_graphs = [
+                {'label_graph_1_name': 'label_graph_1'}, 
+                {'label_graph_2_name': 'label_graph_2'},
+            ]
 
-    def test_handles_empty_semantic_node_grouped_in_separate_card(self, mock_Node):
-        print('foo')
+            mock_label_based_graph.from_tile.side_effect = deepcopy(child_name_graphs)
 
-    def test_handles_node_with_multiple_values(self, mock_Node):
-        print('foo')
+            self.assertEqual(
+                LabelBasedGraph.from_resource(test_resource),
+                dict(ChainMap(*child_name_graphs)),  # combines list of dicts into single dict
+            )
 
-    def test_handles_node_with_multiple_values_grouped_in_separate_card(self, mock_Node):
-        print('foo')
+            self.assertEqual(mock_label_based_graph.from_tile.call_count, 2)
 
-    def test_handles_node_with_multiple_associated_tiles(self, mock_Node):
-        print('foo')
+            for mock_tile in test_resource.tiles:
+                mock_tile.get_root_tile.assert_called_once()
+
+            self.assertEqual(mock_label_based_graph.add_node.call_count, 2)
+
+
+class LabelBasedGraph_BuildGraphTests(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.test_LabelBasedGraph = LabelBasedGraph()
+
+        cls.grouping_node = models.Node(
+            datatype='semantic',
+            name="Test Node Grouping",
+        )
+
+        cls.string_node = models.Node(
+            datatype='string',
+            name="Test Node",
+        )
+
+        cls.test_tile = models.TileModel(
+            data={
+                str(cls.string_node.pk): 'value',
+            },
+        )
+
+    def test_handles_node_with_single_value(self):
+        self.assertEqual(
+            self.test_LabelBasedGraph._build_graph(
+                node=self.string_node,
+                tile=self.test_tile,
+                parent_tree={},
+                tile_reference={},
+            ),
+            {
+                self.string_node.name: {
+                    NODE_ID_KEY: str(self.string_node.pk),
+                    VALUE_KEY: self.test_tile.data[str(self.string_node.pk)]
+                }
+            }
+        )
+
+    def test_handles_node_with_multiple_values(self):
+        string_node_id = str(self.string_node.pk)
+
+        parent_tile = models.TileModel(
+            data={
+                string_node_id: 'test_val_1'
+            }
+        )
+
+        self.test_tile.parenttile = parent_tile
+
+        self.assertEqual(
+            self.test_LabelBasedGraph._build_graph(
+                node=self.string_node,
+                tile=parent_tile,
+                parent_tree={},
+                tile_reference={
+                    string_node_id: [parent_tile, self.test_tile],
+                },
+            ),
+            {
+                self.string_node.name: [
+                    {
+                        NODE_ID_KEY: string_node_id,
+                        VALUE_KEY: parent_tile.data[string_node_id],
+                    }, {
+                        NODE_ID_KEY: string_node_id,
+                        VALUE_KEY: self.test_tile.data[string_node_id],
+                    }
+                ],
+            }
+        )
+
+    
+    def test_handles_empty_semantic_node(self):
+        self.assertEqual(
+            LabelBasedGraph._build_graph(
+                self=LabelBasedGraph,
+                node=self.grouping_node,
+                tile=self.test_tile,
+                parent_tree={},
+                tile_reference={},
+            ),
+            {
+                self.grouping_node.name: {
+                    NODE_ID_KEY: str(self.grouping_node.pk), 
+                    VALUE_KEY: None, 
+                },
+            },
+        )
+
+    def test_semantic_node_with_child(self):
+        self.grouping_node.get_direct_child_nodes = mock.Mock(
+            return_value=[self.string_node]
+        )
+
+        self.assertEqual(
+            LabelBasedGraph._build_graph(
+                self=LabelBasedGraph,
+                node=self.grouping_node,
+                tile=self.test_tile,
+                parent_tree={},
+                tile_reference={},
+            ),
+            {
+                self.grouping_node.name: {
+                    NODE_ID_KEY: str(self.grouping_node.pk), 
+                    VALUE_KEY: None, 
+                    self.string_node.name: {
+                        NODE_ID_KEY: str(self.string_node.pk), 
+                        VALUE_KEY: self.test_tile.data[str(self.string_node.pk)]
+                    },
+                },
+            },
+        )
+
+    def test_handles_node_grouped_in_separate_card(self):
+        separate_card_node = models.Node(
+            datatype='semantic',
+            name='Test Node Separate Card'
+        )
+
+        self.grouping_node.get_direct_child_nodes = mock.Mock(
+            return_value=[separate_card_node],
+        )
+
+        separate_card_node.get_direct_child_nodes = mock.Mock(
+            return_value=[self.string_node],
+        )
+
+        self.assertEqual(
+            LabelBasedGraph._build_graph(
+                self=LabelBasedGraph,
+                node=self.grouping_node,
+                tile=self.test_tile,
+                parent_tree={},
+                tile_reference={},
+            ),
+            {
+                self.grouping_node.name: {
+                    NODE_ID_KEY: str(self.grouping_node.pk), 
+                    VALUE_KEY: None, 
+                    separate_card_node.name: {
+                        NODE_ID_KEY: str(separate_card_node.pk),
+                        VALUE_KEY: None,
+                        self.string_node.name: {
+                            NODE_ID_KEY: str(self.string_node.pk), 
+                            VALUE_KEY: self.test_tile.data[str(self.string_node.pk)]
+                        },
+                    }
+                },
+            },
+        )

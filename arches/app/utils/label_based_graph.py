@@ -1,12 +1,13 @@
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
+from arches.app.models import resource  # avoids circular import
 
 
 NODE_ID_KEY = '@node_id'
 TILE_ID_KEY = '@tile_id'
 VALUE_KEY = '@value'
 
-class LabelBasedGraphNode(object):
+class LabelBasedNode(object):
     def __init__(self, name, value):
         self.name = name
         self.value = value
@@ -17,6 +18,9 @@ class LabelBasedGraph(object):
 
     @staticmethod
     def add_node(graph, node):
+        """
+        Adds a node to a graph, respecting non-unique node names
+        """
         previous_val = graph.get(node.name)
 
         # let's handle multiple identical node names
@@ -28,35 +32,99 @@ class LabelBasedGraph(object):
             graph[node.name] = [previous_val, node.value]   
         
     @staticmethod
-    def is_node_empty(label_based_graph_node):
-        if label_based_graph_node.value[VALUE_KEY]:
-            return False
-        else: 
-            for key in label_based_graph_node.value.keys():  
-                if key in [NODE_ID_KEY, TILE_ID_KEY, VALUE_KEY]:
-                    pass
-                else:
-                    return False
+    def is_node_empty(label_based_node):
+        """
+        Discerns whether a LabelBasedNode either has a value,
+        or children with values
+        """
+        node_empty = True
 
-        return True
+        if isinstance(label_based_node.value, dict):
+            if label_based_node.value[VALUE_KEY]:
+                node_empty = False
+            else:
+                for key in label_based_node.value.keys():  
+                    if key in [NODE_ID_KEY, TILE_ID_KEY, VALUE_KEY]:
+                        pass
+                    else:
+                        node_empty = False
+
+        if isinstance(label_based_node.value, list):
+            for node in label_based_node.value:
+                if not LabelBasedGraph.is_node_empty(
+                    label_based_node=LabelBasedNode(
+                        name=label_based_node.name,
+                        value=node
+                    )
+                ):
+                    node_empty = False
+
+        return node_empty
 
     @classmethod
-    def from_tile(cls, tile, resource):
+    def from_tile(cls, tile, node_tile_reference=None):
+        """
+        Generates a label-based graph from a given tile
+        """
+        if not node_tile_reference:
+            node_tile_reference = cls._generate_node_tile_reference(
+                self=cls,
+                resource=resource.Resource(tile.resourceinstance),
+            )
+
         return cls._build_graph(
             self=cls,
             node=models.Node.objects.get(pk=tile.nodegroup_id),
             tile=tile,
             parent_tree={},
-            tile_reference=cls._generate_node_tile_reference(
-                self=cls,
-                resource=resource,
-            ),
+            tile_reference=node_tile_reference,
         )
+
+    @classmethod
+    def from_resource(cls, resource):
+        """
+        Generates a label-based graph from a given resource
+        """
+        if not resource.tiles:
+            resource.load_tiles()
+
+        node_tile_reference = cls._generate_node_tile_reference(
+            self=cls,
+            resource=resource,
+        )
+
+        root_nodes = {}
+
+        for tile in resource.tiles:
+            root_tile = tile.get_root_tile()
+            
+            if not root_nodes.get(str(root_tile.nodegroup_id)):
+                label_based_graph = LabelBasedGraph.from_tile(
+                    tile=root_tile,
+                    node_tile_reference=node_tile_reference,
+                )
+
+                if label_based_graph:
+                    root_nodes[str(root_tile.nodegroup_id)] = label_based_graph
+
+        root_graph = {}
+
+        for label_based_graph in root_nodes.values():
+            root_node_name, graph = label_based_graph.popitem()
+            LabelBasedGraph.add_node(
+                graph=root_graph, 
+                node=LabelBasedNode(
+                    name=root_node_name, 
+                    value=graph,
+                )
+            )
+
+        return root_graph
     
     def _generate_node_tile_reference(self, resource):
         """
-        Builds a reference of all nodes in a in a given resource
-        paired with a list of tiles they exist in
+        Builds a reference of all nodes in a in a given resource,
+        paired with a list of tiles in which they exist
         """
         node_tile_reference = {}
 
@@ -68,7 +136,7 @@ class LabelBasedGraph(object):
 
         return node_tile_reference
 
-    def _build_graph(self, node, tile, parent_tree, tile_reference, include_empty_nodes=False):
+    def _build_graph(self, node, tile, parent_tree, tile_reference, include_empty_nodes=True):
         datatype = self.datatype_factory.get_instance(node.datatype)
         direct_child_nodes = node.get_direct_child_nodes()
 
@@ -79,13 +147,14 @@ class LabelBasedGraph(object):
 
         for associated_tile in associated_tiles:
             if associated_tile == tile or associated_tile.parenttile == tile:
-                # `get_display_value` varies between datatypes, so let's handle errors here instead of nullguarding all models
+                # `get_display_value` varies between datatypes, 
+                #  so let's handle errors here instead of nullguarding all models
                 try:
                     display_value = datatype.get_display_value(
                         tile=associated_tile,
                         node=node,
                     )
-                except(Exception):
+                except:
                     display_value = None
 
                 label_based_node_data = {
@@ -96,7 +165,7 @@ class LabelBasedGraph(object):
 
                 self.add_node(
                     graph=current_tree, 
-                    node=LabelBasedGraphNode(
+                    node=LabelBasedNode(
                         name=node.name,
                         value=label_based_node_data,
                     ),
@@ -111,7 +180,7 @@ class LabelBasedGraph(object):
                         tile_reference=tile_reference,
                     )
 
-        root_node = LabelBasedGraphNode(
+        root_node = LabelBasedNode(
             name=node.name,
             value=current_tree.get(node.name),
         )

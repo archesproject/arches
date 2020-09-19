@@ -20,10 +20,6 @@ import json
 import os
 import time
 
-from copy import deepcopy
-from collections import ChainMap
-from unittest import mock
-
 from tests import test_settings
 from django.contrib.auth.models import User, Group
 from django.core import management
@@ -136,51 +132,6 @@ class ResourceTests(ArchesTestCase):
     @classmethod
     def tearDownClass(cls):
         cls.user.delete()
-
-    def test_generate_name_based_graph(self):
-        test_resource = Resource()
-
-        test_resource.tiles = [
-            mock.Mock(
-                wraps=Tile(nodegroup_id=1),
-                data={
-                    'mock_node_1': None,
-                },
-            ),
-            mock.Mock(
-                wraps=Tile(nodegroup_id=2),
-                data={
-                    'mock_node_2': None,
-                },
-            ),
-            mock.Mock(
-                wraps=Tile(nodegroup_id=2),  # tests that idential root tiles only have graph built once
-                data={
-                    'mock_node_3': None,
-                },
-            ),
-        ]
-
-        # always mock the RELATIVE path
-        with mock.patch('arches.app.models.resource.LabelBasedGraph', wraps=LabelBasedGraph) as mock_label_based_graph:
-            child_name_graphs = [
-                {'label_graph_1_name': 'label_graph_1'}, 
-                {'label_graph_2_name': 'label_graph_2'},
-            ]
-
-            mock_label_based_graph.from_tile.side_effect = deepcopy(child_name_graphs)
-
-            self.assertEqual(
-                test_resource.generate_name_based_graph(),
-                dict(ChainMap(*child_name_graphs)),  # combines list of dicts into single dict
-            )
-
-            self.assertEqual(mock_label_based_graph.from_tile.call_count, 2)
-
-            for mock_tile in test_resource.tiles:
-                mock_tile.get_root_tile.assert_called_once()
-
-            self.assertEqual(mock_label_based_graph.add_node.call_count, 2)
 
     def test_get_node_value_string(self):
         """
