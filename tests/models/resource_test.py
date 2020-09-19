@@ -33,9 +33,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resource_graph_importer
 from arches.app.utils.exceptions import InvalidNodeNameException, MultipleNodesFoundException
 from arches.app.utils.index_database import index_resources_by_type
-from arches.app.utils.label_based_graph import LabelBasedGraph
 from tests.base_test import ArchesTestCase
-
 
 
 # these tests can be run from the command line via
