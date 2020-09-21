@@ -1,13 +1,13 @@
 define([
     'knockout',
-    'jquery',
     'underscore',
     'viewmodels/widget',
     'arches',
     'views/components/resource-summary',
     'utils/ontology'
-], function(ko, $, _, WidgetViewModel, arches, ResourceSummary, ontologyUtils) {
+], function(ko, _, WidgetViewModel, arches, ResourceSummary, ontologyUtils) {
     var resourceLookup = {};
+    var graphCache = {};
     require(['views/components/workflows/new-tile-step']);
     
     /**
@@ -34,13 +34,14 @@ define([
     */
     var ResourceInstanceSelectViewModel = function(params) {
         var self = this;
-        this.graphLookup = {};
+        this.graphLookup = graphCache;
         params.configKeys = ['placeholder'];
         this.preview = arches.graphs.length > 0;
         this.renderContext = params.renderContext;
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
         this.rootOntologyClass = '';
+        this.graphIsSemantic = false;
         this.resourceTypesToDisplayInDropDown = !!params.graphids ? ko.toJS(params.graphids) : [];
         this.displayOntologyTable = this.renderContext !== 'search' && !!params.node;
 
@@ -48,10 +49,15 @@ define([
             if (graphid in self.graphLookup){
                 return Promise.resolve(self.graphLookup[graphid]);
             } else {
-                return $.getJSON('/graphs/' + graphid)
-                    .done(function(data){
-                        self.graphLookup[graphid] = data.graph;
-                        return self.graphLookup[graphid];
+                return fetch('/graphs/' + graphid)
+                    .then(function(response){
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(function(json){
+                        return self.graphLookup[graphid] = json.graph;
                     });
             }
         };
@@ -60,11 +66,12 @@ define([
         if(!!params.node && params.state !== 'display_value'){
             if(!!params.node.graph && !!params.node.graph.get('root')){
                 this.rootOntologyClass = params.node.graph.get('root').ontologyclass();
+                this.graphIsSemantic = !!this.rootOntologyClass;
             } else {
                 var graphid = params.node.graph_id || params.node.get('graph_id');
                 downloadGraph(graphid)
-                    .then(function(item){
-                        self.rootOntologyClass = item.graph.root.ontologyclass;
+                    .then(function(graph){
+                        self.rootOntologyClass = graph.root.ontologyclass;
                         self.graphIsSemantic = !!self.rootOntologyClass;
                     });
             }
@@ -80,7 +87,6 @@ define([
             });
         }
     
-        this.graphIsSemantic = !!this.rootOntologyClass;
         this.resourceInstanceDisplayName = params.form && params.form.displayname ? params.form.displayname() : '';
         this.makeFriendly = ontologyUtils.makeFriendly;
         this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
@@ -93,10 +99,12 @@ define([
         this.filter = ko.observable('');
 
         this.toggleSelectedResourceRelationship = function(resourceRelationship) {
-            if (self.selectedResourceRelationship() === resourceRelationship) {
-                self.selectedResourceRelationship(null);
-            } else {
-                self.selectedResourceRelationship(resourceRelationship);
+            if(self.graphIsSemantic){
+                if (self.selectedResourceRelationship() === resourceRelationship) {
+                    self.selectedResourceRelationship(null);
+                } else {
+                    self.selectedResourceRelationship(resourceRelationship);
+                }
             }
         };
         
