@@ -1,16 +1,18 @@
+{% load i18n %}
+
 <div class="workflows-get-tile-value padded-workflow-step">
     <div style='display:flex; justify-content: space-between;'>
-        <h4>Workflow Complete</h4>
+        <h4>{% trans "Workflow Complete" %}</h4>
         <div>
             <a href="#" target="_self" type="button" class="btn btn-primary"
                 data-bind="attr: { href: urls.plugin(workflowid)}">
                 <i class="fa fa-plus"></i>
-                <span>New</span>
+                <span>{% trans "New" %}</span>
             </a>
             <a href="#" target="_self" type="button" class="btn btn-primary"
                 data-bind="attr: { href: urls.resource + '/' + resourceid}">
                 <i class="fa fa-pencil"></i>
-                <span>Edit</span>
+                <span>{% trans "Edit" %}</span>
             </a>
         </div>
     </div>

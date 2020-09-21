@@ -1,3 +1,5 @@
+{% load i18n %}
+
 <!-- ko let: { self: $data } -->
     <!-- ko if: !loading() -->
     <div data-bind="" class="wf-multi-tile-step-container">
@@ -15,7 +17,7 @@
                     pageVm: $root
                 }
             }"></div>
-            <button class="btn btn-shim btn-labeled btn-lg fa fa-caret-right btn-mint wf-multi-tile-btn-complete" data-bind="click: function(){complete(true)}">Continue</button>
+            <button class="btn btn-shim btn-labeled btn-lg fa fa-caret-right btn-mint wf-multi-tile-btn-complete" data-bind="click: function(){complete(true)}">{% trans "Continue" %}</button>
         </div>
         <div class="wf-multi-tile-step-list">
             <div><h4 data-bind="text: (itemName())"></h4></div>
@@ -44,8 +46,8 @@
                     </div>
                 </div>
                 <div class="wf-multi-tile-step-card-controls">
-                    <span><i class="fa fa-times-circle"></i></span><span class="" data-bind="click: function(){$parent.remove(tile)}">Remove</span>
-                    <span><i class="fa fa-pencil"></i></span><span data-bind="click: function(){$parent.edit(tile);}">Edit</span>
+                    <span><i class="fa fa-times-circle"></i></span><span class="" data-bind="click: function(){$parent.remove(tile)}">{% trans "Remove" %}</span>
+                    <span><i class="fa fa-pencil"></i></span><span data-bind="click: function(){$parent.edit(tile);}">{% trans "Edit" %}</span>
                 </div>
             </div>
             <!-- /ko -->

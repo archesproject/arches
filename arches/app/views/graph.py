@@ -100,6 +100,7 @@ class GraphSettingsView(GraphBaseView):
                 "isactive",
                 "color",
                 "jsonldcontext",
+                "slug",
                 "config",
                 "template_id",
             ]:
@@ -114,6 +115,9 @@ class GraphSettingsView(GraphBaseView):
         node.ontologyclass = data.get("ontology_class") if data.get("graph").get("ontology_id") is not None else None
         node.name = graph.name
         graph.root.name = node.name
+
+        if graph.isresource is False and "root" in data["graph"]:
+            node.config = data["graph"]["root"]["config"]
 
         try:
             with transaction.atomic():
@@ -136,7 +140,7 @@ class GraphManagerView(GraphBaseView):
             context = self.get_context_data(main_script="views/graph", root_nodes=JSONSerializer().serialize(root_nodes))
             context["graph_models"] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             context["graphs"] = JSONSerializer().serialize(context["graph_models"], exclude=["functions"])
-            context["nav"]["title"] = "Arches Designer"
+            context["nav"]["title"] = _("Arches Designer")
             context["nav"]["icon"] = "fa-bookmark"
 
             context["nav"]["help"] = {"title": _("Using the Arches Designer"), "template": "arches-designer-help"}
@@ -325,8 +329,10 @@ class GraphDataView(View):
                     ret = Graph.new(name=name, is_resource=isresource, author=author)
 
                 elif self.action == "update_node":
+                    old_node_data = graph.nodes.get(uuid.UUID(data["nodeid"]))
+                    nodegroup_changed = str(old_node_data.nodegroup_id) != data["nodegroup_id"]
                     updated_values = graph.update_node(data)
-                    if "nodeid" in data:
+                    if "nodeid" in data and nodegroup_changed is False:
                         graph.save(nodeid=data["nodeid"])
                     else:
                         graph.save()
@@ -359,12 +365,14 @@ class GraphDataView(View):
 
                 elif self.action == "export_branch":
                     clone_data = graph.copy(root=data)
+                    clone_data["copy"].slug = None
                     clone_data["copy"].save()
                     ret = {"success": True, "graphid": clone_data["copy"].pk}
 
                 elif self.action == "clone_graph":
                     clone_data = graph.copy()
                     ret = clone_data["copy"]
+                    ret.slug = None
                     ret.save()
                     ret.copy_functions(graph, [clone_data["nodes"], clone_data["nodegroups"]])
 

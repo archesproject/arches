@@ -38,22 +38,11 @@ from arches.app.models.models import ResourceInstance, Node
 from arches.app.models.resource import Resource
 from arches.app.utils.permission_backend import get_editable_resource_types
 from arches.app.utils.permission_backend import get_resource_types_by_perm
-from arches.app.utils.permission_backend import user_can_read_resources
-from arches.app.utils.permission_backend import user_can_edit_resources
+from arches.app.utils.permission_backend import user_can_read_resource
+from arches.app.utils.permission_backend import user_can_edit_resource
 from arches.app.utils.permission_backend import user_can_read_concepts
-from arches.app.utils.permission_backend import user_can_delete_resources
 from arches.app.utils.permission_backend import user_has_resource_model_permissions
 from arches.app.utils.permission_backend import get_restricted_users
-from arches.app.search.mappings import (
-    prepare_terms_index,
-    prepare_concepts_index,
-    delete_terms_index,
-    delete_concepts_index,
-    prepare_search_index,
-    delete_search_index,
-    prepare_resource_relations_index,
-    delete_resource_relations_index,
-)
 
 # these tests can be run from the command line via
 # python manage.py test tests/permissions/permission_tests.py --pattern="*.py" --settings="tests.test_settings"
@@ -104,8 +93,6 @@ class PermissionTests(ArchesTestCase):
     def setUpClass(cls):
         test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
-        delete_resource_relations_index()
-        prepare_resource_relations_index(create=True)
         cls.add_users()
 
 
@@ -120,12 +107,12 @@ class PermissionTests(ArchesTestCase):
 
         """
 
-        implicit_permission = user_can_read_resources(self.user, self.resource_instance_id)
+        implicit_permission = user_can_read_resource(self.user, self.resource_instance_id)
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
         assign_perm("change_resourceinstance", self.group, resource)
-        can_access_without_view_permission = user_can_read_resources(self.user, self.resource_instance_id)
+        can_access_without_view_permission = user_can_read_resource(self.user, self.resource_instance_id)
         assign_perm("view_resourceinstance", self.group, resource)
-        can_access_with_view_permission = user_can_read_resources(self.user, self.resource_instance_id)
+        can_access_with_view_permission = user_can_read_resource(self.user, self.resource_instance_id)
         self.assertTrue(
             implicit_permission is True and can_access_without_view_permission is False and can_access_with_view_permission is True
         )

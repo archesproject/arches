@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+import logging
 from datetime import datetime
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
@@ -30,10 +31,11 @@ from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Terms, MaxAgg, Aggregation
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, MaxAgg, Aggregation
 from arches.app.search.search_export import SearchResultsExporter
 from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
+from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer
@@ -42,6 +44,7 @@ import arches.app.utils.task_management as task_management
 import arches.app.tasks as tasks
 from io import StringIO
 
+logger = logging.getLogger(__name__)
 
 class SearchView(MapBaseManagerView):
     def get(self, request):
@@ -228,7 +231,8 @@ def append_instance_permission_filter_dsl(request, search_results_object):
     if request.user.is_superuser is False:
         has_access = Bool()
         terms = Terms(field="permissions.users_with_no_access", terms=[str(request.user.id)])
-        has_access.must_not(terms)
+        nested_term_filter = Nested(path="permissions", query=terms)
+        has_access.must_not(nested_term_filter)
         search_results_object["query"].add_query(has_access)
 
 
@@ -250,6 +254,7 @@ def search_results(request):
                 search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional)
         append_instance_permission_filter_dsl(request, search_results_object)
     except Exception as err:
+        logger.exception(err)
         return JSONErrorResponse(message=err)
 
     dsl = search_results_object.pop("query", None)
@@ -270,7 +275,7 @@ def search_results(request):
         dsl.include("tiles")
 
     if for_export is True:
-        results = dsl.search(index="resources", scroll="1m")
+        results = dsl.search(index=RESOURCES_INDEX, scroll="1m")
         scroll_id = results["_scroll_id"]
 
         if total <= settings.SEARCH_EXPORT_LIMIT:
@@ -281,7 +286,7 @@ def search_results(request):
             results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
             results["hits"]["hits"] += results_scrolled["hits"]["hits"]
     else:
-        results = dsl.search(index="resources", id=resourceinstanceid)
+        results = dsl.search(index=RESOURCES_INDEX, id=resourceinstanceid)
 
     ret = {}
     if results is not None:
@@ -304,7 +309,7 @@ def search_results(request):
 
         ret["reviewer"] = user_is_resource_reviewer(request.user)
         ret["timestamp"] = datetime.now()
-        ret["total_results"] = dsl.count(index="resources")
+        ret["total_results"] = dsl.count(index=RESOURCES_INDEX)
         ret["userid"] = request.user.id
         return JSONResponse(ret)
 

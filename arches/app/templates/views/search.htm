@@ -28,7 +28,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <div class="flex search-results-panel">
             <div class="search-attribute-widget">
-                <div data-bind="component: {
+                <div class="search-dropdown" data-bind="component: {
                     name: 'term-filter',
                     params: sharedStateObject
                 }"></div>
@@ -55,6 +55,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- Title Block -->
                 <div class="search-count-container">
                     <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
+                    <!--ko if: sharedStateObject.filterApplied() -->
+                    <button class="btn-sm btn btn-mint btn-labeled" style="padding: 2px 9px;" data-bind="click: function() {sharedStateObject.clearQuery();}">{% trans "Clear Filters" %}</button>
+                    <!--/ko-->
                 </div>
 
                 <div class="search-results-container">

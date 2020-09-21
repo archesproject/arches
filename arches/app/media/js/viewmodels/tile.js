@@ -132,6 +132,7 @@ define([
                     handler(self);
                 });
                 params.provisionalTileViewModel.selectedProvisionalEdit(undefined);
+                delete self.noDefaults;
             },
             getAttributes: function() {
                 var tileData = self.data ? koMapping.toJS(self.data) : {};

@@ -3,12 +3,14 @@
 
 {% block footer %}
 <!-- ko foreach: {data: mapCard.widgets, as: 'widget'} -->
-<a href="javascript:void(0)" data-bind="if: $parent.mapCard.isSelectable($parent.feature), click: function() {
-    $parent.mapCard.relateResource($parent, widget);
-}">
-    <i class="ion-ios-refresh-empty"></i>
-    <span data-bind="text: 'Relate ' + widget.label()"></span>
-</a>
+    <!-- ko if: widget.datatype.datatype === 'resource-instance-list' || widget.datatype.datatype === 'resource-instance' -->
+    <a href="javascript:void(0)" data-bind="if: $parent.mapCard.isSelectable($parent.feature), click: function() {
+        $parent.mapCard.relateResource($parent, widget);
+    }">
+        <i class="ion-ios-refresh-empty"></i>
+        <span data-bind="text: 'Relate ' + widget.label()"></span>
+    </a>
+    <!-- /ko -->
 <!-- /ko -->
 {{ block.super }}
 {% endblock footer %}

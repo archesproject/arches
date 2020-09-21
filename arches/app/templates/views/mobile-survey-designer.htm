@@ -33,8 +33,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <!-- Left Panel -->
         <div class="left-panel graph-designer msm-tree" data-bind="resizableSidepanel:true">
-            <div class="" data-bind="with: tree" style="height: inherit">
-                {% include 'views/mobile-survey-manager/mobile-survey-tree.htm' %}
+            <div class="left-panel-inner-container">
+                <div class="" data-bind="with: tree" style="height: inherit">
+                    {% include 'views/mobile-survey-manager/mobile-survey-tree.htm' %}
+                </div>
             </div>
         </div>
 
@@ -379,6 +381,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         node_id: ko.observable('surveyextent'),
                                         config:{
                                             geometryTypes: [{'id':'Polygon','text':'Polygon'}]
+                                        },
+                                        datatype: {
+                                            datatype: 'geojson-feature-collection'
                                         }
                                     },
                                     config: {

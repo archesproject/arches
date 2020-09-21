@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import json
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.models import User, Group, Permission
 from django.db import transaction
 from django.forms.models import model_to_dict
@@ -32,26 +32,33 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
+from arches import __version__
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource, ModelInactiveError
 from arches.app.models.system_settings import settings
-from arches.app.utils.pagination import get_paginator
+from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_delete_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.permission_backend import user_is_resource_reviewer, user_can_delete_resources
+from arches.app.utils.pagination import get_paginator
+from arches.app.utils.permission_backend import (
+    user_is_resource_reviewer,
+    user_can_delete_resource,
+    user_can_edit_resource,
+    user_can_read_resource,
+)
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
+from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from elasticsearch import Elasticsearch
 from guardian.shortcuts import (
     assign_perm,
@@ -127,7 +134,6 @@ class ResourceEditorView(MapBaseManagerView):
 
         creator = None
         user_created_instance = None
-
         if resourceid is None:
             resource_instance = None
             graph = models.GraphModel.objects.get(pk=graphid)
@@ -218,7 +224,7 @@ class ResourceEditorView(MapBaseManagerView):
             card["is_writable"] = False
             if str(card["nodegroup_id"]) in editable_nodegroup_ids:
                 card["is_writable"] = True
-        user_can_delete_resource = user_can_delete_resources(request.user, resourceid)
+        can_delete = user_can_delete_resource(request.user, resourceid)
         context = self.get_context_data(
             main_script=main_script,
             resourceid=resourceid,
@@ -245,7 +251,7 @@ class ResourceEditorView(MapBaseManagerView):
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             user_is_reviewer=json.dumps(user_is_reviewer),
-            user_can_delete_resource=user_can_delete_resource,
+            user_can_delete_resource=can_delete,
             creator=json.dumps(creator),
             user_created_instance=json.dumps(user_created_instance),
             report_templates=templates,
@@ -263,20 +269,29 @@ class ResourceEditorView(MapBaseManagerView):
 
         return render(request, view_template, context)
 
-    @method_decorator(can_delete_resource_instance, name="dispatch")
     def delete(self, request, resourceid=None):
-        if resourceid is not None:
-            ret = Resource.objects.get(pk=resourceid)
-            try:
-                deleted = ret.delete(user=request.user)
-            except ModelInactiveError as e:
-                message = _("Unable to delete. Please verify the model status is active")
-                return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
-            if deleted is True:
-                return JSONResponse(ret)
-            else:
-                return JSONErrorResponse("Unable to Delete Resource", "Provisional users cannot delete resources with authoritative data")
-        return HttpResponseNotFound()
+        delete_error = _("Unable to Delete Resource")
+        delete_msg = _("User does not have permissions to delete this instance because the instance or its data is restricted")
+        try:
+            if resourceid is not None:
+                if user_can_delete_resource(request.user, resourceid) is False:
+                    return JSONErrorResponse(delete_error, delete_msg)
+                ret = Resource.objects.get(pk=resourceid)
+                try:
+                    deleted = ret.delete(user=request.user)
+                except ModelInactiveError as e:
+                    message = _("Unable to delete. Please verify the model status is active")
+                    return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
+                except PermissionDenied:
+                    return JSONErrorResponse(delete_error, delete_msg)
+                if deleted is True:
+                    return JSONResponse(ret)
+                else:
+                    return JSONErrorResponse(delete_error, delete_msg)
+            return HttpResponseNotFound()
+        except PermissionDenied:
+            return JSONErrorResponse(delete_error, delete_msg)
+
 
     def copy(self, request, resourceid=None):
         resource_instance = Resource.objects.get(pk=resourceid)
@@ -648,7 +663,7 @@ class ResourceDescriptors(View):
             try:
                 resource = Resource.objects.get(pk=resourceid)
                 se = SearchEngineFactory().create()
-                document = se.search(index="resources", id=resourceid)
+                document = se.search(index=RESOURCES_INDEX, id=resourceid)
                 return JSONResponse(
                     {
                         "graphid": document["_source"]["graph_id"],
@@ -677,7 +692,7 @@ class ResourceReportView(MapBaseManagerView):
             models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         )
         related_resource_summary = [{"graphid": str(g.graphid), "name": g.name, "resources": []} for g in resource_models]
-        related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=1000)
+        related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=1000, user=request.user)
         related_resources = related_resources_search_results["related_resources"]
         relationships = related_resources_search_results["resource_relationships"]
         resource_relationship_type_values = {i["id"]: i["text"] for i in get_resource_relationship_types()["values"]}
@@ -687,13 +702,21 @@ class ResourceReportView(MapBaseManagerView):
                 if rr["graph_id"] == summary["graphid"]:
                     relationship_summary = []
                     for relationship in relationships:
-                        if rr["resourceinstanceid"] in (relationship["resourceinstanceidto"], relationship["resourceinstanceidfrom"]):
+                        if rr["resourceinstanceid"] == relationship["resourceinstanceidto"]:
                             rr_type = (
                                 resource_relationship_type_values[relationship["relationshiptype"]]
                                 if relationship["relationshiptype"] in resource_relationship_type_values
                                 else relationship["relationshiptype"]
                             )
                             relationship_summary.append(rr_type)
+                        elif rr["resourceinstanceid"] == relationship["resourceinstanceidfrom"]:
+                            rr_type = (
+                                resource_relationship_type_values[relationship["inverserelationshiptype"]]
+                                if relationship["inverserelationshiptype"] in resource_relationship_type_values
+                                else relationship["inverserelationshiptype"]
+                            )
+                            relationship_summary.append(rr_type)
+
                     summary["resources"].append(
                         {"instance_id": rr["resourceinstanceid"], "displayname": rr["displayname"], "relationships": relationship_summary}
                     )
@@ -797,6 +820,7 @@ class ResourceReportView(MapBaseManagerView):
             ),
             resourceid=resourceid,
             displayname=displayname,
+            version=__version__,
         )
 
         if graph.iconclass:
@@ -865,7 +889,7 @@ class RelatedResourcesView(BaseManagerView):
         except ObjectDoesNotExist:
             resource = Resource()
         page = 1 if request.GET.get("page") == "" else int(request.GET.get("page", 1))
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page, user=request.user)
 
         if related_resources is not None:
             ret = self.paginate_related_resources(related_resources, page, request)
@@ -887,7 +911,7 @@ class RelatedResourcesView(BaseManagerView):
         se.es.indices.refresh(index=se._add_prefix("resource_relations"))
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
         page = 1 if request.GET.get("page") == "" else int(request.GET.get("page", 1))
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page, user=request.user)
         ret = []
 
         if related_resources is not None:
@@ -966,7 +990,7 @@ class RelatedResourcesView(BaseManagerView):
         se.es.indices.refresh(index=se._add_prefix("resource_relations"))
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
         page = 1 if request.GET.get("page") == "" else int(request.GET.get("page", 1))
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page, user=request.user)
         ret = []
 
         if related_resources is not None:

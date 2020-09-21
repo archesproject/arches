@@ -29,7 +29,10 @@ from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
+from django.contrib.contenttypes.models import ContentType
 from django.core.validators import validate_slug
+from guardian.models import GroupObjectPermission
+from guardian.shortcuts import assign_perm
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -56,12 +59,10 @@ class CardModel(models.Model):
     config = JSONField(blank=True, null=True, db_column="config")
 
     def is_editable(self):
-        result = True
-        tiles = TileModel.objects.filter(nodegroup=self.nodegroup).count()
-        result = False if tiles > 0 else True
         if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
-            result = True
-        return result
+            return True
+        else:
+            return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
 
     class Meta:
         managed = True
@@ -400,13 +401,12 @@ class GraphModel(models.Model):
         return False
 
     def is_editable(self):
-        result = True
-        if self.isresource:
-            resource_instances = ResourceInstance.objects.filter(graph_id=self.graphid).count()
-            result = False if resource_instances > 0 else True
-            if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
-                result = True
-        return result
+        if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
+            return True
+        elif self.isresource:
+            return not ResourceInstance.objects.filter(graph_id=self.graphid).exists()
+        else:
+            return True
 
     def __str__(self):
         return self.name
@@ -666,10 +666,10 @@ class ResourceXResource(models.Model):
     modified = models.DateTimeField()
 
     def delete(self, *args, **kwargs):
-        from arches.app.search.search_engine_factory import SearchEngineFactory
+        from arches.app.search.search_engine_factory import SearchEngineInstance as se
+        from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
 
-        se = SearchEngineFactory().create()
-        se.delete(index="resource_relations", id=self.resourcexid)
+        se.delete(index=RESOURCE_RELATIONS_INDEX, id=self.resourcexid)
 
         # update the resource-instance tile by removing any references to a deleted resource
         deletedResourceId = kwargs.pop("deletedResourceId", None)
@@ -687,14 +687,14 @@ class ResourceXResource(models.Model):
         super(ResourceXResource, self).delete()
 
     def save(self):
-        from arches.app.search.search_engine_factory import SearchEngineFactory
+        from arches.app.search.search_engine_factory import SearchEngineInstance as se
+        from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
 
-        se = SearchEngineFactory().create()
         if not self.created:
             self.created = datetime.datetime.now()
         self.modified = datetime.datetime.now()
         document = model_to_dict(self)
-        se.index_data(index="resource_relations", body=document, idfield="resourcexid")
+        se.index_data(index=RESOURCE_RELATIONS_INDEX, body=document, idfield="resourcexid")
         super(ResourceXResource, self).save()
 
     class Meta:
@@ -1038,6 +1038,21 @@ class UserProfile(models.Model):
         db_table = "user_profile"
 
 
+@receiver(post_save, sender=User)
+def create_permissions_for_new_users(sender, instance, created, **kwargs):
+    from arches.app.models.resource import Resource
+
+    if created:
+        ct = ContentType.objects.get(app_label="models", model="resourceinstance")
+        resourceInstanceIds = list(GroupObjectPermission.objects.filter(content_type=ct).values_list("object_pk", flat=True).distinct())
+        for resourceInstanceId in resourceInstanceIds:
+            resourceInstanceId = uuid.UUID(resourceInstanceId)
+        resources = ResourceInstance.objects.filter(pk__in=resourceInstanceIds)
+        assign_perm("no_access_to_resourceinstance", instance, resources)
+        for resource in resources:
+            Resource(resource.resourceinstanceid).index()
+
+
 class UserXTask(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     taskid = models.UUIDField(serialize=False, blank=True, null=True)
@@ -1276,3 +1291,17 @@ class IIIFManifest(models.Model):
     class Meta:
         managed = True
         db_table = "iiif_manifests"
+
+
+class GroupMapSettings(models.Model):
+    group = models.OneToOneField(Group, on_delete=models.CASCADE)
+    min_zoom = models.IntegerField(default=0)
+    max_zoom = models.IntegerField(default=20)
+    default_zoom = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.group.name
+
+    class Meta:
+        managed = True
+        db_table = "group_map_settings"

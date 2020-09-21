@@ -35,7 +35,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {{user.first_name}} {{user.last_name}}
                     </div>
                     <div class="profile-e-mail">
-                        User name: {{user.username}}
+                        {% trans "User name:" %} {{user.username}}
                     </div>
                 </div>
             </div>
@@ -390,13 +390,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </p>
                                                     <ul class="mpm-node-detail-metadata">
                                                         <li class="">
-                                                            Number of edits: 0
+                                                            {% trans "Number of edits:" %} 0
                                                         </li>
                                                         <li class="">
-                                                            Contributors: 0
+                                                            {% trans "Contributors:" %} 0
                                                         </li>
                                                         <li class="">
-                                                            Offline Basemap: Streets-Grey
+                                                            {% trans "Offline Basemap:" %} {% trans "Streets-Grey" %}
                                                         </li>
                                                     </ul>
                                                 </div>

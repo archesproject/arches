@@ -58,6 +58,25 @@ define([
         this.selectedPopup = ko.observable('');
         this.resultsExpanded = ko.observable(true);
         this.query = ko.observable(getQueryObject());
+        this.clearQuery = function(){
+            Object.values(this.filters).forEach(function(value){
+                if (value()){
+                    if (value().clear){
+                        value().clear();
+                    }
+                }
+            }, this);
+        };
+        this.filterApplied = ko.pureComputed(function(){
+            var notFilters = ['paging-filter', 'related-resources-filter', 'saved-searches', 'search-export', 'search-result-details', 'search-results'];
+            var trueFilters = Object.keys(this.filters).filter(function(f){
+                return notFilters.indexOf(f) === -1;
+            });
+            var res = trueFilters.filter(function(f){
+                return this.query()[f];
+            }, this);
+            return res.length > 0;
+        }, this);
         this.mouseoverInstanceId = ko.observable();
         this.mapLinkData = ko.observable(null);
         this.userIsReviewer = ko.observable(false);
@@ -96,6 +115,7 @@ define([
             this.viewModel.total = ko.observable();
             _.extend(this, this.viewModel.sharedStateObject);
             this.viewModel.sharedStateObject.total = this.viewModel.total;
+            this.viewModel.sharedStateObject.loading = this.viewModel.loading;
             this.queryString = ko.computed(function() {
                 return JSON.stringify(this.query());
             }, this);
