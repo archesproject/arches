@@ -137,6 +137,10 @@ define([
                         }
                     }, this);
                 }
+            },
+
+            clear: function() {
+                this.filter.facets.removeAll();
             }
         }),
         template: { require: 'text!templates/views/components/search/advanced-search.htm' }
