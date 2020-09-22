@@ -25,7 +25,7 @@ class NotificationView(View):
                 return JSONResponse({"success": True, "types": notiftype_dict_list}, status=200)
 
             else:
-                if json.loads(request.GET.get("unread_only")) is True:
+                if request.GET.get("unread_only"):
                     userxnotifs = (
                         models.UserXNotification.objects.filter(recipient=request.user, isread=False).order_by("notif__created").reverse()
                     )
