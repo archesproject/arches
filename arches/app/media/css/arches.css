@@ -4839,6 +4839,7 @@ ul.jqtree_common li.jqtree-folder {
 .top-right-nav {
     display: flex;
     float: right;
+    margin-right: -8px;
 }
 
 .top-right-nav .top-btn-container {
@@ -4869,7 +4870,7 @@ ul.jqtree_common li.jqtree-folder {
 .ep-tools-login {
     border: none;
     padding-left: 16px;
-    padding-right: 20px;
+    padding-right: 16px;
     vertical-align: middle
 }
 
