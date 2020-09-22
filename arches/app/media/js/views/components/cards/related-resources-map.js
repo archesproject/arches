@@ -106,8 +106,7 @@ define([
             var type = ko.unwrap(self.form.nodeLookup[id].datatype);
             zoomToData = false;
             var val = [{
-                inverseOntologyProperty: "",
-                ontologyProperty: "",
+
                 resourceId: resourceinstanceid,
                 resourceXresourceId: "",
             }];
