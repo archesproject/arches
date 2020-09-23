@@ -15,7 +15,6 @@ define([
 
         initialize: function(options) {
             $.extend(this, options);
-            // console.log('loading ' + this.name);
             this.requiredFiltersLoaded = ko.computed(function() {
                 var self = this;
                 var res = this.requiredFilters.every(function(f){return self.getFilter(f) !== null;});
