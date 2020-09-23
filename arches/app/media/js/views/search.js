@@ -66,6 +66,7 @@ define([
                     }
                 }
             }, this);
+            this.query({"paging-filter": "1", tiles: "true"});
         };
         this.filterApplied = ko.pureComputed(function(){
             var self = this;
