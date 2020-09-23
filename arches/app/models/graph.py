@@ -1378,7 +1378,6 @@ class Graph(models.GraphModel):
                     validated_fieldname = validate_fieldname(node.fieldname, fieldnames)
                     if validated_fieldname != node.fieldname:
                         node.fieldname = validated_fieldname
-                        node.save()
 
         # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
         if self.ontology is not None:

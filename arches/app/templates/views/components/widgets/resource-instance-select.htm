@@ -3,7 +3,7 @@
 
 {% block form %}
 <!--ko let: {self: $data} -->
-<!-- ko if: self.renderContext === 'search' -->
+<!-- ko ifnot: self.displayOntologyTable -->
 <div class="row" style="margin: 0px;">
     <div class="col-xs-12 resource-instance-wrapper">
         <input style="width:30%; display:inline-block;"
@@ -15,7 +15,7 @@
     </div>
 </div>
 <!-- /ko -->
-<!-- ko ifnot: self.renderContext === 'search' -->
+<!-- ko if: self.displayOntologyTable -->
 <div class="row widget-wrapper" data-bind="visible: !newTileStep()">
     <div class="form-group">
         <label class="control-label widget-input-label" data-bind="text:label">
@@ -67,18 +67,10 @@
                                 <i class="fa fa-info-circle"></i>
                             </button>
                         </div>
-                        <!-- ko if: self.graphIsSemantic -->
-                            <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false">
-                                <div class="rr-table-instance-label" style="padding-left: 10px;" data-bind="text: $data.resourceName()">
-                                </div>
+                        <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false">
+                            <div class="rr-table-instance-label" style="padding-left: 10px;" data-bind="text: $data.resourceName()">
                             </div>
-                        <!-- /ko -->
-                        <!-- ko ifnot: self.graphIsSemantic -->
-                            <div class="rr-table-column" style="flex-grow: 1;">
-                                <div class="rr-table-instance-label" style="padding-left: 10px;" data-bind="text: $data.resourceName()">
-                                </div>
-                            </div>
-                        <!-- /ko -->
+                        </div>
                     </div>
                     <div class="rr-table-row-panel"
                         data-bind="visible: self.selectedResourceRelationship() === $data, if: self.selectedResourceRelationship() === $data, css: { 'rr-table-border': self.selectedResourceRelationship() === $data} ">
@@ -150,7 +142,7 @@
     <div class="create-instance-header" style="display: flex; justify-content: space-between;">
         <div class="new-instance-model-name">
             <span>{% trans "New" %}</span>
-            <span data-bind="text: $parent.lookupGraph(graphid).name"></span>
+            <span data-bind="text: $parent.graphLookup[graphid].name"></span>
         </div>
         <div data-bind="click: function(){$parent.close()}, clickBubble: false" class="close-new-step">
             <i class="fa fa-times-circle"></i>
