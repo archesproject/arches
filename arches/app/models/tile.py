@@ -528,11 +528,11 @@ class Tile(models.TileModel):
         """
 
         if tileid and models.TileModel.objects.filter(pk=tileid).exists():
-            tile = models.TileModel.objects.get(pk=tileid)
+            tile = Tile.objects.get(pk=tileid)
             tile.data[nodeid] = value
             tile.save()
         elif models.TileModel.objects.filter(Q(resourceinstance_id=resourceinstanceid), Q(nodegroup_id=nodegroupid)).count() == 1:
-            tile = models.TileModel.objects.filter(Q(resourceinstance_id=resourceinstanceid), Q(nodegroup_id=nodegroupid))[0]
+            tile = Tile.objects.filter(Q(resourceinstance_id=resourceinstanceid), Q(nodegroup_id=nodegroupid))[0]
             tile.data[nodeid] = value
             tile.save()
         else:
