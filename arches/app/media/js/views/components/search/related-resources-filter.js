@@ -11,16 +11,17 @@ define(['knockout',
                 BaseFilter.prototype.initialize.call(this, options);
                 this.ready = ko.observable(false);
                 this.options = options;
+                var self = this;
                 // this component is just a light weight wrapper around the relatd resources manager
                 // need to wait for the search-resutls filter to be ready
                 // before we can load the realated-resources-filter
                 // because we need to pass the entire rsearch results filter into the 
                 // related resources filter
                 var setSearchResults = function(){
-                    options.searchResultsVm = this.getFilter('search-results');
-                    options.searchResultsVm.relatedResourcesManager = this;
-                    options.filters[componentName](this);
-                    this.ready(true);
+                    options.searchResultsVm = self.getFilter('search-results');
+                    options.searchResultsVm.relatedResourcesManager = self;
+                    options.filters[componentName](self);
+                    self.ready(true);
                 };
 
                 if (this.requiredFiltersLoaded() === false) {

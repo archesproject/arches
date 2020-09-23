@@ -25,9 +25,9 @@ define([
                 this.ready = ko.observable(false);
 
                 var setSearchResults = function(){
-                    options.searchResultsVm = this.getFilter('search-results');
-                    options.searchResultsVm.details = this;
-                    options.filters[componentName](this);           
+                    options.searchResultsVm = self.getFilter('search-results');
+                    options.searchResultsVm.details = self;
+                    options.filters[componentName](self);           
                 };
 
                 if (this.requiredFiltersLoaded() === false) {
