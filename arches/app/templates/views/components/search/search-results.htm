@@ -23,10 +23,11 @@
             <a class="search-candidate-link" href="" data-bind="click: showDetails"><i class="fa fa-info-circle"></i> {% trans "Details" %} </a>
             <!-- /ko -->
 
-
+            {% if user|can_edit_resource_instance %}
             <!--ko if: canEdit -->
             <a class="search-candidate-link" href="" data-bind="click: $parent.editResource.bind($parent)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %} </a>
             <!--/ko-->
+            {% endif %}
             
             <!-- ko if: !!$parent.mapFilter -->
             <a class="search-candidate-link" href="" data-bind="visible: point, click: mapLinkClicked"><i class="fa fa-map-marker"></i> {% trans "Map" %} </a>
