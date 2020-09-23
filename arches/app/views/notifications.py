@@ -29,8 +29,6 @@ class NotificationView(View):
                     userxnotifs = (
                         models.UserXNotification.objects.filter(recipient=request.user, isread=False).order_by("notif__created").reverse()
                     )
-
-                    # import pdb; pdb.set_trace()
                 else:
                     userxnotifs = models.UserXNotification.objects.filter(recipient=request.user).order_by("notif__created").reverse()
                 notif_dict_list = []
