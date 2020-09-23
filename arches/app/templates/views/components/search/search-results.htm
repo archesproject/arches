@@ -28,6 +28,7 @@
             <a class="search-candidate-link" href="" data-bind="click: $parent.editResource.bind($parent)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %} </a>
             <!--/ko-->
             {% endif %}
+            
             <!-- ko if: !!$parent.mapFilter -->
             <a class="search-candidate-link" href="" data-bind="visible: point, click: mapLinkClicked"><i class="fa fa-map-marker"></i> {% trans "Map" %} </a>
             <!-- /ko -->
