@@ -1,13 +1,11 @@
 define([
-    'jquery',
-    'underscore',
     'arches',
     'views/list',
     'bindings/datepicker',
     'bindings/chosen',
     'views/components/simple-switch',
     'views/components/notification',
-], function($, _, arches, ListView) {
+], function(arches, ListView) {
     var NotificationsList = ListView.extend({
         /**
         * A backbone view to manage a list of notification records
@@ -24,11 +22,12 @@ define([
             this.items = options.items;
             this.helploading = options.helploading;
 
+            
             ListView.prototype.initialize.apply(this, arguments);
             
             this.updateList = function() {
                 self.helploading(true);
-
+                
                 $.ajax({
                     type: 'GET',
                     url: arches.urls.get_notifications,
@@ -36,6 +35,7 @@ define([
                 }).done(function(data) {
                     self.items(data.notifications);
                     self.helploading(false);
+                    console.log(self.items())
                 });
             };
 

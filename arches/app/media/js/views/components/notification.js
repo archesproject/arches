@@ -16,8 +16,9 @@ define([
 
         this.displaytime = moment(params.created).format('dddd, DD MMMM YYYY | hh:mm A');
         this.id = params.id;
-        this.message = params.message;
+        this.loaded_resources = params.loaded_resources;
         this.link = params.link;
+        this.message = params.message;
 
         this.dismiss = function(parent) {
             $.ajax({

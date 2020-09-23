@@ -29,6 +29,8 @@ class NotificationView(View):
                     userxnotifs = (
                         models.UserXNotification.objects.filter(recipient=request.user, isread=False).order_by("notif__created").reverse()
                     )
+
+                    # import pdb; pdb.set_trace()
                 else:
                     userxnotifs = models.UserXNotification.objects.filter(recipient=request.user).order_by("notif__created").reverse()
                 notif_dict_list = []
@@ -43,7 +45,8 @@ class NotificationView(View):
                         notif["message"] = userxnotif.notif.message
                         try:
                             notif["link"] = userxnotif.notif.context["link"]
-                        except TypeError as e:
+                            notif['loaded_resources'] = userxnotif.notif.context["loaded_resources"]
+                        except TypeError:
                             logger = logging.getLogger(__name__)
                             logger.warn("Unable to access Notification.context: Does Not Exist. Badly formed Notification.")
                         notif["created"] = userxnotif.notif.created

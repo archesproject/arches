@@ -653,15 +653,18 @@ class Command(BaseCommand):
                 from celery import chord
                 from arches.app.tasks import import_business_data, package_load_complete, on_chord_error
 
+                valid_resource_paths = [ 
+                    path for path in business_data
+                    if (".csv" in path and os.path.exists(path.replace(".csv", ".mapping"))) or (".json" in path)
+                ]
 
                 # assumes resources in csv do not depend on data being loaded prior from json in same dir
                 chord(
                     [
-                        # import_business_data.s(data_source="", overwrite=True, bulk_load=bulk_load)
-                        # for path in business_data
-                        # if (".csv" in path and os.path.exists(path.replace(".csv", ".mapping"))) or (".json" in path)
+                        import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load)
+                        for path in valid_resource_paths
                     ]
-                )(package_load_complete.s('foo').on_error(on_chord_error.s()))
+                )(package_load_complete.signature(kwargs={'valid_resource_paths': valid_resource_paths}).on_error(on_chord_error.s()))
             else:
                 for path in business_data:
                     if path not in erring_csvs:
@@ -795,72 +798,72 @@ class Command(BaseCommand):
             return package_dir
 
         package_location = handle_source(source)
-        # if not package_location:
-        #     raise Exception("this is an invalid package source")
+        if not package_location:
+            raise Exception("this is an invalid package source")
 
-        # if setup_db is not False:
-        #     if setup_db.lower() in ("t", "true", "y", "yes"):
-        #         management.call_command("setup_db", force=True)
+        if setup_db is not False:
+            if setup_db.lower() in ("t", "true", "y", "yes"):
+                management.call_command("setup_db", force=True)
 
-        # load_ontologies(package_location)
-        # print("loading package_settings.py")
-        # load_package_settings(package_location)
-        # print("loading preliminary sql")
-        # load_preliminary_sql(package_location)
-        # print("loading system settings")
-        # load_system_settings(package_location)
-        # print("loading project extensions from project")
-        # management.call_command("project", "update")
-        # print("loading widgets")
-        # load_widgets(package_location)
-        # print("loading card components")
-        # load_card_components(package_location)
-        # print("loading search components")
-        # load_search_components(package_location)
-        # print("loading plugins")
-        # load_plugins(package_location)
-        # print("loading reports")
-        # load_reports(package_location)
-        # print("loading functions")
-        # load_functions(package_location)
-        # print("loading datatypes")
-        # load_datatypes(package_location)
-        # print("loading concepts")
-        # load_concepts(package_location, overwrite_concepts, stage_concepts)
-        # print("loading resource models and branches")
-        # load_graphs(package_location)
-        # print("loading resource to resource constraints")
-        # load_resource_to_resource_constraints(package_location)
-        # print("loading map layers")
-        # load_map_layers(package_location)
-        # print("loading search indexes")
-        # load_indexes(package_location)
+        load_ontologies(package_location)
+        print("loading package_settings.py")
+        load_package_settings(package_location)
+        print("loading preliminary sql")
+        load_preliminary_sql(package_location)
+        print("loading system settings")
+        load_system_settings(package_location)
+        print("loading project extensions from project")
+        management.call_command("project", "update")
+        print("loading widgets")
+        load_widgets(package_location)
+        print("loading card components")
+        load_card_components(package_location)
+        print("loading search components")
+        load_search_components(package_location)
+        print("loading plugins")
+        load_plugins(package_location)
+        print("loading reports")
+        load_reports(package_location)
+        print("loading functions")
+        load_functions(package_location)
+        print("loading datatypes")
+        load_datatypes(package_location)
+        print("loading concepts")
+        load_concepts(package_location, overwrite_concepts, stage_concepts)
+        print("loading resource models and branches")
+        load_graphs(package_location)
+        print("loading resource to resource constraints")
+        load_resource_to_resource_constraints(package_location)
+        print("loading map layers")
+        load_map_layers(package_location)
+        print("loading search indexes")
+        load_indexes(package_location)
         print("loading business data - resource instances and relationships")
         load_business_data(package_location)
-        # print("loading resource views")
-        # load_resource_views(package_location)
-        # print("loading apps")
-        # load_apps(package_location)
-        # root = settings.APP_ROOT if settings.APP_ROOT is not None else os.path.join(settings.ROOT_DIR, "app")
-        # print("loading package css")
-        # css_source = os.path.join(package_location, "extensions", "css")
-        # if os.path.exists(css_source):
-        #     css_dest = os.path.join(root, "media", "css")
-        #     if not os.path.exists(css_dest):
-        #         os.mkdir(css_dest)
-        #     css_files = glob.glob(os.path.join(css_source, "*.css"))
-        #     for css_file in css_files:
-        #         shutil.copy(css_file, css_dest)
-        # print("caching resource models")
-        # try:
-        #     cache_graphs()
-        # except Exception as e:
-        #     print("Unable to cache graph proxy models")
-        #     print(e)
-        # if celery_worker_running:
-        #     print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
-        # else:
-        #     print("package load complete")
+        print("loading resource views")
+        load_resource_views(package_location)
+        print("loading apps")
+        load_apps(package_location)
+        root = settings.APP_ROOT if settings.APP_ROOT is not None else os.path.join(settings.ROOT_DIR, "app")
+        print("loading package css")
+        css_source = os.path.join(package_location, "extensions", "css")
+        if os.path.exists(css_source):
+            css_dest = os.path.join(root, "media", "css")
+            if not os.path.exists(css_dest):
+                os.mkdir(css_dest)
+            css_files = glob.glob(os.path.join(css_source, "*.css"))
+            for css_file in css_files:
+                shutil.copy(css_file, css_dest)
+        print("caching resource models")
+        try:
+            cache_graphs()
+        except Exception as e:
+            print("Unable to cache graph proxy models")
+            print(e)
+        if celery_worker_running:
+            print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
+        else:
+            print("package load complete")
 
     def setup(self, package_name, es_install_location=None):
         """

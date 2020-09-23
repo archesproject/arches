@@ -5,12 +5,23 @@
 
     <div>
         <div class='entry'><i data-bind=""></i>
+            <!-- ko if: link -->
             <div class='entry-label'>{% trans 'Download ready ' %}</div>
+            <!-- /ko -->
+
             <span class='time-label' data-bind="text: displaytime" ></span>
         </div>
 
         <div class="notification-message">
-            {% trans "Your search " %} <span class="" data-bind="text: message"> </span> {% trans " is ready for download.  You have 24 hours to access this file, after which we'll automatically remove it." %}
+            <span class="" data-bind="text: message"></span> 
+
+            <ul>
+                <!-- ko foreach: loaded_resources -->
+                <li>
+                    <span data-bind="text: $data,"></span>
+                </li>
+                <!-- /ko -->
+            </ul>
         </div>
 
         <!-- ko if: link -->

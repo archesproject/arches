@@ -97,13 +97,18 @@ def import_business_data(self, data_source="", overwrite="", bulk_load=False, cr
 
 
 @shared_task
-def package_load_complete(*args, msg=None):
-    if msg is None:
-        msg = _("Resources have completed loading.")
+def package_load_complete(*args, **kwargs):
+    valid_resource_paths = kwargs.get('valid_resource_paths')
+
+    msg = _("Resources have completed loading.")
     notifytype_name = "Package Load Complete"
     user = User.objects.get(id=1)
     context = dict(
         greeting=_("Hello,\nYour package has successfully loaded into your Arches project."),
+        loaded_resources=[
+            os.path.basename(os.path.normpath(resource_path))
+            for resource_path in valid_resource_paths
+        ],
         link="",
         link_text=_("Log me in"),
         closing=_("Thank you"),
