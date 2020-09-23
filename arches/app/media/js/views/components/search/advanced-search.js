@@ -15,12 +15,21 @@ define([
                 var self = this;
                 options.name = 'Advanced Search Filter';
                 BaseFilter.prototype.initialize.call(this, options);
+                this.tagId = "Advanced Search";
                 this.searchableGraphs = ko.observableArray();
                 this.datatypelookup = {};
                 this.facetFilterText = ko.observable('');
                 this.filter = {
                     facets: ko.observableArray()
                 };
+                this.cardNameDict = {};
+                var createLookup = function(list, idKey) {
+                    return _.reduce(list, function(lookup, item) {
+                        lookup[item[idKey]] = item;
+                        return lookup;
+                    }, {});
+                };
+                self.widgetLookup = null;
 
                 $.ajax({
                     type: "GET",
@@ -31,11 +40,25 @@ define([
                     _.each(response.datatypes, function(datatype) {
                         this.datatypelookup[datatype.datatype] = datatype;
                     }, this);
+                    self.widgetLookup = createLookup(
+                        response.cardwidgets,
+                        'node_id'
+                    );
                     _.each(response.cards, function(card) {
+                        self.cardNameDict[card.nodegroup_id] = card.name;
                         card.nodes = _.filter(response.nodes, function(node) {
                             return node.nodegroup_id === card.nodegroup_id;
                         });
                         card.addFacet = function() {
+                            _.each(card.nodes, function(node) {
+                                if (self.cardNameDict[node.nodegroup_id] && node.nodeid === node.nodegroup_id) {
+                                    node.label = self.cardNameDict[node.nodegroup_id];
+                                } else if (node.nodeid !== node.nodegroup_id) {
+                                    node.label = self.widgetLookup[node.nodeid].label;
+                                } else {
+                                    node.label = node.name;
+                                }
+                            });
                             self.newFacet(card);
                         };
                     }, this);
@@ -92,8 +115,13 @@ define([
                         advanced.push(value);
                     });
                     queryObj[componentName] = JSON.stringify(advanced);
+
+                    if (this.getFilter('term-filter').hasTag(this.tagId) === false) {
+                        this.getFilter('term-filter').addTag(this.tagId, this.name, ko.observable(false));
+                    }
                 } else {
                     delete queryObj[componentName];
+                    this.getFilter('term-filter').removeTag(this.tagId);
                 }
                 this.query(queryObj);
             },
@@ -115,6 +143,10 @@ define([
                 var query = this.query();
                 if (componentName in query) {
                     var facets = JSON.parse(query[componentName]);
+
+                    if (facets.length > 0) {
+                        this.getFilter('term-filter').addTag("Advanced Search", this.name, ko.observable(false));    
+                    }
                     _.each(facets, function(facet) {
                         var nodeIds = _.filter(Object.keys(facet), function(key) {
                             return key !== 'op';
@@ -137,6 +169,10 @@ define([
                         }
                     }, this);
                 }
+            },
+
+            clear: function() {
+                this.filter.facets.removeAll();
             }
         }),
         template: { require: 'text!templates/views/components/search/advanced-search.htm' }
