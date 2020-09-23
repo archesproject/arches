@@ -24,16 +24,16 @@ define([
                 this.report = null;
                 this.ready = ko.observable(false);
 
-                if (this.requiredFiltersLoaded() === false) {
-                    this.requiredFiltersLoaded.subscribe(function() {
-                        options.searchResultsVm = this.getFilter('search-results');
-                        options.searchResultsVm.details = this;
-                        options.filters[componentName](this);
-                    }, this);
-                } else {
+                var setSearchResults = function(){
                     options.searchResultsVm = this.getFilter('search-results');
                     options.searchResultsVm.details = this;
-                    options.filters[componentName](this);
+                    options.filters[componentName](this);           
+                };
+
+                if (this.requiredFiltersLoaded() === false) {
+                    this.requiredFiltersLoaded.subscribe(setSearchResults, this);
+                } else {
+                    setSearchResults();
                 }
 
                 var query = this.query();

@@ -16,18 +16,17 @@ define(['knockout',
                 // before we can load the realated-resources-filter
                 // because we need to pass the entire rsearch results filter into the 
                 // related resources filter
-                if (this.requiredFiltersLoaded() === false) {
-                    this.requiredFiltersLoaded.subscribe(function() {
-                        options.searchResultsVm = this.getFilter('search-results');
-                        options.searchResultsVm.relatedResourcesManager = this;
-                        options.filters[componentName](this);
-                        this.ready(true);
-                    }, this);
-                } else {
+                var setSearchResults = function(){
                     options.searchResultsVm = this.getFilter('search-results');
                     options.searchResultsVm.relatedResourcesManager = this;
                     options.filters[componentName](this);
                     this.ready(true);
+                };
+
+                if (this.requiredFiltersLoaded() === false) {
+                    this.requiredFiltersLoaded.subscribe(setSearchResults, this);
+                } else {
+                    setSearchResults();
                 }
             }
         }),
