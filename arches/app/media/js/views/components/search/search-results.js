@@ -23,7 +23,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
 
             initialize: function(options) {
                 options.name = 'Search Results';
-                this.requiredFilters = ['map-filter', 'search-result-details', 'related-resources-filter'];
+                this.requiredFilters = ['map-filter', 'related-resources-filter'];
                 BaseFilter.prototype.initialize.call(this, options);
                 this.results = ko.observableArray();
                 this.showRelationships = ko.observable();
@@ -43,12 +43,10 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 if (this.requiredFiltersLoaded() === false) {
                     this.requiredFiltersLoaded.subscribe(function(){
                         this.mapFilter = this.getFilter('map-filter');
-                        this.details = this.getFilter('search-result-details');
                         this.relatedResourcesManager = this.getFilter('related-resources-filter');
                     }, this);
                 } else {
                     this.mapFilter = this.getFilter('map-filter');
-                    this.details = this.getFilter('search-result-details');
                     this.relatedResourcesManager = this.getFilter('related-resources-filter');
                 }
                 this.selectedTab.subscribe(function(tab){

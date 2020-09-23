@@ -27,10 +27,12 @@ define([
                 if (this.requiredFiltersLoaded() === false) {
                     this.requiredFiltersLoaded.subscribe(function() {
                         options.searchResultsVm = this.getFilter('search-results');
+                        options.searchResultsVm.details = this;
                         options.filters[componentName](this);
                     }, this);
                 } else {
                     options.searchResultsVm = this.getFilter('search-results');
+                    options.searchResultsVm.details = this;
                     options.filters[componentName](this);
                 }
 
