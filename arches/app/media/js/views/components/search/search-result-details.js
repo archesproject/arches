@@ -25,7 +25,7 @@ define([
                 this.ready = ko.observable(false);
 
                 if (this.requiredFiltersLoaded() === false) {
-                    this.requiredFiltersLoaded.subscribe(function(loaded) {
+                    this.requiredFiltersLoaded.subscribe(function() {
                         options.searchResultsVm = this.getFilter('search-results');
                         options.filters[componentName](this);
                     }, this);
