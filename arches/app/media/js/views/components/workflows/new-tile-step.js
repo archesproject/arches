@@ -28,7 +28,7 @@ define([
             }
         }
 
-        var url = arches.urls.api_card + (ko.unwrap(this.resourceId) || ko.unwrap(params.graphid));
+        this.url = arches.urls.api_card + (ko.unwrap(this.resourceId) || ko.unwrap(params.graphid));
         this.card = ko.observable();
         this.tile = ko.observable();
         this.loading = params.loading || ko.observable(false);
@@ -53,8 +53,7 @@ define([
         self.topCards = [];
 
         this.getJSON = function() {
-            var url = arches.urls.api_card + this.seedCardGraphId();
-            $.getJSON(url, function(data) {
+            $.getJSON(self.url, function(data) {
                 var handlers = {
                     'after-update': [],
                     'tile-reset': []
