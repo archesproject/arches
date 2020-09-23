@@ -7,6 +7,7 @@ define(['knockout',
         viewModel: BaseFilter.extend ({
             initialize: function(options) {
                 options.name = 'Related Resources Filter';
+                this.requiredFilters = ['search-results'];
                 BaseFilter.prototype.initialize.call(this, options);
                 this.ready = ko.observable(false);
                 this.options = options;
@@ -15,14 +16,19 @@ define(['knockout',
                 // before we can load the realated-resources-filter
                 // because we need to pass the entire rsearch results filter into the 
                 // related resources filter
-                var loaded = ko.computed(function(){
-                    return this.getFilter('search-results');
-                }, this);
-                loaded.subscribe(function(loaded) {
+                if (this.requiredFiltersLoaded() === false) {
+                    this.requiredFiltersLoaded.subscribe(function() {
+                        options.searchResultsVm = this.getFilter('search-results');
+                        options.searchResultsVm.relatedResourcesManager = this;
+                        options.filters[componentName](this);
+                        this.ready(true);
+                    }, this);
+                } else {
                     options.searchResultsVm = this.getFilter('search-results');
+                    options.searchResultsVm.relatedResourcesManager = this;
                     options.filters[componentName](this);
                     this.ready(true);
-                }, this);
+                }
             }
         }),
         template: { require: 'text!templates/views/components/search/related-resources-filter.htm'}
