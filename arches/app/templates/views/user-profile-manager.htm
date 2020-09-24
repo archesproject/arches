@@ -61,7 +61,7 @@
                                         <div class="col-sm-7">
                                             <h4 class="text-main">{% trans 'Password' %}</h4>
                                             <p class="profile-label-shim">********</p>
-                                            <button class="btn btn-default btn-active-success btn-profile-password add-popover" data-bind='click: toggleChangePasswordForm' aria-label="Change password">
+                                            <button class="btn btn-default btn-active-success btn-profile-password add-popover" data-bind="click: function() { toggleChangePasswordForm(); document.getElementById('old_password').focus(); }" aria-label="Change password">
                                             {% trans 'Change password' %}</button>
                                             <div class="password-success" data-bind="text:changePasswordSuccess"></div>
                                             <div class="change-password-form bottom fade in popover" data-bind='visible: showChangePasswordForm()'>
