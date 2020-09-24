@@ -81,7 +81,7 @@ class LabelBasedGraphTests(TestCase):
             mock_label_based_graph.from_tile.side_effect = deepcopy(child_name_graphs)
 
             self.assertEqual(
-                LabelBasedGraph.from_resource(resource=test_resource, hide_empty_nodes=True), 
+                LabelBasedGraph.from_resource(resource=test_resource, hide_empty_nodes=True),
                 dict(ChainMap(*child_name_graphs)),  # combines list of dicts into single dict
             )
 
