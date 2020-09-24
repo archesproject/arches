@@ -136,10 +136,13 @@ class LabelBasedGraph(object):
             if associated_tile == tile or associated_tile.parenttile == tile:
                 # `get_display_value` varies between datatypes,
                 #  so let's handle errors here instead of nullguarding all models
-                try:
-                    display_value = datatype.get_display_value(tile=associated_tile, node=node)
-                except:
-                    display_value = None
+                display_value = None
+
+                if tile.data:
+                    try:
+                        display_value = datatype.get_display_value(tile=associated_tile, node=node)
+                    except:
+                        pass
 
                 label_based_node_data = {
                     NODE_ID_KEY: str(node.pk),

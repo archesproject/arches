@@ -45,13 +45,13 @@ class LabelBasedGraphTests(TestCase):
     def test_is_node_empty_with_empty_node(self):
         self.assertTrue(LabelBasedGraph.is_node_empty(self.node_2))  # empty node
 
-    @mock.patch.object(LabelBasedGraph, "_generate_node_tile_reference", side_effect=None)
+    @mock.patch.object(LabelBasedGraph, "generate_node_tile_reference", side_effect=None)
     @mock.patch.object(LabelBasedGraph, "_build_graph", side_effect=None)
-    def test_from_tile(self, mock__build_graph, mock__generate_node_tile_reference):
+    def test_from_tile(self, mock__build_graph, mock_generate_node_tile_reference):
         with mock.patch("arches.app.utils.label_based_graph.models.Node", return_value=None):
             LabelBasedGraph.from_tile(tile=mock.Mock(nodegroup_id=1))
 
-            mock__generate_node_tile_reference.assert_called_once()
+            mock_generate_node_tile_reference.assert_called_once()
             mock__build_graph.assert_called_once()
 
     @mock.patch.object(LabelBasedGraph, "_build_graph", side_effect=None)
@@ -61,16 +61,13 @@ class LabelBasedGraphTests(TestCase):
 
             mock__build_graph.assert_called_once()
 
-    @mock.patch.object(LabelBasedGraph, "_generate_node_tile_reference", side_effect=None)
-    def test_from_resource(self, mock__generate_node_tile_reference):
+    @mock.patch.object(LabelBasedGraph, "generate_node_tile_reference", side_effect=None)
+    def test_from_resource(self, mock_generate_node_tile_reference):
         test_resource = mock.Mock(
             load_tiles=mock.Mock(),
             tiles=[
                 mock.Mock(wraps=Tile(nodegroup_id=1), data={"mock_node_1": None}),
                 mock.Mock(wraps=Tile(nodegroup_id=2), data={"mock_node_2": None}),
-                mock.Mock(
-                    wraps=Tile(nodegroup_id=2), data={"mock_node_3": None},  # tests that idential root tiles only have graph built once
-                ),
             ],
         )
 
@@ -84,7 +81,8 @@ class LabelBasedGraphTests(TestCase):
             mock_label_based_graph.from_tile.side_effect = deepcopy(child_name_graphs)
 
             self.assertEqual(
-                LabelBasedGraph.from_resource(test_resource), dict(ChainMap(*child_name_graphs)),  # combines list of dicts into single dict
+                LabelBasedGraph.from_resource(resource=test_resource, hide_empty_nodes=True), 
+                dict(ChainMap(*child_name_graphs)),  # combines list of dicts into single dict
             )
 
             self.assertEqual(mock_label_based_graph.from_tile.call_count, 2)
