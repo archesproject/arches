@@ -41,13 +41,12 @@ class NotificationView(View):
                     ):
                         notif = userxnotif.__dict__
                         notif["message"] = userxnotif.notif.message
-                        try:
-                            notif["link"] = userxnotif.notif.context["link"]
-                            notif['loaded_resources'] = userxnotif.notif.context["loaded_resources"]
-                        except TypeError:
-                            logger = logging.getLogger(__name__)
-                            logger.warn("Unable to access Notification.context: Does Not Exist. Badly formed Notification.")
                         notif["created"] = userxnotif.notif.created
+
+                        if userxnotif.notif.context:
+                            notif['loaded_resources'] = userxnotif.notif.context.get("loaded_resources", [])
+                            notif["link"] = userxnotif.notif.context.get("link")
+                            
                         notif_dict_list.append(notif)
 
                 return JSONResponse({"success": True, "notifications": notif_dict_list}, status=200)
