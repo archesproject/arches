@@ -44,9 +44,9 @@ class NotificationView(View):
                         notif["created"] = userxnotif.notif.created
 
                         if userxnotif.notif.context:
-                            notif['loaded_resources'] = userxnotif.notif.context.get("loaded_resources", [])
+                            notif["loaded_resources"] = userxnotif.notif.context.get("loaded_resources", [])
                             notif["link"] = userxnotif.notif.context.get("link")
-                            
+
                         notif_dict_list.append(notif)
 
                 return JSONResponse({"success": True, "notifications": notif_dict_list}, status=200)
