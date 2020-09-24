@@ -1,6 +1,10 @@
 import json, urllib
 from django.urls import reverse
 from arches.app.models import models
+from django.utils.translation import ugettext as _
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class BaseDataType(object):
@@ -170,9 +174,14 @@ class BaseDataType(object):
             provisionaledits = tile["provisionaledits"]
         if data is not None and len(list(data.keys())) > 0:
             return data
-        elif provisionaledits is not None and len(list(provisionaledits.keys())) == 1:
+        elif provisionaledits is not None and len(list(provisionaledits.keys())) > 0:
+            if len(list(provisionaledits.keys())) > 1:
+                logger.warning(_("Multiple provisional edits. Returning first edit"))
             userid = list(provisionaledits.keys())[0]
             return provisionaledits[userid]["value"]
+        else:
+            logger.exception(_("Tile has no authoritative or provisional data"))
+
 
     def get_display_value(self, tile, node):
         """

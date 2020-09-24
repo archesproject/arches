@@ -68,17 +68,21 @@ def export_search_results(self, userid, request_values, format):
     files, export_info = exporter.export(format)
     exportid = exporter.write_export_zipfile(files, export_info)
 
-    context = dict(
-        greeting=_("Hello,\nYour request to download a set of search results is now ready."),
-        link=exportid,
-        button_text=_("Download Now"),
-        closing=_("Thank you"),
-        email=email,
-        name=export_name,
-    )
-    response = {"taskid": self.request.id, "msg": export_name, "notiftype_name": "Search Export Download Ready", "context": context}
-
-    return response
+    return {
+        "taskid": self.request.id,
+        "msg": _(
+            "Your search {} is ready for download. You have 24 hours to access this file, after which we'll automatically remove it."
+        ).format(export_name),
+        "notiftype_name": "Search Export Download Ready",
+        "context": dict(
+            greeting=_("Hello,\nYour request to download a set of search results is now ready."),
+            link=exportid,
+            button_text=_("Download Now"),
+            closing=_("Thank you"),
+            email=email,
+            name=export_name,
+        ),
+    }
 
 
 @shared_task(bind=True)
@@ -97,13 +101,15 @@ def import_business_data(self, data_source="", overwrite="", bulk_load=False, cr
 
 
 @shared_task
-def package_load_complete(*args, msg=None):
-    if msg is None:
-        msg = _("Resources have completed loading.")
+def package_load_complete(*args, **kwargs):
+    valid_resource_paths = kwargs.get("valid_resource_paths")
+
+    msg = _("Resources have completed loading.")
     notifytype_name = "Package Load Complete"
     user = User.objects.get(id=1)
     context = dict(
         greeting=_("Hello,\nYour package has successfully loaded into your Arches project."),
+        loaded_resources=[os.path.basename(os.path.normpath(resource_path)) for resource_path in valid_resource_paths],
         link="",
         link_text=_("Log me in"),
         closing=_("Thank you"),
