@@ -1,8 +1,9 @@
 define([
+    'jquery',
     'arches',
     'knockout',
     'moment',
-], function(arches, ko, moment) {
+], function($, arches, ko, moment) {
 
     /** 
      * A generic component for displaying notifications
@@ -16,7 +17,7 @@ define([
 
         this.displaytime = moment(params.created).format('dddd, DD MMMM YYYY | hh:mm A');
         this.id = params.id;
-        this.loaded_resources = params.loaded_resources;
+        this.loadedResources = params.loaded_resources;
         this.link = params.link;
         this.message = params.message;
 
@@ -27,7 +28,7 @@ define([
                 data: {"dismissals": JSON.stringify([self.id])},
             }).done(function(data) {
                 if (parent) {
-                    item = parent.items().find(
+                    var item = parent.items().find(
                         function(item) { return item.id === self.id; }
                     );
                     parent.items.remove(item);
