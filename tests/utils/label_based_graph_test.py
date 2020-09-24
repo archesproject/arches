@@ -11,15 +11,15 @@ class LabelBasedGraphTests(TestCase):
     node_1 = LabelBasedNode(
         name='name',
         value={
-            VALUE_KEY: 'value',
-        },
+            VALUE_KEY: 'value'
+        }
     )
 
     node_2 = LabelBasedNode(
         name='name',
         value={
-            VALUE_KEY: None,
-        },
+            VALUE_KEY: None
+        }
     )
 
     def test_add_node_no_previous_values(self):
@@ -27,29 +27,29 @@ class LabelBasedGraphTests(TestCase):
 
         LabelBasedGraph.add_node(
             graph=graph,
-            node=self.node_1,
-        ),
+            node=self.node_1
+        )
 
         self.assertEqual(
             graph,
-            {self.node_1.name: self.node_1.value},
+            {self.node_1.name: self.node_1.value}
         )
 
     def test_add_node_previous_value_list(self):
         graph = {
-            self.node_1.name: [self.node_1.value],
+            self.node_1.name: [self.node_1.value]
         }
 
         LabelBasedGraph.add_node(
             graph=graph,
-            node=self.node_2,
+            node=self.node_2
         ),
 
         self.assertEqual(
             graph,
             {
                 self.node_1.name: [self.node_1.value, self.node_2.value]
-            },
+            }
         )
 
     def test_add_node_previous_value_other_types(self):
@@ -59,14 +59,14 @@ class LabelBasedGraphTests(TestCase):
 
         LabelBasedGraph.add_node(
             graph=graph,
-            node=self.node_2,
-        ),
+            node=self.node_2
+        )
 
         self.assertEqual(
             graph,
             {
                 self.node_1.name: [self.node_1.value, self.node_2.value]
-            },
+            }
         )
 
     def test_is_node_empty(self):
@@ -84,7 +84,7 @@ class LabelBasedGraphTests(TestCase):
     def test_from_tile(self, mock__build_graph, mock__generate_node_tile_reference):
         with mock.patch('arches.app.utils.label_based_graph.models.Node', return_value = None):
                 LabelBasedGraph.from_tile(
-                    tile=mock.Mock(nodegroup_id=1),
+                    tile=mock.Mock(nodegroup_id=1)
                 )
 
                 mock__generate_node_tile_reference.assert_called_once()
@@ -109,28 +109,28 @@ class LabelBasedGraphTests(TestCase):
                     wraps=Tile(nodegroup_id=1),
                     data={
                         'mock_node_1': None,
-                    },
+                    }
                 ),
                 mock.Mock(
                     wraps=Tile(nodegroup_id=2),
                     data={
                         'mock_node_2': None,
-                    },
+                    }
                 ),
                 mock.Mock(
                     wraps=Tile(nodegroup_id=2),  # tests that idential root tiles only have graph built once
                     data={
                         'mock_node_3': None,
-                    },
-                ),
-            ],
+                    }
+                )
+            ]
         )
 
         # always mock the RELATIVE path
         with mock.patch('arches.app.utils.label_based_graph.LabelBasedGraph', wraps=LabelBasedGraph) as mock_label_based_graph:
             child_name_graphs = [
                 {'label_graph_1_name': 'label_graph_1'}, 
-                {'label_graph_2_name': 'label_graph_2'},
+                {'label_graph_2_name': 'label_graph_2'}
             ]
 
             mock_label_based_graph.from_tile.side_effect = deepcopy(child_name_graphs)
@@ -156,18 +156,18 @@ class LabelBasedGraph_BuildGraphTests(TestCase):
 
         cls.grouping_node = models.Node(
             datatype='semantic',
-            name="Test Node Grouping",
+            name="Test Node Grouping"
         )
 
         cls.string_node = models.Node(
             datatype='string',
-            name="Test Node",
+            name="Test Node"
         )
 
         cls.test_tile = models.TileModel(
             data={
                 str(cls.string_node.pk): 'value',
-            },
+            }
         )
 
     def test_handles_node_with_single_value(self):
@@ -204,14 +204,15 @@ class LabelBasedGraph_BuildGraphTests(TestCase):
                 parent_tree={},
                 tile_reference={
                     string_node_id: [parent_tile, self.test_tile],
-                },
+                }
             ),
             {
                 self.string_node.name: [
                     {
                         NODE_ID_KEY: string_node_id,
                         VALUE_KEY: parent_tile.data[string_node_id],
-                    }, {
+                    }, 
+                    {
                         NODE_ID_KEY: string_node_id,
                         VALUE_KEY: self.test_tile.data[string_node_id],
                     }
@@ -248,7 +249,7 @@ class LabelBasedGraph_BuildGraphTests(TestCase):
                 node=self.grouping_node,
                 tile=self.test_tile,
                 parent_tree={},
-                tile_reference={},
+                tile_reference={}
             ),
             {
                 self.grouping_node.name: {
@@ -282,7 +283,7 @@ class LabelBasedGraph_BuildGraphTests(TestCase):
                 node=self.grouping_node,
                 tile=self.test_tile,
                 parent_tree={},
-                tile_reference={},
+                tile_reference={}
             ),
             {
                 self.grouping_node.name: {
@@ -296,6 +297,6 @@ class LabelBasedGraph_BuildGraphTests(TestCase):
                             VALUE_KEY: self.test_tile.data[str(self.string_node.pk)]
                         },
                     }
-                },
-            },
+                }
+            }
         )

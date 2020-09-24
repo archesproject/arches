@@ -44,6 +44,7 @@ from arches.app.utils.decorators import (
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
+from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.permission_backend import (
     user_can_read_resource,
     user_can_edit_resource,
@@ -551,7 +552,10 @@ class Resources(APIBase):
 
                     if request.GET.get("foo"):
                         indent = 4
-                        out = resource.generate_name_based_graph()
+                        out = LabelBasedGraph.from_resource(
+                            resource=resource,
+                            hide_empty_nodes=True,
+                        )
 
                     elif disambiguate:
                         if not include_tiles:

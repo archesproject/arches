@@ -62,7 +62,7 @@ class LabelBasedGraph(object):
         return node_empty
 
     @classmethod
-    def from_tile(cls, tile, node_tile_reference=None):
+    def from_tile(cls, tile, node_tile_reference=None, hide_empty_nodes=False):
         """
         Generates a label-based graph from a given tile
         """
@@ -78,10 +78,11 @@ class LabelBasedGraph(object):
             tile=tile,
             parent_tree={},
             tile_reference=node_tile_reference,
+            include_empty_nodes=bool(not hide_empty_nodes),
         )
 
     @classmethod
-    def from_resource(cls, resource):
+    def from_resource(cls, resource, hide_empty_nodes):
         """
         Generates a label-based graph from a given resource
         """
@@ -102,6 +103,7 @@ class LabelBasedGraph(object):
                 label_based_graph = LabelBasedGraph.from_tile(
                     tile=root_tile,
                     node_tile_reference=node_tile_reference,
+                    hide_empty_nodes=hide_empty_nodes,
                 )
 
                 if label_based_graph:
@@ -178,6 +180,7 @@ class LabelBasedGraph(object):
                         tile=associated_tile, 
                         parent_tree=label_based_node_data, 
                         tile_reference=tile_reference,
+                        include_empty_nodes=include_empty_nodes,
                     )
 
         root_node = LabelBasedNode(
