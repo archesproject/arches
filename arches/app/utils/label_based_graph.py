@@ -105,18 +105,11 @@ class LabelBasedGraph(object):
         for tile in resource.tiles:
             root_tile = tile.get_root_tile()
 
-<<<<<<< HEAD
             label_based_graph = LabelBasedGraph.from_tile(
                 tile=root_tile, 
                 node_tile_reference=node_tile_reference,
                 hide_empty_nodes=hide_empty_nodes,
             )
-=======
-            if not root_nodes.get(str(root_tile.nodegroup_id)):
-                label_based_graph = LabelBasedGraph.from_tile(
-                    tile=root_tile, node_tile_reference=node_tile_reference, hide_empty_nodes=hide_empty_nodes,
-                )
->>>>>>> 70e6df95f3c43fcfaf707dc95f02688756bc0d2b
 
             if label_based_graph:
                 current_root_nodes = root_nodes.get(str(root_tile.nodegroup_id), [])
