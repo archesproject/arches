@@ -117,7 +117,7 @@ class LabelBasedGraph_BuildGraphTests(TestCase):
 
         self.assertEqual(
             self.test_LabelBasedGraph._build_graph(
-                node=self.string_node, tile=parent_tile, parent_tree={}, tile_reference={string_node_id: [parent_tile, self.test_tile],},
+                node=self.string_node, tile=parent_tile, parent_tree={}, tile_reference={string_node_id: [parent_tile, self.test_tile]},
             ),
             {
                 self.string_node.name: [
