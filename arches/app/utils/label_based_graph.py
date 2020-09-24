@@ -105,21 +105,23 @@ class LabelBasedGraph(object):
         for tile in resource.tiles:
             root_tile = tile.get_root_tile()
 
-            if not root_nodes.get(str(root_tile.nodegroup_id)):
-                label_based_graph = LabelBasedGraph.from_tile(
-                    tile=root_tile, 
-                    node_tile_reference=node_tile_reference,
-                    hide_empty_nodes=hide_empty_nodes,
-                )
+            label_based_graph = LabelBasedGraph.from_tile(
+                tile=root_tile, 
+                node_tile_reference=node_tile_reference,
+                hide_empty_nodes=hide_empty_nodes,
+            )
 
-                if label_based_graph:
-                    root_nodes[str(root_tile.nodegroup_id)] = label_based_graph
+            if label_based_graph:
+                current_root_nodes = root_nodes.get(str(root_tile.nodegroup_id), [])
+                current_root_nodes.append(label_based_graph)
+                root_nodes[str(root_tile.nodegroup_id)] = current_root_nodes
 
         root_graph = {}
 
-        for label_based_graph in root_nodes.values():
-            root_node_name, graph = label_based_graph.popitem()
-            LabelBasedGraph.add_node(graph=root_graph, node=LabelBasedNode(name=root_node_name, value=graph))
+        for root_node_list in root_nodes.values():
+            for root_node in root_node_list:
+                root_node_name, graph = root_node.popitem()
+                LabelBasedGraph.add_node(graph=root_graph, node=LabelBasedNode(name=root_node_name, value=graph))
 
         return root_graph
 
