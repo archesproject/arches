@@ -82,10 +82,10 @@ class LabelBasedGraph(object):
             node_tile_reference = cls.generate_node_tile_reference(resource=resource.Resource(tile.resourceinstance))
 
         return cls._build_graph(
-            self=cls, 
-            node=models.Node.objects.get(pk=tile.nodegroup_id), 
+            self=cls,
+            node=models.Node.objects.get(pk=tile.nodegroup_id),
             tile=tile,
-            parent_tree={}, 
+            parent_tree={},
             tile_reference=node_tile_reference,
             include_empty_nodes=bool(not hide_empty_nodes),
         )
@@ -105,11 +105,18 @@ class LabelBasedGraph(object):
         for tile in resource.tiles:
             root_tile = tile.get_root_tile()
 
+<<<<<<< HEAD
             label_based_graph = LabelBasedGraph.from_tile(
                 tile=root_tile, 
                 node_tile_reference=node_tile_reference,
                 hide_empty_nodes=hide_empty_nodes,
             )
+=======
+            if not root_nodes.get(str(root_tile.nodegroup_id)):
+                label_based_graph = LabelBasedGraph.from_tile(
+                    tile=root_tile, node_tile_reference=node_tile_reference, hide_empty_nodes=hide_empty_nodes,
+                )
+>>>>>>> 70e6df95f3c43fcfaf707dc95f02688756bc0d2b
 
             if label_based_graph:
                 current_root_nodes = root_nodes.get(str(root_tile.nodegroup_id), [])
@@ -155,10 +162,10 @@ class LabelBasedGraph(object):
 
                 for child_node in direct_child_nodes:
                     self._build_graph(
-                        self=self, 
-                        node=child_node, 
-                        tile=associated_tile, 
-                        parent_tree=label_based_node_data, 
+                        self=self,
+                        node=child_node,
+                        tile=associated_tile,
+                        parent_tree=label_based_node_data,
                         tile_reference=tile_reference,
                         include_empty_nodes=include_empty_nodes,
                     )
