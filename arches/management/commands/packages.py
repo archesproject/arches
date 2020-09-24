@@ -653,18 +653,16 @@ class Command(BaseCommand):
                 from celery import chord
                 from arches.app.tasks import import_business_data, package_load_complete, on_chord_error
 
-                valid_resource_paths = [ 
-                    path for path in business_data
+                valid_resource_paths = [
+                    path
+                    for path in business_data
                     if (".csv" in path and os.path.exists(path.replace(".csv", ".mapping"))) or (".json" in path)
                 ]
 
                 # assumes resources in csv do not depend on data being loaded prior from json in same dir
-                chord(
-                    [
-                        import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load)
-                        for path in valid_resource_paths
-                    ]
-                )(package_load_complete.signature(kwargs={'valid_resource_paths': valid_resource_paths}).on_error(on_chord_error.s()))
+                chord([import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load) for path in valid_resource_paths])(
+                    package_load_complete.signature(kwargs={"valid_resource_paths": valid_resource_paths}).on_error(on_chord_error.s())
+                )
             else:
                 for path in business_data:
                     if path not in erring_csvs:
