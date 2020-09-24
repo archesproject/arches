@@ -188,7 +188,7 @@ class BaseDataType(object):
         Returns a list of concept values for a given node
         """
         data = self.get_tile_data(tile)
-        
+
         if data:
             display_value = data.get(str(node.nodeid))
 

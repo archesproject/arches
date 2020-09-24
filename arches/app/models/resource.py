@@ -35,7 +35,7 @@ from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.mappings import TERMS_INDEX, RESOURCE_RELATIONS_INDEX, RESOURCES_INDEX
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
-from arches.app.utils import import_class_from_string
+from arches.app.utils import import_class_from_string, label_based_graph
 from guardian.shortcuts import assign_perm, remove_perm
 from guardian.exceptions import NotUserNorGroup
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -495,6 +495,12 @@ class Resource(models.ResourceInstance):
         ret["tiles"] = self.tiles
 
         return JSONSerializer().serializeToPython(ret)
+
+    def generate_name_based_graph(self):
+        """
+        Generates a name-based hierarchical JSON graph of simplified node data
+        """
+        return label_based_graph.LabelBasedGraph.from_resource(self)
 
     def get_node_values(self, node_name):
         """

@@ -486,7 +486,6 @@ class Node(models.Model):
             edges.extend(child_edges)
         return (nodes, edges)
 
-
     def get_direct_child_nodes(self):
         """
         gets all child nodes exactly one level lower in graph
@@ -501,12 +500,9 @@ class Node(models.Model):
             for grandchild_node in child_node.get_child_nodes_and_edges()[0]:
                 if not grandchild_nodes.get(str(grandchild_node.pk)):
                     grandchild_nodes[str(grandchild_node.pk)] = grandchild_node
-        
-        # if node is in grandchild_nodes it cannot be a direct child
-        return list(
-            child_node for child_node in child_nodes if not grandchild_nodes.get(str(child_node.pk))
-        )
 
+        # if node is in grandchild_nodes it cannot be a direct child
+        return list(child_node for child_node in child_nodes if not grandchild_nodes.get(str(child_node.pk)))
 
     @property
     def is_collector(self):
@@ -858,7 +854,7 @@ class TileModel(models.Model):  # Tile
 
         returns Tile
         """
-        root_tile = self 
+        root_tile = self
 
         while root_tile.parenttile:
             root_tile = root_tile.parenttile

@@ -348,7 +348,6 @@ class TileTests(ArchesTestCase):
 
         self.assertEqual(len(Tile.objects.all()), 0)
 
-
     def test_get_root_tile_with_root_tile(self):
         tile = Tile()
         parent_tile = Tile()
@@ -359,11 +358,9 @@ class TileTests(ArchesTestCase):
 
         self.assertIs(tile.get_root_tile(), root_tile)
 
-
     def test_get_root_tile_no_root_tile(self):
         tile = Tile()
         self.assertIs(tile.get_root_tile(), tile)
-
 
     def test_provisional_deletion(self):
         """
