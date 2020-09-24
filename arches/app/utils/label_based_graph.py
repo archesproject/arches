@@ -106,9 +106,7 @@ class LabelBasedGraph(object):
             root_tile = tile.get_root_tile()
 
             label_based_graph = LabelBasedGraph.from_tile(
-                tile=root_tile, 
-                node_tile_reference=node_tile_reference,
-                hide_empty_nodes=hide_empty_nodes,
+                tile=root_tile, node_tile_reference=node_tile_reference, hide_empty_nodes=hide_empty_nodes,
             )
 
             if label_based_graph:
