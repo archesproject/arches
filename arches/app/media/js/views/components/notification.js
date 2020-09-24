@@ -26,7 +26,7 @@ define([
                 type: 'POST',
                 url: arches.urls.dismiss_notifications,
                 data: {"dismissals": JSON.stringify([self.id])},
-            }).done(function(data) {
+            }).done(function() {
                 if (parent) {
                     var item = parent.items().find(
                         function(item) { return item.id === self.id; }
