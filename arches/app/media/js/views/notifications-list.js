@@ -35,7 +35,6 @@ define([
                 }).done(function(data) {
                     self.items(data.notifications);
                     self.helploading(false);
-                    console.log(self.items())
                 });
             };
 
