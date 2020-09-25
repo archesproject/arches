@@ -95,6 +95,8 @@ RESOURCE_FORMATTERS = {
     "trix": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
 }
 
+REPORT_HIDE_EMPTY_NODES = False
+
 # Set the ontolgoy namespace prefixes to use in the UI, set the namespace to '' omit a prefix
 # Users can also override existing namespaces as well if you like
 ONTOLOGY_NAMESPACES = {
