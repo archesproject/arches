@@ -41,7 +41,7 @@ require([
             });
 
             this.viewModel.reportLookup = reportLookup;
-            this.viewModel.report = new ReportModel(_.extend(data, {graphModel: graphModel, cards: cards, hideEmptyNodes: hideEmptyNodes}));
+            this.viewModel.report = new ReportModel(_.extend(data, {graphModel: graphModel, cards: cards, hideEmptyNodes: data.hideEmptyNodes}));
             this.viewModel.graph = data.graph;
 
             var createLookup = function(list, idKey) {
