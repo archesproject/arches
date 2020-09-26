@@ -105,23 +105,24 @@ class LabelBasedGraph(object):
         for tile in resource.tiles:
             root_tile = tile.get_root_tile()
 
-            label_based_graph = LabelBasedGraph.from_tile(
-                tile=root_tile, node_tile_reference=node_tile_reference, hide_empty_nodes=hide_empty_nodes,
-            )
+            # significant time reduction gained by only creating graphs for `root_tile`s with data
+            if root_tile.data:
+                label_based_graph = LabelBasedGraph.from_tile(
+                    tile=root_tile, node_tile_reference=node_tile_reference, hide_empty_nodes=hide_empty_nodes,
+                )
 
-            if label_based_graph:
-                current_root_nodes = root_nodes.get(str(root_tile.nodegroup_id), [])
-                current_root_nodes.append(label_based_graph)
-                root_nodes[str(root_tile.nodegroup_id)] = current_root_nodes
+                if label_based_graph:
+                    name, value = label_based_graph.popitem()
 
-        root_graph = {}
+                    LabelBasedGraph.add_node(
+                        graph=root_nodes, 
+                        node=LabelBasedNode(
+                            name=name, 
+                            value=value
+                        )
+                    )
 
-        for root_node_list in root_nodes.values():
-            for root_node in root_node_list:
-                root_node_name, graph = root_node.popitem()
-                LabelBasedGraph.add_node(graph=root_graph, node=LabelBasedNode(name=root_node_name, value=graph))
-
-        return root_graph
+        return root_nodes
 
     def _build_graph(self, node, tile, parent_tree, tile_reference, include_empty_nodes=True):
         datatype = self.datatype_factory.get_instance(node.datatype)
@@ -146,7 +147,7 @@ class LabelBasedGraph(object):
 
                 label_based_node_data = {
                     NODE_ID_KEY: str(node.pk),
-                    # TILE_ID_KEY: str(associated_tile.pk),
+                    TILE_ID_KEY: str(associated_tile.pk),
                     VALUE_KEY: display_value,
                 }
 
