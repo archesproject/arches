@@ -47,7 +47,7 @@ define([
                         names.push(nameLookup[val]);
                         displayName(names.join(', '));
                     } else {
-                        $.ajax(arches.urls.concept_value + '?valueid=' + val, {
+                        $.ajax(arches.urls.concept_value + '?valueid=' + ko.unwrap(val), {
                             dataType: "json"
                         }).done(function(data) {
                             nameLookup[val] = data.value;

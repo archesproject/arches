@@ -22,7 +22,35 @@ define([
                 self.widgets.push(widget);
             }
         });
-
+        var getNodeIds = function(){
+            var sourceUrl = new window.URL(arches.mapSources[self.selectRelatedSource()].data, window.location.origin);
+            var nodes = sourceUrl.searchParams.get('nodeids');
+            var node = sourceUrl.searchParams.get('nodeid');
+            var nodeids = [];
+            if (node) {
+                nodeids.push(node);
+            }
+            if (nodes) {
+                nodeids = nodeids.concat(nodes.split(','));
+            }
+            return nodeids;
+        };
+        this.nodeids = ko.observableArray(getNodeIds());
+        this.nodeDetails = ko.observableArray();
+        this.nodeids().forEach(function(nodeid) {
+            fetch(arches.urls.api_nodes(nodeid))
+              .then(response => response.json())
+              .then(data => {
+                self.nodeDetails.push(data[0]);
+              })
+              .catch((error) => {
+                console.error('Error:', error);
+              });
+        })
+        this.nodeDetails.subscribe(function(val){
+            console.log(val)
+        });
+        this.filterNodeIds = ko.observableArray(this.nodeids());
         this.relatedResourceWidgets = this.widgets.filter(function(widget){return widget.datatype.datatype === 'resource-instance' || widget.datatype.datatype === 'resource-instance-list';});
         this.showRelatedQuery = ko.observable(false);
         var resourceBounds = ko.observable();
@@ -61,7 +89,7 @@ define([
             }
             zoomToData = true;
         });
-        var selectFeatureLayers = selectFeatureLayersFactory('', selectRelatedSource, selectRelatedSourceLayer, selectedResourceIds(), true);
+        var selectFeatureLayers = selectFeatureLayersFactory('', selectRelatedSource, selectRelatedSourceLayer, selectedResourceIds(), true, null, this.filterNodeIds());
         var sources = [];
         for (var sourceName in arches.mapSources) {
             if (arches.mapSources.hasOwnProperty(sourceName)) {
@@ -72,7 +100,7 @@ define([
             var source = self.selectRelatedSource();
             var sourceLayer = self.selectRelatedSourceLayer();
             selectFeatureLayers = sources.indexOf(source) > 0 ?
-                selectFeatureLayersFactory('', source, sourceLayer, selectedResourceIds(), true) :
+                selectFeatureLayersFactory('', source, sourceLayer, selectedResourceIds(), true, null, self.filterNodeIds()) :
                 [];
             self.additionalLayers(
                 extendedLayers.concat(
@@ -83,6 +111,7 @@ define([
         selectedResourceIds.subscribe(updateResourceSelectLayers);
         this.selectRelatedSource.subscribe(updateResourceSelectLayers);
         this.selectRelatedSourceLayer.subscribe(updateResourceSelectLayers);
+        this.filterNodeIds.subscribe(updateResourceSelectLayers);
 
         params.activeTab = 'editor';
 

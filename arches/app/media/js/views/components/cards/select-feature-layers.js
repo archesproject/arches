@@ -1,6 +1,43 @@
 define([], function() {
-    return function(resourceId, source, sourceLayer, selectedResourceIds, visible, color) {
+    return function(resourceId, source, sourceLayer, selectedResourceIds, visible, color, nodeids) {
         color = color || "#F0C200";
+
+        console.log(nodeids)
+        // color = ["case", 
+        //     ["==", ["get", "nodeid"], "c7121254-46c3-11ea-b9b7-027f24e6fd6b"], "#22ff33", 
+        //     ["==", ["get", "nodeid"], "c1033fc2-46d3-11ea-b9b7-027f24e6fd6b"], "#ff44cc", 
+        //     color];
+
+
+        var createColorExpressions = function(defaultColor, colorPallet){
+            if (nodeids) {
+                var colorExpressions = ['case'];
+                nodeids.forEach(function(nodeid, i) {
+                    colorExpressions.push(['==', ['get', 'nodeid'], nodeid])
+                    if (i <= colorPallet.length) {
+                        colorExpressions.push(colorPallet[i]);
+                    } else {
+                        colorExpressions.push(colorPallet[Math.floor(Math.random() * Math.floor(colorPallet.length))]);
+                    }
+                });
+                colorExpressions.push(color)
+                return colorExpressions;
+            } else {
+                return defaultColor;
+            }
+        } 
+        
+        color = createColorExpressions(color, ["#ff44cc", "#22ff33"])
+        console.log(JSON.stringify(color));
+        console.log(color);
+
+        console.log(JSON.stringify(color));
+        var nodeFilter = ["!=", "resourceinstanceid", "x"]
+        if (nodeids) {
+            var nodeFilter = nodeids.map(id => ["==", "nodeid", id])
+            nodeFilter.splice(0, 0, 'any');
+        }
+        console.log(nodeFilter);
         var strokecolor = "#fff";
         var overviewzoom = 11;
         var minzoom = 15;
@@ -19,9 +56,10 @@ define([], function() {
             "minzoom": overviewzoom,
             "filter": ['all',[
                 "==", "$type", "Polygon"
-            ], [
-                "!=", "resourceinstanceid", resourceId
-            ]],
+                ], [
+                    "!=", "resourceinstanceid", resourceId
+                ], nodeFilter
+            ],
             "paint": {
                 "fill-color": color,
                 "fill-outline-color": color,
@@ -38,7 +76,7 @@ define([], function() {
                 "==", "$type", "Polygon"
             ], [
                 "!=", "resourceinstanceid", resourceId
-            ]],
+            ], nodeFilter],
             "layout": {
                 "line-cap": "round",
                 "line-join": "round",
@@ -56,7 +94,7 @@ define([], function() {
                 "==", "$type", "Polygon"
             ], [
                 "!=", "resourceinstanceid", resourceId
-            ]],
+            ], nodeFilter],
             "layout": {
                 "line-cap": "round",
                 "line-join": "round",
@@ -74,7 +112,7 @@ define([], function() {
                 "==", "$type", "LineString"
             ], [
                 "!=", "resourceinstanceid", resourceId
-            ]],
+            ], nodeFilter],
             "layout": {
                 "line-cap": "round",
                 "line-join": "round",
@@ -88,11 +126,10 @@ define([], function() {
             "id": "select-feature-point-point-stroke",
             "type": "circle",
             "minzoom": minzoom,
-            "filter": ['all',[
-                "==", "$type", "Point"
-            ], [
-                "!=", "resourceinstanceid", resourceId
-            ]],
+            "filter": ['all',
+                ["==", "$type", "Point"],
+                ["!=", "resourceinstanceid", resourceId]
+            ],
             "paint": {
                 "circle-radius": 6,
                 "circle-opacity": 1,
@@ -109,7 +146,7 @@ define([], function() {
                 "==", "$type", "Point"
             ], [
                 "!=", "resourceinstanceid", resourceId
-            ]],
+            ], nodeFilter],
             "paint": {
                 "circle-radius": 4,
                 "circle-color": color
