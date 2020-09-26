@@ -96,7 +96,7 @@ RESOURCE_FORMATTERS = {
 }
 
 # Hide nodes and cards in a report that have no data
-REPORT_HIDE_EMPTY_NODES = False
+HIDE_EMPTY_NODES_IN_REPORT = True
 
 # Set the ontolgoy namespace prefixes to use in the UI, set the namespace to '' omit a prefix
 # Users can also override existing namespaces as well if you like
