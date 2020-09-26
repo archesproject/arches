@@ -213,13 +213,15 @@ class Tile(models.TileModel):
 
     def check_tile_cardinality_violation(self):
         if self.nodegroup.cardinality == "1":
-            existing_tiles = list(models.TileModel.objects.filter(nodegroup=self.nodegroup, resourceinstance_id=self.resourceinstance_id).values_list('tileid', flat=True))
-            
+            existing_tiles = list(
+                models.TileModel.objects.filter(nodegroup=self.nodegroup, resourceinstance_id=self.resourceinstance_id).values_list(
+                    "tileid", flat=True
+                )
+            )
+
             # this should only ever return at most one tile
             if len(existing_tiles) > 0 and self.tileid not in existing_tiles:
-                message = _(
-                    "Trying to save a tile to a card with cardinality 1 where a tile has previously been saved."
-                )
+                message = _("Trying to save a tile to a card with cardinality 1 where a tile has previously been saved.")
                 raise TileCardinalityError(message)
 
     def check_for_constraint_violation(self):
@@ -349,7 +351,7 @@ class Tile(models.TileModel):
 
             if creating_new_tile is False:
                 existing_model = models.TileModel.objects.get(pk=self.tileid)
-            
+
             # this section moves the data over from self.data to self.provisionaledits if certain users permissions are in force
             # then self.data is restored from the previously saved tile data
             if user is not None and user_is_reviewer is False:
@@ -631,6 +633,7 @@ class TileValidationError(Exception):
 
     def __str__(self):
         return repr(self.message)
+
 
 class TileCardinalityError(TileValidationError):
     def __init__(self, message, code=None):
