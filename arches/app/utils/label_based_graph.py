@@ -1,6 +1,6 @@
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
-from arches.app.models import resource  # avoids circular import
+from arches.app.models.resource import Resource  # avoids circular import
 
 
 NODE_ID_KEY = "@node_id"
@@ -79,7 +79,7 @@ class LabelBasedGraph(object):
         Generates a label-based graph from a given tile
         """
         if not node_tile_reference:
-            node_tile_reference = cls.generate_node_tile_reference(resource=resource.Resource(tile.resourceinstance))
+            node_tile_reference = cls.generate_node_tile_reference(resource=Resource(tile.resourceinstance))
 
         return cls._build_graph(
             self=cls,
@@ -100,7 +100,7 @@ class LabelBasedGraph(object):
 
         node_tile_reference = cls.generate_node_tile_reference(resource=resource)
 
-        root_nodes = {}
+        graph = {}
 
         for tile in resource.tiles:
             root_tile = tile.get_root_tile()
@@ -115,31 +115,28 @@ class LabelBasedGraph(object):
                     name, value = label_based_graph.popitem()
 
                     LabelBasedGraph.add_node(
-                        graph=root_nodes, 
+                        graph=graph, 
                         node=LabelBasedNode(
                             name=name, 
                             value=value
                         )
                     )
 
-        return root_nodes
+        return graph
 
     def _build_graph(self, node, tile, parent_tree, tile_reference, include_empty_nodes=True):
-        datatype = self.datatype_factory.get_instance(node.datatype)
-        direct_child_nodes = node.get_direct_child_nodes()
-
         current_tree = {}
 
         # if a tile doesn't have any nodes, it should associate itself
-        associated_tiles = tile_reference.get(str(node.pk), [tile])
-
-        for associated_tile in associated_tiles:
+        for associated_tile in tile_reference.get(str(node.pk), [tile]):
             if associated_tile == tile or associated_tile.parenttile == tile:
-                # `get_display_value` varies between datatypes,
-                #  so let's handle errors here instead of nullguarding all models
                 display_value = None
 
                 if tile.data:
+                    datatype = self.datatype_factory.get_instance(node.datatype)
+
+                    # `get_display_value` varies between datatypes, 
+                    # so let's handle errors here instead of nullguarding all models
                     try:
                         display_value = datatype.get_display_value(tile=associated_tile, node=node)
                     except:
@@ -155,7 +152,7 @@ class LabelBasedGraph(object):
                     graph=current_tree, node=LabelBasedNode(name=node.name, value=label_based_node_data),
                 )
 
-                for child_node in direct_child_nodes:
+                for child_node in node.get_direct_child_nodes():
                     self._build_graph(
                         self=self,
                         node=child_node,
@@ -165,7 +162,7 @@ class LabelBasedGraph(object):
                         include_empty_nodes=include_empty_nodes,
                     )
 
-        root_node = LabelBasedNode(name=node.name, value=current_tree.get(node.name),)
+        root_node = LabelBasedNode(name=node.name, value=current_tree.get(node.name))
 
         if include_empty_nodes or not self.is_node_empty(root_node):
             self.add_node(

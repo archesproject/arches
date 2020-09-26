@@ -552,7 +552,7 @@ class Resources(APIBase):
 
                     if request.GET.get("foo"):
                         indent = 4
-                        out = LabelBasedGraph.from_resource(resource=resource, hide_empty_nodes=True)
+                        out = LabelBasedGraph.from_resource(resource=resource, hide_empty_nodes=False)
 
                     elif disambiguate:
                         if not include_tiles:
