@@ -821,7 +821,7 @@ class ResourceReportView(MapBaseManagerView):
             resourceid=resourceid,
             displayname=displayname,
             version=__version__,
-            hide_empty_nodes=settings.REPORT_HIDE_EMPTY_NODES,
+            hide_empty_nodes=settings.HIDE_EMPTY_NODES_IN_REPORT,
         )
 
         if graph.iconclass:
