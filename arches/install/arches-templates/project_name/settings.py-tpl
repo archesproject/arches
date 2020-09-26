@@ -142,6 +142,9 @@ CACHES = {
     }
 }
 
+# Hide nodes and cards in a report that have no data
+REPORT_HIDE_EMPTY_NODES = False
+
 DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d" # Custom date format for dates imported from and exported to csv
 
 #Identify the usernames and duration (seconds) for which you want to cache the time wheel
