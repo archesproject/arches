@@ -95,6 +95,7 @@ RESOURCE_FORMATTERS = {
     "trix": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
 }
 
+# Hide nodes and cards in a report that have no data
 REPORT_HIDE_EMPTY_NODES = False
 
 # Set the ontolgoy namespace prefixes to use in the UI, set the namespace to '' omit a prefix
