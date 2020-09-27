@@ -1,5 +1,3 @@
-import json
-
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.resource import Resource  # avoids circular import
