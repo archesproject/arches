@@ -146,7 +146,7 @@ class LabelBasedGraph(object):
                     value=cls._get_display_value(tile=associated_tile, node=node),
                 )
 
-                if parent_tree == None:  # if top node
+                if not parent_tree:  # if top node
                     parent_tree = label_based_node
                 elif include_empty_nodes or not cls.is_node_empty(label_based_node):
                     parent_tree.child_nodes.append(label_based_node)
