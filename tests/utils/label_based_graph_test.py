@@ -12,10 +12,7 @@ class LabelBasedNodeTests(TestCase):
     @classmethod
     def setUp(cls):
         cls.test_node = LabelBasedNode(
-            name="test_node_name",
-            node_id="test_node_node_id",
-            tile_id="test_node_tile_id",
-            value="test_node_value"
+            name="test_node_name", node_id="test_node_node_id", tile_id="test_node_tile_id", value="test_node_value"
         )
 
         cls.test_node_json_data = {
@@ -25,21 +22,13 @@ class LabelBasedNodeTests(TestCase):
         }
 
     def test_as_json_no_child_nodes(self):
-        self.assertEqual(
-            self.test_node.as_json(),
-            {
-                self.test_node.name: self.test_node_json_data
-            }
-        )
-        
+        self.assertEqual(self.test_node.as_json(), {self.test_node.name: self.test_node_json_data})
+
     def test_as_json_single_child_node(self):
         child_node = LabelBasedNode(
-            name="child_node_val",
-            node_id="child_node_node_id",
-            tile_id="child_node_tile_id",
-            value="child_node_value"
+            name="child_node_val", node_id="child_node_node_id", tile_id="child_node_tile_id", value="child_node_value"
         )
-        
+
         self.test_node.child_nodes.append(child_node)
         self.test_node_json_data[child_node.name] = {
             NODE_ID_KEY: child_node.node_id,
@@ -47,71 +36,38 @@ class LabelBasedNodeTests(TestCase):
             VALUE_KEY: child_node.value,
         }
 
-        self.assertEqual(
-            self.test_node.as_json(),
-            {
-                self.test_node.name: self.test_node_json_data
-            }
-        )
-        
+        self.assertEqual(self.test_node.as_json(), {self.test_node.name: self.test_node_json_data})
+
     def test_as_json_two_child_nodes(self):
         child_node_1 = LabelBasedNode(
-            name="child_node_val",
-            node_id="child_node_node_id",
-            tile_id="child_node_tile_id",
-            value="child_node_value"
+            name="child_node_val", node_id="child_node_node_id", tile_id="child_node_tile_id", value="child_node_value"
         )
 
         child_node_2 = LabelBasedNode(
-            name="child_node_val",
-            node_id="child_node_node_id",
-            tile_id="child_node_tile_id",
-            value="child_node_value"
+            name="child_node_val", node_id="child_node_node_id", tile_id="child_node_tile_id", value="child_node_value"
         )
 
         self.test_node.child_nodes.append(child_node_1)
         self.test_node.child_nodes.append(child_node_2)
 
         self.test_node_json_data[child_node_1.name] = [
-            {
-                NODE_ID_KEY: child_node_1.node_id,
-                TILE_ID_KEY: child_node_1.tile_id,
-                VALUE_KEY: child_node_1.value,
-            },
-            {
-                NODE_ID_KEY: child_node_2.node_id,
-                TILE_ID_KEY: child_node_2.tile_id,
-                VALUE_KEY: child_node_2.value,
-            }
+            {NODE_ID_KEY: child_node_1.node_id, TILE_ID_KEY: child_node_1.tile_id, VALUE_KEY: child_node_1.value,},
+            {NODE_ID_KEY: child_node_2.node_id, TILE_ID_KEY: child_node_2.tile_id, VALUE_KEY: child_node_2.value,},
         ]
-        
-        self.assertEqual(
-            self.test_node.as_json(),
-            {
-                self.test_node.name: self.test_node_json_data
-            }
-        )
-        
+
+        self.assertEqual(self.test_node.as_json(), {self.test_node.name: self.test_node_json_data})
+
     def test_as_json_many_child_nodes(self):
         child_node_1 = LabelBasedNode(
-            name="child_node_val",
-            node_id="child_node_node_id",
-            tile_id="child_node_tile_id",
-            value="child_node_value"
+            name="child_node_val", node_id="child_node_node_id", tile_id="child_node_tile_id", value="child_node_value"
         )
 
         child_node_2 = LabelBasedNode(
-            name="child_node_val",
-            node_id="child_node_node_id",
-            tile_id="child_node_tile_id",
-            value="child_node_value"
+            name="child_node_val", node_id="child_node_node_id", tile_id="child_node_tile_id", value="child_node_value"
         )
 
         child_node_3 = LabelBasedNode(
-            name="child_node_val",
-            node_id="child_node_node_id",
-            tile_id="child_node_tile_id",
-            value="child_node_value"
+            name="child_node_val", node_id="child_node_node_id", tile_id="child_node_tile_id", value="child_node_value"
         )
 
         self.test_node.child_nodes.append(child_node_1)
@@ -119,57 +75,27 @@ class LabelBasedNodeTests(TestCase):
         self.test_node.child_nodes.append(child_node_3)
 
         self.test_node_json_data[child_node_1.name] = [
-            {
-                NODE_ID_KEY: child_node_1.node_id,
-                TILE_ID_KEY: child_node_1.tile_id,
-                VALUE_KEY: child_node_1.value,
-            },
-            {
-                NODE_ID_KEY: child_node_2.node_id,
-                TILE_ID_KEY: child_node_2.tile_id,
-                VALUE_KEY: child_node_2.value,
-            },
-            {
-                NODE_ID_KEY: child_node_3.node_id,
-                TILE_ID_KEY: child_node_3.tile_id,
-                VALUE_KEY: child_node_3.value,
-            }
+            {NODE_ID_KEY: child_node_1.node_id, TILE_ID_KEY: child_node_1.tile_id, VALUE_KEY: child_node_1.value,},
+            {NODE_ID_KEY: child_node_2.node_id, TILE_ID_KEY: child_node_2.tile_id, VALUE_KEY: child_node_2.value,},
+            {NODE_ID_KEY: child_node_3.node_id, TILE_ID_KEY: child_node_3.tile_id, VALUE_KEY: child_node_3.value,},
         ]
 
-        self.assertEqual(
-            self.test_node.as_json(),
-            {
-                self.test_node.name: self.test_node_json_data
-            }
-        )
+        self.assertEqual(self.test_node.as_json(), {self.test_node.name: self.test_node_json_data})
 
 
 class LabelBasedGraphTests(TestCase):
     @classmethod
     def setUp(cls):
-        cls.node_1 = LabelBasedNode(
-            name="node_1_val",
-            node_id="node_1_node_id",
-            tile_id="node_1_tile_id",
-            value="node_1_value"
-        )
+        cls.node_1 = LabelBasedNode(name="node_1_val", node_id="node_1_node_id", tile_id="node_1_tile_id", value="node_1_value")
 
-        cls.node_2 = LabelBasedNode(
-            name="node_2_val",
-            node_id="node_2_node_id",
-            tile_id="node_2_tile_id",
-            value=None
-        )
+        cls.node_2 = LabelBasedNode(name="node_2_val", node_id="node_2_node_id", tile_id="node_2_tile_id", value=None)
 
     def test_is_node_empty(self):
         self.assertFalse(LabelBasedGraph.is_node_empty(self.node_1))
 
     def test_is_node_empty_with_node_with_child_nodes(self):
         child_node = LabelBasedNode(
-            name="child_node_val",
-            node_id="child_node_node_id",
-            tile_id="child_node_tile_id",
-            value="child_node_value"
+            name="child_node_val", node_id="child_node_node_id", tile_id="child_node_tile_id", value="child_node_value"
         )
 
         self.node_2.child_nodes.append(child_node)
@@ -179,20 +105,11 @@ class LabelBasedGraphTests(TestCase):
         self.assertTrue(LabelBasedGraph.is_node_empty(self.node_2))
 
     def test_generate_node_tile_reference(self):
-        mock_tile = mock.Mock(
-            data={
-                self.node_1.node_id: 'test_val'
-            }
-        )
+        mock_tile = mock.Mock(data={self.node_1.node_id: "test_val"})
 
-        node_tile_reference = LabelBasedGraph.generate_node_tile_reference(
-            resource=mock.Mock(tiles=[mock_tile])
-        )
+        node_tile_reference = LabelBasedGraph.generate_node_tile_reference(resource=mock.Mock(tiles=[mock_tile]))
 
-        self.assertEqual(
-            mock_tile,
-            node_tile_reference.get(self.node_1.node_id)[0]
-        )
+        self.assertEqual(mock_tile, node_tile_reference.get(self.node_1.node_id)[0])
 
     @mock.patch.object(LabelBasedGraph, "generate_node_tile_reference", side_effect=None)
     @mock.patch.object(LabelBasedGraph, "_build_graph", side_effect=None)
@@ -238,13 +155,12 @@ class LabelBasedGraphTests(TestCase):
     #             dict(ChainMap(*child_name_graphs)),  # combines list of dicts into single dict
     #         )
 
+    # self.assertEqual(mock_label_based_graph.from_tile.call_count, 2)
 
-            # self.assertEqual(mock_label_based_graph.from_tile.call_count, 2)
+    # for mock_tile in test_resource.tiles:
+    #     mock_tile.get_root_tile.assert_called_once()
 
-            # for mock_tile in test_resource.tiles:
-            #     mock_tile.get_root_tile.assert_called_once()
-
-            # self.assertEqual(mock_label_based_graph.add_node.call_count, 2)
+    # self.assertEqual(mock_label_based_graph.add_node.call_count, 2)
 
 
 # class LabelBasedGraph_BuildGraphTests(TestCase):
