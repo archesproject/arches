@@ -103,7 +103,7 @@ class LabelBasedGraph(object):
 
         node_tile_reference = cls.generate_node_tile_reference(resource=resource)
 
-        root_graph = LabelBasedNode(name=resource.displayname, node_id=None, tile_id=None, value=None,)
+        root_graph = LabelBasedNode(name=resource.displayname, node_id=None, tile_id=None, value=None)
 
         for tile in resource.tiles:
             root_tile = tile.get_root_tile()
