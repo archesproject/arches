@@ -6,6 +6,7 @@ NODE_ID_KEY = "@node_id"
 TILE_ID_KEY = "@tile_id"
 VALUE_KEY = "@value"
 
+
 class LabelBasedNode(object):
     def __init__(self, name, node_id, tile_id, value):
         self.name = name
@@ -35,9 +36,8 @@ class LabelBasedNode(object):
             else:
                 display_data[formatted_node_name] = [previous_val, formatted_node_value]
 
-        return {
-            self.name: display_data
-        }
+        return {self.name: display_data}
+
 
 class LabelBasedGraph(object):
     datatype_factory = DataTypeFactory()
@@ -81,9 +81,7 @@ class LabelBasedGraph(object):
         Generates a label-based graph from a given tile
         """
         if not node_tile_reference:
-            node_tile_reference = cls.generate_node_tile_reference(
-                resource=Resource(tile.resourceinstance)
-            )
+            node_tile_reference = cls.generate_node_tile_reference(resource=Resource(tile.resourceinstance))
 
         graph = cls._build_graph(
             node=models.Node.objects.get(pk=tile.nodegroup_id),
@@ -104,23 +102,15 @@ class LabelBasedGraph(object):
             resource.load_tiles()
 
         node_tile_reference = cls.generate_node_tile_reference(resource=resource)
-        
-        root_graph = LabelBasedNode(
-            name=resource.displayname,
-            node_id=None,
-            tile_id=None,
-            value=None,
-        )
+
+        root_graph = LabelBasedNode(name=resource.displayname, node_id=None, tile_id=None, value=None,)
 
         for tile in resource.tiles:
             root_tile = tile.get_root_tile()
 
             if root_tile.data:
                 label_based_graph = LabelBasedGraph.from_tile(
-                    tile=root_tile, 
-                    node_tile_reference=node_tile_reference, 
-                    hide_empty_nodes=hide_empty_nodes,
-                    as_json=False,
+                    tile=root_tile, node_tile_reference=node_tile_reference, hide_empty_nodes=hide_empty_nodes, as_json=False,
                 )
 
                 if not cls.is_node_empty(node=label_based_graph):
@@ -135,7 +125,7 @@ class LabelBasedGraph(object):
         if tile.data:
             datatype = cls.datatype_factory.get_instance(node.datatype)
 
-            # `get_display_value` varies between datatypes, 
+            # `get_display_value` varies between datatypes,
             # so let's handle errors here instead of nullguarding all models
             try:
                 display_value = datatype.get_display_value(tile=tile, node=node)
@@ -150,7 +140,7 @@ class LabelBasedGraph(object):
         for associated_tile in tile_reference.get(str(node.pk), [tile]):
             if associated_tile == tile or associated_tile.parenttile == tile:
                 label_based_node = LabelBasedNode(
-                    name=node.name, 
+                    name=node.name,
                     node_id=str(node.pk),
                     tile_id=str(associated_tile.pk),
                     value=cls._get_display_value(tile=associated_tile, node=node),
