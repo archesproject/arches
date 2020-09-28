@@ -15,14 +15,15 @@
 
 {% block sidepanel %}
 <!--ko if: activeTab() === 'editor' -->
-    <div class="workbench-card-sidepanel-header-container">
-        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
+    <div class="workbench-header-buffer">
+        <div class="workbench-card-sidepanel-header-container">
+            <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
+        </div>
     </div>
-
     <div data-bind="css: card.model.cssclass">
 
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
-        <div class="edit-message-container">
+        <div class="edit-message-container" style="margin-left: -16px;">
             <span>{% trans 'Showing edits by' %}</span>
             <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
             <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
@@ -35,7 +36,7 @@
         <!-- /ko-->
 
         <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 && !provisionalTileViewModel.selectedProvisionalEdit()-->
-        <div class="edit-message-container approved">
+        <div class="edit-message-container approved" style="margin-left: -16px;">
             <div>{% trans 'Currently showing the most recent approved edits' %}</div>
         </div>
         <!-- /ko-->
@@ -45,7 +46,7 @@
         <div class="new-provisional-edit-card-container">
             <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
             <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
-            <div class='new-provisional-edits-list'>
+            <div class='new-provisional-edits-list' style="margin-right: -20px">
                 <div class='new-provisional-edits-header'>
                     <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
                     <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){

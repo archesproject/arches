@@ -97,7 +97,7 @@ class SearchResultsExporter(object):
         """
         Writes a list of file like objects out to a zip file
         """
-        zip_stream = zip_utils.create_zip_file(files_for_export)
+        zip_stream = zip_utils.create_zip_file(files_for_export, "outputfile")
         today = datetime.datetime.now().isoformat()
         name = f"{settings.APP_NAME}_{today}.zip"
         search_history_obj = models.SearchExportHistory.objects.get(pk=export_info.searchexportid)
@@ -190,10 +190,6 @@ class SearchResultsExporter(object):
         resource_json = self.create_resource_json(tiles)
         return flatten_dict(resource_json)
 
-    def sort_by_geometry_type(instance):
-        instances = {"polygon": [], "polyline": [], "point": []}
-        return instances
-
     def to_csv(self, instances, headers, name):
         dest = StringIO()
         csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=headers)
@@ -203,7 +199,6 @@ class SearchResultsExporter(object):
         return {"name": f"{name}.csv", "outputfile": dest}
 
     def to_shp(self, instances, headers, name):
-        print(f"{name} = {len(instances)}")
         shape_exporter = ResourceExporter(format="shp")
         dest = shape_exporter.writer.create_shapefiles(instances, headers, name)
         return dest

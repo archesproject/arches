@@ -1,0 +1,35 @@
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
+
+<div class="search-result-details">
+    <!--ko if: !loading() && !report -->
+    <div class="search-result-details-splash">
+        <div class="rr-splash">
+            <!-- Image -->
+            <div class="img-lg img-circle rr-splash-img-container">
+                <i class="fa fa-info"></i>
+            </div>
+
+            <!-- Splash Title -->
+            <div class="rr-splash-title">{% trans "Resource Details" %}</div>
+
+            <!-- Splash Instructions -->
+            <div class="rr-splash-description">{% trans "Click the 'Details' link on a search result from the list on the left" %}</div>
+            <div class="rr-splash-description">{% trans "to view more information about a resource." %}</div>
+        </div>
+    </div>
+    <!--/ko-->
+    <!--ko if: loading() -->
+    <div class='loading-mask'></div>
+    <!--/ko-->
+    <!--ko if: !loading() && report -->
+    <div class='resource-report' data-bind='component: {
+        name: reportLookup[report.get("template_id")()].componentname,
+        params: {
+            report: report,
+            summary: true
+        }
+    }'></div>
+    <!--/ko-->
+</div>

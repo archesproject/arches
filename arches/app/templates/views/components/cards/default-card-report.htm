@@ -1,0 +1,99 @@
+
+{% load i18n %}
+
+<div data-bind="css: {'print-hide': !reportExpanded()}">
+    <!-- ko if: showHeaderLine--><hr class="rp-tile-separator"><!-- /ko -->
+    <div class="rp-card-section" data-bind="css: card.model.cssclass, visible: card.fullyProvisional() !== 'fullyprovisional'">
+        <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
+        <!-- ko if: card.tiles().length > 0 -->
+        <i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': reportExpanded(), 'fa-angle-right': !reportExpanded()}, click: function () { reportExpanded(!reportExpanded()) }"></i>
+        <!-- ko if: reportExpanded() -->
+        <!-- ko foreach: { data: self.preview ? [card.newTile] : card.tiles, as: 'tile' } -->
+
+        <div class="rp-card-section" data-bind="event : { dblclick: function(){tile.selected(true) }}, css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}, attr: {id: tile.tileid}">
+            <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
+            <div style="display: inline-flex; width: 100%; justify-content: space-between;">
+                <span data-bind="visible: tile.parent.model.get('widgets')().length === 0"></span>
+                    {% block report_widgets %}
+                    <!-- ko if: tile.parent.model.get('widgets')().length > 0 -->
+                        <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
+                            <!-- ko if: ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false -->
+                            <div class="report-card-provisional-flag">{% trans 'These data are provisional and pending review' %}</div>
+                            <!-- /ko-->
+                            <dl class="dl-horizontal" data-bind="css: {'provisional': ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false}">
+                                <!-- ko foreach: { data: tile.parent.model.get('widgets'), as: 'widget' } -->
+                                    <!-- ko if: widget.visible -->
+                                    <!-- ko component: {
+                                        name: widget.widgetLookup[widget.get("widget_id")()].name,
+                                        params: {
+                                            config: configJSON,
+                                            label: widget.get("label")(),
+                                            node: widget.node,
+                                            value: tile.data[widget.node.nodeid],
+                                            state: "report",
+                                            hideEmptyNodes: tile.parent.hideEmptyNodes || false
+                                        }
+                                    } --><!-- /ko -->
+                                    <!-- /ko -->
+                                <!-- /ko -->
+                            </dl>
+                        </div>
+                    <!-- /ko -->
+                    {% endblock report_widgets %}
+                    <!-- ko if: $parent.inResourceEditor -->
+                    <div class="rp-edit-buttons">
+                        <!-- ko if: tile.parent.selected() && tile.parent.cardinality == 'n' -->
+                        <i class="fa fa-copy" data-bind="click: function(){tile.parent.copyTile(tile)}"></i>
+                        <!-- /ko -->
+                        <i class="fa fa-pencil" data-bind="click: function(){tile.selected(true)}"></i>
+                        <i class="fa fa-trash" data-bind="click: function(){console.log(tile); tile.deleteTile()}"></i>
+                    </div>
+                    <!-- /ko -->
+                    </div>
+                    {% block report_cards %}
+                    <div class="rp-report-container-tile" data-bind="visible: tile.parent.cards().length > 0">
+                        <!-- ko foreach: { data: self.preview ? tile.parent.cards : tile.cards, as: 'card' } -->
+                            <!-- ko if: card.tiles().length > 0 || ko.unwrap(tile.parent.hideEmptyNodes) === false -->
+                                <!-- ko component: {
+                                    name: tile.parent.model.cardComponentLookup[tile.parent.model.component_id()].componentname,
+                                    params: {
+                                        state: 'report',
+                                        preview: self.preview,
+                                        card: card,
+                                        showHeaderLine: self.card.model.get("widgets")().length > 0 || $index !== 0,
+                                        pageVm: $root,
+                                        hideEmptyNodes: tile.parent.hideEmptyNodes || false
+                                    }
+                                } --> <!-- /ko -->
+                            <!-- /ko -->
+                        <!-- /ko -->
+                    </div>
+                    {% endblock report_cards %}
+                </div>
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+
+        <!-- ko if: card.tiles().length === 0 && !self.preview && !card.hideEmptyNodes -->
+        <div class="row rp-report-tile rp-no-data">
+            <!-- ko ifnot: card.model.get('cardid') -->
+            {% trans "Sorry, you don't have access to this information" %}
+            <!-- /ko -->
+            <!-- ko if: card.model.get('cardid') -->
+            <div style="display: inline-flex; width: 100%; justify-content: space-between;" data-bind="event : { dblclick: function(){$parent.revealForm(card)}}">
+            <div>
+            <span>{% trans "No data added yet for " %}</span>
+            <span data-bind="text: card.model.get('name')"></span>
+            </div>
+            <!-- ko if: $parent.inResourceEditor -->
+            <div class="rp-edit-buttons" style="justify-content: flex-end;">
+            <i class="fa fa-plus-circle" data-bind="click: function(){$parent.revealForm(card)}"></i>
+
+            </div>
+            <!-- /ko -->
+            </div>
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+    </div>
+</div>

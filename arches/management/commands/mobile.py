@@ -72,9 +72,9 @@ class Command(BaseCommand):
                 for mobile_survey in MobileSurvey.objects.all():
                     self.sync_survey(mobile_survey.id)
 
-    def sync_survey(self, uuid, user=None):
+    def sync_survey(self, uuid, userid=None):
         mobile_survey = MobileSurvey.objects.get(id=uuid)
-        synclog = MobileSyncLog(user=user, survey=mobile_survey)
+        synclog = MobileSyncLog(userid=userid, survey=mobile_survey)
         synclog.save()
         logger.info("Syncing {0} from CouchDB to PostgreSQL".format(mobile_survey.name))
         mobile_survey.push_edits_to_db(synclog, user)

@@ -1,12 +1,12 @@
 {% load i18n %}
 
-<div class="workbench-card-wrapper">
+<div class="workbench-card-wrapper" data-bind="class: ko.unwrap(workbenchWrapperClass)">
     <div class="workbench-card-sidebar">
         {% block tabs %}
         {% endblock tabs %}
     </div>
     <!--ko if: activeTab() -->
-    <div class="workbench-card-sidepanel">
+    <div class="workbench-card-sidepanel" data-bind="css:{'expanded': expandSidePanel()}">
     {% block sidepanel %}
     {% endblock sidepanel %}
     </div>

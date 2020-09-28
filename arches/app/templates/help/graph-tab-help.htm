@@ -22,7 +22,7 @@
             &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
         </a>
         <div class="ep-help-topic-content">
-            <span class="ep-help-table-header">Identifiers</span>
+            <span class="ep-help-table-header">{% trans "Identifiers" %}</span>
             <table class="ep-help-table">
                 <tr>
                     <td>{% trans "Name" %}</td>
@@ -41,7 +41,7 @@
                     <td>{% blocktrans %}This setting is only necessary if an "Ontology" has been chosen. Define the ontology class of the root node for this graph.{% endblocktrans %}</td>
                 </tr>
             </table>
-            <span class="ep-help-table-header">Configuration</span>
+            <span class="ep-help-table-header">{% trans "Configuration" %}</span>
             <table class="ep-help-table">
                 <tr>
                     <td>{% trans "Status" %}</td>
@@ -60,7 +60,7 @@
                 </tr>
                 {% endif %}
             </table>
-            <span class="ep-help-table-header">Description</span>
+            <span class="ep-help-table-header">{% trans "Description" %}</span>
             <table class="ep-help-table">
                 <tr>
                     <td>{% trans "Author" %}</td>
@@ -77,7 +77,7 @@
                 </tr>
                 {% endif %}
             </table>
-            <span class="ep-help-table-header">Appearance</span>
+            <span class="ep-help-table-header">{% trans "Appearance" %}</span>
             <table class="ep-help-table">
                 {% if graph.isresource %}
                 <tr>
@@ -123,7 +123,7 @@
             &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
         </a>
         <div class="ep-help-topic-content">
-            <span class="ep-help-table-header">Node Identifiers</span>
+            <span class="ep-help-table-header">{% trans "Node Identifiers" %}</span>
             <table class="ep-help-table">
                 <tr>
                     <td>{% trans "Node Name" %}</td>
@@ -138,8 +138,8 @@
                     <td>{% blocktrans %}Define what relationship this node has with its parent node (the one directly above it in the graph tree). A verbalization of your choice is shown in the <strong>Semantics</strong> section below this setting.{% endblocktrans %}</td>
                 </tr>
             </table>
-            <span class="ep-help-table-header">Node Data Type and Settings</span>
-            <p>Depending on which data type you choose, you may have many more settings to fill out. Those listed below will be present for every node no matter the data type.</p>
+            <span class="ep-help-table-header">{% trans "Node Data Type and Settings" %}</span>
+            <p>{% blocktrans %}Depending on which data type you choose, you may have many more settings to fill out. Those listed below will be present for every node no matter the data type.{% endblocktrans %}</p>
             <table class="ep-help-table">
                 <tr>
                     <td>{% trans "Data type" %}</td>
@@ -167,7 +167,7 @@
         </a>
         <div class="ep-help-topic-content">
             <p>{% trans "The data type of a node determines what kind of data that node will store. Once chosen, some data types will require further configuration." %}</p>
-            <p>Developers can <a href="https://arches.readthedocs.io/en/stable/functions-widgets-datatypes/#datatypes" target="_blank">create new datatypes</a>.</p>
+            <p>{% blocktrans %}Developers can <a href="https://arches.readthedocs.io/en/stable/functions-widgets-datatypes/#datatypes" target="_blank">create new datatypes</a>.{% endblocktrans %}</p>
             <table class="ep-help-table">
                 <tr>
                     <td>{% trans "boolean" %}</td>

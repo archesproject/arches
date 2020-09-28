@@ -2,21 +2,23 @@
 {% load i18n %}
 
 {% block tabs %}
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+<div class="workbench-card-sidebar-tab" data-bind="click: function(){ if (self.card.tiles().length) {
+        toggleTab('manage');
+    }
+}, css: {'disabled': self.card.tiles().length === 0, 
+    'active': activeTab() === 'manage'
+}">
+    <i class="fa fa-pencil"></i>
+    <span class="map-sidebar-text">{% trans "Manage" %}</span>
+</div>
+<div class="workbench-card-sidebar-tab" data-bind="click: function(){ if (self.card.tiles().length) {
     toggleTab('edit');
-}, css: {
+}
+}, css: {'disabled': self.card.tiles().length === 0, 
     'active': activeTab() === 'edit'
 }">
     <i class="fa fa-pencil"></i>
     <span class="map-sidebar-text">{% trans "Edit" %}</span>
-</div>
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
-    toggleTab('add');
-}, css: {
-    'active': activeTab() === 'add'
-}">
-    <i class="fa fa-plus"></i>
-    <span class="map-sidebar-text">{% trans "Add" %}</span>
 </div>
 <!--ko foreach: fileFormatRenderers-->
         <!--ko if: ko.unwrap($parent.displayContent) && $parent.displayContent().renderer && ($parent.displayContent().renderer.id === $data.id) -->
@@ -43,12 +45,13 @@
     <div class="card-display-panel">
         <div>
             <div id="hidden-dz-previews" style="display:none"></div>
-                    <!--ko if: displayContent() -->
+            <!--ko if: displayContent() -->
                         <!--ko foreach: fileFormatRenderers-->
                             <!--ko if: $data.id && $parent.displayContent().renderer && $parent.displayContent().renderer.id === $data.id -->
                                 <!-- ko component: {
                                     name: $data.name,
                                     params: {
+                                        fileViewer: $parent,
                                         card: $parent.card,
                                         selected: $parent.selected,
                                         state: $data.state,
@@ -60,37 +63,55 @@
                                 <!-- /ko -->
                             <!--/ko-->
                         <!--/ko-->
-                        <!--ko ifnot: $parent.displayContent().renderer -->
-                    <div>
+                    <!--ko if: !$parent.displayContent().renderer || $parent.displayContent().validRenderer() === false -->
+                    <div class="file-chart-upload-panel">
                         <div class="gallery-controls new-tile">
                             <div class="dropzone-photo-upload">
                                 <div class="file-select-window">
                                     <!--ko if: $parent.displayContent().availableRenderers.length === 0 -->
-                                    <div class="bord-top pad-ver file-select" style="padding: 0px">
-                                        <div class="" style="padding: 5px">
-                                            <h2>{% trans 'Unable to display the selected file' %}</h2>
-                                            <h4>{% trans 'There are no file renderers that support this format' %}</h4>
+                                    <div class="bord-top file-select" style="padding-bottom: 90px;">
+
+                                        <!-- Image -->
+                                        <div class="img-lg img-circle rr-splash-img-container">
+                                            <img class="rr-splash-img" src="/media/img/answers.png" alt="Resource Editor">
                                         </div>
-                                    <br>
+
+                                        <!-- Splash Title -->
+                                        <h2 class="rr-splash-title">{% trans 'Unable to display the selected file' %}</h2>
+
+                                        <!-- Splash Instructions -->
+                                        <h3 class="rr-splash-description">{% trans "This file can't be displayed." %}</h3>
+
+                                        <!-- Splash Instructions -->
+                                        <h3 class="rr-splash-description">{% trans "It may be a proprietary format or there isn't a loader available yet " %}</h3>
+
+                                        <!-- Splash Instructions -->
+                                        <h3 class="rr-splash-description">{% trans "to present it in this webpage." %}</h3>
                                     </div>
                                     <!--/ko-->
                                     
                                     <!--ko if: $parent.displayContent().availableRenderers.length > 0 -->
-                                    <div class="bord-top pad-ver file-select" style="padding: 0px">
-                                        <div class="" style="padding: 5px">
-                                            <h2>{% trans 'Select File Renderer' %}</h2>
-                                            <h4>{% trans 'Select the renderer best suited for visualization the selected file' %}</h4>
-                                            <div style="display: flex; flex-flow: wrap; justify-content: space-evenly; padding-top: 15px">
+                                    <div class="bord-top file-select loader-select">
+                                        <div class="">
+                                            <!--ko if: $parent.displayContent().validRenderer() === false -->
+                                            <h4 class="loader-error-message">{% trans 'Unable to parse your file with the '%}
+                                                <span data-bind="text:$parent.displayContent().renderer.title"></span>{% trans ' loader'%}
+                                            </h4>
+                                            <!--/ko-->
+                                            
+                                            <h2>{% trans 'Select File Loader' %}</h2>
+                                            <h4>{% trans 'Select the loader best suited for processing and visualizing the selected file' %}</h4>
+                                            <div style="display: flex; flex-flow: wrap; padding: 15px 25px;">
 
                                             <!--ko foreach: $parent.displayContent().availableRenderers -->
                                             <div>
                                                 <div class="r-grid-item relative" style="border: 1px solid #c4c4c4">
-                                                    <div class="" style="display:flex; padding-left: 5px; background-color: #fdfdfd">
+                                                    <div class="" style="display:flex; flex-direction: column; background-color: #fdfdfd">
                                                         <h4 class="r-select-title" data-bind="text: $data.title"></h4>
                                                     </div>
                                                     <div>
                                                         <div class="r-select-card" style="color: #30517a; background-color: #fdfdfd">
-                                                            <div class="r-select-circle" style="top: 50px">
+                                                            <div class="r-select-circle loader-button" style="top: 55px">
                                                                 <span><i data-bind="attr:{class: ($data.iconclass +' r-select-icon')}" class="fa fa fa-user r-select-icon"></i></span>
                                                             </div>
                                                             <div class="r-desc-container">
@@ -102,8 +123,8 @@
                                                     <!-- card Tools -->
                                                     <div class="r-select-card-footer">
                                                         <div class="">
-                                                            <div data-bind="click: function(){$parent.applyFileRenderer($data)}" style="border-top: 1px solid #c4c4c4;" class="btn btn-primary btn-resource-select" role="button">
-                                                            {% trans 'Select and Apply' %}
+                                                            <div data-bind="click: function(){$parent.applyRendererToSelected($data)}" style="border-top: 1px solid #c4c4c4;" class="btn btn-primary btn-resource-select" role="button">
+                                                            {% trans 'Select' %}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -112,11 +133,10 @@
                                             <!--/ko-->
                                         </div>
                                     </div>
-                                    <br>
-                                    
+                                    <br>  
                                 </div>
                                 <div class="file-upload-footer">
-                                    <span>{% trans 'Apply the same selection to all files in the dataset' %}</span>
+                                    <span class="loader-selector" data-bind="component: { name: 'views/components/simple-switch', params: {value: applyToAll, config:{label: '{% trans "Apply the same loader to all selected files in the dataset" %}'}}}"></span>
                                 </div>
                                 <!--/ko-->
                                </div>
@@ -133,32 +153,38 @@
     </div>
 
     <!--ko if: self.displayContent() === undefined -->
-    <div class="gallery-controls new-tile">
-        <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
-            <div class="file-select-window">
-               <div class="bord-top pad-ver file-select">
-                   <div class="" style="padding: 5px">
-                       <h2>{% trans 'Upload Files' %}</h2>
-                       <h4>{% trans 'Drag & Dop your files onto this panel to upload' %}</h4>
-                   </div>
-                   <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
-                       <i class="fa fa-file"></i>
-                       <span>{% trans "Select Files" %}</span>
-                   </button>
-                   <br>
-                   <div style="padding: 10px">{% trans "Adding files to this record is " %}
-                       <span><strong>{% trans "optional." %}</strong></span>
+    <div class="file-chart-upload-panel">
+        <div class="gallery-controls new-tile">
+            <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
+                <div class="file-select-window">
+                   <div class="bord-top pad-ver file-select">
+                       <div class="" style="padding: 5px">
+                           <h2>{% trans 'Upload Files' %}</h2>
+                           <h4>{% trans 'Drag & Drop your files onto this panel to upload' %}</h4>
+                       </div>
+                       <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                           <i class="fa fa-file"></i>
+                           <span>{% trans "Select Files" %}</span>
+                       </button>
                        <br>
-                       {% trans "You may upload as many files as you wish, but the maximum size of any single file is " %}
-                       <span>8MB</span>
+                       <div style="padding: 10px">{% trans "Adding files to this record is " %}
+                           <span><strong>{% trans "optional." %}</strong></span>
+                           <br>
+                           {% trans "You may upload as many files as you wish; check with the site admin on the maximum file size." %}
+                       </div>
+
                    </div>
-
+                   <div class="file-upload-footer">
+                       <!-- ko if: acceptedFiles() !== null -->
+                       <span data-bind="text: ('The following file formats may be uploaded: ' + acceptedFiles())"></span>
+                       <!-- /ko -->
+                       <!-- ko if: !acceptedFiles() -->
+                       <span>{% trans 'Images formatted as .jpg, .png files may be uploaded. Other formats may require a loader to view.' %}</span>
+                       <!-- /ko -->
+                   </div>
                </div>
-               <div class="file-upload-footer">
-                   <span>{% trans 'Images formatted as .jpg, .png, .tiff files may be uploaded. Other formats will be ignored.' %}</span>
-               </div>
-           </div>
 
+            </div>
         </div>
     </div>
     <!--/ko-->
@@ -169,47 +195,81 @@
 {% endblock content_management %}
 
 
-<!--ko if: self.displayContent() !== undefined -->
 {% block sidepanel %}
+<!--ko if: activeTab() === 'manage' -->
+<div class="workbench-header-buffer">
+    <div class="workbench-card-sidepanel-header-container">
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: 'Manage Files/Loaders'"></h4>
+    </div>
+</div>
+<div class="file-workbench-filter">
+    <h2 class="file-workbench-filter-header">{% trans "File Filter" %}</h2>
+    <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'e.g.: .txt' %}" data-bind="textInput: filter"></input>
+    <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+</div>
+<div class='file-workbench-files'>
+<!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
+    <!--ko if: $parent.getUrl(tile) && ($parent.filter().length === 0 || $parent.isFiltered(tile)) -->
+    <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {'staged': $parent.card.staging.indexOf(tile.tileid) > -1}, click: $parent.card.stageTile">
+    <i role="presentation" data-bind="class: $parent.getUrl(tile).iconclass || 'fa fa-file'"></i>
+    <div class='file-name' data-bind="text: $parent.getUrl(tile).name"></div>
+    </div>
+    <!--/ko-->
+<!-- /ko -->
+</div>
+<div class='file-workbench-filecount' style="display:inline-flex; justify-content: space-between; width: 100%">
+    <div style="display: inline-flex; justify-content: space-between;">
+    <div data-bind='text: card.tiles().length + "{% trans ' files uploaded' %}"'></div>
+    <div style='padding-left: 15px;' data-bind='text: card.staging().length + "{% trans ' files selected' %}"'></div>
+    </div>
+    <div data-bind="dropzone: dropzoneOptions">
+        <button type="button" class="btn-file-select fileinput-button dz-clickable" style='width: 65px; margin: 0;' data-bind="css: uniqueidClass">
+            <div>{% trans 'add files' %}</div>
+        </button>
+    </div>
+</div>
+<div class="file-workbench-button-container">
+    <div class="file-workbench-buttons">
+        <button style="width: 50%; margin-right: 2px;" class="btn btn-md btn-primary" data-bind="click: function(){stageFiltered()}"
+        ><i class="fa fa-check-square"></i> {% trans 'Select All' %}</button>
+        <button style="width: 50%; margin-left: 2px;" class="btn btn-md btn-primary" data-bind="click: function(){clearStaging()}, css: {
+            disabled: card.staging().length === 0
+        }"><i class="fa fa-eraser"></i> {% trans 'Clear All' %}</button>
+    </div>
+</div>
 
-<!--ko if: activeTab() === 'add' -->
-<div class="gallery-controls new-tile sidebar">
-    <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
-        <div class="file-select-window">
-           <div class="bord-top pad-ver file-select">
-               <div class="" style="padding: 5px">
-                   <h2>{% trans 'Upload Files' %}</h2>
-                   <h4>{% trans 'Drag & Dop your files onto this panel' %}</h4>
-               </div>
-               <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
-                   <i class="fa fa-file"></i>
-                   <span>{% trans "Select Documents" %}</span>
-               </button>
-               <br>
-               <div style="padding: 10px">{% trans "Adding documents to this record is " %}
-                   <span><strong>{% trans "optional." %}</strong></span>
-                   <br>
-                   {% trans "You may upload as many documents as you wish, but the maximum size of any single file is " %}
-                   <span>8MB</span>
-               </div>
+<div class="file-workbench-selected-buttons" data-bind="visible: card.staging().length > 0">
+    <button class="btn btn-lg btn-workbench btn-warning" data-bind="click: function(){removeTiles()}"><i class="fa fa-trash"></i> {% trans 'Delete Selected' %}</button>
+    <button class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){downloadSelection()}"><i class="fa fa-download"></i> {% trans 'Download Selected' %}</button>
+</div>
 
-           </div>
-           <div class="file-upload-footer">
-               <span>{% trans 'Accepted formats: .jpg, .png, .tiff' %}</span>
-           </div>
-       </div>
-
+<div class="col-xs-12 pad-no crud-widget-container">
+    <h2 class="file-workbench-filter-header">{% trans 'Loader' %}</h2>
+    <input style="display:inline-block;"
+    data-bind="select2Query: {
+        select2Config: {
+            clickBubble: true,
+            disabled: false,
+            data: fileFormatRenderers,
+            value: managerRenderer,
+            allowClear: false,
+            multiple: false,
+            placeholder: {% trans "'File Renderer'" %}}}">
+    <div style="padding-top: 10px">
+        <button style="margin-right: 3px;" class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){$parent.applyRendererToStaged($parent.getFileFormatRenderer(managerRenderer()))}"><i class="fa fa-gears"></i> {% trans 'Apply to Selected Files' %}</button>
     </div>
 </div>
 <!--/ko-->
 
-
 <!--ko if: activeTab() === 'edit' -->
-<div class="workbench-card-sidepanel-header-container file-workbench">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
+<div class="workbench-header-buffer">
+    <div class="workbench-card-sidepanel-header-container">
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
+    </div>
 </div>
-<div style='position: relative;'>
-    <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'Filter file list...' %}" data-bind="textInput: filter"></input>
+<div class="file-workbench-filter">
+    <h2 class="file-workbench-filter-header">{% trans 'File Filter' %}</h2>
+    <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'e.g.: .txt' %}" data-bind="textInput: filter"></input>
     <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
 </div>
 <div class='file-workbench-files'>
@@ -224,21 +284,7 @@
 </div>
 <div class='file-workbench-filecount' data-bind='text: card.tiles().length + "{% trans ' files uploaded' %}"'></div>
 
-<div class="col-xs-12 pad-no crud-widget-container">
-    <input style="display:inline-block;"
-    data-bind="select2Query: {
-        select2Config: {
-            clickBubble: true,
-            disabled: false,
-            data: fileFormatRenderers,
-            value: fileRenderer,
-            allowClear: false,
-            multiple: false,
-            onSelect: $parent.applyFileRenderer,
-            placeholder: {% trans "'File Renderer'" %}}}">
-</div>
-
-<div data-bind="css: card.model.cssclass">
+<div class="workbench-sidepanel-card-container" data-bind="css: card.model.cssclass">
 
     <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
     <div class="edit-message-container">
@@ -310,7 +356,7 @@
             <!-- ko if: card.widgets().length > 0 -->
             {% block form_widgets %}
             <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
-                <!--ko if: $parent.getUrl(tile) && tile.selected()-->
+                <!--ko if: $parent.getUrl(tile) && tile.selected() -->
             <form class="widgets" style="margin-bottom: 20px;">
                 <div data-bind="foreach: {
                         data: $parent.card.widgets, as: 'widget'
@@ -408,6 +454,7 @@
         </div>
     </div>
 </div>
+
 <!--/ko-->
 
 <!--ko foreach: fileFormatRenderers-->
@@ -428,4 +475,3 @@
 
 {{ block.super }}
 {% endblock sidepanel %}
-<!--/ko-->

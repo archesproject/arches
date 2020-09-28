@@ -1,29 +1,39 @@
 define([
+    'jquery',
     'knockout',
-    'knockout-mapping',
-    'underscore',
     'arches',
-    'dropzone',
     'uuid',
     'viewmodels/card-component',
+    'viewmodels/card-multi-select',
     'views/components/workbench',
     'file-renderers',
     'bindings/slide',
     'bindings/fadeVisible',
     'bindings/scroll-to-file',
+    'dropzone',
     'bindings/dropzone'
-], function(ko, koMapping, _, arches, Dropzone, uuid, CardComponentViewModel, WorkbenchComponentViewModel, fileRenderers) {
+], function($, ko, arches, uuid, CardComponentViewModel, CardMultiSelectViewModel, WorkbenchComponentViewModel, fileRenderers) {
     return ko.components.register('file-viewer', {
         viewModel: function(params) {
             params.configKeys = ['acceptedFiles', 'maxFilesize'];
             var self = this;
             this.fileFormatRenderers = fileRenderers;
+
             this.fileFormatRenderers.forEach(function(r){
                 r.state = {};
+                r.disabled = true;
             });
+
+            this.applyToAll = ko.observable(false);
 
             CardComponentViewModel.apply(this, [params]);
 
+            if (!this.card.staging) {
+                CardMultiSelectViewModel.apply(this, [params]);
+            } else {
+                this.card.staging.valueHasMutated();
+            }
+            
             if ('filter' in this.card === false) {
                 this.card.filter = ko.observable('');
             }
@@ -32,6 +42,8 @@ define([
             }
 
             this.fileRenderer = this.card.renderer;
+            this.managerRenderer = ko.observable();
+
             this.filter = this.card.filter;
 
             var getfileListNode = function(){
@@ -48,12 +60,14 @@ define([
             };
 
             this.fileListNodeId = getfileListNode();
+            this.acceptedFiles = ko.observable(null);
 
             this.displayWidgetIndex = self.card.widgets().indexOf(self.card.widgets().find(function(widget) {
                 return widget.datatype.datatype === 'file-list';
             }));
 
             WorkbenchComponentViewModel.apply(this, [params]);
+            this.workbenchWrapperClass = ko.observable('autoheight');
 
             if (this.card && this.card.activeTab) {
                 self.activeTab(this.card.activeTab);
@@ -62,13 +76,14 @@ define([
             }
 
             this.selected = ko.observable();
-            self.activeTab.subscribe(
+
+            this.activeTab.subscribe(
                 function(val){
                     self.card.activeTab = val;
                 });
 
             this.fileRenderer.subscribe(function(){
-                if (['add', 'edit'].indexOf(self.activeTab()) < 0) {
+                if (['add', 'edit', 'manage'].indexOf(self.activeTab()) < 0) {
                     self.activeTab(undefined);
                 }
             });
@@ -79,24 +94,58 @@ define([
                 }
             });
 
-            this.isFiltered = function(t){
-                return self.getUrl(t).name.toLowerCase().includes(self.filter().toLowerCase());
+            this.getFileFormatRenderer = function(rendererid) {
+                return self.fileFormatRenderers.find(function(item) {
+                    return item.id === rendererid;
+                });
             };
+            
+            if (!this.card.checkrenderers) {
+                this.card.checkrenderers = this.card.staging.subscribe(function(){
+                    var compatible = [];
+                    var compatibleIds = [];
+                    var allCompatible = true;
+                    var staging = self.card ? self.card.staging() : [];
+                    var staged = self.card.tiles().filter(function(tile){
+                        return staging.indexOf(tile.tileid) >= 0;  
+                    });
+                    staged.forEach(function(tile){
+                        var file = tile.data[self.fileListNodeId]()[0];
+                        var defaultRenderers = self.getDefaultRenderers(ko.unwrap(file.type), ko.unwrap(file.name));
+                        if (compatible.length === 0) {
+                            compatible = defaultRenderers;
+                            compatibleIds = compatible.map(function(x){return x.id;});
+                        } else {
+                            allCompatible = defaultRenderers.every(function(renderer){
+                                return compatibleIds.indexOf(renderer.id) > -1;
+                            }); 
+                        }
+                    });
+                    self.fileFormatRenderers.forEach(function(r){
+                        if (compatibleIds.indexOf(r.id) === -1 || allCompatible === false) {
+                            r.disabled = true;
+                        } else {
+                            r.disabled = false;
+                        }
+                    });
+                });
+            }
 
             this.getDefaultRenderers = function(type, file){
                 var defaultRenderers = [];
                 this.fileFormatRenderers.forEach(function(renderer){
+                    var excludeExtensions = renderer.exclude ? renderer.exclude.split(",") : [];
                     var rawFileType = type;
-                    var rawExtension = file.url ? ko.unwrap(file.url).split('.').pop() : file.split('.').pop();
+                    var rawExtension = file.name ? ko.unwrap(file.name).split('.').pop() : ko.unwrap(file).split('.').pop();
                     if (renderer.type === rawFileType && renderer.ext === rawExtension)  {
                         defaultRenderers.push(renderer);
                     }
-                    var splitFileType = type.split('/');
+                    var splitFileType = ko.unwrap(type).split('/');
                     var fileType = splitFileType[0];
                     var splitAllowableType = renderer.type.split('/');
                     var allowableType = splitAllowableType[0];
                     var allowableSubType = splitAllowableType[1];
-                    if (allowableSubType === '*' && fileType === allowableType) {
+                    if (allowableSubType === '*' && fileType === allowableType && excludeExtensions.indexOf(rawExtension) < 0) {
                         defaultRenderers.push(renderer);
                     }
                 }); 
@@ -135,6 +184,16 @@ define([
                 return {url: url, type: type, name: name, renderer: renderer, iconclass: iconclass, tile: tile, renderers: availableRenderers};
             };
 
+            this.isFiltered = function(t){
+                return self.getUrl(t).name.toLowerCase().includes(self.filter().toLowerCase());
+            };
+
+            this.filteredTiles = ko.pureComputed(function(){
+                return self.card.tiles().filter(function(t){
+                    return self.getUrl(t).name.toLowerCase().includes(self.filter().toLowerCase());
+                }, this);
+            }, this);
+
             this.uniqueId = uuid.generate();
             this.uniqueidClass = ko.computed(function() {
                 return "unique_id_" + self.uniqueId;
@@ -144,8 +203,8 @@ define([
                 var self = this;
                 return function() {
                     var t;
-                    self.toggleTab('edit');
-                    self.activeTab('edit');
+                    var openTab = self.activeTab() === 'manage' ? 'manage' : 'edit'; 
+                    self.toggleTab(openTab);
                     var selectedIndex = self.card.tiles.indexOf(self.selected());
                     if(self.card.tiles().length > 0 && selectedIndex === -1) {
                         selectedIndex = 0;
@@ -155,21 +214,46 @@ define([
                         t.selected(true);
                         self.selectItem(t);
                     }
+                    self.activeTab(openTab);
                 };
             };
-
             this.defaultSelector = this.selectDefault();
 
-            this.applyFileRenderer = function(val) {
-                var tile = self.displayContent().tile;
-                var node = ko.unwrap(tile.data[self.fileListNodeId]);
-                if (node.length > 0) {
-                    node[0].renderer = val.id;
-                    tile.save();
-                }
+            this.checkIfRendererIsValid = function(file, renderer){
+                var defaultRenderers = self.getDefaultRenderers(ko.unwrap(file.type), ko.unwrap(file.name));
+                return (defaultRenderers.indexOf(renderer) > -1);
+            };
+
+            this.applyRendererToStaged = function(renderer) {
+                this.card.staging().forEach(function(tileid){
+                    var stagedTile = self.card.tiles().find(function(t){return t.tileid == tileid;});
+                    if (stagedTile) {
+                        var node = ko.unwrap(stagedTile.data[self.fileListNodeId]);
+                        var file = node[0];
+                        var valid = self.checkIfRendererIsValid(file, renderer);
+                        if (valid) {
+                            file.renderer = renderer ? renderer.id : '';
+                            stagedTile.save();
+                        }
+                    }
+                });
             }; 
 
-            
+            this.applyRendererToSelected = function(renderer){	
+                if (self.displayContent()) {	
+                    var tile = self.displayContent().tile;	
+                    var node = ko.unwrap(tile.data[self.fileListNodeId]);	
+                    if (node.length > 0) {	
+                        var valid = self.checkIfRendererIsValid(node[0], renderer);	
+                        if (valid) {	
+                            node[0].renderer = renderer ? renderer.id : '';	
+                            tile.save();	
+                        }	
+                    }	
+                } if (ko.unwrap(self.applyToAll)) {
+                    self.applyRendererToStaged(renderer);
+                }	
+            };
 
             this.displayContent = ko.computed(function(){
                 var file;
@@ -186,12 +270,13 @@ define([
                 }
                 else {
                     this.selected(undefined);
-                    if (['add', 'edit'].indexOf(self.activeTab()) < 0) {
+                    if (['add', 'edit', 'manage'].indexOf(self.activeTab()) < 0) {
                         self.activeTab(undefined);
                     }
                 }
                 if (file) {
                     file.availableRenderers = self.getDefaultRenderers(file.type, file);
+                    file.validRenderer = ko.observable(true);
                 }
                 return file;
             }, this).extend({deferred: true});
@@ -212,6 +297,37 @@ define([
                 val.deleteTile(null, self.defaultSelector);
             };
 
+            this.removeTiles = function() {
+                this.card.staging().forEach(function(tileid){
+                    var stagedTile = self.card.tiles().find(function(t){return t.tileid == tileid;});
+                    if (stagedTile) {
+                        stagedTile.deleteTile(null, self.defaultSelector);
+                    }
+                }, this);
+                self.card.staging([]);
+            };  
+            
+            this.stageAll = function() {
+                this.card.tiles().forEach(function(tile){
+                    if (self.card.staging().indexOf(tile.tileid) < 0) {
+                        self.card.staging.push(tile.tileid);
+                    }
+                });
+            };
+
+            this.stageFiltered = function() {
+                self.card.staging([]);
+                this.filteredTiles().forEach(function(tile){
+                    if (self.card.staging().indexOf(tile.tileid) < 0) {
+                        self.card.staging.push(tile.tileid);
+                    }
+                });
+            };
+
+            this.clearStaging = function() {
+                self.card.staging([]);
+            };
+
             if (this.form && ko.unwrap(this.form.resourceId)) {
                 this.card.resourceinstanceid = ko.unwrap(this.form.resourceId);
             } else if (this.card.resourceinstanceid === undefined && this.card.tiles().length === 0) {
@@ -227,10 +343,18 @@ define([
                 }
             }
 
+            function stageTile(t) {
+                self.card.staging.push(t.tileid);
+            }
+
+            this.downloadSelection = function() {
+                var url = arches.urls.download_files + "?tiles=" + JSON.stringify(self.card.staging()) + "&node=" + self.fileListNodeId;
+                window.open(url);
+            };
+
             this.addTile = function(file){
                 var newtile;
                 newtile = self.card.getNewTile();
-                var targetNode;
                 var defaultRenderers = self.getDefaultRenderers(file.type, file.name);
                 var tilevalue = {
                     name: file.name,
@@ -248,20 +372,26 @@ define([
                     error: file.error,
                     renderer: defaultRenderers.length === 1 ? defaultRenderers[0].id : undefined,
                 };
-                Object.keys(newtile.data).forEach(function(val){
-                    if (newtile.datatypeLookup && newtile.datatypeLookup[val] === 'file-list') {
-                        targetNode = val;
-                    }
-                });
-                newtile.data[targetNode]([tilevalue]);
-                newtile.formData.append('file-list_' + targetNode, file, file.name);
+                newtile.data[self.fileListNodeId]([tilevalue]);
+                newtile.formData.append('file-list_' + self.fileListNodeId, file, file.name);
                 newtile.resourceinstance_id = self.card.resourceinstanceid;
                 if (self.card.tiles().length === 0) {
-                    sleep(50);
+                    sleep(100);
                 }
-                newtile.save();
+                newtile.save(null, stageTile);
                 self.card.newTile = undefined;
             };
+
+            this.getAcceptedFiles = function(){
+                self.card.widgets().forEach(function(w) {
+                    if (w.node_id() === self.fileListNodeId) {
+                        if (ko.unwrap(w.attributes.config.acceptedFiles)) {
+                            self.acceptedFiles(ko.unwrap(w.attributes.config.acceptedFiles));
+                        }
+                    }
+                });
+            };
+            this.getAcceptedFiles();
 
             this.dropzoneOptions = {
                 url: "arches.urls.root",
@@ -269,10 +399,14 @@ define([
                 autoProcessQueue: false,
                 uploadMultiple: true,
                 autoQueue: false,
+                acceptedFiles: self.acceptedFiles(),
                 clickable: ".fileinput-button." + this.uniqueidClass(),
                 previewsContainer: '#hidden-dz-previews',
                 init: function() {
                     self.dropzone = this;
+                    this.on("addedfiles", function() {
+                        self.card.staging([]);
+                    });
                     this.on("addedfile", self.addTile, self);
                     this.on("error", function(file, error) {
                         file.error = error;

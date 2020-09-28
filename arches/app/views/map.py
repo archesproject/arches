@@ -33,6 +33,7 @@ from arches.app.utils.response import JSONResponse
 from arches.app.utils.permission_backend import get_users_for_object, get_groups_for_object
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, GeoBoundsAgg, Term
+from arches.app.search.mappings import RESOURCES_INDEX
 
 
 @method_decorator(group_required("Application Administrator"), name="dispatch")
@@ -63,7 +64,7 @@ class MapLayerManagerView(MapBaseManagerView):
             query.add_query(search_query)
             query.add_aggregation(GeoBoundsAgg(field="points.point", name="bounds"))
             query.add_query(Term(field="graph_id", term=str(node.graph.graphid)))
-            results = query.search(index="resources")
+            results = query.search(index=RESOURCES_INDEX)
             bounds = results["aggregations"]["bounds"]["bounds"] if "bounds" in results["aggregations"]["bounds"] else None
             return bounds
 
@@ -75,7 +76,7 @@ class MapLayerManagerView(MapBaseManagerView):
             datatype = datatype_factory.get_instance(node.datatype)
             map_layer = datatype.get_map_layer(node=node, preview=True)
             if map_layer is not None:
-                count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
+                count = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).count()
                 if count > 0:
                     map_layer["bounds"] = get_resource_bounds(node)
                 else:

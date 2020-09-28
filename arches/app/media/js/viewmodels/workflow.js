@@ -71,10 +71,10 @@ define([
             var warnings = []
             self.state.steps.forEach(function(step) {
                 if (step.wastebin && step.wastebin.resourceid) {
-                    warnings.push(step.wastebin.description)
+                    warnings.push(step.wastebin.description);
                     resourcesToDelete.push(step.wastebin);
                 } else if (step.wastebin && step.wastebin.tile) {
-                    warnings.push(step.wastebin.description)
+                    warnings.push(step.wastebin.description);
                     tilesToDelete.push(step.wastebin);
                 }
             });
@@ -163,12 +163,12 @@ define([
             var activeStep = val;
             var previousStep = self.previousStep();
             var resourceId;
-            if (previousStep && previousStep.hasOwnProperty('getStateProperties')) {
-                self.state.steps[previousStep._index] = previousStep.getStateProperties();
+            if (previousStep && previousStep.hasOwnProperty('defineStateProperties')) {
+                self.state.steps[previousStep._index] = previousStep.defineStateProperties();
                 self.state.steps[previousStep._index].complete = ko.unwrap(previousStep.complete);
                 self.state.activestep = val._index;
                 self.state.previousstep = previousStep._index;
-                if (!resourceId) {
+                if (!self.state.resourceid) {
                     resourceId = !!previousStep.resourceid ? ko.unwrap(previousStep.resourceid) : null;
                     self.state.resourceid = resourceId;
                 }

@@ -1,0 +1,331 @@
+{% extends "views/components/workbench.htm" %}
+{% load i18n %}
+
+{% block tabs %}
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('edit');
+}, css: {
+    'active': activeTab() === 'edit'
+}">
+    <i class="fa fa-pencil"></i>
+    <span class="map-sidebar-text">{% trans "Edit" %}</span>
+</div>
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('add');
+}, css: {
+    'active': activeTab() === 'add'
+}">
+    <i class="fa fa-plus"></i>
+    <span class="map-sidebar-text">{% trans "Add" %}</span>
+</div>
+{{ block.super }}
+{% endblock tabs %}
+
+
+{% block content_management %}
+<!-- ko if: card.widgets().length > 0 -->
+<div style="height: inherit; overflow: auto;">
+
+    <div style="min-height: 100%;" data-bind="style: {display: !!self.displayContent() ? 'inherit' : 'none'}">
+        <div id="hidden-dz-previews" style="display:none"></div>
+        <img class="dz-img dz-img-main" data-bind="attr: {src: ko.unwrap(displayContent)}" ></img>
+    </div>
+
+    <div style="position: sticky; bottom: 0px;" data-bind="style: {display: !!self.displayContent() ? 'inherit' : 'none'}">
+        <div class="thumbnail-gallery-container" data-bind="slide: showThumbnails, duration: 100, direction: {direction: 'down'}, easing: 'slide'">
+            <div class='show-thumbnails-btn open' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: '{% trans "close" %}'"></div>
+            <div class="thumbnail-container" data-bind="gallery: photoGallery.pan, duration: 400, scrolldistance: 100, thumbnailclass: 'gallery-thumbnails'">
+                <div class="thumbnail-gallery-controls left" data-bind="click: function(){photoGallery.updatePan('left')}"><i class="fa fa-angle-left"></i></div>
+                <div class="gallery-thumbnails">
+                    <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
+                    <div style='position: relative'>
+                        <!--ko if: $parent.getUrl(tile) -->
+                        <div data-bind="click: $parent.removeTile, visible: ko.unwrap(selected)">
+                            <button class="btn btn-xs dz-cancel"><i class="ion ion-close"></i></button>
+                        </div>
+                        <img class="dz-img" data-bind="attr: {src: $parent.getUrl(tile).url !== undefined ? $parent.getUrl(tile).url : '' }, click: $parent.photoGallery.selectItem">
+                        <!--/ko-->
+                        <!--ko if: $parent.getUrl(tile) === undefined -->
+                        <div data-bind="click: $parent.removeTile, visible: ko.unwrap(selected)">
+                            <button class="btn btn-xs dz-cancel"><i class="ion ion-close"></i></button>
+                        </div>
+                        <img class="dz-img" data-bind="attr: {src: '' }, click: $parent.photoGallery.selectItem">
+                        <!--/ko-->
+                    </div>
+                    <!-- /ko -->
+                </div>
+                <div class="thumbnail-gallery-controls right" data-bind="click: function(){photoGallery.updatePan('right')}"><i class="fa fa-angle-right"></i></div>
+            </div>
+        </div>
+
+        <div class='show-thumbnails-btn closed' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: '{% trans "View Gallery" %}', fadeVisible: showThumbnails, delay:400, fade: 200"></div>
+    </div>
+
+    <!--ko if: self.displayContent() === undefined -->
+    <div class="file-chart-upload-panel">
+        <div class="gallery-controls new-tile">
+            <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
+                <div class="file-select-window">
+                   <div class="bord-top pad-ver file-select">
+                       <div class="" style="padding: 5px">
+                           <h2>{% trans 'Upload Photographs' %}</h2>
+                           <h4>{% trans 'Drag & Dop your photos onto this panel to upload' %}</h4>
+                       </div>
+                       <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                           <i class="fa fa-file"></i>
+                           <span>{% trans "Select Photographs" %}</span>
+                       </button>
+                       <br>
+                       <div style="padding: 10px">
+                            <p>
+                                {% trans "Adding photos to this record is <span><strong>optional.</strong></span>" %}
+                            </p>
+                            <p>
+                                {% trans "You may upload as many photos as you wish, but the maximum size of any single file is <span>8MB</span>" %}
+                            </p>
+                        </div>
+
+                   </div>
+                   <div class="file-upload-footer">
+                       <span>{% trans 'Images formatted as .jpg, .png, .tiff files may be uploaded. Other formats will be ignored.' %}</span>
+                   </div>
+               </div>
+
+            </div>
+        </div>
+    </div>
+    <!--/ko-->
+
+
+</div>
+<!-- /ko -->
+{% endblock content_management %}
+
+
+<!--ko if: self.displayContent() !== undefined -->
+{% block sidepanel %}
+
+<!--ko if: activeTab() === 'add' -->
+<div class="file-chart-upload-panel">
+    <div class="gallery-controls new-tile">
+        <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
+            <div class="file-select-window">
+               <div class="bord-top pad-ver file-select">
+                   <div class="" style="padding: 5px">
+                       <h2>{% trans 'Upload Photographs' %}</h2>
+                       <h4>{% trans 'Drag & Dop your photos onto this panel' %}</h4>
+                   </div>
+                   <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                       <i class="fa fa-file"></i>
+                       <span>{% trans "Select Photographs" %}</span>
+                   </button>
+                   <br>
+                   <div style="padding: 10px">
+                        <p>
+                            {% trans "Adding photos to this record is <span><strong>optional.</strong></span>" %}
+                        </p>
+                        <p>
+                            {% trans "You may upload as many photos as you wish, but the maximum size of any single file is <span>8MB</span>" %}
+                        </p>
+                    </div>
+
+               </div>
+               <div class="file-upload-footer">
+                   <span>{% trans 'Accepted formats: .jpg, .png, .tiff' %}</span>
+               </div>
+           </div>
+
+        </div>
+    </div>
+</div>
+<!--/ko-->
+
+
+<!--ko if: activeTab() === 'edit' -->
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
+</div>
+<h5 class="workbench-tile-picker-label">{% trans 'Image List' %}</h5>
+<div class='photo-workbench-photos'>
+<!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
+    <!--ko if: $parent.getUrl(tile) -->
+    <div class='photo-workbench-photo' data-bind="text: $index() + 1 + ' | ' + ($parent.getUrl(tile).name), click: $parent.photoGallery.selectItem, css: {'selected-photo': ko.unwrap(selected)}"></div>
+    <!--/ko-->
+<!-- /ko -->
+</div>
+
+<div data-bind="css: card.model.cssclass">
+
+    <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
+    <div class="edit-message-container">
+        <span>{% trans 'Currently showing edits by' %}</span>
+        <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
+        <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
+        <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">{% trans 'Return to approved edits' %}</a>
+        <!-- /ko-->
+        <!-- ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
+        <span>{% trans ' This is a new contribution by a provisional editor.' %}</span>
+        <!-- /ko-->
+    </div>
+    <!-- /ko-->
+
+    <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 && !provisionalTileViewModel.selectedProvisionalEdit()-->
+    <div class="edit-message-container approved">
+        <div>{% trans 'Currently showing the most recent approved edits' %}</div>
+    </div>
+    <!-- /ko-->
+
+    <div class="new-provisional-edit-card-container">
+        <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
+        <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
+        <div class='new-provisional-edits-list'>
+            <div class='new-provisional-edits-header'>
+                <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
+                <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){
+                        provisionalTileViewModel.deleteAllProvisionalEdits();
+                    }">{% trans 'Delete all edits' %}</div>
+            </div>
+            <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
+            <div class='new-provisional-edit-entry' data-bind="css: {
+                    'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()
+                }, click: function(){
+                    $parent.provisionalTileViewModel.selectProvisionalEdit(pe);
+                }">
+                <div class='title'>
+                    <div class='field'>
+                        <span data-bind="text : pe.username"></span>
+                    </div>
+                    <a href='' class='field fa fa-times-circle new-delete-provisional-edit' data-bind="click : function(){
+                        $parent.provisionalTileViewModel.rejectProvisionalEdit(pe);
+                    }"></a>
+                </div>
+                <div class="field timestamp">
+                    <span data-bind="text : pe.displaydate">@</span>
+                    <span data-bind="text : pe.displaytimestamp"></span>
+                </div>
+            </div>
+            <!-- /ko -->
+        </div>
+        <!-- /ko-->
+        <!-- /ko-->
+
+        <div class="card">
+            {% block form_header %}
+            <!-- ko if: card.model.helpenabled -->
+            <span>
+                <a class="pull-right card-help help editable-help" data-bind="click: function () {
+                    card.model.get('helpactive')(true)
+                }" style="cursor:pointer;">
+                    {% trans "Help" %}
+                    <i class="fa fa-question-circle"></i>
+                </a>
+            </span>
+            <!-- /ko -->
+            <h5 data-bind="text: card.model.instructions"></h5>
+            {% endblock form_header %}
+            <!-- ko if: card.widgets().length > 0 -->
+            {% block form_widgets %}
+            <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
+                <!--ko if: $parent.getUrl(tile) && tile.selected()-->
+            <form class="widgets" style="margin-bottom: 20px;">
+                <div data-bind="foreach: {
+                        data: $parent.card.widgets, as: 'widget'
+                    }">
+                    <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) !== 'file-list' -->
+                    <div data-bind='component: {
+                        name: self.form.widgetLookup[widget.widget_id()].name,
+                        params: {
+                            formData: tile.formData,
+                            tile: tile,
+                            form: self.form,
+                            config: widget.configJSON,
+                            label: widget.label(),
+                            value: tile.data[widget.node_id()],
+                            node: self.form.nodeLookup[widget.node_id()],
+                            expanded: self.expanded,
+                            graph: self.form.graph,
+                            type: "resource-editor",
+                            disabled: !self.card.isWritable && !self.preview
+                        }
+                    }, css:{
+                        "active": widget.selected,
+                        "hover": widget.hovered,
+                        "widget-preview": self.preview
+                    }, click: function(data, e) {
+                        if (!widget.selected() && self.preview) widget.selected(true);
+                    }, event: {
+                        mouseover: function(){
+                            if (self.preview) widget.hovered(true);
+                        },
+                        mouseout: function(){
+                            if (self.preview) widget.hovered(null);
+                        }
+                    }, visible: widget.visible && self.form.widgetLookup[widget.widget_id()].name !== "newfile-widget" && self.form.widgetLookup[widget.widget_id()].name !== "file-widget"'>
+                    </div>
+                <!--/ko-->
+                </div>
+            </form>
+            <!--/ko-->
+        <!-- /ko -->
+
+            {% endblock form_widgets %}
+            <!-- /ko -->
+            {% block form_buttons %}
+            <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
+                <!--ko if: $parent.getUrl(tile) && tile.selected()-->
+            <div class="install-buttons">
+                <!-- ko if: tile && self.deleteTile -->
+                <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: $parent.removeTile, css: {
+                    disabled: (!$parent.card.isWritable && !self.preview),
+                    'btn-warning': $parent.card.isWritable
+                }">{% trans 'Delete' %}</button>
+                <!-- /ko -->
+                <!-- ko if: tile.dirty() -->
+                    <!-- ko if: $parent.provisionalTileViewModel && !$parent.provisionalTileViewModel.tileIsFullyProvisional() && $parent.card.isWritable -->
+                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: selected().reset">{% trans 'Cancel' %}</button>
+                    <!-- /ko -->
+                    <!-- ko if: tile.tileid -->
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: tile.save, css: {
+                        disabled: (!$parent.card.isWritable && !self.preview),
+                        'btn-mint': $parent.card.isWritable
+                    }">{% trans 'Save' %}</button>
+                    <!-- /ko -->
+                <!-- /ko -->
+                <!-- ko if: !tile.tileid -->
+                <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
+                    disabled: (!$parent.card.isWritable && !self.preview),
+                    'btn-mint': $parent.card.isWritable
+                }">{% trans 'Add'  %}</button>
+                <!-- /ko -->
+            </div>
+                <!--/ko-->
+            <!-- /ko -->
+
+            {% endblock form_buttons %}
+
+            <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
+                <div class="relative">
+                    <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () {
+                        card.model.get('helpactive')(false);
+                    }"></a>
+                </div>
+                <div id="add-basemap-wizard-help-content">
+                    <div>
+                        <div class="panel-heading">
+                            <h3 class="panel-title help-panel-title" style="">
+                                <span data-bind="html: card.model.get('helptitle')"></span>
+                            </h3>
+                        </div>
+                        <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: card.model.get('helptext')">
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+<!--/ko-->
+
+{{ block.super }}
+{% endblock sidepanel %}
+<!--/ko-->

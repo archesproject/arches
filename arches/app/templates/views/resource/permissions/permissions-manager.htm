@@ -1,0 +1,110 @@
+{% load staticfiles %}
+{% load i18n %}
+{% load template_tags %}
+<div id="related-resources-drag-panel" style="height: calc(100vh - 102px);" class="search-container related-resources-container">
+
+
+    <!-- Target -->
+    <!--ko if: openEditor() === false -->
+    <div id="rr-manager-content-id" class="rr-drag-panel-target">
+
+        <div id="rr-splash" class="rr-splash">
+
+            <!-- Image -->
+            <div class="img-lg img-circle rr-splash-img-container">
+                <!-- <img class="rr-splash-img" src="{% static "/img/Workflow.png" %}" alt="Resource Editor"> -->
+                <i class="fa fa-lock"></i>
+            </div>
+
+            <!-- Splash Title -->
+            <div class="rr-splash-title">{% trans "Resource Instance Permissions" %}</div>
+
+
+            <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-link" data-bind="click: function(){makeInstancePrivate()}">{% trans 'Configure Access to this Instance' %}</button>
+
+            <!-- Splash Instructions -->
+            <div class="rr-splash-description">{% trans "Define access privileges for this instance.  You may limit access to yourself, or select which user accounts and groups have permission to this resource." %}</div>
+
+            <!-- Help Hyperlink -->
+        </div>
+    </div>
+    <!--/ko-->
+    <!--ko if: openEditor() -->
+        <div class="permission-grid">
+            <div class="permission-header">
+                <h4>{% trans 'Set Permissions for this instance' %}</h4>
+                <h5>{% trans 'By default only you have access to this record. You can set permissions for specific people or groups by selecting to whom you will grant access' %}</h5>
+            </div>
+            <div class="permission-control">
+                <div class="permission-filter">
+                <input type="text" class="form-control" style="display:inline-block;" placeholder="filter table" data-bind="textInput: filter">
+                <div class="clear-filter" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></div>
+                </div>
+            </div>
+            <div class="permission-list">
+            <div class="applied-permissions">
+            <!--ko if: filteredPermissions()  -->
+            <div class="permission-list-table">
+                <div class="permissions-list-header">
+                    <div class="identities-column">{% trans 'Person/Group' %}</div><div class="permissions-column">{% trans 'Permissions' %}</div>
+                </div>
+                <div class="permissions-list-table-body">
+                     <!--ko foreach: filteredPermissions() --> 
+                        <!--ko if: $data.creatorOrSuperUser -->
+                        <div class="permissions-table-row">
+                            <div style="display: inline-flex">
+                                <div class="identities-column"><i style="color: #579ddb; padding: 0 5px" class="fa" data-bind="class: function(){return $data['type']==='user' ? 'fa-user' : 'fa-users'}()"></i><span data-bind="text: $data['name']"></span></div>
+                                <div class="permissions-column" data-bind="text: [$parent.permissionLabelLookup.view_resourceinstance,$parent.permissionLabelLookup.change_resourceinstance,$parent.permissionLabelLookup.delete_resourceinstance].join(', ')"></div>
+                            </div>
+                        </div>
+                         <!--/ko-->
+                     <!--/ko-->
+                    <!--ko foreach: filteredPermissions() -->
+                    <!--ko ifnot: $data.creatorOrSuperUser -->
+                    <div class="permissions-table-row" data-bind = "css: {selected: $data.selected()}">
+                        <div data-bind="click: function(){$data.selected(!$data.selected())}" style="display: inline-flex">
+                            <div class="identities-column"><i style="color: #579ddb; padding: 0 5px" class="fa" data-bind="class: function(){return $data['type']==='user' ? 'fa-user' : 'fa-users'}()"></i><span data-bind="text: $data['name']"></span></div>
+                            <div class="permissions-column" data-bind="text: $data.availablePermissions.filter(function(a){return !!a.selected()}).map(function(p){return $parent.permissionLabelLookup[p.codename]}).join(', ')"></div>
+                        </div>
+                        <!--ko if: selected-->
+                        <div class="permission-selection-panel">
+                            <div class="identities-column"></div>
+                            <!--ko if: $parent.instancePermissions()  -->
+                            <div class="permissions-column">
+                                <div class="permissions-options">
+                                    <!--ko foreach: $data.availablePermissions -->
+                                    <div style="margin-right: 15px">
+                                    <label class="form-checkbox form-normal form-primary permission-option active" data-bind="css: {
+                                            'active': $data.selected
+                                        }, click: $data.selected.bind($data, !$data.selected())">
+                                        <input type="checkbox" data-bind="checked: $data.selected">
+                                        <i data-bind="css: $data.icon"></i> <span data-bind="text: $data.name.replace(' resource', '')"></span>
+                                    </label>
+                                    </div>
+                                    <!--/ko-->
+                                </div>
+                            </div>
+                            <!--/ko-->
+                        </div>
+                        <!--/ko-->
+                    </div>
+                    <!--/ko-->
+                    <!--/ko-->
+                </div>
+            </div>
+            <!--/ko-->
+            </div>
+            </div>
+            <div class="permissions-buttons mar-btm">
+                <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt" data-bind="click: function(){revertPermissions()}, css: {'disabled': !dirty()}">{% trans 'Cancel' %}
+                </button>
+                <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check" data-bind="click: function(){updatePermissions()}, css: {'disabled': !dirty()}">{% trans 'Apply' %}</button>
+            </div>
+            <div class="remove-permissions-btn mar-btm" style="align-self: end">
+            <button id="cc-save-btn" class="btn btn-shim btn-warning btn-labeled btn-lg fa fa-unlock" data-bind="click: function(){makeInstancePublic()}">{% trans 'Allow Normal Access' %}</button>
+        </div>
+        </div>
+
+    
+    <!--/ko-->
+</div>

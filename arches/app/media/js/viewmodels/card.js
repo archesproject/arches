@@ -75,6 +75,7 @@ define([
         var loading = params.loading || ko.observable();
         var perms = ko.observableArray();
         var permsLiteral = ko.observableArray();
+        var allowProvisionalEditRerender = ko.observable(true);
         var nodegroups = params.graphModel.get('nodegroups');
         var multiselect = params.multiselect || false;
         var isWritable = params.card.is_writable || false;
@@ -147,6 +148,7 @@ define([
             isWritable: isWritable,
             model: cardModel,
             appliedFunctions: appliedFunctions,
+            allowProvisionalEditRerender: allowProvisionalEditRerender,
             multiselect: params.multiselect,
             widgets: cardModel.widgets,
             parent: params.tile,
@@ -164,7 +166,7 @@ define([
                 var provisionalindex;
                 var summary = _.map(this.tiles(), function(tile){
                     var dataEmpty = _.keys(koMapping.toJS(tile.data)).length === 0;
-                    if (tile.provisionaledits() !== null && dataEmpty) {
+                    if (ko.unwrap(tile.provisionaledits) !== null && dataEmpty) {
                         return 2;
                     } else if (tile.provisionaledits() !== null && !dataEmpty) {
                         return 1;
@@ -278,6 +280,10 @@ define([
                     }
                 },
                 owner: this
+            }),
+            showForm: ko.observable(false),
+            showSummary: ko.pureComputed(function(){
+                return self.canAdd() && self.showForm() === false && self.selected();
             }),
             canAdd: ko.pureComputed({
                 read: function() {
@@ -397,9 +403,24 @@ define([
             }
         };
 
-       this.isDirty = function(){
+        this.isDirty = function(){
+            // Returns true if a tile is dirty and dirty state is not triggered by default values.
             if(self.newTile) {
-                if(self.newTile.dirty()) { return true; }
+                if(self.newTile.dirty()) {
+                    var res = {};
+                    self.widgets().forEach(function(w){
+                        res[w.node.nodeid] = ko.unwrap(w.config.defaultValue);
+                    });
+                    for (var k in self.newTile.data) {
+                        if (Object.keys(res).indexOf(k) > -1) {
+                            if ((res[k]||null) == (self.newTile.data[k]()||null) !== true) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }
+                    }
+                }
             }
             return false;
         };
@@ -431,6 +452,16 @@ define([
                 expandParents(this);
             }
         }, this);
+
+        this.copyTile = function(tile) {
+            var newTile = self.getNewTile();
+            newTile.noDefaults = true;
+            self.showForm(true);
+            ko.mapping.fromJS(
+                ko.mapping.toJS(tile.data),
+                newTile.data
+            );
+        };
 
         this.disposables = [];
         this.disposables.push(higlightSubscription);

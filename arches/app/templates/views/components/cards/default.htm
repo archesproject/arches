@@ -19,7 +19,7 @@
         <!-- /ko -->
         <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
         <!-- ko if: card.canAdd() -->
-        <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}" data-toggle="tooltip" data-original-title="{% trans "Add New" %}"></i>
+        <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}, click: function(){card.showForm(true);}, clickBubble: false" data-toggle="tooltip" data-original-title="{% trans 'Add Gnu' %}"></i>
         <!-- /ko -->
     </a>
     <ul class="jstree-children" aria-expanded="true">
@@ -223,7 +223,7 @@
 <div class="card-component" data-bind="css: card.model.cssclass">
 
     <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
-    <div class="edit-message-container">
+    <div class="edit-message-container provisional-editor">
         <span>{% trans 'Showing edits by' %}</span>
         <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
         <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
@@ -272,7 +272,7 @@
 
         <div class="card">
             {% block form_header %}
-            <h4 data-bind="text: card.model.name"></h4>
+            <h4 data-bind="text: card.model.name()"></h4>
 
             <!-- ko if: card.model.helpenabled -->
             <span>
@@ -286,6 +286,7 @@
             <!-- /ko -->
 
             {% endblock form_header %}
+            <!-- ko if: card.showSummary() === false -->
             <!-- ko if: card.widgets().length > 0 -->
             {% block form_widgets %}
             <form class="widgets" style="margin-bottom: 20px;">
@@ -382,6 +383,13 @@
                 <!-- /ko -->
             </div>
             {% endblock form_buttons %}
+            <!-- /ko -->
+            <!-- ko if: card.showSummary() === true -->
+            {% block card_summary %}
+            {% include 'views/components/cards/default-card-report.htm' %}
+            <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-primary" data-bind="text: '{% trans "New" %}', click: function(){card.showForm(true)}"></button>
+            {% endblock card_summary %}
+            <!-- /ko -->
 
             <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
                 <div class="relative">
@@ -407,75 +415,7 @@
 
 <!-- ko if: state === 'report' && card.model.visible() -->
 {% block report %}
-<div data-bind="css: {'print-hide': !reportExpanded()}">
-    <!-- ko if: showHeaderLine--><hr class="rp-tile-separator"><!-- /ko -->
-    <div class="rp-card-section" data-bind="css: card.model.cssclass, visible: card.fullyProvisional() !== 'fullyprovisional'">
-            <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
-            <!-- ko if: card.tiles().length > 0 -->
-            <i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': reportExpanded(), 'fa-angle-right': !reportExpanded()}, click: function () { reportExpanded(!reportExpanded()) }"></i>
-            <!-- ko if: reportExpanded() -->
-            <!-- ko foreach: { data: self.preview ? [card.newTile] : card.tiles, as: 'tile' } -->
-                <div class="rp-card-section" data-bind="css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}, attr: {id: tile.tileid}">
-                    <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
-                    {% block report_widgets %}
-                    <!-- ko if: card.model.get('widgets')().length > 0 -->
-                        <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
-                            <!-- ko if: ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false -->
-                            <div class="report-card-provisional-flag">{% trans 'These data are provisional and pending review' %}</div>
-                            <!-- /ko-->
-                            <dl class="dl-horizontal" data-bind="css: {'provisional': ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false}">
-                                <!-- ko foreach: { data: card.model.get('widgets'), as: 'widget' } -->
-                                    <!-- ko if: widget.visible -->
-                                    <!-- ko component: {
-                                        name: widget.widgetLookup[widget.get("widget_id")()].name,
-                                        params: {
-                                            config: configJSON,
-                                            label: widget.get("label")(),
-                                            node: widget.node,
-                                            value: tile.data[widget.node.nodeid],
-                                            state: "report"
-                                        }
-                                    } --><!-- /ko -->
-                                    <!-- /ko -->
-                                <!-- /ko -->
-                            </dl>
-                        </div>
-                    <!-- /ko -->
-                    {% endblock report_widgets %}
-
-                    {% block report_cards %}
-                    <div class="rp-report-container-tile" data-bind="visible: card.cards().length > 0">
-                        <!-- ko foreach: { data: self.preview ? card.cards : tile.cards, as: 'card' } -->
-                                <!-- ko component: {
-                                    name: card.model.cardComponentLookup[card.model.component_id()].componentname,
-                                    params: {
-                                        state: 'report',
-                                        preview: self.preview,
-                                        card: card,
-                                        showHeaderLine: self.card.model.get("widgets")().length > 0 || $index !== 0,
-                                        pageVm: $root
-                                    }
-                                } --> <!-- /ko -->
-                        <!-- /ko -->
-                    </div>
-                    {% endblock report_cards %}
-                </div>
-            <!-- /ko -->
-            <!-- /ko -->
-            <!-- /ko -->
-
-        <!-- ko if: card.tiles().length === 0 && !self.preview -->
-        <div class="row rp-report-tile rp-no-data">
-            <!-- ko ifnot: card.model.get('cardid') -->
-            {% trans "Sorry, you don't have access to this information" %}
-            <!-- /ko -->
-            <!-- ko if: card.model.get('cardid') -->
-            <span>{% trans "No data added yet for " %}</span><span data-bind="text: card.model.get('name')"></span>
-            <!-- /ko -->
-        </div>
-        <!-- /ko -->
-    </div>
-</div>
+{% include 'views/components/cards/default-card-report.htm' %}
 {% endblock report %}
 <!-- /ko -->
 

@@ -36,75 +36,72 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block main_content %}
 <div class="content-panel">
     <div class="flex">
-        <div class="left-panel graph-designer resource-editor" data-bind="resizableSidepanel:true">
-            <div class="jstree jstree-default" data-bind="visible: true" style="display: none;">
-                <div class="header">
-                    <div class="list-filter" data-bind="">
-                        <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter, event: {keypress: filterEnterKeyHandler}">
-
-                        <!-- Clear Search -->
-                        <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+        <div class="left-panel graph-designer" data-bind="resizableSidepanel:true">
+            <div class="left-panel-inner-container">
+                <div class="jstree jstree-default" data-bind="visible: true" style="display: none;">
+                    <div class="header">
+                        <div class="list-filter" data-bind="">
+                            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter, event: {keypress: filterEnterKeyHandler}">
+    
+                            <!-- Clear Search -->
+                            <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+                        </div>
+                        <div>
+                            <a class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
+                            <a class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
+                        </div>
                     </div>
-                    <div class="tree-display-tools-panel">
-                        <a class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
-            <a class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
+                    <div class="resource-editor-tree">
+                        <ul class="jstree-container-ul jstree-children" aria-expanded="true">
+                        <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
+                            <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
+                            <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root'}">
+                                <strong>
+                                    <i data-bind="css: graphiconclass != (null || '') ? graphiconclass : 'fa fa-question'" role="presentation"></i>
+                                    <span data-bind="text: displayname"></span> (<span data-bind="text: graphname"></span>)
+                                </strong>
+                            </a>
+                            <!-- ko foreach: { data: [$data], as: 'self' } -->
+                            <ul class="jstree-children" aria-expanded="true" data-bind="foreach: {
+                                data: topCards,
+                                as: 'card'
+                            }">
+                                <!-- ko component: {
+                                    name: self.cardComponentLookup[card.model.component_id()].componentname,
+                                    params: {
+                                        state: 'editor-tree',
+                                        card: card,
+                                        tile: null,
+                                        loading: self.loading,
+                                        form: self,
+                                        pageVm: $root
+                                    }
+                                } --> <!-- /ko -->
+                            </ul>
+                            <!-- /ko -->
+                        </li>
+                        <!--ko ifnot: issystemsettings -->
+                        <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId()}">
+                            <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                            <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showRelatedResourcesManager()}}, css: {'jstree-clicked': selection() === 'related-resources', 'disabled': resourceId() === ''}">
+                                <strong>
+                                    <i class="fa fa-link" role="presentation"></i>
+                                    <span>{% trans 'Related Resources' %}</span>
+                                </strong>
+                            </a>
+                        </li>
+                        <!--/ko-->
+                        <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId()}">
+                            <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                            <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showInstancePermissionsManager(self)}}, css: {'jstree-clicked': selection() === 'resource-permissions', 'disabled': resourceId() === '' || userIsCreator === false }">
+                                <strong>
+                                    <i class="fa fa-lock" role="presentation"></i>
+                                    <span>{% trans 'Manage Permissions' %}</span>
+                                </strong>
+                            </a>
+                        </li>
+                    </ul>
                     </div>
-                </div>
-                <div class="resource-editor-tree">
-                    <ul class="jstree-container-ul jstree-children" aria-expanded="true">
-                    <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
-                        <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
-                        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root'}">
-                            <strong>
-                                <i data-bind="css: graphiconclass != (null || '') ? graphiconclass : 'fa fa-question'" role="presentation"></i>
-                                <span data-bind="text: displayname"></span> (<span data-bind="text: graphname"></span>)
-                            </strong>
-                        </a>
-                        <!-- ko foreach: { data: [$data], as: 'self' } -->
-                        <ul class="jstree-children" aria-expanded="true" data-bind="foreach: {
-                            data: topCards,
-                            as: 'card'
-                        }">
-                            <!-- ko component: {
-                                name: self.cardComponentLookup[card.model.component_id()].componentname,
-                                params: {
-                                    state: 'editor-tree',
-                                    card: card,
-                                    tile: null,
-                                    loading: self.loading,
-                                    form: self,
-                                    pageVm: $root
-                                }
-                            } --> <!-- /ko -->
-                        </ul>
-                        <!-- /ko -->
-                    </li>
-                    <!--ko ifnot: issystemsettings -->
-                    <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId()}">
-                        <i class="jstree-icon jstree-ocl" role="presentation"></i>
-                        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showRelatedResourcesManager()}}, css: {'jstree-clicked': selection() === 'related-resources', 'disabled': resourceId() === ''}">
-                            <strong>
-                                <i class="fa fa-link" role="presentation"></i>
-                                <span>{% trans 'Related Resources' %}</span>
-                            </strong>
-                        </a>
-                        <ul class="jstree-container-ul jstree-children related-resources" aria-expanded="true" data-bind="foreach: {
-                            data: [],
-                            as: 'rr'
-                        }">
-                            <li role="treeitem card-treeitem" class="jstree-node jstree-leaf">
-                                <i class="jstree-icon jstree-ocl" role="presentation"></i>
-                                <a class="jstree-anchor" href="#" tabindex="0">
-                                    <strong>
-                                        <i class="fa fa-link" role="presentation"></i>
-                                        <span data-bind="text: rr.name"></span>
-                                    </strong>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <!--/ko-->
-                </ul>
                 </div>
             </div>
         </div>
@@ -117,6 +114,28 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                  <div data-bind="component: {
                     name: 'related-resources-manager',
                     params: relatedResourcesManagerObj
+                }"></div>
+            </div>
+            <!--/ko -->
+
+            <!--ko if: selection() === 'permissions-manager' -->
+            <div>
+                <div data-bind="component: {
+                    name: 'permissions-manager',
+                    params: {
+                        graphId: graphid,
+                        resourceId: resourceId,
+                        creator: creator,
+                        userIsCreator: userIsCreator,
+                        alert: alert, 
+                        permissionLabelLookup: {
+                            'view_resourceinstance':'{% trans 'Read' %}',
+                            'change_resourceinstance':'{% trans 'Update' %}',
+                            'no_access_to_resourceinstance':'{% trans 'No Access' %}',
+                            'delete_resourceinstance':'{% trans 'Delete' %}',
+                        },
+                        alertTitle: '{% trans 'You are about assign normal user access to this instance' %}', 
+                        alertMessage: '{% trans 'Would you like to proceed?' %}'},
                 }"></div>
             </div>
             <!--/ko -->
@@ -209,7 +228,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <!-- /ko -->
                             <!-- /ko -->
                             <!-- ko if: !selectedTile().tileid -->
-                            New <span data-bind="text: selectedCard().model.name"></span>
+                            {% trans "New" %} <span data-bind="text: selectedCard().model.name"></span>
                             <!-- /ko -->
                         </span>
                         <!-- ko if: selectedTile().tileid && selectedTile().cards.length > 0 -->
@@ -217,7 +236,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- ko if: addableCards().length > 0 -->
                         <span class="dropdown">
                             <a class="dropdown-toggle" href="javascript:void(0)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                Add new... <i class="fa fa-caret-down"></i>
+                                {% trans "Add new" %}... <i class="fa fa-caret-down"></i>
                             </a>
                             <ul class="dropdown-menu" style="padding-bottom: 5px;">
                                 <!-- ko foreach: { data: addableCards(), as: 'card' } -->
@@ -229,6 +248,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </span>
                         <!-- /ko -->
 
+                        <!-- /ko -->
+
+                        <!-- ko if: selectedCard().cardinality === 'n' && selectedTile().tileid  -->
+                        <span class="add-new-crumb current-crumb" data-bind="click: function() {
+                            selectedCard().selected(true); setTimeout(function(){selectedCard().showForm(true)}, 50);
+                        }">
+                            <i class="fa fa-plus"></i>
+                            {% trans 'Add New' %}
+                        </span>
                         <!-- /ko -->
                     </div>
                 </div>
@@ -267,7 +295,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 resourceid: '{{resourceid}}',
                 graphid: '{{graphid}}',
                 graphiconclass: '{{graphiconclass}}',
-                graphname: '{{graphname}}',
+                graphname: '{{graphname | escapejs}}',
                 displayname: '{{displayname | escapejs}}',
                 tiles: {{tiles}},
                 cards: {{cards}},
@@ -281,10 +309,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 cardComponents: {{card_components_json}},
                 nodegroups: {{nodegroups}},
                 userisreviewer:  JSON.parse('{{ user_is_reviewer }}'.toLowerCase()),
+                creator:  JSON.parse('{{ creator }}'.toLowerCase()),
+                useriscreator:  JSON.parse('{{ user_created_instance }}'.toLowerCase()),
                 templates: {{templates_json}},
                 graph: {{graph_json}},
                 issystemsettings: {{is_system_settings|yesno:"true,false"}}
-            };
+            };ƒ
         });{% endautoescape %}
     </script>
 {% endblock pre_require_js %}

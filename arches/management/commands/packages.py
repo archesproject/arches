@@ -10,11 +10,6 @@ import urllib.request, urllib.parse, urllib.error
 import os
 import imp
 import logging
-from arches.app.search.mappings import (
-    prepare_terms_index,
-    prepare_concepts_index,
-    prepare_resource_relations_index,
-)
 from arches.setup import unzip_file
 from arches.management.commands import utils
 from arches.app.utils import import_class_from_string
@@ -36,6 +31,7 @@ from arches.app.models import models
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resources.remover as resource_remover
+import arches.app.utils.task_management as task_management
 from django.forms.models import model_to_dict
 from django.db.utils import IntegrityError
 from django.db import transaction, connection
@@ -217,6 +213,8 @@ class Command(BaseCommand):
             will export all grouped business data to one csv file.",
         )
 
+        parser.add_argument("-type", "--graphtype", action="store", dest="type", help="indicates the type of graph intended for export")
+
         parser.add_argument(
             "-y", "--yes", action="store_true", dest="yes", help='used to force a yes answer to any user input "continue? y/n" prompt'
         )
@@ -254,7 +252,7 @@ class Command(BaseCommand):
             self.import_graphs(options["source"])
 
         if options["operation"] == "export_graphs":
-            self.export_graphs(options["dest_dir"], options["graphs"])
+            self.export_graphs(options["dest_dir"], options["graphs"], options["type"])
 
         if options["operation"] == "import_business_data":
 
@@ -470,6 +468,9 @@ class Command(BaseCommand):
     def load_package(
         self, source, setup_db=True, overwrite_concepts="ignore", bulk_load=False, stage_concepts="keep", yes=False,
     ):
+
+        celery_worker_running = task_management.check_if_celery_available()
+
         def load_ontologies(package_dir):
             ontologies = glob.glob(os.path.join(package_dir, "ontologies/*"))
             if len(ontologies) > 0:
@@ -514,13 +515,18 @@ class Command(BaseCommand):
         def load_resource_to_resource_constraints(package_dir):
             config_paths = glob.glob(os.path.join(package_dir, "package_config.json"))
             if len(config_paths) > 0:
-                configs = json.load(open(config_paths[0]))
-                for relationship in configs["permitted_resource_relationships"]:
-                    (obj, created) = models.Resource2ResourceConstraint.objects.update_or_create(
-                        resourceclassfrom_id=uuid.UUID(relationship["resourceclassfrom_id"]),
-                        resourceclassto_id=uuid.UUID(relationship["resourceclassto_id"]),
-                        resource2resourceid=uuid.UUID(relationship["resource2resourceid"]),
-                    )
+                try:
+                    configs = json.load(open(config_paths[0]))
+                    for relationship in configs["permitted_resource_relationships"]:
+                        (obj, created) = models.Resource2ResourceConstraint.objects.update_or_create(
+                            resourceclassfrom_id=uuid.UUID(relationship["resourceclassfrom_id"]),
+                            resourceclassto_id=uuid.UUID(relationship["resourceclassto_id"]),
+                            resource2resourceid=uuid.UUID(relationship["resource2resourceid"]),
+                        )
+                except json.decoder.JSONDecodeError as e:
+                    logger.warn("Invalid syntax in package_config.json. Please inspect and then re-run command.")
+                    logger.warn(e)
+                    sys.exit()
 
         @transaction.atomic
         def load_preliminary_sql(package_dir):
@@ -622,19 +628,47 @@ class Command(BaseCommand):
                 for f in configs["business_data_load_order"]:
                     business_data.append(os.path.join(package_dir, "business_data", f))
             else:
-                business_data += glob.glob(os.path.join(package_dir, "business_data", "*.json"))
-                business_data += glob.glob(os.path.join(package_dir, "business_data", "*.jsonl"))
-                business_data += glob.glob(os.path.join(package_dir, "business_data", "*.csv"))
+                for ext in ["*.json", "*.jsonl", "*.csv"]:
+                    business_data += glob.glob(os.path.join(package_dir, "business_data", ext))
+
+            erring_csvs = [
+                path
+                for path in business_data
+                if os.path.splitext(path)[1] == ".csv" and os.path.isfile(os.path.splitext(path)[0] + ".mapping") is False
+            ]
+            message = (
+                f"The following .csv files will not load because they are missing accompanying .mapping files: \n\t {','.join(erring_csvs)}"
+            )
+            if len(erring_csvs) > 0:
+                print(message)
+            if yes is False and len(erring_csvs) > 0:
+                response = input("Proceed with package load without loading indicated csv files? (Y/N): ")
+                if response.lower() in ("t", "true", "y", "yes"):
+                    print("Proceeding with package load")
+                else:
+                    print("Aborting operation: Package Load")
+                    sys.exit()
+
+            if celery_worker_running:
+                from celery import chord
+                from arches.app.tasks import import_business_data, package_load_complete, on_chord_error
+
+                valid_resource_paths = [
+                    path
+                    for path in business_data
+                    if (".csv" in path and os.path.exists(path.replace(".csv", ".mapping"))) or (".json" in path)
+                ]
+
+                # assumes resources in csv do not depend on data being loaded prior from json in same dir
+                chord([import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load) for path in valid_resource_paths])(
+                    package_load_complete.signature(kwargs={"valid_resource_paths": valid_resource_paths}).on_error(on_chord_error.s())
+                )
+            else:
+                for path in business_data:
+                    if path not in erring_csvs:
+                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load)
 
             relations = glob.glob(os.path.join(package_dir, "business_data", "relations", "*.relations"))
-
-            for path in business_data:
-                if path.endswith("csv"):
-                    config_file = path.replace(".csv", ".mapping")
-                    self.import_business_data(path, overwrite=True, bulk_load=bulk_load)
-                else:
-                    self.import_business_data(path, overwrite=True, bulk_load=bulk_load)
-
             for relation in relations:
                 self.import_business_data_relations(relation)
 
@@ -718,6 +752,9 @@ class Command(BaseCommand):
 
         def load_functions(package_dir):
             load_extensions(package_dir, "functions", "fn")
+
+        def cache_graphs():
+            management.call_command("cache", operation="graphs")
 
         def load_apps(package_dir):
             package_apps = glob.glob(os.path.join(package_dir, "apps", "*"))
@@ -815,7 +852,16 @@ class Command(BaseCommand):
             css_files = glob.glob(os.path.join(css_source, "*.css"))
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
-        print("package load complete")
+        print("caching resource models")
+        try:
+            cache_graphs()
+        except Exception as e:
+            print("Unable to cache graph proxy models")
+            print(e)
+        if celery_worker_running:
+            print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
+        else:
+            print("package load complete")
 
     def setup(self, package_name, es_install_location=None):
         """
@@ -846,42 +892,51 @@ class Command(BaseCommand):
     def setup_indexes(self):
         management.call_command("es", operation="setup_indexes")
 
-    def drop_resources(self, packages_name):
-        drop_all_resources()
-
     def delete_indexes(self):
         management.call_command("es", operation="delete_indexes")
 
     def export_business_data(
-        self, data_dest=None, file_format=None, config_file=None, graph=None, single_file=False,
+        self, data_dest=None, file_format=None, config_file=None, graphid=None, single_file=False,
     ):
-        try:
-            resource_exporter = ResourceExporter(file_format, configs=config_file, single_file=single_file)
-        except KeyError as e:
-            utils.print_message("{0} is not a valid export file format.".format(file_format))
+        graphids = []
+        if graphid is False and file_format == "json":
+            graphids = [
+                str(graph.graphid)
+                for graph in models.GraphModel.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            ]
+        if graphid is False and file_format != "json":
+            utils.print_message("Exporting data for all graphs is currently only supported for the json format")
             sys.exit()
-        except MissingConfigException as e:
-            utils.print_message("No mapping file specified. Please rerun this command with the '-c' parameter populated.")
-            sys.exit()
-
-        if data_dest != "":
-            try:
-                data = resource_exporter.export(graph_id=graph, resourceinstanceids=None)
-            except MissingGraphException as e:
-
-                print(utils.print_message("No resource graph specified. Please rerun this command with the '-g' parameter populated."))
-
-                sys.exit()
-
-            for file in data:
-                with open(os.path.join(data_dest, file["name"]), "w") as f:
-                    bufsize = 16 * 1024
-                    file["outputfile"].seek(0)
-                    shutil.copyfileobj(file["outputfile"], f, bufsize)
-                # with open(os.path.join(data_dest, file['name']), 'wb') as f:
-                #     f.write(file['outputfile'].getvalue())
+        if graphid:
+            graphids.append(graphid)
+        if os.path.exists(data_dest):
+            safe_characters = (" ", ".", "_", "-")
+            for graphid in graphids:
+                try:
+                    resource_exporter = ResourceExporter(
+                        file_format, configs=config_file, single_file=single_file
+                    )  # New exporter needed for each graphid, else previous data is appended with each subsequent graph
+                    data = resource_exporter.export(graph_id=graphid, resourceinstanceids=None)
+                    for file in data:
+                        with open(
+                            os.path.join(
+                                data_dest,
+                                "".join(char if (char.isalnum() or char in safe_characters) else "-" for char in file["name"]).rstrip(),
+                            ),
+                            "w",
+                        ) as f:
+                            file["outputfile"].seek(0)
+                            shutil.copyfileobj(file["outputfile"], f, 16 * 1024)
+                except KeyError:
+                    utils.print_message("{0} is not a valid export file format.".format(file_format))
+                    sys.exit()
+                except MissingConfigException:
+                    utils.print_message("No mapping file specified. Please rerun this command with the '-c' parameter populated.")
+                    sys.exit()
         else:
-            utils.print_message("No destination directory specified. Please rerun this command with the '-d' parameter populated.")
+            utils.print_message(
+                "The destination is unspecified or invalid. Please rerun this command with the '-d' parameter populated with a valid path."
+            )
             sys.exit()
 
     def import_reference_data(self, data_source, overwrite="ignore", stage="stage", bulk_load=False):
@@ -1029,27 +1084,48 @@ will be very jumbled."""
         if isinstance(data_source, str):
             data_source = [data_source]
 
+        errors = []
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
                 print(os.path.join(path))
                 with open(path, "rU") as f:
                     archesfile = JSONDeserializer().deserialize(f)
-                    ResourceGraphImporter(archesfile["graph"], overwrite_graphs)
+                    errs, importer = ResourceGraphImporter(archesfile["graph"], overwrite_graphs)
+                    errors.extend(errs)
             else:
                 file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith(".json")]
                 for file_path in file_paths:
                     print(os.path.join(path, file_path))
                     with open(os.path.join(path, file_path), "rU") as f:
                         archesfile = JSONDeserializer().deserialize(f)
-                        ResourceGraphImporter(archesfile["graph"], overwrite_graphs)
+                        errs, importer = ResourceGraphImporter(archesfile["graph"], overwrite_graphs)
+                        errors.extend(errs)
+        for e in errors:
+            utils.print_message(e)
 
-    def export_graphs(self, data_dest="", graphs=""):
+    def export_graphs(self, data_dest="", graphs="", graphtype=""):
         """
         Exports graphs to arches.json.
 
         """
         if data_dest != "":
-            graphs = [graph.strip() for graph in graphs.split(",")]
+            if not graphs:
+                if not graphtype:
+                    graphs = [
+                        str(graph["graphid"])
+                        for graph in models.GraphModel.objects.exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).values("graphid")
+                    ]
+                elif graphtype == "branch":
+                    graphs = [str(graph["graphid"]) for graph in models.GraphModel.objects.filter(isresource=False).values("graphid")]
+                elif graphtype == "resource":
+                    graphs = [
+                        str(graph["graphid"])
+                        for graph in models.GraphModel.objects.filter(isresource=True)
+                        .exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                        .values("graphid")
+                    ]
+            else:
+                graphs = [graph.strip() for graph in graphs.split(",")]
             for graph in ResourceGraphExporter.get_graphs_for_export(graphids=graphs)["graph"]:
                 graph_name = graph["name"].replace("/", "-")
                 with open(os.path.join(data_dest, graph_name + ".json"), "wb") as f:
@@ -1073,7 +1149,7 @@ will be very jumbled."""
         if data_dest != "":
             data = resource_exporter.export(graph_id=graph)
             for file in data:
-                with open(os.path.join(data_dest, file["name"]), "wb") as f:
+                with open(os.path.join(data_dest, file["name"]), "w") as f:
                     f.write(file["outputfile"].getvalue())
         else:
             utils.print_message("No destination directory specified. Please rerun this command with the '-d' parameter populated.")

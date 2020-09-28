@@ -64,12 +64,12 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <span class="icon-bar"></span>
                     </button>
 
-                    <div class="relative" style="padding: 8px 10px 8px 100px; width: 300px;">
-                        <div class="navbar-brand-v5-icon-container" style="">
-                            <img class="navbar-brand-v5-icon" src="{% static 'img/landing/arches_logo_dark.png' %}" style="" alt="Arches Logo">
+                    <div class="relative" style="padding: 8px 10px 8px 100px; width: 400px;">
+                        <div style="position: absolute; top: 4px; padding:10px 5px 0px 0px;">
+                            <img src="{% static 'img/landing/Arches_logo_white.png' %}" style="height: 25px;" alt="Arches Logo">
                         </div>
-                        <div class="application-name" style="position: absolute; top: 5px; left: 160px;">
-                            <h2>{% trans "Arches | v5" %}</h2>
+                        <div class="application-name" style="position: absolute; top: 5px; left: 250px;">
+                            <h2>{% blocktrans %}Arches | {{version}}{% endblocktrans %}</h2>
                         </div>
                     </div>
                 </div>
@@ -154,12 +154,11 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                     <!-- SLIDE 1 -->
                     <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Slide 1">
                         <!-- MAIN IMAGE -->
-                        <img src="{% static 'img/landing/potala_palace.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
-
+                        <img src="{% static 'img/landing/bhutan_tigersnest_lr.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
                         <!-- LAYERS -->
                         <!-- NEW LAYER -->
-                        <div class="tp-caption sft start text-bold v5-splash-caption" style="left: 150px;" delay="4500"  data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
-                            <h2>{% trans "Arches v5.0" %}</h2>
+                        <div class="tp-caption sft start text-bold v5-splash-caption" style="left: 150px;" delay="4500"  data-hoffset="0" data-y="50" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
+                            <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
                             <p>{% trans "A web and mobile platform for" %}</p>
                             <p>{% trans "managing your most important resource information" %}</p>
                         </div>
@@ -169,7 +168,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                         <!-- Attribution -->
                         <div class="image-attribution" style="">
-                            <span class="">{% trans "Potala Palace, Lhasa | TJKakuris https://www.flickr.com/photos/60546255@N03/5521603324/ | (CC BY-NC-ND 2.0)" %}</span>
+                            <span class="">{% trans "Taktsang Palphug Monastery (also known as Paro Takstang or Tiger's Nest Monastery), Bhutan" %}</span>
                         </div>
                     </li>
 
@@ -228,7 +227,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <p class="sub-block-description">
                             {% trans "Use Arches' Permissions Manager to set up data access rules for all your user groups and individual accounts.  You can define read/write/delete and no-access permissions." %}
                         </p>
-                        <img class="sub-block-image" src="{% static 'img/landing/premissions_manager.png' %}" style="" alt="Permissions Manager">
+                        <img class="sub-block-image" src="{% static 'img/landing/permissions_manager.png' %}" alt="Permissions Manager">
                     </div>
                 </div>
 
@@ -326,7 +325,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             <!-- Content -->
             <div class="row">
                 <div class="col-md-6 col-lg-4">
-                    <img class="iphone" src="{% static 'img/landing/iPhone_8_map.png' %}" style="" alt="Arches Designer">
+                    <img class="iphone" src="{% static 'img/landing/IPhone_8_map.png' %}" style="" alt="Arches Designer">
                 </div>
                 <div class="col-md-6 col-lg-8">
                     <div class="mobile-description-container">
@@ -361,10 +360,10 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 <h2 class="app-footer-heading">{% trans "Sample Institution Name" %}</h2>
 
                 <div class="organization-address">
-                  Sample Address<br>
-                  Getty Conservation Institute<br>
-                  1200 Getty Center Drive<br>
-                  Los Angeles, CA  90049<br>
+                  {% trans "Sample Address" %}<br>
+                  {% trans "Getty Conservation Institute" %}<br>
+                  {% trans "1200 Getty Center Drive" %}<br>
+                  {% trans "Los Angeles, CA  90049" %}<br>
                 </div>
             </div>
 
@@ -436,7 +435,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
         <div class="app-footer-links">
             <a class="link-spacing" href="">{% trans "Terms & Conditions" %}</a>
             <a class="link-spacing" href="">{% trans "Privacy Policy" %}</a>
-            <a class="app-footer-arches-link" href="http://www.archesproject.org" target="_blank">Powered by Arches</a>
+            <a class="app-footer-arches-link" href="http://www.archesproject.org" target="_blank">{% trans "Powered by Arches" %}</a>
         </div>
     </div>
     <!-- End Copyright Container -->

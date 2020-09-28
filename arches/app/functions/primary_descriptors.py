@@ -7,6 +7,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 
 class PrimaryDescriptorsFunction(BaseFunction):
     def get_primary_descriptor_from_nodes(self, resource, config):
+        datatype_factory = None
         try:
             if "nodegroup_id" in config and config["nodegroup_id"] != "" and config["nodegroup_id"] is not None:
                 tiles = models.TileModel.objects.filter(nodegroup_id=uuid.UUID(config["nodegroup_id"]), sortorder=0).filter(
@@ -25,7 +26,8 @@ class PrimaryDescriptorsFunction(BaseFunction):
                             userid = list(tile.provisionaledits.keys())[0]
                             data = tile.provisionaledits[userid]["value"]
                         if str(node.nodeid) in data:
-                            datatype_factory = DataTypeFactory()
+                            if not datatype_factory:
+                                datatype_factory = DataTypeFactory()
                             datatype = datatype_factory.get_instance(node.datatype)
                             value = datatype.get_display_value(tile, node)
                             config["string_template"] = config["string_template"].replace("<%s>" % node.name, str(value))

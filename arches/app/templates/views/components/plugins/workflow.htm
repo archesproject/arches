@@ -36,7 +36,7 @@
             <div class="workflow-nav-controls left"><i class="ion-arrow-left-b" data-bind="click: back, css: {inactive: activeStep()._index === 0}"></i></div>
             <div class="workflow-step-description">
                  <div class="title" data-bind="text:activeStep().title"></div>
-                 <div class="workflow-name" data-bind="text: workflowName() + ' Workflow'">Insert Workflow Name</div>
+                 <div class="workflow-name" data-bind="text: workflowName() + ' Workflow'">{% trans "Insert Workflow Name" %}</div>
                  <div class="subtitle" data-bind="text:activeStep().subtitle"></div>
                  <div class="step">{% trans "Step" %} <span data-bind="text:activeStep()._index+1"></span> {% trans "of" %} <span data-bind="text:steps.length"></span>: <span data-bind="text:activeStep().description"></span></div>
             </div>

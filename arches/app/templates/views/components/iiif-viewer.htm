@@ -1,0 +1,219 @@
+{% extends "views/components/workbench.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block tabs %}
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('imageTools');
+}, css: {
+    'active': activeTab() === 'imageTools'
+}">
+    <i class="fa fa-image"></i>
+    <span class="map-sidebar-text">{% trans "Image" %}</span>
+</div>
+{% endblock tabs %}
+
+{% block sidepanel %}
+<!--ko if: activeTab() === 'imageTools' -->
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Image Tools" %}</h4>
+</div>
+<div class="iiif-image-tools">
+    <div class="iiif-image-tool-slider">
+        <div class="iiif-image-tool-label">
+            <i class="fa fa-lightbulb-o"></i>
+            {% trans "Brightness" %}
+        </div>
+        <div class="iiif-image-tool-slider-wrap">
+            <input type="range" min="0" max="200" step="1" data-bind="value: brightness, valueUpdate: 'input'">
+        </div>
+        <div class="iiif-image-tool-value">
+            <span data-bind="text: brightness"></span>%
+        </div>
+    </div>
+    <div class="iiif-image-tool-slider">
+        <div class="iiif-image-tool-label">
+            <i class="fa fa-adjust"></i>
+            {% trans "Contrast" %}
+        </div>
+        <div class="iiif-image-tool-slider-wrap">
+            <input type="range" min="0" max="200" step="1" data-bind="value: contrast, valueUpdate: 'input'">
+        </div>
+        <div class="iiif-image-tool-value">
+            <span data-bind="text: contrast"></span>%
+        </div>
+    </div>
+    <div class="iiif-image-tool-slider">
+        <div class="iiif-image-tool-label">
+            <i class="fa fa-eyedropper"></i>
+            {% trans "Saturation" %}
+        </div>
+        <div class="iiif-image-tool-slider-wrap">
+            <input type="range" min="0" max="200" step="1" data-bind="value: saturation, valueUpdate: 'input'">
+        </div>
+        <div class="iiif-image-tool-value">
+            <span data-bind="text: saturation"></span>%
+        </div>
+    </div>
+    <div class="iiif-image-tool-slider">
+        <div class="iiif-image-tool-label">
+            <i class="fa fa-image"></i>
+            {% trans "Greyscale" %}
+        </div>
+        <div class="toggle-container">
+            <span class="switch switch-small switch-widget" data-bind="css: {'on': greyscale()}, click: function() { greyscale(!greyscale()); }"><small></small></span>
+            <div style="display:flex; flex-direction:row;">
+                <div class="arches-toggle-sm" data-bind="click: function() { greyscale(!greyscale()); }">{% trans "Display as greyscale" %}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="install-buttons">
+        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: resetImageSettings">{% trans 'Reset to defaults' %}</button>
+    </div>
+</div>
+<!--/ko -->
+{% endblock sidepanel %}
+
+{% block content_management %}
+<div class="workbench-card-container" data-bind="css: {
+        'gallery-visible': showGallery,
+        'gallery-expanded': expandGallery
+    }">
+    <div class="iiif-leaflet" data-bind="leaflet: leafletConfig"></div>
+</div>
+<div class="show-gallery-control" data-bind="css: {
+        'gallery-visible': showGallery,
+        'gallery-expanded': expandGallery
+    }">
+    <i class="fa" data-bind="css: {
+        'fa-chevron-circle-up': !expandGallery(),
+        'fa-chevron-circle-down': expandGallery()
+    }, click: function() { expandGallery(!expandGallery()); }"></i>
+    <h3>{% trans "Gallery" %}</h3>
+    <a href="javascript: void(0)" data-bind="
+        click: toggleGallery,
+        text: showGallery() ? '{% trans "hide" %}' : '{% trans "show" %}'
+    "></a>
+    
+    <!--ko if: expandGallery() -->
+    <span style="padding-right: 3px; padding-left: 3px;">|</span>
+    <a href="">{% trans "close info" %}</a>
+    <!--/ko -->
+
+</div>
+<!--ko let: {canvasClick: canvasClick, getCanvasService: getCanvasService, selectedCanvas: canvas, getAnnotationCount: getAnnotationCount} -->
+<div class="iiif-viewer-gallery" data-bind="css: {
+        'gallery-expanded': expandGallery
+    }">
+    <!--ko if: showGallery() -->
+    <div class="iiif-gallery-content">
+
+        <!--ko if: expandGallery() && manifestData() -->
+        <div class="manifest-details">
+            <h3>
+                <span data-bind="text: manifestName"></span>
+            </h3>
+
+            <div class="manifest-details-list" data-bind="foreach: manifestData().metadata || []">
+                <dt class="manifest-metadata-title" data-bind="text: label"></dt>
+                <!--ko foreach: Array.isArray(value) ? value : [value] -->
+                <dd class="manifest-metadata-value" data-bind="html: $data"></dd>
+                <!--/ko -->
+            </div>
+            <h4 data-bind="text: manifestData().attribution || ''"></h4>
+            <!--ko if: manifestData().logo -->
+            <img class="manifest-logo" data-bind="attr: {src: typeof manifestData().logo === 'string' ? manifestData().logo : manifestData().logo['@id']}">
+            <!--/ko -->
+        </div>
+        <!--/ko -->
+
+        <!--ko if: editManifest() -->
+        <div class="manifest-editor">
+            <div class="manifest-editor-label">
+                {% trans "Select a manifest:" %}
+            </div>
+            <div class="manifest-editor-input">
+                <input class="form-control input-lg widget-input"
+                    data-bind="value: manifest,
+                    select2Query: {
+                        select2Config: manifestSelectConfig
+                    }">
+            </div>
+
+            <div class="install-buttons">
+                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-pencil" data-bind="click: getManifestData,
+                    disabled: manifestLoading(),
+                    css: { 'disabled': manifestLoading() }
+                ">{% trans 'Update manifest' %}</button>
+                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: toggleManifestEditor">{% trans 'Cancel' %}</button>
+                <!--ko if: manifestLoading() -->
+                <span class="manifest-editor-loading">
+                    {% trans "Loading manifest..." %}
+                </span>
+                <!--/ko -->
+                <!--ko if: manifestError() -->
+                <span class="manifest-editor-error">
+                    {% trans "Error loading manifest..." %}
+                </span>
+                <!--/ko -->
+            </div>
+        </div>
+            
+            
+        <!--/ko -->
+        <!--ko if: !editManifest() -->
+            <!--ko if: manifestLoading() -->
+            <span class="manifest-editor-loading">
+                {% trans "Loading manifest..." %}
+            </span>
+            <!--/ko -->
+            <!--ko if: !manifestLoading() -->
+            <div class="iiif-gallery-panel" style="overflow-x: auto;">
+                <div class="iiif-gallery-header">
+                    <span class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor, text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
+                    |
+                    {% trans "Filter" %}
+                    <div class="list-filter" data-bind="">
+                        <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
+
+                        <!-- Clear Search -->
+                        <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+                    </div>
+                </div>
+
+                <div class="iiif-gallery-sequence">
+                    <div class="iiif-gallery-sequence-canvases" data-bind="foreach: canvases">
+                        <div class="iiif-gallery-canvas" data-bind="click: function() {
+                            canvasClick($data);
+                        },
+                        visible: label.toLowerCase().includes(self.filter().toLowerCase()),
+                        css: {
+                            active: getCanvasService($data) === selectedCanvas(),
+                            annotated: getAnnotationCount(getCanvasService($data))
+                        }">
+                            <div class="iiif-gallery-canvas-thumbnail">
+                                <img data-bind="attr: { src: $data.thumbnail || '{% static 'img/photo_missing.png' %}', title: $data.label}">
+                            </div>
+                            <div class="iiif-gallery-canvas-label">
+                                <span data-bind="text: label"></span>
+                                <span class="annotation-count">
+                                    <!--ko if: getAnnotationCount(getCanvasService($data)) -->
+                                    <span data-bind="text: getAnnotationCount(getCanvasService($data))"></span> {% trans "Annotation(s)" %}
+                                    <!--/ko -->
+                                    <!--ko if: !getAnnotationCount(getCanvasService($data)) -->
+                                    &nbsp;
+                                    <!--/ko -->
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--/ko -->
+        <!--/ko -->
+    </div>
+    <!--/ko -->
+</div>
+<!--/ko -->
+{% endblock content_management %}

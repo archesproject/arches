@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+import logging
 from datetime import datetime
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
@@ -30,10 +31,11 @@ from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Terms, MaxAgg, Aggregation
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, MaxAgg, Aggregation
 from arches.app.search.search_export import SearchResultsExporter
 from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
+from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer
@@ -42,6 +44,7 @@ import arches.app.utils.task_management as task_management
 import arches.app.tasks as tasks
 from io import StringIO
 
+logger = logging.getLogger(__name__)
 
 class SearchView(MapBaseManagerView):
     def get(self, request):
@@ -56,6 +59,9 @@ class SearchView(MapBaseManagerView):
         geocoding_providers = models.Geocoder.objects.all()
         search_components = models.SearchComponent.objects.all()
         datatypes = models.DDataType.objects.all()
+        widgets = models.Widget.objects.all()
+        templates = models.ReportTemplate.objects.all()
+        card_components = models.CardComponent.objects.all()
 
         context = self.get_context_data(
             map_layers=map_layers,
@@ -63,6 +69,9 @@ class SearchView(MapBaseManagerView):
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             search_components=search_components,
+            widgets=widgets,
+            report_templates=templates,
+            card_components=card_components,
             main_script="views/search",
             resource_graphs=resource_graphs,
             datatypes=datatypes,
@@ -137,35 +146,36 @@ def search_terms(request):
 
         ret[index] = []
         results = query.search(index=index)
-        for result in results["aggregations"]["value_agg"]["buckets"]:
-            if len(result["top_concept"]["buckets"]) > 0:
-                for top_concept in result["top_concept"]["buckets"]:
-                    top_concept_id = top_concept["key"]
-                    top_concept_label = get_preflabel_from_conceptid(top_concept["key"], lang)["value"]
-                    for concept in top_concept["conceptid"]["buckets"]:
-                        ret[index].append(
-                            {
-                                "type": "concept",
-                                "context": top_concept_id,
-                                "context_label": top_concept_label,
-                                "id": i,
-                                "text": result["key"],
-                                "value": concept["key"],
-                            }
-                        )
+        if results is not None:
+            for result in results["aggregations"]["value_agg"]["buckets"]:
+                if len(result["top_concept"]["buckets"]) > 0:
+                    for top_concept in result["top_concept"]["buckets"]:
+                        top_concept_id = top_concept["key"]
+                        top_concept_label = get_preflabel_from_conceptid(top_concept["key"], lang)["value"]
+                        for concept in top_concept["conceptid"]["buckets"]:
+                            ret[index].append(
+                                {
+                                    "type": "concept",
+                                    "context": top_concept_id,
+                                    "context_label": top_concept_label,
+                                    "id": i,
+                                    "text": result["key"],
+                                    "value": concept["key"],
+                                }
+                            )
+                        i = i + 1
+                else:
+                    ret[index].append(
+                        {
+                            "type": "term",
+                            "context": "",
+                            "context_label": get_resource_model_label(result),
+                            "id": i,
+                            "text": result["key"],
+                            "value": result["key"],
+                        }
+                    )
                     i = i + 1
-            else:
-                ret[index].append(
-                    {
-                        "type": "term",
-                        "context": "",
-                        "context_label": get_resource_model_label(result),
-                        "id": i,
-                        "text": result["key"],
-                        "value": result["key"],
-                    }
-                )
-                i = i + 1
 
     return JSONResponse(ret)
 
@@ -217,9 +227,19 @@ def export_results(request):
         return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
 
 
+def append_instance_permission_filter_dsl(request, search_results_object):
+    if request.user.is_superuser is False:
+        has_access = Bool()
+        terms = Terms(field="permissions.users_with_no_access", terms=[str(request.user.id)])
+        nested_term_filter = Nested(path="permissions", query=terms)
+        has_access.must_not(nested_term_filter)
+        search_results_object["query"].add_query(has_access)
+
+
 def search_results(request):
     for_export = request.GET.get("export")
     total = int(request.GET.get("total", "0"))
+    resourceinstanceid = request.GET.get("id", None)
     se = SearchEngineFactory().create()
     search_results_object = {"query": Query(se)}
 
@@ -232,7 +252,9 @@ def search_results(request):
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
                 search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional)
+        append_instance_permission_filter_dsl(request, search_results_object)
     except Exception as err:
+        logger.exception(err)
         return JSONErrorResponse(message=err)
 
     dsl = search_results_object.pop("query", None)
@@ -240,6 +262,10 @@ def search_results(request):
     dsl.include("root_ontology_class")
     dsl.include("resourceinstanceid")
     dsl.include("points")
+    dsl.include("permissions.users_without_read_perm")
+    dsl.include("permissions.users_without_edit_perm")
+    dsl.include("permissions.users_without_delete_perm")
+    dsl.include("permissions.users_with_no_access")
     dsl.include("geometries")
     dsl.include("displayname")
     dsl.include("displaydescription")
@@ -249,7 +275,7 @@ def search_results(request):
         dsl.include("tiles")
 
     if for_export is True:
-        results = dsl.search(index="resources", scroll="1m")
+        results = dsl.search(index=RESOURCES_INDEX, scroll="1m")
         scroll_id = results["_scroll_id"]
 
         if total <= settings.SEARCH_EXPORT_LIMIT:
@@ -260,10 +286,16 @@ def search_results(request):
             results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
             results["hits"]["hits"] += results_scrolled["hits"]["hits"]
     else:
-        results = dsl.search(index="resources")
+        results = dsl.search(index=RESOURCES_INDEX, id=resourceinstanceid)
 
     ret = {}
     if results is not None:
+        if "hits" not in results:
+            if "docs" in results:
+                results = {"hits": {"hits": results["docs"]}}
+            else:
+                results = {"hits": {"hits": [results]}}
+
         # allow filters to modify the results
         for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
             search_filter = search_filter_factory.get_filter(filter_type)
@@ -277,8 +309,8 @@ def search_results(request):
 
         ret["reviewer"] = user_is_resource_reviewer(request.user)
         ret["timestamp"] = datetime.now()
-        ret["total_results"] = dsl.count(index="resources")
-
+        ret["total_results"] = dsl.count(index=RESOURCES_INDEX)
+        ret["userid"] = request.user.id
         return JSONResponse(ret)
 
     else:

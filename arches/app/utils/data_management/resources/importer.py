@@ -31,12 +31,9 @@ from arches.app.models.tile import Tile
 from arches.app.models.models import DDataType
 from arches.app.models.models import ResourceInstance
 from arches.app.models.models import FunctionXGraph
-from arches.app.models.models import ResourceXResource
 from arches.app.models.models import NodeGroup
-from arches.app.models.models import ResourceXResource
 from arches.app.models.models import Concept
 from arches.app.models.models import Value
-from arches.app.models.models import ResourceXResource
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -219,16 +216,16 @@ class BusinessDataImporter(object):
                 else:
                     print("*" * 80)
                     print(
-                        "ERROR: No mapping file detected. Please indicate one \
+                        f"ERROR: No mapping file detected for {self.file[0]}. Please indicate one \
                         with the '-c' paramater or place one in the same directory as your business data."
                     )
                     print("*" * 80)
-                    sys.exit()
 
             elapsed = time() - start
             print("Time to import_business_data = {0}".format(datetime.timedelta(seconds=elapsed)))
 
-            reader.report_errors()
+            if reader is not None:
+                reader.report_errors()
 
         finally:
             datatype_factory = DataTypeFactory()

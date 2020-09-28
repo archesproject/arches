@@ -95,6 +95,9 @@ RESOURCE_FORMATTERS = {
     "trix": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
 }
 
+# Hide nodes and cards in a report that have no data
+HIDE_EMPTY_NODES_IN_REPORT = True
+
 # Set the ontolgoy namespace prefixes to use in the UI, set the namespace to '' omit a prefix
 # Users can also override existing namespaces as well if you like
 ONTOLOGY_NAMESPACES = {
@@ -199,6 +202,11 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 # URL that handles the media served from MEDIA_ROOT, used for managing stored files.
 # It must end in a slash if set to a non-empty value.
 MEDIA_URL = "/files/"
+
+# By setting RESTRICT_MEDIA_ACCESS to True, media file requests will be
+# served by Django rather than your web server (e.g. Apache). This allows file requests to be checked against nodegroup permissions.
+# However, this will adversely impact performace when serving large files or during periods of high traffic.
+RESTRICT_MEDIA_ACCESS = False
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -305,12 +313,12 @@ INSTALLED_APPS = (
     "revproxy",
     "corsheaders",
     "oauth2_provider",
-    "django_celery_results",
-    #'debug_toolbar'
+    "django_celery_results"
+    # 'debug_toolbar'
 )
 
 MIDDLEWARE = [
-    #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -322,7 +330,7 @@ MIDDLEWARE = [
     "oauth2_provider.middleware.OAuth2TokenMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "arches.app.utils.middleware.SetAnonymousUser",
 ]
 
@@ -393,7 +401,9 @@ if DEBUG is True:
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = "Crowdsource Editor"
 
-CACHES = {"default": {"BACKEND": "django.core.cache.backends.memcached.MemcachedCache", "LOCATION": "127.0.0.1:11211"}}
+CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "unique-snowflake"}}
+
+DEFAULT_RESOURCE_IMPORT_USER = {"username": "admin", "userid": 1}
 
 # Example of a custom time wheel configuration:
 # TIMEWHEEL_DATE_TIERS = {
@@ -416,7 +426,23 @@ TIMEWHEEL_DATE_TIERS = None
 # Identify the usernames and duration (seconds) for which you want to cache the timewheel
 CACHE_BY_USER = {"anonymous": 3600 * 24}
 
-DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d"
+DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d"  # Custom date format for dates imported from and exported to csv
+
+DATE_FORMATS = {
+    "Python": ["%Y-%m-%dT%H:%M:%S.%f%z", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%d %H:%M:%S%z", "%Y-%m-%d", "%Y-%m", "%Y", "-%Y"],
+    "JavaScript": ["YYYY-MM-DDTHH:mm:ss.sssZ", "YYYY-MM-DDTHH:mm:ssZ", "YYYY-MM-DD HH:mm:ssZ", "YYYY-MM-DD", "YYYY-MM", "YYYY", "-YYYY"],
+    "Elasticsearch": [
+        "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ",
+        "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
+        "yyyy-MM-dd'T'HH:mm:ssZZZZZ",
+        "yyyy-MM-dd'T'HH:mm:ssZ",
+        "yyyy-MM-dd HH:mm:ssZZZZZ",
+        "yyyy-MM-dd",
+        "yyyy-MM",
+        "yyyy",
+        "-yyyy",
+    ],
+}
 
 API_MAX_PAGE_SIZE = 500
 
@@ -545,7 +571,8 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 AUTO_REFRESH_GEOM_VIEW = True
-TILE_CACHE_TIMEOUT = 600
+TILE_CACHE_TIMEOUT = 600  # seconds
+GRAPH_MODEL_CACHE_TIMEOUT = None  # seconds * hours * days = ~1mo
 
 RENDERERS = [
     {
@@ -557,8 +584,58 @@ RENDERERS = [
         "component": "views/components/cards/file-renderers/imagereader",
         "ext": "",
         "type": "image/*",
-    }
+        "exclude": "tif,tiff,psd",
+    },
+    {
+        "name": "pdfreader",
+        "title": "PDF Reader",
+        "description": "Displays pdf files",
+        "id": "09dec059-1ee8-4fbd-85dd-c0ab0428aa94",
+        "iconclass": "fa fa-file",
+        "component": "views/components/cards/file-renderers/pdfreader",
+        "ext": "pdf",
+        "type": "application/pdf",
+        "exclude": "tif,tiff,psd",
+    },
 ]
+
+# --- JSON LD sortorder generating functions --- #
+#
+# The functions in the array below will be called in the order given with the json-ld of the node
+#   that should have sortorder set on the resulting tile.  The config below sorts (meaninglessly)
+#   by URI, however more complex, use case specific functions can be implemented based on local
+#   ontology choice and requirements. Examples might be to sort by some value, language (as shown),
+#   type, classification or any other feature.
+# Set JSON_LD_SORT to True to enable the sorting
+#
+# Example: This would sort fields by P72_has_language, and apply an order based on the referenced
+#          entity in the lookup hash
+#
+# JSON_LD_SORT_LANGUAGE = {None: 10000, 'urn:uuid:38729dbe-6d1c-48ce-bf47-e2a18945600e': 0,
+#    "urn:uuid:a1d82c77-ebd6-4215-ab85-2c0b6a68a0e8": 1,
+#    'urn:uuid:7e6c493b-6434-4b3a-9513-02df44b78d24': 2}
+# JSON_LD_SORT_LANGUAGE_PROP = 'http://www.cidoc-crm.org/cidoc-crm/P72_has_language'
+#
+# def langsort(x):
+#    langs = x._json_ld.get(JSON_LD_SORT_LANGUAGE_PROP,[{'@id': None}])
+#    if not langs or not '@id' in langs[0]:
+#        langs = [{'@id':None}]
+#    scores = [JSON_LD_SORT_LANGUAGE.get(x['@id'], 10000) for x in langs]
+#    return min(scores)
+
+JSON_LD_SORT = False
+JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
+
+# --- JSON LD run-time data manipulation --- #
+#
+# This function will be applied to the data to be loaded, immediately before it is sent to the
+#   Reader to be processed. This can correct any errors in the data, or potentially do some
+#   significant series of transformations to get the data into the right form for Arches
+
+
+def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
+    return jsdata
+
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###

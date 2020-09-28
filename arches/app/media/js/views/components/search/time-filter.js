@@ -46,8 +46,8 @@ function($, _, ko, moment, BaseFilter, arches) {
                 this.graph_models = ko.observableArray();
                 this.selectedPeriod.subscribe(function (d) {
                     if (d) {
-                        var start = moment(0, 'YYYY').add(d.start, 'years').format(this.format);
-                        var end = moment(0, 'YYYY').add(d.end, 'years').format(this.format);
+                        var start = moment(0, 'YYYY').add(d.data.start, 'years').format(this.format);
+                        var end = moment(0, 'YYYY').add(d.data.end, 'years').format(this.format);
                         this.dateRangeType('custom');
                         this.filter.fromDate(end);
                         this.filter.toDate(end);

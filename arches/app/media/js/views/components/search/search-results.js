@@ -23,8 +23,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
 
             initialize: function(options) {
                 options.name = 'Search Results';
+                this.requiredFilters = ['map-filter'];
                 BaseFilter.prototype.initialize.call(this, options);
-
                 this.results = ko.observableArray();
                 this.showRelationships = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
@@ -40,9 +40,21 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
 
                 this.filters[componentName](this);
                 this.restoreState();
-
-                this.mapFilter = this.getFilter('map-filter');
-                this.relatedResourcesManager = this.getFilter('related-resources-filter');
+                if (this.requiredFiltersLoaded() === false) {
+                    this.requiredFiltersLoaded.subscribe(function(){
+                        this.mapFilter = this.getFilter('map-filter');
+                    }, this);
+                } else {
+                    this.mapFilter = this.getFilter('map-filter');
+                }
+                this.selectedTab.subscribe(function(tab){
+                    var self = this;
+                    if (tab === 'map-filter') {
+                        if (ko.unwrap(this.mapFilter.map)) {
+                            setTimeout(function() { self.mapFilter.map().resize(); }, 1);
+                        }
+                    }
+                }, this);
             },
 
             mouseoverInstance: function() {
@@ -65,6 +77,16 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                     self.showRelationships(resourceinstance);
                     if (self.selectedTab() !== 'related-resources-filter') {
                         self.selectedTab('related-resources-filter');
+                    }
+                };
+            },
+
+            showResourceDetails: function(graphId, result) {
+                var self = this;
+                return function(){
+                    self.details.setupReport(graphId, result._source);
+                    if (self.selectedTab() !== 'search-result-details') {
+                        self.selectedTab('search-result-details');
                     }
                 };
             },
@@ -93,6 +115,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                             geometries: ko.observableArray(result._source.geometries),
                             iconclass: graphdata ? graphdata.iconclass : '',
                             showrelated: this.showRelatedResources(result._source.resourceinstanceid),
+                            showDetails: this.showResourceDetails(result._source.graph_id, result),
                             mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
                             relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
                             ontologyclass: result._source.root_ontology_class,
@@ -107,7 +130,10 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                             },
                             selected: ko.computed(function() {
                                 return result._source.resourceinstanceid === ko.unwrap(self.selectedResourceId);
-                            })
+                            }),
+                            canRead: result._source.permissions && result._source.permissions.users_without_read_perm.indexOf(this.userid) < 0,
+                            canEdit: result._source.permissions && result._source.permissions.users_without_edit_perm.indexOf(this.userid) < 0,
+                            // can_delete: result._source.permissions.users_without_delete_perm.indexOf(this.userid) < 0,
                         });
                     }, this);
                 }
