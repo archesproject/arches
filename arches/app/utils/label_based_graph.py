@@ -76,8 +76,8 @@ class LabelBasedGraph(object):
         """
         Generates a label-based graph from a given tile
         """
-        # need explicit None comparison here to differentiate between empty reference generated
-        # from the resource and reference not having yet been generated
+        # need explicit None comparison here to differentiate between empty reference being
+        # passed in vs reference having not yet been generated
         if node_tile_reference == None:
             node_tile_reference = cls.generate_node_tile_reference(resource=Resource(tile.resourceinstance))
 
