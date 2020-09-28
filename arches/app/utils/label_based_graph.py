@@ -80,7 +80,9 @@ class LabelBasedGraph(object):
         """
         Generates a label-based graph from a given tile
         """
-        if not node_tile_reference:
+        # need explicit None comparison here to differentiate between empty reference generated
+        # from the resource and reference not having yet been generated
+        if node_tile_reference == None:
             node_tile_reference = cls.generate_node_tile_reference(resource=Resource(tile.resourceinstance))
 
         graph = cls._build_graph(
@@ -103,18 +105,15 @@ class LabelBasedGraph(object):
 
         node_tile_reference = cls.generate_node_tile_reference(resource=resource)
 
-        root_graph = LabelBasedNode(name=resource.displayname, node_id=None, tile_id=None, value=None)
+        root_graph = LabelBasedNode(name=resource.displayname, node_id=None, tile_id=None, value=None,)
 
         for tile in resource.tiles:
-            root_tile = tile.get_root_tile()
+            label_based_graph = LabelBasedGraph.from_tile(
+                tile=tile, node_tile_reference=node_tile_reference, hide_empty_nodes=hide_empty_nodes, as_json=False,
+            )
 
-            if root_tile.data:
-                label_based_graph = LabelBasedGraph.from_tile(
-                    tile=root_tile, node_tile_reference=node_tile_reference, hide_empty_nodes=hide_empty_nodes, as_json=False,
-                )
-
-                if not cls.is_node_empty(node=label_based_graph):
-                    root_graph.child_nodes.append(label_based_graph)
+            if label_based_graph:
+                root_graph.child_nodes.append(label_based_graph)
 
         return root_graph.as_json() if as_json else root_graph
 
@@ -129,7 +128,7 @@ class LabelBasedGraph(object):
             # so let's handle errors here instead of nullguarding all models
             try:
                 display_value = datatype.get_display_value(tile=tile, node=node)
-            except:
+            except: # pragma: no cover
                 pass
 
         return display_value
@@ -146,9 +145,10 @@ class LabelBasedGraph(object):
                     value=cls._get_display_value(tile=associated_tile, node=node),
                 )
 
-                if not parent_tree:  # if top node
-                    parent_tree = label_based_node
-                elif include_empty_nodes or not cls.is_node_empty(label_based_node):
+                if not parent_tree:
+                    if not associated_tile.parenttile:  # if not top node in separate card
+                        parent_tree = label_based_node
+                else:
                     parent_tree.child_nodes.append(label_based_node)
 
                 for child_node in node.get_direct_child_nodes():
