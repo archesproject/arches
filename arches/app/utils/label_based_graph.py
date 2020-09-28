@@ -82,10 +82,7 @@ class LabelBasedGraph(object):
             node_tile_reference = cls.generate_node_tile_reference(resource=Resource(tile.resourceinstance))
 
         graph = cls._build_graph(
-            node=models.Node.objects.get(pk=tile.nodegroup_id),
-            tile=tile,
-            parent_tree=None,
-            tile_reference=node_tile_reference,
+            node=models.Node.objects.get(pk=tile.nodegroup_id), tile=tile, parent_tree=None, tile_reference=node_tile_reference,
         )
 
         return graph.as_json(include_empty_nodes=bool(not hide_empty_nodes)) if as_json else graph
@@ -148,10 +145,7 @@ class LabelBasedGraph(object):
 
                 for child_node in node.get_direct_child_nodes():
                     cls._build_graph(
-                        node=child_node,
-                        tile=associated_tile,
-                        parent_tree=label_based_node,
-                        tile_reference=tile_reference,
+                        node=child_node, tile=associated_tile, parent_tree=label_based_node, tile_reference=tile_reference,
                     )
 
         return parent_tree

@@ -22,9 +22,7 @@ class LabelBasedNodeTests(TestCase):
             VALUE_KEY: cls.test_node.value,
         }
 
-        cls.empty_node = LabelBasedNode(
-            name="empty_node_name", node_id="empty_node_node_id", tile_id="empty_node_tile_id", value=None
-        )
+        cls.empty_node = LabelBasedNode(name="empty_node_name", node_id="empty_node_node_id", tile_id="empty_node_tile_id", value=None)
 
         cls.child_node_1 = LabelBasedNode(
             name="child_node_val", node_id="child_node_node_id", tile_id="child_node_tile_id", value="child_node_value"
