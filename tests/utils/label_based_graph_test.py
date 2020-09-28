@@ -22,6 +22,10 @@ class LabelBasedNodeTests(TestCase):
             VALUE_KEY: cls.test_node.value,
         }
 
+        cls.empty_node = LabelBasedNode(
+            name="empty_node_name", node_id="empty_node_node_id", tile_id="empty_node_tile_id", value=None
+        )
+
         cls.child_node_1 = LabelBasedNode(
             name="child_node_val", node_id="child_node_node_id", tile_id="child_node_tile_id", value="child_node_value"
         )
@@ -33,6 +37,13 @@ class LabelBasedNodeTests(TestCase):
         cls.child_node_3 = LabelBasedNode(
             name="child_node_val", node_id="child_node_node_id", tile_id="child_node_tile_id", value="child_node_value"
         )
+
+    def test_is_empty_with_node_with_child_nodes(self):
+        self.empty_node.child_nodes.append(self.test_node)
+        self.assertFalse(self.empty_node.is_empty())
+
+    def test_is_node_empty_with_empty_node(self):
+        self.assertTrue(self.empty_node.is_empty())
 
     def test_as_json_no_child_nodes(self):
         self.assertEqual(self.test_node.as_json(), {self.test_node.name: self.test_node_json_data})
@@ -78,20 +89,6 @@ class LabelBasedGraphTests(TestCase):
     def setUp(cls):
         cls.node_1 = LabelBasedNode(name="node_1_val", node_id="node_1_node_id", tile_id="node_1_tile_id", value="node_1_value")
         cls.node_2 = LabelBasedNode(name="node_2_val", node_id="node_2_node_id", tile_id="node_2_tile_id", value=None)
-
-    def test_is_node_empty(self):
-        self.assertFalse(LabelBasedGraph.is_node_empty(self.node_1))
-
-    def test_is_node_empty_with_node_with_child_nodes(self):
-        child_node = LabelBasedNode(
-            name="child_node_val", node_id="child_node_node_id", tile_id="child_node_tile_id", value="child_node_value"
-        )
-
-        self.node_2.child_nodes.append(child_node)
-        self.assertFalse(LabelBasedGraph.is_node_empty(self.node_2))
-
-    def test_is_node_empty_with_empty_node(self):
-        self.assertTrue(LabelBasedGraph.is_node_empty(self.node_2))
 
     def test_generate_node_tile_reference(self):
         mock_tile = mock.Mock(data={self.node_1.node_id: "test_val"})

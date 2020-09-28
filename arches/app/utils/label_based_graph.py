@@ -15,7 +15,19 @@ class LabelBasedNode(object):
         self.value = value
         self.child_nodes = []
 
-    def as_json(self):
+    def is_empty(self):
+        is_empty = True
+
+        if self.value:
+            is_empty = False
+        else:
+            for child_node in self.child_nodes:
+                if not child_node.is_empty():
+                    is_empty = False
+
+        return is_empty
+
+    def as_json(self, include_empty_nodes=True):
         display_data = {
             NODE_ID_KEY: self.node_id,
             TILE_ID_KEY: self.tile_id,
@@ -23,41 +35,25 @@ class LabelBasedNode(object):
         }
 
         for child_node in self.child_nodes:
-            formatted_node = child_node.as_json()
+            formatted_node = child_node.as_json(include_empty_nodes=include_empty_nodes)
             formatted_node_name, formatted_node_value = formatted_node.popitem()
 
-            previous_val = display_data.get(formatted_node_name)
+            if include_empty_nodes or not child_node.is_empty():
+                previous_val = display_data.get(formatted_node_name)
 
-            # let's handle multiple identical node names
-            if not previous_val:
-                display_data[formatted_node_name] = formatted_node_value
-            elif isinstance(previous_val, list):
-                display_data[formatted_node_name].append(formatted_node_value)
-            else:
-                display_data[formatted_node_name] = [previous_val, formatted_node_value]
+                # let's handle multiple identical node names
+                if not previous_val:
+                    display_data[formatted_node_name] = formatted_node_value
+                elif isinstance(previous_val, list):
+                    display_data[formatted_node_name].append(formatted_node_value)
+                else:
+                    display_data[formatted_node_name] = [previous_val, formatted_node_value]
 
         return {self.name: display_data}
 
 
 class LabelBasedGraph(object):
     datatype_factory = DataTypeFactory()
-
-    @staticmethod
-    def is_node_empty(node):
-        """
-        Discerns whether a LabelBasedNode either has a value,
-        or children with values
-        """
-        is_empty = True
-
-        if node.value:
-            is_empty = False
-        else:
-            for child_node in node.child_nodes:
-                if not LabelBasedGraph.is_node_empty(child_node):
-                    is_empty = False
-
-        return is_empty
 
     @staticmethod
     def generate_node_tile_reference(resource):
@@ -90,10 +86,9 @@ class LabelBasedGraph(object):
             tile=tile,
             parent_tree=None,
             tile_reference=node_tile_reference,
-            include_empty_nodes=bool(not hide_empty_nodes),
         )
 
-        return graph.as_json() if as_json else graph
+        return graph.as_json(include_empty_nodes=bool(not hide_empty_nodes)) if as_json else graph
 
     @classmethod
     def from_resource(cls, resource, hide_empty_nodes, as_json=True):
@@ -115,7 +110,7 @@ class LabelBasedGraph(object):
             if label_based_graph:
                 root_graph.child_nodes.append(label_based_graph)
 
-        return root_graph.as_json() if as_json else root_graph
+        return root_graph.as_json(include_empty_nodes=bool(not hide_empty_nodes)) if as_json else root_graph
 
     @classmethod
     def _get_display_value(cls, tile, node):
@@ -134,7 +129,7 @@ class LabelBasedGraph(object):
         return display_value
 
     @classmethod
-    def _build_graph(cls, node, tile, parent_tree, tile_reference, include_empty_nodes=True):
+    def _build_graph(cls, node, tile, parent_tree, tile_reference):
         # if a tile doesn't have any nodes, it should associate itself
         for associated_tile in tile_reference.get(str(node.pk), [tile]):
             if associated_tile == tile or associated_tile.parenttile == tile:
@@ -157,7 +152,6 @@ class LabelBasedGraph(object):
                         tile=associated_tile,
                         parent_tree=label_based_node,
                         tile_reference=tile_reference,
-                        include_empty_nodes=include_empty_nodes,
                     )
 
         return parent_tree

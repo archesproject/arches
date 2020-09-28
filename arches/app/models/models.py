@@ -848,19 +848,6 @@ class TileModel(models.Model):  # Tile
         managed = True
         db_table = "tiles"
 
-    def get_root_tile(self):
-        """
-        gets the Tile furthest up the inheritance chain
-
-        returns Tile
-        """
-        root_tile = self
-
-        while root_tile.parenttile:
-            root_tile = root_tile.parenttile
-
-        return root_tile
-
     def save(self, *args, **kwargs):
         if self.sortorder is None or (self.provisionaledits is not None and self.data == {}):
             sortorder_max = TileModel.objects.filter(
