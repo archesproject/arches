@@ -123,7 +123,7 @@ class LabelBasedGraph(object):
             # so let's handle errors here instead of nullguarding all models
             try:
                 display_value = datatype.get_display_value(tile=tile, node=node)
-            except: # pragma: no cover
+            except:  # pragma: no cover
                 pass
 
         return display_value
