@@ -17,20 +17,24 @@ define([
             initialize: function(options) {
                 var self = this;
                 options.name = 'Search Result Details';
+                this.requiredFilters = ['search-results'];
                 BaseFilter.prototype.initialize.call(this, options);
                 this.loading = ko.observable(false);
                 this.options = options;
                 this.report = null;
+                this.ready = ko.observable(false);
 
-                var loaded = ko.computed(function() {
-                    return this.getFilter('search-results');
-                }, this);
-                loaded.subscribe(function(loaded) {
-                    if (loaded) {
-                        options.searchResultsVm = this.getFilter('search-results');
-                        options.filters[componentName](this);
-                    }
-                }, this);
+                var setSearchResults = function(){
+                    options.searchResultsVm = self.getFilter('search-results');
+                    options.searchResultsVm.details = self;
+                    options.filters[componentName](self);           
+                };
+
+                if (this.requiredFiltersLoaded() === false) {
+                    this.requiredFiltersLoaded.subscribe(setSearchResults, this);
+                } else {
+                    setSearchResults();
+                }
 
                 var query = this.query();
                 query['tiles'] = true;

@@ -220,6 +220,12 @@ define([
                 self.resourceLookup[id].feature = feature;
                 self.resourceLookup[id].mapCard = self;
                 return self.resourceLookup[id];
+            } else {
+                data.resourceinstanceid = ko.observable(false);
+                data.loading = ko.observable(false);
+                data.feature = feature;
+                data.mapCard = self;
+                return data;
             }
         };
 
