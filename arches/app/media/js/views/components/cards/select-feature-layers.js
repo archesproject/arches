@@ -1,14 +1,7 @@
 define([], function() {
-    return function(resourceId, source, sourceLayer, selectedResourceIds, visible, color, nodeids) {
+    return function(resourceId, source, sourceLayer, selectedResourceIds, visible, color, nodeids, filteredNodeids) {
         color = color || "#F0C200";
-
-        console.log(nodeids)
-        // color = ["case", 
-        //     ["==", ["get", "nodeid"], "c7121254-46c3-11ea-b9b7-027f24e6fd6b"], "#22ff33", 
-        //     ["==", ["get", "nodeid"], "c1033fc2-46d3-11ea-b9b7-027f24e6fd6b"], "#ff44cc", 
-        //     color];
-
-
+        colorPallet = ["#aebbda", "#fdb462", "#ff44cc", "#22ff33"]
         var createColorExpressions = function(defaultColor, colorPallet){
             if (nodeids) {
                 var colorExpressions = ['case'];
@@ -26,18 +19,12 @@ define([], function() {
                 return defaultColor;
             }
         } 
-        
-        color = createColorExpressions(color, ["#ff44cc", "#22ff33"])
-        console.log(JSON.stringify(color));
-        console.log(color);
-
-        console.log(JSON.stringify(color));
+        color = createColorExpressions(color, colorPallet);
         var nodeFilter = ["!=", "resourceinstanceid", "x"]
-        if (nodeids) {
-            var nodeFilter = nodeids.map(id => ["==", "nodeid", id])
+        if (filteredNodeids) {
+            var nodeFilter = filteredNodeids.map(id => ["==", "nodeid", id])
             nodeFilter.splice(0, 0, 'any');
         }
-        console.log(nodeFilter);
         var strokecolor = "#fff";
         var overviewzoom = 11;
         var minzoom = 15;

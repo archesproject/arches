@@ -35,9 +35,10 @@ define([
             }
             return nodeids;
         };
-        this.nodeids = ko.observableArray(getNodeIds());
+
+        this.nodeids = getNodeIds();
         this.nodeDetails = ko.observableArray();
-        this.nodeids().forEach(function(nodeid) {
+        this.nodeids.forEach(function(nodeid) {
             fetch(arches.urls.api_nodes(nodeid))
               .then(response => response.json())
               .then(data => {
@@ -47,10 +48,7 @@ define([
                 console.error('Error:', error);
               });
         })
-        this.nodeDetails.subscribe(function(val){
-            console.log(val)
-        });
-        this.filterNodeIds = ko.observableArray(this.nodeids());
+        this.filterNodeIds = ko.observableArray(JSON.parse(JSON.stringify(this.nodeids)));
         this.relatedResourceWidgets = this.widgets.filter(function(widget){return widget.datatype.datatype === 'resource-instance' || widget.datatype.datatype === 'resource-instance-list';});
         this.showRelatedQuery = ko.observable(false);
         var resourceBounds = ko.observable();
@@ -89,7 +87,7 @@ define([
             }
             zoomToData = true;
         });
-        var selectFeatureLayers = selectFeatureLayersFactory('', selectRelatedSource, selectRelatedSourceLayer, selectedResourceIds(), true, null, this.filterNodeIds());
+        var selectFeatureLayers = selectFeatureLayersFactory('', selectRelatedSource, selectRelatedSourceLayer, selectedResourceIds(), true, null, this.nodeids, this.filterNodeIds());
         var sources = [];
         for (var sourceName in arches.mapSources) {
             if (arches.mapSources.hasOwnProperty(sourceName)) {
@@ -100,7 +98,7 @@ define([
             var source = self.selectRelatedSource();
             var sourceLayer = self.selectRelatedSourceLayer();
             selectFeatureLayers = sources.indexOf(source) > 0 ?
-                selectFeatureLayersFactory('', source, sourceLayer, selectedResourceIds(), true, null, self.filterNodeIds()) :
+                selectFeatureLayersFactory('', source, sourceLayer, selectedResourceIds(), true, null, self.nodeids, self.filterNodeIds()) :
                 [];
             self.additionalLayers(
                 extendedLayers.concat(
