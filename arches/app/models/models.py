@@ -56,11 +56,14 @@ class CardModel(models.Model):
     config = JSONField(blank=True, null=True, db_column="config")
 
     def is_editable(self):
-        result = True
-        tiles = TileModel.objects.filter(nodegroup=self.nodegroup).count()
-        result = False if tiles > 0 else True
+        
         if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
-            result = True
+            return True
+
+        result = True
+        tiles = TileModel.objects.filter(nodegroup=self.nodegroup).exists()
+        result = False if tiles else True
+        
         return result
 
     class Meta:
@@ -405,10 +408,11 @@ class GraphModel(models.Model):
     def is_editable(self):
         result = True
         if self.isresource:
-            resource_instances = ResourceInstance.objects.filter(graph_id=self.graphid).count()
-            result = False if resource_instances > 0 else True
             if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
-                result = True
+                return True
+            resource_instances = ResourceInstance.objects.filter(graph_id=self.graphid).exists()
+            result = False if resource_instances else True
+            
         return result
 
     def __str__(self):
@@ -1113,7 +1117,8 @@ def send_email_on_save(sender, instance, **kwargs):
                 email_to = instance.recipient.email
             else:
                 email_to = context["email"]
-            subject, from_email, to = instance.notif.notiftype.name, "from@example.com", email_to
+                subject, from_email, to = instance.notif.notiftype.name, settings.DEFAULT_FROM_EMAIL, email_to
+            
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
             msg.attach_alternative(html_content, "text/html")
             msg.send()

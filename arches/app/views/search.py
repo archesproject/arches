@@ -31,7 +31,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Terms, MaxAgg, Aggregation
-import arches.app.search.search_export
+import arches.app.search.search_export as search_export
 from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.views.base import MapBaseManagerView

@@ -337,6 +337,10 @@ button.fa-trash:focus,
     color: #fff !important;
 }
 
+.page-header {
+    padding: 5px;
+}
+
 /*Remove pointer from Mega drop panel button*/
 
 .open.mega-dropdown>.mega-dropdown-toggle:before {
@@ -4835,6 +4839,7 @@ ul.jqtree_common li.jqtree-folder {
 .top-right-nav {
     display: flex;
     float: right;
+    margin-right: -8px;
 }
 
 .top-right-nav .top-btn-container {
@@ -4865,7 +4870,7 @@ ul.jqtree_common li.jqtree-folder {
 .ep-tools-login {
     border: none;
     padding-left: 16px;
-    padding-right: 20px;
+    padding-right: 16px;
     vertical-align: middle
 }
 
@@ -4879,7 +4884,6 @@ ul.jqtree_common li.jqtree-folder {
 .ep-tools-title {
     height: 50px;
     margin-right: 0;
-    float: left;
     overflow: hidden;
 }
 
@@ -4888,9 +4892,7 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .ep-graph-title {
-    font-size: 1.6em;
-    padding-left: 15px;
-    padding-top: 5px;
+    font-size: 1.3em;
 }
 
 .ep-graph-title-icon {
@@ -4919,6 +4921,38 @@ ul.jqtree_common li.jqtree-folder {
     border-bottom: 1px solid #e9e9e9;
 }
 
+.graph-designer .ep-form-toolbar {
+    display: block;
+}
+
+.ep-form-toolbar .ep-form-toolbar-item {
+    min-height: 55px;
+}
+
+.ep-form-toolbar .ep-form-toolbar-item h2,
+.ep-form-toolbar .ep-form-toolbar-item .btn-group-toggle,
+.ep-form-toolbar .ep-form-toolbar-item .graph-settings-crud {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+}
+
+.ep-form-toolbar .ep-form-toolbar-item h2 {
+    padding: 0 10px;
+    z-index: 20;
+}
+
+.ep-form-toolbar .ep-form-toolbar-item .btn-group-toggle {
+    width: fit-content;
+}
+
+.ep-form-toolbar .ep-form-toolbar-item .graph-settings-crud {
+    padding: 0;
+    margin: 0;
+}
+
 .ep-form-toolbar div:nth-last-child(2) {
     margin-right: auto;
 }
@@ -4928,6 +4962,7 @@ ul.jqtree_common li.jqtree-folder {
     font-weight: 400;
     color: #666;
     padding-left: 0;
+    margin: 0;
 }
 
 .ep-form-toolbar-tools {
@@ -11016,6 +11051,7 @@ a.jstree-anchor.permissions-widget {
 .rdm-maincontent {
     height: calc(100vh - 119px);
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .rdm-maincontent .arches-forms-container {
@@ -11184,6 +11220,15 @@ a.tree-display-tool, a.tree-display-tool:hover {
     margin-top: 10px;
 }
 
+.page-rdm #mainnav .list-header,
+.page-rdm nav ul li a {
+    font-size: 11px;
+}
+
+.page-rdm .btn-group.pull-right.hidden-xs {
+    top: 5px !important;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
@@ -11290,6 +11335,9 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .workbench-card-sidepanel {
         right: 0;
     }
+    h1.page-header span {
+        font-size: 1em !important;
+    }
 }
 
 @media screen and (max-width: 639px) {
@@ -11306,6 +11354,9 @@ a.tree-display-tool, a.tree-display-tool:hover {
 @media screen and (max-width: 767px) {
     .manage-dropdown {
         padding-left: 50px;
+    }
+    .page-rdm #aside-container {
+        position: relative !important;
     }
 }
 
@@ -11356,10 +11407,13 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .rp-report-container-preview {
         padding: 0 50px 35px 50px;
     }
-    .ep-tools-title h1 {
+    .ep-tools-title h1,
+    h1.page-header.text-overflow.ep-graph-title {
         font-size: 1.1em;
-        padding-top: 17px;
-        padding-left: 55px;
+        padding-left: 51px !important;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
     }
     .ep-graph-title-icon {
         display: none;
@@ -11466,7 +11520,7 @@ a.tree-display-tool, a.tree-display-tool:hover {
         height: auto;
     }
     .node-configuration {
-        height: 47vh;
+        height: 36vh;
     }
     .report-image-grid {
         margin-bottom: 0;
@@ -11577,9 +11631,16 @@ a.tree-display-tool, a.tree-display-tool:hover {
 @media screen and (max-width: 991px) {
     h1.page-header.text-overflow.ep-graph-title {
         white-space: normal;
+        padding: 5px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
     }
     .find-widget {
         width: 68vw;
+    }
+    .graph-designer .ep-form-toolbar .ep-form-toolbar-item {
+        min-height: 41px;
     }
 }
 

@@ -229,7 +229,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 }
             } else {
                 if(document.getElementsByClassName(elName)[0]) {
-                    document.getElementsByClassName(elName)[0].focus();
+                    setTimeout(function(){
+                        document.getElementsByClassName(elName)[0].focus();
+                    },0);
                 }
             }
             return;

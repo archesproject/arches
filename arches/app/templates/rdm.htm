@@ -10,7 +10,7 @@
 
 {% block css %}
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
-    <link rel="stylesheet" href="{% static 'css/plugins/smartadmin-production.css' %}" type="text/css" media="screen">
+    <link rel="stylesheet" href="{% static 'css/plugins/smartadmin-productionzz.css' %}" type="text/css" media="screen">
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'packages/jqtree/jqtree.css' %}">
 {% endblock css %}
@@ -164,3 +164,14 @@
 </div>
 
 {% endblock main_content %}
+
+{% block pre_require_js %}
+{{block.super}}
+
+<script>
+    window.addEventListener('load', function () {
+        document.body.className += " page-rdm";
+    });
+</script>
+
+{% endblock pre_require_js %}

@@ -1,20 +1,3 @@
-<!--
-ARCHES - a program developed to inventory and manage immovable cultural heritage.
-Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
--->
 {% extends "base-manager.htm" %}
 {% load staticfiles %}
 {% load i18n %}
@@ -40,7 +23,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <!-- Title Block -->
     <div class="ep-form-toolbar">
 
-        <div class="col-md-12 col-lg-5">
+        <div class="col-sm-12 col-md-5 ep-form-toolbar-item">
             <h2 class="ep-form-toolbar-title">
                 <!-- Menu Item -->
                 <div class="graph-selector" data-bind="">
@@ -59,14 +42,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </h2>
         </div>
 
-        <div class="col-md-12 col-lg-3 text-center">
+        <div class="col-sm-12 col-md-3 text-center ep-form-toolbar-item">
             <div class="btn-group btn-group-toggle" data-bind="visible: activeTab() === 'graph'">
                 <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'design' }, click: function(){viewState('design');}">{% trans "Design" %}</button>
                 <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'preview' }, click: showPreview">{% trans "Preview" %}</button>
             </div>
         </div>
 
-        <div class="col-md-12 col-lg-4 text-center">
+        <div class="col-sm-12 col-md-4 text-center ep-form-toolbar-item">
             <div class="graph-settings-crud">
                 <span data-bind="visible: graphSettingsVisible()" style="display: none;">
                     <!-- ko if: graphSettingsViewModel.dirty() -->
@@ -314,5 +297,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 restrictedNodegroups: {{restricted_nodegroups}}
             };
         });{% endautoescape %}
+
+        window.addEventListener('load', function () {
+            document.body.className += " graph-designer";
+        });
     </script>
 {% endblock pre_require_js %}

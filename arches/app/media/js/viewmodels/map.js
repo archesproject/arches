@@ -243,7 +243,8 @@ define([
                     accessToken: mapboxgl.accessToken,
                     mapboxgl: mapboxgl,
                     placeholder: arches.geocoderPlaceHolder,
-                    bbox: arches.hexBinBounds
+                    bbox: arches.hexBinBounds,
+                    countries: 'gb'
                 }), 'top-right');
 
                 self.layers.subscribe(self.updateLayers);

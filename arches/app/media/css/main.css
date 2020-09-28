@@ -3175,6 +3175,8 @@ a.disabled {
 .arches-RDM-headline {
     margin-bottom: 10px;
     padding-left: 10px;
+    padding-bottom: 5px;
+    padding-right: 5px;
 }
 
 .arches-RDM-Concept {
