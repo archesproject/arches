@@ -53,8 +53,6 @@ class LabelBasedNode(object):
 
 
 class LabelBasedGraph(object):
-    datatype_factory = DataTypeFactory()
-
     @staticmethod
     def generate_node_tile_reference(resource):
         """
@@ -114,7 +112,7 @@ class LabelBasedGraph(object):
         display_value = None
 
         if tile.data:
-            datatype = cls.datatype_factory.get_instance(node.datatype)
+            datatype = DataTypeFactory().get_instance(node.datatype)
 
             # `get_display_value` varies between datatypes,
             # so let's handle errors here instead of nullguarding all models
