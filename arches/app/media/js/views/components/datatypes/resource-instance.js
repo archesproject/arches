@@ -13,8 +13,8 @@ define([
             this.search = params.search;
 
             this.resourceModels = ko.computed(function() {
-                ontologyClass = params.ontologyclass()
-                parentProperty = params.parentproperty()
+                var ontologyClass = params.ontologyclass();
+                var parentProperty = params.parentproperty();
                 
                 return data.createableResources.filter(function(resource) {
                     var hasValidOntologyClasses = true;

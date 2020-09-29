@@ -242,7 +242,7 @@ define([
             });
 
             // forces view update on node selection
-            selectedNode = ko.observable(viewModel.selectedNode)
+            var selectedNode = ko.observable(viewModel.selectedNode);
             
             selectedNode.subscribe(function(node) {
                 if (node) {
@@ -255,8 +255,9 @@ define([
                         restrictedNodegroups: data.restrictedNodegroups
                     });
                 }
-            })
-            selectedNode.valueHasMutated()
+            });
+
+            selectedNode.valueHasMutated();
 
             viewModel.branchListView = new BranchListView({
                 el: $('#branch-library'),
