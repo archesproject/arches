@@ -29,7 +29,7 @@ define([
                             }
                         });
                     }
-                    
+
                     if (hasValidOntologyClasses) {
                         return({
                             graphid: resource.graphid,
@@ -83,7 +83,7 @@ define([
                     graph.inverseOntologyProperty = ko.observable(ko.unwrap(graph.inverseOntologyProperty));
                     // use this so that graph.name won't get saved back to the node config
                     Object.defineProperty(graph, 'name', {
-                        value: model ? model.name : null
+                        value: model.name
                     });
                     window.fetch(arches.urls.graph_nodes(graph.graphid))
                         .then(function(response){
