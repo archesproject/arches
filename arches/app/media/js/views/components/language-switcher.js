@@ -1,4 +1,4 @@
-define(['knockout', 'select2'], function(ko) {
+define(['knockout'], function(ko) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"

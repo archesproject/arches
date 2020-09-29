@@ -175,7 +175,7 @@ USE_TZ = False
 # language codes used in the command should be in the form (which is slightly different
 # form the form used in the LANGUAGE_CODE and LANGUAGES settings below):
 # --local={countrycode}_{REGIONCODE} <-- countrycode is lowercase, regioncode is uppercase, also notice the underscore instead of hyphen
-# commsnads to run (to generate files for "British English, German, and Spanish"):
+# commands to run (to generate files for "British English, German, and Spanish"):
 # django-admin.py makemessages --ignore=env/* --local=de --local=en --local=en_GB --local=es  --extension=htm,py
 # django-admin.py compilemessages
 

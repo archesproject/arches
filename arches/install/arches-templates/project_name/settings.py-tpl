@@ -5,6 +5,7 @@ Django settings for {{ project_name }} project.
 import os
 import arches
 import inspect
+from django.utils.translation import gettext_lazy as _
 
 try:
     from arches.settings import *
@@ -203,11 +204,11 @@ RESTRICT_MEDIA_ACCESS = False
 # to see how the language code is derived in the actual code
 
 ####### TO GENERATE .PO FILES DO THE FOLLOWING ########
-# run the following commands
+# run the following commands 
 # language codes used in the command should be in the form (which is slightly different 
 # form the form used in the LANGUAGE_CODE and LANGUAGES settings below):
 # --local={countrycode}_{REGIONCODE} <-- countrycode is lowercase, regioncode is uppercase, also notice the underscore instead of hyphen
-# commsnads to run (to generate files for "British English, German, and Spanish"):
+# commands to run (to generate files for "British English, German, and Spanish"):
 # django-admin.py makemessages --ignore=env/* --local=de --local=en --local=en_GB --local=es  --extension=htm,py
 # django-admin.py compilemessages
 
