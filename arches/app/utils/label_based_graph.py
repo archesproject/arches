@@ -70,17 +70,24 @@ class LabelBasedGraph(object):
         return node_tile_reference
 
     @classmethod
-    def from_tile(cls, tile, node_tile_reference=None, hide_empty_nodes=False, as_json=True):
+    def from_tile(cls, tile, node_tile_reference=None, datatype_factory=None, hide_empty_nodes=False, as_json=True):
         """
         Generates a label-based graph from a given tile
         """
         # need explicit None comparison here to differentiate between empty reference being
         # passed in vs reference having not yet been generated
-        if node_tile_reference == None:
+        if node_tile_reference is None:
             node_tile_reference = cls.generate_node_tile_reference(resource=Resource(tile.resourceinstance))
 
+        if not datatype_factory:
+            datatype_factory = DataTypeFactory()
+
         graph = cls._build_graph(
-            node=models.Node.objects.get(pk=tile.nodegroup_id), tile=tile, parent_tree=None, tile_reference=node_tile_reference,
+            node=models.Node.objects.get(pk=tile.nodegroup_id), 
+            tile=tile, 
+            parent_tree=None, 
+            tile_reference=node_tile_reference,
+            datatype_factory=datatype_factory,
         )
 
         return graph.as_json(include_empty_nodes=bool(not hide_empty_nodes)) if as_json else graph
@@ -94,12 +101,17 @@ class LabelBasedGraph(object):
             resource.load_tiles()
 
         node_tile_reference = cls.generate_node_tile_reference(resource=resource)
+        datatype_factory = DataTypeFactory()
 
-        root_graph = LabelBasedNode(name=resource.displayname, node_id=None, tile_id=None, value=None,)
+        root_graph = LabelBasedNode(name=resource.displayname, node_id=None, tile_id=None, value=None)
 
         for tile in resource.tiles:
             label_based_graph = LabelBasedGraph.from_tile(
-                tile=tile, node_tile_reference=node_tile_reference, hide_empty_nodes=hide_empty_nodes, as_json=False,
+                tile=tile, 
+                node_tile_reference=node_tile_reference, 
+                datatype_factory=datatype_factory,
+                hide_empty_nodes=hide_empty_nodes, 
+                as_json=False,
             )
 
             if label_based_graph:
@@ -108,11 +120,11 @@ class LabelBasedGraph(object):
         return root_graph.as_json(include_empty_nodes=bool(not hide_empty_nodes)) if as_json else root_graph
 
     @classmethod
-    def _get_display_value(cls, tile, node):
+    def _get_display_value(cls, tile, node, datatype_factory):
         display_value = None
 
         if tile.data:
-            datatype = DataTypeFactory().get_instance(node.datatype)
+            datatype = datatype_factory.get_instance(node.datatype)
 
             # `get_display_value` varies between datatypes,
             # so let's handle errors here instead of nullguarding all models
@@ -124,7 +136,7 @@ class LabelBasedGraph(object):
         return display_value
 
     @classmethod
-    def _build_graph(cls, node, tile, parent_tree, tile_reference):
+    def _build_graph(cls, node, tile, parent_tree, tile_reference, datatype_factory):
         # if a tile doesn't have any nodes, it should associate itself
         for associated_tile in tile_reference.get(str(node.pk), [tile]):
             if associated_tile == tile or associated_tile.parenttile == tile:
@@ -132,7 +144,7 @@ class LabelBasedGraph(object):
                     name=node.name,
                     node_id=str(node.pk),
                     tile_id=str(associated_tile.pk),
-                    value=cls._get_display_value(tile=associated_tile, node=node),
+                    value=cls._get_display_value(tile=associated_tile, node=node, datatype_factory=datatype_factory),
                 )
 
                 if not parent_tree:
@@ -143,7 +155,11 @@ class LabelBasedGraph(object):
 
                 for child_node in node.get_direct_child_nodes():
                     cls._build_graph(
-                        node=child_node, tile=associated_tile, parent_tree=label_based_node, tile_reference=tile_reference,
+                        node=child_node, 
+                        tile=associated_tile, 
+                        parent_tree=label_based_node, 
+                        tile_reference=tile_reference,
+                        datatype_factory=datatype_factory,
                     )
 
         return parent_tree
