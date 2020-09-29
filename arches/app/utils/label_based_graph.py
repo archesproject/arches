@@ -83,9 +83,9 @@ class LabelBasedGraph(object):
             datatype_factory = DataTypeFactory()
 
         graph = cls._build_graph(
-            node=models.Node.objects.get(pk=tile.nodegroup_id), 
-            tile=tile, 
-            parent_tree=None, 
+            node=models.Node.objects.get(pk=tile.nodegroup_id),
+            tile=tile,
+            parent_tree=None,
             tile_reference=node_tile_reference,
             datatype_factory=datatype_factory,
         )
@@ -107,10 +107,10 @@ class LabelBasedGraph(object):
 
         for tile in resource.tiles:
             label_based_graph = LabelBasedGraph.from_tile(
-                tile=tile, 
-                node_tile_reference=node_tile_reference, 
+                tile=tile,
+                node_tile_reference=node_tile_reference,
                 datatype_factory=datatype_factory,
-                hide_empty_nodes=hide_empty_nodes, 
+                hide_empty_nodes=hide_empty_nodes,
                 as_json=False,
             )
 
@@ -155,9 +155,9 @@ class LabelBasedGraph(object):
 
                 for child_node in node.get_direct_child_nodes():
                     cls._build_graph(
-                        node=child_node, 
-                        tile=associated_tile, 
-                        parent_tree=label_based_node, 
+                        node=child_node,
+                        tile=associated_tile,
+                        parent_tree=label_based_node,
                         tile_reference=tile_reference,
                         datatype_factory=datatype_factory,
                     )
