@@ -12,32 +12,32 @@ define([
             var self = this;
             this.search = params.search;
 
-            var validResourceModels = data.createableResources.filter(function(resource) {
-                var hasValidOntologyClasses = true;
+            this.resourceModels = ko.computed(function() {
+                ontologyClass = params.ontologyclass()
+                parentProperty = params.parentproperty()
+                
+                return data.createableResources.filter(function(resource) {
+                    var hasValidOntologyClasses = true;
 
-                // only filter resources if parent ontology and relationship are defined
-                if (params.ontologyclass() && params.parentproperty()) {
-                    hasValidOntologyClasses = data.creatableResourceValidOntologies[resource.graphid].some(function(ontology) {
-                        if (ontology['ontology_property'] === params.parentproperty()) {
-                            return ontology['ontology_classes'].some(function(ontologyClass) {
-                                return ontologyClass === params.ontologyclass();
-                            });
-                        }
-                    });
-                }
-
-                if (hasValidOntologyClasses) {
-                    return({
-                        graphid: resource.graphid,
-                        name: resource.name
-                    });
-                }
+                    // only filter resources if parent ontology and relationship are defined
+                    if (ontologyClass && parentProperty) {
+                        hasValidOntologyClasses = data.creatableResourceValidOntologies[resource.graphid].some(function(ontology) {
+                            if (ontology['ontology_property'] === parentProperty) {
+                                return ontology['ontology_classes'].some(function(ontologyClass) {
+                                    return ontologyClass === ontologyClass;
+                                });
+                            }
+                        });
+                    }
+                    
+                    if (hasValidOntologyClasses) {
+                        return({
+                            graphid: resource.graphid,
+                            name: resource.name
+                        });
+                    }
+                });
             });
-
-            this.resourceModels = [{
-                graphid: null,
-                name: ''
-            }].concat(validResourceModels);
 
             if (!this.search) {
                 this.makeFriendly = ontologyUtils.makeFriendly;
@@ -83,7 +83,7 @@ define([
                     graph.inverseOntologyProperty = ko.observable(ko.unwrap(graph.inverseOntologyProperty));
                     // use this so that graph.name won't get saved back to the node config
                     Object.defineProperty(graph, 'name', {
-                        value: model.name
+                        value: model ? model.name : null
                     });
                     window.fetch(arches.urls.graph_nodes(graph.graphid))
                         .then(function(response){
