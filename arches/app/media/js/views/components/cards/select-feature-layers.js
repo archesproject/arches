@@ -1,7 +1,7 @@
 define([], function() {
     return function(resourceId, source, sourceLayer, selectedResourceIds, visible, color, nodeids, filteredNodeids) {
         color = color || "#F0C200";
-        colorPallet = ["#aebbda", "#fdb462", "#ff44cc", "#22ff33"]
+        colorPallet = ["#F0C200", "#fdb462", "#ff44cc", "#22ff33"]
         var createColorExpressions = function(defaultColor, colorPallet){
             if (nodeids) {
                 var colorExpressions = ['case'];
@@ -21,13 +21,14 @@ define([], function() {
         } 
         color = createColorExpressions(color, colorPallet);
         var nodeFilter = ["!=", "resourceinstanceid", "x"]
-        if (filteredNodeids) {
+        if (filteredNodeids && filteredNodeids.length > 1) {
             var nodeFilter = filteredNodeids.map(id => ["==", "nodeid", id])
             nodeFilter.splice(0, 0, 'any');
         }
         var strokecolor = "#fff";
         var overviewzoom = 11;
         var minzoom = 15;
+
         if (selectedResourceIds && selectedResourceIds.length > 0) {
             color = [
                 'match',
