@@ -492,17 +492,9 @@ class Node(models.Model):
 
         returns a list of nodes
         """
-        child_nodes = self.get_child_nodes_and_edges()[0]
-        grandchild_nodes = {}
-
-        # get all nodes that exist in child subtrees
-        for child_node in child_nodes:
-            for grandchild_node in child_node.get_child_nodes_and_edges()[0]:
-                if not grandchild_nodes.get(str(grandchild_node.pk)):
-                    grandchild_nodes[str(grandchild_node.pk)] = grandchild_node
-
-        # if node is in grandchild_nodes it cannot be a direct child
-        return list(child_node for child_node in child_nodes if not grandchild_nodes.get(str(child_node.pk)))
+        return [
+            edge.rangenode for edge in Edge.objects.filter(domainnode=self)
+        ]
 
     @property
     def is_collector(self):

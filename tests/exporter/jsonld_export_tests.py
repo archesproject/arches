@@ -102,17 +102,25 @@ class JsonLDExportTests(ArchesTestCase):
     def tearDown(self):
         pass
 
+    def _create_url(self, resource_id):
+        base_url = reverse(
+            "resources", 
+            kwargs={"resourceid": resource_id}
+        )
+
+        return base_url + "?format=json-ld"
+
     def test_0_missing_resource(self):
         # this 'resources' is from urls.py
         self.client.login(username="admin", password="admin")
-        url = reverse("resources", kwargs={"resourceid": "00000000-f6b5-11e9-8f09-a4d18cec433a"})
+        url = self._create_url(resource_id="00000000-f6b5-11e9-8f09-a4d18cec433a")
         response = self.client.get(url, secure=False)
         print(f"test missing on {url} gets {response.status_code}")
         self.assertTrue(response.status_code == 404)
 
     def test_1_basic_export(self):
         # ef52726c-f6b1-11e9-b47f-a4d18cec433a
-        url = reverse("resources", kwargs={"resourceid": "e6412598-f6b5-11e9-8f09-a4d18cec433a"})
+        url = self._create_url(resource_id="e6412598-f6b5-11e9-8f09-a4d18cec433a")
         # response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {self.token}')
         response = self.client.get(url, secure=False)
         print(f"test basic on {url} gets {response.status_code}")
@@ -125,7 +133,7 @@ class JsonLDExportTests(ArchesTestCase):
 
     def test_2a_complex_export_data(self):
         # 24d0d25a-fa75-11e9-b369-3af9d3b32b71  -- data types
-        url = reverse("resources", kwargs={"resourceid": "24d0d25a-fa75-11e9-b369-3af9d3b32b71"})
+        url = self._create_url(resource_id="24d0d25a-fa75-11e9-b369-3af9d3b32b71")
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
@@ -155,7 +163,7 @@ class JsonLDExportTests(ArchesTestCase):
 
     def test_2b_complex_export_concepts(self):
         # 24d0d25a-fa75-11e9-b369-3af9d3b32b71  -- also concepts
-        url = reverse("resources", kwargs={"resourceid": "24d0d25a-fa75-11e9-b369-3af9d3b32b71"})
+        url = self._create_url(resource_id="24d0d25a-fa75-11e9-b369-3af9d3b32b71")
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
@@ -200,7 +208,7 @@ class JsonLDExportTests(ArchesTestCase):
         # 12bbf5bc-fa85-11e9-91b8-3af9d3b32b71
 
         # Resource-Instance
-        url = reverse("resources", kwargs={"resourceid": "12bbf5bc-fa85-11e9-91b8-3af9d3b32b71"})
+        url = self._create_url(resource_id="12bbf5bc-fa85-11e9-91b8-3af9d3b32b71")
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
@@ -211,7 +219,7 @@ class JsonLDExportTests(ArchesTestCase):
         self.assertTrue(ri["@type"] == "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object")
 
         # Resource-Instance-List
-        url = reverse("resources", kwargs={"resourceid": "396dcffa-fa8a-11e9-b6e7-3af9d3b32b71"})
+        url = self._create_url(resource_id="396dcffa-fa8a-11e9-b6e7-3af9d3b32b71")
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
@@ -230,7 +238,7 @@ class JsonLDExportTests(ArchesTestCase):
         # 9c400558-fa8a-11e9-b6e7-3af9d3b32b71
         # This is #5136 too, applied to a resource-instance
 
-        url = reverse("resources", kwargs={"resourceid": "9c400558-fa8a-11e9-b6e7-3af9d3b32b71"})
+        url = self._create_url(resource_id="9c400558-fa8a-11e9-b6e7-3af9d3b32b71")
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
@@ -245,7 +253,7 @@ class JsonLDExportTests(ArchesTestCase):
     def test_3_5136_meta_resinst(self):
         # '45fbd100-fb60-11e9-98e3-3af9d3b32b71'
 
-        url = reverse("resources", kwargs={"resourceid": "45fbd100-fb60-11e9-98e3-3af9d3b32b71"})
+        url = self._create_url(resource_id="45fbd100-fb60-11e9-98e3-3af9d3b32b71")
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
@@ -264,7 +272,7 @@ class JsonLDExportTests(ArchesTestCase):
     def test_nesting_permutations_concept(self):
         # This tests nesting permutations of concept and concept-list
 
-        url = reverse("resources", kwargs={"resourceid": "6edd753e-fbf0-11e9-9ca4-3af9d3b32b71"})
+        url = self._create_url(resource_id="6edd753e-fbf0-11e9-9ca4-3af9d3b32b71")
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
@@ -328,7 +336,7 @@ class JsonLDExportTests(ArchesTestCase):
 
         # test c -> cl
 
-        url = reverse("resources", kwargs={"resourceid": "bbc1651a-fbf3-11e9-9ca4-3af9d3b32b71"})
+        url = self._create_url(resource_id="bbc1651a-fbf3-11e9-9ca4-3af9d3b32b71")
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
@@ -357,7 +365,7 @@ class JsonLDExportTests(ArchesTestCase):
 
         # ri -> ri
 
-        url = reverse('resources', kwargs={"resourceid": 'a16ea9a4-fbf1-11e9-9ca4-3af9d3b32b71'})
+        url = self._create_url(resource_id='a16ea9a4-fbf1-11e9-9ca4-3af9d3b32b71')
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
@@ -378,7 +386,7 @@ class JsonLDExportTests(ArchesTestCase):
 
         # ril -> ri
 
-        url = reverse('resources', kwargs={"resourceid": 'd323639a-fbf1-11e9-9ca4-3af9d3b32b71'})
+        url = self._create_url(resource_id='d323639a-fbf1-11e9-9ca4-3af9d3b32b71')
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
@@ -404,7 +412,7 @@ class JsonLDExportTests(ArchesTestCase):
 
         # ril -> ril
 
-        url = reverse('resources', kwargs={"resourceid": 'b588fae8-fbf1-11e9-9ca4-3af9d3b32b71'})
+        url = self._create_url(resource_id='b588fae8-fbf1-11e9-9ca4-3af9d3b32b71')
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
@@ -432,7 +440,7 @@ class JsonLDExportTests(ArchesTestCase):
     def test_nesting_permutations_res_inst_concept(self):
 
         # ril -> cl
-        url = reverse('resources', kwargs={"resourceid": 'd1d2ce8e-fbf3-11e9-9ca4-3af9d3b32b71'})
+        url = self._create_url(resource_id='d1d2ce8e-fbf3-11e9-9ca4-3af9d3b32b71')
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
@@ -465,7 +473,7 @@ class JsonLDExportTests(ArchesTestCase):
 
         # dc277c1a-fc32-11e9-9201-3af9d3b32b71 references cba81b1a-fc32-11e9-9201-3af9d3b32b71
 
-        url = reverse('resources', kwargs={"resourceid": 'dc277c1a-fc32-11e9-9201-3af9d3b32b71'})
+        url = self._create_url(resource_id='dc277c1a-fc32-11e9-9201-3af9d3b32b71')
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
@@ -476,7 +484,7 @@ class JsonLDExportTests(ArchesTestCase):
         ref = js[prop]
         self.assertTrue(js[prop]['@id'] == "http://localhost:8000/resources/cba81b1a-fc32-11e9-9201-3af9d3b32b71")
 
-        url = reverse('resources', kwargs={"resourceid": 'cba81b1a-fc32-11e9-9201-3af9d3b32b71'})
+        url = self._create_url(resource_id='cba81b1a-fc32-11e9-9201-3af9d3b32b71')
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js2 = response.json()
@@ -488,7 +496,7 @@ class JsonLDExportTests(ArchesTestCase):
 
     def test_5299_basic(self):
 
-        url = reverse('resources', kwargs={"resourceid": 'c76f74ba-071a-11ea-8c2d-acde48001122'})
+        url = self._create_url(resource_id='c76f74ba-071a-11ea-8c2d-acde48001122')
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
@@ -506,7 +514,7 @@ class JsonLDExportTests(ArchesTestCase):
     def test_5299_complex(self):
         # 7f90ff58-0722-11ea-b628-acde48001122
 
-        url = reverse('resources', kwargs={"resourceid": '7f90ff58-0722-11ea-b628-acde48001122'})
+        url = self._create_url(resource_id='7f90ff58-0722-11ea-b628-acde48001122')
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()

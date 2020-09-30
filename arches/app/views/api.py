@@ -44,7 +44,7 @@ from arches.app.utils.decorators import (
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
-from arches.app.utils.label_based_graph import LabelBasedGraph
+from arches.app.utils.label_based_graph import LabelBasedGraph, NODE_ID_KEY, TILE_ID_KEY, VALUE_KEY
 from arches.app.utils.permission_backend import (
     user_can_read_resource,
     user_can_edit_resource,
@@ -520,120 +520,144 @@ class Resources(APIBase):
     # }]
 
     def get(self, request, resourceid=None, slug=None, graphid=None):
-        if user_can_read_resource(user=request.user, resourceid=resourceid):
-            allowed_formats = ["json", "json-ld"]
-            format = request.GET.get("format", "json-ld")
-            include_tiles = True if request.GET.get("includetiles", "true").lower() == "true" else False
-            disambiguate = False if request.GET.get("disambiguate", "false").lower() == "false" else True
+        if not user_can_read_resource(user=request.user, resourceid=resourceid):
+            return JSONResponse(status=403)
 
-            if format not in allowed_formats:
-                return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
-            try:
-                indent = int(request.GET.get("indent", None))
-            except Exception:
-                indent = None
+        allowed_formats = ["json", "json-ld"]
+        format = request.GET.get("format", "json")
 
-            if resourceid:
-                if format == "json-ld":
-                    try:
-                        models.ResourceInstance.objects.get(pk=resourceid)  # check for existance
-                        exporter = ResourceExporter(format=format)
-                        output = exporter.writer.write_resources(resourceinstanceids=[resourceid], indent=indent, user=request.user)
-                        out = output[0]["outputfile"].getvalue()
-                    except models.ResourceInstance.DoesNotExist:
-                        logger.error(_("The specified resource '{0}' does not exist. JSON-LD export failed.".format(resourceid)))
-                        return JSONResponse(status=404)
-                elif format == "json":
-                    resource = Resource.objects.get(pk=resourceid)
+        if format not in allowed_formats:
+            return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
+
+        include_tiles = bool(request.GET.get("includetiles", "true").lower() == "true")  # default True
+        disambiguate = bool(request.GET.get("disambiguate", "false").lower() == "true")  # default False
+        arches_json = bool(request.GET.get("arches-json", "false").lower() == "true")  # default False
+
+        try:
+            indent = int(request.GET.get("indent", None))
+        except Exception:
+            indent = None
+
+        if resourceid:
+            if format == "json":
+                resource = Resource.objects.get(pk=resourceid)
+
+                label_based_graph = LabelBasedGraph.from_resource(resource=resource, hide_empty_nodes=True)
+                _name, resource_graph = label_based_graph.popitem()
+
+                for key in [NODE_ID_KEY, TILE_ID_KEY, VALUE_KEY]:
+                    resource_graph.pop(key)  # removes unneccesary top-node values
+
+                out = {
+                    "resource": resource_graph,
+                    "displaydescription": resource.displaydescription,
+                    "displayname": resource.displayname,
+                    "graph_id": resource.graph_id,
+                    "legacyid": resource.legacyid,
+                    "map_popup": resource.map_popup,
+                    "resourceinstanceid": resource.resourceinstanceid,
+                }
+
+                if arches_json:
                     out = resource
 
-                    if include_tiles is True:
+                    if include_tiles or disambiguate:
                         resource.load_tiles()
 
-                    if request.GET.get("foo"):
-                        indent = 4
-                        out = LabelBasedGraph.from_resource(resource=resource, hide_empty_nodes=False)
+                    if disambiguate:
+                        out = {
+                            resourceid: resource,
+                            'disambiguated': dict(),
+                        }
 
-                    elif disambiguate:
-                        if not include_tiles:
-                            resource.load_tiles()
-                        out = dict()
-                        out[resourceid] = resource
-                        out["disambiguated"] = dict()
                         datatype_factory = DataTypeFactory()
 
                         # lookup all nodes from its corresponding graph, then compare that list against nodeid in tile.data.keys
                         graph = Graph.objects.get(graphid=resource.graph.graphid)
-                        graph_nodes = graph.nodes.copy()
-                        for t in resource.tiles:
-                            for nid in list(t.data.keys()):  # better to compare nodegroups?
-                                if uuid.UUID(nid) in graph_nodes.keys():
-                                    datatype = datatype_factory.get_instance(graph_nodes[uuid.UUID(nid)].datatype)
-                                    value = datatype.get_display_value(t, graph_nodes[uuid.UUID(nid)])
-                                    out["disambiguated"][graph_nodes[uuid.UUID(nid)].name] = value
-                                    del graph_nodes[uuid.UUID(nid)]  # shrink list for efficiency
+                        graph_nodes = dict(graph.nodes)
 
-            else:
-                #
-                # The following commented code would be what you would use if you wanted to use the rdflib module,
-                # the problem with using this is that items in the "ldp:contains" array don't maintain a consistent order
-                #
+                        for tile in resource.tiles:
+                            for node_id in list(tile.data.keys()):  # better to compare nodegroups?
+                                graph_node = graph_nodes.get(uuid.UUID(node_id))
 
-                # archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
-                # ldp = Namespace('https://www.w3.org/ns/ldp/')
+                                if graph_node:
+                                    datatype = datatype_factory.get_instance(graph_node.datatype)
 
-                # g = Graph()
-                # g.bind('archesproject', archesproject, False)
-                # g.add((archesproject['resources'], RDF.type, ldp['BasicContainer']))
+                                    out["disambiguated"][graph_node.name] = datatype.get_display_value(
+                                        tile=tile, 
+                                        node=graph_node
+                                    )
 
-                # base_url = "%s%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, reverse('resources',args=['']).lstrip('/'))
-                # for resourceid in list(Resource.objects.values_list('pk', flat=True).order_by('pk')[:10]):
-                #     g.add((archesproject['resources'], ldp['contains'], URIRef("%s%s") % (base_url, resourceid) ))
-
-                # value = g.serialize(format='nt')
-                # out = from_rdf(str(value), options={format:'application/nquads'})
-                # framing = {
-                #     "@omitDefault": True
-                # }
-
-                # out = frame(out, framing)
-                # context = {
-                #     "@context": {
-                #         'ldp': 'https://www.w3.org/ns/ldp/',
-                #         'arches': settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT
-                #     }
-                # }
-                # out = compact(out, context, options={'skipExpansion':False, 'compactArrays': False})
-
-                page_size = settings.API_MAX_PAGE_SIZE
+            elif format == "json-ld":
                 try:
-                    page = int(request.GET.get("page", None))
-                except Exception:
-                    page = 1
+                    models.ResourceInstance.objects.get(pk=resourceid)  # check for existance
+                    exporter = ResourceExporter(format=format)
+                    output = exporter.writer.write_resources(resourceinstanceids=[resourceid], indent=indent, user=request.user)
+                    out = output[0]["outputfile"].getvalue()
+                except models.ResourceInstance.DoesNotExist:
+                    logger.error(_("The specified resource '{0}' does not exist. JSON-LD export failed.".format(resourceid)))
+                    return JSONResponse(status=404)
 
-                start = (page - 1) * page_size
-                end = start + page_size
-
-                base_url = "%s%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, reverse("resources", args=[""]).lstrip("/"))
-                out = {
-                    "@context": "https://www.w3.org/ns/ldp/",
-                    "@id": "",
-                    "@type": "ldp:BasicContainer",
-                    # Here we actually mean the name
-                    # "label": str(model.name),
-                    "ldp:contains": [
-                        "%s%s" % (base_url, resourceid)
-                        for resourceid in list(
-                            Resource.objects.values_list("pk", flat=True)
-                            .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID)
-                            .order_by("pk")[start:end]
-                        )
-                    ],
-                }
-
-            return JSONResponse(out, indent=indent)
         else:
-            return JSONResponse(status=403)
+            #
+            # The following commented code would be what you would use if you wanted to use the rdflib module,
+            # the problem with using this is that items in the "ldp:contains" array don't maintain a consistent order
+            #
+
+            # archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
+            # ldp = Namespace('https://www.w3.org/ns/ldp/')
+
+            # g = Graph()
+            # g.bind('archesproject', archesproject, False)
+            # g.add((archesproject['resources'], RDF.type, ldp['BasicContainer']))
+
+            # base_url = "%s%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, reverse('resources',args=['']).lstrip('/'))
+            # for resourceid in list(Resource.objects.values_list('pk', flat=True).order_by('pk')[:10]):
+            #     g.add((archesproject['resources'], ldp['contains'], URIRef("%s%s") % (base_url, resourceid) ))
+
+            # value = g.serialize(format='nt')
+            # out = from_rdf(str(value), options={format:'application/nquads'})
+            # framing = {
+            #     "@omitDefault": True
+            # }
+
+            # out = frame(out, framing)
+            # context = {
+            #     "@context": {
+            #         'ldp': 'https://www.w3.org/ns/ldp/',
+            #         'arches': settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT
+            #     }
+            # }
+            # out = compact(out, context, options={'skipExpansion':False, 'compactArrays': False})
+
+            page_size = settings.API_MAX_PAGE_SIZE
+            
+            try:
+                page = int(request.GET.get("page", None))
+            except Exception:
+                page = 1
+
+            start = (page - 1) * page_size
+            end = start + page_size
+
+            base_url = "%s%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, reverse("resources", args=[""]).lstrip("/"))
+            out = {
+                "@context": "https://www.w3.org/ns/ldp/",
+                "@id": "",
+                "@type": "ldp:BasicContainer",
+                # Here we actually mean the name
+                # "label": str(model.name),
+                "ldp:contains": [
+                    "%s%s" % (base_url, resourceid)
+                    for resourceid in list(
+                        Resource.objects.values_list("pk", flat=True)
+                        .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID)
+                        .order_by("pk")[start:end]
+                    )
+                ],
+            }
+
+        return JSONResponse(out, indent=indent)
 
     # def put(self, request, resourceid):
     #     try:
