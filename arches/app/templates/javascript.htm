@@ -366,7 +366,22 @@
             },{% endfor %}{% endautoescape %}],
             userEmail: '{{ user.email }}',
             celeryRunning: '{{celery_running}}',
-            graphs: {% autoescape off %}{{graphs|default:"[]"}}{% endautoescape %}
+            graphs: {% autoescape off %}{{graphs|default:"[]"}}{% endautoescape %},
+            translations: {
+                'deactivateSurveyTitle': '{% trans "You are deactivating an active survey" %}',
+                'deactivateSurveyMessage': '{% trans "Users will not be able to download this survey to their device" %}',
+                'activateSurveyTitle': '{% trans "You are activating this survey" %}',
+                'activateSurveyMessage': '{% trans "Users will immediately be able to download this survey and begin collecting data" %}',
+                'mapAddPoint': '{% trans "Add point" %}',
+                'mapAddLine': '{% trans "Add line" %}',
+                'mapAddPolygon': '{% trans "Add polygon" %}',
+                'mapSelectDrawing': '{% trans "Select drawing" %}',
+                'riSelectCreateNew': '{% trans "Create a new ${graphName}" %}',
+                'riSelectPlaceholder': '{% trans "Add new Relationship" %}',
+                'reNetworkReponseError': '{% trans "Network response was not ok" %}',
+                'workflowWastbinWarning': '{% trans "You are about to delete ${val}." %}',
+                'workflowWastbinWarning2': '{% trans "Are you sure you want to continue?" %}'
+            }
         };
     });
 
