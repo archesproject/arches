@@ -492,9 +492,7 @@ class Node(models.Model):
 
         returns a list of nodes
         """
-        return [
-            edge.rangenode for edge in Edge.objects.filter(domainnode=self)
-        ]
+        return [edge.rangenode for edge in Edge.objects.filter(domainnode=self)]
 
     @property
     def is_collector(self):

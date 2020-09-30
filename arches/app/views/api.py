@@ -567,7 +567,7 @@ class Resources(APIBase):
                     if disambiguate:
                         out = {
                             resourceid: resource,
-                            'disambiguated': dict(),
+                            "disambiguated": dict(),
                         }
 
                         datatype_factory = DataTypeFactory()
@@ -583,10 +583,7 @@ class Resources(APIBase):
                                 if graph_node:
                                     datatype = datatype_factory.get_instance(graph_node.datatype)
 
-                                    out["disambiguated"][graph_node.name] = datatype.get_display_value(
-                                        tile=tile, 
-                                        node=graph_node
-                                    )
+                                    out["disambiguated"][graph_node.name] = datatype.get_display_value(tile=tile, node=graph_node)
 
             elif format == "json-ld":
                 try:
@@ -631,7 +628,7 @@ class Resources(APIBase):
             # out = compact(out, context, options={'skipExpansion':False, 'compactArrays': False})
 
             page_size = settings.API_MAX_PAGE_SIZE
-            
+
             try:
                 page = int(request.GET.get("page", None))
             except Exception:

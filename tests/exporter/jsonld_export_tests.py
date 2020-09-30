@@ -103,10 +103,7 @@ class JsonLDExportTests(ArchesTestCase):
         pass
 
     def _create_url(self, resource_id):
-        base_url = reverse(
-            "resources", 
-            kwargs={"resourceid": resource_id}
-        )
+        base_url = reverse("resources", kwargs={"resourceid": resource_id})
 
         return base_url + "?format=json-ld"
 
@@ -365,12 +362,12 @@ class JsonLDExportTests(ArchesTestCase):
 
         # ri -> ri
 
-        url = self._create_url(resource_id='a16ea9a4-fbf1-11e9-9ca4-3af9d3b32b71')
+        url = self._create_url(resource_id="a16ea9a4-fbf1-11e9-9ca4-3af9d3b32b71")
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
-        self.assertTrue('@id' in js)      
-        self.assertTrue(js['@id'] == "http://localhost:8000/resources/a16ea9a4-fbf1-11e9-9ca4-3af9d3b32b71")
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/a16ea9a4-fbf1-11e9-9ca4-3af9d3b32b71")
 
         p1 = "http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"
         p2 = "http://www.cidoc-crm.org/cidoc-crm/P10i_contains"
@@ -379,92 +376,98 @@ class JsonLDExportTests(ArchesTestCase):
         tier1id = "http://localhost:8000/resources/24d0d25a-fa75-11e9-b369-3af9d3b32b71"
         tier2id = "http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71"
 
-        self.assertTrue(js[p1]['@id'] == tier1id)
+        self.assertTrue(js[p1]["@id"] == tier1id)
         self.assertTrue(p2 in js[p1])
-        self.assertTrue(js[p1][p2]['@id'] == tier2id)
-
+        self.assertTrue(js[p1][p2]["@id"] == tier2id)
 
         # ril -> ri
 
-        url = self._create_url(resource_id='d323639a-fbf1-11e9-9ca4-3af9d3b32b71')
+        url = self._create_url(resource_id="d323639a-fbf1-11e9-9ca4-3af9d3b32b71")
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
-        self.assertTrue('@id' in js)      
-        self.assertTrue(js['@id'] == "http://localhost:8000/resources/d323639a-fbf1-11e9-9ca4-3af9d3b32b71")
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/d323639a-fbf1-11e9-9ca4-3af9d3b32b71")
 
         prop = "http://www.cidoc-crm.org/cidoc-crm/P130_shows_features_of"
         self.assertTrue(prop in js)
         self.assertTrue(type(js[prop]) == list)
-        tier1ids = ["http://localhost:8000/resources/24d0d25a-fa75-11e9-b369-3af9d3b32b71",
-            "http://localhost:8000/resources/396dcffa-fa8a-11e9-b6e7-3af9d3b32b71"]
+        tier1ids = [
+            "http://localhost:8000/resources/24d0d25a-fa75-11e9-b369-3af9d3b32b71",
+            "http://localhost:8000/resources/396dcffa-fa8a-11e9-b6e7-3af9d3b32b71",
+        ]
         tier2id = "http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71"
 
-        self.assertTrue(js[prop][0]['@id'] in tier1ids)
-        self.assertTrue(js[prop][1]['@id'] in tier1ids)
+        self.assertTrue(js[prop][0]["@id"] in tier1ids)
+        self.assertTrue(js[prop][1]["@id"] in tier1ids)
         self.assertTrue(prop in js[prop][0])
         self.assertTrue(prop in js[prop][1])
-        self.assertTrue(js[prop][0][prop]['@id'] == tier2id)
-        self.assertTrue(js[prop][0][prop]['@id'] == tier2id)
-        self.assertTrue(js[prop][1][prop]['@id'] == tier2id)
-        self.assertTrue(js[prop][1][prop]['@id'] == tier2id)
-
+        self.assertTrue(js[prop][0][prop]["@id"] == tier2id)
+        self.assertTrue(js[prop][0][prop]["@id"] == tier2id)
+        self.assertTrue(js[prop][1][prop]["@id"] == tier2id)
+        self.assertTrue(js[prop][1][prop]["@id"] == tier2id)
 
         # ril -> ril
 
-        url = self._create_url(resource_id='b588fae8-fbf1-11e9-9ca4-3af9d3b32b71')
+        url = self._create_url(resource_id="b588fae8-fbf1-11e9-9ca4-3af9d3b32b71")
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
-        self.assertTrue('@id' in js)      
-        self.assertTrue(js['@id'] == "http://localhost:8000/resources/b588fae8-fbf1-11e9-9ca4-3af9d3b32b71")
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/b588fae8-fbf1-11e9-9ca4-3af9d3b32b71")
 
         prop = "http://www.cidoc-crm.org/cidoc-crm/P133_is_separated_from"
         self.assertTrue(prop in js)
         self.assertTrue(type(js[prop]) == list)
-        tier1ids = ["http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71",
-            "http://localhost:8000/resources/24d0d25a-fa75-11e9-b369-3af9d3b32b71"]
-        tier2ids = ["http://localhost:8000/resources/9c400558-fa8a-11e9-b6e7-3af9d3b32b71",
-            "http://localhost:8000/resources/396dcffa-fa8a-11e9-b6e7-3af9d3b32b71"]
+        tier1ids = [
+            "http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71",
+            "http://localhost:8000/resources/24d0d25a-fa75-11e9-b369-3af9d3b32b71",
+        ]
+        tier2ids = [
+            "http://localhost:8000/resources/9c400558-fa8a-11e9-b6e7-3af9d3b32b71",
+            "http://localhost:8000/resources/396dcffa-fa8a-11e9-b6e7-3af9d3b32b71",
+        ]
 
-        self.assertTrue(js[prop][0]['@id'] in tier1ids)
-        self.assertTrue(js[prop][1]['@id'] in tier1ids)
+        self.assertTrue(js[prop][0]["@id"] in tier1ids)
+        self.assertTrue(js[prop][1]["@id"] in tier1ids)
         self.assertTrue(prop in js[prop][0])
         self.assertTrue(prop in js[prop][1])
-        self.assertTrue(js[prop][0][prop][0]['@id'] in tier2ids)
-        self.assertTrue(js[prop][0][prop][1]['@id'] in tier2ids)
-        self.assertTrue(js[prop][1][prop][0]['@id'] in tier2ids)
-        self.assertTrue(js[prop][1][prop][1]['@id'] in tier2ids)
-
+        self.assertTrue(js[prop][0][prop][0]["@id"] in tier2ids)
+        self.assertTrue(js[prop][0][prop][1]["@id"] in tier2ids)
+        self.assertTrue(js[prop][1][prop][0]["@id"] in tier2ids)
+        self.assertTrue(js[prop][1][prop][1]["@id"] in tier2ids)
 
     def test_nesting_permutations_res_inst_concept(self):
 
         # ril -> cl
-        url = self._create_url(resource_id='d1d2ce8e-fbf3-11e9-9ca4-3af9d3b32b71')
+        url = self._create_url(resource_id="d1d2ce8e-fbf3-11e9-9ca4-3af9d3b32b71")
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
-        self.assertTrue('@id' in js)      
-        self.assertTrue(js['@id'] == "http://localhost:8000/resources/d1d2ce8e-fbf3-11e9-9ca4-3af9d3b32b71")
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/d1d2ce8e-fbf3-11e9-9ca4-3af9d3b32b71")
 
         p1 = "http://www.cidoc-crm.org/cidoc-crm/P62_depicts"
         p2 = "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"
-        t1ids = ["http://localhost:8000/resources/12345678-abcd-11e9-9cbb-3af9d3b32b71",
-            "http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71"]
-        t2ids = ["http://localhost:8000/concepts/6458c29a-e043-46f7-b89b-bb6f50be9f78",
-            "http://localhost:8000/concepts/fb457e76-e018-41e7-9be3-0f986816450a"]
+        t1ids = [
+            "http://localhost:8000/resources/12345678-abcd-11e9-9cbb-3af9d3b32b71",
+            "http://localhost:8000/resources/12bbf5bc-fa85-11e9-91b8-3af9d3b32b71",
+        ]
+        t2ids = [
+            "http://localhost:8000/concepts/6458c29a-e043-46f7-b89b-bb6f50be9f78",
+            "http://localhost:8000/concepts/fb457e76-e018-41e7-9be3-0f986816450a",
+        ]
 
         self.assertTrue(p1 in js)
         self.assertTrue(type(js[p1]) == list)
-        self.assertTrue(js[p1][0]['@id'] in t1ids)
-        self.assertTrue(js[p1][1]['@id'] in t1ids)
+        self.assertTrue(js[p1][0]["@id"] in t1ids)
+        self.assertTrue(js[p1][1]["@id"] in t1ids)
         self.assertTrue(p2 in js[p1][0])
         self.assertTrue(p2 in js[p1][1])
-        self.assertTrue(js[p1][0][p2][0]['@id'] in t2ids)
-        self.assertTrue(js[p1][0][p2][1]['@id'] in t2ids)
-        self.assertTrue(js[p1][1][p2][0]['@id'] in t2ids)
-        self.assertTrue(js[p1][1][p2][1]['@id'] in t2ids)
-
+        self.assertTrue(js[p1][0][p2][0]["@id"] in t2ids)
+        self.assertTrue(js[p1][0][p2][1]["@id"] in t2ids)
+        self.assertTrue(js[p1][1][p2][0]["@id"] in t2ids)
+        self.assertTrue(js[p1][1][p2][1]["@id"] in t2ids)
 
     def test_4564_export(self):
 
@@ -473,39 +476,39 @@ class JsonLDExportTests(ArchesTestCase):
 
         # dc277c1a-fc32-11e9-9201-3af9d3b32b71 references cba81b1a-fc32-11e9-9201-3af9d3b32b71
 
-        url = self._create_url(resource_id='dc277c1a-fc32-11e9-9201-3af9d3b32b71')
+        url = self._create_url(resource_id="dc277c1a-fc32-11e9-9201-3af9d3b32b71")
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
-        self.assertTrue('@id' in js)      
-        self.assertTrue(js['@id'] == "http://localhost:8000/resources/dc277c1a-fc32-11e9-9201-3af9d3b32b71")
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/dc277c1a-fc32-11e9-9201-3af9d3b32b71")
         prop = "http://www.cidoc-crm.org/cidoc-crm/P51_has_former_or_current_owner"
         self.assertTrue(prop in js)
         ref = js[prop]
-        self.assertTrue(js[prop]['@id'] == "http://localhost:8000/resources/cba81b1a-fc32-11e9-9201-3af9d3b32b71")
+        self.assertTrue(js[prop]["@id"] == "http://localhost:8000/resources/cba81b1a-fc32-11e9-9201-3af9d3b32b71")
 
-        url = self._create_url(resource_id='cba81b1a-fc32-11e9-9201-3af9d3b32b71')
+        url = self._create_url(resource_id="cba81b1a-fc32-11e9-9201-3af9d3b32b71")
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js2 = response.json()
-        self.assertTrue('@id' in js2)      
-        self.assertTrue(js2['@id'] == "http://localhost:8000/resources/cba81b1a-fc32-11e9-9201-3af9d3b32b71")
+        self.assertTrue("@id" in js2)
+        self.assertTrue(js2["@id"] == "http://localhost:8000/resources/cba81b1a-fc32-11e9-9201-3af9d3b32b71")
 
-        self.assertTrue(ref['@type'] == "http://www.cidoc-crm.org/cidoc-crm/E74_Group")
-        self.assertTrue(js2['@type'] == ref['@type'])
+        self.assertTrue(ref["@type"] == "http://www.cidoc-crm.org/cidoc-crm/E74_Group")
+        self.assertTrue(js2["@type"] == ref["@type"])
 
     def test_5299_basic(self):
 
-        url = self._create_url(resource_id='c76f74ba-071a-11ea-8c2d-acde48001122')
+        url = self._create_url(resource_id="c76f74ba-071a-11ea-8c2d-acde48001122")
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
-        self.assertTrue('@id' in js)      
-        self.assertTrue(js['@id'] == "http://localhost:8000/resources/c76f74ba-071a-11ea-8c2d-acde48001122")
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/c76f74ba-071a-11ea-8c2d-acde48001122")
         prop = "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by"
         self.assertTrue(prop in js)
         ref = js[prop]
-        note = 'http://www.cidoc-crm.org/cidoc-crm/P3_has_note'
+        note = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
         self.assertTrue(note in ref)
         self.assertTrue(ref[note] == "Production")
         self.assertTrue(note in js)
@@ -514,12 +517,12 @@ class JsonLDExportTests(ArchesTestCase):
     def test_5299_complex(self):
         # 7f90ff58-0722-11ea-b628-acde48001122
 
-        url = self._create_url(resource_id='7f90ff58-0722-11ea-b628-acde48001122')
+        url = self._create_url(resource_id="7f90ff58-0722-11ea-b628-acde48001122")
         response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 200)
         js = response.json()
-        self.assertTrue('@id' in js)      
-        self.assertTrue(js['@id'] == "http://localhost:8000/resources/7f90ff58-0722-11ea-b628-acde48001122")
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/7f90ff58-0722-11ea-b628-acde48001122")
         prop = "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by"
         self.assertTrue(prop in js)
         ref = js[prop]
