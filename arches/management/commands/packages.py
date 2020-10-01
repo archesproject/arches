@@ -1065,7 +1065,6 @@ will be very jumbled."""
                 utils.print_message("No file found at indicated location: {0}".format(path))
                 sys.exit()
 
-
     def import_graphs(self, data_source="", overwrite_graphs=True):
         """
         Imports objects from arches.json.
