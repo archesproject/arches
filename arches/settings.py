@@ -146,6 +146,8 @@ SESSION_COOKIE_NAME = "arches"
 # EMAIL_HOST_PASSWORD = 'xxxxxxx'
 # EMAIL_PORT = 587
 
+DEFAULT_FROM_EMAIL = "from@example.com"
+
 POSTGIS_VERSION = (3, 0, 0)
 
 # If you set this to False, Django will make some optimizations so as not
