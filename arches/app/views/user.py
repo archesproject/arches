@@ -66,7 +66,13 @@ class UserManagerView(BaseManagerView):
                     for user in users
                 ]
             identities.append(
-                {"name": group.name, "type": "group", "id": group.pk, "users": groupUsers, "default_permissions": group.permissions.all()}
+                {
+                    "name": group.name,
+                    "type": "group",
+                    "id": group.pk,
+                    "users": groupUsers,
+                    "default_permissions": group.permissions.all(),
+                }
             )
         for user in User.objects.filter():
             groups = []
@@ -93,7 +99,8 @@ class UserManagerView(BaseManagerView):
 
         user_mobile_surveys = [pxu.mobile_survey for pxu in models.MobileSurveyXUser.objects.filter(user=user)]
         user_mobile_surveys_by_group = [
-            pxu_x_group.mobile_survey for pxu_x_group in models.MobileSurveyXGroup.objects.filter(group__in=user.groups.all())
+            pxu_x_group.mobile_survey
+            for pxu_x_group in models.MobileSurveyXGroup.objects.filter(group__in=user.groups.all())
         ]
 
         for gp in user_mobile_surveys_by_group:
@@ -185,7 +192,9 @@ class UserManagerView(BaseManagerView):
             return render(request, "views/user-profile-manager.htm", context)
 
     def get_mobile_survey_resources(self, mobile_survey_models):
-        graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        graphs = models.GraphModel.objects.filter(isresource=True).exclude(
+            graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
+        )
         resources = []
         mobile_surveys = []
         all_ordered_card_ids = []
@@ -196,14 +205,22 @@ class UserManagerView(BaseManagerView):
             all_ordered_card_ids += mobile_survey_dict["cards"]
             mobile_surveys.append(mobile_survey_dict)
 
-        active_graphs = {str(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)}
+        active_graphs = {
+            str(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)
+        }
 
         for i, graph in enumerate(graphs):
             cards = []
             if i == 0 or str(graph.graphid) in active_graphs:
                 cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
             resources.append(
-                {"name": graph.name, "id": graph.graphid, "subtitle": graph.subtitle, "iconclass": graph.iconclass, "cards": cards}
+                {
+                    "name": graph.name,
+                    "id": graph.graphid,
+                    "subtitle": graph.subtitle,
+                    "iconclass": graph.iconclass,
+                    "cards": cards,
+                }
             )
 
         return mobile_surveys, resources
