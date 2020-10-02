@@ -7,6 +7,7 @@ define([
         viewModel: BaseFilter.extend({
             initialize: function(options) {
                 options.name = 'Resource Type Filter';
+                this.requiredFilters = ['term-filter'];
                 BaseFilter.prototype.initialize.call(this, options);
                 
                 this.filter = ko.observableArray();
@@ -19,7 +20,14 @@ define([
                 }, this);
 
                 this.filters[componentName](this);
-                this.restoreState();
+
+                if (this.requiredFiltersLoaded() === false) {
+                    this.requiredFiltersLoaded.subscribe(function() {
+                        this.restoreState();
+                    }, this);
+                } else {
+                    this.restoreState();
+                }
             },
 
             updateQuery: function() {

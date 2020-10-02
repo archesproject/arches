@@ -96,6 +96,11 @@ define([
                     }
                 });
                 return has_tag;
+            },
+
+            clear: function() {
+                this.filter.terms.removeAll();
+                this.filter.tags.removeAll();
             }
         }),
         template: { require: 'text!templates/views/components/search/term-filter.htm' }

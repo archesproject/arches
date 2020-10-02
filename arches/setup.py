@@ -48,12 +48,7 @@ def get_version(version=None):
     major = get_major_version(version)
 
     sub = ""
-    if version[3] == "alpha" and version[4] == 0:
-        changeset = get_changeset()
-        if changeset:
-            sub = ".dev%s" % changeset
-
-    elif version[3] != "final":
+    if version[3] != "final":
         mapping = {"alpha": "a", "beta": "b", "rc": "rc"}
         sub = mapping[version[3]] + str(version[4])
 
@@ -63,7 +58,7 @@ def get_version(version=None):
 def get_major_version(version=None):
     "Returns major version from VERSION."
     version = get_complete_version(version)
-    parts = 2 if version[2] == 0 else 3
+    parts = 3
     major = ".".join(str(x) for x in version[:parts])
     return major
 
@@ -79,55 +74,6 @@ def get_complete_version(version=None):
         assert version[3] in ("alpha", "beta", "rc", "final")
 
     return version
-
-
-def get_changeset(path_to_file=None):
-    import os
-    import subprocess
-    from io import StringIO
-    from management.commands.utils import write_to_file
-
-    sb = StringIO()
-    if not path_to_file:
-        path_to_file = os.path.abspath(os.path.dirname(__file__))
-
-    ver = ""
-    try:
-        hg_archival = open(os.path.abspath(os.path.join(here, "..", ".hg_archival.txt")), "r")
-        the_file = hg_archival.readlines()
-        hg_archival.close()
-        node = ""
-        latesttag = ""
-        date = ""
-        for line in the_file:
-            if line.startswith("node:"):
-                node = line.split(":")[1].strip()[:12]
-            if line.startswith("latesttag:"):
-                latesttag = line.split(":")[1].strip()
-            if line.startswith("date:"):
-                date = line.split(":")[1].strip()
-
-        sb.writelines(['__VERSION__="%s"' % latesttag])
-        sb.writelines(['\n__BUILD__="%s"' % node])
-        ver = "%s:%s" % (latesttag, node)
-        ver = date
-        # write_to_file(os.path.join(path_to_file,'version.py'), sb.getvalue(), 'w')
-    except:
-        try:
-            ver = subprocess.check_output(["hg", "log", "-r", ".", "--template", "{latesttag}:{node|short}"])
-            ver = subprocess.check_output(["hg", "log", "-r", ".", "--template", "{node|short}"])
-            ver = subprocess.check_output(["hg", "log", "-r", ".", "--template", "{date}"])
-            sb.writelines(['__VERSION__="%s"' % ver.split(":")[0]])
-            sb.writelines(['\n__BUILD__="%s"' % ver.split(":")[1]])
-            # write_to_file(os.path.join(path_to_file,'version.py'), sb.getvalue(), 'w')
-        except:
-            pass
-
-    try:
-        timestamp = datetime.datetime.utcfromtimestamp(float(ver))
-    except ValueError:
-        return None
-    return timestamp.strftime("%Y%m%d%H%M%S")
 
 
 if __name__ == "__main__":

@@ -490,7 +490,7 @@ define([
         this.isFeatureClickable = function(feature) {
             var tool = self.selectedTool();
             if (tool && tool !== 'select_feature') return false;
-            return feature.properties.resourceinstanceid;
+            return feature.properties.resourceinstanceid || self.isSelectable(feature);
         };
 
         this.popupTemplate = popupTemplate;

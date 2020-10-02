@@ -2,7 +2,7 @@ Django==2.2.13
 psycopg2-binary==2.8.4
 elasticsearch>=7.0.0,<8.0.0
 rdflib==4.2.2
-django-guardian==2.1.0
+django-guardian==2.3.0
 python-memcached==1.59
 celery==4.4.4
 django-celery-results==1.2.1
