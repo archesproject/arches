@@ -9,7 +9,7 @@ from arches.app.search.elasticsearch_dsl_builder import Query, Term
 
 class BaseIndex(object):
     def __init__(self, index_name=None):
-        if index_name is None or index_name is "":
+        if index_name is None or index_name == "":
             raise SearchIndexError("Index name is not defined")
 
         self.se = SearchEngineFactory().create()
