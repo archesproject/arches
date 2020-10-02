@@ -159,11 +159,10 @@ class GraphDesignerView(GraphBaseView):
                         ontology_namespaces[k] = ontology.namespaces[k]
             except AttributeError as e:
                 logger.info(
-                    _(
-                        f"No namespaces appear to be associated with {ontology.ontologyid} in the ontologies table."
+                    _("No namespaces appear to be associated with {ontology.ontologyid} in the ontologies table."
                         " This is not a problem as long as all necessary namespaces are included in the"
                         " ONTOLOGY_NAMESPACES setting."
-                    )
+                    ).format(**locals())
                 )
         return ontology_namespaces
 

@@ -846,10 +846,9 @@ class Graph(models.GraphModel):
             tile_count = models.TileModel.objects.filter(nodegroup=node.nodegroup).count()
             if self.is_editable() is False and tile_count > 0:
                 raise GraphValidationError(
-                    _(
-                        f"Your resource model: {self.name}, already has instances saved. \
+                    _("Your resource model: {self.name}, already has instances saved. \
                             You cannot delete nodes from a Resource Model with instances."
-                    ),
+                    ).format(**locals()),
                     1006,
                 )
 
@@ -1315,10 +1314,9 @@ class Graph(models.GraphModel):
                     unpermitted_edits.append(unpermitted_graph_edits)
                 if len(unpermitted_edits) > 0:
                     raise GraphValidationError(
-                        _(
-                            f"Your resource model: {self.name}, already has instances saved. \
+                        _("Your resource model: {self.name}, already has instances saved. \
                                 You cannot modify a Resource Model with instances."
-                        ),
+                        ).format(**locals()),
                         1006,
                     )
 
@@ -1339,10 +1337,9 @@ class Graph(models.GraphModel):
         if self.isresource is True:
             if self.root.is_collector is True:
                 raise GraphValidationError(
-                    _(
-                        f"The top node of your resource graph: {self.root.name} needs to be a collector. \
+                    _("The top node of your resource graph: {self.root.name} needs to be a collector. \
                             Hint: check that nodegroup_id of your resource node(s) are not null."
-                    ),
+                    ).format(**locals()),
                     997,
                 )
             if self.root.datatype != "semantic":
@@ -1365,7 +1362,7 @@ class Graph(models.GraphModel):
                 fieldname = fieldname[:10]
             try:
                 dupe = fieldnames[fieldname]
-                raise GraphValidationError(_(f"Field name must be unique to the graph; '{fieldname}' already exists."), 1009)
+                raise GraphValidationError(_("Field name must be unique to the graph; '{fieldname}' already exists.").format(**locals()), 1009)
             except KeyError:
                 fieldnames[fieldname] = True
 
@@ -1395,11 +1392,10 @@ class Graph(models.GraphModel):
                 # print 'checking %s-%s-%s' % (edge.domainnode.ontologyclass,edge.ontologyproperty, edge.rangenode.ontologyclass)
                 if edge.ontologyproperty is None:
                     raise GraphValidationError(
-                        _(
-                            f"You must specify an ontology property. Your graph isn't semantically valid. \
+                        _("You must specify an ontology property. Your graph isn't semantically valid. \
                                 Entity domain '{edge.domainnode.ontologyclass}' and \
                                 Entity range '{edge.rangenode.ontologyclass}' can not be related via Property '{edge.ontologyproperty}'."
-                        ),
+                        ).format(**locals()),
                         1002,
                     )
                 property_found = False
@@ -1414,11 +1410,10 @@ class Graph(models.GraphModel):
 
                 if not okay:
                     raise GraphValidationError(
-                        _(
-                            f"Your graph isn't semantically valid. Entity domain '{edge.domainnode.ontologyclass}' and \
+                        _("Your graph isn't semantically valid. Entity domain '{edge.domainnode.ontologyclass}' and \
                                 Entity range '{edge.rangenode.ontologyclass}' cannot \
                                 be related via Property '{edge.ontologyproperty}'."
-                        ),
+                        ).format(**locals()),
                         1003,
                     )
                 elif not property_found:
@@ -1458,7 +1453,7 @@ class Graph(models.GraphModel):
         if self.slug is not None:
             graphs_with_matching_slug = models.GraphModel.objects.exclude(slug__isnull=True).filter(slug=self.slug)
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
-                raise GraphValidationError(_(f"Another resource modal already uses the slug '{self.slug}'"), 1007)
+                raise GraphValidationError(_("Another resource modal already uses the slug '{self.slug}'").format(**locals()), 1007)
 
 
 class GraphValidationError(Exception):
