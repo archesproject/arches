@@ -204,7 +204,8 @@ def export_results(request):
             result = tasks.export_search_results.apply_async(
                 (request.user.id, request_values, format), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
             )
-            message = _("{total} instances have been submitted for export. \
+            message = _(
+                "{total} instances have been submitted for export. \
                 Click the Bell icon to check for a link to download your data"
             ).format(**locals())
             return JSONResponse({"success": True, "message": message})
