@@ -117,6 +117,7 @@ define(['arches',
             }, this);
 
             this.related_resources = [];
+            this.total_related_resources = null;
 
             this.sort_related = function(anArray, property) {
                 anArray.sort(function(a, b){
@@ -125,18 +126,26 @@ define(['arches',
                     return 0;
                 });
             };
-            _.each(this.get('related_resources'), function(rr){
-                var res = {'graph_name': rr.name, 'related':[], 'loadCount':ko.observable(5)};
-                _.each(rr.resources, function(resource) {
-                    _.each(resource.relationships, function(relationship){
-                        res.related.push({'displayname':resource.displayname,'link': arches.urls.resource_report + resource.instance_id, 'relationship': relationship});
-                    });
-                });
-                this.sort_related(res.related, 'displayname');
-                this.related_resources.push(res);
-            }, this);
 
-            this.sort_related(this.related_resources, 'graph_name');
+            var related_resource_summary = this.get('related_resources');
+
+            if (related_resource_summary) {
+                console.log(related_resource_summary)
+                // this.total_related_resources = related_resource_summary['total']
+
+                // _.each(related_resource_summary['related_resources'], function(rr){
+                //     var res = {'graph_name': rr.name, 'related':[], 'loadCount':ko.observable(5)};
+                //     _.each(rr.resources, function(resource) {
+                //         _.each(resource.relationships, function(relationship){
+                //             res.related.push({'displayname':resource.displayname,'link': arches.urls.resource_report + resource.instance_id, 'relationship': relationship});
+                //         });
+                //     });
+                //     this.sort_related(res.related, 'displayname');
+                //     this.related_resources.push(res);
+                // }, this);
+    
+                // this.sort_related(this.related_resources, 'graph_name');
+            }
 
             this._data(JSON.stringify(this.toJSON()));
         },

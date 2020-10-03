@@ -16,8 +16,9 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import uuid
 import json
+import uuid
+
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.models import User, Group, Permission
 from django.db import transaction
@@ -684,6 +685,33 @@ class ResourceDescriptors(View):
 
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
+    def paginate_related_resources(self, related_resources, page, request):
+        total = related_resources["total"]["value"]
+        paginator, pages = get_paginator(request, related_resources, total, page, settings.RELATED_RESOURCES_PER_PAGE)
+        page = paginator.page(page)
+
+        # def parse_relationshiptype_label(relationship):
+        #     if relationship["relationshiptype_label"].startswith("http"):
+        #         relationship["relationshiptype_label"] = relationship["relationshiptype_label"].rsplit("/")[-1]
+        #     return relationship
+
+        # related_resources["resource_relationships"] = [parse_relationshiptype_label(r) for r in related_resources["resource_relationships"]]
+
+        ret = {}
+        ret["related_resources"] = related_resources
+        ret["paginator"] = {}
+        ret["paginator"]["current_page"] = page.number
+        ret["paginator"]["has_next"] = page.has_next()
+        ret["paginator"]["has_previous"] = page.has_previous()
+        ret["paginator"]["has_other_pages"] = page.has_other_pages()
+        ret["paginator"]["next_page_number"] = page.next_page_number() if page.has_next() else None
+        ret["paginator"]["previous_page_number"] = page.previous_page_number() if page.has_previous() else None
+        ret["paginator"]["start_index"] = page.start_index()
+        ret["paginator"]["end_index"] = page.end_index()
+        ret["paginator"]["pages"] = pages
+
+        return ret
+
     def get(self, request, resourceid=None):
         lang = request.GET.get("lang", settings.LANGUAGE_CODE)
         resource = Resource.objects.get(pk=resourceid)
@@ -691,25 +719,31 @@ class ResourceReportView(MapBaseManagerView):
         resource_models = (
             models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         )
-        related_resource_summary = [{"graphid": str(g.graphid), "name": g.name, "resources": []} for g in resource_models]
-        related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=1000, user=request.user)
-        related_resources = related_resources_search_results["related_resources"]
-        relationships = related_resources_search_results["resource_relationships"]
-        resource_relationship_type_values = {i["id"]: i["text"] for i in get_resource_relationship_types()["values"]}
+        simplified_related_resources = [{"graphid": str(g.graphid), "name": g.name, "resources": []} for g in resource_models]
 
-        for rr in related_resources:
-            for summary in related_resource_summary:
-                if rr["graph_id"] == summary["graphid"]:
+        related_resources_search_results = resource.get_related_resources(
+            lang=lang, 
+            limit=settings.RELATED_RESOURCES_PER_PAGE, 
+            user=request.user
+        )
+
+        resource_relationship_type_values = {
+            relationship_type["id"]: relationship_type["text"] for relationship_type in get_resource_relationship_types()["values"]
+        }
+
+        for related_resource in related_resources_search_results["related_resources"]:
+            for summary in simplified_related_resources:
+                if related_resource["graph_id"] == summary["graphid"]:
                     relationship_summary = []
-                    for relationship in relationships:
-                        if rr["resourceinstanceid"] == relationship["resourceinstanceidto"]:
+                    for relationship in related_resources_search_results["resource_relationships"]:
+                        if related_resource["resourceinstanceid"] == relationship["resourceinstanceidto"]:
                             rr_type = (
                                 resource_relationship_type_values[relationship["relationshiptype"]]
                                 if relationship["relationshiptype"] in resource_relationship_type_values
                                 else relationship["relationshiptype"]
                             )
                             relationship_summary.append(rr_type)
-                        elif rr["resourceinstanceid"] == relationship["resourceinstanceidfrom"]:
+                        elif related_resource["resourceinstanceid"] == relationship["resourceinstanceidfrom"]:
                             rr_type = (
                                 resource_relationship_type_values[relationship["inverserelationshiptype"]]
                                 if relationship["inverserelationshiptype"] in resource_relationship_type_values
@@ -718,7 +752,11 @@ class ResourceReportView(MapBaseManagerView):
                             relationship_summary.append(rr_type)
 
                     summary["resources"].append(
-                        {"instance_id": rr["resourceinstanceid"], "displayname": rr["displayname"], "relationships": relationship_summary}
+                        {
+                            "instance_id": related_resource["resourceinstanceid"], 
+                            "displayname": related_resource["displayname"], 
+                            "relationships": relationship_summary
+                        }
                     )
 
         tiles = Tile.objects.filter(resourceinstance=resource).order_by("sortorder")
@@ -726,6 +764,27 @@ class ResourceReportView(MapBaseManagerView):
         permitted_tiles = []
 
         perm = "read_nodegroup"
+
+
+
+
+
+        foo = {
+            'related_resources': simplified_related_resources,
+            'total': related_resources_search_results['total']
+        }
+
+        qux = self.paginate_related_resources(
+            related_resources=related_resources_search_results,
+            page=1,
+            request=request,
+        )
+
+
+        # import ipdb; ipdb.set_trace()
+
+
+
 
         for tile in tiles:
             if request.user.has_perm(perm, tile.nodegroup):
@@ -736,7 +795,7 @@ class ResourceReportView(MapBaseManagerView):
             return JSONResponse(
                 {
                     "tiles": permitted_tiles,
-                    "related_resources": related_resource_summary,
+                    "related_resources": foo,
                     "displayname": displayname,
                     "resourceid": resourceid,
                 }
@@ -761,7 +820,7 @@ class ResourceReportView(MapBaseManagerView):
                     "cards": permitted_cards,
                     "tiles": permitted_tiles,
                     "graph": graph,
-                    "related_resources": related_resource_summary,
+                    "related_resources": foo,
                     "displayname": displayname,
                     "resourceid": resourceid,
                     "cardwidgets": cardwidgets,
@@ -796,7 +855,7 @@ class ResourceReportView(MapBaseManagerView):
                 datatypes, exclude=["modulename", "issearchable", "configcomponent", "configname", "iconclass"]
             ),
             geocoding_providers=geocoding_providers,
-            related_resources=JSONSerializer().serialize(related_resource_summary, sort_keys=False),
+            related_resources=JSONSerializer().serialize(qux),
             widgets=widgets,
             map_layers=map_layers,
             map_markers=map_markers,
