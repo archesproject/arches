@@ -163,6 +163,8 @@ class DLanguage(models.Model):
         managed = True
         db_table = "d_languages"
 
+    def __str__(self):
+        return f"{self.languageid} ({self.languagename})"
 
 class DNodeType(models.Model):
     nodetype = models.TextField(primary_key=True)
