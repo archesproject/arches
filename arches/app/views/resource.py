@@ -722,9 +722,7 @@ class ResourceReportView(MapBaseManagerView):
         simplified_related_resources = [{"graphid": str(g.graphid), "name": g.name, "resources": []} for g in resource_models]
 
         related_resources_search_results = resource.get_related_resources(
-            lang=lang, 
-            limit=settings.RELATED_RESOURCES_PER_PAGE, 
-            user=request.user
+            lang=lang, limit=settings.RELATED_RESOURCES_PER_PAGE, user=request.user
         )
 
         resource_relationship_type_values = {
@@ -753,9 +751,9 @@ class ResourceReportView(MapBaseManagerView):
 
                     summary["resources"].append(
                         {
-                            "instance_id": related_resource["resourceinstanceid"], 
-                            "displayname": related_resource["displayname"], 
-                            "relationships": relationship_summary
+                            "instance_id": related_resource["resourceinstanceid"],
+                            "displayname": related_resource["displayname"],
+                            "relationships": relationship_summary,
                         }
                     )
 
@@ -765,26 +763,11 @@ class ResourceReportView(MapBaseManagerView):
 
         perm = "read_nodegroup"
 
+        foo = {"related_resources": simplified_related_resources, "total": related_resources_search_results["total"]}
 
-
-
-
-        foo = {
-            'related_resources': simplified_related_resources,
-            'total': related_resources_search_results['total']
-        }
-
-        qux = self.paginate_related_resources(
-            related_resources=related_resources_search_results,
-            page=1,
-            request=request,
-        )
-
+        qux = self.paginate_related_resources(related_resources=related_resources_search_results, page=1, request=request,)
 
         # import ipdb; ipdb.set_trace()
-
-
-
 
         for tile in tiles:
             if request.user.has_perm(perm, tile.nodegroup):
@@ -792,14 +775,7 @@ class ResourceReportView(MapBaseManagerView):
                 permitted_tiles.append(tile)
 
         if request.GET.get("json", False) and request.GET.get("exclude_graph", False):
-            return JSONResponse(
-                {
-                    "tiles": permitted_tiles,
-                    "related_resources": foo,
-                    "displayname": displayname,
-                    "resourceid": resourceid,
-                }
-            )
+            return JSONResponse({"tiles": permitted_tiles, "related_resources": foo, "displayname": displayname, "resourceid": resourceid,})
 
         datatypes = models.DDataType.objects.all()
         graph = Graph.objects.get(graphid=resource.graph_id)
