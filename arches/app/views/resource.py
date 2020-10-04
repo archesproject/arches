@@ -685,33 +685,6 @@ class ResourceDescriptors(View):
 
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
-    def paginate_related_resources(self, related_resources, page, request):
-        total = related_resources["total"]["value"]
-        paginator, pages = get_paginator(request, related_resources, total, page, settings.RELATED_RESOURCES_PER_PAGE)
-        page = paginator.page(page)
-
-        # def parse_relationshiptype_label(relationship):
-        #     if relationship["relationshiptype_label"].startswith("http"):
-        #         relationship["relationshiptype_label"] = relationship["relationshiptype_label"].rsplit("/")[-1]
-        #     return relationship
-
-        # related_resources["resource_relationships"] = [parse_relationshiptype_label(r) for r in related_resources["resource_relationships"]]
-
-        ret = {}
-        ret["related_resources"] = related_resources
-        ret["paginator"] = {}
-        ret["paginator"]["current_page"] = page.number
-        ret["paginator"]["has_next"] = page.has_next()
-        ret["paginator"]["has_previous"] = page.has_previous()
-        ret["paginator"]["has_other_pages"] = page.has_other_pages()
-        ret["paginator"]["next_page_number"] = page.next_page_number() if page.has_next() else None
-        ret["paginator"]["previous_page_number"] = page.previous_page_number() if page.has_previous() else None
-        ret["paginator"]["start_index"] = page.start_index()
-        ret["paginator"]["end_index"] = page.end_index()
-        ret["paginator"]["pages"] = pages
-
-        return ret
-
     def get(self, request, resourceid=None):
         lang = request.GET.get("lang", settings.LANGUAGE_CODE)
         resource = Resource.objects.get(pk=resourceid)
@@ -724,6 +697,11 @@ class ResourceReportView(MapBaseManagerView):
         related_resources_search_results = resource.get_related_resources(
             lang=lang, limit=settings.RELATED_RESOURCES_PER_PAGE, user=request.user
         )
+
+        # sss = ResourceRelatedResources().get(request, resourceid, paginate=True)
+
+        # import ipdb; ipdb.set_trace()
+
 
         resource_relationship_type_values = {
             relationship_type["id"]: relationship_type["text"] for relationship_type in get_resource_relationship_types()["values"]
@@ -765,9 +743,17 @@ class ResourceReportView(MapBaseManagerView):
 
         foo = {"related_resources": simplified_related_resources, "total": related_resources_search_results["total"]}
 
-        qux = self.paginate_related_resources(related_resources=related_resources_search_results, page=1, request=request,)
+
+        get_params = request.GET.copy()
+        get_params.update({"paginate": "true"})
+        request.GET = get_params
+
 
         # import ipdb; ipdb.set_trace()
+        
+        
+        qux = RelatedResourcesView().get(request, resourceid)
+
 
         for tile in tiles:
             if request.user.has_perm(perm, tile.nodegroup):
@@ -831,7 +817,7 @@ class ResourceReportView(MapBaseManagerView):
                 datatypes, exclude=["modulename", "issearchable", "configcomponent", "configname", "iconclass"]
             ),
             geocoding_providers=geocoding_providers,
-            related_resources=JSONSerializer().serialize(qux),
+            related_resources=JSONSerializer().serialize(json.loads(qux.content)),
             widgets=widgets,
             map_layers=map_layers,
             map_markers=map_markers,
@@ -901,34 +887,43 @@ class RelatedResourcesView(BaseManagerView):
         return ret
 
     def get(self, request, resourceid=None):
+        ret = {}
+
         if self.action == "get_candidates":
             resourceid = request.GET.get("resourceids", "")
             resources = Resource.objects.filter(resourceinstanceid=resourceid)
             ret = []
-            for rr in resources:
-                res = JSONSerializer().serializeToPython(rr)
-                res["ontologyclass"] = rr.get_root_ontology()
-                ret.append(res)
-            return JSONResponse(ret)
 
-        if self.action == "get_relatable_resources":
+            for resource in resources:
+                res = JSONSerializer().serializeToPython(resource)
+                res["ontologyclass"] = resource.get_root_ontology()
+                ret.append(res)
+                
+        elif self.action == "get_relatable_resources":
             graphid = request.GET.get("graphid", None)
             nodes = models.Node.objects.filter(graph=graphid).exclude(istopnode=False)[0].get_relatable_resources()
             ret = {str(node.graph_id) for node in nodes}
-            return JSONResponse(ret)
 
-        lang = request.GET.get("lang", settings.LANGUAGE_CODE)
-        start = request.GET.get("start", 0)
-        ret = []
-        try:
+        elif resourceid:
+            lang = request.GET.get("lang", settings.LANGUAGE_CODE)
+            paginate = bool(request.GET.get("paginate"))
             resource = Resource.objects.get(pk=resourceid)
-        except ObjectDoesNotExist:
-            resource = Resource()
-        page = 1 if request.GET.get("page") == "" else int(request.GET.get("page", 1))
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page, user=request.user)
 
-        if related_resources is not None:
-            ret = self.paginate_related_resources(related_resources, page, request)
+            if paginate:
+                page = 1 if request.GET.get("page") == "" else int(request.GET.get("page", 1))
+                start = int(request.GET.get("start", 0))
+
+                related_resources = resource.get_related_resources(
+                    lang=lang, start=start, page=page, limit=settings.RELATED_RESOURCES_PER_PAGE, user=request.user
+                )
+
+                ret = self.paginate_related_resources(
+                    related_resources=related_resources, page=page, request=request
+                )
+            else:
+                ret = resource.get_related_resources(
+                    lang=lang, limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, user=request.user
+                )
 
         return JSONResponse(ret)
 

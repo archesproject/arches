@@ -64,46 +64,38 @@
 
     {% endblock body %}
 
-    <!-- ko if: report.related_resources.length && report.related_resources.map(x => typeof(x.related) != 'undefined' ?  x.related.length : 0).reduce((a,b) => a+b) > 0 || !hideEmptyNodes() -->
+    <!-- ko if: report.relatedResources().length > 0 || !hideEmptyNodes() -->
     <div class="rp-report-section relative report-related-resources">
         <div class="rp-report-section-title">
             <h4 class="rp-section-title">{% trans 'Related Resources' %}</h4>
         </div>
-        <!-- ko foreach: { data: report.related_resources, as: 'rr' } -->
-            <!-- ko if: rr.related.length > 0 -->
-            <div class="rp-card-section">
-                <h5 class="rp-tile-title">
-                    <span class="rp-tile-title-float" data-bind="text: rr.graph_name"></span>
-                </h5>
+        
+        
+        <div class="rp-card-section">
+            <!-- ko foreach: { data: report.relatedResources(), as: 'relatedResource' } -->
+            <h5 class="rp-tile-title">
+                <span class="rp-tile-title-float" data-bind="text: $parent.report.graph.name"></span>
+            </h5>
 
-                <div class="rp-report-container-tile">
-                    <div class="row rp-report-tile">
-                        <!-- ko foreach: { data: rr.related.slice(0, rr.loadCount()) } -->
-                            <dl class="dl-horizontal">
-                                <dt><a data-bind="text: $data.displayname, attr: {href: $data.link}"></a></dt>
-                                <dd data-bind="text: '( ' + $data.relationship + ' )'"></dd>
-                            </dl>
-                        <!-- /ko -->
-
-                        <!-- ko if: rr.related.length < report.total_related_resources -->
-                        <div 
-                            class="load-relations-report" 
-                        >
-                            {% trans "Load More" %}
-                        </div>
-                        <!-- /ko -->
-                    </div>
+            <div class="rp-report-container-tile">
+                <div class="row rp-report-tile">
+                    <dl class="dl-horizontal">
+                        <dt><a data-bind="text: relatedResource.displayName, attr: {href: relatedResource.link}"></a></dt>
+                        <dd data-bind="text: '( ' + relatedResource.relationship + ' )'"></dd>
+                    </dl>
                 </div>
             </div>
             <!-- /ko -->
 
-
-            <!--ko if: rr.related.length === 0 -->
-            <!-- <div class="rp-report-container-tile">
-                <div class="row rp-report-tile rp-no-data">{% trans 'No relationships added' %}</div>
-            </div> -->
-            <!--/ko-->
-        <!-- /ko -->
+            <!-- ko if: report.paginator().has_next -->
+            <div 
+                class="load-relations-report" 
+                data-bind="click: report.bar.bind(report)"
+            >
+                {% trans "Load More" %}
+            </div>
+            <!-- /ko -->
+        </div>
     </div>  
     <!-- /ko -->    
 </div>

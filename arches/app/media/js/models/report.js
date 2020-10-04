@@ -1,10 +1,11 @@
-define(['arches',
+define(['jquery',
+    'arches',
     'models/abstract',
     'knockout',
     'knockout-mapping',
     'underscore',
     'report-templates'
-], function(arches, AbstractModel, ko, koMapping, _, reportLookup) {
+], function($, arches, AbstractModel, ko, koMapping, _, reportLookup) {
     var ReportModel = AbstractModel.extend({
         /**
          * A backbone model to manage report data
@@ -21,13 +22,13 @@ define(['arches',
             this.cards = options.cards || [];
             this.preview = options.preview;
             this.userisreviewer = options.userisreviewer;
-
+            
             this.set('graphid', ko.observable());
             this.set('config', {});
             self.configKeys = ko.observableArray();
-
+            
             this._data = ko.observable('{}');
-
+            
             this.configJSON = ko.observable({});
             this.configState = {};
             this.configKeys.subscribe(function(val){
@@ -44,6 +45,33 @@ define(['arches',
                     self.configState = koMapping.fromJS(self.configState);
                 }
             });
+
+
+
+
+
+
+
+
+
+            this.paginator = ko.observable(options.related_resources.paginator);
+
+            this.relatedResources = ko.observableArray();
+
+            for (resourceRelationship of options.related_resources.related_resources.resource_relationships) {
+                console.log('****', options)
+                var relatedResource = options.related_resources.related_resources.related_resources.find(function(resource) {
+                    return resource.resourceinstanceid === resourceRelationship.resourceinstanceidto
+                });
+
+                this.relatedResources.push({
+                    'displayName': relatedResource.displayname,
+                    'relationship': resourceRelationship.relationshiptype_label,
+                    'link': arches.urls.resource_report + relatedResource.resourceinstanceid,
+                })
+            }
+
+
 
             this.resetConfigs = function(previousConfigs) {
                 this.configKeys().forEach(function(key){
@@ -116,21 +144,16 @@ define(['arches',
                 }
             }, this);
 
-            this.related_resources = [];
-            this.total_related_resources = null;
+            // this.sort_related = function(anArray, property) {
+            //     anArray.sort(function(a, b){
+            //         if (a[property] > b[property]) return 1;
+            //         if (b[property] > a[property]) return -1;
+            //         return 0;
+            //     });
+            // };
 
-            this.sort_related = function(anArray, property) {
-                anArray.sort(function(a, b){
-                    if (a[property] > b[property]) return 1;
-                    if (b[property] > a[property]) return -1;
-                    return 0;
-                });
-            };
-
-            var related_resource_summary = this.get('related_resources');
-
-            if (related_resource_summary) {
-                console.log(related_resource_summary)
+            console.log(this.relatedResources, this)
+            // if (related_resource_summary) {
                 // this.total_related_resources = related_resource_summary['total']
 
                 // _.each(related_resource_summary['related_resources'], function(rr){
@@ -145,9 +168,35 @@ define(['arches',
                 // }, this);
     
                 // this.sort_related(this.related_resources, 'graph_name');
-            }
+            // }
 
             this._data(JSON.stringify(this.toJSON()));
+        },
+
+        foo: function(resourceRelationship) {
+            var relatedResource = this.relatedResources.related_resources.related_resources.find(function(resource) {
+                return resource.resourceinstanceid === resourceRelationship.resourceinstanceidto
+            })
+
+            // var relatedResourceGraphName = 
+            // console.log(relatedResource)
+
+            return {
+                'displayName': relatedResource.displayname,
+                'relationship': resourceRelationship.relationshiptype_label,
+                'link': arches.urls.resource_report + relatedResource.resourceinstanceid,
+            }
+        },
+
+        bar: function(e) {
+
+            $.ajax({
+                url: arches.urls.related_resources + this.attributes.resourceid + `?paginate=true&page=${this.paginator().next_page_number}`
+            }).done(function(json) {
+                console.log(json)
+            })
+
+
         },
 
         reset: function() {
