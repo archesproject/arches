@@ -702,7 +702,6 @@ class ResourceReportView(MapBaseManagerView):
 
         # import ipdb; ipdb.set_trace()
 
-
         resource_relationship_type_values = {
             relationship_type["id"]: relationship_type["text"] for relationship_type in get_resource_relationship_types()["values"]
         }
@@ -743,17 +742,13 @@ class ResourceReportView(MapBaseManagerView):
 
         foo = {"related_resources": simplified_related_resources, "total": related_resources_search_results["total"]}
 
-
         get_params = request.GET.copy()
         get_params.update({"paginate": "true"})
         request.GET = get_params
 
-
         # import ipdb; ipdb.set_trace()
-        
-        
-        qux = RelatedResourcesView().get(request, resourceid)
 
+        qux = RelatedResourcesView().get(request, resourceid)
 
         for tile in tiles:
             if request.user.has_perm(perm, tile.nodegroup):
@@ -898,7 +893,7 @@ class RelatedResourcesView(BaseManagerView):
                 res = JSONSerializer().serializeToPython(resource)
                 res["ontologyclass"] = resource.get_root_ontology()
                 ret.append(res)
-                
+
         elif self.action == "get_relatable_resources":
             graphid = request.GET.get("graphid", None)
             nodes = models.Node.objects.filter(graph=graphid).exclude(istopnode=False)[0].get_relatable_resources()
@@ -917,13 +912,9 @@ class RelatedResourcesView(BaseManagerView):
                     lang=lang, start=start, page=page, limit=settings.RELATED_RESOURCES_PER_PAGE, user=request.user
                 )
 
-                ret = self.paginate_related_resources(
-                    related_resources=related_resources, page=page, request=request
-                )
+                ret = self.paginate_related_resources(related_resources=related_resources, page=page, request=request)
             else:
-                ret = resource.get_related_resources(
-                    lang=lang, limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, user=request.user
-                )
+                ret = resource.get_related_resources(lang=lang, limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, user=request.user)
 
         return JSONResponse(ret)
 
