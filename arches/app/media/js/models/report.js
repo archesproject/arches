@@ -56,20 +56,38 @@ define(['jquery',
 
             this.paginator = ko.observable(options.related_resources.paginator);
 
-            this.relatedResources = ko.observableArray();
+            // this.resourceLookup = ko.observable(options.related_resources.related_resources.node_config_lookup);
 
-            for (resourceRelationship of options.related_resources.related_resources.resource_relationships) {
-                console.log('****', options)
+            // this.relatedResources = ko.observableArray();
+            
+            
+            this.foobar = {}
+
+            for (var [graph_id, value] of Object.entries(options.related_resources.related_resources.node_config_lookup)) {
+                if (!this.foobar[graph_id]) {
+                    this.foobar[graph_id] = {
+                        'name': value['name'],
+                        'relatedResources': ko.observableArray(),
+                    }
+                }
+            }
+            
+            for (var resourceRelationship of options.related_resources.related_resources.resource_relationships) {
                 var relatedResource = options.related_resources.related_resources.related_resources.find(function(resource) {
                     return resource.resourceinstanceid === resourceRelationship.resourceinstanceidto
                 });
-
-                this.relatedResources.push({
+                
+                this.foobar[relatedResource.graph_id]['relatedResources'].push({
                     'displayName': relatedResource.displayname,
                     'relationship': resourceRelationship.relationshiptype_label,
                     'link': arches.urls.resource_report + relatedResource.resourceinstanceid,
                 })
             }
+            
+            
+            console.log('****', this.foobar)
+
+            
 
 
 
@@ -189,11 +207,34 @@ define(['jquery',
         },
 
         bar: function(e) {
-
             $.ajax({
                 url: arches.urls.related_resources + this.attributes.resourceid + `?paginate=true&page=${this.paginator().next_page_number}`
             }).done(function(json) {
-                console.log(json)
+                for (var [graph_id, value] of Object.entries(options.related_resources.related_resources.node_config_lookup)) {
+                    if (!this.foobar[graph_id]) {
+                        this.foobar[graph_id] = {
+                            'name': value['name'],
+                            'relatedResources': ko.observableArray(),
+                        }
+                    }
+                }
+                
+                for (var resourceRelationship of options.related_resources.related_resources.resource_relationships) {
+                    var relatedResource = options.related_resources.related_resources.related_resources.find(function(resource) {
+                        return resource.resourceinstanceid === resourceRelationship.resourceinstanceidto
+                    });
+                    
+                    this.foobar[relatedResource.graph_id]['relatedResources'].push({
+                        'displayName': relatedResource.displayname,
+                        'relationship': resourceRelationship.relationshiptype_label,
+                        'link': arches.urls.resource_report + relatedResource.resourceinstanceid,
+                    })
+                }
+                
+                
+                console.log('****', this.foobar)
+
+                // console.log(json)
             })
 
 

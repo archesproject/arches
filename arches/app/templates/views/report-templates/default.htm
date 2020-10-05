@@ -64,19 +64,21 @@
 
     {% endblock body %}
 
-    <!-- ko if: report.relatedResources().length > 0 || !hideEmptyNodes() -->
+
+    
     <div class="rp-report-section relative report-related-resources">
         <div class="rp-report-section-title">
             <h4 class="rp-section-title">{% trans 'Related Resources' %}</h4>
         </div>
         
-        
-        <div class="rp-card-section">
-            <!-- ko foreach: { data: report.relatedResources(), as: 'relatedResource' } -->
-            <h5 class="rp-tile-title">
-                <span class="rp-tile-title-float" data-bind="text: $parent.report.graph.name"></span>
-            </h5>
+        <!-- ko foreach: { data: Object.values(report.foobar), as: 'resourceRelationship' } -->
+        <!-- ko if: resourceRelationship.relatedResources().length > 0 || !$parent.hideEmptyNodes() -->
+        <h5 class="rp-tile-title">
+            <span class="rp-tile-title-float" data-bind="text: resourceRelationship.name"></span>
+        </h5>
 
+        <div class="rp-card-section">
+            <!-- ko foreach: { data: resourceRelationship.relatedResources(), as: 'relatedResource' } -->
             <div class="rp-report-container-tile">
                 <div class="row rp-report-tile">
                     <dl class="dl-horizontal">
@@ -86,18 +88,12 @@
                 </div>
             </div>
             <!-- /ko -->
+            
 
-            <!-- ko if: report.paginator().has_next -->
-            <div 
-                class="load-relations-report" 
-                data-bind="click: report.bar.bind(report)"
-            >
-                {% trans "Load More" %}
-            </div>
-            <!-- /ko -->
         </div>
+        <!-- /ko -->
+        <!-- /ko -->    
     </div>  
-    <!-- /ko -->    
 </div>
 {% endblock report %}
 <!-- /ko -->
