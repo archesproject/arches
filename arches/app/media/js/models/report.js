@@ -138,14 +138,17 @@ define(['jquery',
             
             for (var resourceRelationship of json.related_resources.resource_relationships) {
                 var relatedResource = json.related_resources.related_resources.find(function(resource) {
-                    return resource.resourceinstanceid === resourceRelationship.resourceinstanceidto
+                    return (
+                        resource.resourceinstanceid === resourceRelationship.resourceinstanceidto
+                        || resource.resourceinstanceid === resourceRelationship.resourceinstanceidfrom
+                    );
                 });
-                
-                // foobar[relatedResource.graph_id]['relatedResources'].push({
-                //     'displayName': relatedResource.displayname,
-                //     'relationship': resourceRelationship.relationshiptype_label,
-                //     'link': arches.urls.resource_report + relatedResource.resourceinstanceid,
-                // });
+
+                foobar[relatedResource.graph_id]['relatedResources'].push({
+                    'displayName': relatedResource.displayname,
+                    'relationship': resourceRelationship.relationshiptype_label,
+                    'link': arches.urls.resource_report + relatedResource.resourceinstanceid,
+                });
             }
 
             this.paginator(json.paginator);
