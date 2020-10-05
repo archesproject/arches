@@ -56,9 +56,9 @@ define(['jquery',
                 });
             };
 
-            this.foobar = ko.observable({});
+            this.relatedResources = ko.observable({});
             this.paginator = ko.observable();
-            this.foo(options.related_resources);
+            this.formatRelatedResources(options.related_resources);
 
             this.graph = options.graph;
             this.parse(options.graph);
@@ -124,12 +124,12 @@ define(['jquery',
             this._data(JSON.stringify(this.toJSON()));
         },
 
-        foo: function(json) {
-            var foobar = this.foobar();
+        formatRelatedResources: function(json) {
+            var relatedResources = this.relatedResources();
 
             for (var [graph_id, value] of Object.entries(json.related_resources.node_config_lookup)) {
-                if (!foobar[graph_id]) {
-                    foobar[graph_id] = {
+                if (!relatedResources[graph_id]) {
+                    relatedResources[graph_id] = {
                         'name': value['name'],
                         'relatedResources': ko.observableArray(),
                     };
@@ -144,7 +144,7 @@ define(['jquery',
                     );
                 });
 
-                foobar[relatedResource.graph_id]['relatedResources'].push({
+                relatedResources[relatedResource.graph_id]['relatedResources'].push({
                     'displayName': relatedResource.displayname,
                     'relationship': resourceRelationship.relationshiptype_label,
                     'link': arches.urls.resource_report + relatedResource.resourceinstanceid,
@@ -152,16 +152,15 @@ define(['jquery',
             }
 
             this.paginator(json.paginator);
-            this.foobar(foobar);
+            this.relatedResources(relatedResources);
         },
 
-        bar: function(e) {
-            var self = this;
-
+        getRelatedResources: function() {
             $.ajax({
+                context: this,
                 url: arches.urls.related_resources + this.attributes.resourceid + `?paginate=true&page=${this.paginator().next_page_number}`
             }).done(function(json) {
-                self.foo(json);
+                this.formatRelatedResources(json);
             });
         },
 

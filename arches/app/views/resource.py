@@ -698,10 +698,6 @@ class ResourceReportView(MapBaseManagerView):
             lang=lang, limit=settings.RELATED_RESOURCES_PER_PAGE, user=request.user
         )
 
-        # sss = ResourceRelatedResources().get(request, resourceid, paginate=True)
-
-        # import ipdb; ipdb.set_trace()
-
         resource_relationship_type_values = {
             relationship_type["id"]: relationship_type["text"] for relationship_type in get_resource_relationship_types()["values"]
         }
@@ -740,15 +736,11 @@ class ResourceReportView(MapBaseManagerView):
 
         perm = "read_nodegroup"
 
-        foo = {"related_resources": simplified_related_resources, "total": related_resources_search_results["total"]}
-
+        # uses generic endpoint to get related resources
         get_params = request.GET.copy()
         get_params.update({"paginate": "true"})
         request.GET = get_params
-
-        # import ipdb; ipdb.set_trace()
-
-        qux = RelatedResourcesView().get(request, resourceid)
+        related_resources = json.loads(RelatedResourcesView().get(request, resourceid).content)
 
         for tile in tiles:
             if request.user.has_perm(perm, tile.nodegroup):
@@ -756,7 +748,7 @@ class ResourceReportView(MapBaseManagerView):
                 permitted_tiles.append(tile)
 
         if request.GET.get("json", False) and request.GET.get("exclude_graph", False):
-            return JSONResponse({"tiles": permitted_tiles, "related_resources": foo, "displayname": displayname, "resourceid": resourceid,})
+            return JSONResponse({"tiles": permitted_tiles, "related_resources": simplified_related_resources, "displayname": displayname, "resourceid": resourceid,})
 
         datatypes = models.DDataType.objects.all()
         graph = Graph.objects.get(graphid=resource.graph_id)
@@ -777,7 +769,7 @@ class ResourceReportView(MapBaseManagerView):
                     "cards": permitted_cards,
                     "tiles": permitted_tiles,
                     "graph": graph,
-                    "related_resources": foo,
+                    "related_resources": simplified_related_resources,
                     "displayname": displayname,
                     "resourceid": resourceid,
                     "cardwidgets": cardwidgets,
@@ -812,7 +804,7 @@ class ResourceReportView(MapBaseManagerView):
                 datatypes, exclude=["modulename", "issearchable", "configcomponent", "configname", "iconclass"]
             ),
             geocoding_providers=geocoding_providers,
-            related_resources=JSONSerializer().serialize(json.loads(qux.content)),
+            related_resources=JSONSerializer().serialize(related_resources),
             widgets=widgets,
             map_layers=map_layers,
             map_markers=map_markers,
