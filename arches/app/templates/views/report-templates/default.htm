@@ -63,15 +63,13 @@
     </div>
 
     {% endblock body %}
-
-
     
     <div class="rp-report-section relative report-related-resources">
         <div class="rp-report-section-title">
             <h4 class="rp-section-title">{% trans 'Related Resources' %}</h4>
         </div>
         
-        <!-- ko foreach: { data: Object.values(report.foobar), as: 'resourceRelationship' } -->
+        <!-- ko foreach: { data: Object.values(report.foobar()), as: 'resourceRelationship' } -->
         <!-- ko if: resourceRelationship.relatedResources().length > 0 || !$parent.hideEmptyNodes() -->
         <h5 class="rp-tile-title">
             <span class="rp-tile-title-float" data-bind="text: resourceRelationship.name"></span>
@@ -88,11 +86,21 @@
                 </div>
             </div>
             <!-- /ko -->
-            
-
+                
+            <!--ko if: resourceRelationship.relatedResources().length === 0 -->	
+            <div class="rp-report-container-tile">	
+                <div class="row rp-report-tile rp-no-data">{% trans 'No relationships added' %}</div>	
+            </div>	
+            <!--/ko-->
         </div>
         <!-- /ko -->
         <!-- /ko -->    
+
+        <!-- ko if: report.paginator().has_next -->
+        <div class="load-relations-report" data-bind="click: report.bar.bind(report)">
+            {% trans "Load More" %}
+        </div>
+        <!-- /ko -->
     </div>  
 </div>
 {% endblock report %}

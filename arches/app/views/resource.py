@@ -899,16 +899,9 @@ class RelatedResourcesView(BaseManagerView):
             nodes = models.Node.objects.filter(graph=graphid).exclude(istopnode=False)[0].get_relatable_resources()
             ret = {str(node.graph_id) for node in nodes}
 
-<<<<<<< HEAD
         elif resourceid:
             lang = request.GET.get("lang", settings.LANGUAGE_CODE)
             paginate = bool(request.GET.get("paginate"))
-=======
-        lang = request.GET.get("lang", request.LANGUAGE_CODE)
-        start = request.GET.get("start", 0)
-        ret = []
-        try:
->>>>>>> 0a082aee50f7c225cf8081ac4b4bec3711192dad
             resource = Resource.objects.get(pk=resourceid)
 
             if paginate:
