@@ -748,7 +748,14 @@ class ResourceReportView(MapBaseManagerView):
                 permitted_tiles.append(tile)
 
         if request.GET.get("json", False) and request.GET.get("exclude_graph", False):
-            return JSONResponse({"tiles": permitted_tiles, "related_resources": simplified_related_resources, "displayname": displayname, "resourceid": resourceid,})
+            return JSONResponse(
+                {
+                    "tiles": permitted_tiles,
+                    "related_resources": simplified_related_resources,
+                    "displayname": displayname,
+                    "resourceid": resourceid,
+                }
+            )
 
         datatypes = models.DDataType.objects.all()
         graph = Graph.objects.get(graphid=resource.graph_id)
