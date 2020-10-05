@@ -12928,6 +12928,18 @@ a.jstree-anchor.permissions-widget {
     border: 1px solid #000;
 }
 
+.lang-switch .chosen-single {
+    border: none;
+    font-size: 12px;
+    color: #454545;
+    padding-top: 8px;
+}
+
+.lang-switch .chosen-drop {
+    font-size: 12px;
+    color: #454545;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
