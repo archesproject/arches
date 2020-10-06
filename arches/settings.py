@@ -124,7 +124,12 @@ ARCHES_NAMESPACE_FOR_DATA_EXPORT = "http://localhost:8000/"
 RDM_JSONLD_CONTEXT = {"arches": ARCHES_NAMESPACE_FOR_DATA_EXPORT}
 
 PREFERRED_COORDINATE_SYSTEMS = (
-    {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True},  # Required
+    {
+        "name": "Geographic",
+        "srid": "4326",
+        "proj4": "+proj=longlat +datum=WGS84 +no_defs",
+        "default": True,
+    },  # Required
 )
 
 ANALYSIS_COORDINATE_SYSTEM_SRID = 3857  # Coord sys units must be meters
@@ -512,7 +517,10 @@ DEFAULT_BOUNDS = {
     "type": "FeatureCollection",
     "features": [
         {
-            "geometry": {"type": "Polygon", "coordinates": [[[-122, -52], [128, -52], [128, 69], [-122, 69], [-122, -52]]]},
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [[[-122, -52], [128, -52], [128, 69], [-122, 69], [-122, -52]]],
+            },
             "type": "Feature",
             "properties": {},
         }
@@ -540,7 +548,11 @@ CELERY_SEARCH_EXPORT_CHECK = 3600  # seconds
 
 CELERY_BEAT_SCHEDULE = {
     "delete-expired-search-export": {"task": "arches.app.tasks.delete_file", "schedule": CELERY_SEARCH_EXPORT_CHECK},
-    "notification": {"task": "arches.app.tasks.message", "schedule": CELERY_SEARCH_EXPORT_CHECK, "args": ("Celery Beat is Running",)},
+    "notification": {
+        "task": "arches.app.tasks.message",
+        "schedule": CELERY_SEARCH_EXPORT_CHECK,
+        "args": ("Celery Beat is Running",),
+    },
 }
 
 AUTO_REFRESH_GEOM_VIEW = True
