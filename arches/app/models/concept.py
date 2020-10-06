@@ -521,6 +521,7 @@ class Concept(object):
                             ORDER BY (
                                 CASE WHEN languageid = '{languageid}' THEN 10
                                 WHEN languageid like '{short_languageid}%' THEN 5
+                                WHEN languageid like '{default_languageid}%' THEN 2
                                 ELSE 0
                                 END
                             ) desc limit 1
@@ -554,6 +555,7 @@ class Concept(object):
                             ORDER BY (
                                 CASE WHEN languageid = '{languageid}' THEN 10
                                 WHEN languageid like '{short_languageid}%' THEN 5
+                                WHEN languageid like '{default_languageid}%' THEN 2
                                 ELSE 0
                                 END
                             ) desc limit 1
@@ -611,6 +613,7 @@ class Concept(object):
                         ORDER BY (
                             CASE WHEN languageid = '{languageid}' THEN 10
                             WHEN languageid like '{short_languageid}%' THEN 5
+                            WHEN languageid like '{default_languageid}%' THEN 2
                             ELSE 0
                             END
                         ) desc limit 1
@@ -652,6 +655,7 @@ class Concept(object):
                 recursive_table=recursive_table,
                 languageid=languageid,
                 short_languageid=languageid.split("-")[0],
+                default_languageid=settings.LANGUAGE_CODE
             )
 
         else:
