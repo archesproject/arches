@@ -655,7 +655,7 @@ class Concept(object):
                 recursive_table=recursive_table,
                 languageid=languageid,
                 short_languageid=languageid.split("-")[0],
-                default_languageid=settings.LANGUAGE_CODE
+                default_languageid=settings.LANGUAGE_CODE,
             )
 
         else:
