@@ -151,7 +151,8 @@ SESSION_COOKIE_NAME = "arches"
 # EMAIL_HOST_PASSWORD = 'xxxxxxx'
 # EMAIL_PORT = 587
 
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # Change if you need an alternate 'from' address for notifications that is different from your EMAIL_HOST_USER email address.
+# Change if you need an alternate 'from' address for notifications that is different from your EMAIL_HOST_USER email address.
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 POSTGIS_VERSION = (3, 0, 0)
 
