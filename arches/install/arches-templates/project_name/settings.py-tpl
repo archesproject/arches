@@ -174,7 +174,7 @@ if DEBUG is True:
 # EMAIL_HOST_PASSWORD = 'xxxxxxx'
 # EMAIL_PORT = 587
 
-DEFAULT_FROM_EMAIL = "from@example.com"
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 CELERY_BROKER_URL = 'amqp://guest:guest@localhost'
 CELERY_ACCEPT_CONTENT = ['json']
