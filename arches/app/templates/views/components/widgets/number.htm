@@ -30,20 +30,22 @@
 
 {% block report %}
 <dt data-bind="text: label"></dt>
-<dd class='number-widget-report'>
+<dd>
+    <div class='number-widget-report'>
     <!-- ko if: value -->
-    <div data-bind="text: prefix(), css: {'number-prefix': prefix()}"></div>
+    <span data-bind="text: prefix(), css: {'number-prefix': prefix()}"></span>
         <!-- ko if: format -->
-        <div data-bind="formattedNumber: value(), format: format || '{% trans "None" %}'"></div>
+        <span data-bind="formattedNumber: value(), format: format || '{% trans "None" %}'"></span>
         <!-- /ko -->
         <!-- ko ifnot: format -->
-        <div data-bind="text: value()"></div>
+        <span data-bind="text: value()"></span>
         <!-- /ko -->
-    <div data-bind="text: suffix(), css: {'number-suffix': suffix()}"></div>
+    <span data-bind="text: suffix(), css: {'number-suffix': suffix()}"></span>
     <!-- /ko -->
     <!-- ko ifnot: value -->
-    <div data-bind="text: '{% trans "None" %}'"></div>
+    <span data-bind="text: '{% trans "None" %}'"></span>
     <!-- /ko -->
+    </div>
 </dd>
 {% endblock report %}
 

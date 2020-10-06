@@ -5,6 +5,7 @@ Django settings for {{ project_name }} project.
 import os
 import arches
 import inspect
+from django.utils.translation import gettext_lazy as _
 
 try:
     from arches.settings import *
@@ -142,6 +143,9 @@ CACHES = {
     }
 }
 
+# Hide nodes and cards in a report that have no data
+HIDE_EMPTY_NODES_IN_REPORT = False
+
 DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d" # Custom date format for dates imported from and exported to csv
 
 #Identify the usernames and duration (seconds) for which you want to cache the time wheel
@@ -194,6 +198,45 @@ CELERY_BEAT_SCHEDULE = {
 
 # By setting RESTRICT_MEDIA_ACCESS to True, media file requests outside of Arches will checked against nodegroup permissions.
 RESTRICT_MEDIA_ACCESS = False
+
+
+# see https://docs.djangoproject.com/en/1.9/topics/i18n/translation/#how-django-discovers-language-preference
+# to see how LocaleMiddleware tries to determine the user's language preference
+# (make sure to check your accept headers as they will override the LANGUAGE_CODE setting!)
+# also see get_language_from_request in django.utils.translation.trans_real.py
+# to see how the language code is derived in the actual code
+
+####### TO GENERATE .PO FILES DO THE FOLLOWING ########
+# run the following commands 
+# language codes used in the command should be in the form (which is slightly different 
+# form the form used in the LANGUAGE_CODE and LANGUAGES settings below):
+# --local={countrycode}_{REGIONCODE} <-- countrycode is lowercase, regioncode is uppercase, also notice the underscore instead of hyphen
+# commands to run (to generate files for "British English, German, and Spanish"):
+# django-admin.py makemessages --ignore=env/* --local=de --local=en --local=en_GB --local=es  --extension=htm,py
+# django-admin.py compilemessages
+
+
+# default language of the application
+# language code needs to be all lower case with the form:
+# {langcode}-{regioncode} eg: en, en-gb ....
+# a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGE_CODE = "en"
+
+# list of languages to display in the language switcher, 
+# if left empty or with a single entry then the switch won't be displayed
+# language codes need to be all lower case with the form:
+# {langcode}-{regioncode} eg: en, en-gb ....
+# a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGES = [
+#   ('de', _('German')),
+#   ('en', _('English')),
+#   ('en-gb', _('British English')),
+#   ('es', _('Spanish')),
+]
+
+# override this to permenantly display/hide the language switcher
+SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
+
 
 try:
     from .package_settings import *

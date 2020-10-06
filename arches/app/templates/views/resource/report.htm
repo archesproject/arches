@@ -60,7 +60,8 @@ define('resource-report-data', [], function () {
         displayname: "{{displayname | escapejs}}",
         cardComponents: {{card_components_json}},
         resourceid: '{{resourceid}}',
-        cardwidgets: {{cardwidgets}}
+        cardwidgets: {{cardwidgets}},
+        hideEmptyNodes: JSON.parse('{{hide_empty_nodes}}'.toLowerCase())
     };
 });
 {% endautoescape %}</script>
