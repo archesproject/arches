@@ -67,7 +67,7 @@ define([
                 newGraph('/graph/new', {isresource: false});
             };
 
-            viewModel.exportMappingFile = function(model) {
+            viewModel.exportMappingFile = function() {
                 window.open(arches.urls.export_mapping_file(viewModel.graph.graphid()), '_blank');
             };
 
