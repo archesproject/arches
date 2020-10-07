@@ -2090,6 +2090,14 @@ div.final-cons-step-separator>h4 {
     margin-bottom: 32px;
 }
 
+.rr-map-card-intersect-panel .intersection-result {
+    padding: 3px 0 0 12px;
+}
+
+.rr-map-card-intersect-panel .intersection-result.hovered {
+    background-color: #ddd;
+}
+
 .map-card-zoom-tool,
 .map-card-feature-tool {
     font-size: 0.9em;

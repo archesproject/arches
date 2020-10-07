@@ -7,7 +7,7 @@ define([
     'viewmodels/card-component',
     'viewmodels/map-editor',
     'viewmodels/map-filter',
-    'views/components/cards/select-feature-layers',
+    'views/components/cards/select-related-feature-layers',
     'text!templates/views/components/cards/related-resources-map-popup.htm'
 ], function($, arches, ko, koMapping, geojsonExtent, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
@@ -35,7 +35,7 @@ define([
             }
             return nodeids;
         };
-
+        this.hoverId = ko.observable();
         this.nodeids = getNodeIds();
         this.nodeDetails = ko.observableArray();
         this.nodeids.forEach(function(nodeid) {
@@ -87,7 +87,7 @@ define([
             }
             zoomToData = true;
         });
-        var selectFeatureLayers = selectFeatureLayersFactory('', selectRelatedSource, selectRelatedSourceLayer, selectedResourceIds(), true, null, this.nodeids, this.filterNodeIds());
+        var selectFeatureLayers = selectFeatureLayersFactory(selectRelatedSource, selectRelatedSourceLayer, selectedResourceIds(), true, null, this.nodeids, this.filterNodeIds());
         var sources = [];
         for (var sourceName in arches.mapSources) {
             if (arches.mapSources.hasOwnProperty(sourceName)) {
@@ -98,7 +98,7 @@ define([
             var source = self.selectRelatedSource();
             var sourceLayer = self.selectRelatedSourceLayer();
             selectFeatureLayers = sources.indexOf(source) > 0 ?
-                selectFeatureLayersFactory('', source, sourceLayer, selectedResourceIds(), true, null, self.nodeids, self.filterNodeIds()) :
+                selectFeatureLayersFactory(source, sourceLayer, selectedResourceIds(), true, null, self.nodeids, self.filterNodeIds(), self.hoverId()) :
                 [];
             self.additionalLayers(
                 extendedLayers.concat(
@@ -110,6 +110,7 @@ define([
         this.selectRelatedSource.subscribe(updateResourceSelectLayers);
         this.selectRelatedSourceLayer.subscribe(updateResourceSelectLayers);
         this.filterNodeIds.subscribe(updateResourceSelectLayers);
+        this.hoverId.subscribe(updateResourceSelectLayers);
 
         params.activeTab = 'editor';
 
@@ -164,6 +165,9 @@ define([
         });
 
         this.intersectionSummary = ko.observable({});
+        this.updateHoverId = function(val){
+            self.hoverId() === val.resourceinstanceid ? self.hoverId(null) : self.hoverId(val.resourceinstanceid);
+        };
         this.targetGraphs = ko.observableArray();
         this.mapFilter.filter.feature_collection.subscribe(function(val){
             if (self.widget && self.widget.node.config.graphs().length && val.features && val.features.length > 0) {

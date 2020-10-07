@@ -179,7 +179,7 @@
                             <div data-bind="text: 'Total: ' + self.intersectionSummary()[targetGraph].results().length"></div>
                             </div>
                             <!-- ko foreach: {data: self.intersectionSummary()[targetGraph].results(), as: 'result'} -->
-                            <div style="padding: 3px 0 0 12px;" data-bind="text: result.displayname"></div>
+                            <div class="intersection-result" data-bind="text: result.displayname, event: { mouseover: self.updateHoverId, mouseout: self.updateHoverId }, css: {hovered: self.hoverId() === result.resourceinstanceid } "></div>
                             <!-- /ko -->
                             <!-- /ko -->
                     </div>
