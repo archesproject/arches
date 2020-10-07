@@ -65,6 +65,17 @@
                 </li>
                 <!-- Menu Item -->
                 <li class="edit-menu-item" data-bind="visible: graph.isresource">
+                    <a data-bind="click: exportMappingFile">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-download"></i> {% trans "Export Mapping File" %}</div>
+                            <span
+                                class="text-muted menu-item-subtitle">{% trans "Use a mapping file with import/export of business data" %}
+                            </span>
+                        </div>
+                    </a>
+                </li>
+                <!-- Menu Item -->
+                <li class="edit-menu-item" data-bind="visible: graph.isresource">
                     <a href="{% url 'graph' '' %}" data-bind="click: deleteInstances">
                         <div class="media-body">
                             <div class="menu-item-title"><i class="fa fa-trash"></i> {% trans "Delete Associated Instances" %}</div>
