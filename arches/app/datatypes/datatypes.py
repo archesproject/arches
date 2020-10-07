@@ -1034,11 +1034,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         if celery_worker_running is True:
             res = refresh_materialized_view.apply_async((), link_error=log_error.s())
         elif settings.AUTO_REFRESH_GEOM_VIEW:
-            cursor = connection.cursor()
-            sql = """
-                REFRESH MATERIALIZED VIEW mv_geojson_geoms;
-            """
-            cursor.execute(sql)
+            with connection.cursor() as cursor:
+                sql = """
+                    REFRESH MATERIALIZED VIEW mv_geojson_geoms;
+                """
+                cursor.execute(sql)
 
     def default_es_mapping(self):
         # let ES dyanamically map this datatype
