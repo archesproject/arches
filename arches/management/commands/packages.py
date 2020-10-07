@@ -756,6 +756,10 @@ class Command(BaseCommand):
         def cache_graphs():
             management.call_command("cache", operation="graphs")
 
+        def update_resource_materialized_view():
+            with connection.cursor() as cursor:
+                cursor.execute("REFRESH MATERIALIZED VIEW mv_geojson_geoms;")
+
         def load_apps(package_dir):
             package_apps = glob.glob(os.path.join(package_dir, "apps", "*"))
             for app in package_apps:
@@ -852,12 +856,8 @@ class Command(BaseCommand):
             css_files = glob.glob(os.path.join(css_source, "*.css"))
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
-        print("caching resource models")
-        try:
-            cache_graphs()
-        except Exception as e:
-            print("Unable to cache graph proxy models")
-            print(e)
+        print("Refreshing the resource view")
+        update_resource_materialized_view()
         if celery_worker_running:
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
