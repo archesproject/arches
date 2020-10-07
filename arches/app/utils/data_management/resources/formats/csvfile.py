@@ -1014,7 +1014,7 @@ class CsvReader(Reader):
 
         finally:
             for e in self.errors:
-                if e["type"] == "WARNING":   
+                if e["type"] == "WARNING":
                     logger.warn(e["message"])
                 elif e["type"] == "ERROR":
                     logger.error(e["message"])
