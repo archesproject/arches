@@ -529,17 +529,17 @@ class Command(BaseCommand):
                     sys.exit()
 
         @transaction.atomic
-        def load_preliminary_sql(package_dir):
-            resource_views = glob.glob(os.path.join(package_dir, "preliminary_sql", "*.sql"))
+        def load_sql(package_dir, sql_dir):
+            sql_files = glob.glob(os.path.join(package_dir, sql_dir, "*.sql"))
             try:
                 with connection.cursor() as cursor:
-                    for view in resource_views:
-                        with open(view, "r") as f:
+                    for sql_file in sql_files:
+                        with open(sql_file, "r") as f:
                             sql = f.read()
                             cursor.execute(sql)
             except Exception as e:
                 print(e)
-                print("Could not connect to db")
+                print("Failed to load sql files")
 
         def load_resource_views(package_dir):
             resource_views = glob.glob(os.path.join(package_dir, "business_data", "resource_views", "*.sql"))
@@ -551,7 +551,7 @@ class Command(BaseCommand):
                             cursor.execute(sql)
             except Exception as e:
                 print(e)
-                print("Could not connect to db")
+                print("Failed to load resource views")
 
         def load_graphs(package_dir):
             try:
@@ -811,7 +811,7 @@ class Command(BaseCommand):
         print("loading package_settings.py")
         load_package_settings(package_location)
         print("loading preliminary sql")
-        load_preliminary_sql(package_location)
+        load_sql(package_location, "preliminary_sql")
         print("loading system settings")
         load_system_settings(package_location)
         print("loading project extensions from project")
@@ -858,6 +858,8 @@ class Command(BaseCommand):
                 shutil.copy(css_file, css_dest)
         print("Refreshing the resource view")
         update_resource_materialized_view()
+        print("loading post sql")
+        load_sql(package_location, "post_sql")
         if celery_worker_running:
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
