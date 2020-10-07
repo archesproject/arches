@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import os
 import uuid
@@ -32,27 +32,25 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument('operation', nargs='?')
+        parser.add_argument("operation", nargs="?")
 
     def handle(self, *args, **options):
         self.add_users()
 
     def add_users(self):
         profiles = (
-            {'name': 'tester1', 'email': 'tester1@test.com', 'password': 'Test12345!', 'groups': ['Graph Editor', 'Resource Editor']},
-            {'name': 'tester2', 'email': 'tester2@test.com', 'password': 'Test12345!', 'groups': ['Graph Editor', 'Resource Editor']},
-            {'name': 'tester3', 'email': 'tester3@test.com', 'password': 'Test12345!', 'groups': ['Graph Editor', 'Resource Editor']},
+            {"name": "tester1", "email": "tester1@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
+            {"name": "tester2", "email": "tester2@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
+            {"name": "tester3", "email": "tester3@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
         )
 
         for profile in profiles:
             try:
-                user = User.objects.create_user(username=profile['name'],
-                                                 email=profile['email'],
-                                                 password=profile['password'])
+                user = User.objects.create_user(username=profile["name"], email=profile["email"], password=profile["password"])
                 user.save()
                 print(f"Added test user: {user.username}, password: {profile['password']}")
 
-                for group_name in profile['groups']:
+                for group_name in profile["groups"]:
                     group = Group.objects.get(name=group_name)
                     group.user_set.add(user)
 

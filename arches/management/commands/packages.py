@@ -292,7 +292,13 @@ class Command(BaseCommand):
 
         if options["operation"] in ["load", "load_package"]:
             self.load_package(
-                options["source"], options["setup_db"], options["overwrite"], options["bulk_load"], options["stage"], options["yes"], options["dev"]
+                options["source"],
+                options["setup_db"],
+                options["overwrite"],
+                options["bulk_load"],
+                options["stage"],
+                options["yes"],
+                options["dev"],
             )
 
         if options["operation"] in ["create", "create_package"]:
