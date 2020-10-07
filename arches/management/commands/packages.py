@@ -1058,18 +1058,11 @@ will be very jumbled."""
             data_source = [data_source]
 
         for path in data_source:
-            if os.path.isabs(path):
-                if os.path.isfile(os.path.join(path)):
-                    relations = csv.DictReader(open(path, "r"))
-                    RelationImporter().import_relations(relations)
-                else:
-                    utils.print_message("No file found at indicated location: {0}".format(path))
-                    sys.exit()
+            if os.path.isfile(os.path.join(path)):
+                relations = csv.DictReader(open(path, "r"))
+                RelationImporter().import_relations(relations)
             else:
-                utils.print_message(
-                    "ERROR: The specified file path appears to be relative. \
-                    Please rerun command with an absolute file path."
-                )
+                utils.print_message("No file found at indicated location: {0}".format(path))
                 sys.exit()
 
     def import_graphs(self, data_source="", overwrite_graphs=True):

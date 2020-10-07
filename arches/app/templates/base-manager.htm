@@ -117,6 +117,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </a>
                         {% endif %}
 
+                        {% if show_language_swtich %}
+                        {% get_current_language as LANGUAGE_CODE %}
+                            <div class="lang-switch ep-tools ep-tools-right" style="max-width: none;" 
+                            data-bind='component: {
+                                name: "views/components/language-switcher",
+                                params: {
+                                    current_language: "{{LANGUAGE_CODE}}"
+                                }
+                            }'></div>
+                        {% endif %}
+                        
                         <!-- Notifications -->
                         {% if nav.notifs %}
                         <a href="" class="ep-tools ep-notifs-toggle ep-tools-right" data-bind="click: function() {getNotifications();}">

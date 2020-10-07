@@ -31,7 +31,7 @@ class SearchResultsFilter(BaseSearchFilter):
             if include_provisional is False:
                 geo_agg_filter.filter(Terms(field="points.provisional", terms=["false"]))
 
-            elif include_provisional is "only provisional":
+            elif include_provisional == "only provisional":
                 geo_agg_filter.filter(Terms(field="points.provisional", terms=["true"]))
 
         geo_agg_filter.filter(Terms(field="points.nodegroup_id", terms=permitted_nodegroups))

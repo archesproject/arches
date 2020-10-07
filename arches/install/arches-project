@@ -15,7 +15,10 @@ from django.utils.crypto import get_random_string
 from django.core.management.utils import handle_extensions
 from django.core.management.templates import TemplateCommand
 from django.core.management.base import BaseCommand, CommandError
+from arches import __version__
+from arches.setup import get_complete_version
 from arches.management.commands import utils
+
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")
 here = os.path.abspath(os.path.dirname(__file__))
@@ -46,6 +49,14 @@ class ArchesCommand(TemplateCommand):
         # Create a random SECRET_KEY to put it in the main settings.
         chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
         options['secret_key'] = get_random_string(50, chars)
+        
+        # this is used in the package.json file generated when "arches-project create" is called
+        # if this is not a final released version of arches (for developers) then arches_version will be blank
+        # and the arches dependency defined in the generated package.json file will point to "master"
+        options["arches_version"] = "master"
+        if get_complete_version()[3] == 'final':
+            options["arches_version"] = __version__
+
         super(ArchesCommand, self).handle('project', project_name, target, **options)
 
 
@@ -55,9 +66,6 @@ def command_create_app(args):
     proj_name = options['name']
     cmd.handle(options)
     yarn_path = os.path.join(os.getcwd(), proj_name, proj_name)
-    packagejson_path_src = os.path.join(os.path.dirname(arches.__file__), 'install', 'package.json')
-    packagejson_path_dst = os.path.join(yarn_path, 'package.json')
-    shutil.copy(packagejson_path_src, packagejson_path_dst)
     os.chdir(yarn_path)
     subprocess.call("yarn install", shell=True)
     if os.path.isdir(os.path.join(os.getcwd(), 'logs')) is not True:
@@ -104,7 +112,7 @@ parser_start.add_argument(
     dest='extensions',
     help='The file extension(s) to render (default: py).',
     type=str,
-    default=['py', 'txt', 'html', 'js', 'css', 'log'])
+    default=['py', 'txt', 'html', 'js', 'css', 'log', 'json'])
 
 parser_start.add_argument(
     '-n', '--name',

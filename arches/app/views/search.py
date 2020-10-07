@@ -37,7 +37,7 @@ from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import MapBaseManagerView
-from arches.app.views.concept import get_preflabel_from_conceptid
+from arches.app.models.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer
 import arches.app.utils.zip as zip_utils
 import arches.app.utils.task_management as task_management
@@ -110,7 +110,7 @@ def home_page(request):
 
 
 def search_terms(request):
-    lang = request.GET.get("lang", settings.LANGUAGE_CODE)
+    lang = request.GET.get("lang", request.LANGUAGE_CODE)
     se = SearchEngineFactory().create()
     searchString = request.GET.get("q", "")
     user_is_reviewer = user_is_resource_reviewer(request.user)
