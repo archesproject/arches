@@ -184,7 +184,8 @@ class Command(BaseCommand):
 
         parser.add_argument("-b", "--is_basemap", action="store_true", dest="is_basemap", help="Add to make the layer a basemap.")
 
-        parser.add_argument("-db", "--setup_db", action="store", dest="setup_db", default=False, help="Rebuild database")
+        parser.add_argument("-db", "--setup_db", action="store_true", dest="setup_db", default=False, help="Rebuild database")
+        parser.add_argument("-dev", "--dev", action="store_true", dest="dev", help="Loading package for development")
 
         parser.add_argument(
             "-bulk",
@@ -291,7 +292,7 @@ class Command(BaseCommand):
 
         if options["operation"] in ["load", "load_package"]:
             self.load_package(
-                options["source"], options["setup_db"], options["overwrite"], options["bulk_load"], options["stage"], options["yes"]
+                options["source"], options["setup_db"], options["overwrite"], options["bulk_load"], options["stage"], options["yes"], options["dev"]
             )
 
         if options["operation"] in ["create", "create_package"]:
@@ -466,7 +467,7 @@ class Command(BaseCommand):
             self.export_package_settings(dest_dir, "true")
 
     def load_package(
-        self, source, setup_db=True, overwrite_concepts="ignore", bulk_load=False, stage_concepts="keep", yes=False,
+        self, source, setup_db=False, overwrite_concepts="ignore", bulk_load=False, stage_concepts="keep", yes=False, dev=False
     ):
 
         celery_worker_running = task_management.check_if_celery_available()
@@ -803,10 +804,10 @@ class Command(BaseCommand):
         if not package_location:
             raise Exception("this is an invalid package source")
 
-        if setup_db is not False:
-            if setup_db.lower() in ("t", "true", "y", "yes"):
-                management.call_command("setup_db", force=True)
-
+        if setup_db:
+            management.call_command("setup_db", force=True)
+        if dev:
+            management.call_command("add_test_users")
         load_ontologies(package_location)
         print("loading package_settings.py")
         load_package_settings(package_location)
