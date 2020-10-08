@@ -27,8 +27,9 @@ from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS, get_preflabel_from_valueid
-from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, SimpleQueryString
+from arches.app.search.mappings import CONCEPTS_INDEX
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
@@ -39,7 +40,7 @@ from arches.app.views.base import BaseManagerView
 @method_decorator(group_required("RDM Administrator"), name="dispatch")
 class RDMView(BaseManagerView):
     def get(self, request, conceptid):
-        lang = request.GET.get("lang", settings.LANGUAGE_CODE)
+        lang = request.GET.get("lang", request.LANGUAGE_CODE)
 
         languages = sort_languages(models.DLanguage.objects.all(), lang)
 
@@ -82,9 +83,8 @@ def get_sparql_providers(endpoint=None):
 
 def sort_languages(languages, lang):
     """
-    Sorts languages from the d_languages model by name. If there is more than
-    one default language or no default language, the default language is defined
-    by lang (the settings.LANGUAGE_CODE)
+    Sorts languages from the d_languages model by name. If there is more than one
+    default language or no default language, the default language is defined by lang
     """
 
     if len([l for l in languages if l.isdefault == True]) != 1:
@@ -101,7 +101,7 @@ def sort_languages(languages, lang):
 def concept(request, conceptid):
     f = request.GET.get("f", "json")
     mode = request.GET.get("mode", "")
-    lang = request.GET.get("lang", settings.LANGUAGE_CODE)
+    lang = request.GET.get("lang", request.LANGUAGE_CODE)
     pretty = request.GET.get("pretty", False)
 
     if request.method == "GET":
@@ -214,7 +214,7 @@ def concept(request, conceptid):
                     value=request.FILES.get("file", None),
                     concept_id=conceptid,
                     valuetype_id="image",
-                    language_id=settings.LANGUAGE_CODE,
+                    language_id=lang,
                 )
                 value.save()
                 return JSONResponse(value)
@@ -307,7 +307,7 @@ def export_collections(request):
 
 
 def get_concept_collections(request):
-    lang = request.GET.get("lang", settings.LANGUAGE_CODE)
+    lang = request.GET.get("lang", request.LANGUAGE_CODE)
     concept_collections = Concept().concept_tree(mode="collections", lang=lang)
     return JSONResponse(concept_collections)
 
@@ -355,7 +355,7 @@ def manage_parents(request, conceptid):
 
 
 def confirm_delete(request, conceptid):
-    lang = request.GET.get("lang", settings.LANGUAGE_CODE)
+    lang = request.GET.get("lang", request.LANGUAGE_CODE)
     concept = Concept().get(id=conceptid)
     concepts_to_delete = [
         concept.get_preflabel(lang=lang).value for key, concept in Concept.gather_concepts_to_delete(concept, lang=lang).items()
@@ -391,18 +391,17 @@ def paged_dropdown(request):
 
 def get_pref_label(request):
     valueid = request.GET.get("valueid")
-    label = get_preflabel_from_valueid(valueid, settings.LANGUAGE_CODE)
+    label = get_preflabel_from_valueid(valueid, request.LANGUAGE_CODE)
     return JSONResponse(label)
 
 
 def search(request):
-    se = SearchEngineFactory().create()
     searchString = request.GET["q"]
     removechildren = request.GET.get("removechildren", None)
     query = Query(se, start=0, limit=100)
     phrase = Match(field="value", query=searchString.lower(), type="phrase_prefix")
     query.add_query(phrase)
-    results = query.search(index="concepts")
+    results = query.search(index=CONCEPTS_INDEX)
 
     ids = []
     if removechildren is not None:
@@ -422,7 +421,7 @@ def search(request):
                 query = Query(se, start=0, limit=100)
                 phrase = Match(field="conceptid", query=top_concept, type="phrase")
                 query.add_query(phrase)
-                scheme = query.search(index="concepts")
+                scheme = query.search(index=CONCEPTS_INDEX)
                 for label in scheme["hits"]["hits"]:
                     if label["_source"]["type"] == "prefLabel":
                         cached_scheme_names[top_concept] = label["_source"]["value"]
@@ -458,7 +457,7 @@ def search(request):
     #             if conceptid in cached_scheme_names:
     #                 result['in_scheme_name'] = cached_scheme_names[conceptid]
     #             else:
-    #                 result['in_scheme_name'] = get_preflabel_from_conceptid(conceptid, lang=settings.LANGUAGE_CODE)['value']
+    #                 result['in_scheme_name'] = get_preflabel_from_conceptid(conceptid, lang=request.LANGUAGE_CODE)['value']
     #                 cached_scheme_names[conceptid] = result['in_scheme_name']
 
     #         newresults.append(result)
@@ -507,39 +506,10 @@ def search_sparql_endpoint_for_concepts(request):
 
 
 def concept_tree(request, mode):
-    lang = request.GET.get("lang", settings.LANGUAGE_CODE)
+    lang = request.GET.get("lang", request.LANGUAGE_CODE)
     conceptid = request.GET.get("node", None)
     concepts = Concept({"id": conceptid}).concept_tree(lang=lang, mode=mode)
     return JSONResponse(concepts, indent=4)
-
-
-def get_concept_label_from_valueid(valueid):
-    se = SearchEngineFactory().create()
-    concept_label = se.search(index="concepts", id=valueid)
-    if concept_label["found"]:
-        return concept_label["_source"]
-
-
-def get_preflabel_from_conceptid(conceptid, lang):
-    ret = None
-    default = {"category": "", "conceptid": "", "language": "", "value": "", "type": "", "id": ""}
-    se = SearchEngineFactory().create()
-    query = Query(se)
-    bool_query = Bool()
-    bool_query.must(Match(field="type", query="prefLabel", type="phrase"))
-    bool_query.filter(Terms(field="conceptid", terms=[conceptid]))
-    query.add_query(bool_query)
-    preflabels = query.search(index="concepts")["hits"]["hits"]
-    for preflabel in preflabels:
-        default = preflabel["_source"]
-        # get the label in the preferred language, otherwise get the label in the default language
-        if preflabel["_source"]["language"] == lang:
-            return preflabel["_source"]
-        if preflabel["_source"]["language"].split("-")[0] == lang.split("-")[0]:
-            ret = preflabel["_source"]
-        if preflabel["_source"]["language"] == settings.LANGUAGE_CODE and ret is None:
-            ret = preflabel["_source"]
-    return default if ret is None else ret
 
 
 def concept_value(request):

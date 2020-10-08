@@ -23,8 +23,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
 
             initialize: function(options) {
                 options.name = 'Search Results';
+                this.requiredFilters = ['map-filter'];
                 BaseFilter.prototype.initialize.call(this, options);
-
                 this.results = ko.observableArray();
                 this.showRelationships = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
@@ -40,10 +40,13 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
 
                 this.filters[componentName](this);
                 this.restoreState();
-
-                this.mapFilter = this.getFilter('map-filter');
-                this.details = this.getFilter('search-result-details');
-                this.relatedResourcesManager = this.getFilter('related-resources-filter');
+                if (this.requiredFiltersLoaded() === false) {
+                    this.requiredFiltersLoaded.subscribe(function(){
+                        this.mapFilter = this.getFilter('map-filter');
+                    }, this);
+                } else {
+                    this.mapFilter = this.getFilter('map-filter');
+                }
                 this.selectedTab.subscribe(function(tab){
                     var self = this;
                     if (tab === 'map-filter') {
@@ -128,8 +131,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                             selected: ko.computed(function() {
                                 return result._source.resourceinstanceid === ko.unwrap(self.selectedResourceId);
                             }),
-                            canRead: result._source.permissions.users_without_read_perm.indexOf(this.userid) < 0,
-                            canEdit: result._source.permissions.users_without_edit_perm.indexOf(this.userid) < 0,
+                            canRead: result._source.permissions && result._source.permissions.users_without_read_perm.indexOf(this.userid) < 0,
+                            canEdit: result._source.permissions && result._source.permissions.users_without_edit_perm.indexOf(this.userid) < 0,
                             // can_delete: result._source.permissions.users_without_delete_perm.indexOf(this.userid) < 0,
                         });
                     }, this);

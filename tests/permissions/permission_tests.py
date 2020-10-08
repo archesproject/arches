@@ -1,17 +1,14 @@
 """
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -19,7 +16,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 This file demonstrates writing tests using the unittest module. These will pass
 when you run "manage.py test".
-
 Replace this with more appropriate tests for your application.
 """
 
@@ -43,16 +39,6 @@ from arches.app.utils.permission_backend import user_can_edit_resource
 from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.permission_backend import user_has_resource_model_permissions
 from arches.app.utils.permission_backend import get_restricted_users
-from arches.app.search.mappings import (
-    prepare_terms_index,
-    prepare_concepts_index,
-    delete_terms_index,
-    delete_concepts_index,
-    prepare_search_index,
-    delete_search_index,
-    prepare_resource_relations_index,
-    delete_resource_relations_index,
-)
 
 # these tests can be run from the command line via
 # python manage.py test tests/permissions/permission_tests.py --pattern="*.py" --settings="tests.test_settings"
@@ -103,8 +89,6 @@ class PermissionTests(ArchesTestCase):
     def setUpClass(cls):
         test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
-        delete_resource_relations_index()
-        prepare_resource_relations_index(create=True)
         cls.add_users()
 
 
@@ -116,7 +100,6 @@ class PermissionTests(ArchesTestCase):
         """
         Tests if a user is allowed to view a resource with implicit permissions and explicit permissions, but
         not without explicit permission if a permission other than 'view_resourceinstance' is assigned.
-
         """
 
         implicit_permission = user_can_read_resource(self.user, self.resource_instance_id)
@@ -146,7 +129,6 @@ class PermissionTests(ArchesTestCase):
     def test_get_restricted_users(self):
         """
         Tests that users are properly identified as restricted.
-
         """
 
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)

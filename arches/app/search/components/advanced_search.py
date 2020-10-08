@@ -58,6 +58,7 @@ class AdvancedSearch(BaseSearchFilter):
             graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes, issearchable=True
         )
         resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__isactive=True)
+        cardwidgets = models.CardXNodeXWidget.objects.filter(node__in=searchable_nodes)
         datatypes = models.DDataType.objects.all()
 
         # only allow cards that the user has permission to read
@@ -70,5 +71,6 @@ class AdvancedSearch(BaseSearchFilter):
         ret["datatypes"] = datatypes
         ret["nodes"] = searchable_nodes
         ret["cards"] = searchable_cards
+        ret["cardwidgets"] = cardwidgets
 
         return ret

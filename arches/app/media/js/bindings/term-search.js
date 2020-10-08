@@ -147,13 +147,14 @@ define([
                 var selectedTerm = $(el).data('select2-data');
                 var terms = searchbox.select2('data');
 
-                if(!selectedTerm.inverted()){
-                    $(el).find('.fa-minus').show();
-                }else{
-                    $(el).find('.fa-minus').hide();
+                if (selectedTerm.id !== "Advanced Search") {
+                    if(!selectedTerm.inverted()){
+                        $(el).find('.fa-minus').show();
+                    }else{
+                        $(el).find('.fa-minus').hide();
+                    }
+                    selectedTerm.inverted(!selectedTerm.inverted());
                 }
-
-                selectedTerm.inverted(!selectedTerm.inverted());
 
                 //terms(terms);
 

@@ -25,7 +25,6 @@ from django.views.generic import TemplateView
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.permission_backend import get_createable_resource_types, user_is_resource_reviewer
 
-
 class BaseManagerView(TemplateView):
 
     template_name = ""
@@ -39,13 +38,14 @@ class BaseManagerView(TemplateView):
         for plugin in models.Plugin.objects.all().order_by("sortorder"):
             if self.request.user.has_perm("view_plugin", plugin):
                 context["plugins"].append(plugin)
+
+        createable = get_createable_resource_types(self.request.user)
+        createable.sort(key=lambda x: x.name.lower())
         context["createable_resources"] = JSONSerializer().serialize(
-            get_createable_resource_types(self.request.user),
+            createable,
             exclude=[
                 "functions",
                 "ontology",
-                "subtitle",
-                "color",
                 "isactive",
                 "isresource",
                 "version",
@@ -54,6 +54,7 @@ class BaseManagerView(TemplateView):
                 "author",
             ],
         )
+
         context["notifications"] = models.UserXNotification.objects.filter(recipient=self.request.user, isread=False)
         context["nav"] = {
             "icon": "fa fa-chevron-circle-right",
@@ -70,6 +71,7 @@ class BaseManagerView(TemplateView):
         }
         context["user_is_reviewer"] = user_is_resource_reviewer(self.request.user)
         context["app_name"] = settings.APP_NAME
+        context["show_language_swtich"] = settings.SHOW_LANGUAGE_SWITCH
         return context
 
 

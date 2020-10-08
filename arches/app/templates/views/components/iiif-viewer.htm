@@ -193,13 +193,13 @@
                             annotated: getAnnotationCount(getCanvasService($data))
                         }">
                             <div class="iiif-gallery-canvas-thumbnail">
-                                <img data-bind="attr: { src: $data.thumbnail || '{% static 'img/photo_missing.png' %}' }">
+                                <img data-bind="attr: { src: $data.thumbnail || '{% static 'img/photo_missing.png' %}', title: $data.label}">
                             </div>
                             <div class="iiif-gallery-canvas-label">
                                 <span data-bind="text: label"></span>
                                 <span class="annotation-count">
                                     <!--ko if: getAnnotationCount(getCanvasService($data)) -->
-                                    <span data-bind="text: getAnnotationCount(getCanvasService($data))"></span> Annotation(s)
+                                    <span data-bind="text: getAnnotationCount(getCanvasService($data))"></span> {% trans "Annotation(s)" %}
                                     <!--/ko -->
                                     <!--ko if: !getAnnotationCount(getCanvasService($data)) -->
                                     &nbsp;

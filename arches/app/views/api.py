@@ -57,6 +57,8 @@ from arches.app.utils.permission_backend import (
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.search.search_engine_factory import SearchEngineFactory
+
 
 from arches.celery import app
 
@@ -140,7 +142,7 @@ class Sync(APIBase):
 
         can_sync = userCanAccessMobileSurvey(request, surveyid)
         if can_sync:
-            synclog = {"logid": "", "message": "", "status": "", "survey_id": surveyid, "userid": request.user.id}
+            synclog = models.MobileSyncLog(logid=None, survey_id=surveyid, userid=request.user.id)
             try:
                 survey = MobileSurvey.objects.get(id=surveyid)
                 synclog = survey.sync(userid=request.user.id, use_celery=True)
@@ -241,6 +243,8 @@ class Surveys(APIBase):
 
 
 class GeoJSON(APIBase):
+    se = SearchEngineFactory().create()
+
     def get_name(self, resource):
         module = importlib.import_module("arches.app.functions.primary_descriptors")
         PrimaryDescriptorsFunction = getattr(module, "PrimaryDescriptorsFunction")()
@@ -255,6 +259,7 @@ class GeoJSON(APIBase):
         set_precision = GeoUtils().set_precision
         resourceid = request.GET.get("resourceid", None)
         nodeid = request.GET.get("nodeid", None)
+        nodeids = request.GET.get("nodeids", None)
         tileid = request.GET.get("tileid", None)
         nodegroups = request.GET.get("nodegroups", [])
         precision = request.GET.get("precision", None)
@@ -278,15 +283,19 @@ class GeoJSON(APIBase):
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
         nodegroups = [i for i in nodegroups if i in viewable_nodegroups]
         nodes = models.Node.objects.filter(datatype="geojson-feature-collection", nodegroup_id__in=viewable_nodegroups)
-        if nodeid is not None:
-            nodes = nodes.filter(nodeid=nodeid)
+        node_filter = []
+        if nodeids:
+            node_filter += nodeids.split(",")
+        if nodeid:
+            node_filter.append(nodeid)
+        nodes = nodes.filter(nodeid__in=node_filter)
         nodes = nodes.order_by("sortorder")
         features = []
         i = 1
         property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups)
         property_node_map = {}
         property_nodes = models.Node.objects.filter(nodegroup_id__in=nodegroups).order_by("sortorder")
-        restricted_resource_ids = get_restricted_instances(request.user)
+        restricted_resource_ids = get_restricted_instances(request.user, self.se)
         for node in property_nodes:
             property_node_map[str(node.nodeid)] = {"node": node}
             if node.fieldname is None or node.fieldname == "":
@@ -365,10 +374,6 @@ class MVT(APIBase):
         if hasattr(request.user, "userprofile") is not True:
             models.UserProfile.objects.create(user=request.user)
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
-        resource_ids = get_restricted_instances(request.user)
-        if len(resource_ids) == 0:
-            resource_ids.append("10000000-0000-0000-0000-000000000001")  # This must have a uuid that will never be a resource id.
-        resource_ids = tuple(resource_ids)
         try:
             node = models.Node.objects.get(nodeid=nodeid, nodegroup_id__in=viewable_nodegroups)
         except models.Node.DoesNotExist:
@@ -377,10 +382,11 @@ class MVT(APIBase):
         cache_key = f"mvt_{nodeid}_{zoom}_{x}_{y}"
         tile = cache.get(cache_key)
         if tile is None:
+            resource_ids = get_restricted_instances(request.user, allresources=True)
+            if len(resource_ids) == 0:
+                resource_ids.append("10000000-0000-0000-0000-000000000001")  # This must have a uuid that will never be a resource id.
+            resource_ids = tuple(resource_ids)
             with connection.cursor() as cursor:
-                # TODO: when we upgrade to PostGIS 3, we can get feature state
-                # working by adding the feature_id_name arg:
-                # https://github.com/postgis/postgis/pull/303
                 if int(zoom) <= int(config["clusterMaxZoom"]):
                     arc = self.EARTHCIRCUM / ((1 << int(zoom)) * self.PIXELSPERTILE)
                     distance = arc * int(config["clusterDistance"])
@@ -466,9 +472,7 @@ class Graphs(APIBase):
         graph = cache.get(f"graph_{graph_id}")
         user = request.user
         if graph is None:
-            print("not using graph cache")
             graph = Graph.objects.get(graphid=graph_id)
-            cache.set(f"graph_{graph_id}", JSONSerializer().serializeToPython(graph), settings.GRAPH_MODEL_CACHE_TIMEOUT)
         cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
         permitted_cards = []
         for card in cards:
@@ -478,7 +482,8 @@ class Graphs(APIBase):
         cardwidgets = [
             widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
         ]
-
+        graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"])
+        permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
         return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
 
 
@@ -517,7 +522,8 @@ class Resources(APIBase):
         if user_can_read_resource(user=request.user, resourceid=resourceid):
             allowed_formats = ["json", "json-ld"]
             format = request.GET.get("format", "json-ld")
-            include_tiles = request.GET.get("includetiles", True)
+            include_tiles = True if request.GET.get("includetiles", "true").lower() == "true" else False
+            disambiguate = False if request.GET.get("disambiguate", "false").lower() == "false" else True
             if format not in allowed_formats:
                 return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
             try:
@@ -536,9 +542,31 @@ class Resources(APIBase):
                         logger.error(_("The specified resource '{0}' does not exist. JSON-LD export failed.".format(resourceid)))
                         return JSONResponse(status=404)
                 elif format == "json":
-                    out = Resource.objects.get(pk=resourceid)
+                    resource = Resource.objects.get(pk=resourceid)
+                    out = resource
+
                     if include_tiles is True:
-                        out.load_tiles()
+                        resource.load_tiles()
+
+                    if disambiguate:
+                        if not include_tiles:
+                            resource.load_tiles()
+                        out = dict()
+                        out[resourceid] = resource
+                        out["disambiguated"] = dict()
+                        datatype_factory = DataTypeFactory()
+
+                        # lookup all nodes from its corresponding graph, then compare that list against nodeid in tile.data.keys
+                        graph = Graph.objects.get(graphid=resource.graph.graphid)
+                        graph_nodes = graph.nodes.copy()
+                        for t in resource.tiles:
+                            for nid in list(t.data.keys()):  # better to compare nodegroups?
+                                if uuid.UUID(nid) in graph_nodes.keys():
+                                    datatype = datatype_factory.get_instance(graph_nodes[uuid.UUID(nid)].datatype)
+                                    value = datatype.get_display_value(t, graph_nodes[uuid.UUID(nid)])
+                                    out["disambiguated"][graph_nodes[uuid.UUID(nid)].name] = value
+                                    del graph_nodes[uuid.UUID(nid)]  # shrink list for efficiency
+
             else:
                 #
                 # The following commented code would be what you would use if you wanted to use the rdflib module,
@@ -951,7 +979,7 @@ class IIIFManifest(APIBase):
         return response
 
 
-class OntolgyPropery(APIBase):
+class OntologyProperty(APIBase):
     def get(self, request):
         domain_ontology_class = request.GET.get("domain_ontology_class", None)
         range_ontology_class = request.GET.get("range_ontology_class", None)

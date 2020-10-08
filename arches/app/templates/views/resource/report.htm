@@ -36,8 +36,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     }'></div>
 
     <footer id="footer" style="background: #fff;">
-        <div class="pull-left">
-            Arches 4
+        <div class="pull-left" style="padding-left: 10px;">
+            {% blocktrans %}Arches {{ version }}{% endblocktrans %}
         </div>
         <div class="pull-right pad-rgt">
             <a href="http://archesproject.org" target="_blank">http://archesproject.org</a>
@@ -60,7 +60,8 @@ define('resource-report-data', [], function () {
         displayname: "{{displayname | escapejs}}",
         cardComponents: {{card_components_json}},
         resourceid: '{{resourceid}}',
-        cardwidgets: {{cardwidgets}}
+        cardwidgets: {{cardwidgets}},
+        hideEmptyNodes: JSON.parse('{{hide_empty_nodes}}'.toLowerCase())
     };
 });
 {% endautoescape %}</script>

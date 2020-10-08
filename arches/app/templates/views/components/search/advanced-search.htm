@@ -5,7 +5,7 @@
     <!-- Advanced Search Panel -->
     <div class="facets-container" style="">
         <div class="list-group search-facets">
-            <div class="search-facet-item disabled">
+            <div class="search-facet-item header">
                 <h4 class="search-facet-item-heading">{% trans "Search Facets" %}</h4>
                 <div class="list-filter relative">
                     <input type="text" class="form-control" style="" placeholder="{% trans "Find ..." %}" data-bind="value: facetFilterText, valueUpdate: 'keyup'">
@@ -65,7 +65,7 @@
                 <!-- ko foreach: card.nodes -->
                 <div class="facet-body">
 
-                    <div class="facet-label" data-bind="text: name"></div>
+                    <div class="facet-label" data-bind="text: label"></div>
                     <div data-bind="component: {
                         name: self.datatypelookup[datatype].configname,
                         params: {

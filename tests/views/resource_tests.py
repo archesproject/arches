@@ -35,16 +35,6 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
-from arches.app.search.mappings import (
-    prepare_terms_index,
-    prepare_concepts_index,
-    delete_terms_index,
-    delete_concepts_index,
-    prepare_search_index,
-    delete_search_index,
-    prepare_resource_relations_index,
-    delete_resource_relations_index,
-)
 
 # these tests can be run from the command line via
 # python manage.py test tests/views/resource_tests.py --pattern="*.py" --settings="tests.test_settings"
@@ -96,8 +86,6 @@ class CommandLineTests(ArchesTestCase):
     def setUpClass(cls):
         test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
-        delete_resource_relations_index()
-        prepare_resource_relations_index(create=True)
         add_users()
 
     @classmethod

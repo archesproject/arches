@@ -61,10 +61,10 @@ from arches.app.views.auth import (
     GetClientIdView,
     UserProfileView,
     ServerSettingView,
+    PasswordResetView,
+    PasswordResetConfirmView,
 )
 from arches.app.models.system_settings import settings
-from arches.app.utils.forms import ArchesPasswordResetForm
-from arches.app.utils.forms import ArchesSetPasswordForm
 from django.views.decorators.cache import cache_page
 
 # Uncomment the next two lines to enable the admin:
@@ -73,6 +73,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 uuid_regex = settings.UUID_REGEX
+
 
 urlpatterns = [
     url(r"^$", main.index, name="root"),
@@ -243,7 +244,7 @@ urlpatterns = [
         name="mvt",
     ),
     url(r"^images$", api.Images.as_view(), name="images"),
-    url(r"^ontology_properties$", api.OntolgyPropery.as_view(), name="ontology_properties"),
+    url(r"^ontology_properties$", api.OntologyProperty.as_view(), name="ontology_properties"),
     url(r"^tileserver/(?P<path>.*)$", TileserverProxyView.as_view()),
     url(r"^history/$", ResourceActivityStreamCollectionView.as_view(), name="as_stream_collection"),
     url(r"^history/(?P<page>[0-9]+)$", ResourceActivityStreamPageView.as_view(), name="as_stream_page"),
@@ -252,18 +253,13 @@ urlpatterns = [
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     # Uncomment the next line to enable the admin:
     url(r"^admin/", admin.site.urls),
-    url(
-        r"^password_reset/$",
-        auth_views.PasswordResetView.as_view(),
-        name="password_reset",
-        kwargs={"password_reset_form": ArchesPasswordResetForm},
-    ),
+    url("i18n/", include("django.conf.urls.i18n")),
+    url(r"^password_reset/$", PasswordResetView.as_view(), name="password_reset",),
     url(r"^password_reset/done/$", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     url(
         r"^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$",
-        auth_views.PasswordResetConfirmView.as_view(),
+        PasswordResetConfirmView.as_view(),
         name="password_reset_confirm",
-        kwargs={"set_password_form": ArchesSetPasswordForm},
     ),
     url(r"^reset/done/$", auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
     url(r"^o/", include("oauth2_provider.urls", namespace="oauth2")),

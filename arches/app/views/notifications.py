@@ -25,7 +25,7 @@ class NotificationView(View):
                 return JSONResponse({"success": True, "types": notiftype_dict_list}, status=200)
 
             else:
-                if json.loads(request.GET.get("unread_only")) is True:
+                if request.GET.get("unread_only"):
                     userxnotifs = (
                         models.UserXNotification.objects.filter(recipient=request.user, isread=False).order_by("notif__created").reverse()
                     )
@@ -41,12 +41,12 @@ class NotificationView(View):
                     ):
                         notif = userxnotif.__dict__
                         notif["message"] = userxnotif.notif.message
-                        try:
-                            notif["link"] = userxnotif.notif.context["link"]
-                        except TypeError as e:
-                            logger = logging.getLogger(__name__)
-                            logger.warn("Unable to access Notification.context: Does Not Exist. Badly formed Notification.")
                         notif["created"] = userxnotif.notif.created
+
+                        if userxnotif.notif.context:
+                            notif["loaded_resources"] = userxnotif.notif.context.get("loaded_resources", [])
+                            notif["link"] = userxnotif.notif.context.get("link")
+
                         notif_dict_list.append(notif)
 
                 return JSONResponse({"success": True, "notifications": notif_dict_list}, status=200)

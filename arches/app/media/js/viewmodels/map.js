@@ -3,10 +3,11 @@ define([
     'underscore',
     'arches',
     'knockout',
+    'knockout-mapping',
     'mapbox-gl',
     'mapbox-gl-geocoder',
     'text!templates/views/components/map-popup.htm'
-], function($, _, arches, ko, mapboxgl, MapboxGeocoder, popupTemplate) {
+], function($, _, arches, ko, koMapping, mapboxgl, MapboxGeocoder, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         var geojsonSourceFactory = function() {
@@ -196,6 +197,7 @@ define([
         this.getPopupData = function(feature) {
             var data = feature.properties;
             var id = data.resourceinstanceid;
+            data.showEditButton = false;
             if (id) {
                 if (!self.resourceLookup[id]){
                     data = _.defaults(data, {
@@ -205,12 +207,18 @@ define([
                         'map_popup': ''
                     });
                     if (data.permissions) {
-                        data.permissions = JSON.parse(data.permissions);
+                        try {
+                            data.permissions = JSON.parse(ko.unwrap(data.permissions));
+                        } catch (err) {
+                            data.permissions = koMapping.toJS(ko.unwrap(data.permissions));
+                        }
+                        if (data.permissions.users_without_edit_perm.indexOf(ko.unwrap(self.userid)) === -1) {
+                            data.showEditButton = true;
+                        }
                     }
                     data = ko.mapping.fromJS(data);
                     data.reportURL = arches.urls.resource_report;
                     data.editURL = arches.urls.resource_editor;
-
                     self.resourceLookup[id] = data;
                     $.get(arches.urls.resource_descriptors + id, function(data) {
                         data.loading = false;
@@ -220,6 +228,12 @@ define([
                 self.resourceLookup[id].feature = feature;
                 self.resourceLookup[id].mapCard = self;
                 return self.resourceLookup[id];
+            } else {
+                data.resourceinstanceid = ko.observable(false);
+                data.loading = ko.observable(false);
+                data.feature = feature;
+                data.mapCard = self;
+                return data;
             }
         };
 

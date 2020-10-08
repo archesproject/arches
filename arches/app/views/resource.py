@@ -32,18 +32,20 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
+from arches import __version__
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource, ModelInactiveError
 from arches.app.models.system_settings import settings
-from arches.app.utils.pagination import get_paginator
+from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_delete_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.pagination import get_paginator
 from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
     user_can_delete_resource,
@@ -53,10 +55,10 @@ from arches.app.utils.permission_backend import (
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
+from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from elasticsearch import Elasticsearch
 from guardian.shortcuts import (
     assign_perm,
@@ -661,7 +663,7 @@ class ResourceDescriptors(View):
             try:
                 resource = Resource.objects.get(pk=resourceid)
                 se = SearchEngineFactory().create()
-                document = se.search(index="resources", id=resourceid)
+                document = se.search(index=RESOURCES_INDEX, id=resourceid)
                 return JSONResponse(
                     {
                         "graphid": document["_source"]["graph_id"],
@@ -683,14 +685,14 @@ class ResourceDescriptors(View):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
-        lang = request.GET.get("lang", settings.LANGUAGE_CODE)
+        lang = request.GET.get("lang", request.LANGUAGE_CODE)
         resource = Resource.objects.get(pk=resourceid)
         displayname = resource.displayname
         resource_models = (
             models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         )
         related_resource_summary = [{"graphid": str(g.graphid), "name": g.name, "resources": []} for g in resource_models]
-        related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=1000)
+        related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=1000, user=request.user)
         related_resources = related_resources_search_results["related_resources"]
         relationships = related_resources_search_results["resource_relationships"]
         resource_relationship_type_values = {i["id"]: i["text"] for i in get_resource_relationship_types()["values"]}
@@ -700,13 +702,21 @@ class ResourceReportView(MapBaseManagerView):
                 if rr["graph_id"] == summary["graphid"]:
                     relationship_summary = []
                     for relationship in relationships:
-                        if rr["resourceinstanceid"] in (relationship["resourceinstanceidto"], relationship["resourceinstanceidfrom"]):
+                        if rr["resourceinstanceid"] == relationship["resourceinstanceidto"]:
                             rr_type = (
                                 resource_relationship_type_values[relationship["relationshiptype"]]
                                 if relationship["relationshiptype"] in resource_relationship_type_values
                                 else relationship["relationshiptype"]
                             )
                             relationship_summary.append(rr_type)
+                        elif rr["resourceinstanceid"] == relationship["resourceinstanceidfrom"]:
+                            rr_type = (
+                                resource_relationship_type_values[relationship["inverserelationshiptype"]]
+                                if relationship["inverserelationshiptype"] in resource_relationship_type_values
+                                else relationship["inverserelationshiptype"]
+                            )
+                            relationship_summary.append(rr_type)
+
                     summary["resources"].append(
                         {"instance_id": rr["resourceinstanceid"], "displayname": rr["displayname"], "relationships": relationship_summary}
                     )
@@ -810,6 +820,8 @@ class ResourceReportView(MapBaseManagerView):
             ),
             resourceid=resourceid,
             displayname=displayname,
+            version=__version__,
+            hide_empty_nodes=settings.HIDE_EMPTY_NODES_IN_REPORT,
         )
 
         if graph.iconclass:
@@ -870,7 +882,7 @@ class RelatedResourcesView(BaseManagerView):
             ret = {str(node.graph_id) for node in nodes}
             return JSONResponse(ret)
 
-        lang = request.GET.get("lang", settings.LANGUAGE_CODE)
+        lang = request.GET.get("lang", request.LANGUAGE_CODE)
         start = request.GET.get("start", 0)
         ret = []
         try:
@@ -878,7 +890,7 @@ class RelatedResourcesView(BaseManagerView):
         except ObjectDoesNotExist:
             resource = Resource()
         page = 1 if request.GET.get("page") == "" else int(request.GET.get("page", 1))
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page, user=request.user)
 
         if related_resources is not None:
             ret = self.paginate_related_resources(related_resources, page, request)
@@ -886,7 +898,7 @@ class RelatedResourcesView(BaseManagerView):
         return JSONResponse(ret)
 
     def delete(self, request, resourceid=None):
-        lang = request.GET.get("lang", settings.LANGUAGE_CODE)
+        lang = request.GET.get("lang", request.LANGUAGE_CODE)
         se = SearchEngineFactory().create()
         req = dict(request.GET)
         ids_to_delete = req["resourcexids[]"]
@@ -900,7 +912,7 @@ class RelatedResourcesView(BaseManagerView):
         se.es.indices.refresh(index=se._add_prefix("resource_relations"))
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
         page = 1 if request.GET.get("page") == "" else int(request.GET.get("page", 1))
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page, user=request.user)
         ret = []
 
         if related_resources is not None:
@@ -909,7 +921,7 @@ class RelatedResourcesView(BaseManagerView):
         return JSONResponse(ret, indent=4)
 
     def post(self, request, resourceid=None):
-        lang = request.GET.get("lang", settings.LANGUAGE_CODE)
+        lang = request.GET.get("lang", request.LANGUAGE_CODE)
         se = SearchEngineFactory().create()
         res = dict(request.POST)
         relationshiptype = res["relationship_properties[relationshiptype]"][0]
@@ -979,7 +991,7 @@ class RelatedResourcesView(BaseManagerView):
         se.es.indices.refresh(index=se._add_prefix("resource_relations"))
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
         page = 1 if request.GET.get("page") == "" else int(request.GET.get("page", 1))
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page, user=request.user)
         ret = []
 
         if related_resources is not None:

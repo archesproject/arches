@@ -270,6 +270,7 @@ class Graph(models.GraphModel):
             card.helpenabled = cardobj.get("helpenabled", "")
             card.helptitle = cardobj.get("helptitle", "")
             card.helptext = cardobj.get("helptext", "")
+            card.cssclass = cardobj.get("cssclass", "")
             card.active = cardobj.get("active", "")
             card.visible = cardobj.get("visible", "")
             card.sortorder = cardobj.get("sortorder", "")
@@ -399,10 +400,6 @@ class Graph(models.GraphModel):
             for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()
             self._nodegroups_to_delete = []
-            try:
-                cache.set(f"graph_{self.graphid}", JSONSerializer().serializeToPython(self), settings.GRAPH_MODEL_CACHE_TIMEOUT)
-            except KeyError as e:
-                logger.warn(e)
 
         return self
 
@@ -516,6 +513,8 @@ class Graph(models.GraphModel):
         if skip_validation or self.can_append(branch_graph, nodeToAppendTo):
             branch_copy = branch_graph.copy()["copy"]
             branch_copy.root.istopnode = False
+            # Copy the description of the branch to the new node
+            branch_copy.root.description = branch_graph.description
 
             newEdge = models.Edge(domainnode=nodeToAppendTo, rangenode=branch_copy.root, ontologyproperty=property, graph=self)
             branch_copy.add_edge(newEdge)
@@ -1166,7 +1165,7 @@ class Graph(models.GraphModel):
             if card.nodegroup.parentnodegroup is None:
                 return card
 
-    def get_cards(self):
+    def get_cards(self, check_if_editable=True):
         """
         get the card data (if any) associated with this graph
 
@@ -1183,10 +1182,10 @@ class Graph(models.GraphModel):
                         card.description = self.nodes[card.nodegroup_id].description
                     except KeyError as e:
                         print("Error: card.description not accessible, nodegroup_id not in self.nodes: ", e)
-
-                is_editable = card.is_editable()
+                if check_if_editable:
+                    is_editable = card.is_editable()
             else:
-                if card.nodegroup.parentnodegroup is None:
+                if card.nodegroup.parentnodegroup_id is None:
                     card.name = self.name
                     card.description = self.description
                 else:
@@ -1232,7 +1231,10 @@ class Graph(models.GraphModel):
         else:
             ret.pop("relatable_resource_model_ids", None)
 
-        ret["cards"] = self.get_cards() if "cards" not in exclude else ret.pop("cards", None)
+        check_if_editable = "is_editable" not in exclude
+        ret["is_editable"] = self.is_editable() if check_if_editable else ret.pop("is_editable", None)
+        ret["cards"] = self.get_cards(check_if_editable=check_if_editable) if "cards" not in exclude else ret.pop("cards", None)
+
         if "widgets" not in exclude:
             ret["widgets"] = self.get_widgets()
         ret["nodegroups"] = self.get_nodegroups() if "nodegroups" not in exclude else ret.pop("nodegroups", None)
@@ -1376,7 +1378,6 @@ class Graph(models.GraphModel):
                     validated_fieldname = validate_fieldname(node.fieldname, fieldnames)
                     if validated_fieldname != node.fieldname:
                         node.fieldname = validated_fieldname
-                        node.save()
 
         # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
         if self.ontology is not None:
@@ -1402,21 +1403,25 @@ class Graph(models.GraphModel):
                         1002,
                     )
                 property_found = False
+                okay = False
                 ontology_classes = self.ontology.ontologyclasses.get(source=edge.domainnode.ontologyclass)
                 for classes in ontology_classes.target["down"]:
                     if classes["ontology_property"] == edge.ontologyproperty:
                         property_found = True
-                        if edge.rangenode.ontologyclass not in classes["ontology_classes"]:
-                            raise GraphValidationError(
-                                _(
-                                    f"Your graph isn't semantically valid. Entity domain '{edge.domainnode.ontologyclass}' and \
-                                        Entity range '{edge.rangenode.ontologyclass}' cannot \
-                                        be related via Property '{edge.ontologyproperty}'."
-                                ),
-                                1003,
-                            )
+                        if edge.rangenode.ontologyclass in classes["ontology_classes"]:
+                            okay = True
+                            break
 
-                if not property_found:
+                if not okay:
+                    raise GraphValidationError(
+                        _(
+                            f"Your graph isn't semantically valid. Entity domain '{edge.domainnode.ontologyclass}' and \
+                                Entity range '{edge.rangenode.ontologyclass}' cannot \
+                                be related via Property '{edge.ontologyproperty}'."
+                        ),
+                        1003,
+                    )
+                elif not property_found:
                     raise GraphValidationError(
                         _("'{0}' is not found in the {1} ontology or is not a valid ontology property for Entity domain '{2}'.").format(
                             edge.ontologyproperty, self.ontology.name, edge.domainnode.ontologyclass
@@ -1450,13 +1455,10 @@ class Graph(models.GraphModel):
         except JsonLdError:
             raise GraphValidationError(_("The json-ld context you supplied wasn't formatted correctly."), 1006)
 
-        # check that slug does not already exist
-        slugs = models.GraphModel.objects.exclude(slug__isnull=True).values_list("slug", flat=True)
-        if self.slug is not None and self.slug in slugs:
-            try:
-                self.slug = None
-            except:
-                raise GraphValidationError(_("The slug for this model/branch already exists."), 1007)
+        if self.slug is not None:
+            graphs_with_matching_slug = models.GraphModel.objects.exclude(slug__isnull=True).filter(slug=self.slug)
+            if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
+                raise GraphValidationError(_(f"Another resource modal already uses the slug '{self.slug}'"), 1007)
 
 
 class GraphValidationError(Exception):

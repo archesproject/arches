@@ -25,10 +25,12 @@ from django.db import transaction, connection
 from django.db.models import Q
 from arches.app.models import models
 from arches.app.models.system_settings import settings
-from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.elasticsearch_dsl_builder import Term, Query, Bool, Match, Terms
+from arches.app.search.mappings import CONCEPTS_INDEX
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
+from django.utils.translation import get_language
 from django.db import IntegrityError
 import logging
 
@@ -148,7 +150,7 @@ class Concept(object):
 
             if include is not None:
                 if len(include) > 0 and len(exclude) > 0:
-                    raise Exception("Only include values for include or exclude, but not both")
+                    raise Exception(_("Only include values for include or exclude, but not both"))
                 include = (
                     include if len(include) != 0 else models.DValueType.objects.distinct("category").values_list("category", flat=True)
                 )
@@ -490,13 +492,14 @@ class Concept(object):
         limit=20,
         order_hierarchically=False,
         query=None,
-        languageid=settings.LANGUAGE_CODE,
+        languageid=None,
     ):
         """
         Recursively builds a list of concept relations for a given concept and all it's subconcepts based on its relationship type and valuetypes.
 
         """
 
+        languageid = get_language() if languageid is None else languageid
         relationtypes = " or ".join(["r.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
         depth_limit = "and depth < %s" % depth_limit if depth_limit else ""
         child_valuetypes = ("','").join(
@@ -518,6 +521,7 @@ class Concept(object):
                             ORDER BY (
                                 CASE WHEN languageid = '{languageid}' THEN 10
                                 WHEN languageid like '{short_languageid}%' THEN 5
+                                WHEN languageid like '{default_languageid}%' THEN 2
                                 ELSE 0
                                 END
                             ) desc limit 1
@@ -551,6 +555,7 @@ class Concept(object):
                             ORDER BY (
                                 CASE WHEN languageid = '{languageid}' THEN 10
                                 WHEN languageid like '{short_languageid}%' THEN 5
+                                WHEN languageid like '{default_languageid}%' THEN 2
                                 ELSE 0
                                 END
                             ) desc limit 1
@@ -608,6 +613,7 @@ class Concept(object):
                         ORDER BY (
                             CASE WHEN languageid = '{languageid}' THEN 10
                             WHEN languageid like '{short_languageid}%' THEN 5
+                            WHEN languageid like '{default_languageid}%' THEN 2
                             ELSE 0
                             END
                         ) desc limit 1
@@ -649,6 +655,7 @@ class Concept(object):
                 recursive_table=recursive_table,
                 languageid=languageid,
                 short_languageid=languageid.split("-")[0],
+                default_languageid=settings.LANGUAGE_CODE,
             )
 
         else:
@@ -828,7 +835,7 @@ class Concept(object):
         elif isinstance(value, Concept):
             self.subconcepts.append(value)
         else:
-            raise Exception("Invalid subconcept definition: %s" % (value))
+            raise Exception(_("Invalid subconcept definition: %s") % (value))
 
     def addrelatedconcept(self, value):
         if isinstance(value, dict):
@@ -836,7 +843,7 @@ class Concept(object):
         elif isinstance(value, Concept):
             self.relatedconcepts.append(value)
         else:
-            raise Exception("Invalid related concept definition: %s" % (value))
+            raise Exception(_("Invalid related concept definition: %s") % (value))
 
     def addvalue(self, value):
         if isinstance(value, dict):
@@ -847,7 +854,7 @@ class Concept(object):
         elif isinstance(value, models.Value):
             self.values.append(ConceptValue(value))
         else:
-            raise Exception("Invalid value definition: %s" % (value))
+            raise Exception(_("Invalid value definition: %s") % (value))
 
     def index(self, scheme=None):
         if scheme is None:
@@ -862,7 +869,6 @@ class Concept(object):
             subconcept.index(scheme=scheme)
 
     def bulk_index(self):
-        se = SearchEngineFactory().create()
         concept_docs = []
 
         if self.nodetype == "ConceptScheme":
@@ -872,10 +878,10 @@ class Concept(object):
                 concept = Concept().get(id=topConcept["conceptid"])
                 scheme = concept.get_context()
                 topConcept["top_concept"] = scheme.id
-                concept_docs.append(se.create_bulk_item(index="concepts", id=topConcept["id"], data=topConcept))
+                concept_docs.append(se.create_bulk_item(index=CONCEPTS_INDEX, id=topConcept["id"], data=topConcept))
                 for childConcept in concept.get_child_concepts_for_indexing(topConcept["conceptid"]):
                     childConcept["top_concept"] = scheme.id
-                    concept_docs.append(se.create_bulk_item(index="concepts", id=childConcept["id"], data=childConcept))
+                    concept_docs.append(se.create_bulk_item(index=CONCEPTS_INDEX, id=childConcept["id"], data=childConcept))
 
         if self.nodetype == "Concept":
             concept = Concept().get(id=self.id, values=["label"])
@@ -883,18 +889,17 @@ class Concept(object):
             concept.index(scheme)
             for childConcept in concept.get_child_concepts_for_indexing(self.id):
                 childConcept["top_concept"] = scheme.id
-                concept_docs.append(se.create_bulk_item(index="concepts", id=childConcept["id"], data=childConcept))
+                concept_docs.append(se.create_bulk_item(index=CONCEPTS_INDEX, id=childConcept["id"], data=childConcept))
 
         se.bulk_index(concept_docs)
 
     def delete_index(self, delete_self=False):
         def delete_concept_values_index(concepts_to_delete):
-            se = SearchEngineFactory().create()
             for concept in concepts_to_delete.values():
                 query = Query(se, start=0, limit=10000)
                 term = Term(field="conceptid", term=concept.id)
                 query.add_query(term)
-                query.delete(index="concepts")
+                query.delete(index=CONCEPTS_INDEX)
 
         if delete_self:
             concepts_to_delete = Concept.gather_concepts_to_delete(self)
@@ -1253,7 +1258,7 @@ class Concept(object):
 
     def make_collection(self):
         if len(self.values) == 0:
-            raise Exception("Need to include values when creating a collection")
+            raise Exception(_("Need to include values when creating a collection"))
         values = JSONSerializer().serializeToPython(self.values)
         for value in values:
             value["id"] = ""
@@ -1357,26 +1362,23 @@ class ConceptValue(object):
 
     def index(self, scheme=None):
         if self.category == "label":
-            se = SearchEngineFactory().create()
             data = JSONSerializer().serializeToPython(self)
             if scheme is None:
                 scheme = self.get_scheme_id()
             if scheme is None:
-                raise Exception("Index of label failed.  Index type (scheme id) could not be derived from the label.")
+                raise Exception(_("Index of label failed.  Index type (scheme id) could not be derived from the label."))
 
             data["top_concept"] = scheme.id
-            se.index_data(index="concepts", body=data, idfield="id")
+            se.index_data(index=CONCEPTS_INDEX, body=data, idfield="id")
 
     def delete_index(self):
-        se = SearchEngineFactory().create()
         query = Query(se, start=0, limit=10000)
         term = Term(field="id", term=self.id)
         query.add_query(term)
-        query.delete(index="concepts")
+        query.delete(index=CONCEPTS_INDEX)
 
     def get_scheme_id(self):
-        se = SearchEngineFactory().create()
-        result = se.search(index="concepts", id=self.id)
+        result = se.search(index=CONCEPTS_INDEX, id=self.id)
         if result["found"]:
             return Concept(result["top_concept"])
         else:
@@ -1393,13 +1395,12 @@ def get_preflabel_from_conceptid(conceptid, lang):
         "type": "",
         "id": "",
     }
-    se = SearchEngineFactory().create()
     query = Query(se)
     bool_query = Bool()
     bool_query.must(Match(field="type", query="prefLabel", type="phrase"))
     bool_query.filter(Terms(field="conceptid", terms=[conceptid]))
     query.add_query(bool_query)
-    preflabels = query.search(index="concepts")["hits"]["hits"]
+    preflabels = query.search(index=CONCEPTS_INDEX)["hits"]["hits"]
     for preflabel in preflabels:
         default = preflabel["_source"]
         if preflabel["_source"]["language"] is not None and lang is not None:
@@ -1414,7 +1415,6 @@ def get_preflabel_from_conceptid(conceptid, lang):
 
 
 def get_valueids_from_concept_label(label, conceptid=None, lang=None):
-    se = SearchEngineFactory().create()
 
     def exact_val_match(val, conceptid=None):
         # exact term match, don't care about relevance ordering.
@@ -1429,7 +1429,7 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
                 }
             }
 
-    concept_label_results = se.search(index="concepts", body=exact_val_match(label, conceptid))
+    concept_label_results = se.search(index=CONCEPTS_INDEX, body=exact_val_match(label, conceptid))
     if concept_label_results is None:
         print("Found no matches for label:'{0}' and concept_id: '{1}'".format(label, conceptid))
         return
@@ -1440,15 +1440,7 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
     ]
 
 
-def get_concept_label_from_valueid(valueid):
-    se = SearchEngineFactory().create()
-    concept_label = se.search(index="concepts", id=valueid)
-    if concept_label["found"]:
-        return concept_label["_source"]
-
-
 def get_preflabel_from_valueid(valueid, lang):
-    se = SearchEngineFactory().create()
-    concept_label = se.search(index="concepts", id=valueid)
+    concept_label = se.search(index=CONCEPTS_INDEX, id=valueid)
     if concept_label["found"]:
-        return get_preflabel_from_conceptid(get_concept_label_from_valueid(valueid)["conceptid"], lang)
+        return get_preflabel_from_conceptid(concept_label["_source"]["conceptid"], lang)
