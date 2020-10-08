@@ -56,9 +56,8 @@ define(['jquery',
                 });
             };
 
-            this.relatedResources = ko.observable({});
-            this.paginator = ko.observable();
-            this.formatRelatedResources(options.related_resources);
+            this.relatedResourcesLookup = ko.observable({});
+            this.updateRelatedResourcesLookup(options.related_resources);
 
             this.graph = options.graph;
             this.parse(options.graph);
@@ -124,43 +123,70 @@ define(['jquery',
             this._data(JSON.stringify(this.toJSON()));
         },
 
-        formatRelatedResources: function(json) {
-            var relatedResources = this.relatedResources();
+        updateRelatedResourcesLookup: function(json) {
+            var relatedResourcesLookup = this.relatedResourcesLookup();
+            
+            for (var [graphId, value] of Object.entries(json)) {
+                var relatedResources;
+                var paginator;
+                
+                // add graphId to lookup if we haven't added it yet, otherwise
+                // get reference to its relatedResources
+                if (!relatedResourcesLookup[graphId]) {
+                    relatedResources = ko.observableArray();
+                    paginator = ko.observable();
 
-            for (var [graph_id, value] of Object.entries(json.related_resources.node_config_lookup)) {
-                if (!relatedResources[graph_id]) {
-                    relatedResources[graph_id] = {
-                        'name': value['name'],
-                        'relatedResources': ko.observableArray(),
+                    relatedResourcesLookup[graphId] = {
+                        'graphId': graphId,
+                        'loadedRelatedResources': relatedResources,
+                        'name': value['related_resources']['node_config_lookup'][graphId]['name'],
+                        'paginator': paginator,
+                        'totalRelatedResources': value['related_resources']['total']['value'],
                     };
+                } else {
+                    relatedResources = relatedResourcesLookup[graphId]['loadedRelatedResources'];
+                    paginator = relatedResourcesLookup[graphId]['paginator'];
                 }
+
+                // add new resource relationships to lookup entry
+                for (var resourceRelationship of value['related_resources']['resource_relationships']) {
+                    var relatedResource = value['related_resources']['related_resources'].find(function(resource) {
+                        return (
+                            resource.resourceinstanceid === resourceRelationship.resourceinstanceidto
+                            || resource.resourceinstanceid === resourceRelationship.resourceinstanceidfrom
+                        );
+                    });
+
+                    relatedResources.push({
+                        'displayName': relatedResource.displayname,
+                        'relationship': resourceRelationship.relationshiptype_label,
+                        'link': arches.urls.resource_report + relatedResource.resourceinstanceid,
+                    });
+                }
+
+                paginator(value['paginator'])
             }
             
-            for (var resourceRelationship of json.related_resources.resource_relationships) {
-                var relatedResource = json.related_resources.related_resources.find(function(resource) {
-                    return (
-                        resource.resourceinstanceid === resourceRelationship.resourceinstanceidto
-                        || resource.resourceinstanceid === resourceRelationship.resourceinstanceidfrom
-                    );
-                });
-
-                relatedResources[relatedResource.graph_id]['relatedResources'].push({
-                    'displayName': relatedResource.displayname,
-                    'relationship': resourceRelationship.relationshiptype_label,
-                    'link': arches.urls.resource_report + relatedResource.resourceinstanceid,
-                });
-            }
-
-            this.paginator(json.paginator);
-            this.relatedResources(relatedResources);
+            // console.log(relatedResourcesLookup)
+            this.relatedResourcesLookup(relatedResourcesLookup);
         },
 
-        getRelatedResources: function() {
+        getRelatedResources: function(e) {
+            console.log(e)
+
+            var url = (
+                arches.urls.related_resources 
+                + this.attributes.resourceid 
+                + `?resourceinstance_graphid=${e.graphId}`
+                + `&paginate=true&page=${e.paginator().next_page_number}`
+            );
+
+
             $.ajax({
                 context: this,
-                url: arches.urls.related_resources + this.attributes.resourceid + `?paginate=true&page=${this.paginator().next_page_number}`
+                url: url,
             }).done(function(json) {
-                this.formatRelatedResources(json);
+                this.updateRelatedResourcesLookup({[e.graphId]: json});  // expected 'generic' shape
             });
         },
 
