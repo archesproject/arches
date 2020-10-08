@@ -67,6 +67,10 @@ define([
                 newGraph('/graph/new', {isresource: false});
             };
 
+            viewModel.exportMappingFile = function() {
+                window.open(arches.urls.export_mapping_file(viewModel.graph.graphid()), '_blank');
+            };
+
             viewModel.deleteGraph = function() {
                 viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {
                     return;
