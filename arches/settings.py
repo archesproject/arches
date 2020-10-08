@@ -18,11 +18,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import inspect
-from django.utils.translation import gettext_lazy as _
 
 try:
+    from django.utils.translation import gettext_lazy as _
     from corsheaders.defaults import default_headers
-except ImportError:  # unable to import corsheaders prior to installing requirements.txt in setup.py
+except ImportError:  # unable to import prior to installing requirements.txt in setup.py
     pass
 
 #########################################
