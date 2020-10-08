@@ -29,6 +29,7 @@
 {% endblock form %}
 
 {% block report %}
+<!-- ko if: !ko.unwrap(hideEmptyNodes) || ko.unwrap(hideEmptyNodes) === true && typeof ko.unwrap(value) === 'number' -->
 <dt data-bind="text: label"></dt>
 <dd>
     <div class='number-widget-report'>
@@ -47,6 +48,7 @@
     <!-- /ko -->
     </div>
 </dd>
+<!-- /ko -->
 {% endblock report %}
 
 {% block config_form %}
