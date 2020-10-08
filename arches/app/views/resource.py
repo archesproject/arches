@@ -702,8 +702,8 @@ class ResourceReportView(MapBaseManagerView):
                 get_params.update({"resourceinstance_graphid": str(resource_model.graphid)})
 
                 request.GET = get_params
-                related_resources_response = RelatedResourcesView().get(request, resourceid).content 
-                
+                related_resources_response = RelatedResourcesView().get(request, resourceid).content
+
                 foo[str(resource_model.pk)] = json.loads(related_resources_response)
 
         tiles = Tile.objects.filter(resourceinstance=resource).order_by("sortorder")
@@ -881,22 +881,14 @@ class RelatedResourcesView(BaseManagerView):
                 start = int(request.GET.get("start", 0))
 
                 related_resources = resource.get_related_resources(
-                    lang=lang, 
-                    start=start,
-                    page=page, 
-                    user=request.user,
-                    resourceinstance_graphid=resourceinstance_graphid,
+                    lang=lang, start=start, page=page, user=request.user, resourceinstance_graphid=resourceinstance_graphid,
                 )
 
                 # import ipdb; ipdb.set_trace()
 
                 ret = self.paginate_related_resources(related_resources=related_resources, page=page, request=request)
             else:
-                ret = resource.get_related_resources(
-                    lang=lang, 
-                    user=request.user,
-                    resourceinstance_graphid=resourceinstance_graphid,
-                )
+                ret = resource.get_related_resources(lang=lang, user=request.user, resourceinstance_graphid=resourceinstance_graphid,)
 
         return JSONResponse(ret)
 

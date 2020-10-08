@@ -384,13 +384,7 @@ class Resource(models.ResourceInstance):
         return permit_deletion
 
     def get_related_resources(
-        self, 
-        lang="en-US", 
-        limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, 
-        start=0, 
-        page=0, 
-        user=None, 
-        resourceinstance_graphid=None, 
+        self, lang="en-US", limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0, user=None, resourceinstance_graphid=None,
     ):
         """
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
@@ -422,12 +416,8 @@ class Resource(models.ResourceInstance):
             if resourceinstance_graphid:
                 bf = Bool()
 
-                bf.should(
-                    Terms(field="resourceinstancefrom_graphid", terms=resourceinstance_graphid)
-                )
-                bf.should(
-                    Terms(field="resourceinstanceto_graphid", terms=resourceinstance_graphid)
-                ) 
+                bf.should(Terms(field="resourceinstancefrom_graphid", terms=resourceinstance_graphid))
+                bf.should(Terms(field="resourceinstanceto_graphid", terms=resourceinstance_graphid))
 
                 bool_filter.must(bf)
             query.add_query(bool_filter)
@@ -435,13 +425,8 @@ class Resource(models.ResourceInstance):
             return query.search(index=RESOURCE_RELATIONS_INDEX)
 
         resource_relations = get_relations(
-            resourceinstanceid=self.resourceinstanceid, 
-            start=start, 
-            limit=limit, 
-            resourceinstance_graphid=resourceinstance_graphid, 
+            resourceinstanceid=self.resourceinstanceid, start=start, limit=limit, resourceinstance_graphid=resourceinstance_graphid,
         )
-
-
 
         ret["total"] = resource_relations["hits"]["total"]
         instanceids = set()
@@ -470,17 +455,13 @@ class Resource(models.ResourceInstance):
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
                 for resource in related_resources["docs"]:
-                    relations = get_relations(
-                        resourceinstanceid=resource["_id"], 
-                        start=0, 
-                        limit=0,
-                    )
+                    relations = get_relations(resourceinstanceid=resource["_id"], start=0, limit=0,)
                     if resource["found"]:
                         resource["_source"]["total_relations"] = relations["hits"]["total"]
                         ret["related_resources"].append(resource["_source"])
-        
+
         # import ipdb; ipdb.set_trace()
-        
+
         return ret
 
     def copy(self):
