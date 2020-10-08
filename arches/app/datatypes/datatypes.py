@@ -380,7 +380,7 @@ class DateDataType(BaseDataType):
         try:
             og_value = data[str(node.pk)]
             valid_date_format, valid = self.get_valid_date_format(og_value)
-            new_date_format = settings.DATE_FORMATS['Python'][settings.DATE_FORMATS['JavaScript'].index(node.config['dateFormat'])]
+            new_date_format = settings.DATE_FORMATS["Python"][settings.DATE_FORMATS["JavaScript"].index(node.config["dateFormat"])]
             value = datetime.strptime(og_value, valid_date_format).strftime(new_date_format)
         except TypeError:
             value = data[str(node.pk)]
