@@ -1791,7 +1791,7 @@ class ResourceInstanceDataType(BaseDataType):
             # do this if json (invalid) is formatted with single quotes, re #6390
             return ast.literal_eval(value)
         except TypeError:
-            # data should come in as json but python list accepted as well
+            # data should come in as json but python list is accepted as well
             if isinstance(value, list):
                 return value
 
