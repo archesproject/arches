@@ -132,8 +132,7 @@ define(['jquery',
                 var remainingResources;
 
                 
-                // add graphId to lookup if we haven't added it yet, otherwise
-                // get reference to its relatedResources
+                // add graphId to lookup if we haven't added it yet, otherwise get pertinent references
                 if (!relatedResourcesLookup[graphId]) {
                     relatedResources = ko.observableArray();
                     remainingResources = ko.observable();
@@ -171,7 +170,6 @@ define(['jquery',
 
                 paginator(value['paginator'])
 
-
                 var foo = value['related_resources']['total']['value'] - relatedResources().length
 
                 if (foo < value['related_resources']['resource_relationships'].length) {  // defacto value for settings.RELATED_RESOURCES_PER_PAGE
@@ -180,8 +178,7 @@ define(['jquery',
                     remainingResources(value['related_resources']['resource_relationships'].length)
                 }
             }
-            
-            // console.log(relatedResourcesLookup)
+
             this.relatedResourcesLookup(relatedResourcesLookup);
         },
 

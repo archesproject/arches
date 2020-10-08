@@ -886,7 +886,7 @@ class RelatedResourcesView(BaseManagerView):
 
                 ret = self.paginate_related_resources(related_resources=related_resources, page=page, request=request)
             else:
-                ret = resource.get_related_resources(lang=lang, user=request.user, resourceinstance_graphid=resourceinstance_graphid,)
+                ret = resource.get_related_resources(lang=lang, user=request.user, resourceinstance_graphid=resourceinstance_graphid)
 
         return JSONResponse(ret)
 
