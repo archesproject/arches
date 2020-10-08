@@ -129,11 +129,14 @@ define(['jquery',
             for (var [graphId, value] of Object.entries(json)) {
                 var relatedResources;
                 var paginator;
+                var remainingResources;
+
                 
                 // add graphId to lookup if we haven't added it yet, otherwise
                 // get reference to its relatedResources
                 if (!relatedResourcesLookup[graphId]) {
                     relatedResources = ko.observableArray();
+                    remainingResources = ko.observable();
                     paginator = ko.observable();
 
                     relatedResourcesLookup[graphId] = {
@@ -141,11 +144,13 @@ define(['jquery',
                         'loadedRelatedResources': relatedResources,
                         'name': value['related_resources']['node_config_lookup'][graphId]['name'],
                         'paginator': paginator,
+                        'remainingResources': remainingResources,
                         'totalRelatedResources': value['related_resources']['total']['value'],
                     };
                 } else {
                     relatedResources = relatedResourcesLookup[graphId]['loadedRelatedResources'];
                     paginator = relatedResourcesLookup[graphId]['paginator'];
+                    remainingResources = relatedResourcesLookup[graphId]['remainingResources'];
                 }
 
                 // add new resource relationships to lookup entry
@@ -165,6 +170,15 @@ define(['jquery',
                 }
 
                 paginator(value['paginator'])
+
+
+                var foo = value['related_resources']['total']['value'] - relatedResources().length
+
+                if (foo < value['related_resources']['resource_relationships'].length) {  // defacto value for settings.RELATED_RESOURCES_PER_PAGE
+                    remainingResources(foo)
+                } else {
+                    remainingResources(value['related_resources']['resource_relationships'].length)
+                }
             }
             
             // console.log(relatedResourcesLookup)
@@ -172,8 +186,6 @@ define(['jquery',
         },
 
         getRelatedResources: function(e) {
-            console.log(e)
-
             var url = (
                 arches.urls.related_resources 
                 + this.attributes.resourceid 
@@ -181,11 +193,11 @@ define(['jquery',
                 + `&paginate=true&page=${e.paginator().next_page_number}`
             );
 
-
             $.ajax({
                 context: this,
                 url: url,
             }).done(function(json) {
+                // console.log(json)
                 this.updateRelatedResourcesLookup({[e.graphId]: json});  // expected 'generic' shape
             });
         },

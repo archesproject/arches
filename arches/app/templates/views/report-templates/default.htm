@@ -23,7 +23,7 @@
 
 
 <!-- Report Content -->
-<div class="rp-report-container-preview">
+<div class="rp-report-container-preview" style="margin-bottom: 15px;">
 
     {% block header %}
     {% endblock header %}
@@ -88,9 +88,15 @@
             <!-- /ko -->
 
             <!-- ko if: resourceData.paginator().has_next -->
-            <div class="load-relations-report" data-bind="click: $parent.report.getRelatedResources.bind($parent.report)">
+            <button class="btn btn-primary" data-bind="click: $parent.report.getRelatedResources.bind($parent.report)">
                 {% trans "Load More" %}
-            </div>
+                <span data-bind="text: '[' + resourceData.remainingResources() + ']'"></span>
+            </button>
+
+            <button class="btn btn-primary">
+                {% trans "Load All" %}
+                <span data-bind="text: '[' + (resourceData.totalRelatedResources - resourceData.loadedRelatedResources().length) + ']'"></span>
+            </button>
             <!-- /ko -->
                 
             <!--ko if: resourceData.totalRelatedResources === 0 -->	
@@ -120,6 +126,7 @@
         </div>
     </div>
 </div>
+
 <div class="rp-report-container-preview">
     <div class="rp-report-section relative rp-report-section-root">
         <div class="rp-report-section-title">

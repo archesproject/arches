@@ -2749,16 +2749,6 @@ a.select2-search-choice-close {
     font-weight: 600;
 }
 
-.load-relations-report {
-    color: #fff;
-    padding: 3px 5px;
-    background: steelblue;
-    border-radius: 2px;
-    font-weight: 600;
-    width: 96px;
-    margin-left: 96px;
-}
-
 .load-relations.disabled {
     color: #888;
     margin-left: 5px;
