@@ -19,6 +19,17 @@
         <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
     </div>
 
+
+    <div style="margin: 70px 10px -25px;">
+        <div class='control-label widget-input-label'>{% trans "Participating Layers" %}</div>
+        <!-- ko foreach: {data: self.nodeDetails, as: 'nodeInfo'} -->
+        <div class="overlay-listing rr-map-card" style="padding: 5px; min-height: 0px" 
+            data-bind="click: function(){self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1 ? self.filterNodeIds.remove(nodeInfo.nodeid) : self.filterNodeIds.push(nodeInfo.nodeid)}, css: {'active-overlay': self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1}">
+            <div class="overlay-name" data-bind="text: nodeInfo.resourcemodelname"></div>
+        </div>
+        <!-- /ko -->
+    </div>
+
     <div data-bind="css: card.model.cssclass" style="height: calc(100% - 80px)">        
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
         <div class="edit-message-container">
@@ -103,22 +114,11 @@
 
             <!-- ko if: showRelatedQuery() -->
             <div class="card" style="padding-top: 55px; padding-bottom: 30px">
-                <div class="rr-map-card-intersect-panel">
-                    <div class='control-label widget-input-label'>{% trans "Participating Layers" %}</div>
-                    <!-- ko foreach: {data: self.nodeDetails, as: 'nodeInfo'} -->
-                    <div class="overlay-listing rr-map-card" style="padding: 5px; min-height: 0px" 
-                        data-bind="click: function(){self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1 ? self.filterNodeIds.remove(nodeInfo.nodeid) : self.filterNodeIds.push(nodeInfo.nodeid)}, css: {'active-overlay': self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1}">
-                        <div class="overlay-name" data-bind="text: nodeInfo.resourcemodelname"></div>
-                    </div>
-                    <!-- /ko -->
-                </div>
 
                 <div data-bind="foreach: {
                     data:card.widgets, as: 'widget'
                 }">
                 <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) === 'geojson-feature-collection' -->
-                    
-
                     <!--ko if: self.featureLookup[widget.node_id()].features -->
                     <div class="rr-map-card-intersect-panel">
                     <div class='control-label widget-input-label'>{% trans "Select a feature to perform intersection" %}</div>
