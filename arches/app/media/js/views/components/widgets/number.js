@@ -18,7 +18,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber
         var self = this;
 
         this.updateVal = ko.computed(function(){
-            if (self.value()){
+            if (self.value() !== null){
                 var val = self.value();
                 if (typeof self.min() === 'number') {
                     val = Number(val) < Number(self.min()) ? Number(self.min()) : Number(val);
@@ -31,7 +31,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber
                 if (self.precision()) {
                     val = Number(val).toFixed(self.precision());
                 }
-                
+                val = val.toString()
             }
             return val || self.value();
         }, self).extend({throttle: 600});
