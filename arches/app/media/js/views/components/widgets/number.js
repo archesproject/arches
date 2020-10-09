@@ -31,7 +31,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber
                 if (self.precision()) {
                     val = Number(val).toFixed(self.precision());
                 }
-                val = val.toString()
+                val = val.toString();
             }
             return val || self.value();
         }, self).extend({throttle: 600});
