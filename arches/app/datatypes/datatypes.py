@@ -172,13 +172,22 @@ class NumberDataType(BaseDataType):
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
-        return float(value)
-
-    def clean(self, tile, nodeid):
         try:
-            tile.data[nodeid].upper()
-            tile.data[nodeid] = float(tile.data[nodeid])
-        except Exception:
+            if value.isdigit():
+                value = int(value)
+            else:
+                value = float(value)
+        except AttributeError:
+            pass
+        return value
+
+    def pre_tile_save(self, tile, nodeid):
+        try:
+            if tile.data[nodeid].isdigit():
+                tile.data[nodeid] = int(tile.data[nodeid])
+            else:
+                tile.data[nodeid] = float(tile.data[nodeid])
+        except AttributeError:
             pass
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
