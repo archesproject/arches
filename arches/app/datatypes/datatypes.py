@@ -375,6 +375,17 @@ class DateDataType(BaseDataType):
         es_date_formats = "||".join(settings.DATE_FORMATS["Elasticsearch"])
         return {"type": "date", "format": es_date_formats}
 
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(tile)
+        try:
+            og_value = data[str(node.pk)]
+            valid_date_format, valid = self.get_valid_date_format(og_value)
+            new_date_format = settings.DATE_FORMATS["Python"][settings.DATE_FORMATS["JavaScript"].index(node.config["dateFormat"])]
+            value = datetime.strptime(og_value, valid_date_format).strftime(new_date_format)
+        except TypeError:
+            value = data[str(node.pk)]
+        return value
+
 
 class EDTFDataType(BaseDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):

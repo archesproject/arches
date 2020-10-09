@@ -449,6 +449,7 @@ CACHE_BY_USER = {"anonymous": 3600 * 24}
 DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d"  # Custom date format for dates imported from and exported to csv
 
 DATE_FORMATS = {
+    # Keep index values the same for formats in the python and javascript arrays.
     "Python": ["%Y-%m-%dT%H:%M:%S.%f%z", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%d %H:%M:%S%z", "%Y-%m-%d", "%Y-%m", "%Y", "-%Y"],
     "JavaScript": ["YYYY-MM-DDTHH:mm:ss.sssZ", "YYYY-MM-DDTHH:mm:ssZ", "YYYY-MM-DD HH:mm:ssZ", "YYYY-MM-DD", "YYYY-MM", "YYYY", "-YYYY"],
     "Elasticsearch": [
