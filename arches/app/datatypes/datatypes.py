@@ -172,13 +172,22 @@ class NumberDataType(BaseDataType):
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
-        return float(value)
-
-    def clean(self, tile, nodeid):
         try:
-            tile.data[nodeid].upper()
-            tile.data[nodeid] = float(tile.data[nodeid])
-        except Exception:
+            if value.isdigit():
+                value = int(value)
+            else:
+                value = float(value)
+        except AttributeError:
+            pass
+        return value
+
+    def pre_tile_save(self, tile, nodeid):
+        try:
+            if tile.data[nodeid].isdigit():
+                tile.data[nodeid] = int(tile.data[nodeid])
+            else:
+                tile.data[nodeid] = float(tile.data[nodeid])
+        except AttributeError:
             pass
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -374,6 +383,17 @@ class DateDataType(BaseDataType):
     def default_es_mapping(self):
         es_date_formats = "||".join(settings.DATE_FORMATS["Elasticsearch"])
         return {"type": "date", "format": es_date_formats}
+
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(tile)
+        try:
+            og_value = data[str(node.pk)]
+            valid_date_format, valid = self.get_valid_date_format(og_value)
+            new_date_format = settings.DATE_FORMATS["Python"][settings.DATE_FORMATS["JavaScript"].index(node.config["dateFormat"])]
+            value = datetime.strptime(og_value, valid_date_format).strftime(new_date_format)
+        except TypeError:
+            value = data[str(node.pk)]
+        return value
 
 
 class EDTFDataType(BaseDataType):
@@ -1034,11 +1054,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         if celery_worker_running is True:
             res = refresh_materialized_view.apply_async((), link_error=log_error.s())
         elif settings.AUTO_REFRESH_GEOM_VIEW:
-            cursor = connection.cursor()
-            sql = """
-                REFRESH MATERIALIZED VIEW mv_geojson_geoms;
-            """
-            cursor.execute(sql)
+            with connection.cursor() as cursor:
+                sql = """
+                    REFRESH MATERIALIZED VIEW mv_geojson_geoms;
+                """
+                cursor.execute(sql)
 
     def default_es_mapping(self):
         # let ES dyanamically map this datatype

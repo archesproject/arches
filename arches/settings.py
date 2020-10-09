@@ -18,11 +18,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import inspect
-from django.utils.translation import gettext_lazy as _
 
 try:
+    from django.utils.translation import gettext_lazy as _
     from corsheaders.defaults import default_headers
-except ImportError:  # unable to import corsheaders prior to installing requirements.txt in setup.py
+except ImportError:  # unable to import prior to installing requirements.txt in setup.py
     pass
 
 #########################################
@@ -96,7 +96,7 @@ RESOURCE_FORMATTERS = {
 }
 
 # Hide nodes and cards in a report that have no data
-HIDE_EMPTY_NODES_IN_REPORT = True
+HIDE_EMPTY_NODES_IN_REPORT = False
 
 # Set the ontolgoy namespace prefixes to use in the UI, set the namespace to '' omit a prefix
 # Users can also override existing namespaces as well if you like
@@ -449,6 +449,7 @@ CACHE_BY_USER = {"anonymous": 3600 * 24}
 DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d"  # Custom date format for dates imported from and exported to csv
 
 DATE_FORMATS = {
+    # Keep index values the same for formats in the python and javascript arrays.
     "Python": ["%Y-%m-%dT%H:%M:%S.%f%z", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%d %H:%M:%S%z", "%Y-%m-%d", "%Y-%m", "%Y", "-%Y"],
     "JavaScript": ["YYYY-MM-DDTHH:mm:ss.sssZ", "YYYY-MM-DDTHH:mm:ssZ", "YYYY-MM-DD HH:mm:ssZ", "YYYY-MM-DD", "YYYY-MM", "YYYY", "-YYYY"],
     "Elasticsearch": [
