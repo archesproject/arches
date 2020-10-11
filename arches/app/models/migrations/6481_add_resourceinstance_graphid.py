@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '6492_add_date_datatype_configs'),
+        ("models", "6492_add_date_datatype_configs"),
     ]
 
     def forward_migrate(apps, schema_editor, with_create_permissions=True):
@@ -27,18 +27,34 @@ class Migration(migrations.Migration):
             except:
                 pass
 
-            row.save(updated_fields=['resourceinstancefrom_graphid', 'resourceinstanceto_graphid'])
+            row.save(updated_fields=["resourceinstancefrom_graphid", "resourceinstanceto_graphid"])
 
     operations = [
         migrations.AddField(
-            model_name='resourcexresource',
-            name='resourceinstancefrom_graphid',
-            field=models.ForeignKey(blank=True, db_column='resourceinstancefrom_graphid', db_constraint=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='resxres_resource_instance_fom_graph_id', to='models.Graph'),
+            model_name="resourcexresource",
+            name="resourceinstancefrom_graphid",
+            field=models.ForeignKey(
+                blank=True,
+                db_column="resourceinstancefrom_graphid",
+                db_constraint=False,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="resxres_resource_instance_fom_graph_id",
+                to="models.Graph",
+            ),
         ),
         migrations.AddField(
-            model_name='resourcexresource',
-            name='resourceinstanceto_graphid',
-            field=models.ForeignKey(blank=True, db_column='resourceinstanceto_graphid', db_constraint=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='resxres_resource_instance_to_graph_id', to='models.Graph'),
+            model_name="resourcexresource",
+            name="resourceinstanceto_graphid",
+            field=models.ForeignKey(
+                blank=True,
+                db_column="resourceinstanceto_graphid",
+                db_constraint=False,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="resxres_resource_instance_to_graph_id",
+                to="models.Graph",
+            ),
         ),
-        migrations.RunPython(forward_migrate, reverse_code=migrations.RunPython.noop)
+        migrations.RunPython(forward_migrate, reverse_code=migrations.RunPython.noop),
     ]

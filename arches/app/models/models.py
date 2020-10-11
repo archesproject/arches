@@ -721,7 +721,7 @@ class ResourceXResource(models.Model):
             self.resourceinstanceto_graphid = self.resourceinstanceidto.graph
         except:
             pass
-        
+
         if not self.created:
             self.created = datetime.datetime.now()
 
