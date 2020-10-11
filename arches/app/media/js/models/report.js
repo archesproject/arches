@@ -57,7 +57,10 @@ define(['jquery',
             };
 
             this.relatedResourcesLookup = ko.observable({});
-            this.updateRelatedResourcesLookup(options.related_resources);
+            
+            if (options.related_resources) {
+                this.updateRelatedResourcesLookup(options.related_resources);
+            }
 
             this.graph = options.graph;
             this.parse(options.graph);
@@ -125,6 +128,8 @@ define(['jquery',
 
         updateRelatedResourcesLookup: function(json) {
             var relatedResourcesLookup = this.relatedResourcesLookup();
+
+            console.log(json)
             
             for (var [graphId, value] of Object.entries(json)) {
                 var relatedResources;

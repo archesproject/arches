@@ -133,13 +133,9 @@ def index_resource_relations(clear_index=True, batch_size=settings.BULK_IMPORT_B
 
     with se.BulkIndexer(batch_size=batch_size, refresh=True) as resource_relations_indexer:
         sql = """
-            SELECT resourcexid, notes, datestarted, dateended, relationshiptype, resourceinstanceidfrom, res_1.graphid,
-            resourceinstanceidto, res_2.graphid, modified, created, inverserelationshiptype, tileid, nodeid
+            SELECT resourcexid, notes, datestarted, dateended, relationshiptype, resourceinstanceidfrom, resourceinstancefrom_graphid,
+            resourceinstanceidto, resourceinstanceto_graphid, modified, created, inverserelationshiptype, tileid, nodeid
             FROM public.resource_x_resource
-            INNER JOIN public.resource_instances res_1 
-            ON public.resource_x_resource.resourceinstanceidfrom = res_1.resourceinstanceid
-            INNER JOIN public.resource_instances res_2 
-            ON public.resource_x_resource.resourceinstanceidto = res_2.resourceinstanceid;
         """
 
         cursor.execute(sql)
