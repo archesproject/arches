@@ -173,7 +173,7 @@ class NumberDataType(BaseDataType):
 
     def transform_value_for_tile(self, value, **kwargs):
         try:
-            if value == '':
+            if value == "":
                 value = None
             elif value.isdigit():
                 value = int(value)
@@ -185,7 +185,7 @@ class NumberDataType(BaseDataType):
 
     def pre_tile_save(self, tile, nodeid):
         try:
-            if tile.data[nodeid] == '':
+            if tile.data[nodeid] == "":
                 tile.data[nodeid] = None
             elif tile.data[nodeid].isdigit():
                 tile.data[nodeid] = int(tile.data[nodeid])
