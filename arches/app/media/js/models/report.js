@@ -131,7 +131,7 @@ define(['jquery',
 
             for (var [graphId, value] of Object.entries(json)) {
                 // let's not relate the resource to itself
-                if (graphId === this.attributes.graph.graphid) { continue }
+                if (graphId === this.attributes.graph.graphid) { continue; }
 
                 var relatedResources;
                 var paginator;
@@ -157,6 +157,14 @@ define(['jquery',
                     remainingResources = relatedResourcesLookup[graphId]['remainingResources'];
                 }
 
+                paginator(value['paginator']);
+
+                /* 
+                    if there's no paginator, the request fetched all related resources and
+                    we should remove the ones we already have so as not to duplicate them
+                */
+                if (!value['paginator']) {relatedResources.removeAll();}
+
                 // add new resource relationships to lookup entry
                 for (var resourceRelationship of value['related_resources']['resource_relationships']) {
                     var relatedResource = value['related_resources']['related_resources'].find(function(resource) {
@@ -173,15 +181,11 @@ define(['jquery',
                     });
                 }
 
-                paginator(value['paginator'])
+                // defacto value is settings.RELATED_RESOURCES_PER_PAGE
+                var resourceLimit = value['related_resources']['resource_relationships'].length;  
+                var remainingResourcesCount = value['related_resources']['total']['value'] - relatedResources().length;
 
-                var foo = value['related_resources']['total']['value'] - relatedResources().length
-
-                if (foo < value['related_resources']['resource_relationships'].length) {  // defacto value for settings.RELATED_RESOURCES_PER_PAGE
-                    remainingResources(foo)
-                } else {
-                    remainingResources(value['related_resources']['resource_relationships'].length)
-                }
+                remainingResources(remainingResourcesCount < resourceLimit ? remainingResourcesCount : resourceLimit);
             }
 
             this.relatedResourcesLookup(relatedResourcesLookup);
