@@ -459,8 +459,6 @@ class Resource(models.ResourceInstance):
                         resource["_source"]["total_relations"] = relations["hits"]["total"]
                         ret["related_resources"].append(resource["_source"])
 
-        # import ipdb; ipdb.set_trace()
-
         return ret
 
     def copy(self):
