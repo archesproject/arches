@@ -418,7 +418,7 @@ class Resource(models.ResourceInstance):
                 graph_id_filter.should(Terms(field="resourceinstancefrom_graphid", terms=resourceinstance_graphid))
                 graph_id_filter.should(Terms(field="resourceinstanceto_graphid", terms=resourceinstance_graphid))
                 bool_filter.must(graph_id_filter)
-                
+
             query.add_query(bool_filter)
 
             return query.search(index=RESOURCE_RELATIONS_INDEX)
