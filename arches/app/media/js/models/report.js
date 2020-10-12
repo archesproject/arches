@@ -137,8 +137,8 @@ define(['jquery',
                 var paginator;
                 var remainingResources;
                 
-                // add graphId to lookup if we haven't added it yet, otherwise get pertinent references
                 if (!relatedResourcesLookup[graphId]) {
+                    // add graphId to lookup if we haven't added it yet
                     relatedResources = ko.observableArray();
                     remainingResources = ko.observable();
                     paginator = ko.observable();
@@ -152,6 +152,7 @@ define(['jquery',
                         'totalRelatedResources': value['related_resources']['total']['value'],
                     };
                 } else {
+                    // else get pertinent references
                     relatedResources = relatedResourcesLookup[graphId]['loadedRelatedResources'];
                     paginator = relatedResourcesLookup[graphId]['paginator'];
                     remainingResources = relatedResourcesLookup[graphId]['remainingResources'];
@@ -160,8 +161,8 @@ define(['jquery',
                 paginator(value['paginator']);
 
                 /* 
-                    if there's no paginator, the request fetched all related resources and
-                    we should remove the ones we already have so as not to duplicate them
+                    if there's no paginator, the incoming json is all related resource instances,
+                    and we should remove the ones we already have so as not to duplicate them
                 */
                 if (!value['paginator']) {relatedResources.removeAll();}
 
@@ -181,8 +182,7 @@ define(['jquery',
                     });
                 }
 
-                // defacto value is settings.RELATED_RESOURCES_PER_PAGE
-                var resourceLimit = value['related_resources']['resource_relationships'].length;  
+                var resourceLimit = value['related_resources']['resource_relationships'].length;  /* equivalent to settings.py RELATED_RESOURCES_PER_PAGE */ 
                 var remainingResourcesCount = value['related_resources']['total']['value'] - relatedResources().length;
 
                 remainingResources(remainingResourcesCount < resourceLimit ? remainingResourcesCount : resourceLimit);
@@ -192,29 +192,17 @@ define(['jquery',
         },
 
         getRelatedResources: function(loadAll, resource) {
-            var url;
-
-            if (loadAll) {
-                url = (
-                    arches.urls.related_resources 
-                    + this.attributes.resourceid 
-                    + `?resourceinstance_graphid=${resource.graphId}`
-                    + `&paginate=false`
-                );
-            } else {
-                url = (
-                    arches.urls.related_resources 
-                    + this.attributes.resourceid 
-                    + `?resourceinstance_graphid=${resource.graphId}`
-                    + `&page=${resource.paginator().next_page_number}`
-                );
-            }
-
             $.ajax({
                 context: this,
-                url: url,
+                url: (
+                    arches.urls.related_resources 
+                    + this.attributes.resourceid 
+                    + `?resourceinstance_graphid=${resource.graphId}`
+                    + (loadAll ? `&paginate=false` : `&page=${resource.paginator().next_page_number}`)
+                ),
             }).done(function(json) {
                 this.updateRelatedResourcesLookup({
+                    // coerces expected shape
                     [resource.graphId]: json['paginator'] ? json : {'related_resources': json, 'paginator': null }
                 });  
             });
