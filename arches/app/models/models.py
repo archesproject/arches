@@ -528,8 +528,9 @@ class Node(models.Model):
         managed = True
         db_table = "nodes"
         constraints = [
-            models.UniqueConstraint(fields=['name', 'nodegroupid'], name='unique_nodename_nodegroup'),
+            models.UniqueConstraint(fields=["name", "nodegroupid"], name="unique_nodename_nodegroup"),
         ]
+
 
 class Ontology(models.Model):
     ontologyid = models.UUIDField(default=uuid.uuid1, primary_key=True)

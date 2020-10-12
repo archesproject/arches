@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '6492_add_date_datatype_configs'),
+        ("models", "6492_add_date_datatype_configs"),
     ]
 
     operations = [
@@ -24,7 +24,6 @@ class Migration(migrations.Migration):
             """,
         ),
         migrations.AddConstraint(
-            model_name='node',
-            constraint=models.UniqueConstraint(fields=('name', 'nodegroup'), name='unique_nodename_nodegroup'),
+            model_name="node", constraint=models.UniqueConstraint(fields=("name", "nodegroup"), name="unique_nodename_nodegroup"),
         ),
     ]
