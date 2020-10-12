@@ -59,7 +59,6 @@ define(['jquery',
             this.relatedResourcesLookup = ko.observable({});
             
             if (options.related_resources) {
-                console.log("AAA")
                 this.updateRelatedResourcesLookup(options.related_resources);
             }
 
@@ -130,13 +129,13 @@ define(['jquery',
         updateRelatedResourcesLookup: function(json) {
             var relatedResourcesLookup = this.relatedResourcesLookup();
 
-            console.log(json)
-            
             for (var [graphId, value] of Object.entries(json)) {
+                // let's not relate the resource to itself
+                if (graphId === this.attributes.graph.graphid) { continue }
+
                 var relatedResources;
                 var paginator;
                 var remainingResources;
-
                 
                 // add graphId to lookup if we haven't added it yet, otherwise get pertinent references
                 if (!relatedResourcesLookup[graphId]) {
@@ -188,20 +187,32 @@ define(['jquery',
             this.relatedResourcesLookup(relatedResourcesLookup);
         },
 
-        getRelatedResources: function(e) {
-            var url = (
-                arches.urls.related_resources 
-                + this.attributes.resourceid 
-                + `?resourceinstance_graphid=${e.graphId}`
-                + `&page=${e.paginator().next_page_number}`
-            );
+        getRelatedResources: function(loadAll, resource) {
+            var url;
+
+            if (loadAll) {
+                url = (
+                    arches.urls.related_resources 
+                    + this.attributes.resourceid 
+                    + `?resourceinstance_graphid=${resource.graphId}`
+                    + `&paginate=false`
+                );
+            } else {
+                url = (
+                    arches.urls.related_resources 
+                    + this.attributes.resourceid 
+                    + `?resourceinstance_graphid=${resource.graphId}`
+                    + `&page=${resource.paginator().next_page_number}`
+                );
+            }
 
             $.ajax({
                 context: this,
                 url: url,
             }).done(function(json) {
-                // console.log(json)
-                this.updateRelatedResourcesLookup({[e.graphId]: json});  // expected 'generic' shape
+                this.updateRelatedResourcesLookup({
+                    [resource.graphId]: json['paginator'] ? json : {'related_resources': json, 'paginator': null }
+                });  
             });
         },
 
