@@ -689,12 +689,11 @@ class ResourceDescriptors(View):
 class ResourceReportView(MapBaseManagerView):
     def _generate_related_resources_summary(self, related_resources, resource_relationships, resource_models):
         related_resource_summary = [
-            {"graphid": str(resource_model.graphid), "name": resource_model.name, "resources": []} 
-            for resource_model in resource_models
+            {"graphid": str(resource_model.graphid), "name": resource_model.name, "resources": []} for resource_model in resource_models
         ]
 
         resource_relationship_types = {
-            resource_relationship_type["id"]: resource_relationship_type["text"] 
+            resource_relationship_type["id"]: resource_relationship_type["text"]
             for resource_relationship_type in get_resource_relationship_types()["values"]
         }
 
@@ -718,15 +717,15 @@ class ResourceReportView(MapBaseManagerView):
                             )
                             relationship_summary.append(rr_type)
 
-                    summary["resources"].append({
-                        "instance_id": related_resource["resourceinstanceid"], 
-                        "displayname": related_resource["displayname"], 
-                        "relationships": relationship_summary
-                    })
+                    summary["resources"].append(
+                        {
+                            "instance_id": related_resource["resourceinstanceid"],
+                            "displayname": related_resource["displayname"],
+                            "relationships": relationship_summary,
+                        }
+                    )
 
         return related_resource_summary
-
-
 
     def get(self, request, resourceid=None):
         resource = Resource.objects.get(pk=resourceid)
@@ -752,21 +751,23 @@ class ResourceReportView(MapBaseManagerView):
             related_resources = json.loads(related_resources_response.content)
 
             related_resources_summary = self._generate_related_resources_summary(
-                related_resources=related_resources['related_resources'],
-                resource_relationships=related_resources['resource_relationships'],
+                related_resources=related_resources["related_resources"],
+                resource_relationships=related_resources["resource_relationships"],
                 resource_models=resource_models,
             )
 
-            return JSONResponse({
-                "tiles": permitted_tiles,
-                "related_resources": related_resources_summary,
-                "displayname": resource.displayname,
-                "resourceid": resourceid,
-            })
+            return JSONResponse(
+                {
+                    "tiles": permitted_tiles,
+                    "related_resources": related_resources_summary,
+                    "displayname": resource.displayname,
+                    "resourceid": resourceid,
+                }
+            )
 
         datatypes = models.DDataType.objects.all()
         graph = Graph.objects.get(graphid=resource.graph_id)
-       
+
         permitted_cards = []
 
         for card in Card.objects.filter(graph_id=resource.graph_id).order_by("sortorder"):
@@ -787,22 +788,23 @@ class ResourceReportView(MapBaseManagerView):
             related_resources = json.loads(related_resources_response.content)
 
             related_resources_summary = self._generate_related_resources_summary(
-                related_resources=related_resources['related_resources'],
-                resource_relationships=related_resources['resource_relationships'],
+                related_resources=related_resources["related_resources"],
+                resource_relationships=related_resources["resource_relationships"],
                 resource_models=resource_models,
             )
 
-            return JSONResponse({
-                "datatypes": datatypes,
-                "cards": permitted_cards,
-                "tiles": permitted_tiles,
-                "graph": graph,
-                "related_resources": related_resources_summary,
-                "displayname": resource.displayname,
-                "resourceid": resourceid,
-                "cardwidgets": cardwidgets,
-            })
-
+            return JSONResponse(
+                {
+                    "datatypes": datatypes,
+                    "cards": permitted_cards,
+                    "tiles": permitted_tiles,
+                    "graph": graph,
+                    "related_resources": related_resources_summary,
+                    "displayname": resource.displayname,
+                    "resourceid": resourceid,
+                    "cardwidgets": cardwidgets,
+                }
+            )
 
         related_resources = {}
 
@@ -812,7 +814,7 @@ class ResourceReportView(MapBaseManagerView):
             get_params.update({"resourceinstance_graphid": str(resource_model.graphid)})
 
             request.GET = get_params
-            
+
             related_resources_response = RelatedResourcesView().get(request, resourceid).content
             related_resources[str(resource_model.pk)] = json.loads(related_resources_response)
 
