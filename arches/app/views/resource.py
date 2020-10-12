@@ -19,6 +19,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import json
 import uuid
 
+from distutils.util import strtobool
+
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.models import User, Group, Permission
 from django.db import transaction
@@ -685,6 +687,47 @@ class ResourceDescriptors(View):
 
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
+    def _generate_related_resources_summary(self, related_resources, resource_relationships, resource_models):
+        related_resource_summary = [
+            {"graphid": str(resource_model.graphid), "name": resource_model.name, "resources": []} 
+            for resource_model in resource_models
+        ]
+
+        resource_relationship_types = {
+            resource_relationship_type["id"]: resource_relationship_type["text"] 
+            for resource_relationship_type in get_resource_relationship_types()["values"]
+        }
+
+        for related_resource in related_resources:
+            for summary in related_resource_summary:
+                if related_resource["graph_id"] == summary["graphid"]:
+                    relationship_summary = []
+                    for resource_relationship in resource_relationships:
+                        if related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidto"]:
+                            rr_type = (
+                                resource_relationship_types[resource_relationship["relationshiptype"]]
+                                if resource_relationship["relationshiptype"] in resource_relationship_types
+                                else resource_relationship["relationshiptype"]
+                            )
+                            relationship_summary.append(rr_type)
+                        elif related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidfrom"]:
+                            rr_type = (
+                                resource_relationship_types[resource_relationship["inverserelationshiptype"]]
+                                if resource_relationship["inverserelationshiptype"] in resource_relationship_types
+                                else resource_relationship["inverserelationshiptype"]
+                            )
+                            relationship_summary.append(rr_type)
+
+                    summary["resources"].append({
+                        "instance_id": related_resource["resourceinstanceid"], 
+                        "displayname": related_resource["displayname"], 
+                        "relationships": relationship_summary
+                    })
+
+        return related_resource_summary
+
+
+
     def get(self, request, resourceid=None):
         resource = Resource.objects.get(pk=resourceid)
 
@@ -692,46 +735,41 @@ class ResourceReportView(MapBaseManagerView):
             models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         )
 
-        foo = {}
-
-        for resource_model in resource_models:
-            if str(resource_model.graphid) != str(resource.graph_id):
-                # use generic endpoint to get related resources
-                get_params = request.GET.copy()
-                get_params.update({"paginate": "true"})
-                get_params.update({"resourceinstance_graphid": str(resource_model.graphid)})
-
-                request.GET = get_params
-                related_resources_response = RelatedResourcesView().get(request, resourceid).content
-
-                foo[str(resource_model.pk)] = json.loads(related_resources_response)
-
-        tiles = Tile.objects.filter(resourceinstance=resource).order_by("sortorder")
-
         permitted_tiles = []
         perm = "read_nodegroup"
 
-        for tile in tiles:
+        for tile in Tile.objects.filter(resourceinstance=resource).order_by("sortorder"):
             if request.user.has_perm(perm, tile.nodegroup):
                 tile.filter_by_perm(request.user, perm)
                 permitted_tiles.append(tile)
 
-        # if request.GET.get("json", False) and request.GET.get("exclude_graph", False):
-        #     return JSONResponse(
-        #         {
-        #             "tiles": permitted_tiles,
-        #             "related_resources": simplified_related_resources,
-        #             "displayname": resource.displayname,
-        #             "resourceid": resourceid,
-        #         }
-        #     )
+        if strtobool(request.GET.get("json", "false")) and strtobool(request.GET.get("exclude_graph", "false")):
+            get_params = request.GET.copy()
+            get_params.update({"paginate": "false"})
+            request.GET = get_params
+
+            related_resources_response = RelatedResourcesView().get(request, resourceid)
+            related_resources = json.loads(related_resources_response.content)
+
+            related_resources_summary = self._generate_related_resources_summary(
+                related_resources=related_resources['related_resources'],
+                resource_relationships=related_resources['resource_relationships'],
+                resource_models=resource_models,
+            )
+
+            return JSONResponse({
+                "tiles": permitted_tiles,
+                "related_resources": related_resources_summary,
+                "displayname": resource.displayname,
+                "resourceid": resourceid,
+            })
 
         datatypes = models.DDataType.objects.all()
         graph = Graph.objects.get(graphid=resource.graph_id)
-        cards = Card.objects.filter(graph_id=resource.graph_id).order_by("sortorder")
+       
         permitted_cards = []
 
-        for card in cards:
+        for card in Card.objects.filter(graph_id=resource.graph_id).order_by("sortorder"):
             if request.user.has_perm(perm, card.nodegroup):
                 card.filter_by_perm(request.user, perm)
                 permitted_cards.append(card)
@@ -740,19 +778,43 @@ class ResourceReportView(MapBaseManagerView):
             widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
         ]
 
-        # if request.GET.get("json", False) and not request.GET.get("exclude_graph", False):
-        #     return JSONResponse(
-        #         {
-        #             "datatypes": datatypes,
-        #             "cards": permitted_cards,
-        #             "tiles": permitted_tiles,
-        #             "graph": graph,
-        #             "related_resources": simplified_related_resources,
-        #             "displayname": resource.displayname,
-        #             "resourceid": resourceid,
-        #             "cardwidgets": cardwidgets,
-        #         }
-        #     )
+        if strtobool(request.GET.get("json", "false")) and not strtobool(request.GET.get("exclude_graph", "false")):
+            get_params = request.GET.copy()
+            get_params.update({"paginate": "false"})
+            request.GET = get_params
+
+            related_resources_response = RelatedResourcesView().get(request, resourceid)
+            related_resources = json.loads(related_resources_response.content)
+
+            related_resources_summary = self._generate_related_resources_summary(
+                related_resources=related_resources['related_resources'],
+                resource_relationships=related_resources['resource_relationships'],
+                resource_models=resource_models,
+            )
+
+            return JSONResponse({
+                "datatypes": datatypes,
+                "cards": permitted_cards,
+                "tiles": permitted_tiles,
+                "graph": graph,
+                "related_resources": related_resources_summary,
+                "displayname": resource.displayname,
+                "resourceid": resourceid,
+                "cardwidgets": cardwidgets,
+            })
+
+
+        related_resources = {}
+
+        for resource_model in [resource_model for resource_model in resource_models if resource_model.graphid != resource.graph_id]:
+            get_params = request.GET.copy()
+            get_params.update({"paginate": "true"})
+            get_params.update({"resourceinstance_graphid": str(resource_model.graphid)})
+
+            request.GET = get_params
+            
+            related_resources_response = RelatedResourcesView().get(request, resourceid).content
+            related_resources[str(resource_model.pk)] = json.loads(related_resources_response)
 
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
@@ -783,7 +845,7 @@ class ResourceReportView(MapBaseManagerView):
                 datatypes, exclude=["modulename", "issearchable", "configcomponent", "configname", "iconclass"]
             ),
             geocoding_providers=geocoding_providers,
-            related_resources=JSONSerializer().serialize(foo),
+            related_resources=JSONSerializer().serialize(related_resources),
             widgets=widgets,
             map_layers=map_layers,
             map_markers=map_markers,
@@ -869,10 +931,10 @@ class RelatedResourcesView(BaseManagerView):
             nodes = models.Node.objects.filter(graph=graphid).exclude(istopnode=False)[0].get_relatable_resources()
             ret = {str(node.graph_id) for node in nodes}
 
-        elif resourceid:
+        else:
             lang = request.GET.get("lang", settings.LANGUAGE_CODE)
-            paginate = bool(request.GET.get("paginate"))
             resourceinstance_graphid = request.GET.get("resourceinstance_graphid")
+            paginate = strtobool(request.GET.get("paginate", "true"))  # default to true
 
             resource = Resource.objects.get(pk=resourceid)
 

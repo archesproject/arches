@@ -414,12 +414,11 @@ class Resource(models.ResourceInstance):
             bool_filter.should(Terms(field="resourceinstanceidto", terms=resourceinstanceid))
 
             if resourceinstance_graphid:
-                bf = Bool()
-
-                bf.should(Terms(field="resourceinstancefrom_graphid", terms=resourceinstance_graphid))
-                bf.should(Terms(field="resourceinstanceto_graphid", terms=resourceinstance_graphid))
-
-                bool_filter.must(bf)
+                graph_id_filter = Bool()
+                graph_id_filter.should(Terms(field="resourceinstancefrom_graphid", terms=resourceinstance_graphid))
+                graph_id_filter.should(Terms(field="resourceinstanceto_graphid", terms=resourceinstance_graphid))
+                bool_filter.must(graph_id_filter)
+                
             query.add_query(bool_filter)
 
             return query.search(index=RESOURCE_RELATIONS_INDEX)

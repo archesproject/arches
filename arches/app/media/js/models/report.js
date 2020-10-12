@@ -59,6 +59,7 @@ define(['jquery',
             this.relatedResourcesLookup = ko.observable({});
             
             if (options.related_resources) {
+                console.log("AAA")
                 this.updateRelatedResourcesLookup(options.related_resources);
             }
 
@@ -192,7 +193,7 @@ define(['jquery',
                 arches.urls.related_resources 
                 + this.attributes.resourceid 
                 + `?resourceinstance_graphid=${e.graphId}`
-                + `&paginate=true&page=${e.paginator().next_page_number}`
+                + `&page=${e.paginator().next_page_number}`
             );
 
             $.ajax({
