@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
             except:
                 pass
 
-            row.save(updated_fields=["resourceinstancefrom_graphid", "resourceinstanceto_graphid"])
+            row.save()
 
     operations = [
         migrations.AddField(
