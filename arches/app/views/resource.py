@@ -735,15 +735,7 @@ class ResourceReportView(MapBaseManagerView):
             models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         )
 
-        permitted_tiles = []
-        perm = "read_nodegroup"
-
-        for tile in Tile.objects.filter(resourceinstance=resource).order_by("sortorder"):
-            if request.user.has_perm(perm, tile.nodegroup):
-                tile.filter_by_perm(request.user, perm)
-                permitted_tiles.append(tile)
-
-        if strtobool(request.GET.get("json", "false")) and strtobool(request.GET.get("exclude_graph", "false")):
+        if strtobool(request.GET.get("json", "false")):
             get_params = request.GET.copy()
             get_params.update({"paginate": "false"})
             request.GET = get_params
@@ -756,7 +748,26 @@ class ResourceReportView(MapBaseManagerView):
                 resource_relationships=related_resources['resource_relationships'],
                 resource_models=resource_models,
             )
+        else:
+            related_resources_summary = {}
 
+            for resource_model in resource_models:
+                get_params = request.GET.copy()
+                get_params.update({"resourceinstance_graphid": str(resource_model.graphid)})
+                request.GET = get_params
+                
+                related_resources_response = RelatedResourcesView().get(request, resourceid).content
+                related_resources_summary[str(resource_model.pk)] = json.loads(related_resources_response)
+        
+        permitted_tiles = []
+        perm = "read_nodegroup"
+
+        for tile in Tile.objects.filter(resourceinstance=resource).order_by("sortorder"):
+            if request.user.has_perm(perm, tile.nodegroup):
+                tile.filter_by_perm(request.user, perm)
+                permitted_tiles.append(tile)
+
+        if strtobool(request.GET.get("json", "false")) and strtobool(request.GET.get("exclude_graph", "false")):
             return JSONResponse({
                 "tiles": permitted_tiles,
                 "related_resources": related_resources_summary,
@@ -779,19 +790,6 @@ class ResourceReportView(MapBaseManagerView):
         ]
 
         if strtobool(request.GET.get("json", "false")) and not strtobool(request.GET.get("exclude_graph", "false")):
-            get_params = request.GET.copy()
-            get_params.update({"paginate": "false"})
-            request.GET = get_params
-
-            related_resources_response = RelatedResourcesView().get(request, resourceid)
-            related_resources = json.loads(related_resources_response.content)
-
-            related_resources_summary = self._generate_related_resources_summary(
-                related_resources=related_resources['related_resources'],
-                resource_relationships=related_resources['resource_relationships'],
-                resource_models=resource_models,
-            )
-
             return JSONResponse({
                 "datatypes": datatypes,
                 "cards": permitted_cards,
@@ -802,19 +800,6 @@ class ResourceReportView(MapBaseManagerView):
                 "resourceid": resourceid,
                 "cardwidgets": cardwidgets,
             })
-
-
-        related_resources = {}
-
-        for resource_model in [resource_model for resource_model in resource_models if resource_model.graphid != resource.graph_id]:
-            get_params = request.GET.copy()
-            get_params.update({"paginate": "true"})
-            get_params.update({"resourceinstance_graphid": str(resource_model.graphid)})
-
-            request.GET = get_params
-            
-            related_resources_response = RelatedResourcesView().get(request, resourceid).content
-            related_resources[str(resource_model.pk)] = json.loads(related_resources_response)
 
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
@@ -845,7 +830,7 @@ class ResourceReportView(MapBaseManagerView):
                 datatypes, exclude=["modulename", "issearchable", "configcomponent", "configname", "iconclass"]
             ),
             geocoding_providers=geocoding_providers,
-            related_resources=JSONSerializer().serialize(related_resources),
+            related_resources=JSONSerializer().serialize(related_resources_summary, sort_keys=False),
             widgets=widgets,
             map_layers=map_layers,
             map_markers=map_markers,
