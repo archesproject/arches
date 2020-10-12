@@ -754,10 +754,10 @@ class ResourceReportView(MapBaseManagerView):
                 get_params = request.GET.copy()
                 get_params.update({"resourceinstance_graphid": str(resource_model.graphid)})
                 request.GET = get_params
-                
+
                 related_resources_response = RelatedResourcesView().get(request, resourceid).content
                 related_resources_summary[str(resource_model.pk)] = json.loads(related_resources_response)
-        
+
         permitted_tiles = []
         perm = "read_nodegroup"
 
@@ -767,12 +767,14 @@ class ResourceReportView(MapBaseManagerView):
                 permitted_tiles.append(tile)
 
         if strtobool(request.GET.get("json", "false")) and strtobool(request.GET.get("exclude_graph", "false")):
-            return JSONResponse({
-                "tiles": permitted_tiles,
-                "related_resources": related_resources_summary,
-                "displayname": resource.displayname,
-                "resourceid": resourceid,
-            })
+            return JSONResponse(
+                {
+                    "tiles": permitted_tiles,
+                    "related_resources": related_resources_summary,
+                    "displayname": resource.displayname,
+                    "resourceid": resourceid,
+                }
+            )
 
         datatypes = models.DDataType.objects.all()
         graph = Graph.objects.get(graphid=resource.graph_id)
@@ -789,16 +791,18 @@ class ResourceReportView(MapBaseManagerView):
         ]
 
         if strtobool(request.GET.get("json", "false")) and not strtobool(request.GET.get("exclude_graph", "false")):
-            return JSONResponse({
-                "datatypes": datatypes,
-                "cards": permitted_cards,
-                "tiles": permitted_tiles,
-                "graph": graph,
-                "related_resources": related_resources_summary,
-                "displayname": resource.displayname,
-                "resourceid": resourceid,
-                "cardwidgets": cardwidgets,
-            })
+            return JSONResponse(
+                {
+                    "datatypes": datatypes,
+                    "cards": permitted_cards,
+                    "tiles": permitted_tiles,
+                    "graph": graph,
+                    "related_resources": related_resources_summary,
+                    "displayname": resource.displayname,
+                    "resourceid": resourceid,
+                    "cardwidgets": cardwidgets,
+                }
+            )
 
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
