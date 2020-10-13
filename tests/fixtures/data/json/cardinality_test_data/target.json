@@ -336,11 +336,11 @@
                 {
                     "card_id": "5ac05c9c-c66e-11e7-82ac-b8f6b115d7dd",
                     "config": {
-                        "label": "Spatial Accuraccy",
+                        "label": "Spatial Accuracy",
                         "placeholder": "Select an option"
                     },
                     "id": "5ac07038-c66e-11e7-a4a7-b8f6b115d7dd",
-                    "label": "Spatial Accuraccy",
+                    "label": "Spatial Accuracy",
                     "node_id": "5ac063f3-c66e-11e7-bf46-b8f6b115d7dd",
                     "sortorder": 0,
                     "widget_id": "10000000-0000-0000-0000-000000000015"
@@ -1369,7 +1369,7 @@
                     "isrequired": false,
                     "issearchable": true,
                     "istopnode": false,
-                    "name": "Spatial Accuraccy",
+                    "name": "Spatial Accuracy",
                     "nodegroup_id": "5ac058f8-c66e-11e7-b2e6-b8f6b115d7dd",
                     "nodeid": "5ac063f3-c66e-11e7-bf46-b8f6b115d7dd",
                     "ontologyclass": null,
@@ -1401,7 +1401,7 @@
                     "isrequired": false,
                     "issearchable": true,
                     "istopnode": false,
-                    "name": "Spatial Accuraccy",
+                    "name": "Spatial Accuracy II",
                     "nodegroup_id": "5ac058f8-c66e-11e7-b2e6-b8f6b115d7dd",
                     "nodeid": "5ac06259-c66e-11e7-8045-b8f6b115d7dd",
                     "ontologyclass": null,
