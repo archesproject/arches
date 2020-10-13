@@ -71,7 +71,7 @@
         }, 
         {
             "arches_nodeid": "5ac063f3-c66e-11e7-bf46-b8f6b115d7dd", 
-            "arches_node_name": "Spatial Accuraccy", 
+            "arches_node_name": "Spatial Accuracy", 
             "file_field_name": "", 
             "data_type": "domain-value", 
             "concept_export_value": "label", 
