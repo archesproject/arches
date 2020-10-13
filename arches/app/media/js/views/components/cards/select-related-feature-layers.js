@@ -1,10 +1,13 @@
 define([], function() {
-    return function(source, sourceLayer, selectedResourceIds, visible, color, nodeids, filteredNodeids, hoverId) {
-        color = color || "#F0C200";
+    return function(source, sourceLayer, selectedResourceIds, visible, color, nodeids, filteredNodeids, hoverId, selectedLayerConfig) {
+
+        var layerConfig = selectedLayerConfig;
+        color = color || layerConfig.defaultcolor;
         hoverId = hoverId;
-        var selectionColor = "#427AFF";
-        var hoverColor = "#ff0000";
-        var colorPalette = [ "#A4DB6E", "#F0C200", "#fdb462", "#22ff33", "#D29EFF"]
+        var selectionColor = layerConfig.selectioncolor;
+        var hoverColor = layerConfig.hovercolor;
+        var colorPalette = layerConfig.colorpalette
+
         var createColorExpressions = function(defaultColor, colorPalette){
             if (nodeids) {
                 var colorExpressions = ['case'];
@@ -28,9 +31,6 @@ define([], function() {
             var nodeFilter = filteredNodeids.map(id => ["==", "nodeid", id])
             nodeFilter.splice(0, 0, 'any');
         }
-        var strokecolor = "#fff";
-        var overviewzoom = 11;
-        var minzoom = 15;
         if (selectedResourceIds && selectedResourceIds.length > 0) {
             color = ['match', ['get', 'resourceinstanceid'], selectedResourceIds, selectionColor, color
             ];
@@ -43,7 +43,7 @@ define([], function() {
         var layers = [{
             "id": "select-feature-polygon-fill",
             "type": "fill",
-            "minzoom": overviewzoom,
+            "minzoom": layerConfig.overviewzoom,
             "filter": ['all',[
                 "==", "$type", "Polygon"
                 ], nodeFilter
@@ -51,7 +51,7 @@ define([], function() {
             "paint": {
                 "fill-color": color,
                 "fill-outline-color": color,
-                "fill-opacity": 0.2
+                "fill-opacity": layerConfig.fillopacity
             },
             "layout": {
                 "visibility": visible ? "visible": "none"
@@ -59,7 +59,7 @@ define([], function() {
         },  {
             "id": "select-feature-polygon-under-stroke",
             "type": "line",
-            "minzoom": minzoom,
+            "minzoom": layerConfig.minzoom,
             "filter": ['all',[
                 "==", "$type", "Polygon"
             ], nodeFilter],
@@ -69,13 +69,13 @@ define([], function() {
                 "visibility": visible ? "visible": "none"
             },
             "paint": {
-                "line-color": strokecolor,
-                "line-width": 4
+                "line-color": layerConfig.strokecolor,
+                "line-width": layerConfig.strokelinewidth
             }
         }, {
             "id": "select-feature-polygon-stroke",
             "type": "line",
-            "minzoom": overviewzoom,
+            "minzoom": layerConfig.overviewzoom,
             "filter": ['all',[
                 "==", "$type", "Polygon"
             ], nodeFilter],
@@ -86,12 +86,12 @@ define([], function() {
             },
             "paint": {
                 "line-color": color,
-                "line-width": 2
+                "line-width": layerConfig.linewidth
             }
         }, {
             "id": "select-feature-line",
             "type": "line",
-            "minzoom": minzoom,
+            "minzoom": layerConfig.minzoom,
             "filter": ['all',[
                 "==", "$type", "LineString"
             ], nodeFilter],
@@ -102,19 +102,19 @@ define([], function() {
             },
             "paint": {
                 "line-color": color,
-                "line-width": 2
+                "line-width": layerConfig.linewidth
             }
         }, {
             "id": "select-feature-point-point-stroke",
             "type": "circle",
-            "minzoom": minzoom,
+            "minzoom": layerConfig.minzoom,
             "filter": ['all',
                 ["==", "$type", "Point"]
             ],
             "paint": {
-                "circle-radius": 6,
-                "circle-opacity": 1,
-                "circle-color": "#fff"
+                "circle-radius": layerConfig.strokepointradius,
+                "circle-opacity": layerConfig.strokepointopacity,
+                "circle-color": layerConfig.strokecolor
             },
             "layout": {
                 "visibility": visible ? "visible": "none"
@@ -122,12 +122,12 @@ define([], function() {
         }, {
             "id": "select-feature-point",
             "type": "circle",
-            "minzoom": minzoom,
+            "minzoom": layerConfig.minzoom,
             "filter": ['all',[
                 "==", "$type", "Point"
             ], nodeFilter],
             "paint": {
-                "circle-radius": 4,
+                "circle-radius": layerConfig.pointradius,
                 "circle-color": color
             },
             "layout": {

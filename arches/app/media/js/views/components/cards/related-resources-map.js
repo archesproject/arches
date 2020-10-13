@@ -13,8 +13,39 @@ define([
     var viewModel = function(params) {
         var self = this;
         this.widgets = [];
-        params.configKeys = ['selectRelatedSource', 'selectRelatedSourceLayer'];
+        params.configKeys = [
+            'selectRelatedSource',
+            'selectRelatedSourceLayer',
+            'selectLayerConfig',
+            'defaultcolor',
+            'selectioncolor',
+            'hovercolor',
+            'colorpalette',
+            'fillopacity',
+            'overviewzoom',
+            'minzoom',
+            'pointradius',
+            'linewidth',
+            'strokecolor',
+            'strokelinewidth',
+            'strokepointradius',
+            'strokepointopacity'
+        ];
         CardComponentViewModel.apply(this, [params]);
+        var selectLayerConfig = {};
+        selectLayerConfig.defaultcolor = this.defaultcolor()
+        selectLayerConfig.selectioncolor = this.selectioncolor()
+        selectLayerConfig.hovercolor = this.hovercolor()
+        selectLayerConfig.colorpalette = typeof this.colorpalette() === 'string' ? this.colorpalette().split(",") : this.colorpalette();
+        selectLayerConfig.fillopacity = Number(this.fillopacity());
+        selectLayerConfig.overviewzoom = Number(this.overviewzoom());
+        selectLayerConfig.minzoom = Number(this.minzoom());
+        selectLayerConfig.pointradius = Number(this.pointradius());
+        selectLayerConfig.linewidth = Number(this.linewidth());
+        selectLayerConfig.strokecolor = this.strokecolor();
+        selectLayerConfig.strokelinewidth = Number(this.strokelinewidth());
+        selectLayerConfig.strokepointradius = Number(this.strokepointradius());
+        selectLayerConfig.strokepointopacity = Number(this.strokepointopacity());
         if (self.form && self.tile) self.card.widgets().forEach(function(widget) {
             var id = widget.node_id();
             var type = ko.unwrap(self.form.nodeLookup[id].datatype);
@@ -23,15 +54,18 @@ define([
             }
         });
         var getNodeIds = function(){
-            var sourceUrl = new window.URL(arches.mapSources[self.selectRelatedSource()].data, window.location.origin);
-            var nodes = sourceUrl.searchParams.get('nodeids');
-            var node = sourceUrl.searchParams.get('nodeid');
             var nodeids = [];
-            if (node) {
-                nodeids.push(node);
-            }
-            if (nodes) {
-                nodeids = nodeids.concat(nodes.split(','));
+            if (self.selectRelatedSource()) {
+                var sourceUrl = new window.URL(arches.mapSources[self.selectRelatedSource()].data, window.location.origin);
+                var nodes = sourceUrl.searchParams.get('nodeids');
+                var node = sourceUrl.searchParams.get('nodeid');
+                var nodeids = [];
+                if (node) {
+                    nodeids.push(node);
+                }
+                if (nodes) {
+                    nodeids = nodeids.concat(nodes.split(','));
+                }
             }
             return nodeids;
         };
@@ -87,7 +121,7 @@ define([
             }
             zoomToData = true;
         });
-        var selectFeatureLayers = selectFeatureLayersFactory(selectRelatedSource, selectRelatedSourceLayer, selectedResourceIds(), true, null, this.nodeids, this.filterNodeIds());
+        var selectFeatureLayers = selectFeatureLayersFactory(selectRelatedSource, selectRelatedSourceLayer, selectedResourceIds(), true, null, this.nodeids, this.filterNodeIds(), self.hoverId(), selectLayerConfig);
         var sources = [];
         for (var sourceName in arches.mapSources) {
             if (arches.mapSources.hasOwnProperty(sourceName)) {
@@ -98,7 +132,7 @@ define([
             var source = self.selectRelatedSource();
             var sourceLayer = self.selectRelatedSourceLayer();
             selectFeatureLayers = sources.indexOf(source) > 0 ?
-                selectFeatureLayersFactory(source, sourceLayer, selectedResourceIds(), true, null, self.nodeids, self.filterNodeIds(), self.hoverId()) :
+                selectFeatureLayersFactory(source, sourceLayer, selectedResourceIds(), true, null, self.nodeids, self.filterNodeIds(), self.hoverId(), selectLayerConfig) :
                 [];
             self.additionalLayers(
                 extendedLayers.concat(
