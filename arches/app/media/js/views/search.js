@@ -167,6 +167,7 @@ define([
                     }
                 },
                 complete: function(request, status) {
+                    this.viewModel.loading(false);
                     this.updateRequest = undefined;
                     window.history.pushState({}, '', '?' + $.param(queryString).split('+').join('%20'));
                 }
