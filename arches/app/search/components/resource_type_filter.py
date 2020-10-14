@@ -20,7 +20,7 @@ class ResourceTypeFilter(BaseSearchFilter):
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         search_query = Bool()
         querystring_params = self.request.GET.get(details["componentname"], "")
-        
+
         graph_ids = []
         for resourceTypeFilter in JSONDeserializer().deserialize(querystring_params):
             graph_ids.append(str(resourceTypeFilter["graphid"]))

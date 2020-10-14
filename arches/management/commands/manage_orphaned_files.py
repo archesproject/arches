@@ -1,4 +1,4 @@
-'''
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import os
 from glob import glob
@@ -32,25 +32,27 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument('operation', nargs='?',
-                            help='operation \'list\' lists orphaned files, \
-                            \'remove\' deletes orphaned files')
-        parser.add_argument('accept_defaults', nargs='?', default='n',
-                            help='\'y\' accepts all defaults')
+        parser.add_argument(
+            "operation",
+            nargs="?",
+            help="operation 'list' lists orphaned files, \
+                            'remove' deletes orphaned files",
+        )
+        parser.add_argument("accept_defaults", nargs="?", default="n", help="'y' accepts all defaults")
 
     def handle(self, *args, **options):
         accept_defaults = False
-        if options['accept_defaults'].lower() in ('y', 't'):
+        if options["accept_defaults"].lower() in ("y", "t"):
             accept_defaults = True
-        if options['operation'] == 'list':
+        if options["operation"] == "list":
             self.print_orphans()
-        if options['operation'] == 'remove':
+        if options["operation"] == "remove":
             self.remove_files(accept_defaults)
 
     def list_orphans(self):
         saved_files = models.File.objects.all()
         saved_file_names = {os.path.basename(f.path.path) for f in saved_files}
-        uploaded_paths = glob(os.path.join(settings.MEDIA_ROOT, 'uploadedfiles', '*'))
+        uploaded_paths = glob(os.path.join(settings.MEDIA_ROOT, "uploadedfiles", "*"))
         uploaded_names = {os.path.basename(path) for path in uploaded_paths}
         orphans = list(uploaded_names.difference(saved_file_names))
         return orphans, uploaded_paths
@@ -72,10 +74,10 @@ class Command(BaseCommand):
             pp(orphans)
             message = "Do you want to delete the above files?"
             if utils.get_yn_input(message) is True:
-                print('deleting files')
+                print("deleting files")
                 self.delete(orphans, uploaded_paths)
             else:
-                print('not deleting')
+                print("not deleting")
         else:
-            print('deleting files')
+            print("deleting files")
             self.delete(orphans, uploaded_paths)
