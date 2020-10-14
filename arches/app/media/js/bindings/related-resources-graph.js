@@ -33,7 +33,7 @@ define([
                 .force("charge", d3.forceCollide().radius(100))
                 .force("radial", d3.forceRadial(300, width/2, height/2))
                 .force("center", d3.forceCenter(width / 2, height / 2))
-                .alpha(0.01)
+                .alpha(0.01);
                 
             var nodeList = options.nodeList;
             var currentResource = options.currentResource;
@@ -289,7 +289,7 @@ define([
                         .on("end", dragended));
 
                     function dragstarted(event, d) {
-                        if (!event.active) simulation.alphaTarget(0.01).restart();
+                        if (!event.active) { simulation.alphaTarget(0.01).restart() };
                         d.fx = d.x;
                         d.fy = d.y;
                     }
@@ -300,7 +300,7 @@ define([
                     }
                     
                     function dragended(event, d) {
-                        if (!event.active) simulation.alphaTarget(0);
+                        if (!event.active) { simulation.alphaTarget(0) };
                         d.fx = null;
                         d.fy = null;
                     }    
