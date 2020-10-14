@@ -18,12 +18,12 @@ display_help() {
 CUSTOM_SCRIPT_FOLDER=${CUSTOM_SCRIPT_FOLDER:-/docker/entrypoint}
 if [[ -z ${ARCHES_PROJECT} ]]; then
 	APP_FOLDER=${ARCHES_ROOT}
-	PACKAGE_JSON_FOLDER=${ARCHES_ROOT}/arches/install
+	PACKAGE_JSON_FOLDER=${ARCHES_ROOT}
 else
 	APP_FOLDER=${WEB_ROOT}/${ARCHES_PROJECT}
 	# due to https://github.com/archesproject/arches/issues/4841, changes were made to yarn install
 	# and module deployment. Using the arches install directory for yarn.
-	PACKAGE_JSON_FOLDER=${ARCHES_ROOT}/arches/install
+	PACKAGE_JSON_FOLDER=${ARCHES_ROOT}
 fi
 
 # Read modules folder from yarn config file
@@ -218,9 +218,8 @@ init_arches_project() {
 			echo ""
 
 			cd_web_root
-			[[ -d ${APP_FOLDER} ]] || mkdir ${APP_FOLDER}
 
-			arches-project create ${ARCHES_PROJECT} --directory ${ARCHES_PROJECT}
+			arches-project create ${ARCHES_PROJECT}
 
 			exit_code=$?
 			if [[ ${exit_code} != 0 ]]; then
