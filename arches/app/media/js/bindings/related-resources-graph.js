@@ -289,7 +289,7 @@ define([
                         .on("end", dragended));
 
                     function dragstarted(event, d) {
-                        if (!event.active) { simulation.alphaTarget(0.01).restart() };
+                        if (!event.active) { simulation.alphaTarget(0.01).restart(); }
                         d.fx = d.x;
                         d.fy = d.y;
                     }
@@ -300,7 +300,7 @@ define([
                     }
                     
                     function dragended(event, d) {
-                        if (!event.active) { simulation.alphaTarget(0) };
+                        if (!event.active) { simulation.alphaTarget(0); }
                         d.fx = null;
                         d.fy = null;
                     }    
