@@ -9,7 +9,7 @@ from django.conf import settings
 
 class Migration(migrations.Migration):
 
-    dependencies = [("models", "6492_add_date_datatype_configs")]
+    dependencies = [("models", "6700_unique_nodename")]
 
     operations = [
         migrations.RunSQL(
