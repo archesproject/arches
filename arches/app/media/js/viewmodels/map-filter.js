@@ -1,6 +1,6 @@
 define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw) {
     /**
-     * A viewmodel used for a generic geocoder
+     * A viewmodel used for managing a spatial search filter.
      *
      * @constructor
      * @name MapFilterViewModel
@@ -187,9 +187,9 @@ define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw)
         this.useMaxBuffer = function (unit, buffer, maxBuffer) {
             var res = false;
             if (unit === 'ft') {
-                res = (buffer * 0.3048) > maxBuffer
+                res = (buffer * 0.3048) > maxBuffer;
             } else {
-                res = buffer > maxBuffer
+                res = buffer > maxBuffer;
             }
             return res;
         };
@@ -248,7 +248,7 @@ define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw)
 
             var useMaxBuffer = this.useMaxBuffer(this.bufferUnit(), this.buffer(), this.maxBuffer);
             if (useMaxBuffer) {
-                max = this.bufferUnit() === 'ft' ? 328084 : this.maxBuffer;
+                var max = this.bufferUnit() === 'ft' ? 328084 : this.maxBuffer;
                 this.buffer(max);
             }
 
@@ -269,16 +269,15 @@ define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw)
             });
         }
 
-        this.buffer.subscribe(function(val) {
+        this.buffer.subscribe(function() {
             this.updateFilter();
         }, this);
 
-        this.bufferUnit.subscribe(function(val) {
+        this.bufferUnit.subscribe(function() {
             this.updateFilter();
         }, this);
         //----------------- End search buffer values from map-filter
         
-
     };
     return MapFilterViewModel;
 });
