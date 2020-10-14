@@ -29,11 +29,11 @@ define([
             var selectedNode;
 
             var simulation = d3.forceSimulation(data.nodes)
-                .force("link", d3.forceLink(data.links).id(d => d.id).distance(function(d){
-                    return 200;
-                }))
-                .force("charge", d3.forceManyBody().strength(-500))
-                .force("center", d3.forceCenter(width / 2, height / 2)); 
+                .force("link", d3.forceLink(data.links))
+                .force("charge", d3.forceCollide().radius(100))
+                .force("radial", d3.forceRadial(300, width/2, height/2))
+                .force("center", d3.forceCenter(width / 2, height / 2))
+                .alpha(0.01)
                 
             var nodeList = options.nodeList;
             var currentResource = options.currentResource;
@@ -129,7 +129,7 @@ define([
                 .attr("viewBox", [0, 0, width, height])
                 .call(d3.zoom()
                     .extent([[0, 0], [width, height]])
-                    .scaleExtent([1, 8])
+                    .scaleExtent([0.25, 8])
                     .on("zoom", function(event) {
                         groupElement.attr("transform", event.transform);
                     }));
@@ -140,11 +140,11 @@ define([
 
             var update = function() {
                 var linkMap = linkMap;
-        
+
                 $(window).trigger("resize");
                 simulation.nodes(data.nodes);
                 simulation.force("link").links(data.links);
-                simulation.restart();
+                simulation.alpha(0.01).restart();
 
                 var link = linksElement.selectAll("line")
                     .data(data.links)
@@ -289,7 +289,7 @@ define([
                         .on("end", dragended));
 
                     function dragstarted(event, d) {
-                        if (!event.active) simulation.alphaTarget(0.3).restart();
+                        if (!event.active) simulation.alphaTarget(0.01).restart();
                         d.fx = d.x;
                         d.fy = d.y;
                     }
@@ -339,8 +339,13 @@ define([
                         })
                         .attr("cy", function(d) {
                             return d.y;
+                        })
+                        .attr("x", function() {
+                            return width / 2;
+                        })
+                        .attr("y", function() {
+                            return height / 2;
                         });
-
                     texts
                         .attr("x", function(d) {
                             return d.x;
@@ -350,7 +355,6 @@ define([
                         });
 
                 });
-
             };
 
             var updateNodeInfo = function(d) {
@@ -603,9 +607,7 @@ define([
             }, this);
 
             nodeList([]);
-
         }
     };
-
     return ko.bindingHandlers.relatedResourcesGraph;
 });
