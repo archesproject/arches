@@ -20,11 +20,11 @@ define([
                 }
             };
         };
-
-        var x = ko.unwrap(params.x) || arches.mapDefaultX;
-        var y = ko.unwrap(params.y) || arches.mapDefaultY;
-        var bounds = ko.unwrap(params.bounds) || arches.hexBinBounds;
-        var zoom = ko.unwrap(params.zoom) || arches.mapDefaultZoom;
+        
+        var x = ko.unwrap(params.x) ? params.x : arches.mapDefaultX;
+        var y = ko.unwrap(params.y) ? params.y : arches.mapDefaultY;
+        var bounds = ko.unwrap(params.bounds) ? params.bounds : arches.hexBinBounds;
+        var zoom = ko.unwrap(params.zoom) ? params.zoom : arches.mapDefaultZoom;
         var minZoom = arches.mapDefaultMinZoom;
         var maxZoom = arches.mapDefaultMaxZoom;
         var sources = Object.assign({
