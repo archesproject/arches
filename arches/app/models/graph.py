@@ -24,6 +24,7 @@ from copy import copy, deepcopy
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
+from django.db.utils import IntegrityError
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
@@ -339,7 +340,19 @@ class Graph(models.GraphModel):
         saved_node_datatype = None
         if already_saved is True:
             saved_node_datatype = models.Node.objects.get(pk=node.nodeid).datatype
-        node.save()
+
+        if self.is_editable() is True:
+            try:
+                node.save()
+            except IntegrityError as e:
+                raise GraphValidationError(
+                    _("The node: {0}, you tried to save is invalid. Be sure that all node names in your card are unique.".format(node.name))
+                )
+        else:
+            raise GraphValidationError(
+                _("Your resource model: {0}, already has instances saved. You cannot edit the node with instances.".format(self.name))
+            )
+
         if saved_node_datatype != node.datatype:
             datatype = datatype_factory.get_instance(node.datatype)
             datatype_mapping = datatype.get_es_mapping(node.nodeid)

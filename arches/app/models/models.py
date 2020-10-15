@@ -492,6 +492,12 @@ class Node(models.Model):
     def is_collector(self):
         return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup is not None
 
+    def is_editable(self):
+        if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
+            return True
+        else:
+            return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
+
     def get_relatable_resources(self):
         relatable_resource_ids = [
             r2r.resourceclassfrom
@@ -521,6 +527,9 @@ class Node(models.Model):
     class Meta:
         managed = True
         db_table = "nodes"
+        constraints = [
+            models.UniqueConstraint(fields=["name", "nodegroupid"], name="unique_nodename_nodegroup"),
+        ]
 
 
 class Ontology(models.Model):
