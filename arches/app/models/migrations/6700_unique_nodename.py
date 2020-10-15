@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 node.name = node.name[:-37]
                 node.save()
 
-    sql =   """
+    sql = """
                 UPDATE nodes AS n1
                 SET name = n1.name || '_' || n1.nodeid
                 WHERE EXISTS (
@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
                     AND n1.nodegroupid = n2.nodegroupid
                 );
             """
-    reverse_sql =   """
+    reverse_sql = """
                         UPDATE nodes
                         SET name = substring(name from 0 for length(name) - 36)
                         where substring(name from length(name) - 35 for 36) = nodeid::text
