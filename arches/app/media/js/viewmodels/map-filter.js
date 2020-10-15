@@ -184,7 +184,7 @@ define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw)
             }
         }, this);
         
-        this.useMaxBuffer = function (unit, buffer, maxBuffer) {
+        this.useMaxBuffer = function(unit, buffer, maxBuffer) {
             var res = false;
             if (unit === 'ft') {
                 res = (buffer * 0.3048) > maxBuffer;
@@ -217,7 +217,7 @@ define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw)
                                 self.draw.delete(feature.id);
                             }
                         } else {
-                            self.draw.setFeatureProperty(feature.id, 'nodeId', null)
+                            self.draw.setFeatureProperty(feature.id, 'nodeId', null);
                             self.draw.setFeatureProperty(feature.id, 'searchGeom', true);
                         }
                     });
@@ -267,7 +267,7 @@ define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw)
                 "type": "FeatureCollection",
                 "features": this.searchGeometries()
             });
-        }
+        };
 
         this.buffer.subscribe(function() {
             this.updateFilter();
