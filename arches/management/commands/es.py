@@ -136,7 +136,9 @@ class Command(BaseCommand):
     def index_database(self, batch_size, clear_index, name):
         if name is not None:
             index_database_util.index_resources(
-                clear_index=clear_index, index_name=name, batch_size=batch_size,
+                clear_index=clear_index,
+                index_name=name,
+                batch_size=batch_size,
             )
         else:
             index_database_util.index_db(clear_index=clear_index, batch_size=batch_size)
