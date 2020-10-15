@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                 node.save()
 
     operations = [
-        migrations.RunPython(forward_migrate, reverse_migrate),        
+        migrations.RunPython(forward_migrate, reverse_migrate),
         migrations.AddConstraint(
             model_name="node", constraint=models.UniqueConstraint(fields=("name", "nodegroup"), name="unique_nodename_nodegroup"),
         ),
