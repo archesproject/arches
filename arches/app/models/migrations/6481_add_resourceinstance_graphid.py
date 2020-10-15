@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="resxres_resource_instance_fom_graph_id",
-                to="models.Graph",
+                to="models.GraphModel",
             ),
         ),
         migrations.AddField(
@@ -53,7 +53,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="resxres_resource_instance_to_graph_id",
-                to="models.Graph",
+                to="models.GraphModel",
             ),
         ),
         migrations.RunPython(forward_migrate, reverse_code=migrations.RunPython.noop),

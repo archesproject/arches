@@ -656,7 +656,7 @@ class ResourceXResource(models.Model):
         db_constraint=False,
     )
     resourceinstancefrom_graphid = models.ForeignKey(
-        "Graph",
+        "GraphModel",
         db_column="resourceinstancefrom_graphid",
         blank=True,
         null=True,
@@ -674,7 +674,7 @@ class ResourceXResource(models.Model):
         db_constraint=False,
     )
     resourceinstanceto_graphid = models.ForeignKey(
-        "Graph",
+        "GraphModel",
         db_column="resourceinstanceto_graphid",
         blank=True,
         null=True,
