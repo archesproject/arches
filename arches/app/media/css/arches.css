@@ -1686,6 +1686,14 @@ div.final-cons-step-separator>h4 {
     position: relative;
 }
 
+.overlay-listing.rr-map-card .overlay-name:before {
+    content: "\f070";
+}
+
+.overlay-listing.rr-map-card.active-overlay .overlay-name:before {
+    content: "\f06e";
+}
+
 .summary-panel {
     background: #f9f9f9;
     margin-top: -30px;
@@ -2071,6 +2079,23 @@ div.final-cons-step-separator>h4 {
 
 .map-card-feature-tool {
     width: 65px;
+}
+
+.map-card-feature-tool.intersect {
+    width: 80px;
+}
+
+.rr-map-card-intersect-panel {
+    margin-top: 7px;
+    margin-bottom: 32px;
+}
+
+.rr-map-card-intersect-panel .intersection-result {
+    padding: 3px 0 0 12px;
+}
+
+.rr-map-card-intersect-panel .intersection-result.hovered {
+    background-color: #ddd;
 }
 
 .map-card-zoom-tool,
@@ -13021,6 +13046,7 @@ a.jstree-anchor.permissions-widget {
     .dl-horizontal dt {
         white-space: pre-wrap;
         margin-bottom: 5px;
+        width: 200px;
     }
 }
 
