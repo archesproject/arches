@@ -2233,10 +2233,10 @@ knockstrap@1.3.2:
     knockout ">=2.3.0"
     twitter-bootstrap-3.0.0 "~3"
 
-latlon-geohash@1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/latlon-geohash/-/latlon-geohash-1.1.0.tgz#7abe15224c4800e3eaecac71c753a20bfb6cbf65"
-  integrity sha1-er4VIkxIAOPq7Kxxx1OiC/tsv2U=
+latlon-geohash@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/latlon-geohash/-/latlon-geohash-2.0.0.tgz#2b0203ab30ef56a18600b0312b8c3a627cbd17d1"
+  integrity sha512-OKBswTwrvTdtenV+9C9euBmvgGuqyjJNAzpQCarRz1m8/pYD2nz9fKkXmLs2S3jeXaLi3Ry76twQplKKUlgS/g==
 
 leaflet-draw@^1.0.4:
   version "1.0.4"
