@@ -20,7 +20,6 @@ class Migration(migrations.Migration):
             if node.name in sibling_nodes:
                 node.name = "{}_{}".format(node.name, node.nodeid)
                 node.save()
-                print("The node '{}' is renamed to '{}'".format(node.name[:-37], node.name))
 
     def reverse_migrate(apps, schema_editor, with_create_permissions=True):
         node_model = apps.get_model("models", "Node")
@@ -30,8 +29,26 @@ class Migration(migrations.Migration):
                 node.name = node.name[:-37]
                 node.save()
 
+    sql =   """
+                UPDATE nodes AS n1
+                SET name = n1.name || '_' || n1.nodeid
+                WHERE EXISTS (
+                    SELECT n1.nodeid
+                    FROM nodes AS n2
+                    WHERE n1.nodeid <> n2.nodeid
+                    AND n1.name = n2.name
+                    AND n1.nodegroupid = n2.nodegroupid
+                );
+            """
+    reverse_sql =   """
+                        UPDATE nodes
+                        SET name = substring(name from 0 for length(name) - 36)
+                        where substring(name from length(name) - 35 for 36) = nodeid::text
+                    """
+
     operations = [
         migrations.RunPython(forward_migrate, reverse_migrate),
+        migrations.RunSQL(sql, reverse_sql),
         migrations.AddConstraint(
             model_name="node", constraint=models.UniqueConstraint(fields=("name", "nodegroup"), name="unique_nodename_nodegroup"),
         ),
