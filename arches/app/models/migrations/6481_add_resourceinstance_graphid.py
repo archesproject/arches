@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "6492_add_date_datatype_configs"),
+        ("models", "6700_unique_nodename"),
     ]
 
     def forward_migrate(apps, schema_editor, with_create_permissions=True):
