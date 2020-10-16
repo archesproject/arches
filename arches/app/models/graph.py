@@ -346,7 +346,11 @@ class Graph(models.GraphModel):
                 node.save()
             except IntegrityError as e:
                 raise GraphValidationError(
-                    _("The node: {0}, you tried to save is invalid. Be sure that all node names in your card are unique.".format(node.name))
+                    _(
+                        "The node: {0}, you tried to save is invalid. Be sure that all sibling node names and node names in your card are unique.".format(
+                            node.name
+                        )
+                    )
                 )
         else:
             raise GraphValidationError(
