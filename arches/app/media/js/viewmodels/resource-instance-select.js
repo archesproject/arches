@@ -194,12 +194,28 @@ define([
 
         var makeObject = function(id, esSource){
             var graph = self.graphLookup[esSource.graph_id];
-            var ontologyProperty = graph ? graph.config.ontologyProperty : '';
-            var inverseOntologyProperty = graph ? graph.config.inverseOntologyProperty : '';
+
+            var ontologyProperty = '';
+            var inverseOntologyProperty = '';
+
+            if (graph) {
+                if (graph.config.ontologyProperty && graph.config.inverseOntologyProperty) {
+                    ontologyProperty = graph.config.ontologyProperty;
+                    inverseOntologyProperty = graph.config.inverseOntologyProperty;
+                } else {
+                    var ontologyProperties = self.node.config.graphs().find(function(nodeConfigGraph) {
+                        return nodeConfigGraph.graphid === graph.graphid;
+                    });
+
+                    ontologyProperty = graph.config.ontologyProperty || ontologyProperties.ontologyProperty || "";
+                    inverseOntologyProperty = graph.config.inverseOntologyProperty || ontologyProperties.inverseOntologyProperty || "";
+                }
+            }
+
             var ret = {
                 "resourceId": ko.observable(id),
-                "ontologyProperty": ko.observable(ontologyProperty || ''),
-                "inverseOntologyProperty": ko.observable(inverseOntologyProperty || ''),
+                "ontologyProperty": ko.observable(ontologyProperty),
+                "inverseOntologyProperty": ko.observable(inverseOntologyProperty),
                 "resourceXresourceId": ""
             };            
             Object.defineProperty(ret, 'resourceName', {value: ko.observable(esSource.displayname)});
