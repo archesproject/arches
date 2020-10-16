@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import logging
 import sys
 import uuid
 from arches.app.models.graph import Graph
@@ -24,6 +25,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.models.models import GraphXMapping
 from django.db import transaction
 
+logger = logging.getLogger(__name__)
 
 class GraphImportReporter:
     def __init__(self, graphs):
@@ -121,10 +123,11 @@ def import_graph(graphs, overwrite_graphs=True):
                         card_x_node_x_widget["config"] = check_default_configs(default_config, card_x_node_x_widget_config)
                         cardxnodexwidget = CardXNodeXWidget.objects.update_or_create(**card_x_node_x_widget)
             except GraphImportException as ge:
+                logger.exception(ge)
                 errors.append(ge)
             except Exception as e:
-                errors.append(f"Could not define graph. Its resources were not loaded.")
-                errors.append(e)
+                errors.append(str(e))
+                logger.exception(e)
             # try/except block here until all graphs have a resource_2_resource_constraints object.
             try:
                 if not hasattr(graph, "resource_2_resource_constraints"):
