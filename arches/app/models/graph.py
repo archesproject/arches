@@ -364,7 +364,11 @@ class Graph(models.GraphModel):
                     )
             else:
                 raise GraphValidationError(
-                    _("Your resource model: {0}, already has instances saved. You cannot edit the node with instances.".format(self.name))
+                    _(
+                        "The node: {0}, you tried to save is invalid. Be sure that all sibling node names and node names in your card are unique.".format(
+                            node.name
+                        )
+                    )
                 )
         else:
             raise GraphValidationError(
