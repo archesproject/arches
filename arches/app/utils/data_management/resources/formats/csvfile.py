@@ -324,6 +324,7 @@ class TileCsvWriter(Writer):
 
 class CsvReader(Reader):
     def __init__(self):
+        self.errors = []
         super(CsvReader, self).__init__()
 
     def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number):
@@ -1009,10 +1010,16 @@ class CsvReader(Reader):
             formatted = traceback.format_exception(exc_type, exc_value, exc_traceback)
             if len(formatted):
                 for message in formatted:
-                    print(message)
+                    logger.error(message)
 
         finally:
-            pass
+            for e in self.errors:
+                if e["type"] == "WARNING":
+                    logger.warn(e["message"])
+                elif e["type"] == "ERROR":
+                    logger.error(e["message"])
+                else:
+                    logger.info(e["message"])
 
 
 class TileCsvReader(Reader):
