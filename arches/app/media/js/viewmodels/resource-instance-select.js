@@ -207,8 +207,8 @@ define([
                         return nodeConfigGraph.graphid === graph.graphid;
                     });
 
-                    ontologyProperty = graph.config.ontologyProperty || ontologyProperties.ontologyProperty;
-                    inverseOntologyProperty = graph.config.inverseOntologyProperty || ontologyProperties.inverseOntologyProperty;
+                    ontologyProperty = graph.config.ontologyProperty || ontologyProperties.ontologyProperty || "";
+                    inverseOntologyProperty = graph.config.inverseOntologyProperty || ontologyProperties.inverseOntologyProperty || "";
                 }
             }
 
