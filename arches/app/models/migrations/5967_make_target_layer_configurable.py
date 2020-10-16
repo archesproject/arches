@@ -9,7 +9,7 @@ from django.conf import settings
 
 class Migration(migrations.Migration):
 
-    dependencies = [("models", "6700_unique_nodename")]
+    dependencies = [("models", "6481_add_resourceinstance_graphid")]
 
     operations = [
         migrations.RunSQL(
