@@ -345,8 +345,7 @@ class Graph(models.GraphModel):
             saved_node = models.Node.objects.get(pk=node.nodeid)
             saved_node_datatype = saved_node.datatype
             saved_name = saved_node.name
-
-        if not node.istopnode:
+        if not node.istopnode and models.Edge.objects.filter(rangenode=node).exists():
             parent_node = models.Edge.objects.get(rangenode=node).domainnode.nodeid
             sibling_nodes = [edge.rangenode.name for edge in models.Edge.objects.filter(domainnode=parent_node)]
             is_name_valid = (saved_name == node.name) or (saved_name != node.name and (node.name not in sibling_nodes))
