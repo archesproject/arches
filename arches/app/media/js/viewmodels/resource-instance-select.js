@@ -203,12 +203,12 @@ define([
                     ontologyProperty = graph.config.ontologyProperty;
                     inverseOntologyProperty = graph.config.inverseOntologyProperty;
                 } else {
-                    var foo = self.node.config.graphs().find(function(nodeConfigGraph) {
+                    var ontologyProperties = self.node.config.graphs().find(function(nodeConfigGraph) {
                         return nodeConfigGraph.graphid === graph.graphid;
                     });
 
-                    ontologyProperty = graph.config.ontologyProperty || foo.ontologyProperty;
-                    inverseOntologyProperty = graph.config.inverseOntologyProperty || foo.inverseOntologyProperty;
+                    ontologyProperty = graph.config.ontologyProperty || ontologyProperties.ontologyProperty;
+                    inverseOntologyProperty = graph.config.inverseOntologyProperty || ontologyProperties.inverseOntologyProperty;
                 }
             }
 
