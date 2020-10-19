@@ -1456,7 +1456,7 @@ class DomainDataType(BaseDomainDataType):
                 key = "text"
 
             domain_val_node_query = models.Node.objects.filter(config__contains={"options": [{key: value}]})
-
+    
             if len(domain_val_node_query) != 1:
                 row_number = row_number if row_number else ""
                 if len(domain_val_node_query) == 0:
@@ -1559,12 +1559,16 @@ class DomainDataType(BaseDomainDataType):
 
 
 class DomainListDataType(BaseDomainDataType):
+    def transform_value_for_tile(self, value, **kwargs):
+        if value is not None:
+            if not isinstance(value, list):
+                value = value.split(',')
+        return value
+    
     def validate(self, values, row_number=None, source="", node=None, nodeid=None):
         domainDataType = DomainDataType()
         errors = []
         if values is not None:
-            if not isinstance(values, list):
-                values = [values]
             for value in values:
                 errors = errors + domainDataType.validate(value, row_number)
         return errors
