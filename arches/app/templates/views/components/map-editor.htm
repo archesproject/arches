@@ -231,24 +231,24 @@
                 <div class="install-buttons">
                     <!-- ko if: tile.tileid && self.deleteTile -->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: self.deleteTile, css: {
-                        disabled: (!card.isWritable && !self.preview) || self.editing(),
+                        disabled: (!card.isWritable && !self.preview),
                         'btn-warning': card.isWritable
                     }">{% trans 'Delete' %}</button>
                     <!-- /ko -->
                     <!-- ko if: tile.dirty() -->
                         <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
-                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset, css: { disabled: self.editing()}">{% trans 'Cancel' %}</button>
+                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">{% trans 'Cancel' %}</button>
                         <!-- /ko -->
                         <!-- ko if: tile.tileid -->
                         <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
-                            disabled: (!card.isWritable && !self.preview) || self.editing(),
+                            disabled: (!card.isWritable && !self.preview),
                             'btn-mint': card.isWritable
                         }">{% trans 'Save' %}</button>
                         <!-- /ko -->
                     <!-- /ko -->
                     <!-- ko if: !tile.tileid -->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
-                        disabled: (!card.isWritable && !self.preview) || self.editing(),
+                        disabled: (!card.isWritable && !self.preview),
                         'btn-mint': card.isWritable
                     }">{% trans 'Add'  %}</button>
                     <!-- /ko -->
