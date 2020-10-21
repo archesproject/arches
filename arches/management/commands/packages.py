@@ -741,7 +741,12 @@ class Command(BaseCommand):
                     es_index.prepare_index()
 
         def load_kibana_objects(package_dir):
-            management.call_command("kibana", "--source_dir", os.path.join(package_dir, "kibana_objects"), "-ow", operation="load")
+            # only try and load Kibana objects if they exist
+            if len(glob.glob(os.path.join(package_dir, "kibana_objects", "*.ndjson"))) > 0:
+                commands = ["kibana", "--source_dir", os.path.join(package_dir, "kibana_objects"), "-ow"]
+                if yes is True:
+                    commands.append("-y")
+                management.call_command(*commands, operation="load")
 
         def load_datatypes(package_dir):
             load_extensions(package_dir, "datatypes", "datatype")

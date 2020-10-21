@@ -72,17 +72,23 @@ class Command(BaseCommand):
             "-s", "--source_dir", action="store", dest="source_dir", default="", help="Directory where Kibana .ndjson files are stored."
         )
 
-        parser.add_argument("-ow", "--overwrite", action="store_true", dest="overwrite", default=False, help="Rebuild database")
+        parser.add_argument(
+            "-ow", "--overwrite", action="store_true", dest="overwrite", help="Overwirte existing objects."
+        )
+
+        parser.add_argument(
+            "-y", "--yes", action="store_true", dest="yes", help='Used to force a yes answer to any user input "continue? y/n" prompt'
+        )
 
     def handle(self, *args, **options):
         if options["operation"] == "add_space":
             self.setup_kibana_space(space_name=options["name"])
 
         if options["operation"] == "delete_space":
-            self.delete_kibana_space(space_name=options["name"])
+            self.delete_kibana_space(space_name=options["name"], force=options["yes"])
 
         if options["operation"] == "load":
-            self.upload_kibana_objects(space_name=options["name"], source=options["source_dir"], overwrite=options["overwrite"])
+            self.upload_kibana_objects(space_name=options["name"], source=options["source_dir"], overwrite=options["overwrite"], force=options["yes"])
 
     def setup_kibana_space(self, space_name=""):
         name = settings.ELASTICSEARCH_PREFIX if space_name == "" else space_name
@@ -97,11 +103,12 @@ class Command(BaseCommand):
         else:
             self.stdout.write(self.style.ERROR(f"ERROR - {req.json()['message']}"))
 
-    def delete_kibana_space(self, space_name=""):
+    def delete_kibana_space(self, space_name="", force=False):
         name = settings.ELASTICSEARCH_PREFIX if space_name == "" else space_name
         url = f"{self.baseurl}/api/spaces/space/{name}"
-        yes_no = input(f"Deleting the space \"{name}\" will permanently removes the space and all of its contents. You can't undo this action. Do you want to delete it? Y/N:  ")
-        if yes_no.upper() == "Y":
+        if force is False:
+            yes_no = input(f"Deleting the space \"{name}\" will permanently removes the space and all of its contents. You can't undo this action. Do you want to delete it? Y/N:  ")
+        if force is True or yes_no.upper() == "Y":
             req = requests.delete(url=url, headers=self.headers)
             if req.status_code == 204:
                 self.stdout.write(self.style.SUCCESS(f"Space '{name}' successfully deleted"))
@@ -110,15 +117,18 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(self.style.ERROR(f"ERROR - {req.json()['message']}"))
         
-    def upload_kibana_objects(self, space_name="", source="", overwrite=False):
+    def upload_kibana_objects(self, space_name="", source="", overwrite=False, force=False):
         name = settings.ELASTICSEARCH_PREFIX if space_name == "" else space_name
         
         # first check to see if the kibana space exists
         req = requests.get(url=f"{self.baseurl}/api/spaces/space/{name}")
         if req.status_code != 200:
-            yes_no = input(f"The Kibana space name specified \"{name}\" doesn't exist. Do you want to create it? Y/N:  ")
-            if yes_no.upper() == "Y":
+            if force is True:
                 self.setup_kibana_space(space_name=name)
+            else:
+                yes_no = input(f"The Kibana space name specified \"{name}\" doesn't exist. Do you want to create it? Y/N:  ")
+                if yes_no.upper() == "Y":
+                    self.setup_kibana_space(space_name=name)
 
         # now try to figure out if we can find the appropriate .ndjson files to load
         if source == "":
