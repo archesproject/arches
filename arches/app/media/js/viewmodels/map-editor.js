@@ -115,10 +115,6 @@ define([
             return tool;
         });
 
-        this.editing = ko.pureComputed(function() {
-            return !!(self.selectedFeatureIds().length > 0 || self.selectedTool());
-        });
-
         this.updateTiles = function() {
             var featureCollection = self.draw.getAll();
             _.each(self.featureLookup, function(value) {
