@@ -1338,7 +1338,7 @@ class Graph(models.GraphModel):
                 names_in_nodegroup = [v.name for k, v in self.nodes.items() if v.nodegroup_id == node.nodegroup_id]
                 unique_names_in_nodegroup = {n for n in names_in_nodegroup}
                 if len(names_in_nodegroup) > len(unique_names_in_nodegroup):
-                    message = _("Duplicate node name: \"{0}\". All node names in a card must be unique.".format(node.name))
+                    message = _('Duplicate node name: "{0}". All node names in a card must be unique.'.format(node.name))
                     raise GraphValidationError(message)
                 elif node.is_editable() is False:
                     message = "The name of this node cannot be changed because business data has already been saved to a card that this node is part of."
@@ -1347,7 +1347,7 @@ class Graph(models.GraphModel):
                     parent_node = models.Edge.objects.get(rangenode_id=node.nodeid).domainnode_id
                     sibling_nodes = [edge.rangenode.name for edge in models.Edge.objects.filter(domainnode_id=parent_node)]
                     if node.name in sibling_nodes:
-                        message = _("Duplicate node name: \"{0}\". All sibling node names must be unique.".format(node.name))
+                        message = _('Duplicate node name: "{0}". All sibling node names must be unique.'.format(node.name))
                         raise GraphValidationError(message)
 
     def validate(self):
