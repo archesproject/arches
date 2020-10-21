@@ -27,14 +27,14 @@ from django.core.management.base import BaseCommand
 from arches.app.models.system_settings import settings
 
 
-
-class ArchesHelpTextFormatter (argparse.HelpFormatter):
+class ArchesHelpTextFormatter(argparse.HelpFormatter):
     def _split_lines(self, text, width):
         ret = []
         for line in text.splitlines():
-            ret = ret + [line if index == 0 else f"     {line}" for index, line in enumerate(textwrap.wrap(line.strip(), width))] 
+            ret = ret + [line if index == 0 else f"     {line}" for index, line in enumerate(textwrap.wrap(line.strip(), width))]
         return ret
-        
+
+
 class Command(BaseCommand):
     """
     Commands for running common elasticsearch commands
@@ -43,38 +43,31 @@ class Command(BaseCommand):
 
     def __init__(self, *args, **kwargs):
         self.baseurl = f"{settings.KIBANA_URL}{settings.KIBANA_CONFIG_BASEPATH}"
-        self.headers = {
-            "kbn-xsrf": "true"
-        }
+        self.headers = {"kbn-xsrf": "true"}
         super(Command, self).__init__(*args, **kwargs)
 
     def add_arguments(self, parser):
-        parser.formatter_class=ArchesHelpTextFormatter
+        parser.formatter_class = ArchesHelpTextFormatter
         parser.add_argument(
             "operation",
             nargs="?",
-            choices=[
-                "add_space",
-                "delete_space",
-                "load"
-            ],
-            help="Operation Type;\n" + 
-                BaseCommand().style.SUCCESS("add_space") + " = Creates an Arches managed space in Kibana if no name is provided otherwise creates the space with the passed in name\n" +
-                BaseCommand().style.SUCCESS("delete_space") + " = Deletes an Arches managed space in Kibana if no name is provided otherwise deletes the space with the passed in name\n" +
-                BaseCommand().style.SUCCESS("load") + " = Loads Kibana objects/dashboards provided by .ndjson files into an existing or new space\n"
+            choices=["add_space", "delete_space", "load"],
+            help="Operation Type;\n"
+            + BaseCommand().style.SUCCESS("add_space")
+            + " = Creates an Arches managed space in Kibana if no name is provided otherwise creates the space with the passed in name\n"
+            + BaseCommand().style.SUCCESS("delete_space")
+            + " = Deletes an Arches managed space in Kibana if no name is provided otherwise deletes the space with the passed in name\n"
+            + BaseCommand().style.SUCCESS("load")
+            + " = Loads Kibana objects/dashboards provided by .ndjson files into an existing or new space\n",
         )
 
-        parser.add_argument(
-            "-n", "--name", action="store", dest="name", default="", help="Name of Kibana space."
-        )
+        parser.add_argument("-n", "--name", action="store", dest="name", default="", help="Name of Kibana space.")
 
         parser.add_argument(
             "-s", "--source_dir", action="store", dest="source_dir", default="", help="Directory where Kibana .ndjson files are stored."
         )
 
-        parser.add_argument(
-            "-ow", "--overwrite", action="store_true", dest="overwrite", help="Overwirte existing objects."
-        )
+        parser.add_argument("-ow", "--overwrite", action="store_true", dest="overwrite", help="Overwirte existing objects.")
 
         parser.add_argument(
             "-y", "--yes", action="store_true", dest="yes", help='Used to force a yes answer to any user input "continue? y/n" prompt'
@@ -88,7 +81,9 @@ class Command(BaseCommand):
             self.delete_kibana_space(space_name=options["name"], force=options["yes"])
 
         if options["operation"] == "load":
-            self.upload_kibana_objects(space_name=options["name"], source=options["source_dir"], overwrite=options["overwrite"], force=options["yes"])
+            self.upload_kibana_objects(
+                space_name=options["name"], source=options["source_dir"], overwrite=options["overwrite"], force=options["yes"]
+            )
 
     def setup_kibana_space(self, space_name=""):
         name = settings.ELASTICSEARCH_PREFIX if space_name == "" else space_name
@@ -107,7 +102,9 @@ class Command(BaseCommand):
         name = settings.ELASTICSEARCH_PREFIX if space_name == "" else space_name
         url = f"{self.baseurl}/api/spaces/space/{name}"
         if force is False:
-            yes_no = input(f"Deleting the space \"{name}\" will permanently removes the space and all of its contents. You can't undo this action. Do you want to delete it? Y/N:  ")
+            yes_no = input(
+                f'Deleting the space "{name}" will permanently removes the space and all of its contents. You can\'t undo this action. Do you want to delete it? Y/N:  '
+            )
         if force is True or yes_no.upper() == "Y":
             req = requests.delete(url=url, headers=self.headers)
             if req.status_code == 204:
@@ -116,17 +113,17 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.ERROR(f"ERROR - space '{name}' not found"))
             else:
                 self.stdout.write(self.style.ERROR(f"ERROR - {req.json()['message']}"))
-        
+
     def upload_kibana_objects(self, space_name="", source="", overwrite=False, force=False):
         name = settings.ELASTICSEARCH_PREFIX if space_name == "" else space_name
-        
+
         # first check to see if the kibana space exists
         req = requests.get(url=f"{self.baseurl}/api/spaces/space/{name}")
         if req.status_code != 200:
             if force is True:
                 self.setup_kibana_space(space_name=name)
             else:
-                yes_no = input(f"The Kibana space name specified \"{name}\" doesn't exist. Do you want to create it? Y/N:  ")
+                yes_no = input(f'The Kibana space name specified "{name}" doesn\'t exist. Do you want to create it? Y/N:  ')
                 if yes_no.upper() == "Y":
                     self.setup_kibana_space(space_name=name)
 
@@ -134,7 +131,11 @@ class Command(BaseCommand):
         if source == "":
             in_project = os.path.isfile(os.path.join(os.getcwd(), "manage.py"))
             if not in_project:
-                self.stdout.write(self.style.ERROR(f"Please run this command from the directory where manage.py resides or supply a source file/directory"))
+                self.stdout.write(
+                    self.style.ERROR(
+                        f"Please run this command from the directory where manage.py resides or supply a source file/directory"
+                    )
+                )
                 return
             else:
                 index_files = glob.glob(os.path.join("**", "pkg", "kibana_objects", "*.ndjson"))
@@ -151,15 +152,15 @@ class Command(BaseCommand):
         url = f"{self.baseurl}/s/{name}/api/saved_objects/_import"
         if len(index_files) > 0:
             for index_file in index_files:
-                files = {'file': open(index_file,'rb')}
+                files = {"file": open(index_file, "rb")}
                 req = requests.post(url, files=files, headers=self.headers, params={"overwrite": overwrite})
                 if req.status_code == 200:
-                    if req.json()['success']:
+                    if req.json()["success"]:
                         self.stdout.write(self.style.SUCCESS(f"Loaded: {index_file}"))
                     else:
                         self.stdout.write(self.style.WARNING(f"Errors when loading: {index_file}"))
                         self.stdout.write(self.style.SUCCESS(f"{req.json()['successCount']} items loaded successfully"))
-                        for error in req.json()['errors']:
+                        for error in req.json()["errors"]:
                             name = error["title"] if "title" in error else error["id"]
                             self.stdout.write(self.style.ERROR(f"{error['error']['type']} - type: {error['type']} - name/id: {name}"))
                 elif req.status_code == 404:
