@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '6727_map_layer_configs'),
+        ("models", "6727_map_layer_configs"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='function',
-            name='component',
+            model_name="function",
+            name="component",
             field=models.TextField(blank=True, null=True),
         ),
     ]
