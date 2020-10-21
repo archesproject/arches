@@ -76,9 +76,9 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 # }]
 
 
-KIBANA_URL = "http://localhost:5601/" 
-KIBANA_CONFIG_BASEPATH = "kibana"  # must match Kibana config setting (server.basePath) but without the leading slash, 
-                                   # also make sure to set server.rewriteBasePath: true
+KIBANA_URL = "http://localhost:5601/"
+KIBANA_CONFIG_BASEPATH = "kibana"  # must match Kibana config setting (server.basePath) but without the leading slash,
+# also make sure to set server.rewriteBasePath: true
 
 USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -199,11 +199,11 @@ LANGUAGE_CODE = "en"
 # {langcode}-{regioncode} eg: en, en-gb ....
 # a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES = [
-      ('de', _('German')),
-      ('en', _('English')),
-      ('en-gb', _('British English')),
-      ('es', _('Spanish')),
-      ('ar', _('Arabic')),
+    ("de", _("German")),
+    ("en", _("English")),
+    ("en-gb", _("British English")),
+    ("es", _("Spanish")),
+    ("ar", _("Arabic")),
 ]
 
 # override this to permenantly display/hide the language switcher
