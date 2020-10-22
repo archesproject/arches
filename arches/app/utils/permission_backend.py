@@ -407,6 +407,14 @@ def user_can_read_concepts(user):
     return False
 
 
+def user_is_resource_editor(user):
+    """
+    Single test for whether a user is in the Resource Editor group
+    """
+
+    return user.groups.filter(name='Resource Editor').exists()
+
+
 def user_is_resource_reviewer(user):
     """
     Single test for whether a user is in the Resource Reviewer group
