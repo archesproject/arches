@@ -178,3 +178,9 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.ERROR(f"No '.ndjson' files found!"))
         except requests.exceptions.ConnectionError:
             self.stdout.write(self.style.WARNING(f"Kibana is not running, no objects were loaded."))
+            if force is False:
+                yes_no = input(
+                    f'Would you like to start Kibana and try again? Y/N:  '
+                )
+                if yes_no.upper() == "Y":
+                    self.upload_kibana_objects(space_name=space_name, source=source, overwrite=overwrite, force=force)
