@@ -18,11 +18,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import inspect
-from django.utils.translation import gettext_lazy as _
 
 try:
+    from django.utils.translation import gettext_lazy as _
     from corsheaders.defaults import default_headers
-except ImportError:  # unable to import corsheaders prior to installing requirements.txt in setup.py
+except ImportError:  # unable to import prior to installing requirements.txt in setup.py
     pass
 
 #########################################
@@ -56,7 +56,6 @@ COUCHDB_URL = "http://admin:admin@localhost:5984"  # defaults to localhost:5984
 ANONYMOUS_USER_NAME = None
 
 ELASTICSEARCH_HTTP_PORT = 9200  # this should be in increments of 200, eg: 9400, 9600, 9800
-ELASTICSEARCH_TEMP_HTTP_ENDPOINT = "http://localhost:9800"
 SEARCH_BACKEND = "arches.app.search.search.SearchEngine"
 # see http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
 ELASTICSEARCH_HOSTS = [{"host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
@@ -75,6 +74,11 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 #     'module': 'my_project.search_indexes.sample_index.SampleIndex',
 #     'name': 'my_new_custom_index'
 # }]
+
+
+KIBANA_URL = "http://localhost:5601/"
+KIBANA_CONFIG_BASEPATH = "kibana"  # must match Kibana config.yml setting (server.basePath) but without the leading slash,
+# also make sure to set server.rewriteBasePath: true
 
 USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -96,7 +100,7 @@ RESOURCE_FORMATTERS = {
 }
 
 # Hide nodes and cards in a report that have no data
-HIDE_EMPTY_NODES_IN_REPORT = True
+HIDE_EMPTY_NODES_IN_REPORT = False
 
 # Set the ontolgoy namespace prefixes to use in the UI, set the namespace to '' omit a prefix
 # Users can also override existing namespaces as well if you like
@@ -195,10 +199,11 @@ LANGUAGE_CODE = "en"
 # {langcode}-{regioncode} eg: en, en-gb ....
 # a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES = [
-    #   ('de', _('German')),
-    #   ('en', _('English')),
-    #   ('en-gb', _('British English')),
-    #   ('es', _('Spanish')),
+    # ("de", _("German")),
+    # ("en", _("English")),
+    # ("en-gb", _("British English")),
+    # ("es", _("Spanish")),
+    # ("ar", _("Arabic")),
 ]
 
 # override this to permenantly display/hide the language switcher
@@ -449,6 +454,7 @@ CACHE_BY_USER = {"anonymous": 3600 * 24}
 DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d"  # Custom date format for dates imported from and exported to csv
 
 DATE_FORMATS = {
+    # Keep index values the same for formats in the python and javascript arrays.
     "Python": ["%Y-%m-%dT%H:%M:%S.%f%z", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%d %H:%M:%S%z", "%Y-%m-%d", "%Y-%m", "%Y", "-%Y"],
     "JavaScript": ["YYYY-MM-DDTHH:mm:ss.sssZ", "YYYY-MM-DDTHH:mm:ssZ", "YYYY-MM-DD HH:mm:ssZ", "YYYY-MM-DD", "YYYY-MM", "YYYY", "-YYYY"],
     "Elasticsearch": [

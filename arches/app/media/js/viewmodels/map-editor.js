@@ -28,6 +28,7 @@ define([
         this.draw = null;
         this.selectSource = this.selectSource || ko.observable();
         this.selectSourceLayer = this.selectSourceLayer || ko.observable();
+        this.drawAvailable = ko.observable(false);
 
         var selectSource = this.selectSource();
         var selectSourceLayer = this.selectSourceLayer();
@@ -112,10 +113,6 @@ define([
                 if (selectedTool) tool = selectedTool;
             });
             return tool;
-        });
-
-        this.editing = ko.pureComputed(function() {
-            return !!(self.selectedFeatureIds().length > 0 || self.selectedTool());
         });
 
         this.updateTiles = function() {
@@ -416,6 +413,9 @@ define([
                     if (value.selectedTool()) value.selectedTool('');
                 });
             });
+            if (self.draw) {
+                self.drawAvailable(true);
+            }
         };
 
 

@@ -559,7 +559,7 @@ class Tile(models.TileModel):
                 except NotImplementedError:
                     pass
         except TypeError:
-            logger.info(_("No associated functions"))
+            logger.info(_("No associated functions or other TypeError raised by a function"))
 
     def __preDelete(self, request):
         try:
@@ -569,7 +569,7 @@ class Tile(models.TileModel):
                 except NotImplementedError:
                     pass
         except TypeError:
-            logger.info(_("No associated functions"))
+            logger.info(_("No associated functions or other TypeError raised by a function"))
 
     def __postSave(self, request=None):
         try:
@@ -579,8 +579,8 @@ class Tile(models.TileModel):
                 except NotImplementedError:
                     pass
         except TypeError as e:
-            logger.warn(_("No associated functions"))
-            logger.warn(e)
+            logger.warning(_("No associated functions or other TypeError raised by a function"))
+            logger.warning(e)
 
     def _getFunctionClassInstances(self):
         ret = []

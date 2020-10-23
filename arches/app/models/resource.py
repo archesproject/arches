@@ -384,7 +384,7 @@ class Resource(models.ResourceInstance):
         return permit_deletion
 
     def get_related_resources(
-        self, lang="en-US", limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0, user=None
+        self, lang="en-US", limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0, user=None, resourceinstance_graphid=None,
     ):
         """
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
@@ -396,24 +396,37 @@ class Resource(models.ResourceInstance):
             .exclude(isresource=False)
             .exclude(isactive=False)
         )
+
         graph_lookup = {
             str(graph.graphid): {"name": graph.name, "iconclass": graph.iconclass, "fillColor": graph.color} for graph in graphs
         }
+
         ret = {"resource_instance": self, "resource_relationships": [], "related_resources": [], "node_config_lookup": graph_lookup}
 
         if page > 0:
             limit = settings.RELATED_RESOURCES_PER_PAGE
             start = limit * int(page - 1)
 
-        def get_relations(resourceinstanceid, start, limit):
+        def get_relations(resourceinstanceid, start, limit, resourceinstance_graphid=None):
             query = Query(se, start=start, limit=limit)
             bool_filter = Bool()
             bool_filter.should(Terms(field="resourceinstanceidfrom", terms=resourceinstanceid))
             bool_filter.should(Terms(field="resourceinstanceidto", terms=resourceinstanceid))
+
+            if resourceinstance_graphid:
+                graph_id_filter = Bool()
+                graph_id_filter.should(Terms(field="resourceinstancefrom_graphid", terms=resourceinstance_graphid))
+                graph_id_filter.should(Terms(field="resourceinstanceto_graphid", terms=resourceinstance_graphid))
+                bool_filter.must(graph_id_filter)
+
             query.add_query(bool_filter)
+
             return query.search(index=RESOURCE_RELATIONS_INDEX)
 
-        resource_relations = get_relations(self.resourceinstanceid, start, limit)
+        resource_relations = get_relations(
+            resourceinstanceid=self.resourceinstanceid, start=start, limit=limit, resourceinstance_graphid=resourceinstance_graphid,
+        )
+
         ret["total"] = resource_relations["hits"]["total"]
         instanceids = set()
 
@@ -434,17 +447,18 @@ class Resource(models.ResourceInstance):
             else:
                 ret["total"]["value"] -= 1
 
-        if len(instanceids) > 0:
+        if str(self.resourceinstanceid) in instanceids:
             instanceids.remove(str(self.resourceinstanceid))
 
         if len(instanceids) > 0:
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
                 for resource in related_resources["docs"]:
-                    relations = get_relations(resource["_id"], 0, 0)
+                    relations = get_relations(resourceinstanceid=resource["_id"], start=0, limit=0,)
                     if resource["found"]:
                         resource["_source"]["total_relations"] = relations["hits"]["total"]
                         ret["related_resources"].append(resource["_source"])
+
         return ret
 
     def copy(self):
