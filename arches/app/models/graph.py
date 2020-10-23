@@ -515,8 +515,6 @@ class Graph(models.GraphModel):
         if skip_validation or self.can_append(branch_graph, nodeToAppendTo):
             branch_copy = branch_graph.copy()["copy"]
             branch_copy.root.istopnode = False
-            # Copy the description of the branch to the new node
-            branch_copy.root.description = branch_graph.description
 
             newEdge = models.Edge(domainnode=nodeToAppendTo, rangenode=branch_copy.root, ontologyproperty=property, graph=self)
             branch_copy.add_edge(newEdge)
@@ -531,11 +529,31 @@ class Graph(models.GraphModel):
                 self.widgets[widget.pk] = widget
 
             self.populate_null_nodegroups()
+            sibling_node_names = [node.name for node in self.get_sibling_nodes(branch_copy.root)]
+            branch_copy.root.name = self.make_name_unique(branch_copy.root.name, sibling_node_names)
+            branch_copy.root.description = branch_graph.description
 
             if self.ontology is None:
                 branch_copy.clear_ontology_references()
 
             return branch_copy
+
+    def make_name_unique(self, name, names_to_check):
+        """
+        Makes a name unique among a list of name
+
+        Arguments:
+        name -- the name to check and modfiy to make unique in the list of "names_to_check"
+        names_to_check -- a list of names that "name" should be unique among
+        """
+
+        i = 1
+        temp_node_name = name
+        while temp_node_name in names_to_check:
+            temp_node_name = "{0}_{1}".format(name, i)
+            i += 1
+        return temp_node_name
+        
 
     def append_node(self, nodeid=None):
         """
@@ -548,14 +566,7 @@ class Graph(models.GraphModel):
         """
 
         node_names = [node.name for node in self.nodes.values()]
-        temp_node_name = self.temp_node_name
-        if temp_node_name in node_names:
-            i = 1
-            temp_node_name = "{0}_{1}".format(self.temp_node_name, i)
-            while temp_node_name in node_names:
-                i += 1
-                temp_node_name = "{0}_{1}".format(self.temp_node_name, i)
-
+        temp_node_name = self.make_name_unique(self.temp_node_name, node_names)
         nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
         card = None
 
@@ -910,8 +921,8 @@ class Graph(models.GraphModel):
         """
 
         if str(self.root.nodeid) == str(nodeid):
-
             return None
+
         for edge_id, edge in self.edges.items():
             if str(edge.rangenode_id) == str(nodeid):
                 return edge.domainnode
@@ -931,6 +942,17 @@ class Graph(models.GraphModel):
             ret.append(edge.rangenode)
             ret.extend(self.get_child_nodes(edge.rangenode_id))
         return ret
+
+    def get_sibling_nodes(self, node):
+        """
+        Given a node will get all of that nodes siblings excluding the given node itself
+
+        """
+
+        incoming_edge = list(filter(lambda x: x.rangenode_id == node.nodeid, self.edges.values()))[0]
+        parent_node_id = incoming_edge.domainnode_id
+        sibling_nodes = [edge.rangenode for edge in filter(lambda x: x.domainnode_id == parent_node_id , self.edges.values()) if edge.rangenode.nodeid != node.nodeid]
+        return sibling_nodes
 
     def get_out_edges(self, nodeid):
         """
@@ -1330,25 +1352,23 @@ class Graph(models.GraphModel):
         Prevents a user from changing the name of a node that already has tiles.
         Verifies a node's name is unique to its sibling nodes.
         """
-        if node.istopnode or models.Node.objects.filter(pk=node.nodeid).exists() is False:
+
+        if node.istopnode:
             return
         else:
-            changing_name = node.name != models.Node.objects.get(pk=node.nodeid).name
-            if changing_name:
-                names_in_nodegroup = [v.name for k, v in self.nodes.items() if v.nodegroup_id == node.nodegroup_id]
-                unique_names_in_nodegroup = {n for n in names_in_nodegroup}
-                if len(names_in_nodegroup) > len(unique_names_in_nodegroup):
-                    message = _('Duplicate node name: "{0}". All node names in a card must be unique.'.format(node.name))
+            names_in_nodegroup = [v.name for k, v in self.nodes.items() if v.nodegroup_id == node.nodegroup_id]
+            unique_names_in_nodegroup = {n for n in names_in_nodegroup}
+            if len(names_in_nodegroup) > len(unique_names_in_nodegroup):
+                message = _('Duplicate node name: "{0}". All node names in a card must be unique.'.format(node.name))
+                raise GraphValidationError(message)
+            elif node.is_editable() is False:
+                message = "The name of this node cannot be changed because business data has already been saved to a card that this node is part of."
+                raise GraphValidationError(_(message))
+            else:
+                sibling_node_names = [node.name for node in self.get_sibling_nodes(node)]
+                if node.name in sibling_node_names:
+                    message = _('Duplicate node name: "{0}". All sibling node names must be unique.'.format(node.name))
                     raise GraphValidationError(message)
-                elif node.is_editable() is False:
-                    message = "The name of this node cannot be changed because business data has already been saved to a card that this node is part of."
-                    raise GraphValidationError(_(message))
-                elif models.Edge.objects.filter(rangenode_id=node.nodeid).exists():
-                    parent_node = models.Edge.objects.get(rangenode_id=node.nodeid).domainnode_id
-                    sibling_nodes = [edge.rangenode.name for edge in models.Edge.objects.filter(domainnode_id=parent_node)]
-                    if node.name in sibling_nodes:
-                        message = _('Duplicate node name: "{0}". All sibling node names must be unique.'.format(node.name))
-                        raise GraphValidationError(message)
 
     def validate(self):
         """
