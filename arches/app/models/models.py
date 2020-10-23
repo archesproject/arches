@@ -343,7 +343,7 @@ class Function(models.Model):
     defaultconfig = JSONField(blank=True, null=True)
     modulename = models.TextField(blank=True, null=True)
     classname = models.TextField(blank=True, null=True)
-    component = models.TextField(blank=True, null=True, unique=True)
+    component = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
