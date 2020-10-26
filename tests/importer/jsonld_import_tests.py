@@ -118,7 +118,10 @@ class JsonLDImportTests(ArchesTestCase):
         pass
 
     def _create_url(self, graph_id, resource_id):
-        base_url = reverse("resources_graphid", kwargs={"graphid": graph_id, "resourceid": resource_id},)
+        base_url = reverse(
+            "resources_graphid",
+            kwargs={"graphid": graph_id, "resourceid": resource_id},
+        )
 
         return base_url + "?format=json-ld"
 
@@ -165,7 +168,10 @@ class JsonLDImportTests(ArchesTestCase):
             "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "test!"
             }"""
 
-        url = self._create_url(graph_id="bf734b4e-f6b5-11e9-8f09-a4d18cec433a", resource_id="221d1154-fa8e-11e9-9cbb-3af9d3b32b71",)
+        url = self._create_url(
+            graph_id="bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
+            resource_id="221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
+        )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
 
@@ -186,7 +192,10 @@ class JsonLDImportTests(ArchesTestCase):
             "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "test!"
             }"""
 
-        url = self._create_url(graph_id="bf734b4e-f6b5-11e9-8f09-a4d18cec433a", resource_id="",)
+        url = self._create_url(
+            graph_id="bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
+            resource_id="",
+        )
 
         response = self.client.post(url, data=data, content_type="application/json", HTTP_AUTHORIZATION=f"Bearer {self.token}")
 
@@ -247,7 +256,10 @@ class JsonLDImportTests(ArchesTestCase):
             }
         """
 
-        url = self._create_url(graph_id="ee72fb1e-fa6c-11e9-b369-3af9d3b32b71", resource_id="12345678-abcd-11e9-9cbb-3af9d3b32b71",)
+        url = self._create_url(
+            graph_id="ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
+            resource_id="12345678-abcd-11e9-9cbb-3af9d3b32b71",
+        )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
 
@@ -347,7 +359,10 @@ class JsonLDImportTests(ArchesTestCase):
             } 
         """
 
-        url = self._create_url(graph_id="ee72fb1e-fa6c-11e9-b369-3af9d3b32b71", resource_id="5e9baff0-109b-11ea-957a-acde48001122",)
+        url = self._create_url(
+            graph_id="ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
+            resource_id="5e9baff0-109b-11ea-957a-acde48001122",
+        )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
 
@@ -403,7 +418,10 @@ class JsonLDImportTests(ArchesTestCase):
             }
         """
 
-        url = self._create_url(graph_id="92ccf5aa-bec9-11e9-bd39-0242ac160002", resource_id="0b4439a8-beca-11e9-b4dc-0242ac160002",)
+        url = self._create_url(
+            graph_id="92ccf5aa-bec9-11e9-bd39-0242ac160002",
+            resource_id="0b4439a8-beca-11e9-b4dc-0242ac160002",
+        )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
 
@@ -450,7 +468,10 @@ class JsonLDImportTests(ArchesTestCase):
             }
         """
 
-        url = self._create_url(graph_id="ee72fb1e-fa6c-11e9-b369-3af9d3b32b71", resource_id="abcd1234-1234-1129-b6e7-3af9d3b32b71",)
+        url = self._create_url(
+            graph_id="ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
+            resource_id="abcd1234-1234-1129-b6e7-3af9d3b32b71",
+        )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         print(f"Test 4: {response.content}")
@@ -518,7 +539,10 @@ class JsonLDImportTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
-        url = self._create_url(graph_id="40dbcffa-faa1-11e9-84de-3af9d3b32b71", resource_id="7fffffff-faa1-11e9-84de-3af9d3b32b71",)
+        url = self._create_url(
+            graph_id="40dbcffa-faa1-11e9-84de-3af9d3b32b71",
+            resource_id="7fffffff-faa1-11e9-84de-3af9d3b32b71",
+        )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
 
@@ -563,7 +587,10 @@ class JsonLDImportTests(ArchesTestCase):
                 }
             }
         """
-        url = self._create_url(graph_id="09e3dc8a-c055-11e9-b4dc-0242ac160002", resource_id="69a4af50-c055-11e9-b4dc-0242ac160002",)
+        url = self._create_url(
+            graph_id="09e3dc8a-c055-11e9-b4dc-0242ac160002",
+            resource_id="69a4af50-c055-11e9-b4dc-0242ac160002",
+        )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         print(f"Test 6 response: {response.content}")
@@ -601,7 +628,10 @@ class JsonLDImportTests(ArchesTestCase):
             }
         """
 
-        url = self._create_url(graph_id="9f716aa2-bf96-11e9-bd39-0242ac160002", resource_id="87654321-c000-1100-b400-0242ac160002",)
+        url = self._create_url(
+            graph_id="9f716aa2-bf96-11e9-bd39-0242ac160002",
+            resource_id="87654321-c000-1100-b400-0242ac160002",
+        )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         print(f"Test 7 response: {response.content}")
@@ -651,7 +681,10 @@ class JsonLDImportTests(ArchesTestCase):
             }
         """
 
-        url = self._create_url(graph_id="9f716aa2-bf96-11e9-bd39-0242ac160002", resource_id="87654321-c000-1100-b400-0242ac160002",)
+        url = self._create_url(
+            graph_id="9f716aa2-bf96-11e9-bd39-0242ac160002",
+            resource_id="87654321-c000-1100-b400-0242ac160002",
+        )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         print(f"Test 7b response: {response.content}")
@@ -694,7 +727,10 @@ class JsonLDImportTests(ArchesTestCase):
             }
         """
 
-        url = self._create_url(graph_id="2c03ddcc-bfa8-11e9-b4dc-0242ac160002", resource_id="923a5fa8-bfa8-11e9-bd39-0242ac160002",)
+        url = self._create_url(
+            graph_id="2c03ddcc-bfa8-11e9-b4dc-0242ac160002",
+            resource_id="923a5fa8-bfa8-11e9-bd39-0242ac160002",
+        )
 
         response = self.client.put(url, data=aux_data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
 
@@ -711,7 +747,10 @@ class JsonLDImportTests(ArchesTestCase):
             }
         """
 
-        url = self._create_url(graph_id="e3d4505e-bfa7-11e9-b4dc-0242ac160002", resource_id="940a2c82-bfa8-11e9-bd39-0242ac160002",)
+        url = self._create_url(
+            graph_id="e3d4505e-bfa7-11e9-b4dc-0242ac160002",
+            resource_id="940a2c82-bfa8-11e9-bd39-0242ac160002",
+        )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         print(f"Test 8 response: {response.content}")
@@ -730,7 +769,10 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(owner["@id"] == "http://localhost:8000/resources/923a5fa8-bfa8-11e9-bd39-0242ac160002")
 
     def test_9_5299_basic(self):
-        url = self._create_url(graph_id="0cadd978-071a-11ea-8d9a-acde48001122", resource_id="faceb004-dead-11e9-bd39-0242ac160002",)
+        url = self._create_url(
+            graph_id="0cadd978-071a-11ea-8d9a-acde48001122",
+            resource_id="faceb004-dead-11e9-bd39-0242ac160002",
+        )
 
         data = """
             {
@@ -767,7 +809,10 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(js[note] == "#ff00ff")
 
     def test_a_5299_complex(self):
-        url = self._create_url(graph_id="f348bbda-0721-11ea-b628-acde48001122", resource_id="deadface-0000-11e9-bd39-0242ac160002",)
+        url = self._create_url(
+            graph_id="f348bbda-0721-11ea-b628-acde48001122",
+            resource_id="deadface-0000-11e9-bd39-0242ac160002",
+        )
 
         data = """
             {
@@ -853,7 +898,10 @@ class JsonLDImportTests(ArchesTestCase):
             }     
         """
 
-        url = self._create_url(graph_id="9d2c2ca0-0e3d-11ea-b4f1-acde48001122", resource_id="61787e78-0e3f-11ea-b4f1-acde48001122",)
+        url = self._create_url(
+            graph_id="9d2c2ca0-0e3d-11ea-b4f1-acde48001122",
+            resource_id="61787e78-0e3f-11ea-b4f1-acde48001122",
+        )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
 
@@ -896,7 +944,10 @@ class JsonLDImportTests(ArchesTestCase):
             }
         """
 
-        url = self._create_url(graph_id="d5456066-107c-11ea-b7e9-acde48001122", resource_id="5683f462-107d-11ea-b7e9-acde48001122",)
+        url = self._create_url(
+            graph_id="d5456066-107c-11ea-b7e9-acde48001122",
+            resource_id="5683f462-107d-11ea-b7e9-acde48001122",
+        )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         print(f"\n\n\nTest c response: {response.content}")
@@ -925,7 +976,10 @@ class JsonLDImportTests(ArchesTestCase):
             }     
         """
 
-        url = self._create_url(graph_id="ee72fb1e-fa6c-11e9-b369-3af9d3b32b71", resource_id="10000000-109b-11ea-957a-acde48001122",)
+        url = self._create_url(
+            graph_id="ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
+            resource_id="10000000-109b-11ea-957a-acde48001122",
+        )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         self.assertEqual(response.status_code, 201)
@@ -959,7 +1013,10 @@ class JsonLDImportTests(ArchesTestCase):
             }
         """
 
-        url = self._create_url(graph_id="9f716aa2-bf96-11e9-bd39-0242ac160002", resource_id="8e870000-114e-11ea-8de7-acde48001122",)
+        url = self._create_url(
+            graph_id="9f716aa2-bf96-11e9-bd39-0242ac160002",
+            resource_id="8e870000-114e-11ea-8de7-acde48001122",
+        )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
 
@@ -1063,7 +1120,10 @@ class JsonLDImportTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
-        url = self._create_url(graph_id="9b596906-1540-11ea-b353-acde48001122", resource_id="c3b693cc-1542-11ea-b353-acde48001122",)
+        url = self._create_url(
+            graph_id="9b596906-1540-11ea-b353-acde48001122",
+            resource_id="c3b693cc-1542-11ea-b353-acde48001122",
+        )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
 
@@ -1106,7 +1166,10 @@ class JsonLDImportTests(ArchesTestCase):
             }
             """
 
-        url = self._create_url(graph_id="0bc001c2-c163-11ea-8354-3af9d3b32b71", resource_id="05f314d0-7a7b-4408-8d9b-f0b61f1fb27d",)
+        url = self._create_url(
+            graph_id="0bc001c2-c163-11ea-8354-3af9d3b32b71",
+            resource_id="05f314d0-7a7b-4408-8d9b-f0b61f1fb27d",
+        )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         self.assertEqual(response.status_code, 201)

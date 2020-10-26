@@ -454,7 +454,11 @@ class Resource(models.ResourceInstance):
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
                 for resource in related_resources["docs"]:
-                    relations = get_relations(resourceinstanceid=resource["_id"], start=0, limit=0,)
+                    relations = get_relations(
+                        resourceinstanceid=resource["_id"],
+                        start=0,
+                        limit=0,
+                    )
                     if resource["found"]:
                         resource["_source"]["total_relations"] = relations["hits"]["total"]
                         ret["related_resources"].append(resource["_source"])

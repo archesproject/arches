@@ -134,7 +134,10 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
         self.test_resource.tiles.append(self.string_tile)
 
-        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, hide_empty_nodes=False,)
+        label_based_graph = LabelBasedGraph.from_resource(
+            resource=self.test_resource,
+            hide_empty_nodes=False,
+        )
 
         self.assertEqual(
             label_based_graph,
@@ -160,7 +163,10 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         self.test_resource.tiles.append(self.string_tile)
         self.test_resource.tiles.append(duplicate_node_tile)
 
-        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, hide_empty_nodes=False,)
+        label_based_graph = LabelBasedGraph.from_resource(
+            resource=self.test_resource,
+            hide_empty_nodes=False,
+        )
 
         self.assertEqual(
             label_based_graph,
@@ -190,7 +196,10 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
         self.test_resource.tiles.append(self.grouping_tile)
 
-        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, hide_empty_nodes=False,)
+        label_based_graph = LabelBasedGraph.from_resource(
+            resource=self.test_resource,
+            hide_empty_nodes=False,
+        )
 
         self.assertEqual(
             label_based_graph,
@@ -214,7 +223,10 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
         self.test_resource.tiles.append(self.grouping_tile)
 
-        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, hide_empty_nodes=False,)
+        label_based_graph = LabelBasedGraph.from_resource(
+            resource=self.test_resource,
+            hide_empty_nodes=False,
+        )
 
         self.assertEqual(
             label_based_graph,
@@ -242,7 +254,10 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         self.test_resource.tiles.append(self.grouping_tile)
         self.test_resource.tiles.append(self.string_tile)
 
-        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, hide_empty_nodes=False,)
+        label_based_graph = LabelBasedGraph.from_resource(
+            resource=self.test_resource,
+            hide_empty_nodes=False,
+        )
 
         self.assertEqual(
             label_based_graph,
