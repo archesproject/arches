@@ -117,6 +117,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </a>
                         {% endif %}
 
+                        {% if show_language_swtich %}
+                        {% get_current_language as LANGUAGE_CODE %}
+                            <div class="lang-switch ep-tools ep-tools-right" style="max-width: none;" 
+                            data-bind='component: {
+                                name: "views/components/language-switcher",
+                                params: {
+                                    current_language: "{{LANGUAGE_CODE}}"
+                                }
+                            }'></div>
+                        {% endif %}
+                        
                         <!-- Notifications -->
                         {% if nav.notifs %}
                         <a href="" class="ep-tools ep-notifs-toggle ep-tools-right" data-bind="click: function() {getNotifications();}">
@@ -404,9 +415,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             {% if p.config is not None %}
                                                 {% if p.config.show is not False %}
                                                     <li{% if main_script == "views/plugin" and plugin.pluginid == p.pluginid  %} class="active-sub"{% endif %}>
-                                                        {% if p.name == "Dashboard" %}
-                                                        <a href="{% url 'plugins' p.pluginid %}" data-bind="css: {'nav-item-disabled': !inSearch() }" alt="Click Search to use Dashboard">
-                                                        {% elif p.slug is not None %}
+                                                        {% if p.slug is not None %}
                                                         <a href="{% url 'plugins' p.slug %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.slug %}') ">
                                                         {% else %}
                                                         <a href="{% url 'plugins' p.pluginid %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.pluginid %}') ">
@@ -420,9 +429,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 {% endif %}
                                             {% else %}
                                             <li{% if main_script == "views/plugin" and plugin.pluginid == p.pluginid  %} class="active-sub"{% endif %}>
-                                                {% if p.name == "Dashboard" %}
-                                                <a href="{% url 'plugins' p.pluginid %}" data-bind="css: {'nav-item-disabled': !inSearch() }" alt="Click Search to use Dashboard">
-                                                {% elif p.slug is not None %}
+                                                {% if p.slug is not None %}
                                                 <a href="{% url 'plugins' p.slug %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.slug %}') ">
                                                 {% else %}
                                                 <a href="{% url 'plugins' p.pluginid %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.pluginid %}') ">

@@ -23,7 +23,7 @@
 
 
 <!-- Report Content -->
-<div class="rp-report-container-preview">
+<div class="rp-report-container-preview" style="margin-bottom: 15px;">
 
     {% block header %}
     {% endblock header %}
@@ -63,40 +63,53 @@
     </div>
 
     {% endblock body %}
-
-    <!-- ko if: report.related_resources.length && report.related_resources.map(x => typeof(x.related) != 'undefined' ?  x.related.length : 0).reduce((a,b) => a+b) > 0 || !hideEmptyNodes() -->
+    
     <div class="rp-report-section relative report-related-resources">
         <div class="rp-report-section-title">
             <h4 class="rp-section-title">{% trans 'Related Resources' %}</h4>
         </div>
-        <!-- ko foreach: { data: report.related_resources, as: 'rr' } -->
-            <!-- ko if: rr.related.length > 0 -->
-            <div class="rp-card-section">
-                <h5 class="rp-tile-title">
-                    <span class="rp-tile-title-float" data-bind="text: rr.graph_name"></span>
-                </h5>
-                <!--ko if: rr.related.length > 0 -->
-                <div class="rp-report-container-tile">
+        
+        <!-- ko foreach: { data: Object.values(report.relatedResourcesLookup()), as: 'resourceData' } -->
+        <!-- ko if: resourceData.totalRelatedResources > 0 || !$parent.hideEmptyNodes() -->
+        <h5 class="rp-tile-title">
+            <span class="rp-tile-title-float" data-bind="text: resourceData.name"></span>
+        </h5>
+
+        <div class="rp-card-section">
+            <!-- ko foreach: { data: resourceData.loadedRelatedResources(), as: 'relatedResource' } -->
+            <div class="rp-report-container-tile">
                 <div class="row rp-report-tile">
-                    <!-- ko foreach: { data: rr.related } -->
-                        <dl class="dl-horizontal">
-                            <dt><a data-bind="text: $data.displayname, attr: {href: $data.link}"></a></dt>
-                            <dd data-bind="text: '( ' + $data.relationship + ' )'"></dd>
-                        </dl>
-                    <!-- /ko -->
+                    <dl class="dl-horizontal">
+                        <dt><a data-bind="text: relatedResource.displayName, attr: {href: relatedResource.link}"></a></dt>
+                        <!-- ko if: relatedResource.relationship -->
+                        <dd data-bind="text: '( ' + relatedResource.relationship + ' )'"></dd>
+                        <!-- /ko -->
+                    </dl>
                 </div>
-                </div>
-                <!-- /ko -->
-                <!--ko if: rr.related.length === 0 -->
-                <div class="rp-report-container-tile">
-                    <div class="row rp-report-tile rp-no-data">{% trans 'No relationships added' %}</div>
-                </div>
-                <!--/ko-->
             </div>
             <!-- /ko -->
+
+            <!-- ko if: resourceData.paginator() && resourceData.paginator().has_next -->
+            <button class="btn btn-primary" data-bind="click: $parent.report.getRelatedResources.bind($parent.report, false)">
+                {% trans "Load More" %}
+                <span data-bind="text: '(' + resourceData.remainingResources() + ')'"></span>
+            </button>
+
+            <button class="btn btn-primary" data-bind="click: $parent.report.getRelatedResources.bind($parent.report, true)">
+                {% trans "Load All" %}
+                <span data-bind="text: '(' + (resourceData.totalRelatedResources - resourceData.loadedRelatedResources().length) + ')'"></span>
+            </button>
+            <!-- /ko -->
+                
+            <!--ko if: resourceData.totalRelatedResources === 0 -->	
+            <div class="rp-report-container-tile">	
+                <div class="row rp-report-tile rp-no-data">{% trans 'No relationships added' %}</div>	
+            </div>	
+            <!--/ko-->
+        </div>
         <!-- /ko -->
+        <!-- /ko -->    
     </div>  
-    <!-- /ko -->    
 </div>
 {% endblock report %}
 <!-- /ko -->
@@ -115,6 +128,7 @@
         </div>
     </div>
 </div>
+
 <div class="rp-report-container-preview">
     <div class="rp-report-section relative rp-report-section-root">
         <div class="rp-report-section-title">
