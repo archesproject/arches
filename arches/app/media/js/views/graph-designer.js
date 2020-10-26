@@ -281,6 +281,7 @@ define([
                 onReset: function() {
                     var graph = koMapping.toJS(viewModel.graphSettingsViewModel.graph);
                     viewModel.report.resetConfigs(graph.config);
+                    viewModel.report.get('template_id')(graph["template_id"]);
                 }
             });
 
