@@ -1627,23 +1627,15 @@ datatables.net-responsive-bs@~2.1.0:
     datatables.net-responsive ">=1.0.7"
     jquery ">=1.7"
 
-datatables.net-responsive@>=1.0.7:
-  version "2.2.5"
-  resolved "https://registry.yarnpkg.com/datatables.net-responsive/-/datatables.net-responsive-2.2.5.tgz#33a11ec59b416a546a213b3b736e1ff8ad1fa5eb"
-  integrity sha512-AuF28BJRQWfke0cwZwgJB5+WHgoDCDAnW59TJWX4JAXYes3iFrJA6mNHWw46Up3bqUJVI2ZxJoKTGpoEHm5hNA==
+datatables.net-responsive@>=1.0.7, datatables.net-responsive@~2.2.6:
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/datatables.net-responsive/-/datatables.net-responsive-2.2.6.tgz#74a4ac0da7681eb4273b8d359f198ef2def2971e"
+  integrity sha512-cSz8xlM6bUgQlroT6wJjj+wyKGo+GY2Bq+2CL17HaLGrtv1k/RDitHoDMdYbaKljBwSa4sGVBxikHGz3yvirJA==
   dependencies:
     datatables.net "^1.10.15"
     jquery ">=1.7"
 
-datatables.net-responsive@~2.1.0:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/datatables.net-responsive/-/datatables.net-responsive-2.1.1.tgz#cbbd617882267ab2663e9745ad1b4e748158ed11"
-  integrity sha1-y71heIImerJmPpdFrRtOdIFY7RE=
-  dependencies:
-    datatables.net ">=1.10.9"
-    jquery ">=1.7"
-
-datatables.net@1.10.21, datatables.net@>=1.10.9, datatables.net@^1.10.15, datatables.net@~1.10.12:
+datatables.net@1.10.21, datatables.net@^1.10.15, datatables.net@~1.10.12:
   version "1.10.21"
   resolved "https://registry.yarnpkg.com/datatables.net/-/datatables.net-1.10.21.tgz#f1d35c8e5c3eb7f5caef39e80cd5b836a8c77103"
   integrity sha512-/bSZtxmf3GTpYcvEmwZ8q26I1yhSx8qklR2B+s1K8+/51UW/zc2zTYwJMqr/Z+iCYixAc00ildj4g2x0Qamolw==
