@@ -1593,7 +1593,7 @@ d3@^6.1.1:
     d3-transition "2"
     d3-zoom "2"
 
-datatables.net-bs@>=1.10.9, datatables.net-bs@^1.10.15, datatables.net-bs@~1.10.12:
+datatables.net-bs@^1.10.15, datatables.net-bs@~1.10.12:
   version "1.10.21"
   resolved "https://registry.yarnpkg.com/datatables.net-bs/-/datatables.net-bs-1.10.21.tgz#c80e655033787512423ad78a45e8164f25417dc5"
   integrity sha512-4mpesFXNEkLlQET3IDLclLz95Xit4Kp/jHcOM2X0nc/ijDfO3qJk3ehZ+NSEAkXZDge6ZtY5Zxq2O90ISiIjwQ==
@@ -1618,19 +1618,19 @@ datatables.net-buttons@1.6.3, datatables.net-buttons@^1.5.4:
     datatables.net "^1.10.15"
     jquery ">=1.7"
 
-datatables.net-responsive-bs@~2.1.0:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/datatables.net-responsive-bs/-/datatables.net-responsive-bs-2.1.1.tgz#8770c0fad439a7839b1633cf454e01f227dde877"
-  integrity sha1-h3DA+tQ5p4ObFjPPRU4B8ifd6Hc=
+datatables.net-responsive-bs@~2.2.6:
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/datatables.net-responsive-bs/-/datatables.net-responsive-bs-2.2.6.tgz#3930019f973acb9327d51a4e6cc15d2d4e5b27b0"
+  integrity sha512-ZGOoLyHxrlUMoOosPSwR9diDG4LZEJMl4rQZ0ApbA8l7U1QZVjcy+9L4V98xVeb1BElq91j7+zlQZBvAtGOlAw==
   dependencies:
-    datatables.net-bs ">=1.10.9"
-    datatables.net-responsive ">=1.0.7"
+    datatables.net-bs "^1.10.15"
+    datatables.net-responsive "2.2.6"
     jquery ">=1.7"
 
-datatables.net-responsive@>=1.0.7:
-  version "2.2.5"
-  resolved "https://registry.yarnpkg.com/datatables.net-responsive/-/datatables.net-responsive-2.2.5.tgz#33a11ec59b416a546a213b3b736e1ff8ad1fa5eb"
-  integrity sha512-AuF28BJRQWfke0cwZwgJB5+WHgoDCDAnW59TJWX4JAXYes3iFrJA6mNHWw46Up3bqUJVI2ZxJoKTGpoEHm5hNA==
+datatables.net-responsive@2.2.6:
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/datatables.net-responsive/-/datatables.net-responsive-2.2.6.tgz#74a4ac0da7681eb4273b8d359f198ef2def2971e"
+  integrity sha512-cSz8xlM6bUgQlroT6wJjj+wyKGo+GY2Bq+2CL17HaLGrtv1k/RDitHoDMdYbaKljBwSa4sGVBxikHGz3yvirJA==
   dependencies:
     datatables.net "^1.10.15"
     jquery ">=1.7"

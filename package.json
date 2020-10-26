@@ -24,7 +24,7 @@
         "datatables.net-buttons": "^1.5.4",
         "datatables.net-buttons-bs": "^1.5.4",
         "datatables.net-responsive": "~2.1.0",
-        "datatables.net-responsive-bs": "~2.1.0",
+        "datatables.net-responsive-bs": "~2.2.6",
         "dom4": "^2.0.1",
         "dropzone": "5.7.0",
         "eonasdan-bootstrap-datetimepicker": "4.17.44",
