@@ -24,6 +24,7 @@ from copy import copy, deepcopy
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
+from django.db.utils import IntegrityError
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
@@ -337,9 +338,43 @@ class Graph(models.GraphModel):
     def _update_node(self, node, datatype_factory, se):
         already_saved = models.Node.objects.filter(pk=node.nodeid).exists()
         saved_node_datatype = None
-        if already_saved is True:
-            saved_node_datatype = models.Node.objects.get(pk=node.nodeid).datatype
-        node.save()
+        saved_name = ""
+        is_name_valid = True
+
+        if already_saved:
+            saved_node = models.Node.objects.get(pk=node.nodeid)
+            saved_node_datatype = saved_node.datatype
+            saved_name = saved_node.name
+        if not node.istopnode and models.Edge.objects.filter(rangenode=node).exists():
+            parent_node = models.Edge.objects.get(rangenode=node).domainnode.nodeid
+            sibling_nodes = [edge.rangenode.name for edge in models.Edge.objects.filter(domainnode=parent_node)]
+            is_name_valid = (saved_name == node.name) or (saved_name != node.name and (node.name not in sibling_nodes))
+
+        if is_name_valid:
+            if self.is_editable() is True:
+                try:
+                    node.save()
+                except IntegrityError:
+                    raise GraphValidationError(
+                        _(
+                            "The node: {0}, you tried to save is invalid. Be sure that all node names in your card are unique.".format(
+                                node.name
+                            )
+                        )
+                    )
+            else:
+                raise GraphValidationError(
+                    _(
+                        "The node: {0}, you tried to save is invalid. Be sure that all sibling node names and node names in your card are unique.".format(
+                            node.name
+                        )
+                    )
+                )
+        else:
+            raise GraphValidationError(
+                _("The node: {0}, you tried to save is invalid. Be sure that all node names in your card are unique.".format(node.name))
+            )
+
         if saved_node_datatype != node.datatype:
             datatype = datatype_factory.get_instance(node.datatype)
             datatype_mapping = datatype.get_es_mapping(node.nodeid)

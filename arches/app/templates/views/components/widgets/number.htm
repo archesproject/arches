@@ -29,11 +29,10 @@
 {% endblock form %}
 
 {% block report %}
-<!-- ko if: !ko.unwrap(hideEmptyNodes) || ko.unwrap(hideEmptyNodes) === true && typeof ko.unwrap(value) === 'number' -->
 <dt data-bind="text: label"></dt>
 <dd>
     <div class='number-widget-report'>
-    <!-- ko if: typeof ko.unwrap(value) === 'number' -->
+    <!-- ko if: value -->
     <span data-bind="text: prefix(), css: {'number-prefix': prefix()}"></span>
         <!-- ko if: format -->
         <span data-bind="formattedNumber: value(), format: format || '{% trans "None" %}'"></span>
@@ -43,12 +42,11 @@
         <!-- /ko -->
     <span data-bind="text: suffix(), css: {'number-suffix': suffix()}"></span>
     <!-- /ko -->
-    <!-- ko ifnot: typeof ko.unwrap(value) === 'number' -->
+    <!-- ko ifnot: value -->
     <span data-bind="text: '{% trans "None" %}'"></span>
     <!-- /ko -->
     </div>
 </dd>
-<!-- /ko -->
 {% endblock report %}
 
 {% block config_form %}

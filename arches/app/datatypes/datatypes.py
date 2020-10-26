@@ -172,13 +172,26 @@ class NumberDataType(BaseDataType):
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
-        return float(value)
-
-    def clean(self, tile, nodeid):
         try:
-            tile.data[nodeid].upper()
-            tile.data[nodeid] = float(tile.data[nodeid])
-        except Exception:
+            if value == "":
+                value = None
+            elif value.isdigit():
+                value = int(value)
+            else:
+                value = float(value)
+        except AttributeError:
+            pass
+        return value
+
+    def pre_tile_save(self, tile, nodeid):
+        try:
+            if tile.data[nodeid] == "":
+                tile.data[nodeid] = None
+            elif tile.data[nodeid].isdigit():
+                tile.data[nodeid] = int(tile.data[nodeid])
+            else:
+                tile.data[nodeid] = float(tile.data[nodeid])
+        except AttributeError:
             pass
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -1546,12 +1559,16 @@ class DomainDataType(BaseDomainDataType):
 
 
 class DomainListDataType(BaseDomainDataType):
+    def transform_value_for_tile(self, value, **kwargs):
+        if value is not None:
+            if not isinstance(value, list):
+                value = value.split(",")
+        return value
+
     def validate(self, values, row_number=None, source="", node=None, nodeid=None):
         domainDataType = DomainDataType()
         errors = []
         if values is not None:
-            if not isinstance(values, list):
-                values = [values]
             for value in values:
                 errors = errors + domainDataType.validate(value, row_number)
         return errors
@@ -1801,6 +1818,11 @@ class ResourceInstanceDataType(BaseDataType):
         except ValueError:
             # do this if json (invalid) is formatted with single quotes, re #6390
             return ast.literal_eval(value)
+        except TypeError:
+            # data should come in as json but python list is accepted as well
+            if isinstance(value, list):
+                return value
+
 
     def transform_export_values(self, value, *args, **kwargs):
         return json.dumps(value)

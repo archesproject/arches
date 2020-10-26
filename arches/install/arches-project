@@ -112,7 +112,7 @@ parser_start.add_argument(
     dest='extensions',
     help='The file extension(s) to render (default: py).',
     type=str,
-    default=['py', 'txt', 'html', 'js', 'css', 'log', 'json'])
+    default=['py', 'txt', 'html', 'js', 'css', 'log', 'json', 'gitignore'])
 
 parser_start.add_argument(
     '-n', '--name',

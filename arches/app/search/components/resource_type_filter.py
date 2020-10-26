@@ -19,14 +19,14 @@ details = {
 class ResourceTypeFilter(BaseSearchFilter):
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         search_query = Bool()
-        querysting_params = self.request.GET.get(details["componentname"], "")
+        querystring_params = self.request.GET.get(details["componentname"], "")
 
         graph_ids = []
-        for resouceTypeFilter in JSONDeserializer().deserialize(querysting_params):
-            graph_ids.append(str(resouceTypeFilter["graphid"]))
+        for resourceTypeFilter in JSONDeserializer().deserialize(querystring_params):
+            graph_ids.append(str(resourceTypeFilter["graphid"]))
 
         terms = Terms(field="graph_id", terms=graph_ids)
-        if resouceTypeFilter["inverted"] is True:
+        if resourceTypeFilter["inverted"] is True:
             search_query.must_not(terms)
         else:
             search_query.filter(terms)

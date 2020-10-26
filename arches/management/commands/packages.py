@@ -10,6 +10,7 @@ import urllib.request, urllib.parse, urllib.error
 import os
 import imp
 import logging
+import requests
 from arches.setup import unzip_file
 from arches.management.commands import utils
 from arches.app.utils import import_class_from_string
@@ -739,6 +740,14 @@ class Command(BaseCommand):
                     es_index = import_class_from_string(index["module"])(index["name"])
                     es_index.prepare_index()
 
+        def load_kibana_objects(package_dir):
+            # only try and load Kibana objects if they exist
+            if len(glob.glob(os.path.join(package_dir, "kibana_objects", "*.ndjson"))) > 0:
+                commands = ["kibana", "--source_dir", os.path.join(package_dir, "kibana_objects"), "-ow"]
+                if yes is True:
+                    commands.append("-y")
+                management.call_command(*commands, operation="load")
+
         def load_datatypes(package_dir):
             load_extensions(package_dir, "datatypes", "datatype")
 
@@ -815,6 +824,8 @@ class Command(BaseCommand):
         if dev:
             management.call_command("add_test_users")
         load_ontologies(package_location)
+        print("loading Kibana objects")
+        load_kibana_objects(package_location)
         print("loading package_settings.py")
         load_package_settings(package_location)
         print("loading preliminary sql")
