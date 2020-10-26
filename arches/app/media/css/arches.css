@@ -1686,6 +1686,14 @@ div.final-cons-step-separator>h4 {
     position: relative;
 }
 
+.overlay-listing.rr-map-card .overlay-name:before {
+    content: "\f070";
+}
+
+.overlay-listing.rr-map-card.active-overlay .overlay-name:before {
+    content: "\f06e";
+}
+
 .summary-panel {
     background: #f9f9f9;
     margin-top: -30px;
@@ -2071,6 +2079,23 @@ div.final-cons-step-separator>h4 {
 
 .map-card-feature-tool {
     width: 65px;
+}
+
+.map-card-feature-tool.intersect {
+    width: 80px;
+}
+
+.rr-map-card-intersect-panel {
+    margin-top: 7px;
+    margin-bottom: 32px;
+}
+
+.rr-map-card-intersect-panel .intersection-result {
+    padding: 3px 0 0 12px;
+}
+
+.rr-map-card-intersect-panel .intersection-result.hovered {
+    background-color: #ddd;
 }
 
 .map-card-zoom-tool,
@@ -7687,6 +7712,7 @@ a.mega-dropdown-toggle.disabled {
     border-radius: 2px;
     padding: 0px 12px 0px 7px;
     margin-top: -1px;
+    overflow-y: hidden;
 }
 
 #container .table-bordered td,
@@ -12918,6 +12944,18 @@ a.jstree-anchor.permissions-widget {
     border: 1px solid #000;
 }
 
+.lang-switch .chosen-single {
+    border: none;
+    font-size: 12px;
+    color: #454545;
+    padding-top: 8px;
+}
+
+.lang-switch .chosen-drop {
+    font-size: 12px;
+    color: #454545;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
@@ -13008,6 +13046,7 @@ a.jstree-anchor.permissions-widget {
     .dl-horizontal dt {
         white-space: pre-wrap;
         margin-bottom: 5px;
+        width: 200px;
     }
 }
 

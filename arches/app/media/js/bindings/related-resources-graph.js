@@ -6,7 +6,7 @@ define([
     'd3'
 ], function(ko, $, _, arches, d3) {
     ko.bindingHandlers.relatedResourcesGraph = {
-        init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+        init: function(element, valueAccessor) {
             var modelMap = arches.resources.reduce(function(a, v) {
                 a[v.graphid] = v;
                 return a;
@@ -29,11 +29,11 @@ define([
             var selectedNode;
 
             var simulation = d3.forceSimulation(data.nodes)
-                .force("link", d3.forceLink(data.links).id(d => d.id).distance(function(d){
-                    return 200;
-                }))
-                .force("charge", d3.forceManyBody().strength(-500))
-                .force("center", d3.forceCenter(width / 2, height / 2)); 
+                .force("link", d3.forceLink(data.links))
+                .force("charge", d3.forceCollide().radius(100))
+                .force("radial", d3.forceRadial(300, width/2, height/2))
+                .force("center", d3.forceCenter(width / 2, height / 2))
+                .alpha(0.01);
                 
             var nodeList = options.nodeList;
             var currentResource = options.currentResource;
@@ -129,7 +129,7 @@ define([
                 .attr("viewBox", [0, 0, width, height])
                 .call(d3.zoom()
                     .extent([[0, 0], [width, height]])
-                    .scaleExtent([1, 8])
+                    .scaleExtent([0.25, 8])
                     .on("zoom", function(event) {
                         groupElement.attr("transform", event.transform);
                     }));
@@ -140,11 +140,11 @@ define([
 
             var update = function() {
                 var linkMap = linkMap;
-        
+
                 $(window).trigger("resize");
                 simulation.nodes(data.nodes);
                 simulation.force("link").links(data.links);
-                simulation.restart();
+                simulation.alpha(0.01).restart();
 
                 var link = linksElement.selectAll("line")
                     .data(data.links)
@@ -286,24 +286,25 @@ define([
                     .call(d3.drag()
                         .on("start", dragstarted)
                         .on("drag", dragged)
-                        .on("end", dragended));
+                        .on("end", dragended)
+                    );
 
-                    function dragstarted(event, d) {
-                        if (!event.active) simulation.alphaTarget(0.3).restart();
-                        d.fx = d.x;
-                        d.fy = d.y;
-                    }
-                    
-                    function dragged(event, d) {
-                        d.fx = event.x;
-                        d.fy = event.y;
-                    }
-                    
-                    function dragended(event, d) {
-                        if (!event.active) simulation.alphaTarget(0);
-                        d.fx = null;
-                        d.fy = null;
-                    }    
+                function dragstarted(event, d) {
+                    if (!event.active) { simulation.alphaTarget(0.01).restart(); }
+                    d.fx = d.x;
+                    d.fy = d.y;
+                }
+                
+                function dragged(event, d) {
+                    d.fx = event.x;
+                    d.fy = event.y;
+                }
+                
+                function dragended(event, d) {
+                    if (!event.active) { simulation.alphaTarget(0); }
+                    d.fx = null;
+                    d.fy = null;
+                }    
 
                 if (texts) {
                     texts.remove();
@@ -322,8 +323,8 @@ define([
 
                 simulation.on("tick", function() {
                     link.attr("x1", function(d) {
-                            return d.source.x;
-                        })
+                        return d.source.x;
+                    })
                         .attr("y1", function(d) {
                             return d.source.y;
                         })
@@ -335,12 +336,17 @@ define([
                         });
 
                     node.attr("cx", function(d) {
-                            return d.x;
-                        })
+                        return d.x;
+                    })
                         .attr("cy", function(d) {
                             return d.y;
+                        })
+                        .attr("x", function() {
+                            return width / 2;
+                        })
+                        .attr("y", function() {
+                            return height / 2;
                         });
-
                     texts
                         .attr("x", function(d) {
                             return d.x;
@@ -350,7 +356,6 @@ define([
                         });
 
                 });
-
             };
 
             var updateNodeInfo = function(d) {
@@ -423,13 +428,14 @@ define([
                             page: page > 0 ? page : 1
                         },
                         error: function(e) {
+                            // eslint-disable-next-line no-console
                             console.log('request failed', e);
                         },
                         success: function(response) {
                             var links = [];
                             var nodes = [];
                             var rr = response.related_resources;
-                            var total_loaded;
+                            var totalLoaded;
                             if (isRoot) {
                                 nodeSelection.removeAll();
                                 selectedState(false);
@@ -453,8 +459,8 @@ define([
                                 nodeMap[resourceId] = rootNode;
                                 newNodeId += 1;
                             } else if (rootNode.relationCount) {
-                                total_loaded = rootNode.relationCount.loaded + rr.resource_relationships.length;
-                                rootNode.relationCount.loaded = total_loaded <= rr.total.value ? total_loaded : rr.total.value;
+                                totalLoaded = rootNode.relationCount.loaded + rr.resource_relationships.length;
+                                rootNode.relationCount.loaded = totalLoaded <= rr.total.value ? totalLoaded : rr.total.value;
                             } else {
                                 rootNode.relationCount = {
                                     total: rr.total.value,
@@ -464,40 +470,40 @@ define([
                             rootNode.loading = false;
                             updateNodeInfo(rootNode);
 
-                            var getRelated = function(related_resource) {
+                            var getRelated = function(relatedResource) {
                                 var nodeConfigLookup = rr.node_config_lookup;
-                                if (!nodeMap[related_resource.resourceinstanceid]) {
+                                if (!nodeMap[relatedResource.resourceinstanceid]) {
                                     var node = {
                                         id: newNodeId,
-                                        entityid: related_resource.resourceinstanceid,
-                                        entitytypeid: related_resource.graph_id,
-                                        name: related_resource.displayname,
-                                        description: related_resource.displaydescription,
-                                        color: nodeConfigLookup[related_resource.graph_id].fillColor,
-                                        iconclass: nodeConfigLookup[related_resource.graph_id].iconclass,
-                                        graphname: nodeConfigLookup[related_resource.graph_id].name,
+                                        entityid: relatedResource.resourceinstanceid,
+                                        entitytypeid: relatedResource.graph_id,
+                                        name: relatedResource.displayname,
+                                        description: relatedResource.displaydescription,
+                                        color: nodeConfigLookup[relatedResource.graph_id].fillColor,
+                                        iconclass: nodeConfigLookup[relatedResource.graph_id].iconclass,
+                                        graphname: nodeConfigLookup[relatedResource.graph_id].name,
                                         isRoot: false,
                                         relationType: 'Ancestor',
                                         relationCount: {
-                                            total: related_resource.total_relations.value,
+                                            total: relatedResource.total_relations.value,
                                             loaded: 1
                                         }
                                     };
                                     nodes.push(node);
-                                    nodeMap[related_resource.resourceinstanceid] = node;
+                                    nodeMap[relatedResource.resourceinstanceid] = node;
                                     newNodeId += 1;
                                 }
                             };
                             _.each(rr.related_resources, getRelated);
 
-                            _.each(rr.resource_relationships, function(resource_relationships) {
-                                var sourceId = nodeMap[resource_relationships.resourceinstanceidfrom];
-                                var targetId = nodeMap[resource_relationships.resourceinstanceidto];
-                                var relationshipSource = resource_relationships.relationshiptype_label;
-                                var relationshipTarget = resource_relationships.relationshiptype_label;
-                                if (resource_relationships.relationshiptype_label.split('/').length === 2) {
-                                    relationshipSource = resource_relationships.relationshiptype_label.split('/')[0].trim();
-                                    relationshipTarget = resource_relationships.relationshiptype_label.split('/')[1].trim();
+                            _.each(rr.resource_relationships, function(resourceRelationships) {
+                                var sourceId = nodeMap[resourceRelationships.resourceinstanceidfrom];
+                                var targetId = nodeMap[resourceRelationships.resourceinstanceidto];
+                                var relationshipSource = resourceRelationships.relationshiptype_label;
+                                var relationshipTarget = resourceRelationships.relationshiptype_label;
+                                if (resourceRelationships.relationshiptype_label.split('/').length === 2) {
+                                    relationshipSource = resourceRelationships.relationshiptype_label.split('/')[0].trim();
+                                    relationshipTarget = resourceRelationships.relationshiptype_label.split('/')[1].trim();
                                 }
 
                                 links.push({
@@ -603,9 +609,7 @@ define([
             }, this);
 
             nodeList([]);
-
         }
     };
-
     return ko.bindingHandlers.relatedResourcesGraph;
 });

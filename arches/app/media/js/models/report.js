@@ -1,10 +1,11 @@
-define(['arches',
+define(['jquery',
+    'arches',
     'models/abstract',
     'knockout',
     'knockout-mapping',
     'underscore',
     'report-templates'
-], function(arches, AbstractModel, ko, koMapping, _, reportLookup) {
+], function($, arches, AbstractModel, ko, koMapping, _, reportLookup) {
     var ReportModel = AbstractModel.extend({
         /**
          * A backbone model to manage report data
@@ -21,13 +22,13 @@ define(['arches',
             this.cards = options.cards || [];
             this.preview = options.preview;
             this.userisreviewer = options.userisreviewer;
-
+            
             this.set('graphid', ko.observable());
             this.set('config', {});
             self.configKeys = ko.observableArray();
-
+            
             this._data = ko.observable('{}');
-
+            
             this.configJSON = ko.observable({});
             this.configState = {};
             this.configKeys.subscribe(function(val){
@@ -54,6 +55,12 @@ define(['arches',
                     }
                 });
             };
+
+            this.relatedResourcesLookup = ko.observable({});
+            
+            if (options.related_resources) {
+                this.updateRelatedResourcesLookup(options.related_resources);
+            }
 
             this.graph = options.graph;
             this.parse(options.graph);
@@ -116,29 +123,89 @@ define(['arches',
                 }
             }, this);
 
-            this.related_resources = [];
-
-            this.sort_related = function(anArray, property) {
-                anArray.sort(function(a, b){
-                    if (a[property] > b[property]) return 1;
-                    if (b[property] > a[property]) return -1;
-                    return 0;
-                });
-            };
-            _.each(this.get('related_resources'), function(rr){
-                var res = {'graph_name': rr.name, 'related':[]};
-                _.each(rr.resources, function(resource) {
-                    _.each(resource.relationships, function(relationship){
-                        res.related.push({'displayname':resource.displayname,'link': arches.urls.resource_report + resource.instance_id, 'relationship': relationship});
-                    });
-                });
-                this.sort_related(res.related, 'displayname');
-                this.related_resources.push(res);
-            }, this);
-
-            this.sort_related(this.related_resources, 'graph_name');
-
             this._data(JSON.stringify(this.toJSON()));
+        },
+
+        updateRelatedResourcesLookup: function(json) {
+            var relatedResourcesLookup = this.relatedResourcesLookup();
+
+            for (var [graphId, value] of Object.entries(json)) {
+                // let's not relate the resource to itself
+                if (graphId === this.attributes.graph.graphid) { continue; }
+
+                var relatedResources;
+                var paginator;
+                var remainingResources;
+                
+                if (!relatedResourcesLookup[graphId]) {
+                    // add graphId to lookup if we haven't added it yet
+                    relatedResources = ko.observableArray();
+                    remainingResources = ko.observable();
+                    paginator = ko.observable();
+
+                    relatedResourcesLookup[graphId] = {
+                        'graphId': graphId,
+                        'loadedRelatedResources': relatedResources,
+                        'name': value['related_resources']['node_config_lookup'][graphId]['name'],
+                        'paginator': paginator,
+                        'remainingResources': remainingResources,
+                        'totalRelatedResources': value['related_resources']['total']['value'],
+                    };
+                } else {
+                    // else get pertinent references
+                    relatedResources = relatedResourcesLookup[graphId]['loadedRelatedResources'];
+                    paginator = relatedResourcesLookup[graphId]['paginator'];
+                    remainingResources = relatedResourcesLookup[graphId]['remainingResources'];
+                }
+
+                paginator(value['paginator']);
+
+                /* 
+                    if there's no paginator, the incoming json is all related resource instances,
+                    and we should remove the ones we already have so as not to duplicate them
+                */
+                if (!value['paginator']) {relatedResources.removeAll();}
+
+                // add new resource relationships to lookup entry
+                for (var resourceRelationship of value['related_resources']['resource_relationships']) {
+                    var relatedResource = value['related_resources']['related_resources'].find(function(resource) {
+                        return (
+                            resource.resourceinstanceid === resourceRelationship.resourceinstanceidto
+                            || resource.resourceinstanceid === resourceRelationship.resourceinstanceidfrom
+                        );
+                    });
+
+                    relatedResources.push({
+                        'displayName': relatedResource.displayname,
+                        'relationship': resourceRelationship.relationshiptype_label,
+                        'link': arches.urls.resource_report + relatedResource.resourceinstanceid,
+                    });
+                }
+
+                var resourceLimit = value['related_resources']['resource_relationships'].length;  /* equivalent to settings.py RELATED_RESOURCES_PER_PAGE */ 
+                var remainingResourcesCount = value['related_resources']['total']['value'] - relatedResources().length;
+
+                remainingResources(remainingResourcesCount < resourceLimit ? remainingResourcesCount : resourceLimit);
+            }
+
+            this.relatedResourcesLookup(relatedResourcesLookup);
+        },
+
+        getRelatedResources: function(loadAll, resource) {
+            $.ajax({
+                context: this,
+                url: (
+                    arches.urls.related_resources 
+                    + this.attributes.resourceid 
+                    + `?resourceinstance_graphid=${resource.graphId}`
+                    + (loadAll ? `&paginate=false` : `&page=${resource.paginator().next_page_number}`)
+                ),
+            }).done(function(json) {
+                this.updateRelatedResourcesLookup({
+                    // coerces expected shape
+                    [resource.graphId]: json['paginator'] ? json : {'related_resources': json, 'paginator': null }
+                });  
+            });
         },
 
         reset: function() {
