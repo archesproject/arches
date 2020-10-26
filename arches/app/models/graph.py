@@ -948,13 +948,15 @@ class Graph(models.GraphModel):
 
         """
 
-        incoming_edge = list(filter(lambda x: x.rangenode_id == node.nodeid, self.edges.values()))[0]
-        parent_node_id = incoming_edge.domainnode_id
-        sibling_nodes = [
-            edge.rangenode
-            for edge in filter(lambda x: x.domainnode_id == parent_node_id, self.edges.values())
-            if edge.rangenode.nodeid != node.nodeid
-        ]
+        sibling_nodes = []
+        if node.istopnode is False:
+            incoming_edge = list(filter(lambda x: x.rangenode_id == node.nodeid, self.edges.values()))[0]
+            parent_node_id = incoming_edge.domainnode_id
+            sibling_nodes = [
+                edge.rangenode
+                for edge in filter(lambda x: x.domainnode_id == parent_node_id, self.edges.values())
+                if edge.rangenode.nodeid != node.nodeid
+            ]
         return sibling_nodes
 
     def get_out_edges(self, nodeid):
