@@ -38,13 +38,6 @@ define([
         return childSelected;
     };
 
-    var isDirty = function(){
-        if(self.tile) {
-            return true;
-        }
-        return false;
-    };
-
     var doesChildHaveProvisionalEdits = function(parent) {
         var hasEdits = false;
         var childrenKey = 'tileid' in parent ? 'cards': 'tiles';
