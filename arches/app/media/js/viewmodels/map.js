@@ -41,7 +41,7 @@ define([
         this.overlays = params.overlaysObservable || ko.observableArray();
 
         var config = ko.unwrap(self.config);  // different between card && widget
-        this.overlayConfigs = ko.observableArray(ko.unwrap(config.overlayConfigs));
+        this.overlayConfigs = ko.observableArray(config && ko.unwrap(config.overlayConfigs));
 
         this.activeBasemap = params.activeBasemap || ko.observable();
         this.activeBasemap.subscribe(function(basemap) {
