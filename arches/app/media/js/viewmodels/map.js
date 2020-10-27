@@ -39,7 +39,14 @@ define([
         this.popupTemplate = popupTemplate;
         this.basemaps = params.basemaps || [];
         this.overlays = params.overlaysObservable || ko.observableArray();
+
         this.activeBasemap = params.activeBasemap || ko.observable();
+        this.activeBasemap.subscribe(function(basemap) {
+            if (this.config && ko.unwrap(this.config.basemap)) {
+                this.config.basemap(basemap.name);
+            }
+        }, this);
+
         this.activeTab = ko.observable(params.activeTab);
         this.hideSidePanel = function() {
             self.activeTab(undefined);
@@ -52,7 +59,12 @@ define([
         mapLayers.forEach(function(layer) {
             if (!layer.isoverlay) {
                 if (!params.basemaps) self.basemaps.push(layer);
-                if (layer.addtomap && !params.activeBasemap) self.activeBasemap(layer);
+
+                if (self.config && ko.unwrap(self.config.basemap) === layer.name) {
+                    self.activeBasemap(layer)
+                } else if (layer.addtomap && !ko.unwrap(self.activeBasemap)) {
+                    self.activeBasemap(layer)
+                }
             }
             else if (!params.overlaysObservable) {
                 if (layer.searchonly && !params.search) return;
