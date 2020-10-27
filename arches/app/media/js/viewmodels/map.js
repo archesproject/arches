@@ -42,8 +42,15 @@ define([
 
         this.activeBasemap = params.activeBasemap || ko.observable();
         this.activeBasemap.subscribe(function(basemap) {
-            if (this.config && ko.unwrap(this.config.basemap)) {
-                this.config.basemap(basemap.name);
+            if (this.config) {
+                if (ko.isObservable(this.config)) {  // in widget
+                    this.config({
+                        ...this.config,
+                        'basemap': basemap.name, 
+                    })
+                } else {  // in card
+                    this.config.basemap(basemap.name);
+                }
             }
         }, this);
 
@@ -60,15 +67,16 @@ define([
             if (!layer.isoverlay) {
                 if (!params.basemaps) self.basemaps.push(layer);
 
-                if (
-                    !ko.unwrap(self.activeBasemap)
-                    && (
-                        self.config && ko.unwrap(self.config.basemap) === layer.name
-                        || layer.addtomap
-                    )
-                ) {
-                    self.activeBasemap(layer);
+                if (!ko.unwrap(self.activeBasemap)) {
+                    if (self.config) {
+                        // hardening to handle both card && widget
+                        var config = ko.unwrap(self.config);
+                        if (ko.unwrap(config.basemap) === layer.name) { self.activeBasemap(layer); }
+                    } else if (layer.addtomap) {
+                        self.activeBasemap(layer);
+                    }
                 }
+
             }
             else if (!params.overlaysObservable) {
                 if (layer.searchonly && !params.search) return;
