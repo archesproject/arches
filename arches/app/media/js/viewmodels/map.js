@@ -40,6 +40,9 @@ define([
         this.basemaps = params.basemaps || [];
         this.overlays = params.overlaysObservable || ko.observableArray();
 
+        var config = ko.unwrap(self.config);  // different between card && widget
+        this.overlayConfigs = ko.observableArray(ko.unwrap(config.overlayConfigs));
+
         this.activeBasemap = params.activeBasemap || ko.observable();
         this.activeBasemap.subscribe(function(basemap) {
             if (this.config) {
@@ -69,14 +72,12 @@ define([
 
                 if (!ko.unwrap(self.activeBasemap)) {
                     if (self.config) {
-                        // hardening to handle both card && widget
                         var config = ko.unwrap(self.config);
                         if (ko.unwrap(config.basemap) === layer.name) { self.activeBasemap(layer); }
                     } else if (layer.addtomap) {
                         self.activeBasemap(layer);
                     }
                 }
-
             }
             else if (!params.overlaysObservable) {
                 if (layer.searchonly && !params.search) return;
@@ -87,6 +88,24 @@ define([
                         layer.opacity(value ? 100 : 0);
                     }
                 });
+
+                if (self.overlayConfigs.indexOf(layer.maplayerid) > -1) {
+                    layer.onMap(100);  // value unneccesary but keeps it semantic
+                }
+
+                layer.onMap.subscribe(function() {
+                    if (self.config) {
+                        if (ko.isObservable(self.config)) {  // in widget
+                            self.config({
+                                ...self.config,
+                                'overlayConfigs': self.overlayConfigs(), 
+                            })
+                        } else {  // in card
+                            self.config.overlayConfigs(self.overlayConfigs);
+                        }
+                    }
+                });
+
                 self.overlays.push(layer);
             }
         });
@@ -164,7 +183,9 @@ define([
                     }).concat(layers);
                 }
             });
-            layers = self.activeBasemap().layer_definitions.slice(0).concat(layers);
+            if (self.activeBasemap()) {
+                layers = self.activeBasemap().layer_definitions.slice(0).concat(layers);
+            }
             if (this.additionalLayers) {
                 layers = layers.concat(ko.unwrap(this.additionalLayers));
             }
