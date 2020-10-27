@@ -60,10 +60,14 @@ define([
             if (!layer.isoverlay) {
                 if (!params.basemaps) self.basemaps.push(layer);
 
-                if (self.config && ko.unwrap(self.config.basemap) === layer.name) {
-                    self.activeBasemap(layer)
-                } else if (layer.addtomap && !ko.unwrap(self.activeBasemap)) {
-                    self.activeBasemap(layer)
+                if (
+                    !ko.unwrap(self.activeBasemap)
+                    && (
+                        self.config && ko.unwrap(self.config.basemap) === layer.name
+                        || layer.addtomap
+                    )
+                ) {
+                    self.activeBasemap(layer);
                 }
             }
             else if (!params.overlaysObservable) {
