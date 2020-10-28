@@ -21,11 +21,19 @@ define([
 
         CardComponentViewModel.apply(this, [params]);
 
-        if (self.form && self.tile) params.widgets = self.card.widgets().filter(function(widget) {
-            var id = widget.node_id();
-            var type = ko.unwrap(self.form.nodeLookup[id].datatype);
-            return type === 'geojson-feature-collection';
-        });
+        if (self.form && self.tile) {
+            params.widgets = self.card.widgets().filter(function(widget) {
+                var id = widget.node_id();
+                var type = ko.unwrap(self.form.nodeLookup[id].datatype);
+                return type === 'geojson-feature-collection';
+            });
+
+            for (var widget of params.widgets) {
+                widget.config.centerX(self.centerX());
+                widget.config.centerY(self.centerY());
+                widget.config.zoom(self.zoom());
+            }
+        }
 
         if (this.card.overlaysObservable) {
             params.overlaysObservable = this.card.overlaysObservable;
@@ -37,10 +45,27 @@ define([
             this.centerY(arches.mapDefaultY);
             this.zoom(arches.mapDefaultZoom);
         }
+
         params.zoom = this.zoom;
         params.x = this.centerX;
         params.y = this.centerY;
         params.usePosition = true;
+
+        params.x.subscribe(function(foo) {
+            if (params.widgets) {
+                params.widgets[0].config.centerX(foo)
+            }
+        })
+        params.y.subscribe(function(foo) {
+            if (params.widgets) {
+                params.widgets[0].config.centerY(foo)
+            }
+        })
+        params.zoom.subscribe(function(foo) {
+            if (params.widgets) {
+                params.widgets[0].config.zoom(foo)
+            }
+        })
 
         MapEditorViewModel.apply(this, [params]);
 
