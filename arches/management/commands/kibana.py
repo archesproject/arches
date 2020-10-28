@@ -86,86 +86,99 @@ class Command(BaseCommand):
             )
 
     def setup_kibana_space(self, space_name=""):
-        name = settings.ELASTICSEARCH_PREFIX if space_name == "" else space_name
-        url = f"{self.baseurl}/api/spaces/space"
-        values = {
-            "id": f"{name}",
-            "name": f"{name}",
-        }
-        req = requests.post(url, data=values, headers=self.headers)
-        if req.status_code == 200:
-            self.stdout.write(self.style.SUCCESS(f"Space '{name}' successfully created"))
-        else:
-            self.stdout.write(self.style.ERROR(f"ERROR - {req.json()['message']}"))
-
-    def delete_kibana_space(self, space_name="", force=False):
-        name = settings.ELASTICSEARCH_PREFIX if space_name == "" else space_name
-        url = f"{self.baseurl}/api/spaces/space/{name}"
-        if force is False:
-            yes_no = input(
-                f'Deleting the space "{name}" will permanently removes the space and all of its contents. You can\'t undo this action. Do you want to delete it? Y/N:  '
-            )
-        if force is True or yes_no.upper() == "Y":
-            req = requests.delete(url=url, headers=self.headers)
-            if req.status_code == 204:
-                self.stdout.write(self.style.SUCCESS(f"Space '{name}' successfully deleted"))
-            elif req.status_code == 404:
-                self.stdout.write(self.style.ERROR(f"ERROR - space '{name}' not found"))
+        try:
+            name = settings.ELASTICSEARCH_PREFIX if space_name == "" else space_name
+            url = f"{self.baseurl}/api/spaces/space"
+            values = {
+                "id": f"{name}",
+                "name": f"{name}",
+            }
+            req = requests.post(url, data=values, headers=self.headers)
+            if req.status_code == 200:
+                self.stdout.write(self.style.SUCCESS(f"Space '{name}' successfully created"))
             else:
                 self.stdout.write(self.style.ERROR(f"ERROR - {req.json()['message']}"))
+        except requests.exceptions.ConnectionError:
+            self.stdout.write(self.style.WARNING(f"Kibana is not running, the Kibana space wasn't created."))
 
-    def upload_kibana_objects(self, space_name="", source="", overwrite=False, force=False):
-        name = settings.ELASTICSEARCH_PREFIX if space_name == "" else space_name
-
-        # first check to see if the kibana space exists
-        req = requests.get(url=f"{self.baseurl}/api/spaces/space/{name}")
-        if req.status_code != 200:
-            if force is True:
-                self.setup_kibana_space(space_name=name)
-            else:
-                yes_no = input(f'The Kibana space name specified "{name}" doesn\'t exist. Do you want to create it? Y/N:  ')
-                if yes_no.upper() == "Y":
-                    self.setup_kibana_space(space_name=name)
-
-        # now try to figure out if we can find the appropriate .ndjson files to load
-        if source == "":
-            in_project = os.path.isfile(os.path.join(os.getcwd(), "manage.py"))
-            if not in_project:
-                self.stdout.write(
-                    self.style.ERROR(
-                        f"Please run this command from the directory where manage.py resides or supply a source file/directory"
-                    )
+    def delete_kibana_space(self, space_name="", force=False):
+        try:
+            name = settings.ELASTICSEARCH_PREFIX if space_name == "" else space_name
+            url = f"{self.baseurl}/api/spaces/space/{name}"
+            if force is False:
+                yes_no = input(
+                    f'Deleting the space "{name}" will permanently removes the space and all of its contents. You can\'t undo this action. Do you want to delete it? Y/N:  '
                 )
-                return
-            else:
-                index_files = glob.glob(os.path.join("**", "pkg", "kibana_objects", "*.ndjson"))
-        else:
-            if source.endswith(".ndjson"):
-                if os.path.isfile(source):
-                    index_files = [source]
-                else:
-                    self.stdout.write(self.style.ERROR(f"Source file not found at: {source}"))
-            else:
-                index_files = glob.glob(os.path.join(source, "*.ndjson"))
-
-        # load the .ndjson files if any
-        url = f"{self.baseurl}/s/{name}/api/saved_objects/_import"
-        if len(index_files) > 0:
-            for index_file in index_files:
-                files = {"file": open(index_file, "rb")}
-                req = requests.post(url, files=files, headers=self.headers, params={"overwrite": overwrite})
-                if req.status_code == 200:
-                    if req.json()["success"]:
-                        self.stdout.write(self.style.SUCCESS(f"Loaded: {index_file}"))
-                    else:
-                        self.stdout.write(self.style.WARNING(f"Errors when loading: {index_file}"))
-                        self.stdout.write(self.style.SUCCESS(f"{req.json()['successCount']} items loaded successfully"))
-                        for error in req.json()["errors"]:
-                            name = error["title"] if "title" in error else error["id"]
-                            self.stdout.write(self.style.ERROR(f"{error['error']['type']} - type: {error['type']} - name/id: {name}"))
+            if force is True or yes_no.upper() == "Y":
+                req = requests.delete(url=url, headers=self.headers)
+                if req.status_code == 204:
+                    self.stdout.write(self.style.SUCCESS(f"Space '{name}' successfully deleted"))
                 elif req.status_code == 404:
                     self.stdout.write(self.style.ERROR(f"ERROR - space '{name}' not found"))
                 else:
                     self.stdout.write(self.style.ERROR(f"ERROR - {req.json()['message']}"))
-        else:
-            self.stdout.write(self.style.ERROR(f"No '.ndjson' files found!"))
+        except requests.exceptions.ConnectionError:
+            self.stdout.write(self.style.WARNING(f"Kibana is not running, the Kibana space wasn't deleted."))
+
+    def upload_kibana_objects(self, space_name="", source="", overwrite=False, force=False):
+        try:
+            name = settings.ELASTICSEARCH_PREFIX if space_name == "" else space_name
+
+            # first check to see if the kibana space exists
+            req = requests.get(url=f"{self.baseurl}/api/spaces/space/{name}")
+            if req.status_code != 200:
+                if force is True:
+                    self.setup_kibana_space(space_name=name)
+                else:
+                    yes_no = input(f'The Kibana space name specified "{name}" doesn\'t exist. Do you want to create it? Y/N:  ')
+                    if yes_no.upper() == "Y":
+                        self.setup_kibana_space(space_name=name)
+
+            # now try to figure out if we can find the appropriate .ndjson files to load
+            if source == "":
+                in_project = os.path.isfile(os.path.join(os.getcwd(), "manage.py"))
+                if not in_project:
+                    self.stdout.write(
+                        self.style.ERROR(
+                            f"Please run this command from the directory where manage.py resides or supply a source file/directory"
+                        )
+                    )
+                    return
+                else:
+                    index_files = glob.glob(os.path.join("**", "pkg", "kibana_objects", "*.ndjson"))
+            else:
+                if source.endswith(".ndjson"):
+                    if os.path.isfile(source):
+                        index_files = [source]
+                    else:
+                        self.stdout.write(self.style.ERROR(f"Source file not found at: {source}"))
+                else:
+                    index_files = glob.glob(os.path.join(source, "*.ndjson"))
+
+            # load the .ndjson files if any
+            url = f"{self.baseurl}/s/{name}/api/saved_objects/_import"
+            if len(index_files) > 0:
+                for index_file in index_files:
+                    files = {"file": open(index_file, "rb")}
+                    req = requests.post(url, files=files, headers=self.headers, params={"overwrite": overwrite})
+                    if req.status_code == 200:
+                        if req.json()["success"]:
+                            self.stdout.write(self.style.SUCCESS(f"Loaded: {index_file}"))
+                        else:
+                            self.stdout.write(self.style.WARNING(f"Errors when loading: {index_file}"))
+                            self.stdout.write(self.style.SUCCESS(f"{req.json()['successCount']} items loaded successfully"))
+                            for error in req.json()["errors"]:
+                                name = error["title"] if "title" in error else error["id"]
+                                self.stdout.write(self.style.ERROR(f"{error['error']['type']} - type: {error['type']} - name/id: {name}"))
+                    elif req.status_code == 404:
+                        self.stdout.write(self.style.ERROR(f"ERROR - space '{name}' not found"))
+                    else:
+                        self.stdout.write(self.style.ERROR(f"ERROR - {req.json()['message']}"))
+            else:
+                self.stdout.write(self.style.ERROR(f"No '.ndjson' files found!"))
+        except requests.exceptions.ConnectionError:
+            self.stdout.write(self.style.WARNING(f"Kibana is not running, no objects were loaded."))
+            if force is False:
+                yes_no = input(f"Would you like to start Kibana and try again? Y/N:  ")
+                if yes_no.upper() == "Y":
+                    self.upload_kibana_objects(space_name=space_name, source=source, overwrite=overwrite, force=force)
