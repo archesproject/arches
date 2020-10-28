@@ -33,4 +33,3 @@ def check_if_celery_available():
         except Exception as e:
             logger.error(_("Unable to connect to a celery broker"))
     return result
-
