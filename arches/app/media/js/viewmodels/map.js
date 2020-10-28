@@ -93,7 +93,9 @@ define([
                     layer.onMap(100);  // value unneccesary but keeps it semantic
                 }
 
-                layer.onMap.subscribe(function() {
+                layer.onMap.subscribe(function(onMap) {
+                    onMap ? self.overlayConfigs.push(layer.maplayerid) : self.overlayConfigs.remove(layer.maplayerid);
+
                     if (self.config) {
                         if (ko.isObservable(self.config)) {  // in widget
                             self.config({
