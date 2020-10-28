@@ -1003,7 +1003,8 @@ class CsvReader(Reader):
                 if bulk:
                     print("Time to create resource and tile objects: %s" % datetime.timedelta(seconds=time() - self.start))
                     Resource.bulk_save(resources=resources)
-                print(_("Total resources saved: {save_count + 1}").format(**locals()))
+                save_count = save_count + 1
+                print(_("Total resources saved: {save_count}").format(**locals()))
 
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
