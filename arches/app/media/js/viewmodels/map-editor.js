@@ -292,7 +292,7 @@ define([
                 }
             } catch(e) {
                 if (e instanceof TypeError) {
-                    return
+                    return;
                 }
             }
         };
