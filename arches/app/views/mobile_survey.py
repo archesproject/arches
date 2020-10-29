@@ -399,7 +399,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
                 "Welcome to Arches!  You've just been added to a Mobile Survey.  \
                 Please take a moment to review the mobile_survey description and mobile_survey start and end dates."
             ),
-            "closing": _(f"If you have any qustions contact the site administrator at {admin_email}."),
+            "closing": _("If you have any qustions contact the site administrator at {admin_email}.").format(**locals()),
         }
 
         html_content = render_to_string("email/general_notification.htm", email_context)
@@ -425,7 +425,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
                 "Hi!  The Mobile Survey you were part of has ended or is temporarily suspended. \
                 Please permform a final sync of your local dataset as soon as possible."
             ),
-            "closing": _(f"If you have any qustions contact the site administrator at {admin_email}."),
+            "closing": _("If you have any qustions contact the site administrator at {admin_email}.").format(**locals()),
         }
 
         html_content = render_to_string("email/general_notification.htm", email_context)

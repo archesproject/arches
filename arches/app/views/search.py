@@ -205,12 +205,12 @@ def export_results(request):
                 (request.user.id, request_values, format), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
             )
             message = _(
-                f"{total} instances have been submitted for export. \
+                "{total} instances have been submitted for export. \
                 Click the Bell icon to check for a link to download your data"
-            )
+            ).format(**locals())
             return JSONResponse({"success": True, "message": message})
         else:
-            message = _(f"Your search exceeds the {download_limit} instance download limit. Please refine your search")
+            message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(**locals())
             return JSONResponse({"success": False, "message": message})
     else:
         exporter = SearchResultsExporter(search_request=request)
