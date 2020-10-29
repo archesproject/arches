@@ -25,6 +25,7 @@ define([
         var y = ko.unwrap(params.y) ? params.y : arches.mapDefaultY;
         var bounds = ko.unwrap(params.bounds) ? params.bounds : arches.hexBinBounds;
         var zoom = ko.unwrap(params.zoom) ? params.zoom : arches.mapDefaultZoom;
+
         var minZoom = arches.mapDefaultMinZoom;
         var maxZoom = arches.mapDefaultMaxZoom;
         var sources = Object.assign({
@@ -40,8 +41,24 @@ define([
         this.basemaps = params.basemaps || [];
         this.overlays = params.overlaysObservable || ko.observableArray();
 
-        var config = ko.unwrap(self.config);  // different between card && widget
-        this.overlayConfigs = ko.observableArray(config && ko.unwrap(config.overlayConfigs));
+        this.overlayConfigs = ko.observableArray((function() {
+            if (ko.isObservable(params.config)) {  // in widget
+                return params.config().overlayConfigs;
+            } else if (params.card) {  // in card
+                return params.card.widgets()[0].config.overlayConfigs();
+            } 
+        })());  // IIFE pattern
+
+        this.overlayConfigs.subscribe(function() {
+            if (ko.isObservable(params.config)) {  // in widget
+                params.config({
+                    ...params.config(),
+                    'overlayConfigs': self.overlayConfigs(),
+                })
+            } else if (params.card) {  // in card
+                params.card.widgets()[0].config.overlayConfigs(self.overlayConfigs());
+            } 
+        })
 
         this.activeBasemap = params.activeBasemap || ko.observable();
         this.activeBasemap.subscribe(function(basemap) {
@@ -84,28 +101,17 @@ define([
                 layer.opacity = ko.observable(layer.addtomap ? 100 : 0);
                 layer.onMap = ko.pureComputed({
                     read: function() { return layer.opacity() > 0; },
-                    write: function(value) {
+                    write: function(value, foo) {
                         layer.opacity(value ? 100 : 0);
                     }
                 });
 
                 if (self.overlayConfigs.indexOf(layer.maplayerid) > -1) {
-                    layer.onMap(100);  // value unneccesary but keeps it semantic
+                    layer.onMap(100);  // exact value unneccesary but keeps it semantic
                 }
 
                 layer.onMap.subscribe(function(onMap) {
                     onMap ? self.overlayConfigs.push(layer.maplayerid) : self.overlayConfigs.remove(layer.maplayerid);
-
-                    if (self.config) {
-                        if (ko.isObservable(self.config)) {  // in widget
-                            self.config({
-                                ...self.config,
-                                'overlayConfigs': self.overlayConfigs(), 
-                            })
-                        } else {  // in card
-                            self.config.overlayConfigs(self.overlayConfigs);
-                        }
-                    }
                 });
 
                 self.overlays.push(layer);

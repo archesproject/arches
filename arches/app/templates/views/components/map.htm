@@ -66,6 +66,8 @@
                         <div class="overlay-name" data-bind="
                             click: function() {
                                 onMap(!onMap());
+                                console.log($data, $parent, this)
+                                $parent.overlays.valueHasMutated();
                             }
                         ">
                             <i data-bind="css: icon" class="layer-listing-icon"></i>

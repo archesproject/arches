@@ -29,6 +29,7 @@ define([
             });
 
             for (var widget of params.widgets) {
+                console.log(widget)
                 widget.config.centerX(self.centerX());
                 widget.config.centerY(self.centerY());
                 widget.config.zoom(self.zoom());
