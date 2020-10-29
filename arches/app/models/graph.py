@@ -1367,7 +1367,7 @@ class Graph(models.GraphModel):
                 message = _('Duplicate node name: "{0}". All node names in a card must be unique.'.format(node.name))
                 raise GraphValidationError(message)
             elif node.is_editable() is False:
-                if node.name != models.Node.objects.get(pk=node.nodeid).name:
+                if node.name != models.Node.objects.values_list('name', flat=True).get(pk=node.nodeid):
                     message = "The name of this node cannot be changed because business data has already been saved to a card that this node is part of."
                     raise GraphValidationError(_(message))
             else:
