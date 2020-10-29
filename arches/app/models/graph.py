@@ -338,43 +338,10 @@ class Graph(models.GraphModel):
     def _update_node(self, node, datatype_factory, se):
         already_saved = models.Node.objects.filter(pk=node.nodeid).exists()
         saved_node_datatype = None
-        saved_name = ""
-        is_name_valid = True
-
+        node.save()
         if already_saved:
             saved_node = models.Node.objects.get(pk=node.nodeid)
             saved_node_datatype = saved_node.datatype
-            saved_name = saved_node.name
-        if not node.istopnode and models.Edge.objects.filter(rangenode=node).exists():
-            parent_node = models.Edge.objects.get(rangenode=node).domainnode.nodeid
-            sibling_nodes = [edge.rangenode.name for edge in models.Edge.objects.filter(domainnode=parent_node)]
-            is_name_valid = (saved_name == node.name) or (saved_name != node.name and (node.name not in sibling_nodes))
-
-        if is_name_valid:
-            if self.is_editable() is True:
-                try:
-                    node.save()
-                except IntegrityError:
-                    raise GraphValidationError(
-                        _(
-                            "The node: {0}, you tried to save is invalid. Be sure that all node names in your card are unique.".format(
-                                node.name
-                            )
-                        )
-                    )
-            else:
-                raise GraphValidationError(
-                    _(
-                        "The node: {0}, you tried to save is invalid. Be sure that all sibling node names and node names in your card are unique.".format(
-                            node.name
-                        )
-                    )
-                )
-        else:
-            raise GraphValidationError(
-                _("The node: {0}, you tried to save is invalid. Be sure that all node names in your card are unique.".format(node.name))
-            )
-
         if saved_node_datatype != node.datatype:
             datatype = datatype_factory.get_instance(node.datatype)
             datatype_mapping = datatype.get_es_mapping(node.nodeid)
@@ -548,8 +515,6 @@ class Graph(models.GraphModel):
         if skip_validation or self.can_append(branch_graph, nodeToAppendTo):
             branch_copy = branch_graph.copy()["copy"]
             branch_copy.root.istopnode = False
-            # Copy the description of the branch to the new node
-            branch_copy.root.description = branch_graph.description
 
             newEdge = models.Edge(domainnode=nodeToAppendTo, rangenode=branch_copy.root, ontologyproperty=property, graph=self)
             branch_copy.add_edge(newEdge)
@@ -564,11 +529,30 @@ class Graph(models.GraphModel):
                 self.widgets[widget.pk] = widget
 
             self.populate_null_nodegroups()
+            sibling_node_names = [node.name for node in self.get_sibling_nodes(branch_copy.root)]
+            branch_copy.root.name = self.make_name_unique(branch_copy.root.name, sibling_node_names)
+            branch_copy.root.description = branch_graph.description
 
             if self.ontology is None:
                 branch_copy.clear_ontology_references()
 
             return branch_copy
+
+    def make_name_unique(self, name, names_to_check):
+        """
+        Makes a name unique among a list of name
+
+        Arguments:
+        name -- the name to check and modfiy to make unique in the list of "names_to_check"
+        names_to_check -- a list of names that "name" should be unique among
+        """
+
+        i = 1
+        temp_node_name = name
+        while temp_node_name in names_to_check:
+            temp_node_name = "{0}_{1}".format(name, i)
+            i += 1
+        return temp_node_name
 
     def append_node(self, nodeid=None):
         """
@@ -581,14 +565,7 @@ class Graph(models.GraphModel):
         """
 
         node_names = [node.name for node in self.nodes.values()]
-        temp_node_name = self.temp_node_name
-        if temp_node_name in node_names:
-            i = 1
-            temp_node_name = "{0}_{1}".format(self.temp_node_name, i)
-            while temp_node_name in node_names:
-                i += 1
-                temp_node_name = "{0}_{1}".format(self.temp_node_name, i)
-
+        temp_node_name = self.make_name_unique(self.temp_node_name, node_names)
         nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
         card = None
 
@@ -943,8 +920,8 @@ class Graph(models.GraphModel):
         """
 
         if str(self.root.nodeid) == str(nodeid):
-
             return None
+
         for edge_id, edge in self.edges.items():
             if str(edge.rangenode_id) == str(nodeid):
                 return edge.domainnode
@@ -964,6 +941,23 @@ class Graph(models.GraphModel):
             ret.append(edge.rangenode)
             ret.extend(self.get_child_nodes(edge.rangenode_id))
         return ret
+
+    def get_sibling_nodes(self, node):
+        """
+        Given a node will get all of that nodes siblings excluding the given node itself
+
+        """
+
+        sibling_nodes = []
+        if node.istopnode is False:
+            incoming_edge = list(filter(lambda x: x.rangenode_id == node.nodeid, self.edges.values()))[0]
+            parent_node_id = incoming_edge.domainnode_id
+            sibling_nodes = [
+                edge.rangenode
+                for edge in filter(lambda x: x.domainnode_id == parent_node_id, self.edges.values())
+                if edge.rangenode.nodeid != node.nodeid
+            ]
+        return sibling_nodes
 
     def get_out_edges(self, nodeid):
         """
@@ -1357,6 +1351,31 @@ class Graph(models.GraphModel):
                         1006,
                     )
 
+    def _validate_node_name(self, node):
+        """
+        Verifies a node's name is unique to its nodegroup
+        Prevents a user from changing the name of a node that already has tiles.
+        Verifies a node's name is unique to its sibling nodes.
+        """
+
+        if node.istopnode:
+            return
+        else:
+            names_in_nodegroup = [v.name for k, v in self.nodes.items() if v.nodegroup_id == node.nodegroup_id]
+            unique_names_in_nodegroup = {n for n in names_in_nodegroup}
+            if len(names_in_nodegroup) > len(unique_names_in_nodegroup):
+                message = _('Duplicate node name: "{0}". All node names in a card must be unique.'.format(node.name))
+                raise GraphValidationError(message)
+            elif node.is_editable() is False:
+                if node.name != models.Node.objects.values_list("name", flat=True).get(pk=node.nodeid):
+                    message = "The name of this node cannot be changed because business data has already been saved to a card that this node is part of."
+                    raise GraphValidationError(_(message))
+            else:
+                sibling_node_names = [node.name for node in self.get_sibling_nodes(node)]
+                if node.name in sibling_node_names:
+                    message = _('Duplicate node name: "{0}". All sibling node names must be unique.'.format(node.name))
+                    raise GraphValidationError(message)
+
     def validate(self):
         """
         validates certain aspects of resource graphs according to defined rules:
@@ -1408,6 +1427,7 @@ class Graph(models.GraphModel):
 
         fieldnames = {}
         for node_id, node in self.nodes.items():
+            self._validate_node_name(node)
             if node.exportable is True:
                 if node.fieldname is not None:
                     validated_fieldname = validate_fieldname(node.fieldname, fieldnames)

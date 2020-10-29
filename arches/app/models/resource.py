@@ -523,7 +523,6 @@ class Resource(models.ResourceInstance):
         """
 
         nodes = models.Node.objects.filter(name=node_name, graph_id=self.graph_id)
-
         if len(nodes) > 1:
             raise MultipleNodesFoundException(node_name, nodes)
 
