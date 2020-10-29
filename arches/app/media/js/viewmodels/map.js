@@ -101,7 +101,7 @@ define([
                 layer.opacity = ko.observable(layer.addtomap ? 100 : 0);
                 layer.onMap = ko.pureComputed({
                     read: function() { return layer.opacity() > 0; },
-                    write: function(value, foo) {
+                    write: function(value) {
                         layer.opacity(value ? 100 : 0);
                     }
                 });
