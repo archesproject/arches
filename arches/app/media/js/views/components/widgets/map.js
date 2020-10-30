@@ -38,6 +38,8 @@ define([
         ];
 
         params.configKeys = [
+            'basemap',
+            'overlayConfigs',
             'zoom',
             'centerX',
             'centerY',
@@ -85,6 +87,9 @@ define([
             this.centerY(arches.mapDefaultY);
             this.zoom(arches.mapDefaultZoom);
         }
+
+        
+        params.overlayConfigs = this.overlayConfigs;
         params.zoom = this.zoom;
         params.x = this.centerX;
         params.y = this.centerY;

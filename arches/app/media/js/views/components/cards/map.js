@@ -1,3 +1,5 @@
+const { param } = require("jquery");
+
 define([
     'arches',
     'knockout',
@@ -11,6 +13,8 @@ define([
         var self = this;
 
         params.configKeys = [
+            'basemap',
+            'overlayConfigs',
             'selectSource',
             'selectSourceLayer',
             'selectText',
@@ -46,26 +50,51 @@ define([
             this.zoom(arches.mapDefaultZoom);
         }
 
+        this.centerX.subscribe(function(x) {
+            if (params.widgets) {
+                for (var widget of params.widgets) {
+                    widget.config.centerX(x)
+                }
+            }
+        });
+        this.centerY.subscribe(function(y) {
+            if (params.widgets) {
+                for (var widget of params.widgets) {
+                    widget.config.centerY(y)
+                }
+            }
+        });
+        this.zoom.subscribe(function(zoom) {
+            if (params.widgets) {
+                for (var widget of params.widgets) {
+                    widget.config.zoom(zoom)
+                }
+            }
+        });
+        this.overlayConfigs.subscribe(function(foo) {
+            if (params.widgets) {
+                for (var widget of params.widgets) {
+                    widget.config.overlayConfigs(foo)
+                }
+            }
+        });
+        this.basemap.subscribe(function(foo) {
+            if (params.widgets) {
+                for (var widget of params.widgets) {
+                    widget.config.basemap(foo)
+                }
+            }
+        });
+
+
+        params.overlayConfigs = this.overlayConfigs;
+        // params.basemap = this.basemap;
+
+
         params.zoom = this.zoom;
         params.x = this.centerX;
         params.y = this.centerY;
         params.usePosition = true;
-
-        params.x.subscribe(function(foo) {
-            if (params.widgets) {
-                params.widgets[0].config.centerX(foo)
-            }
-        })
-        params.y.subscribe(function(foo) {
-            if (params.widgets) {
-                params.widgets[0].config.centerY(foo)
-            }
-        })
-        params.zoom.subscribe(function(foo) {
-            if (params.widgets) {
-                params.widgets[0].config.zoom(foo)
-            }
-        })
 
         MapEditorViewModel.apply(this, [params]);
 

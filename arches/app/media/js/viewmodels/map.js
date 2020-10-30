@@ -42,21 +42,40 @@ define([
         this.overlays = params.overlaysObservable || ko.observableArray();
 
         this.overlayConfigs = ko.observableArray((function() {
-            if (ko.isObservable(params.config)) {  // in widget
-                return params.config().overlayConfigs;
-            } else if (params.card) {  // in card
+            var overlayConfigs = params.overlayConfigs();
+
+            if (overlayConfigs.length) {
+                return overlayConfigs;
+            } else if (params.card) {
                 return params.card.widgets()[0].config.overlayConfigs();
             } 
-        })());  // IIFE pattern
+            // if (ko.isObservable(params.config)) {  // in widget
+            //     return params.config().overlayConfigs;
+            // } else if (params.card) {  // in card
+            // } 
+        })());
 
         this.overlayConfigs.subscribe(function() {
-            if (ko.isObservable(params.config)) {  // in widget
-                params.config({
-                    ...params.config(),
-                    'overlayConfigs': self.overlayConfigs(),
-                })
-            } else if (params.card) {  // in card
-                params.card.widgets()[0].config.overlayConfigs(self.overlayConfigs());
+
+
+
+
+
+
+            // if (ko.isObservable(params.config)) {  // in widget
+                params.overlayConfigs(self.overlayConfigs());
+                // console.log(params)
+                // params.config({
+                //     ...params.config(),
+                //     'overlayConfigs': self.overlayConfigs(),
+                // })
+            // } else 
+            if (params.card) {  // in card
+                // params.overlayConfigs(self.overlayConfigs());
+
+                for (var widget of params.card.widgets()) {
+                    widget.config.overlayConfigs(self.overlayConfigs());
+                }
             } 
         })
 
