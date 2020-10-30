@@ -1,7 +1,8 @@
 define([
     'knockout',
-    'knockout-mapping'
-], function(ko, koMapping) {
+    'knockout-mapping',
+    'arches'
+], function(ko, koMapping, arches) {
     var ConstraintViewModel = function(params) {
         this.widgets = params.widgets || [];
         this.constraint = params.constraint;
@@ -14,7 +15,7 @@ define([
                 value: this.constraint.nodes,
                 multiple: params.multiple || true,
                 closeOnSelect: false,
-                placeholder: placeholder || "Select Widgets",
+                placeholder: placeholder || arches.translations.cardConstraintsPlaceholder,
                 allowClear: true
             };
         };

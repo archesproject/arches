@@ -19,7 +19,7 @@ define([
         this.state = {steps:[]};
         this.quitUrl = arches.urls.home;
         this.wastebinWarning = function(val){
-            return [["You are about to delete " + val + "."],["Are you sure you want to continue?"]];
+            return [[arches.translations.workflowWastbinWarning.replace("${val}", val)],[arches.translations.workflowWastbinWarning2]];
         };
         this.warning = '';
 

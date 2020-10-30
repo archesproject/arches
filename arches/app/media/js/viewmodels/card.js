@@ -371,9 +371,9 @@ define([
                             }
                             nodegroupId = params.card.nodegroup_id;
                             if(nodegroupId === appFuncDesc) {
-                                return "(This card data will define the resource description.)";
+                                return arches.translations.cardFunctionNodeDesc;
                             } else if(nodegroupId === appFuncName) {
-                                return "(This card data will define the resource name.)";
+                                return arches.translations.cardFunctionNodeName;
                             }
                         }
                     }
