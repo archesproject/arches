@@ -39,8 +39,6 @@ define([
 
                 widget.config.overlayConfigs.subscribe(function(foo) {
                     if (self.overlayConfigs() !== foo) {
-                        console.log(self, this, widget,  params, foo)
-
                         self.overlayConfigs(foo)
                     }
                 })
@@ -80,11 +78,19 @@ define([
             }
         });
         this.overlayConfigs.subscribe(function(foo) {
-            if (params.widgets) {
-                for (var widget of params.widgets) {
-                    if (widget.config.overlayConfigs() !== foo) {
-                        widget.config.overlayConfigs(foo)
-                    }
+            var widgets = params.widgets;
+
+            if (!widgets && self.form) {
+                widgets = self.card.widgets().filter(function(widget) {
+                    var id = widget.node_id();
+                    var type = ko.unwrap(self.form.nodeLookup[id].datatype);
+                    return type === 'geojson-feature-collection';
+                });
+            }
+
+            if (widgets) {
+                for (var widget of widgets) {
+                    widget.config.overlayConfigs(foo)
                 }
             }
         });
@@ -98,9 +104,7 @@ define([
 
 
         params.overlayConfigs = this.overlayConfigs;
-        // params.basemap = this.basemap;
-
-
+        params.basemap = this.basemap;
         params.zoom = this.zoom;
         params.x = this.centerX;
         params.y = this.centerY;
