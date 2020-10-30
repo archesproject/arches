@@ -111,15 +111,17 @@ define([
                 overlay.opacity(100);  // exact value unneccesary but keeps it semantic
             }
     
-            overlay.onMap.subscribe(function(onMap) {
-                if (onMap && self.overlayConfigs.indexOf(overlay.maplayerid) === -1) {
+            overlay.foo = function() {
+                if (self.overlayConfigs.indexOf(overlay.maplayerid) === -1) {
                     self.overlayConfigs.push(overlay.maplayerid)
+                    overlay.opacity(100)
                 }
-
-                if (!onMap && self.overlayConfigs.indexOf(overlay.maplayerid) > -1) {
+                
+                if (self.overlayConfigs.indexOf(overlay.maplayerid) > -1) {
                     self.overlayConfigs.remove(overlay.maplayerid);
+                    overlay.opacity(0)
                 }
-            });
+            };
         }
 
         _.each(sources, function(sourceConfig) {
