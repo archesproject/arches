@@ -474,7 +474,7 @@ class Command(BaseCommand):
             self.export_package_settings(dest_dir, "true")
 
     def load_package(
-        self, source, setup_db=False, overwrite_concepts="ignore", bulk_load=False, stage_concepts="keep", yes=False, dev=False
+        self, source, setup_db=False, overwrite_concepts="ignore", bulk_load=False, stage_concepts="keep", yes=False, dev=False, defer_index=True
     ):
 
         celery_worker_running = task_management.check_if_celery_available()
@@ -860,6 +860,9 @@ class Command(BaseCommand):
         load_indexes(package_location)
         print("loading business data - resource instances and relationships")
         load_business_data(package_location)
+        if defer_index is True:
+            print('&'*100)
+            management.call_command("es", "reindex_database")
         print("loading resource views")
         load_resource_views(package_location)
         print("loading apps")
@@ -968,7 +971,7 @@ class Command(BaseCommand):
         ret = skos.save_concepts_from_skos(rdf, overwrite, stage)
 
     def import_business_data(
-        self, data_source, config_file=None, overwrite=None, bulk_load=False, create_concepts=False, use_multiprocessing=False, force=False
+        self, data_source, config_file=None, overwrite=None, bulk_load=False, create_concepts=False, use_multiprocessing=False, force=False, defer_index=False
     ):
         """
         Imports business data from all formats. A config file (mapping file) is required for .csv format.
@@ -1028,6 +1031,7 @@ will be very jumbled."""
                         create_concepts=create_concepts,
                         create_collections=create_collections,
                         use_multiprocessing=use_multiprocessing,
+                        defer_index=defer_index
                     )
                 else:
                     utils.print_message("No file found at indicated location: {0}".format(source))

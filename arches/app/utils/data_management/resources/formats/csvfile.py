@@ -327,7 +327,7 @@ class CsvReader(Reader):
         self.errors = []
         super(CsvReader, self).__init__()
 
-    def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number):
+    def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number, defer_index):
         # create a resource instance only if there are populated_tiles
         errors = []
         if len(populated_tiles) > 0:
@@ -347,7 +347,7 @@ class CsvReader(Reader):
                     del resources[:]  # clear out the array
             else:
                 try:
-                    newresourceinstance.save()
+                    newresourceinstance.save(defer_index=defer_index)
 
                 except TransportError as e:
 
@@ -388,7 +388,7 @@ class CsvReader(Reader):
             print("%s resources processed" % str(save_count))
 
     def import_business_data(
-        self, business_data=None, mapping=None, overwrite="append", bulk=False, create_concepts=False, create_collections=False
+        self, business_data=None, mapping=None, overwrite="append", bulk=False, create_concepts=False, create_collections=False, defer_index=False
     ):
         # errors = businessDataValidator(self.business_data)
         celery_worker_running = task_management.check_if_celery_available()
@@ -810,7 +810,7 @@ class CsvReader(Reader):
 
                         save_count = save_count + 1
                         self.save_resource(
-                            populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number
+                            populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number, defer_index
                         )
 
                         # reset values for next resource instance
@@ -997,7 +997,7 @@ class CsvReader(Reader):
 
                 if "legacyid" in locals():
                     self.save_resource(
-                        populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number
+                        populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number, defer_index
                     )
 
                 if bulk:
