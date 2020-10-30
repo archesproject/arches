@@ -41,19 +41,13 @@ define([
         this.basemaps = params.basemaps || [];
         this.overlays = params.overlaysObservable || ko.observableArray();
 
-
-
-
-        
         
         this.overlayConfigs = ko.observableArray(params.overlayConfigs());
         this.overlayConfigs.subscribe(function(foo) {
             if (params.overlayConfigs !== foo) {
                 params.overlayConfigs(foo)
             }
-            // params.overlayConfigs(self.overlayConfigs());
         })
-        console.log(self, params, self.overlayConfigs())
 
         
         this.activeBasemap = params.activeBasemap || ko.observable();
@@ -102,26 +96,26 @@ define([
                     }
                 });
                 
+                layer.foo = function() {
+                    if (self.overlayConfigs.indexOf(layer.maplayerid) === -1) {
+                        self.overlayConfigs.push(layer.maplayerid)
+                        layer.opacity(100)
+                    } else {
+                        self.overlayConfigs.remove(layer.maplayerid);
+                        layer.opacity(0)
+                    }
+                };
+
                 self.overlays.push(layer);
             }
         });
         
         for (var overlay of self.overlays()) {
             if (self.overlayConfigs.indexOf(overlay.maplayerid) > -1) {
-                overlay.opacity(100);  // exact value unneccesary but keeps it semantic
+                overlay.opacity(100);
+            } else {
+                overlay.opacity(0);
             }
-    
-            overlay.foo = function() {
-                if (self.overlayConfigs.indexOf(overlay.maplayerid) === -1) {
-                    self.overlayConfigs.push(overlay.maplayerid)
-                    overlay.opacity(100)
-                }
-                
-                if (self.overlayConfigs.indexOf(overlay.maplayerid) > -1) {
-                    self.overlayConfigs.remove(overlay.maplayerid);
-                    overlay.opacity(0)
-                }
-            };
         }
 
         _.each(sources, function(sourceConfig) {
