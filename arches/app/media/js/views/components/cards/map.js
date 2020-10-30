@@ -36,6 +36,14 @@ define([
                 widget.config.centerX(self.centerX());
                 widget.config.centerY(self.centerY());
                 widget.config.zoom(self.zoom());
+
+                widget.config.overlayConfigs.subscribe(function(foo) {
+                    if (self.overlayConfigs() !== foo) {
+                        console.log(self, this, widget,  params, foo)
+
+                        self.overlayConfigs(foo)
+                    }
+                })
             }
         }
 
@@ -74,7 +82,9 @@ define([
         this.overlayConfigs.subscribe(function(foo) {
             if (params.widgets) {
                 for (var widget of params.widgets) {
-                    widget.config.overlayConfigs(foo)
+                    if (widget.config.overlayConfigs() !== foo) {
+                        widget.config.overlayConfigs(foo)
+                    }
                 }
             }
         });

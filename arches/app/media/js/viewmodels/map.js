@@ -41,42 +41,9 @@ define([
         this.basemaps = params.basemaps || [];
         this.overlays = params.overlaysObservable || ko.observableArray();
 
-        this.overlayConfigs = ko.observableArray((function() {
-            var overlayConfigs = params.overlayConfigs();
-
-            if (overlayConfigs.length) {
-                return overlayConfigs;
-            } else if (params.card) {
-                return params.card.widgets()[0].config.overlayConfigs();
-            } 
-            // if (ko.isObservable(params.config)) {  // in widget
-            //     return params.config().overlayConfigs;
-            // } else if (params.card) {  // in card
-            // } 
-        })());
-
+        this.overlayConfigs = ko.observableArray(params.overlayConfigs());
         this.overlayConfigs.subscribe(function() {
-
-
-
-
-
-
-            // if (ko.isObservable(params.config)) {  // in widget
-                params.overlayConfigs(self.overlayConfigs());
-                // console.log(params)
-                // params.config({
-                //     ...params.config(),
-                //     'overlayConfigs': self.overlayConfigs(),
-                // })
-            // } else 
-            if (params.card) {  // in card
-                // params.overlayConfigs(self.overlayConfigs());
-
-                for (var widget of params.card.widgets()) {
-                    widget.config.overlayConfigs(self.overlayConfigs());
-                }
-            } 
+            params.overlayConfigs(self.overlayConfigs());
         })
 
         this.activeBasemap = params.activeBasemap || ko.observable();
