@@ -18,9 +18,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import csv
 import datetime
+import logging
 from io import StringIO
 from io import BytesIO
 from django.core.files import File
+from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -30,6 +32,8 @@ from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.geo_utils import GeoUtils
 import arches.app.utils.zip as zip_utils
 from arches.app.views import search as SearchView
+
+logger = logging.getLogger(__name__)
 
 
 class SearchResultsExporter(object):
@@ -80,6 +84,17 @@ class SearchResultsExporter(object):
                 headers.append("resourceid")
                 ret.append(self.to_csv(resources["output"], headers=headers, name=graph.name))
             if format == "shp":
+                headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype", "name")[::1]
+                missing_field_names = []
+                for header in headers:
+                    if not header["fieldname"]:
+                        missing_field_names.append(header["name"])
+                    header.pop("name")
+                if len(missing_field_names) > 0:
+                    message = _("Shapefile are fieldnames required for the following nodes: {0}".format(", ".join(missing_field_names)))
+                    logger.error(message)
+                    raise (Exception(message))
+
                 headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype")[::1]
                 headers.append({"fieldname": "resourceid", "datatype": "str"})
                 ret += self.to_shp(resources["output"], headers=headers, name=graph.name)
