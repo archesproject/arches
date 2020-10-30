@@ -41,11 +41,21 @@ define([
         this.basemaps = params.basemaps || [];
         this.overlays = params.overlaysObservable || ko.observableArray();
 
-        this.overlayConfigs = ko.observableArray(params.overlayConfigs());
-        this.overlayConfigs.subscribe(function() {
-            params.overlayConfigs(self.overlayConfigs());
-        })
 
+
+
+        
+        
+        this.overlayConfigs = ko.observableArray(params.overlayConfigs());
+        this.overlayConfigs.subscribe(function(foo) {
+            if (params.overlayConfigs !== foo) {
+                params.overlayConfigs(foo)
+            }
+            // params.overlayConfigs(self.overlayConfigs());
+        })
+        console.log(self, params, self.overlayConfigs())
+
+        
         this.activeBasemap = params.activeBasemap || ko.observable();
         this.activeBasemap.subscribe(function(basemap) {
             if (this.config) {
@@ -85,24 +95,32 @@ define([
             else if (!params.overlaysObservable) {
                 if (layer.searchonly && !params.search) return;
                 layer.opacity = ko.observable(layer.addtomap ? 100 : 0);
-                layer.onMap = ko.pureComputed({
+                layer.onMap = ko.computed({
                     read: function() { return layer.opacity() > 0; },
                     write: function(value) {
                         layer.opacity(value ? 100 : 0);
                     }
                 });
-
-                if (self.overlayConfigs.indexOf(layer.maplayerid) > -1) {
-                    layer.onMap(100);  // exact value unneccesary but keeps it semantic
-                }
-
-                layer.onMap.subscribe(function(onMap) {
-                    onMap ? self.overlayConfigs.push(layer.maplayerid) : self.overlayConfigs.remove(layer.maplayerid);
-                });
-
+                
                 self.overlays.push(layer);
             }
         });
+        
+        for (var overlay of self.overlays()) {
+            if (self.overlayConfigs.indexOf(overlay.maplayerid) > -1) {
+                overlay.opacity(100);  // exact value unneccesary but keeps it semantic
+            }
+    
+            overlay.onMap.subscribe(function(onMap) {
+                if (onMap && self.overlayConfigs.indexOf(overlay.maplayerid) === -1) {
+                    self.overlayConfigs.push(overlay.maplayerid)
+                }
+
+                if (!onMap && self.overlayConfigs.indexOf(overlay.maplayerid) > -1) {
+                    self.overlayConfigs.remove(overlay.maplayerid);
+                }
+            });
+        }
 
         _.each(sources, function(sourceConfig) {
             if (sourceConfig.tiles) {
