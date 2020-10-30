@@ -32,6 +32,7 @@ from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.geo_utils import GeoUtils
 import arches.app.utils.zip as zip_utils
 from arches.app.views import search as SearchView
+
 logger = logging.getLogger(__name__)
 
 
@@ -92,7 +93,7 @@ class SearchResultsExporter(object):
                 if len(missing_field_names) > 0:
                     message = _("Shapefile are fieldnames required for the following nodes: {0}".format(", ".join(missing_field_names)))
                     logger.error(message)
-                    raise(Exception(message))
+                    raise (Exception(message))
 
                 headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype")[::1]
                 headers.append({"fieldname": "resourceid", "datatype": "str"})
