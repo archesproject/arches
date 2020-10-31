@@ -50,17 +50,10 @@ define([
         
         this.activeBasemap = params.activeBasemap || ko.observable();
         this.activeBasemap.subscribe(function(basemap) {
-            if (this.config) {
-                if (ko.isObservable(this.config)) {  // in widget
-                    this.config({
-                        ...this.config,
-                        'basemap': basemap.name, 
-                    })
-                } else {  // in card
-                    this.config.basemap(basemap.name);
-                }
+            if (params.basemap !== basemap) {
+                params.basemap(basemap.name);
             }
-        }, this);
+        });
 
         this.activeTab = ko.observable(params.activeTab);
         this.hideSidePanel = function() {
@@ -87,7 +80,7 @@ define([
             else if (!params.overlaysObservable) {
                 if (layer.searchonly && !params.search) return;
                 layer.opacity = ko.observable(layer.addtomap ? 100 : 0);
-                layer.onMap = ko.computed({
+                layer.onMap = ko.pureComputed({
                     read: function() { return layer.opacity() > 0; },
                     write: function(value) {
                         layer.opacity(value ? 100 : 0);
