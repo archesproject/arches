@@ -40,7 +40,6 @@ define([
         this.popupTemplate = popupTemplate;
         this.basemaps = params.basemaps || [];
         this.overlays = params.overlaysObservable || ko.observableArray();
-
         
         this.overlayConfigs = ko.observableArray(params.overlayConfigs());
         this.overlayConfigs.subscribe(function(foo) {
@@ -48,7 +47,6 @@ define([
                 params.overlayConfigs(foo)
             }
         })
-
         
         this.activeBasemap = params.activeBasemap || ko.observable();
         this.activeBasemap.subscribe(function(basemap) {
@@ -96,14 +94,21 @@ define([
                     }
                 });
                 
-                layer.foo = function() {
-                    if (self.overlayConfigs.indexOf(layer.maplayerid) === -1) {
-                        self.overlayConfigs.push(layer.maplayerid)
+                layer.foo = function(parent) {
+                    /* 
+                        parent does not always equal self! Explicity performing
+                        operations on parent keeps app sane && happy
+                    */
+
+                    if (parent.overlayConfigs.indexOf(layer.maplayerid) === -1) {
+                        parent.overlayConfigs.push(layer.maplayerid)
                         layer.opacity(100)
                     } else {
-                        self.overlayConfigs.remove(layer.maplayerid);
+                        parent.overlayConfigs.remove(layer.maplayerid);
                         layer.opacity(0)
                     }
+
+                    parent.overlays.valueHasMutated();
                 };
 
                 self.overlays.push(layer);

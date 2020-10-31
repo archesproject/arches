@@ -90,7 +90,6 @@ define([
 
         this.overlayConfigs = ko.observable(this.config().overlayConfigs);
         this.overlayConfigs.subscribe(function(foo) {
-            console.log('!!', self, this, params, foo)
             params.config({
                 ...params.config(),
                 'overlayConfigs': foo,

@@ -102,7 +102,6 @@ define([
             }
         });
 
-
         params.overlayConfigs = this.overlayConfigs;
         params.basemap = this.basemap;
         params.zoom = this.zoom;
