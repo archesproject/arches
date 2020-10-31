@@ -160,7 +160,7 @@ class Command(BaseCommand):
             if len(index_files) > 0:
                 for index_file in index_files:
                     files = {"file": open(index_file, "rb")}
-                    req = requests.post(url, files=files, headers=self.headers, params={"overwrite": overwrite})
+                    req = requests.post(url, files=files, headers=self.headers, params={"overwrite": str(overwrite).lower()})
                     if req.status_code == 200:
                         if req.json()["success"]:
                             self.stdout.write(self.style.SUCCESS(f"Loaded: {index_file}"))
