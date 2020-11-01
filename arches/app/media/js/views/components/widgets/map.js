@@ -87,14 +87,6 @@ define([
             this.centerY(arches.mapDefaultY);
             this.zoom(arches.mapDefaultZoom);
         }
-
-        this.overlayConfigs = ko.observable(this.config().overlayConfigs);
-        this.overlayConfigs.subscribe(function(foo) {
-            params.config({
-                ...params.config(),
-                'overlayConfigs': foo,
-            })
-        })
         
         params.basemap = this.basemap;
         params.overlayConfigs = this.overlayConfigs;
