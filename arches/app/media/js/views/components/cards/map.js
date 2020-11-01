@@ -78,7 +78,7 @@ define([
         });
         this.overlayConfigs.subscribe(function(overlayConfigs) {
             if (params.widgets) {
-                for (var widget of widgets) {
+                for (var widget of params.widgets) {
                     widget.config.overlayConfigs(overlayConfigs)
                 }
             }
