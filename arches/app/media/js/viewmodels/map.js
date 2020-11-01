@@ -41,16 +41,16 @@ define([
         this.basemaps = params.basemaps || [];
         this.overlays = params.overlaysObservable || ko.observableArray();
         
-        this.overlayConfigs = ko.observableArray(params.overlayConfigs());
+        this.overlayConfigs = ko.observableArray(ko.unwrap(params.overlayConfigs));
         this.overlayConfigs.subscribe(function(overlayConfigs) {
-            if (params.overlayConfigs !== overlayConfigs) {
+            if (ko.isObservable(params.overlayConfigs) && params.overlayConfigs() !== overlayConfigs) {
                 params.overlayConfigs(overlayConfigs)
             }
         })
         
         this.activeBasemap = params.activeBasemap || ko.observable();
         this.activeBasemap.subscribe(function(basemap) {
-            if (params.basemap !== basemap) {
+            if (ko.isObservable(params.basemap) && params.basemap() !== basemap) {
                 params.basemap(basemap.name);
             }
         });
@@ -228,11 +228,22 @@ define([
         };
 
         this.updateLayers = function(layers) {
-            var map = self.map();
-            var style = map.getStyle();
+            var style;
+
+            /* 
+                wrapping in a try to prevent harmless error when manually refreshing map, see #6729
+            */ 
+            try {
+                style = self.map().getStyle();
+            } catch(e) {
+                if (e instanceof TypeError) {
+                    return;
+                }
+            }
+
             if (style) {
-                style.layers = layers;
-                map.setStyle(style);
+                style.layers = self.draw ? layers.concat(self.draw.options.styles) : layers;
+                self.map().setStyle(style);
             }
         };
 
