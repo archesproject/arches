@@ -20,7 +20,7 @@ define([
                 }
             };
         };
-        
+
         var x = ko.unwrap(params.x) ? params.x : arches.mapDefaultX;
         var y = ko.unwrap(params.y) ? params.y : arches.mapDefaultY;
         var bounds = ko.unwrap(params.bounds) ? params.bounds : arches.hexBinBounds;

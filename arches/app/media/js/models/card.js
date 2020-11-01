@@ -102,9 +102,12 @@ define([
             var componentIdSubscription = this.get('component_id').subscribe(function(value) {
                 var key;
                 var defaultConfig = JSON.parse(self.cardComponentLookup[value].defaultconfig);
+                self.set('defaultConfig',defaultConfig);
+
                 for (key in defaultConfig) {
                     defaultConfig[key] = ko.observable(defaultConfig[key]);
                 }
+                
                 var currentConfig = self.get('config');
                 self.set('config', _.defaults(currentConfig, defaultConfig));
                 for (key in defaultConfig) {
