@@ -34,12 +34,6 @@ define([
                 widget.config.centerX(self.centerX());
                 widget.config.centerY(self.centerY());
                 widget.config.zoom(self.zoom());
-
-                widget.config.overlayConfigs.subscribe(function(overlayConfigs) {
-                    if (self.overlayConfigs() !== overlayConfigs) {
-                        self.overlayConfigs(overlayConfigs)
-                    }
-                })
             }
         }
 
