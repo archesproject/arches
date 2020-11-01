@@ -50,7 +50,7 @@ define([
         
         this.activeBasemap = params.activeBasemap || ko.observable();
         this.activeBasemap.subscribe(function(basemap) {
-            if (ko.isObservable(params.basemap) && params.basemap() !== basemap) {
+            if (ko.isObservable(params.basemap) && params.basemap() !== basemap.name) {
                 params.basemap(basemap.name);
             }
         });
