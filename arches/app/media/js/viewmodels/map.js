@@ -189,8 +189,8 @@ define([
                     }).concat(layers);
                 }
             });
-            if (self.activeBasemap()) {
-                layers = self.activeBasemap().layer_definitions.slice(0).concat(layers);
+            if (ko.unwrap(self.activeBasemap)) {
+                layers = ko.unwrap(self.activeBasemap).layer_definitions.slice(0).concat(layers);
             }
             if (this.additionalLayers) {
                 layers = layers.concat(ko.unwrap(this.additionalLayers));
