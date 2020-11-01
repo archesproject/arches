@@ -42,9 +42,9 @@ define([
         this.overlays = params.overlaysObservable || ko.observableArray();
         
         this.overlayConfigs = ko.observableArray(params.overlayConfigs());
-        this.overlayConfigs.subscribe(function(foo) {
-            if (params.overlayConfigs !== foo) {
-                params.overlayConfigs(foo)
+        this.overlayConfigs.subscribe(function(overlayConfigs) {
+            if (params.overlayConfigs !== overlayConfigs) {
+                params.overlayConfigs(overlayConfigs)
             }
         })
         
@@ -87,10 +87,10 @@ define([
                     }
                 });
                 
-                layer.foo = function(parent) {
+                layer.updateParent = function(parent) {
                     /* 
-                        parent does not always equal self! Explicity performing
-                        operations on parent keeps app sane && happy
+                        Sometimes parent !== self. Explicity performing
+                        operations on parent keeps them behaving as expected.
                     */
 
                     if (parent.overlayConfigs.indexOf(layer.maplayerid) === -1) {
