@@ -35,9 +35,9 @@ define([
                 widget.config.centerY(self.centerY());
                 widget.config.zoom(self.zoom());
 
-                widget.config.overlayConfigs.subscribe(function(foo) {
-                    if (self.overlayConfigs() !== foo) {
-                        self.overlayConfigs(foo)
+                widget.config.overlayConfigs.subscribe(function(overlayConfigs) {
+                    if (self.overlayConfigs() !== overlayConfigs) {
+                        self.overlayConfigs(overlayConfigs)
                     }
                 })
             }
@@ -54,6 +54,7 @@ define([
             this.zoom(arches.mapDefaultZoom);
         }
 
+        // subscriptions need to stay explicit! DRY-ing will break
         this.centerX.subscribe(function(x) {
             if (params.widgets) {
                 for (var widget of params.widgets) {
@@ -75,27 +76,17 @@ define([
                 }
             }
         });
-        this.overlayConfigs.subscribe(function(foo) {
-            var widgets = params.widgets;
-
-            if (!widgets && self.form) {
-                widgets = self.card.widgets().filter(function(widget) {
-                    var id = widget.node_id();
-                    var type = ko.unwrap(self.form.nodeLookup[id].datatype);
-                    return type === 'geojson-feature-collection';
-                });
-            }
-
-            if (widgets) {
+        this.overlayConfigs.subscribe(function(overlayConfigs) {
+            if (params.widgets) {
                 for (var widget of widgets) {
-                    widget.config.overlayConfigs(foo)
+                    widget.config.overlayConfigs(overlayConfigs)
                 }
             }
         });
-        this.basemap.subscribe(function(foo) {
+        this.basemap.subscribe(function(basemap) {
             if (params.widgets) {
                 for (var widget of params.widgets) {
-                    widget.config.basemap(foo)
+                    widget.config.basemap(basemap)
                 }
             }
         });
