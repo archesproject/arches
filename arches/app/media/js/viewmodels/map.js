@@ -103,7 +103,10 @@ define([
             var config = ko.unwrap(self.config);
 
             for (var basemap of ko.unwrap(self.basemaps)) {
-                if (config && ko.unwrap(config.basemap) === basemap.name) {
+                if (
+                    config && ko.unwrap(config.basemap) === basemap.name
+                    || self.name === 'Map Filter' && basemap.addtomap
+                ) {
                     self.activeBasemap(basemap);
                 }
                 

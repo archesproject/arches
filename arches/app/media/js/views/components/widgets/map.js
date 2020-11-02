@@ -92,7 +92,7 @@ define([
 
         var mapCardComponent = Object.values(cardComponentLookup).find(function(cardComponent) {
             return cardComponent.componentname === 'map-card';
-        })
+        });
         params.defaultConfig = JSON.parse(mapCardComponent.defaultconfig);
 
         params.basemap = this.basemap;
