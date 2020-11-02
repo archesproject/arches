@@ -18,6 +18,7 @@ define([
     'geocoder-templates'
 ], function(arches, _, ko, koMapping, cardComponentLookup, WidgetViewModel, MapEditorViewModel) {
     var viewModel = function(params) {
+        var self = this;
         this.context = params.type;
 
         this.summaryDetails = [];
@@ -94,6 +95,11 @@ define([
             return cardComponent.componentname === 'map-card';
         });
         params.defaultConfig = JSON.parse(mapCardComponent.defaultconfig);
+
+
+        // this.zoom.subscribe(function(foo) {
+        //     console.log(self, this, zoom)
+        // });
 
         params.basemap = this.basemap;
         params.overlayConfigs = this.overlayConfigs;

@@ -69,6 +69,37 @@ define([
             }
             return nodeids;
         };
+
+
+        
+
+        console.log('AAA', self, params)
+
+
+
+        params.zoom = this.overviewzoom;
+        this.overviewzoom.subscribe(function(zoom) {
+
+            self.config.overviewzoom(zoom);
+
+            var foo = self.card.widgets().filter(function(widget) {
+                var id = widget.node_id();
+                var type = self.form && ko.unwrap(self.form.nodeLookup[id].datatype);
+                return type === 'geojson-feature-collection';
+            });
+
+
+            if (foo) {
+                console.log(foo)
+                for (var widget of foo) {
+                    widget.config.zoom(zoom)
+                }
+            }
+        });
+
+
+
+
         this.hoverId = ko.observable();
         this.nodeids = getNodeIds();
         this.nodeDetails = ko.observableArray();

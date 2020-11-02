@@ -24,7 +24,13 @@ define([
         var x = ko.observable(ko.unwrap(params.x) || arches.mapDefaultX);
         var y = ko.observable(ko.unwrap(params.y) || arches.mapDefaultY);
         var bounds = ko.observable(ko.unwrap(params.bounds) || arches.hexBinBounds);
-        var zoom = ko.observable(ko.unwrap(params.zoom) || arches.mapDefaultZoom);
+
+
+        console.log("******", this, params)
+
+
+        this.zoom = ko.observable(ko.unwrap(params.zoom) || arches.mapDefaultZoom);
+
 
         var minZoom = arches.mapDefaultMinZoom;
         var maxZoom = arches.mapDefaultMaxZoom;
@@ -223,7 +229,7 @@ define([
                     parseFloat(ko.unwrap(x)),
                     parseFloat(ko.unwrap(y))
                 ],
-                zoom: parseFloat(ko.unwrap(zoom)),
+                zoom: parseFloat(self.zoom()),
             },
             maxZoom: maxZoom,
             minZoom: minZoom,
@@ -331,6 +337,11 @@ define([
         };
 
         this.setupMap = function(map) {
+            // handles Related Resourcecs Map Card
+            if (self.config.overviewzoom) {
+                map.setZoom(self.config.overviewzoom())
+            }
+
             map.on('load', function() {
                 map.addControl(new mapboxgl.NavigationControl(), 'top-left');
                 map.addControl(new mapboxgl.FullscreenControl({
@@ -388,14 +399,21 @@ define([
                 }
                 setTimeout(function() { map.resize(); }, 1);
 
-                
+                console.log(self, this, map)
                 map.on('zoomend', function() {
-                    zoom(map.getZoom());
+                    self.zoom(map.getZoom());
                 });
-                zoom.subscribe(function(level) {
+                self.zoom.subscribe(function(level) {
                     level = parseFloat(level);
-                    if (level) map.setZoom(level);
-                    self.zoom(level);
+        
+                    if (level) { map.setZoom(level) };
+        
+                    
+                    console.log(self, params, level)
+        
+                    if (ko.isObservable(params.zoom)) {
+                        params.zoom(level);
+                    }
                 });
 
                 map.on('dragend', function() {
@@ -409,7 +427,9 @@ define([
                         center.lng = lng;
                         map.setCenter(center);
                     }
-                    self.centerX(lng);
+                    if (ko.isObservable(self.centerX)) {
+                        self.centerX(lng);
+                    }
                 });
 
                 map.on('dragend', function() {
@@ -423,7 +443,9 @@ define([
                         center.lat = lat;
                         map.setCenter(center);
                     }
-                    self.centerY(lat);
+                    if (ko.isObservable(self.centerY)) {
+                        self.centerY(lat);
+                    }
                 });
             });
         };

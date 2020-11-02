@@ -167,6 +167,15 @@ define([
             });
             params.fitBoundsOptions = { padding: {top: padding, left: padding + 200, bottom: padding, right: padding + 200} };
         }
+
+
+
+        console.log(params, self)
+
+        // params.zoom = self.zoom;
+
+
+
         params.activeTab = 'editor';
         params.sources = Object.assign({
             "geojson-editor-data": {

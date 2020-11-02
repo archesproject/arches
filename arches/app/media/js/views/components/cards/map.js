@@ -66,6 +66,9 @@ define([
             }
         });
         this.zoom.subscribe(function(zoom) {
+            console.log(self, this, zoom, params)
+            self.foo(zoom)
+            
             if (params.widgets) {
                 for (var widget of params.widgets) {
                     widget.config.zoom(zoom)
@@ -86,6 +89,9 @@ define([
                 }
             }
         });
+
+        this.foo = ko.observable(this.zoom());
+        params.foo = this.foo;
 
         params.defaultConfig = self.card.model.get('defaultConfig');
 
