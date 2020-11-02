@@ -48,14 +48,14 @@ define([
             }
         })
         
-        this.activeBasemap = params.activeBasemap || ko.observable();
+        this.activeBasemap = ko.observable();
         this.activeBasemap.subscribe(function(basemap) {
             if (ko.isObservable(params.basemap) && params.basemap() !== basemap.name) {
                 params.basemap(basemap.name);
             }
         });
 
-        console.log(self, params, ko.unwrap(params.activeBasemap), ko.unwrap(self.activeBasemap), mapLayers)
+        console.log(self, params, )
 
         this.activeTab = ko.observable(params.activeTab);
         this.hideSidePanel = function() {
@@ -69,18 +69,6 @@ define([
         mapLayers.forEach(function(layer) {
             if (!layer.isoverlay) {
                 if (!params.basemaps) self.basemaps.push(layer);
-
-                if (!ko.unwrap(self.activeBasemap)) {
-                    var config = ko.unwrap(self.config);
-
-                    if (
-                        config && ko.unwrap(config.basemap) === layer.name
-                        || self.defaultConfig && self.defaultConfig.basemap() === layer.name
-                        || layer.addtomap
-                        ) {
-                        self.activeBasemap(layer);
-                    }
-                }
             }
             else if (!params.overlaysObservable) {
                 if (layer.searchonly && !params.search) return;
@@ -112,6 +100,29 @@ define([
                 self.overlays.push(layer);
             }
         });
+
+        if (!self.activeBasemap()) {
+            for (var basemap of ko.unwrap(self.basemaps)) {
+                var config = ko.unwrap(self.config);
+
+                if (config && ko.unwrap(config.basemap) === basemap.name) {
+                    self.activeBasemap(basemap);
+                }
+                
+            }
+
+            // set to default map if above failed
+            if (!self.activeBasemap()) {
+                for (var basemap of ko.unwrap(self.basemaps)) {
+                    if (basemap.addtomap) {
+                        self.activeBasemap(basemap);
+                    }
+                    else if (self.defaultConfig && self.defaultConfig.basemap() === basemap.name) {
+                        self.activeBasemap(basemap);
+                    }
+                }
+            }
+        }
         
         for (var overlay of self.overlays()) {
             if (self.overlayConfigs() && self.overlayConfigs.indexOf(overlay.maplayerid) > -1) {

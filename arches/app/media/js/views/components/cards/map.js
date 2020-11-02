@@ -81,6 +81,7 @@ define([
             }
         });
         this.basemap.subscribe(function(basemap) {
+            console.log("!!!!", self, basemap, params.widgets)
             if (params.widgets) {
                 for (var widget of params.widgets) {
                     widget.config.basemap(basemap)
