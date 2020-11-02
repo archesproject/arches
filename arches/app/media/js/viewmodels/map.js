@@ -55,6 +55,8 @@ define([
             }
         });
 
+        console.log(self, params, ko.unwrap(params.activeBasemap), ko.unwrap(self.activeBasemap), mapLayers)
+
         this.activeTab = ko.observable(params.activeTab);
         this.hideSidePanel = function() {
             self.activeTab(undefined);
@@ -69,10 +71,13 @@ define([
                 if (!params.basemaps) self.basemaps.push(layer);
 
                 if (!ko.unwrap(self.activeBasemap)) {
-                    if (self.config) {
-                        var config = ko.unwrap(self.config);
-                        if (ko.unwrap(config.basemap) === layer.name) { self.activeBasemap(layer); }
-                    } else if (layer.addtomap) {
+                    var config = ko.unwrap(self.config);
+
+                    if (
+                        config && ko.unwrap(config.basemap) === layer.name
+                        || self.defaultConfig && self.defaultConfig.basemap() === layer.name
+                        || layer.addtomap
+                        ) {
                         self.activeBasemap(layer);
                     }
                 }
@@ -109,7 +114,7 @@ define([
         });
         
         for (var overlay of self.overlays()) {
-            if (self.overlayConfigs.indexOf(overlay.maplayerid) > -1) {
+            if (self.overlayConfigs() && self.overlayConfigs.indexOf(overlay.maplayerid) > -1) {
                 overlay.opacity(100);
             } else {
                 overlay.opacity(0);

@@ -34,6 +34,9 @@ define([
                 widget.config.centerX(self.centerX());
                 widget.config.centerY(self.centerY());
                 widget.config.zoom(self.zoom());
+                widget.config.overlayConfigs(self.overlayConfigs())
+                widget.config.basemap(self.basemap());
+
             }
         }
 

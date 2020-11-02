@@ -82,7 +82,8 @@ define([
             var id = ko.unwrap(widget.node_id);
             self.featureLookup[id] = {
                 features: ko.computed(function() {
-                    var value = koMapping.toJS(self.tile.data[id]);
+                    var value;
+                    if (self.tile.data[id]) { value = koMapping.toJS(self.tile.data[id]); }
                     if (value) return value.features;
                     else return [];
                 }),
