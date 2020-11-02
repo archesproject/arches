@@ -43,7 +43,7 @@ define([
         
         this.overlayConfigs = ko.observableArray(ko.unwrap(params.overlayConfigs));
         this.overlayConfigs.subscribe(function(overlayConfigs) {
-            if (ko.isObservable(params.overlayConfigs) && params.overlayConfigs() !== overlayConfigs) {
+            if (ko.isObservable(params.overlayConfigs)) {
                 params.overlayConfigs(overlayConfigs)
             }
         })
@@ -54,8 +54,6 @@ define([
                 params.basemap(basemap.name);
             }
         });
-
-        console.log(self, params, )
 
         this.activeTab = ko.observable(params.activeTab);
         this.hideSidePanel = function() {
@@ -100,24 +98,18 @@ define([
                 self.overlays.push(layer);
             }
         });
-
+        
         if (!self.activeBasemap()) {
-            for (var basemap of ko.unwrap(self.basemaps)) {
-                var config = ko.unwrap(self.config);
+            var config = ko.unwrap(self.config);
 
+            for (var basemap of ko.unwrap(self.basemaps)) {
                 if (config && ko.unwrap(config.basemap) === basemap.name) {
                     self.activeBasemap(basemap);
                 }
                 
-            }
-
-            // set to default map if above failed
-            if (!self.activeBasemap()) {
-                for (var basemap of ko.unwrap(self.basemaps)) {
-                    if (basemap.addtomap) {
-                        self.activeBasemap(basemap);
-                    }
-                    else if (self.defaultConfig && self.defaultConfig.basemap() === basemap.name) {
+                // set to default map if above failed
+                if (!self.activeBasemap()) {
+                    if (self.defaultConfig && self.defaultConfig.basemap() === basemap.name) {
                         self.activeBasemap(basemap);
                     }
                 }
@@ -125,7 +117,7 @@ define([
         }
         
         for (var overlay of self.overlays()) {
-            if (self.overlayConfigs() && self.overlayConfigs.indexOf(overlay.maplayerid) > -1) {
+            if (self.overlayConfigs.indexOf(overlay.maplayerid) > -1) {
                 overlay.opacity(100);
             } else {
                 overlay.opacity(0);

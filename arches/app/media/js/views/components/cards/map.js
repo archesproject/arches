@@ -36,7 +36,6 @@ define([
                 widget.config.zoom(self.zoom());
                 widget.config.overlayConfigs(self.overlayConfigs())
                 widget.config.basemap(self.basemap());
-
             }
         }
 
@@ -81,7 +80,6 @@ define([
             }
         });
         this.basemap.subscribe(function(basemap) {
-            console.log("!!!!", self, basemap, params.widgets)
             if (params.widgets) {
                 for (var widget of params.widgets) {
                     widget.config.basemap(basemap)
