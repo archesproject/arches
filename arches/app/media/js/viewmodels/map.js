@@ -80,8 +80,8 @@ define([
                 
                 layer.updateParent = function(parent) {
                     /* 
-                        In widget we need to explicity perform this action on its ( card ) parent. 
-                        In card parent === self so this action is still valid.
+                        In widget, we need to explicity perform this action on its ( card ) parent. 
+                        In card, parent === self so this action is still valid.
                     */
 
                     if (parent.overlayConfigs.indexOf(layer.maplayerid) === -1) {
@@ -105,11 +105,11 @@ define([
             for (var basemap of ko.unwrap(self.basemaps)) {
                 if (
                     config && ko.unwrap(config.basemap) === basemap.name
-                    || self.name === 'Map Filter' && basemap.addtomap
+                    || self.name === 'Map Filter' && basemap.addtomap  // handles search basemap
                 ) {
                     self.activeBasemap(basemap);
                 }
-                
+
                 // set to default map if above failed
                 if (!self.activeBasemap()) {
                     if (self.defaultConfig && self.defaultConfig.basemap() === basemap.name) {
@@ -118,9 +118,12 @@ define([
                 }
             }
         }
-        
+
         for (var overlay of self.overlays()) {
-            if (self.overlayConfigs.indexOf(overlay.maplayerid) > -1) {
+            if (
+                self.overlayConfigs.indexOf(overlay.maplayerid) > -1
+                || self.name === 'Map Filter' && overlay.addtomap  // handles search overlays
+            ) {
                 overlay.opacity(100);
             } else {
                 overlay.opacity(0);
