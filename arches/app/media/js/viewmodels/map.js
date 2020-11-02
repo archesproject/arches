@@ -21,10 +21,10 @@ define([
             };
         };
 
-        var x = ko.unwrap(params.x) ? params.x : arches.mapDefaultX;
-        var y = ko.unwrap(params.y) ? params.y : arches.mapDefaultY;
-        var bounds = ko.unwrap(params.bounds) ? params.bounds : arches.hexBinBounds;
-        var zoom = ko.unwrap(params.zoom) ? params.zoom : arches.mapDefaultZoom;
+        var x = ko.observable(ko.unwrap(params.x) || arches.mapDefaultX);
+        var y = ko.observable(ko.unwrap(params.y) || arches.mapDefaultY);
+        var bounds = ko.observable(ko.unwrap(params.bounds) || arches.hexBinBounds);
+        var zoom = ko.observable(ko.unwrap(params.zoom) || arches.mapDefaultZoom);
 
         var minZoom = arches.mapDefaultMinZoom;
         var maxZoom = arches.mapDefaultMaxZoom;
@@ -388,45 +388,43 @@ define([
                 }
                 setTimeout(function() { map.resize(); }, 1);
 
-                if (ko.isObservable(zoom)) {
-                    map.on('zoomend', function() {
-                        zoom(map.getZoom());
-                    });
-                    zoom.subscribe(function(level) {
-                        level = parseFloat(level);
-                        if (level) map.setZoom(level);
-                    });
-                }
+                
+                map.on('zoomend', function() {
+                    zoom(map.getZoom());
+                });
+                zoom.subscribe(function(level) {
+                    level = parseFloat(level);
+                    if (level) map.setZoom(level);
+                    self.zoom(level);
+                });
 
-                if (ko.isObservable(x)) {
-                    map.on('dragend', function() {
-                        var center = map.getCenter();
-                        x(center.lng);
-                    });
-                    x.subscribe(function(lng) {
-                        var center = map.getCenter();
-                        lng = parseFloat(lng);
-                        if (lng) {
-                            center.lng = lng;
-                            map.setCenter(center);
-                        }
-                    });
-                }
+                map.on('dragend', function() {
+                    var center = map.getCenter();
+                    x(center.lng);
+                });
+                x.subscribe(function(lng) {
+                    var center = map.getCenter();
+                    lng = parseFloat(lng);
+                    if (lng) {
+                        center.lng = lng;
+                        map.setCenter(center);
+                    }
+                    self.centerX(lng);
+                });
 
-                if (ko.isObservable(y)) {
-                    map.on('dragend', function() {
-                        var center = map.getCenter();
-                        y(center.lat);
-                    });
-                    y.subscribe(function(lat) {
-                        var center = map.getCenter();
-                        lat = parseFloat(lat);
-                        if (lat) {
-                            center.lat = lat;
-                            map.setCenter(center);
-                        }
-                    });
-                }
+                map.on('dragend', function() {
+                    var center = map.getCenter();
+                    y(center.lat);
+                });
+                y.subscribe(function(lat) {
+                    var center = map.getCenter();
+                    lat = parseFloat(lat);
+                    if (lat) {
+                        center.lat = lat;
+                        map.setCenter(center);
+                    }
+                    self.centerY(lat);
+                });
             });
         };
     };

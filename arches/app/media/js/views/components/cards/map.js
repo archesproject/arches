@@ -88,7 +88,7 @@ define([
         });
 
         params.defaultConfig = self.card.model.get('defaultConfig');
-        
+
         params.overlayConfigs = this.overlayConfigs;
         params.basemap = this.basemap;
         params.zoom = this.zoom;
