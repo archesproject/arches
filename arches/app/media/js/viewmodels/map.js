@@ -80,8 +80,8 @@ define([
                 
                 layer.updateParent = function(parent) {
                     /* 
-                        Sometimes parent !== self. Explicity performing
-                        operations on parent keeps them behaving as expected.
+                        In widget we need to explicity perform this action on its ( card ) parent. 
+                        In card parent === self so this action is still valid.
                     */
 
                     if (parent.overlayConfigs.indexOf(layer.maplayerid) === -1) {
