@@ -22,12 +22,6 @@ define([
             };
         };
 
-        this.activeTab = ko.observable(params.activeTab);
-        this.activeTab.subscribe(function() {
-            // var map = self.map();
-            // if (map && map.getStyle()) setTimeout(function() { map.resize(); }, 1);
-        });
-
         this.map = ko.observable(ko.unwrap(params.map));
         this.map.subscribe(function(map) {
             var center = map.getCenter();
@@ -63,7 +57,6 @@ define([
                 params.fitBounds(bounds);
             }
         });
-
 
         this.centerX = ko.observable(ko.unwrap(params.x) || arches.mapDefaultX);
         this.centerX.subscribe(function(lng) {
@@ -127,6 +120,7 @@ define([
             "search-results-points": geojsonSourceFactory()
         }, arches.mapSources, params.sources);
         
+        this.activeTab = ko.observable(params.activeTab);
         this.basemaps = params.basemaps || [];
         this.overlays = params.overlaysObservable || ko.observableArray();
         
@@ -167,16 +161,8 @@ define([
         });
         
         if (!self.activeBasemap()) {
-            var config = ko.unwrap(self.config);
-
-            console.log(config, self, params)
-
             for (var basemap of ko.unwrap(self.basemaps)) {
-                if (
-                    // config && ko.unwrap(config.basemap) === basemap.name
-                    // || self.name === 'Map Filter' && basemap.addtomap  // handles search basemap
-                    params.basemap() === basemap.name
-                ) {
+                if (params.basemap() === basemap.name) {
                     self.activeBasemap(basemap);
                 }
 
