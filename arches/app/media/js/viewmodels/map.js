@@ -21,13 +21,26 @@ define([
             };
         };
 
+        this.map = ko.observable(ko.unwrap(params.map));
+        this.map.subscribe(function(map) {
+            var center = map.getCenter();
+            
+            lng = parseFloat(self.centerX());
+            lat = parseFloat(self.centerY());
+            
+            if (lng) { center.lng = lng; }
+            if (lat) { center.lat = lat; }
+            
+            self.setupMap(map)
+            map.setCenter(center);
+            map.setZoom(parseFloat(self.zoom()))
+        })
+
         this.centerX = ko.observable(ko.unwrap(params.x) || arches.mapDefaultX);
         this.centerX.subscribe(function(lng) {
-            console.log('***', self, this, params, lng);
-
             lng = parseFloat(lng);
             
-            if (self.map() && lng) {
+            if (lng && self.map()) {
                 var center = self.map().getCenter();
                 center.lng = lng;
             
@@ -37,51 +50,34 @@ define([
                 params.x(lng);
             }
         });
+
         this.centerY = ko.observable(ko.unwrap(params.y) || arches.mapDefaultY);
-
-        this.map = ko.observable(ko.unwrap(params.map));
-        this.map.subscribe(function(map) {
+        this.centerY.subscribe(function(lat) {
+            lat = parseFloat(lat);
             
-            self.setupMap(map)
-
-            map.setZoom(parseFloat(self.zoom()))
-            // map.setCenter(parseFloat(params.x()), parseFloat(params.y()))
-
-            var center = map.getCenter();
-            lng = parseFloat(self.centerX());
-            if (lng) {
-                center.lng = lng;
-                map.setCenter(center);
+            if (lat && self.map()) {
+                var center = self.map().getCenter();
+                center.lat = lat;
+            
+                self.map().setCenter(center);
             }
-
-            // map.setCenter(parseFloat(self.centerX()), parseFloat(self.centerY()))
-
-            // map.resize();
-
-        })
+            if (ko.isObservable(params.x)) {
+                params.y(lat);
+            }
+        });
         
-
-        var x = ko.observable(ko.unwrap(params.x) || arches.mapDefaultX);
-        var y = ko.observable(ko.unwrap(params.y) || arches.mapDefaultY);
-        var bounds = ko.observable(ko.unwrap(params.bounds) || arches.hexBinBounds);
-
-
-        console.log("******", this, params)
-
-
         this.zoom = ko.observable(ko.unwrap(params.zoom) || arches.mapDefaultZoom);
         this.zoom.subscribe(function(level) {
             level = parseFloat(level);
 
-            console.log(self, params, level)
-            if (self.map() && level) { self.map().setZoom(level) };
-
+            if (level && self.map()) { self.map().setZoom(level) };
 
             if (ko.isObservable(params.zoom)) {
                 params.zoom(level);
             }
         });
 
+        var bounds = ko.observable(ko.unwrap(params.bounds) || arches.hexBinBounds);
 
         var minZoom = arches.mapDefaultMinZoom;
         var maxZoom = arches.mapDefaultMaxZoom;
@@ -277,7 +273,7 @@ define([
                 layers: self.layers(),
                 center: [
                     parseFloat(self.centerX()),
-                    parseFloat(ko.unwrap(y))
+                    parseFloat(self.centerY()),
                 ],
                 zoom: parseFloat(self.zoom()),
             },
@@ -387,11 +383,6 @@ define([
         };
 
         this.setupMap = function(map) {
-            // // handles Related Resourcecs Map Card
-            // if (self.config.overviewzoom) {
-            //     map.setZoom(self.config.overviewzoom())
-            // }
-
             map.on('load', function() {
                 self.map(map);
 
@@ -450,7 +441,6 @@ define([
                 }
                 // setTimeout(function() { map.resize(); }, 1);
 
-                console.log(self, this, map)
                 map.on('zoomend', function() {
                     self.zoom(map.getZoom());
                 });
@@ -460,21 +450,9 @@ define([
                     self.centerX(center.lng);
                 });
 
-
                 map.on('dragend', function() {
                     var center = map.getCenter();
-                    y(center.lat);
-                });
-                y.subscribe(function(lat) {
-                    var center = map.getCenter();
-                    lat = parseFloat(lat);
-                    if (lat) {
-                        center.lat = lat;
-                        map.setCenter(center);
-                    }
-                    if (ko.isObservable(self.centerY)) {
-                        self.centerY(lat);
-                    }
+                    self.centerY(center.lat);
                 });
             });
         };

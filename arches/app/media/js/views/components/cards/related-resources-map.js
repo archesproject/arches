@@ -86,12 +86,28 @@ define([
                 var type = self.form && ko.unwrap(self.form.nodeLookup[id].datatype);
                 return type === 'geojson-feature-collection';
             });
-
-
             if (foo) {
                 console.log(foo)
                 for (var widget of foo) {
                     widget.config.centerX(x)
+                }
+            }
+        });
+
+
+        this.centerY = ko.observable(self.card.widgets && self.card.widgets()[0].config.centerY());
+        params.y = this.centerY;
+        
+        this.centerY.subscribe(function(y) {
+            var foo = self.card.widgets().filter(function(widget) {
+                var id = widget.node_id();
+                var type = self.form && ko.unwrap(self.form.nodeLookup[id].datatype);
+                return type === 'geojson-feature-collection';
+            });
+            if (foo) {
+                console.log(foo)
+                for (var widget of foo) {
+                    widget.config.centerY(y)
                 }
             }
         });
