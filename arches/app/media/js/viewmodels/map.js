@@ -24,7 +24,7 @@ define([
 
         this.activeTab = ko.observable(params.activeTab);
 
-        var boundsOptions = {
+        var boundingOptions = {
             padding: {
                 top: 40,
                 left: 40 + (self.activeTab() ? 200: 0),
@@ -55,15 +55,15 @@ define([
             }
 
             if (ko.unwrap(params.bounds)) {
-                map.fitBounds(ko.unwrap(params.bounds), boundsOptions);
+                map.fitBounds(ko.unwrap(params.bounds), boundingOptions);
             }
         })
 
         this.bounds = ko.observable(ko.unwrap(params.bounds) || arches.hexBinBounds);
         this.bounds.subscribe(function(bounds) {
-            self.map().fitBounds(bounds, boundsOptions);
+            self.map().fitBounds(bounds, boundingOptions);
 
-            if (ko.isObservable(params.fitBounds)){
+            if (ko.isObservable(params.fitBounds) && params.fitBounds() !== bounds){
                 params.fitBounds(bounds);
             }
         });
@@ -76,7 +76,7 @@ define([
             
                 self.map().setCenter(center);
             }
-            if (ko.isObservable(params.x)) {
+            if (ko.isObservable(params.x) && params.x() !== lng) {
                 params.x(lng);
             }
         });
@@ -89,7 +89,7 @@ define([
             
                 self.map().setCenter(center);
             }
-            if (ko.isObservable(params.x)) {
+            if (ko.isObservable(params.y) && params.y() !== lat) {
                 params.y(lat);
             }
         });
