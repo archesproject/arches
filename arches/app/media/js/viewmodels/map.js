@@ -10,6 +10,7 @@ define([
 ], function($, _, arches, ko, koMapping, mapboxgl, MapboxGeocoder, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
+
         var geojsonSourceFactory = function() {
             return {
                 "type": "geojson",
@@ -20,6 +21,12 @@ define([
                 }
             };
         };
+
+        this.activeTab = ko.observable(params.activeTab);
+        this.activeTab.subscribe(function() {
+            // var map = self.map();
+            // if (map && map.getStyle()) setTimeout(function() { map.resize(); }, 1);
+        });
 
         this.map = ko.observable(ko.unwrap(params.map));
         this.map.subscribe(function(map) {
@@ -35,6 +42,28 @@ define([
             map.setCenter(center);
             map.setZoom(parseFloat(self.zoom()))
         })
+
+        this.bounds = ko.observable(ko.unwrap(params.bounds) || arches.hexBinBounds);
+        this.bounds.subscribe(function(bounds) {
+            var padding = 40;
+            var activeTab = self.activeTab();
+            var options = {
+                padding: {
+                    top: padding,
+                    left: padding + (activeTab ? 200: 0),
+                    bottom: padding,
+                    right: padding + (activeTab ? 200: 0)
+                },
+                animate: false
+            };
+            
+            self.map().fitBounds(bounds, options);
+
+            if (ko.isObservable(params.fitBounds)){
+                params.fitBounds(bounds);
+            }
+        });
+
 
         this.centerX = ko.observable(ko.unwrap(params.x) || arches.mapDefaultX);
         this.centerX.subscribe(function(lng) {
@@ -77,22 +106,6 @@ define([
             }
         });
 
-        var bounds = ko.observable(ko.unwrap(params.bounds) || arches.hexBinBounds);
-
-        var minZoom = arches.mapDefaultMinZoom;
-        var maxZoom = arches.mapDefaultMaxZoom;
-        var sources = Object.assign({
-            "resource": geojsonSourceFactory(),
-            "search-results-hex": geojsonSourceFactory(),
-            "search-results-hashes": geojsonSourceFactory(),
-            "search-results-points": geojsonSourceFactory()
-        }, arches.mapSources, params.sources);
-        var mapLayers = params.mapLayers || arches.mapLayers;
-
-        this.popupTemplate = popupTemplate;
-        this.basemaps = params.basemaps || [];
-        this.overlays = params.overlaysObservable || ko.observableArray();
-        
         this.overlayConfigs = ko.observableArray(ko.unwrap(params.overlayConfigs));
         this.overlayConfigs.subscribe(function(overlayConfigs) {
             if (ko.isObservable(params.overlayConfigs)) {
@@ -107,15 +120,17 @@ define([
             }
         });
 
-        this.activeTab = ko.observable(params.activeTab);
-        this.hideSidePanel = function() {
-            self.activeTab(undefined);
-        };
-        this.activeTab.subscribe(function() {
-            var map = self.map();
-            if (map && map.getStyle()) setTimeout(function() { map.resize(); }, 1);
-        });
-
+        var sources = Object.assign({
+            "resource": geojsonSourceFactory(),
+            "search-results-hex": geojsonSourceFactory(),
+            "search-results-hashes": geojsonSourceFactory(),
+            "search-results-points": geojsonSourceFactory()
+        }, arches.mapSources, params.sources);
+        
+        this.basemaps = params.basemaps || [];
+        this.overlays = params.overlaysObservable || ko.observableArray();
+        
+        var mapLayers = params.mapLayers || arches.mapLayers;
         mapLayers.forEach(function(layer) {
             if (!layer.isoverlay) {
                 if (!params.basemaps) self.basemaps.push(layer);
@@ -277,13 +292,17 @@ define([
                 ],
                 zoom: parseFloat(self.zoom()),
             },
-            maxZoom: maxZoom,
-            minZoom: minZoom,
+            maxZoom: arches.mapDefaultMaxZoom,
+            minZoom: arches.mapDefaultMinZoom,
         };
         if (!params.usePosition) {
-            this.mapOptions.bounds = bounds;
+            this.mapOptions.bounds = this.bounds;
             this.mapOptions.fitBoundsOptions = params.fitBoundsOptions;
         }
+
+        this.hideSidePanel = function() {
+            self.activeTab(undefined);
+        };
 
         this.toggleTab = function(tabName) {
             if (self.activeTab() === tabName) {
@@ -365,6 +384,7 @@ define([
             }
         };
 
+        this.popupTemplate = popupTemplate;
         this.onFeatureClick = function(feature, lngLat) {
             var map = self.map();
             self.popup = new mapboxgl.Popup()
@@ -384,8 +404,6 @@ define([
 
         this.setupMap = function(map) {
             map.on('load', function() {
-                self.map(map);
-
                 map.addControl(new mapboxgl.NavigationControl(), 'top-left');
                 map.addControl(new mapboxgl.FullscreenControl({
                     container: $(map.getContainer()).closest('.workbench-card-wrapper')[0]
@@ -400,6 +418,7 @@ define([
                 self.layers.subscribe(self.updateLayers);
 
                 var hoverFeature;
+
                 map.on('mousemove', function(e) {
                     var style = map.getStyle();
                     if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: false });
@@ -417,30 +436,6 @@ define([
                     }
                 });
 
-                if (params.fitBounds){
-                    var padding = 40;
-                    var activeTab = self.activeTab();
-                    var options = {
-                        padding: {
-                            top: padding,
-                            left: padding + (activeTab ? 200: 0),
-                            bottom: padding,
-                            right: padding + (activeTab ? 200: 0)
-                        },
-                        animate: false
-                    };
-                    var bounds = params.fitBounds();
-                    if (bounds) {
-                        map.fitBounds(bounds, options);
-                    } else {
-                        var fitBounds = params.fitBounds.subscribe(function(bounds) {
-                            map.fitBounds(bounds, options);
-                            fitBounds.dispose();
-                        });
-                    }
-                }
-                // setTimeout(function() { map.resize(); }, 1);
-
                 map.on('zoomend', function() {
                     self.zoom(map.getZoom());
                 });
@@ -454,6 +449,8 @@ define([
                     var center = map.getCenter();
                     self.centerY(center.lat);
                 });
+
+                self.map(map);
             });
         };
     };
