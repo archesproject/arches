@@ -96,11 +96,6 @@ define([
         });
         params.defaultConfig = JSON.parse(mapCardComponent.defaultconfig);
 
-
-        // this.zoom.subscribe(function(foo) {
-        //     console.log(self, this, zoom)
-        // });
-
         params.basemap = this.basemap;
         params.overlayConfigs = this.overlayConfigs;
         params.zoom = this.zoom;
