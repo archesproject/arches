@@ -11,6 +11,9 @@ define([
     var viewModel = function(params) {
         var self = this;
 
+        // console.log('!!!', cardComponentLookup)
+
+
         var geojsonSourceFactory = function() {
             return {
                 "type": "geojson",
@@ -60,8 +63,6 @@ define([
 
         this.centerX = ko.observable(ko.unwrap(params.x) || arches.mapDefaultX);
         this.centerX.subscribe(function(lng) {
-            lng = parseFloat(lng);
-            
             if (lng && self.map()) {
                 var center = self.map().getCenter();
                 center.lng = lng;
@@ -75,8 +76,6 @@ define([
 
         this.centerY = ko.observable(ko.unwrap(params.y) || arches.mapDefaultY);
         this.centerY.subscribe(function(lat) {
-            lat = parseFloat(lat);
-            
             if (lat && self.map()) {
                 var center = self.map().getCenter();
                 center.lat = lat;
@@ -90,11 +89,9 @@ define([
         
         this.zoom = ko.observable(ko.unwrap(params.zoom) || arches.mapDefaultZoom);
         this.zoom.subscribe(function(level) {
-            level = parseFloat(level);
-
             if (level && self.map()) { self.map().setZoom(level) };
 
-            if (ko.isObservable(params.zoom)) {
+            if (ko.isObservable(params.zoom) && params.zoom() !== level) {
                 params.zoom(level);
             }
         });
@@ -162,13 +159,14 @@ define([
         
         if (!self.activeBasemap()) {
             for (var basemap of ko.unwrap(self.basemaps)) {
-                if (params.basemap() === basemap.name) {
+                if (ko.unwrap(params.basemap) === basemap.name) {
                     self.activeBasemap(basemap);
                 }
 
-                // set to default map if above failed
                 if (!self.activeBasemap()) {
-                    if (self.defaultConfig && self.defaultConfig.basemap() === basemap.name) {
+                    if (
+                        params.defaultConfig.basemap === basemap.name
+                    ) {
                         self.activeBasemap(basemap);
                     }
                 }
@@ -177,8 +175,8 @@ define([
 
         for (var overlay of self.overlays()) {
             if (
-                self.overlayConfigs.indexOf(overlay.maplayerid) > -1
-                || self.name === 'Map Filter' && overlay.addtomap  // handles search overlays
+                ko.unwrap(self.overlayConfigs) && self.overlayConfigs.indexOf(overlay.maplayerid) > -1
+                // || self.name === 'Map Filter' && overlay.addtomap  // handles search overlays
             ) {
                 overlay.opacity(100);
             } else {
@@ -426,17 +424,19 @@ define([
                 });
 
                 map.on('zoomend', function() {
-                    self.zoom(map.getZoom());
+                    self.zoom(
+                        parseFloat(map.getZoom())
+                    );
                 });
 
                 map.on('dragend', function() {
                     var center = map.getCenter();
-                    self.centerX(center.lng);
+                    self.centerX(parseFloat(center.lng));
                 });
 
                 map.on('dragend', function() {
                     var center = map.getCenter();
-                    self.centerY(center.lat);
+                    self.centerY(parseFloat(center.lat));
                 });
 
                 self.map(map);

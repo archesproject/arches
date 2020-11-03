@@ -14,8 +14,9 @@ define([
     'geojson-extent',
     'uuid',
     'geojsonhint',
+    'card-components',
     'codemirror/mode/javascript/javascript'
-], function($, _, arches, ko, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash, mapboxgl, MapboxDraw, geojsonExtent, uuid, geojsonhint) {
+], function($, _, arches, ko, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash, mapboxgl, MapboxDraw, geojsonExtent, uuid, geojsonhint, cardComponentLookup) {
     var componentName = 'map-filter';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -86,6 +87,11 @@ define([
                 );
 
                 options.search = true;
+
+                var mapCardComponent = Object.values(cardComponentLookup).find(function(cardComponent) {
+                    return cardComponent.componentname === 'map-card';
+                });
+                options.defaultConfig = JSON.parse(mapCardComponent.defaultconfig);
 
                 MapComponentViewModel.apply(this, [options]);
 

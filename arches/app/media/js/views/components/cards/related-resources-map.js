@@ -85,7 +85,6 @@ define([
             }
         });
         
-        
         this.centerY = ko.observable(self.card.widgets && self.card.widgets()[0].config.centerY());
         this.centerY.subscribe(function(y) {
             var foo = self.card.widgets().filter(function(widget) {
@@ -118,9 +117,7 @@ define([
         });
                 
         this.basemap = ko.observable(self.card.widgets && self.card.widgets()[0].config.basemap());
-        console.log(self.card.widgets())
         this.basemap.subscribe(function(map) {
-            console.log("!!!!", self, this, map)
             var foo = self.card.widgets().filter(function(widget) {
                 var id = widget.node_id();
                 var type = self.form && ko.unwrap(self.form.nodeLookup[id].datatype);
@@ -138,7 +135,6 @@ define([
         params.x = this.centerX;
         params.y = this.centerY;
         
-
         this.hoverId = ko.observable();
         this.nodeids = getNodeIds();
         this.nodeDetails = ko.observableArray();
