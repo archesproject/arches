@@ -21,6 +21,46 @@ define([
             };
         };
 
+        this.centerX = ko.observable(ko.unwrap(params.x) || arches.mapDefaultX);
+        this.centerX.subscribe(function(lng) {
+            console.log('***', self, this, params, lng);
+
+            lng = parseFloat(lng);
+            
+            if (self.map() && lng) {
+                var center = self.map().getCenter();
+                center.lng = lng;
+            
+                self.map().setCenter(center);
+            }
+            if (ko.isObservable(params.x)) {
+                params.x(lng);
+            }
+        });
+        this.centerY = ko.observable(ko.unwrap(params.y) || arches.mapDefaultY);
+
+        this.map = ko.observable(ko.unwrap(params.map));
+        this.map.subscribe(function(map) {
+            
+            self.setupMap(map)
+
+            map.setZoom(parseFloat(self.zoom()))
+            // map.setCenter(parseFloat(params.x()), parseFloat(params.y()))
+
+            var center = map.getCenter();
+            lng = parseFloat(self.centerX());
+            if (lng) {
+                center.lng = lng;
+                map.setCenter(center);
+            }
+
+            // map.setCenter(parseFloat(self.centerX()), parseFloat(self.centerY()))
+
+            // map.resize();
+
+        })
+        
+
         var x = ko.observable(ko.unwrap(params.x) || arches.mapDefaultX);
         var y = ko.observable(ko.unwrap(params.y) || arches.mapDefaultY);
         var bounds = ko.observable(ko.unwrap(params.bounds) || arches.hexBinBounds);
@@ -30,6 +70,17 @@ define([
 
 
         this.zoom = ko.observable(ko.unwrap(params.zoom) || arches.mapDefaultZoom);
+        this.zoom.subscribe(function(level) {
+            level = parseFloat(level);
+
+            console.log(self, params, level)
+            if (self.map() && level) { self.map().setZoom(level) };
+
+
+            if (ko.isObservable(params.zoom)) {
+                params.zoom(level);
+            }
+        });
 
 
         var minZoom = arches.mapDefaultMinZoom;
@@ -42,7 +93,6 @@ define([
         }, arches.mapSources, params.sources);
         var mapLayers = params.mapLayers || arches.mapLayers;
 
-        this.map = ko.isObservable(params.map) ? params.map : ko.observable();
         this.popupTemplate = popupTemplate;
         this.basemaps = params.basemaps || [];
         this.overlays = params.overlaysObservable || ko.observableArray();
@@ -226,7 +276,7 @@ define([
                 glyphs: arches.mapboxGlyphs,
                 layers: self.layers(),
                 center: [
-                    parseFloat(ko.unwrap(x)),
+                    parseFloat(self.centerX()),
                     parseFloat(ko.unwrap(y))
                 ],
                 zoom: parseFloat(self.zoom()),
@@ -337,12 +387,14 @@ define([
         };
 
         this.setupMap = function(map) {
-            // handles Related Resourcecs Map Card
-            if (self.config.overviewzoom) {
-                map.setZoom(self.config.overviewzoom())
-            }
+            // // handles Related Resourcecs Map Card
+            // if (self.config.overviewzoom) {
+            //     map.setZoom(self.config.overviewzoom())
+            // }
 
             map.on('load', function() {
+                self.map(map);
+
                 map.addControl(new mapboxgl.NavigationControl(), 'top-left');
                 map.addControl(new mapboxgl.FullscreenControl({
                     container: $(map.getContainer()).closest('.workbench-card-wrapper')[0]
@@ -374,7 +426,6 @@ define([
                     }
                 });
 
-                self.map(map);
                 if (params.fitBounds){
                     var padding = 40;
                     var activeTab = self.activeTab();
@@ -397,40 +448,18 @@ define([
                         });
                     }
                 }
-                setTimeout(function() { map.resize(); }, 1);
+                // setTimeout(function() { map.resize(); }, 1);
 
                 console.log(self, this, map)
                 map.on('zoomend', function() {
                     self.zoom(map.getZoom());
                 });
-                self.zoom.subscribe(function(level) {
-                    level = parseFloat(level);
-        
-                    if (level) { map.setZoom(level) };
-        
-                    
-                    console.log(self, params, level)
-        
-                    if (ko.isObservable(params.zoom)) {
-                        params.zoom(level);
-                    }
-                });
 
                 map.on('dragend', function() {
                     var center = map.getCenter();
-                    x(center.lng);
+                    self.centerX(center.lng);
                 });
-                x.subscribe(function(lng) {
-                    var center = map.getCenter();
-                    lng = parseFloat(lng);
-                    if (lng) {
-                        center.lng = lng;
-                        map.setCenter(center);
-                    }
-                    if (ko.isObservable(self.centerX)) {
-                        self.centerX(lng);
-                    }
-                });
+
 
                 map.on('dragend', function() {
                     var center = map.getCenter();
