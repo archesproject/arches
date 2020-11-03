@@ -51,6 +51,20 @@ define([
         }
 
         // subscriptions need to stay explicit! DRY-ing will break
+        this.basemap.subscribe(function(basemap) {
+            if (params.widgets) {
+                for (var widget of params.widgets) {
+                    widget.config.basemap(basemap)
+                }
+            }
+        });
+        this.overlayConfigs.subscribe(function(overlayConfigs) {
+            if (params.widgets) {
+                for (var widget of params.widgets) {
+                    widget.config.overlayConfigs(overlayConfigs)
+                }
+            }
+        });
         this.centerX.subscribe(function(x) {
             self.centerX(x);
             
@@ -75,20 +89,6 @@ define([
             if (params.widgets) {
                 for (var widget of params.widgets) {
                     widget.config.zoom(zoom)
-                }
-            }
-        });
-        this.overlayConfigs.subscribe(function(overlayConfigs) {
-            if (params.widgets) {
-                for (var widget of params.widgets) {
-                    widget.config.overlayConfigs(overlayConfigs)
-                }
-            }
-        });
-        this.basemap.subscribe(function(basemap) {
-            if (params.widgets) {
-                for (var widget of params.widgets) {
-                    widget.config.basemap(basemap)
                 }
             }
         });
