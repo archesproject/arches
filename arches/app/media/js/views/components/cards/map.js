@@ -52,6 +52,8 @@ define([
 
         // subscriptions need to stay explicit! DRY-ing will break
         this.centerX.subscribe(function(x) {
+            self.centerX(x);
+            
             if (params.widgets) {
                 for (var widget of params.widgets) {
                     widget.config.centerX(x)
@@ -59,6 +61,8 @@ define([
             }
         });
         this.centerY.subscribe(function(y) {
+            self.centerY(y);
+
             if (params.widgets) {
                 for (var widget of params.widgets) {
                     widget.config.centerY(y)
@@ -66,9 +70,8 @@ define([
             }
         });
         this.zoom.subscribe(function(zoom) {
-            console.log(self, this, zoom, params)
-            self.foo(zoom)
-            
+            self.zoom(zoom);
+
             if (params.widgets) {
                 for (var widget of params.widgets) {
                     widget.config.zoom(zoom)
@@ -89,9 +92,6 @@ define([
                 }
             }
         });
-
-        this.foo = ko.observable(this.zoom());
-        params.foo = this.foo;
 
         params.defaultConfig = self.card.model.get('defaultConfig');
 
