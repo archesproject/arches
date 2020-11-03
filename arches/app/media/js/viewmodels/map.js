@@ -11,9 +11,6 @@ define([
     var viewModel = function(params) {
         var self = this;
 
-        // console.log('!!!', cardComponentLookup)
-
-
         var geojsonSourceFactory = function() {
             return {
                 "type": "geojson",
@@ -25,36 +22,46 @@ define([
             };
         };
 
+        this.activeTab = ko.observable(params.activeTab);
+
+        var boundsOptions = {
+            padding: {
+                top: 40,
+                left: 40 + (self.activeTab() ? 200: 0),
+                bottom: 40,
+                right: 40 + (self.activeTab() ? 200: 0)
+            },
+            animate: false
+        };
+
         this.map = ko.observable(ko.unwrap(params.map));
         this.map.subscribe(function(map) {
-            var center = map.getCenter();
+            self.setupMap(map);
+
+            if (ko.unwrap(params.x) && ko.unwrap(params.y)) {
+                var center = map.getCenter();
             
-            lng = parseFloat(self.centerX());
-            lat = parseFloat(self.centerY());
-            
-            if (lng) { center.lng = lng; }
-            if (lat) { center.lat = lat; }
-            
-            self.setupMap(map)
-            map.setCenter(center);
-            map.setZoom(parseFloat(self.zoom()))
+                lng = parseFloat(params.x());
+                lat = parseFloat(params.y());
+                
+                if (lng) { center.lng = lng; }
+                if (lat) { center.lat = lat; }
+    
+                map.setCenter(center);
+            }
+
+            if (ko.unwrap(params.zoom)) {
+                map.setZoom(ko.unwrap(params.zoom));
+            }
+
+            if (ko.unwrap(params.bounds)) {
+                map.fitBounds(ko.unwrap(params.bounds), boundsOptions);
+            }
         })
 
         this.bounds = ko.observable(ko.unwrap(params.bounds) || arches.hexBinBounds);
         this.bounds.subscribe(function(bounds) {
-            var padding = 40;
-            var activeTab = self.activeTab();
-            var options = {
-                padding: {
-                    top: padding,
-                    left: padding + (activeTab ? 200: 0),
-                    bottom: padding,
-                    right: padding + (activeTab ? 200: 0)
-                },
-                animate: false
-            };
-            
-            self.map().fitBounds(bounds, options);
+            self.map().fitBounds(bounds, boundsOptions);
 
             if (ko.isObservable(params.fitBounds)){
                 params.fitBounds(bounds);
@@ -96,7 +103,6 @@ define([
             }
         });
 
-        console.log(ko.unwrap(params.overlayConfigs), params)
         this.overlayConfigs = ko.observableArray(ko.unwrap(params.overlayConfigs));
         this.overlayConfigs.subscribe(function(overlayConfigs) {
             if (ko.isObservable(params.overlayConfigs)) {
@@ -118,7 +124,6 @@ define([
             "search-results-points": geojsonSourceFactory()
         }, arches.mapSources, params.sources);
         
-        this.activeTab = ko.observable(params.activeTab);
         this.basemaps = params.basemaps || [];
         this.overlays = params.overlaysObservable || ko.observableArray();
         
