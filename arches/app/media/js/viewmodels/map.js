@@ -96,6 +96,7 @@ define([
             }
         });
 
+        console.log(ko.unwrap(params.overlayConfigs), params)
         this.overlayConfigs = ko.observableArray(ko.unwrap(params.overlayConfigs));
         this.overlayConfigs.subscribe(function(overlayConfigs) {
             if (ko.isObservable(params.overlayConfigs)) {
@@ -162,13 +163,13 @@ define([
                 return ko.unwrap(params.basemap) === basemap.name;
             });
 
-            if (!basemap) {
+            if (!basemap && params.config) {
                 basemap = ko.unwrap(self.basemaps).find(function(basemap) {
-                    return params.config && params.config().basemap === basemap.name;
+                    return params.config().basemap === basemap.name;
                 });
             }
 
-            if (!basemap) {
+            if (!basemap && params.defaultConfig) {
                 basemap = ko.unwrap(self.basemaps).find(function(basemap) {
                     return ko.unwrap(params.defaultConfig.basemap) === basemap.name;
                 });

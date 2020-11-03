@@ -77,7 +77,7 @@ define([
         this.basemap = ko.observable((function() {
             for (var widget of self.widgets) {
                 if (widget.config.basemap) {
-                    return basemap;
+                    return widget.config.basemap();
                 }
             }
         })());  // IIFE
@@ -92,7 +92,7 @@ define([
         this.overlayConfigs = ko.observable((function() {
             for (var widget of self.widgets) {
                 if (widget.config.overlayConfigs) {
-                    return overlayConfigs;
+                    return widget.config.overlayConfigs();
                 }
             }
         })());  // IIFE
@@ -107,7 +107,7 @@ define([
         this.centerX = ko.observable((function() {
             for (var widget of self.widgets) {
                 if (widget.config.centerX) {
-                    return centerX;
+                    return widget.config.centerX();
                 }
             }
         })());  // IIFE
@@ -122,7 +122,7 @@ define([
         this.centerY = ko.observable((function() {
             for (var widget of self.widgets) {
                 if (widget.config.centerY) {
-                    return centerY;
+                    return widget.config.centerY();
                 }
             }
         })());  // IIFE
