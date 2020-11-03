@@ -158,25 +158,29 @@ define([
         });
         
         if (!self.activeBasemap()) {
-            for (var basemap of ko.unwrap(self.basemaps)) {
-                if (ko.unwrap(params.basemap) === basemap.name) {
-                    self.activeBasemap(basemap);
-                }
+            var basemap = ko.unwrap(self.basemaps).find(function(basemap) {
+                return ko.unwrap(params.basemap) === basemap.name;
+            });
 
-                if (!self.activeBasemap()) {
-                    if (
-                        params.defaultConfig.basemap === basemap.name
-                    ) {
-                        self.activeBasemap(basemap);
-                    }
-                }
+            if (!basemap) {
+                basemap = ko.unwrap(self.basemaps).find(function(basemap) {
+                    return params.config && params.config().basemap === basemap.name;
+                });
             }
+
+            if (!basemap) {
+                basemap = ko.unwrap(self.basemaps).find(function(basemap) {
+                    return ko.unwrap(params.defaultConfig.basemap) === basemap.name;
+                });
+            }
+
+            self.activeBasemap(basemap);
         }
 
         for (var overlay of self.overlays()) {
             if (
                 ko.unwrap(self.overlayConfigs) && self.overlayConfigs.indexOf(overlay.maplayerid) > -1
-                // || self.name === 'Map Filter' && overlay.addtomap  // handles search overlays
+                || params.search && overlay.addtomap
             ) {
                 overlay.opacity(100);
             } else {
