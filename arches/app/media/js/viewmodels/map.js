@@ -113,7 +113,7 @@ define([
             }
         })
         
-        this.activeBasemap = ko.observable();
+        this.activeBasemap = ko.observable();  // params.basemap is a string, activeBasemap is a map. Cannot initialize from params.
         this.activeBasemap.subscribe(function(basemap) {
             if (ko.isObservable(params.basemap) && params.basemap() !== basemap.name) {
                 params.basemap(basemap.name);
@@ -169,10 +169,13 @@ define([
         if (!self.activeBasemap()) {
             var config = ko.unwrap(self.config);
 
+            console.log(config, self, params)
+
             for (var basemap of ko.unwrap(self.basemaps)) {
                 if (
-                    config && ko.unwrap(config.basemap) === basemap.name
-                    || self.name === 'Map Filter' && basemap.addtomap  // handles search basemap
+                    // config && ko.unwrap(config.basemap) === basemap.name
+                    // || self.name === 'Map Filter' && basemap.addtomap  // handles search basemap
+                    params.basemap() === basemap.name
                 ) {
                     self.activeBasemap(basemap);
                 }

@@ -71,15 +71,7 @@ define([
         };
 
 
-        
-
-        
-        
-        console.log('AAA', self, params)
-
         this.centerX = ko.observable(self.card.widgets && self.card.widgets()[0].config.centerX());
-        params.x = this.centerX;
-        
         this.centerX.subscribe(function(x) {
             var foo = self.card.widgets().filter(function(widget) {
                 var id = widget.node_id();
@@ -87,17 +79,14 @@ define([
                 return type === 'geojson-feature-collection';
             });
             if (foo) {
-                console.log(foo)
                 for (var widget of foo) {
                     widget.config.centerX(x)
                 }
             }
         });
-
-
-        this.centerY = ko.observable(self.card.widgets && self.card.widgets()[0].config.centerY());
-        params.y = this.centerY;
         
+        
+        this.centerY = ko.observable(self.card.widgets && self.card.widgets()[0].config.centerY());
         this.centerY.subscribe(function(y) {
             var foo = self.card.widgets().filter(function(widget) {
                 var id = widget.node_id();
@@ -105,22 +94,14 @@ define([
                 return type === 'geojson-feature-collection';
             });
             if (foo) {
-                console.log(foo)
                 for (var widget of foo) {
                     widget.config.centerY(y)
                 }
             }
         });
-
-
-
-
-
-        params.zoom = this.overviewzoom;
-
-
-        this.overviewzoom.subscribe(function(zoom) {
-
+        
+        this.zoom = ko.observable(this.overviewzoom());
+        this.zoom.subscribe(function(zoom) {
             self.config.overviewzoom(zoom);
 
             var foo = self.card.widgets().filter(function(widget) {
@@ -129,17 +110,34 @@ define([
                 return type === 'geojson-feature-collection';
             });
 
-
             if (foo) {
-                console.log(foo)
                 for (var widget of foo) {
                     widget.config.zoom(zoom)
                 }
             }
         });
-
-
-
+                
+        this.basemap = ko.observable(self.card.widgets && self.card.widgets()[0].config.basemap());
+        console.log(self.card.widgets())
+        this.basemap.subscribe(function(map) {
+            console.log("!!!!", self, this, map)
+            var foo = self.card.widgets().filter(function(widget) {
+                var id = widget.node_id();
+                var type = self.form && ko.unwrap(self.form.nodeLookup[id].datatype);
+                return type === 'geojson-feature-collection';
+            });
+            if (foo) {
+                for (var widget of foo) {
+                    widget.config.basemap(map)
+                }
+            }
+        });
+        
+        params.basemap = this.basemap;
+        params.zoom = this.zoom;
+        params.x = this.centerX;
+        params.y = this.centerY;
+        
 
         this.hoverId = ko.observable();
         this.nodeids = getNodeIds();
