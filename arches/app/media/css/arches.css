@@ -1640,7 +1640,6 @@ div.final-cons-step-separator>h4 {
 }
 
 .workbench-card-sidepanel.expanded {
-    position: absolute;
     width: 600px;
     z-index: 1001;
 }
@@ -1733,6 +1732,10 @@ div.final-cons-step-separator>h4 {
 .workbench-card-container {
     height: 100%;
     margin-right: 75px;
+}
+
+.workbench-card-container.workbench-card-container-sidepanel-active {
+    margin-right: 475px;
 }
 
 .workbench-card-sidebar {
