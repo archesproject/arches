@@ -22,7 +22,7 @@ define([
             };
         };
 
-        this.activeTab = ko.observable(params.activeTab);
+        this.activeTab = ko.observable(ko.unwrap(params.activeTab));
 
         var boundingOptions = {
             padding: {
