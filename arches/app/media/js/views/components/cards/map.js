@@ -77,6 +77,8 @@ define([
             if (self.config.centerX() !== x) {
                 self.config.centerX(x);
             }
+
+            self.centerX(x); /* forces card-control update */
             
             if (params.widgets) {
                 for (var widget of params.widgets) {
@@ -89,6 +91,8 @@ define([
                 self.config.centerY(y);
             }
 
+            self.centerY(y); /* forces card-control update */
+
             if (params.widgets) {
                 for (var widget of params.widgets) {
                     widget.config.centerY(y);
@@ -99,7 +103,9 @@ define([
             if (self.config.zoom() !== zoom) {
                 self.config.zoom(zoom);
             }
-
+            
+            self.zoom(zoom); /* forces card-control update */
+            
             if (params.widgets) {
                 for (var widget of params.widgets) {
                     widget.config.zoom(zoom);
