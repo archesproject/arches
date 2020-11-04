@@ -153,9 +153,16 @@ define([
                         layer.opacity(0)
                     }
                     
-                    if (parent !== self) {  /* widget with parent map card */ 
+                    if (parent !== self) {
                         parent.overlayConfigs(self.overlayConfigs())
-                        parent.overlays.valueHasMutated();
+
+                        if (params.inWidget) {
+                            try {
+                                parent.overlays.valueHasMutated();
+                            } catch(e) {
+                                console.log(e);
+                            }
+                        }
                     }
                 };
 

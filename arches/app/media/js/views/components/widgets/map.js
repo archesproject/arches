@@ -79,8 +79,6 @@ define([
 
         if (params.widget) {
             params.widgets = [params.widget];
-        } else {
-            params.widget = WidgetViewModel;
         }
 
         if (ko.unwrap(this.value) !== null) {
@@ -99,6 +97,7 @@ define([
         params.x = this.centerX;
         params.y = this.centerY;
         params.usePosition = true;
+        params.inWidget = true;
 
         MapEditorViewModel.apply(this, [params]);
     };
