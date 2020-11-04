@@ -23,19 +23,21 @@ define([
 
         CardComponentViewModel.apply(this, [params]);
 
+        var widgets = [];
+
         if (self.form && self.tile) {
-            params.widgets = self.card.widgets().filter(function(widget) {
+            widgets = self.card.widgets().filter(function(widget) {
                 var id = widget.node_id();
                 var type = ko.unwrap(self.form.nodeLookup[id].datatype);
                 return type === 'geojson-feature-collection';
             });
 
-            for (var widget of params.widgets) {
+            for (var widget of widgets) {
+                widget.config.basemap(self.basemap());
+                widget.config.overlayConfigs(self.overlayConfigs())
                 widget.config.centerX(self.centerX());
                 widget.config.centerY(self.centerY());
                 widget.config.zoom(self.zoom());
-                widget.config.overlayConfigs(self.overlayConfigs())
-                widget.config.basemap(self.basemap());
             }
         }
 
@@ -56,10 +58,8 @@ define([
                 self.config.basemap(basemap);
             }
 
-            if (params.widgets) {
-                for (var widget of params.widgets) {
-                    widget.config.basemap(basemap);
-                }
+            for (var widget of widgets) {
+                widget.config.basemap(basemap);
             }
         });
         this.overlayConfigs.subscribe(function(overlayConfigs) {
@@ -67,10 +67,8 @@ define([
                 self.config.overlayConfigs(overlayConfigs);
             }
 
-            if (params.widgets) {
-                for (var widget of params.widgets) {
-                    widget.config.overlayConfigs(overlayConfigs);
-                }
+            for (var widget of widgets) {
+                widget.config.overlayConfigs(overlayConfigs);
             }
         });
         this.centerX.subscribe(function(x) {
@@ -80,10 +78,8 @@ define([
 
             self.centerX(x); /* forces card-control update */
             
-            if (params.widgets) {
-                for (var widget of params.widgets) {
-                    widget.config.centerX(x);
-                }
+            for (var widget of widgets) {
+                widget.config.centerX(x);
             }
         });
         this.centerY.subscribe(function(y) {
@@ -93,10 +89,8 @@ define([
 
             self.centerY(y); /* forces card-control update */
 
-            if (params.widgets) {
-                for (var widget of params.widgets) {
-                    widget.config.centerY(y);
-                }
+            for (var widget of widgets) {
+                widget.config.centerY(y);
             }
         });
         this.zoom.subscribe(function(zoom) {
@@ -105,22 +99,20 @@ define([
             }
             
             self.zoom(zoom); /* forces card-control update */
-            
-            if (params.widgets) {
-                for (var widget of params.widgets) {
-                    widget.config.zoom(zoom);
-                }
+
+            for (var widget of widgets) {
+                widget.config.zoom(zoom);
             }
         });
 
         params.defaultConfig = self.card.model.get('defaultConfig');
-
         params.overlayConfigs = this.overlayConfigs;
         params.basemap = this.basemap;
-        params.zoom = this.zoom;
         params.x = this.centerX;
         params.y = this.centerY;
+        params.zoom = this.zoom;
         params.usePosition = true;
+        params.widgets = widgets;
 
         MapEditorViewModel.apply(this, [params]);
 

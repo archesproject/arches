@@ -293,7 +293,7 @@ define([
             minZoom: arches.mapDefaultMinZoom,
         };
         if (!params.usePosition) {
-            this.mapOptions.bounds = this.bounds;
+            this.mapOptions.bounds = self.bounds;
             this.mapOptions.fitBoundsOptions = params.fitBoundsOptions;
         }
 
