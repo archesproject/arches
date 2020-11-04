@@ -1,11 +1,11 @@
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
-from arches.app.models.resource import Resource  # avoids circular import
 
 NODE_ID_KEY = "@node_id"
 TILE_ID_KEY = "@tile_id"
 VALUE_KEY = "@value"
 
+NON_DATA_COLLECTING_NODE = "NON_DATA_COLLECTING_NODE"
 
 class LabelBasedNode(object):
     def __init__(self, name, node_id, tile_id, value):
@@ -18,7 +18,7 @@ class LabelBasedNode(object):
     def is_empty(self):
         is_empty = True
 
-        if self.value:
+        if self.value and self.value is not NON_DATA_COLLECTING_NODE:
             is_empty = False
         else:
             for child_node in self.child_nodes:
@@ -27,15 +27,15 @@ class LabelBasedNode(object):
 
         return is_empty
 
-    def as_json(self, include_empty_nodes=True):
-        display_data = {
-            NODE_ID_KEY: self.node_id,
-            TILE_ID_KEY: self.tile_id,
-            VALUE_KEY: self.value,
-        }
+    def as_json(self, compacted=False, include_empty_nodes=True):
+        display_data = {}
 
         for child_node in self.child_nodes:
-            formatted_node = child_node.as_json(include_empty_nodes=include_empty_nodes)
+            formatted_node = child_node.as_json(
+                compacted=compacted, 
+                include_empty_nodes=include_empty_nodes
+            )
+
             formatted_node_name, formatted_node_value = formatted_node.popitem()
 
             if include_empty_nodes or not child_node.is_empty():
@@ -48,6 +48,13 @@ class LabelBasedNode(object):
                     display_data[formatted_node_name].append(formatted_node_value)
                 else:
                     display_data[formatted_node_name] = [previous_val, formatted_node_value]
+
+        if compacted and not display_data:
+            display_data = self.value
+        elif not compacted:
+            display_data[NODE_ID_KEY] = self.node_id
+            display_data[TILE_ID_KEY] = self.tile_id
+            display_data[VALUE_KEY] = self.value
 
         return {self.name: display_data}
 
@@ -70,15 +77,10 @@ class LabelBasedGraph(object):
         return node_tile_reference
 
     @classmethod
-    def from_tile(cls, tile, node_tile_reference=None, datatype_factory=None, hide_empty_nodes=False, as_json=True):
+    def from_tile(cls, tile, node_tile_reference, datatype_factory=None, hide_empty_nodes=False, as_json=True):
         """
         Generates a label-based graph from a given tile
         """
-        # need explicit None comparison here to differentiate between empty reference being
-        # passed in vs reference having not yet been generated
-        if node_tile_reference is None:
-            node_tile_reference = cls.generate_node_tile_reference(resource=Resource(tile.resourceinstance))
-
         if not datatype_factory:
             datatype_factory = DataTypeFactory()
 
@@ -93,7 +95,7 @@ class LabelBasedGraph(object):
         return graph.as_json(include_empty_nodes=bool(not hide_empty_nodes)) if as_json else graph
 
     @classmethod
-    def from_resource(cls, resource, hide_empty_nodes, as_json=True):
+    def from_resource(cls, resource, compacted, hide_empty_nodes, as_json=True):
         """
         Generates a label-based graph from a given resource
         """
@@ -117,13 +119,22 @@ class LabelBasedGraph(object):
             if label_based_graph:
                 root_graph.child_nodes.append(label_based_graph)
 
-        return root_graph.as_json(include_empty_nodes=bool(not hide_empty_nodes)) if as_json else root_graph
+        if as_json:
+            return root_graph.as_json(
+                compacted=compacted, 
+                include_empty_nodes=bool(not hide_empty_nodes)
+            ) 
+        else: 
+            return root_graph
 
     @classmethod
     def _get_display_value(cls, tile, node, datatype_factory):
         display_value = None
 
-        if tile.data:
+        # if the node is unable to collect data, let's explicity say so
+        if datatype_factory.datatypes[node.datatype].defaultwidget is None:
+            display_value = NON_DATA_COLLECTING_NODE
+        elif tile.data:
             datatype = datatype_factory.get_instance(node.datatype)
 
             # `get_display_value` varies between datatypes,
