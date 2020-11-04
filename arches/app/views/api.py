@@ -536,7 +536,7 @@ class Resources(APIBase):
         if not user_can_read_resource(user=request.user, resourceid=resourceid):
             return JSONResponse(status=403)
 
-        allowed_formats = ["json", "json-ld"]
+        allowed_formats = ["json", "json-ld", "arches-json"]
         format = request.GET.get("format", "json")
 
         if format not in allowed_formats:
@@ -544,7 +544,6 @@ class Resources(APIBase):
 
         include_tiles = bool(request.GET.get("includetiles", "true").lower() == "true")  # default True
         disambiguate = bool(request.GET.get("disambiguate", "false").lower() == "true")  # default False
-        arches_json = bool(request.GET.get("arches-json", "false").lower() == "true")  # default False
 
         try:
             indent = int(request.GET.get("indent", None))
@@ -571,32 +570,11 @@ class Resources(APIBase):
                     "resourceinstanceid": resource.resourceinstanceid,
                 }
 
-                if arches_json:
-                    out = resource
+            elif format == "arches-json":
+                out = Resource.objects.get(pk=resourceid)
 
-                    if include_tiles or disambiguate:
-                        resource.load_tiles()
-
-                    if disambiguate:
-                        out = {
-                            resourceid: resource,
-                            "disambiguated": dict(),
-                        }
-
-                        datatype_factory = DataTypeFactory()
-
-                        # lookup all nodes from its corresponding graph, then compare that list against nodeid in tile.data.keys
-                        graph = Graph.objects.get(graphid=resource.graph.graphid)
-                        graph_nodes = dict(graph.nodes)
-
-                        for tile in resource.tiles:
-                            for node_id in list(tile.data.keys()):  # better to compare nodegroups?
-                                graph_node = graph_nodes.get(uuid.UUID(node_id))
-
-                                if graph_node:
-                                    datatype = datatype_factory.get_instance(graph_node.datatype)
-
-                                    out["disambiguated"][graph_node.name] = datatype.get_display_value(tile=tile, node=graph_node)
+                if include_tiles:
+                    out.load_tiles()
 
             elif format == "json-ld":
                 try:
