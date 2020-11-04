@@ -74,7 +74,7 @@ define([
             }
         });
         this.centerX.subscribe(function(x) {
-            if (self.config.centerX() !== centerX) {
+            if (self.config.centerX() !== x) {
                 self.config.centerX(x);
             }
             
@@ -85,7 +85,7 @@ define([
             }
         });
         this.centerY.subscribe(function(y) {
-            if (self.config.centerY() !== centerY) {
+            if (self.config.centerY() !== y) {
                 self.config.centerY(y);
             }
 
