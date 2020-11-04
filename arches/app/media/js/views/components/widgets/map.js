@@ -3,7 +3,6 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
-    'card-components',
     'viewmodels/widget',
     'viewmodels/map-editor',
     'bindings/chosen',
@@ -16,9 +15,8 @@ define([
     'bindings/chosen',
     'bindings/color-picker',
     'geocoder-templates'
-], function(arches, _, ko, koMapping, cardComponentLookup, WidgetViewModel, MapEditorViewModel) {
+], function(arches, _, ko, koMapping, WidgetViewModel, MapEditorViewModel) {
     var viewModel = function(params) {
-        var self = this;
         this.context = params.type;
 
         this.summaryDetails = [];
@@ -94,11 +92,6 @@ define([
             this.centerY(arches.mapDefaultY);
             this.zoom(arches.mapDefaultZoom);
         }
-
-        var mapCardComponent = Object.values(cardComponentLookup).find(function(cardComponent) {
-            return cardComponent.componentname === 'map-card';
-        });
-        params.defaultConfig = JSON.parse(mapCardComponent.defaultconfig);
 
         params.basemap = this.basemap;
         params.overlayConfigs = this.overlayConfigs;
