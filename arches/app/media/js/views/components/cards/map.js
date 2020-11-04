@@ -52,43 +52,57 @@ define([
 
         // subscriptions need to stay explicit! DRY-ing will break
         this.basemap.subscribe(function(basemap) {
+            if (self.config.basemap() !== basemap) {
+                self.config.basemap(basemap);
+            }
+
             if (params.widgets) {
                 for (var widget of params.widgets) {
-                    widget.config.basemap(basemap)
+                    widget.config.basemap(basemap);
                 }
             }
         });
         this.overlayConfigs.subscribe(function(overlayConfigs) {
+            if (self.config.overlayConfigs() !== overlayConfigs) {
+                self.config.overlayConfigs(overlayConfigs);
+            }
+
             if (params.widgets) {
                 for (var widget of params.widgets) {
-                    widget.config.overlayConfigs(overlayConfigs)
+                    widget.config.overlayConfigs(overlayConfigs);
                 }
             }
         });
         this.centerX.subscribe(function(x) {
-            self.centerX(x);
+            if (self.config.centerX() !== centerX) {
+                self.config.centerX(x);
+            }
             
             if (params.widgets) {
                 for (var widget of params.widgets) {
-                    widget.config.centerX(x)
+                    widget.config.centerX(x);
                 }
             }
         });
         this.centerY.subscribe(function(y) {
-            self.centerY(y);
+            if (self.config.centerY() !== centerY) {
+                self.config.centerY(y);
+            }
 
             if (params.widgets) {
                 for (var widget of params.widgets) {
-                    widget.config.centerY(y)
+                    widget.config.centerY(y);
                 }
             }
         });
         this.zoom.subscribe(function(zoom) {
-            self.zoom(zoom);
+            if (self.config.zoom() !== zoom) {
+                self.config.zoom(zoom);
+            }
 
             if (params.widgets) {
                 for (var widget of params.widgets) {
-                    widget.config.zoom(zoom)
+                    widget.config.zoom(zoom);
                 }
             }
         });
