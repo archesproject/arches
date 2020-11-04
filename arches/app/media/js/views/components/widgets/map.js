@@ -18,7 +18,6 @@ define([
     'geocoder-templates'
 ], function(arches, _, ko, koMapping, cardComponentLookup, WidgetViewModel, MapEditorViewModel) {
     var viewModel = function(params) {
-        var self = this;
         this.context = params.type;
 
         this.summaryDetails = [];
@@ -79,7 +78,11 @@ define([
             return value.features.length;
         }, this);
 
-        if (params.widget) params.widgets = [params.widget];
+        if (params.widget) {
+            params.widgets = [params.widget];
+        } else {
+            params.widget = WidgetViewModel;
+        }
 
         if (ko.unwrap(this.value) !== null) {
             this.summaryDetails = koMapping.toJS(this.value).features || [];

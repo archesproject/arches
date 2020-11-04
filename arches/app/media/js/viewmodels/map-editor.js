@@ -82,8 +82,7 @@ define([
             var id = ko.unwrap(widget.node_id);
             self.featureLookup[id] = {
                 features: ko.computed(function() {
-                    var value;
-                    if (self.tile.data[id]) { value = koMapping.toJS(self.tile.data[id]); }
+                    var value = koMapping.toJS(self.tile.data[id]);
                     if (value) return value.features;
                     else return [];
                 }),
@@ -167,7 +166,6 @@ define([
             });
             params.fitBoundsOptions = { padding: {top: padding, left: padding + 200, bottom: padding, right: padding + 200} };
         }
-
         params.activeTab = 'editor';
         params.sources = Object.assign({
             "geojson-editor-data": {
@@ -281,22 +279,11 @@ define([
         };
 
         this.updateLayers = function(layers) {
-            var style;
-
-            /* 
-                wrapping in a try to prevent harmless error when manually refreshing map, see #6729
-            */ 
-            try {
-                style = self.map().getStyle();
-            } catch(e) {
-                if (e instanceof TypeError) {
-                    return;
-                }
-            }
-
+            var map = self.map();
+            var style = map.getStyle();
             if (style) {
                 style.layers = self.draw ? layers.concat(self.draw.options.styles) : layers;
-                self.map().setStyle(style);
+                map.setStyle(style);
             }
         };
 

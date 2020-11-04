@@ -143,20 +143,18 @@ define([
                 });
                 
                 layer.updateParent = function(parent) {
-                    /* 
-                        In widget, we need to explicity perform this action on its ( card ) parent. 
-                        In card, parent === self so this action is still valid.
-                    */
-
-                    if (parent.overlayConfigs.indexOf(layer.maplayerid) === -1) {
-                        parent.overlayConfigs.push(layer.maplayerid)
+                    if (self.overlayConfigs.indexOf(layer.maplayerid) === -1) {
+                        self.overlayConfigs.push(layer.maplayerid)
                         layer.opacity(100)
                     } else {
-                        parent.overlayConfigs.remove(layer.maplayerid);
+                        self.overlayConfigs.remove(layer.maplayerid);
                         layer.opacity(0)
                     }
-
-                    parent.overlays.valueHasMutated();
+                    
+                    if (parent !== self) {  /* widget with parent map card */ 
+                        parent.overlayConfigs(self.overlayConfigs())
+                        parent.overlays.valueHasMutated();
+                    }
                 };
 
                 self.overlays.push(layer);
@@ -310,18 +308,7 @@ define([
         };
 
         this.updateLayers = function(layers) {
-            var style;
-
-            /* 
-                wrapping in a try to prevent harmless error when manually refreshing map, see #6729
-            */ 
-            try {
-                style = self.map().getStyle();
-            } catch(e) {
-                if (e instanceof TypeError) {
-                    return;
-                }
-            }
+            var style = self.map().getStyle();
 
             if (style) {
                 style.layers = self.draw ? layers.concat(self.draw.options.styles) : layers;
