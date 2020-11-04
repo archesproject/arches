@@ -2,8 +2,9 @@ define([
     'jquery',
     'underscore',
     'knockout',
-    'd3'
-], function($, _, ko, d3) {
+    'd3',
+    'arches'
+], function($, _, ko, d3, arches) {
     var width = 300;
     var height = 300;
     var radius = Math.min(width, height) / 8;
@@ -169,7 +170,7 @@ define([
             function clearHighlight(){
                 d3.selectAll("path")
                     .style("opacity", 1);
-                breadCrumb(total + ' date values')
+                breadCrumb(arches.translations.timeWheelDateMatches.replace("${total}", total))
             }
 
             selectedPeriod.subscribe(function(d) {
@@ -181,7 +182,7 @@ define([
             if(!!configJSON){
                 var root = partition(configJSON);
                 total = configJSON.size;
-                breadCrumb(total + ' date values');
+                breadCrumb(arches.translations.timeWheelDateMatches.replace("${total}", total));
     
                 root.each(function(d) {
                     d.current = d;
