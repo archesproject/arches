@@ -226,8 +226,8 @@ class Resource(models.ResourceInstance):
 
             for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
                 es_index = import_class_from_string(index["module"])(index["name"])
-                document, doc_id = es_index.get_documents_to_index(self, document["tiles"])
-                es_index.index_document(document=document, id=doc_id)
+                doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
+                es_index.index_document(document=doc, id=doc_id)
 
     def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None):
         """
