@@ -172,9 +172,9 @@ define([
                 });
             }
 
-            if (!basemap && params.defaultConfig) {
+            if (!basemap) {
                 basemap = ko.unwrap(self.basemaps).find(function(basemap) {
-                    return ko.unwrap(params.defaultConfig.basemap) === basemap.name;
+                    return basemap.addtomap;
                 });
             }
 
