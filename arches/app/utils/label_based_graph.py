@@ -119,16 +119,11 @@ class LabelBasedGraph(object):
                 root_graph.child_nodes.append(label_based_graph)
 
         if as_json:
-<<<<<<< HEAD
             return root_graph.as_json(
                 compacted=compacted, 
                 include_empty_nodes=bool(not hide_empty_nodes)
             ) 
         else: # pragma: no cover
-=======
-            return root_graph.as_json(compacted=compacted, include_empty_nodes=bool(not hide_empty_nodes))
-        else:
->>>>>>> 4edbd0bfbec6923e26a0c293d6cd7c78a306eba7
             return root_graph
 
     @classmethod
