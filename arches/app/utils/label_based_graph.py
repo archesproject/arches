@@ -7,6 +7,7 @@ VALUE_KEY = "@value"
 
 NON_DATA_COLLECTING_NODE = "NON_DATA_COLLECTING_NODE"
 
+
 class LabelBasedNode(object):
     def __init__(self, name, node_id, tile_id, value):
         self.name = name
@@ -31,10 +32,7 @@ class LabelBasedNode(object):
         display_data = {}
 
         for child_node in self.child_nodes:
-            formatted_node = child_node.as_json(
-                compacted=compacted, 
-                include_empty_nodes=include_empty_nodes
-            )
+            formatted_node = child_node.as_json(compacted=compacted, include_empty_nodes=include_empty_nodes)
 
             formatted_node_name, formatted_node_value = formatted_node.popitem()
 
@@ -121,11 +119,16 @@ class LabelBasedGraph(object):
                 root_graph.child_nodes.append(label_based_graph)
 
         if as_json:
+<<<<<<< HEAD
             return root_graph.as_json(
                 compacted=compacted, 
                 include_empty_nodes=bool(not hide_empty_nodes)
             ) 
         else: # pragma: no cover
+=======
+            return root_graph.as_json(compacted=compacted, include_empty_nodes=bool(not hide_empty_nodes))
+        else:
+>>>>>>> 4edbd0bfbec6923e26a0c293d6cd7c78a306eba7
             return root_graph
 
     @classmethod
