@@ -516,11 +516,7 @@ class Resource(models.ResourceInstance):
         return JSONSerializer().serializeToPython(ret)
 
     def to_json(self):
-        return LabelBasedGraph.from_resource(
-            resource=self,
-            compacted=False,
-            hide_empty_nodes=True
-        )
+        return LabelBasedGraph.from_resource(resource=self, compacted=False, hide_empty_nodes=True)
 
     def get_node_values(self, node_name):
         """

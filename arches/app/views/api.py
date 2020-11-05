@@ -552,7 +552,7 @@ class Resources(APIBase):
         if resourceid:
             if format == "json":
                 resource = Resource.objects.get(pk=resourceid)
-                
+
                 label_based_graph = resource.to_json()
                 _name, resource_graph = label_based_graph.popitem()
 
