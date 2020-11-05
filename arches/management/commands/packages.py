@@ -625,7 +625,7 @@ class Command(BaseCommand):
             load_mapbox_styles(basemap_styles, True)
             load_mapbox_styles(overlay_styles, False)
 
-        def load_business_data(package_dir):
+        def load_business_data(package_dir, defer_index):
             config_paths = glob.glob(os.path.join(package_dir, "package_config.json"))
             configs = {}
             if len(config_paths) > 0:
@@ -668,13 +668,13 @@ class Command(BaseCommand):
                 ]
 
                 # assumes resources in csv do not depend on data being loaded prior from json in same dir
-                chord([import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load) for path in valid_resource_paths])(
+                chord([import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load, defer_index=defer_index) for path in valid_resource_paths])(
                     package_load_complete.signature(kwargs={"valid_resource_paths": valid_resource_paths}).on_error(on_chord_error.s())
                 )
             else:
                 for path in business_data:
                     if path not in erring_csvs:
-                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load)
+                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load, defer_index=defer_index)
 
             relations = glob.glob(os.path.join(package_dir, "business_data", "relations", "*.relations"))
             for relation in relations:
@@ -859,7 +859,7 @@ class Command(BaseCommand):
         print("loading search indexes")
         load_indexes(package_location)
         print("loading business data - resource instances and relationships")
-        load_business_data(package_location)
+        load_business_data(package_location, defer_index)
         if defer_index is True:
             print('&'*100)
             management.call_command("es", "reindex_database")
