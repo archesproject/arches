@@ -44,7 +44,6 @@ from arches.app.utils.decorators import (
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
-from arches.app.utils.label_based_graph import LabelBasedGraph, NODE_ID_KEY, TILE_ID_KEY, VALUE_KEY
 from arches.app.utils.permission_backend import (
     user_can_read_resource,
     user_can_edit_resource,
@@ -553,8 +552,8 @@ class Resources(APIBase):
         if resourceid:
             if format == "json":
                 resource = Resource.objects.get(pk=resourceid)
-
-                label_based_graph = LabelBasedGraph.from_resource(resource=resource, compacted=False, hide_empty_nodes=True)
+                
+                label_based_graph = resource.to_json()
                 _name, resource_graph = label_based_graph.popitem()
 
                 out = {
