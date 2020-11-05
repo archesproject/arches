@@ -86,7 +86,6 @@ class BaseConceptDataType(BaseDataType):
 
 
 class ConceptDataType(BaseConceptDataType):
-
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
         # first check to see if the validator has been passed a valid UUID,
