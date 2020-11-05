@@ -557,12 +557,6 @@ class Resources(APIBase):
                 label_based_graph = LabelBasedGraph.from_resource(resource=resource, compacted=False, hide_empty_nodes=True)
                 _name, resource_graph = label_based_graph.popitem()
 
-                for key in [NODE_ID_KEY, TILE_ID_KEY, VALUE_KEY]:
-                    try:
-                        resource_graph.pop(key)  # removes unneccesary top-node values
-                    except:
-                        pass
-
                 out = {
                     "resource": resource_graph,
                     "displaydescription": resource.displaydescription,

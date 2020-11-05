@@ -128,7 +128,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
     def test_smoke(self, mock_Node):
         label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compacted=False, hide_empty_nodes=False)
 
-        self.assertEqual(label_based_graph, {self.test_resource.displayname: {NODE_ID_KEY: None, TILE_ID_KEY: None, VALUE_KEY: None}})
+        self.assertEqual(label_based_graph, {self.test_resource.displayname: {}})
 
     def test_handles_node_with_single_value(self, mock_Node):
         mock_Node.objects.get.return_value = self.string_node
@@ -141,9 +141,6 @@ class LabelBasedGraph_FromResourceTests(TestCase):
             label_based_graph,
             {
                 self.test_resource.displayname: {
-                    NODE_ID_KEY: None,
-                    TILE_ID_KEY: None,
-                    VALUE_KEY: None,
                     self.string_node.name: {
                         NODE_ID_KEY: str(self.string_node.pk),
                         TILE_ID_KEY: str(self.string_tile.pk),
@@ -167,9 +164,6 @@ class LabelBasedGraph_FromResourceTests(TestCase):
             label_based_graph,
             {
                 self.test_resource.displayname: {
-                    NODE_ID_KEY: None,
-                    TILE_ID_KEY: None,
-                    VALUE_KEY: None,
                     self.string_node.name: [
                         {
                             NODE_ID_KEY: str(self.string_node.pk),
@@ -197,9 +191,6 @@ class LabelBasedGraph_FromResourceTests(TestCase):
             label_based_graph,
             {
                 self.test_resource.displayname: {
-                    NODE_ID_KEY: None,
-                    TILE_ID_KEY: None,
-                    VALUE_KEY: None,
                     self.grouping_node.name: {
                         NODE_ID_KEY: str(self.grouping_node.pk),
                         TILE_ID_KEY: str(self.grouping_tile.pk),
@@ -223,9 +214,6 @@ class LabelBasedGraph_FromResourceTests(TestCase):
             label_based_graph,
             {
                 self.test_resource.displayname: {
-                    NODE_ID_KEY: None,
-                    TILE_ID_KEY: None,
-                    VALUE_KEY: None,
                     self.grouping_node.name: {
                         NODE_ID_KEY: str(self.grouping_node.pk),
                         TILE_ID_KEY: str(self.grouping_tile.pk),
@@ -256,9 +244,6 @@ class LabelBasedGraph_FromResourceTests(TestCase):
             label_based_graph,
             {
                 self.test_resource.displayname: {
-                    NODE_ID_KEY: None,
-                    TILE_ID_KEY: None,
-                    VALUE_KEY: None,
                     self.grouping_node.name: {
                         NODE_ID_KEY: str(self.grouping_node.pk),
                         TILE_ID_KEY: str(self.grouping_tile.pk),
