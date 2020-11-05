@@ -28,11 +28,11 @@ class LabelBasedNode(object):
 
         return is_empty
 
-    def as_json(self, compacted=False, include_empty_nodes=True):
+    def as_json(self, compact=False, include_empty_nodes=True):
         display_data = {}
 
         for child_node in self.child_nodes:
-            formatted_node = child_node.as_json(compacted=compacted, include_empty_nodes=include_empty_nodes)
+            formatted_node = child_node.as_json(compact=compact, include_empty_nodes=include_empty_nodes)
 
             formatted_node_name, formatted_node_value = formatted_node.popitem()
 
@@ -47,9 +47,9 @@ class LabelBasedNode(object):
                 else:
                     display_data[formatted_node_name] = [previous_val, formatted_node_value]
 
-        if compacted and not display_data:  # if compacted and no child nodes
+        if compact and not display_data:  # if compact and no child nodes
             display_data = self.value
-        elif not compacted:
+        elif not compact:
             display_data[NODE_ID_KEY] = self.node_id
             display_data[TILE_ID_KEY] = self.tile_id
             display_data[VALUE_KEY] = self.value
@@ -75,7 +75,7 @@ class LabelBasedGraph(object):
         return node_tile_reference
 
     @classmethod
-    def from_tile(cls, tile, node_tile_reference, datatype_factory=None, compacted=False, hide_empty_nodes=False, as_json=True):
+    def from_tile(cls, tile, node_tile_reference, datatype_factory=None, compact=False, hide_empty_nodes=False, as_json=True):
         """
         Generates a label-based graph from a given tile
         """
@@ -93,7 +93,7 @@ class LabelBasedGraph(object):
         return graph.as_json(include_empty_nodes=bool(not hide_empty_nodes)) if as_json else graph
 
     @classmethod
-    def from_resource(cls, resource, compacted, hide_empty_nodes, as_json=True):
+    def from_resource(cls, resource, compact, hide_empty_nodes, as_json=True):
         """
         Generates a label-based graph from a given resource
         """
@@ -110,7 +110,7 @@ class LabelBasedGraph(object):
                 tile=tile,
                 node_tile_reference=node_tile_reference,
                 datatype_factory=datatype_factory,
-                compacted=compacted,
+                compact=compact,
                 hide_empty_nodes=hide_empty_nodes,
                 as_json=False,
             )
@@ -119,7 +119,7 @@ class LabelBasedGraph(object):
                 root_graph.child_nodes.append(label_based_graph)
 
         if as_json:
-            root_graph_json = root_graph.as_json(compacted=compacted, include_empty_nodes=bool(not hide_empty_nodes))
+            root_graph_json = root_graph.as_json(compact=compact, include_empty_nodes=bool(not hide_empty_nodes))
 
             resource_name, resource_graph = root_graph_json.popitem()
 

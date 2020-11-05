@@ -53,8 +53,8 @@ class LabelBasedNodeTests(TestCase):
     def test_as_json(self):
         self.assertEqual(self.test_node.as_json(), {self.test_node.name: self.test_node_json_data})
 
-    def test_as_json_compacted(self):
-        self.assertEqual(self.test_node.as_json(compacted=True), {self.test_node.name: self.test_node.value})
+    def test_as_json_compact(self):
+        self.assertEqual(self.test_node.as_json(compact=True), {self.test_node.name: self.test_node.value})
 
     def test_as_json_single_child_node(self):
         self.test_node.child_nodes.append(self.child_node_1)
@@ -126,7 +126,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         cls.test_resource = mock.Mock(displayname="Test Resource", tiles=[])
 
     def test_smoke(self, mock_Node):
-        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compacted=False, hide_empty_nodes=False)
+        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
 
         self.assertEqual(label_based_graph, {self.test_resource.displayname: {}})
 
@@ -135,7 +135,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
         self.test_resource.tiles.append(self.string_tile)
 
-        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compacted=False, hide_empty_nodes=False)
+        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
 
         self.assertEqual(
             label_based_graph,
@@ -158,7 +158,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         self.test_resource.tiles.append(self.string_tile)
         self.test_resource.tiles.append(duplicate_node_tile)
 
-        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compacted=False, hide_empty_nodes=False)
+        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
 
         self.assertEqual(
             label_based_graph,
@@ -185,7 +185,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
         self.test_resource.tiles.append(self.grouping_tile)
 
-        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compacted=False, hide_empty_nodes=False)
+        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
 
         self.assertEqual(
             label_based_graph,
@@ -208,7 +208,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         self.grouping_tile.data = {str(self.string_node.pk): "value_2"}
         self.test_resource.tiles.append(self.grouping_tile)
 
-        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compacted=False, hide_empty_nodes=False)
+        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
 
         self.assertEqual(
             label_based_graph,
@@ -238,7 +238,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         self.test_resource.tiles.append(self.grouping_tile)
         self.test_resource.tiles.append(self.string_tile)
 
-        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compacted=False, hide_empty_nodes=False)
+        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
 
         self.assertEqual(
             label_based_graph,

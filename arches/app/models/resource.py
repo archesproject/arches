@@ -515,8 +515,23 @@ class Resource(models.ResourceInstance):
 
         return JSONSerializer().serializeToPython(ret)
 
-    def to_json(self, compacted, hide_empty_nodes):
-        return LabelBasedGraph.from_resource(resource=self, compacted=compacted, hide_empty_nodes=hide_empty_nodes)
+    def to_json(self, compact, hide_empty_nodes):
+        """
+        Returns resource represented as disambiguated JSON graph
+
+        Arguments:
+        compact -- type bool: hide superfluous node data
+        hide_empty_nodes -- type bool: hide nodes without data
+        """
+        label_based_graph = LabelBasedGraph.from_resource(
+            resource=self, 
+            compact=compact, 
+            hide_empty_nodes=hide_empty_nodes
+        )
+
+        _name, resource_graph = label_based_graph.popitem()
+
+        return resource_graph
 
     def get_node_values(self, node_name):
         """

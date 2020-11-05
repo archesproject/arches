@@ -551,17 +551,14 @@ class Resources(APIBase):
             if format == "json":
                 resource = Resource.objects.get(pk=resourceid)
 
-                compacted = bool(request.GET.get("compacted", "false").lower() == "true")  # default False
+                compact = bool(request.GET.get("compact", "false").lower() == "true")  # default False
                 hide_empty_nodes = bool(request.GET.get("hide_empty_nodes", "true").lower() == "true")  # default True
 
-                label_based_graph = resource.to_json(
-                    compacted=compacted,
-                    hide_empty_nodes=hide_empty_nodes,
-                )
-                _name, resource_graph = label_based_graph.popitem()
-
                 out = {
-                    "resource": resource_graph,
+                    "resource": resource.to_json(
+                        compact=compact,
+                        hide_empty_nodes=hide_empty_nodes,
+                    ),
                     "displaydescription": resource.displaydescription,
                     "displayname": resource.displayname,
                     "graph_id": resource.graph_id,
