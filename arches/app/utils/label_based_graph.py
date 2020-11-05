@@ -119,10 +119,7 @@ class LabelBasedGraph(object):
                 root_graph.child_nodes.append(label_based_graph)
 
         if as_json:
-            root_graph_json = root_graph.as_json(
-                compacted=compacted, 
-                include_empty_nodes=bool(not hide_empty_nodes)
-            ) 
+            root_graph_json = root_graph.as_json(compacted=compacted, include_empty_nodes=bool(not hide_empty_nodes))
 
             resource_name, resource_graph = root_graph_json.popitem()
 
@@ -131,7 +128,7 @@ class LabelBasedGraph(object):
                     resource_graph.pop(key)  # removes unneccesary top-node values
 
             return {resource_name: resource_graph}
-        else: # pragma: no cover
+        else:  # pragma: no cover
             return root_graph
 
     @classmethod
