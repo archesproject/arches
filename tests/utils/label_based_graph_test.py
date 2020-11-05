@@ -6,7 +6,7 @@ from unittest import mock, TestCase
 from arches.app.models import models
 from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource
-from arches.app.utils.label_based_graph import LabelBasedGraph, LabelBasedNode, NODE_ID_KEY, TILE_ID_KEY, VALUE_KEY
+from arches.app.utils.label_based_graph import LabelBasedGraph, LabelBasedNode, NODE_ID_KEY, TILE_ID_KEY, VALUE_KEY, NON_DATA_COLLECTING_NODE
 
 
 class LabelBasedNodeTests(TestCase):
@@ -43,8 +43,14 @@ class LabelBasedNodeTests(TestCase):
     def test_is_node_empty_with_empty_node(self):
         self.assertTrue(self.empty_node.is_empty())
 
-    def test_as_json_no_child_nodes(self):
+    def test_as_json(self):
         self.assertEqual(self.test_node.as_json(), {self.test_node.name: self.test_node_json_data})
+
+    def test_as_json_compacted(self):
+        self.assertEqual(
+            self.test_node.as_json(compacted=True), 
+            {self.test_node.name: self.test_node.value}
+        )
 
     def test_as_json_single_child_node(self):
         self.test_node.child_nodes.append(self.child_node_1)
@@ -94,17 +100,8 @@ class LabelBasedGraphTests(TestCase):
 
         self.assertEqual(mock_tile, node_tile_reference.get(self.node_1.node_id)[0])
 
-    @mock.patch.object(LabelBasedGraph, "generate_node_tile_reference", side_effect=None)
     @mock.patch.object(LabelBasedGraph, "_build_graph", side_effect=None)
-    def test_from_tile(self, mock__build_graph, mock_generate_node_tile_reference):
-        with mock.patch("arches.app.utils.label_based_graph.models.Node", return_value=None):
-            LabelBasedGraph.from_tile(tile=mock.Mock(nodegroup_id=1))
-
-            mock_generate_node_tile_reference.assert_called_once()
-            mock__build_graph.assert_called_once()
-
-    @mock.patch.object(LabelBasedGraph, "_build_graph", side_effect=None)
-    def test_from_tile_with_node_tile_reference(self, mock__build_graph):
+    def test_from_tile(self, mock__build_graph):
         with mock.patch("arches.app.utils.label_based_graph.models.Node", return_value=None):
             LabelBasedGraph.from_tile(tile=mock.Mock(nodegroup_id=1), node_tile_reference=mock.Mock())
             mock__build_graph.assert_called_once()
@@ -125,7 +122,11 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         cls.test_resource = mock.Mock(displayname="Test Resource", tiles=[])
 
     def test_smoke(self, mock_Node):
-        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, hide_empty_nodes=False)
+        label_based_graph = LabelBasedGraph.from_resource(
+            resource=self.test_resource, 
+            compacted=False,
+            hide_empty_nodes=False
+        )
 
         self.assertEqual(label_based_graph, {self.test_resource.displayname: {NODE_ID_KEY: None, TILE_ID_KEY: None, VALUE_KEY: None}})
 
@@ -135,8 +136,9 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         self.test_resource.tiles.append(self.string_tile)
 
         label_based_graph = LabelBasedGraph.from_resource(
-            resource=self.test_resource,
-            hide_empty_nodes=False,
+            resource=self.test_resource, 
+            compacted=False,
+            hide_empty_nodes=False
         )
 
         self.assertEqual(
@@ -164,8 +166,9 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         self.test_resource.tiles.append(duplicate_node_tile)
 
         label_based_graph = LabelBasedGraph.from_resource(
-            resource=self.test_resource,
-            hide_empty_nodes=False,
+            resource=self.test_resource, 
+            compacted=False,
+            hide_empty_nodes=False
         )
 
         self.assertEqual(
@@ -197,8 +200,9 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         self.test_resource.tiles.append(self.grouping_tile)
 
         label_based_graph = LabelBasedGraph.from_resource(
-            resource=self.test_resource,
-            hide_empty_nodes=False,
+            resource=self.test_resource, 
+            compacted=False,
+            hide_empty_nodes=False
         )
 
         self.assertEqual(
@@ -211,7 +215,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                     self.grouping_node.name: {
                         NODE_ID_KEY: str(self.grouping_node.pk),
                         TILE_ID_KEY: str(self.grouping_tile.pk),
-                        VALUE_KEY: None,
+                        VALUE_KEY: NON_DATA_COLLECTING_NODE,
                     },
                 }
             },
@@ -219,13 +223,16 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
     def test_semantic_node_with_child(self, mock_Node):
         mock_Node.objects.get.return_value = self.grouping_node
-        self.grouping_tile.data = {str(self.grouping_node.pk): "value_2"}
 
+        self.grouping_node.get_direct_child_nodes = mock.Mock(return_value=[self.string_node])
+       
+        self.grouping_tile.data = {str(self.string_node.pk): "value_2"}
         self.test_resource.tiles.append(self.grouping_tile)
 
         label_based_graph = LabelBasedGraph.from_resource(
-            resource=self.test_resource,
-            hide_empty_nodes=False,
+            resource=self.test_resource, 
+            compacted=False,
+            hide_empty_nodes=False
         )
 
         self.assertEqual(
@@ -238,7 +245,12 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                     self.grouping_node.name: {
                         NODE_ID_KEY: str(self.grouping_node.pk),
                         TILE_ID_KEY: str(self.grouping_tile.pk),
-                        VALUE_KEY: self.grouping_tile.data[str(self.grouping_node.pk)],
+                        VALUE_KEY: NON_DATA_COLLECTING_NODE,
+                        self.string_node.name: {
+                            NODE_ID_KEY: str(self.string_node.pk),
+                            TILE_ID_KEY: str(self.grouping_tile.pk),
+                            VALUE_KEY: self.grouping_tile.data[str(self.string_node.pk)],
+                        },
                     },
                 }
             },
@@ -255,8 +267,9 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         self.test_resource.tiles.append(self.string_tile)
 
         label_based_graph = LabelBasedGraph.from_resource(
-            resource=self.test_resource,
-            hide_empty_nodes=False,
+            resource=self.test_resource, 
+            compacted=False,
+            hide_empty_nodes=False
         )
 
         self.assertEqual(
@@ -269,7 +282,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                     self.grouping_node.name: {
                         NODE_ID_KEY: str(self.grouping_node.pk),
                         TILE_ID_KEY: str(self.grouping_tile.pk),
-                        VALUE_KEY: None,
+                        VALUE_KEY: NON_DATA_COLLECTING_NODE,
                         self.string_node.name: {
                             NODE_ID_KEY: str(self.string_node.pk),
                             TILE_ID_KEY: str(self.string_tile.pk),

@@ -554,7 +554,7 @@ class Resources(APIBase):
             if format == "json":
                 resource = Resource.objects.get(pk=resourceid)
 
-                label_based_graph = LabelBasedGraph.from_resource(resource=resource, compacted=True, hide_empty_nodes=True)
+                label_based_graph = LabelBasedGraph.from_resource(resource=resource, compacted=False, hide_empty_nodes=True)
                 _name, resource_graph = label_based_graph.popitem()
 
                 for key in [NODE_ID_KEY, TILE_ID_KEY, VALUE_KEY]:

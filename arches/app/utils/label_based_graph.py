@@ -49,7 +49,7 @@ class LabelBasedNode(object):
                 else:
                     display_data[formatted_node_name] = [previous_val, formatted_node_value]
 
-        if compacted and not display_data:
+        if compacted and not display_data:  # if compacted and no child nodes
             display_data = self.value
         elif not compacted:
             display_data[NODE_ID_KEY] = self.node_id
@@ -77,7 +77,7 @@ class LabelBasedGraph(object):
         return node_tile_reference
 
     @classmethod
-    def from_tile(cls, tile, node_tile_reference, datatype_factory=None, hide_empty_nodes=False, as_json=True):
+    def from_tile(cls, tile, node_tile_reference, datatype_factory=None, compacted=False, hide_empty_nodes=False, as_json=True):
         """
         Generates a label-based graph from a given tile
         """
@@ -112,6 +112,7 @@ class LabelBasedGraph(object):
                 tile=tile,
                 node_tile_reference=node_tile_reference,
                 datatype_factory=datatype_factory,
+                compacted=compacted,
                 hide_empty_nodes=hide_empty_nodes,
                 as_json=False,
             )
@@ -124,14 +125,14 @@ class LabelBasedGraph(object):
                 compacted=compacted, 
                 include_empty_nodes=bool(not hide_empty_nodes)
             ) 
-        else: 
+        else: # pragma: no cover
             return root_graph
 
     @classmethod
     def _get_display_value(cls, tile, node, datatype_factory):
         display_value = None
 
-        # if the node is unable to collect data, let's explicity say so
+        # if the node is unable to collect data, let's explicitly say so
         if datatype_factory.datatypes[node.datatype].defaultwidget is None:
             display_value = NON_DATA_COLLECTING_NODE
         elif tile.data:
