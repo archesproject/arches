@@ -632,12 +632,20 @@ class Command(BaseCommand):
                 configs = json.load(open(config_paths[0]))
 
             business_data = []
-            if "business_data_load_order" in configs and len(configs["business_data_load_order"]) > 0:
-                for f in configs["business_data_load_order"]:
-                    business_data.append(os.path.join(package_dir, "business_data", f))
+            if dev and os.path.isdir(os.path.join(package_dir, "business_data", "sample_data")):
+                if "business_data_load_order_dev" in configs and len(configs["business_data_load_order_dev"]) > 0:
+                    for f in configs["business_data_load_order_dev"]:
+                        business_data.append(os.path.join(package_dir, "business_data", "sample_data", f))
+                else:
+                    for ext in ["*.json", "*.jsonl", "*.csv"]:
+                        business_data += glob.glob(os.path.join(package_dir, "business_data", "sample_data", ext))
             else:
-                for ext in ["*.json", "*.jsonl", "*.csv"]:
-                    business_data += glob.glob(os.path.join(package_dir, "business_data", ext))
+                if "business_data_load_order" in configs and len(configs["business_data_load_order"]) > 0:
+                    for f in configs["business_data_load_order"]:
+                        business_data.append(os.path.join(package_dir, "business_data", f))
+                else:
+                    for ext in ["*.json", "*.jsonl", "*.csv"]:
+                        business_data += glob.glob(os.path.join(package_dir, "business_data", ext))
 
             erring_csvs = [
                 path
