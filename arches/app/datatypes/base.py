@@ -17,9 +17,9 @@ class BaseDataType(object):
     def create_error_message(self, datatype, value, source, row_number, message):
         source_info = "{0} {1}".format(source, row_number) if row_number else ""
         error_message = {
-                "type": "ERROR",
-                "message": _("""{0} error, {1} {2} - {3}. Unable to save.""".format(self.datatype_model.datatype, value, source_info, message))
-            }
+            "type": "ERROR",
+            "message": _("""{0} error, {1} {2} - {3}. Unable to save.""".format(self.datatype_model.datatype, value, source_info, message)),
+        }
         return error_message
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):

@@ -285,7 +285,9 @@ class DateDataType(BaseDataType):
         if value is not None:
             valid_date_format, valid = self.get_valid_date_format(value)
             if valid is False:
-                message = _("Incorrect format, make sure format is in settings.DATE_FORMATS or set the format in settings.DATE_IMPORT_EXPORT_FORMAT.")
+                message = _(
+                    "Incorrect format, make sure format is in settings.DATE_FORMATS or set the format in settings.DATE_IMPORT_EXPORT_FORMAT."
+                )
                 error_message = self.create_error_message(datatype, value, source, row_number, message)
                 errors.append(error_message)
         return errors
@@ -1083,13 +1085,12 @@ class FileListDataType(BaseDataType):
                 formatted_max_size = format_bytes(max_size)
                 for v in value:
                     if v["size"] > max_size:
-                        message = _("This node has a file-size limit of {0}. Please reduce file size or contact your sysadmin.".format(formatted_max_size))
-                        errors.append(
-                            {
-                                "type": "ERROR",
-                                "message": message
-                            }
+                        message = _(
+                            "This node has a file-size limit of {0}. Please reduce file size or contact your sysadmin.".format(
+                                formatted_max_size
+                            )
                         )
+                        errors.append({"type": "ERROR", "message": message})
         except Exception as e:
             dt = self.datatype_model.datatype
             message = _("datatype: {0}, value: {1} - {2} .".format(dt, value, e))
@@ -1676,13 +1677,10 @@ class ResourceInstanceDataType(BaseDataType):
                 try:
                     models.ResourceInstance.objects.get(pk=resourceid)
                 except ObjectDoesNotExist:
-                    message = _("Resource id: {0} is in the system. This relationship will be added once resource {0} is loaded.".format(resourceid))
-                    errors.append(
-                        {
-                            "type": "WARNING",
-                            "message": message
-                        }
+                    message = _(
+                        "Resource id: {0} is in the system. This relationship will be added once resource {0} is loaded.".format(resourceid)
                     )
+                    errors.append({"type": "WARNING", "message": message})
         return errors
 
     def pre_tile_save(self, tile, nodeid):
