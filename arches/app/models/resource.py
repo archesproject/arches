@@ -523,11 +523,7 @@ class Resource(models.ResourceInstance):
         compact -- type bool: hide superfluous node data
         hide_empty_nodes -- type bool: hide nodes without data
         """
-        label_based_graph = LabelBasedGraph.from_resource(
-            resource=self, 
-            compact=compact, 
-            hide_empty_nodes=hide_empty_nodes
-        )
+        label_based_graph = LabelBasedGraph.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes)
 
         _name, resource_graph = label_based_graph.popitem()
 
