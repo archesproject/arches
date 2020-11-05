@@ -1678,7 +1678,9 @@ class ResourceInstanceDataType(BaseDataType):
                     models.ResourceInstance.objects.get(pk=resourceid)
                 except ObjectDoesNotExist:
                     message = _(
-                        "Resource id: {0} is not in the system. This relationship will be added once resource {0} is loaded.".format(resourceid)
+                        "Resource id: {0} is not in the system. This relationship will be added once resource {0} is loaded.".format(
+                            resourceid
+                        )
                     )
                     errors.append({"type": "WARNING", "message": message})
         return errors
