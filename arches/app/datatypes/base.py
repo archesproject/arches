@@ -14,7 +14,7 @@ class BaseDataType(object):
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
         return []
 
-    def create_error_message(self, datatype, value, source, row_number, message):
+    def create_error_message(self, value, source, row_number, message):
         source_info = "{0} {1}".format(source, row_number) if row_number else ""
         error_message = {
             "type": "ERROR",

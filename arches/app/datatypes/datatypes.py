@@ -87,7 +87,7 @@ class StringDataType(BaseDataType):
                 value.upper()
         except:
             message = _("This is not a string")
-            error_message = self.create_error_message(datatype, value, source, row_number, message)
+            error_message = self.create_error_message(value, source, row_number, message)
             errors.append(error_message)
         return errors
 
@@ -157,7 +157,7 @@ class NumberDataType(BaseDataType):
         except Exception:
             dt = self.datatype_model.datatype
             message = _("Not a properly formatted number")
-            error_message = self.create_error_message(datatype, value, source, row_number, message)
+            error_message = self.create_error_message(value, source, row_number, message)
             errors.append(error_message)
         return errors
 
@@ -238,7 +238,7 @@ class BooleanDataType(BaseDataType):
                 type(bool(util.strtobool(str(value)))) is True
         except Exception:
             message = _("Not of type boolean")
-            error_message = self.create_error_message(datatype, value, source, row_number, message)
+            error_message = self.create_error_message(value, source, row_number, message)
             errors.append(error_message)
 
         return errors
@@ -288,7 +288,7 @@ class DateDataType(BaseDataType):
                 message = _(
                     "Incorrect format. Confirm format is in settings.DATE_FORMATS or set the format in settings.DATE_IMPORT_EXPORT_FORMAT."
                 )
-                error_message = self.create_error_message(datatype, value, source, row_number, message)
+                error_message = self.create_error_message(value, source, row_number, message)
                 errors.append(error_message)
         return errors
 
@@ -395,7 +395,7 @@ class EDTFDataType(BaseDataType):
         if value is not None:
             if not ExtendedDateFormat(value).is_valid():
                 message = _("Incorrect Extended Date Time Format. See http://www.loc.gov/standards/datetime/ for supported formats.")
-                error_message = self.create_error_message(datatype, value, source, row_number, message)
+                error_message = self.create_error_message(value, source, row_number, message)
                 errors.append(error_message)
         return errors
 
@@ -532,7 +532,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     validate_geom(geom, coordinate_count)
                 except Exception:
                     message = _("Unable to serialize some geometry features")
-                    error_message = self.create_error_message(datatype, value, source, row_number, message)
+                    error_message = self.create_error_message(value, source, row_number, message)
                     errors.append(error_message)
         return errors
 
@@ -1439,7 +1439,7 @@ class DomainDataType(BaseDomainDataType):
                 row_number = row_number if row_number else ""
                 if len(domain_val_node_query) == 0:
                     message = _("Invalid domain id. Please check the node this value is mapped to for a list of valid domain ids.")
-                    error_message = self.create_error_message(datatype, value, source, row_number, message)
+                    error_message = self.create_error_message(value, source, row_number, message)
                     errors.append(error_message)
         return errors
 
