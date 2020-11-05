@@ -18,7 +18,7 @@ class BaseDataType(object):
         source_info = "{0} {1}".format(source, row_number) if row_number else ""
         error_message = {
             "type": "ERROR",
-            "message": _("""{0} error, {1} {2} - {3}. Unable to save.""".format(self.datatype_model.datatype, value, source_info, message)),
+            "message": _("{0} error, {1} {2} - {3}. Unable to save.".format(self.datatype_model.datatype, value, source_info, message)),
         }
         return error_message
 

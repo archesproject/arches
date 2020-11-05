@@ -286,7 +286,7 @@ class DateDataType(BaseDataType):
             valid_date_format, valid = self.get_valid_date_format(value)
             if valid is False:
                 message = _(
-                    "Incorrect format, make sure format is in settings.DATE_FORMATS or set the format in settings.DATE_IMPORT_EXPORT_FORMAT."
+                    "Incorrect format. Confirm format is in settings.DATE_FORMATS or set the format in settings.DATE_IMPORT_EXPORT_FORMAT."
                 )
                 error_message = self.create_error_message(datatype, value, source, row_number, message)
                 errors.append(error_message)
