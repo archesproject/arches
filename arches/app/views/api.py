@@ -541,7 +541,7 @@ class Resources(APIBase):
         if format not in allowed_formats:
             return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
 
-        indent = request.GET.get("indent", None)
+        indent = request.GET.get("indent")
         if indent and str.isdigit(indent):
             indent = int(indent)
         else:
