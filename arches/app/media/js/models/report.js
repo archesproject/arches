@@ -58,7 +58,7 @@ define(['jquery',
 
             this.relatedResourcesLookup = ko.observable({});
             
-            if (options.related_resources) {
+            if (options.related_resources && options.related_resources.node_config_lookup) {
                 this.updateRelatedResourcesLookup(options.related_resources);
             }
 
