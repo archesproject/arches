@@ -541,19 +541,23 @@ class Resources(APIBase):
         if format not in allowed_formats:
             return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
 
-        include_tiles = bool(request.GET.get("includetiles", "true").lower() == "true")  # default True
-        disambiguate = bool(request.GET.get("disambiguate", "false").lower() == "true")  # default False
-
-        try:
-            indent = int(request.GET.get("indent", None))
-        except Exception:
+        indent = request.GET.get("indent", None)
+        if indent and str.isdigit(indent):
+            indent = int(indent)
+        else:
             indent = None
 
         if resourceid:
             if format == "json":
                 resource = Resource.objects.get(pk=resourceid)
 
-                label_based_graph = resource.to_json()
+                compacted = bool(request.GET.get("compacted", "false").lower() == "true")  # default False
+                hide_empty_nodes = bool(request.GET.get("hide_empty_nodes", "true").lower() == "true")  # default True
+
+                label_based_graph = resource.to_json(
+                    compacted=compacted,
+                    hide_empty_nodes=hide_empty_nodes,
+                )
                 _name, resource_graph = label_based_graph.popitem()
 
                 out = {
@@ -568,6 +572,8 @@ class Resources(APIBase):
 
             elif format == "arches-json":
                 out = Resource.objects.get(pk=resourceid)
+
+                include_tiles = bool(request.GET.get("includetiles", "true").lower() == "true")  # default True
 
                 if include_tiles:
                     out.load_tiles()
