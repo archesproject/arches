@@ -488,6 +488,14 @@ class Node(models.Model):
             edges.extend(child_edges)
         return (nodes, edges)
 
+    def get_direct_child_nodes(self):
+        """
+        gets all child nodes exactly one level lower in graph
+
+        returns a list of nodes
+        """
+        return [edge.rangenode for edge in Edge.objects.filter(domainnode=self)]
+
     @property
     def is_collector(self):
         return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup is not None
