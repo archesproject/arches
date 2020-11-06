@@ -82,7 +82,7 @@ class Command(BaseCommand):
                     ontology_src = os.path.join(options["source"], configs["base"])
             else:
                 print(_("You must supply an ontology_config.json within your ontology source directory."))
-                print(_(f"'{config_file}' was not found."))
+                print(_("'{config_file}' was not found.").format(**locals()))
                 return
 
         if ontology_version is None:

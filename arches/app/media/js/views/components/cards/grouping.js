@@ -61,8 +61,8 @@ define([
                 var subscription = card.model.cardinality.subscribe(function(cardinality){
                     if (cardinality !== '1') {
                         card.model.cardinality('1');
-                        var errorTitle = 'Settings Conflict: Remove this card from grouped card?';
-                        var errorMesssage = 'The cardinality of this card can\'t be changed until you remove it from being grouped with the "' + self.card.model.name() + '" card.  Do you want to remove this card from being grouped with the "' + self.card.model.name() + '" card';
+                        var errorTitle = arches.translations.groupingErrorTitle;
+                        var errorMesssage = arches.translations.groupingErrorMessage.replace(/\$\{cardName\}/g, self.card.model.name());
                         params.pageVm.alert(new AlertViewModel('ep-alert-red', errorTitle, errorMesssage, function(){}, function(){
                             var newgroup = _.filter(self.groupedCardIds(), function(cardid) {
                                 return cardid !== card.model.id;
