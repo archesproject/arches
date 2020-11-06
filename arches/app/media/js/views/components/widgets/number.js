@@ -7,11 +7,12 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber
     * @param {function} params.config - observable containing config object
     * @param {string} params.config().label - label to use alongside the text input
     * @param {string} params.config().placeholder - default text to show in the text input
+    * @param {string} params.config().disabled - disables widget
     */
 
 
     var NumberWidget = function(params) {
-        params.configKeys = ['placeholder', 'width', 'min', 'max', 'step', 'precision', 'prefix', 'suffix', 'defaultValue', 'format'];
+        params.configKeys = ['placeholder', 'width', 'min', 'max', 'step', 'precision', 'prefix', 'suffix', 'defaultValue', 'format', 'disabled'];
 
         WidgetViewModel.apply(this, [params]);
 
