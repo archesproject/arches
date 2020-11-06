@@ -286,6 +286,9 @@ class BaseDataType(object):
     def from_rdf(self, json_ld_node):
         raise NotImplementedError
 
+    def validate_from_rdf(self, value):
+        return self.validate(value)
+
     def collects_multiple_values(self):
         """
         Data type that can collect multiple values at once like DomainListDataType, etc...
