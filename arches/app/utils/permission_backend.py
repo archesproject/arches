@@ -200,7 +200,10 @@ def get_editable_resource_types(user):
 
     """
 
-    return get_resource_types_by_perm(user, ["models.write_nodegroup", "models.delete_nodegroup"])
+    if user_is_resource_editor(user):
+        return get_resource_types_by_perm(user, ["models.write_nodegroup", "models.delete_nodegroup"])
+    else:
+        return []
 
 
 def get_createable_resource_types(user):
@@ -405,6 +408,14 @@ def user_can_read_concepts(user):
     if user.is_authenticated:
         return user.groups.filter(name="RDM Administrator").exists()
     return False
+
+
+def user_is_resource_editor(user):
+    """
+    Single test for whether a user is in the Resource Editor group
+    """
+
+    return user.groups.filter(name="Resource Editor").exists()
 
 
 def user_is_resource_reviewer(user):

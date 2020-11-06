@@ -149,6 +149,7 @@ class SearchTests(ArchesTestCase):
     @classmethod
     def tearDownClass(cls):
         cls.user.delete()
+        models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
 
     def test_temporal_only_search_1(self):
         """

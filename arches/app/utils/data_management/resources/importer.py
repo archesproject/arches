@@ -19,26 +19,12 @@ import django
 # during a resource load that uses multiprocessing.
 # see https://stackoverflow.com/a/49461944/3873885
 django.setup()
-from django.db import connection, connections, transaction
-from django.contrib.auth.models import User
+from django.db import connection, connections
 from django.contrib.gis.gdal import DataSource
-from django.forms.models import model_to_dict
-from django.core.management.base import BaseCommand, CommandError
-from django.core.exceptions import ValidationError
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.resource import Resource
-from arches.app.models.tile import Tile
-from arches.app.models.models import DDataType
-from arches.app.models.models import ResourceInstance
-from arches.app.models.models import FunctionXGraph
-from arches.app.models.models import NodeGroup
-from arches.app.models.models import Concept
-from arches.app.models.models import Value
-from arches.app.models.concept import Concept
+from arches.app.models.models import DDataType, ResourceXResource, ResourceInstance
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.management.commands import utils
 from arches.setup import unzip_file
 from .formats.csvfile import CsvReader
 from .formats.archesfile import ArchesFileReader
@@ -228,6 +214,16 @@ class BusinessDataImporter(object):
                 reader.report_errors()
 
         finally:
+            # cleans up the ResourceXResource table, adding any graph_id values that were unavailable during package/csv load
+            for res_x_res in ResourceXResource.objects.filter(resourceinstanceto_graphid__isnull=True):
+                # wrapping in a try allows for graceful handling of corrupted data
+                try:
+                    res_x_res.resourceinstanceto_graphid = res_x_res.resourceinstanceidto.graph
+                except:
+                    pass
+
+                res_x_res.save()
+
             datatype_factory = DataTypeFactory()
             datatypes = DDataType.objects.all()
             for datatype in datatypes:

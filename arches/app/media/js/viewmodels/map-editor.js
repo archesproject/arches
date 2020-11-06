@@ -28,6 +28,7 @@ define([
         this.draw = null;
         this.selectSource = this.selectSource || ko.observable();
         this.selectSourceLayer = this.selectSourceLayer || ko.observable();
+        this.drawAvailable = ko.observable(false);
 
         var selectSource = this.selectSource();
         var selectSourceLayer = this.selectSourceLayer();
@@ -112,10 +113,6 @@ define([
                 if (selectedTool) tool = selectedTool;
             });
             return tool;
-        });
-
-        this.editing = ko.pureComputed(function() {
-            return !!(self.selectedFeatureIds().length > 0 || self.selectedTool());
         });
 
         this.updateTiles = function() {
@@ -416,6 +413,9 @@ define([
                     if (value.selectedTool()) value.selectedTool('');
                 });
             });
+            if (self.draw) {
+                self.drawAvailable(true);
+            }
         };
 
 
@@ -461,15 +461,15 @@ define([
                             switch (ko.unwrap(type.id)) {
                             case 'Point':
                                 option.value = 'draw_point';
-                                option.text = 'Add point';
+                                option.text = arches.translations.mapAddPoint;
                                 break;
                             case 'Line':
                                 option.value = 'draw_line_string';
-                                option.text = 'Add line';
+                                option.text = arches.translations.mapAddLine;
                                 break;
                             case 'Polygon':
                                 option.value = 'draw_polygon';
-                                option.text = 'Add polygon';
+                                option.text = arches.translations.mapAddPolygon;
                                 break;
                             }
                             return option;
@@ -478,7 +478,7 @@ define([
                     if (self.selectSource()) {
                         options.push({
                             value: "select_feature",
-                            text: self.selectText() || 'Select drawing'
+                            text: self.selectText() || arches.translations.mapSelectDrawing
                         });
                     }
                     options = options.concat(params.additionalDrawOptions);

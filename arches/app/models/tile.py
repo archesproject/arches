@@ -271,9 +271,9 @@ class Tile(models.TileModel):
                             missing_nodes.append(node.name)
             except Exception as e:
                 warning = _(
-                    f"Error checking for missing node. Nodeid: {nodeid} with value: {value}, not in nodes. \
+                    "Error checking for missing node. Nodeid: {nodeid} with value: {value}, not in nodes. \
                     You may have a node in your business data that no longer exists in any graphs."
-                )
+                ).format(**locals())
                 logger.warning(warning)
         if missing_nodes != []:
             message = _("This card requires values for the following: ")
@@ -569,7 +569,7 @@ class Tile(models.TileModel):
                 except NotImplementedError:
                     pass
         except TypeError:
-            logger.info(_("No associated functions"))
+            logger.info(_("No associated functions or other TypeError raised by a function"))
 
     def __preDelete(self, request):
         try:
@@ -579,7 +579,7 @@ class Tile(models.TileModel):
                 except NotImplementedError:
                     pass
         except TypeError:
-            logger.info(_("No associated functions"))
+            logger.info(_("No associated functions or other TypeError raised by a function"))
 
     def __postSave(self, request=None):
         try:
@@ -589,8 +589,8 @@ class Tile(models.TileModel):
                 except NotImplementedError:
                     pass
         except TypeError as e:
-            logger.warn(_("No associated functions"))
-            logger.warn(e)
+            logger.warning(_("No associated functions or other TypeError raised by a function"))
+            logger.warning(e)
 
     def _getFunctionClassInstances(self):
         ret = []

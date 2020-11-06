@@ -19,8 +19,18 @@
         <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
     </div>
 
-    <div data-bind="css: card.model.cssclass">
 
+    <div style="margin: 70px 10px -25px;">
+        <div class='control-label widget-input-label'>{% trans "Participating Layers" %}</div>
+        <!-- ko foreach: {data: self.nodeDetails, as: 'nodeInfo'} -->
+        <div class="overlay-listing rr-map-card" style="padding: 5px; min-height: 0px" 
+            data-bind="click: function(){self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1 ? self.filterNodeIds.remove(nodeInfo.nodeid) : self.filterNodeIds.push(nodeInfo.nodeid)}, css: {'active-overlay': self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1}">
+            <div class="overlay-name" data-bind="text: nodeInfo.resourcemodelname"></div>
+        </div>
+        <!-- /ko -->
+    </div>
+
+    <div data-bind="css: card.model.cssclass" style="height: calc(100% - 80px)">        
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
         <div class="edit-message-container">
             <span>{% trans 'Showing edits by' %}</span>
@@ -39,8 +49,6 @@
             <div>{% trans 'Currently showing the most recent approved edits' %}</div>
         </div>
         <!-- /ko-->
-
-
 
         <div class="new-provisional-edit-card-container">
             <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
@@ -104,7 +112,95 @@
             </div>
             <!-- /ko-->
 
-            <div class="card" style="padding-top: 45px;" data-bind="visible: geoJSONString() === undefined">
+            <!-- ko if: showRelatedQuery() -->
+            <div class="card" style="padding-top: 55px; padding-bottom: 30px">
+
+                <div data-bind="foreach: {
+                    data:card.widgets, as: 'widget'
+                }">
+                <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) === 'geojson-feature-collection' -->
+                    <!--ko if: self.featureLookup[widget.node_id()].features -->
+                    <div class="rr-map-card-intersect-panel">
+                    <div class='control-label widget-input-label'>{% trans "Select a feature to perform intersection" %}</div>
+                    <table class="table">
+                        <tbody>
+                        <!-- ko foreach: {data: self.featureLookup[widget.node_id()].features, as: 'feature'} -->
+                        <tr class="map-card-feature-item" data-bind="css: {'active': self.mapFilter.searchGeometries().length && self.mapFilter.searchGeometries().find(function(x){return x.id === feature.id})};">
+                            <td>
+                                <span class="map-card-feature-name" data-bind="text: feature.geometry.type"></span>
+                            </td>
+                            <td class="map-card-feature-tool intersect">
+                                <a href="javascript:void(0);" data-bind="
+                                click: function(){self.mapFilter.makeSearchFeature(feature)}">
+                                    <i class="fa fa-pencil map-card-feature-edit"></i>
+                                    {% trans "Intersect" %}
+                                </a>
+                            </td>
+                        </tr>
+                        <!-- /ko -->
+                        </tbody>
+                    </table>
+                    </div>
+                    <!-- /ko -->
+
+                    <div class="rr-map-card-intersect-panel">
+                        <div class='control-label widget-input-label'>{% trans "Buffer Intersecting Feature" %}</div>
+                        <div class="buffer-control" style="padding-left: 0px">
+                            <div style="display: inline-flex; justify-content: space-between; width: 100%">
+                                <div class="form-inline">
+                                <input type="number" min=0.0 id="buffer-input" placeholder="{% trans " buffer " %}" class="form-control" style="height: 34px; width: 95px" data-bind="textInput: self.mapFilter.buffer">
+                                <select class="form-control" style="vertical-align: top; height: auto" data-bind="options: self.mapFilter.bufferUnits, optionsText:'name', optionsValue:'val', value: self.mapFilter.bufferUnit"></select>
+                                </div>
+                                <div style="display: flex;">
+                                    <button class="btn btn-sm btn-primary" data-bind="
+                                        click: function(){self.appendBufferToTileFeatures(widget.node_id());}, 
+                                        disable: !ko.unwrap(self.mapFilter.buffer) || !ko.unwrap(self.mapFilter.searchGeometries).length
+                                        ">{% trans 'Add buffer to features' %}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--ko if: self.mapFilter.searchGeometries().length -->
+                    <div class="rr-map-card-intersect-panel">
+                    <div class='control-label widget-input-label'>{% trans "Intersection Results" %}</div>
+                    <div>
+                    <!-- ko foreach: {data: self.targetGraphs, as: 'targetGraph'} -->
+                    <div style="margin-bottom: 12px; border: solid 1px #eee; min-height: 0px;">
+                            <!--ko if: self.intersectionSummary()[targetGraph] -->
+                            <div style="
+                                display: inline-flex;
+                                justify-content: space-between;
+                                width: 100%;
+                                padding: 10px;
+                                background-color: aliceblue;
+                            ">
+                            <div data-bind="text: self.intersectionSummary()[targetGraph].name"></div>
+                            <div data-bind="text: 'Total: ' + self.intersectionSummary()[targetGraph].results().length"></div>
+                            </div>
+                            <div style="max-height: 200px; overflow-y: scroll;">
+                            <!-- ko foreach: {data: self.intersectionSummary()[targetGraph].results(), as: 'result'} -->
+                            <div class="intersection-result" data-bind="text: result.displayname, event: { mouseover: self.updateHoverId, mouseout: self.updateHoverId }, css: {hovered: self.hoverId() === result.resourceinstanceid } "></div>
+                            <!-- /ko -->
+                            </div>
+                            <!-- /ko -->
+                    </div>
+                    <!-- /ko -->
+                    </div>
+                    </div>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </div>
+
+                <div class="install-buttons">
+                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
+                        showRelatedQuery(false);
+                    }">{% trans 'Close' %}</button>
+                </div>
+            </div>
+            <!-- /ko-->
+
+            <div class="card" style="padding-top: 45px;" data-bind="visible: geoJSONString() === undefined && showRelatedQuery() === false">
                 {% block form_header %}
                 <!-- ko if: card.model.helpenabled -->
                 <span>
@@ -201,6 +297,15 @@
                                             </tbody>
                                         </table>
                                         <div class="map-card-zoom-tool">
+                                            <!-- ko if: ko.unwrap(self.featureLookup[widget.node_id()].features) && self.featureLookup[widget.node_id()].features().length > 0 -->
+                                            <a href="javascript:void(0);" data-bind="click: function() {
+                                                self.showRelatedQuery(true);
+                                            }">
+                                                <i class="fa fa-pencil map-card-feature-edit"></i>
+                                                {% trans "Find" %}
+                                            </a>
+                                            |
+                                            <!--/ko-->
                                             <a href="javascript:void(0);" data-bind="click: function() {
                                                 self.editGeoJSON(self.featureLookup[widget.node_id()].features(), widget.node_id());
                                             }">
@@ -256,7 +361,7 @@
 
                 <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
                     <div class="relative">
-                        <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () {
+                        <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" data-bind="click: function () {
                             card.model.get('helpactive')(false);
                         }"></a>
                     </div>

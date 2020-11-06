@@ -52,7 +52,7 @@ define([
                 return fetch('/graphs/' + graphid)
                     .then(function(response){
                         if (!response.ok) {
-                            throw new Error('Network response was not ok');
+                            throw new Error(arches.translations.reNetworkReponseError);
                         }
                         return response.json();
                     })
@@ -194,12 +194,28 @@ define([
 
         var makeObject = function(id, esSource){
             var graph = self.graphLookup[esSource.graph_id];
-            var ontologyProperty = graph ? graph.config.ontologyProperty : '';
-            var inverseOntologyProperty = graph ? graph.config.inverseOntologyProperty : '';
+
+            var ontologyProperty;
+            var inverseOntologyProperty;
+
+            if (graph) {
+                ontologyProperty = graph.config.ontologyProperty;
+                inverseOntologyProperty = graph.config.inverseOntologyProperty;
+            }
+            
+            if (self.node && (!ontologyProperty || !inverseOntologyProperty) ) {
+                var ontologyProperties = self.node.config.graphs().find(function(nodeConfigGraph) {
+                    return nodeConfigGraph.graphid === graph.graphid;
+                });
+
+                ontologyProperty = ontologyProperty || ontologyProperties.ontologyProperty;
+                inverseOntologyProperty = inverseOntologyProperty || ontologyProperties.inverseOntologyProperty;
+            }
+
             var ret = {
                 "resourceId": ko.observable(id),
-                "ontologyProperty": ko.observable(ontologyProperty || ''),
-                "inverseOntologyProperty": ko.observable(inverseOntologyProperty || ''),
+                "ontologyProperty": ko.observable(ontologyProperty || ""),
+                "inverseOntologyProperty": ko.observable(inverseOntologyProperty || ""),
                 "resourceXresourceId": ""
             };            
             Object.defineProperty(ret, 'resourceName', {value: ko.observable(esSource.displayname)});
@@ -214,7 +230,7 @@ define([
             value: self.renderContext === 'search' ? self.value : resourceToAdd,
             clickBubble: true,
             multiple: !self.displayOntologyTable ? params.multiple : false,
-            placeholder: this.placeholder() || "Add new Relationship",
+            placeholder: this.placeholder() || arches.translations.riSelectPlaceholder,
             closeOnSelect: true,
             allowClear: self.renderContext === 'search' ? true : false,
             onSelect: function(item) {
@@ -331,7 +347,7 @@ define([
                 if (item._source) {
                     return item._source.displayname;
                 } else {
-                    return '<b> Create a new ' + item.name + ' . . . </b>';
+                    return '<b> ' + arches.translations.riSelectCreateNew.replace('${graphName}', item.name) + ' . . . </b>';
                 }
             },
             formatSelection: function(item) {

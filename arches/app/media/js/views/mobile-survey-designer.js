@@ -32,11 +32,11 @@ define([
         }
 
         if (this.mobilesurvey.activatedOnServer() === true && this.mobilesurvey.active() === false) {
-            title = "You are deactivating an active survey";
-            message = "Users will not be able to download this survey to their device";
+            title = arches.translations.deactivateSurveyTitle;
+            message = arches.translations.deactivateSurveyMessage;
         } else if (this.mobilesurvey.activatedOnServer() === false && this.mobilesurvey.active() === true) {
-            title = "You are activating this survey";
-            message = "Users will immediately be able to download this survey and begin collecting data";
+            title = arches.translations.activateSurveyTitle;
+            message = arches.translations.activateSurveyMessage;
         }
         pageView.viewModel.alert(new AlertViewModel('ep-alert-blue', title, message, function() {
             return;
