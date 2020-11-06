@@ -551,8 +551,8 @@ class Resources(APIBase):
             if format == "json":
                 resource = Resource.objects.get(pk=resourceid)
 
-                compact = bool(request.GET.get("compact", "false").lower() == "true")  # default False
-                hide_empty_nodes = bool(request.GET.get("hide_empty_nodes", "true").lower() == "true")  # default True
+                compact = bool(request.GET.get("compact", "true").lower() == "true")  # default True
+                hide_empty_nodes = bool(request.GET.get("hide_empty_nodes", "false").lower() == "true")  # default False
 
                 out = {
                     "resource": resource.to_json(
