@@ -322,7 +322,7 @@ class DateDataType(BaseDataType):
         if valid:
             value = datetime.strptime(value, valid_date_format).strftime(settings.DATE_IMPORT_EXPORT_FORMAT)
         else:
-            logger.warning(_(f"{value} is an invalid date format"))
+            logger.warning(_("{value} is an invalid date format").format(**locals()))
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
