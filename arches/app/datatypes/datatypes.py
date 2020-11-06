@@ -1089,10 +1089,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             val = json.loads(json_ld_node["@value"])
         except:
             raise ValueError(f"Bad Data in GeoJSON, should be JSON string: {json_ld_node}")
-        if not "features" in val or type(val["features"]) != list:
+        if "features" not in val or type(val["features"]) != list:
             raise ValueError(f"GeoJSON must have features array")
         for f in val["features"]:
-            f["properties"] = {}
+            if "properties" not in f:
+                f["properties"] = {}
         return val
 
     def validate_from_rdf(self, value):
