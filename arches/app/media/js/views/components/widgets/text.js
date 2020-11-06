@@ -7,12 +7,15 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     * @param {function} params.config - observable containing config object
     * @param {string} params.config().label - label to use alongside the text input
     * @param {string} params.config().placeholder - default text to show in the text input
-    * @param {string} params.config().disabled - disables widget
+    * @param {string} params.config().uneditable - disables widget
     */
     return ko.components.register('text-widget', {
         viewModel: function(params) {
-            params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue', 'disabled'];
+            params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue', 'uneditable'];
             WidgetViewModel.apply(this, [params]);
+            this.uneditable.subscribe(function(val){
+                console.log(val)
+            });
         },
         template: { require: 'text!widget-templates/text' }
     });
