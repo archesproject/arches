@@ -1074,25 +1074,25 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
     def to_rdf(self, edge_info, edge):
         # Default to string containing JSON
         g = Graph()
-        if edge_info['range_tile_data'] is not None:
-            data = edge_info['range_tile_data']
-            if data['type'] == 'FeatureCollection':
-                for f in data['features']:
-                    del f['id']
-                    del f['properties']
-            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(JSONSerializer().serialize(data))))
+        if edge_info["range_tile_data"] is not None:
+            data = edge_info["range_tile_data"]
+            if data["type"] == "FeatureCollection":
+                for f in data["features"]:
+                    del f["id"]
+                    del f["properties"]
+            g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(JSONSerializer().serialize(data))))
         return g
 
     def from_rdf(self, json_ld_node):
         # Allow either a JSON literal or a string containing JSON
         try:
-            val = json.loads(json_ld_node['@value'])
+            val = json.loads(json_ld_node["@value"])
         except:
             raise ValueError(f"Bad Data in GeoJSON, should be JSON string: {json_ld_node}")
-        if not 'features' in val or type(val['features']) != list:
+        if not "features" in val or type(val["features"]) != list:
             raise ValueError(f"GeoJSON must have features array")
-        for f in val['features']:
-            f['properties'] = {}
+        for f in val["features"]:
+            f["properties"] = {}
         return val
 
     def validate_from_rdf(self, value):
