@@ -515,11 +515,11 @@ class Resource(models.ResourceInstance):
 
         return JSONSerializer().serializeToPython(ret)
 
-    def to_json(self, compact, hide_empty_nodes):
+    def to_json(self, compact=True, hide_empty_nodes=False):
         """
         Returns resource represented as disambiguated JSON graph
 
-        Arguments:
+        Keyword Arguments:
         compact -- type bool: hide superfluous node data
         hide_empty_nodes -- type bool: hide nodes without data
         """
