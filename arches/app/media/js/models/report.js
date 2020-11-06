@@ -130,9 +130,6 @@ define(['jquery',
             var relatedResourcesLookup = this.relatedResourcesLookup();
 
             for (var [graphId, value] of Object.entries(json)) {
-                // let's not relate the resource to itself
-                if (graphId === this.attributes.graph.graphid) { continue; }
-
                 var relatedResources;
                 var paginator;
                 var remainingResources;
@@ -146,10 +143,10 @@ define(['jquery',
                     relatedResourcesLookup[graphId] = {
                         'graphId': graphId,
                         'loadedRelatedResources': relatedResources,
-                        'name': value['related_resources']['node_config_lookup'][graphId]['name'],
+                        'name': value['name'] || value['related_resources']['node_config_lookup'][graphId]['name'],
                         'paginator': paginator,
                         'remainingResources': remainingResources,
-                        'totalRelatedResources': value['related_resources']['total']['value'],
+                        'totalRelatedResources': value['related_resources'] ? value['related_resources']['total']['value'] : 0,
                     };
                 } else {
                     // else get pertinent references
@@ -166,26 +163,31 @@ define(['jquery',
                 */
                 if (!value['paginator']) {relatedResources.removeAll();}
 
-                // add new resource relationships to lookup entry
-                for (var resourceRelationship of value['related_resources']['resource_relationships']) {
-                    var relatedResource = value['related_resources']['related_resources'].find(function(resource) {
-                        return (
-                            resource.resourceinstanceid === resourceRelationship.resourceinstanceidto
-                            || resource.resourceinstanceid === resourceRelationship.resourceinstanceidfrom
-                        );
-                    });
+                if (value['related_resources']) {
+                    // add new resource relationships to lookup entry
+                    for (var resourceRelationship of value['related_resources']['resource_relationships']) {
+                        var relatedResource = value['related_resources']['related_resources'].find(function(resource) {
+                            return (
+                                resource.resourceinstanceid === resourceRelationship.resourceinstanceidto
+                                || resource.resourceinstanceid === resourceRelationship.resourceinstanceidfrom
+                                || this.attributes && resource.resourceinstanceid === this.attributes.graph.graphid  // self
+                            );
+                        });
+    
+                        if (relatedResource) {
+                            relatedResources.push({
+                                'displayName': relatedResource.displayname,
+                                'relationship': resourceRelationship.relationshiptype_label,
+                                'link': arches.urls.resource_report + relatedResource.resourceinstanceid,
+                            });
+                        }
+                    }
 
-                    relatedResources.push({
-                        'displayName': relatedResource.displayname,
-                        'relationship': resourceRelationship.relationshiptype_label,
-                        'link': arches.urls.resource_report + relatedResource.resourceinstanceid,
-                    });
+                    var resourceLimit = value['related_resources']['resource_relationships'].length;  /* equivalent to settings.py RELATED_RESOURCES_PER_PAGE */ 
+                    var remainingResourcesCount = value['related_resources']['total']['value'] - relatedResources().length;
+    
+                    remainingResources(remainingResourcesCount < resourceLimit ? remainingResourcesCount : resourceLimit);
                 }
-
-                var resourceLimit = value['related_resources']['resource_relationships'].length;  /* equivalent to settings.py RELATED_RESOURCES_PER_PAGE */ 
-                var remainingResourcesCount = value['related_resources']['total']['value'] - relatedResources().length;
-
-                remainingResources(remainingResourcesCount < resourceLimit ? remainingResourcesCount : resourceLimit);
             }
 
             this.relatedResourcesLookup(relatedResourcesLookup);
