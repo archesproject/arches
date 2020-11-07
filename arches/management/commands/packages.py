@@ -315,7 +315,7 @@ class Command(BaseCommand):
         with open(os.path.join(dest_dir, "package_config.json"), "w") as config_file:
             try:
                 constraints = models.Resource2ResourceConstraint.objects.all()
-                configs = {"permitted_resource_relationships": constraints}
+                configs = {"permitted_resource_relationships": constraints, "business_data_load_order": []}
                 config_file.write(JSONSerializer().serialize(configs))
             except Exception as e:
                 print(e)
