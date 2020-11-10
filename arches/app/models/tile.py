@@ -333,8 +333,9 @@ class Tile(models.TileModel):
                 datatype = self.datatype_factory.get_instance(node.datatype)
                 datatype.pre_tile_save(self, nodeid)
             self.__preSave(request)
-            self.check_for_missing_nodes(request)
-            self.check_for_constraint_violation(request)
+            if settings.PERFORM_TILE_VALIDATION:
+                self.check_for_missing_nodes(request)
+                self.check_for_constraint_violation(request)
 
             creating_new_tile = models.TileModel.objects.filter(pk=self.tileid).exists() is False
             edit_type = "tile create" if (creating_new_tile is True) else "tile edit"

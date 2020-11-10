@@ -974,7 +974,8 @@ class CsvReader(Reader):
                         if target_tile is not None and len(source_data) > 0:
                             populate_tile(source_data, target_tile)
                             # Check that required nodes are populated. If not remove tile from populated_tiles array.
-                            check_required_nodes(target_tile, target_tile, required_nodes, all_nodes)
+                            if settings.PERFORM_TILE_VALIDATION:
+                                check_required_nodes(target_tile, target_tile, required_nodes, all_nodes)
 
                     previous_row_resourceid = row["ResourceID"]
                     legacyid = row["ResourceID"]
