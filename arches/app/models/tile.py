@@ -553,14 +553,15 @@ class Tile(models.TileModel):
         return tile
 
     def __preSave(self, request=None):
-        try:
-            for function in self._getFunctionClassInstances():
-                try:
-                    function.save(self, request)
-                except NotImplementedError:
-                    pass
-        except TypeError:
-            logger.info(_("No associated functions or other TypeError raised by a function"))
+        if settings.PERFORM_ARCHES_FUNCTIONS_ON_SAVE:
+            try:
+                for function in self._getFunctionClassInstances():
+                    try:
+                        function.save(self, request)
+                    except NotImplementedError:
+                        pass
+            except TypeError:
+                logger.info(_("No associated functions or other TypeError raised by a function"))
 
     def __preDelete(self, request):
         try:
@@ -573,15 +574,16 @@ class Tile(models.TileModel):
             logger.info(_("No associated functions or other TypeError raised by a function"))
 
     def __postSave(self, request=None):
-        try:
-            for function in self._getFunctionClassInstances():
-                try:
-                    function.post_save(self, request)
-                except NotImplementedError:
-                    pass
-        except TypeError as e:
-            logger.warning(_("No associated functions or other TypeError raised by a function"))
-            logger.warning(e)
+        if settings.PERFORM_ARCHES_FUNCTIONS_ON_SAVE:
+            try:
+                for function in self._getFunctionClassInstances():
+                    try:
+                        function.post_save(self, request)
+                    except NotImplementedError:
+                        pass
+            except TypeError as e:
+                logger.warning(_("No associated functions or other TypeError raised by a function"))
+                logger.warning(e)
 
     def _getFunctionClassInstances(self):
         ret = []

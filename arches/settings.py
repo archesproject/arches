@@ -393,6 +393,7 @@ LOGIN_URL = "auth"
 PROFILE_LOG_BASE = os.path.join(ROOT_DIR, "logs")
 
 BULK_IMPORT_BATCH_SIZE = 2000
+PERFORM_ARCHES_FUNCTIONS_ON_SAVE = True 
 PERFORM_TILE_VALIDATION = True 
 
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, "db", "system_settings", "Arches_System_Settings_Local.json")
