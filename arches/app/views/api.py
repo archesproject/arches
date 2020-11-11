@@ -995,6 +995,7 @@ class IIIFManifest(APIBase):
         response = JSONResponse({"results": manifests, "count": count})
         return response
 
+
 class Manifest(APIBase):
     def get(self, request, id):
         manifest = models.IIIFManifest.objects.get(id=id).manifest
