@@ -1,6 +1,6 @@
+os: linux
 dist: xenial
 filter_secrets: false
-sudo: false
 
 env:
   - ES_VERSION=7.4.0 ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz
@@ -47,16 +47,16 @@ language:
   - python
   - node_js
 
-python: 3.7
+python: 3.9
 node_js: 10.8
 
-matrix:
+jobs:
   allow_failures:
     - name: "Javascript - Cypress.io tests"
   include:
     - name: "Python 3 - Nose/unittests"
       install: echo "Python dependences installed"
-      python: 3.7
+      python: 3.9
       script:
         - wait-on http://localhost:9200/
         - python manage.py test tests --pattern="*.py" --settings="tests.test_settings"

@@ -258,9 +258,9 @@ class Tile(models.TileModel):
                             missing_nodes.append(node.name)
             except Exception as e:
                 warning = _(
-                    f"Error checking for missing node. Nodeid: {nodeid} with value: {value}, not in nodes. \
+                    "Error checking for missing node. Nodeid: {nodeid} with value: {value}, not in nodes. \
                     You may have a node in your business data that no longer exists in any graphs."
-                )
+                ).format(**locals())
                 logger.warning(warning)
         if missing_nodes != []:
             message = _("This card requires values for the following: ")
