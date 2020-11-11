@@ -7,14 +7,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '6759_fn_unique_component'),
+        ("models", "6759_fn_unique_component"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='iiifmanifest',
-            name='manifest',
+            model_name="iiifmanifest",
+            name="manifest",
             field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True),
         ),
     ]
-    
