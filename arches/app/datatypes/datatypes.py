@@ -1698,8 +1698,6 @@ class ResourceInstanceDataType(BaseDataType):
                         f"Resource {resourceid} not available. This message may appear during resource load, \
                             in which case the problem will be resolved once the related resource is loaded"
                     )
-        else:
-            logger.warning(_("No resource relationship available"))
         return ret
 
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
