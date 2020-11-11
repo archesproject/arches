@@ -13,9 +13,6 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
         viewModel: function(params) {
             params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue', 'uneditable'];
             WidgetViewModel.apply(this, [params]);
-            this.uneditable.subscribe(function(val){
-                console.log(val)
-            });
         },
         template: { require: 'text!widget-templates/text' }
     });
