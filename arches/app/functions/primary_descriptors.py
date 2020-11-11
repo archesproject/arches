@@ -3,6 +3,7 @@ from arches.app.functions.base import BaseFunction
 from arches.app.models import models
 from arches.app.models.tile import Tile
 from arches.app.datatypes.datatypes import DataTypeFactory
+from django.utils.translation import ugettext as _
 
 
 class PrimaryDescriptorsFunction(BaseFunction):
@@ -30,8 +31,11 @@ class PrimaryDescriptorsFunction(BaseFunction):
                                 datatype_factory = DataTypeFactory()
                             datatype = datatype_factory.get_instance(node.datatype)
                             value = datatype.get_display_value(tile, node)
+                            if value is None:
+                                value = ""
                             config["string_template"] = config["string_template"].replace("<%s>" % node.name, str(value))
         except ValueError as e:
             print(e, "invalid nodegroupid participating in descriptor function.")
-
+        if config["string_template"].strip() == "":
+            config["string_template"] = _("Undefined")
         return config["string_template"]
