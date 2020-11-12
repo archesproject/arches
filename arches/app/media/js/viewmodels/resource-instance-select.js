@@ -21,6 +21,7 @@ define([
     * the table of ontologyProperties below the dropdown otherwise the table will be hidden and you will have to populate params.graphids
     * @param  {boolean} params.graphids (optional) - if params.node is not supplied then you need to supply a list of graphids that can be used to get resource instances for the dropdown
     * @param  {boolean} params.multiple - whether to display multiple values in the dropdown/table
+    * @param  {boolean} params.allowInstanceCreation - whether the dropdown will give the user the option to create a new resource instance
     * @param  {function} params.termFilter (optional) - a function to override the default term filter used when typing into the dropdown to search for resources
     * this.termFilter = function(term, data){
     *    return data["advanced-search"] = JSON.stringify([{
@@ -37,6 +38,7 @@ define([
         this.graphLookup = graphCache;
         params.configKeys = ['placeholder'];
         this.preview = arches.graphs.length > 0;
+        this.allowInstanceCreation = params.allowInstanceCreation === false ? false : true;
         this.renderContext = params.renderContext;
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
@@ -347,7 +349,9 @@ define([
                 if (item._source) {
                     return item._source.displayname;
                 } else {
-                    return '<b> ' + arches.translations.riSelectCreateNew.replace('${graphName}', item.name) + ' . . . </b>';
+                    if (self.allowInstanceCreation) {
+                        return '<b> ' + arches.translations.riSelectCreateNew.replace('${graphName}', item.name) + ' . . . </b>';
+                    }
                 }
             },
             formatSelection: function(item) {
