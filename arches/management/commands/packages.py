@@ -198,6 +198,14 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
+            "-pi",
+            "--prevent_indexing",
+            action="store_true",
+            dest="prevent_indexing",
+            help="Prevents indexing the resources into Elasticsearch",
+        )
+
+        parser.add_argument(
             "-create_concepts",
             "--create_concepts",
             action="store",
@@ -266,6 +274,7 @@ class Command(BaseCommand):
                 options["create_concepts"],
                 use_multiprocessing=options["use_multiprocessing"],
                 force=options["yes"],
+                defer_index=options["prevent_indexing"]
             )
 
         if options["operation"] == "import_node_value_data":
