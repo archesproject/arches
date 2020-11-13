@@ -324,7 +324,7 @@ class Command(BaseCommand):
         with open(os.path.join(dest_dir, "package_config.json"), "w") as config_file:
             try:
                 constraints = models.Resource2ResourceConstraint.objects.all()
-                configs = {"permitted_resource_relationships": constraints}
+                configs = {"permitted_resource_relationships": constraints, "business_data_load_order": []}
                 config_file.write(JSONSerializer().serialize(configs))
             except Exception as e:
                 print(e)
@@ -641,12 +641,20 @@ class Command(BaseCommand):
                 configs = json.load(open(config_paths[0]))
 
             business_data = []
-            if "business_data_load_order" in configs and len(configs["business_data_load_order"]) > 0:
-                for f in configs["business_data_load_order"]:
-                    business_data.append(os.path.join(package_dir, "business_data", f))
+            if dev and os.path.isdir(os.path.join(package_dir, "business_data", "dev_data")):
+                if "business_data_load_order" in configs and len(configs["business_data_load_order"]) > 0:
+                    for f in configs["business_data_load_order"]:
+                        business_data.append(os.path.join(package_dir, "business_data", "dev_data", f))
+                else:
+                    for ext in ["*.json", "*.jsonl", "*.csv"]:
+                        business_data += glob.glob(os.path.join(package_dir, "business_data", "dev_data", ext))
             else:
-                for ext in ["*.json", "*.jsonl", "*.csv"]:
-                    business_data += glob.glob(os.path.join(package_dir, "business_data", ext))
+                if "business_data_load_order" in configs and len(configs["business_data_load_order"]) > 0:
+                    for f in configs["business_data_load_order"]:
+                        business_data.append(os.path.join(package_dir, "business_data", f))
+                else:
+                    for ext in ["*.json", "*.jsonl", "*.csv"]:
+                        business_data += glob.glob(os.path.join(package_dir, "business_data", ext))
 
             erring_csvs = [
                 path
