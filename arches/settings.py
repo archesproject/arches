@@ -19,10 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os
 import inspect
 
-
 try:
+    from django.utils.translation import gettext_lazy as _
     from corsheaders.defaults import default_headers
-except ImportError:  # unable to import corsheaders prior to installing requirements.txt in setup.py
+except ImportError:  # unable to import prior to installing requirements.txt in setup.py
     pass
 
 #########################################
@@ -56,7 +56,6 @@ COUCHDB_URL = "http://admin:admin@localhost:5984"  # defaults to localhost:5984
 ANONYMOUS_USER_NAME = None
 
 ELASTICSEARCH_HTTP_PORT = 9200  # this should be in increments of 200, eg: 9400, 9600, 9800
-ELASTICSEARCH_TEMP_HTTP_ENDPOINT = "http://localhost:9800"
 SEARCH_BACKEND = "arches.app.search.search.SearchEngine"
 # see http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
 ELASTICSEARCH_HOSTS = [{"host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
@@ -76,6 +75,11 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 #     'name': 'my_new_custom_index'
 # }]
 
+
+KIBANA_URL = "http://localhost:5601/"
+KIBANA_CONFIG_BASEPATH = "kibana"  # must match Kibana config.yml setting (server.basePath) but without the leading slash,
+# also make sure to set server.rewriteBasePath: true
+
 USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 PACKAGE_ROOT = ROOT_DIR
@@ -94,6 +98,9 @@ RESOURCE_FORMATTERS = {
     "nt": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
     "trix": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
 }
+
+# Hide nodes and cards in a report that have no data
+HIDE_EMPTY_NODES_IN_REPORT = False
 
 # Set the ontolgoy namespace prefixes to use in the UI, set the namespace to '' omit a prefix
 # Users can also override existing namespaces as well if you like
@@ -163,23 +170,44 @@ USE_I18N = True
 TIME_ZONE = "America/Chicago"
 USE_TZ = False
 
-# Default Language code for this installation. All choices can be found here:
-# http://www.i18nguy.com/unicode/language-identifiers.html
 
 # see https://docs.djangoproject.com/en/1.9/topics/i18n/translation/#how-django-discovers-language-preference
 # to see how LocaleMiddleware tries to determine the user's language preference
 # (make sure to check your accept headers as they will override the LANGUAGE_CODE setting!)
 # also see get_language_from_request in django.utils.translation.trans_real.py
 # to see how the language code is derived in the actual code
-#
-# make sure to uncomment the Middleware class 'LocaleMiddleware'
-#
-# https://docs.djangoproject.com/en/1.9/ref/django-admin/#makemessages
-#
-# run
-# django-admin.py makemessages --ignore=virtualenv/* --local=en --extension=htm,py
+
+####### TO GENERATE .PO FILES DO THE FOLLOWING ########
+# run the following commands
+# language codes used in the command should be in the form (which is slightly different
+# form the form used in the LANGUAGE_CODE and LANGUAGES settings below):
+# --local={countrycode}_{REGIONCODE} <-- countrycode is lowercase, regioncode is uppercase, also notice the underscore instead of hyphen
+# commands to run (to generate files for "British English, German, and Spanish"):
+# django-admin.py makemessages --ignore=env/* --local=de --local=en --local=en_GB --local=es  --extension=htm,py
 # django-admin.py compilemessages
-LANGUAGE_CODE = "en-US"
+
+
+# default language of the application
+# language code needs to be all lower case with the form:
+# {langcode}-{regioncode} eg: en, en-gb ....
+# a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGE_CODE = "en"
+
+# list of languages to display in the language switcher,
+# if left empty or with a single entry then the switch won't be displayed
+# language codes need to be all lower case with the form:
+# {langcode}-{regioncode} eg: en, en-gb ....
+# a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGES = [
+    # ("de", _("German")),
+    # ("en", _("English")),
+    # ("en-gb", _("British English")),
+    # ("es", _("Spanish")),
+    # ("ar", _("Arabic")),
+]
+
+# override this to permenantly display/hide the language switcher
+SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
 
 # the path where your translation strings are stored
 LOCALE_PATHS = [
@@ -320,7 +348,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     #'arches.app.utils.middleware.TokenMiddleware',
-    # 'django.middleware.locale.LocaleMiddleware',
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "arches.app.utils.middleware.ModifyAuthorizationHeader",
@@ -426,18 +454,19 @@ CACHE_BY_USER = {"anonymous": 3600 * 24}
 DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d"  # Custom date format for dates imported from and exported to csv
 
 DATE_FORMATS = {
-    "Python": ["-%Y", "%Y", "%Y-%m", "%Y-%m-%d", "%Y-%m-%d %H:%M:%S%z", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S.%f%z"],
-    "JavaScript": ["-YYYY", "YYYY", "YYYY-MM", "YYYY-MM-DD", "YYYY-MM-DD HH:mm:ssZ", "YYYY-MM-DDTHH:mm:ssZ", "YYYY-MM-DDTHH:mm:ss.sssZ"],
+    # Keep index values the same for formats in the python and javascript arrays.
+    "Python": ["%Y-%m-%dT%H:%M:%S.%f%z", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%d %H:%M:%S%z", "%Y-%m-%d", "%Y-%m", "%Y", "-%Y"],
+    "JavaScript": ["YYYY-MM-DDTHH:mm:ss.sssZ", "YYYY-MM-DDTHH:mm:ssZ", "YYYY-MM-DD HH:mm:ssZ", "YYYY-MM-DD", "YYYY-MM", "YYYY", "-YYYY"],
     "Elasticsearch": [
-        "-yyyy",
-        "yyyy",
-        "yyyy-MM",
-        "yyyy-MM-dd",
-        "yyyy-MM-dd HH:mm:ssZZZZZ",
-        "yyyy-MM-dd'T'HH:mm:ssZ",
-        "yyyy-MM-dd'T'HH:mm:ssZZZZZ",
-        "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
         "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ",
+        "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
+        "yyyy-MM-dd'T'HH:mm:ssZZZZZ",
+        "yyyy-MM-dd'T'HH:mm:ssZ",
+        "yyyy-MM-dd HH:mm:ssZZZZZ",
+        "yyyy-MM-dd",
+        "yyyy-MM",
+        "yyyy",
+        "-yyyy",
     ],
 }
 
@@ -555,7 +584,7 @@ ALLOWED_POPUP_HOSTS = []
 
 TILESERVER_URL = None
 
-CELERY_BROKER_URL = "amqp://guest:guest@localhost"
+CELERY_BROKER_URL = ""  # RabbitMQ --> "amqp://guest:guest@localhost",  Redis --> "redis://localhost:6379/0"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_RESULT_BACKEND = "django-db"  # Use 'django-cache' if you want to use your cache as your backend
 CELERY_TASK_SERIALIZER = "json"

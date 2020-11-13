@@ -163,6 +163,8 @@ class DLanguage(models.Model):
         managed = True
         db_table = "d_languages"
 
+    def __str__(self):
+        return f"{self.languageid} ({self.languagename})"
 
 class DNodeType(models.Model):
     nodetype = models.TextField(primary_key=True)
@@ -341,7 +343,7 @@ class Function(models.Model):
     defaultconfig = JSONField(blank=True, null=True)
     modulename = models.TextField(blank=True, null=True)
     classname = models.TextField(blank=True, null=True)
-    component = models.TextField(blank=True, null=True, unique=True)
+    component = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
@@ -486,9 +488,23 @@ class Node(models.Model):
             edges.extend(child_edges)
         return (nodes, edges)
 
+    def get_direct_child_nodes(self):
+        """
+        gets all child nodes exactly one level lower in graph
+
+        returns a list of nodes
+        """
+        return [edge.rangenode for edge in Edge.objects.filter(domainnode=self)]
+
     @property
     def is_collector(self):
         return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup is not None
+
+    def is_editable(self):
+        if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
+            return True
+        else:
+            return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
 
     def get_relatable_resources(self):
         relatable_resource_ids = [
@@ -519,6 +535,9 @@ class Node(models.Model):
     class Meta:
         managed = True
         db_table = "nodes"
+        constraints = [
+            models.UniqueConstraint(fields=["name", "nodegroupid"], name="unique_nodename_nodegroup"),
+        ]
 
 
 class Ontology(models.Model):
@@ -644,6 +663,15 @@ class ResourceXResource(models.Model):
         on_delete=models.CASCADE,
         db_constraint=False,
     )
+    resourceinstancefrom_graphid = models.ForeignKey(
+        "GraphModel",
+        db_column="resourceinstancefrom_graphid",
+        blank=True,
+        null=True,
+        related_name="resxres_resource_instance_fom_graph_id",
+        on_delete=models.CASCADE,
+        db_constraint=False,
+    )
     resourceinstanceidto = models.ForeignKey(
         "ResourceInstance",
         db_column="resourceinstanceidto",
@@ -653,6 +681,16 @@ class ResourceXResource(models.Model):
         on_delete=models.CASCADE,
         db_constraint=False,
     )
+    resourceinstanceto_graphid = models.ForeignKey(
+        "GraphModel",
+        db_column="resourceinstanceto_graphid",
+        blank=True,
+        null=True,
+        related_name="resxres_resource_instance_to_graph_id",
+        on_delete=models.CASCADE,
+        db_constraint=False,
+    )
+
     notes = models.TextField(blank=True, null=True)
     relationshiptype = models.TextField(blank=True, null=True)
     inverserelationshiptype = models.TextField(blank=True, null=True)
@@ -690,10 +728,24 @@ class ResourceXResource(models.Model):
         from arches.app.search.search_engine_factory import SearchEngineInstance as se
         from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
 
+        # during package/csv load the ResourceInstance models are not always available
+        try:
+            self.resourceinstancefrom_graphid = self.resourceinstanceidfrom.graph
+        except:
+            pass
+
+        try:
+            self.resourceinstanceto_graphid = self.resourceinstanceidto.graph
+        except:
+            pass
+
         if not self.created:
             self.created = datetime.datetime.now()
+
         self.modified = datetime.datetime.now()
+
         document = model_to_dict(self)
+
         se.index_data(index=RESOURCE_RELATIONS_INDEX, body=document, idfield="resourcexid")
         super(ResourceXResource, self).save()
 

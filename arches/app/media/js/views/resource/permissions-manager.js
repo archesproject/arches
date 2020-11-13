@@ -121,13 +121,32 @@ define([
                 self._startPermissions = JSON.stringify(data);
                 self._currentPermissions = JSON.parse(self._startPermissions);
                 self._permissionLookup = {};
+
                 data.permissions.forEach(function(perm){ 
                     self._permissionLookup[perm.codename] = perm;
                 });
+
                 data['identities'].forEach(function(id){
                     id.selected = ko.observable(false);
-                    id.creatorOrSuperUser = Number(self.creatorid) === Number(id.id) && id.type == 'user';
-                    id.availablePermissions = JSON.parse(JSON.stringify(data['permissions']));
+                    id.creatorOrSuperUser = Number(self.creatorid) === Number(id.id) && id.type === 'user';
+
+                    id.availablePermissions = JSON.parse(JSON.stringify(data['permissions'])).filter(function(permission) {
+                        if (
+                            permission.codename === "change_resourceinstance" 
+                            || permission.codename === "delete_resourceinstance"
+                        )  {
+                            if (id.type === 'user') {
+                                if (id.creatorOrSuperUser || id.is_editor_or_reviewer) { return true; }
+                            } else {  // id.type === 'group'
+                                if (id.name === 'Resource Editor' || id.name === 'Resource Reviewer') { return true; }
+                            }
+
+                            return false;
+                        }
+
+                        return true;
+                    });
+                  
                     var defaultPermissions = id.default_permissions.map(function(perm){return perm.codename;});
                     var iconLookup = {
                         "view_resourceinstance":"ion-ios-book",
@@ -156,8 +175,8 @@ define([
                     }, this);
                 } 
                 return res;
-            }, this).extend({deferred:true});    
-
+            }, this).extend({deferred:true});
+            
             this.makeInstancePrivate = function(){
                 $.ajax({
                     type: 'POST',

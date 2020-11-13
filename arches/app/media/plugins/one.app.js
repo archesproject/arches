@@ -115,12 +115,12 @@ var App = function() {
 			event.preventDefault();
 		});
 
-		var $scrollspy = $('body').scrollspy({target: '.navbar-fixed-top', offset: $offset+2});
+		// var $scrollspy = $('body').scrollspy({target: '.navbar-fixed-top', offset: $offset+2});
 
 		// Collapse Navbar When It's Clickicked
-		$(window).scroll(function() {
-			$('.navbar-collapse.in').collapse('hide');
-		});
+		// $(window).scroll(function() {
+		// 	$('.navbar-collapse.in').collapse('hide');
+		// });
 	}
 
   return {

@@ -86,14 +86,9 @@ class StringDataType(BaseDataType):
             if value is not None:
                 value.upper()
         except:
-            errors.append(
-                {
-                    "type": "ERROR",
-                    "message": "datatype: {0} value: {1} {2} {3} - {4}. {5}".format(
-                        self.datatype_model.datatype, value, source, row_number, "this is not a string", "This data was not imported."
-                    ),
-                }
-            )
+            message = _("This is not a string")
+            error_message = self.create_error_message(value, source, row_number, message)
+            errors.append(error_message)
         return errors
 
     def clean(self, tile, nodeid):
@@ -161,24 +156,32 @@ class NumberDataType(BaseDataType):
                 decimal.Decimal(value)
         except Exception:
             dt = self.datatype_model.datatype
-            errors.append(
-                {
-                    "type": "ERROR",
-                    "message": "datatype: {0}, value: {1} {2} {3} - {4}. {5}".format(
-                        dt, value, source, row_number, "not a properly formatted number", "This data was not saved."
-                    ),
-                }
-            )
+            message = _("Not a properly formatted number")
+            error_message = self.create_error_message(value, source, row_number, message)
+            errors.append(error_message)
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
-        return float(value)
-
-    def clean(self, tile, nodeid):
         try:
-            tile.data[nodeid].upper()
-            tile.data[nodeid] = float(tile.data[nodeid])
-        except Exception:
+            if value == "":
+                value = None
+            elif value.isdigit():
+                value = int(value)
+            else:
+                value = float(value)
+        except AttributeError:
+            pass
+        return value
+
+    def pre_tile_save(self, tile, nodeid):
+        try:
+            if tile.data[nodeid] == "":
+                tile.data[nodeid] = None
+            elif tile.data[nodeid].isdigit():
+                tile.data[nodeid] = int(tile.data[nodeid])
+            else:
+                tile.data[nodeid] = float(tile.data[nodeid])
+        except AttributeError:
             pass
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -234,7 +237,9 @@ class BooleanDataType(BaseDataType):
             if value is not None:
                 type(bool(util.strtobool(str(value)))) is True
         except Exception:
-            errors.append({"type": "ERROR", "message": "{0} is not of type boolean. This data was not imported.".format(value)})
+            message = _("Not of type boolean")
+            error_message = self.create_error_message(value, source, row_number, message)
+            errors.append(error_message)
 
         return errors
 
@@ -279,15 +284,12 @@ class DateDataType(BaseDataType):
         errors = []
         if value is not None:
             valid_date_format, valid = self.get_valid_date_format(value)
-            if valid == False:
-                errors.append(
-                    {
-                        "type": "ERROR",
-                        "message": f"{value} {row_number} is not in the correct format, make sure it is in settings.DATE_FORMATS\
-                         or set the date format in settings.DATE_IMPORT_EXPORT_FORMAT. This data was not imported.",
-                    }
+            if valid is False:
+                message = _(
+                    "Incorrect format. Confirm format is in settings.DATE_FORMATS or set the format in settings.DATE_IMPORT_EXPORT_FORMAT."
                 )
-
+                error_message = self.create_error_message(value, source, row_number, message)
+                errors.append(error_message)
         return errors
 
     def get_valid_date_format(self, value):
@@ -320,7 +322,7 @@ class DateDataType(BaseDataType):
         if valid:
             value = datetime.strptime(value, valid_date_format).strftime(settings.DATE_IMPORT_EXPORT_FORMAT)
         else:
-            logger.warning(_(f"{value} is an invalid date format"))
+            logger.warning(_("{value} is an invalid date format").format(**locals()))
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -331,7 +333,10 @@ class DateDataType(BaseDataType):
     def append_search_filters(self, value, node, query, request):
         try:
             if value["val"] != "" and value["val"] is not None:
-                date_value = datetime.strptime(value["val"], "%Y-%m-%d").isoformat()
+                try:
+                    date_value = datetime.strptime(value["val"], "%Y-%m-%d %H:%M:%S%z").astimezone().isoformat()
+                except ValueError:
+                    date_value = value["val"]
                 if value["op"] != "eq":
                     operators = {"gte": None, "lte": None, "lt": None, "gt": None}
                     operators[value["op"]] = date_value
@@ -339,7 +344,7 @@ class DateDataType(BaseDataType):
                     operators = {"gte": date_value, "lte": date_value}
                 search_query = Range(field="tiles.data.%s" % (str(node.pk)), **operators)
                 query.must(search_query)
-        except KeyError as e:
+        except KeyError:
             pass
 
     def after_update_all(self):
@@ -372,20 +377,26 @@ class DateDataType(BaseDataType):
         es_date_formats = "||".join(settings.DATE_FORMATS["Elasticsearch"])
         return {"type": "date", "format": es_date_formats}
 
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(tile)
+        try:
+            og_value = data[str(node.pk)]
+            valid_date_format, valid = self.get_valid_date_format(og_value)
+            new_date_format = settings.DATE_FORMATS["Python"][settings.DATE_FORMATS["JavaScript"].index(node.config["dateFormat"])]
+            value = datetime.strptime(og_value, valid_date_format).strftime(new_date_format)
+        except TypeError:
+            value = data[str(node.pk)]
+        return value
+
 
 class EDTFDataType(BaseDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
         if value is not None:
             if not ExtendedDateFormat(value).is_valid():
-                errors.append(
-                    {
-                        "type": "ERROR",
-                        "message": f"{value} {row_number} is not in the correct Extended Date Time Format, \
-                            see http://www.loc.gov/standards/datetime/ for supported formats. This data was not imported.",
-                    }
-                )
-
+                message = _("Incorrect Extended Date Time Format. See http://www.loc.gov/standards/datetime/ for supported formats.")
+                error_message = self.create_error_message(value, source, row_number, message)
+                errors.append(error_message)
         return errors
 
     def get_display_value(self, tile, node):
@@ -520,16 +531,9 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     geom = GEOSGeometry(JSONSerializer().serialize(feature["geometry"]))
                     validate_geom(geom, coordinate_count)
                 except Exception:
-                    message = _("It was not possible to serialize some feaures in your geometry.")
-                    errors.append(
-                        {
-                            "type": "ERROR",
-                            "message": "datatype: {0} value: {1} {2} - {3}. {4}".format(
-                                self.datatype_model.datatype, value, source, message, "This data was not imported."
-                            ),
-                        }
-                    )
-
+                    message = _("Unable to serialize some geometry features")
+                    error_message = self.create_error_message(value, source, row_number, message)
+                    errors.append(error_message)
         return errors
 
     def clean(self, tile, nodeid):
@@ -1031,15 +1035,49 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         if celery_worker_running is True:
             res = refresh_materialized_view.apply_async((), link_error=log_error.s())
         elif settings.AUTO_REFRESH_GEOM_VIEW:
-            cursor = connection.cursor()
-            sql = """
-                REFRESH MATERIALIZED VIEW mv_geojson_geoms;
-            """
-            cursor.execute(sql)
+            with connection.cursor() as cursor:
+                sql = """
+                    REFRESH MATERIALIZED VIEW mv_geojson_geoms;
+                """
+                cursor.execute(sql)
 
     def default_es_mapping(self):
         # let ES dyanamically map this datatype
         return
+
+    def is_a_literal_in_rdf(self):
+        return True
+
+    def to_rdf(self, edge_info, edge):
+        # Default to string containing JSON
+        g = Graph()
+        if edge_info["range_tile_data"] is not None:
+            data = edge_info["range_tile_data"]
+            if data["type"] == "FeatureCollection":
+                for f in data["features"]:
+                    del f["id"]
+                    del f["properties"]
+            g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(JSONSerializer().serialize(data))))
+        return g
+
+    def from_rdf(self, json_ld_node):
+        # Allow either a JSON literal or a string containing JSON
+        try:
+            val = json.loads(json_ld_node["@value"])
+        except:
+            raise ValueError(f"Bad Data in GeoJSON, should be JSON string: {json_ld_node}")
+        if "features" not in val or type(val["features"]) != list:
+            raise ValueError(f"GeoJSON must have features array")
+        for f in val["features"]:
+            if "properties" not in f:
+                f["properties"] = {}
+        return val
+
+    def validate_from_rdf(self, value):
+        if type(value) == str:
+            # first deserialize it from a string
+            value = json.loads(value)
+        return self.validate(value)
 
 
 class FileListDataType(BaseDataType):
@@ -1074,22 +1112,23 @@ class FileListDataType(BaseDataType):
             max_size = config["maxFileSize"] if "maxFileSize" in config.keys() else None
 
             if value is not None and config["activateMax"] is True and len(value) > limit:
-                errors.append({"type": "ERROR", "message": f"This node has a limit of {limit} files. Please reduce files."})
+                message = _("This node has a limit of {0} files. Please reduce files.".format(limit))
+                errors.append({"type": "ERROR", "message": message})
 
             if max_size is not None:
                 formatted_max_size = format_bytes(max_size)
                 for v in value:
                     if v["size"] > max_size:
-                        errors.append(
-                            {
-                                "type": "ERROR",
-                                "message": f"This node has a file-size limit of {formatted_max_size}. \
-                                    Please reduce file size or contact your sysadmin.",
-                            }
+                        message = _(
+                            "This node has a file-size limit of {0}. Please reduce file size or contact your sysadmin.".format(
+                                formatted_max_size
+                            )
                         )
+                        errors.append({"type": "ERROR", "message": message})
         except Exception as e:
             dt = self.datatype_model.datatype
-            errors.append({"type": "ERROR", "message": f"datatype: {dt}, value: {value} - {e} ."})
+            message = _("datatype: {0}, value: {1} - {2} .".format(dt, value, e))
+            errors.append({"type": "ERROR", "message": message})
         return errors
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -1433,23 +1472,9 @@ class DomainDataType(BaseDomainDataType):
             if len(domain_val_node_query) != 1:
                 row_number = row_number if row_number else ""
                 if len(domain_val_node_query) == 0:
-                    errors.append(
-                        {
-                            "type": "ERROR",
-                            "message": f"{value} {row_number} is not a valid domain id. Please check the node this value \
-                            is mapped to for a list of valid domain ids. This data was not imported.",
-                        }
-                    )
-                """
-                elif len(domain_val_node_query) > 1:
-                    errors.append(
-                        {
-                            "type": "ERROR",
-                            "message": f"Multiple domain values were found for '{value}' {row_number}.  \
-                        Please use an explicit id instead of a domain string value. This data was not imported.",
-                        }
-                    )
-                """
+                    message = _("Invalid domain id. Please check the node this value is mapped to for a list of valid domain ids.")
+                    error_message = self.create_error_message(value, source, row_number, message)
+                    errors.append(error_message)
         return errors
 
     def get_search_terms(self, nodevalue, nodeid=None):
@@ -1532,12 +1557,16 @@ class DomainDataType(BaseDomainDataType):
 
 
 class DomainListDataType(BaseDomainDataType):
+    def transform_value_for_tile(self, value, **kwargs):
+        if value is not None:
+            if not isinstance(value, list):
+                value = value.split(",")
+        return value
+
     def validate(self, values, row_number=None, source="", node=None, nodeid=None):
         domainDataType = DomainDataType()
         errors = []
         if values is not None:
-            if not isinstance(values, list):
-                values = [values]
             for value in values:
                 errors = errors + domainDataType.validate(value, row_number)
         return errors
@@ -1669,8 +1698,6 @@ class ResourceInstanceDataType(BaseDataType):
                         f"Resource {resourceid} not available. This message may appear during resource load, \
                             in which case the problem will be resolved once the related resource is loaded"
                     )
-        else:
-            logger.warning(_("No resource relationship available"))
         return ret
 
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
@@ -1682,13 +1709,12 @@ class ResourceInstanceDataType(BaseDataType):
                 try:
                     models.ResourceInstance.objects.get(pk=resourceid)
                 except ObjectDoesNotExist:
-                    errors.append(
-                        {
-                            "type": "WARNING",
-                            "message": f"The resource id: {resourceid} does not exist in the system. The data for this card will \
-                                be available in the system once resource {resourceid} is loaded.",
-                        }
+                    message = _(
+                        "Resource id: {0} is not in the system. This relationship will be added once resource {0} is loaded.".format(
+                            resourceid
+                        )
                     )
+                    errors.append({"type": "WARNING", "message": message})
         return errors
 
     def pre_tile_save(self, tile, nodeid):
@@ -1787,6 +1813,11 @@ class ResourceInstanceDataType(BaseDataType):
         except ValueError:
             # do this if json (invalid) is formatted with single quotes, re #6390
             return ast.literal_eval(value)
+        except TypeError:
+            # data should come in as json but python list is accepted as well
+            if isinstance(value, list):
+                return value
+
 
     def transform_export_values(self, value, *args, **kwargs):
         return json.dumps(value)

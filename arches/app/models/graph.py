@@ -24,6 +24,7 @@ from copy import copy, deepcopy
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
+from django.db.utils import IntegrityError
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
@@ -337,9 +338,10 @@ class Graph(models.GraphModel):
     def _update_node(self, node, datatype_factory, se):
         already_saved = models.Node.objects.filter(pk=node.nodeid).exists()
         saved_node_datatype = None
-        if already_saved is True:
-            saved_node_datatype = models.Node.objects.get(pk=node.nodeid).datatype
         node.save()
+        if already_saved:
+            saved_node = models.Node.objects.get(pk=node.nodeid)
+            saved_node_datatype = saved_node.datatype
         if saved_node_datatype != node.datatype:
             datatype = datatype_factory.get_instance(node.datatype)
             datatype_mapping = datatype.get_es_mapping(node.nodeid)
@@ -513,8 +515,6 @@ class Graph(models.GraphModel):
         if skip_validation or self.can_append(branch_graph, nodeToAppendTo):
             branch_copy = branch_graph.copy()["copy"]
             branch_copy.root.istopnode = False
-            # Copy the description of the branch to the new node
-            branch_copy.root.description = branch_graph.description
 
             newEdge = models.Edge(domainnode=nodeToAppendTo, rangenode=branch_copy.root, ontologyproperty=property, graph=self)
             branch_copy.add_edge(newEdge)
@@ -529,11 +529,30 @@ class Graph(models.GraphModel):
                 self.widgets[widget.pk] = widget
 
             self.populate_null_nodegroups()
+            sibling_node_names = [node.name for node in self.get_sibling_nodes(branch_copy.root)]
+            branch_copy.root.name = self.make_name_unique(branch_copy.root.name, sibling_node_names)
+            branch_copy.root.description = branch_graph.description
 
             if self.ontology is None:
                 branch_copy.clear_ontology_references()
 
             return branch_copy
+
+    def make_name_unique(self, name, names_to_check):
+        """
+        Makes a name unique among a list of name
+
+        Arguments:
+        name -- the name to check and modfiy to make unique in the list of "names_to_check"
+        names_to_check -- a list of names that "name" should be unique among
+        """
+
+        i = 1
+        temp_node_name = name
+        while temp_node_name in names_to_check:
+            temp_node_name = "{0}_{1}".format(name, i)
+            i += 1
+        return temp_node_name
 
     def append_node(self, nodeid=None):
         """
@@ -546,14 +565,7 @@ class Graph(models.GraphModel):
         """
 
         node_names = [node.name for node in self.nodes.values()]
-        temp_node_name = self.temp_node_name
-        if temp_node_name in node_names:
-            i = 1
-            temp_node_name = "{0}_{1}".format(self.temp_node_name, i)
-            while temp_node_name in node_names:
-                i += 1
-                temp_node_name = "{0}_{1}".format(self.temp_node_name, i)
-
+        temp_node_name = self.make_name_unique(self.temp_node_name, node_names)
         nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
         card = None
 
@@ -847,9 +859,9 @@ class Graph(models.GraphModel):
             if self.is_editable() is False and tile_count > 0:
                 raise GraphValidationError(
                     _(
-                        f"Your resource model: {self.name}, already has instances saved. \
+                        "Your resource model: {self.name}, already has instances saved. \
                             You cannot delete nodes from a Resource Model with instances."
-                    ),
+                    ).format(**locals()),
                     1006,
                 )
 
@@ -908,8 +920,8 @@ class Graph(models.GraphModel):
         """
 
         if str(self.root.nodeid) == str(nodeid):
-
             return None
+
         for edge_id, edge in self.edges.items():
             if str(edge.rangenode_id) == str(nodeid):
                 return edge.domainnode
@@ -929,6 +941,23 @@ class Graph(models.GraphModel):
             ret.append(edge.rangenode)
             ret.extend(self.get_child_nodes(edge.rangenode_id))
         return ret
+
+    def get_sibling_nodes(self, node):
+        """
+        Given a node will get all of that nodes siblings excluding the given node itself
+
+        """
+
+        sibling_nodes = []
+        if node.istopnode is False:
+            incoming_edge = list(filter(lambda x: x.rangenode_id == node.nodeid, self.edges.values()))[0]
+            parent_node_id = incoming_edge.domainnode_id
+            sibling_nodes = [
+                edge.rangenode
+                for edge in filter(lambda x: x.domainnode_id == parent_node_id, self.edges.values())
+                if edge.rangenode.nodeid != node.nodeid
+            ]
+        return sibling_nodes
 
     def get_out_edges(self, nodeid):
         """
@@ -1316,11 +1345,36 @@ class Graph(models.GraphModel):
                 if len(unpermitted_edits) > 0:
                     raise GraphValidationError(
                         _(
-                            f"Your resource model: {self.name}, already has instances saved. \
+                            "Your resource model: {self.name}, already has instances saved. \
                                 You cannot modify a Resource Model with instances."
-                        ),
+                        ).format(**locals()),
                         1006,
                     )
+
+    def _validate_node_name(self, node):
+        """
+        Verifies a node's name is unique to its nodegroup
+        Prevents a user from changing the name of a node that already has tiles.
+        Verifies a node's name is unique to its sibling nodes.
+        """
+
+        if node.istopnode:
+            return
+        else:
+            names_in_nodegroup = [v.name for k, v in self.nodes.items() if v.nodegroup_id == node.nodegroup_id]
+            unique_names_in_nodegroup = {n for n in names_in_nodegroup}
+            if len(names_in_nodegroup) > len(unique_names_in_nodegroup):
+                message = _('Duplicate node name: "{0}". All node names in a card must be unique.'.format(node.name))
+                raise GraphValidationError(message)
+            elif node.is_editable() is False:
+                if node.name != models.Node.objects.values_list("name", flat=True).get(pk=node.nodeid):
+                    message = "The name of this node cannot be changed because business data has already been saved to a card that this node is part of."
+                    raise GraphValidationError(_(message))
+            else:
+                sibling_node_names = [node.name for node in self.get_sibling_nodes(node)]
+                if node.name in sibling_node_names:
+                    message = _('Duplicate node name: "{0}". All sibling node names must be unique.'.format(node.name))
+                    raise GraphValidationError(message)
 
     def validate(self):
         """
@@ -1340,9 +1394,9 @@ class Graph(models.GraphModel):
             if self.root.is_collector is True:
                 raise GraphValidationError(
                     _(
-                        f"The top node of your resource graph: {self.root.name} needs to be a collector. \
+                        "The top node of your resource graph: {self.root.name} needs to be a collector. \
                             Hint: check that nodegroup_id of your resource node(s) are not null."
-                    ),
+                    ).format(**locals()),
                     997,
                 )
             if self.root.datatype != "semantic":
@@ -1365,7 +1419,9 @@ class Graph(models.GraphModel):
                 fieldname = fieldname[:10]
             try:
                 dupe = fieldnames[fieldname]
-                raise GraphValidationError(_(f"Field name must be unique to the graph; '{fieldname}' already exists."), 1009)
+                raise GraphValidationError(
+                    _("Field name must be unique to the graph; '{fieldname}' already exists.").format(**locals()), 1009
+                )
             except KeyError:
                 fieldnames[fieldname] = True
 
@@ -1373,12 +1429,12 @@ class Graph(models.GraphModel):
 
         fieldnames = {}
         for node_id, node in self.nodes.items():
+            self._validate_node_name(node)
             if node.exportable is True:
                 if node.fieldname is not None:
                     validated_fieldname = validate_fieldname(node.fieldname, fieldnames)
                     if validated_fieldname != node.fieldname:
                         node.fieldname = validated_fieldname
-                        node.save()
 
         # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
         if self.ontology is not None:
@@ -1397,10 +1453,10 @@ class Graph(models.GraphModel):
                 if edge.ontologyproperty is None:
                     raise GraphValidationError(
                         _(
-                            f"You must specify an ontology property. Your graph isn't semantically valid. \
+                            "You must specify an ontology property. Your graph isn't semantically valid. \
                                 Entity domain '{edge.domainnode.ontologyclass}' and \
                                 Entity range '{edge.rangenode.ontologyclass}' can not be related via Property '{edge.ontologyproperty}'."
-                        ),
+                        ).format(**locals()),
                         1002,
                     )
                 property_found = False
@@ -1416,10 +1472,10 @@ class Graph(models.GraphModel):
                 if not okay:
                     raise GraphValidationError(
                         _(
-                            f"Your graph isn't semantically valid. Entity domain '{edge.domainnode.ontologyclass}' and \
+                            "Your graph isn't semantically valid. Entity domain '{edge.domainnode.ontologyclass}' and \
                                 Entity range '{edge.rangenode.ontologyclass}' cannot \
                                 be related via Property '{edge.ontologyproperty}'."
-                        ),
+                        ).format(**locals()),
                         1003,
                     )
                 elif not property_found:
@@ -1459,7 +1515,7 @@ class Graph(models.GraphModel):
         if self.slug is not None:
             graphs_with_matching_slug = models.GraphModel.objects.exclude(slug__isnull=True).filter(slug=self.slug)
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
-                raise GraphValidationError(_(f"Another resource modal already uses the slug '{self.slug}'"), 1007)
+                raise GraphValidationError(_("Another resource modal already uses the slug '{self.slug}'").format(**locals()), 1007)
 
 
 class GraphValidationError(Exception):

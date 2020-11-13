@@ -19,7 +19,7 @@ define([
         this.state = {steps:[]};
         this.quitUrl = arches.urls.home;
         this.wastebinWarning = function(val){
-            return [["You are about to delete " + val + "."],["Are you sure you want to continue?"]];
+            return [[arches.translations.workflowWastbinWarning.replace("${val}", val)],[arches.translations.workflowWastbinWarning2]];
         };
         this.warning = '';
 
@@ -71,10 +71,10 @@ define([
             var warnings = []
             self.state.steps.forEach(function(step) {
                 if (step.wastebin && step.wastebin.resourceid) {
-                    warnings.push(step.wastebin.description)
+                    warnings.push(step.wastebin.description);
                     resourcesToDelete.push(step.wastebin);
                 } else if (step.wastebin && step.wastebin.tile) {
-                    warnings.push(step.wastebin.description)
+                    warnings.push(step.wastebin.description);
                     tilesToDelete.push(step.wastebin);
                 }
             });

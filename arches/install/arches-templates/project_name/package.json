@@ -1,0 +1,6 @@
+{
+    "name": "{{ project_name }}",
+    "dependencies": {
+        "arches": "archesproject/arches#{{ arches_version }}"
+    }
+}
