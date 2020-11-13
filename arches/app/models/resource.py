@@ -114,7 +114,7 @@ class Resource(models.ResourceInstance):
             raise ModelInactiveError(message)
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)
-        defer_index = kwargs.pop("defer_index", None)
+        defer_index = kwargs.pop("defer_index", False)
         super(Resource, self).save(*args, **kwargs)
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
