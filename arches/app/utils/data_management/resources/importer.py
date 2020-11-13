@@ -161,7 +161,7 @@ class BusinessDataImporter(object):
         create_concepts=False,
         create_collections=False,
         use_multiprocessing=False,
-        defer_index=False
+        defer_index=False,
     ):
         reader = None
         start = time()
@@ -200,7 +200,7 @@ class BusinessDataImporter(object):
                         bulk=bulk,
                         create_concepts=create_concepts,
                         create_collections=create_collections,
-                        defer_index=defer_index
+                        defer_index=defer_index,
                     )
                 else:
                     print("*" * 80)
