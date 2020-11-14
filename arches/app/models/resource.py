@@ -108,9 +108,9 @@ class Resource(models.ResourceInstance):
         Saves and indexes a single resource
 
         Keyword Arguments:
-        request -- the request object 
+        request -- the request object
         user -- the user to associate the edit with if the user can't be derived from the request
-        index -- True(default) to index the resource, otherwise don't index the resource  
+        index -- True(default) to index the resource, otherwise don't index the resource
 
         """
         graph = models.GraphModel.objects.get(graphid=self.graph_id)

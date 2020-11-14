@@ -328,7 +328,16 @@ class CsvReader(Reader):
         super(CsvReader, self).__init__()
 
     def save_resource(
-        self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number, prevent_indexing
+        self,
+        populated_tiles,
+        resourceinstanceid,
+        legacyid,
+        resources,
+        target_resource_model,
+        bulk,
+        save_count,
+        row_number,
+        prevent_indexing,
     ):
         # create a resource instance only if there are populated_tiles
         errors = []
