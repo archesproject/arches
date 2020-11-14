@@ -328,7 +328,7 @@ class CsvReader(Reader):
         super(CsvReader, self).__init__()
 
     def save_resource(
-        self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number, defer_index
+        self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number, prevent_indexing
     ):
         # create a resource instance only if there are populated_tiles
         errors = []
@@ -349,7 +349,7 @@ class CsvReader(Reader):
                     del resources[:]  # clear out the array
             else:
                 try:
-                    newresourceinstance.save(defer_index=defer_index)
+                    newresourceinstance.save(index=(not prevent_indexing))
 
                 except TransportError as e:
 
@@ -397,7 +397,7 @@ class CsvReader(Reader):
         bulk=False,
         create_concepts=False,
         create_collections=False,
-        defer_index=False,
+        prevent_indexing=False,
     ):
         # errors = businessDataValidator(self.business_data)
         celery_worker_running = task_management.check_if_celery_available()
@@ -827,7 +827,7 @@ class CsvReader(Reader):
                             bulk,
                             save_count,
                             row_number,
-                            defer_index,
+                            prevent_indexing,
                         )
 
                         # reset values for next resource instance
@@ -1022,7 +1022,7 @@ class CsvReader(Reader):
                         bulk,
                         save_count,
                         row_number,
-                        defer_index,
+                        prevent_indexing,
                     )
 
                 if bulk:
