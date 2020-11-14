@@ -137,7 +137,7 @@ class Resource(models.ResourceInstance):
             pass
 
         self.save_edit(user=user, edit_type="create")
-        if index is False:
+        if index is True:
             self.index()
 
     def get_root_ontology(self):
