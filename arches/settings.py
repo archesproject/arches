@@ -670,10 +670,7 @@ def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
 try:
     from .settings_local import *
 except ImportError as e:
-    print(e)
-    print("Error attempting to load settings from relative '.settings_local'. Attempting 'arches.settings_local' import")
     try:
         from arches.settings_local import *
     except ImportError as e:
-        print("Error attempting to load settings from 'arches.settings_local.py'.")
-        print(e)
+        pass
