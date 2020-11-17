@@ -42,6 +42,7 @@ define([
         this.renderContext = params.renderContext;
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
+        this.selectedItem = params.selectedItem || ko.observable();
         this.rootOntologyClass = '';
         this.graphIsSemantic = false;
         this.resourceTypesToDisplayInDropDown = !!params.graphids ? ko.toJS(params.graphids) : [];
@@ -236,6 +237,7 @@ define([
             closeOnSelect: true,
             allowClear: self.renderContext === 'search' ? true : false,
             onSelect: function(item) {
+                self.selectedItem(item);
                 if (self.renderContext !== 'search') {
                     if (item._source) {
                         var ret = makeObject(item._id, item._source);
