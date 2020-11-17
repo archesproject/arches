@@ -996,6 +996,12 @@ class IIIFManifest(APIBase):
         return response
 
 
+class Manifest(APIBase):
+    def get(self, request, id):
+        manifest = models.IIIFManifest.objects.get(id=id).manifest
+        return JSONResponse(manifest)
+
+
 class OntologyProperty(APIBase):
     def get(self, request):
         domain_ontology_class = request.GET.get("domain_ontology_class", None)
