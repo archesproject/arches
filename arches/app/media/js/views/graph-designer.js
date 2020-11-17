@@ -281,7 +281,11 @@ define([
                 onReset: function() {
                     var graph = koMapping.toJS(viewModel.graphSettingsViewModel.graph);
                     viewModel.report.resetConfigs(graph.config);
-                    viewModel.report.get('template_id')(graph["template_id"]);
+
+                    // only reset the template if it's been changed
+                    if (viewModel.report.get('template_id')() !== graph["template_id"]) {
+                        viewModel.report.get('template_id')(graph["template_id"]);
+                    }
                 }
             });
 
