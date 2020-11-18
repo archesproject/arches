@@ -201,7 +201,7 @@ class TileTests(ArchesTestCase):
         request = HttpRequest()
         request.user = self.user
         authoritative_tile.save(index=False, request=request)
-        
+
         self.assertEqual(authoritative_tile.is_provisional(), False)
 
     def test_create_new_provisional(self):

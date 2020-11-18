@@ -213,10 +213,7 @@ class Tile(models.TileModel):
 
     def check_tile_cardinality_violation(self):
         if self.nodegroup.cardinality == "1":
-            kwargs = {
-                "nodegroup": self.nodegroup,
-                "resourceinstance_id": self.resourceinstance_id
-            }
+            kwargs = {"nodegroup": self.nodegroup, "resourceinstance_id": self.resourceinstance_id}
             try:
                 uuid.UUID(str(self.parenttile_id))
                 kwargs["parenttile_id"] = self.parenttile_id
