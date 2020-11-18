@@ -1369,7 +1369,7 @@ div.workflow-panel {
     padding-top: 0px;
 }
 
-.row.widget-wrapper .form-group .col-xs-12.dropzone .dz-default.dz-message button {
+.widget-wrapper .col-xs-12.dropzone .dz-default.dz-message button {
     display: none;
 }
 
