@@ -1690,6 +1690,7 @@ class ResourceInstanceDataType(BaseDataType):
                 except NotFoundError as e:
                     try:
                         from arches.app.models.resource import Resource
+
                         displayname = Resource.objects.get(pk=resourceid).displayname
                     except ObjectDoesNotExist:
                         logger.info(
