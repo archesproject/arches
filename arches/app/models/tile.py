@@ -213,11 +213,17 @@ class Tile(models.TileModel):
 
     def check_tile_cardinality_violation(self):
         if self.nodegroup.cardinality == "1":
-            existing_tiles = list(
-                models.TileModel.objects.filter(nodegroup=self.nodegroup, resourceinstance_id=self.resourceinstance_id).values_list(
-                    "tileid", flat=True
-                )
-            )
+            kwargs = {
+                "nodegroup": self.nodegroup,
+                "resourceinstance_id": self.resourceinstance_id
+            }
+            try:
+                uuid.UUID(str(self.parenttile_id))
+                kwargs["parenttile_id"] = self.parenttile_id
+            except ValueError:
+                pass
+
+            existing_tiles = list(models.TileModel.objects.filter(**kwargs).values_list("tileid", flat=True))
 
             # this should only ever return at most one tile
             if len(existing_tiles) > 0 and self.tileid not in existing_tiles:

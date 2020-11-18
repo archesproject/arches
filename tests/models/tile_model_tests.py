@@ -181,10 +181,9 @@ class TileTests(ArchesTestCase):
         self.assertEqual(t.tileid, t2.tileid)
         self.assertEqual(t2.data["72048cb3-adbc-11e6-9ccf-14109fd34195"], "TEST 1")
 
-    def test_create_new_provisional(self):
+    def test_create_new_authoritative(self):
         """
-        Test that a new provisional tile is created when a user IS NOT a reviwer
-        and that an authoritative tile is created when a user IS a reviwer.
+        Test that a new authoritative tile is created when a user IS a reviwer.
 
         """
 
@@ -202,6 +201,14 @@ class TileTests(ArchesTestCase):
         request = HttpRequest()
         request.user = self.user
         authoritative_tile.save(index=False, request=request)
+        
+        self.assertEqual(authoritative_tile.is_provisional(), False)
+
+    def test_create_new_provisional(self):
+        """
+        Test that a new provisional tile is created when a user IS NOT a reviwer.
+
+        """
 
         self.user = User.objects.create_user(username="testuser", password="TestingTesting123!")
 
@@ -219,7 +226,6 @@ class TileTests(ArchesTestCase):
         provisional_tile.save(index=False, request=request)
 
         self.assertEqual(provisional_tile.is_provisional(), True)
-        self.assertEqual(authoritative_tile.is_provisional(), False)
 
     def test_save_provisional_from_athoritative(self):
         """
