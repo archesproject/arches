@@ -29,7 +29,8 @@ from django.db import connection
 from django.core import management
 from django.contrib.auth.models import User
 from django.http import HttpRequest
-from arches.app.models.tile import Tile
+from arches.app.models.tile import Tile, TileCardinalityError
+
 
 # these tests can be run from the command line via
 # python manage.py test tests/models/tile_model_tests.py --pattern="*.py" --settings="tests.test_settings"
@@ -272,6 +273,38 @@ class TileTests(ArchesTestCase):
         self.assertEqual(provisional_tile.data["72048cb3-adbc-11e6-9ccf-14109fd34195"], "AUTHORITATIVE")
         self.assertEqual(provisionaledits[str(self.user.id)]["action"], "update")
         self.assertEqual(provisionaledits[str(self.user.id)]["status"], "review")
+
+    def test_tile_cardinality(self):
+        """
+        Tests that the tile is not saved if the cardinality is violated 
+        by testin to save a tile with the same values as existing one
+
+        """
+
+        self.user = User.objects.get(username="admin")
+        first_json = {
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": "",
+            "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+            "tileid": "",
+            "data": {"72048cb3-adbc-11e6-9ccf-14109fd34195": "AUTHORITATIVE"},
+        }
+        first_tile = Tile(first_json)
+        request = HttpRequest()
+        request.user = self.user
+        first_tile.save(index=False, request=request)
+
+        second_json = {
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": "",
+            "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+            "tileid": "",
+            "data": {"72048cb3-adbc-11e6-9ccf-14109fd34195": "AUTHORITATIVE"},
+        }
+        second_tile = Tile(second_json)
+        
+        with self.assertRaises(TileCardinalityError):
+            second_tile.save(index=False, request=request)
 
     def test_apply_provisional_edit(self):
         """
