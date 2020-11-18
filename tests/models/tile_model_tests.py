@@ -276,7 +276,7 @@ class TileTests(ArchesTestCase):
 
     def test_tile_cardinality(self):
         """
-        Tests that the tile is not saved if the cardinality is violated 
+        Tests that the tile is not saved if the cardinality is violated
         by testin to save a tile with the same values as existing one
 
         """
@@ -302,7 +302,7 @@ class TileTests(ArchesTestCase):
             "data": {"72048cb3-adbc-11e6-9ccf-14109fd34195": "AUTHORITATIVE"},
         }
         second_tile = Tile(second_json)
-        
+
         with self.assertRaises(TileCardinalityError):
             second_tile.save(index=False, request=request)
 
