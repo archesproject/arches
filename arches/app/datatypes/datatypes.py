@@ -1675,29 +1675,35 @@ class ResourceInstanceDataType(BaseDataType):
             resourceXresourceList = self.get_id_list(nodevalue)
             for resourceXresource in resourceXresourceList:
                 resourceid = None
+                displayname = ""
+                if isinstance(resourceXresource, str):
+                    resourceXresourceId = resourceXresource
+                else:
+                    resourceXresourceId = resourceXresource["resourceXresourceId"]
+                if not resourceXresourceId:
+                    continue
+                rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
+                resourceid = str(rr.resourceinstanceidto_id)
                 try:
-                    if isinstance(resourceXresource, str):
-                        resourceXresourceId = resourceXresource
-                    else:
-                        resourceXresourceId = resourceXresource["resourceXresourceId"]
-                    if not resourceXresourceId:
-                        continue
-                    rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
-                    resourceid = str(rr.resourceinstanceidto_id)
                     resource_document = se.search(index=RESOURCES_INDEX, id=resourceid)
-                    ret.append(
-                        {
-                            "resourceName": resource_document["_source"]["displayname"],
-                            "resourceId": resourceid,
-                            "ontologyProperty": rr.relationshiptype,
-                            "inverseOntologyProperty": rr.inverserelationshiptype,
-                        }
-                    )
+                    displayname = resource_document["_source"]["displayname"]
                 except NotFoundError as e:
-                    logger.info(
-                        f"Resource {resourceid} not available. This message may appear during resource load, \
-                            in which case the problem will be resolved once the related resource is loaded"
-                    )
+                    try:
+                        from arches.app.models.resource import Resource
+                        displayname = Resource.objects.get(pk=resourceid).displayname
+                    except ObjectDoesNotExist:
+                        logger.info(
+                            f"Resource {resourceid} not available. This message may appear during resource load, \
+                                in which case the problem will be resolved once the related resource is loaded"
+                        )
+                ret.append(
+                    {
+                        "resourceName": displayname,
+                        "resourceId": resourceid,
+                        "ontologyProperty": rr.relationshiptype,
+                        "inverseOntologyProperty": rr.inverserelationshiptype,
+                    }
+                )
         return ret
 
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
@@ -1834,8 +1840,6 @@ class ResourceInstanceDataType(BaseDataType):
                     query.must(search_query)
         except KeyError as e:
             pass
-
-        print(query.dsl)
 
     def get_rdf_uri(self, node, data, which="r"):
         if not data:
