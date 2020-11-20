@@ -43,7 +43,7 @@ define([], function() {
         var layers = [{
             "id": "select-feature-polygon-fill",
             "type": "fill",
-            "minzoom": layerConfig.overviewzoom,
+            "minzoom": layerConfig.minzoom,
             "filter": ['all',[
                 "==", "$type", "Polygon"
                 ], nodeFilter
@@ -75,7 +75,7 @@ define([], function() {
         }, {
             "id": "select-feature-polygon-stroke",
             "type": "line",
-            "minzoom": layerConfig.overviewzoom,
+            "minzoom": layerConfig.minzoom,
             "filter": ['all',[
                 "==", "$type", "Polygon"
             ], nodeFilter],
@@ -138,6 +138,7 @@ define([], function() {
             layer["source"] = source;
             if (sourceLayer) layer["source-layer"] = sourceLayer;
         });
+        console.log(layers);
         return layers;
     };
 });
