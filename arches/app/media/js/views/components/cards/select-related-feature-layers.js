@@ -138,7 +138,6 @@ define([], function() {
             layer["source"] = source;
             if (sourceLayer) layer["source-layer"] = sourceLayer;
         });
-        console.log(layers);
         return layers;
     };
 });
