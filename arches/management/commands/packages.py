@@ -310,7 +310,7 @@ class Command(BaseCommand):
             self.create_mapping_file(options["dest_dir"], options["graphs"])
 
         if options["operation"] in ["load", "load_package"]:
-            defer_indexing = False if str(options["defer_indexing"])[0].lower() == 'f' else True
+            defer_indexing = False if str(options["defer_indexing"])[0].lower() == "f" else True
             self.load_package(
                 options["source"],
                 options["setup_db"],
