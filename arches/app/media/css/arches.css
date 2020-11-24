@@ -2624,7 +2624,7 @@ a.select2-search-choice-close {
 }
 
 .middle-column-container.card-configuration {
-    padding: 10px 15px;
+    padding: 60px 15px;
 }
 
 .middle-column-container.card-configuration.expanded {
@@ -6641,10 +6641,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     color: #2d3c4b;
     /*#f1f1f1*/
     height: 100%;
-}
-
-.panel-config .middle-column-container.card-configuration {
-    margin-top: 50px;
 }
 
 .panel-config .toggle-container {
