@@ -186,6 +186,18 @@ define([
             }
         };
 
+        this.unrelateResource = function(resourceData, widget) {
+            var id = widget.node_id();
+            var resourceinstanceid = ko.unwrap(resourceData.resourceinstanceid);
+            var related = resourceData.mapCard.tile.data[id]()
+            for( var i = 0; i < related.length; i++){ 
+                if ( ko.unwrap(related[i].resourceId) === resourceinstanceid) { 
+                    related.splice(i, 1); 
+                }
+            }
+            resourceData.mapCard.tile.data[id](related);
+        };
+
         this.isSelectable = function(feature) {
             var selectLayerIds = selectFeatureLayers.map(function(layer) {
                 return layer.id;
