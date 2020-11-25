@@ -82,7 +82,9 @@ define([
                 console.error('Error:', error);
               });
         })
-        this.filterNodeIds = ko.observableArray(JSON.parse(JSON.stringify(this.nodeids)));
+        var parsedNodeIds = JSON.parse(JSON.stringify(this.nodeids));
+        var firstNode = parsedNodeIds.length > 0 ? [parsedNodeIds[0]] : [];
+        this.filterNodeIds = ko.observableArray(firstNode);
         this.relatedResourceWidgets = this.widgets.filter(function(widget){return widget.datatype.datatype === 'resource-instance' || widget.datatype.datatype === 'resource-instance-list';});
         this.showRelatedQuery = ko.observable(false);
         var resourceBounds = ko.observable();
