@@ -67,7 +67,10 @@ class LabelBasedGraph(object):
         node_tile_reference = {}
 
         for tile in resource.tiles:
-            for node_id in tile.data.keys():
+            node_ids = list(tile.data.keys())
+            if str(tile.nodegroup_id) not in node_ids:
+                node_ids.append(str(tile.nodegroup_id))
+            for node_id in node_ids:
                 tile_list = node_tile_reference.get(node_id, [])
                 tile_list.append(tile)
                 node_tile_reference[node_id] = tile_list
