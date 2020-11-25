@@ -32,12 +32,18 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber
                 if (self.precision()) {
                     val = Number(val).toFixed(self.precision());
                 }
-                val = val.toString();
+
             }
             return val || self.value();
         }, self).extend({throttle: 600});
 
         this.value(this.updateVal());
+
+        this.displayValue = ko.pureComputed(function() {
+            if (self.value() !== null && self.value() !== undefined) {
+                return self.value().toString();
+            }
+        }, self);
 
         if (ko.isObservable(this.precision)) {
             var precisionSubscription = this.precision.subscribe(function(val){
