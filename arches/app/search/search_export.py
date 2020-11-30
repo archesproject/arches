@@ -79,6 +79,22 @@ class SearchResultsExporter(object):
 
         for graph_id, resources in output.items():
             graph = models.GraphModel.objects.get(pk=graph_id)
+            if format == "geojson":
+                # geojson needs header? name field?
+                headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype", "name")[::1]
+                missing_field_names = []
+                for header in headers:
+                    if not header["fieldname"]:
+                        missing_field_names.append(header["name"])
+                    header.pop("name")
+                """if len(missing_field_names) > 0:
+                    message = _("Geojson feature property names are required for the following nodes: {0}".format(", ".join(missing_field_names)))
+                    logger.error(message)
+                    raise (Exception(message))
+                headers.append({"fieldname": "resourceid", "datatype": "str"})"""
+                ret = self.to_geojson(resources["output"], headers=headers, name=graph.name)
+                return ret, "" # request is expecting info as a second component
+
             if format == "tilecsv":
                 headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
                 headers.append("resourceid")
@@ -217,3 +233,41 @@ class SearchResultsExporter(object):
         shape_exporter = ResourceExporter(format="shp")
         dest = shape_exporter.writer.create_shapefiles(instances, headers, name)
         return dest
+
+    def get_geometry_fieldnames(self, instance): # the same function exist in shapefile.py l.70
+        from django.contrib.gis.geos import GeometryCollection
+        geometry_fields = []
+        for k, v in instance.items():
+            if isinstance(v, GeometryCollection):
+                geometry_fields.append(k)
+        return geometry_fields
+
+    def to_geojson(self, instances, headers, name): # a part of the code exists in datatypes.py, l.567
+        from arches.app.utils.response import JSONResponse
+        from django.contrib.gis.geos import GEOSGeometry
+
+        if len(instances) > 0:
+            geometry_fields = self.get_geometry_fieldnames(instances[0])
+
+        features = []
+        for geometry_field in geometry_fields:
+            for instance in instances:
+                properties = {}
+                for key,value in instance.items():
+                    if key != geometry_field:
+                        properties[key] = value
+                for key,value in instance.items():
+                    # while flattening the tile, FeatureCollection to GeometryCollection by transform_export_values
+                    # so turn it back to a geojson collection
+                    # but l.221 when not compact and if the flat_dict does not convert to GeometryCollection ???
+                    if key == geometry_field:
+                        geometry = GEOSGeometry(value, srid=4326)
+                        for geom in geometry:
+                            feature = {}
+                            feature["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
+                            feature["type"] = "Feature"
+                            feature["properties"] = properties
+                            features.append(feature)
+
+        feature_collection = {"type": "FeatureCollection", "features": features}
+        return feature_collection

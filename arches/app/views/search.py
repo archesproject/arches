@@ -196,7 +196,7 @@ def export_results(request):
     total = int(request.GET.get("total", 0))
     format = request.GET.get("format", "tilecsv")
     download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
-    if total > download_limit:
+    if total > download_limit and format != "geojson":
         celery_worker_running = task_management.check_if_celery_available()
         if celery_worker_running is True:
             request_values = dict(request.GET)
@@ -215,6 +215,10 @@ def export_results(request):
     else:
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format)
+        if format == "geojson":            
+            response = JSONResponse(export_files)
+            return response
+
         if len(export_files) == 0 and format == "shp":
             message = _(
                 "Either no instances were identified for export or no resources have exportable geometry nodes\
