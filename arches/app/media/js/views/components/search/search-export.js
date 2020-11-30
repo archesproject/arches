@@ -1,7 +1,8 @@
 define(['jquery',
     'knockout',
     'arches',
-    'bindings/fadeVisible'],
+    'bindings/fadeVisible',
+    'bindings/clipboard'],
 function($, ko, arches) {
     var componentName = 'search-export';
     return ko.components.register(componentName, {
@@ -26,6 +27,14 @@ function($, ko, arches) {
                 urlparams.total = self.total();
                 url = url + '?' + $.param(urlparams);
                 return url;
+            });
+
+            this.geojsonUrl = ko.pureComputed(function(){
+                if (ko.unwrap(self.format()) === 'geojson') {
+                    return window.location.origin + self.url();
+                } else {
+                    return null;
+                }
             });
 
             this.getExportData = function(){
