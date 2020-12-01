@@ -58,6 +58,7 @@ from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.search_export import SearchResultsExporter
 
 
 from arches.celery import app
@@ -927,6 +928,20 @@ class Card(APIBase):
         }
 
         return JSONResponse(context, indent=4)
+
+
+
+class SearchExport(View):
+    def get(self, request):
+        #parse auth info
+        #authenticate user
+        #call search export with the request url
+        exporter = SearchResultsExporter(search_request=request)
+        export_files, export_info = exporter.export(format)
+        if format == "geojson":            
+            response = JSONResponse(export_files)
+            return response
+        return JSONResponse(status=404)
 
 
 class SearchComponentData(APIBase):

@@ -31,7 +31,7 @@ function($, ko, arches) {
 
             this.geojsonUrl = ko.pureComputed(function(){
                 if (ko.unwrap(self.format()) === 'geojson') {
-                    return window.location.origin + self.url();
+                    return window.location.origin + '/api' + self.url();
                 } else {
                     return null;
                 }
