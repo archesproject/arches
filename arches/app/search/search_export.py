@@ -82,20 +82,9 @@ class SearchResultsExporter(object):
         for graph_id, resources in output.items():
             graph = models.GraphModel.objects.get(pk=graph_id)
             if format == "geojson":
-                # geojson needs header? name field?
                 headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
-                """missing_field_names = []
-                for header in headers:
-                    if not header["fieldname"]:
-                        missing_field_names.append(header["name"])
-                    header.pop("name")
-                if len(missing_field_names) > 0:
-                    message = _("Geojson feature property names are required for the following nodes: {0}".format(", ".join(missing_field_names)))
-                    logger.error(message)
-                    raise (Exception(message))
-                headers.append({"fieldname": "resourceid", "datatype": "str"})"""
                 ret = self.to_geojson(resources["output"], headers=headers, name=graph.name)
-                return ret, "" # request is expecting info as a second component
+                return ret, ""
 
             if format == "tilecsv":
                 headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
@@ -256,14 +245,11 @@ class SearchResultsExporter(object):
                 properties = {}
                 for header in headers:
                     if header != geometry_field:
-                        properties[header] = instance[header]
-                """for key,value in instance.items():
-                    if key != geometry_field:
-                        properties[key] = value"""
+                        try:
+                            properties[header] = instance[header]
+                        except KeyError:
+                            properties[header] = None
                 for key,value in instance.items():
-                    # while flattening the tile, FeatureCollection to GeometryCollection by transform_export_values
-                    # so turn it back to a geojson collection
-                    # but l.221 when not compact and if the flat_dict does not convert to GeometryCollection ???
                     if key == geometry_field:
                         geometry = GEOSGeometry(value, srid=4326)
                         for geom in geometry:
