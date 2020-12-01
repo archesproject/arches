@@ -60,7 +60,9 @@ function($, ko, arches) {
             };
 
             this.executeExport = function(limit){
-                if (this.total() > limit) {
+                if (ko.unwrap(self.format()) === 'geojson' && this.total() <= limit) {
+                    window.open(this.geojsonUrl());
+                } else if (this.total() > limit) {
                     this.getExportData();
                 } else if (this.total() > 0) {
                     window.open(this.url());

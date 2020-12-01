@@ -935,6 +935,8 @@ class Card(APIBase):
 
 class SearchExport(View):
     def get(self, request):
+        total = int(request.GET.get("total", 0))
+        download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
         format = request.GET.get("format", "tilecsv")
         if 'HTTP_AUTHORIZATION' in request.META:
             request_auth = request.META.get('HTTP_AUTHORIZATION').split()
@@ -945,7 +947,7 @@ class SearchExport(View):
                     request.user = user
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format)
-        if format == "geojson":         
+        if format == "geojson" and total <= download_limit:
             response = JSONResponse(export_files)
             return response
         return JSONResponse(status=404)
