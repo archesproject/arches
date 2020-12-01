@@ -324,9 +324,21 @@ class TileCsvWriter(Writer):
 
 class CsvReader(Reader):
     def __init__(self):
+        self.errors = []
         super(CsvReader, self).__init__()
 
-    def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number):
+    def save_resource(
+        self,
+        populated_tiles,
+        resourceinstanceid,
+        legacyid,
+        resources,
+        target_resource_model,
+        bulk,
+        save_count,
+        row_number,
+        prevent_indexing,
+    ):
         # create a resource instance only if there are populated_tiles
         errors = []
         if len(populated_tiles) > 0:
@@ -346,7 +358,7 @@ class CsvReader(Reader):
                     del resources[:]  # clear out the array
             else:
                 try:
-                    newresourceinstance.save()
+                    newresourceinstance.save(index=(not prevent_indexing))
 
                 except TransportError as e:
 
@@ -387,7 +399,14 @@ class CsvReader(Reader):
             print("%s resources processed" % str(save_count))
 
     def import_business_data(
-        self, business_data=None, mapping=None, overwrite="append", bulk=False, create_concepts=False, create_collections=False
+        self,
+        business_data=None,
+        mapping=None,
+        overwrite="append",
+        bulk=False,
+        create_concepts=False,
+        create_collections=False,
+        prevent_indexing=False,
     ):
         # errors = businessDataValidator(self.business_data)
         celery_worker_running = task_management.check_if_celery_available()
@@ -809,7 +828,15 @@ class CsvReader(Reader):
 
                         save_count = save_count + 1
                         self.save_resource(
-                            populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number
+                            populated_tiles,
+                            resourceinstanceid,
+                            legacyid,
+                            resources,
+                            target_resource_model,
+                            bulk,
+                            save_count,
+                            row_number,
+                            prevent_indexing,
                         )
 
                         # reset values for next resource instance
@@ -996,23 +1023,38 @@ class CsvReader(Reader):
 
                 if "legacyid" in locals():
                     self.save_resource(
-                        populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number
+                        populated_tiles,
+                        resourceinstanceid,
+                        legacyid,
+                        resources,
+                        target_resource_model,
+                        bulk,
+                        save_count,
+                        row_number,
+                        prevent_indexing,
                     )
 
                 if bulk:
                     print("Time to create resource and tile objects: %s" % datetime.timedelta(seconds=time() - self.start))
                     Resource.bulk_save(resources=resources)
-                print(_(f"Total resources saved: {save_count + 1}"))
+                save_count = save_count + 1
+                print(_("Total resources saved: {save_count}").format(**locals()))
 
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             formatted = traceback.format_exception(exc_type, exc_value, exc_traceback)
             if len(formatted):
                 for message in formatted:
-                    print(message)
+                    logger.error(message)
 
         finally:
-            pass
+            for e in self.errors:
+                if e["type"] == "WARNING":
+                    logger.warn(e["message"])
+                elif e["type"] == "ERROR":
+                    logger.error(e["message"])
+                else:
+                    logger.info(e["message"])
 
 
 class TileCsvReader(Reader):

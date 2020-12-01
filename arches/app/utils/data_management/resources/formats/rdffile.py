@@ -39,7 +39,8 @@ def use_cache(url):
         return True
 
 
-def load_document_and_cache(url):
+# PyLD 2.0 / JSON-LD 1.1 passes two params, we don't need the second
+def load_document_and_cache(url, cache=None):
     if url in docCache and use_cache(url):
         return docCache[url]
 
@@ -481,7 +482,7 @@ class JsonLdReader(Reader):
                 for o in options:
                     # print(f"Considering:\n  {vi}\n  {o['name']}")
                     if is_literal and o["datatype"].is_a_literal_in_rdf():
-                        if len(o["datatype"].validate(value)) == 0:
+                        if len(o["datatype"].validate_from_rdf(value)) == 0:
                             possible.append([o, value])
                         else:
                             print(f"Could not validate {value} as a {o['datatype']}")

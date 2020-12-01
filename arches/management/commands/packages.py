@@ -10,6 +10,7 @@ import urllib.request, urllib.parse, urllib.error
 import os
 import imp
 import logging
+import requests
 from arches.setup import unzip_file
 from arches.management.commands import utils
 from arches.app.utils import import_class_from_string
@@ -184,7 +185,8 @@ class Command(BaseCommand):
 
         parser.add_argument("-b", "--is_basemap", action="store_true", dest="is_basemap", help="Add to make the layer a basemap.")
 
-        parser.add_argument("-db", "--setup_db", action="store", dest="setup_db", default=False, help="Rebuild database")
+        parser.add_argument("-db", "--setup_db", action="store_true", dest="setup_db", default=False, help="Rebuild database")
+        parser.add_argument("-dev", "--dev", action="store_true", dest="dev", help="Loading package for development")
 
         parser.add_argument(
             "-bulk",
@@ -193,6 +195,14 @@ class Command(BaseCommand):
             dest="bulk_load",
             help="Bulk load values into the database.  By setting this flag the system will bypass any PreSave \
             functions attached to the resource, as well as prevent some logging statements from printing to console.",
+        )
+
+        parser.add_argument(
+            "-pi",
+            "--prevent_indexing",
+            action="store_true",
+            dest="prevent_indexing",
+            help="Prevents indexing the resources into Elasticsearch",
         )
 
         parser.add_argument(
@@ -264,6 +274,7 @@ class Command(BaseCommand):
                 options["create_concepts"],
                 use_multiprocessing=options["use_multiprocessing"],
                 force=options["yes"],
+                prevent_indexing=options["prevent_indexing"],
             )
 
         if options["operation"] == "import_node_value_data":
@@ -291,7 +302,13 @@ class Command(BaseCommand):
 
         if options["operation"] in ["load", "load_package"]:
             self.load_package(
-                options["source"], options["setup_db"], options["overwrite"], options["bulk_load"], options["stage"], options["yes"]
+                options["source"],
+                options["setup_db"],
+                options["overwrite"],
+                options["bulk_load"],
+                options["stage"],
+                options["yes"],
+                options["dev"],
             )
 
         if options["operation"] in ["create", "create_package"]:
@@ -307,7 +324,7 @@ class Command(BaseCommand):
         with open(os.path.join(dest_dir, "package_config.json"), "w") as config_file:
             try:
                 constraints = models.Resource2ResourceConstraint.objects.all()
-                configs = {"permitted_resource_relationships": constraints}
+                configs = {"permitted_resource_relationships": constraints, "business_data_load_order": []}
                 config_file.write(JSONSerializer().serialize(configs))
             except Exception as e:
                 print(e)
@@ -466,7 +483,15 @@ class Command(BaseCommand):
             self.export_package_settings(dest_dir, "true")
 
     def load_package(
-        self, source, setup_db=True, overwrite_concepts="ignore", bulk_load=False, stage_concepts="keep", yes=False,
+        self,
+        source,
+        setup_db=False,
+        overwrite_concepts="ignore",
+        bulk_load=False,
+        stage_concepts="keep",
+        yes=False,
+        dev=False,
+        defer_indexing=True,
     ):
 
         celery_worker_running = task_management.check_if_celery_available()
@@ -529,17 +554,17 @@ class Command(BaseCommand):
                     sys.exit()
 
         @transaction.atomic
-        def load_preliminary_sql(package_dir):
-            resource_views = glob.glob(os.path.join(package_dir, "preliminary_sql", "*.sql"))
+        def load_sql(package_dir, sql_dir):
+            sql_files = glob.glob(os.path.join(package_dir, sql_dir, "*.sql"))
             try:
                 with connection.cursor() as cursor:
-                    for view in resource_views:
-                        with open(view, "r") as f:
+                    for sql_file in sql_files:
+                        with open(sql_file, "r") as f:
                             sql = f.read()
                             cursor.execute(sql)
             except Exception as e:
                 print(e)
-                print("Could not connect to db")
+                print("Failed to load sql files")
 
         def load_resource_views(package_dir):
             resource_views = glob.glob(os.path.join(package_dir, "business_data", "resource_views", "*.sql"))
@@ -551,7 +576,7 @@ class Command(BaseCommand):
                             cursor.execute(sql)
             except Exception as e:
                 print(e)
-                print("Could not connect to db")
+                print("Failed to load resource views")
 
         def load_graphs(package_dir):
             try:
@@ -617,19 +642,27 @@ class Command(BaseCommand):
             load_mapbox_styles(basemap_styles, True)
             load_mapbox_styles(overlay_styles, False)
 
-        def load_business_data(package_dir):
+        def load_business_data(package_dir, prevent_indexing):
             config_paths = glob.glob(os.path.join(package_dir, "package_config.json"))
             configs = {}
             if len(config_paths) > 0:
                 configs = json.load(open(config_paths[0]))
 
             business_data = []
-            if "business_data_load_order" in configs and len(configs["business_data_load_order"]) > 0:
-                for f in configs["business_data_load_order"]:
-                    business_data.append(os.path.join(package_dir, "business_data", f))
+            if dev and os.path.isdir(os.path.join(package_dir, "business_data", "dev_data")):
+                if "business_data_load_order" in configs and len(configs["business_data_load_order"]) > 0:
+                    for f in configs["business_data_load_order"]:
+                        business_data.append(os.path.join(package_dir, "business_data", "dev_data", f))
+                else:
+                    for ext in ["*.json", "*.jsonl", "*.csv"]:
+                        business_data += glob.glob(os.path.join(package_dir, "business_data", "dev_data", ext))
             else:
-                for ext in ["*.json", "*.jsonl", "*.csv"]:
-                    business_data += glob.glob(os.path.join(package_dir, "business_data", ext))
+                if "business_data_load_order" in configs and len(configs["business_data_load_order"]) > 0:
+                    for f in configs["business_data_load_order"]:
+                        business_data.append(os.path.join(package_dir, "business_data", f))
+                else:
+                    for ext in ["*.json", "*.jsonl", "*.csv"]:
+                        business_data += glob.glob(os.path.join(package_dir, "business_data", ext))
 
             erring_csvs = [
                 path
@@ -653,18 +686,23 @@ class Command(BaseCommand):
                 from celery import chord
                 from arches.app.tasks import import_business_data, package_load_complete, on_chord_error
 
+                valid_resource_paths = [
+                    path
+                    for path in business_data
+                    if (".csv" in path and os.path.exists(path.replace(".csv", ".mapping"))) or (".json" in path)
+                ]
+
                 # assumes resources in csv do not depend on data being loaded prior from json in same dir
                 chord(
                     [
-                        import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load)
-                        for path in business_data
-                        if (".csv" in path and os.path.exists(path.replace(".csv", ".mapping"))) or (".json" in path)
+                        import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load, prevent_indexing=prevent_indexing)
+                        for path in valid_resource_paths
                     ]
-                )(package_load_complete.s().on_error(on_chord_error.s()))
+                )(package_load_complete.signature(kwargs={"valid_resource_paths": valid_resource_paths}).on_error(on_chord_error.s()))
             else:
                 for path in business_data:
                     if path not in erring_csvs:
-                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load)
+                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load, prevent_indexing=prevent_indexing)
 
             relations = glob.glob(os.path.join(package_dir, "business_data", "relations", "*.relations"))
             for relation in relations:
@@ -730,6 +768,14 @@ class Command(BaseCommand):
                     es_index = import_class_from_string(index["module"])(index["name"])
                     es_index.prepare_index()
 
+        def load_kibana_objects(package_dir):
+            # only try and load Kibana objects if they exist
+            if len(glob.glob(os.path.join(package_dir, "kibana_objects", "*.ndjson"))) > 0:
+                commands = ["kibana", "--source_dir", os.path.join(package_dir, "kibana_objects"), "-ow"]
+                if yes is True:
+                    commands.append("-y")
+                management.call_command(*commands, operation="load")
+
         def load_datatypes(package_dir):
             load_extensions(package_dir, "datatypes", "datatype")
 
@@ -753,6 +799,10 @@ class Command(BaseCommand):
 
         def cache_graphs():
             management.call_command("cache", operation="graphs")
+
+        def update_resource_materialized_view():
+            with connection.cursor() as cursor:
+                cursor.execute("REFRESH MATERIALIZED VIEW mv_geojson_geoms;")
 
         def load_apps(package_dir):
             package_apps = glob.glob(os.path.join(package_dir, "apps", "*"))
@@ -797,15 +847,17 @@ class Command(BaseCommand):
         if not package_location:
             raise Exception("this is an invalid package source")
 
-        if setup_db is not False:
-            if setup_db.lower() in ("t", "true", "y", "yes"):
-                management.call_command("setup_db", force=True)
-
+        if setup_db:
+            management.call_command("setup_db", force=True)
+        if dev:
+            management.call_command("add_test_users")
         load_ontologies(package_location)
+        print("loading Kibana objects")
+        load_kibana_objects(package_location)
         print("loading package_settings.py")
         load_package_settings(package_location)
         print("loading preliminary sql")
-        load_preliminary_sql(package_location)
+        load_sql(package_location, "preliminary_sql")
         print("loading system settings")
         load_system_settings(package_location)
         print("loading project extensions from project")
@@ -835,7 +887,10 @@ class Command(BaseCommand):
         print("loading search indexes")
         load_indexes(package_location)
         print("loading business data - resource instances and relationships")
-        load_business_data(package_location)
+        load_business_data(package_location, defer_indexing)
+        if defer_indexing is True:
+            print("&" * 100)
+            management.call_command("es", "reindex_database")
         print("loading resource views")
         load_resource_views(package_location)
         print("loading apps")
@@ -850,12 +905,10 @@ class Command(BaseCommand):
             css_files = glob.glob(os.path.join(css_source, "*.css"))
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
-        print("caching resource models")
-        try:
-            cache_graphs()
-        except Exception as e:
-            print("Unable to cache graph proxy models")
-            print(e)
+        print("Refreshing the resource view")
+        update_resource_materialized_view()
+        print("loading post sql")
+        load_sql(package_location, "post_sql")
         if celery_worker_running:
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
@@ -946,7 +999,15 @@ class Command(BaseCommand):
         ret = skos.save_concepts_from_skos(rdf, overwrite, stage)
 
     def import_business_data(
-        self, data_source, config_file=None, overwrite=None, bulk_load=False, create_concepts=False, use_multiprocessing=False, force=False
+        self,
+        data_source,
+        config_file=None,
+        overwrite=None,
+        bulk_load=False,
+        create_concepts=False,
+        use_multiprocessing=False,
+        force=False,
+        prevent_indexing=False,
     ):
         """
         Imports business data from all formats. A config file (mapping file) is required for .csv format.
@@ -1006,6 +1067,7 @@ will be very jumbled."""
                         create_concepts=create_concepts,
                         create_collections=create_collections,
                         use_multiprocessing=use_multiprocessing,
+                        prevent_indexing=prevent_indexing,
                     )
                 else:
                     utils.print_message("No file found at indicated location: {0}".format(source))
@@ -1056,18 +1118,11 @@ will be very jumbled."""
             data_source = [data_source]
 
         for path in data_source:
-            if os.path.isabs(path):
-                if os.path.isfile(os.path.join(path)):
-                    relations = csv.DictReader(open(path, "r"))
-                    RelationImporter().import_relations(relations)
-                else:
-                    utils.print_message("No file found at indicated location: {0}".format(path))
-                    sys.exit()
+            if os.path.isfile(os.path.join(path)):
+                relations = csv.DictReader(open(path, "r"))
+                RelationImporter().import_relations(relations)
             else:
-                utils.print_message(
-                    "ERROR: The specified file path appears to be relative. \
-                    Please rerun command with an absolute file path."
-                )
+                utils.print_message("No file found at indicated location: {0}".format(path))
                 sys.exit()
 
     def import_graphs(self, data_source="", overwrite_graphs=True):

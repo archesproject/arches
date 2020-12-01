@@ -205,10 +205,10 @@
                                     {% trans "Export via Search Results" %}
                                     </p>
                                     <span class="graph-settings-switch-subtitle">
-                                        {% trans "Provide a field name for shapefiles. " %} <strong>{% trans "Name will be truncated to 10 characters to meet shapefile requirements." %}</strong>
+                                        {% trans "Provide a field name for shapefiles. " %} <strong>{% trans "Limited to 10 characters to meet shapefile requirements." %}</strong>
                                     </span>
                                     <div class="exportable-field-name">
-                                        <input class="form-control input-md widget-input" placeholder="{% trans 'shapefile fieldname' %}" type="text" data-bind="textInput: node().fieldname, disable: !node().exportable(), css: {'disabled': !node().exportable()}"></input>
+                                        <input class="form-control input-md widget-input" placeholder="{% trans 'shapefile fieldname' %}" type="text" maxlength="10" data-bind="textInput: node().fieldname, disable: !node().exportable(), css: {'disabled': !node().exportable()}"></input>
                                     </div>
                                 </div>
                             </div>

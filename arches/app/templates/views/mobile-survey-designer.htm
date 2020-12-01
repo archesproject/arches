@@ -22,7 +22,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block graph_title %}
 <div class="ep-tools-title">
     <h1 class="page-header text-overflow mobile-designer-title">
-        <span data-bind="text: mobilesurvey.name() || 'Unnamed'"></span>
+        <span data-bind="text: mobilesurvey.name() || '{% trans 'Unnamed' %}'"></span>
     </h1>
 </div>
 {% endblock graph_title %}
@@ -380,7 +380,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     widget: {
                                         node_id: ko.observable('surveyextent'),
                                         config:{
-                                            geometryTypes: [{'id':'Polygon','text':'Polygon'}]
+                                            geometryTypes: [{'id':'Polygon','text':'{% trans "Polygon" %}'}]
                                         },
                                         datatype: {
                                             datatype: 'geojson-feature-collection'
@@ -398,7 +398,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         geocodePlaceholder: "Locate a Place or Address",
                                         geocodeProvider: geocoderDefault,
                                         geocoderVisible: true,
-                                        geometryTypes: [{'id':'Polygon','text':'Polygon'}],
+                                        geometryTypes: [{'id':'Polygon','text':'{% trans "Polygon" %}'}],
                                         mapControlsHidden: false,
                                         maxZoom: mapDefaultMaxZoom,
                                         minZoom: mapDefaultMinZoom,
