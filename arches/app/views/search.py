@@ -16,9 +16,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
-import logging
+from base64 import b64decode
 from datetime import datetime
+import logging
+import os
+from django.contrib.auth import authenticate
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
 from django.http import HttpResponseNotFound
@@ -215,7 +217,7 @@ def export_results(request):
     else:
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format)
-        if format == "geojson":            
+        if format == "geojson":
             response = JSONResponse(export_files)
             return response
 
