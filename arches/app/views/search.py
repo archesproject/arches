@@ -215,6 +215,14 @@ def export_results(request):
             message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(**locals())
             return JSONResponse({"success": False, "message": message})
     else:
+        if 'HTTP_AUTHORIZATION' in request.META:
+            request_auth = request.META.get('HTTP_AUTHORIZATION').split()
+            if request_auth[0].lower() == "basic":
+                user_cred = b64decode(request_auth[1]).decode().split(":")
+                user = authenticate(username=user_cred[0], password=user_cred[1])
+                if user is not None:
+                    request.user = user
+
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format)
         if format == "geojson":
