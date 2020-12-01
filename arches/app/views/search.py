@@ -16,9 +16,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
-import logging
+from base64 import b64decode
 from datetime import datetime
+import logging
+import os
+from django.contrib.auth import authenticate
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
 from django.http import HttpResponseNotFound
@@ -213,9 +215,17 @@ def export_results(request):
             message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(**locals())
             return JSONResponse({"success": False, "message": message})
     else:
+        if 'HTTP_AUTHORIZATION' in request.META:
+            request_auth = request.META.get('HTTP_AUTHORIZATION').split()
+            if request_auth[0].lower() == "basic":
+                user_cred = b64decode(request_auth[1]).decode().split(":")
+                user = authenticate(username=user_cred[0], password=user_cred[1])
+                if user is not None:
+                    request.user = user
+
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format)
-        if format == "geojson":            
+        if format == "geojson":
             response = JSONResponse(export_files)
             return response
 
