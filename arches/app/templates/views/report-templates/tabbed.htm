@@ -124,6 +124,7 @@
             <!-- /ko -->
             <!-- ko ifnot: tabs()[activeTabIndex()].main_component  -->
             <!-- ko foreach: { data: activeCards(), as: 'card' } -->
+            <!-- ko if: $parent.hideEmptyNodes() === false || card.tiles().length > 0 -->
                 <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
                 <div class="rp-card-section">
                     <!--ko if: card && card.alternateReportComponent -->
@@ -141,10 +142,11 @@
                         <!-- /ko -->
                     <!-- /ko -->
                 </div>
-                <!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
             <!-- /ko -->
         </div>
     </div>
     <!--/ko-->
 
-    {% endblock body %}
+{% endblock body %}

@@ -198,6 +198,14 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
+            "-pi",
+            "--prevent_indexing",
+            action="store_true",
+            dest="prevent_indexing",
+            help="Prevents indexing the resources into Elasticsearch",
+        )
+
+        parser.add_argument(
             "-create_concepts",
             "--create_concepts",
             action="store",
@@ -266,6 +274,7 @@ class Command(BaseCommand):
                 options["create_concepts"],
                 use_multiprocessing=options["use_multiprocessing"],
                 force=options["yes"],
+                prevent_indexing=options["prevent_indexing"],
             )
 
         if options["operation"] == "import_node_value_data":
@@ -315,7 +324,7 @@ class Command(BaseCommand):
         with open(os.path.join(dest_dir, "package_config.json"), "w") as config_file:
             try:
                 constraints = models.Resource2ResourceConstraint.objects.all()
-                configs = {"permitted_resource_relationships": constraints}
+                configs = {"permitted_resource_relationships": constraints, "business_data_load_order": []}
                 config_file.write(JSONSerializer().serialize(configs))
             except Exception as e:
                 print(e)
@@ -474,7 +483,15 @@ class Command(BaseCommand):
             self.export_package_settings(dest_dir, "true")
 
     def load_package(
-        self, source, setup_db=False, overwrite_concepts="ignore", bulk_load=False, stage_concepts="keep", yes=False, dev=False
+        self,
+        source,
+        setup_db=False,
+        overwrite_concepts="ignore",
+        bulk_load=False,
+        stage_concepts="keep",
+        yes=False,
+        dev=False,
+        defer_indexing=True,
     ):
 
         celery_worker_running = task_management.check_if_celery_available()
@@ -625,19 +642,27 @@ class Command(BaseCommand):
             load_mapbox_styles(basemap_styles, True)
             load_mapbox_styles(overlay_styles, False)
 
-        def load_business_data(package_dir):
+        def load_business_data(package_dir, prevent_indexing):
             config_paths = glob.glob(os.path.join(package_dir, "package_config.json"))
             configs = {}
             if len(config_paths) > 0:
                 configs = json.load(open(config_paths[0]))
 
             business_data = []
-            if "business_data_load_order" in configs and len(configs["business_data_load_order"]) > 0:
-                for f in configs["business_data_load_order"]:
-                    business_data.append(os.path.join(package_dir, "business_data", f))
+            if dev and os.path.isdir(os.path.join(package_dir, "business_data", "dev_data")):
+                if "business_data_load_order" in configs and len(configs["business_data_load_order"]) > 0:
+                    for f in configs["business_data_load_order"]:
+                        business_data.append(os.path.join(package_dir, "business_data", "dev_data", f))
+                else:
+                    for ext in ["*.json", "*.jsonl", "*.csv"]:
+                        business_data += glob.glob(os.path.join(package_dir, "business_data", "dev_data", ext))
             else:
-                for ext in ["*.json", "*.jsonl", "*.csv"]:
-                    business_data += glob.glob(os.path.join(package_dir, "business_data", ext))
+                if "business_data_load_order" in configs and len(configs["business_data_load_order"]) > 0:
+                    for f in configs["business_data_load_order"]:
+                        business_data.append(os.path.join(package_dir, "business_data", f))
+                else:
+                    for ext in ["*.json", "*.jsonl", "*.csv"]:
+                        business_data += glob.glob(os.path.join(package_dir, "business_data", ext))
 
             erring_csvs = [
                 path
@@ -668,13 +693,16 @@ class Command(BaseCommand):
                 ]
 
                 # assumes resources in csv do not depend on data being loaded prior from json in same dir
-                chord([import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load) for path in valid_resource_paths])(
-                    package_load_complete.signature(kwargs={"valid_resource_paths": valid_resource_paths}).on_error(on_chord_error.s())
-                )
+                chord(
+                    [
+                        import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load, prevent_indexing=prevent_indexing)
+                        for path in valid_resource_paths
+                    ]
+                )(package_load_complete.signature(kwargs={"valid_resource_paths": valid_resource_paths}).on_error(on_chord_error.s()))
             else:
                 for path in business_data:
                     if path not in erring_csvs:
-                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load)
+                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load, prevent_indexing=prevent_indexing)
 
             relations = glob.glob(os.path.join(package_dir, "business_data", "relations", "*.relations"))
             for relation in relations:
@@ -859,7 +887,10 @@ class Command(BaseCommand):
         print("loading search indexes")
         load_indexes(package_location)
         print("loading business data - resource instances and relationships")
-        load_business_data(package_location)
+        load_business_data(package_location, defer_indexing)
+        if defer_indexing is True:
+            print("&" * 100)
+            management.call_command("es", "reindex_database")
         print("loading resource views")
         load_resource_views(package_location)
         print("loading apps")
@@ -968,7 +999,15 @@ class Command(BaseCommand):
         ret = skos.save_concepts_from_skos(rdf, overwrite, stage)
 
     def import_business_data(
-        self, data_source, config_file=None, overwrite=None, bulk_load=False, create_concepts=False, use_multiprocessing=False, force=False
+        self,
+        data_source,
+        config_file=None,
+        overwrite=None,
+        bulk_load=False,
+        create_concepts=False,
+        use_multiprocessing=False,
+        force=False,
+        prevent_indexing=False,
     ):
         """
         Imports business data from all formats. A config file (mapping file) is required for .csv format.
@@ -1028,6 +1067,7 @@ will be very jumbled."""
                         create_concepts=create_concepts,
                         create_collections=create_collections,
                         use_multiprocessing=use_multiprocessing,
+                        prevent_indexing=prevent_indexing,
                     )
                 else:
                     utils.print_message("No file found at indicated location: {0}".format(source))
