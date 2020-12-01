@@ -149,12 +149,15 @@ class SearchResultsExporter(object):
 
     def get_feature_collections(self, tile, node, feature_collections, fieldname, datatype):
         node_value = tile["data"][str(node.nodeid)]
-        for feature_index, feature in enumerate(node_value["features"]):
-            feature["geometry"]["coordinates"] = self.set_precision(feature["geometry"]["coordinates"], self.precision)
-            try:
-                feature_collections[fieldname]["features"].append(feature)
-            except KeyError:
-                feature_collections[fieldname] = {"datatype": datatype, "features": [feature]}
+        try:
+            for feature_index, feature in enumerate(node_value["features"]):
+                feature["geometry"]["coordinates"] = self.set_precision(feature["geometry"]["coordinates"], self.precision)
+                try:
+                    feature_collections[fieldname]["features"].append(feature)
+                except KeyError:
+                    feature_collections[fieldname] = {"datatype": datatype, "features": [feature]}
+        except TypeError as e:
+            pass
         return feature_collections
 
     def create_resource_json(self, tiles):
