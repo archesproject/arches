@@ -1,3 +1,4 @@
+from base64 import b64decode
 import importlib
 import json
 import logging
@@ -13,6 +14,7 @@ from rdflib.namespace import SKOS, DCTERMS
 from revproxy.views import ProxyView
 from slugify import slugify
 from urllib import parse
+from django.contrib.auth import authenticate
 from django.shortcuts import render
 from django.views.generic import View
 from django.db import transaction, connection
@@ -933,12 +935,17 @@ class Card(APIBase):
 
 class SearchExport(View):
     def get(self, request):
-        #parse auth info
-        #authenticate user
-        #call search export with the request url
+        format = request.GET.get("format", "tilecsv")
+        if 'HTTP_AUTHORIZATION' in request.META:
+            request_auth = request.META.get('HTTP_AUTHORIZATION').split()
+            if request_auth[0].lower() == "basic":
+                user_cred = b64decode(request_auth[1]).decode().split(":")
+                user = authenticate(username=user_cred[0], password=user_cred[1])
+                if user is not None:
+                    request.user = user
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format)
-        if format == "geojson":            
+        if format == "geojson":         
             response = JSONResponse(export_files)
             return response
         return JSONResponse(status=404)
