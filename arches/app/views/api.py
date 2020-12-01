@@ -932,14 +932,13 @@ class Card(APIBase):
         return JSONResponse(context, indent=4)
 
 
-
 class SearchExport(View):
     def get(self, request):
         total = int(request.GET.get("total", 0))
         download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
         format = request.GET.get("format", "tilecsv")
-        if 'HTTP_AUTHORIZATION' in request.META:
-            request_auth = request.META.get('HTTP_AUTHORIZATION').split()
+        if "HTTP_AUTHORIZATION" in request.META:
+            request_auth = request.META.get("HTTP_AUTHORIZATION").split()
             if request_auth[0].lower() == "basic":
                 user_cred = b64decode(request_auth[1]).decode().split(":")
                 user = authenticate(username=user_cred[0], password=user_cred[1])

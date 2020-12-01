@@ -217,7 +217,7 @@ def export_results(request):
     else:
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format)
-        
+
         if len(export_files) == 0 and format == "shp":
             message = _(
                 "Either no instances were identified for export or no resources have exportable geometry nodes\

@@ -228,14 +228,14 @@ class SearchResultsExporter(object):
         dest = shape_exporter.writer.create_shapefiles(instances, headers, name)
         return dest
 
-    def get_geometry_fieldnames(self, instance): # the same function exist in shapefile.py l.70
+    def get_geometry_fieldnames(self, instance):  # the same function exist in shapefile.py l.70
         geometry_fields = []
         for k, v in instance.items():
             if isinstance(v, GeometryCollection):
                 geometry_fields.append(k)
         return geometry_fields
 
-    def to_geojson(self, instances, headers, name): # a part of the code exists in datatypes.py, l.567
+    def to_geojson(self, instances, headers, name):  # a part of the code exists in datatypes.py, l.567
         if len(instances) > 0:
             geometry_fields = self.get_geometry_fieldnames(instances[0])
 
@@ -249,7 +249,7 @@ class SearchResultsExporter(object):
                             properties[header] = instance[header]
                         except KeyError:
                             properties[header] = None
-                for key,value in instance.items():
+                for key, value in instance.items():
                     if key == geometry_field:
                         geometry = GEOSGeometry(value, srid=4326)
                         for geom in geometry:
