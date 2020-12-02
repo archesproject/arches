@@ -1,9 +1,13 @@
+import logging
 from django.contrib.gis.geos import GEOSGeometry
 from django.db import connection
+from django.utils.translation import ugettext as _
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Terms, GeoShape
 from arches.app.search.components.base import BaseSearchFilter
+
+logger = logging.getLogger(__name__)
 
 details = {
     "searchcomponentid": "",
@@ -68,7 +72,7 @@ class MapFilter(BaseSearchFilter):
         try:
             search_results_object[details["componentname"]]["search_buffer"] = feature_geom
         except NameError:
-            print("feature geom is not defined")
+            logger.info(_("Feature geometry is not defined"))
 
 
 def _buffer(geojson, width=0, unit="ft"):
