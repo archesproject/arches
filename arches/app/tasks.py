@@ -96,8 +96,12 @@ def refresh_materialized_view(self):
 
 
 @shared_task(bind=True)
-def import_business_data(self, data_source="", overwrite="", bulk_load=False, create_concepts=False, create_collections=False):
-    management.call_command("packages", operation="import_business_data", source=data_source, overwrite=True)
+def import_business_data(
+    self, data_source="", overwrite="", bulk_load=False, create_concepts=False, create_collections=False, prevent_indexing=False
+):
+    management.call_command(
+        "packages", operation="import_business_data", source=data_source, overwrite=True, prevent_indexing=prevent_indexing
+    )
 
 
 @shared_task

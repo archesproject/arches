@@ -82,7 +82,9 @@ define([
                 console.error('Error:', error);
               });
         })
-        this.filterNodeIds = ko.observableArray(JSON.parse(JSON.stringify(this.nodeids)));
+        var parsedNodeIds = JSON.parse(JSON.stringify(this.nodeids));
+        var firstNode = parsedNodeIds.length > 0 ? [parsedNodeIds[0]] : [];
+        this.filterNodeIds = ko.observableArray(firstNode);
         this.relatedResourceWidgets = this.widgets.filter(function(widget){return widget.datatype.datatype === 'resource-instance' || widget.datatype.datatype === 'resource-instance-list';});
         this.showRelatedQuery = ko.observable(false);
         var resourceBounds = ko.observable();
@@ -184,6 +186,18 @@ define([
                     self.tile.data[id](values);
                 }
             }
+        };
+
+        this.unrelateResource = function(resourceData, widget) {
+            var id = widget.node_id();
+            var resourceinstanceid = ko.unwrap(resourceData.resourceinstanceid);
+            var related = resourceData.mapCard.tile.data[id]()
+            for( var i = 0; i < related.length; i++){ 
+                if ( ko.unwrap(related[i].resourceId) === resourceinstanceid) { 
+                    related.splice(i, 1); 
+                }
+            }
+            resourceData.mapCard.tile.data[id](related);
         };
 
         this.isSelectable = function(feature) {

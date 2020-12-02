@@ -111,8 +111,8 @@ define([
             r.childNodes = ko.observableArray([]);
             r.pageid = 'resourcemodel';
             r.selected = ko.observable(false);
-            r.namelong = arches.tranlations.mobileSurveyNameLong;
-            r.description = arches.tranlations.mobileSurveyDesc;
+            r.namelong = arches.translations.mobileSurveyNameLong;
+            r.description = arches.translations.mobileSurveyDesc;
             r.cards = self.getRootCards(r.cards);
             r.hasApprovedCards = ko.pureComputed(function(){
                 var result = r.cards().filter(function(c){return ko.unwrap(c.approved) === true;}).length > 0;

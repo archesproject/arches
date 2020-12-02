@@ -536,7 +536,7 @@ class Resources(APIBase):
             return JSONResponse(status=403)
 
         allowed_formats = ["json", "json-ld", "arches-json"]
-        format = request.GET.get("format", "json")
+        format = request.GET.get("format", "json-ld")
 
         if format not in allowed_formats:
             return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
