@@ -92,7 +92,9 @@ def _buffer(geojson, width=0, unit="ft"):
             cursor.execute(
                 """SELECT ST_TRANSFORM(
                     ST_BUFFER(ST_TRANSFORM(ST_SETSRID(%s::geometry, 4326), %s), %s),
-                4326)""", (geom.hex.decode('utf-8'), settings.ANALYSIS_COORDINATE_SYSTEM_SRID, width))
+                4326)""",
+                (geom.hex.decode("utf-8"), settings.ANALYSIS_COORDINATE_SYSTEM_SRID, width),
+            )
             res = cursor.fetchone()
             geom = GEOSGeometry(res[0], srid=4326)
     return geom
