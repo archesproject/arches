@@ -26,7 +26,7 @@ define([
         update: function(element, valueAccessor) {
             // Whenever the value subsequently changes, slowly fade the element in or out
             var value = valueAccessor();
-            console.log('update', value)
+            console.log('update', value);
         }
     };
     return ko.bindingHandlers.clipboard;
