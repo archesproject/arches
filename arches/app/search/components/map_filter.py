@@ -1,4 +1,5 @@
 from django.contrib.gis.geos import GEOSGeometry
+from django.db import connection
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Terms, GeoShape
@@ -82,9 +83,12 @@ def _buffer(geojson, width=0, unit="ft"):
     if width > 0:
         if unit == "ft":
             width = width / 3.28084
-
-        geom.transform(settings.ANALYSIS_COORDINATE_SYSTEM_SRID)
-        geom = geom.buffer(width)
-        geom.transform(4326)
-
+        with connection.cursor() as cursor:
+            # Transform geom to the analysis SRID, buffer it, and transform it back to wgs84
+            cursor.execute(
+                """SELECT ST_TRANSFORM(
+                    ST_BUFFER(ST_TRANSFORM(ST_SETSRID(%s::geometry, 4326), %s), %s),
+                4326)""", (geom.hex.decode('utf-8'), settings.ANALYSIS_COORDINATE_SYSTEM_SRID, width))
+            res = cursor.fetchone()
+            geom = GEOSGeometry(res[0], srid=4326)
     return geom
