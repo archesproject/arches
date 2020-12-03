@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "6759_fn_unique_component"),
+        ("models", "6839_widget_disabled_configs"),
     ]
 
     operations = [
