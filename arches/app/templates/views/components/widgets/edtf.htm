@@ -3,8 +3,25 @@
 
 {% block form %}
 <div class="row widget-wrapper">
-    <div class="form-group">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <div class="form-group">
+          <div class="style-tools-collapser" data-bind=" click: function() {
+              showEDTFFormats(!showEDTFFormats());
+          }">
+              <span data-bind="text: showEDTFFormats() ? '{% trans "Hide Common EDTF Formats" %}' : '{% trans "Show Common EDTF Formats" %}'"></span>
+              <i class="fa" data-bind="{
+                  css: {
+                      'fa-caret-down' : !showEDTFFormats(),
+                      'fa-caret-up' : showEDTFFormats(),
+                  }
+              }"></i>
+          </div>
+          <div class="form-horizontal" data-bind="if: showEDTFFormats">
+              <div class="style-tools-panel">
+                  <div class="form-group">
+                  </div>
+              </div>
+          </div>
         <!-- ko if: node -->
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
