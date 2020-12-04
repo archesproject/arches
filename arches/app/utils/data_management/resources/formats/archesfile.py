@@ -151,7 +151,7 @@ class ArchesFileReader(Reader):
                         try:
                             resourceinstance = Resource.objects.get(resourceinstanceid=resourceinstanceid)
                             for key, value in defaults.items():
-                                setattr(obj, key, value)
+                                setattr(resourceinstance, key, value)
                         except Resource.DoesNotExist:
                             resourceinstance = Resource(**new_values)
 
@@ -175,7 +175,7 @@ class ArchesFileReader(Reader):
                                 try:
                                     tile = Tile.objects.get(tileid=uuid.UUID(str(src_tile["tileid"])))
                                     for key, value in defaults.items():
-                                        setattr(obj, key, value)
+                                        setattr(tile, key, value)
                                 except Tile.DoesNotExist:
                                     tile = Tile(**new_values)
                             if tile is not None:
@@ -352,9 +352,9 @@ class ArchesFileReader(Reader):
                         resourceinstanceid=resourceinstanceid, 
                         graph_id=target_resource_model, 
                         legacyid=None, 
-                        createdtime=datetime.datetime.now(),
-                        tiles=populated_tiles
+                        createdtime=datetime.datetime.now()
                     )
+                    newresourceinstance.tiles = populated_tiles
                     newresourceinstance.save(index=(not prevent_indexing))
                     reporter.update_resources_saved()
 
