@@ -118,9 +118,7 @@ define([
                 .map(function(resourceid){return self.relatedResourceDetails[resourceid]})
                 .filter(function(val){return val !== undefined});
         });
-        this.relatedResources.subscribe(function(val){
-            console.log(val);
-        })
+
         this.showRelatedQuery = ko.observable(false);
         var resourceBounds = ko.observable();
         var selectRelatedSource = this.selectRelatedSource();
@@ -202,7 +200,6 @@ define([
             var id = widget.node_id();
             var resourceinstanceid = ko.unwrap(resourceData.resourceinstanceid);
             var type = ko.unwrap(self.form.nodeLookup[id].datatype);
-            console.log(resourceData)
             self.relatedResourceDetails[ko.unwrap(resourceData.resourceinstanceid)] = {
                 graphid: ko.unwrap(resourceData.graphid),
                 displayname: ko.unwrap(resourceData.displayname),
