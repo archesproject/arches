@@ -170,8 +170,8 @@ define([
                 selectFeatureLayersFactory(source, sourceLayer, selectedResourceIds(), true, null, self.nodeids, self.filterNodeIds(), self.hoverId(), selectLayerConfig) :
                 [];
             self.additionalLayers(
-                extendedLayers.concat(
-                    selectFeatureLayers
+                selectFeatureLayers.concat(
+                    extendedLayers
                 )
             );
         };
