@@ -313,6 +313,18 @@ define([
                     self.map().addLayer(layer);
                     extendedLayers.push(layer);
                 });
+                self.map().on('mousemove', (e) => {
+                    var features = self.map().queryRenderedFeatures(e.point);
+                    var feature;
+                    if (features.length && features[0].properties.resourceinstanceid) {
+                        feature = features[0].properties.resourceinstanceid;
+                        if (self.relatedResources().filter(function(val){return val.resourceinstanceid === feature}).length) {
+                            self.hoverId(feature);
+                        }
+                    } else {
+                        self.hoverId(null);
+                    }
+                });
             }
         });
 
