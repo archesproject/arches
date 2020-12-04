@@ -121,7 +121,7 @@
             <!-- /ko-->
 
             <!-- ko if: showRelatedQuery() -->
-            <div class="card" style="padding-top: 55px; padding-bottom: 30px">
+            <div class="card" style="padding-top: 25px; padding-bottom: 30px">
 
                 <div data-bind="foreach: {
                     data:card.widgets, as: 'widget'
@@ -168,35 +168,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!--ko if: self.mapFilter.searchGeometries().length -->
-                    <div class="rr-map-card-intersect-panel">
-                    <div class='control-label widget-input-label'>{% trans "Intersection Results" %}</div>
-                    <div>
-                    <!-- ko foreach: {data: self.targetGraphs, as: 'targetGraph'} -->
-                    <div style="margin-bottom: 12px; border: solid 1px #eee; min-height: 0px;">
-                            <!--ko if: self.intersectionSummary()[targetGraph] -->
-                            <div style="
-                                display: inline-flex;
-                                justify-content: space-between;
-                                width: 100%;
-                                padding: 10px;
-                                background-color: aliceblue;
-                            ">
-                            <div data-bind="text: self.intersectionSummary()[targetGraph].name"></div>
-                            <div data-bind="text: 'Total: ' + self.intersectionSummary()[targetGraph].results().length"></div>
-                            </div>
-                            <div style="max-height: 200px; overflow-y: scroll;">
-                            <!-- ko foreach: {data: self.intersectionSummary()[targetGraph].results(), as: 'result'} -->
-                            <div class="intersection-result" data-bind="text: result.displayname, event: { mouseover: self.updateHoverId, mouseout: self.updateHoverId }, css: {hovered: self.hoverId() === result.resourceinstanceid }"></div>
-                            <!-- /ko -->
-                            </div>
-                            <!-- /ko -->
-                    </div>
-                    <!-- /ko -->
-                    </div>
-                    </div>
-                    <!-- /ko -->
                     <!-- /ko -->
                 </div>
 
