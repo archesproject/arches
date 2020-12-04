@@ -138,12 +138,9 @@ class ArchesFileReader(Reader):
                     resourceinstanceid = uuid.UUID(str(resource["resourceinstance"]["resourceinstanceid"]))
                     defaults = {
                         "graph_id": uuid.UUID(str(resource["resourceinstance"]["graph_id"])),
-                        "legacyid": resource["resourceinstance"]["legacyid"]
+                        "legacyid": resource["resourceinstance"]["legacyid"],
                     }
-                    new_values = {
-                        "resourceinstanceid": resourceinstanceid,
-                        "createdtime": datetime.datetime.now()
-                    }
+                    new_values = {"resourceinstanceid": resourceinstanceid, "createdtime": datetime.datetime.now()}
                     new_values.update(defaults)
                     if overwrite == "overwrite":
                         resourceinstance = Resource(**new_values)
@@ -161,13 +158,13 @@ class ArchesFileReader(Reader):
                         def update_or_create_tile(src_tile):
                             tile = None
                             src_tile["parenttile_id"] = uuid.UUID(str(src_tile["parenttile_id"])) if src_tile["parenttile_id"] else None
-                            defaults={
+                            defaults = {
                                 "resourceinstance": resourceinstance,
                                 "parenttile_id": str(src_tile["parenttile_id"]) if src_tile["parenttile_id"] else None,
                                 "nodegroup_id": str(src_tile["nodegroup_id"]) if src_tile["nodegroup_id"] else None,
                                 "data": src_tile["data"],
                             }
-                            new_values = {"tileid":uuid.UUID(str(src_tile["tileid"]))}
+                            new_values = {"tileid": uuid.UUID(str(src_tile["tileid"]))}
                             new_values.update(defaults)
                             if overwrite == "overwrite":
                                 tile = Tile(**new_values)
@@ -181,7 +178,7 @@ class ArchesFileReader(Reader):
                             if tile is not None:
                                 resourceinstance.tiles.append(tile)
                                 reporter.update_tiles_saved()
-                            
+
                             for child in src_tile["tiles"]:
                                 update_or_create_tile(child)
 
@@ -191,7 +188,7 @@ class ArchesFileReader(Reader):
                         for tile in [k for k in resource["tiles"] if k["parenttile_id"] is None]:
                             update_or_create_tile(tile)
 
-                    resourceinstance.save(index=(not prevent_indexing))    
+                    resourceinstance.save(index=(not prevent_indexing))
                     reporter.update_resources_saved()
 
     def get_blank_tile(self, sourcetilegroup, blanktilecache, tiles, resourceinstanceid):
