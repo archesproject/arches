@@ -346,10 +346,10 @@ class ArchesFileReader(Reader):
                                     populate_tile(mapped_tiles, blank_tile)
 
                     newresourceinstance = Resource(
-                        resourceinstanceid=resourceinstanceid, 
-                        graph_id=target_resource_model, 
-                        legacyid=None, 
-                        createdtime=datetime.datetime.now()
+                        resourceinstanceid=resourceinstanceid,
+                        graph_id=target_resource_model,
+                        legacyid=None,
+                        createdtime=datetime.datetime.now(),
                     )
                     newresourceinstance.tiles = populated_tiles
                     newresourceinstance.save(index=(not prevent_indexing))
