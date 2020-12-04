@@ -20,16 +20,20 @@
     </div>
 
 
-    <div style="margin: 70px 10px -25px;">
+    <div style="margin: 70px 10px 0px;">
         <div class='control-label widget-input-label'>{% trans "Participating Layers" %}</div>
         <!-- ko foreach: {data: self.nodeDetails, as: 'nodeInfo'} -->
-        <div class="overlay-listing rr-map-card" style="padding: 5px; min-height: 0px" data-bind="click: function(){self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1 ? self.filterNodeIds.remove(nodeInfo.nodeid) : self.filterNodeIds.push(nodeInfo.nodeid)}, css: {'active-overlay': self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1}">
+        <div data-bind="css: {'active-overlay': self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1}">
+        <div class="overlay-listing rr-map-card" style="padding: 5px; min-height: 0px" data-bind="click: function(){self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1 ? self.filterNodeIds.remove(nodeInfo.nodeid) : self.filterNodeIds.push(nodeInfo.nodeid)}">
             <div class="overlay-name" data-bind="text: nodeInfo.resourcemodelname"></div>
-            <!-- ko foreach: self.relatedResources -->
-                <!-- ko if: nodeInfo.graph_id === $data.graphid -->
-                    <div data-bind="text: $data.displayname, event: { mouseover: self.updateHoverId, mouseout: self.updateHoverId }, css: {hovered: self.hoverId() === $data.resourceinstanceid }"></div>
-                <!-- /ko -->
+        </div>
+        <div class="rr-map-card related-instances">
+        <!-- ko foreach: self.relatedResources -->
+            <!-- ko if: nodeInfo.graph_id === $data.graphid -->
+                <div class="related-instance" data-bind="text: $data.displayname, event: { mouseover: self.updateHoverId, mouseout: self.updateHoverId }, css: {hovered: self.hoverId() === $data.resourceinstanceid}"></div>
             <!-- /ko -->
+        <!-- /ko -->
+        </div>
         </div>
         <!-- /ko -->
     </div>
