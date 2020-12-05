@@ -429,7 +429,7 @@ class Tile(models.TileModel):
 
             self.__preDelete(request)
             self.save_edit(
-                user=request.user, edit_type="tile delete", old_value=self.data, provisional_edit_log_details=provisional_edit_log_details
+                user=user, edit_type="tile delete", old_value=self.data, provisional_edit_log_details=provisional_edit_log_details
             )
             try:
                 super(Tile, self).delete(*args, **kwargs)
