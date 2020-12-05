@@ -229,7 +229,7 @@ class BaseDataType(object):
         """
         pass
 
-    def post_tile_delete(self, tile, nodeid):
+    def post_tile_delete(self, tile, nodeid, **kwargs):
         """
         Called following the tile.delete operation
 
