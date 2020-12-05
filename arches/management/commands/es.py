@@ -133,20 +133,16 @@ class Command(BaseCommand):
         es_index = get_index(name)
         es_index.delete_index()
 
-    def index_database(self, batch_size, clear_index, name):
+    def index_database(self, batch_size, clear_index=True, name=None):
         if name is not None:
-            index_database_util.index_resources(
-                clear_index=clear_index,
-                index_name=name,
-                batch_size=batch_size,
-            )
+            index_database_util.index_custom_indexes(index_name=name, clear_index=clear_index, batch_size=batch_size)
         else:
             index_database_util.index_db(clear_index=clear_index, batch_size=batch_size)
 
-    def reindex_database(self, batch_size, clear_index, name):
+    def reindex_database(self, batch_size, clear_index):
         self.delete_indexes()
         self.setup_indexes()
-        self.index_database(batch_size=batch_size, clear_index=clear_index, name=name)
+        self.index_database(batch_size=batch_size, clear_index=clear_index)
 
     def setup_indexes(self):
         prepare_terms_index(create=True)
