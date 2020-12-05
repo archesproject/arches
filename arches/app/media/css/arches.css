@@ -12936,9 +12936,13 @@ a.jstree-anchor.permissions-widget {
     cursor: pointer;
     padding: 5px;
     font-size: 0.9em;
-    left: 480px;
+    left: 510px;
     position: absolute;
-    top: 5px;
+    top: 6px;
+}
+
+.workbench-card-sidepanel .edtf-style-tools-collapser {
+    left: 250px;
 }
 
 .style-tools-panel {
@@ -12958,6 +12962,22 @@ a.jstree-anchor.permissions-widget {
     height: 200px;
     width: 600px;
     overflow-y: scroll;
+}
+
+.edtf-style-tools-panel::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 9px;
+    border-left: 1px solid #ddd;
+}
+
+.edtf-style-tools-panel::-webkit-scrollbar-thumb {
+    border-radius: 1px;
+    background-color: rgba(0, 0, 0, .1);
+    -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+}
+
+.workbench-card-sidepanel .edtf-style-tools-panel {
+    width: 340px;
 }
 
 .widget-help-panel {
