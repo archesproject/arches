@@ -98,7 +98,9 @@ class BaseIndex(object):
         result_summary["indexed"] = self.se.count(index=self.index_name, body=q.dsl) - count_before
         status = "Passed" if result_summary["database"] == result_summary["indexed"] else "Failed"
         print(f"Custom Index - {settings.ELASTICSEARCH_PREFIX}_{self.index_name}")
-        print(f"    Status: {status}, In Database: {result_summary['database']}, Indexed: {result_summary['indexed']}, Took: {(datetime.now() - start).seconds} seconds")
+        print(
+            f"    Status: {status}, In Database: {result_summary['database']}, Indexed: {result_summary['indexed']}, Took: {(datetime.now() - start).seconds} seconds"
+        )
 
     def delete_index(self):
         """
@@ -117,9 +119,9 @@ class BaseIndex(object):
 
     def reindex(self, graphids=None, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
         """
-        Reindexes the index.  By default this does nothing, it needs to be implemented in a subclass.  
+        Reindexes the index.  By default this does nothing, it needs to be implemented in a subclass.
         By default you can pass in a list of graph ids to trigger the reindex.  This will loop through all resource instances of each graph type.
-            
+
             Example subclass command:
             def reindex(self, clear_index=True):
                 PARCEL_GRAPHID = "e3c35dca-5e72-11ea-a2d3-dca90488358a"

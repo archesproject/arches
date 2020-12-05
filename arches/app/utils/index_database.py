@@ -104,6 +104,7 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
         )
     return status
 
+
 def index_custom_indexes(index_name=None, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
     """
     Indexes any custom indexes, optionally by name
