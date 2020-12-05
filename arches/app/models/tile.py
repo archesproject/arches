@@ -434,13 +434,12 @@ class Tile(models.TileModel):
             )
             try:
                 super(Tile, self).delete(*args, **kwargs)
+                for nodeid in self.data.keys():
+                    node = models.Node.objects.get(nodeid=nodeid)
+                    datatype = self.datatype_factory.get_instance(node.datatype)
+                    datatype.post_tile_delete(self, nodeid, index=index)
                 if index:
-                    for nodeid in self.data.keys():
-                        node = models.Node.objects.get(nodeid=nodeid)
-                        datatype = self.datatype_factory.get_instance(node.datatype)
-                        datatype.post_tile_delete(self, nodeid)
-                    resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
-                    resource.index()
+                    self.index()
             except IntegrityError as e:
                 logger.error(e)
 
