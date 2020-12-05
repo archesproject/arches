@@ -43,7 +43,10 @@ define([
         this.provisionalTileViewModel = params.provisionalTileViewModel;
         this.reviewer = params.reviewer;
         this.expanded = ko.observable(true);
-        this.card.showForm(false);
+        this.card.showForm(true);
+        if (this.card.tiles().length > 0) {
+            this.card.showForm(false);
+        }
 
         this.beforeMove = function(e) {
             e.cancelDrop = (e.sourceParent!==e.targetParent);
