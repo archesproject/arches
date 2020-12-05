@@ -441,8 +441,8 @@ class Tile(models.TileModel):
                         datatype.post_tile_delete(self, nodeid)
                     resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
                     resource.index()
-            except IntegrityError:
-                logger.error
+            except IntegrityError as e:
+                logger.error(e)
 
         else:
             self.apply_provisional_edit(user, data={}, action="delete")
