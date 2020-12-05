@@ -435,7 +435,7 @@ class Tile(models.TileModel):
             try:
                 super(Tile, self).delete(*args, **kwargs)
                 if index:
-                    for nodeid, value in self.data.items():
+                    for nodeid in self.data.keys():
                         node = models.Node.objects.get(nodeid=nodeid)
                         datatype = self.datatype_factory.get_instance(node.datatype)
                         datatype.post_tile_delete(self, nodeid)
