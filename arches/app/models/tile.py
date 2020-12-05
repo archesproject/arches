@@ -407,6 +407,7 @@ class Tile(models.TileModel):
     def delete(self, *args, **kwargs):
         se = SearchEngineFactory().create()
         request = kwargs.pop("request", None)
+        index = kwargs.pop("index", True)
         provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)
         for tile in self.tiles:
             tile.delete(*args, request=request, **kwargs)
@@ -418,14 +419,14 @@ class Tile(models.TileModel):
             user_is_reviewer = True
 
         if user_is_reviewer is True or self.user_owns_provisional(user):
-            query = Query(se)
-            bool_query = Bool()
-            bool_query.filter(Terms(field="tileid", terms=[self.tileid]))
-            query.add_query(bool_query)
-            results = query.search(index=TERMS_INDEX)["hits"]["hits"]
-
-            for result in results:
-                se.delete(index=TERMS_INDEX, id=result["_id"])
+            if index:
+                query = Query(se)
+                bool_query = Bool()
+                bool_query.filter(Terms(field="tileid", terms=[self.tileid]))
+                query.add_query(bool_query)
+                results = query.search(index=TERMS_INDEX)["hits"]["hits"]
+                for result in results:
+                    se.delete(index=TERMS_INDEX, id=result["_id"])
 
             self.__preDelete(request)
             self.save_edit(
@@ -433,12 +434,13 @@ class Tile(models.TileModel):
             )
             try:
                 super(Tile, self).delete(*args, **kwargs)
-                for nodeid, value in self.data.items():
-                    node = models.Node.objects.get(nodeid=nodeid)
-                    datatype = self.datatype_factory.get_instance(node.datatype)
-                    datatype.post_tile_delete(self, nodeid)
-                resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
-                resource.index()
+                if index:
+                    for nodeid, value in self.data.items():
+                        node = models.Node.objects.get(nodeid=nodeid)
+                        datatype = self.datatype_factory.get_instance(node.datatype)
+                        datatype.post_tile_delete(self, nodeid)
+                    resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
+                    resource.index()
             except IntegrityError:
                 logger.error
 
