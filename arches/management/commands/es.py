@@ -155,7 +155,7 @@ class Command(BaseCommand):
             for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
                 self.register_index(index["name"])
         else:
-            self.register_index(name) 
+            self.register_index(name)
 
     def delete_indexes(self, name=None):
         if name is None:
@@ -168,4 +168,4 @@ class Command(BaseCommand):
             for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
                 self.remove_index(index["name"])
         else:
-            self.remove_index(name) 
+            self.remove_index(name)
