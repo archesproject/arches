@@ -113,24 +113,24 @@ define([
                 this.bufferUnits = [{
                     name: 'meters',
                     val: 'm'
-                }, {
+                },{
                     name: 'feet',
                     val: 'ft'
                 }];
 
                 this.mapLinkData.subscribe(function(data) {
                     this.zoomToGeoJSON(data);
-                }, this);
+                },this);
 
                 var bins = binFeatureCollection(this.searchAggregations);
 
                 this.geoJSONString.subscribe(function(geoJSONString) {
                     this.geoJSONErrors(this.getGeoJSONErrors(geoJSONString));
-                    if (this.geoJSONErrors().length === 0) {
+                    if(this.geoJSONErrors().length === 0){
                         var geoJSON = JSON.parse(geoJSONString);
                         // remove any extra geometries as only one geometry is allowed for search
                         geoJSON.features = geoJSON.features.slice(0, 1);
-                        if (geoJSON.features.length > 0) {
+                        if(geoJSON.features.length > 0){
                             var extent = geojsonExtent(geoJSON);
                             var bounds = new mapboxgl.LngLatBounds(extent);
                             this.map().fitBounds(bounds, {
@@ -145,20 +145,20 @@ define([
                 this.getGeoJSONErrors = function(geoJSONString) {
                     var hint = geojsonhint.hint(geoJSONString);
                     var errors = [];
-                    try {
+                    try{
                         var geoJSON = JSON.parse(geoJSONString);
-                        if (geoJSON.features.length > 1) {
+                        if (geoJSON.features.length > 1){
                             hint.push({
                                 "level": 'warning',
                                 "message": 'Only one feature is allowed for search filtering.  Ignorning all all but the first feature.'
                             });
                         }
                         var feature = geoJSON.features[0];
-                        if (!!feature.properties && !!feature.properties.buffer) {
+                        if (!!feature.properties && !!feature.properties.buffer){
                             var buffer = feature.properties.buffer;
                             try {
                                 var bufferWidth = parseInt(buffer.width, 10);
-                                if (bufferWidth < 0 || bufferWidth > this.maxBuffer) {
+                                if (bufferWidth < 0 || bufferWidth > this.maxBuffer){
                                     throw new Error('Whoops!');
                                 }
                             }
@@ -169,9 +169,9 @@ define([
                                 });
                             }
 
-                            try {
+                            try{
                                 var bufferUnit = buffer.unit;
-                                if (bufferUnit !== 'ft' && bufferUnit !== 'm') {
+                                if (bufferUnit !== 'ft' && bufferUnit !== 'm'){
                                     throw new Error('Whoops!');
                                 }
                             }
@@ -183,11 +183,11 @@ define([
                             }
                         }
 
-                        if (!!feature.properties && !!feature.properties.inverted) {
+                        if (!!feature.properties && !!feature.properties.inverted){
                             var inverted = feature.properties.inverted;
                             try {
                                 var bufferWidth = parseInt(buffer.width, 10);
-                                if (inverted !== true && inverted !== false) {
+                                if (inverted !== true && inverted !== false){
                                     throw new Error('Whoops!');
                                 }
                             }
@@ -198,7 +198,7 @@ define([
                                 });
                             }
                         }
-                    } finally {
+                    }finally{
                         hint.forEach(function(item) {
                             if (item.level !== 'message') {
                                 errors.push(item);
@@ -241,8 +241,8 @@ define([
                 this.drawModes = _.pluck(this.spatialFilterTypes, 'drawMode');
 
                 this.drawMode.subscribe(function(selectedDrawTool) {
-                    if (!!selectedDrawTool) {
-                        if (selectedDrawTool === 'extent') {
+                    if(!!selectedDrawTool){
+                        if(selectedDrawTool === 'extent'){
                             this.searchByExtent();
                         } else {
                             this.draw.changeMode(selectedDrawTool);
@@ -252,7 +252,7 @@ define([
                 }, this);
 
                 this.searchResults.timestamp.subscribe(function(timestamp) {
-                    if (this.pageLoaded) {
+                    if(this.pageLoaded) {
                         this.updateResults();
                     }
                 }, this);
@@ -318,7 +318,7 @@ define([
                 };
 
                 this.filters[componentName](this);
-                this.map.subscribe(function() {
+                this.map.subscribe(function(){
                     this.setupDraw();
                     this.restoreState();
 
@@ -362,8 +362,8 @@ define([
                 });
                 this.map().addControl(this.draw);
                 this.map().on('draw.create', function(e) {
-                    self.draw.getAll().features.forEach(function(feature) {
-                        if (feature.id !== e.features[0].id) {
+                    self.draw.getAll().features.forEach(function(feature){
+                        if(feature.id !== e.features[0].id){
                             self.draw.delete(feature.id);
                         }
                     })
@@ -418,7 +418,7 @@ define([
                 return res;
             },
 
-            updateFilter: function() {
+            updateFilter: function(){
                 if (this.buffer() < 0) {
                     this.buffer(0);
                 }
@@ -430,8 +430,8 @@ define([
                     this.buffer(max);
                 }
 
-                this.searchGeometries().forEach(function(feature) {
-                    if (!feature.properties) {
+                this.searchGeometries().forEach(function(feature){
+                    if(!feature.properties){
                         feature.properties = {};
                     }
                     feature.properties.buffer = {
@@ -457,12 +457,12 @@ define([
                     var geoJSON = JSON.parse(this.geoJSONString());
                     this.draw.set(geoJSON);
                     this.searchGeometries(geoJSON.features);
-                    geoJSON.features.forEach(function(feature) {
-                        if (!!feature.properties && !!feature.properties.buffer) {
+                    geoJSON.features.forEach(function(feature){
+                        if(!!feature.properties && !!feature.properties.buffer){
                             this.buffer(parseInt(feature.properties.buffer.width, 10));
                             this.bufferUnit(feature.properties.buffer.unit);
                         }
-                        if (!!feature.properties && feature.properties.hasOwnProperty('inverted')) {
+                        if(!!feature.properties && feature.properties.hasOwnProperty('inverted')){
                             this.filter.inverted(feature.properties.inverted);
                         }
                     }, this);
@@ -537,14 +537,14 @@ define([
             },
 
             updateResults: function() {
-                if (!!this.searchResults.results) {
+                if (!!this.searchResults.results){
                     this.searchAggregations({
                         results: this.searchResults.results.hits.hits,
                         geo_aggs: this.searchResults.results.aggregations.geo_aggs.inner.buckets[0]
                     });
                     this.fitToAggregationBounds();
                 }
-                if (!!this.searchResults[componentName]) {
+                if(!!this.searchResults[componentName]) {
                     var buffer = this.searchResults[componentName].search_buffer;
                     this.map().getSource('geojson-search-buffer-data').setData(buffer);
                 }

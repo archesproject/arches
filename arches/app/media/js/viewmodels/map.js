@@ -199,7 +199,7 @@ define([
             var id = data.resourceinstanceid;
             data.showEditButton = false;
             if (id) {
-                if (!self.resourceLookup[id]) {
+                if (!self.resourceLookup[id]){
                     data = _.defaults(data, {
                         'loading': true,
                         'displayname': '',
@@ -209,7 +209,7 @@ define([
                     if (data.permissions) {
                         try {
                             data.permissions = JSON.parse(ko.unwrap(data.permissions));
-                        } catch (err) {
+                        } catch(err) {
                             data.permissions = koMapping.toJS(ko.unwrap(data.permissions));
                         }
                         if (data.permissions.users_without_edit_perm.indexOf(ko.unwrap(self.userid)) === -1) {
@@ -294,15 +294,15 @@ define([
                 });
 
                 self.map(map);
-                if (params.fitBounds) {
+                if (params.fitBounds){
                     var padding = 40;
                     var activeTab = self.activeTab();
                     var options = {
                         padding: {
                             top: padding,
-                            left: padding + (activeTab ? 200 : 0),
+                            left: padding + (activeTab ? 200: 0),
                             bottom: padding,
-                            right: padding + (activeTab ? 200 : 0)
+                            right: padding + (activeTab ? 200: 0)
                         },
                         animate: false
                     };
