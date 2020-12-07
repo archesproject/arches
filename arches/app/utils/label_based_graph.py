@@ -97,7 +97,7 @@ class LabelBasedGraph(object):
         if not datatype_factory:
             datatype_factory = DataTypeFactory()
 
-        if node_cache == None:  # need explicit None comparison
+        if node_cache is None:  # need explicit None comparison
             node_cache = {}
 
         nodegroup_id = tile.nodegroup_id
@@ -134,7 +134,7 @@ class LabelBasedGraph(object):
         if not datatype_factory:
             datatype_factory = DataTypeFactory()
 
-        if node_cache == None:  # need explicit None comparison
+        if node_cache is None:  # need explicit None comparison
             node_cache = {}
 
         if not resource.tiles:
