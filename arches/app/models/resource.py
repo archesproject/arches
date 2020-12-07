@@ -530,11 +530,19 @@ class Resource(models.ResourceInstance):
         compact -- type bool: hide superfluous node data
         hide_empty_nodes -- type bool: hide nodes without data
         """
-        label_based_graph = LabelBasedGraph.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes)
+        return LabelBasedGraph.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes)
 
-        _name, resource_graph = label_based_graph.popitem()
+    @staticmethod
+    def to_json__bulk(resources, compact=True, hide_empty_nodes=False):
+        """
+        Returns list of resources represented as disambiguated JSON graphs
 
-        return resource_graph
+        Keyword Arguments:
+        resources -- list of Resource
+        compact -- type bool: hide superfluous node data
+        hide_empty_nodes -- type bool: hide nodes without data
+        """
+        return LabelBasedGraph.from_resources(resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes)
 
     def get_node_values(self, node_name):
         """
