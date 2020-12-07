@@ -888,7 +888,7 @@ class TileModel(models.Model):  # Tile
                 nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id
             ).aggregate(Max("sortorder"))["sortorder__max"]
             self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
-        super(TileModel, self).save(*args, **kwargs)  # Call the "real" save() method.
+        super(TileModel, self).save(**kwargs)  # Call the "real" save() method.
 
 
 class Value(models.Model):
