@@ -7,10 +7,10 @@ define([
     'mapbox-gl',
     'mapbox-gl-geocoder',
     'text!templates/views/components/map-popup.htm'
-], function($, _, arches, ko, koMapping, mapboxgl, MapboxGeocoder, popupTemplate) {
-    var viewModel = function(params) {
+], function ($, _, arches, ko, koMapping, mapboxgl, MapboxGeocoder, popupTemplate) {
+    var viewModel = function (params) {
         var self = this;
-        var geojsonSourceFactory = function() {
+        var geojsonSourceFactory = function () {
             return {
                 "type": "geojson",
                 "generateId": true,
@@ -20,7 +20,7 @@ define([
                 }
             };
         };
-        
+
         var x = ko.unwrap(params.x) ? params.x : arches.mapDefaultX;
         var y = ko.unwrap(params.y) ? params.y : arches.mapDefaultY;
         var bounds = ko.unwrap(params.bounds) ? params.bounds : arches.hexBinBounds;
@@ -41,15 +41,15 @@ define([
         this.overlays = params.overlaysObservable || ko.observableArray();
         this.activeBasemap = params.activeBasemap || ko.observable();
         this.activeTab = ko.observable(params.activeTab);
-        this.hideSidePanel = function() {
+        this.hideSidePanel = function () {
             self.activeTab(undefined);
         };
-        this.activeTab.subscribe(function() {
+        this.activeTab.subscribe(function () {
             var map = self.map();
-            if (map && map.getStyle()) setTimeout(function() { map.resize(); }, 1);
+            if (map && map.getStyle()) setTimeout(function () { map.resize(); }, 1);
         });
 
-        mapLayers.forEach(function(layer) {
+        mapLayers.forEach(function (layer) {
             if (!layer.isoverlay) {
                 if (!params.basemaps) self.basemaps.push(layer);
                 if (layer.addtomap && !params.activeBasemap) self.activeBasemap(layer);
@@ -58,8 +58,8 @@ define([
                 if (layer.searchonly && !params.search) return;
                 layer.opacity = ko.observable(layer.addtomap ? 100 : 0);
                 layer.onMap = ko.pureComputed({
-                    read: function() { return layer.opacity() > 0; },
-                    write: function(value) {
+                    read: function () { return layer.opacity() > 0; },
+                    write: function (value) {
                         layer.opacity(value ? 100 : 0);
                     }
                 });
@@ -67,9 +67,9 @@ define([
             }
         });
 
-        _.each(sources, function(sourceConfig) {
+        _.each(sources, function (sourceConfig) {
             if (sourceConfig.tiles) {
-                sourceConfig.tiles.forEach(function(url, i) {
+                sourceConfig.tiles.forEach(function (url, i) {
                     if (url.startsWith('/')) {
                         sourceConfig.tiles[i] = window.location.origin + url;
                     }
@@ -80,8 +80,8 @@ define([
             }
         });
 
-        var multiplyStopValues = function(stops, multiplier) {
-            _.each(stops, function(stop) {
+        var multiplyStopValues = function (stops, multiplier) {
+            _.each(stops, function (stop) {
                 if (Array.isArray(stop[1])) {
                     multiplyStopValues(stop[1], multiplier);
                 } else {
@@ -90,7 +90,7 @@ define([
             });
         };
 
-        var updateOpacity = function(layer, val) {
+        var updateOpacity = function (layer, val) {
             var opacityVal = Number(val) / 100.0;
             layer = JSON.parse(JSON.stringify(layer));
             if (layer.paint === undefined) {
@@ -106,7 +106,7 @@ define([
                 'circle',
                 'fill-extrusion',
                 'heatmap'
-            ], function(opacityType) {
+            ], function (opacityType) {
                 var startVal = layer.paint ? layer.paint[opacityType + '-opacity'] : null;
 
                 if (startVal) {
@@ -122,7 +122,7 @@ define([
                         }
                     }
                 } else if (layer.type === opacityType ||
-                     (layer.type === 'symbol' && (opacityType === 'text' || opacityType === 'icon'))) {
+                    (layer.type === 'symbol' && (opacityType === 'text' || opacityType === 'icon'))) {
                     layer.paint[opacityType + '-opacity'] = opacityVal;
                 }
             }, self);
@@ -130,12 +130,12 @@ define([
         };
 
         this.additionalLayers = params.layers;
-        this.layers = ko.pureComputed(function() {
+        this.layers = ko.pureComputed(function () {
             var layers = [];
-            self.overlays().forEach(function(layer) {
+            self.overlays().forEach(function (layer) {
                 if (layer.onMap()) {
                     var opacity = layer.opacity();
-                    layers = layer.layer_definitions.map(function(layer) {
+                    layers = layer.layer_definitions.map(function (layer) {
                         return updateOpacity(layer, opacity);
                     }).concat(layers);
                 }
@@ -168,7 +168,7 @@ define([
             this.mapOptions.fitBoundsOptions = params.fitBoundsOptions;
         }
 
-        this.toggleTab = function(tabName) {
+        this.toggleTab = function (tabName) {
             if (self.activeTab() === tabName) {
                 self.activeTab(null);
             } else {
@@ -176,7 +176,7 @@ define([
             }
         };
 
-        this.updateLayers = function(layers) {
+        this.updateLayers = function (layers) {
             var map = self.map();
             var style = map.getStyle();
             if (style) {
@@ -185,21 +185,21 @@ define([
             }
         };
 
-        this.isFeatureClickable = function(feature) {
+        this.isFeatureClickable = function (feature) {
             return feature.properties.resourceinstanceid;
         };
 
-        this.expandSidePanel = function() {
+        this.expandSidePanel = function () {
             return false;
         };
 
         this.resourceLookup = {};
-        this.getPopupData = function(feature) {
+        this.getPopupData = function (feature) {
             var data = feature.properties;
             var id = data.resourceinstanceid;
             data.showEditButton = false;
             if (id) {
-                if (!self.resourceLookup[id]){
+                if (!self.resourceLookup[id]) {
                     data = _.defaults(data, {
                         'loading': true,
                         'displayname': '',
@@ -220,7 +220,7 @@ define([
                     data.reportURL = arches.urls.resource_report;
                     data.editURL = arches.urls.resource_editor;
                     self.resourceLookup[id] = data;
-                    $.get(arches.urls.resource_descriptors + id, function(data) {
+                    $.get(arches.urls.resource_descriptors + id, function (data) {
                         data.loading = false;
                         ko.mapping.fromJS(data, self.resourceLookup[id]);
                     });
@@ -237,7 +237,7 @@ define([
             }
         };
 
-        this.onFeatureClick = function(feature, lngLat) {
+        this.onFeatureClick = function (feature, lngLat) {
             var map = self.map();
             self.popup = new mapboxgl.Popup()
                 .setLngLat(lngLat)
@@ -248,14 +248,14 @@ define([
                 self.popup._content
             );
             if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: true });
-            self.popup.on('close', function() {
+            self.popup.on('close', function () {
                 if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: false });
                 self.popup = undefined;
             });
         };
 
-        this.setupMap = function(map) {
-            map.on('load', function() {
+        this.setupMap = function (map) {
+            map.on('load', function () {
                 map.addControl(new mapboxgl.NavigationControl(), 'top-left');
                 map.addControl(new mapboxgl.FullscreenControl({
                     container: $(map.getContainer()).closest('.workbench-card-wrapper')[0]
@@ -270,33 +270,39 @@ define([
                 self.layers.subscribe(self.updateLayers);
 
                 var hoverFeature;
-                map.on('mousemove', function(e) {
+                map.on('mousemove', function (e) {
                     var style = map.getStyle();
                     if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: false });
-                    hoverFeature = _.find(
-                        map.queryRenderedFeatures(e.point),
-                        self.isFeatureClickable
-                    );
-                    if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: true });
                     map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
+
+                    if (self.map().draw_mode) {
+                        crosshairModes = [
+                            "draw_point",
+                            "draw_line_string",
+                            "draw_polygon",
+                        ];
+                        map.getCanvas().style.cursor = crosshairModes.includes(self.map().draw_mode) ? "crosshair" : "";
+                    }
                 });
 
-                map.on('click', function(e) {
+                map.draw_mode = null;
+
+                map.on('click', function (e) {
                     if (hoverFeature) {
                         self.onFeatureClick(hoverFeature, e.lngLat);
                     }
                 });
 
                 self.map(map);
-                if (params.fitBounds){
+                if (params.fitBounds) {
                     var padding = 40;
                     var activeTab = self.activeTab();
                     var options = {
                         padding: {
                             top: padding,
-                            left: padding + (activeTab ? 200: 0),
+                            left: padding + (activeTab ? 200 : 0),
                             bottom: padding,
-                            right: padding + (activeTab ? 200: 0)
+                            right: padding + (activeTab ? 200 : 0)
                         },
                         animate: false
                     };
@@ -304,30 +310,30 @@ define([
                     if (bounds) {
                         map.fitBounds(bounds, options);
                     } else {
-                        var fitBounds = params.fitBounds.subscribe(function(bounds) {
+                        var fitBounds = params.fitBounds.subscribe(function (bounds) {
                             map.fitBounds(bounds, options);
                             fitBounds.dispose();
                         });
                     }
                 }
-                setTimeout(function() { map.resize(); }, 1);
+                setTimeout(function () { map.resize(); }, 1);
 
                 if (ko.isObservable(zoom)) {
-                    map.on('zoomend', function() {
+                    map.on('zoomend', function () {
                         zoom(map.getZoom());
                     });
-                    zoom.subscribe(function(level) {
+                    zoom.subscribe(function (level) {
                         level = parseFloat(level);
                         if (level) map.setZoom(level);
                     });
                 }
 
                 if (ko.isObservable(x)) {
-                    map.on('dragend', function() {
+                    map.on('dragend', function () {
                         var center = map.getCenter();
                         x(center.lng);
                     });
-                    x.subscribe(function(lng) {
+                    x.subscribe(function (lng) {
                         var center = map.getCenter();
                         lng = parseFloat(lng);
                         if (lng) {
@@ -338,11 +344,11 @@ define([
                 }
 
                 if (ko.isObservable(y)) {
-                    map.on('dragend', function() {
+                    map.on('dragend', function () {
                         var center = map.getCenter();
                         y(center.lat);
                     });
-                    y.subscribe(function(lat) {
+                    y.subscribe(function (lat) {
                         var center = map.getCenter();
                         lat = parseFloat(lat);
                         if (lat) {
