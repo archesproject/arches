@@ -333,12 +333,13 @@ class Resource(models.ResourceInstance):
 
         return document, terms
 
-    def delete(self, user={}, note=""):
+    def delete(self, user={}, note="", **kwargs):
         """
         Deletes a single resource and any related indexed data
 
         """
 
+        index = kwargs.pop("index", True)
         permit_deletion = False
         graph = models.GraphModel.objects.get(graphid=self.graph_id)
         if graph.isactive is False:
@@ -357,31 +358,32 @@ class Resource(models.ResourceInstance):
             permit_deletion = True
 
         if permit_deletion is True:
-            related_resources = self.get_related_resources(lang="en-US", start=0, limit=1000, page=0)
-            for rr in related_resources["resource_relationships"]:
-                # delete any related resource entries, also reindex the resource that references this resource that's being deleted
-                try:
-                    resourceXresource = models.ResourceXResource.objects.get(pk=rr["resourcexid"])
-                    resource_to_reindex = (
-                        resourceXresource.resourceinstanceidfrom_id
-                        if resourceXresource.resourceinstanceidto_id == self.resourceinstanceid
-                        else resourceXresource.resourceinstanceidto_id
-                    )
-                    resourceXresource.delete(deletedResourceId=self.resourceinstanceid)
-                    res = Resource.objects.get(pk=resource_to_reindex)
-                    res.load_tiles()
-                    res.index()
-                except ObjectDoesNotExist:
-                    se.delete(index=RESOURCE_RELATIONS_INDEX, id=rr["resourcexid"])
+            if index:
+                related_resources = self.get_related_resources(lang="en-US", start=0, limit=1000, page=0)
+                for rr in related_resources["resource_relationships"]:
+                    # delete any related resource entries, also reindex the resource that references this resource that's being deleted
+                    try:
+                        resourceXresource = models.ResourceXResource.objects.get(pk=rr["resourcexid"])
+                        resource_to_reindex = (
+                            resourceXresource.resourceinstanceidfrom_id
+                            if resourceXresource.resourceinstanceidto_id == self.resourceinstanceid
+                            else resourceXresource.resourceinstanceidto_id
+                        )
+                        resourceXresource.delete(deletedResourceId=self.resourceinstanceid)
+                        res = Resource.objects.get(pk=resource_to_reindex)
+                        res.load_tiles()
+                        res.index()
+                    except ObjectDoesNotExist:
+                        se.delete(index=RESOURCE_RELATIONS_INDEX, id=rr["resourcexid"])
 
-            query = Query(se)
-            bool_query = Bool()
-            bool_query.filter(Terms(field="resourceinstanceid", terms=[self.resourceinstanceid]))
-            query.add_query(bool_query)
-            results = query.search(index=TERMS_INDEX)["hits"]["hits"]
-            for result in results:
-                se.delete(index=TERMS_INDEX, id=result["_id"])
-            se.delete(index=RESOURCES_INDEX, id=self.resourceinstanceid)
+                query = Query(se)
+                bool_query = Bool()
+                bool_query.filter(Terms(field="resourceinstanceid", terms=[self.resourceinstanceid]))
+                query.add_query(bool_query)
+                results = query.search(index=TERMS_INDEX)["hits"]["hits"]
+                for result in results:
+                    se.delete(index=TERMS_INDEX, id=result["_id"])
+                se.delete(index=RESOURCES_INDEX, id=self.resourceinstanceid)
 
             try:
                 self.save_edit(edit_type="delete", user=user, note=self.displayname)
