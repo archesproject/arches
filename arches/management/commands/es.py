@@ -114,7 +114,7 @@ class Command(BaseCommand):
             self.index_database(batch_size=options["batch_size"], clear_index=options["clear_index"], name=options["name"])
 
         if options["operation"] == "reindex_database":
-            self.reindex_database(batch_size=options["batch_size"], clear_index=options["clear_index"], name=options["name"])
+            self.reindex_database(batch_size=options["batch_size"], name=options["name"])
 
         if options["operation"] == "index_concepts":
             index_database_util.index_concepts(clear_index=options["clear_index"], batch_size=options["batch_size"])
@@ -139,10 +139,10 @@ class Command(BaseCommand):
         else:
             index_database_util.index_db(clear_index=clear_index, batch_size=batch_size)
 
-    def reindex_database(self, batch_size, clear_index, name=None):
+    def reindex_database(self, batch_size, name=None):
         self.delete_indexes(name=name)
         self.setup_indexes(name=name)
-        self.index_database(batch_size=batch_size, clear_index=clear_index, name=name)
+        self.index_database(batch_size=batch_size, clear_index=False, name=name)
 
     def setup_indexes(self, name=None):
         if name is None:
