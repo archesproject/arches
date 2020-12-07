@@ -211,23 +211,7 @@ class Tile(models.TileModel):
                 edit = edits[str(user.id)]
         return edit
 
-    def check_tile_cardinality_violation(self):
-        if self.nodegroup.cardinality == "1":
-            kwargs = {"nodegroup": self.nodegroup, "resourceinstance_id": self.resourceinstance_id}
-            try:
-                uuid.UUID(str(self.parenttile_id))
-                kwargs["parenttile_id"] = self.parenttile_id
-            except ValueError:
-                pass
-
-            existing_tiles = list(models.TileModel.objects.filter(**kwargs).values_list("tileid", flat=True))
-
-            # this should only ever return at most one tile
-            if len(existing_tiles) > 0 and self.tileid not in existing_tiles:
-                message = _("Trying to save a tile to a card with cardinality 1 where a tile has previously been saved.")
-                raise TileCardinalityError(message)
-
-    def check_for_constraint_violation(self):
+    def check_for_constraint_violation(self, request):
         card = models.CardModel.objects.get(nodegroup=self.nodegroup)
         constraints = models.ConstraintModel.objects.filter(card=card)
         if constraints.count() > 0:
@@ -339,6 +323,10 @@ class Tile(models.TileModel):
         except AttributeError:  # no user - probably importing data
             user = None
 
+
+        # if user is not None:
+        #     self.validate([])
+
         with transaction.atomic():
             for nodeid, value in self.data.items():
                 node = models.Node.objects.get(nodeid=nodeid)
@@ -346,8 +334,7 @@ class Tile(models.TileModel):
                 datatype.pre_tile_save(self, nodeid)
             self.__preSave(request)
             self.check_for_missing_nodes(request)
-            self.check_for_constraint_violation()
-            self.check_tile_cardinality_violation()
+            self.check_for_constraint_violation(request)
 
             creating_new_tile = models.TileModel.objects.filter(pk=self.tileid).exists() is False
             edit_type = "tile create" if (creating_new_tile is True) else "tile edit"
@@ -636,9 +623,3 @@ class TileValidationError(Exception):
 
     def __str__(self):
         return repr(self.message)
-
-
-class TileCardinalityError(TileValidationError):
-    def __init__(self, message, code=None):
-        super(TileCardinalityError, self).__init__(message, code)
-        self.title = _("Tile Cardinaltiy Error")
