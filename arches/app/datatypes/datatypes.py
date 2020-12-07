@@ -1682,9 +1682,9 @@ class ResourceInstanceDataType(BaseDataType):
                     resourceXresourceId = resourceXresource["resourceXresourceId"]
                 if not resourceXresourceId:
                     continue
-                rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
-                resourceid = str(rr.resourceinstanceidto_id)
                 try:
+                    rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
+                    resourceid = str(rr.resourceinstanceidto_id)
                     resource_document = se.search(index=RESOURCES_INDEX, id=resourceid)
                     displayname = resource_document["_source"]["displayname"]
                 except NotFoundError as e:
@@ -1693,18 +1693,26 @@ class ResourceInstanceDataType(BaseDataType):
 
                         displayname = Resource.objects.get(pk=resourceid).displayname
                     except ObjectDoesNotExist:
+                        rr = None
                         logger.info(
-                            f"Resource {resourceid} not available. This message may appear during resource load, \
+                            f"Resource with resourceXresourceId {resourceXresourceId} not available. This message may appear during resource load, \
                                 in which case the problem will be resolved once the related resource is loaded"
                         )
-                ret.append(
-                    {
-                        "resourceName": displayname,
-                        "resourceId": resourceid,
-                        "ontologyProperty": rr.relationshiptype,
-                        "inverseOntologyProperty": rr.inverserelationshiptype,
-                    }
-                )
+                except ObjectDoesNotExist:
+                    rr = None
+                    logger.info(
+                        f"Resource with resourceXresourceId {resourceXresourceId} not available. This message may appear during resource load, \
+                            in which case the problem will be resolved once the related resource is loaded"
+                    )
+                if rr is not None:
+                    ret.append(
+                        {
+                            "resourceName": displayname,
+                            "resourceId": resourceid,
+                            "ontologyProperty": rr.relationshiptype,
+                            "inverseOntologyProperty": rr.inverserelationshiptype,
+                        }
+                    )
         return ret
 
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
