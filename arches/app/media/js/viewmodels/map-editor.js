@@ -48,8 +48,8 @@ define([
         };
 
         var sources = [];
-        for (var sourceName in arches.mapSources){
-            if (arches.mapSources.hasOwnProperty(sourceName)){
+        for (var sourceName in arches.mapSources) {
+            if (arches.mapSources.hasOwnProperty(sourceName)) {
                 sources.push(sourceName);
             }
         }
