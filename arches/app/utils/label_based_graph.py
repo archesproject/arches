@@ -82,14 +82,7 @@ class LabelBasedGraph(object):
 
     @classmethod
     def from_tile(
-        cls, 
-        tile,
-        node_ids_to_tiles_reference, 
-        datatype_factory=None, 
-        node_cache=None,
-        compact=False, 
-        hide_empty_nodes=False, 
-        as_json=True
+        cls, tile, node_ids_to_tiles_reference, datatype_factory=None, node_cache=None, compact=False, hide_empty_nodes=False, as_json=True
     ):
         """
         Generates a label-based graph from a given tile
@@ -119,15 +112,7 @@ class LabelBasedGraph(object):
         return graph.as_json(include_empty_nodes=bool(not hide_empty_nodes)) if as_json else graph
 
     @classmethod
-    def from_resource(
-        cls, 
-        resource, 
-        datatype_factory=None, 
-        node_cache=None,
-        compact=False, 
-        hide_empty_nodes=False,
-        as_json=True
-    ):
+    def from_resource(cls, resource, datatype_factory=None, node_cache=None, compact=False, hide_empty_nodes=False, as_json=True):
         """
         Generates a label-based graph from a given resource
         """
@@ -166,21 +151,14 @@ class LabelBasedGraph(object):
             # removes unneccesary ( None ) top-node values
             for key in [NODE_ID_KEY, TILE_ID_KEY, VALUE_KEY]:
                 if key in resource_graph:
-                    resource_graph.pop(key)  
+                    resource_graph.pop(key)
 
             return resource_graph
-        else: # pragma: no cover
+        else:  # pragma: no cover
             return root_label_based_node
 
-
     @classmethod
-    def from_resources(
-        cls, 
-        resources, 
-        compact=False, 
-        hide_empty_nodes=False,
-        as_json=True
-    ):
+    def from_resources(cls, resources, compact=False, hide_empty_nodes=False, as_json=True):
         """
         Generates a list of label-based graph from given resources
         """
@@ -204,7 +182,7 @@ class LabelBasedGraph(object):
             resource_label_based_graphs.append(resource_label_based_graph)
 
         return resource_label_based_graphs
-   
+
     @classmethod
     def _get_display_value(cls, tile, node, datatype_factory):
         display_value = None
