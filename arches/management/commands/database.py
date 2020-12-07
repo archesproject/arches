@@ -24,6 +24,7 @@ import gzip
 from django.core.management.base import BaseCommand
 from arches.app.models.system_settings import settings
 
+
 class Command(BaseCommand):
     """
     Commands for running common database commands
@@ -34,37 +35,30 @@ class Command(BaseCommand):
         parser.add_argument(
             "operation",
             nargs="?",
-            choices=[
-                "backup",
-                "restore"
-            ],
+            choices=["backup", "restore"],
             help="Operation Type; "
             + "'setup_indexes'=Creates a pg.dump file of your database in a destination directory"
-            + "'delete_indexes'=Restores your database from a pg.dump file in a soure directory"
+            + "'delete_indexes'=Restores your database from a pg.dump file in a soure directory",
         )
 
-        parser.add_argument(
-            "-d", "--dest_dir", action="store", dest="dest_dir", default="", help="Destination directory of the backup"
-        )
+        parser.add_argument("-d", "--dest_dir", action="store", dest="dest_dir", default="", help="Destination directory of the backup")
 
-        parser.add_argument(
-            "-s", "--source_dir", action="store", dest="source_dir", default="", help="Source directory of a backup"
-        )
+        parser.add_argument("-s", "--source_dir", action="store", dest="source_dir", default="", help="Source directory of a backup")
 
         parser.add_argument("-n", "--name ", action="store", dest="name", default=None, help="Name of the custom index")
 
     def handle(self, *args, **options):
         if options["operation"] == "backup":
-            self.backup(options['dest_dir'])
-        
+            self.backup(options["dest_dir"])
+
         if options["operation"] == "restore":
-            self.restore(options['source_dir'])
+            self.restore(options["source_dir"])
 
     def backup(self, dest):
         if os.path.exists(dest) is False:
             dest = os.path.join(os.getcwd(), dest)
         if os.path.exists(dest):
-            print('backing up to', dest)
+            print("backing up to", dest)
             output = os.path.join(dest, "backup.tar")
             print(settings.APP_NAME, output)
             cmd = f"pg_dump -U postgres -W -F t arches_her".split()
@@ -72,11 +66,9 @@ class Command(BaseCommand):
                 popen = subprocess.Popen(cmd, stdout=subprocess.PIPE)
                 for stdout_line in iter(popen.stdout.readline, ""):
                     f.write(stdout_line)
-                
+
                 popen.stdout.close()
                 popen.wait()
-
-
 
     def start_worker(self, beat):
         if beat is True:
@@ -86,6 +78,5 @@ class Command(BaseCommand):
         cmd_process = cmd.split()
         subprocess.call(cmd_process)
 
-
     def restore(self, src):
-        print('restoring from', dest)
+        print("restoring from", dest)
