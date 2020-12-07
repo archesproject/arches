@@ -98,16 +98,16 @@ class LabelBasedGraphTests(TestCase):
         cls.node_1 = LabelBasedNode(name="node_1_val", node_id="node_1_node_id", tile_id="node_1_tile_id", value="node_1_value")
         cls.node_2 = LabelBasedNode(name="node_2_val", node_id="node_2_node_id", tile_id="node_2_tile_id", value=None)
 
-    def test_generate_node_tile_reference(self):
+    def test_generate_node_ids_to_tiles_reference(self):
         mock_tile = mock.Mock(data={self.node_1.node_id: "test_val"})
-        node_tile_reference = LabelBasedGraph.generate_node_tile_reference(resource=mock.Mock(tiles=[mock_tile]))
+        node_ids_to_tiles_reference = LabelBasedGraph.generate_node_ids_to_tiles_reference(resource=mock.Mock(tiles=[mock_tile]))
 
-        self.assertEqual(mock_tile, node_tile_reference.get(self.node_1.node_id)[0])
+        self.assertEqual(mock_tile, node_ids_to_tiles_reference.get(self.node_1.node_id)[0])
 
     @mock.patch.object(LabelBasedGraph, "_build_graph", side_effect=None)
     def test_from_tile(self, mock__build_graph):
         with mock.patch("arches.app.utils.label_based_graph.models.Node", return_value=None):
-            LabelBasedGraph.from_tile(tile=mock.Mock(nodegroup_id=1), node_tile_reference=mock.Mock())
+            LabelBasedGraph.from_tile(tile=mock.Mock(nodegroup_id=1), node_ids_to_tiles_reference=mock.Mock())
             mock__build_graph.assert_called_once()
 
 
@@ -128,7 +128,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
     def test_smoke(self, mock_Node):
         label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
 
-        self.assertEqual(label_based_graph, {self.test_resource.displayname: {}})
+        self.assertEqual(label_based_graph, {})
 
     def test_handles_node_with_single_value(self, mock_Node):
         mock_Node.objects.get.return_value = self.string_node
@@ -140,13 +140,11 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         self.assertEqual(
             label_based_graph,
             {
-                self.test_resource.displayname: {
-                    self.string_node.name: {
-                        NODE_ID_KEY: str(self.string_node.pk),
-                        TILE_ID_KEY: str(self.string_tile.pk),
-                        VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
-                    },
-                }
+                self.string_node.name: {
+                    NODE_ID_KEY: str(self.string_node.pk),
+                    TILE_ID_KEY: str(self.string_tile.pk),
+                    VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
+                },
             },
         )
 
@@ -163,20 +161,18 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         self.assertEqual(
             label_based_graph,
             {
-                self.test_resource.displayname: {
-                    self.string_node.name: [
-                        {
-                            NODE_ID_KEY: str(self.string_node.pk),
-                            TILE_ID_KEY: str(self.string_tile.pk),
-                            VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
-                        },
-                        {
-                            NODE_ID_KEY: str(self.string_node.pk),
-                            TILE_ID_KEY: str(duplicate_node_tile.pk),
-                            VALUE_KEY: duplicate_node_tile.data[str(self.string_node.pk)],
-                        },
-                    ],
-                }
+                self.string_node.name: [
+                    {
+                        NODE_ID_KEY: str(self.string_node.pk),
+                        TILE_ID_KEY: str(self.string_tile.pk),
+                        VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
+                    },
+                    {
+                        NODE_ID_KEY: str(self.string_node.pk),
+                        TILE_ID_KEY: str(duplicate_node_tile.pk),
+                        VALUE_KEY: duplicate_node_tile.data[str(self.string_node.pk)],
+                    },
+                ],
             },
         )
 
@@ -190,13 +186,11 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         self.assertEqual(
             label_based_graph,
             {
-                self.test_resource.displayname: {
-                    self.grouping_node.name: {
-                        NODE_ID_KEY: str(self.grouping_node.pk),
-                        TILE_ID_KEY: str(self.grouping_tile.pk),
-                        VALUE_KEY: NON_DATA_COLLECTING_NODE,
-                    },
-                }
+                self.grouping_node.name: {
+                    NODE_ID_KEY: str(self.grouping_node.pk),
+                    TILE_ID_KEY: str(self.grouping_tile.pk),
+                    VALUE_KEY: NON_DATA_COLLECTING_NODE,
+                },
             },
         )
 
@@ -213,18 +207,16 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         self.assertEqual(
             label_based_graph,
             {
-                self.test_resource.displayname: {
-                    self.grouping_node.name: {
-                        NODE_ID_KEY: str(self.grouping_node.pk),
+                self.grouping_node.name: {
+                    NODE_ID_KEY: str(self.grouping_node.pk),
+                    TILE_ID_KEY: str(self.grouping_tile.pk),
+                    VALUE_KEY: NON_DATA_COLLECTING_NODE,
+                    self.string_node.name: {
+                        NODE_ID_KEY: str(self.string_node.pk),
                         TILE_ID_KEY: str(self.grouping_tile.pk),
-                        VALUE_KEY: NON_DATA_COLLECTING_NODE,
-                        self.string_node.name: {
-                            NODE_ID_KEY: str(self.string_node.pk),
-                            TILE_ID_KEY: str(self.grouping_tile.pk),
-                            VALUE_KEY: self.grouping_tile.data[str(self.string_node.pk)],
-                        },
+                        VALUE_KEY: self.grouping_tile.data[str(self.string_node.pk)],
                     },
-                }
+                },
             },
         )
 
@@ -243,17 +235,15 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         self.assertEqual(
             label_based_graph,
             {
-                self.test_resource.displayname: {
-                    self.grouping_node.name: {
-                        NODE_ID_KEY: str(self.grouping_node.pk),
-                        TILE_ID_KEY: str(self.grouping_tile.pk),
-                        VALUE_KEY: NON_DATA_COLLECTING_NODE,
-                        self.string_node.name: {
-                            NODE_ID_KEY: str(self.string_node.pk),
-                            TILE_ID_KEY: str(self.string_tile.pk),
-                            VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
-                        },
+                self.grouping_node.name: {
+                    NODE_ID_KEY: str(self.grouping_node.pk),
+                    TILE_ID_KEY: str(self.grouping_tile.pk),
+                    VALUE_KEY: NON_DATA_COLLECTING_NODE,
+                    self.string_node.name: {
+                        NODE_ID_KEY: str(self.string_node.pk),
+                        TILE_ID_KEY: str(self.string_tile.pk),
+                        VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
                     },
-                }
+                },
             },
         )

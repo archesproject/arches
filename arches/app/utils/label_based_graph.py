@@ -169,7 +169,7 @@ class LabelBasedGraph(object):
                     resource_graph.pop(key)  
 
             return resource_graph
-        else:
+        else: # pragma: no cover
             return root_label_based_node
 
 
