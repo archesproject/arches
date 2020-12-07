@@ -142,7 +142,7 @@ class Command(BaseCommand):
     def reindex_database(self, batch_size, clear_index, name=None):
         self.delete_indexes(name=name)
         self.setup_indexes(name=name)
-        self.index_database(batch_size=batch_size, clear_index=clear_index)
+        self.index_database(batch_size=batch_size, clear_index=clear_index, name=name)
 
     def setup_indexes(self, name=None):
         if name is None:
