@@ -276,7 +276,7 @@ define([
                     map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
 
                     if (self.map().draw_mode) {
-                        crosshairModes = [
+                        var crosshairModes = [
                             "draw_point",
                             "draw_line_string",
                             "draw_polygon",
