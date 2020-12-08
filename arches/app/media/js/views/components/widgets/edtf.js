@@ -10,15 +10,9 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetVi
     */
     return ko.components.register('edtf-widget', {
         viewModel: function(params) {
-            var self = this;
             params.configKeys = ['placeholder', 'defaultValue'];
-
             this.showEDTFFormats = ko.observable(false);
-
             WidgetViewModel.apply(this, [params]);
-
-
-
         },
         template: { require: 'text!widget-templates/edtf' }
     });
