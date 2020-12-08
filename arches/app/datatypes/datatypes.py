@@ -1798,8 +1798,7 @@ class ResourceInstanceDataType(BaseDataType):
             for rr in models.ResourceXResource.objects.filter(pk__in=to_delete):
                 rr.delete()
 
-    def post_tile_delete(self, tile, nodeid, **kwargs):
-        index = kwargs.pop("index", True)
+    def post_tile_delete(self, tile, nodeid, index=True):
         if tile.data and tile.data[nodeid] and index:
             for related in tile.data[nodeid]:
                 se.delete(index=RESOURCE_RELATIONS_INDEX, id=related["resourceXresourceId"])
