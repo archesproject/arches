@@ -158,7 +158,7 @@ class Resource(models.ResourceInstance):
 
         """
 
-        self.tiles = list(models.Tile.objects.filter(resourceinstance=self))
+        self.tiles = list(models.TileModel.objects.filter(resourceinstance=self))
 
     # # flatten out the nested tiles into a single array
     def get_flattened_tiles(self):
