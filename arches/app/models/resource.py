@@ -340,6 +340,10 @@ class Resource(models.ResourceInstance):
         """
 
         index = kwargs.pop("index", True)
+        # note that deferring index will require:
+        # - that any resources related to the to-be-deleted resource get re-indexed
+        # - that the index for the to-be-deleted resource gets deleted
+
         permit_deletion = False
         graph = models.GraphModel.objects.get(graphid=self.graph_id)
         if graph.isactive is False:
