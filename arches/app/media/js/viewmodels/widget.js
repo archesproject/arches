@@ -15,6 +15,11 @@ define([
     var WidgetViewModel = function(params) {
         this.externalObservables = ['value', 'config', 'expanded', 'defaultValueSubscription', 'valueSubscription'];
         var self = this;
+
+  
+        console.log(params)
+
+
         this.state = params.state || 'form';
         var expanded = params.expanded || ko.observable(false);
         var nodeid = params.node ? params.node.nodeid : uuid.generate();
@@ -57,6 +62,15 @@ define([
         }
 
         this.disposables = [];
+
+
+        if (params.foo) {
+            var bar = self.value.subscribe(function(val){
+                params.foo['value'](val);
+            });
+
+            self.disposables.push(bar);
+        }
 
         var subscribeConfigObservable = function(obs, key) {
             self[key] = obs;

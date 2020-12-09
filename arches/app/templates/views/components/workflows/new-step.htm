@@ -1,0 +1,27 @@
+<!-- ko foreach: { data: layoutSections(), as: 'layoutSection'} -->
+    <div style="padding:10px 0px;">
+        <div 
+            data-bind="text: layoutSection.sectionTitle"
+            style="padding-bottom: 5px;"
+        ></div>
+        <!-- ko foreach: { data: layoutSection.widgetConfigs, as: 'widgetConfig'} -->
+            <div data-bind='{
+                component: {
+                    name: $data.widget.name,
+                    params: { foo: widgetConfig }
+                },
+                attr: { id: $data.widgetInstanceName }
+            }'></div>
+        <!-- /ko -->
+    </div>
+<!-- /ko -->
+<!-- ko if: complete() -->
+<div style="display: flex;"">
+    <button>
+        Finish
+    </button>
+    <button>
+        Quit
+    </button>
+</div>
+<!-- /ko -->
