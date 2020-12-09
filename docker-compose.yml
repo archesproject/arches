@@ -11,53 +11,16 @@ services:
       volumes:
         - arches-log:/arches/arches/logs
         - arches-static:/static_root
-      environment:
-        - INSTALL_DEFAULT_GRAPHS=False
-        - INSTALL_DEFAULT_CONCEPTS=False
-        - PGUSERNAME=postgres
-        - PGPASSWORD=postgres
-        - PGDBNAME=arches
-        - PGHOST=db
-        - PGPORT=5432
-        - COUCHDB_HOST=couchdb
-        - COUCHDB_PORT=5984
-        - COUCHDB_USER=admin
-        - COUCHDB_PASS=password
-        - ESHOST=elasticsearch
-        - ESPORT=9200
-        - DJANGO_MODE=PROD
-        - DJANGO_DEBUG=False
-        - DOMAIN_NAMES=localhost
-        - PYTHONUNBUFFERED=0
-        - TZ=PST
+        - .:/web_root/arches
+        - ../arches5_projects/:/web_root/projects
+      env_file:
+        - ./env_file.env
       ports:
         - '8000:8000'
       depends_on:
         - db
         - elasticsearch
         - couchdb
-
-    nginx:
-      container_name: nginx
-      image: cvast/cvast-nginx:1.2.0
-      restart: unless-stopped
-      ports:
-        - '80:80'
-        - '443:443'
-      volumes:
-        - arches-static:/www/static
-        - letsencrypt-acme-challenge:/var/www
-        - letsencrypt:/etc/letsencrypt
-      environment:
-        - NGINX_PROXY_MODE=local
-        - NGINX_PROTOCOL=http
-        - LOCAL_PROXY_HOST=arches
-        - LOCAL_PROXY_PORT=8000
-        - DOMAIN_NAMES=localhost
-        - PUBLIC_MODE=False
-        - TZ=PST
-      depends_on:
-        - arches
 
     db:
       container_name: db
@@ -68,21 +31,16 @@ services:
           - ./arches/install/init-unix.sql:/docker-entrypoint-initdb.d/init.sql # to set up the DB template
       ports:
         - '5432:5432'
-      environment:
-        - POSTGRES_USER=postgres
-        - POSTGRES_PASS=postgres
-        - POSTGRES_DB=postgres
-        - POSTGRES_MULTIPLE_EXTENSIONS=postgis,postgis_topology
-        - TZ=PST
+      env_file:
+        - ./env_file.env
 
     couchdb:
       container_name: couchdb
       image: couchdb:2.1.1
       ports:
         - "5984:5984"
-      environment:
-        COUCHDB_USER: admin
-        COUCHDB_PASSWORD: password
+      env_file:
+        - ./env_file.env
       volumes:
         - couchdb-data:/usr/local/var/lib/couchdb
         - couchdb-log:/usr/local/var/log/couchdb
@@ -95,27 +53,8 @@ services:
       ports:
         - "9200:9200"
         - "9300:9300"
-      environment:
-        - TZ=PST
-        - discovery.type=single-node
-        - discovery.seed_hosts=
-        - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
-
-    letsencrypt:
-      container_name: letsencrypt
-      image: cvast/cvast-letsencrypt:1.1
-      volumes:
-        - letsencrypt-acme-challenge:/var/www
-        - letsencrypt:/etc/letsencrypt
-        - letsencrypt-log:/var/log/letsencrypt
-      command: get_certificate
-      environment:
-        - MODE=regular
-        - LETSENCRYPT_EMAIL=info@example.com
-        - DOMAIN_NAMES=localhost
-        - PRODUCTION_MODE=False
-        - PERSISTENT_MODE=True
-        - TZ=PST
+      env_file:
+        - ./env_file.env
 
 volumes:
     arches-log:
@@ -125,6 +64,3 @@ volumes:
     postgres-data:
     postgres-log:
     elasticsearch-data:
-    letsencrypt:
-    letsencrypt-log:
-    letsencrypt-acme-challenge:

@@ -1,4 +1,4 @@
-FROM ubuntu:18.04 as base 
+FROM ubuntu:20.04 as base
 USER root
 
 ## Setting default environment variables
@@ -48,11 +48,11 @@ RUN pip3 wheel --no-cache-dir -b /tmp -r ${WHEELS}/requirements.txt  \
     && pip3 wheel --no-cache-dir -b /tmp django-auth-ldap
 
 # Add Docker-related files
-COPY docker/entrypoint.sh ${WHEELS}/entrypoint.sh
+COPY docker/entrypoint_dev.sh ${WHEELS}/entrypoint_dev.sh
 RUN chmod -R 700 ${WHEELS} &&\
   dos2unix ${WHEELS}/*.sh
 
-FROM base 
+FROM base
 
 # Get the pre-built python wheels from the build environment
 RUN mkdir ${WEB_ROOT}
@@ -86,17 +86,14 @@ RUN set -ex \
     && npm install -g yarn
 
 # Install Yarn components
-COPY ./arches/install/package.json ${ARCHES_ROOT}/arches/install/package.json
-COPY ./arches/install/.yarnrc ${ARCHES_ROOT}/arches/install/.yarnrc
-COPY ./arches/install/yarn.lock ${ARCHES_ROOT}/arches/install/yarn.lock
-WORKDIR ${ARCHES_ROOT}/arches/install
+WORKDIR ${ARCHES_ROOT}
 RUN mkdir -p ${ARCHES_ROOT}/arches/app/media/packages
 RUN yarn install
 
 ## Install virtualenv
 WORKDIR ${WEB_ROOT}
 
-RUN mv ${WHEELS}/entrypoint.sh entrypoint.sh
+RUN mv ${WHEELS}/entrypoint_dev.sh entrypoint_dev.sh
 
 RUN python3.8 -m venv ENV \
     && . ENV/bin/activate \
@@ -126,10 +123,9 @@ WORKDIR ${ARCHES_ROOT}
 COPY docker/gunicorn_config.py ${ARCHES_ROOT}/gunicorn_config.py
 COPY docker/settings_local.py ${ARCHES_ROOT}/arches/settings_local.py
 
-# Set entrypoint
-ENTRYPOINT ["../entrypoint.sh"]
+# Set entrypoint_dev
+ENTRYPOINT ["../entrypoint_dev.sh"]
 CMD ["run_arches"]
 
 # Expose port 8000
 EXPOSE 8000
-

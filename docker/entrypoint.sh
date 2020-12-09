@@ -17,17 +17,17 @@ display_help() {
 
 CUSTOM_SCRIPT_FOLDER=${CUSTOM_SCRIPT_FOLDER:-/docker/entrypoint}
 if [[ -z ${ARCHES_PROJECT} ]]; then
-	APP_FOLDER=${ARCHES_ROOT}
-	PACKAGE_JSON_FOLDER=${ARCHES_ROOT}/arches/install
+	APP_FOLDER=${ARCHES_ROOT}/projects
+	PACKAGE_JSON_FOLDER=${ARCHES_ROOT}
 else
-	APP_FOLDER=${WEB_ROOT}/${ARCHES_PROJECT}
+	APP_FOLDER=${WEB_ROOT}/projects/${ARCHES_PROJECT}
 	# due to https://github.com/archesproject/arches/issues/4841, changes were made to yarn install
 	# and module deployment. Using the arches install directory for yarn.
-	PACKAGE_JSON_FOLDER=${ARCHES_ROOT}/arches/install
+	PACKAGE_JSON_FOLDER=${ARCHES_ROOT}
 fi
 
 # Read modules folder from yarn config file
-# Get string after '--install.modules-folder' -> get first word of the result 
+# Get string after '--install.modules-folder' -> get first word of the result
 # -> remove line endlings -> trim quotes -> trim leading ./
 YARN_MODULES_FOLDER=${PACKAGE_JSON_FOLDER}/$(awk \
 	-F '--install.modules-folder' '{print $2}' ${PACKAGE_JSON_FOLDER}/.yarnrc \
@@ -218,9 +218,8 @@ init_arches_project() {
 			echo ""
 
 			cd_web_root
-			[[ -d ${APP_FOLDER} ]] || mkdir ${APP_FOLDER}
 
-			arches-project create ${ARCHES_PROJECT} --directory ${ARCHES_PROJECT}
+			arches-project create ${ARCHES_PROJECT}
 
 			exit_code=$?
 			if [[ ${exit_code} != 0 ]]; then
@@ -320,7 +319,13 @@ run_django_server() {
 	echo "----- *** RUNNING DJANGO DEVELOPMENT SERVER *** -----"
 	echo ""
 	cd_app_folder
-	exec python manage.py runserver 0.0.0.0:${DJANGO_PORT}
+	if [[ ${DJANGO_REMOTE_DEBUG} != "True" ]]; then
+	    echo "Running Django with livereload."
+		exec python manage.py runserver 0.0.0.0:${DJANGO_PORT}
+	else
+        echo "Running Django with options --noreload --nothreading for remote debugging."
+		exec python manage.py runserver --noreload --nothreading 0.0.0.0:${DJANGO_PORT}
+	fi
 }
 
 
