@@ -884,6 +884,8 @@ class TileModel(models.Model):  # Tile
 
     def save(self, *args, **kwargs):
         if self.sortorder is None or (self.provisionaledits is not None and self.data == {}):
+            kwargs.pop("request", None)
+            kwargs.pop("index", None)
             sortorder_max = TileModel.objects.filter(
                 nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id
             ).aggregate(Max("sortorder"))["sortorder__max"]
