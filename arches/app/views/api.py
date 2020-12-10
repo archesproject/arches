@@ -1147,3 +1147,13 @@ class NodeValue(APIBase):
             response = JSONResponse(_("User does not have permission to edit this node."), status=403)
 
         return response
+
+
+class Annotations(APIBase):
+    def get(self, request):
+        canvas = request.GET.get("canvas", None)
+        annotations = models.VwAnnotation.objects.all()
+        if canvas is not None:
+            annotations = annotations.filter(canvas=canvas)
+        response = JSONResponse(annotations)
+        return response

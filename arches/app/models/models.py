@@ -1357,3 +1357,16 @@ class GroupMapSettings(models.Model):
     class Meta:
         managed = True
         db_table = "group_map_settings"
+
+class VwAnnotation(models.Model):
+    feature_id = models.UUIDField(primary_key=True)
+    tile = models.ForeignKey(TileModel, on_delete=models.DO_NOTHING, db_column="tileid")
+    resourceinstance = models.ForeignKey(ResourceInstance, on_delete=models.DO_NOTHING, db_column="resourceinstanceid")
+    nodegroup = models.ForeignKey(NodeGroup, on_delete=models.DO_NOTHING, db_column="nodegroupid")
+    node = models.ForeignKey(Node, on_delete=models.DO_NOTHING, db_column="nodeid")
+    feature = JSONField(blank=True, null=True, db_column="feature")
+    canvas = models.TextField()
+
+    class Meta:
+        managed = False
+        db_table = 'vw_annotations'
