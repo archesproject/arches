@@ -34,23 +34,7 @@ define([
     function viewModel(params) {
         var self = this;
 
-        // if (params.workflow) {
-        //     if (!params.resourceid()) {
-        //         if (params.workflow.state.steps[params._index]) {
-        //             this.resourceId(params.workflow.state.steps[params._index].resourceid);
-        //         } else {
-        //             this.resourceId(params.workflow.state.resourceid);
-        //         }
-        //     } else {
-        //         this.resourceId = params.resourceid;
-        //     }
-        // }
-
-        // this.url = arches.urls.api_card + ko.unwrap(params.graphid);
-        
-        this.alert = params.alert || ko.observable(null);
-        this.altButtons =  params.altButtons || ko.observable(null);
-        this.hideDefaultButtons = params.hideDefaultButtons || ko.observable(false);
+        console.log("!!!", params)
         
         this.loading = params.loading || ko.observable(false);
         this.complete = params.complete || ko.observable(false);
@@ -62,34 +46,41 @@ define([
             sections: ko.observableArray(),
         };
 
-        /* setup pageLayout */ 
-        ko.toJS(params.layoutSections).forEach(function(layoutSection) {
-            var section = new Section(layoutSection.sectionTitle)
+        this.updatePageLayout = function(layoutSections) {
+            self.requiredComponentData = {};
+            self.pageLayout.sections([]);
 
-            layoutSection.componentConfigs.forEach(function(componentConfig) {
-                var componentConfig = new ComponentConfig(componentConfig);
-
-                /* if a component is marked as 'required' let's add a subscription to track its value */ 
-                if (componentConfig.required) {
-                    self.requiredComponentData[componentConfig.uniqueInstanceName] = ko.observable();
-
-                    componentConfig['value'].subscribe(function(value) {
-                        self.requiredComponentData[componentConfig.uniqueInstanceName](value);
-
-                        var complete = Object.values(self.requiredComponentData).reduce(function(acc, value) {
-                            if (!value()) { acc = false }
-                            return acc;
-                        }, true);
-
-                        self.complete(complete);
-                    });
-                }
-
-                section.componentConfigs.push(componentConfig);
+            layoutSections.forEach(function(layoutSection) {
+                var section = new Section(layoutSection.sectionTitle)
+    
+                layoutSection.componentConfigs.forEach(function(componentConfig) {
+                    var componentConfig = new ComponentConfig(componentConfig);
+    
+                    /* if a component is marked as 'required' let's add a subscription to track its value */ 
+                    if (componentConfig.required) {
+                        self.requiredComponentData[componentConfig.uniqueInstanceName] = ko.observable();
+    
+                        componentConfig.value.subscribe(function(value) {
+                            self.requiredComponentData[componentConfig.uniqueInstanceName](value);
+    
+                            var complete = Object.values(self.requiredComponentData).reduce(function(acc, value) {
+                                if (!value()) { acc = false }
+                                return acc;
+                            }, true);
+    
+                            self.complete(complete);
+                        });
+                    }
+    
+                    section.componentConfigs.push(componentConfig);
+                });
+    
+                self.pageLayout.sections.push(section);
             });
+        };
 
-            self.pageLayout.sections.push(section);
-        });
+        this.updatePageLayout(koMapping.toJS(params.layoutSections));
+
 
         params.defineStateProperties = function(){
             // Collects those properties that you want to set to the state.
@@ -108,18 +99,13 @@ define([
             var wastebin;
             if (ko.unwrap(params.wastebin)) {
                 wastebin = koMapping.toJS(params.wastebin)
-
-                // if (ko.unwrap(wastebin.hasOwnProperty('resourceid'))) {
-                //     wastebin.resourceid = ko.unwrap(params.resourceid);
-                // }
             }
             
             return {
-                // resourceid: ko.unwrap(params.resourceid) || this.workflow.state.resourceid,
-                wastebin: wastebin
+                wastebin: wastebin,
+                pageLayout: koMapping.toJS(self.pageLayout),
             };
         };
-
 
         this.setStateProperties = function(){
             // Sets properties in defineStateProperties to the state.
@@ -128,21 +114,14 @@ define([
             }
         };
 
-        // self.onSaveSuccess = function(tiles) {
-        //     // var tile;
-        //     // if (tiles.length > 0 || typeof tiles == 'object') {
-        //     //     tile = tiles[0] || tiles;
-        //     //     params.resourceid(tile.resourceinstance_id);
-        //     //     params.tileid(tile.tileid);
-        //     //     self.resourceId(tile.resourceinstance_id);
-        //     // }
-        //     self.setStateProperties();
-        //     if (params.workflow) {
-        //         params.workflow.updateUrl();
-        //     }
-        //     if (self.completeOnSave === true) { self.complete(true); }
-        // };
+        this.finish = function() {
+            self.setStateProperties();
+        };
 
+        this.quit = function() {
+            self.updatePageLayout(koMapping.toJS(params.layoutSections));
+            self.setStateProperties();
+        };
     }
     ko.components.register('new-step', {
         viewModel: viewModel,

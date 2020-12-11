@@ -22,11 +22,20 @@
 <!-- /ko -->
 <!-- ko if: complete() -->
 <div style="display: flex;">
-    <button>
-        Finish
+    <button data-bind="click: finish">
+        <span class="fa-stack">
+            <i class="fa fa-cloud fa-stack-2x"></i>
+            <i class="fa fa-check fa-inverse fa-stack-1x"></i>
+        </span>
+        <span>
+            Finish
+        </span>
     </button>
-    <button>
-        Quit
+    <button data-bind="click: quit">
+        <i class="fa fa-times-circle fa-2x"></i>
+        <span>
+            Quit
+        </span>
     </button>
 </div>
 <!-- /ko -->
