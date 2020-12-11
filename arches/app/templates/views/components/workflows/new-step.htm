@@ -1,22 +1,27 @@
-<!-- ko foreach: { data: layoutSections(), as: 'layoutSection'} -->
+<!-- ko foreach: { data: pageLayout.sections(), as: 'layoutSection'} -->
     <div style="padding:10px 0px;">
         <div 
             data-bind="text: layoutSection.sectionTitle"
             style="padding-bottom: 5px;"
         ></div>
-        <!-- ko foreach: { data: layoutSection.widgetConfigs, as: 'widgetConfig'} -->
+        <!-- ko foreach: { data: layoutSection.componentConfigs(), as: 'componentConfig'} -->
+            <div style="display:none" data-bind="text: console.log($data)"></div>
+
             <div data-bind='{
                 component: {
-                    name: $data.widget.name,
-                    params: { foo: widgetConfig }
+                    name: $data.componentName,
+                    params: { 
+                        foo: componentConfig,
+                        graphids: componentConfig.graphIds,
+                    }
                 },
-                attr: { id: $data.widgetInstanceName }
+                attr: { id: $data.uniqueInstanceName }
             }'></div>
         <!-- /ko -->
     </div>
 <!-- /ko -->
 <!-- ko if: complete() -->
-<div style="display: flex;"">
+<div style="display: flex;">
     <button>
         Finish
     </button>

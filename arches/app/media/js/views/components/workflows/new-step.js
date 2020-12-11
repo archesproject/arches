@@ -8,6 +8,29 @@ define([
     'viewmodels/card',
     'viewmodels/alert',
 ], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, AlertViewModel) {
+    function Section(sectionTitle, componentConfigs) {
+        if (!componentConfigs) {
+            componentConfigs = ko.observableArray();
+        }
+
+        return {
+            sectionTitle: sectionTitle,
+            componentConfigs: componentConfigs,
+        }
+    };
+
+    function ComponentConfig(componentConfig) {
+        return {
+            required: componentConfig.required,
+            uniqueInstanceName: componentConfig.uniqueInstanceName,
+            componentName: componentConfig.componentName,
+            graphIds: componentConfig.graphIds,
+            value: ko.observable(
+                componentConfig.defaultValue ? componentConfig.defaultValue : null
+            ),
+        }
+    };
+    
     function viewModel(params) {
         var self = this;
 
@@ -23,60 +46,50 @@ define([
         //     }
         // }
 
-        this.url = arches.urls.api_card + ko.unwrap(params.graphid);
+        // this.url = arches.urls.api_card + ko.unwrap(params.graphid);
         
         this.alert = params.alert || ko.observable(null);
         this.altButtons =  params.altButtons || ko.observable(null);
         this.hideDefaultButtons = params.hideDefaultButtons || ko.observable(false);
         
-        this.loading = params.loading || ko.observable(true);
+        this.loading = params.loading || ko.observable(false);
         this.complete = params.complete || ko.observable(false);
 
-        this.requiredWidgets = {};
+        this.requiredComponentData = {};
         
         /* source-of-truth for page data */
-        this.layoutSections = ko.observable();
+        this.pageLayout = {
+            sections: ko.observableArray(),
+        };
 
-        var generateInitialLayoutConfig = function() {
-            $.getJSON(self.url, function(data) {
-                /* add widgets to each section config */ 
-                var layoutSections = ko.toJS(params.layoutSections).map(function(layoutSection) {
-                    layoutSection.widgetConfigs.map(function(widgetConfig) {
-                        var widget = data.widgets.find(function(widget) { return widget.widgetid === widgetConfig.widgetid });
-                        if (widget) { 
-                            widgetConfig['widget'] = widget; 
-                            widgetConfig['value'] = ko.observable();
+        /* setup pageLayout */ 
+        ko.toJS(params.layoutSections).forEach(function(layoutSection) {
+            var section = new Section(layoutSection.sectionTitle)
 
-                            /* if the widget is marked as required, let's add a subscription to know when self.complete === true */ 
-                            if (widgetConfig.required) {
-                                self.requiredWidgets[widgetConfig.widgetInstanceName] = null;
+            layoutSection.componentConfigs.forEach(function(componentConfig) {
+                var componentConfig = new ComponentConfig(componentConfig);
 
-                                widgetConfig['value'].subscribe(function(value) {
-                                    self.requiredWidgets[widgetConfig.widgetInstanceName] = value;
+                /* if a component is marked as 'required' let's add a subscription to track its value */ 
+                if (componentConfig.required) {
+                    self.requiredComponentData[componentConfig.uniqueInstanceName] = ko.observable();
 
-                                    var complete = true;
-                                    Object.values(self.requiredWidgets).forEach(function(value) {
-                                        if (!Boolean(value)) { complete = false }
-                                    });
+                    componentConfig['value'].subscribe(function(value) {
+                        self.requiredComponentData[componentConfig.uniqueInstanceName](value);
 
-                                    // console.log(complete, self.layoutSections())
+                        var complete = Object.values(self.requiredComponentData).reduce(function(acc, value) {
+                            if (!value()) { acc = false }
+                            return acc;
+                        }, true);
 
-                                    self.complete(complete);
-                                });
-                            }
-                        }
+                        self.complete(complete);
                     });
-    
-                    return layoutSection;
-                });
+                }
 
-                self.layoutSections(layoutSections);
+                section.componentConfigs.push(componentConfig);
             });
 
-            self.loading = false;
-        };
-        
-        generateInitialLayoutConfig();
+            self.pageLayout.sections.push(section);
+        });
 
         params.defineStateProperties = function(){
             // Collects those properties that you want to set to the state.
