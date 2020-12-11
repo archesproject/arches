@@ -13,13 +13,9 @@ define([
     * @param  {string} params - a configuration object
     */
     var WidgetViewModel = function(params) {
-        this.externalObservables = ['value', 'config', 'expanded', 'defaultValueSubscription', 'valueSubscription'];
         var self = this;
-
-  
-        console.log(params)
-
-
+        
+        this.externalObservables = ['value', 'config', 'expanded', 'defaultValueSubscription', 'valueSubscription'];
         this.state = params.state || 'form';
         var expanded = params.expanded || ko.observable(false);
         var nodeid = params.node ? params.node.nodeid : uuid.generate();
@@ -63,13 +59,12 @@ define([
 
         this.disposables = [];
 
-
-        if (params.foo) {
-            var bar = self.value.subscribe(function(val){
-                params.foo['value'](val);
+        if (params.externalValueSubscription) {
+            var externalValueSubscription = self.value.subscribe(function(val){
+                params.externalValueSubscription(val);
             });
 
-            self.disposables.push(bar);
+            self.disposables.push(externalValueSubscription);
         }
 
         var subscribeConfigObservable = function(obs, key) {
