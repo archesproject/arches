@@ -32,7 +32,7 @@ from django.core.exceptions import PermissionDenied
 class ReIndexResources(View):
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
-        index_resources_by_type(data["graphids"], clear_index=False, batch_size=4000)
+        index_resources_by_type(data["graphids"], clear_index=False, batch_size=4000, quiet=True)
         return JSONResponse(data)
 
 

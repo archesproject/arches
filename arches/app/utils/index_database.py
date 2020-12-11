@@ -14,7 +14,7 @@ from arches.app.utils import import_class_from_string
 from datetime import datetime
 
 
-def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
+def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):
     """
     Deletes any existing indicies from elasticsearch and then indexes all
     concepts and resources from the database
@@ -22,22 +22,24 @@ def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
     Keyword Arguments:
     clear_index -- set to True to remove all the resources and concepts from the index before the reindexing operation
     batch_size -- the number of records to index as a group, the larger the number to more memory required
+    quiet -- Silences the status bar output during certain operations, use in celery operations for example
 
     """
 
     index_concepts(clear_index=clear_index, batch_size=batch_size)
-    index_resources(clear_index=clear_index, batch_size=batch_size)
-    index_custom_indexes(clear_index=clear_index, batch_size=batch_size)
+    index_resources(clear_index=clear_index, batch_size=batch_size, quiet=quiet)
+    index_custom_indexes(clear_index=clear_index, batch_size=batch_size, quiet=quiet)
     index_resource_relations(clear_index=clear_index, batch_size=batch_size)
 
 
-def index_resources(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
+def index_resources(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):
     """
     Indexes all resources from the database
 
     Keyword Arguments:
     clear_index -- set to True to remove all the resources from the index before the reindexing operation
     batch_size -- the number of records to index as a group, the larger the number to more memory required
+    quiet -- Silences the status bar output during certain operations, use in celery operations for example
 
     """
 
@@ -50,10 +52,10 @@ def index_resources(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE
         .exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         .values_list("graphid", flat=True)
     )
-    index_resources_by_type(resource_types, clear_index=clear_index, batch_size=batch_size)
+    index_resources_by_type(resource_types, clear_index=clear_index, batch_size=batch_size, quiet=quiet)
 
 
-def index_resources_by_type(resource_types, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
+def index_resources_by_type(resource_types, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):
     """
     Indexes all resources of a given type(s)
 
@@ -63,6 +65,7 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
     Keyword Arguments:
     clear_index -- set to True to remove all the resources of the types passed in from the index before the reindexing operation
     batch_size -- the number of records to index as a group, the larger the number to more memory required
+    quiet -- Silences the status bar output during certain operations, use in celery operations for example
 
     """
 
@@ -84,9 +87,10 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
 
         with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
             with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
-                bar = pyprind.ProgBar(len(resources), bar_char="█") if len(resources) > 1 else None
+                if quiet is False:
+                    bar = pyprind.ProgBar(len(resources), bar_char="█") if len(resources) > 1 else None
                 for resource in resources:
-                    if bar is not None:
+                    if quiet is False and bar is not None:
                         bar.update(item_id=resource)
                     document, terms = resource.get_documents_to_index(
                         fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
@@ -105,7 +109,7 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
     return status
 
 
-def index_custom_indexes(index_name=None, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
+def index_custom_indexes(index_name=None, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):
     """
     Indexes any custom indexes, optionally by name
 
@@ -113,15 +117,17 @@ def index_custom_indexes(index_name=None, clear_index=True, batch_size=settings.
     index_name -- if supplied will only reindex the custom index with the given name
     clear_index -- set to True to remove all the resources of the types passed in from the index before the reindexing operation
     batch_size -- the number of records to index as a group, the larger the number to more memory required
+    quiet -- Silences the status bar output during certain operations, use in celery operations for example
+
     """
 
     if index_name is None:
         for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
             es_index = import_class_from_string(index["module"])(index["name"])
-            es_index.reindex(clear_index=clear_index, batch_size=batch_size)
+            es_index.reindex(clear_index=clear_index, batch_size=batch_size, quiet=quiet)
     else:
         es_index = get_index(index_name)
-        es_index.reindex(clear_index=clear_index, batch_size=batch_size)
+        es_index.reindex(clear_index=clear_index, batch_size=batch_size, quiet=quiet)
 
 
 def index_resource_relations(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
