@@ -120,7 +120,9 @@ class Command(BaseCommand):
             self.remove_index(name=options["name"])
 
         if options["operation"] == "index_database":
-            self.index_database(batch_size=options["batch_size"], clear_index=options["clear_index"], name=options["name"], quiet=options["quiet"])
+            self.index_database(
+                batch_size=options["batch_size"], clear_index=options["clear_index"], name=options["name"], quiet=options["quiet"]
+            )
 
         if options["operation"] == "reindex_database":
             self.reindex_database(batch_size=options["batch_size"], name=options["name"], quiet=options["quiet"])
@@ -129,7 +131,9 @@ class Command(BaseCommand):
             index_database_util.index_concepts(clear_index=options["clear_index"], batch_size=options["batch_size"])
 
         if options["operation"] == "index_resources":
-            index_database_util.index_resources(clear_index=options["clear_index"], batch_size=options["batch_size"], quiet=options["quiet"])
+            index_database_util.index_resources(
+                clear_index=options["clear_index"], batch_size=options["batch_size"], quiet=options["quiet"]
+            )
 
         if options["operation"] == "index_resource_relations":
             index_database_util.index_resource_relations(clear_index=options["clear_index"], batch_size=options["batch_size"])
