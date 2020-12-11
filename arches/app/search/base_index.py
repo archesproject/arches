@@ -86,11 +86,11 @@ class BaseIndex(object):
         self.se.refresh(index=self.index_name)
         count_before = self.se.count(index=self.index_name, body=q.dsl)
         result_summary = {"database": len(resources), "indexed": 0}
-        if quiet == False:
+        if quiet is False:
             bar = pyprind.ProgBar(len(resources), bar_char="█") if len(resources) > 1 else None
         with self.se.BulkIndexer(batch_size=batch_size, refresh=True) as indexer:
             for resource in resources:
-                if quiet == False and bar is not None:
+                if quiet is False and bar is not None:
                     bar.update(item_id=resource)
                 tiles = list(models.TileModel.objects.filter(resourceinstance=resource))
                 document, doc_id = self.get_documents_to_index(resource, tiles)

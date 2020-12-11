@@ -87,10 +87,10 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
 
         with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
             with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
-                if quiet == False:
+                if quiet is False:
                     bar = pyprind.ProgBar(len(resources), bar_char="█") if len(resources) > 1 else None
                 for resource in resources:
-                    if quiet == False and bar is not None:
+                    if quiet is False and bar is not None:
                         bar.update(item_id=resource)
                     document, terms = resource.get_documents_to_index(
                         fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
