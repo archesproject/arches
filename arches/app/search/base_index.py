@@ -69,13 +69,15 @@ class BaseIndex(object):
         if document is not None and id is not None:
             self.se.index_data(index=self.index_name, body=document, id=id)
 
-    def index_resources(self, resources=None, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
+    def index_resources(self, resources=None, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):
         """
         Indexes a list of resources in bulk to Elastic Search
 
         Keyword Arguments:
         resources -- the list of resource instances to index
         batch_size -- the number of records to index as a group, the larger the number to more memory required
+        quiet -- Silences the status bar output during certain operations, use in celery operations for example
+
         Return: None
         """
 
@@ -84,10 +86,11 @@ class BaseIndex(object):
         self.se.refresh(index=self.index_name)
         count_before = self.se.count(index=self.index_name, body=q.dsl)
         result_summary = {"database": len(resources), "indexed": 0}
-        bar = pyprind.ProgBar(len(resources), bar_char="█") if len(resources) > 1 else None
+        if quiet is False:
+            bar = pyprind.ProgBar(len(resources), bar_char="█") if len(resources) > 1 else None
         with self.se.BulkIndexer(batch_size=batch_size, refresh=True) as indexer:
             for resource in resources:
-                if bar is not None:
+                if quiet is False and bar is not None:
                     bar.update(item_id=resource)
                 tiles = list(models.TileModel.objects.filter(resourceinstance=resource))
                 document, doc_id = self.get_documents_to_index(resource, tiles)
@@ -117,7 +120,7 @@ class BaseIndex(object):
 
         self.se.delete_index(index=self.index_name)
 
-    def reindex(self, graphids=None, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
+    def reindex(self, graphids=None, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):
         """
         Reindexes the index.  By default this does nothing, it needs to be implemented in a subclass.
         By default you can pass in a list of graph ids to trigger the reindex.  This will loop through all resource instances of each graph type.
@@ -142,7 +145,7 @@ class BaseIndex(object):
 
             for graphid in graphids:
                 resources = Resource.objects.filter(graph_id=graphid)
-                self.index_resources(resources=resources, batch_size=batch_size)
+                self.index_resources(resources=resources, batch_size=batch_size, quiet=quiet)
         else:
             raise NotImplementedError
 
