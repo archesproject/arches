@@ -20,13 +20,14 @@ define([
     };
 
     function ComponentConfig(componentConfig) {
+        console.log(componentConfig)
         return {
             required: componentConfig.required,
             uniqueInstanceName: componentConfig.uniqueInstanceName,
             componentName: componentConfig.componentName,
             graphIds: componentConfig.graphIds,
             value: ko.observable(
-                componentConfig.defaultValue ? componentConfig.defaultValue : null
+                componentConfig.value ? componentConfig.value() : null
             ),
         }
     };
@@ -34,8 +35,6 @@ define([
     function viewModel(params) {
         var self = this;
 
-        console.log("!!!", params)
-        
         this.loading = params.loading || ko.observable(false);
         this.complete = params.complete || ko.observable(false);
 
@@ -50,25 +49,25 @@ define([
             self.requiredComponentData = {};
             self.pageLayout.sections([]);
 
-            layoutSections.forEach(function(layoutSection) {
+            layoutSections().forEach(function(layoutSection) {
                 var section = new Section(layoutSection.sectionTitle)
-    
-                layoutSection.componentConfigs.forEach(function(componentConfig) {
+
+                layoutSection.componentConfigs().forEach(function(componentConfig) {
                     var componentConfig = new ComponentConfig(componentConfig);
     
                     /* if a component is marked as 'required' let's add a subscription to track its value */ 
-                    if (componentConfig.required) {
-                        self.requiredComponentData[componentConfig.uniqueInstanceName] = ko.observable();
+                    if (componentConfig.required()) {
+                        self.requiredComponentData[componentConfig.uniqueInstanceName()] = ko.observable();
     
                         componentConfig.value.subscribe(function(value) {
-                            self.requiredComponentData[componentConfig.uniqueInstanceName](value);
+                            self.requiredComponentData[componentConfig.uniqueInstanceName()](value);
     
-                            var complete = Object.values(self.requiredComponentData).reduce(function(acc, value) {
+                            var allRequiredDataObtained = Object.values(self.requiredComponentData).reduce(function(acc, value) {
                                 if (!value()) { acc = false }
                                 return acc;
                             }, true);
-    
-                            self.complete(complete);
+
+                            if (allRequiredDataObtained) { self.finish(); }
                         });
                     }
     
@@ -79,7 +78,55 @@ define([
             });
         };
 
-        this.updatePageLayout(koMapping.toJS(params.layoutSections));
+        this.getStateProperties = function(){
+            // Gets properties in defineStateProperties to the state.
+            if (params.workflow) {
+                return params.workflow.state.steps[params._index];
+            }
+        };
+
+        this.setStateProperties = function(){
+            // Sets properties in defineStateProperties to the state.
+            if (params.workflow) {
+                params.workflow.state.steps[params._index] = params.defineStateProperties();
+            }
+        };
+
+        this.finish = function() {
+            self.setStateProperties();
+
+            if (self.complete() === false) {
+                self.complete(true);
+            }
+        };
+
+        this.quit = function() {
+            this.complete(false);
+            self.updatePageLayout(koMapping.toJS(params.layoutSections));
+            self.setStateProperties();
+        };
+
+
+
+
+        /* BEGIN logic to run on load */ 
+
+        console.log('000', params, self.getStateProperties())
+
+        
+        if (self.complete() === true) {
+            var previouslySavedData = self.getStateProperties();
+
+            if (previouslySavedData && previouslySavedData.pageLayout.sections) {
+                this.updatePageLayout(previouslySavedData.pageLayout.sections);
+            }
+        }
+        else {
+            this.updatePageLayout(params.layoutSections);
+        }
+
+        /* END logic to run on load */ 
+
 
 
         params.defineStateProperties = function(){
@@ -103,24 +150,8 @@ define([
             
             return {
                 wastebin: wastebin,
-                pageLayout: koMapping.toJS(self.pageLayout),
+                pageLayout: self.pageLayout,
             };
-        };
-
-        this.setStateProperties = function(){
-            // Sets properties in defineStateProperties to the state.
-            if (params.workflow) {
-                params.workflow.state.steps[params._index] = params.defineStateProperties();
-            }
-        };
-
-        this.finish = function() {
-            self.setStateProperties();
-        };
-
-        this.quit = function() {
-            self.updatePageLayout(koMapping.toJS(params.layoutSections));
-            self.setStateProperties();
         };
     }
     ko.components.register('new-step', {

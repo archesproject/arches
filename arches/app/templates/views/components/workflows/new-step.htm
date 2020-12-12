@@ -1,39 +1,38 @@
 <!-- ko foreach: { data: pageLayout.sections(), as: 'layoutSection'} -->
     <div style="padding:10px 0px;">
         <div 
-            data-bind="text: layoutSection.sectionTitle"
+            data-bind="text: layoutSection.sectionTitle()"
             style="padding-bottom: 5px;"
         ></div>
         <!-- ko foreach: { data: layoutSection.componentConfigs(), as: 'componentConfig'} -->
-            <div style="display:none" data-bind="text: console.log($data)"></div>
-
             <div data-bind='{
                 component: {
-                    name: $data.componentName,
+                    name: componentConfig.componentName(),
                     params: { 
-                        externalValueSubscription: componentConfig.value,
-                        graphids: componentConfig.graphIds,
+                        value: componentConfig.value,
+                        graphids: componentConfig.graphIds(),
                     }
                 },
-                attr: { id: $data.uniqueInstanceName }
             }'></div>
         <!-- /ko -->
     </div>
 <!-- /ko -->
 <!-- ko if: complete() -->
 <div style="display: flex;">
-    <button data-bind="click: finish">
+    <button style="display:flex; align-items: center; margin: 5px;"  data-bind="click: finish">
         <span class="fa-stack">
             <i class="fa fa-cloud fa-stack-2x"></i>
             <i class="fa fa-check fa-inverse fa-stack-1x"></i>
         </span>
-        <span>
+        <span style="padding: 0px 5px;">
             Finish
         </span>
     </button>
-    <button data-bind="click: quit">
-        <i class="fa fa-times-circle fa-2x"></i>
+    <button style="display:flex; align-items: center; margin: 5px;" data-bind="click: quit">
         <span>
+            <i class="fa fa-times-circle fa-2x"></i>
+        </span>
+        <span style="padding: 0px 5px;">
             Quit
         </span>
     </button>

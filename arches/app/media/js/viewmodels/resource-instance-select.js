@@ -229,6 +229,7 @@ define([
         var url = ko.observable(arches.urls.search_results);
         this.url = url;
         var resourceToAdd = ko.observable("");
+        console.log("!!&&", self)
         this.select2Config = {
             value: self.renderContext === 'search' ? self.value : resourceToAdd,
             clickBubble: true,
