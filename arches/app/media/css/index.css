@@ -67,6 +67,11 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     color: #13ce67;
 }
 
+.nav>li>a:focus, .nav>li>a:hover {
+    text-decoration: none;
+    background-color: inherit;
+}
+
 .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
     padding: 0px 0px 0px;
     z-index: 100;

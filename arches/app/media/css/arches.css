@@ -10798,8 +10798,8 @@ table.table.dataTable {
 }
 
 .search-popup-panel {
-    position: absolute;
-    top: 0px;
+    position: fixed;
+    top: 101px;
     right: 0px;
     z-index: 900;
     background-color: #fff;
