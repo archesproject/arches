@@ -209,7 +209,7 @@ define([
                     if (data.permissions) {
                         try {
                             data.permissions = JSON.parse(ko.unwrap(data.permissions));
-                        } catch(err) {
+                        } catch (err) {
                             data.permissions = koMapping.toJS(ko.unwrap(data.permissions));
                         }
                         if (data.permissions.users_without_edit_perm.indexOf(ko.unwrap(self.userid)) === -1) {
