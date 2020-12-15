@@ -224,7 +224,14 @@ class Tile(models.TileModel):
 
             # this should only ever return at most one tile
             if len(existing_tiles) > 0 and self.tileid not in existing_tiles:
-                message = _("Trying to save a tile to a card with cardinality 1 where a tile has previously been saved.")
+                card = models.CardModel.objects.get(nodegroup=self.nodegroup)
+                message = _("Unable to save a tile to a card with cardinality 1 where a tile has previously been saved.")
+                details = _(
+                    "Details: card: {0}, graph: {1}, resource: {2}, tile: {3}, nodegroup: {4}".format(
+                        card.name, self.resourceinstance.graph.name, self.resourceinstance_id, self.tileid, self.nodegroup_id
+                    )
+                )
+                message += " " + details
                 raise TileCardinalityError(message)
 
     def check_for_constraint_violation(self):
