@@ -213,7 +213,7 @@ class Tile(models.TileModel):
 
     def check_tile_cardinality_violation(self):
         if settings.BYPASS_CARDINALITY_TILE_VALIDATION:
-            return 
+            return
         if self.nodegroup.cardinality == "1":
             kwargs = {"nodegroup": self.nodegroup, "resourceinstance_id": self.resourceinstance_id}
             try:
@@ -238,7 +238,7 @@ class Tile(models.TileModel):
 
     def check_for_constraint_violation(self):
         if settings.BYPASS_UNIQUE_CONSTRAINT_TILE_VALIDATION:
-            return 
+            return
         card = models.CardModel.objects.get(nodegroup=self.nodegroup)
         constraints = models.ConstraintModel.objects.filter(card=card)
         if constraints.count() > 0:
@@ -272,7 +272,7 @@ class Tile(models.TileModel):
 
     def check_for_missing_nodes(self, request):
         if settings.BYPASS_REQUIRED_VALUE_TILE_VALIDATION:
-            return 
+            return
         missing_nodes = []
         for nodeid, value in self.data.items():
             try:
