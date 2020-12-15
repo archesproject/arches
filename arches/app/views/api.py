@@ -996,6 +996,16 @@ class IIIFManifest(APIBase):
         return response
 
 
+class IIIFAnnotations(APIBase):
+    def get(self, request):
+        canvas = request.GET.get("canvas", None)
+        annotations = models.VwAnnotation.objects.all()
+        if canvas is not None:
+            annotations = annotations.filter(canvas=canvas)
+        response = JSONResponse(annotations)
+        return response
+
+
 class OntologyProperty(APIBase):
     def get(self, request):
         domain_ontology_class = request.GET.get("domain_ontology_class", None)
@@ -1146,14 +1156,4 @@ class NodeValue(APIBase):
         else:
             response = JSONResponse(_("User does not have permission to edit this node."), status=403)
 
-        return response
-
-
-class Annotations(APIBase):
-    def get(self, request):
-        canvas = request.GET.get("canvas", None)
-        annotations = models.VwAnnotation.objects.all()
-        if canvas is not None:
-            annotations = annotations.filter(canvas=canvas)
-        response = JSONResponse(annotations)
         return response

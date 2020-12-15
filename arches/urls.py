@@ -265,7 +265,7 @@ urlpatterns = [
     url(r"^reset/done/$", auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
     url(r"^o/", include("oauth2_provider.urls", namespace="oauth2")),
     url(r"^iiifmanifest$", api.IIIFManifest.as_view(), name="iiifmanifest"),
-    url(r"^annotations$", api.Annotations.as_view(), name="annotations"),
+    url(r"^iiifannotations$", api.IIIFAnnotations.as_view(), name="iiifannotations"),
 ]
 
 if settings.DEBUG:
