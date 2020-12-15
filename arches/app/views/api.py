@@ -999,12 +999,33 @@ class IIIFManifest(APIBase):
 class IIIFAnnotations(APIBase):
     def get(self, request):
         canvas = request.GET.get("canvas", None)
+        resourceid = request.GET.get("resourceid", None)
+        nodeid = request.GET.get("nodeid", None)
         permitted_nodegroups = [nodegroup for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]
         annotations = models.VwAnnotation.objects.filter(nodegroup__in=permitted_nodegroups)
         if canvas is not None:
             annotations = annotations.filter(canvas=canvas)
-        response = JSONResponse(annotations)
-        return response
+        if resourceid is not None:
+            annotations = annotations.filter(resourceinstance_id=resourceid)
+        if nodeid is not None:
+            annotations = annotations.filter(node_id=nodeid)
+        return JSONResponse({
+            "type": "FeatureCollection",
+            "features": [{
+                "id": annotation.feature["id"],
+                "geometry": annotation.feature["geometry"],
+                "properties": {
+                    **annotation.feature["properties"],
+                    **{
+                        "nodeId": annotation.node_id,
+                        "nodegroupId": annotation.nodegroup_id,
+                        "resourceId": annotation.resourceinstance_id,
+                        "graphId": annotation.node.graph_id,
+                        "tileId": annotation.tile_id
+                    }
+                },
+            } for annotation in annotations]
+        })
 
 
 class OntologyProperty(APIBase):
