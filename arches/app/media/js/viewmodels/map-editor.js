@@ -501,7 +501,7 @@ define([
 
         this.popupTemplate = popupTemplate;
 
-        self.isSelectable = function(feature){
+        self.isSelectable = function(feature) {
             var selectLayerIds = selectFeatureLayers.map(function(layer){
                 return layer.id;
             });
