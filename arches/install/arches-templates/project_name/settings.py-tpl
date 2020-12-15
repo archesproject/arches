@@ -150,6 +150,10 @@ CACHES = {
 # Hide nodes and cards in a report that have no data
 HIDE_EMPTY_NODES_IN_REPORT = False
 
+BYPASS_CARDINALITY_TILE_VALIDATION = True
+BYPASS_UNIQUE_CONSTRAINT_TILE_VALIDATION = False
+BYPASS_REQUIRED_VALUE_TILE_VALIDATION = False
+
 DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d" # Custom date format for dates imported from and exported to csv
 
 #Identify the usernames and duration (seconds) for which you want to cache the time wheel
