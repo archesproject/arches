@@ -791,6 +791,8 @@ class CsvReader(Reader):
 
                 def check_required_nodes(tile, parent_tile, required_nodes, all_nodes):
                     # Check that each required node in a tile is populated.
+                    if settings.BYPASS_REQUIRED_VALUE_TILE_VALIDATION:
+                        return
                     errors = []
                     if len(required_nodes) > 0:
                         if bool(tile.data):
