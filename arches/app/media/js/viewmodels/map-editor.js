@@ -502,7 +502,7 @@ define([
         this.popupTemplate = popupTemplate;
 
         self.isSelectable = function(feature) {
-            var selectLayerIds = selectFeatureLayers.map(function(layer){
+            var selectLayerIds = selectFeatureLayers.map(function(layer) {
                 return layer.id;
             });
             return selectLayerIds.indexOf(feature.layer.id) >= 0;
