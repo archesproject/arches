@@ -156,9 +156,9 @@ define([
                         var feature = geoJSON.features[0];
                         if (!!feature.properties && !!feature.properties.buffer){
                             var buffer = feature.properties.buffer;
-                            try {
+                            try{
                                 var bufferWidth = parseInt(buffer.width, 10);
-                                if (bufferWidth < 0 || bufferWidth > this.maxBuffer){
+                                if(bufferWidth < 0 || bufferWidth > this.maxBuffer){
                                     throw new Error('Whoops!');
                                 }
                             }
@@ -171,7 +171,7 @@ define([
 
                             try{
                                 var bufferUnit = buffer.unit;
-                                if (bufferUnit !== 'ft' && bufferUnit !== 'm'){
+                                if(bufferUnit !== 'ft' && bufferUnit !== 'm'){
                                     throw new Error('Whoops!');
                                 }
                             }
@@ -185,9 +185,9 @@ define([
 
                         if (!!feature.properties && !!feature.properties.inverted){
                             var inverted = feature.properties.inverted;
-                            try {
+                            try{
                                 var bufferWidth = parseInt(buffer.width, 10);
-                                if (inverted !== true && inverted !== false){
+                                if(inverted !== true && inverted !== false){
                                     throw new Error('Whoops!');
                                 }
                             }
@@ -240,7 +240,7 @@ define([
 
                 this.drawModes = _.pluck(this.spatialFilterTypes, 'drawMode');
 
-                this.drawMode.subscribe(function(selectedDrawTool) {
+                this.drawMode.subscribe(function(selectedDrawTool){
                     if(!!selectedDrawTool){
                         if(selectedDrawTool === 'extent'){
                             this.searchByExtent();
@@ -408,7 +408,7 @@ define([
                 this.drawMode(undefined);
             },
 
-            useMaxBuffer: function(unit, buffer, maxBuffer) {
+            useMaxBuffer: function (unit, buffer, maxBuffer) {
                 res = false;
                 if (unit === 'ft') {
                     res = (buffer * 0.3048) > maxBuffer
