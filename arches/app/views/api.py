@@ -21,6 +21,7 @@ from django.http import Http404, HttpResponse
 from django.http.request import QueryDict
 from django.core import management
 from django.core.cache import cache
+from django.forms.models import model_to_dict
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.core.files.base import ContentFile
@@ -1021,11 +1022,21 @@ class IIIFAnnotations(APIBase):
                         "nodegroupId": annotation.nodegroup_id,
                         "resourceId": annotation.resourceinstance_id,
                         "graphId": annotation.node.graph_id,
-                        "tileId": annotation.tile_id
+                        "tileId": annotation.tile_id,
                     }
                 },
             } for annotation in annotations]
         })
+
+
+class IIIFAnnotationNodes(APIBase):
+    def get(self, request, indent=None):
+        permitted_nodegroups = [nodegroup for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]
+        annotation_nodes = models.Node.objects.filter(nodegroup__in=permitted_nodegroups, datatype="annotation")
+        return JSONResponse([{
+            **model_to_dict(node),
+            "graph_name": node.graph.name
+        } for node in annotation_nodes])
 
 
 class OntologyProperty(APIBase):

@@ -266,6 +266,7 @@ urlpatterns = [
     url(r"^o/", include("oauth2_provider.urls", namespace="oauth2")),
     url(r"^iiifmanifest$", api.IIIFManifest.as_view(), name="iiifmanifest"),
     url(r"^iiifannotations$", api.IIIFAnnotations.as_view(), name="iiifannotations"),
+    url(r"^iiifannotationnodes$", api.IIIFAnnotationNodes.as_view(), name="iiifannotationnodes"),
 ]
 
 if settings.DEBUG:
