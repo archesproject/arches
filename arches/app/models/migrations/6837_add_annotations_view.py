@@ -1,3 +1,4 @@
+import django.contrib.postgres.fields.jsonb
 from django.db import migrations, models
 
 class Migration(migrations.Migration):
@@ -36,12 +37,24 @@ class Migration(migrations.Migration):
         AND n.datatype = 'annotation'::text;
     """
 
-    reverse_sql = ("DROP VIEW IF EXISTS vw_annotations;",)
+    reverse_sql = "DROP VIEW IF EXISTS vw_annotations;"
 
     operations = [
         migrations.RunSQL(
             sql,
             reverse_sql,
         ),
+        migrations.CreateModel(
+            name='VwAnnotation',
+            fields=[
+                ('feature_id', models.UUIDField(primary_key=True, serialize=False)),
+                ('tiledata', django.contrib.postgres.fields.jsonb.JSONField()),
+                ('feature', django.contrib.postgres.fields.jsonb.JSONField()),
+                ('canvas', models.TextField()),
+            ],
+            options={
+                'db_table': 'vw_annotations',
+                'managed': False,
+            },
+        ),
     ]
-
