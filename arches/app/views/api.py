@@ -999,7 +999,8 @@ class IIIFManifest(APIBase):
 class IIIFAnnotations(APIBase):
     def get(self, request):
         canvas = request.GET.get("canvas", None)
-        annotations = models.VwAnnotation.objects.all()
+        permitted_nodegroups = [nodegroup for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]
+        annotations = models.VwAnnotation.objects.filter(nodegroup__in=permitted_nodegroups)
         if canvas is not None:
             annotations = annotations.filter(canvas=canvas)
         response = JSONResponse(annotations)
