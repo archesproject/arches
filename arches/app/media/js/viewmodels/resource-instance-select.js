@@ -3,9 +3,10 @@ define([
     'underscore',
     'viewmodels/widget',
     'arches',
+    'uuid',
     'views/components/resource-summary',
     'utils/ontology'
-], function(ko, _, WidgetViewModel, arches, ResourceSummary, ontologyUtils) {
+], function(ko, _, WidgetViewModel, arches, uuid, ResourceSummary, ontologyUtils) {
     var resourceLookup = {};
     var graphCache = {};
     require(['views/components/workflows/new-tile-step']);
@@ -229,12 +230,16 @@ define([
         var url = ko.observable(arches.urls.search_results);
         this.url = url;
         var resourceToAdd = ko.observable("");
-        console.log("!!&&", self)
+        
+        if (self.value()) {
+            self.placeholder(self.value()[0].resourceName())
+        }
+
         this.select2Config = {
             value: self.renderContext === 'search' ? self.value : resourceToAdd,
             clickBubble: true,
             multiple: !self.displayOntologyTable ? params.multiple : false,
-            placeholder: this.placeholder() || arches.translations.riSelectPlaceholder,
+            placeholder: self.placeholder() || arches.translations.riSelectPlaceholder,
             closeOnSelect: true,
             allowClear: self.renderContext === 'search' ? true : false,
             onSelect: function(item) {

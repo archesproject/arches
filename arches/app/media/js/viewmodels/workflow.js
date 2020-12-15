@@ -4,11 +4,17 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'uuid',
     'viewmodels/alert',
     'viewmodels/workflow-step'
-], function(arches, $, _, ko, koMapping, AlertViewModel, Step) {
+], function(arches, $, _, ko, koMapping, uuid, AlertViewModel, Step) {
     var Workflow = function(config) {
         var self = this;
+
+        this.id = ko.observable();  
+        
+
+        
         this.steps = config.steps || [];
         this.activeStep = ko.observable();
         this.previousStep = ko.observable();
@@ -22,6 +28,48 @@ define([
             return [[arches.translations.workflowWastbinWarning.replace("${val}", val)],[arches.translations.workflowWastbinWarning2]];
         };
         this.warning = '';
+
+        this.initialize = function() {
+            var workflowId = self.getWorkflowIdFromUrl();
+
+            if (workflowId) {
+                self.id(workflowId);
+            }
+            else {
+                self.id(uuid.generate());
+                history.replaceState(null, '', `?workflowId=${self.id()}`)
+            }
+
+            /* add workflow to localStorage if not there already */
+            if (!localStorage.getItem(`workflowStep-${self.id()}`)) {
+                localStorage.setItem(`workflowStep-${self.id()}`, JSON.stringify([]));
+            }
+        };
+
+
+
+        this.getWorkflowIdFromUrl = function() {
+            var searchParams = new window.URLSearchParams(window.location.search);
+            return searchParams.get('workflowId');
+        };
+
+
+
+        this.foo = function() {
+            // var stepIds = self.steps.map(function(step) {
+            //     return step.id;
+            // });
+
+            console.log("CCC", self.getWorkflowIdFromUrl())
+
+            // if (!)
+
+            
+            console.log(self, config, self.steps[0].id)
+
+        }
+
+
 
         this.workflowName = ko.observable();
         this.getJSON = function(pluginJsonFileName) {
@@ -130,7 +178,12 @@ define([
                         step.workflow = self;
                         step.loading = self.loading;
                         step.alert = self.alert;
-                        self.steps[i] = new Step(step);
+
+                        var newStep = new Step(step);
+                        self.steps[i] = newStep;
+
+                        console.log("HERE!!!")
+
                         if (stateStepCount !== 0 && i <= stateStepCount) {
                             if(self.state.steps[i]) {
                                 self.steps[i].complete(self.state.steps[i].complete);
@@ -149,7 +202,24 @@ define([
                     self.activeStep(self.steps[0]);
                 }
             });
+
+            self.initialize();
+
         });
+
+        // this.writeToLocalStorage = function() {
+        //     console.log("OOOO", self)
+        //     //  stringifies && writes a value to localStorage
+
+        //     // localStorage.setItem(self.id, JSON.stringify())
+
+        //     self.steps.reduce(function(acc, step) {
+        //         acc[step.id] = JSON.stringify({});
+        //         return acc;
+        //     }, {});
+
+        // };
+        // this.writeToLocalStorage()
 
         this.updateUrl = function() {
             //Updates the url with the parameters needed for the next step

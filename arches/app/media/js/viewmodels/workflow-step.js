@@ -1,20 +1,41 @@
+const { param } = require("jquery");
+
 define([
     'knockout',
     'underscore',
-    'knockout-mapping'
-], function(ko, _, koMapping) {
+    'knockout-mapping',
+    'uuid'
+], function(ko, _, koMapping, uuid) {
     var WorkflowStep = function(config) {
+        this.id = uuid.generate();
+        this.workflowId = ko.observable(config.workflow ? config.workflow.id : null);
+
+        // if (this.workflowId()) {
+        //     /* let's add the step.id to the workflow's localStorage if not already there */ 
+        //     var workflowStepIds = localStorage.getItem(`workflow-${this.workflowId()}`);
+            
+        //     if (
+        //         workflowStepIds
+        //         && !workflowStepIds.some(function(workflowStepId) { return workflowStepId !== this.id })
+        //     ) {
+                
+        //     }
+        // }
+
         this.classUnvisited = 'workflow-step-icon';
         this.classActive = 'workflow-step-icon active';
         this.classComplete = 'workflow-step-icon complete';
         this.classCanAdavance = 'workflow-step-icon can-advance';
+
         this.icon = 'fa-chevron-circle-right';
         this.title = '';
         this.subtitle = '';
         this.description = '';
+        
         this.complete = ko.observable(false);
         this.required = ko.observable(ko.unwrap(config.required));
         this.autoAdvance = ko.observable(true);
+
         this.active = ko.computed(function() {
             return config.workflow.activeStep() === this;
         }, this);

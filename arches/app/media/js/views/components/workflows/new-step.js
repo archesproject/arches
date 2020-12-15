@@ -34,7 +34,9 @@ define([
     
     function viewModel(params) {
         var self = this;
+        console.log("AHAHA", self)
 
+        this.value = params.value || ko.observable();
         this.loading = params.loading || ko.observable(false);
         this.complete = params.complete || ko.observable(false);
 
