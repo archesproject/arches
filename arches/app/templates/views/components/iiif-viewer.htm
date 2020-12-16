@@ -76,6 +76,7 @@
 {% endblock sidepanel %}
 
 {% block content_management %}
+<!-- ko foreach: { data: [$data], as: 'self' } -->
 <div class="workbench-card-container" data-bind="css: {
         'gallery-visible': showGallery,
         'gallery-expanded': expandGallery
@@ -215,5 +216,6 @@
     </div>
     <!--/ko -->
 </div>
+<!--/ko -->
 <!--/ko -->
 {% endblock content_management %}

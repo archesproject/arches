@@ -6,6 +6,7 @@ define([
     'views/components/workbench',
     'leaflet-iiif',
     'leaflet-fullscreen',
+    'bindings/select2-query',
     'bindings/leaflet'
 ], function(arches, $, ko, L, WorkbenchViewmodel) {
     var IIIFViewerViewmodel = function(params) {
