@@ -12,24 +12,6 @@ define([
     function viewModel(params) {
         var self = this;
 
-        console.log("!!!((((", params)
-
-        this.resourceId = ko.observable();
-        if (params.workflow) {
-            if (!params.resourceid()) {
-                if (params.workflow.state.steps[params._index]) {
-                    this.resourceId(params.workflow.state.steps[params._index].resourceid);
-                } else {
-                    this.resourceId(params.workflow.state.resourceid);
-                }
-            } else {
-                this.resourceId = params.resourceid;
-            }
-            if (params.workflow.state.steps[params._index]) {
-                params.tileid(params.workflow.state.steps[params._index].tileid);
-            }
-        }
-
         this.url = arches.urls.api_card + (ko.unwrap(this.resourceId) || ko.unwrap(params.graphid));
         this.card = ko.observable();
         this.tile = ko.observable();
@@ -41,6 +23,19 @@ define([
         this.hideDefaultButtons = params.hideDefaultButtons || ko.observable(false);
         this.loading(true);
         this.customCardLabel = params.customCardLabel || false;
+
+        this.resourceId = ko.observable();
+        
+        if (ko.unwrap(params.resourceId)) {
+            self.resourceId = params.resourceId;
+        }
+
+        var cachedValue = ko.unwrap(params.value);
+        if (cachedValue) {
+            self.resourceId(cachedValue.resourceid);
+            params.tileid(cachedValue.tileid);
+        }
+
         var flattenTree = function(parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {
                 flatList.push(parent);

@@ -80,8 +80,6 @@ define([
                     step.loading = self.loading;
                     step.alert = self.alert;
 
-
-
                     /* if stepIds exist for this workflow in localStorage, set correct value */ 
                     if (stepIds.length) { step.id = stepIds[i]; }
 

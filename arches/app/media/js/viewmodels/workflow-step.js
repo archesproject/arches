@@ -52,7 +52,6 @@ define([
                 self.id(uuid.generate());
             }
 
-
             var cachedValue = self.getValueFromLocalStorage();
 
             if (cachedValue) {
