@@ -451,6 +451,10 @@ TIMEWHEEL_DATE_TIERS = None
 # Identify the usernames and duration (seconds) for which you want to cache the timewheel
 CACHE_BY_USER = {"anonymous": 3600 * 24}
 
+BYPASS_CARDINALITY_TILE_VALIDATION = True
+BYPASS_UNIQUE_CONSTRAINT_TILE_VALIDATION = False
+BYPASS_REQUIRED_VALUE_TILE_VALIDATION = False
+
 DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d"  # Custom date format for dates imported from and exported to csv
 
 DATE_FORMATS = {
@@ -584,7 +588,7 @@ ALLOWED_POPUP_HOSTS = []
 
 TILESERVER_URL = None
 
-CELERY_BROKER_URL = "amqp://guest:guest@localhost"
+CELERY_BROKER_URL = ""  # RabbitMQ --> "amqp://guest:guest@localhost",  Redis --> "redis://localhost:6379/0"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_RESULT_BACKEND = "django-db"  # Use 'django-cache' if you want to use your cache as your backend
 CELERY_TASK_SERIALIZER = "json"
@@ -670,10 +674,7 @@ def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
 try:
     from .settings_local import *
 except ImportError as e:
-    print(e)
-    print("Error attempting to load settings from relative '.settings_local'. Attempting 'arches.settings_local' import")
     try:
         from arches.settings_local import *
     except ImportError as e:
-        print("Error attempting to load settings from 'arches.settings_local.py'.")
-        print(e)
+        pass

@@ -111,8 +111,8 @@ define([
             r.childNodes = ko.observableArray([]);
             r.pageid = 'resourcemodel';
             r.selected = ko.observable(false);
-            r.namelong = 'Model Details';
-            r.description = 'Summary of how this model participates in the survey';
+            r.namelong = arches.translations.mobileSurveyNameLong;
+            r.description = arches.translations.mobileSurveyDesc;
             r.cards = self.getRootCards(r.cards);
             r.hasApprovedCards = ko.pureComputed(function(){
                 var result = r.cards().filter(function(c){return ko.unwrap(c.approved) === true;}).length > 0;

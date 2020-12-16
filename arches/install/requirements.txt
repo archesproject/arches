@@ -7,8 +7,8 @@ python-memcached==1.59
 celery==4.4.4
 django-celery-results==1.2.1
 mapbox-vector-tile==1.2.0
-SPARQLWrapper==1.8.4
-django-recaptcha==2.0.5
+SPARQLWrapper==1.8.5
+django-recaptcha==2.0.6
 edtf==4.0.1
 couchdb==1.2
 django-revproxy==0.9.15
@@ -18,7 +18,7 @@ python-docx==0.8.10
 PyLD[requests]==1.0.5
 pyprind==2.11.2
 pycryptodome<4.0.0,>=3.3.1
-pyshp==2.1.0
+pyshp==2.1.2
 requests[security]>=2.18.1
 python-slugify==4.0.0
 pillow==7.0.0

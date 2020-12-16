@@ -50,6 +50,7 @@ from arches.app.utils.decorators import can_delete_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.permission_backend import (
+    user_is_resource_editor,
     user_is_resource_reviewer,
     user_can_delete_resource,
     user_can_edit_resource,
@@ -360,6 +361,7 @@ class ResourcePermissionDataView(View):
                 "id": user.id,
                 "type": "user",
                 "default_permissions": self.get_perms(user, "user", resource_instance, ordered_perms),
+                "is_editor_or_reviewer": bool(user_is_resource_editor(user) or user_is_resource_reviewer(user)),
             }
             for user in User.objects.all()
         ]
@@ -856,6 +858,7 @@ class ResourceReportView(MapBaseManagerView):
                 ],
             ),
             resourceid=resourceid,
+            displayname=resource.displayname,
             version=__version__,
             hide_empty_nodes=settings.HIDE_EMPTY_NODES_IN_REPORT,
         )

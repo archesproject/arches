@@ -14,6 +14,14 @@ class BaseDataType(object):
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
         return []
 
+    def create_error_message(self, value, source, row_number, message):
+        source_info = "{0} {1}".format(source, row_number) if row_number else ""
+        error_message = {
+            "type": "ERROR",
+            "message": _("{0} error, {1} {2} - {3}. Unable to save.").format(self.datatype_model.datatype, value, source_info, message),
+        }
+        return error_message
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         """
         Assigns a given node value to the corresponding key in a document in
@@ -188,7 +196,12 @@ class BaseDataType(object):
         Returns a list of concept values for a given node
         """
         data = self.get_tile_data(tile)
-        return str(data[str(node.nodeid)])
+
+        if data:
+            display_value = data.get(str(node.nodeid))
+
+            if display_value:
+                return str(display_value)
 
     def get_search_terms(self, nodevalue, nodeid=None):
         """
@@ -272,6 +285,9 @@ class BaseDataType(object):
 
     def from_rdf(self, json_ld_node):
         raise NotImplementedError
+
+    def validate_from_rdf(self, value):
+        return self.validate(value)
 
     def collects_multiple_values(self):
         """

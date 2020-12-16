@@ -461,15 +461,15 @@ define([
                             switch (ko.unwrap(type.id)) {
                             case 'Point':
                                 option.value = 'draw_point';
-                                option.text = 'Add point';
+                                option.text = arches.translations.mapAddPoint;
                                 break;
                             case 'Line':
                                 option.value = 'draw_line_string';
-                                option.text = 'Add line';
+                                option.text = arches.translations.mapAddLine;
                                 break;
                             case 'Polygon':
                                 option.value = 'draw_polygon';
-                                option.text = 'Add polygon';
+                                option.text = arches.translations.mapAddPolygon;
                                 break;
                             }
                             return option;
@@ -478,7 +478,7 @@ define([
                     if (self.selectSource()) {
                         options.push({
                             value: "select_feature",
-                            text: self.selectText() || 'Select drawing'
+                            text: self.selectText() || arches.translations.mapSelectDrawing
                         });
                     }
                     options = options.concat(params.additionalDrawOptions);

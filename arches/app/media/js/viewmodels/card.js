@@ -38,13 +38,6 @@ define([
         return childSelected;
     };
 
-    var isDirty = function(){
-        if(self.tile) {
-            return true;
-        }
-        return false;
-    };
-
     var doesChildHaveProvisionalEdits = function(parent) {
         var hasEdits = false;
         var childrenKey = 'tileid' in parent ? 'cards': 'tiles';
@@ -371,9 +364,9 @@ define([
                             }
                             nodegroupId = params.card.nodegroup_id;
                             if(nodegroupId === appFuncDesc) {
-                                return "(This card data will define the resource description.)";
+                                return arches.translations.cardFunctionNodeDesc;
                             } else if(nodegroupId === appFuncName) {
-                                return "(This card data will define the resource name.)";
+                                return arches.translations.cardFunctionNodeName;
                             }
                         }
                     }

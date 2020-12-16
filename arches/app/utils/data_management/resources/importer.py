@@ -11,6 +11,7 @@ from time import time
 from copy import deepcopy
 from optparse import make_option
 from os.path import isfile, join
+from django.core import management
 from multiprocessing import Pool, TimeoutError, cpu_count
 import django
 
@@ -160,6 +161,7 @@ class BusinessDataImporter(object):
         create_concepts=False,
         create_collections=False,
         use_multiprocessing=False,
+        prevent_indexing=False,
     ):
         reader = None
         start = time()
@@ -198,6 +200,7 @@ class BusinessDataImporter(object):
                         bulk=bulk,
                         create_concepts=create_concepts,
                         create_collections=create_collections,
+                        prevent_indexing=prevent_indexing,
                     )
                 else:
                     print("*" * 80)
