@@ -12,6 +12,18 @@ define([
     function viewModel(params) {
         var self = this;
 
+        this.resourceId = ko.observable();
+
+        if (ko.unwrap(params.resourceId)) {
+            self.resourceId = params.resourceId;
+        }
+
+        var cachedValue = ko.unwrap(params.value);
+        if (cachedValue) {
+            self.resourceId(cachedValue.resourceid);
+            params.tileid(cachedValue.tileid);
+        }
+
         this.url = arches.urls.api_card + (ko.unwrap(this.resourceId) || ko.unwrap(params.graphid));
         this.card = ko.observable();
         this.tile = ko.observable();
@@ -23,19 +35,6 @@ define([
         this.hideDefaultButtons = params.hideDefaultButtons || ko.observable(false);
         this.loading(true);
         this.customCardLabel = params.customCardLabel || false;
-
-        this.resourceId = ko.observable();
-        
-        if (ko.unwrap(params.resourceId)) {
-            self.resourceId = params.resourceId;
-        }
-
-        var cachedValue = ko.unwrap(params.value);
-        if (cachedValue) {
-            self.resourceId(cachedValue.resourceid);
-            params.tileid(cachedValue.tileid);
-        }
-
         var flattenTree = function(parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {
                 flatList.push(parent);
