@@ -6,21 +6,15 @@ define([
     'knockout-mapping',
     'uuid'
 ], function(ko, _, koMapping, uuid) {
-    var WorkflowStep = function(config) {
-        this.id = ko.observable(config.id || uuid.generate());
-        this.workflowId = ko.observable(config.workflow ? config.workflow.id : null);
+    STEP_ID_URL_PARAM = 'step-id';
 
-        // if (this.workflowId()) {
-        //     /* let's add the step.id to the workflow's localStorage if not already there */ 
-        //     var workflowStepIds = localStorage.getItem(`workflow-${this.workflowId()}`);
-            
-        //     if (
-        //         workflowStepIds
-        //         && !workflowStepIds.some(function(workflowStepId) { return workflowStepId !== this.id })
-        //     ) {
-                
-        //     }
-        // }
+    var WorkflowStep = function(config) {
+        var self = this;
+
+        console.log('00', config)
+
+        this.id = ko.observable();
+        this.workflowId = ko.observable(config.workflow ? config.workflow.id : null);
 
         this.classUnvisited = 'workflow-step-icon';
         this.classActive = 'workflow-step-icon active';
@@ -36,19 +30,58 @@ define([
         this.required = ko.observable(ko.unwrap(config.required));
         this.autoAdvance = ko.observable(true);
 
+        this.value = ko.observable();
+
         this.active = ko.computed(function() {
             return config.workflow.activeStep() === this;
         }, this);
-
-        this.value = function(){
-            return {};
-        };
 
         Object.keys(config).forEach(function(prop){
             if(prop !== 'workflow') {
                 config[prop] = koMapping.fromJS(config[prop]);
             }
         });
+
+        this.initialize = function() {
+            var cachedId = ko.unwrap(config.id);
+
+            if (cachedId) {
+                self.id(cachedId)
+            }
+            else {
+                self.id(uuid.generate());
+            }
+
+
+            var cachedValue = self.getValueFromLocalStorage();
+
+            if (cachedValue) {
+                self.value(cachedValue)
+            }
+
+            self.value.subscribe(function(value) {
+                self.setValueToLocalStorage(value);
+            });
+        };
+
+        this.getValueFromLocalStorage = function() {
+            return JSON.parse(localStorage.getItem(self.id()));
+        };
+
+        this.setValueToLocalStorage = function(value) {
+            localStorage.setItem(self.id(), JSON.stringify(value));
+        };
+
+        // this.setStepIdToUrl = function() {
+        //     var searchParams = new URLSearchParams(window.location.search);
+        //     searchParams.set(STEP_ID_URL_PARAM, self.id());
+
+        //     var newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
+        //     history.pushState(null, '', newRelativePathQuery);
+        // };
+
+
+        // this.setStepIdToUrl();
 
         _.extend(this, config);
 
@@ -63,6 +96,8 @@ define([
             }
             return ret + ' ' + ko.unwrap(this.icon);
         }, this);
+
+        this.initialize();
     };
     return WorkflowStep;
 });

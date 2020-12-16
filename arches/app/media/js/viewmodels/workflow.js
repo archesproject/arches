@@ -8,7 +8,7 @@ define([
     'viewmodels/alert',
     'viewmodels/workflow-step'
 ], function(arches, $, _, ko, koMapping, uuid, AlertViewModel, Step) {
-    WORKFLOW_NAMESPACE = 'workflows';
+    WORKFLOWS_NAMESPACE = 'workflows';
     WORKFLOW_ID_URL_PARAM = 'workflow-id';
 
     var Workflow = function(config) {
@@ -47,7 +47,12 @@ define([
 
         this.initialize = function() {
             /* if there's no workflowId in the params, let's set one */ 
-            if (!self.getWorkflowIdFromUrl()) {
+            var cachedId = self.getWorkflowIdFromUrl();
+
+            if (cachedId) {
+                self.id(cachedId)
+            }
+            else {
                 self.id(uuid.generate());
                 self.setWorkflowIdToUrl();
             }
@@ -67,11 +72,15 @@ define([
             var stateStepCount = self.state.steps.length;
             var generatedStepIds = [];
 
+            console.log('!!!AAA', stepIds)
+
             self.steps.forEach(function(step, i) {
                 if (!(self.steps[i] instanceof Step)) {
                     step.workflow = self;
                     step.loading = self.loading;
                     step.alert = self.alert;
+
+
 
                     /* if stepIds exist for this workflow in localStorage, set correct value */ 
                     if (stepIds.length) { step.id = stepIds[i]; }
@@ -112,22 +121,22 @@ define([
         };
 
         this.getStepIdsFromLocalStorage = function() {
-            var workflows = JSON.parse(localStorage.getItem(WORKFLOW_NAMESPACE));
+            var workflows = JSON.parse(localStorage.getItem(WORKFLOWS_NAMESPACE));
 
             if (workflows && workflows[self.id()]) {
-                return workflows[self.id()]
+                return workflows[self.id()];
             }
 
             return [];
         };
 
         this.setStepIdsToLocalStorage = function(stepIds) {
-            var workflows = JSON.parse(localStorage.getItem(WORKFLOW_NAMESPACE));
+            var workflows = JSON.parse(localStorage.getItem(WORKFLOWS_NAMESPACE));
             if (!workflows) { workflows = {}; }  /* create workflows namespace if it doesn't already exist */ 
                         
             workflows[self.id()] = stepIds;
             
-            localStorage.setItem(WORKFLOW_NAMESPACE, JSON.stringify(workflows));
+            localStorage.setItem(WORKFLOWS_NAMESPACE, JSON.stringify(workflows));
         };
 
         this.getJSON = function(pluginJsonFileName) {
@@ -140,15 +149,15 @@ define([
             });
         };
 
-        this.restoreStateFromURL = function(){
-            var urlparams = new window.URLSearchParams(window.location.search);
-            var res = {};
-            var pathArray = window.location.pathname.split('/');
-            res.workflowid = pathArray[2];
-            urlparams.forEach(function(v, k){res[k] = v;});
-            res.steps = res.steps ? JSON.parse(res.steps) : [];
-            this.state = res;
-        };
+        // this.restoreStateFromURL = function(){
+        //     var urlparams = new window.URLSearchParams(window.location.search);
+        //     var res = {};
+        //     var pathArray = window.location.pathname.split('/');
+        //     res.workflowid = pathArray[2];
+        //     urlparams.forEach(function(v, k){res[k] = v;});
+        //     res.steps = res.steps ? JSON.parse(res.steps) : [];
+        //     this.state = res;
+        // };
 
         this.checkCanFinish = function(){
             var required = false, canFinish = true, complete = null;
@@ -220,11 +229,15 @@ define([
             );
         };
 
-        this.updateUrl = function() {
-            //Updates the url with the parameters needed for the next step
-            var urlparams = JSON.parse(JSON.stringify(this.state)); //deep copy
-            urlparams.steps = JSON.stringify(this.state.steps);
-            history.pushState(null, '', window.location.pathname + '?' + $.param(urlparams));
+        // this.updateUrl = function() {
+        //     //Updates the url with the parameters needed for the next step
+        //     var urlparams = JSON.parse(JSON.stringify(this.state)); //deep copy
+        //     urlparams.steps = JSON.stringify(this.state.steps);
+        //     history.pushState(null, '', window.location.pathname + '?' + $.param(urlparams));
+        // };
+
+        this.foo = function() {
+
         };
 
         this.updateState = function(val) {
@@ -241,7 +254,6 @@ define([
                     resourceId = !!previousStep.resourceid ? ko.unwrap(previousStep.resourceid) : null;
                     self.state.resourceid = resourceId;
                 }
-                self.updateUrl();
             }
             self.previousStep(activeStep);
         };

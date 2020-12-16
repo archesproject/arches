@@ -12,6 +12,8 @@ define([
     function viewModel(params) {
         var self = this;
 
+        console.log("!!!((((", params)
+
         this.resourceId = ko.observable();
         if (params.workflow) {
             if (!params.resourceid()) {
@@ -231,9 +233,9 @@ define([
                 self.resourceId(tile.resourceinstance_id);
             }
             self.setStateProperties();
-            if (params.workflow) {
-                params.workflow.updateUrl();
-            }
+
+            params.value(params.defineStateProperties());
+
             if (self.completeOnSave === true) { self.complete(true); }
         };
 
