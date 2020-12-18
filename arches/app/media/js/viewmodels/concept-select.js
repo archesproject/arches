@@ -10,15 +10,16 @@ define([
         var self = this;
 
         params.configKeys = ['placeholder', 'defaultValue'];
-
+        
         this.multiple = params.multiple || false;
         this.allowClear = true;
         this.displayName = ko.observable('');
-
+        
         WidgetViewModel.apply(this, [params]);
 
         this.valueList = ko.computed(function() {
             var valueList = self.value();
+            self.displayName();
             
             if (!self.multiple && valueList) {
                 valueList = [valueList];
@@ -30,6 +31,7 @@ define([
         });
 
         this.valueObjects = ko.computed(function() {
+            self.displayName();
             return self.valueList().map(function(value) {
                 return {
                     id: value,
@@ -40,9 +42,21 @@ define([
             });
         });
 
-        this.updateName = function() {
-            var names = [];
+        this.displayValue = ko.computed(function() {
+            var val = self.value();
+            var name = self.displayName();
+            var displayVal = null;
 
+            if (val) {
+                displayVal = name;
+            }
+
+            return displayVal;
+        });
+
+        this.value.subscribe(function() {
+            var names = [];
+    
             self.valueList().forEach(function(val) {
                 if (val) {
                     if (NAME_LOOKUP[val]) {
@@ -59,20 +73,12 @@ define([
                     }
                 }
             });
-        };
-        this.value.subscribe(self.updateName);
-
-        this.displayValue = ko.computed(function() {
-            var val = self.value();
-            var name = self.displayName();
-            var displayVal = null;
-            
-            if (val) {
-                displayVal = name;
-            }
-
-            return displayVal;
         });
+
+        /* flags UI change for previously saved data */
+        if (self.value()) {
+            self.value.valueHasMutated();  
+        }
 
         this.select2Config = {
             value: self.value,
@@ -124,34 +130,45 @@ define([
                 return self.value() === '' || !self.value();
             }),
             initSelection: function(el, callback) {
-                /* reversing the values gives correct ordering if multiple === true */ 
-                var valueList = self.valueList().reverse();
+                var valueList = self.valueList();
                 
                 var setSelectionData = function(data) {
-                    if (!(data instanceof Array)) { data = [data]; }
-                    
-                    var valueData = data.map(function(valueId) {
-                        return {
-                            id: valueId,
-                            text: NAME_LOOKUP[valueId],
-                        };
-                    });
-                    
+                    var valueData;
+
                     if (self.multiple) {
+                        if (!(data instanceof Array)) { data = [data]; }
+                        
+                        valueData = data.map(function(valueId) {
+                            return {
+                                id: valueId,
+                                text: NAME_LOOKUP[valueId],
+                            };
+                        });
+
                         /* add the rest of the previously selected values */ 
                         valueList.forEach(function(value) {
                             if (value !== valueData[0].id) {
-                                valueData.unshift({
+                                valueData.push({
                                     id: value,
                                     text: NAME_LOOKUP[value],
                                 });
                             }
                         });
+
+                        /* keeps valueData obeying valueList as ordering source of truth */ 
+                        if (valueData[0].id !== valueList[0]) {
+                            valueData.reverse();
+                        }
+
+                    }
+                    else {
+                        valueData = {
+                            id: data,
+                            text: NAME_LOOKUP[data],
+                        }
                     }
 
-                    if (valueData) {
-                        self.multiple ? callback(valueData) : callback(valueData[0]);
-                    }
+                    if (valueData) { callback(valueData); }
                 };
 
                 valueList.forEach(function(value) {
@@ -168,6 +185,7 @@ define([
                         }
                     }
                 });
+
             }
         };
     };
