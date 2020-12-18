@@ -150,7 +150,7 @@ define([
                     }
 
                     if (valueData) {
-                        callback(valueData);
+                        self.multiple ? callback(valueData) : callback(valueData[0]);
                     }
                 };
 
