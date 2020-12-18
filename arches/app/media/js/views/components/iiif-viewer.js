@@ -45,10 +45,12 @@ define([
             });
             return canvases;
         });
-        this.manifestName = ko.pureComputed(function() {
+
+        /*this.manifestName = ko.pureComputed(function() {
             var manifestData = self.manifestData();
             return getLabel(manifestData || {label: ''});
-        });
+        });*/
+
         this.zoomToCanvas = !(params.zoom && params.center);
 
         var validateUrl = function(value) {
@@ -235,6 +237,20 @@ define([
             if (canvas.images.length > 0) return canvas.images[0].resource.service['@id'];
         };
 
+        var getDescription = function(object) {
+            var description = object.description;
+            if (Array.isArray(description)) description = object.description[0]["@value"];
+            return description || '';
+        };
+
+        this.manifestAttribution = ko.observable();
+        this.manifestLogo = ko.observable();
+        this.manifestName = ko.observable();
+        this.manifestDescription = ko.observable();
+        this.canvasLabel = ko.observable();
+        this.canvas.subscribe(function(canvas) {
+            self.canvasLabel(getLabel(canvas));
+        })
         var updateCanvas = !self.canvas();
         this.manifestData.subscribe(function(manifestData) {
             if (updateCanvas && manifestData.sequences.length > 0) {
@@ -245,6 +261,8 @@ define([
                 }
             }
             updateCanvas = true;
+            self.manifestName(getLabel(manifestData));
+            self.manifestDescription(getDescription(manifestData));
         });
 
         this.toggleManifestEditor = function() {

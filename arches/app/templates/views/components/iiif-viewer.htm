@@ -116,7 +116,12 @@
                 <span data-bind="text: manifestName"></span>
             </h3>
 
+            <h4>
+                <span data-bind="text: manifestDescription"></span>
+            </h4>
+
             <div class="manifest-details-list" data-bind="foreach: manifestData().metadata || []">
+            <!--div class="manifest-details-list" data-bind="foreach: manifestMetadata || []"-->
                 <dt class="manifest-metadata-title" data-bind="text: label"></dt>
                 <!--ko foreach: Array.isArray(value) ? value : [value] -->
                 <dd class="manifest-metadata-value" data-bind="html: $data"></dd>
