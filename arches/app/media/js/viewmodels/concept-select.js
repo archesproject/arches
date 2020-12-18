@@ -165,7 +165,7 @@ define([
                         valueData = {
                             id: data,
                             text: NAME_LOOKUP[data],
-                        }
+                        };
                     }
 
                     if (valueData) { callback(valueData); }
