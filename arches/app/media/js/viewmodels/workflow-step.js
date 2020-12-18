@@ -6,12 +6,10 @@ define([
     'knockout-mapping',
     'uuid'
 ], function(ko, _, koMapping, uuid) {
-    STEP_ID_URL_PARAM = 'step-id';
+    STEP_ID_LABEL = 'workflow-step-id';
 
     var WorkflowStep = function(config) {
         var self = this;
-
-        console.log('00', config)
 
         this.id = ko.observable();
         this.workflowId = ko.observable(config.workflow ? config.workflow.id : null);
@@ -35,6 +33,9 @@ define([
         this.active = ko.computed(function() {
             return config.workflow.activeStep() === this;
         }, this);
+        this.active.subscribe(function(active) {
+            if (active) { self.setStepIdToUrl(); }
+        });
 
         Object.keys(config).forEach(function(prop){
             if(prop !== 'workflow') {
@@ -43,8 +44,10 @@ define([
         });
 
         this.initialize = function() {
-            var cachedId = ko.unwrap(config.id);
+            /* handles corner case of id being in URL but not localStorage */ 
+            if (self.getStepIdFromUrl()) { self.removeStepIdFromUrl(); }
 
+            var cachedId = ko.unwrap(config.id);
             if (cachedId) {
                 self.id(cachedId)
             }
@@ -53,9 +56,9 @@ define([
             }
 
             var cachedValue = self.getValueFromLocalStorage();
-
             if (cachedValue) {
-                self.value(cachedValue)
+                self.value(cachedValue);
+                self.complete(true);
             }
 
             self.value.subscribe(function(value) {
@@ -64,23 +67,33 @@ define([
         };
 
         this.getValueFromLocalStorage = function() {
-            return JSON.parse(localStorage.getItem(self.id()));
+            return JSON.parse(localStorage.getItem(`${STEP_ID_LABEL}-${self.id()}`));
         };
 
         this.setValueToLocalStorage = function(value) {
-            localStorage.setItem(self.id(), JSON.stringify(value));
+            localStorage.setItem(`${STEP_ID_LABEL}-${self.id()}`, JSON.stringify(value));
         };
 
-        // this.setStepIdToUrl = function() {
-        //     var searchParams = new URLSearchParams(window.location.search);
-        //     searchParams.set(STEP_ID_URL_PARAM, self.id());
+        this.getStepIdFromUrl = function() {
+            var searchParams = new URLSearchParams(window.location.search);
+            return searchParams.get(STEP_ID_LABEL);
+        };
 
-        //     var newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
-        //     history.pushState(null, '', newRelativePathQuery);
-        // };
+        this.setStepIdToUrl = function() {
+            var searchParams = new URLSearchParams(window.location.search);
+            searchParams.set(STEP_ID_LABEL, self.id());
 
+            var newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
+            history.pushState(null, '', newRelativePathQuery);
+        };
 
-        // this.setStepIdToUrl();
+        this.removeStepIdFromUrl = function() {
+            var searchParams = new URLSearchParams(window.location.search);
+            searchParams.delete(STEP_ID_LABEL);
+
+            var newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
+            history.replaceState(null, '', newRelativePathQuery);
+        };
 
         _.extend(this, config);
 
