@@ -28,7 +28,7 @@ define([
             }
         }
 
-        this.seedCardGraphId = function() { // override for different cases
+        this.getCardResourceIdOrGraphId = function() { // override for different cases
             return (ko.unwrap(this.resourceId) || ko.unwrap(params.graphid));
         };
 
@@ -56,7 +56,7 @@ define([
         self.topCards = [];
 
         this.getJSON = function() {
-            var url = arches.urls.api_card + this.seedCardGraphId();
+            var url = arches.urls.api_card + this.getCardResourceIdOrGraphId();
             $.getJSON(url, function(data) {
                 var handlers = {
                     'after-update': [],
