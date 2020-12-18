@@ -4,7 +4,8 @@ define([
     'viewmodels/widget',
     'arches',
 ], function(ko, $, WidgetViewModel, arches) {
-    var nameLookup = {};
+    NAME_LOOKUP = {};
+
     var ConceptSelectViewModel = function(params) {
         var self = this;
 
@@ -32,7 +33,7 @@ define([
             return self.valueList().map(function(value) {
                 return {
                     id: value,
-                    name: nameLookup[value]
+                    name: NAME_LOOKUP[value]
                 };
             }).filter(function(item) {
                 return item.name;
@@ -44,14 +45,14 @@ define([
 
             self.valueList().forEach(function(val) {
                 if (val) {
-                    if (nameLookup[val]) {
-                        names.push(nameLookup[val]);
+                    if (NAME_LOOKUP[val]) {
+                        names.push(NAME_LOOKUP[val]);
                         self.displayName(names.join(', '));
                     } else {
                         $.ajax(arches.urls.get_pref_label + '?valueid=' + val, {
                             dataType: "json"
                         }).done(function(data) {
-                            nameLookup[val] = data.value;
+                            NAME_LOOKUP[val] = data.value;
                             names.push(data.value);
                             self.displayName(names.join(', '));
                         });
@@ -129,43 +130,20 @@ define([
                 var setSelectionData = function(data) {
                     if (!(data instanceof Array)) { data = [data]; }
                     
-                    var valueData = data.reduce(function(acc, datum) {
-                        var valueDatum;
-
-                        /* coerce different datum types into expected type */ 
-                        if (!datum.value) {
-                            var valueObject = self.valueObjects().find(function(valueObject) {
-                                return valueObject.name === datum;
-                            });
-
-                            if (valueObject) {
-                                valueDatum = {
-                                    id: valueObject.id,
-                                    text: valueObject.name,
-                                };
-                            }
-                        }
-                        else if (datum.value) {
-                            valueDatum = {
-                                id: datum.valueid,
-                                text: datum.value,
-                            };
-                        }
-
-                        if (valueDatum) {
-                            acc.push(valueDatum);
-                        }
-                        
-                        return acc;
-                    }, []);
+                    var valueData = data.map(function(valueId) {
+                        return {
+                            id: valueId,
+                            text: NAME_LOOKUP[valueId],
+                        };
+                    });
                     
                     if (self.multiple) {
-                        /* add the rest of the valueList */ 
+                        /* add the rest of the previously selected values */ 
                         valueList.forEach(function(value) {
                             if (value !== valueData[0].id) {
                                 valueData.unshift({
                                     id: value,
-                                    text: nameLookup[value],
+                                    text: NAME_LOOKUP[value],
                                 });
                             }
                         });
@@ -178,14 +156,14 @@ define([
 
                 valueList.forEach(function(value) {
                     if (value) {
-                        if (nameLookup[value]) {
-                            setSelectionData(nameLookup[value]);
+                        if (NAME_LOOKUP[value]) {
+                            setSelectionData(value);
                         } else {
                             $.ajax(arches.urls.concept_value + '?valueid=' + value, {
                                 dataType: "json"
                             }).done(function(data) {
-                                nameLookup[value] = data.value;
-                                setSelectionData(data);
+                                NAME_LOOKUP[value] = data.value;
+                                setSelectionData(value);
                             });
                         }
                     }
