@@ -4,7 +4,7 @@ define([
     'viewmodels/widget',
     'arches',
 ], function(ko, $, WidgetViewModel, arches) {
-    NAME_LOOKUP = {};
+    var NAME_LOOKUP = {};
 
     var ConceptSelectViewModel = function(params) {
         var self = this;
