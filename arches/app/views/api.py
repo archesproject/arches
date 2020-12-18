@@ -1,3 +1,4 @@
+from base64 import b64decode
 import importlib
 import json
 import logging
@@ -13,6 +14,7 @@ from rdflib.namespace import SKOS, DCTERMS
 from revproxy.views import ProxyView
 from slugify import slugify
 from urllib import parse
+from django.contrib.auth import authenticate
 from django.shortcuts import render
 from django.views.generic import View
 from django.db import transaction, connection
@@ -58,6 +60,7 @@ from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.search_export import SearchResultsExporter
 
 
 from arches.celery import app
@@ -367,9 +370,9 @@ class GeoJSON(APIBase):
                             features.append(feature)
                 except KeyError:
                     pass
-                except TypeError as e:
-                    print(e)
-                    print(tile.data)
+                except TypeError:
+                    pass
+
         feature_collection = {"type": "FeatureCollection", "features": features}
         if last_page is not None:
             feature_collection["_page"] = page
@@ -929,6 +932,26 @@ class Card(APIBase):
         return JSONResponse(context, indent=4)
 
 
+class SearchExport(View):
+    def get(self, request):
+        total = int(request.GET.get("total", 0))
+        download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
+        format = request.GET.get("format", "tilecsv")
+        if "HTTP_AUTHORIZATION" in request.META:
+            request_auth = request.META.get("HTTP_AUTHORIZATION").split()
+            if request_auth[0].lower() == "basic":
+                user_cred = b64decode(request_auth[1]).decode().split(":")
+                user = authenticate(username=user_cred[0], password=user_cred[1])
+                if user is not None:
+                    request.user = user
+        exporter = SearchResultsExporter(search_request=request)
+        export_files, export_info = exporter.export(format)
+        if format == "geojson" and total <= download_limit:
+            response = JSONResponse(export_files)
+            return response
+        return JSONResponse(status=404)
+
+
 class SearchComponentData(APIBase):
     def get(self, request, componentname):
         search_filter_factory = SearchFilterFactory(request)
@@ -994,6 +1017,12 @@ class IIIFManifest(APIBase):
 
         response = JSONResponse({"results": manifests, "count": count})
         return response
+
+
+class Manifest(APIBase):
+    def get(self, request, id):
+        manifest = models.IIIFManifest.objects.get(id=id).manifest
+        return JSONResponse(manifest)
 
 
 class OntologyProperty(APIBase):

@@ -32,17 +32,17 @@
 <dt data-bind="text: label"></dt>
 <dd>
     <div class='number-widget-report'>
-    <!-- ko if: value -->
+    <!-- ko if: displayValue -->
     <span data-bind="text: prefix(), css: {'number-prefix': prefix()}"></span>
         <!-- ko if: format -->
-        <span data-bind="formattedNumber: value(), format: format || '{% trans "None" %}'"></span>
+        <span data-bind="formattedNumber: displayValue(), format: format || '{% trans "None" %}'"></span>
         <!-- /ko -->
         <!-- ko ifnot: format -->
-        <span data-bind="text: value()"></span>
+        <span data-bind="text: displayValue()"></span>
         <!-- /ko -->
     <span data-bind="text: suffix(), css: {'number-suffix': suffix()}"></span>
     <!-- /ko -->
-    <!-- ko ifnot: value -->
+    <!-- ko ifnot: displayValue -->
     <span data-bind="text: '{% trans "None" %}'"></span>
     <!-- /ko -->
     </div>
