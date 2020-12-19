@@ -120,8 +120,8 @@
                 <span data-bind="text: manifestDescription"></span>
             </h4>
 
-            <div class="manifest-details-list" data-bind="foreach: manifestData().metadata || []">
-            <!--div class="manifest-details-list" data-bind="foreach: manifestMetadata || []"-->
+            <!--div class="manifest-details-list" data-bind="foreach: manifestData().metadata || []"-->
+            <div class="manifest-details-list" data-bind="foreach: manifestMetaData">
                 <dt class="manifest-metadata-title" data-bind="text: label"></dt>
                 <!--ko foreach: Array.isArray(value) ? value : [value] -->
                 <dd class="manifest-metadata-value" data-bind="html: $data"></dd>
@@ -202,7 +202,12 @@
                                 <img data-bind="attr: { src: $data.thumbnail || '{% static 'img/photo_missing.png' %}', title: $data.label}">
                             </div>
                             <div class="iiif-gallery-canvas-label">
+                                <!--ko if: getCanvasService($data) === selectedCanvas() -->
+                                <span data-bind="text: $parent.canvasLabel"></span>
+                                <!--/ko -->                                
+                                <!--ko ifnot: getCanvasService($data) === selectedCanvas() -->
                                 <span data-bind="text: label"></span>
+                                <!--/ko -->                                
                                 <span class="annotation-count">
                                     <!--ko if: getAnnotationCount(getCanvasService($data)) -->
                                     <span data-bind="text: getAnnotationCount(getCanvasService($data))"></span> {% trans "Annotation(s)" %}

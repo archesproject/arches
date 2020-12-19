@@ -226,6 +226,7 @@ define([
             var service = self.getCanvasService(canvas);
             self.zoomToCanvas = true;
             if (service) self.canvas(service);
+            self.canvasLabel(getLabel(canvas));
         };
 
         this.canvasClick = function(canvas) {
@@ -243,10 +244,14 @@ define([
             return description || '';
         };
 
-        this.manifestAttribution = ko.observable();
-        this.manifestLogo = ko.observable();
+        var getMetaData = function(object) {
+            var metadata = object.metadata;
+            return metadata || [];
+        };
+
         this.manifestName = ko.observable();
         this.manifestDescription = ko.observable();
+        this.manifestMetaData = ko.observableArray([{"label": "", "value": [""]}]);
         this.canvasLabel = ko.observable();
         this.canvas.subscribe(function(canvas) {
             self.canvasLabel(getLabel(canvas));
@@ -263,6 +268,7 @@ define([
             updateCanvas = true;
             self.manifestName(getLabel(manifestData));
             self.manifestDescription(getDescription(manifestData));
+            self.manifestMetaData(getMetaData(manifestData));
         });
 
         this.toggleManifestEditor = function() {
