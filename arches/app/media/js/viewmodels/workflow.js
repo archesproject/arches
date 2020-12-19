@@ -57,17 +57,22 @@ define([
             
             self.createSteps();
 
-            /* set active step */ 
-            var cachedStepId = self.getStepIdFromUrl();
-            if (cachedStepId) {
-                var step = self.steps.find(function(step) { return step.id() === cachedStepId; });
-                if (step) { self.activeStep(step); }
+            var cachedActiveStep = self.steps.find(function(step) {
+                return step.id() === self.getStepIdFromUrl();
+            });
+
+            if (cachedActiveStep) {
+                self.activeStep(cachedActiveStep);
             }
-            else if (self.state.activestep) {
-                self.activeStep(self.steps[self.state.activestep]);
-            }
-            else if(self.steps.length > 0) {
-                self.activeStep(self.steps[0]);
+            else {
+                self.removeStepIdFromUrl();
+
+                if (self.state.activestep) {
+                    self.activeStep(self.steps[self.state.activestep]);
+                }
+                else if(self.steps.length > 0) {
+                    self.activeStep(self.steps[0]);
+                }
             }
         };
 
@@ -111,6 +116,14 @@ define([
         this.getStepIdFromUrl = function() {
             var searchParams = new URLSearchParams(window.location.search);
             return searchParams.get(STEP_ID_LABEL);
+        };
+
+        this.removeStepIdFromUrl = function() {
+            var searchParams = new URLSearchParams(window.location.search);
+            searchParams.delete(STEP_ID_LABEL);
+
+            var newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
+            history.replaceState(null, '', newRelativePathQuery);
         };
 
         this.getWorkflowIdFromUrl = function() {

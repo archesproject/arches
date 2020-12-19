@@ -44,9 +44,6 @@ define([
         });
 
         this.initialize = function() {
-            /* handles corner case of id being in URL but not localStorage */ 
-            if (self.getStepIdFromUrl()) { self.removeStepIdFromUrl(); }
-
             var cachedId = ko.unwrap(config.id);
             if (cachedId) {
                 self.id(cachedId)
@@ -74,25 +71,12 @@ define([
             localStorage.setItem(`${STEP_ID_LABEL}-${self.id()}`, JSON.stringify(value));
         };
 
-        this.getStepIdFromUrl = function() {
-            var searchParams = new URLSearchParams(window.location.search);
-            return searchParams.get(STEP_ID_LABEL);
-        };
-
         this.setStepIdToUrl = function() {
             var searchParams = new URLSearchParams(window.location.search);
             searchParams.set(STEP_ID_LABEL, self.id());
 
             var newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
             history.pushState(null, '', newRelativePathQuery);
-        };
-
-        this.removeStepIdFromUrl = function() {
-            var searchParams = new URLSearchParams(window.location.search);
-            searchParams.delete(STEP_ID_LABEL);
-
-            var newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
-            history.replaceState(null, '', newRelativePathQuery);
         };
 
         _.extend(this, config);
