@@ -210,6 +210,10 @@ class SearchEngine(object):
         else:
             return None
 
+    def refresh(self, **kwargs):
+        kwargs = self._add_prefix(**kwargs)
+        self.es.indices.refresh(**kwargs)
+
     def BulkIndexer(outer_self, batch_size=500, **kwargs):
         class _BulkIndexer(object):
             def __init__(self, **kwargs):
