@@ -9,11 +9,13 @@ define([
 ], function(arches, $, _, ko, koMapping, AlertViewModel, Step) {
     var Workflow = function(config) {
         var self = this;
+        
         this.steps = config.steps || [];
         this.activeStep = ko.observable();
         this.previousStep = ko.observable();
         this.hoverStep = ko.observable();
         this.ready = ko.observable(false);
+        this.tabbedWorkflow = ko.observable(ko.unwrap(config.tabbedWorkflow));
         this.loading = config.loading || ko.observable(false);
         this.alert = config.alert || ko.observable(null);
         this.state = {steps:[]};
@@ -175,6 +177,23 @@ define([
                 self.updateUrl();
             }
             self.previousStep(activeStep);
+        };
+
+        this.canStepBecomeActive = function(step) {
+            var canStepBecomeActive = false;
+
+            
+            if (!step.active()) {  /* prevents refresh if clicking on active tab */ 
+                if (
+                    step.complete() 
+                    || self.steps[step._index - 1].complete() 
+                    || self.canFinish() === true
+                ) { 
+                        canStepBecomeActive = true; 
+                }
+            }
+
+            return canStepBecomeActive;
         };
 
         this.next = function(){
