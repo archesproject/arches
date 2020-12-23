@@ -157,8 +157,6 @@ define([
             //Updates the url with the parameters needed for the next step
             var urlparams = JSON.parse(JSON.stringify(self.state)); //deep copy
             urlparams.steps = JSON.stringify(self.state.steps);
-
-            console.log(urlparams)
             history.pushState(null, '', window.location.pathname + '?' + $.param(urlparams));
         };
 
@@ -192,7 +190,7 @@ define([
                     || ( previousStep && previousStep.complete() )
                     || self.canFinish() === true
                 ) { 
-                        canStepBecomeActive = true; 
+                    canStepBecomeActive = true; 
                 }
             }
 
