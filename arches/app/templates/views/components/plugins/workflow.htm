@@ -17,7 +17,7 @@
             <button data-bind="click: quitWorkflow" class="btn btn-dark btn-labeled"><i class="btn-label ion-android-cancel"></i>{% trans "Quit" %}</button>
         </div>
     </div>
-    <div>
+    <div style="height: 100%;">
         <div class="workflow-nav-tab-container">
             <ul class="nav nav-tabs workflow-nav-tab-list">
                 <!--ko foreach: {data: steps, as: 'step'} -->
@@ -27,12 +27,49 @@
                         data-bind="{
                             css: { 
                                 active: step.active(), 
-                                disabled: !step.active() && !$parent.canStepBecomeActive(step) ,
+                                inactive: !step.active() && $parent.canStepBecomeActive(step),
+                                disabled: !step.active() && !$parent.canStepBecomeActive(step),
                             },
-                            text: step.title(), 
                             click: function() { if ($parent.canStepBecomeActive(step)) { $parent.activeStep(step) }},
                         }" 
                     >
+                        <div style="display: flex; flex-direction: row; align-items: center;">
+                            <div
+                                class="workflow-nav-tab-arrow"
+                                data-bind="{ 
+                                    click: $parent.back, 
+                                    clickBubble: false ,
+                                    css: {
+                                        disabled: !$parent.canStepBecomeActive($parent.steps[step._index - 1]),
+                                    },
+                                    visible: step.active() && step._index !== 0,
+                                }"
+                            >
+                                <i 
+                                    class="fa fa-chevron-left" 
+                                    style="margin-right: 8px; font-size: 10px;"
+                                ></i>
+                            </div>
+                            
+                            <div data-bind="text: step.title()"></div>
+                            
+                            <div
+                                class="workflow-nav-tab-arrow"
+                                data-bind="{ 
+                                    click: $parent.next, 
+                                    clickBubble: false,
+                                    css: {
+                                        disabled: !$parent.canStepBecomeActive($parent.steps[step._index + 1]),
+                                    },
+                                    visible: step.active() && step._index !== 0,
+                                }"
+                            >
+                                <i 
+                                    class="fa fa-chevron-right" 
+                                    style="margin-left: 8px; font-size: 10px;"
+                                ></i>
+                            </div>
+                        </div>
                     </div>
                 </li>
                 <!-- /ko -->

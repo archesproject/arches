@@ -585,10 +585,13 @@ input[type="checkbox"] {
 }
 
 .workflow-step-body {
-    background-color: #f9f9f9;
+    background-color: #fff;
     height: 100%;
     overflow-y: auto;
-    padding: 0 0 218px 25px;
+}
+
+.workflow-step-body > * {
+    background-color: #fff !important;
 }
 
 .workflow-step-body .workbench-card-wrapper {
@@ -759,19 +762,31 @@ div.wf-multi-tile-card-info div {
 
 .workflow-nav-tab {
     padding: 15px 20px;
-    cursor: pointer;
 }
 
 .workflow-nav-tab.active {
-    background-color: #fafafa;
+    background-color: #fff;
     font-weight: 600;
     border-left: 1px solid #ddd;
     border-right: 1px solid #ddd;
 }
 
+.workflow-nav-tab.inactive {
+    cursor: pointer;
+}
+
 .workflow-nav-tab.disabled {
     color: darkgrey;
     cursor: not-allowed;
+}
+
+.workflow-nav-tab-arrow {
+    cursor: pointer;
+}
+
+.workflow-nav-tab-arrow.disabled {
+    color: #a9a9a9;
+    cursor: default;
 }
 
 .workflow-nav-controls {

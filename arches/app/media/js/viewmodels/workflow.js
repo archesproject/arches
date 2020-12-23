@@ -155,8 +155,10 @@ define([
 
         this.updateUrl = function() {
             //Updates the url with the parameters needed for the next step
-            var urlparams = JSON.parse(JSON.stringify(this.state)); //deep copy
-            urlparams.steps = JSON.stringify(this.state.steps);
+            var urlparams = JSON.parse(JSON.stringify(self.state)); //deep copy
+            urlparams.steps = JSON.stringify(self.state.steps);
+
+            console.log(urlparams)
             history.pushState(null, '', window.location.pathname + '?' + $.param(urlparams));
         };
 
@@ -181,12 +183,13 @@ define([
 
         this.canStepBecomeActive = function(step) {
             var canStepBecomeActive = false;
-
             
-            if (!step.active()) {  /* prevents refresh if clicking on active tab */ 
+            if (step && !step.active()) {  /* prevents refresh if clicking on active tab */ 
+                var previousStep = self.steps[step._index - 1];
+
                 if (
                     step.complete() 
-                    || self.steps[step._index - 1].complete() 
+                    || ( previousStep && previousStep.complete() )
                     || self.canFinish() === true
                 ) { 
                         canStepBecomeActive = true; 
@@ -198,6 +201,7 @@ define([
 
         this.next = function(){
             var activeStep = self.activeStep();
+
             if (activeStep && (activeStep.complete() || !activeStep.required()) && activeStep._index < self.steps.length - 1) {
                 self.activeStep(self.steps[activeStep._index+1]);
             }
