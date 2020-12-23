@@ -585,12 +585,19 @@ input[type="checkbox"] {
 }
 
 .workflow-step-body {
+    background-color: #f9f9f9;
+    height: 100%;
+    overflow-y: auto;
+    padding: 0 0 218px 25px;
+}
+
+.tabbed-workflow-step-body {
     background-color: #fff;
     height: 100%;
     overflow-y: auto;
 }
 
-.workflow-step-body > * {
+.tabbed-workflow-step-body > * {
     background-color: #fff !important;
 }
 
