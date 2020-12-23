@@ -597,8 +597,9 @@ input[type="checkbox"] {
     overflow-y: auto;
 }
 
-.tabbed-workflow-step-body > * {
+.tabbed-workflow-step-body > div {
     background-color: #fff !important;
+    border: none !important;
 }
 
 .workflow-step-body .workbench-card-wrapper {
