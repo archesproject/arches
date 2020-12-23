@@ -761,10 +761,11 @@ div.wf-multi-tile-card-info div {
 }
 
 .workflow-nav-tab {
-    padding: 15px 20px;
+    padding: 10px 20px;
 }
 
 .workflow-nav-tab.active {
+    padding: 10px 15px;
     background-color: #fff;
     font-weight: 600;
     border-left: 1px solid #ddd;
@@ -781,7 +782,11 @@ div.wf-multi-tile-card-info div {
 }
 
 .workflow-nav-tab-arrow {
+    display: flex;
+    align-items: center;
     cursor: pointer;
+    padding: 5px;
+    font-size: 14px;
 }
 
 .workflow-nav-tab-arrow.disabled {

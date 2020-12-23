@@ -33,8 +33,9 @@
                             click: function() { if ($parent.canStepBecomeActive(step)) { $parent.activeStep(step) }},
                         }" 
                     >
-                        <div style="display: flex; flex-direction: row; align-items: center;">
-                            <div
+                        <div style="display: flex; flex-direction: row;">
+                            <span
+                                style="margin-right: 4px;"
                                 class="workflow-nav-tab-arrow"
                                 data-bind="{ 
                                     click: $parent.back, 
@@ -45,15 +46,13 @@
                                     visible: step.active() && step._index !== 0,
                                 }"
                             >
-                                <i 
-                                    class="fa fa-chevron-left" 
-                                    style="margin-right: 8px; font-size: 10px;"
-                                ></i>
-                            </div>
+                                <i class="fa fa-caret-left"></i>
+                            </span>
                             
-                            <div data-bind="text: step.title()"></div>
+                            <span style="padding: 2px;" data-bind="text: step.title()"></span>
                             
-                            <div
+                            <span
+                                style="margin-left: 4px;"
                                 class="workflow-nav-tab-arrow"
                                 data-bind="{ 
                                     click: $parent.next, 
@@ -61,14 +60,11 @@
                                     css: {
                                         disabled: !$parent.canStepBecomeActive($parent.steps[step._index + 1]),
                                     },
-                                    visible: step.active() && step._index !== 0,
+                                    visible: step.active() && step._index !== $parent.steps.length - 1,
                                 }"
                             >
-                                <i 
-                                    class="fa fa-chevron-right" 
-                                    style="margin-left: 8px; font-size: 10px;"
-                                ></i>
-                            </div>
+                                <i class="fa fa-caret-right"></i>
+                            </span>
                         </div>
                     </div>
                 </li>
