@@ -751,9 +751,9 @@ div.wf-multi-tile-card-info div {
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid #ddd;
-    padding: 6px 18px;
+    padding: 6px 12px;
     font-size: medium;
-    font-weight: 400;
+    font-weight: 600;
 }
 
 .workflow-nav-tab-container {
