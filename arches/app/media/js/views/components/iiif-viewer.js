@@ -45,6 +45,7 @@ define([
             });
             return canvases;
         });
+        this.canvasLabel = ko.observable();
 
         /*this.manifestName = ko.pureComputed(function() {
             var manifestData = self.manifestData();
@@ -226,6 +227,8 @@ define([
             var service = self.getCanvasService(canvas);
             self.zoomToCanvas = true;
             if (service) self.canvas(service);
+
+            self.origCanvasLabel = getLabel(canvas);
             self.canvasLabel(getLabel(canvas));
         };
 
@@ -252,23 +255,30 @@ define([
         this.manifestName = ko.observable();
         this.manifestDescription = ko.observable();
         this.manifestMetaData = ko.observableArray([{"label": "", "value": [""]}]);
-        this.canvasLabel = ko.observable();
-        this.canvas.subscribe(function(canvas) {
+
+        /*this.canvas.subscribe(function(canvas) {
+            self.origCanvasLabel = getLabel(canvas);
             self.canvasLabel(getLabel(canvas));
-        })
+        });*/
+
         var updateCanvas = !self.canvas();
         this.manifestData.subscribe(function(manifestData) {
-            if (updateCanvas && manifestData.sequences.length > 0) {
-                var sequence = manifestData.sequences[0];
-                if (sequence.canvases.length > 0) {
-                    var canvas = sequence.canvases[0];
-                    self.selectCanvas(canvas);
+            if (manifestData) {
+                if (updateCanvas && manifestData.sequences.length > 0) {
+                    var sequence = manifestData.sequences[0];
+                    if (sequence.canvases.length > 0) {
+                        var canvas = sequence.canvases[0];
+                        self.selectCanvas(canvas);
+                    }    
                 }
-            }
             updateCanvas = true;
+            self.origManifestName = getLabel(manifestData);
+            self.origManifestDescription = getDescription(manifestData);
+            self.origMetaData = getMetaData(manifestData);
             self.manifestName(getLabel(manifestData));
             self.manifestDescription(getDescription(manifestData));
             self.manifestMetaData(getMetaData(manifestData));
+            }
         });
 
         this.toggleManifestEditor = function() {
