@@ -124,7 +124,7 @@ define([
                 self.expandGallery(false);
                 self.activeTab('editor');
                 setTab.dispose();
-            };
+            }
         });
 
         this.getAnnotationCount = function(canvas) {
