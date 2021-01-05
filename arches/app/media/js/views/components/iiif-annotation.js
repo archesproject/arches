@@ -127,6 +127,12 @@ define([
             }
         });
 
+        this.expandGallery.subscribe(function(val){
+            if (val) {
+                self.hideSidePanel();
+            }
+        });
+
         this.getAnnotationCount = function(canvas) {
             return drawFeatures().filter(function(feature) {
                 return feature.properties.canvas === canvas;
