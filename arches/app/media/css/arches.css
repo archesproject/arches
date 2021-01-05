@@ -12613,6 +12613,7 @@ a.jstree-anchor.permissions-widget {
 
 .gallery-visible.show-gallery-control {
     bottom: 159px;
+    z-index: 2000;
 }
 
 .show-gallery-control.gallery-expanded {
