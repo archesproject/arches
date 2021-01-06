@@ -68,6 +68,9 @@ define([
                             return annotation.properties.resourceId !== params.tile.resourceinstance_id;
                         });
                     }
+                    annotations.forEach(function(annotation) {
+                        annotation.properties.opacityModifier = node.opacity();
+                    });
                     annotationFeatures = annotationFeatures.concat(annotations);
                 }
             });
@@ -76,24 +79,26 @@ define([
                 features: annotationFeatures
             }, {
                 pointToLayer: function(feature, latlng) {
+                    var modifier = feature.properties.opacityModifier / 100;
                     var style = {
                         color: feature.properties.color,
                         fillColor: feature.properties.fillColor,
                         weight: feature.properties.weight,
                         radius: feature.properties.radius,
-                        opacity: feature.properties.opacity,
-                        fillOpacity: feature.properties.fillOpacity
+                        opacity: (feature.properties.opacity * modifier),
+                        fillOpacity: (feature.properties.fillOpacity * modifier)
                     };
                     return L.circleMarker(latlng, style);
                 },
                 style: function(feature) {
+                    var modifier = feature.properties.opacityModifier / 100;
                     var style = {
                         color: feature.properties.color,
                         fillColor: feature.properties.fillColor,
                         weight: feature.properties.weight,
                         radius: feature.properties.radius,
-                        opacity: feature.properties.opacity,
-                        fillOpacity: feature.properties.fillOpacity
+                        opacity: (feature.properties.opacity * modifier),
+                        fillOpacity: (feature.properties.fillOpacity * modifier)
                     };
                     return style;
                 }
