@@ -61,13 +61,14 @@ class SKOSReader(object):
             raise Exception("Error occurred while parsing the file %s" % path_to_file)
         return rdf
 
-    def save_concepts_from_skos(self, graph, overwrite_options="overwrite", staging_options="keep"):
+    def save_concepts_from_skos(self, graph, overwrite_options="overwrite", staging_options="keep", prevent_indexing=False):
         """
         given an RDF graph, tries to save the concpets to the system
 
         Keyword arguments:
         overwrite_options -- 'overwrite', 'ignore'
         staging_options -- 'stage', 'keep'
+        prevent_indexing -- True to prevent indexing of concepts
 
         """
 
@@ -316,7 +317,7 @@ class SKOSReader(object):
 
                 # need to index after the concepts and relations have been entered into the db
                 # so that the proper context gets indexed with the concept
-                if scheme_node:
+                if scheme_node and not prevent_indexing:
                     scheme_node.bulk_index()
 
             # insert the concept collection relations

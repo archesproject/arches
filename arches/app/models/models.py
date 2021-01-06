@@ -1336,6 +1336,7 @@ class IIIFManifest(models.Model):
     label = models.TextField()
     url = models.TextField()
     description = models.TextField(blank=True, null=True)
+    manifest = JSONField(blank=True, null=True)
 
     def __str__(self):
         return self.label

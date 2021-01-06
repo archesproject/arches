@@ -233,6 +233,7 @@ urlpatterns = [
     url(r"^api/nodes/(?P<nodeid>%s|())$" % (uuid_regex), api.Node.as_view(), name="api_nodes"),
     url(r"^api/instance_permissions/$", api.InstancePermission.as_view(), name="api_instance_permissions"),
     url(r"^api/node_value/$", api.NodeValue.as_view(), name="api_node_value"),
+    url(r"^api/search/export_results$", api.SearchExport.as_view(), name="api_export_results"),
     url(r"^rdm/concepts/(?P<conceptid>%s|())$" % uuid_regex, api.Concepts.as_view(), name="concepts"),
     url(r"^plugins/(?P<pluginid>%s)$" % uuid_regex, PluginView.as_view(), name="plugins"),
     url(r"^plugins/(?P<slug>[-\w]+)$", PluginView.as_view(), name="plugins"),
@@ -267,6 +268,7 @@ urlpatterns = [
     url(r"^iiifmanifest$", api.IIIFManifest.as_view(), name="iiifmanifest"),
     url(r"^iiifannotations$", api.IIIFAnnotations.as_view(), name="iiifannotations"),
     url(r"^iiifannotationnodes$", api.IIIFAnnotationNodes.as_view(), name="iiifannotationnodes"),
+    url(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
 ]
 
 if settings.DEBUG:
