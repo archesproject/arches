@@ -206,9 +206,9 @@ To create it, use:
         management.call_command("packages", operation="import_graphs", source=settings_graph)
 
         settings_data = os.path.join(settings.ROOT_DIR, "db", "system_settings", "Arches_System_Settings.json")
-        management.call_command("packages", operation="import_business_data", source=settings_data, overwrite=True)
+        management.call_command("packages", operation="import_business_data", source=settings_data, overwrite="overwrite")
 
         settings_data_local = settings.SYSTEM_SETTINGS_LOCAL_PATH
 
         if os.path.isfile(settings_data_local):
-            management.call_command("packages", operation="import_business_data", source=settings_data_local, overwrite=True)
+            management.call_command("packages", operation="import_business_data", source=settings_data_local, overwrite="overwrite")
