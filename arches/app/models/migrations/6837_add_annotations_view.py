@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '6839_widget_disabled_configs'),
+        ('models', '6838_add_manifest_json'),
     ]
 
     sql = """
