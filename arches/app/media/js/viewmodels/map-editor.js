@@ -75,7 +75,12 @@ define([
             if (showSelectLayers) {
                 self.draw.changeMode('simple_select');
                 self.selectedFeatureIds([]);
-            } else if (tool) self.draw.changeMode(tool);
+            } else {
+                if (tool) {
+                    self.draw.changeMode(tool);
+                    self.map().draw_mode = tool;
+                }
+            }
         };
 
         self.geojsonWidgets.forEach(function(widget) {
@@ -385,9 +390,10 @@ define([
             });
             map.on('draw.update', self.updateTiles);
             map.on('draw.delete', self.updateTiles);
-            map.on('draw.modechange', function() {
+            map.on('draw.modechange', function(e) {
                 self.updateTiles();
                 self.setSelectLayersVisibility(false);
+                map.draw_mode = e.mode;
             });
             map.on('draw.selectionchange', function(e) {
                 self.selectedFeatureIds(e.features.map(function(feature) {
