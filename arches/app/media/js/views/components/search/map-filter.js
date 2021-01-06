@@ -246,6 +246,7 @@ define([
                             this.searchByExtent();
                         } else {
                             this.draw.changeMode(selectedDrawTool);
+                            self.map().draw_mode = selectedDrawTool;
                         }
                     }
                 }, this);
@@ -373,6 +374,9 @@ define([
                 this.map().on('draw.update', function(e) {
                     self.searchGeometries(e.features);
                     self.updateFilter();
+                });
+                this.map().on("draw.modechange", function (e) {
+                    self.map().draw_mode = e.mode;
                 });
             },
 

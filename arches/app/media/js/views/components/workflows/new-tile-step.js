@@ -24,7 +24,10 @@ define([
             params.tileid(cachedValue.tileid);
         }
 
-        this.url = arches.urls.api_card + (ko.unwrap(this.resourceId) || ko.unwrap(params.graphid));
+        this.getCardResourceIdOrGraphId = function() { // override for different cases
+            return (ko.unwrap(this.resourceId) || ko.unwrap(params.graphid));
+        };
+
         this.card = ko.observable();
         this.tile = ko.observable();
         this.loading = params.loading || ko.observable(false);
@@ -49,7 +52,8 @@ define([
         self.topCards = [];
 
         this.getJSON = function() {
-            $.getJSON(self.url, function(data) {
+            var url = arches.urls.api_card + this.getCardResourceIdOrGraphId();
+            $.getJSON(url, function(data) {
                 var handlers = {
                     'after-update': [],
                     'tile-reset': []
