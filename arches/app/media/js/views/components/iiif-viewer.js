@@ -25,6 +25,90 @@ define([
         this.filter = ko.observable('');
         this.manifestData = ko.observable();
         this.manifestError = ko.observable();
+        this.annotationNodes = ko.observableArray();
+        window.fetch(arches.urls.iiifannotationnodes)
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(json) {
+                self.annotationNodes(
+                    json.map(function(node) {
+                        var annotations = ko.observableArray();
+                        var updateAnnotations = function() {
+                            var canvas = self.canvas();
+                            if (canvas) {
+                                window.fetch(arches.urls.iiifannotations + '?canvas=' + canvas + '&nodeid=' + node.nodeid)
+                                    .then(function(response) {
+                                        return response.json();
+                                    })
+                                    .then(function(json) {
+                                        annotations(json.features);
+                                    });
+                            }
+                        };
+                        self.canvas.subscribe(updateAnnotations);
+                        updateAnnotations();
+                        return {
+                            name: node['graph_name'] + ' - ' + node.name,
+                            icon: node.icon,
+                            active: ko.observable(false),
+                            opacity: ko.observable(100),
+                            annotations: annotations
+                        };
+                    })
+                );
+            });
+        var annotationLayer = ko.computed(function() {
+            var annotationFeatures = [];
+            self.annotationNodes().forEach(function(node) {
+                if (node.active()) {
+                    var annotations = node.annotations();
+                    if (params.tile && params.tile.resourceinstance_id) {
+                        annotations = annotations.filter(function(annotation) {
+                            return annotation.properties.resourceId !== params.tile.resourceinstance_id;
+                        });
+                    }
+                    annotationFeatures = annotationFeatures.concat(annotations);
+                }
+            });
+            return L.geoJson({
+                type: 'FeatureCollection',
+                features: annotationFeatures
+            }, {
+                pointToLayer: function(feature, latlng) {
+                    var style = {
+                        color: feature.properties.color,
+                        fillColor: feature.properties.fillColor,
+                        weight: feature.properties.weight,
+                        radius: feature.properties.radius,
+                        opacity: feature.properties.opacity,
+                        fillOpacity: feature.properties.fillOpacity
+                    };
+                    return L.circleMarker(latlng, style);
+                },
+                style: function(feature) {
+                    var style = {
+                        color: feature.properties.color,
+                        fillColor: feature.properties.fillColor,
+                        weight: feature.properties.weight,
+                        radius: feature.properties.radius,
+                        opacity: feature.properties.opacity,
+                        fillOpacity: feature.properties.fillOpacity
+                    };
+                    return style;
+                }
+            });
+        });
+        var annotationFeatureGroup = new L.FeatureGroup();
+
+        annotationLayer.subscribe(function(newAnnotationLayer) {
+            var map = self.map();
+            if (map) {
+                annotationFeatureGroup.clearLayers();
+                annotationFeatureGroup.addLayer(newAnnotationLayer);
+            }
+        });
+
         this.canvases = ko.pureComputed(function() {
             var manifestData = self.manifestData();
             var sequences = manifestData ? manifestData.sequences : [];
@@ -216,6 +300,7 @@ define([
                 fullscreenElement: $(map.getContainer()).closest('.workbench-card-wrapper')[0]
             }).addTo(map);
             addCanvasLayer();
+            map.addLayer(annotationFeatureGroup);
         });
         this.canvas.subscribe(addCanvasLayer);
 

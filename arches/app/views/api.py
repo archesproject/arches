@@ -1013,6 +1013,7 @@ class IIIFAnnotations(APIBase):
         return JSONResponse({
             "type": "FeatureCollection",
             "features": [{
+                "type": "Feature",
                 "id": annotation.feature["id"],
                 "geometry": annotation.feature["geometry"],
                 "properties": {
@@ -1035,7 +1036,8 @@ class IIIFAnnotationNodes(APIBase):
         annotation_nodes = models.Node.objects.filter(nodegroup__in=permitted_nodegroups, datatype="annotation")
         return JSONResponse([{
             **model_to_dict(node),
-            "graph_name": node.graph.name
+            "graph_name": node.graph.name,
+            "icon": node.graph.iconclass,
         } for node in annotation_nodes])
 
 
