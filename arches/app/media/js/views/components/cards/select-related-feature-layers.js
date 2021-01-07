@@ -26,8 +26,8 @@ define([], function() {
             }
         } 
         color = createColorExpressions(color, colorPalette);
-        var nodeFilter = ["!=", "resourceinstanceid", "x"] // just a placeholder if there are no filerNodeids
-        if (filteredNodeids && nodeids.length > 1) {
+        var nodeFilter = ["!=", "resourceinstanceid", "x"] // just a placeholder if there are no filterNodeids
+        if (filteredNodeids && nodeids.length > 0) {
             var nodeFilter = filteredNodeids.map(id => ["==", "nodeid", id])
             nodeFilter.splice(0, 0, 'any');
         }

@@ -150,6 +150,10 @@ CACHES = {
 # Hide nodes and cards in a report that have no data
 HIDE_EMPTY_NODES_IN_REPORT = False
 
+BYPASS_CARDINALITY_TILE_VALIDATION = False
+BYPASS_UNIQUE_CONSTRAINT_TILE_VALIDATION = False
+BYPASS_REQUIRED_VALUE_TILE_VALIDATION = False
+
 DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d" # Custom date format for dates imported from and exported to csv
 
 #Identify the usernames and duration (seconds) for which you want to cache the time wheel
@@ -179,12 +183,15 @@ NOCAPTCHA = True
 if DEBUG is True:
     SILENCED_SYSTEM_CHECKS = ["captcha.recaptcha_test_key_error"]
 
+
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
 # EMAIL_USE_TLS = True
 # EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_HOST_USER = 'xxxx@xxx.com'
+EMAIL_HOST_USER = "xxxx@xxx.com"
 # EMAIL_HOST_PASSWORD = 'xxxxxxx'
 # EMAIL_PORT = 587
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 CELERY_BROKER_URL = "" # RabbitMQ --> "amqp://guest:guest@localhost",  Redis --> "redis://localhost:6379/0"
 CELERY_ACCEPT_CONTENT = ['json']
@@ -211,8 +218,8 @@ RESTRICT_MEDIA_ACCESS = False
 # to see how the language code is derived in the actual code
 
 ####### TO GENERATE .PO FILES DO THE FOLLOWING ########
-# run the following commands 
-# language codes used in the command should be in the form (which is slightly different 
+# run the following commands
+# language codes used in the command should be in the form (which is slightly different
 # form the form used in the LANGUAGE_CODE and LANGUAGES settings below):
 # --local={countrycode}_{REGIONCODE} <-- countrycode is lowercase, regioncode is uppercase, also notice the underscore instead of hyphen
 # commands to run (to generate files for "British English, German, and Spanish"):
@@ -226,7 +233,7 @@ RESTRICT_MEDIA_ACCESS = False
 # a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = "en"
 
-# list of languages to display in the language switcher, 
+# list of languages to display in the language switcher,
 # if left empty or with a single entry then the switch won't be displayed
 # language codes need to be all lower case with the form:
 # {langcode}-{regioncode} eg: en, en-gb ....

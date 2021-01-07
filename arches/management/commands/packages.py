@@ -198,11 +198,20 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
+            "-di",
+            "--defer_indexing",
+            action="store",
+            default=True,
+            dest="defer_indexing",
+            help="t/f - True(t) Defer indexing until all data is loaded (default).  Should speed up data load. False(f) to index resources and concepts incrementally during loading which allows users to search data while package load runs.",
+        )
+
+        parser.add_argument(
             "-pi",
             "--prevent_indexing",
             action="store_true",
             dest="prevent_indexing",
-            help="Prevents indexing the resources into Elasticsearch",
+            help="Prevents indexing the resources or concepts into Elasticsearch",
         )
 
         parser.add_argument(
@@ -256,7 +265,7 @@ class Command(BaseCommand):
             )
 
         if options["operation"] == "import_reference_data":
-            self.import_reference_data(options["source"], options["overwrite"], options["stage"], options["bulk_load"])
+            self.import_reference_data(options["source"], options["overwrite"], options["stage"], options["prevent_indexing"])
 
         if options["operation"] == "import_graphs":
             self.import_graphs(options["source"])
@@ -301,6 +310,7 @@ class Command(BaseCommand):
             self.create_mapping_file(options["dest_dir"], options["graphs"])
 
         if options["operation"] in ["load", "load_package"]:
+            defer_indexing = False if str(options["defer_indexing"])[0].lower() == "f" else True
             self.load_package(
                 options["source"],
                 options["setup_db"],
@@ -309,6 +319,7 @@ class Command(BaseCommand):
                 options["stage"],
                 options["yes"],
                 options["dev"],
+                defer_indexing,
             )
 
         if options["operation"] in ["create", "create_package"]:
@@ -590,7 +601,7 @@ class Command(BaseCommand):
             self.import_graphs(branches, overwrite_graphs=overwrite_graphs)
             self.import_graphs(resource_models, overwrite_graphs=overwrite_graphs)
 
-        def load_concepts(package_dir, overwrite, stage):
+        def load_concepts(package_dir, overwrite, stage, defer_indexing):
             file_types = ["*.xml", "*.rdf"]
 
             from time import time
@@ -605,7 +616,7 @@ class Command(BaseCommand):
             for path in concept_data:
                 if bar1 is None:
                     print(path)
-                self.import_reference_data(path, overwrite, stage, bulk_load)
+                self.import_reference_data(path, overwrite, stage, defer_indexing)
                 if bar1 is not None:
                     head, tail = os.path.split(path)
                     bar1.update(item_id=tail + (" " * 10))
@@ -618,7 +629,7 @@ class Command(BaseCommand):
             for path in collection_data:
                 if bar2 is None:
                     print(path)
-                self.import_reference_data(path, overwrite, stage, bulk_load)
+                self.import_reference_data(path, overwrite, stage, defer_indexing)
                 if bar2 is not None:
                     head, tail = os.path.split(path)
                     bar2.update(item_id=tail)
@@ -877,7 +888,7 @@ class Command(BaseCommand):
         print("loading datatypes")
         load_datatypes(package_location)
         print("loading concepts")
-        load_concepts(package_location, overwrite_concepts, stage_concepts)
+        load_concepts(package_location, overwrite_concepts, stage_concepts, defer_indexing)
         print("loading resource models and branches")
         load_graphs(package_location)
         print("loading resource to resource constraints")
@@ -888,9 +899,6 @@ class Command(BaseCommand):
         load_indexes(package_location)
         print("loading business data - resource instances and relationships")
         load_business_data(package_location, defer_indexing)
-        if defer_indexing is True:
-            print("&" * 100)
-            management.call_command("es", "reindex_database")
         print("loading resource views")
         load_resource_views(package_location)
         print("loading apps")
@@ -909,6 +917,9 @@ class Command(BaseCommand):
         update_resource_materialized_view()
         print("loading post sql")
         load_sql(package_location, "post_sql")
+        if defer_indexing is True:
+            print("indexing database")
+            management.call_command("es", "reindex_database")
         if celery_worker_running:
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
@@ -990,13 +1001,13 @@ class Command(BaseCommand):
             )
             sys.exit()
 
-    def import_reference_data(self, data_source, overwrite="ignore", stage="stage", bulk_load=False):
+    def import_reference_data(self, data_source, overwrite="ignore", stage="stage", prevent_indexing=False):
         if overwrite == "":
             overwrite = "overwrite"
 
         skos = SKOSReader()
         rdf = skos.read_file(data_source)
-        ret = skos.save_concepts_from_skos(rdf, overwrite, stage)
+        ret = skos.save_concepts_from_skos(rdf, overwrite, stage, prevent_indexing)
 
     def import_business_data(
         self,

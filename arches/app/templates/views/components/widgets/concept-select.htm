@@ -55,9 +55,9 @@
 {% block report %}
 <dt data-bind="text: label"></dt>
 <!-- ko foreach: valueObjects -->
-<dd>
-    <a data-bind="text: name" target="_blank"></a>
-</dd>
+    <dd>
+        <a data-bind="text: name" target="_blank"></a>
+    </dd>
 <!-- /ko -->
 <!-- ko if: valueObjects().length === 0 -->
 <dd>{% trans "None" %}</dd>

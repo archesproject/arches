@@ -370,9 +370,9 @@ class GeoJSON(APIBase):
                             features.append(feature)
                 except KeyError:
                     pass
-                except TypeError as e:
-                    print(e)
-                    print(tile.data)
+                except TypeError:
+                    pass
+
         feature_collection = {"type": "FeatureCollection", "features": features}
         if last_page is not None:
             feature_collection["_page"] = page

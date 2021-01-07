@@ -591,6 +591,17 @@ input[type="checkbox"] {
     padding: 0 0 218px 25px;
 }
 
+.tabbed-workflow-step-body {
+    background-color: #fff;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.tabbed-workflow-step-body > div {
+    background-color: #fff !important;
+    border: none !important;
+}
+
 .workflow-step-body .workbench-card-wrapper {
     margin-left: -25px;
 }
@@ -733,6 +744,62 @@ div.wf-multi-tile-card-info div {
     padding: 5px 15px;
     background: #f8f8f8;
     border-top: 1px solid #ddd;
+}
+
+.tabbed-workflow-title-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #ddd;
+    padding: 6px 64px 6px 12px;
+    font-size: medium;
+    font-weight: 600;
+}
+
+.workflow-nav-tab-container {
+    width: 100vw;
+    overflow-x: scroll;
+}
+
+.workflow-nav-tab-list {
+    padding: 0px 50px 0px 10px;
+    background-color: #fafafa;
+    display: flex;
+    min-width: max-content;
+}
+
+.workflow-nav-tab {
+    padding: 10px 20px;
+}
+
+.workflow-nav-tab.active {
+    padding: 10px 15px;
+    background-color: #fff;
+    font-weight: 600;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+
+.workflow-nav-tab.inactive {
+    cursor: pointer;
+}
+
+.workflow-nav-tab.disabled {
+    color: darkgrey;
+    cursor: not-allowed;
+}
+
+.workflow-nav-tab-arrow {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.workflow-nav-tab-arrow.disabled {
+    color: #a9a9a9;
+    cursor: default;
 }
 
 .workflow-nav-controls {
@@ -1694,8 +1761,28 @@ div.final-cons-step-separator>h4 {
     content: "\f070";
 }
 
-.overlay-listing.rr-map-card.active-overlay .overlay-name:before {
+.active-overlay .overlay-listing.rr-map-card .overlay-name {
+    color: #666;
     content: "\f06e";
+}
+
+.active-overlay .overlay-listing.rr-map-card .overlay-name:before {
+    color: #666;
+    content: "\f06e";
+}
+
+.rr-map-card.related-instances .related-instance {
+    color: #9e9e9e;
+    font-size: 12px;
+    padding: 3px 0 0 12px;
+}
+
+.active-overlay .rr-map-card.related-instances .related-instance {
+    color: #666;
+}
+
+.active-overlay .rr-map-card.related-instances .related-instance.hovered {
+    background-color: #eee;
 }
 
 .summary-panel {
@@ -12933,12 +13020,79 @@ a.jstree-anchor.permissions-widget {
     font-size: 0.9em;
 }
 
+.edtf-style-tools-collapser {
+    cursor: pointer;
+    padding: 5px;
+    font-size: 0.9em;
+    left: 510px;
+    position: absolute;
+    top: 6px;
+}
+
+.workbench-card-sidepanel .edtf-style-tools-collapser {
+    left: 250px;
+}
+
 .style-tools-panel {
     background: #fbfbfb;
     border: 1px solid #ddd;
     padding: 15px 15px 5px 5px;
     margin-bottom: 5px;
     border-radius: 2px;
+}
+
+.edtf-style-tools-panel {
+    background: #fbfbfb;
+    border: 1px solid #ddd;
+    padding: 10px 15px 5px 5px;
+    margin-bottom: 5px;
+    border-radius: 2px;
+    height: 200px;
+    width: 600px;
+    overflow-y: scroll;
+}
+
+.edtf-style-tools-panel::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 9px;
+    border-left: 1px solid #ddd;
+}
+
+.edtf-style-tools-panel::-webkit-scrollbar-thumb {
+    border-radius: 1px;
+    background-color: rgba(0, 0, 0, .1);
+    -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+}
+
+.workbench-card-sidepanel .edtf-style-tools-panel {
+    width: 340px;
+}
+
+.widget-help-panel {
+    padding: 5px 10px;
+}
+
+.widget-help-panel h2 {
+    font-size: 1.0em;
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
+.widget-help-panel a {
+    color: steelblue;
+    font-weight: 500;
+    text-decoration: underline;
+}
+
+.widget-help-panel h3 {
+    font-size: 1.0em;
+    margin-top: 0px;
+    color: #777;
+}
+
+.widget-help-panel .text-thin {
+    color: #666;
+    font-weight: 400;
 }
 
 .style-tools-color-visualizer {
