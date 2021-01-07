@@ -16,8 +16,8 @@
 }, css: {
     'active': activeTab() === 'annotations'
 }">
-    <i class="fa fa-image"></i>
-    <span class="map-sidebar-text">{% trans "Annotations" %}</span>
+    <i class="fa fa-paint-brush"></i>
+    <span class="map-sidebar-text">{% trans "Drawings" %}</span>
 </div>
 {% endblock tabs %}
 
@@ -84,7 +84,7 @@
 <!--ko if: activeTab() === 'annotations' -->
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
-        {% trans "Annotations" %}
+        {% trans "Drawings" %}
     </h4>
 </div>
 <div class="overlays-listing-container" data-bind="sortable: {

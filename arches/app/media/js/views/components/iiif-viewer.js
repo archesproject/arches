@@ -4,10 +4,11 @@ define([
     'knockout',
     'leaflet',
     'views/components/workbench',
+    'text!templates/views/components/iiif-popup.htm',
     'leaflet-iiif',
     'leaflet-fullscreen',
     'bindings/leaflet'
-], function(arches, $, ko, L, WorkbenchViewmodel) {
+], function(arches, $, ko, L, WorkbenchViewmodel, iiifPopup) {
     var IIIFViewerViewmodel = function(params) {
         var self = this;
         var abortFetchManifest;
@@ -42,6 +43,9 @@ define([
                                         return response.json();
                                     })
                                     .then(function(json) {
+                                        json.features.forEach(function(feature) {
+                                            feature.properties.graphName = node['graph_name'];
+                                        });
                                         annotations(json.features);
                                     });
                             }
@@ -63,9 +67,9 @@ define([
             self.annotationNodes().forEach(function(node) {
                 if (node.active()) {
                     var annotations = node.annotations();
-                    if (params.tile && params.tile.resourceinstance_id) {
+                    if (params.tile && params.tile.tileid) {
                         annotations = annotations.filter(function(annotation) {
-                            return annotation.properties.resourceId !== params.tile.resourceinstance_id;
+                            return annotation.properties.tileId !== params.tile.tileid;
                         });
                     }
                     annotations.forEach(function(annotation) {
@@ -101,6 +105,38 @@ define([
                         fillOpacity: (feature.properties.fillOpacity * modifier)
                     };
                     return style;
+                },
+                onEachFeature: function(feature, layer) {
+                    var popup = L.popup({
+                        closeButton: false,
+                        maxWidth: 349
+                    })
+                        .setContent(iiifPopup)
+                        .on('add', function() {
+                            var popupData = {
+                                'closePopup': function() {
+                                    popup.remove();
+                                },
+                                'name': ko.observable(''),
+                                'description': ko.observable(''),
+                                'graphName': feature.properties.graphName,
+                                'resourceinstanceid': feature.properties.resourceId,
+                                'reportURL': arches.urls.resource_report
+                            };
+                            window.fetch(arches.urls.resource_descriptors + popupData.resourceinstanceid)
+                                .then(function(response) {
+                                    return response.json();
+                                })
+                                .then(function(descriptors) {
+                                    popupData.name(descriptors.displayname);
+                                    popupData.description(descriptors['map_popup']);
+                                });
+                            var popupElement = popup.getElement()
+                                .querySelector('.mapboxgl-popup-content');
+                            ko.applyBindingsToDescendants(popupData, popupElement);
+                        });
+                    layer.bindPopup(popup);
+
                 }
             });
         });
