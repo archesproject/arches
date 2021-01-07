@@ -74,6 +74,7 @@ def export_search_results(self, userid, request_values, format):
         closing="Thank you",
         email=email,
         name=export_name,
+        email_link=str(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT).rstrip("/") + "/files/" + str(search_history_obj.downloadfile),
     )
     response = {"taskid": self.request.id, "msg": export_name, "notiftype_name": "Search Export Download Ready", "context": context}
 
