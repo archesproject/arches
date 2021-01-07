@@ -20,7 +20,7 @@ define([
                 }
             };
         };
-        
+
         var x = ko.unwrap(params.x) ? params.x : arches.mapDefaultX;
         var y = ko.unwrap(params.y) ? params.y : arches.mapDefaultY;
         var bounds = ko.unwrap(params.bounds) ? params.bounds : arches.hexBinBounds;
@@ -278,8 +278,19 @@ define([
                         self.isFeatureClickable
                     );
                     if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: true });
+
                     map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
+                    if (self.map().draw_mode) {
+                        var crosshairModes = [
+                            "draw_point",
+                            "draw_line_string",
+                            "draw_polygon",
+                        ];
+                        map.getCanvas().style.cursor = crosshairModes.includes(self.map().draw_mode) ? "crosshair" : "";
+                    }
                 });
+
+                map.draw_mode = null;
 
                 map.on('click', function(e) {
                     if (hoverFeature) {

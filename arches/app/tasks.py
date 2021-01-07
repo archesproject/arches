@@ -40,6 +40,7 @@ def message(arg):
 @shared_task(bind=True)
 def sync(self, surveyid=None, userid=None, synclogid=None):
     from arches.app.models.mobile_survey import MobileSurvey
+
     create_user_task_record(self.request.id, self.name, userid)
     survey = MobileSurvey.objects.get(id=surveyid)
     survey._sync(synclogid, userid)
@@ -67,6 +68,7 @@ def export_search_results(self, userid, request_values, format):
     exporter = SearchResultsExporter(search_request=new_request)
     files, export_info = exporter.export(format)
     exportid = exporter.write_export_zipfile(files, export_info)
+    search_history_obj = models.SearchExportHistory.objects.get(pk=exportid)
 
     return {
         "taskid": self.request.id,
@@ -81,6 +83,7 @@ def export_search_results(self, userid, request_values, format):
             closing=_("Thank you"),
             email=email,
             name=export_name,
+            email_link=str(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT).rstrip("/") + "/files/" + str(search_history_obj.downloadfile),
         ),
     }
 
