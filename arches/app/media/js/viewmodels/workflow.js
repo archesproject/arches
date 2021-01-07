@@ -28,15 +28,12 @@ define([
         });
 
         this.ready = ko.observable(false);
-<<<<<<< HEAD
         this.ready.subscribe(function() {
             var components = _.unique(self.steps.map(function(step) {return step.component;}));
             require(components, function() { self.initialize(); });
         });
 
-=======
         this.tabbedWorkflow = ko.observable(ko.unwrap(config.tabbedWorkflow));
->>>>>>> 5167f1ff625d855ae1950d6236b6337aecaba660
         this.loading = config.loading || ko.observable(false);
 
         this.workflowName = ko.observable();
@@ -231,49 +228,6 @@ define([
             );
         };
 
-<<<<<<< HEAD
-=======
-        this.restoreStateFromURL();
-
-        this.ready.subscribe(function() {
-            var components = _.unique(self.steps.map(function(step) {return step.component;}));
-            require(components, function() {
-                // var modules = arguments;
-                var stateStepCount = self.state.steps.length;
-                self.steps.forEach(function(step, i) {
-                    if (!(self.steps[i] instanceof Step)) {
-                        step.workflow = self;
-                        step.loading = self.loading;
-                        step.alert = self.alert;
-                        self.steps[i] = new Step(step);
-                        if (stateStepCount !== 0 && i <= stateStepCount) {
-                            if(self.state.steps[i]) {
-                                self.steps[i].complete(self.state.steps[i].complete);
-                            }
-                        }
-                        self.steps[i].complete.subscribe(function(complete) {
-                            if (complete && self.steps[i].autoAdvance()) self.next();
-                        });
-                    }
-                    self.steps[i]._index = i;
-                });
-                if (self.state.activestep) {
-                    self.activeStep(self.steps[self.state.activestep]);
-                }
-                else if(self.steps.length > 0) {
-                    self.activeStep(self.steps[0]);
-                }
-            });
-        });
-
-        this.updateUrl = function() {
-            //Updates the url with the parameters needed for the next step
-            var urlparams = JSON.parse(JSON.stringify(self.state)); //deep copy
-            urlparams.steps = JSON.stringify(self.state.steps);
-            history.pushState(null, '', window.location.pathname + '?' + $.param(urlparams));
-        };
-
->>>>>>> 5167f1ff625d855ae1950d6236b6337aecaba660
         this.updateState = function(val) {
             var activeStep = val;
             var previousStep = self.previousStep();
