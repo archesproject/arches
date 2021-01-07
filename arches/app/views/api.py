@@ -1033,35 +1033,45 @@ class IIIFAnnotations(APIBase):
             annotations = annotations.filter(resourceinstance_id=resourceid)
         if nodeid is not None:
             annotations = annotations.filter(node_id=nodeid)
-        return JSONResponse({
-            "type": "FeatureCollection",
-            "features": [{
-                "type": "Feature",
-                "id": annotation.feature["id"],
-                "geometry": annotation.feature["geometry"],
-                "properties": {
-                    **annotation.feature["properties"],
-                    **{
-                        "nodeId": annotation.node_id,
-                        "nodegroupId": annotation.nodegroup_id,
-                        "resourceId": annotation.resourceinstance_id,
-                        "graphId": annotation.node.graph_id,
-                        "tileId": annotation.tile_id,
+        return JSONResponse(
+            {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "id": annotation.feature["id"],
+                        "geometry": annotation.feature["geometry"],
+                        "properties": {
+                            **annotation.feature["properties"],
+                            **{
+                                "nodeId": annotation.node_id,
+                                "nodegroupId": annotation.nodegroup_id,
+                                "resourceId": annotation.resourceinstance_id,
+                                "graphId": annotation.node.graph_id,
+                                "tileId": annotation.tile_id,
+                            },
+                        },
                     }
-                },
-            } for annotation in annotations]
-        })
+                    for annotation in annotations
+                ],
+            }
+        )
 
 
 class IIIFAnnotationNodes(APIBase):
     def get(self, request, indent=None):
         permitted_nodegroups = [nodegroup for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]
         annotation_nodes = models.Node.objects.filter(nodegroup__in=permitted_nodegroups, datatype="annotation")
-        return JSONResponse([{
-            **model_to_dict(node),
-            "graph_name": node.graph.name,
-            "icon": node.graph.iconclass,
-        } for node in annotation_nodes])
+        return JSONResponse(
+            [
+                {
+                    **model_to_dict(node),
+                    "graph_name": node.graph.name,
+                    "icon": node.graph.iconclass,
+                }
+                for node in annotation_nodes
+            ]
+        )
 
 
 class Manifest(APIBase):

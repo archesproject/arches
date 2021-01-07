@@ -1372,4 +1372,4 @@ class VwAnnotation(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'vw_annotations'
+        db_table = "vw_annotations"

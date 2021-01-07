@@ -1,10 +1,11 @@
 import django.contrib.postgres.fields.jsonb
 from django.db import migrations, models
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '6838_add_manifest_json'),
+        ("models", "6838_add_manifest_json"),
     ]
 
     sql = """
@@ -45,16 +46,16 @@ class Migration(migrations.Migration):
             reverse_sql,
         ),
         migrations.CreateModel(
-            name='VwAnnotation',
+            name="VwAnnotation",
             fields=[
-                ('feature_id', models.UUIDField(primary_key=True, serialize=False)),
-                ('tiledata', django.contrib.postgres.fields.jsonb.JSONField()),
-                ('feature', django.contrib.postgres.fields.jsonb.JSONField()),
-                ('canvas', models.TextField()),
+                ("feature_id", models.UUIDField(primary_key=True, serialize=False)),
+                ("tiledata", django.contrib.postgres.fields.jsonb.JSONField()),
+                ("feature", django.contrib.postgres.fields.jsonb.JSONField()),
+                ("canvas", models.TextField()),
             ],
             options={
-                'db_table': 'vw_annotations',
-                'managed': False,
+                "db_table": "vw_annotations",
+                "managed": False,
             },
         ),
     ]
