@@ -1755,7 +1755,6 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-container {
     height: 100%;
-    margin-right: 75px;
 }
 
 .workbench-card-container.workbench-card-container-sidepanel-active {
@@ -12665,7 +12664,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .workbench-card-container-sidepanel-active .workbench-card-container {
-    margin-right: 475px;
+    margin-right: 400px;
 }
 
 .add-new-crumb {
