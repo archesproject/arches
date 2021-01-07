@@ -1,6 +1,7 @@
 import json, urllib
 from django.urls import reverse
 from arches.app.models import models
+from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, Exists
 from django.utils.translation import ugettext as _
 import logging
 
@@ -215,6 +216,18 @@ class BaseDataType(object):
         advanced search
         """
         pass
+
+    def append_null_search_filters(self, value, node, query, request):
+        """
+        Appends the search query dsl to search for fields that haven't been populated
+        """
+        null_query = Bool()
+        null_query.must(Exists(field="tiles.data.%s" % (str(node.pk))))
+        query.filter(Terms(field="tiles.nodegroup_id", terms=[str(node.nodegroup_id)]))
+        if value["op"] == "null":
+            query.must_not(null_query)
+        elif value["op"] == "not_null":
+            query.must(null_query)
 
     def handle_request(self, current_tile, request, node):
         """

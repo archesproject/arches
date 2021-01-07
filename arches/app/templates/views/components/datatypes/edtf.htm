@@ -8,9 +8,11 @@
         <option value="lt"> < </option>
         <option value="gte"> >= </option>
         <option value="lte"> <= </option>
+        <option value="null">{% trans "Has no value" %}</option>
+        <option value="not_null">{% trans "Has any value" %}</option>
     </select>
 </div>
-<div class="col-md-8 col-lg-9">
+<div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
     <input type="text" placeholder='{% trans "Name" %}' class="form-control input-lg" style="height: 36px;" data-bind="textInput: searchValue">
 </div>
 <!-- /ko -->

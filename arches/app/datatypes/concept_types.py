@@ -133,7 +133,9 @@ class ConceptDataType(BaseConceptDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value["val"] != "":
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "":
                 match_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
                 if "!" in value["op"]:
                     query.must_not(match_query)
@@ -273,7 +275,9 @@ class ConceptListDataType(BaseConceptDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value["val"] != "":
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "":
                 match_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
                 if "!" in value["op"]:
                     query.must_not(match_query)

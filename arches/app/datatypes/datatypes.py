@@ -20,7 +20,7 @@ from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.utils.geo_utils import GeoUtils
 import arches.app.utils.task_management as task_management
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Terms, Exists, RangeDSLException
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Terms, Nested, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.mappings import RESOURCES_INDEX, RESOURCE_RELATIONS_INDEX
 from django.core.cache import cache
@@ -112,7 +112,9 @@ class StringDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value["val"] != "":
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "":
                 match_type = "phrase_prefix" if "~" in value["op"] else "phrase"
                 match_query = Match(field="tiles.data.%s" % (str(node.pk)), query=value["val"], type=match_type)
                 if "!" in value["op"]:
@@ -189,7 +191,9 @@ class NumberDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value["val"] != "":
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "":
                 if value["op"] != "eq":
                     operators = {"gte": None, "lte": None, "lt": None, "gt": None}
                     operators[value["op"]] = value["val"]
@@ -248,11 +252,25 @@ class BooleanDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value["val"] != "":
+            if value["val"] == "null" or value["val"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "" and value["val"] is not None:
                 term = True if value["val"] == "t" else False
                 query.must(Term(field="tiles.data.%s" % (str(node.pk)), term=term))
         except KeyError as e:
             pass
+
+    def append_null_search_filters(self, value, node, query, request):
+        """
+        Appends the search query dsl to search for fields that haven't been populated
+        """
+        null_query = Bool()
+        null_query.must(Exists(field="tiles.data.%s" % (str(node.pk))))
+        query.filter(Terms(field="tiles.nodegroup_id", terms=[str(node.nodegroup_id)]))
+        if value["val"] == "null":
+            query.must_not(null_query)
+        elif value["val"] == "not_null":
+            query.must(null_query)
 
     def to_rdf(self, edge_info, edge):
         # returns an in-memory graph object, containing the domain resource, its
@@ -332,7 +350,9 @@ class DateDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value["val"] != "" and value["val"] is not None:
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "" and value["val"] is not None:
                 try:
                     date_value = datetime.strptime(value["val"], "%Y-%m-%d %H:%M:%S%z").astimezone().isoformat()
                 except ValueError:
@@ -469,13 +489,16 @@ class EDTFDataType(BaseDataType):
                 except RangeDSLException:
                     if edtf.lower is None and edtf.upper is None:
                         raise Exception(_("Invalid date specified."))
-
-        edtf = ExtendedDateFormat(value["val"])
-        if edtf.result_set:
-            for result in edtf.result_set:
-                add_date_to_doc(query, result)
-        else:
-            add_date_to_doc(query, edtf)
+        
+        if value["op"] == "null" or value["op"] == "not_null":
+            self.append_null_search_filters(value, node, query, request)
+        elif value["val"] != "" and value["val"] is not None:
+            edtf = ExtendedDateFormat(value["val"])
+            if edtf.result_set:
+                for result in edtf.result_set:
+                    add_date_to_doc(query, result)
+            else:
+                add_date_to_doc(query, edtf)
 
     def default_es_mapping(self):
         return {"properties": {"value": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}}}
@@ -1517,7 +1540,9 @@ class DomainDataType(BaseDomainDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value["val"] != "":
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "":
                 search_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
                 # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(value['val']))
                 if "!" in value["op"]:
@@ -1622,7 +1647,9 @@ class DomainListDataType(BaseDomainDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value["val"] != "":
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "":
                 search_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
                 # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(value['val']))
                 if "!" in value["op"]:
@@ -1831,7 +1858,9 @@ class ResourceInstanceDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value["val"] != "" and value["val"] != []:
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "" and value["val"] != []:
                 # search_query = Match(field="tiles.data.%s.resourceId" % (str(node.pk)), type="phrase", query=value["val"])
                 search_query = Terms(field="tiles.data.%s.resourceId.keyword" % (str(node.pk)), terms=value["val"])
                 if "!" in value["op"]:
