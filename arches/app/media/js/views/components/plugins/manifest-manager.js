@@ -46,7 +46,7 @@ define([
                 return "unique_id_" + self.uniqueId;
             });
 
-            this.formData = new FormData();
+            this.formData = new window.FormData();
 
             this.addAllCanvases = function() {
                 self.canvases().forEach(function(canvas){
@@ -66,7 +66,7 @@ define([
 
             this.reset = function() {
                 self.formData.delete("files");
-                self.formData = new FormData();
+                self.formData = new window.FormData();
                 self.imagesForUpload.removeAll();
                 self.metaDataLabel('');
                 self.metaDataValues('');
