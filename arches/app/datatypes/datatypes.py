@@ -487,7 +487,9 @@ class EDTFDataType(BaseDataType):
             if value["op"] == "eq":
                 if edtf.lower != edtf.upper:
                     raise Exception(_('Only dates that specify an exact year, month, and day can be used with the "=" operator'))
-                match_query = Nested(path="tiles", query=Match(field="tiles.data.%s.dates.date" % (str(node.pk)), query=edtf.lower, type="phrase_prefix"))
+                match_query = Nested(
+                    path="tiles", query=Match(field="tiles.data.%s.dates.date" % (str(node.pk)), query=edtf.lower, type="phrase_prefix")
+                )
                 base_query.should(match_query)
             else:
                 if value["op"] == "overlaps":
@@ -505,12 +507,17 @@ class EDTFDataType(BaseDataType):
 
                 try:
                     base_query.should(Nested(path="tiles", query=Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators)))
-                    base_query.should(Nested(path="tiles", query=Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators)))
+                    base_query.should(
+                        Nested(
+                            path="tiles",
+                            query=Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators),
+                        )
+                    )
                 except RangeDSLException:
                     if edtf.lower is None and edtf.upper is None:
                         raise Exception(_("Invalid date specified."))
             query.must(base_query)
-        
+
         if value["op"] == "null" or value["op"] == "not_null":
             self.append_null_search_filters(value, node, query, request)
         elif value["val"] != "" and value["val"] is not None:
@@ -1886,7 +1893,9 @@ class ResourceInstanceDataType(BaseDataType):
             elif value["val"] != "" and value["val"] != []:
                 base_query = Bool()
                 base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
-                search_query = Nested(path="tiles", query=Terms(field="tiles.data.%s.resourceId.keyword" % (str(node.pk)), terms=value["val"]))
+                search_query = Nested(
+                    path="tiles", query=Terms(field="tiles.data.%s.resourceId.keyword" % (str(node.pk)), terms=value["val"])
+                )
                 if "!" in value["op"]:
                     base_query.must_not(search_query)
                 else:
