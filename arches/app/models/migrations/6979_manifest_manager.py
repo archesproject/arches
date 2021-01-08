@@ -7,7 +7,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '6843_manifest_file_model'),
+        ("models", "6843_manifest_file_model"),
     ]
 
     sql = """
