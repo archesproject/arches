@@ -68,6 +68,7 @@ define([
                 self.formData.delete("files");
                 self.formData = new window.FormData();
                 self.imagesForUpload.removeAll();
+                self.clearCanvasSelection();
                 self.metaDataLabel('');
                 self.metaDataValues('');
                 self.manifestName(self.origManifestName);
