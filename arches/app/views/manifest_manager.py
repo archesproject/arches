@@ -17,10 +17,11 @@ from arches.app.views.search import search_results
 
 logger = logging.getLogger(__name__)
 
+
 class ManifestManagerView(View):
     def delete(self, request):
         data = JSONDeserializer().deserialize(request.body)
-        manifest = data.get('manifest')
+        manifest = data.get("manifest")
         manifest = models.IIIFManifest.objects.get(url=manifest)
         manifest.delete()
         return JSONResponse({"success": True})
@@ -29,67 +30,55 @@ class ManifestManagerView(View):
         def create_manifest(name, desc, file_url, canvases):
             attribution = "Provided by The J. Paul Getty Museum"
             logo = "http://www.getty.edu/museum/media/graphics/web/logos/getty.png"
-            metadata = [] #{"label": "TBD", "value": ["Unknown", ...]}
+            metadata = []  # {"label": "TBD", "value": ["Unknown", ...]}
             sequence_id = settings.CANTALOUPE_HTTP_ENDPOINT + "iiif/manifest/sequence/TBD.json"
 
-            return  {
-                        "@context": "http://iiif.io/api/presentation/2/context.json",
-                        "@type": "sc:Manifest",
-                        "description": desc,
-                        "label": name,
-                        "attribution": attribution,
-                        "logo": logo,
-                        "metadata": metadata,
-                        "thumbnail": {
-                            "@id": file_url + "/full/!300,300/0/default.jpg",
-                            "@type": "dctypes:Image",
-                            "format": "image/jpeg",
-                            "label": "Main VIew (.45v)",
-                        },
-                        "sequences": [{
-                                "@id": sequence_id,
-                                "@type": "sc:Sequence",
-                                "canvases": canvases,
-                                "label": "Object",
-                                "startCanvas": "",
-                            }],
+            return {
+                "@context": "http://iiif.io/api/presentation/2/context.json",
+                "@type": "sc:Manifest",
+                "description": desc,
+                "label": name,
+                "attribution": attribution,
+                "logo": logo,
+                "metadata": metadata,
+                "thumbnail": {
+                    "@id": file_url + "/full/!300,300/0/default.jpg",
+                    "@type": "dctypes:Image",
+                    "format": "image/jpeg",
+                    "label": "Main VIew (.45v)",
+                },
+                "sequences": [
+                    {
+                        "@id": sequence_id,
+                        "@type": "sc:Sequence",
+                        "canvases": canvases,
+                        "label": "Object",
+                        "startCanvas": "",
                     }
+                ],
+            }
 
         def create_canvas(image_json, file_url, file_name, image_id):
             canvas_id = f"{settings.CANTALOUPE_HTTP_ENDPOINT}iiif/manifest/canvas/{image_id}.json"
             image_id = f"{settings.CANTALOUPE_HTTP_ENDPOINT}iiif/manifest/annotation/{image_id}.json"
 
-            return  {
-                        "@id": canvas_id,
-                        "@type": "sc:Canvas",
-                        "height": image_json["height"],
-                        "width": image_json["width"],
-                        "images": [
-                            {
-                                "@id": image_id,
-                                "@type": "oa.Annotation",
-                                "motivation": "unknown",
-                                "on": canvas_id,
-                                "resource": {
-                                    "@id": file_url + "/full/full/0/default.jpg",
-                                    "@type": "dctypes:Image",
-                                    "format": "image/jpeg",
-                                    "height": image_json["height"],
-                                    "width": image_json["width"],
-                                    "service": {
-                                        "@context": "http://iiif.io/api/image/2/context.json",
-                                        "@id": file_url,
-                                        "profile": "http://iiif.io/api/image/2/level2.json",
-                                    },
-                                },
-                            }
-                        ],
-                        "label": f"{file_name}",
-                        "license": "TBD",
-                        "thumbnail": {
-                            "@id": file_url + "/full/!300,300/0/default.jpg",
+            return {
+                "@id": canvas_id,
+                "@type": "sc:Canvas",
+                "height": image_json["height"],
+                "width": image_json["width"],
+                "images": [
+                    {
+                        "@id": image_id,
+                        "@type": "oa.Annotation",
+                        "motivation": "unknown",
+                        "on": canvas_id,
+                        "resource": {
+                            "@id": file_url + "/full/full/0/default.jpg",
                             "@type": "dctypes:Image",
                             "format": "image/jpeg",
+                            "height": image_json["height"],
+                            "width": image_json["width"],
                             "service": {
                                 "@context": "http://iiif.io/api/image/2/context.json",
                                 "@id": file_url,
@@ -97,18 +86,34 @@ class ManifestManagerView(View):
                             },
                         },
                     }
+                ],
+                "label": f"{file_name}",
+                "license": "TBD",
+                "thumbnail": {
+                    "@id": file_url + "/full/!300,300/0/default.jpg",
+                    "@type": "dctypes:Image",
+                    "format": "image/jpeg",
+                    "service": {
+                        "@context": "http://iiif.io/api/image/2/context.json",
+                        "@id": file_url,
+                        "profile": "http://iiif.io/api/image/2/level2.json",
+                    },
+                },
+            }
 
         def add_canvases(manifest, canvases):
             manifest = models.IIIFManifest.objects.get(url=manifest)
-            manifest.manifest['sequences'][0]['canvases'] += canvases
+            manifest.manifest["sequences"][0]["canvases"] += canvases
             manifest.save()
             return manifest
 
         def delete_canvas(manifest, canvases_to_remove):
             manifest = models.IIIFManifest.objects.get(url=manifest)
-            canvas_ids_remove = [canvas['images'][0]['resource']['service']['@id'] for canvas in canvases_to_remove]
-            canvases = manifest.manifest['sequences'][0]['canvases']
-            manifest.manifest['sequences'][0]['canvases'] = [canvas for canvas in canvases if canvas['images'][0]['resource']['service']['@id'] not in canvas_ids_remove]
+            canvas_ids_remove = [canvas["images"][0]["resource"]["service"]["@id"] for canvas in canvases_to_remove]
+            canvases = manifest.manifest["sequences"][0]["canvases"]
+            manifest.manifest["sequences"][0]["canvases"] = [
+                canvas for canvas in canvases if canvas["images"][0]["resource"]["service"]["@id"] not in canvas_ids_remove
+            ]
             manifest.save()
             return manifest
 
@@ -125,7 +130,7 @@ class ManifestManagerView(View):
 
         def get_image_count(manifest):
             manifest = models.IIIFManifest.objects.get(url=manifest)
-            return len(manifest.manifest['sequences'][0]['canvases'])
+            return len(manifest.manifest["sequences"][0]["canvases"])
 
         def change_manifest_info(manifest, name, desc):
             manifest = models.IIIFManifest.objects.get(url=manifest)
@@ -138,23 +143,22 @@ class ManifestManagerView(View):
             manifest.save()
             return manifest
 
-        def change_manifest_metadata(manifest, metadata_dict): # To be fixed
+        def change_manifest_metadata(manifest, metadata_dict):  # To be fixed
             manifest = models.IIIFManifest.objects.get(url=manifest)
-            for k,v in metadata_dict.items():
-                manifest.manifest['metadata'].append({'label':k,'value':v})
+            for k, v in metadata_dict.items():
+                manifest.manifest["metadata"].append({"label": k, "value": v})
             manifest.save()
             return manifest
 
         def change_canvas_label(manifest, canvas_id, label):
             manifest = models.IIIFManifest.objects.get(url=manifest)
-            #canvas_id = canvas['images'][0]['resource']['service']['@id']
-            canvases = manifest.manifest['sequences'][0]['canvases']
+            # canvas_id = canvas['images'][0]['resource']['service']['@id']
+            canvases = manifest.manifest["sequences"][0]["canvases"]
             for canvas in canvases:
-                if canvas['images'][0]['resource']['service']['@id'] == canvas_id:
-                    canvas['label'] = label
+                if canvas["images"][0]["resource"]["service"]["@id"] == canvas_id:
+                    canvas["label"] = label
             manifest.save()
             return manifest
-
 
         acceptable_types = [
             ".jpg",
@@ -167,18 +171,18 @@ class ManifestManagerView(View):
         files = request.FILES.getlist("files")
         name = request.POST.get("manifest_title")
         desc = request.POST.get("manifest_description")
-        operation = request.POST.get('operation')
-        manifest = request.POST.get('manifest')
-        canvas_label = request.POST.get('canvas_label')
-        canvas_id = request.POST.get('canvas_id')
-        metadata_label = request.POST.get('metadata_label')
-        metadata_values = request.POST.get('metadata_values')
-        selected_canvases = request.POST.get('selected_canvases')
+        operation = request.POST.get("operation")
+        manifest = request.POST.get("manifest")
+        canvas_label = request.POST.get("canvas_label")
+        canvas_id = request.POST.get("canvas_id")
+        metadata_label = request.POST.get("metadata_label")
+        metadata_values = request.POST.get("metadata_values")
+        selected_canvases = request.POST.get("selected_canvases")
 
         if not os.path.exists(settings.CANTALOUPE_DIR):
             os.mkdir(settings.CANTALOUPE_DIR)
 
-        if operation == 'create':
+        if operation == "create":
             canvases = []
             for f in files:
                 if os.path.splitext(f.name)[1].lower() in acceptable_types:
@@ -230,9 +234,9 @@ class ManifestManagerView(View):
             except:
                 logger.warning("You have to select a manifest to add images")
                 return None
-        
+
         if metadata_values is not None and metadata_values != "" and metadata_label is not None and metadata_label != "":
-            metadata_values_list = metadata_values.split(',')
+            metadata_values_list = metadata_values.split(",")
             metadata_dict = {metadata_label: metadata_values_list}
             updated_manifest = change_manifest_metadata(manifest, metadata_dict)
 

@@ -7,19 +7,19 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '6838_add_manifest_json'),
+        ("models", "6838_add_manifest_json"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ManifestImage',
+            name="ManifestImage",
             fields=[
-                ('imageid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('image', models.ImageField(upload_to='cantaloupe')),
+                ("imageid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ("image", models.ImageField(upload_to="cantaloupe")),
             ],
             options={
-                'db_table': 'manifest_images',
-                'managed': True,
+                "db_table": "manifest_images",
+                "managed": True,
             },
         ),
     ]
