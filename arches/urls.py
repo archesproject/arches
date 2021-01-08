@@ -53,6 +53,7 @@ from arches.app.views.tile import TileData
 from arches.app.views.notifications import NotificationView
 from arches.app.views.map import MapLayerManagerView, TileserverProxyView
 from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources, MobileSurveyDesignerView
+from arches.app.views.manifest_manager import ManifestManagerView
 from arches.app.views.auth import (
     LoginView,
     SignupView,
@@ -267,6 +268,7 @@ urlpatterns = [
     url(r"^o/", include("oauth2_provider.urls", namespace="oauth2")),
     url(r"^iiifmanifest$", api.IIIFManifest.as_view(), name="iiifmanifest"),
     url(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
+    url(r"^manifest-manager", ManifestManagerView.as_view(), name="manifest_manager"),
 ]
 
 if settings.DEBUG:
