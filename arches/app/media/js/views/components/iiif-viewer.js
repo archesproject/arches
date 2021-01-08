@@ -75,7 +75,7 @@ define([
                     annotations.forEach(function(annotation) {
                         annotation.properties.opacityModifier = node.opacity();
                     });
-                    annotationFeatures = annotationFeatures.concat(annotations);
+                    annotationFeatures = annotations.concat(annotationFeatures);
                 }
             });
             return L.geoJson({
