@@ -2,7 +2,7 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.search.elasticsearch_dsl_builder import Bool, Nested
+from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Terms
 from arches.app.search.components.base import BaseSearchFilter
 
 details = {
@@ -36,15 +36,15 @@ class AdvancedSearch(BaseSearchFilter):
                     if self.request.user.has_perm("read_nodegroup", node.nodegroup):
                         datatype = datatype_factory.get_instance(node.datatype)
                         datatype.append_search_filters(val, node, tile_query, self.request)
-            nested_query = Nested(path="tiles", query=tile_query)
             if advanced_filter["op"] == "or" and index != 0:
                 grouped_query = Bool()
                 grouped_queries.append(grouped_query)
-            grouped_query.must(nested_query)
+            grouped_query.must(tile_query)
         for grouped_query in grouped_queries:
             advanced_query.should(grouped_query)
         search_query.must(advanced_query)
         search_results_object["query"].add_query(search_query)
+        print(search_results_object["query"])
 
     def view_data(self):
         ret = {}
