@@ -2190,6 +2190,17 @@ div.final-cons-step-separator>h4 {
     padding-left: 22px;
 }
 
+.option-input {
+    display: flex; 
+    flex-wrap: wrap; 
+    max-width: 600px;
+}
+
+.option-input-config {
+    display: flex;
+    flex-direction: column;
+}
+
 span.icon-wrap.icon-circle.bg-gray-dark:hover {
     background: #94A6BC;
     color: #123;
