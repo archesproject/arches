@@ -6,7 +6,7 @@
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('imageTools');
 }, css: {
-    'active': activeTab() === 'imageTools'
+    'active': activeTab() === 'imageTools', 'disabled': !canvas() || expandGallery()
 }">
     <i class="fa fa-image"></i>
     <span class="map-sidebar-text">{% trans "Image" %}</span>

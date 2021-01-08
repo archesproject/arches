@@ -1684,6 +1684,7 @@ div.final-cons-step-separator>h4 {
 .workbench-card-sidebar-tab.disabled {
     color: #aaa;
     cursor: auto;
+    pointer-events: none;
 }
 
 .workbench-card-sidebar-tab i {
