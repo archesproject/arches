@@ -470,12 +470,13 @@ class EDTFDataType(BaseDataType):
                     if edtf.lower is None and edtf.upper is None:
                         raise Exception(_("Invalid date specified."))
 
-        edtf = ExtendedDateFormat(value["val"])
-        if edtf.result_set:
-            for result in edtf.result_set:
-                add_date_to_doc(query, result)
-        else:
-            add_date_to_doc(query, edtf)
+        if value["val"] != "" and value["val"] is not None:
+            edtf = ExtendedDateFormat(value["val"])
+            if edtf.result_set:
+                for result in edtf.result_set:
+                    add_date_to_doc(query, result)
+            else:
+                add_date_to_doc(query, edtf)
 
     def default_es_mapping(self):
         return {"properties": {"value": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}}}
