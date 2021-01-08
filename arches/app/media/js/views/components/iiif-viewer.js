@@ -271,13 +271,13 @@ define([
                         self.selectCanvas(canvas);
                     }    
                 }
-            updateCanvas = true;
-            self.origManifestName = getLabel(manifestData);
-            self.origManifestDescription = getDescription(manifestData);
-            self.origMetaData = getMetaData(manifestData);
-            self.manifestName(getLabel(manifestData));
-            self.manifestDescription(getDescription(manifestData));
-            self.manifestMetaData(getMetaData(manifestData));
+                updateCanvas = true;
+                self.origManifestName = getLabel(manifestData);
+                self.origManifestDescription = getDescription(manifestData);
+                self.origMetaData = getMetaData(manifestData);
+                self.manifestName(getLabel(manifestData));
+                self.manifestDescription(getDescription(manifestData));
+                self.manifestMetaData(getMetaData(manifestData));
             }
         });
 

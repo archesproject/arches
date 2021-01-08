@@ -1,11 +1,12 @@
 define([
     'knockout',
+    'jquery',
     'dropzone',
     'uuid',
     'arches',
     'views/components/iiif-viewer',
     'bindings/dropzone'
-], function (ko, Dropzone, uuid, arches, IIIFViewerViewmodel) {
+], function(ko, $, Dropzone, uuid, arches, IIIFViewerViewmodel) {
     return ko.components.register('manifest-manager', {
         viewModel: function(params) {
             var self = this;
@@ -14,19 +15,17 @@ define([
 
             this.imagesForUpload = ko.observableArray([]);
             this.canvasesForDeletion = ko.observableArray([]);
-            //this.metadataToAdd = ko.observableArray([]);
-            //this.metadataToRemove = ko.observableArray([]);
-            this.metaDataLabel = ko.observable('')
-            this.metaDataValues = ko.observable('')
+            this.metaDataLabel = ko.observable('');
+            this.metaDataValues = ko.observable('');
 
             this.addCanvas = function(canvas) { //the function name needs to be better
                 self.canvasesForDeletion.push(canvas);
-                self.canvas(canvas.images[0].resource.service['@id'])
+                self.canvas(canvas.images[0].resource.service['@id']);
             };
 
             this.removeCanvas = function(canvas) { //the function name needs to be better
                 self.canvasesForDeletion.remove(canvas);
-                self.canvas(canvas.images[0].resource.service['@id'])
+                self.canvas(canvas.images[0].resource.service['@id']);
             };
 
             IIIFViewerViewmodel.apply(this, [params]);
@@ -35,7 +34,7 @@ define([
                 return ((ko.unwrap(self.manifestName) !== self.origManifestName) ||
                         (ko.unwrap(self.manifestDescription) !== self.origManifestDescription) ||
                         ((ko.unwrap(self.metaDataLabel) !== '') && (ko.unwrap(self.metaDataValues) !== ''))
-                        );
+                );
             });
 
             this.isCanvasDirty = ko.computed(function() {
@@ -98,7 +97,7 @@ define([
                         console.log(response);
                         console.log("Failed");
                     }
-                })
+                });
             };
 
             this.deleteCanvases = function() {
@@ -116,7 +115,7 @@ define([
                     cache: false,
                     processData: false,
                     contentType: false,
-                    success: function(response) {
+                    success: function() {
                         self.reset();
                         self.toggleManifestEditor();
                         self.manifestData(null);
@@ -127,27 +126,27 @@ define([
                         self.expandGallery(true);
                         console.log('Deleted');
                     },
-                    error: function(response) {
+                    error: function() {
                         self.reset();
                         console.log("Failed to Delete");
                     }
-                })
+                });
             };
 
             this.createManifest = function(fileList){
                 Array.from(fileList).forEach(function(file) {
                     self.formData.append("files", file, file.name);
-                    self.imagesForUpload.push(file);})
+                    self.imagesForUpload.push(file);});
                 self.formData.append("manifest_title", ko.unwrap(self.manifestName));
                 self.formData.append("manifest_description", ko.unwrap(self.manifestDescription));
-                self.formData.append("operation", "create")
+                self.formData.append("operation", "create");
                 self.submitToManifest();
             };
 
             this.addFiles = function(fileList) {
                 Array.from(fileList).forEach(function(file) {
                     self.formData.append("files", file, file.name);
-                    self.imagesForUpload.push(file);})
+                    self.imagesForUpload.push(file);});
                 self.updateManifest();
             };
 
@@ -199,5 +198,5 @@ define([
             };
         },
         template: { require: 'text!templates/views/components/plugins/manifest-manager.htm' }
-    })
+    });
 });
