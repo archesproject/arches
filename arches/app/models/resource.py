@@ -361,7 +361,9 @@ class Resource(models.ResourceInstance):
             permit_deletion = True
 
         if permit_deletion is True:
-            for related_resource in models.ResourceXResource.objects.filter(Q(resourceinstanceidfrom=self.resourceinstanceid) | Q(resourceinstanceidto=self.resourceinstanceid)):
+            for related_resource in models.ResourceXResource.objects.filter(
+                Q(resourceinstanceidfrom=self.resourceinstanceid) | Q(resourceinstanceidto=self.resourceinstanceid)
+            ):
                 related_resource.delete(deletedResourceId=self.resourceinstanceid, index=False)
 
             if index:
