@@ -424,9 +424,7 @@ class Tile(models.TileModel):
                 bool_query = Bool()
                 bool_query.filter(Terms(field="tileid", terms=[self.tileid]))
                 query.add_query(bool_query)
-                results = query.search(index=TERMS_INDEX)["hits"]["hits"]
-                for result in results:
-                    se.delete(index=TERMS_INDEX, id=result["_id"])
+                results = query.delete(index=TERMS_INDEX)
 
             self.__preDelete(request)
             self.save_edit(
