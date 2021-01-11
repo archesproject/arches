@@ -24,15 +24,31 @@ define([
         
         this.complete = ko.observable(false);
         this.required = ko.observable(ko.unwrap(config.required));
-        this.autoAdvance = ko.observable(true);
+        this.autoAdvance = ko.observable(false);
 
+        this.externalStepData = {};
+
+        var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
+        Object.keys(externalStepSourceData).forEach(function(key) {
+            if (key !== '__ko_mapping__') {
+                self.externalStepData[key] = {
+                    stepName: externalStepSourceData[key],
+                    data: config.workflow.getStepData(externalStepSourceData[key]),
+                };
+            }
+        });
+        delete config.externalstepdata;
+        
         this.value = ko.observable();
 
         this.active = ko.computed(function() {
             return config.workflow.activeStep() === this;
         }, this);
         this.active.subscribe(function(active) {
-            if (active) { self.setStepIdToUrl(); }
+            if (active) { 
+                self.setStepIdToUrl(); 
+                self.getExternalStepData();
+            }
         });
 
         Object.keys(config).forEach(function(prop){
@@ -76,6 +92,13 @@ define([
             var newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
             history.pushState(null, '', newRelativePathQuery);
         };
+
+        this.getExternalStepData = function() {
+            console.log(self.externalStepData)
+            Object.keys(self.externalStepData).forEach(function(key) {
+                self.externalStepData[key]['data'] = config.workflow.getStepData(externalStepSourceData[key]);
+            });
+        }
 
         _.extend(this, config);
 

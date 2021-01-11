@@ -14,8 +14,8 @@ define([
     var Workflow = function(config) {
         var self = this;
 
-        this.id = ko.observable();  
-        
+        this.id = ko.observable();
+
         this.steps = config.steps || [];
         this.stepIds = ko.observableArray();
         
@@ -39,8 +39,8 @@ define([
         this.workflowName = ko.observable();
         this.canFinish = ko.observable(false);
         this.alert = config.alert || ko.observable(null);
-        this.state = {steps:[]};
         this.quitUrl = arches.urls.home;
+
         this.wastebinWarning = function(val){
             return [[arches.translations.workflowWastbinWarning.replace("${val}", val)],[arches.translations.workflowWastbinWarning2]];
         };
@@ -68,19 +68,14 @@ define([
             else {
                 self.removeStepIdFromUrl();
 
-                if (self.state.activestep) {
-                    self.activeStep(self.steps[self.state.activestep]);
-                }
-                else if(self.steps.length > 0) {
+                if(self.steps.length > 0) {
                     self.activeStep(self.steps[0]);
                 }
             }
         };
 
         this.createSteps = function() {
-            var stateStepCount = self.state.steps.length;
             var generatedStepIds = [];
-
             var cachedStepIds = self.getStepIdsFromLocalStorage(self.id());
 
             self.steps.forEach(function(step, i) {
@@ -98,11 +93,6 @@ define([
                     /* if stepIds DO NOT exist for this workflow in localStorage, add id to accumulator */ 
                     if (!cachedStepIds) { generatedStepIds.push(newStep.id()); }
 
-                    if (stateStepCount !== 0 && i <= stateStepCount) {
-                        if(self.state.steps[i]) {
-                            self.steps[i].complete(self.state.steps[i].complete);
-                        }
-                    }
                     self.steps[i].complete.subscribe(function(complete) {
                         if (complete && self.steps[i].autoAdvance()) self.next();
                     });
@@ -112,6 +102,14 @@ define([
 
             /* if stepIds DO NOT exist for this workflow in localStorage, set them */ 
             if (!cachedStepIds) { self.setStepIdsToLocalStorage(generatedStepIds); }
+        };
+
+        this.getStepData = function(stepName) {
+            /* ONLY to be used as intermediary for when a step needs data from a different step in the workflow */
+
+            var step = self.steps.find(function(step) { return ko.unwrap(step.name) === ko.unwrap(stepName) });
+            console.log('888', step)
+            if (step) { return step.value(); }
         };
 
         this.getStepIdFromUrl = function() {
@@ -179,7 +177,8 @@ define([
             var resourcesToDelete = [];
             var tilesToDelete = [];
             var warnings = []
-            self.state.steps.forEach(function(step) {
+
+            self.steps.forEach(function(step) {
                 if (step.wastebin && step.wastebin.resourceid) {
                     warnings.push(step.wastebin.description);
                     resourcesToDelete.push(step.wastebin);
@@ -228,21 +227,27 @@ define([
             );
         };
 
+        this.updateUrl = function() {
+            /* DO NOT USE -- needed for legacy support */
+            // var activeStep = this.activeStep()
+            // activeStep.value(activeStep.defineStateProperties())
+        };
+
         this.updateState = function(val) {
-            var activeStep = val;
-            var previousStep = self.previousStep();
-            var resourceId;
-            if (previousStep && previousStep.hasOwnProperty('defineStateProperties')) {
-                self.state.steps[previousStep._index] = previousStep.defineStateProperties();
-                self.state.steps[previousStep._index].complete = ko.unwrap(previousStep.complete);
-                self.state.activestep = val._index;
-                self.state.previousstep = previousStep._index;
-                if (!self.state.resourceid) {
-                    resourceId = !!previousStep.resourceid ? ko.unwrap(previousStep.resourceid) : null;
-                    self.state.resourceid = resourceId;
-                }
-            }
-            self.previousStep(activeStep);
+            // var activeStep = val;
+            // var previousStep = self.previousStep();
+            // var resourceId;
+            // if (previousStep && previousStep.hasOwnProperty('defineStateProperties')) {
+            //     self.state.steps[previousStep._index] = previousStep.defineStateProperties();
+            //     self.state.steps[previousStep._index].complete = ko.unwrap(previousStep.complete);
+            //     self.state.activestep = val._index;
+            //     self.state.previousstep = previousStep._index;
+            //     if (!self.state.resourceid) {
+            //         resourceId = !!previousStep.resourceid ? ko.unwrap(previousStep.resourceid) : null;
+            //         self.state.resourceid = resourceId;
+            //     }
+            // }
+            // self.previousStep(activeStep);
         };
 
         this.canStepBecomeActive = function(step) {
@@ -273,6 +278,7 @@ define([
 
         this.back = function(){
             var activeStep = self.activeStep();
+
             if (activeStep && activeStep._index > 0) {
                 self.activeStep(self.steps[activeStep._index - 1]);
             }

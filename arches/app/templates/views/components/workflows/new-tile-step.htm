@@ -1,3 +1,5 @@
+<div style="display:none" data-bind="text: console.log(tile(), card())"></div>
+
 <!-- ko if: tile() && card() -->
     <!-- ko component: {
         name: cardComponentLookup[card().model.component_id()].componentname,

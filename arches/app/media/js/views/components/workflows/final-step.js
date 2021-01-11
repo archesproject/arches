@@ -9,17 +9,24 @@ define([
 ], function(_, $, arches, ko, GraphModel, ReportModel, CardViewModel) {
     function viewModel(params) {
         var self = this;
+        
         this.urls = arches.urls;
-        this.workflowid = params.workflow.state.workflowid;
-        if (!params.resourceid()) { params.resourceid(params.workflow.state.resourceid); }
-        this.resourceid = params.resourceid();
-        var url = arches.urls.api_card + (ko.unwrap(this.resourceid));
         this.report = ko.observable();
         this.loading = ko.observable(true);
-        this.nodegroupids = params.workflow.steps
-            .filter(function(step){return ko.unwrap(step.nodegroupid);})
-            .map(function(x){return ko.unwrap(x.nodegroupid);});
+        
+        this.nodegroupids = params.workflow.steps.filter(function(step){
+            return ko.unwrap(step.nodegroupid);
+        }).map(function(x){
+            return ko.unwrap(x.nodegroupid);
+        });
+        
+        if (!params.resourceid()) { 
+            var resourceIdStepData = params.externalStepData['resourceidstep']['data'];
+            params.resourceid(resourceIdStepData.resourceid);
+        }
+        this.resourceid = params.resourceid();
 
+        var url = arches.urls.api_card + (ko.unwrap(this.resourceid));
         $.getJSON(url, function(data) {
             var displayname = ko.observable(data.displayname);
             var graphModel = new GraphModel({

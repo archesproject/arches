@@ -14,9 +14,12 @@ define([
 
         this.resourceId = ko.observable();
 
-        if (ko.unwrap(params.resourceId)) {
-            self.resourceId = params.resourceId;
-        }
+        if (ko.isObservable(params.resourceid)) {
+            self.resourceId = params.resourceid;
+        } 
+        else {
+            self.resourceId(params.resourceid);
+        } 
 
         var cachedValue = ko.unwrap(params.value);
         if (cachedValue) {
@@ -30,9 +33,17 @@ define([
 
         this.card = ko.observable();
         this.tile = ko.observable();
+        
         this.loading = params.loading || ko.observable(false);
         this.alert = params.alert || ko.observable(null);
         this.complete = params.complete || ko.observable();
+        this.complete.subscribe(function(isComplete) {
+            if (isComplete) {
+                params.value(params.defineStateProperties());
+            }
+        });
+
+
         this.completeOnSave = params.completeOnSave === false ? false : true;
         this.altButtons =  params.altButtons || ko.observable(null);
         this.hideDefaultButtons = params.hideDefaultButtons || ko.observable(false);
@@ -53,6 +64,8 @@ define([
 
         this.getJSON = function() {
             var url = arches.urls.api_card + this.getCardResourceIdOrGraphId();
+
+            console.log("HOHJOHJO", url)
             $.getJSON(url, function(data) {
                 var handlers = {
                     'after-update': [],
@@ -144,6 +157,7 @@ define([
                         if (self.customCardLabel) item.model.name(ko.unwrap(self.customCardLabel));
                         self.card(item);
                         if (ko.unwrap(params.tileid)) {
+                            console.log(item, params)
                             ko.unwrap(item.tiles).forEach(function(tile) {
                                 if (tile.tileid === ko.unwrap(params.tileid)) {
                                     self.tile(tile);
@@ -207,7 +221,7 @@ define([
                 }
             }
             return {
-                resourceid: ko.unwrap(params.resourceid) || this.workflow.state.resourceid,
+                resourceid: ko.unwrap(params.resourceid),
                 tile: !!(ko.unwrap(params.tile)) ? koMapping.toJS(params.tile().data) : undefined,
                 tileid: !!(ko.unwrap(params.tile)) ? ko.unwrap(params.tile().tileid): undefined,
                 wastebin: wastebin
@@ -217,9 +231,9 @@ define([
 
         this.setStateProperties = function(){
             //Sets properties in defineStateProperties to the state.
-            if (params.workflow) {
-                params.workflow.state.steps[params._index] = params.defineStateProperties();
-            }
+            // if (params.workflow) {
+            //     params.workflow.state.steps[params._index] = params.defineStateProperties();
+            // }
         };
 
         self.onSaveSuccess = function(tiles) {
@@ -228,10 +242,14 @@ define([
                 tile = tiles[0] || tiles;
                 params.resourceid(tile.resourceinstance_id);
                 params.tileid(tile.tileid);
+                params.tile(tile);
                 self.resourceId(tile.resourceinstance_id);
             }
-            self.setStateProperties();
+            // self.setStateProperties();
 
+            // if (!params.workflow.resourceId()) {
+            //     params.workflow.resourceId(params.resourceid())
+            // }
             params.value(params.defineStateProperties());
 
             if (self.completeOnSave === true) { self.complete(true); }
