@@ -8,7 +8,7 @@ from arches.app.models.system_settings import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory, get_value_from_jsonld
 from arches.app.models.concept import get_preflabel_from_valueid, get_preflabel_from_conceptid, get_valueids_from_concept_label
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested, Exists
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested, Exists, Terms
 from arches.app.utils.date_utils import ExtendedDateFormat
 # for the RDF graph export helper functions
 from rdflib import Namespace, URIRef, Literal, BNode
