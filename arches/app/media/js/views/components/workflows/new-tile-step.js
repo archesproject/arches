@@ -14,11 +14,11 @@ define([
 
         this.resourceId = ko.observable();
 
-        if (ko.isObservable(params.resourceid)) {
-            self.resourceId = params.resourceid;
+        if (ko.unwrap(params.resourceid)) {
+            self.resourceId(ko.unwrap(params.resourceid));
         } 
-        else {
-            self.resourceId(params.resourceid);
+        else if (ko.unwrap(params.workflow.resourceId)) {
+            self.resourceId(ko.unwrap(params.workflow.resourceId));
         } 
 
         var cachedValue = ko.unwrap(params.value);

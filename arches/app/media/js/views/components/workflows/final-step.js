@@ -21,8 +21,9 @@ define([
         });
         
         if (!params.resourceid()) { 
-            var resourceIdStepData = params.externalStepData['resourceidstep']['data'];
-            params.resourceid(resourceIdStepData.resourceid);
+            if (ko.unwrap(params.workflow.resourceId)) {
+                params.resourceid(ko.unwrap(params.workflow.resourceId));
+            }
         }
         this.resourceid = params.resourceid();
 

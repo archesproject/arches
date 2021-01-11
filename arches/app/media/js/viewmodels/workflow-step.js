@@ -24,7 +24,7 @@ define([
         
         this.complete = ko.observable(false);
         this.required = ko.observable(ko.unwrap(config.required));
-        this.autoAdvance = ko.observable(false);
+        this.autoAdvance = ko.observable(true);
 
         this.externalStepData = {};
 
