@@ -29,6 +29,7 @@ define([
         this.externalStepData = {};
 
         var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
+        console.log("!!!!!!!!!", externalStepSourceData)
         Object.keys(externalStepSourceData).forEach(function(key) {
             if (key !== '__ko_mapping__') {
                 self.externalStepData[key] = {

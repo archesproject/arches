@@ -36,13 +36,13 @@ define([
         
         this.loading = params.loading || ko.observable(false);
         this.alert = params.alert || ko.observable(null);
+        
         this.complete = params.complete || ko.observable();
         this.complete.subscribe(function(isComplete) {
             if (isComplete) {
                 params.value(params.defineStateProperties());
             }
         });
-
 
         this.completeOnSave = params.completeOnSave === false ? false : true;
         this.altButtons =  params.altButtons || ko.observable(null);
@@ -238,6 +238,7 @@ define([
 
         self.onSaveSuccess = function(tiles) {
             var tile;
+            
             if (tiles.length > 0 || typeof tiles == 'object') {
                 tile = tiles[0] || tiles;
                 params.resourceid(tile.resourceinstance_id);
@@ -245,12 +246,14 @@ define([
                 params.tile(tile);
                 self.resourceId(tile.resourceinstance_id);
             }
-            // self.setStateProperties();
 
-            // if (!params.workflow.resourceId()) {
-            //     params.workflow.resourceId(params.resourceid())
-            // }
             params.value(params.defineStateProperties());
+
+            if (params.shouldtrackresource) {
+                if (params.workflow.resourceId ) {  /* if we have defined that this is part of a single-resource workflow */ 
+                    params.workflow.resourceId(tile.resourceinstance_id);
+                }
+            }
 
             if (self.completeOnSave === true) { self.complete(true); }
         };
