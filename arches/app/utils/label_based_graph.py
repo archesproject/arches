@@ -178,7 +178,7 @@ class LabelBasedGraph(object):
                 as_json=as_json,
             )
 
-            resource_label_based_graph[RESOURCE_ID_KEY] = resource.pk
+            resource_label_based_graph[RESOURCE_ID_KEY] = str(resource.pk)
             resource_label_based_graphs.append(resource_label_based_graph)
 
         return resource_label_based_graphs
