@@ -65,7 +65,6 @@ define([
         this.getJSON = function() {
             var url = arches.urls.api_card + this.getCardResourceIdOrGraphId();
 
-            console.log("HOHJOHJO", url)
             $.getJSON(url, function(data) {
                 var handlers = {
                     'after-update': [],
@@ -227,14 +226,6 @@ define([
             };
         };
 
-
-        this.setStateProperties = function(){
-            //Sets properties in defineStateProperties to the state.
-            // if (params.workflow) {
-            //     params.workflow.state.steps[params._index] = params.defineStateProperties();
-            // }
-        };
-
         self.onSaveSuccess = function(tiles) {
             var tile;
             
@@ -242,7 +233,7 @@ define([
                 tile = tiles[0] || tiles;
                 params.resourceid(tile.resourceinstance_id);
                 params.tileid(tile.tileid);
-                params.tile(tile);
+
                 self.resourceId(tile.resourceinstance_id);
             }
 

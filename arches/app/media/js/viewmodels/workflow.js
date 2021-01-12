@@ -225,29 +225,6 @@ define([
             );
         };
 
-        this.updateUrl = function() {
-            /* DO NOT USE -- needed for legacy support */
-            // var activeStep = this.activeStep()
-            // activeStep.value(activeStep.defineStateProperties())
-        };
-
-        this.updateState = function(val) {
-            // var activeStep = val;
-            // var previousStep = self.previousStep();
-            // var resourceId;
-            // if (previousStep && previousStep.hasOwnProperty('defineStateProperties')) {
-            //     self.state.steps[previousStep._index] = previousStep.defineStateProperties();
-            //     self.state.steps[previousStep._index].complete = ko.unwrap(previousStep.complete);
-            //     self.state.activestep = val._index;
-            //     self.state.previousstep = previousStep._index;
-            //     if (!self.state.resourceid) {
-            //         resourceId = !!previousStep.resourceid ? ko.unwrap(previousStep.resourceid) : null;
-            //         self.state.resourceid = resourceId;
-            //     }
-            // }
-            // self.previousStep(activeStep);
-        };
-
         this.canStepBecomeActive = function(step) {
             var canStepBecomeActive = false;
             

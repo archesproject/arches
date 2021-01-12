@@ -28,10 +28,6 @@ define([
         this.resourceid = params.resourceid();
 
         var url = arches.urls.api_card + (ko.unwrap(this.resourceid));
-
-
-
-        console.log("URL", params)
         $.getJSON(url, function(data) {
             var displayname = ko.observable(data.displayname);
             var graphModel = new GraphModel({
