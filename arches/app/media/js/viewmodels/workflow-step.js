@@ -29,7 +29,6 @@ define([
         this.externalStepData = {};
 
         var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
-        console.log("!!!!!!!!!", externalStepSourceData)
         Object.keys(externalStepSourceData).forEach(function(key) {
             if (key !== '__ko_mapping__') {
                 self.externalStepData[key] = {
@@ -41,6 +40,12 @@ define([
         delete config.externalstepdata;
         
         this.value = ko.observable();
+        this.value.subscribe(function(value) {
+            /* if we have defined that this is part of a single-resource workflow, and that this step creates the desired resource */ 
+            if (self.shouldtrackresource && !ko.unwrap(config.workflow.resourceId)) {
+                config.workflow.resourceId(value.resourceid)
+            }
+        });
 
         this.active = ko.computed(function() {
             return config.workflow.activeStep() === this;
@@ -95,7 +100,6 @@ define([
         };
 
         this.getExternalStepData = function() {
-            console.log(self.externalStepData)
             Object.keys(self.externalStepData).forEach(function(key) {
                 self.externalStepData[key]['data'] = config.workflow.getStepData(externalStepSourceData[key]);
             });

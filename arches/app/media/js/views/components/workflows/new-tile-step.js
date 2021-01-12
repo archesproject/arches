@@ -14,18 +14,18 @@ define([
 
         this.resourceId = ko.observable();
 
+        var cachedValue = ko.unwrap(params.value);
+        if (cachedValue) {
+            self.resourceId(cachedValue.resourceid);
+            params.tileid(cachedValue.tileid);
+        }
+
         if (ko.unwrap(params.resourceid)) {
             self.resourceId(ko.unwrap(params.resourceid));
         } 
         else if (ko.unwrap(params.workflow.resourceId)) {
             self.resourceId(ko.unwrap(params.workflow.resourceId));
         } 
-
-        var cachedValue = ko.unwrap(params.value);
-        if (cachedValue) {
-            self.resourceId(cachedValue.resourceid);
-            params.tileid(cachedValue.tileid);
-        }
 
         this.getCardResourceIdOrGraphId = function() { // override for different cases
             return (ko.unwrap(this.resourceId) || ko.unwrap(params.graphid));
@@ -157,7 +157,6 @@ define([
                         if (self.customCardLabel) item.model.name(ko.unwrap(self.customCardLabel));
                         self.card(item);
                         if (ko.unwrap(params.tileid)) {
-                            console.log(item, params)
                             ko.unwrap(item.tiles).forEach(function(tile) {
                                 if (tile.tileid === ko.unwrap(params.tileid)) {
                                     self.tile(tile);
@@ -248,13 +247,7 @@ define([
             }
 
             params.value(params.defineStateProperties());
-
-            if (params.shouldtrackresource) {
-                if (params.workflow.resourceId ) {  /* if we have defined that this is part of a single-resource workflow */ 
-                    params.workflow.resourceId(tile.resourceinstance_id);
-                }
-            }
-
+            
             if (self.completeOnSave === true) { self.complete(true); }
         };
 

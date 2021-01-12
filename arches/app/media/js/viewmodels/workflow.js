@@ -106,9 +106,7 @@ define([
 
         this.getStepData = function(stepName) {
             /* ONLY to be used as intermediary for when a step needs data from a different step in the workflow */
-
             var step = self.steps.find(function(step) { return ko.unwrap(step.name) === ko.unwrap(stepName) });
-            console.log('888', step)
             if (step) { return step.value(); }
         };
 
