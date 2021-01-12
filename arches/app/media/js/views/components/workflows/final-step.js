@@ -9,15 +9,6 @@ define([
 ], function(_, $, arches, ko, GraphModel, ReportModel, CardViewModel) {
     function viewModel(params) {
         var self = this;
-
-        if (!params.resourceid()) { 
-            if (ko.unwrap(params.workflow.resourceId)) {
-                params.resourceid(ko.unwrap(params.workflow.resourceId));
-            }
-        }
-        this.resourceid = ko.unwrap(params.resourceid);
-
-        console.log("AAAA", params)
         
         this.urls = arches.urls;
         this.report = ko.observable();
@@ -29,8 +20,18 @@ define([
             return ko.unwrap(x.nodegroupid);
         });
         
-        var url = arches.urls.api_card + (ko.unwrap(params.resourceid));
+        if (!params.resourceid()) { 
+            if (ko.unwrap(params.workflow.resourceId)) {
+                params.resourceid(ko.unwrap(params.workflow.resourceId));
+            }
+        }
+        this.resourceid = params.resourceid();
 
+        var url = arches.urls.api_card + (ko.unwrap(this.resourceid));
+
+
+
+        console.log("URL", params)
         $.getJSON(url, function(data) {
             var displayname = ko.observable(data.displayname);
             var graphModel = new GraphModel({
