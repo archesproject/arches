@@ -10,7 +10,7 @@ define([
         var self = this;
 
         this.id = ko.observable();
-        this.workflowId = ko.observable(config.workflow ? config.workflow.id : null);
+        // this.workflowId = ko.observable(config.workflow ? config.workflow.id : null);
 
         this.classUnvisited = 'workflow-step-icon';
         this.classActive = 'workflow-step-icon active';
@@ -29,7 +29,6 @@ define([
         this.externalStepData = {};
 
         var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
-        console.log("!!!!!!!!!", externalStepSourceData)
         Object.keys(externalStepSourceData).forEach(function(key) {
             if (key !== '__ko_mapping__') {
                 self.externalStepData[key] = {
@@ -76,6 +75,17 @@ define([
             self.value.subscribe(function(value) {
                 self.setValueToLocalStorage(value);
             });
+
+
+            if (config.shouldtrackresource) {
+                var cachedValue = self.getValueFromLocalStorage();
+
+                if (cachedValue && config.workflow.resourceId) {
+                    config.workflow.resourceId(cachedValue.resourceid)
+                }
+
+                // console.log("AAAAAAGFHGHFJFDJDKDKD", cachedValue, self, config)
+            }
         };
 
         this.getValueFromLocalStorage = function() {

@@ -12,6 +12,8 @@ define([
     function viewModel(params) {
         var self = this;
 
+        console.log('BBBBBBB', params.workflow)
+
         this.resourceId = ko.observable();
 
         if (ko.unwrap(params.resourceid)) {
@@ -250,7 +252,7 @@ define([
             params.value(params.defineStateProperties());
 
             if (params.shouldtrackresource) {
-                if (params.workflow.resourceId ) {  /* if we have defined that this is part of a single-resource workflow */ 
+                if (params.workflow.resourceId) {  /* if we have defined that this is part of a single-resource workflow */ 
                     params.workflow.resourceId(tile.resourceinstance_id);
                 }
             }
