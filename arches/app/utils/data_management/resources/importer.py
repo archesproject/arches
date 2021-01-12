@@ -11,6 +11,7 @@ from time import time
 from copy import deepcopy
 from optparse import make_option
 from os.path import isfile, join
+from django.core import management
 from multiprocessing import Pool, TimeoutError, cpu_count
 import django
 
@@ -31,14 +32,14 @@ from .formats.archesfile import ArchesFileReader
 import ctypes
 
 
-def import_one_resource(line):
+def import_one_resource(line, prevent_indexing=False):
     """this single resource import function must be outside of the BusinessDataImporter
     class in order for it to be called with multiprocessing"""
 
     connections.close_all()
     reader = ArchesFileReader()
     archesresource = JSONDeserializer().deserialize(line)
-    reader.import_business_data({"resources": [archesresource]})
+    reader.import_business_data({"resources": [archesresource]}, prevent_indexing=prevent_indexing)
 
 
 class BusinessDataImporter(object):
@@ -160,6 +161,7 @@ class BusinessDataImporter(object):
         create_concepts=False,
         create_collections=False,
         use_multiprocessing=False,
+        prevent_indexing=False,
     ):
         reader = None
         start = time()
@@ -174,20 +176,22 @@ class BusinessDataImporter(object):
                 mapping = self.mapping
             if file_format == "json":
                 reader = ArchesFileReader()
-                reader.import_business_data(business_data, mapping)
+                reader.import_business_data(business_data, mapping=mapping, overwrite=overwrite, prevent_indexing=prevent_indexing)
             elif file_format == "jsonl":
                 with open(self.file[0], "rU") as openf:
                     lines = openf.readlines()
                     if use_multiprocessing is True:
                         pool = Pool(cpu_count())
-                        pool.map(import_one_resource, lines)
+                        pool.map(import_one_resource, lines, prevent_indexing=prevent_indexing)
                         connections.close_all()
                         reader = ArchesFileReader()
                     else:
                         reader = ArchesFileReader()
                         for line in lines:
                             archesresource = JSONDeserializer().deserialize(line)
-                            reader.import_business_data({"resources": [archesresource]})
+                            reader.import_business_data(
+                                {"resources": [archesresource]}, overwrite=overwrite, prevent_indexing=prevent_indexing
+                            )
             elif file_format == "csv" or file_format == "shp" or file_format == "zip":
                 if mapping is not None:
                     reader = CsvReader()
@@ -198,6 +202,7 @@ class BusinessDataImporter(object):
                         bulk=bulk,
                         create_concepts=create_concepts,
                         create_collections=create_collections,
+                        prevent_indexing=prevent_indexing,
                     )
                 else:
                     print("*" * 80)

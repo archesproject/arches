@@ -107,7 +107,9 @@ class UserManagerView(BaseManagerView):
     def get(self, request):
 
         if self.request.user.is_authenticated and self.request.user.username != "anonymous":
-            context = self.get_context_data(main_script="views/user-profile-manager", )
+            context = self.get_context_data(
+                main_script="views/user-profile-manager",
+            )
 
             user_details = self.get_user_details(request.user)
 
@@ -139,7 +141,9 @@ class UserManagerView(BaseManagerView):
 
             user_details = self.get_user_details(request.user)
 
-            context = self.get_context_data(main_script="views/user-profile-manager", )
+            context = self.get_context_data(
+                main_script="views/user-profile-manager",
+            )
             context["errors"] = []
             context["nav"]["icon"] = "fa fa-user"
             context["nav"]["title"] = _("Profile Manager")
@@ -166,10 +170,13 @@ class UserManagerView(BaseManagerView):
                 try:
                     admin_info = settings.ADMINS[0][1] if settings.ADMINS else ""
                     message = _(
-                        "Your arches profile was just changed.  If this was unexpected, please contact your Arches administrator at %s."
-                        % (admin_info)
+                        "Your "
+                        + settings.APP_NAME
+                        + " profile was just changed.  If this was unexpected, please contact your "
+                        + settings.APP_NAME
+                        + " administrator at %s." % (admin_info)
                     )
-                    user.email_user(_("You're Arches Profile Has Changed"), message)
+                    user.email_user(_("Your " + settings.APP_NAME + " Profile Has Changed"), message)
                 except Exception as e:
                     print(e)
                 request.user = user

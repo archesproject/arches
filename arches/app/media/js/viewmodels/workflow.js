@@ -9,11 +9,13 @@ define([
 ], function(arches, $, _, ko, koMapping, AlertViewModel, Step) {
     var Workflow = function(config) {
         var self = this;
+        
         this.steps = config.steps || [];
         this.activeStep = ko.observable();
         this.previousStep = ko.observable();
         this.hoverStep = ko.observable();
         this.ready = ko.observable(false);
+        this.tabbedWorkflow = ko.observable(ko.unwrap(config.tabbedWorkflow));
         this.loading = config.loading || ko.observable(false);
         this.alert = config.alert || ko.observable(null);
         this.state = {steps:[]};
@@ -153,8 +155,8 @@ define([
 
         this.updateUrl = function() {
             //Updates the url with the parameters needed for the next step
-            var urlparams = JSON.parse(JSON.stringify(this.state)); //deep copy
-            urlparams.steps = JSON.stringify(this.state.steps);
+            var urlparams = JSON.parse(JSON.stringify(self.state)); //deep copy
+            urlparams.steps = JSON.stringify(self.state.steps);
             history.pushState(null, '', window.location.pathname + '?' + $.param(urlparams));
         };
 
@@ -177,8 +179,27 @@ define([
             self.previousStep(activeStep);
         };
 
+        this.canStepBecomeActive = function(step) {
+            var canStepBecomeActive = false;
+            
+            if (step && !step.active()) {  /* prevents refresh if clicking on active tab */ 
+                var previousStep = self.steps[step._index - 1];
+
+                if (
+                    step.complete() 
+                    || ( previousStep && previousStep.complete() )
+                    || self.canFinish() === true
+                ) { 
+                    canStepBecomeActive = true; 
+                }
+            }
+
+            return canStepBecomeActive;
+        };
+
         this.next = function(){
             var activeStep = self.activeStep();
+
             if (activeStep && (activeStep.complete() || !activeStep.required()) && activeStep._index < self.steps.length - 1) {
                 self.activeStep(self.steps[activeStep._index+1]);
             }

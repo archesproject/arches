@@ -488,6 +488,14 @@ class Node(models.Model):
             edges.extend(child_edges)
         return (nodes, edges)
 
+    def get_direct_child_nodes(self):
+        """
+        gets all child nodes exactly one level lower in graph
+
+        returns a list of nodes
+        """
+        return [edge.rangenode for edge in Edge.objects.filter(domainnode=self)]
+
     @property
     def is_collector(self):
         return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup is not None
@@ -1204,7 +1212,7 @@ def send_email_on_save(sender, instance, **kwargs):
                 email_to = instance.recipient.email
             else:
                 email_to = context["email"]
-            subject, from_email, to = instance.notif.notiftype.name, "from@example.com", email_to
+            subject, from_email, to = instance.notif.notiftype.name, settings.DEFAULT_FROM_EMAIL, email_to
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
@@ -1328,6 +1336,7 @@ class IIIFManifest(models.Model):
     label = models.TextField()
     url = models.TextField()
     description = models.TextField(blank=True, null=True)
+    manifest = JSONField(blank=True, null=True)
 
     def __str__(self):
         return self.label

@@ -18,9 +18,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import csv
 import datetime
+import logging
 from io import StringIO
 from io import BytesIO
+from django.contrib.gis.geos import GeometryCollection, GEOSGeometry
 from django.core.files import File
+from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -28,8 +31,11 @@ from arches.app.utils.flatten_dict import flatten_dict
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.geo_utils import GeoUtils
+from arches.app.utils.response import JSONResponse
 import arches.app.utils.zip as zip_utils
 from arches.app.views import search as SearchView
+
+logger = logging.getLogger(__name__)
 
 
 class SearchResultsExporter(object):
@@ -75,11 +81,27 @@ class SearchResultsExporter(object):
 
         for graph_id, resources in output.items():
             graph = models.GraphModel.objects.get(pk=graph_id)
+            if format == "geojson":
+                headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
+                ret = self.to_geojson(resources["output"], headers=headers, name=graph.name)
+                return ret, ""
+
             if format == "tilecsv":
                 headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
                 headers.append("resourceid")
                 ret.append(self.to_csv(resources["output"], headers=headers, name=graph.name))
             if format == "shp":
+                headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype", "name")[::1]
+                missing_field_names = []
+                for header in headers:
+                    if not header["fieldname"]:
+                        missing_field_names.append(header["name"])
+                    header.pop("name")
+                if len(missing_field_names) > 0:
+                    message = _("Shapefile are fieldnames required for the following nodes: {0}".format(", ".join(missing_field_names)))
+                    logger.error(message)
+                    raise (Exception(message))
+
                 headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype")[::1]
                 headers.append({"fieldname": "resourceid", "datatype": "str"})
                 ret += self.to_shp(resources["output"], headers=headers, name=graph.name)
@@ -116,12 +138,15 @@ class SearchResultsExporter(object):
 
     def get_feature_collections(self, tile, node, feature_collections, fieldname, datatype):
         node_value = tile["data"][str(node.nodeid)]
-        for feature_index, feature in enumerate(node_value["features"]):
-            feature["geometry"]["coordinates"] = self.set_precision(feature["geometry"]["coordinates"], self.precision)
-            try:
-                feature_collections[fieldname]["features"].append(feature)
-            except KeyError:
-                feature_collections[fieldname] = {"datatype": datatype, "features": [feature]}
+        try:
+            for feature_index, feature in enumerate(node_value["features"]):
+                feature["geometry"]["coordinates"] = self.set_precision(feature["geometry"]["coordinates"], self.precision)
+                try:
+                    feature_collections[fieldname]["features"].append(feature)
+                except KeyError:
+                    feature_collections[fieldname] = {"datatype": datatype, "features": [feature]}
+        except TypeError as e:
+            pass
         return feature_collections
 
     def create_resource_json(self, tiles):
@@ -202,3 +227,37 @@ class SearchResultsExporter(object):
         shape_exporter = ResourceExporter(format="shp")
         dest = shape_exporter.writer.create_shapefiles(instances, headers, name)
         return dest
+
+    def get_geometry_fieldnames(self, instance):  # the same function exist in shapefile.py l.70
+        geometry_fields = []
+        for k, v in instance.items():
+            if isinstance(v, GeometryCollection):
+                geometry_fields.append(k)
+        return geometry_fields
+
+    def to_geojson(self, instances, headers, name):  # a part of the code exists in datatypes.py, l.567
+        if len(instances) > 0:
+            geometry_fields = self.get_geometry_fieldnames(instances[0])
+
+        features = []
+        for geometry_field in geometry_fields:
+            for instance in instances:
+                properties = {}
+                for header in headers:
+                    if header != geometry_field:
+                        try:
+                            properties[header] = instance[header]
+                        except KeyError:
+                            properties[header] = None
+                for key, value in instance.items():
+                    if key == geometry_field:
+                        geometry = GEOSGeometry(value, srid=4326)
+                        for geom in geometry:
+                            feature = {}
+                            feature["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
+                            feature["type"] = "Feature"
+                            feature["properties"] = properties
+                            features.append(feature)
+
+        feature_collection = {"type": "FeatureCollection", "features": features}
+        return feature_collection

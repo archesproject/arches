@@ -36,6 +36,7 @@ from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.mappings import TERMS_INDEX, RESOURCE_RELATIONS_INDEX, RESOURCES_INDEX
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
 from arches.app.utils import import_class_from_string
+from arches.app.utils.label_based_graph import LabelBasedGraph
 from guardian.shortcuts import assign_perm, remove_perm
 from guardian.exceptions import NotUserNorGroup
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -106,6 +107,11 @@ class Resource(models.ResourceInstance):
         """
         Saves and indexes a single resource
 
+        Keyword Arguments:
+        request -- the request object
+        user -- the user to associate the edit with if the user can't be derived from the request
+        index -- True(default) to index the resource, otherwise don't index the resource
+
         """
         graph = models.GraphModel.objects.get(graphid=self.graph_id)
         if graph.isactive is False:
@@ -113,6 +119,7 @@ class Resource(models.ResourceInstance):
             raise ModelInactiveError(message)
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)
+        index = kwargs.pop("index", True)
         super(Resource, self).save(*args, **kwargs)
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
@@ -130,7 +137,8 @@ class Resource(models.ResourceInstance):
             pass
 
         self.save_edit(user=user, edit_type="create")
-        self.index()
+        if index is True:
+            self.index()
 
     def get_root_ontology(self):
         """
@@ -226,8 +234,8 @@ class Resource(models.ResourceInstance):
 
             for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
                 es_index = import_class_from_string(index["module"])(index["name"])
-                document, doc_id = es_index.get_documents_to_index(self, document["tiles"])
-                es_index.index_document(document=document, id=doc_id)
+                doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
+                es_index.index_document(document=doc, id=doc_id)
 
     def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None):
         """
@@ -454,7 +462,11 @@ class Resource(models.ResourceInstance):
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
                 for resource in related_resources["docs"]:
-                    relations = get_relations(resourceinstanceid=resource["_id"], start=0, limit=0,)
+                    relations = get_relations(
+                        resourceinstanceid=resource["_id"],
+                        start=0,
+                        limit=0,
+                    )
                     if resource["found"]:
                         resource["_source"]["total_relations"] = relations["hits"]["total"]
                         ret["related_resources"].append(resource["_source"])
@@ -463,7 +475,7 @@ class Resource(models.ResourceInstance):
 
     def copy(self):
         """
-        Returns a copy of this resource instance includeing a copy of all tiles associated with this resource instance
+        Returns a copy of this resource instance including a copy of all tiles associated with this resource instance
 
         """
         # need this here to prevent a circular import error
@@ -509,6 +521,20 @@ class Resource(models.ResourceInstance):
         ret["tiles"] = self.tiles
 
         return JSONSerializer().serializeToPython(ret)
+
+    def to_json(self, compact=True, hide_empty_nodes=False):
+        """
+        Returns resource represented as disambiguated JSON graph
+
+        Keyword Arguments:
+        compact -- type bool: hide superfluous node data
+        hide_empty_nodes -- type bool: hide nodes without data
+        """
+        label_based_graph = LabelBasedGraph.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes)
+
+        _name, resource_graph = label_based_graph.popitem()
+
+        return resource_graph
 
     def get_node_values(self, node_name):
         """

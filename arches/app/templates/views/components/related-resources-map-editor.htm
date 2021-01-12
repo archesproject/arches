@@ -20,12 +20,20 @@
     </div>
 
 
-    <div style="margin: 70px 10px -25px;">
+    <div style="margin: 70px 10px 0px;">
         <div class='control-label widget-input-label'>{% trans "Participating Layers" %}</div>
         <!-- ko foreach: {data: self.nodeDetails, as: 'nodeInfo'} -->
-        <div class="overlay-listing rr-map-card" style="padding: 5px; min-height: 0px" 
-            data-bind="click: function(){self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1 ? self.filterNodeIds.remove(nodeInfo.nodeid) : self.filterNodeIds.push(nodeInfo.nodeid)}, css: {'active-overlay': self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1}">
+        <div data-bind="css: {'active-overlay': self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1}">
+        <div class="overlay-listing rr-map-card" style="padding: 5px; min-height: 0px" data-bind="click: function(){self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1 ? self.filterNodeIds.remove(nodeInfo.nodeid) : self.filterNodeIds.push(nodeInfo.nodeid)}">
             <div class="overlay-name" data-bind="text: nodeInfo.resourcemodelname"></div>
+        </div>
+        <div class="rr-map-card related-instances">
+        <!-- ko foreach: self.relatedResources -->
+            <!-- ko if: nodeInfo.graph_id === $data.graphid -->
+                <div class="related-instance" data-bind="text: $data.displayname, event: { mouseover: self.updateHoverId, mouseout: self.updateHoverId }, css: {hovered: self.hoverId() === $data.resourceinstanceid}"></div>
+            <!-- /ko -->
+        <!-- /ko -->
+        </div>
         </div>
         <!-- /ko -->
     </div>
@@ -113,7 +121,7 @@
             <!-- /ko-->
 
             <!-- ko if: showRelatedQuery() -->
-            <div class="card" style="padding-top: 55px; padding-bottom: 30px">
+            <div class="card" style="padding-top: 25px; padding-bottom: 30px">
 
                 <div data-bind="foreach: {
                     data:card.widgets, as: 'widget'
@@ -160,35 +168,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!--ko if: self.mapFilter.searchGeometries().length -->
-                    <div class="rr-map-card-intersect-panel">
-                    <div class='control-label widget-input-label'>{% trans "Intersection Results" %}</div>
-                    <div>
-                    <!-- ko foreach: {data: self.targetGraphs, as: 'targetGraph'} -->
-                    <div style="margin-bottom: 12px; border: solid 1px #eee; min-height: 0px;">
-                            <!--ko if: self.intersectionSummary()[targetGraph] -->
-                            <div style="
-                                display: inline-flex;
-                                justify-content: space-between;
-                                width: 100%;
-                                padding: 10px;
-                                background-color: aliceblue;
-                            ">
-                            <div data-bind="text: self.intersectionSummary()[targetGraph].name"></div>
-                            <div data-bind="text: 'Total: ' + self.intersectionSummary()[targetGraph].results().length"></div>
-                            </div>
-                            <div style="max-height: 200px; overflow-y: scroll;">
-                            <!-- ko foreach: {data: self.intersectionSummary()[targetGraph].results(), as: 'result'} -->
-                            <div class="intersection-result" data-bind="text: result.displayname, event: { mouseover: self.updateHoverId, mouseout: self.updateHoverId }, css: {hovered: self.hoverId() === result.resourceinstanceid } "></div>
-                            <!-- /ko -->
-                            </div>
-                            <!-- /ko -->
-                    </div>
-                    <!-- /ko -->
-                    </div>
-                    </div>
-                    <!-- /ko -->
                     <!-- /ko -->
                 </div>
 

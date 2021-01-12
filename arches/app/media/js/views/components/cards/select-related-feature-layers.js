@@ -26,8 +26,8 @@ define([], function() {
             }
         } 
         color = createColorExpressions(color, colorPalette);
-        var nodeFilter = ["!=", "resourceinstanceid", "x"] // just a placeholder if there are no filerNodeids
-        if (filteredNodeids && nodeids.length > 1) {
+        var nodeFilter = ["!=", "resourceinstanceid", "x"] // just a placeholder if there are no filterNodeids
+        if (filteredNodeids && nodeids.length > 0) {
             var nodeFilter = filteredNodeids.map(id => ["==", "nodeid", id])
             nodeFilter.splice(0, 0, 'any');
         }
@@ -43,7 +43,7 @@ define([], function() {
         var layers = [{
             "id": "select-feature-polygon-fill",
             "type": "fill",
-            "minzoom": layerConfig.overviewzoom,
+            "minzoom": layerConfig.minzoom,
             "filter": ['all',[
                 "==", "$type", "Polygon"
                 ], nodeFilter
@@ -75,7 +75,7 @@ define([], function() {
         }, {
             "id": "select-feature-polygon-stroke",
             "type": "line",
-            "minzoom": layerConfig.overviewzoom,
+            "minzoom": layerConfig.minzoom,
             "filter": ['all',[
                 "==", "$type", "Polygon"
             ], nodeFilter],
