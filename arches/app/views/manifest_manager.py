@@ -28,7 +28,7 @@ class ManifestManagerView(View):
         return JSONResponse({"success": True})
 
     def post(self, request):
-        self.iiif_proxy_uri = request.scheme + '://' + request.get_host() + '/iiifserver/'
+        self.iiif_proxy_uri = request.scheme + "://" + request.get_host() + "/iiifserver/"
 
         def create_manifest(name, desc, file_url, canvases):
             attribution = "Provided by The J. Paul Getty Museum"
@@ -126,8 +126,8 @@ class ManifestManagerView(View):
             new_image.save()
 
             file_name = os.path.basename(new_image.image.name)
-            file_url = self.iiif_proxy_uri + "iiif/2/" +  file_name
-            file_json_url = settings.CANTALOUPE_HTTP_ENDPOINT + "/iiif/2/" + file_name + '/info.json'
+            file_url = self.iiif_proxy_uri + "iiif/2/" + file_name
+            file_json_url = settings.CANTALOUPE_HTTP_ENDPOINT + "/iiif/2/" + file_name + "/info.json"
             image_json = self.fetch(file_json_url)
             return image_json, new_image_id, file_url
 
