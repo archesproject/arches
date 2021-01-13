@@ -571,11 +571,15 @@ define([
                                 feature.properties.nodeId = nodeId;
                                 tileGeoJSON.features.push(feature);
                             });
+                            self.map().removeControl(self.draw);
+                            self.draw = undefined;
                             if (ko.isObservable(self.tile.data[nodeId])) {
                                 self.tile.data[nodeId](tileGeoJSON);
                             } else {
                                 self.tile.data[nodeId].features(tileGeoJSON.features);
                             }
+                            self.selectedFeatureIds([]);
+                            setupDraw(self.map());
                         } else console.log(errors);
                     }
                     else
