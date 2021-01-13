@@ -15,7 +15,6 @@ define([
         this.previousStep = ko.observable();
         this.hoverStep = ko.observable();
         this.ready = ko.observable(false);
-        this.tabbedWorkflow = ko.observable(ko.unwrap(config.tabbedWorkflow));
         this.loading = config.loading || ko.observable(false);
         this.alert = config.alert || ko.observable(null);
         this.state = {steps:[]};

@@ -2,87 +2,6 @@
 <!--ko if: ready() -->
 <div class="workflow-plugin">
     <!--ko if: ko.unwrap(activeStep) -->
-
-    <!-- ko if: tabbedWorkflow() -->
-    <div class="tabbed-workflow-title-bar">
-        <div class="workflow-name" data-bind="text: workflowName() + ' Workflow'">{% trans "Insert Workflow Name" %}</div>
-
-        <div>
-            <!--ko if: activeStep()._index+1 !== steps.length -->
-            <button data-bind="click: finishWorkflow, css:{disabled: canFinish() === false}" class="btn btn-mint btn-labeled"><i class="btn-label ion-android-cloud-done"></i>{% trans "Finish" %}</button>
-            <!--/ko-->
-            <!--ko if: activeStep()._index+1 === steps.length -->
-            <button disabled class="btn btn-mint btn-labeled"><i class="btn-label ion-android-cloud-done"></i>{% trans "Finished!" %}</button>
-            <!--/ko-->
-            <button data-bind="click: quitWorkflow" class="btn btn-dark btn-labeled"><i class="btn-label ion-android-cancel"></i>{% trans "Quit" %}</button>
-        </div>
-    </div>
-    <div style="height: 100%;">
-        <div class="workflow-nav-tab-container">
-            <ul class="nav nav-tabs workflow-nav-tab-list">
-                <!--ko foreach: {data: steps, as: 'step'} -->
-                <li data-bind="css: { active: step.active() }">
-                    <div
-                        class='workflow-nav-tab'
-                        data-bind="{
-                            css: { 
-                                active: step.active(), 
-                                inactive: !step.active() && $parent.canStepBecomeActive(step),
-                                disabled: !step.active() && !$parent.canStepBecomeActive(step),
-                            },
-                            click: function() { if ($parent.canStepBecomeActive(step)) { $parent.activeStep(step) }},
-                        }" 
-                    >
-                        <div style="display: flex; flex-direction: row;">
-                            <span
-                                style="margin-right: 4px;"
-                                class="workflow-nav-tab-arrow"
-                                data-bind="{ 
-                                    click: $parent.back, 
-                                    clickBubble: false ,
-                                    css: {
-                                        disabled: !$parent.canStepBecomeActive($parent.steps[step._index - 1]),
-                                    },
-                                    visible: step.active() && step._index !== 0,
-                                }"
-                            >
-                                <i class="fa fa-caret-left"></i>
-                            </span>
-                            
-                            <span style="padding: 2px;" data-bind="text: step.title()"></span>
-                            
-                            <span
-                                style="margin-left: 4px;"
-                                class="workflow-nav-tab-arrow"
-                                data-bind="{ 
-                                    click: $parent.next, 
-                                    clickBubble: false,
-                                    css: {
-                                        disabled: !$parent.canStepBecomeActive($parent.steps[step._index + 1]),
-                                    },
-                                    visible: step.active() && step._index !== $parent.steps.length - 1,
-                                }"
-                            >
-                                <i class="fa fa-caret-right"></i>
-                            </span>
-                        </div>
-                    </div>
-                </li>
-                <!-- /ko -->
-            </ul>
-        </div>
-        
-        <div class='tabbed-workflow-step-body'>
-            <!--ko if: activeStep().componentname-->
-                <!-- ko component: {
-                    name: activeStep().componentname,
-                    params: activeStep()
-                } --><!--/ko-->
-            <!--/ko-->
-        </div>
-    </div>
-    <!-- /ko -->
-    <!-- ko ifnot: tabbedWorkflow() -->
     <div class="workflowstep-nav">
         <!--ko foreach: {data: steps, as: 'step'}-->
             <div class="nav-group">
@@ -134,8 +53,6 @@
                 <!--/ko-->
         </div>
     </div>
-    <!-- /ko -->
-
     <!--/ko-->
 </div>
 <!--/ko-->
