@@ -71,6 +71,31 @@
                 <!-- /ko -->
             </ul>
         </div>
+
+        <!--ko if: activeStep().informationBoxData -->
+        <div 
+            class='step-information-box-container' 
+            style="
+                background-color: #fff; 
+                padding: 25px;
+                padding-bottom: unset;
+                margin-right: 50px;
+            "
+        >
+            <div
+                class='step-information-box'
+                style="
+                    padding: 10px 20px 15px 20px;
+                    background-color: #fafafa;
+                    border: 1px solid #ddd;
+                    color: grey;
+                "
+            >
+                <h4 data-bind="text: ko.unwrap(activeStep().informationBoxData.heading)"></h4>
+                <span data-bind="text: ko.unwrap(activeStep().informationBoxData.text)"></span>
+            </div>
+        </div>
+        <!-- /ko -->
         
         <div class='tabbed-workflow-step-body'>
             <!--ko if: activeStep().componentname-->
@@ -80,6 +105,8 @@
                 } --><!--/ko-->
             <!--/ko-->
         </div>
+
+
     </div>
     <!-- /ko -->
     <!-- ko ifnot: tabbedWorkflow() -->
@@ -87,9 +114,12 @@
         <!--ko foreach: {data: steps, as: 'step'}-->
             <div class="nav-group">
                 <div
-                data-bind="click: function() { if ($parent.canStepBecomeActive(step)) { $parent.activeStep(step) }},
+                    data-bind="{
+                        click: function() { if ($parent.canStepBecomeActive(step)) { $parent.activeStep(step) }},
                         event: { mouseover: function(){$parent.hoverStep(step)}, mouseout: function(){$parent.hoverStep(null)}},
-                        css: { selectable: step.complete() || ($parent.steps[step._index - 1] && $parent.steps[step._index - 1].complete()) || $parent.canFinish() === true, 'can-advance': ($parent.steps[step._index - 1] && $parent.steps[step._index - 1].complete() === true) || $parent.canFinish() === true }">
+                        css: { selectable: step.complete() || ($parent.steps[step._index - 1] && $parent.steps[step._index - 1].complete()) || $parent.canFinish() === true, 'can-advance': ($parent.steps[step._index - 1] && $parent.steps[step._index - 1].complete() === true) || $parent.canFinish() === true }
+                    }"
+                >
                     <i class="fa fa-lg" data-bind="class: step.iconClass"></i>
                 </div>
 

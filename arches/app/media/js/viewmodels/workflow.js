@@ -1,3 +1,5 @@
+const { param } = require("jquery");
+
 define([
     'arches',
     'jquery',

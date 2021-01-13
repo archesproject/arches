@@ -4,6 +4,8 @@ define([
     'knockout-mapping'
 ], function(ko, _, koMapping) {
     var WorkflowStep = function(config) {
+        var self = this;
+
         this.classUnvisited = 'workflow-step-icon';
         this.classActive = 'workflow-step-icon active';
         this.classComplete = 'workflow-step-icon complete';
@@ -12,6 +14,19 @@ define([
         this.title = '';
         this.subtitle = '';
         this.description = '';
+
+        this.informationBoxData = {
+            heading: ko.observable(),
+            text: ko.observable(),
+        };
+
+        if (config.informationboxdata) {
+            self.informationBoxData['heading'](config.informationboxdata['heading']);
+            self.informationBoxData['text'](config.informationboxdata['text']);
+        } else {
+            self.informationBoxData = null;  /* sets to falsey so template doesn't take up DOM space */
+        }
+
         this.complete = ko.observable(false);
         this.required = ko.observable(ko.unwrap(config.required));
         this.autoAdvance = ko.observable(true);

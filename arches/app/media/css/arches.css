@@ -597,6 +597,15 @@ input[type="checkbox"] {
     overflow-y: auto;
 }
 
+.tabbed-workflow-step-body .card-component {
+    margin: unset;
+    padding: 0 25px;
+}
+
+.tabbed-workflow-step-body .card-title {
+    display: none;
+}
+
 .tabbed-workflow-step-body > div {
     background-color: #fff !important;
     border: none !important;
