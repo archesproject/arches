@@ -12679,6 +12679,13 @@ a.jstree-anchor.permissions-widget {
     margin-top: -1px;
 }
 
+.map-data-drop-area {
+    padding: 15px;
+    border: 1px dashed #808080;
+    color: #808080;
+    margin: 5px;
+}
+
 .iiif-gallery-content {
     border-top: solid 1px rgb(221, 221, 221);
     height: 160px;

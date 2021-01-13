@@ -538,6 +538,58 @@ define([
                 });
             }
         };
+
+        self.dropZoneHandler = function(data, e) {
+            var nodeId = data.node.nodeid;
+            var tileGeoJSON = self.tile.data[nodeId]() || {
+                type: "FeatureCollection",
+                features: []
+            };
+            e.stopPropagation();
+            e.preventDefault();
+            var files = e.originalEvent.dataTransfer.files;
+            for (var i = 0; i < files.length; i++) {
+                var extension = files[i].name.split('.').pop();
+                if (!['kml', 'json', 'geojson'].includes(extension)) return;
+
+                var reader = new window.FileReader();
+                reader.onload = function(e) {
+                    if (['json', 'geojson'].includes(extension)){
+                        var geoJSONString = e.target.result;
+                        var hint = geojsonhint.hint(geoJSONString);
+                        var errors = [];
+                        hint.forEach(function(item) {
+                            if (item.level !== 'message') {
+                                errors.push(item);
+                            }
+                        });
+                        if (errors.length === 0) {
+                            var geoJSON = JSON.parse(geoJSONString);
+                            geoJSON.features.forEach(function(feature) {
+                                feature.id = uuid.generate();
+                                if (!feature.properties) feature.properties = {};
+                                feature.properties.nodeId = nodeId;
+                                tileGeoJSON.features.push(feature);
+                            });
+                            if (ko.isObservable(self.tile.data[nodeId])) {
+                                self.tile.data[nodeId](tileGeoJSON);
+                            } else {
+                                self.tile.data[nodeId].features(tileGeoJSON.features);
+                            }
+                        } else console.log(errors);
+                    }
+                    else
+                        console.log('kml');
+                };
+                reader.readAsText(files[i]);
+            }
+        };
+
+        self.dropZoneOverHandler = function(data, e) {
+            e.stopPropagation();
+            e.preventDefault();
+            e.originalEvent.dataTransfer.dropEffect = 'copy';
+        };
     };
     return viewModel;
 });

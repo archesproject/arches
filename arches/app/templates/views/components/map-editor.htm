@@ -147,6 +147,12 @@
                                                 }
                                             "></select>
                                         </div>
+                                        <div class="map-data-drop-area" data-bind="event: {
+                                            dragover: dropZoneOverHandler,
+                                            drop: dropZoneHandler
+                                        }">
+                                            Drag GeoJSON or KML files here to add...
+                                        </div>
                                         <table class="table">
                                             <tbody>
                                                 <!-- ko foreach: {data: self.featureLookup[widget.node_id()].features, as: 'feature'} -->
