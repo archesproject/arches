@@ -4,6 +4,7 @@ import os
 import requests
 import shutil
 import uuid
+from revproxy.views import ProxyView
 from django.core.files.storage import default_storage
 from django.http import HttpRequest
 from django.views.generic import View
@@ -27,6 +28,8 @@ class ManifestManagerView(View):
         return JSONResponse({"success": True})
 
     def post(self, request):
+        self.iiif_proxy_uri = request.scheme + '://' + request.get_host() + '/iiifserver/'
+
         def create_manifest(name, desc, file_url, canvases):
             attribution = "Provided by The J. Paul Getty Museum"
             logo = "http://www.getty.edu/museum/media/graphics/web/logos/getty.png"
@@ -123,9 +126,9 @@ class ManifestManagerView(View):
             new_image.save()
 
             file_name = os.path.basename(new_image.image.name)
-            file_url = settings.CANTALOUPE_HTTP_ENDPOINT + "iiif/2/" + file_name
-            file_json = file_url + "/info.json"
-            image_json = self.fetch(file_json)
+            file_url = self.iiif_proxy_uri + "iiif/2/" +  file_name
+            file_json_url = settings.CANTALOUPE_HTTP_ENDPOINT + "/iiif/2/" + file_name + '/info.json'
+            image_json = self.fetch(file_json_url)
             return image_json, new_image_id, file_url
 
         def get_image_count(manifest):
@@ -258,3 +261,13 @@ class ManifestManagerView(View):
 
     def get(self):
         raise NotImplementedError
+
+
+class IIIFServerProxyView(ProxyView):
+    upstream = settings.CANTALOUPE_HTTP_ENDPOINT
+
+    def get_request_headers(self):
+        headers = super(IIIFServerProxyView, self).get_request_headers()
+        if settings.CANTALOUPE_HTTP_ENDPOINT is None:
+            raise Http404(_("IIIF server proxy not configured"))
+        return headers
