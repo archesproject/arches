@@ -551,10 +551,18 @@ define([
             if (errors.length === 0) {
                 var geoJSON = JSON.parse(geoJSONString);
                 geoJSON.features = geoJSON.features.filter(function(feature) {
+                    return feature.geometry;
+                });
+                self.map().fitBounds(
+                    geojsonExtent(geoJSON),
+                    {
+                        padding: padding
+                    }
+                );
+                geoJSON.features.forEach(function(feature) {
                     feature.id = uuid.generate();
                     if (!feature.properties) feature.properties = {};
                     feature.properties.nodeId = nodeId;
-                    return feature.geometry;
                 });
                 self.map().removeControl(self.draw);
                 self.draw = undefined;
