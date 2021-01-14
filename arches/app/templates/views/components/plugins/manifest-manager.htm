@@ -50,10 +50,6 @@
         </div>
     </div>
 
-    <div class="file-workbench-buttons" style="margin-top: 20px;">
-        <button class="btn btn-mint btn-lg btn-labeled fa fa-pencil" data-bind="click: updateManifest, clickBubble: false, disable: !isManifestDirty()">{% trans "Save" %}</button>
-        <button class="btn btn-danger btn-lg btn-labeled fa fa-refresh" data-bind="click: reset, clickBubble: false, disable: !isManifestDirty()">{% trans "Cancel" %}</button>
-    </div>
 
     <!--ko if: imagesForUpload().length > 0-->
     <label class="control-label">{% trans "Images to be Added" %}</label>
@@ -74,12 +70,13 @@
         <div style="min-height: 100%;">
             <div id="hidden-dz-create-previews" style="display:none"></div>
         </div>
-        <!--ko if: manifest-->
-        <div class="file-workbench-buttons">
-            <button class="btn btn-primary btn-lg btn-block btn-labeled btn-workbench fa fa-file" data-bind="click: deleteManifest">
-                <span>{% trans "Delete the current Manifest" %}</span>
-            </button>
+    <div class="install-buttons" style="display: inline-flex; justify-content: space-between;">
+        <div style="display: flex;">
+        <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" style="width: auto; margin-right: 10px;" data-bind="click: updateManifest, clickBubble: false, disable: !isManifestDirty()">{% trans "Save" %}</button>
+        <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" style="width: auto; margin-right: 10px;" data-bind="click: reset, clickBubble: false, disable: !isManifestDirty()">{% trans "Cancel" %}</button>
         </div>
+        <!--ko if: manifest-->
+        <button class="btn btn-danger btn-md btn-block btn-labeled btn-workbench fa fa-trash" style="width: auto" data-bind="click: deleteManifest"><span>{% trans "Delete" %}</span></button>
         <!--/ko-->
     </div>
 </div>
@@ -148,9 +145,11 @@
         <div style="min-height: 100%;">
             <div id="hidden-dz-previews" style="display:none"></div>
         </div>
-        <div class="file-workbench-buttons" style="margin-top: 20px;">
-            <button class="btn btn-mint btn-lg btn-labeled fa fa-pencil" data-bind="click: updateManifest, clickBubble: false, disable: !isCanvasDirty()">{% trans "Save" %}</button>
-            <button class="btn btn-warning btn-lg btn-labeled fa fa-refresh" data-bind="click: reset, clickBubble: false, disable: !isCanvasDirty()">{% trans "Cancel" %}</button>
+    </div>
+    <div class="install-buttons" style="display: inline-flex; justify-content: space-between;">
+        <div class="file-workbench-buttons">
+            <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" data-bind="click: updateManifest, clickBubble: false, disable: !isCanvasDirty()">{% trans "Save" %}</button>
+            <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" data-bind="click: reset, clickBubble: false, disable: !isCanvasDirty()">{% trans "Cancel" %}</button>
         </div>
     </div>
 </div>
