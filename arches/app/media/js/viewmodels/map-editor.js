@@ -563,23 +563,9 @@ define([
                     feature.id = uuid.generate();
                     if (!feature.properties) feature.properties = {};
                     feature.properties.nodeId = nodeId;
+                    self.draw.add(feature);
                 });
-                self.map().removeControl(self.draw);
-                self.draw = undefined;
-                if (ko.isObservable(self.tile.data[nodeId])) {
-                    var tileValue = self.tile.data[nodeId]();
-                    if (tileValue && tileValue.features) {
-                        tileValue.features = tileValue.features.concat(geoJSON.features);
-                        geoJSON = tileValue;
-                    }
-                    self.tile.data[nodeId](geoJSON);
-                } else {
-                    self.tile.data[nodeId].features(
-                        self.tile.data[nodeId].features().concat(geoJSON.features)
-                    );
-                }
-                self.selectedFeatureIds([]);
-                setupDraw(self.map());
+                self.updateTiles();
             }
             return errors;
         };
