@@ -1,4 +1,5 @@
 {% extends "views/components/iiif-viewer.htm" %}
+{% load staticfiles %}
 {% load i18n %}
 
 {% block tabs %}
@@ -157,3 +158,225 @@
 <!--/ko-->
 {{ block.super }}
 {% endblock sidepanel %}
+
+{% block content_management %}
+<!-- ko foreach: { data: [$data], as: 'self' } -->
+
+<!-- ko if: mainMenu() -->
+<div class="bord-top file-select loader-select" style="height: 100%;">
+    <div class="">
+        <h2>{% trans 'IIIF Manifest Manager' %}</h2>
+        <h4>{% trans 'Create a new manifest or modify an existing one' %}</h4>
+        <div style="display: flex; padding: 15px 25px; justify-content: center;">
+        <div style="width: 620px; display:flex; justify-content:space-between;">
+            <div class="r-grid-item relative" style="border: 1px solid #c4c4c4">
+                <div class="" style="display:flex; flex-direction: column; background-color: #fdfdfd">
+                    <h4 class="r-select-title">{% trans 'Select a Manifest' %}</h4>
+                </div>
+                <div>
+                    <div class="r-select-card" style="color: #30517a; background-color: #fdfdfd">
+                        <div class="r-select-circle loader-button" style="top: 55px">
+                            <span><i class="fa fa-pencil r-select-icon"></i></span>
+                        </div>
+                        <div class="r-desc-container">
+                            <p style="color: #30517a; background-color: #fdfdfd" class="r-select-desc">{% trans 'Choose an existing manifest to edit' %}</p> 
+                        </div>  
+                    </div>
+                </div>
+
+                <!-- card Tools -->
+                <div class="r-select-card-footer">
+                    <div class="">
+                        <div data-bind="click: function(){self.mainMenu(false);}" style="border-top: 1px solid #c4c4c4;" class="btn btn-primary btn-resource-select" role="button">
+                        {% trans 'Select' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="r-grid-item relative" style="border: 1px solid #c4c4c4">
+                <div class="" style="display:flex; flex-direction: column; background-color: #fdfdfd">
+                    <h4 class="r-select-title">{% trans 'Create a New Manifest' %}</h4>
+                </div>
+                <div>
+                    <div class="r-select-card" style="color: #30517a; background-color: #fdfdfd">
+                        <div class="r-select-circle loader-button" style="top: 55px">
+                            <span><i class="fa fa-upload r-select-icon"></i></span>
+                        </div>
+                        <div class="r-desc-container">
+                            <p style="color: #30517a; background-color: #fdfdfd" class="r-select-desc">{% trans 'Add files to create a new manifest' %}</p> 
+                        </div>  
+                    </div>
+                </div>
+
+                <!-- card Tools -->
+                <div class="r-select-card-footer" class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions4create">
+                    <div class="">
+                        <div style="border-top: 1px solid #c4c4c4;" class="btn btn-primary btn-resource-select fileinput-create-button dz-clickable" data-bind="css: uniqueidClass" role="button">
+                        {% trans 'Select' %}
+                        </div>
+                    </div>
+                    <div style="min-height: 100%;">
+                        <div id="hidden-dz-create-previews" style="display:none"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<!--/ko-->
+
+
+<!-- ko if: !mainMenu() -->
+<div class="workbench-card-container" data-bind="css: {
+        'gallery-visible': showGallery,
+        'gallery-expanded': expandGallery
+    }">
+    <div class="iiif-leaflet" data-bind="leaflet: leafletConfig"></div>
+</div>
+<div class="show-gallery-control" data-bind="css: {
+        'gallery-visible': showGallery,
+        'gallery-expanded': expandGallery
+    }">
+    <i class="fa" data-bind="css: {
+        'fa-chevron-circle-up': !expandGallery(),
+        'fa-chevron-circle-down': expandGallery()
+    }, click: function() { expandGallery(!expandGallery()); }"></i>
+    <h3>{% trans "Gallery" %}</h3>
+    <a href="javascript: void(0)" data-bind="
+        click: toggleGallery,
+        text: showGallery() ? '{% trans "hide" %}' : '{% trans "show" %}'
+    "></a>
+    
+    <!--ko if: expandGallery() -->
+    <span style="padding-right: 3px; padding-left: 3px;">|</span>
+    <a href="">{% trans "close info" %}</a>
+    <!--/ko -->
+
+</div>
+<!--ko let: {canvasClick: canvasClick, getCanvasService: getCanvasService, selectedCanvas: canvas, getAnnotationCount: getAnnotationCount} -->
+<div class="iiif-viewer-gallery" data-bind="css: {
+        'gallery-expanded': expandGallery
+    }">
+    <!--ko if: showGallery() -->
+    <div class="iiif-gallery-content">
+
+        <!--ko if: expandGallery() && manifestData() -->
+        <div class="manifest-details">
+            <h3>
+                <span data-bind="text: manifestName"></span>
+            </h3>
+
+            <h4>
+                <span data-bind="text: manifestDescription"></span>
+            </h4>
+
+            <div class="manifest-details-list" data-bind="foreach: manifestMetaData">
+                <dt class="manifest-metadata-title" data-bind="text: label"></dt>
+                <!--ko foreach: Array.isArray(value) ? value : [value] -->
+                <dd class="manifest-metadata-value" data-bind="html: $data"></dd>
+                <!--/ko -->
+            </div>
+            <h4 data-bind="text: manifestData().attribution || ''"></h4>
+            <!--ko if: manifestData().logo -->
+            <img class="manifest-logo" data-bind="attr: {src: typeof manifestData().logo === 'string' ? manifestData().logo : manifestData().logo['@id']}">
+            <!--/ko -->
+        </div>
+        <!--/ko -->
+
+        <!--ko if: editManifest() -->
+        <div class="manifest-editor">
+            <div class="manifest-editor-label">
+                {% trans "Select a manifest:" %}
+            </div>
+            <div class="manifest-editor-input">
+                <input class="form-control input-lg widget-input"
+                    data-bind="value: manifest,
+                    select2Query: {
+                        select2Config: manifestSelectConfig
+                    }">
+            </div>
+
+            <div class="install-buttons">
+                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-pencil" data-bind="click: getManifestData,
+                    disabled: manifestLoading(),
+                    css: { 'disabled': manifestLoading() }
+                ">{% trans 'Update manifest' %}</button>
+                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: toggleManifestEditor">{% trans 'Cancel' %}</button>
+                <!--ko if: manifestLoading() -->
+                <span class="manifest-editor-loading">
+                    {% trans "Loading manifest..." %}
+                </span>
+                <!--/ko -->
+                <!--ko if: manifestError() -->
+                <span class="manifest-editor-error">
+                    {% trans "Error loading manifest..." %}
+                </span>
+                <!--/ko -->
+            </div>
+        </div>
+            
+            
+        <!--/ko -->
+        <!--ko if: !editManifest() -->
+            <!--ko if: manifestLoading() -->
+            <span class="manifest-editor-loading">
+                {% trans "Loading manifest..." %}
+            </span>
+            <!--/ko -->
+            <!--ko if: !manifestLoading() -->
+            <div class="iiif-gallery-panel" style="overflow-x: auto;">
+                <div class="iiif-gallery-header">
+                    <span class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor, text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
+                    |
+                    {% trans "Filter" %}
+                    <div class="list-filter" data-bind="">
+                        <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
+
+                        <!-- Clear Search -->
+                        <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+                    </div>
+                </div>
+
+            <div class="iiif-gallery-sequence">
+                <div class="iiif-gallery-sequence-canvases" data-bind="foreach: canvases">
+                    <div class="iiif-gallery-canvas" data-bind="click: function() {
+                        canvasClick($data);
+                    },
+                    visible: label.toLowerCase().includes(self.filter().toLowerCase()),
+                    css: {
+                        active: getCanvasService($data) === selectedCanvas(),
+                        annotated: getAnnotationCount(getCanvasService($data))
+                    }">
+                        <div class="iiif-gallery-canvas-thumbnail">
+                            <img data-bind="attr: { src: $data.thumbnail || '{% static 'img/photo_missing.png' %}', title: $data.label}">
+                        </div>
+                        <div class="iiif-gallery-canvas-label">
+                            <!--ko if: getCanvasService($data) === selectedCanvas() -->
+                            <span data-bind="text: $parent.canvasLabel"></span>
+                            <!--/ko -->                                
+                            <!--ko ifnot: getCanvasService($data) === selectedCanvas() -->
+                            <span data-bind="text: label"></span>
+                            <!--/ko -->                                
+                            <span class="annotation-count">
+                                <!--ko if: getAnnotationCount(getCanvasService($data)) -->
+                                <span data-bind="text: getAnnotationCount(getCanvasService($data))"></span> {% trans "Annotation(s)" %}
+                                <!--/ko -->
+                                <!--ko if: !getAnnotationCount(getCanvasService($data)) -->
+                                &nbsp;
+                                <!--/ko -->
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <!--/ko -->
+        <!--/ko -->
+    </div>
+    <!--/ko -->
+</div>
+<!--/ko -->
+<!--/ko -->
+<!--/ko -->
+{% endblock content_management %}

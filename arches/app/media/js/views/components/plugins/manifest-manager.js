@@ -17,6 +17,7 @@ define([
             this.canvasesForDeletion = ko.observableArray([]);
             this.metaDataLabel = ko.observable('');
             this.metaDataValues = ko.observable('');
+            this.mainMenu = ko.observable(true);
 
             this.addCanvas = function(canvas) { //the function name needs to be better
                 self.canvasesForDeletion.push(canvas);
@@ -142,6 +143,7 @@ define([
                 self.formData.append("manifest_description", ko.unwrap(self.manifestDescription));
                 self.formData.append("operation", "create");
                 self.submitToManifest();
+                self.mainMenu(false);
             };
 
             this.addFiles = function(fileList) {
