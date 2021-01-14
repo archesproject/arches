@@ -32,13 +32,17 @@
 
 <div class="iiif-image-tools">
     <div class="form-group">
+        <div class="row widget-wrapper">
         <label class="control-label">{% trans "Title" %}</label>
         <input type="text" placeholder="Manifest Title" class="form-control input-lg" style="height: 36px;"
             data-bind="textInput: self.manifestName, valueUpdate: 'keyup'">
+        </div>  
+        <div class="row widget-wrapper">  
         <label class="control-label">{% trans "Description" %}</label>
         <textarea rows="10" type="text" placeholder='Manifest Description' class="form-control input-lg"
             data-bind="textInput: self.manifestDescription, valueUpdate: 'keyup'"></textarea>
-
+        </div>
+        <div class="row widget-wrapper">
         <label class="control-label">{% trans "Metadata" %}</label>
         <div class="manifest-details-list">
             <label class="control-label">{% trans "Label" %}</label>
@@ -47,6 +51,7 @@
             <label class="control-label">{% trans "Values" %}</label>
             <input type="text" placeholder='Metadata Value' class="form-control input-md" style="height: 36px;" 
                 data-bind="textInput: metaDataValues, valueUpdate: 'keyup'">
+        </div>
         </div>
     </div>
 
@@ -117,7 +122,7 @@
     </div>
 
     <!--ko if: canvas-->
-    <label class="control-label">{% trans "Image Information" %}</label>
+    <label class="control-label">{% trans "Selected Image Name" %}</label>
     <div>
         <input type="text" placeholder='Image Caption' class="form-control input-lg" style="height: 36px;" 
         data-bind="textInput: self.canvasLabel, valueUpdate: 'keyup'">
