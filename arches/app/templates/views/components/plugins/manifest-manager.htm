@@ -30,7 +30,7 @@
     </div>
 </div>
 
-<div class="iiif-image-tools">
+<div class="iiif-image-tools" style="margin-top: 20px;">
     <div class="form-group">
         <div class="row widget-wrapper">
         <label class="control-label">{% trans "Title" %}</label>
@@ -57,7 +57,6 @@
         <div class="manifest-details-list">
             <input type="text" placeholder='Metadata Label' class="form-control input-md" style="height: 36px;" 
                 data-bind="textInput: metaDataLabel, valueUpdate: 'keyup'">
-            <label class="control-label">{% trans "Values" %}</label>
             <input type="text" placeholder='Metadata Value' class="form-control input-md" style="height: 36px;" 
                 data-bind="textInput: metaDataValues, valueUpdate: 'keyup'">
         </div>
@@ -103,7 +102,7 @@
     </div>
 </div>
 
-<div class="iiif-image-tools">
+<div class="iiif-image-tools" style="margin-top: 20px;">
     <!--ko if: canvases().length > 0-->
     <label class="control-label">{% trans "Canvases" %}</label>
     <div>{% trans "Select canvas to delete from the manifest" %}</div>
