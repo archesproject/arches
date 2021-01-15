@@ -28,6 +28,8 @@ define([
         this.manifestError = ko.observable();
         this.manifestName = ko.observable();
         this.manifestDescription = ko.observable();
+        this.manifestAttribution = ko.observable();
+        this.manifestLogo = ko.observable();
         this.manifestMetaData = ko.observableArray([{"label": "", "value": [""]}]);
         this.canvasLabel = ko.observable();
         this.zoomToCanvas = !(params.zoom && params.center);
@@ -244,6 +246,18 @@ define([
             return description || '';
         };
 
+        var getAttribution = function(object) {
+            var attribution = object.attribution;
+            if (Array.isArray(attribution)) attribution = object.attribution[0]["@value"];
+            return attribution || '';
+        };
+
+        var getLogo = function(object) {
+            var logo = object.logo;
+            if (Array.isArray(logo)) logo = object.logo[0]["@value"];
+            return logo || '';
+        };
+
         var getMetaData = function(object) {
             var metadata = object.metadata;
             return metadata || [];
@@ -262,9 +276,13 @@ define([
                 updateCanvas = true;
                 self.origManifestName = getLabel(manifestData);
                 self.origManifestDescription = getDescription(manifestData);
+                self.origManifestAttribution = getAttribution(manifestData);
+                self.origManifestLogo = getLogo(manifestData);
                 self.origMetaData = getMetaData(manifestData);
                 self.manifestName(getLabel(manifestData));
                 self.manifestDescription(getDescription(manifestData));
+                self.manifestAttribution(getAttribution(manifestData));
+                self.manifestLogo(getLogo(manifestData));
                 self.manifestMetaData(getMetaData(manifestData));
             }
         });

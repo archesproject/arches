@@ -18,6 +18,8 @@ define([
             this.metaDataLabel = ko.observable('');
             this.metaDataValues = ko.observable('');
             this.mainMenu = ko.observable(true);
+            this.manifestAttribution = ko.observable('');
+            this.manifestLogo = ko.observable('');
 
             this.addCanvas = function(canvas) { //the function name needs to be better
                 self.canvasesForDeletion.push(canvas);
@@ -34,6 +36,8 @@ define([
             this.isManifestDirty = ko.computed(function() {
                 return ((ko.unwrap(self.manifestName) !== self.origManifestName) ||
                         (ko.unwrap(self.manifestDescription) !== self.origManifestDescription) ||
+                        (ko.unwrap(self.manifestAttribution) !== self.origManifestAttribution) ||
+                        (ko.unwrap(self.manifestLogo) !== self.origManifestLogo) ||
                         ((ko.unwrap(self.metaDataLabel) !== '') && (ko.unwrap(self.metaDataValues) !== ''))
                 );
             });
@@ -73,6 +77,8 @@ define([
                 self.metaDataLabel('');
                 self.metaDataValues('');
                 self.manifestName(self.origManifestName);
+                self.manifestAttribution(self.origManifestAttribution);
+                self.manifestLogo(self.origManifestLogo);
                 self.manifestDescription(self.origManifestDescription);
                 self.canvasLabel(self.origCanvasLabel);
                 if (self.dropzone) {
@@ -156,6 +162,8 @@ define([
             this.updateManifest = function() {
                 self.formData.append("manifest_title", ko.unwrap(self.manifestName));
                 self.formData.append("manifest_description", ko.unwrap(self.manifestDescription));
+                self.formData.append("manifest_attribution", ko.unwrap(self.manifestAttribution));
+                self.formData.append("manifest_logo", ko.unwrap(self.manifestLogo));
                 self.formData.append("manifest", ko.unwrap(self.manifest));
                 self.formData.append("canvas_label", ko.unwrap(self.canvasLabel)); //new label for canvas
                 self.formData.append("canvas_id", ko.unwrap(self.canvas)); //canvas id for label change

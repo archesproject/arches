@@ -30,9 +30,7 @@ class ManifestManagerView(View):
     def post(self, request):
         self.iiif_proxy_uri = request.scheme + '://' + request.get_host() + '/iiifserver/'
 
-        def create_manifest(name, desc, file_url, canvases):
-            attribution = "Provided by The J. Paul Getty Museum"
-            logo = "http://www.getty.edu/museum/media/graphics/web/logos/getty.png"
+        def create_manifest(name="<manifest_title>", desc="<manifest_description>", file_url="file_url",  attribution="", logo="", canvases=[]):
             metadata = []  # {"label": "TBD", "value": ["Unknown", ...]}
             sequence_id = settings.CANTALOUPE_HTTP_ENDPOINT + "iiif/manifest/sequence/TBD.json"
 
@@ -105,20 +103,14 @@ class ManifestManagerView(View):
             }
 
         def add_canvases(manifest, canvases):
-            manifest = models.IIIFManifest.objects.get(url=manifest)
             manifest.manifest["sequences"][0]["canvases"] += canvases
-            manifest.save()
-            return manifest
 
         def delete_canvas(manifest, canvases_to_remove):
-            manifest = models.IIIFManifest.objects.get(url=manifest)
             canvas_ids_remove = [canvas["images"][0]["resource"]["service"]["@id"] for canvas in canvases_to_remove]
             canvases = manifest.manifest["sequences"][0]["canvases"]
             manifest.manifest["sequences"][0]["canvases"] = [
                 canvas for canvas in canvases if canvas["images"][0]["resource"]["service"]["@id"] not in canvas_ids_remove
             ]
-            manifest.save()
-            return manifest
 
         def create_image(file):
             new_image_id = uuid.uuid4()
@@ -135,33 +127,28 @@ class ManifestManagerView(View):
             manifest = models.IIIFManifest.objects.get(url=manifest)
             return len(manifest.manifest["sequences"][0]["canvases"])
 
-        def change_manifest_info(manifest, name, desc):
-            manifest = models.IIIFManifest.objects.get(url=manifest)
+        def change_manifest_info(manifest, name, desc, attribution, logo):
             if name is not None and name != "":
                 manifest.label = name
                 manifest.manifest["label"] = name
             if desc is not None and desc != "":
                 manifest.description = desc
                 manifest.manifest["description"] = desc
-            manifest.save()
-            return manifest
+            if attribution and attribution != "":
+                manifest.manifest["attribution"] = attribution
+            if logo and logo != "":
+                manifest.manifest["logo"] = logo
 
         def change_manifest_metadata(manifest, metadata_dict):  # To be fixed
-            manifest = models.IIIFManifest.objects.get(url=manifest)
             for k, v in metadata_dict.items():
                 manifest.manifest["metadata"].append({"label": k, "value": v})
-            manifest.save()
-            return manifest
 
         def change_canvas_label(manifest, canvas_id, label):
-            manifest = models.IIIFManifest.objects.get(url=manifest)
             # canvas_id = canvas['images'][0]['resource']['service']['@id']
             canvases = manifest.manifest["sequences"][0]["canvases"]
             for canvas in canvases:
                 if canvas["images"][0]["resource"]["service"]["@id"] == canvas_id:
                     canvas["label"] = label
-            manifest.save()
-            return manifest
 
         acceptable_types = [
             ".jpg",
@@ -173,9 +160,11 @@ class ManifestManagerView(View):
 
         files = request.FILES.getlist("files")
         name = request.POST.get("manifest_title")
+        attribution = request.POST.get("manifest_attribution", "")
+        logo = request.POST.get("manifest_logo", "")
         desc = request.POST.get("manifest_description")
         operation = request.POST.get("operation")
-        manifest = request.POST.get("manifest")
+        manifest_url = request.POST.get("manifest")
         canvas_label = request.POST.get("canvas_label")
         canvas_id = request.POST.get("canvas_id")
         metadata_label = request.POST.get("metadata_label")
@@ -198,27 +187,24 @@ class ManifestManagerView(View):
                 else:
                     logger.warn("filetype unacceptable: " + f.name)
 
-            pres_dict = create_manifest("<manifest_title>", "<manifest_description>", "file_url", canvases)
-
-            # create a manuscript record in the db
+            pres_dict = create_manifest(canvases=canvases)
             manifest = models.IIIFManifest.objects.create(label=name, description=desc, manifest=pres_dict)
             manifest_id = manifest.id
             json_url = f"/manifest/{manifest_id}"
-
             manifest.url = json_url
             manifest.save()
-
             return JSONResponse(manifest)
+        else:
+            manifest = models.IIIFManifest.objects.get(url=manifest_url)
 
-        if name is not None or desc is not None:
-            updated_manifest = change_manifest_info(manifest, name, desc)
+        change_manifest_info(manifest, name, desc, attribution, logo)
 
         if canvas_label is not None:
-            updated_manifest = change_canvas_label(manifest, canvas_id, canvas_label)
+            change_canvas_label(manifest, canvas_id, canvas_label)
 
         if selected_canvases is not None:
             selected_canvases_json = json.loads(selected_canvases)
-            updated_manifest = delete_canvas(manifest, selected_canvases_json)
+            delete_canvas(manifest, selected_canvases_json)
 
         if len(files) > 0:
             try:
@@ -233,7 +219,7 @@ class ManifestManagerView(View):
                         canvases.append(canvas)
                     else:
                         logger.warn("filetype unacceptable: " + f.name)
-                updated_manifest = add_canvases(manifest, canvases)
+                add_canvases(manifest, canvases)
             except:
                 logger.warning("You have to select a manifest to add images")
                 return None
@@ -241,9 +227,10 @@ class ManifestManagerView(View):
         if metadata_values is not None and metadata_values != "" and metadata_label is not None and metadata_label != "":
             metadata_values_list = metadata_values.split(",")
             metadata_dict = {metadata_label: metadata_values_list}
-            updated_manifest = change_manifest_metadata(manifest, metadata_dict)
+            change_manifest_metadata(manifest, metadata_dict)
 
-        return JSONResponse(updated_manifest)
+        manifest.save()
+        return JSONResponse(manifest)
 
     def fetch(self, url):
         try:

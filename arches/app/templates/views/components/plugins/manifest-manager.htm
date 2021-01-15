@@ -43,9 +43,18 @@
             data-bind="textInput: self.manifestDescription, valueUpdate: 'keyup'"></textarea>
         </div>
         <div class="row widget-wrapper">
+            <label class="control-label">{% trans "Attribution" %}</label>
+            <input type="text" placeholder="Attribution" class="form-control input-lg" style="height: 36px;"
+                data-bind="textInput: self.manifestAttribution, valueUpdate: 'keyup'">
+            </div>  
+        <div class="row widget-wrapper">
+            <label class="control-label">{% trans "Attribution Logo" %}</label>
+            <input type="text" placeholder="Attribution Logo" class="form-control input-lg" style="height: 36px;"
+                data-bind="textInput: self.manifestLogo, valueUpdate: 'keyup'">
+            </div>  
+        <div class="row widget-wrapper">
         <label class="control-label">{% trans "Metadata" %}</label>
         <div class="manifest-details-list">
-            <label class="control-label">{% trans "Label" %}</label>
             <input type="text" placeholder='Metadata Label' class="form-control input-md" style="height: 36px;" 
                 data-bind="textInput: metaDataLabel, valueUpdate: 'keyup'">
             <label class="control-label">{% trans "Values" %}</label>
@@ -281,10 +290,8 @@
                 <dd class="manifest-metadata-value" data-bind="html: $data"></dd>
                 <!--/ko -->
             </div>
-            <h4 data-bind="text: manifestData().attribution || ''"></h4>
-            <!--ko if: manifestData().logo -->
-            <img class="manifest-logo" data-bind="attr: {src: typeof manifestData().logo === 'string' ? manifestData().logo : manifestData().logo['@id']}">
-            <!--/ko -->
+            <h4 data-bind="text: manifestAttribution"></h4>
+            <img class="manifest-logo" data-bind="attr: {src: manifestLogo()}">
         </div>
         <!--/ko -->
 
