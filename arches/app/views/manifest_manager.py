@@ -48,7 +48,7 @@ class ManifestManagerView(View):
                     "@id": file_url + "/full/!300,300/0/default.jpg",
                     "@type": "dctypes:Image",
                     "format": "image/jpeg",
-                    "label": "Main VIew (.45v)",
+                    "label": "Main View (.45v)",
                 },
                 "sequences": [
                     {
