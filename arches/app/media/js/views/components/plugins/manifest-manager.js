@@ -11,8 +11,6 @@ define([
         viewModel: function(params) {
             var self = this;
 
-            this.unsupportedImageTypes = ['tif', 'tiff', 'vnd.adobe.photoshop'];
-
             this.imagesForUpload = ko.observableArray([]);
             this.canvasesForDeletion = ko.observableArray([]);
             this.metaDataLabel = ko.observable('');
