@@ -74,15 +74,6 @@
     </div>
     <!--/ko-->
     
-    <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions4create">
-        <div class="file-workbench-buttons" style="margin-bottom: 20px;">
-            <button class="btn btn-primary btn-lg btn-block btn-labeled btn-workbench fa fa-file fileinput-create-button dz-clickable" data-bind="css: uniqueidClass">
-                <span>{% trans "Create a new Manifest" %}</span>
-            </button>
-        </div>
-        <div style="min-height: 100%;">
-            <div id="hidden-dz-create-previews" style="display:none"></div>
-        </div>
     <div class="install-buttons" style="display: inline-flex; justify-content: space-between;">
         <div style="display: flex;">
         <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" style="width: auto; margin-right: 10px;" data-bind="click: updateManifest, clickBubble: false, disable: !isManifestDirty()">{% trans "Save" %}</button>
