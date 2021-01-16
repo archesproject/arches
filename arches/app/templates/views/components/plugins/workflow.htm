@@ -5,7 +5,34 @@
 
     <!-- ko if: tabbedWorkflow() -->
     <div class="tabbed-workflow-title-bar">
-        <div class="workflow-name" data-bind="text: workflowName() + ' Workflow'">{% trans "Insert Workflow Name" %}</div>
+        <div
+            style="
+                display: flex;
+                flex-direction: row;
+            "
+        >
+            <div class="workflow-name" data-bind="text: workflowName() + ' Workflow'">{% trans "Insert Workflow Name" %}</div>
+
+            <div
+                style="
+                    padding-left: 10px;
+                "
+            >
+                <i
+                    data-bind="
+                        click: activeStep().showInformationBox,
+                        css: {
+                            seen: activeStep().informationBoxData().hidden,
+                            unseen: !activeStep().informationBoxData().hidden,
+                        }
+                    "
+                    style="color: darkblue; font-size: 14px; cursor: pointer;" 
+                    class="fa fa-question-circle tabbed-workflow-information-box-marker"
+                ></i>
+            </div>
+        </div>
+
+
 
         <div>
             <!--ko if: activeStep()._index+1 !== steps.length -->
@@ -72,29 +99,55 @@
             </ul>
         </div>
 
-        <!--ko if: activeStep().informationBoxData -->
-        <div 
-            class='step-information-box-container' 
-            style="
-                background-color: #fff; 
-                padding: 25px;
-                padding-bottom: unset;
-                margin-right: 50px;
-            "
-        >
-            <div
-                class='step-information-box'
+        <!--ko if: ko.unwrap(activeStep().informationBoxData) -->
+        <!-- ko with: activeStep -->
+            <div 
+                class='tabbed-workflow-step-information-box-container'
+                data-bind="
+                    css: {
+                        seen: !informationBoxData().hidden,
+                        unseen: informationBoxData().hidden,
+                    }
+                "
                 style="
-                    padding: 10px 20px 15px 20px;
-                    background-color: #fafafa;
-                    border: 1px solid #ddd;
-                    color: grey;
+                    margin-right: 50px;
                 "
             >
-                <h4 data-bind="text: ko.unwrap(activeStep().informationBoxData.heading)"></h4>
-                <span data-bind="text: ko.unwrap(activeStep().informationBoxData.text)"></span>
+                    <div
+                        style="
+                            padding: 20px;
+                            padding-bottom: unset;
+                        "
+                    >
+                        <div
+                            class='tabbed-workflow-step-information-box'
+                            style="
+                                padding: 10px 20px 20px 20px;
+                                background-color: #fafafa;
+                                border: 1px solid #ddd;
+                                color: grey;
+                            "
+                        >
+                            <h4 data-bind="text: informationBoxData().heading"></h4>
+                            <span data-bind="text: informationBoxData().text"></span>
+
+                            <div>
+                                <span 
+                                    data-bind="click: hideInformationBox"
+                                    style="
+                                        position: absolute; 
+                                        right: 40px; 
+                                        font-size: smaller;
+                                        cursor: pointer;
+                                    "
+                                >
+                                    dismiss
+                                </span>
+                            </div>
+                        </div>
+                    </div>
             </div>
-        </div>
+        <!-- /ko -->
         <!-- /ko -->
         
         <div class='tabbed-workflow-step-body'>

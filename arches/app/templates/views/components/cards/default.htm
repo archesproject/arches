@@ -279,7 +279,7 @@
                 <a class="pull-right card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
             </span>
             <!-- /ko -->
-            <h5 data-bind="text: card.model.instructions"></h5>
+            <h5 class="card-instructions" data-bind="text: card.model.instructions"></h5>
 
             <!-- ko if: card.isFuncNode && card.isFuncNode()  -->
             <h4 class="is-function-node" data-bind="text: card.isFuncNode()"></h4>

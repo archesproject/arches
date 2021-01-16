@@ -597,12 +597,44 @@ input[type="checkbox"] {
     overflow-y: auto;
 }
 
+.tabbed-workflow-information-box-marker.seen {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 1s;
+}
+
+.tabbed-workflow-information-box-marker.unseen {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.5s, visibility 0.5s;
+}
+
+
+.tabbed-workflow-step-information-box-container.seen {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 1s, height 0.5s;
+}
+
+.tabbed-workflow-step-information-box-container.unseen {
+    visibility: hidden;
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    animation: slide 1s;
+}
+@keyframes slide {
+    from {height: inherit;}
+    to {height: 0px;}
+}
+
 .tabbed-workflow-step-body .card-component {
     margin: unset;
     padding: 0 25px;
 }
 
-.tabbed-workflow-step-body .card-title {
+.tabbed-workflow-step-body .card-title, 
+.tabbed-workflow-step-body .card-instructions {
     display: none;
 }
 
@@ -757,6 +789,7 @@ div.wf-multi-tile-card-info div {
 
 .tabbed-workflow-title-bar {
     display: flex;
+    background-color: #eceef0;
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid #ddd;
@@ -845,6 +878,7 @@ div.wf-multi-tile-card-info div {
 
 .workflow-plugin {
     flex-grow: inherit;
+    background-color: #fff;
 }
 
 .workflow-select-plugin {

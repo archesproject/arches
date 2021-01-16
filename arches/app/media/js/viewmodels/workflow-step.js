@@ -15,16 +15,14 @@ define([
         this.subtitle = '';
         this.description = '';
 
-        this.informationBoxData = {
-            heading: ko.observable(),
-            text: ko.observable(),
-        };
-
+        this.informationBoxData = ko.observable();
         if (config.informationboxdata) {
-            self.informationBoxData['heading'](config.informationboxdata['heading']);
-            self.informationBoxData['text'](config.informationboxdata['text']);
-        } else {
-            self.informationBoxData = null;  /* sets to falsey so template doesn't take up DOM space */
+            self.informationBoxData({
+                // hidden: self.getInformationBoxHiddenState(),
+                hidden: true,
+                heading: config.informationboxdata['heading'],
+                text: config.informationboxdata['text'],
+            })
         }
 
         this.complete = ko.observable(false);
@@ -45,6 +43,28 @@ define([
         });
 
         _.extend(this, config);
+
+        this.hideInformationBox = function() {
+            var informationBoxData = self.informationBoxData();
+            informationBoxData['hidden'] = true;
+
+            self.informationBoxData(informationBoxData);
+
+            // set localStorage
+        };
+
+        this.showInformationBox = function(foo) {
+            console.log("AAAAAAAAA", foo)
+            var informationBoxData = self.informationBoxData();
+            informationBoxData['hidden'] = false;
+            self.informationBoxData(informationBoxData);
+
+            // set localStorage
+        };
+
+        this.getInformationBoxHiddenState = function() {
+            // fetch localStorage
+        };
 
         this.iconClass = ko.computed(function(){
             var ret = '';
