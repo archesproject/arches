@@ -163,6 +163,7 @@ define([
                 self.formData.append("manifest_description", ko.unwrap(self.manifestDescription));
                 self.formData.append("operation", "create");
                 self.submitToManifest();
+                self.activeTab('manifest');
                 self.mainMenu(false);
             };
 
