@@ -1716,6 +1716,13 @@ div.final-cons-step-separator>h4 {
     z-index: 1001;
 }
 
+.manifest-manager-canvas-name {
+    width: 315px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .basemap-listing,
 .overlay-listing,
 .legend-listing {

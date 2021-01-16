@@ -133,12 +133,12 @@
     <div>{% trans "Select canvas to delete from the manifest" %}</div>
     <div class="file-workbench-files" data-bind="foreach: canvases">
         <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {staged: ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id']}">
-            <input type="checkbox" style="width:1em; height:1em;" data-bind="value: $data, checked: $parent.canvasesForDeletion">
+            <input type="checkbox" style="width:15px; height:15px;" data-bind="value: $data, checked: $parent.canvasesForDeletion">
             <!--ko if: ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id'] -->
-            <span class='file-name' data-bind="text: $parent.canvasLabel, click: $parent.canvasClick, clickBubble: false"></span>
+            <span class='file-name manifest-manager-canvas-name' data-bind="text: $parent.canvasLabel, click: $parent.canvasClick, clickBubble: false"></span>
             <!--/ko-->
             <!--ko ifnot: ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id'] -->
-            <span class='file-name' data-bind="text: label, click: $parent.canvasClick, clickBubble: false"></span>
+            <span class='file-name manifest-manager-canvas-name' data-bind="text: label, click: $parent.canvasClick, clickBubble: false"></span>
             <!--/ko-->
         </div>
     </div>
@@ -388,10 +388,10 @@
                         </div>
                         <div class="iiif-gallery-canvas-label">
                             <!--ko if: getCanvasService($data) === selectedCanvas() -->
-                            <span data-bind="text: $parent.canvasLabel"></span>
+                            <span class="manifest-manager-canvas-name" data-bind="text: $parent.canvasLabel"></span>
                             <!--/ko -->                                
                             <!--ko ifnot: getCanvasService($data) === selectedCanvas() -->
-                            <span data-bind="text: label"></span>
+                            <span class="manifest-manager-canvas-name" data-bind="text: label"></span>
                             <!--/ko -->                                
                             <span class="annotation-count">
                                 <!--ko if: getAnnotationCount(getCanvasService($data)) -->
