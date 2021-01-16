@@ -54,11 +54,45 @@
             </div>  
         <div class="row widget-wrapper">
         <label class="control-label">{% trans "Metadata" %}</label>
-        <div class="manifest-details-list">
-            <input type="text" placeholder='Metadata Label' class="form-control input-md" style="height: 36px;" 
-                data-bind="textInput: metaDataLabel, valueUpdate: 'keyup'">
-            <input type="text" placeholder='Metadata Value' class="form-control input-md" style="height: 36px;" 
-                data-bind="textInput: metaDataValues, valueUpdate: 'keyup'">
+        <div class="manifest-metadata" style="display: flex;">
+            <div style="display: flex; flex-direction: column; width: 100%;">
+            <div style="padding: 3px">
+                <input type="text" placeholder='Metadata Label' class="form-control input-md" style="height: 36px;" 
+                data-bind="textInput: metadataLabel, valueUpdate: 'keyup'">
+            </div>
+            <div style="padding: 3px">
+                 <input type="text" placeholder='Metadata Value' class="form-control input-md" style="height: 36px;" 
+                data-bind="textInput: metadataValues, valueUpdate: 'keyup'">
+            </div>
+            </div>
+            <div style="height: fit-content; padding-top: 15px; cursor: pointer;" data-bind="click: function(){updateMetadata()}">
+                <i class="fa fa-plus-circle pull-right"></i>
+            </div>
+        </div>
+        <hr>
+        <div data-bind="sortable: {
+                data: manifestMetadata,
+                options: {
+                    start: self.startDrag
+                },
+                beforeMove: self.beforeMove,
+                afterMove: function(){console.log('hi')}
+            }">  
+            <div style="padding-bottom: 2px; display: flex;">
+                <div style="display: flex; flex-direction: column; width: 100%;">
+                <div style="padding: 3px;">
+                    <input type="text" placeholder='Metadata Label' class="form-control input-md" style="height: 36px;" 
+                    data-bind="textInput: $data.label, valueUpdate: 'keyup'">
+                </div>
+                <div style="padding: 3px">
+                    <input type="text" placeholder='Metadata Value' class="form-control input-md" style="height: 36px;" 
+                    data-bind="textInput: $data.value, valueUpdate: 'keyup'">
+                </div>
+                </div>
+                <div style="height: fit-content; padding-top: 15px; cursor: pointer;" data-bind="click: function(){self.removeMetadata($data)}">
+                    <i class="fa fa-minus-circle pull-right"></i>
+                </div>
+            </div>
         </div>
         </div>
     </div>
@@ -274,7 +308,7 @@
                 <span data-bind="text: manifestDescription"></span>
             </h4>
 
-            <div class="manifest-details-list" data-bind="foreach: manifestMetaData">
+            <div class="manifest-details-list" data-bind="foreach: manifestMetadata">
                 <dt class="manifest-metadata-title" data-bind="text: label"></dt>
                 <!--ko foreach: Array.isArray(value) ? value : [value] -->
                 <dd class="manifest-metadata-value" data-bind="html: $data"></dd>

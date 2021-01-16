@@ -30,7 +30,7 @@ class ManifestManagerView(View):
     def post(self, request):
         self.iiif_proxy_uri = request.scheme + "://" + request.get_host() + "/iiifserver/"
 
-        def create_manifest(name="<manifest_title>", desc="<manifest_description>", file_url="file_url",  attribution="", logo="", canvases=[]):
+        def create_manifest(name="", desc="", file_url="file_url",  attribution="", logo="", canvases=[]):
             metadata = []  # {"label": "TBD", "value": ["Unknown", ...]}
             sequence_id = settings.CANTALOUPE_HTTP_ENDPOINT + "iiif/manifest/sequence/TBD.json"
 
@@ -139,9 +139,8 @@ class ManifestManagerView(View):
             if logo and logo != "":
                 manifest.manifest["logo"] = logo
 
-        def change_manifest_metadata(manifest, metadata_dict):  # To be fixed
-            for k, v in metadata_dict.items():
-                manifest.manifest["metadata"].append({"label": k, "value": v})
+        def change_manifest_metadata(manifest):  # To be fixed
+            manifest.manifest["metadata"] = metadata
 
         def change_canvas_label(manifest, canvas_id, label):
             # canvas_id = canvas['images'][0]['resource']['service']['@id']
@@ -167,9 +166,12 @@ class ManifestManagerView(View):
         manifest_url = request.POST.get("manifest")
         canvas_label = request.POST.get("canvas_label")
         canvas_id = request.POST.get("canvas_id")
-        metadata_label = request.POST.get("metadata_label")
-        metadata_values = request.POST.get("metadata_values")
+        metadata = request.POST.get("metadata")
         selected_canvases = request.POST.get("selected_canvases")
+        try:
+            metadata = json.loads(request.POST.get('metadata'))
+        except TypeError:
+            metadata = []
 
         if not os.path.exists(settings.CANTALOUPE_DIR):
             os.mkdir(settings.CANTALOUPE_DIR)
@@ -224,10 +226,8 @@ class ManifestManagerView(View):
                 logger.warning("You have to select a manifest to add images")
                 return None
 
-        if metadata_values is not None and metadata_values != "" and metadata_label is not None and metadata_label != "":
-            metadata_values_list = metadata_values.split(",")
-            metadata_dict = {metadata_label: metadata_values_list}
-            change_manifest_metadata(manifest, metadata_dict)
+        if metadata:
+            change_manifest_metadata(manifest)
 
         manifest.save()
         return JSONResponse(manifest)

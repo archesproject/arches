@@ -1,20 +1,21 @@
 define([
     'knockout',
+    'knockout-mapping',
     'jquery',
     'dropzone',
     'uuid',
     'arches',
     'views/components/iiif-viewer',
     'bindings/dropzone'
-], function(ko, $, Dropzone, uuid, arches, IIIFViewerViewmodel) {
+], function(ko, koMapping, $, Dropzone, uuid, arches, IIIFViewerViewmodel) {
     return ko.components.register('manifest-manager', {
         viewModel: function(params) {
             var self = this;
 
             this.imagesForUpload = ko.observableArray([]);
             this.canvasesForDeletion = ko.observableArray([]);
-            this.metaDataLabel = ko.observable('');
-            this.metaDataValues = ko.observable('');
+            this.metadataLabel = ko.observable('');
+            this.metadataValues = ko.observable('');
             this.mainMenu = ko.observable(true);
             this.manifestAttribution = ko.observable('');
             this.manifestLogo = ko.observable('');
@@ -36,7 +37,7 @@ define([
                         (ko.unwrap(self.manifestDescription) !== self.origManifestDescription) ||
                         (ko.unwrap(self.manifestAttribution) !== self.origManifestAttribution) ||
                         (ko.unwrap(self.manifestLogo) !== self.origManifestLogo) ||
-                        ((ko.unwrap(self.metaDataLabel) !== '') && (ko.unwrap(self.metaDataValues) !== ''))
+                        ((ko.unwrap(self.metadataLabel) !== '') && (ko.unwrap(self.metadataValues) !== ''))
                 );
             });
 
@@ -50,6 +51,21 @@ define([
             });
 
             this.formData = new window.FormData();
+
+            this.stagedMetadata = ko.computed(function(){
+                var res = {label: self.metadataLabel(), value: self.metadataValues()};
+                return res;
+            });
+
+            this.updateMetadata = function(){
+                this.manifestMetadata.unshift(koMapping.fromJS(this.stagedMetadata()));
+                self.metadataLabel(null);
+                self.metadataValues(null);
+            };
+
+            this.removeMetadata = function(val) {
+                this.manifestMetadata.remove(val);
+            };
 
             this.addAllCanvases = function() {
                 self.canvases().forEach(function(canvas){
@@ -72,8 +88,8 @@ define([
                 self.formData = new window.FormData();
                 self.imagesForUpload.removeAll();
                 self.clearCanvasSelection();
-                self.metaDataLabel('');
-                self.metaDataValues('');
+                self.metadataLabel('');
+                self.metadataValues('');
                 self.manifestName(self.origManifestName);
                 self.manifestAttribution(self.origManifestAttribution);
                 self.manifestLogo(self.origManifestLogo);
@@ -165,8 +181,7 @@ define([
                 self.formData.append("manifest", ko.unwrap(self.manifest));
                 self.formData.append("canvas_label", ko.unwrap(self.canvasLabel)); //new label for canvas
                 self.formData.append("canvas_id", ko.unwrap(self.canvas)); //canvas id for label change
-                self.formData.append("metadata_label", ko.unwrap(self.metaDataLabel));
-                self.formData.append("metadata_values", ko.unwrap(self.metaDataValues));
+                self.formData.append("metadata", JSON.stringify(koMapping.toJS(self.manifestMetadata)));
                 self.submitToManifest();
             };
 
