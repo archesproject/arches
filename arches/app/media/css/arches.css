@@ -2193,7 +2193,7 @@ div.final-cons-step-separator>h4 {
 .option-input {
     display: flex; 
     flex-wrap: wrap; 
-    max-width: 600px;
+    max-width: 100%;
 }
 
 .option-input-config {
@@ -6665,7 +6665,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .panel-config {
     flex-direction: row-reverse;
-    min-width: max-content;
 }
 
 .panel-config .middle-column-container {
