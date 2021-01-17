@@ -600,20 +600,19 @@ input[type="checkbox"] {
 .tabbed-workflow-information-box-marker.seen {
     visibility: visible;
     opacity: 1;
-    transition: opacity 1s;
+    transition: all 0.6s linear;
 }
 
 .tabbed-workflow-information-box-marker.unseen {
     visibility: hidden;
+    position: absolute;
     opacity: 0;
-    transition: opacity 0.5s, visibility 0.5s;
 }
-
 
 .tabbed-workflow-step-information-box-container.seen {
     visibility: visible;
     opacity: 1;
-    transition: opacity 1s, height 0.5s;
+    transition: all 0.8s linear;
 }
 
 .tabbed-workflow-step-information-box-container.unseen {
@@ -621,11 +620,6 @@ input[type="checkbox"] {
     position: absolute;
     width: 100%;
     opacity: 0;
-    animation: slide 1s;
-}
-@keyframes slide {
-    from {height: inherit;}
-    to {height: 0px;}
 }
 
 .tabbed-workflow-step-body .card-component {
@@ -810,12 +804,17 @@ div.wf-multi-tile-card-info div {
     min-width: max-content;
 }
 
+.workflow-nav-tab-list-item {
+    display: flex !important; /* override navs.less */
+    align-items: center;
+}
 .workflow-nav-tab {
+    width: 200px;
     padding: 10px 20px;
+    border-right: 1px solid #ddd;
 }
 
 .workflow-nav-tab.active {
-    padding: 10px 15px;
     background-color: #fff;
     font-weight: 600;
     border-left: 1px solid #ddd;
@@ -835,8 +834,9 @@ div.wf-multi-tile-card-info div {
     display: flex;
     align-items: center;
     cursor: pointer;
-    padding: 5px;
-    font-size: 14px;
+    padding: 4px;
+    padding-top: 6px;
+    font-size: 15px;
 }
 
 .workflow-nav-tab-arrow.disabled {

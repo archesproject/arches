@@ -12,24 +12,6 @@
             "
         >
             <div class="workflow-name" data-bind="text: workflowName() + ' Workflow'">{% trans "Insert Workflow Name" %}</div>
-
-            <div
-                style="
-                    padding-left: 10px;
-                "
-            >
-                <i
-                    data-bind="
-                        click: activeStep().showInformationBox,
-                        css: {
-                            seen: activeStep().informationBoxData().hidden,
-                            unseen: !activeStep().informationBoxData().hidden,
-                        }
-                    "
-                    style="color: darkblue; font-size: 14px; cursor: pointer;" 
-                    class="fa fa-question-circle tabbed-workflow-information-box-marker"
-                ></i>
-            </div>
         </div>
 
 
@@ -48,7 +30,7 @@
         <div class="workflow-nav-tab-container">
             <ul class="nav nav-tabs workflow-nav-tab-list">
                 <!--ko foreach: {data: steps, as: 'step'} -->
-                <li data-bind="css: { active: step.active() }">
+                <li class="workflow-nav-tab-list-item" data-bind="css: { active: step.active() }">
                     <div
                         class='workflow-nav-tab'
                         data-bind="{
@@ -60,7 +42,7 @@
                             click: function() { if ($parent.canStepBecomeActive(step)) { $parent.activeStep(step) }},
                         }" 
                     >
-                        <div style="display: flex; flex-direction: row;">
+                        <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
                             <span
                                 style="margin-right: 4px;"
                                 class="workflow-nav-tab-arrow"
@@ -75,9 +57,37 @@
                             >
                                 <i class="fa fa-caret-left"></i>
                             </span>
-                            
-                            <span style="padding: 2px;" data-bind="text: step.title()"></span>
-                            
+
+                            <!-- ko if: step.active() -->
+                            <!--ko if: ko.unwrap(step.informationBoxData) -->
+                            <div
+                                data-bind="
+                                    click: showInformationBox,
+                                "
+                            >
+                                <i
+                                    class="fa fa-info-circle tabbed-workflow-information-box-marker"
+                                    style="
+                                        font-size: 14px;
+                                        padding-left: 2px;
+                                        padding-right: 6px;
+                                        margin-top: 3px;
+                                        cursor: pointer;
+                                        color: #454545;
+                                    "
+                                    data-bind="
+                                        css: {
+                                            seen: step.informationBoxData().hidden,
+                                            unseen: !step.informationBoxData().hidden,
+                                        }
+                                    "
+                                ></i>
+                            </div>
+                            <!-- /ko -->
+                            <!-- /ko -->
+
+                            <span style="font-size: 14px" data-bind="text: step.title()"></span>
+
                             <span
                                 style="margin-left: 4px;"
                                 class="workflow-nav-tab-arrow"

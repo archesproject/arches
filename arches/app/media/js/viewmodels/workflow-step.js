@@ -53,10 +53,10 @@ define([
             // set localStorage
         };
 
-        this.showInformationBox = function(foo) {
-            console.log("AAAAAAAAA", foo)
+        this.showInformationBox = function() {
             var informationBoxData = self.informationBoxData();
             informationBoxData['hidden'] = false;
+            
             self.informationBoxData(informationBoxData);
 
             // set localStorage
