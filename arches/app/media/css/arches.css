@@ -12839,6 +12839,13 @@ a.jstree-anchor.permissions-widget {
     text-decoration: none;
 }
 
+.iiif-gallery-panel {
+    display: flex;
+    flex-direction: column;
+    width: inherit;
+}
+
+
 .gallery-expanded .iiif-gallery-panel {
     padding-left: 15px;
     margin-left: 225px;
@@ -12849,6 +12856,9 @@ a.jstree-anchor.permissions-widget {
     padding-left: 10px;
     position: sticky;
     left: 0px;
+    display: inline-flex;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .gallery-expanded .iiif-gallery-header {
@@ -12945,6 +12955,11 @@ a.jstree-anchor.permissions-widget {
     font-size: 0.9em;
     font-weight: 650;
     color: rgb(91, 155, 215);
+    width: 110px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: initial;
 }
 
 .iiif-gallery-canvas-label .annotation-count {

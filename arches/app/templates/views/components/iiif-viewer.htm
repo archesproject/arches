@@ -77,6 +77,11 @@
 
 {% block content_management %}
 <!-- ko foreach: { data: [$data], as: 'self' } -->
+<!--ko if: ko.unwrap(self.mainMenu) -->
+{% block main_menu %}
+{% endblock main_menu %}
+<!--/ko-->
+<!--ko if: !ko.unwrap(self.mainMenu) -->
 <div class="workbench-card-container" data-bind="css: {
         'gallery-visible': showGallery,
         'gallery-expanded': expandGallery
@@ -175,17 +180,26 @@
             <!--/ko -->
             <!--ko if: !manifestLoading() -->
             <div class="iiif-gallery-panel" style="overflow-x: auto;">
+                {% block gallery_header %}
                 <div class="iiif-gallery-header">
-                    <span class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor, text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
-                    |
-                    {% trans "Filter" %}
-                    <div class="list-filter" data-bind="">
-                        <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
+                    <div>
+                        <span data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
+                        |
+                        {% trans "Filter" %}
+                        <div class="list-filter" data-bind="">
+                            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
 
-                        <!-- Clear Search -->
-                        <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+                            <!-- Clear Search -->
+                            <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+                        </div>
+                    </div>
+                    <div style="display: inline-flex; padding: 5px">
+                        <div class="iiif-gallery-sequence-label" style="padding:0 5px" data-bind="click: toggleManifestEditor">
+                            {% trans "Switch Manifest" %}
+                        </div>
                     </div>
                 </div>
+                {% endblock gallery_header %}
 
                 <div class="iiif-gallery-sequence">
                     <div class="iiif-gallery-sequence-canvases" data-bind="foreach: canvases">
@@ -225,6 +239,7 @@
     </div>
     <!--/ko -->
 </div>
+<!--/ko -->
 <!--/ko -->
 <!--/ko -->
 {% endblock content_management %}
