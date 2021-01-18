@@ -64,7 +64,7 @@ define([
             value: this.manifest,
             clickBubble: true,
             multiple: false,
-            closeOnSlect: false,
+            closeOnSelect: false,
             allowClear: true,
             ajax: {
                 url: arches.urls.iiifmanifest,
