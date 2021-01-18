@@ -612,7 +612,7 @@ input[type="checkbox"] {
 .tabbed-workflow-step-information-box-container.seen {
     visibility: visible;
     opacity: 1;
-    transition: all 0.8s linear;
+    transition: all 0.6s linear;
 }
 
 .tabbed-workflow-step-information-box-container.unseen {
