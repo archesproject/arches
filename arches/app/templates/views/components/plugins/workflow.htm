@@ -14,8 +14,6 @@
             <div class="workflow-name" data-bind="text: workflowName() + ' Workflow'">{% trans "Insert Workflow Name" %}</div>
         </div>
 
-
-
         <div>
             <!--ko if: activeStep()._index+1 !== steps.length -->
             <button data-bind="click: finishWorkflow, css:{disabled: canFinish() === false}" class="btn btn-mint btn-labeled"><i class="btn-label ion-android-cloud-done"></i>{% trans "Finish" %}</button>
@@ -67,14 +65,6 @@
                             >
                                 <i
                                     class="fa fa-info-circle tabbed-workflow-information-box-marker"
-                                    style="
-                                        font-size: 14px;
-                                        padding-left: 2px;
-                                        padding-right: 6px;
-                                        margin-top: 3px;
-                                        cursor: pointer;
-                                        color: #454545;
-                                    "
                                     data-bind="
                                         css: {
                                             seen: step.informationBoxData().hidden,
@@ -131,12 +121,6 @@
                     >
                         <div
                             class='tabbed-workflow-step-information-box'
-                            style="
-                                padding: 10px 20px 20px 20px;
-                                background-color: #fafafa;
-                                border: 1px solid #ddd;
-                                color: grey;
-                            "
                         >
                             <h4 data-bind="text: informationBoxData().heading"></h4>
                             <span data-bind="text: informationBoxData().text"></span>

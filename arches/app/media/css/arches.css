@@ -597,6 +597,15 @@ input[type="checkbox"] {
     overflow-y: auto;
 }
 
+.tabbed-workflow-information-box-marker {
+    font-size: 14px;
+    padding-left: 2px;
+    padding-right: 6px;
+    margin-top: 3px;
+    cursor: pointer;
+    color: #454545;
+}
+
 .tabbed-workflow-information-box-marker.seen {
     visibility: visible;
     opacity: 1;
@@ -620,6 +629,13 @@ input[type="checkbox"] {
     position: absolute;
     width: 100%;
     opacity: 0;
+}
+
+.tabbed-workflow-step-information-box {
+    padding: 10px 20px 20px 20px;
+    background-color: #fafafa;
+    border: 1px solid #ddd;
+    color: grey;
 }
 
 .tabbed-workflow-step-body .card-component {
