@@ -33,7 +33,6 @@ define([
             require(components, function() { self.initialize(); });
         });
 
-        this.tabbedWorkflow = ko.observable(ko.unwrap(config.tabbedWorkflow));
         this.loading = config.loading || ko.observable(false);
 
         this.workflowName = ko.observable();
