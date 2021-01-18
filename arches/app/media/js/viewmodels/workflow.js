@@ -28,15 +28,12 @@ define([
         });
 
         this.ready = ko.observable(false);
-<<<<<<< HEAD
-=======
         this.ready.subscribe(function() {
             var components = _.unique(self.steps.map(function(step) {return step.component;}));
             require(components, function() { self.initialize(); });
         });
 
         this.tabbedWorkflow = ko.observable(ko.unwrap(config.tabbedWorkflow));
->>>>>>> eca1a6e76c24ff06b29ef51553a811e79f542806
         this.loading = config.loading || ko.observable(false);
 
         this.workflowName = ko.observable();
