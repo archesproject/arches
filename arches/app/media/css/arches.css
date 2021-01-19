@@ -1823,7 +1823,6 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-container {
     height: 100%;
-    margin-right: 75px;
 }
 
 .workbench-card-container.workbench-card-container-sidepanel-active {
@@ -7952,7 +7951,7 @@ a.mega-dropdown-toggle.disabled {
 
 .rr-table-row-panel {
     background: #fff;
-    border: none; 
+    border: none;
     border-top: 1px solid #ddd;
     padding: 20px 30px;
 }
@@ -7968,7 +7967,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rr-table-column:last-child {
-    border-right: none;   
+    border-right: none;
 }
 
 .rr-table-column button {
@@ -12123,7 +12122,7 @@ ul.select2-choices:after {
 }
 
 .left-panel-inner-container {
-    min-width: 300px; 
+    min-width: 300px;
     height: 100%;
 }
 
@@ -12733,7 +12732,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .workbench-card-container-sidepanel-active .workbench-card-container {
-    margin-right: 475px;
+    margin-right: 400px;
 }
 
 .add-new-crumb {
@@ -13109,6 +13108,15 @@ a.jstree-anchor.permissions-widget {
 .lang-switch .chosen-drop {
     font-size: 12px;
     color: #454545;
+}
+
+.leaflet-popup-content-wrapper {
+    border-radius: 3px;
+    padding: 0;
+}
+
+.leaflet-popup-content {
+    margin: 0;
 }
 
 @keyframes loader {
