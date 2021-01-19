@@ -21,7 +21,8 @@ define([
         this.title = '';
         this.subtitle = '';
         this.description = '';
-        
+
+        this.informationBoxData = ko.observable();        
         this.complete = ko.observable(false);
         this.required = ko.observable(ko.unwrap(config.required));
         this.autoAdvance = ko.observable(true);
@@ -64,6 +65,7 @@ define([
         });
 
         this.initialize = function() {
+            /* cached ID logic */ 
             var cachedId = ko.unwrap(config.id);
             if (cachedId) {
                 self.id(cachedId)
@@ -72,23 +74,41 @@ define([
                 self.id(uuid.generate());
             }
 
-            var cachedValue = self.getValueFromLocalStorage();
+            /* cached value logic */ 
+            var cachedValue = self.getFromLocalStorage('value');
             if (cachedValue) {
                 self.value(cachedValue);
                 self.complete(true);
             }
 
+            /* set value subscription */ 
             self.value.subscribe(function(value) {
-                self.setValueToLocalStorage(value);
+                self.setToLocalStorage('value', value);
             });
+
+            /* cached informationBox logic */ 
+            if (config.informationboxdata) {
+                self.informationBoxData({
+                    hidden: self.getInformationBoxHiddenStateFromLocalStorage(),
+                    heading: config.informationboxdata['heading'],
+                    text: config.informationboxdata['text'],
+                })
+            }
         };
 
-        this.getValueFromLocalStorage = function() {
-            return JSON.parse(localStorage.getItem(`${STEP_ID_LABEL}-${self.id()}`));
+        this.setToLocalStorage = function(key, value) {
+            localStorage.setItem(
+                `${STEP_ID_LABEL}-${self.id()}`, 
+                JSON.stringify({ [key]: value })
+            );
         };
 
-        this.setValueToLocalStorage = function(value) {
-            localStorage.setItem(`${STEP_ID_LABEL}-${self.id()}`, JSON.stringify(value));
+        this.getFromLocalStorage = function(key) {
+            var localStorageData = JSON.parse(localStorage.getItem(`${STEP_ID_LABEL}-${self.id()}`));
+
+            if (localStorageData) {
+                return localStorageData[key];
+            }
         };
 
         this.setStepIdToUrl = function() {
@@ -104,6 +124,26 @@ define([
                 self.externalStepData[key]['data'] = config.workflow.getStepData(externalStepSourceData[key]);
             });
         }
+
+        this.hideInformationBox = function() {
+            var informationBoxData = self.informationBoxData();
+            informationBoxData['hidden'] = true;
+
+            self.informationBoxData(informationBoxData);
+            self.setToLocalStorage('informationBoxHidden', true);
+        };
+
+        this.showInformationBox = function() {
+            var informationBoxData = self.informationBoxData();
+            informationBoxData['hidden'] = false;
+            
+            self.informationBoxData(informationBoxData);
+            self.setToLocalStorage('informationBoxHidden', false);
+        };
+
+        this.getInformationBoxHiddenStateFromLocalStorage = function() {
+            return self.getFromLocalStorage('informationBoxHidden')
+        };
 
         _.extend(this, config);
 

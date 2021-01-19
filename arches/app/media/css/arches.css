@@ -597,6 +597,57 @@ input[type="checkbox"] {
     overflow-y: auto;
 }
 
+.tabbed-workflow-information-box-marker {
+    font-size: 14px;
+    padding-left: 2px;
+    padding-right: 6px;
+    margin-top: 3px;
+    cursor: pointer;
+    color: #454545;
+}
+
+.tabbed-workflow-information-box-marker.seen {
+    visibility: visible;
+    opacity: 1;
+    transition: all 0.6s linear;
+}
+
+.tabbed-workflow-information-box-marker.unseen {
+    visibility: hidden;
+    position: absolute;
+    opacity: 0;
+}
+
+.tabbed-workflow-step-information-box-container.seen {
+    visibility: visible;
+    opacity: 1;
+    transition: all 0.6s linear;
+}
+
+.tabbed-workflow-step-information-box-container.unseen {
+    visibility: hidden;
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+}
+
+.tabbed-workflow-step-information-box {
+    padding: 10px 20px 20px 20px;
+    background-color: #fafafa;
+    border: 1px solid #ddd;
+    color: grey;
+}
+
+.tabbed-workflow-step-body .card-component {
+    margin: unset;
+    padding: 0 25px;
+}
+
+.tabbed-workflow-step-body .card-title, 
+.tabbed-workflow-step-body .card-instructions {
+    display: none;
+}
+
 .tabbed-workflow-step-body > div {
     background-color: #fff !important;
     border: none !important;
@@ -748,6 +799,7 @@ div.wf-multi-tile-card-info div {
 
 .tabbed-workflow-title-bar {
     display: flex;
+    background-color: #eceef0;
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid #ddd;
@@ -768,12 +820,17 @@ div.wf-multi-tile-card-info div {
     min-width: max-content;
 }
 
+.workflow-nav-tab-list-item {
+    display: flex !important; /* override navs.less */
+    align-items: center;
+}
 .workflow-nav-tab {
+    width: 200px;
     padding: 10px 20px;
+    border-right: 1px solid #ddd;
 }
 
 .workflow-nav-tab.active {
-    padding: 10px 15px;
     background-color: #fff;
     font-weight: 600;
     border-left: 1px solid #ddd;
@@ -793,8 +850,9 @@ div.wf-multi-tile-card-info div {
     display: flex;
     align-items: center;
     cursor: pointer;
-    padding: 5px;
-    font-size: 14px;
+    padding: 4px;
+    padding-top: 6px;
+    font-size: 15px;
 }
 
 .workflow-nav-tab-arrow.disabled {
@@ -836,6 +894,7 @@ div.wf-multi-tile-card-info div {
 
 .workflow-plugin {
     flex-grow: inherit;
+    background-color: #fff;
 }
 
 .workflow-select-plugin {
