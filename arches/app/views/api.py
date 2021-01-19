@@ -23,6 +23,7 @@ from django.http import Http404, HttpResponse
 from django.http.request import QueryDict
 from django.core import management
 from django.core.cache import cache
+from django.forms.models import model_to_dict
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.core.files.base import ContentFile
@@ -39,10 +40,7 @@ from arches.app.models.tile import Tile as TileProxyModel
 from arches.app.views.tile import TileData as TileView
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse
-from arches.app.utils.decorators import (
-    can_read_concept,
-    group_required
-)
+from arches.app.utils.decorators import can_read_concept, group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
@@ -1017,6 +1015,60 @@ class IIIFManifest(APIBase):
 
         response = JSONResponse({"results": manifests, "count": count})
         return response
+
+
+class IIIFAnnotations(APIBase):
+    def get(self, request):
+        canvas = request.GET.get("canvas", None)
+        resourceid = request.GET.get("resourceid", None)
+        nodeid = request.GET.get("nodeid", None)
+        permitted_nodegroups = [nodegroup for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]
+        annotations = models.VwAnnotation.objects.filter(nodegroup__in=permitted_nodegroups)
+        if canvas is not None:
+            annotations = annotations.filter(canvas=canvas)
+        if resourceid is not None:
+            annotations = annotations.filter(resourceinstance_id=resourceid)
+        if nodeid is not None:
+            annotations = annotations.filter(node_id=nodeid)
+        return JSONResponse(
+            {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "id": annotation.feature["id"],
+                        "geometry": annotation.feature["geometry"],
+                        "properties": {
+                            **annotation.feature["properties"],
+                            **{
+                                "nodeId": annotation.node_id,
+                                "nodegroupId": annotation.nodegroup_id,
+                                "resourceId": annotation.resourceinstance_id,
+                                "graphId": annotation.node.graph_id,
+                                "tileId": annotation.tile_id,
+                            },
+                        },
+                    }
+                    for annotation in annotations
+                ],
+            }
+        )
+
+
+class IIIFAnnotationNodes(APIBase):
+    def get(self, request, indent=None):
+        permitted_nodegroups = [nodegroup for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]
+        annotation_nodes = models.Node.objects.filter(nodegroup__in=permitted_nodegroups, datatype="annotation")
+        return JSONResponse(
+            [
+                {
+                    **model_to_dict(node),
+                    "graph_name": node.graph.name,
+                    "icon": node.graph.iconclass,
+                }
+                for node in annotation_nodes
+            ]
+        )
 
 
 class Manifest(APIBase):
