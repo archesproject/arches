@@ -6,10 +6,18 @@
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('imageTools');
 }, css: {
-    'active': activeTab() === 'imageTools'
+    'active': activeTab() === 'imageTools', 'disabled': !canvas() || expandGallery()
 }">
     <i class="fa fa-image"></i>
     <span class="map-sidebar-text">{% trans "Image" %}</span>
+</div>
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('annotations');
+}, css: {
+    'active': activeTab() === 'annotations'
+}">
+    <i class="fa fa-list"></i>
+    <span class="map-sidebar-text">{% trans "Overlays" %}</span>
 </div>
 {% endblock tabs %}
 
@@ -73,6 +81,33 @@
     </div>
 </div>
 <!--/ko -->
+<!--ko if: activeTab() === 'annotations' -->
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+        {% trans "Annotation Overlays" %}
+    </h4>
+</div>
+<div class="overlays-listing-container" data-bind="sortable: {
+    data: annotationNodes
+}">
+    <div class="overlay-listing" data-bind="css: {'active-overlay': active}">
+        <div class="overlay-name" data-bind="
+            click: function() {
+                active(!active());
+            }
+        ">
+            <i data-bind="css: icon" class="layer-listing-icon"></i>
+            <span data-bind="text: name"></span>
+        </div>
+        <div class="overlay-opacity-control">
+            <i class="fa fa-adjust"></i>
+            <div class="overlay-opacity-slider">
+                <input type="range" min="0" max="100" step="1" data-bind="value: opacity, valueUpdate: 'input'">
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ko -->
 {% endblock sidepanel %}
 
 {% block content_management %}
@@ -95,7 +130,7 @@
         click: toggleGallery,
         text: showGallery() ? '{% trans "hide" %}' : '{% trans "show" %}'
     "></a>
-    
+
     <!--ko if: expandGallery() -->
     <span style="padding-right: 3px; padding-left: 3px;">|</span>
     <a href="">{% trans "close info" %}</a>
@@ -159,8 +194,8 @@
                 <!--/ko -->
             </div>
         </div>
-            
-            
+
+
         <!--/ko -->
         <!--ko if: !editManifest() -->
             <!--ko if: manifestLoading() -->
