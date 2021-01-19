@@ -433,6 +433,7 @@ class Tile(models.TileModel):
     def delete(self, *args, **kwargs):
         se = SearchEngineFactory().create()
         request = kwargs.pop("request", None)
+        index = kwargs.pop("index", True)
         provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)
         for tile in self.tiles:
             tile.delete(*args, request=request, **kwargs)
@@ -444,29 +445,27 @@ class Tile(models.TileModel):
             user_is_reviewer = True
 
         if user_is_reviewer is True or self.user_owns_provisional(user):
-            query = Query(se)
-            bool_query = Bool()
-            bool_query.filter(Terms(field="tileid", terms=[self.tileid]))
-            query.add_query(bool_query)
-            results = query.search(index=TERMS_INDEX)["hits"]["hits"]
-
-            for result in results:
-                se.delete(index=TERMS_INDEX, id=result["_id"])
+            if index:
+                query = Query(se)
+                bool_query = Bool()
+                bool_query.filter(Terms(field="tileid", terms=[self.tileid]))
+                query.add_query(bool_query)
+                results = query.delete(index=TERMS_INDEX)
 
             self.__preDelete(request)
             self.save_edit(
-                user=request.user, edit_type="tile delete", old_value=self.data, provisional_edit_log_details=provisional_edit_log_details
+                user=user, edit_type="tile delete", old_value=self.data, provisional_edit_log_details=provisional_edit_log_details
             )
             try:
                 super(Tile, self).delete(*args, **kwargs)
-                for nodeid, value in self.data.items():
+                for nodeid in self.data.keys():
                     node = models.Node.objects.get(nodeid=nodeid)
                     datatype = self.datatype_factory.get_instance(node.datatype)
-                    datatype.post_tile_delete(self, nodeid)
-                resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
-                resource.index()
-            except IntegrityError:
-                logger.error
+                    datatype.post_tile_delete(self, nodeid, index=index)
+                if index:
+                    self.index()
+            except IntegrityError as e:
+                logger.error(e)
 
         else:
             self.apply_provisional_edit(user, data={}, action="delete")
