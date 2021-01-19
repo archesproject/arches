@@ -10,7 +10,7 @@
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12">
-            <div class="pad-hor columns" data-bind="foreach: flatOptions">
+            <div class="pad-hor columns option-input" data-bind="foreach: flatOptions">
                 <label class="form-radio form-normal form-text"
                     data-bind="css: {
                         'active': $parent.isOptionSelected($data),
@@ -38,7 +38,7 @@
         {% trans "Default Value" %}
     </div>
     <div class="col-xs-12">
-        <div class="pad-hor columns radio-panel" data-bind="foreach: flatOptions">
+        <div class="pad-hor columns radio-panel option-input-config" data-bind="foreach: flatOptions">
             <label class="form-radio form-normal form-text"
                 data-bind="css: {
                     'active': $parent.isOptionSelected($data)

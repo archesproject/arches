@@ -7,10 +7,12 @@
         <option value="lt"> < </option>
         <option value="gte"> >= </option>
         <option value="lte"> <= </option>
+        <option value="null">{% trans "Has no value" %}</option>
+        <option value="not_null">{% trans "Has any value" %}</option>
     </select>
 </div>
 
-<div class="col-md-8 col-lg-9">
+<div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
     <input type="" placeholder="{% trans "Date" %}" class="form-control input-md widget-input" data-bind="value: searchValue, datepicker: {format: dateFormat, viewMode: 'days', minDate: false, maxDate: false}">
 </div>
 <!-- /ko -->
