@@ -66,6 +66,7 @@
                         <div class="overlay-name" data-bind="
                             click: function() {
                                 onMap(!onMap());
+                                updateParent($parent);
                             }
                         ">
                             <i data-bind="css: icon" class="layer-listing-icon"></i>

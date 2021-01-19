@@ -12,6 +12,7 @@ define([
 ], function($, arches, ko, koMapping, geojsonExtent, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
+
         this.widgets = [];
         params.configKeys = [
             'selectRelatedSource',
@@ -69,6 +70,88 @@ define([
             }
             return nodeids;
         };
+
+        /* 
+            get/set logic to ensure all data values are equal between parent and children
+        */
+        this.basemap = ko.observable((function() {
+            for (var widget of self.widgets) {
+                if (widget.config.basemap) {
+                    return widget.config.basemap();
+                }
+            }
+        })());  // IIFE
+        this.basemap.subscribe(function(map) {
+            for (var widget of self.widgets) {
+                if (widget.config.basemap) {
+                    widget.config.basemap(map)
+                }
+            }
+        });
+                
+        this.overlayConfigs = ko.observable((function() {
+            for (var widget of self.widgets) {
+                if (widget.config.overlayConfigs) {
+                    return widget.config.overlayConfigs();
+                }
+            }
+        })());  // IIFE
+        this.overlayConfigs.subscribe(function(configs) {
+            for (var widget of self.widgets) {
+                if (widget.config.overlayConfigs) {
+                    widget.config.overlayConfigs(configs)
+                }
+            }
+        });
+
+        this.centerX = ko.observable((function() {
+            for (var widget of self.widgets) {
+                if (widget.config.centerX) {
+                    return widget.config.centerX();
+                }
+            }
+        })());  // IIFE
+        this.centerX.subscribe(function(x) {
+            for (var widget of self.widgets) {
+                if (widget.config.centerX) {
+                    widget.config.centerX(x)
+                }
+            }
+        });
+        
+        this.centerY = ko.observable((function() {
+            for (var widget of self.widgets) {
+                if (widget.config.centerY) {
+                    return widget.config.centerY();
+                }
+            }
+        })());  // IIFE
+        this.centerY.subscribe(function(y) {
+            for (var widget of self.widgets) {
+                if (widget.config.centerY) {
+                    widget.config.centerY(y)
+                }
+            }
+        });
+        
+        // local set/get
+        this.zoom = ko.observable(this.overviewzoom());
+        this.zoom.subscribe(function(zoom) {
+            self.config.overviewzoom(zoom);
+
+            for (var widget of self.widgets) {
+                if (widget.config.zoom) {
+                    widget.config.zoom(zoom)
+                }
+            }
+        });
+        
+        params.basemap = this.basemap;
+        params.overlayConfigs = this.overlayConfigs;
+        params.x = this.centerX;
+        params.y = this.centerY;
+        params.zoom = this.zoom;
+        
         this.hoverId = ko.observable();
         this.nodeids = getNodeIds();
         this.nodeDetails = ko.observableArray();

@@ -166,6 +166,7 @@ class DLanguage(models.Model):
     def __str__(self):
         return f"{self.languageid} ({self.languagename})"
 
+
 class DNodeType(models.Model):
     nodetype = models.TextField(primary_key=True)
     namespace = models.TextField()
@@ -695,9 +696,21 @@ class ResourceXResource(models.Model):
     relationshiptype = models.TextField(blank=True, null=True)
     inverserelationshiptype = models.TextField(blank=True, null=True)
     tileid = models.ForeignKey(
-        "TileModel", db_column="tileid", blank=True, null=True, related_name="resxres_tile_id", on_delete=models.CASCADE,
+        "TileModel",
+        db_column="tileid",
+        blank=True,
+        null=True,
+        related_name="resxres_tile_id",
+        on_delete=models.CASCADE,
     )
-    nodeid = models.ForeignKey("Node", db_column="nodeid", blank=True, null=True, related_name="resxres_node_id", on_delete=models.CASCADE,)
+    nodeid = models.ForeignKey(
+        "Node",
+        db_column="nodeid",
+        blank=True,
+        null=True,
+        related_name="resxres_node_id",
+        on_delete=models.CASCADE,
+    )
     datestarted = models.DateField(blank=True, null=True)
     dateended = models.DateField(blank=True, null=True)
     created = models.DateTimeField()
@@ -1060,10 +1073,10 @@ class UserProfile(models.Model):
     phone = models.CharField(max_length=16, blank=True)
 
     def is_reviewer(self):
-        """ DEPRECATED Use new pattern:
+        """DEPRECATED Use new pattern:
 
-            from arches.app.utils.permission_backend import user_is_resource_reviewer
-            is_reviewer = user_is_resource_reviewer(user)
+        from arches.app.utils.permission_backend import user_is_resource_reviewer
+        is_reviewer = user_is_resource_reviewer(user)
         """
         pass
 
@@ -1196,8 +1209,7 @@ class UserXNotificationType(models.Model):
 
 @receiver(post_save, sender=UserXNotification)
 def send_email_on_save(sender, instance, **kwargs):
-    """Checks if a notification type needs to send an email, does so if email server exists
-    """
+    """Checks if a notification type needs to send an email, does so if email server exists"""
 
     if instance.notif.notiftype is not None and instance.isread is False:
         if UserXNotificationType.objects.filter(user=instance.recipient, notiftype=instance.notif.notiftype, emailnotify=False).exists():
@@ -1366,3 +1378,18 @@ class GroupMapSettings(models.Model):
     class Meta:
         managed = True
         db_table = "group_map_settings"
+
+
+class VwAnnotation(models.Model):
+    feature_id = models.UUIDField(primary_key=True)
+    tile = models.ForeignKey(TileModel, on_delete=models.DO_NOTHING, db_column="tileid")
+    tiledata = JSONField()
+    resourceinstance = models.ForeignKey(ResourceInstance, on_delete=models.DO_NOTHING, db_column="resourceinstanceid")
+    nodegroup = models.ForeignKey(NodeGroup, on_delete=models.DO_NOTHING, db_column="nodegroupid")
+    node = models.ForeignKey(Node, on_delete=models.DO_NOTHING, db_column="nodeid")
+    feature = JSONField()
+    canvas = models.TextField()
+
+    class Meta:
+        managed = False
+        db_table = "vw_annotations"
