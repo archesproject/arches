@@ -37,7 +37,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber
             return val || self.value();
         }, self).extend({throttle: 600});
 
-        this.value(this.updateVal());
+        this.value(Number(this.updateVal()));
 
         this.displayValue = ko.pureComputed(function() {
             if (self.value() !== null && self.value() !== undefined) {

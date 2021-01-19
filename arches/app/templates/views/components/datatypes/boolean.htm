@@ -6,8 +6,11 @@
         width: '100%',
         disable_search_threshold: 15
     }, options: [
+        {id: '', name: '{% trans "Select an Option" %}'},
         {id: 't', name: trueLabel},
-        {id: 'f', name: falseLabel}
+        {id: 'f', name: falseLabel},
+        {id: 'null', name: '{% trans "Has no value" %}'},
+        {id: 'not_null', name: '{% trans "Has any value" %}'}
     ], optionsText: 'name', optionsValue: 'id'"></select>
 </div>
 {% endblock search %}

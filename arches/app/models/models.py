@@ -716,11 +716,11 @@ class ResourceXResource(models.Model):
     created = models.DateTimeField()
     modified = models.DateTimeField()
 
-    def delete(self, *args, **kwargs):
-        from arches.app.search.search_engine_factory import SearchEngineInstance as se
-        from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
-
-        se.delete(index=RESOURCE_RELATIONS_INDEX, id=self.resourcexid)
+    def delete(self, index=True, *args, **kwargs):
+        if index:
+            from arches.app.search.search_engine_factory import SearchEngineInstance as se
+            from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
+            se.delete(index=RESOURCE_RELATIONS_INDEX, id=self.resourcexid)
 
         # update the resource-instance tile by removing any references to a deleted resource
         deletedResourceId = kwargs.pop("deletedResourceId", None)

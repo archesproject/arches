@@ -2316,6 +2316,17 @@ div.final-cons-step-separator>h4 {
     padding-left: 22px;
 }
 
+.option-input {
+    display: flex; 
+    flex-wrap: wrap; 
+    max-width: 100%;
+}
+
+.option-input-config {
+    display: flex;
+    flex-direction: column;
+}
+
 span.icon-wrap.icon-circle.bg-gray-dark:hover {
     background: #94A6BC;
     color: #123;
@@ -6780,7 +6791,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .panel-config {
     flex-direction: row-reverse;
-    min-width: max-content;
 }
 
 .panel-config .middle-column-container {
@@ -10924,8 +10934,8 @@ table.table.dataTable {
 }
 
 .search-popup-panel {
-    position: absolute;
-    top: 0px;
+    position: fixed;
+    top: 101px;
     right: 0px;
     z-index: 900;
     background-color: #fff;
