@@ -171,7 +171,7 @@ class ManifestManagerView(View):
         metadata = request.POST.get("metadata")
         selected_canvases = request.POST.get("selected_canvases")
         try:
-            metadata = json.loads(request.POST.get('metadata'))
+            metadata = json.loads(request.POST.get("metadata"))
         except TypeError:
             metadata = []
 
