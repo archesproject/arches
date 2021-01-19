@@ -45,9 +45,9 @@ define([
         });
 
         this.completeOnSave = params.completeOnSave === false ? false : true;
-        this.altButtons =  params.altButtons || ko.observable(null);
-        this.hideDefaultButtons = params.hideDefaultButtons || ko.observable(false);
+
         this.loading(true);
+
         this.customCardLabel = params.customCardLabel || false;
         var flattenTree = function(parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {

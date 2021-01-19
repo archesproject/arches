@@ -602,6 +602,10 @@ input[type="checkbox"] {
     border: none !important;
 }
 
+.tabbed-workflow-step-body .install-buttons {
+    display: none;
+}
+
 .workflow-step-body .workbench-card-wrapper {
     margin-left: -25px;
 }
