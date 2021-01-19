@@ -1,55 +1,56 @@
 {% load i18n %}
 
-<!-- ko with: step -->
-    <!--ko if: informationBoxData -->
-    <div 
-        class='tabbed-workflow-step-information-box-container'
-        data-bind="
-            css: {
-                seen: !informationBoxData().hidden,
-                unseen: informationBoxData().hidden,
-            }
-        "
-        style="
-            margin-right: 50px;
-        "
-    >
-        <div
+<div class='tabbed-workflow-step-body'>
+    <!-- ko with: step -->
+        <!--ko if: informationBoxData -->
+        <div 
+            class='tabbed-workflow-step-information-box-container'
+            data-bind="
+                css: {
+                    seen: !informationBoxData().hidden,
+                    unseen: informationBoxData().hidden,
+                }
+            "
             style="
-                padding: 20px;
-                padding-bottom: unset;
+                margin-right: 50px;
             "
         >
             <div
-                class='tabbed-workflow-step-information-box'
+                style="
+                    padding: 20px;
+                    padding-bottom: unset;
+                "
             >
-                <h4 data-bind="text: informationBoxData().heading"></h4>
-                <span data-bind="text: informationBoxData().text"></span>
+                <div
+                    class='tabbed-workflow-step-information-box'
+                >
+                    <h4 data-bind="text: informationBoxData().heading"></h4>
+                    <span data-bind="text: informationBoxData().text"></span>
 
-                <div>
-                    <span 
-                        data-bind="click: hideInformationBox"
-                        style="
-                            position: absolute; 
-                            right: 40px; 
-                            font-size: smaller;
-                            cursor: pointer;
-                        "
-                    >
-                        {% trans "dismiss" %}
-                    </span>
+                    <div>
+                        <span 
+                            data-bind="click: hideInformationBox"
+                            style="
+                                position: absolute; 
+                                right: 40px; 
+                                font-size: smaller;
+                                cursor: pointer;
+                            "
+                        >
+                            {% trans "dismiss" %}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- /ko -->
+        <!-- /ko -->
 
-    <div class='tabbed-workflow-step-body'>
         <!--ko if: componentname-->
             <!-- ko component: {
                 name: componentname,
                 params: $data,
             } --><!--/ko-->
         <!--/ko-->
-    </div>
-<!-- /ko -->
+    <!-- /ko -->
+</div>
+
