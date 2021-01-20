@@ -97,16 +97,6 @@
         </div>
     </div>
 
-
-    <!--ko if: imagesForUpload().length > 0-->
-    <label class="control-label">{% trans "Images to be Added" %}</label>
-    <div class="file-workbench-files" data-bind="foreach: imagesForUpload">
-        <div class='file-workbench-file' style="display: inline-flex;" data-bind="click: $parent.removeFile, clickBubble: false">
-            <i class="fa fa-trash" style="margin: 0px 10px"></i>
-            <span class='file-name' data-bind="text: name"></span>
-        </div>
-    </div>
-    <!--/ko-->
     
     <div class="install-buttons" style="display: inline-flex; justify-content: space-between;">
         <div style="display: flex;">
@@ -163,17 +153,6 @@
     <!--/ko-->
     <!--/ko-->
         
-    <!--ko if: imagesForUpload().length > 0-->
-    <label class="control-label">{% trans "Images to be Added" %}</label>
-    <div class="file-workbench-files" data-bind="foreach: imagesForUpload">
-        <div class='file-workbench-file' style="display: inline-flex;" data-bind="click: $parent.removeFile, clickBubble: false">
-            <i class="fa fa-trash" style="margin: 0px 10px"></i>
-            <span class='file-name' data-bind="text: name"></span>
-        </div>
-    </div>
-    <!--/ko-->
-
-
     <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
         <div class="file-workbench-buttons">
             <button class="btn btn-primary btn-lg btn-block btn-labeled btn-workbench fa fa-upload fileinput-button dz-clickable" data-bind="css: uniqueidClass">

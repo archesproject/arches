@@ -12,7 +12,6 @@ define([
         viewModel: function(params) {
             var self = this;
 
-            this.imagesForUpload = ko.observableArray([]);
             this.canvasesForDeletion = ko.observableArray([]);
             this.metadataLabel = ko.observable('');
             this.metadataValues = ko.observable('');
@@ -79,14 +78,10 @@ define([
                 self.canvasesForDeletion([]);
             };
 
-            this.removeFile = function(file){
-                self.imagesForUpload.remove(file);
-            };
 
             this.reset = function() {
                 self.formData.delete("files");
                 self.formData = new window.FormData();
-                self.imagesForUpload.removeAll();
                 self.clearCanvasSelection();
                 self.metadataLabel('');
                 self.metadataValues('');
@@ -157,7 +152,7 @@ define([
             this.createManifest = function(fileList){
                 Array.from(fileList).forEach(function(file) {
                     self.formData.append("files", file, file.name);
-                    self.imagesForUpload.push(file);});
+                });
                 self.formData.append("manifest_title", ko.unwrap(self.manifestName));
                 self.formData.append("manifest_description", ko.unwrap(self.manifestDescription));
                 self.formData.append("operation", "create");
@@ -169,7 +164,7 @@ define([
             this.addFiles = function(fileList) {
                 Array.from(fileList).forEach(function(file) {
                     self.formData.append("files", file, file.name);
-                    self.imagesForUpload.push(file);});
+                });
                 self.updateManifest();
             };
 
@@ -198,7 +193,6 @@ define([
                     this.on("addedfiles", self.createManifest); 
                     this.on("error", function(file, error) {
                         file.error = error;
-                        self.imagessForUpload.valueHasMutated();
                     });    
                 }
             };
@@ -216,7 +210,6 @@ define([
                     this.on("addedfiles", self.addFiles);
                     this.on("error", function(file, error) {
                         file.error = error;
-                        self.imagessForUpload.valueHasMutated();
                     });    
                 }
             };
