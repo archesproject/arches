@@ -31,7 +31,7 @@ class ManifestManagerView(View):
         self.iiif_proxy_uri = request.scheme + "://" + request.get_host() + "/iiifserver/"
 
         def create_manifest(
-            name="<manifest_title>", desc="<manifest_description>", file_url="file_url", attribution="", logo="", canvases=[]
+            name="", desc="", file_url="file_url", attribution="", logo="", canvases=[]
         ):
             metadata = []  # {"label": "TBD", "value": ["Unknown", ...]}
             sequence_id = settings.CANTALOUPE_HTTP_ENDPOINT + "iiif/manifest/sequence/TBD.json"
