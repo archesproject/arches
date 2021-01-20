@@ -95,7 +95,7 @@ define([
                 }
             };
 
-            this.submitToManifest = function(){
+            this.submitToManifest = function(onSuccess, onError){
                 $.ajax({
                     type: "POST",
                     url: arches.urls.manifest_manager,
@@ -107,11 +107,17 @@ define([
                         self.reset();
                         self.manifest(response.url);
                         self.getManifestData();
+                        if (onSuccess) {
+                            onSuccess();
+                        }
                     },
                     error: function() {
                         self.reset();
                         // eslint-disable-next-line no-console
                         console.log("Failed to save manifest");
+                        if (onError) {
+                            onError();
+                        }
                     }
                 });
             };
@@ -156,9 +162,14 @@ define([
                 self.formData.append("manifest_title", ko.unwrap(self.manifestName));
                 self.formData.append("manifest_description", ko.unwrap(self.manifestDescription));
                 self.formData.append("operation", "create");
-                self.submitToManifest();
-                self.activeTab('manifest');
-                self.mainMenu(false);
+                var onSuccess = function() {
+                    self.activeTab('manifest');
+                    self.mainMenu(false);
+                };
+                var onError = function() {
+                    self.mainMenu(true);
+                };
+                self.submitToManifest(onSuccess, onError);
             };
 
             this.addFiles = function(fileList) {
