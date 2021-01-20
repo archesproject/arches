@@ -12800,7 +12800,7 @@ a.jstree-anchor.permissions-widget {
     padding-left: 0px;
     display: inline-block;
     white-space: nowrap;
-    vertical-align: inherit;
+    vertical-align: top;
 }
 
 .iiif-viewer-gallery.gallery-expanded .iiif-gallery-canvas,
