@@ -157,7 +157,7 @@
             </h3>
 
             <h4>
-                <span data-bind="text: manifestDescription"></span>
+                <span data-bind="html: manifestDescription"></span>
             </h4>
 
             <div class="manifest-details-list" data-bind="foreach: manifestMetadata">
@@ -166,10 +166,8 @@
                 <dd class="manifest-metadata-value" data-bind="html: $data"></dd>
                 <!--/ko -->
             </div>
-            <h4 data-bind="text: manifestData().attribution || ''"></h4>
-            <!--ko if: manifestData().logo -->
-            <img class="manifest-logo" data-bind="attr: {src: typeof manifestData().logo === 'string' ? manifestData().logo : manifestData().logo['@id']}">
-            <!--/ko -->
+            <h4 data-bind="text: manifestAttribution"></h4>
+            <img class="manifest-logo" data-bind="attr: {src: manifestLogo()}">
         </div>
         <!--/ko -->
 
