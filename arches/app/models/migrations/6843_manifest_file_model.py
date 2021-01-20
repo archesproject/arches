@@ -7,7 +7,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "6838_add_manifest_json"),
+        ("models", "6837_add_annotations_view"),
     ]
 
     operations = [
