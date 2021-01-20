@@ -112,12 +112,11 @@ define([
                         self.reset();
                         self.manifest(response.url);
                         self.getManifestData();
-                        console.log('Submitted');
                     },
-                    error: function(response) {
+                    error: function() {
                         self.reset();
-                        console.log(response);
-                        console.log("Failed");
+                        // eslint-disable-next-line no-console
+                        console.log("Failed to save manifest");
                     }
                 });
             };
@@ -146,11 +145,11 @@ define([
                         self.manifestName(null);
                         self.manifestDescription(null);
                         self.expandGallery(true);
-                        console.log('Deleted');
                     },
                     error: function() {
                         self.reset();
-                        console.log("Failed to Delete");
+                        // eslint-disable-next-line no-console
+                        console.log("Failed to delete manifest");
                     }
                 });
             };
