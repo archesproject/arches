@@ -87,7 +87,8 @@ define([
                     if (value) return value.features;
                     else return [];
                 }),
-                selectedTool: ko.observable()
+                selectedTool: ko.observable(),
+                dropErrors: ko.observableArray()
             };
             self.featureLookup[id].selectedTool.subscribe(function(tool) {
                 if (self.draw) {
@@ -553,19 +554,21 @@ define([
                 geoJSON.features = geoJSON.features.filter(function(feature) {
                     return feature.geometry;
                 });
-                self.map().fitBounds(
-                    geojsonExtent(geoJSON),
-                    {
-                        padding: padding
-                    }
-                );
-                geoJSON.features.forEach(function(feature) {
-                    feature.id = uuid.generate();
-                    if (!feature.properties) feature.properties = {};
-                    feature.properties.nodeId = nodeId;
-                    self.draw.add(feature);
-                });
-                self.updateTiles();
+                if (geoJSON.features.length > 0) {
+                    self.map().fitBounds(
+                        geojsonExtent(geoJSON),
+                        {
+                            padding: padding
+                        }
+                    );
+                    geoJSON.features.forEach(function(feature) {
+                        feature.id = uuid.generate();
+                        if (!feature.properties) feature.properties = {};
+                        feature.properties.nodeId = nodeId;
+                        self.draw.add(feature);
+                    });
+                    self.updateTiles();
+                }
             }
             return errors;
         };
@@ -579,25 +582,29 @@ define([
             var promises = [];
             for (var i = 0; i < files.length; i++) {
                 var extension = files[i].name.split('.').pop();
-                if (!['kml', 'json', 'geojson'].includes(extension)) return;
-
-                promises.push(new Promise(function(resolve) {
-                    var file = files[i];
-                    var extension = file.name.split('.').pop();
-                    var reader = new window.FileReader();
-                    reader.onload = function(e) {
-                        var geoJSON;
-                        if (['json', 'geojson'].includes(extension))
-                            geoJSON = JSON.parse(e.target.result);
-                        else
-                            geoJSON = toGeoJSON.kml(
-                                new window.DOMParser()
-                                    .parseFromString(e.target.result, "text/xml")
-                            );
-                        resolve(geoJSON);
-                    };
-                    reader.readAsText(file);
-                }));
+                if (!['kml', 'json', 'geojson'].includes(extension)) {
+                    errors.push({
+                        message: 'File unsupported: "' + files[i].name + '"'
+                    });
+                } else {
+                    promises.push(new Promise(function(resolve) {
+                        var file = files[i];
+                        var extension = file.name.split('.').pop();
+                        var reader = new window.FileReader();
+                        reader.onload = function(e) {
+                            var geoJSON;
+                            if (['json', 'geojson'].includes(extension))
+                                geoJSON = JSON.parse(e.target.result);
+                            else
+                                geoJSON = toGeoJSON.kml(
+                                    new window.DOMParser()
+                                        .parseFromString(e.target.result, "text/xml")
+                                );
+                            resolve(geoJSON);
+                        };
+                        reader.readAsText(file);
+                    }));
+                }
             }
             Promise.all(promises).then(function(results) {
                 var geoJSON = {
@@ -610,6 +617,7 @@ define([
                 errors = errors.concat(
                     addFromGeoJSON(JSON.stringify(geoJSON), nodeId)
                 );
+                self.featureLookup[nodeId].dropErrors(errors);
             });
         };
 
