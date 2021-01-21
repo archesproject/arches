@@ -573,11 +573,7 @@ define([
             return errors;
         };
 
-        self.dropZoneHandler = function(data, e) {
-            var nodeId = data.node.nodeid;
-            e.stopPropagation();
-            e.preventDefault();
-            var files = e.originalEvent.dataTransfer.files;
+        self.handleFiles = function(files, nodeId) {
             var errors = [];
             var promises = [];
             for (var i = 0; i < files.length; i++) {
@@ -621,10 +617,38 @@ define([
             });
         };
 
+        self.dropZoneHandler = function(data, e) {
+            var nodeId = data.node.nodeid;
+            e.stopPropagation();
+            e.preventDefault();
+            var files = e.originalEvent.dataTransfer.files;
+            self.handleFiles(files, nodeId);
+            self.dropZoneLeaveHandler(data, e);
+        };
+
         self.dropZoneOverHandler = function(data, e) {
             e.stopPropagation();
             e.preventDefault();
             e.originalEvent.dataTransfer.dropEffect = 'copy';
+        };
+
+        self.dropZoneClickHandler = function(data, e) {
+            var fileInput = e.target.parentNode.querySelector('.hidden-file-input input');
+            var event = window.document.createEvent("MouseEvents");
+            event.initEvent("click", true, false);
+            fileInput.dispatchEvent(event);
+        };
+
+        self.dropZoneEnterHandler = function(data, e) {
+            e.target.classList.add('drag-hover');
+        };
+
+        self.dropZoneLeaveHandler = function(data, e) {
+            e.target.classList.remove('drag-hover');
+        };
+
+        self.dropZoneFileSelected = function(data, e) {
+            self.handleFiles(e.target.files, data.node.nodeid);
         };
     };
     return viewModel;

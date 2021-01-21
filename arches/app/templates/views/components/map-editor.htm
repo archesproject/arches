@@ -149,9 +149,18 @@
                                         </div>
                                         <div class="map-data-drop-area" data-bind="event: {
                                             dragover: self.dropZoneOverHandler,
-                                            drop: self.dropZoneHandler
+                                            drop: self.dropZoneHandler,
+                                            click: self.dropZoneClickHandler,
+                                            dragenter: self.dropZoneEnterHandler,
+                                            dragleave: self.dropZoneLeaveHandler,
+                                            dragend: self.dropZoneLeaveHandler
                                         }">
                                             {% trans "Drag GeoJSON or KML files here to add..." %}
+                                        </div>
+                                        <div class="hidden-file-input">
+                                            <input type="file" accept=".json,.geojson,.kml" data-bind="event: {
+                                                change: self.dropZoneFileSelected
+                                            }"/>
                                         </div>
                                         <!-- ko if: self.featureLookup[widget.node_id()].dropErrors().length !== 0 -->
                                         <div class="geojson-error-list">

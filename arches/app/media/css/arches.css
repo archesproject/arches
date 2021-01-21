@@ -7884,7 +7884,7 @@ a.mega-dropdown-toggle.disabled {
 
 .rr-table-row-panel {
     background: #fff;
-    border: none; 
+    border: none;
     border-top: 1px solid #ddd;
     padding: 20px 30px;
 }
@@ -7900,7 +7900,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rr-table-column:last-child {
-    border-right: none;   
+    border-right: none;
 }
 
 .rr-table-column button {
@@ -12055,7 +12055,7 @@ ul.select2-choices:after {
 }
 
 .left-panel-inner-container {
-    min-width: 300px; 
+    min-width: 300px;
     height: 100%;
 }
 
@@ -12668,6 +12668,10 @@ a.jstree-anchor.permissions-widget {
     margin-right: 475px;
 }
 
+.hidden-file-input {
+    display: none;
+}
+
 .add-new-crumb {
     float: right;
     cursor: pointer;
@@ -12684,6 +12688,14 @@ a.jstree-anchor.permissions-widget {
     border: 1px dashed #808080;
     color: #808080;
     margin: 5px;
+    cursor: pointer;
+}
+
+.map-data-drop-area:hover,
+.map-data-drop-area.drag-hover {
+    border: 1px dashed black;
+    color: black;
+    background-color: #EEEEEE;
 }
 
 .iiif-gallery-content {
