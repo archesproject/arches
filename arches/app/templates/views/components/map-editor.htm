@@ -148,8 +148,8 @@
                                             "></select>
                                         </div>
                                         <div class="map-data-drop-area" data-bind="event: {
-                                            dragover: dropZoneOverHandler,
-                                            drop: dropZoneHandler
+                                            dragover: self.dropZoneOverHandler,
+                                            drop: self.dropZoneHandler
                                         }">
                                             {% trans "Drag GeoJSON or KML files here to add..." %}
                                         </div>
