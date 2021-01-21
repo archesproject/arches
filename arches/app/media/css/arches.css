@@ -591,6 +591,12 @@ input[type="checkbox"] {
     padding: 0 0 218px 25px;
 }
 
+.tabbed-workflow {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
 .tabbed-workflow-step-body {
     background-color: #fff;
     height: 100%;
@@ -654,7 +660,7 @@ input[type="checkbox"] {
 }
 
 .tabbed-workflow-step-body .install-buttons {
-    display: none;
+    /* display: none; */
 }
 
 .workflow-step-body .workbench-card-wrapper {
