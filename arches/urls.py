@@ -256,7 +256,11 @@ urlpatterns = [
     # Uncomment the next line to enable the admin:
     url(r"^admin/", admin.site.urls),
     url("i18n/", include("django.conf.urls.i18n")),
-    url(r"^password_reset/$", PasswordResetView.as_view(), name="password_reset",),
+    url(
+        r"^password_reset/$",
+        PasswordResetView.as_view(),
+        name="password_reset",
+    ),
     url(r"^password_reset/done/$", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     url(
         r"^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$",
@@ -266,6 +270,8 @@ urlpatterns = [
     url(r"^reset/done/$", auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
     url(r"^o/", include("oauth2_provider.urls", namespace="oauth2")),
     url(r"^iiifmanifest$", api.IIIFManifest.as_view(), name="iiifmanifest"),
+    url(r"^iiifannotations$", api.IIIFAnnotations.as_view(), name="iiifannotations"),
+    url(r"^iiifannotationnodes$", api.IIIFAnnotationNodes.as_view(), name="iiifannotationnodes"),
     url(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
 ]
 
