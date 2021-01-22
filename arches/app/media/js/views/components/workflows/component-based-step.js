@@ -4,6 +4,7 @@ define([
     'arches',
     'knockout',
     'knockout-mapping',
+    'viewmodels/card',
 ], function(_, $, arches, ko, koMapping) {
     function Section(sectionTitle, componentConfigs) {
         if (!componentConfigs) {
