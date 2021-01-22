@@ -19,8 +19,7 @@
                     name: componentConfig.componentName(),
                     params: { 
                         value: componentConfig.value,
-                        graphids: componentConfig.graphIds(),
-                        renderContext: "workflow"
+                        ...componentConfig.parameters()
                     }
                 },
             }'></div>

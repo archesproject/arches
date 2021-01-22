@@ -28,8 +28,8 @@ define([
             required: ko.observable(componentConfig.required),
             uniqueInstanceName: ko.observable(componentConfig.uniqueInstanceName),
             componentName: ko.observable(componentConfig.componentName),
-            graphIds: ko.observable(componentConfig.graphIds),
-            value: ko.mapping.fromJS(componentConfig.value),
+            parameters: ko.observable(componentConfig.parameters),
+            value: ko.mapping.fromJS(componentConfig.value),  /* mapping all values to observables */
         }
     };
 
@@ -54,7 +54,6 @@ define([
             else {
                 this.updatePageLayout(params.layoutSections);
             }
-    
         };
 
         this.updatePageLayout = function(layoutSections) {
