@@ -591,68 +591,6 @@ input[type="checkbox"] {
     padding: 0 0 218px 25px;
 }
 
-.tabbed-workflow-step-body {
-    background-color: #fff;
-    height: 100%;
-    overflow-y: auto;
-}
-
-.tabbed-workflow-information-box-marker {
-    font-size: 14px;
-    padding-left: 2px;
-    padding-right: 6px;
-    margin-top: 3px;
-    cursor: pointer;
-    color: #454545;
-}
-
-.tabbed-workflow-information-box-marker.seen {
-    visibility: visible;
-    opacity: 1;
-    transition: all 0.6s linear;
-}
-
-.tabbed-workflow-information-box-marker.unseen {
-    visibility: hidden;
-    position: absolute;
-    opacity: 0;
-}
-
-.tabbed-workflow-step-information-box-container.seen {
-    visibility: visible;
-    opacity: 1;
-    transition: all 0.6s linear;
-}
-
-.tabbed-workflow-step-information-box-container.unseen {
-    visibility: hidden;
-    position: absolute;
-    width: 100%;
-    opacity: 0;
-}
-
-.tabbed-workflow-step-information-box {
-    padding: 10px 20px 20px 20px;
-    background-color: #fafafa;
-    border: 1px solid #ddd;
-    color: grey;
-}
-
-.tabbed-workflow-step-body .card-component {
-    margin: unset;
-    padding: 0 25px;
-}
-
-.tabbed-workflow-step-body .card-title, 
-.tabbed-workflow-step-body .card-instructions {
-    display: none;
-}
-
-.tabbed-workflow-step-body > div {
-    background-color: #fff !important;
-    border: none !important;
-}
-
 .workflow-step-body .workbench-card-wrapper {
     margin-left: -25px;
 }
@@ -797,69 +735,6 @@ div.wf-multi-tile-card-info div {
     border-top: 1px solid #ddd;
 }
 
-.tabbed-workflow-title-bar {
-    display: flex;
-    background-color: #eceef0;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid #ddd;
-    padding: 6px 64px 6px 12px;
-    font-size: medium;
-    font-weight: 600;
-}
-
-.workflow-nav-tab-container {
-    width: 100vw;
-    overflow-x: scroll;
-}
-
-.workflow-nav-tab-list {
-    padding: 0px 50px 0px 10px;
-    background-color: #fafafa;
-    display: flex;
-    min-width: max-content;
-}
-
-.workflow-nav-tab-list-item {
-    display: flex !important; /* override navs.less */
-    align-items: center;
-}
-.workflow-nav-tab {
-    width: 200px;
-    padding: 10px 20px;
-    border-right: 1px solid #ddd;
-}
-
-.workflow-nav-tab.active {
-    background-color: #fff;
-    font-weight: 600;
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-}
-
-.workflow-nav-tab.inactive {
-    cursor: pointer;
-}
-
-.workflow-nav-tab.disabled {
-    color: darkgrey;
-    cursor: not-allowed;
-}
-
-.workflow-nav-tab-arrow {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    padding: 4px;
-    padding-top: 6px;
-    font-size: 15px;
-}
-
-.workflow-nav-tab-arrow.disabled {
-    color: #a9a9a9;
-    cursor: default;
-}
-
 .workflow-nav-controls {
     width: 60px;
     display: flex;
@@ -894,7 +769,6 @@ div.wf-multi-tile-card-info div {
 
 .workflow-plugin {
     flex-grow: inherit;
-    background-color: #fff;
 }
 
 .workflow-select-plugin {
@@ -1743,7 +1617,6 @@ div.final-cons-step-separator>h4 {
 .workbench-card-sidebar-tab.disabled {
     color: #aaa;
     cursor: auto;
-    pointer-events: none;
 }
 
 .workbench-card-sidebar-tab i {
@@ -1882,6 +1755,7 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-container {
     height: 100%;
+    margin-right: 75px;
 }
 
 .workbench-card-container.workbench-card-container-sidepanel-active {
@@ -8020,7 +7894,7 @@ a.mega-dropdown-toggle.disabled {
 
 .rr-table-row-panel {
     background: #fff;
-    border: none;
+    border: none; 
     border-top: 1px solid #ddd;
     padding: 20px 30px;
 }
@@ -8036,7 +7910,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rr-table-column:last-child {
-    border-right: none;
+    border-right: none;   
 }
 
 .rr-table-column button {
@@ -12191,7 +12065,7 @@ ul.select2-choices:after {
 }
 
 .left-panel-inner-container {
-    min-width: 300px;
+    min-width: 300px; 
     height: 100%;
 }
 
@@ -12801,7 +12675,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .workbench-card-container-sidepanel-active .workbench-card-container {
-    margin-right: 400px;
+    margin-right: 475px;
 }
 
 .add-new-crumb {
@@ -13177,15 +13051,6 @@ a.jstree-anchor.permissions-widget {
 .lang-switch .chosen-drop {
     font-size: 12px;
     color: #454545;
-}
-
-.leaflet-popup-content-wrapper {
-    border-radius: 3px;
-    padding: 0;
-}
-
-.leaflet-popup-content {
-    margin: 0;
 }
 
 @keyframes loader {
