@@ -6,7 +6,8 @@
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('imageTools');
 }, css: {
-    'active': activeTab() === 'imageTools', 'disabled': !canvas() || expandGallery()
+    'active': activeTab() === 'imageTools',
+    'disabled': !canvas() || expandGallery()
 }">
     <i class="fa fa-image"></i>
     <span class="map-sidebar-text">{% trans "Image" %}</span>
@@ -14,7 +15,8 @@
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('annotations');
 }, css: {
-    'active': activeTab() === 'annotations'
+    'active': activeTab() === 'annotations',
+    'disabled': !canvas() || expandGallery()
 }">
     <i class="fa fa-list"></i>
     <span class="map-sidebar-text">{% trans "Overlays" %}</span>

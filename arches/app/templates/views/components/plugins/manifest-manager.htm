@@ -6,7 +6,8 @@
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('manifest');
 }, css: {
-    'active': activeTab() === 'manifest'
+    'active': activeTab() === 'manifest',
+    'disabled': mainMenu()
 }">
     <i class="fa fa-book"></i>
     <span class="map-sidebar-text">{% trans "Manifest" %}</span>
