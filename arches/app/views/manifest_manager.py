@@ -20,6 +20,8 @@ logger = logging.getLogger(__name__)
 
 
 class ManifestManagerView(View):
+    cantaloupe_uri = f"{settings.CANTALOUPE_HTTP_ENDPOINT.rstrip('/')}/iiif"
+
     def delete(self, request):
         data = JSONDeserializer().deserialize(request.body)
         manifest = data.get("manifest")
@@ -28,13 +30,10 @@ class ManifestManagerView(View):
         return JSONResponse({"success": True})
 
     def post(self, request):
-        self.iiif_proxy_uri = request.scheme + "://" + request.get_host() + "/iiifserver/"
-
-        def create_manifest(
-            name="", desc="", file_url="file_url", attribution="", logo="", canvases=[]
-        ):
+ 
+        def create_manifest(name="", desc="", file_url="file_url", attribution="", logo="", canvases=[]):
             metadata = []  # {"label": "TBD", "value": ["Unknown", ...]}
-            sequence_id = settings.CANTALOUPE_HTTP_ENDPOINT + "iiif/manifest/sequence/TBD.json"
+            sequence_id = f"{self.cantaloupe_uri}/manifest/sequence/TBD.json"
 
             return {
                 "@context": "http://iiif.io/api/presentation/2/context.json",
@@ -62,8 +61,8 @@ class ManifestManagerView(View):
             }
 
         def create_canvas(image_json, file_url, file_name, image_id):
-            canvas_id = f"{settings.CANTALOUPE_HTTP_ENDPOINT}iiif/manifest/canvas/{image_id}.json"
-            image_id = f"{settings.CANTALOUPE_HTTP_ENDPOINT}iiif/manifest/annotation/{image_id}.json"
+            canvas_id = f"{self.cantaloupe_uri}/manifest/canvas/{image_id}.json"
+            image_id = f"{self.cantaloupe_uri}/manifest/annotation/{image_id}.json"
 
             return {
                 "@id": canvas_id,
@@ -120,8 +119,8 @@ class ManifestManagerView(View):
             new_image.save()
 
             file_name = os.path.basename(new_image.image.name)
-            file_url = self.iiif_proxy_uri + "iiif/2/" + file_name
-            file_json_url = settings.CANTALOUPE_HTTP_ENDPOINT + "/iiif/2/" + file_name + "/info.json"
+            file_url = f"{request.scheme}://{request.get_host()}/iiifserver/iiif/2/{file_name}"
+            file_json_url = f"{self.cantaloupe_uri}/2/{file_name}/info.json"
             image_json = self.fetch(file_json_url)
             return image_json, new_image_id, file_url
 
