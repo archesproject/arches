@@ -14,19 +14,19 @@ define([
             sectionTitle: sectionTitle,
             componentConfigs: componentConfigs,
         };
-    };
+    }
 
     function ComponentConfig(componentConfig) {
-        var componentConfig = ko.toJS(componentConfig);
+        var parsedComponentConfig = ko.toJS(componentConfig);
 
         return {
-            required: ko.observable(componentConfig.required),
-            uniqueInstanceName: ko.observable(componentConfig.uniqueInstanceName),
-            componentName: ko.observable(componentConfig.componentName),
-            parameters: ko.observable(componentConfig.parameters),
-            value: ko.mapping.fromJS(componentConfig.value),  /* mapping all values to observables */
+            required: ko.observable(parsedComponentConfig.required),
+            uniqueInstanceName: ko.observable(parsedComponentConfig.uniqueInstanceName),
+            componentName: ko.observable(parsedComponentConfig.componentName),
+            parameters: ko.observable(parsedComponentConfig.parameters),
+            value: ko.mapping.fromJS(parsedComponentConfig.value),  /* mapping all values to observables */
         };
-    };
+    }
 
     function viewModel(params) {
         var self = this;
@@ -58,16 +58,16 @@ define([
 
             var hasAllRequiredComponentData = function(requiredComponentData) {
                 return Object.values(requiredComponentData).reduce(function(acc, value) {
-                    if (!value()) { acc = false }
+                    if (!value()) { acc = false; }
                     return acc;
                 }, true);
             };
 
             ko.toJS(layoutSections).forEach(function(layoutSection) {
-                var section = new Section(layoutSection.sectionTitle)
+                var section = new Section(layoutSection.sectionTitle);
 
-                layoutSection.componentConfigs.forEach(function(componentConfig) {
-                    var componentConfig = new ComponentConfig(componentConfig);
+                layoutSection.componentConfigs.forEach(function(componentConfigData) {
+                    var componentConfig = new ComponentConfig(componentConfigData);
 
                     /* save value on update */ 
                     componentConfig.value.subscribe(function() {
@@ -114,7 +114,7 @@ define([
             **/
             var wastebin;
             if (ko.unwrap(params.wastebin)) {
-                wastebin = koMapping.toJS(params.wastebin)
+                wastebin = koMapping.toJS(params.wastebin);
             }
 
             return {
@@ -124,7 +124,7 @@ define([
         };
 
         this.initialize();
-    };
+    }
 
     ko.components.register('component-based-step', {
         viewModel: viewModel,
