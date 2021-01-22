@@ -255,7 +255,11 @@ urlpatterns = [
     # Uncomment the next line to enable the admin:
     url(r"^admin/", admin.site.urls),
     url("i18n/", include("django.conf.urls.i18n")),
-    url(r"^password_reset/$", PasswordResetView.as_view(), name="password_reset",),
+    url(
+        r"^password_reset/$",
+        PasswordResetView.as_view(),
+        name="password_reset",
+    ),
     url(r"^password_reset/done/$", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     url(
         r"^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$",

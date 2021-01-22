@@ -1072,10 +1072,10 @@ class UserProfile(models.Model):
     phone = models.CharField(max_length=16, blank=True)
 
     def is_reviewer(self):
-        """ DEPRECATED Use new pattern:
+        """DEPRECATED Use new pattern:
 
-            from arches.app.utils.permission_backend import user_is_resource_reviewer
-            is_reviewer = user_is_resource_reviewer(user)
+        from arches.app.utils.permission_backend import user_is_resource_reviewer
+        is_reviewer = user_is_resource_reviewer(user)
         """
         pass
 
@@ -1208,8 +1208,7 @@ class UserXNotificationType(models.Model):
 
 @receiver(post_save, sender=UserXNotification)
 def send_email_on_save(sender, instance, **kwargs):
-    """Checks if a notification type needs to send an email, does so if email server exists
-    """
+    """Checks if a notification type needs to send an email, does so if email server exists"""
 
     if instance.notif.notiftype is not None and instance.isread is False:
         if UserXNotificationType.objects.filter(user=instance.recipient, notiftype=instance.notif.notiftype, emailnotify=False).exists():
