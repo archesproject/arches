@@ -8,13 +8,13 @@ define([
         init: function(el, valueAccessor, allBindingsAccessor) {
             var allBindings = allBindingsAccessor().select2Query;
             var select2Config = ko.utils.unwrapObservable(allBindings.select2Config);
-
             select2Config = Object.assign({}, select2Config);
             select2Config = _.defaults(select2Config, {
                 clickBubble: true,
                 multiple: false,
                 allowClear: true,
             });
+            var value = select2Config.value;
 
             ko.utils.domNodeDisposal.addDisposeCallback(el, function() {
                 $(el).select2('destroy');
@@ -33,16 +33,13 @@ define([
             }
 
             //select2Config.value = value();
-
             $(el).select2(select2Config);
 
-            var value = select2Config.value;
             if (value) {
-                $(el).select2("val", value(), true);
+                $(el).select2("val", value());
                 value.subscribe(function(newVal) {
                     select2Config.value = newVal;
-                    $(el).select2("val", newVal, true);
-                    $(el).text = 'hohoho'
+                    $(el).select2("val", newVal);
                 }, this);
                 $(el).on("change", function(val) {
                     if (val.val === "") {

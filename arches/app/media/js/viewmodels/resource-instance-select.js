@@ -368,7 +368,6 @@ define([
                 }
             },
             initSelection: function(ele, callback) {
-                console.log(self.value())
                 if(self.renderContext === "search" && self.value() !== "") {
                     var values = self.value();
                     if(!Array.isArray(self.value())){

@@ -49,8 +49,6 @@ define([
             if (self.complete() === true) {
                 var cachedValue = ko.unwrap(params.value);
 
-                console.log(cachedValue)
-    
                 if (cachedValue && cachedValue.pageLayout.sections) {
                     this.updatePageLayout(cachedValue.pageLayout.sections);
                 }
