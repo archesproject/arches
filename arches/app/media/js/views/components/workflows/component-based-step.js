@@ -4,10 +4,7 @@ define([
     'arches',
     'knockout',
     'knockout-mapping',
-    'models/graph',
-    'viewmodels/card',
-    'viewmodels/alert',
-], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, AlertViewModel) {
+], function(_, $, arches, ko, koMapping) {
     function Section(sectionTitle, componentConfigs) {
         if (!componentConfigs) {
             componentConfigs = ko.observableArray();
@@ -16,7 +13,7 @@ define([
         return {
             sectionTitle: sectionTitle,
             componentConfigs: componentConfigs,
-        }
+        };
     };
 
     function ComponentConfig(componentConfig) {
@@ -28,7 +25,7 @@ define([
             componentName: ko.observable(componentConfig.componentName),
             parameters: ko.observable(componentConfig.parameters),
             value: ko.mapping.fromJS(componentConfig.value),  /* mapping all values to observables */
-        }
+        };
     };
 
     function viewModel(params) {
