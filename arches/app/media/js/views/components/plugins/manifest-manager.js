@@ -146,6 +146,8 @@ define([
                         self.manifestName(null);
                         self.manifestDescription(null);
                         self.expandGallery(true);
+                        self.mainMenu(true);
+                        self.activeTab(undefined);
                     },
                     error: function() {
                         self.reset();
@@ -168,6 +170,7 @@ define([
                 };
                 var onError = function() {
                     self.mainMenu(true);
+                    self.activeTab(undefined);
                 };
                 self.submitToManifest(onSuccess, onError);
             };
