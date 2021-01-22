@@ -16,11 +16,9 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from base64 import b64decode
-from datetime import datetime
-import logging
 import os
-from django.contrib.auth import authenticate
+import logging
+from datetime import datetime
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
 from django.http import HttpResponseNotFound
@@ -198,7 +196,7 @@ def export_results(request):
     total = int(request.GET.get("total", 0))
     format = request.GET.get("format", "tilecsv")
     download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
-    if total > download_limit and format != "geojson":
+    if total > download_limit:
         celery_worker_running = task_management.check_if_celery_available()
         if celery_worker_running is True:
             request_values = dict(request.GET)
@@ -217,7 +215,6 @@ def export_results(request):
     else:
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format)
-
         if len(export_files) == 0 and format == "shp":
             message = _(
                 "Either no instances were identified for export or no resources have exportable geometry nodes\

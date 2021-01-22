@@ -13,37 +13,27 @@ define([
         var self = this;
 
         this.resourceId = ko.observable();
-
-        var cachedValue = ko.unwrap(params.value);
-        if (cachedValue) {
-            self.resourceId(cachedValue.resourceid);
-            params.tileid(cachedValue.tileid);
+        if (params.workflow) {
+            if (!params.resourceid()) {
+                if (params.workflow.state.steps[params._index]) {
+                    this.resourceId(params.workflow.state.steps[params._index].resourceid);
+                } else {
+                    this.resourceId(params.workflow.state.resourceid);
+                }
+            } else {
+                this.resourceId = params.resourceid;
+            }
+            if (params.workflow.state.steps[params._index]) {
+                params.tileid(params.workflow.state.steps[params._index].tileid);
+            }
         }
 
-        if (ko.unwrap(params.resourceid)) {
-            self.resourceId(ko.unwrap(params.resourceid));
-        } 
-        else if (ko.unwrap(params.workflow.resourceId)) {
-            self.resourceId(ko.unwrap(params.workflow.resourceId));
-        } 
-
-        this.getCardResourceIdOrGraphId = function() { // override for different cases
-            return (ko.unwrap(this.resourceId) || ko.unwrap(params.graphid));
-        };
-
+        this.url = arches.urls.api_card + (ko.unwrap(this.resourceId) || ko.unwrap(params.graphid));
         this.card = ko.observable();
         this.tile = ko.observable();
-        
         this.loading = params.loading || ko.observable(false);
         this.alert = params.alert || ko.observable(null);
-        
         this.complete = params.complete || ko.observable();
-        this.complete.subscribe(function(isComplete) {
-            if (isComplete) {
-                params.value(params.defineStateProperties());
-            }
-        });
-
         this.completeOnSave = params.completeOnSave === false ? false : true;
         this.altButtons =  params.altButtons || ko.observable(null);
         this.hideDefaultButtons = params.hideDefaultButtons || ko.observable(false);
@@ -63,9 +53,7 @@ define([
         self.topCards = [];
 
         this.getJSON = function() {
-            var url = arches.urls.api_card + this.getCardResourceIdOrGraphId();
-
-            $.getJSON(url, function(data) {
+            $.getJSON(self.url, function(data) {
                 var handlers = {
                     'after-update': [],
                     'tile-reset': []
@@ -219,26 +207,33 @@ define([
                 }
             }
             return {
-                resourceid: ko.unwrap(params.resourceid),
+                resourceid: ko.unwrap(params.resourceid) || this.workflow.state.resourceid,
                 tile: !!(ko.unwrap(params.tile)) ? koMapping.toJS(params.tile().data) : undefined,
                 tileid: !!(ko.unwrap(params.tile)) ? ko.unwrap(params.tile().tileid): undefined,
                 wastebin: wastebin
             };
         };
 
+
+        this.setStateProperties = function(){
+            //Sets properties in defineStateProperties to the state.
+            if (params.workflow) {
+                params.workflow.state.steps[params._index] = params.defineStateProperties();
+            }
+        };
+
         self.onSaveSuccess = function(tiles) {
             var tile;
-            
             if (tiles.length > 0 || typeof tiles == 'object') {
                 tile = tiles[0] || tiles;
                 params.resourceid(tile.resourceinstance_id);
                 params.tileid(tile.tileid);
-
                 self.resourceId(tile.resourceinstance_id);
             }
-
-            params.value(params.defineStateProperties());
-            
+            self.setStateProperties();
+            if (params.workflow) {
+                params.workflow.updateUrl();
+            }
             if (self.completeOnSave === true) { self.complete(true); }
         };
 

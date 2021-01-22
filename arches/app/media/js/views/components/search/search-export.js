@@ -1,8 +1,7 @@
 define(['jquery',
     'knockout',
     'arches',
-    'bindings/fadeVisible',
-    'bindings/clipboard'],
+    'bindings/fadeVisible'],
 function($, ko, arches) {
     var componentName = 'search-export';
     return ko.components.register(componentName, {
@@ -29,15 +28,6 @@ function($, ko, arches) {
                 return url;
             });
 
-            this.geojsonUrl = ko.pureComputed(function(){
-                if (ko.unwrap(self.format()) === 'geojson') {
-                    var exportPath = self.url().replace('search/export_results', 'api/search/export_results');
-                    return window.location.origin + exportPath;
-                } else {
-                    return null;
-                }
-            });
-
             this.getExportData = function(){
                 var payload = ko.unwrap(this.query);
                 self.downloadPending(true);
@@ -61,9 +51,7 @@ function($, ko, arches) {
             };
 
             this.executeExport = function(limit){
-                if (ko.unwrap(self.format()) === 'geojson' && this.total() <= limit) {
-                    window.open(this.geojsonUrl());
-                } else if (this.total() > limit) {
+                if (this.total() > limit) {
                     this.getExportData();
                 } else if (this.total() > 0) {
                     window.open(this.url());
