@@ -71,6 +71,11 @@ define([
                 layoutSection.componentConfigs.forEach(function(componentConfig) {
                     var componentConfig = new ComponentConfig(componentConfig);
 
+                    /* save value on update */ 
+                    componentConfig.value.subscribe(function(value) {
+                        params.value(params.defineStateProperties());
+                    });
+
                     /* if a component is marked as 'required' let's add a subscription to track its value */ 
                     if (componentConfig.required()) {
                         self.requiredComponentData[componentConfig.uniqueInstanceName()] = ko.observable();
@@ -95,9 +100,6 @@ define([
         };
 
         this.finish = function() {
-            console.log("AAAA", params.defineStateProperties())
-            params.value(params.defineStateProperties());
-
             if (self.complete() === false) {
                 self.complete(true);
             }

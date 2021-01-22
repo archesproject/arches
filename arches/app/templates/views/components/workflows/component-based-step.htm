@@ -1,20 +1,22 @@
 {% load i18n %}
-
-<!-- ko foreach: { data: pageLayout.sections(), as: 'layoutSection'} -->
 <div>
-    <div 
-        data-bind="text: layoutSection.sectionTitle"
-    ></div>
-    <!-- ko foreach: { data: layoutSection.componentConfigs(), as: 'componentConfig'} -->
-        <div data-bind='{
-            component: {
-                name: componentConfig.componentName(),
-                params: { 
-                    value: componentConfig.value,
-                    graphids: componentConfig.graphIds(),
-                }
-            },
-        }'></div>
+    <!-- ko foreach: { data: pageLayout.sections(), as: 'layoutSection'} -->
+    <div>
+        <div 
+            data-bind="text: layoutSection.sectionTitle"
+        ></div>
+        <!-- ko foreach: { data: layoutSection.componentConfigs(), as: 'componentConfig'} -->
+            <div data-bind='{
+                component: {
+                    name: componentConfig.componentName(),
+                    params: { 
+                        value: componentConfig.value,
+                        graphids: componentConfig.graphIds(),
+                        renderContext: "workflow"
+                    }
+                },
+            }'></div>
+        <!-- /ko -->
+    </div>
     <!-- /ko -->
 </div>
-<!-- /ko -->

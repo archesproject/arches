@@ -40,6 +40,15 @@ define([
         this.preview = arches.graphs.length > 0;
         this.allowInstanceCreation = params.allowInstanceCreation === false ? false : true;
         this.renderContext = params.renderContext;
+
+        /* 
+            shoehorn logic to piggyback off of search context functionality. 
+            Should be refactored when we get the chance for better component clarity.
+        */ 
+        if (params.renderContext === 'workflow') {
+            self.renderContext = 'search';
+        }
+
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
 
@@ -176,9 +185,6 @@ define([
                                     self.displayValue(names.join(', '));
                                     val.resourceName(resourceInstance["_source"].displayname);
                                     val.ontologyClass(resourceInstance["_source"].root_ontology_class);
-
-                                    console.log(val.resourceId())
-                                    self.select2Config.value(val.resourceId());
                                 });
                         }
                     });
@@ -373,22 +379,35 @@ define([
                     if(!Array.isArray(self.value())){
                         values = [self.value()];
                     }
+
                     var lookups = [];
+
                     values.forEach(function(val){
-                        lookups.push(lookupResourceInstanceData(val)
-                            .then(function(resourceInstance) {
-                                return resourceInstance;
-                            })
-                        );
-                    });
-                    Promise.all(lookups).then(function(val){
-                        var ret = val.map(function(item) {
-                            return {"_source":{"displayname": item["_source"].displayname}, "_id":item["_id"]};
-                        });
-                        if(self.multiple === false) {
-                            ret = ret[0];
+                        var resourceId;
+                        if (typeof val === 'string') {
+                            resourceId = val;
                         }
-                        callback(ret);
+                        else if (ko.unwrap(val.resourceId)) {
+                            resourceId = ko.unwrap(val.resourceId);
+                        }
+
+                        var resourceInstance = lookupResourceInstanceData(resourceId).then(
+                            function(resourceInstance) { return resourceInstance }
+                        );
+           
+                        if (resourceInstance) { lookups.push(resourceInstance) }
+                    });
+
+                    Promise.all(lookups).then(function(arr){
+                        if (arr.length) {
+                            var ret = arr.map(function(item) {
+                                return {"_source":{"displayname": item["_source"].displayname}, "_id":item["_id"]};
+                            });
+                            if(self.multiple === false) {
+                                ret = ret[0];
+                            }
+                            callback(ret);
+                        }
                     });
                 }
             }
