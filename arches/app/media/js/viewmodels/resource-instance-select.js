@@ -392,10 +392,10 @@ define([
                         }
 
                         var resourceInstance = lookupResourceInstanceData(resourceId).then(
-                            function(resourceInstance) { return resourceInstance }
+                            function(resourceInstance) { return resourceInstance; }
                         );
            
-                        if (resourceInstance) { lookups.push(resourceInstance) }
+                        if (resourceInstance) { lookups.push(resourceInstance); }
                     });
 
                     Promise.all(lookups).then(function(arr){

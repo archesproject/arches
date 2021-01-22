@@ -1,5 +1,3 @@
-const { all } = require("underscore");
-
 define([
     'underscore',
     'jquery',
