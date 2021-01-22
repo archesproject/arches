@@ -194,7 +194,7 @@
     <a data-bind="text: resourceName, attr: { href: $parent.resourceReportUrl+resourceId() }" target="_blank"></a>
 </dd>
 <!-- /ko -->
-<!-- ko if: !!value() && value().length === 0 -->
+<!-- ko if: (!!value() && value().length === 0) || value() === null -->
 <dd>{% trans "None" %}</dd>
 <!-- /ko -->
 {% endblock report %}
