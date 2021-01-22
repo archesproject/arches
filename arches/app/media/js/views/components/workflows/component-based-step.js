@@ -1,3 +1,5 @@
+const { all } = require("underscore");
+
 define([
     'underscore',
     'jquery',
@@ -38,20 +40,16 @@ define([
         this.loading = params.loading || ko.observable(false);
         this.complete = params.complete || ko.observable(false);
 
-        this.requiredComponentData = {};
-
         /* source-of-truth for page data */
         this.pageLayout = {
             sections: ko.observableArray(),
         };
 
         this.initialize = function() {
-            if (self.complete() === true) {
-                var cachedValue = ko.unwrap(params.value);
+            var cachedValue = ko.unwrap(params.value);
 
-                if (cachedValue && cachedValue.pageLayout.sections) {
-                    this.updatePageLayout(cachedValue.pageLayout.sections);
-                }
+            if (cachedValue && cachedValue.pageLayout.sections) {
+                this.updatePageLayout(cachedValue.pageLayout.sections);
             }
             else {
                 this.updatePageLayout(params.layoutSections);
@@ -60,35 +58,35 @@ define([
         };
 
         this.updatePageLayout = function(layoutSections) {
-            self.requiredComponentData = {};
-            self.pageLayout.sections([]);
+            self.pageLayout.sections([]); /* clear page section data */
 
-            var layoutSections = ko.toJS(layoutSections);
+            var requiredComponentData = {};
 
-            layoutSections.forEach(function(layoutSection) {
+            var hasAllRequiredComponentData = function(requiredComponentData) {
+                return Object.values(requiredComponentData).reduce(function(acc, value) {
+                    if (!value()) { acc = false }
+                    return acc;
+                }, true);
+            };
+
+            ko.toJS(layoutSections).forEach(function(layoutSection) {
                 var section = new Section(layoutSection.sectionTitle)
 
                 layoutSection.componentConfigs.forEach(function(componentConfig) {
                     var componentConfig = new ComponentConfig(componentConfig);
 
                     /* save value on update */ 
-                    componentConfig.value.subscribe(function(value) {
+                    componentConfig.value.subscribe(function() {
                         params.value(params.defineStateProperties());
                     });
 
                     /* if a component is marked as 'required' let's add a subscription to track its value */ 
                     if (componentConfig.required()) {
-                        self.requiredComponentData[componentConfig.uniqueInstanceName()] = ko.observable();
+                        requiredComponentData[componentConfig.uniqueInstanceName()] = ko.observable(componentConfig.value());
 
                         componentConfig.value.subscribe(function(value) {
-                            self.requiredComponentData[componentConfig.uniqueInstanceName()](value);
-
-                            var allRequiredDataObtained = Object.values(self.requiredComponentData).reduce(function(acc, value) {
-                                if (!value()) { acc = false }
-                                return acc;
-                            }, true);
-
-                            if (allRequiredDataObtained) { self.finish(); }
+                            requiredComponentData[componentConfig.uniqueInstanceName()](value);
+                            hasAllRequiredComponentData(requiredComponentData) ? self.complete(true) : self.complete(false);
                         });
                     }
 
@@ -96,13 +94,8 @@ define([
                 });
 
                 self.pageLayout.sections.push(section);
+                hasAllRequiredComponentData(requiredComponentData) ? self.complete(true) : self.complete(false);
             });
-        };
-
-        this.finish = function() {
-            if (self.complete() === false) {
-                self.complete(true);
-            }
         };
 
         this.quit = function() {
