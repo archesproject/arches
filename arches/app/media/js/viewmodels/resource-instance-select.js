@@ -42,6 +42,7 @@ define([
         this.renderContext = params.renderContext;
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
+
         this.selectedItem = params.selectedItem || ko.observable();
         this.rootOntologyClass = '';
         this.graphIsSemantic = false;
@@ -112,7 +113,7 @@ define([
         };
         
         WidgetViewModel.apply(this, [params]);
-        
+
         this.displayValue = ko.observable('');
         
         //
@@ -175,6 +176,9 @@ define([
                                     self.displayValue(names.join(', '));
                                     val.resourceName(resourceInstance["_source"].displayname);
                                     val.ontologyClass(resourceInstance["_source"].root_ontology_class);
+
+                                    console.log(val.resourceId())
+                                    self.select2Config.value(val.resourceId());
                                 });
                         }
                     });
@@ -183,7 +187,7 @@ define([
     
             self.value.subscribe(updateNameAndOntologyClass);
             // Resolve Resource Instance Names from the incoming values
-            updateNameAndOntologyClass(self.value);
+            self.value.valueHasMutated();
 
             this.relationshipsInFilter = ko.computed(function() {
                 if(!self.value()) {
@@ -364,6 +368,7 @@ define([
                 }
             },
             initSelection: function(ele, callback) {
+                console.log(self.value())
                 if(self.renderContext === "search" && self.value() !== "") {
                     var values = self.value();
                     if(!Array.isArray(self.value())){

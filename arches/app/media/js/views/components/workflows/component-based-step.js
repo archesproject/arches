@@ -27,7 +27,7 @@ define([
             uniqueInstanceName: ko.observable(componentConfig.uniqueInstanceName),
             componentName: ko.observable(componentConfig.componentName),
             graphIds: ko.observable(componentConfig.graphIds),
-            value: ko.observable(componentConfig.value),
+            value: ko.mapping.fromJS(componentConfig.value),
         }
     };
 
