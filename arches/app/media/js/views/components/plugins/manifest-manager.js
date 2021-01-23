@@ -16,7 +16,6 @@ define([
             this.metadataLabel = ko.observable('');
             this.metadataValues = ko.observable('');
             this.mainMenu = ko.observable(true);
-            
             this.addCanvas = function(canvas) { //the function name needs to be better
                 self.canvasesForDeletion.push(canvas);
                 self.canvas(canvas.images[0].resource.service['@id']);
@@ -197,6 +196,7 @@ define([
                 self.formData.append("canvas_label", ko.unwrap(self.canvasLabel)); //new label for canvas
                 self.formData.append("canvas_id", ko.unwrap(self.canvas)); //canvas id for label change
                 self.formData.append("metadata", JSON.stringify(koMapping.toJS(self.manifestMetadata)));
+                self.updateCanvas = false;
                 self.submitToManifest();
             };
 

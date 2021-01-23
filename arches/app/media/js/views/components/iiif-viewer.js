@@ -367,18 +367,21 @@ define([
             if (canvas.images.length > 0) return canvas.images[0].resource.service['@id'];
         };
 
-
-        var updateCanvas = !self.canvas();
+        this.updateCanvas = !self.canvas();
         this.manifestData.subscribe(function(manifestData) {
             if (manifestData) {
-                if (updateCanvas && manifestData.sequences.length > 0) {
+                if (manifestData.sequences.length > 0) {
                     var sequence = manifestData.sequences[0];
+                    var canvasIndex = 0;
                     if (sequence.canvases.length > 0) {
-                        var canvas = sequence.canvases[0];
+                        if (!self.updateCanvas) {
+                            canvasIndex = sequence.canvases.findIndex(function(c){return c.images[0].resource.service['@id'] === self.canvas();});
+                        }
+                        var canvas = sequence.canvases[canvasIndex];
                         self.selectCanvas(canvas);
                     }    
                 }
-                updateCanvas = true;
+                self.updateCanvas = true;
                 self.origManifestName = self.getManifestDataValue(manifestData, 'label', true);
                 self.manifestName(self.origManifestName);
                 self.origManifestDescription = self.getManifestDataValue(manifestData, 'description', true);
