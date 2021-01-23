@@ -16,9 +16,7 @@ define([
             this.metadataLabel = ko.observable('');
             this.metadataValues = ko.observable('');
             this.mainMenu = ko.observable(true);
-            this.manifestAttribution = ko.observable('');
-            this.manifestLogo = ko.observable('');
-
+            
             this.addCanvas = function(canvas) { //the function name needs to be better
                 self.canvasesForDeletion.push(canvas);
                 self.canvas(canvas.images[0].resource.service['@id']);
@@ -36,9 +34,10 @@ define([
                         (ko.unwrap(self.manifestDescription) !== self.origManifestDescription) ||
                         (ko.unwrap(self.manifestAttribution) !== self.origManifestAttribution) ||
                         (ko.unwrap(self.manifestLogo) !== self.origManifestLogo) ||
-                        ((ko.unwrap(self.metadataLabel) !== '') && (ko.unwrap(self.metadataValues) !== ''))
-                );
-            });
+                        (ko.unwrap(self.metadataLabel)) ||
+                        (ko.unwrap(self.metadataValues)) ||
+                        (koMapping.toJSON(self.manifestMetadata) !== self.origManifestMetadata)
+                );});
 
             this.isCanvasDirty = ko.computed(function() {
                 return (ko.unwrap(self.canvasLabel) !== self.origCanvasLabel);
@@ -90,6 +89,12 @@ define([
                 self.manifestLogo(self.origManifestLogo);
                 self.manifestDescription(self.origManifestDescription);
                 self.canvasLabel(self.origCanvasLabel);
+                if (self.origManifestMetadata) {
+                    self.manifestMetadata.removeAll();
+                    JSON.parse(self.origManifestMetadata).forEach(function(entry){
+                        self.manifestMetadata.push(koMapping.fromJS(entry));
+                    });
+                }
                 if (self.dropzone) {
                     self.dropzone.removeAllFiles(true);
                 }
@@ -145,6 +150,7 @@ define([
                         self.canvas(null);
                         self.manifestName(null);
                         self.manifestDescription(null);
+                        self.manifestAttribution(null);
                         self.expandGallery(true);
                         self.mainMenu(true);
                         self.activeTab(undefined);

@@ -14,10 +14,10 @@ define([
     var IIIFViewerViewmodel = function(params) {
         var self = this;
         var abortFetchManifest;
-        var getLabel = function(object) {
-            var label = object.label;
-            if (Array.isArray(label)) label = object.label[0]["@value"];
-            return label;
+        this.getManifestDataValue = function(object, property, returnFirstVal) {
+            var val = object[property];
+            if (Array.isArray(val) && returnFirstVal) val = object[property][0]["@value"];
+            return val;
         };
 
         this.map = ko.observable();
@@ -165,9 +165,9 @@ define([
             var canvases = [];
             sequences.forEach(function(sequence) {
                 if (sequence.canvases) {
-                    sequence.label = getLabel(sequence);
+                    sequence.label = self.getManifestDataValue(sequence, 'label', true);
                     sequence.canvases.forEach(function(canvas) {
-                        canvas.label = getLabel(canvas);
+                        canvas.label = self.getManifestDataValue(canvas, 'label', true);
                         if (typeof canvas.thumbnail === 'object')
                             canvas.thumbnail = canvas.thumbnail["@id"];
                         else if (canvas.images && canvas.images[0] && canvas.images[0].resource)
@@ -354,8 +354,8 @@ define([
             self.zoomToCanvas = true;
             if (service) self.canvas(service);
 
-            self.origCanvasLabel = getLabel(canvas);
-            self.canvasLabel(getLabel(canvas));
+            self.origCanvasLabel = self.getManifestDataValue(canvas, 'label', true);
+            self.canvasLabel(self.getManifestDataValue(canvas, 'label', true));
         };
 
         this.canvasClick = function(canvas) {
@@ -367,28 +367,6 @@ define([
             if (canvas.images.length > 0) return canvas.images[0].resource.service['@id'];
         };
 
-        var getDescription = function(object) {
-            var description = object.description;
-            if (Array.isArray(description)) description = object.description[0]["@value"];
-            return description || '';
-        };
-
-        var getAttribution = function(object) {
-            var attribution = object.attribution;
-            if (Array.isArray(attribution)) attribution = object.attribution[0]["@value"];
-            return attribution || '';
-        };
-
-        var getLogo = function(object) {
-            var logo = object.logo;
-            if (Array.isArray(logo)) logo = object.logo[0]["@value"];
-            return logo || '';
-        };
-
-        var getMetadata = function(object) {
-            var metadata = object.metadata;
-            return metadata || [];
-        };
 
         var updateCanvas = !self.canvas();
         this.manifestData.subscribe(function(manifestData) {
@@ -401,16 +379,19 @@ define([
                     }    
                 }
                 updateCanvas = true;
-                self.origManifestName = getLabel(manifestData);
-                self.origManifestDescription = getDescription(manifestData);
-                self.origManifestAttribution = getAttribution(manifestData);
-                self.origManifestLogo = getLogo(manifestData);
-                self.origMetadata = getMetadata(manifestData);
-                self.manifestName(getLabel(manifestData));
-                self.manifestDescription(getDescription(manifestData));
-                self.manifestAttribution(getAttribution(manifestData));
-                self.manifestLogo(getLogo(manifestData));
-                self.manifestMetadata(getMetadata(manifestData));
+                self.origManifestName = self.getManifestDataValue(manifestData, 'label', true);
+                self.manifestName(self.origManifestName);
+                self.origManifestDescription = self.getManifestDataValue(manifestData, 'description', true);
+                self.manifestDescription(self.origManifestDescription);
+                self.origManifestAttribution = self.getManifestDataValue(manifestData, 'attribution', true);
+                self.manifestAttribution(self.origManifestAttribution);
+                self.origManifestLogo = self.getManifestDataValue(manifestData, 'logo', true);
+                self.manifestLogo(self.origManifestLogo);
+                self.origManifestMetadata = koMapping.toJSON(self.getManifestDataValue(manifestData, 'metadata'));
+                self.manifestMetadata.removeAll();
+                self.getManifestDataValue(manifestData, 'metadata').forEach(function(entry){
+                    self.manifestMetadata.push(koMapping.fromJS(entry));
+                });
             }
         });
 
