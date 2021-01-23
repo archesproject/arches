@@ -30,7 +30,6 @@ class ManifestManagerView(View):
         return JSONResponse({"success": True})
 
     def post(self, request):
- 
         def create_manifest(name="", desc="", file_url="file_url", attribution="", logo="", canvases=[]):
             metadata = []  # {"label": "TBD", "value": ["Unknown", ...]}
             sequence_id = f"{self.cantaloupe_uri}/manifest/sequence/TBD.json"
