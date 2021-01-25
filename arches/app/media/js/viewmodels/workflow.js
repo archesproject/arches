@@ -6,7 +6,8 @@ define([
     'knockout-mapping',
     'uuid',
     'viewmodels/alert',
-    'viewmodels/workflow-step'
+    'viewmodels/workflow-step',
+    'views/components/simple-switch'
 ], function(arches, $, _, ko, koMapping, uuid, AlertViewModel, Step) {
     WORKFLOW_ID_LABEL = 'workflow-id';
     STEP_ID_LABEL = 'workflow-step-id';

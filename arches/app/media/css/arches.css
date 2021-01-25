@@ -660,8 +660,24 @@ input[type="checkbox"] {
 }
 
 .tabbed-workflow-step-body .install-buttons {
-    /* display: none; */
+    display: none;
 }
+
+.tabbed-workflow-footer .toggle-container {
+    padding: unset;
+    padding-top: 6px;
+}
+
+.tabbed-workflow-footer .toggle-container .arches-toggle-subtitle{
+    display: none;
+}
+
+.tabbed-workflow-footer .btn {
+    border-radius: 2px;
+}
+
+
+
 
 .workflow-step-body .workbench-card-wrapper {
     margin-left: -25px;

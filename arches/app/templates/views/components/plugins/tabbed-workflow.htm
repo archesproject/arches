@@ -28,73 +28,73 @@
         <div class="workflow-nav-tab-container">
             <ul class="nav nav-tabs workflow-nav-tab-list">
                 <!--ko foreach: {data: steps, as: 'step'} -->
-                <li class="workflow-nav-tab-list-item" data-bind="css: { active: step.active() }">
-                    <div
-                        class='workflow-nav-tab'
-                        data-bind="{
-                            css: { 
-                                active: step.active(), 
-                                inactive: !step.active() && $parent.canStepBecomeActive(step),
-                                disabled: !step.active() && !$parent.canStepBecomeActive(step),
-                            },
-                            click: function() { if ($parent.canStepBecomeActive(step)) { $parent.activeStep(step) }},
-                        }" 
-                    >
-                        <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
-                            <span
-                                style="margin-right: 4px;"
-                                class="workflow-nav-tab-arrow"
-                                data-bind="{ 
-                                    click: $parent.back, 
-                                    clickBubble: false ,
-                                    css: {
-                                        disabled: !$parent.canStepBecomeActive($parent.steps[step._index - 1]),
-                                    },
-                                    visible: step.active() && step._index !== 0,
-                                }"
-                            >
-                                <i class="fa fa-caret-left"></i>
-                            </span>
-
-                            <!-- ko if: step.active() -->
-                            <!--ko if: ko.unwrap(step.informationBoxData) -->
-                            <div
-                                data-bind="
-                                    click: showInformationBox,
-                                "
-                            >
-                                <i
-                                    class="fa fa-info-circle tabbed-workflow-information-box-marker"
-                                    data-bind="
+                    <li class="workflow-nav-tab-list-item" data-bind="css: { active: step.active() }">
+                        <div
+                            class='workflow-nav-tab'
+                            data-bind="{
+                                css: { 
+                                    active: step.active(), 
+                                    inactive: !step.active() && $parent.canStepBecomeActive(step),
+                                    disabled: !step.active() && !$parent.canStepBecomeActive(step),
+                                },
+                                click: function() { if ($parent.canStepBecomeActive(step)) { $parent.activeStep(step) }},
+                            }" 
+                        >
+                            <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
+                                <span
+                                    style="margin-right: 4px;"
+                                    class="workflow-nav-tab-arrow"
+                                    data-bind="{ 
+                                        click: $parent.back, 
+                                        clickBubble: false ,
                                         css: {
-                                            seen: step.informationBoxData().hidden,
-                                            unseen: !step.informationBoxData().hidden,
-                                        }
+                                            disabled: !$parent.canStepBecomeActive($parent.steps[step._index - 1]),
+                                        },
+                                        visible: step.active() && step._index !== 0,
+                                    }"
+                                >
+                                    <i class="fa fa-caret-left"></i>
+                                </span>
+
+                                <!-- ko if: step.active() -->
+                                <!--ko if: ko.unwrap(step.informationBoxData) -->
+                                <div
+                                    data-bind="
+                                        click: showInformationBox,
                                     "
-                                ></i>
+                                >
+                                    <i
+                                        class="fa fa-info-circle tabbed-workflow-information-box-marker"
+                                        data-bind="
+                                            css: {
+                                                seen: step.informationBoxData().hidden,
+                                                unseen: !step.informationBoxData().hidden,
+                                            }
+                                        "
+                                    ></i>
+                                </div>
+                                <!-- /ko -->
+                                <!-- /ko -->
+
+                                <span style="font-size: 14px; white-space: nowrap;" data-bind="text: step.title()"></span>
+
+                                <span
+                                    style="margin-left: 4px;"
+                                    class="workflow-nav-tab-arrow"
+                                    data-bind="{ 
+                                        click: $parent.next, 
+                                        clickBubble: false,
+                                        css: {
+                                            disabled: !$parent.canStepBecomeActive($parent.steps[step._index + 1]),
+                                        },
+                                        visible: step.active() && step._index !== $parent.steps.length - 1,
+                                    }"
+                                >
+                                    <i class="fa fa-caret-right"></i>
+                                </span>
                             </div>
-                            <!-- /ko -->
-                            <!-- /ko -->
-
-                            <span style="font-size: 14px; white-space: nowrap;" data-bind="text: step.title()"></span>
-
-                            <span
-                                style="margin-left: 4px;"
-                                class="workflow-nav-tab-arrow"
-                                data-bind="{ 
-                                    click: $parent.next, 
-                                    clickBubble: false,
-                                    css: {
-                                        disabled: !$parent.canStepBecomeActive($parent.steps[step._index + 1]),
-                                    },
-                                    visible: step.active() && step._index !== $parent.steps.length - 1,
-                                }"
-                            >
-                                <i class="fa fa-caret-right"></i>
-                            </span>
                         </div>
-                    </div>
-                </li>
+                    </li>
                 <!-- /ko -->
             </ul>
         </div>
@@ -103,8 +103,81 @@
             <workflow-step params='step: activeStep()' ></workflow-step>
         </div>
 
-        <div>
-            foobar
+        <div
+            class="tabbed-workflow-footer"
+            style="
+                background-color: #fafafa;
+                border-top: 1px solid #ddd;
+                padding: 10px 75px 10px 25px;
+                display: flex; 
+                justify-content: space-between;
+            "
+        >
+
+            <div
+                style="
+                    display: flex;
+                "
+            >
+                <div
+                    style="
+                        display: flex;
+                        align-items: center;
+                        border-right: 1px solid #ddd;
+                        padding-right: 24px;
+                        margin-right: 18px;
+                    "
+                >
+                    <span>
+                        1 / 12
+                    </span>
+                </div>
+    
+                <div
+                    data-bind="{
+                        component: { 
+                            name: 'views/components/simple-switch', 
+                            params: {
+                                value: function() { return false }, 
+                                config:{
+                                    label: '{% trans "Show Detailed Step Information" %}'
+                                }
+                            }
+                        }
+                    }"
+                ></div>
+            </div>
+
+            <div
+                style="
+                "
+            >
+                <button class="btn btn-primary">
+                    <i class="fa fa-caret-left"></i>
+                    <span>
+                        Previous Step
+                    </span>
+                </button>
+                <button class="btn btn-success">
+                    <i class="ion-android-cloud-done"></i>
+                    <span>
+                        Save
+                    </span>
+                </button>
+                <button class="btn btn-danger">
+                    <i class="fa fa-times-circle"></i>
+                    <span>
+                        Cancel
+                    </span>
+                </button>
+                <button class="btn btn-primary">
+                    <span>
+                        Next Step
+                    </span>
+                    <i class="fa fa-caret-right"></i>
+                </button>
+            </div>
+
         </div>
     </div>
     <!-- /ko -->
