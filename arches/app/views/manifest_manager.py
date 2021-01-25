@@ -25,6 +25,11 @@ class ManifestManagerView(View):
     def delete(self, request):
         data = JSONDeserializer().deserialize(request.body)
         manifest = data.get("manifest")
+        canvases_in_manifest = manifest.manifest["sequences"][0]["canvases"]
+        canvas_ids = [canvas["images"][0]["resource"]["service"]["@id"] for canvas in canvases_in_manifest]
+        for canvas_id in canvas_ids:
+            if self.check_canvas_in_use(canvas_id):
+                return None
         manifest = models.IIIFManifest.objects.get(url=manifest)
         manifest.delete()
         return JSONResponse({"success": True})
@@ -105,8 +110,15 @@ class ManifestManagerView(View):
         def add_canvases(manifest, canvases):
             manifest.manifest["sequences"][0]["canvases"] += canvases
 
+        def check_canvas_in_use(canvas_id):
+            canvas_ids_in_use = [annotation.canvas for annotation in models.VwAnnotation.objects.all()]
+            return canvas_id in canvas_ids_in_use
+
         def delete_canvas(manifest, canvases_to_remove):
             canvas_ids_remove = [canvas["images"][0]["resource"]["service"]["@id"] for canvas in canvases_to_remove]
+            for canvas_id in canvas_ids_remove:
+                if check_canvas_in_use(canvas_id):
+                    canvas_ids_remove.remove(canvas_id)
             canvases = manifest.manifest["sequences"][0]["canvases"]
             manifest.manifest["sequences"][0]["canvases"] = [
                 canvas for canvas in canvases if canvas["images"][0]["resource"]["service"]["@id"] not in canvas_ids_remove
