@@ -7,8 +7,8 @@
             class='tabbed-workflow-step-information-box-container'
             data-bind="
                 css: {
-                    seen: !informationBoxData().hidden,
-                    unseen: informationBoxData().hidden,
+                    seen: informationBoxData().hidden,
+                    unseen: !informationBoxData().hidden,
                 }
             "
             style="
@@ -29,7 +29,7 @@
 
                     <div>
                         <span 
-                            data-bind="click: hideInformationBox"
+                            data-bind="click: toggleInformationBox"
                             style="
                                 position: absolute; 
                                 right: 40px; 

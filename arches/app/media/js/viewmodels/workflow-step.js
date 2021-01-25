@@ -123,22 +123,16 @@ define([
             Object.keys(self.externalStepData).forEach(function(key) {
                 self.externalStepData[key]['data'] = config.workflow.getStepData(externalStepSourceData[key]);
             });
-        }
-
-        this.hideInformationBox = function() {
-            var informationBoxData = self.informationBoxData();
-            informationBoxData['hidden'] = true;
-
-            self.informationBoxData(informationBoxData);
-            self.setToLocalStorage('informationBoxHidden', true);
         };
 
-        this.showInformationBox = function() {
+        this.toggleInformationBox = function() {
             var informationBoxData = self.informationBoxData();
-            informationBoxData['hidden'] = false;
-            
+            var isHidden = informationBoxData['hidden'];
+
+            informationBoxData['hidden'] = !isHidden;
             self.informationBoxData(informationBoxData);
-            self.setToLocalStorage('informationBoxHidden', false);
+
+            self.setToLocalStorage('informationBoxHidden', !isHidden);
         };
 
         this.getInformationBoxHiddenStateFromLocalStorage = function() {

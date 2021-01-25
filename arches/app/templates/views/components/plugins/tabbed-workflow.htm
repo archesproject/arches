@@ -56,26 +56,6 @@
                                     <i class="fa fa-caret-left"></i>
                                 </span>
 
-                                <!-- ko if: step.active() -->
-                                <!--ko if: ko.unwrap(step.informationBoxData) -->
-                                <div
-                                    data-bind="
-                                        click: showInformationBox,
-                                    "
-                                >
-                                    <i
-                                        class="fa fa-info-circle tabbed-workflow-information-box-marker"
-                                        data-bind="
-                                            css: {
-                                                seen: step.informationBoxData().hidden,
-                                                unseen: !step.informationBoxData().hidden,
-                                            }
-                                        "
-                                    ></i>
-                                </div>
-                                <!-- /ko -->
-                                <!-- /ko -->
-
                                 <span style="font-size: 14px; white-space: nowrap;" data-bind="text: step.title()"></span>
 
                                 <span
@@ -133,19 +113,23 @@
                     </span>
                 </div>
     
+                <!--ko if: ko.unwrap(activeStep().informationBoxData) -->
                 <div
                     data-bind="{
                         component: { 
                             name: 'views/components/simple-switch', 
                             params: {
-                                value: function() { return false }, 
+                                value: activeStep().informationBoxData()['hidden'], 
                                 config:{
-                                    label: '{% trans "Show Detailed Step Information" %}'
+                                    label: '{% trans "Detailed Step Information" %}',
+                                    setvalue: activeStep().toggleInformationBox,
+                                    getvalue: activeStep().informationBoxData()['hidden'],
                                 }
                             }
                         }
                     }"
                 ></div>
+                <!-- /ko -->
             </div>
 
             <div
