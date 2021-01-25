@@ -326,11 +326,9 @@
                             card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true);
                         }
                     }">
-                        <h4 class="card-summary-name">
+                        <h4 class="card-summary-name" style='color: #2f527a'>
                             <span data-bind="text: card.model.name"></span>
-                            <!-- ko if: card.canAdd() && card.parent.tileid -->
-                            <i class="fa fa-plus-circle card-summary-add"></i>
-                            <!-- /ko -->
+                            <i class="fa fa-plus-circle card-summary-add" data-bind="click: function(){$parent.createParentAndChild($parent.tile, card)}"></i>
                         </h4>
                     </a>
                     <ul class="tile-summary-item" data-bind="foreach: {
@@ -386,7 +384,7 @@
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">{% trans 'Save edit' %}</button>
                     <!-- /ko -->
                 <!-- /ko -->
-                <!-- ko if: !tile.tileid -->
+                <!-- ko if: !tile.tileid && tile.parenttile_id-->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">{% trans 'Add'  %}</button>
                 <!-- /ko -->
 

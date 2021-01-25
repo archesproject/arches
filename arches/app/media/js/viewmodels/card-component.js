@@ -144,5 +144,13 @@ define([
                 }
             });
         };
+        this.createParentAndChild = function (parenttile, childcard) {
+            if (parenttile.tileid === "") {
+                var callback = function(){childcard.selected(true);}
+                parenttile.save(function() {
+                    return;
+                }, callback);
+            }
+        };
     };
 });
