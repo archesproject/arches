@@ -111,9 +111,6 @@ define([
 
                 self.steps[i]._index = i;
             });
-
-            /* if stepIds DO NOT exist for this workflow in localStorage, set them */ 
-            if (!cachedStepIds) { self.setStepIdsToLocalStorage(generatedStepIds); }
         };
 
         this.getStepData = function(stepName) {
