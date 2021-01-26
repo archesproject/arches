@@ -4,6 +4,7 @@ define([
     'knockout-mapping',
     'uuid'
 ], function(ko, _, koMapping, uuid) {
+    STEPS_LABEL = 'workflow-steps';
     STEP_ID_LABEL = 'workflow-step-id';
 
     var WorkflowStep = function(config) {
@@ -137,17 +138,25 @@ define([
         }
 
         this.setToLocalStorage = function(key, value) {
+            var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};
+
+            if (!allStepsLocalStorageData[self.id()]) {
+                allStepsLocalStorageData[self.id()] = {};
+            }
+            
+            allStepsLocalStorageData[self.id()][key] = value;
+
             localStorage.setItem(
-                `${STEP_ID_LABEL}-${self.id()}`, 
-                JSON.stringify({ [key]: value })
+                STEPS_LABEL, 
+                JSON.stringify(allStepsLocalStorageData)
             );
         };
 
         this.getFromLocalStorage = function(key) {
-            var localStorageData = JSON.parse(localStorage.getItem(`${STEP_ID_LABEL}-${self.id()}`));
+            var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};
 
-            if (localStorageData) {
-                return localStorageData[key];
+            if (allStepsLocalStorageData[self.id()]) {
+                return allStepsLocalStorageData[self.id()][key];
             }
         };
 
