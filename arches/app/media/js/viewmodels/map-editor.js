@@ -8,10 +8,11 @@ define([
     'mapbox-gl-draw',
     'geojson-extent',
     'geojsonhint',
+    'togeojson',
     'views/components/map',
     'views/components/cards/select-feature-layers',
     'text!templates/views/components/cards/map-popup.htm'
-], function(arches, $, _, ko, koMapping, uuid, MapboxDraw, geojsonExtent, geojsonhint, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function(arches, $, _, ko, koMapping, uuid, MapboxDraw, geojsonExtent, geojsonhint, toGeoJSON, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         var padding = 40;
@@ -86,7 +87,8 @@ define([
                     if (value) return value.features;
                     else return [];
                 }),
-                selectedTool: ko.observable()
+                selectedTool: ko.observable(),
+                dropErrors: ko.observableArray()
             };
             self.featureLookup[id].selectedTool.subscribe(function(tool) {
                 if (self.draw) {
@@ -537,6 +539,116 @@ define([
                     addSelectFeatures(data.features);
                 });
             }
+        };
+
+        var addFromGeoJSON = function(geoJSONString, nodeId) {
+            var hint = geojsonhint.hint(geoJSONString);
+            var errors = [];
+            hint.forEach(function(item) {
+                if (item.level !== 'message') {
+                    errors.push(item);
+                }
+            });
+            if (errors.length === 0) {
+                var geoJSON = JSON.parse(geoJSONString);
+                geoJSON.features = geoJSON.features.filter(function(feature) {
+                    return feature.geometry;
+                });
+                if (geoJSON.features.length > 0) {
+                    self.map().fitBounds(
+                        geojsonExtent(geoJSON),
+                        {
+                            padding: padding
+                        }
+                    );
+                    geoJSON.features.forEach(function(feature) {
+                        feature.id = uuid.generate();
+                        if (!feature.properties) feature.properties = {};
+                        feature.properties.nodeId = nodeId;
+                        self.draw.add(feature);
+                    });
+                    self.updateTiles();
+                }
+            }
+            return errors;
+        };
+
+        self.handleFiles = function(files, nodeId) {
+            var errors = [];
+            var promises = [];
+            for (var i = 0; i < files.length; i++) {
+                var extension = files[i].name.split('.').pop();
+                if (!['kml', 'json', 'geojson'].includes(extension)) {
+                    errors.push({
+                        message: 'File unsupported: "' + files[i].name + '"'
+                    });
+                } else {
+                    promises.push(new Promise(function(resolve) {
+                        var file = files[i];
+                        var extension = file.name.split('.').pop();
+                        var reader = new window.FileReader();
+                        reader.onload = function(e) {
+                            var geoJSON;
+                            if (['json', 'geojson'].includes(extension))
+                                geoJSON = JSON.parse(e.target.result);
+                            else
+                                geoJSON = toGeoJSON.kml(
+                                    new window.DOMParser()
+                                        .parseFromString(e.target.result, "text/xml")
+                                );
+                            resolve(geoJSON);
+                        };
+                        reader.readAsText(file);
+                    }));
+                }
+            }
+            Promise.all(promises).then(function(results) {
+                var geoJSON = {
+                    "type": "FeatureCollection",
+                    "features": results.reduce(function(features, geoJSON) {
+                        features = features.concat(geoJSON.features);
+                        return features;
+                    }, [])
+                };
+                errors = errors.concat(
+                    addFromGeoJSON(JSON.stringify(geoJSON), nodeId)
+                );
+                self.featureLookup[nodeId].dropErrors(errors);
+            });
+        };
+
+        self.dropZoneHandler = function(data, e) {
+            var nodeId = data.node.nodeid;
+            e.stopPropagation();
+            e.preventDefault();
+            var files = e.originalEvent.dataTransfer.files;
+            self.handleFiles(files, nodeId);
+            self.dropZoneLeaveHandler(data, e);
+        };
+
+        self.dropZoneOverHandler = function(data, e) {
+            e.stopPropagation();
+            e.preventDefault();
+            e.originalEvent.dataTransfer.dropEffect = 'copy';
+        };
+
+        self.dropZoneClickHandler = function(data, e) {
+            var fileInput = e.target.parentNode.querySelector('.hidden-file-input input');
+            var event = window.document.createEvent("MouseEvents");
+            event.initEvent("click", true, false);
+            fileInput.dispatchEvent(event);
+        };
+
+        self.dropZoneEnterHandler = function(data, e) {
+            e.target.classList.add('drag-hover');
+        };
+
+        self.dropZoneLeaveHandler = function(data, e) {
+            e.target.classList.remove('drag-hover');
+        };
+
+        self.dropZoneFileSelected = function(data, e) {
+            self.handleFiles(e.target.files, data.node.nodeid);
         };
     };
     return viewModel;
