@@ -1775,6 +1775,13 @@ div.final-cons-step-separator>h4 {
     z-index: 1001;
 }
 
+.manifest-manager-canvas-name {
+    width: 315px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .basemap-listing,
 .overlay-listing,
 .legend-listing {
@@ -12769,6 +12776,7 @@ a.jstree-anchor.permissions-widget {
 
 .gallery-visible.show-gallery-control {
     bottom: 159px;
+    z-index: 2000;
 }
 
 .show-gallery-control.gallery-expanded {
@@ -12861,6 +12869,7 @@ a.jstree-anchor.permissions-widget {
     padding-left: 0px;
     display: inline-block;
     white-space: nowrap;
+    vertical-align: top;
 }
 
 .iiif-viewer-gallery.gallery-expanded .iiif-gallery-canvas,
@@ -12899,6 +12908,13 @@ a.jstree-anchor.permissions-widget {
     text-decoration: none;
 }
 
+.iiif-gallery-panel {
+    display: flex;
+    flex-direction: column;
+    width: inherit;
+}
+
+
 .gallery-expanded .iiif-gallery-panel {
     padding-left: 15px;
     margin-left: 225px;
@@ -12909,6 +12925,9 @@ a.jstree-anchor.permissions-widget {
     padding-left: 10px;
     position: sticky;
     left: 0px;
+    display: inline-flex;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .gallery-expanded .iiif-gallery-header {
@@ -13005,6 +13024,15 @@ a.jstree-anchor.permissions-widget {
     font-size: 0.9em;
     font-weight: 650;
     color: rgb(91, 155, 215);
+    width: 110px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: initial;
+}
+
+.gallery-expanded .iiif-gallery-canvas-label {
+    width: 100%;
 }
 
 .iiif-gallery-canvas-label .annotation-count {
