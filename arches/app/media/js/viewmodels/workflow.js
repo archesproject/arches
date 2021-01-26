@@ -18,7 +18,7 @@ define([
         this.id = ko.observable();
 
         this.steps = config.steps || [];
-        this.stepIds = ko.observableArray();
+        this.stepCount = ko.observable(0);
         
         this.hoverStep = ko.observable();
         this.previousStep = ko.observable();
@@ -99,6 +99,8 @@ define([
                 }
                 self.steps[i]._index = i;
             });
+
+            self.stepCount(self.steps.length);
 
             /* if stepIds DO NOT exist for this workflow in localStorage, set them */ 
             if (!cachedStepIds) { self.setStepIdsToLocalStorage(generatedStepIds); }

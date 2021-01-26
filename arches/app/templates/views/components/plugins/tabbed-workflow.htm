@@ -108,9 +108,14 @@
                         margin-right: 18px;
                     "
                 >
-                    <span>
-                        1 / 12
-                    </span>
+                    <div style="display:none" data-bind="text: console.log($data, activeStep())"></div>
+
+                    <span 
+                        style="padding-right: 2px;"
+                        data-bind="text:activeStep()['_index'] + 1"
+                    ></span>
+                    <span data-bind="text:`/ ${steps.length}`"></span>
+                    
                 </div>
     
                 <!--ko if: ko.unwrap(activeStep().informationBoxData) -->
