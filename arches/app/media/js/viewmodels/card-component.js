@@ -64,10 +64,14 @@ define([
                 self.card.preSaveCallback(self.saveTile);
             }
             if (self.card.preClearCallback) {
+                self.card.preClearCallback(self.tile.reset);
             }
             if (self.card.postClearCallback) {
-                self.card.postClearCallback(self.tile.reset);
-                // self.card.postClearCallback(self.deleteTile);
+                // self.card.postClearCallback(function() {
+                //     if (self.tile.tileid) {
+                //         self.deleteTile();
+                //     }
+                // });
             }
         };
 
