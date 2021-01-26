@@ -7,6 +7,7 @@ import uuid
 from revproxy.views import ProxyView
 from django.core.files.storage import default_storage
 from django.http import HttpRequest
+from django.utils.translation import ugettext as _
 from django.views.generic import View
 from arches.app.utils.response import JSONResponse
 from arches.app.models import models
@@ -40,7 +41,7 @@ class ManifestManagerView(View):
             canvas_labels_in_use = [
                 item["label"] for item in canvases_in_manifest if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use
             ]
-            response = f"The manifest cannot be deleted because some canvases are in use: {canvas_labels_in_use}"
+            response = "The manifest cannot be deleted because some canvases are in use: {}".format(canvas_labels_in_use)
             return JSONResponse({"message": response}, status=500)
         manifest.delete()
         return JSONResponse({"success": True})
@@ -132,7 +133,7 @@ class ManifestManagerView(View):
                 canvas_labels_in_use = [
                     item["label"] for item in canvases if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use
                 ]
-                raise ValueError(f"The canvases cannot be deleted because some canvases are in use: {canvas_labels_in_use}")
+                raise ManifestValidationError("The canvases cannot be deleted because some canvases are in use: {}".format(canvas_labels_in_use))
             manifest.manifest["sequences"][0]["canvases"] = [
                 canvas for canvas in canvases if canvas["images"][0]["resource"]["service"]["@id"] not in canvas_ids_remove
             ]
@@ -233,7 +234,7 @@ class ManifestManagerView(View):
             selected_canvases_json = json.loads(selected_canvases)
             try:
                 delete_canvases(manifest, selected_canvases_json)
-            except ValueError as e:
+            except ManifestValidationError as e:
                 return JSONResponse({"message": str(e)}, status=500)
 
         if len(files) > 0:
@@ -286,3 +287,13 @@ class IIIFServerProxyView(ProxyView):
         if settings.CANTALOUPE_HTTP_ENDPOINT is None:
             raise Http404(_("IIIF server proxy not configured"))
         return headers
+
+
+class ManifestValidationError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Manifest Validation Error")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self.message)
