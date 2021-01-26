@@ -27,6 +27,9 @@ define([
         this.required = ko.observable(ko.unwrap(config.required));
         this.autoAdvance = ko.observable(true);
 
+        this.preSaveCallback = ko.observable();
+        this.postSaveCallback = ko.observable();
+
         this.externalStepData = {};
 
         var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
@@ -83,7 +86,7 @@ define([
 
             /* set value subscription */ 
             self.value.subscribe(function(value) {
-                self.setToLocalStorage('value', value);
+                // self.__test_save__();
             });
 
             /* cached informationBox logic */ 
@@ -93,6 +96,18 @@ define([
                     heading: config.informationboxdata['heading'],
                     text: config.informationboxdata['text'],
                 })
+            }
+        };
+        
+        this.__test_save__ = function() {
+            if (ko.unwrap(self.preSaveCallback)) {
+                self.preSaveCallback()();
+            }
+
+            self.setToLocalStorage('value', self.value())
+
+            if (ko.unwrap(self.postSaveCallback)) {
+                self.postSaveCallback()();
             }
         };
 

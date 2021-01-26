@@ -153,7 +153,13 @@
                         Previous Step
                     </span>
                 </button>
-                <button class="btn btn-success">
+
+                <button 
+                    class="btn btn-success"
+                    data-bind="
+                        click: activeStep().__test_save__
+                    "
+                >
                     <i class="ion-android-cloud-done"></i>
                     <span>
                         Save

@@ -117,6 +117,10 @@ define([
                 });
     
                 self.card.subscribe(function(card){
+                    if (card) {
+                        card.preSaveCallback = params.preSaveCallback;
+                        card.postSaveCallback = params.postSaveCallback;
+                    }
                     if (ko.unwrap(card.widgets) && params.hiddenNodes) {
                         card.widgets().forEach(function(widget){
                             if (params.hiddenNodes.indexOf(widget.node_id()) > -1) {
