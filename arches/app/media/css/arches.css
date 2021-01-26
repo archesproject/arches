@@ -692,6 +692,11 @@ input[type="checkbox"] {
     border-radius: 2px;
 }
 
+.tabbed-workflow-footer .btn > i,
+.tabbed-workflow-footer .btn > span {
+    padding: 0px 2px;
+}
+
 .workflow-step-body .workbench-card-wrapper {
     margin-left: -25px;
 }
