@@ -663,6 +663,22 @@ input[type="checkbox"] {
     display: none;
 }
 
+.tabbed-workflow-footer {
+    background-color: #fafafa;
+    border-top: 1px solid #ddd;
+    padding: 10px 75px 10px 25px;
+    display: flex; 
+    justify-content: space-between;
+}
+
+.tabbed-workflow-footer .step-counter {
+    display: flex;
+    align-items: center;
+    border-right: 1px solid #ddd;
+    padding-right: 24px;
+    margin-right: 18px;
+}
+
 .tabbed-workflow-footer .toggle-container {
     padding: unset;
     padding-top: 6px;
@@ -675,9 +691,6 @@ input[type="checkbox"] {
 .tabbed-workflow-footer .btn {
     border-radius: 2px;
 }
-
-
-
 
 .workflow-step-body .workbench-card-wrapper {
     margin-left: -25px;

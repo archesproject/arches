@@ -83,33 +83,9 @@
             <workflow-step params='step: activeStep()' ></workflow-step>
         </div>
 
-        <div
-            class="tabbed-workflow-footer"
-            style="
-                background-color: #fafafa;
-                border-top: 1px solid #ddd;
-                padding: 10px 75px 10px 25px;
-                display: flex; 
-                justify-content: space-between;
-            "
-        >
-
-            <div
-                style="
-                    display: flex;
-                "
-            >
-                <div
-                    style="
-                        display: flex;
-                        align-items: center;
-                        border-right: 1px solid #ddd;
-                        padding-right: 24px;
-                        margin-right: 18px;
-                    "
-                >
-                    <div style="display:none" data-bind="text: console.log($data, activeStep())"></div>
-
+        <div class="tabbed-workflow-footer">
+            <div style="display: flex;">
+                <div class="step-counter">
                     <span 
                         style="padding-right: 2px;"
                         data-bind="text:activeStep()['_index'] + 1"
@@ -150,7 +126,7 @@
                 >
                     <i class="fa fa-caret-left"></i>
                     <span>
-                        Previous Step
+                        {% trans  "Previous Step" %}
                     </span>
                 </button>
 
@@ -162,7 +138,7 @@
                 >
                     <i class="ion-android-cloud-done"></i>
                     <span>
-                        Save
+                        {% trans  "Save" %}
                     </span>
                 </button>
                 <button
@@ -173,7 +149,7 @@
                 >
                     <i class="fa fa-times-circle"></i>
                     <span>
-                        Clear
+                        {% trans  "Clear" %}
                     </span>
                 </button>
                 <button 
@@ -186,7 +162,7 @@
                     "
                 >
                     <span>
-                        Next Step
+                        {% trans  "Next Step" %}
                     </span>
                     <i class="fa fa-caret-right"></i>
                 </button>
