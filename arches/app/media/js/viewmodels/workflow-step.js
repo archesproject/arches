@@ -48,12 +48,14 @@ define([
         
         this.value = ko.observable();
         this.value.subscribe(function(value) {
-            if (!value) {
-                config.workflow.resourceId(value)
-            }
             /* if we have defined that this is part of a single-resource workflow, and that this step creates the desired resource */ 
-            else if (self.shouldtrackresource && !ko.unwrap(config.workflow.resourceId)) {
-                config.workflow.resourceId(value.resourceid)
+            if (self.shouldtrackresource && !ko.unwrap(config.workflow.resourceId)) {
+                if (value) {
+                    config.workflow.resourceId(value.resourceid);
+                } 
+                else {
+                    config.workflow.resourceId(null);
+                }
             }
         });
 
@@ -92,7 +94,7 @@ define([
 
             /* set value subscription */ 
             self.value.subscribe(function(value) {
-                self.setToLocalStorage('value', value)
+                self.setToLocalStorage('value', value);
             });
 
             /* cached informationBox logic */ 
@@ -105,35 +107,40 @@ define([
             }
         };
         
-        this.__test_save__ = function() {
+        this.save = function() {
             /* 
                 currently SYNCHRONOUS, however async localStore interaction is
                 covered by value subscription. This should be refactored when we can.
             */ 
-            if (ko.unwrap(self.preSaveCallback)) {
-                self.preSaveCallback()();
+            var preSaveCallback = ko.unwrap(self.preSaveCallback);
+            if (preSaveCallback) {
+                preSaveCallback();
             }
 
             self.setToLocalStorage('value', self.value())
 
-            if (ko.unwrap(self.postSaveCallback)) {
-                self.postSaveCallback()();
+            var postSaveCallback = ko.unwrap(self.postSaveCallback);
+            if (postSaveCallback) {
+                postSaveCallback();
             }
         };
 
-        this.__test_clear__ = function() {
+        this.clear = function() {
             /* 
                 currently SYNCHRONOUS, however async localStore interaction is
                 covered by value subscription. This should be refactored when we can.
             */ 
-           if (ko.unwrap(self.preClearCallback)) {
-                self.preClearCallback()();
+
+            var preClearCallback = ko.unwrap(self.preClearCallback);
+            if (preClearCallback) {
+                preClearCallback();
             }
 
             self.value(null);
 
-            if (ko.unwrap(self.postClearCallback)) {
-                self.postClearCallback()();
+            var postClearCallback = ko.unwrap(self.postClearCallback);
+            if (postClearCallback) {
+                postClearCallback();
             }
         }
 

@@ -7,7 +7,6 @@ define([
     'uuid',
     'viewmodels/alert',
     'viewmodels/workflow-step',
-    'views/components/simple-switch'
 ], function(arches, $, _, ko, koMapping, uuid, AlertViewModel, Step) {
     WORKFLOW_LABEL = 'workflow';
     WORKFLOW_ID_LABEL = 'workflow-id';
