@@ -118,8 +118,18 @@ define([
     
                 self.card.subscribe(function(card){
                     if (card) {
-                        card.preSaveCallback = params.preSaveCallback;
-                        card.postSaveCallback = params.postSaveCallback;
+                        if (params.preSaveCallback) {
+                            card.preSaveCallback = params.preSaveCallback;
+                        }
+                        if (params.postSaveCallback) {
+                            card.postSaveCallback = params.postSaveCallback;
+                        }
+                        if (params.preClearCallback) {
+                            card.preClearCallback = params.preClearCallback;
+                        }
+                        if (params.postClearCallback) {
+                            card.postClearCallback = params.postClearCallback;
+                        }
                     }
                     if (ko.unwrap(card.widgets) && params.hiddenNodes) {
                         card.widgets().forEach(function(widget){

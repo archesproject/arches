@@ -60,9 +60,16 @@ define([
                 self.card.showForm(false);
             }
 
-            self.card.preSaveCallback(self.saveTile);
+            if (self.card.preSaveCallback) {
+                self.card.preSaveCallback(self.saveTile);
+            }
+            if (self.card.preClearCallback) {
+            }
+            if (self.card.postClearCallback) {
+                self.card.postClearCallback(self.tile.reset);
+                // self.card.postClearCallback(self.deleteTile);
+            }
         };
-
 
         this.revealForm = function(card){
             if (!card.selected()) {card.selected(true);}
@@ -108,7 +115,6 @@ define([
         };
 
         this.saveTile = function(callback) {
-            console.log('fooo')
             self.loading(true);
             self.tile.save(function(response) {
                 self.loading(false);

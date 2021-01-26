@@ -29,6 +29,8 @@ define([
 
         this.preSaveCallback = ko.observable();
         this.postSaveCallback = ko.observable();
+        this.preClearCallback = ko.observable();
+        this.postClearCallback = ko.observable();
 
         this.externalStepData = {};
 
@@ -45,8 +47,11 @@ define([
         
         this.value = ko.observable();
         this.value.subscribe(function(value) {
+            if (!value) {
+                config.workflow.resourceId(value)
+            }
             /* if we have defined that this is part of a single-resource workflow, and that this step creates the desired resource */ 
-            if (self.shouldtrackresource && !ko.unwrap(config.workflow.resourceId)) {
+            else if (self.shouldtrackresource && !ko.unwrap(config.workflow.resourceId)) {
                 config.workflow.resourceId(value.resourceid)
             }
         });
@@ -86,7 +91,7 @@ define([
 
             /* set value subscription */ 
             self.value.subscribe(function(value) {
-                // self.__test_save__();
+                self.setToLocalStorage('value', value)
             });
 
             /* cached informationBox logic */ 
@@ -100,6 +105,10 @@ define([
         };
         
         this.__test_save__ = function() {
+            /* 
+                currently SYNCHRONOUS, however async localStore interaction is
+                covered by value subscription. This should be refactored when we can.
+            */ 
             if (ko.unwrap(self.preSaveCallback)) {
                 self.preSaveCallback()();
             }
@@ -110,6 +119,22 @@ define([
                 self.postSaveCallback()();
             }
         };
+
+        this.__test_clear__ = function() {
+            /* 
+                currently SYNCHRONOUS, however async localStore interaction is
+                covered by value subscription. This should be refactored when we can.
+            */ 
+           if (ko.unwrap(self.preClearCallback)) {
+                self.preClearCallback()();
+            }
+
+            self.value(null);
+
+            if (ko.unwrap(self.postClearCallback)) {
+                self.postClearCallback()();
+            }
+        }
 
         this.setToLocalStorage = function(key, value) {
             localStorage.setItem(

@@ -165,7 +165,12 @@
                         Save
                     </span>
                 </button>
-                <button class="btn btn-danger">
+                <button
+                    class="btn btn-danger"
+                    data-bind="
+                        click: activeStep().__test_clear__
+                    "
+                >
                     <i class="fa fa-times-circle"></i>
                     <span>
                         Cancel
