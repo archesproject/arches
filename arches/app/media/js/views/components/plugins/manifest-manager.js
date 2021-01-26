@@ -5,9 +5,10 @@ define([
     'dropzone',
     'uuid',
     'arches',
+    'viewmodels/alert-json',
     'views/components/iiif-viewer',
     'bindings/dropzone'
-], function(ko, koMapping, $, Dropzone, uuid, arches, IIIFViewerViewmodel) {
+], function(ko, koMapping, $, Dropzone, uuid, arches, JsonErrorAlertViewModel, IIIFViewerViewmodel) {
     return ko.components.register('manifest-manager', {
         viewModel: function(params) {
             var self = this;
@@ -16,6 +17,7 @@ define([
             this.metadataLabel = ko.observable('');
             this.metadataValues = ko.observable('');
             this.mainMenu = ko.observable(true);
+            this.alert = params.alert;
             this.addCanvas = function(canvas) { //the function name needs to be better
                 self.canvasesForDeletion.push(canvas);
                 self.canvas(canvas.images[0].resource.service['@id']);
@@ -115,10 +117,11 @@ define([
                             onSuccess();
                         }
                     },
-                    error: function() {
+                    error: function(response) {
                         self.reset();
                         // eslint-disable-next-line no-console
                         console.log("Failed to save manifest");
+                        self.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                         if (onError) {
                             onError();
                         }
@@ -154,10 +157,11 @@ define([
                         self.mainMenu(true);
                         self.activeTab(undefined);
                     },
-                    error: function() {
+                    error: function(response) {
                         self.reset();
                         // eslint-disable-next-line no-console
                         console.log("Failed to delete manifest");
+                        self.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                     }
                 });
             };
