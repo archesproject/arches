@@ -138,10 +138,16 @@
             </div>
 
             <div
-                style="
-                "
             >
-                <button class="btn btn-primary">
+                <button 
+                    class="btn btn-primary"
+                    data-bind="
+                        click: back,
+                        css: {
+                            disabled: !canStepBecomeActive(steps[activeStep()._index - 1]),
+                        }
+                    "
+                >
                     <i class="fa fa-caret-left"></i>
                     <span>
                         Previous Step
@@ -159,7 +165,15 @@
                         Cancel
                     </span>
                 </button>
-                <button class="btn btn-primary">
+                <button 
+                    class="btn btn-primary"
+                    data-bind="
+                        click: next,
+                        css: {
+                            disabled: !canStepBecomeActive(steps[activeStep()._index + 1]),
+                        }
+                    "
+                >
                     <span>
                         Next Step
                     </span>

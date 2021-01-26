@@ -248,7 +248,10 @@ define([
         this.next = function(){
             var activeStep = self.activeStep();
 
-            if (activeStep && (activeStep.complete() || !activeStep.required()) && activeStep._index < self.steps.length - 1) {
+            if (
+                (activeStep.complete() || !activeStep.required()) 
+                && activeStep._index < self.steps.length - 1
+            ) {
                 self.activeStep(self.steps[activeStep._index+1]);
             }
         };
