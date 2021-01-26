@@ -37,7 +37,9 @@ class ManifestManagerView(View):
             if self.check_canvas_in_use(canvas_id):
                 canvases_in_use.append(canvas_id)
         if len(canvases_in_use) > 0:
-            canvas_labels_in_use = [item['label'] for item in canvases_in_manifest if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use]
+            canvas_labels_in_use = [
+                item["label"] for item in canvases_in_manifest if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use
+            ]
             response = f"The manifest cannot be deleted because some canvases are in use: {canvas_labels_in_use}"
             return JSONResponse({"message": response}, status=500)
         manifest.delete()
@@ -127,7 +129,9 @@ class ManifestManagerView(View):
                     canvases_in_use.append(canvas_id)
             canvases = manifest.manifest["sequences"][0]["canvases"]
             if len(canvases_in_use) > 0:
-                canvas_labels_in_use = [item['label'] for item in canvases if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use]
+                canvas_labels_in_use = [
+                    item["label"] for item in canvases if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use
+                ]
                 raise ValueError(f"The canvases cannot be deleted because some canvases are in use: {canvas_labels_in_use}")
             manifest.manifest["sequences"][0]["canvases"] = [
                 canvas for canvas in canvases if canvas["images"][0]["resource"]["service"]["@id"] not in canvas_ids_remove
