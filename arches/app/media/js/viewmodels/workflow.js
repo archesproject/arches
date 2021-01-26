@@ -8,8 +8,11 @@ define([
     'viewmodels/alert',
     'viewmodels/workflow-step'
 ], function(arches, $, _, ko, koMapping, uuid, AlertViewModel, Step) {
+    WORKFLOW_LABEL = 'workflow';
     WORKFLOW_ID_LABEL = 'workflow-id';
+    STEPS_LABEL = 'workflow-steps';
     STEP_ID_LABEL = 'workflow-step-id';
+    STEP_IDS_LABEL = 'workflow-step-ids';
 
     var Workflow = function(config) {
         var self = this;
@@ -46,17 +49,32 @@ define([
         this.warning = '';
 
         this.initialize = function() {
-            var cachedWorkflowId = self.getWorkflowIdFromUrl();
-            if (cachedWorkflowId && self.getStepIdsFromLocalStorage(cachedWorkflowId)) {
-                self.id(cachedWorkflowId)
+            /* workflow ID url logic */  
+            var currentWorkflowId = self.getWorkflowIdFromUrl();
+            if (currentWorkflowId) {
+                self.id(currentWorkflowId)
             }
             else {
                 self.id(uuid.generate());
                 self.setWorkflowIdToUrl();
             }
-            
-            self.createSteps();
 
+            /* cached Step data logic */ 
+            if (self.getFromLocalStorage(WORKFLOW_ID_LABEL) === self.id()) {
+                var cachedStepIds = self.getFromLocalStorage(STEP_IDS_LABEL);
+                self.createSteps(cachedStepIds);
+            }
+            else {
+                self.setToLocalStorage(WORKFLOW_ID_LABEL, self.id());
+                localStorage.removeItem(STEPS_LABEL);
+
+                self.createSteps();
+
+                var stepIds = self.steps.map(function(step) { return step.id(); })
+                self.setToLocalStorage(STEP_IDS_LABEL, stepIds);
+            }
+
+            /* cached activeStep logic */ 
             var cachedActiveStep = self.steps.find(function(step) {
                 return step.id() === self.getStepIdFromUrl();
             });
@@ -73,10 +91,7 @@ define([
             }
         };
 
-        this.createSteps = function() {
-            var generatedStepIds = [];
-            var cachedStepIds = self.getStepIdsFromLocalStorage(self.id());
-
+        this.createSteps = function(cachedStepIds) {
             self.steps.forEach(function(step, i) {
                 if (!(self.steps[i] instanceof Step)) {
                     step.workflow = self;
@@ -89,18 +104,13 @@ define([
                     var newStep = new Step(step);
                     self.steps[i] = newStep;
 
-                    /* if stepIds DO NOT exist for this workflow in localStorage, add id to accumulator */ 
-                    if (!cachedStepIds) { generatedStepIds.push(newStep.id()); }
-
                     self.steps[i].complete.subscribe(function(complete) {
                         if (complete && self.steps[i].autoAdvance()) self.next();
                     });
                 }
+
                 self.steps[i]._index = i;
             });
-
-            /* if stepIds DO NOT exist for this workflow in localStorage, set them */ 
-            if (!cachedStepIds) { self.setStepIdsToLocalStorage(generatedStepIds); }
         };
 
         this.getStepData = function(stepName) {
@@ -135,12 +145,23 @@ define([
             history.replaceState(null, '', newRelativePathQuery);
         };
 
-        this.getStepIdsFromLocalStorage = function(workflowId) {
-            return JSON.parse(localStorage.getItem(`${WORKFLOW_ID_LABEL}-${workflowId}`));
+        this.setToLocalStorage = function(key, value) {
+            var workflowLocalStorageData = JSON.parse(localStorage.getItem(WORKFLOW_LABEL)) || {};
+            
+            workflowLocalStorageData[key] = value;
+
+            localStorage.setItem(
+                WORKFLOW_LABEL, 
+                JSON.stringify(workflowLocalStorageData)
+            );
         };
 
-        this.setStepIdsToLocalStorage = function(stepIds) {
-            return localStorage.setItem(`${WORKFLOW_ID_LABEL}-${self.id()}`, JSON.stringify(stepIds));
+        this.getFromLocalStorage = function(key) {
+            var localStorageData = JSON.parse(localStorage.getItem(WORKFLOW_LABEL));
+
+            if (localStorageData) {
+                return localStorageData[key];
+            }
         };
 
         this.getJSON = function(pluginJsonFileName) {
