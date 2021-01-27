@@ -1339,7 +1339,7 @@ class FileListDataType(BaseDataType):
                 try:
                     if file["file_id"]:
                         if file["url"] == "/files/{}".format(file["file_id"]):
-                            val = uuid.UUID(file["file_id"]) # to test if file_id is uuid
+                            val = uuid.UUID(file["file_id"])  # to test if file_id is uuid
                             file_path = "uploadedfiles/" + file["name"]
                             file_model, created = models.File.objects.get_or_create(pk=file["file_id"], path=file_path)
                             if not file_model.tile_id:
