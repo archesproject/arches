@@ -1337,12 +1337,20 @@ class FileListDataType(BaseDataType):
         if tile.data[nodeid]:
             for file in tile.data[nodeid]:
                 try:
-                    file_model = models.File.objects.get(pk=file["file_id"])
-                    if not file_model.tile_id:
-                        file_model.tile = tile
-                        file_model.save()
-                except ObjectDoesNotExist:
-                    logger.warning(_("A file is not available for this tile"))
+                    if file["file_id"]:
+                        if file["url"] == "/files/{}".format(file["file_id"]):
+                            val = uuid.UUID(file["file_id"]) # to test if file_id is uuid
+                            file_path = "uploadedfiles/" + file["name"]
+                            file_model, created = models.File.objects.get_or_create(pk=file["file_id"], path=file_path)
+                            if not file_model.tile_id:
+                                file_model.tile = tile
+                                file_model.save()
+                        else:
+                            logger.warning(_("The file url is invalid"))
+                    else:
+                        logger.warning(_("A file is not available for this tile"))
+                except ValueError:
+                    logger.warning(_("A file record needs uuid"))
 
     def transform_export_values(self, value, *args, **kwargs):
         return ",".join([settings.MEDIA_URL + "uploadedfiles/" + str(file["name"]) for file in value])
