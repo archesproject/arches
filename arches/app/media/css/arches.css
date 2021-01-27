@@ -591,6 +591,68 @@ input[type="checkbox"] {
     padding: 0 0 218px 25px;
 }
 
+.tabbed-workflow-step-body {
+    background-color: #fff;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.tabbed-workflow-information-box-marker {
+    font-size: 14px;
+    padding-left: 2px;
+    padding-right: 6px;
+    margin-top: 3px;
+    cursor: pointer;
+    color: #454545;
+}
+
+.tabbed-workflow-information-box-marker.seen {
+    visibility: visible;
+    opacity: 1;
+    transition: all 0.6s linear;
+}
+
+.tabbed-workflow-information-box-marker.unseen {
+    visibility: hidden;
+    position: absolute;
+    opacity: 0;
+}
+
+.tabbed-workflow-step-information-box-container.seen {
+    visibility: visible;
+    opacity: 1;
+    transition: all 0.6s linear;
+}
+
+.tabbed-workflow-step-information-box-container.unseen {
+    visibility: hidden;
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+}
+
+.tabbed-workflow-step-information-box {
+    padding: 10px 20px 20px 20px;
+    background-color: #fafafa;
+    border: 1px solid #ddd;
+    color: grey;
+}
+
+.tabbed-workflow-step-body .card-component {
+    margin: unset;
+    padding: 0 25px;
+}
+
+.tabbed-workflow-step-body .card-title, 
+.tabbed-workflow-step-body .card-instructions {
+    display: none;
+}
+
+.tabbed-workflow-step-body > div {
+    background-color: #fff !important;
+    border: none !important;
+}
+
 .workflow-step-body .workbench-card-wrapper {
     margin-left: -25px;
 }
@@ -735,6 +797,69 @@ div.wf-multi-tile-card-info div {
     border-top: 1px solid #ddd;
 }
 
+.tabbed-workflow-title-bar {
+    display: flex;
+    background-color: #eceef0;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #ddd;
+    padding: 6px 64px 6px 12px;
+    font-size: medium;
+    font-weight: 600;
+}
+
+.workflow-nav-tab-container {
+    width: 100vw;
+    overflow-x: scroll;
+}
+
+.workflow-nav-tab-list {
+    padding: 0px 50px 0px 10px;
+    background-color: #fafafa;
+    display: flex;
+    min-width: max-content;
+}
+
+.workflow-nav-tab-list-item {
+    display: flex !important; /* override navs.less */
+    align-items: center;
+}
+.workflow-nav-tab {
+    width: 200px;
+    padding: 10px 20px;
+    border-right: 1px solid #ddd;
+}
+
+.workflow-nav-tab.active {
+    background-color: #fff;
+    font-weight: 600;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+
+.workflow-nav-tab.inactive {
+    cursor: pointer;
+}
+
+.workflow-nav-tab.disabled {
+    color: darkgrey;
+    cursor: not-allowed;
+}
+
+.workflow-nav-tab-arrow {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 4px;
+    padding-top: 6px;
+    font-size: 15px;
+}
+
+.workflow-nav-tab-arrow.disabled {
+    color: #a9a9a9;
+    cursor: default;
+}
+
 .workflow-nav-controls {
     width: 60px;
     display: flex;
@@ -769,6 +894,7 @@ div.wf-multi-tile-card-info div {
 
 .workflow-plugin {
     flex-grow: inherit;
+    background-color: #fff;
 }
 
 .workflow-select-plugin {
@@ -1617,6 +1743,7 @@ div.final-cons-step-separator>h4 {
 .workbench-card-sidebar-tab.disabled {
     color: #aaa;
     cursor: auto;
+    pointer-events: none;
 }
 
 .workbench-card-sidebar-tab i {
@@ -1646,6 +1773,13 @@ div.final-cons-step-separator>h4 {
 .workbench-card-sidepanel.expanded {
     width: 600px;
     z-index: 1001;
+}
+
+.manifest-manager-canvas-name {
+    width: 315px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .basemap-listing,
@@ -2187,6 +2321,17 @@ div.final-cons-step-separator>h4 {
     padding-right: 25px;
     padding-top: 5px;
     padding-left: 22px;
+}
+
+.option-input {
+    display: flex; 
+    flex-wrap: wrap; 
+    max-width: 100%;
+}
+
+.option-input-config {
+    display: flex;
+    flex-direction: column;
 }
 
 span.icon-wrap.icon-circle.bg-gray-dark:hover {
@@ -6653,7 +6798,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .panel-config {
     flex-direction: row-reverse;
-    min-width: max-content;
 }
 
 .panel-config .middle-column-container {
@@ -10797,8 +10941,8 @@ table.table.dataTable {
 }
 
 .search-popup-panel {
-    position: absolute;
-    top: 0px;
+    position: fixed;
+    top: 101px;
     right: 0px;
     z-index: 900;
     background-color: #fff;
@@ -12632,6 +12776,7 @@ a.jstree-anchor.permissions-widget {
 
 .gallery-visible.show-gallery-control {
     bottom: 159px;
+    z-index: 2000;
 }
 
 .show-gallery-control.gallery-expanded {
@@ -12743,6 +12888,7 @@ a.jstree-anchor.permissions-widget {
     padding-left: 0px;
     display: inline-block;
     white-space: nowrap;
+    vertical-align: top;
 }
 
 .iiif-viewer-gallery.gallery-expanded .iiif-gallery-canvas,
@@ -12781,6 +12927,13 @@ a.jstree-anchor.permissions-widget {
     text-decoration: none;
 }
 
+.iiif-gallery-panel {
+    display: flex;
+    flex-direction: column;
+    width: inherit;
+}
+
+
 .gallery-expanded .iiif-gallery-panel {
     padding-left: 15px;
     margin-left: 225px;
@@ -12791,6 +12944,9 @@ a.jstree-anchor.permissions-widget {
     padding-left: 10px;
     position: sticky;
     left: 0px;
+    display: inline-flex;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .gallery-expanded .iiif-gallery-header {
@@ -12887,6 +13043,15 @@ a.jstree-anchor.permissions-widget {
     font-size: 0.9em;
     font-weight: 650;
     color: rgb(91, 155, 215);
+    width: 110px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: initial;
+}
+
+.gallery-expanded .iiif-gallery-canvas-label {
+    width: 100%;
 }
 
 .iiif-gallery-canvas-label .annotation-count {

@@ -20,7 +20,7 @@ from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.utils.geo_utils import GeoUtils
 import arches.app.utils.task_management as task_management
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Terms, Exists, RangeDSLException
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Terms, Nested, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.mappings import RESOURCES_INDEX, RESOURCE_RELATIONS_INDEX
 from django.core.cache import cache
@@ -112,14 +112,19 @@ class StringDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value["val"] != "":
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "":
+                base_query = Bool()
+                base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+                data_field = "tiles.data.%s" % (str(node.pk))
                 match_type = "phrase_prefix" if "~" in value["op"] else "phrase"
-                match_query = Match(field="tiles.data.%s" % (str(node.pk)), query=value["val"], type=match_type)
+                match_query = Nested(path="tiles", query=Match(field=data_field, query=value["val"], type=match_type))
                 if "!" in value["op"]:
-                    query.must_not(match_query)
-                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
+                    base_query.must_not(match_query)
                 else:
-                    query.must(match_query)
+                    base_query.must(match_query)
+                query.must(base_query)
         except KeyError as e:
             pass
 
@@ -189,14 +194,19 @@ class NumberDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value["val"] != "":
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "":
+                base_query = Bool()
+                base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
                 if value["op"] != "eq":
                     operators = {"gte": None, "lte": None, "lt": None, "gt": None}
                     operators[value["op"]] = value["val"]
                 else:
                     operators = {"gte": value["val"], "lte": value["val"]}
-                search_query = Range(field="tiles.data.%s" % (str(node.pk)), **operators)
-                query.must(search_query)
+                search_query = Nested(path="tiles", query=Range(field="tiles.data.%s" % (str(node.pk)), **operators))
+                base_query.must(search_query)
+                query.must(base_query)
         except KeyError:
             pass
 
@@ -248,11 +258,33 @@ class BooleanDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value["val"] != "":
+            if value["val"] == "null" or value["val"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "" and value["val"] is not None:
+                base_query = Bool()
+                base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
                 term = True if value["val"] == "t" else False
-                query.must(Term(field="tiles.data.%s" % (str(node.pk)), term=term))
+                term_query = Nested(path="tiles", query=Term(field="tiles.data.%s" % (str(node.pk)), term=term))
+                base_query.must(term_query)
+                query.must(base_query)
         except KeyError as e:
             pass
+
+    def append_null_search_filters(self, value, node, query, request):
+        """
+        Appends the search query dsl to search for fields that haven't been populated
+        """
+        base_query = Bool()
+        null_query = Bool()
+        data_exists_query = Exists(field="tiles.data.%s" % (str(node.pk)))
+        nested_query = Nested(path="tiles", query=data_exists_query)
+        null_query.must(nested_query)
+        base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+        if value["val"] == "null":
+            base_query.must_not(null_query)
+        elif value["val"] == "not_null":
+            base_query.must(null_query)
+        query.must(base_query)
 
     def to_rdf(self, edge_info, edge):
         # returns an in-memory graph object, containing the domain resource, its
@@ -332,7 +364,11 @@ class DateDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value["val"] != "" and value["val"] is not None:
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "" and value["val"] is not None:
+                base_query = Bool()
+                base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
                 try:
                     date_value = datetime.strptime(value["val"], "%Y-%m-%d %H:%M:%S%z").astimezone().isoformat()
                 except ValueError:
@@ -342,8 +378,9 @@ class DateDataType(BaseDataType):
                     operators[value["op"]] = date_value
                 else:
                     operators = {"gte": date_value, "lte": date_value}
-                search_query = Range(field="tiles.data.%s" % (str(node.pk)), **operators)
-                query.must(search_query)
+                search_query = Nested(path="tiles", query=Range(field="tiles.data.%s" % (str(node.pk)), **operators))
+                base_query.must(search_query)
+                query.must(base_query)
         except KeyError:
             pass
 
@@ -445,10 +482,15 @@ class EDTFDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         def add_date_to_doc(query, edtf):
+            base_query = Bool()
+            base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
             if value["op"] == "eq":
                 if edtf.lower != edtf.upper:
                     raise Exception(_('Only dates that specify an exact year, month, and day can be used with the "=" operator'))
-                query.should(Match(field="tiles.data.%s.dates.date" % (str(node.pk)), query=edtf.lower, type="phrase_prefix"))
+                match_query = Nested(
+                    path="tiles", query=Match(field="tiles.data.%s.dates.date" % (str(node.pk)), query=edtf.lower, type="phrase_prefix")
+                )
+                base_query.should(match_query)
             else:
                 if value["op"] == "overlaps":
                     operators = {"gte": edtf.lower, "lte": edtf.upper}
@@ -464,18 +506,27 @@ class EDTFDataType(BaseDataType):
                     operators = {value["op"]: edtf.lower or edtf.upper}
 
                 try:
-                    query.should(Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators))
-                    query.should(Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators))
+                    base_query.should(Nested(path="tiles", query=Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators)))
+                    base_query.should(
+                        Nested(
+                            path="tiles",
+                            query=Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators),
+                        )
+                    )
                 except RangeDSLException:
                     if edtf.lower is None and edtf.upper is None:
                         raise Exception(_("Invalid date specified."))
+            query.must(base_query)
 
-        edtf = ExtendedDateFormat(value["val"])
-        if edtf.result_set:
-            for result in edtf.result_set:
-                add_date_to_doc(query, result)
-        else:
-            add_date_to_doc(query, edtf)
+        if value["op"] == "null" or value["op"] == "not_null":
+            self.append_null_search_filters(value, node, query, request)
+        elif value["val"] != "" and value["val"] is not None:
+            edtf = ExtendedDateFormat(value["val"])
+            if edtf.result_set:
+                for result in edtf.result_set:
+                    add_date_to_doc(query, result)
+            else:
+                add_date_to_doc(query, edtf)
 
     def default_es_mapping(self):
         return {"properties": {"value": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}}}
@@ -1517,14 +1568,17 @@ class DomainDataType(BaseDomainDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value["val"] != "":
-                search_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
-                # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(value['val']))
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "":
+                base_query = Bool()
+                base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+                search_query = Nested(path="tiles", query=Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"]))
                 if "!" in value["op"]:
-                    query.must_not(search_query)
-                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
+                    base_query.must_not(search_query)
                 else:
-                    query.must(search_query)
+                    base_query.must(search_query)
+                query.must(base_query)
 
         except KeyError as e:
             pass
@@ -1622,14 +1676,17 @@ class DomainListDataType(BaseDomainDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value["val"] != "":
-                search_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
-                # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(value['val']))
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "":
+                base_query = Bool()
+                base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+                search_query = Nested(path="tiles", query=Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"]))
                 if "!" in value["op"]:
-                    query.must_not(search_query)
-                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
+                    base_query.must_not(search_query)
                 else:
-                    query.must(search_query)
+                    base_query.must(search_query)
+                query.must(base_query)
         except KeyError as e:
             pass
 
@@ -1682,9 +1739,9 @@ class ResourceInstanceDataType(BaseDataType):
                     resourceXresourceId = resourceXresource["resourceXresourceId"]
                 if not resourceXresourceId:
                     continue
-                rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
-                resourceid = str(rr.resourceinstanceidto_id)
                 try:
+                    rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
+                    resourceid = str(rr.resourceinstanceidto_id)
                     resource_document = se.search(index=RESOURCES_INDEX, id=resourceid)
                     displayname = resource_document["_source"]["displayname"]
                 except NotFoundError as e:
@@ -1693,18 +1750,26 @@ class ResourceInstanceDataType(BaseDataType):
 
                         displayname = Resource.objects.get(pk=resourceid).displayname
                     except ObjectDoesNotExist:
+                        rr = None
                         logger.info(
-                            f"Resource {resourceid} not available. This message may appear during resource load, \
+                            f"Resource with resourceXresourceId {resourceXresourceId} not available. This message may appear during resource load, \
                                 in which case the problem will be resolved once the related resource is loaded"
                         )
-                ret.append(
-                    {
-                        "resourceName": displayname,
-                        "resourceId": resourceid,
-                        "ontologyProperty": rr.relationshiptype,
-                        "inverseOntologyProperty": rr.inverserelationshiptype,
-                    }
-                )
+                except ObjectDoesNotExist:
+                    rr = None
+                    logger.info(
+                        f"Resource with resourceXresourceId {resourceXresourceId} not available. This message may appear during resource load, \
+                            in which case the problem will be resolved once the related resource is loaded"
+                    )
+                if rr is not None:
+                    ret.append(
+                        {
+                            "resourceName": displayname,
+                            "resourceId": resourceid,
+                            "ontologyProperty": rr.relationshiptype,
+                            "inverseOntologyProperty": rr.inverserelationshiptype,
+                        }
+                    )
         return ret
 
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
@@ -1790,8 +1855,8 @@ class ResourceInstanceDataType(BaseDataType):
             for rr in models.ResourceXResource.objects.filter(pk__in=to_delete):
                 rr.delete()
 
-    def post_tile_delete(self, tile, nodeid):
-        if tile.data and tile.data[nodeid]:
+    def post_tile_delete(self, tile, nodeid, index=True):
+        if tile.data and tile.data[nodeid] and index:
             for related in tile.data[nodeid]:
                 se.delete(index=RESOURCE_RELATIONS_INDEX, id=related["resourceXresourceId"])
 
@@ -1831,14 +1896,19 @@ class ResourceInstanceDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value["val"] != "" and value["val"] != []:
-                # search_query = Match(field="tiles.data.%s.resourceId" % (str(node.pk)), type="phrase", query=value["val"])
-                search_query = Terms(field="tiles.data.%s.resourceId.keyword" % (str(node.pk)), terms=value["val"])
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "" and value["val"] != []:
+                base_query = Bool()
+                base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+                search_query = Nested(
+                    path="tiles", query=Terms(field="tiles.data.%s.resourceId.keyword" % (str(node.pk)), terms=value["val"])
+                )
                 if "!" in value["op"]:
-                    query.must_not(search_query)
-                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
+                    base_query.must_not(search_query)
                 else:
-                    query.must(search_query)
+                    base_query.must(search_query)
+                query.must(base_query)
         except KeyError as e:
             pass
 

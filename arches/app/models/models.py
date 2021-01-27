@@ -716,11 +716,11 @@ class ResourceXResource(models.Model):
     created = models.DateTimeField()
     modified = models.DateTimeField()
 
-    def delete(self, *args, **kwargs):
-        from arches.app.search.search_engine_factory import SearchEngineInstance as se
-        from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
-
-        se.delete(index=RESOURCE_RELATIONS_INDEX, id=self.resourcexid)
+    def delete(self, index=True, *args, **kwargs):
+        if index:
+            from arches.app.search.search_engine_factory import SearchEngineInstance as se
+            from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
+            se.delete(index=RESOURCE_RELATIONS_INDEX, id=self.resourcexid)
 
         # update the resource-instance tile by removing any references to a deleted resource
         deletedResourceId = kwargs.pop("deletedResourceId", None)
@@ -1224,7 +1224,7 @@ def send_email_on_save(sender, instance, **kwargs):
                 email_to = instance.recipient.email
             else:
                 email_to = context["email"]
-            subject, from_email, to = instance.notif.notiftype.name, "from@example.com", email_to
+            subject, from_email, to = instance.notif.notiftype.name, settings.DEFAULT_FROM_EMAIL, email_to
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
@@ -1357,6 +1357,14 @@ class IIIFManifest(models.Model):
         managed = True
         db_table = "iiif_manifests"
 
+
+class ManifestImage(models.Model):
+    imageid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    image = models.ImageField(upload_to="cantaloupe")
+
+    class Meta:
+        managed = True
+        db_table = "manifest_images"
 
 class GroupMapSettings(models.Model):
     group = models.OneToOneField(Group, on_delete=models.CASCADE)

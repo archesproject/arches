@@ -92,9 +92,11 @@
     <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
         <option value="">{% trans "References" %}</option>
         <option value="!">{% trans "Does not reference" %}</option>
+        <option value="null">{% trans "Has no value" %}</option>
+        <option value="not_null">{% trans "Has any value" %}</option>
     </select>
 </div>
-<div class="col-md-8 col-lg-9 resource-instance-search">
+<div class="col-md-8 col-lg-9 resource-instance-search" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
     <!-- ko component: {
         name:  datatype.datatype.includes('list') ? 'resource-instance-multiselect-widget' : 'resource-instance-select-widget',
         params: {

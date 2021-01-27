@@ -335,10 +335,9 @@ class Graph(models.GraphModel):
                 old.update({k: v})
         return old, new
 
-    def _update_node(self, node, datatype_factory, se):
+    def update_es_node_mapping(self, node, datatype_factory, se):
         already_saved = models.Node.objects.filter(pk=node.nodeid).exists()
         saved_node_datatype = None
-        node.save()
         if already_saved:
             saved_node = models.Node.objects.get(pk=node.nodeid)
             saved_node_datatype = saved_node.datatype
@@ -371,10 +370,12 @@ class Graph(models.GraphModel):
 
             if nodeid is not None:
                 node = self.nodes[nodeid]
-                self._update_node(node, datatype_factory, se)
+                self.update_es_node_mapping(node, datatype_factory, se)
+                node.save()
             else:
                 for node in self.nodes.values():
-                    self._update_node(node, datatype_factory, se)
+                    self.update_es_node_mapping(node, datatype_factory, se)
+                    node.save()
 
             for edge in self.edges.values():
                 edge.save()

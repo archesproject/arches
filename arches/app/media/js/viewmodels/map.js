@@ -10,6 +10,7 @@ define([
 ], function($, _, arches, ko, koMapping, mapboxgl, MapboxGeocoder, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
+
         var geojsonSourceFactory = function() {
             return {
                 "type": "geojson",
@@ -20,39 +21,118 @@ define([
                 }
             };
         };
+
+        this.activeTab = ko.observable(ko.unwrap(params.activeTab));
+
+        var boundingOptions = {
+            padding: {
+                top: 40,
+                left: 40 + (self.activeTab() ? 200: 0),
+                bottom: 40,
+                right: 40 + (self.activeTab() ? 200: 0)
+            },
+            animate: false
+        };
+
+        this.map = ko.observable(ko.unwrap(params.map));
+        this.map.subscribe(function(map) {
+            self.setupMap(map);
+
+            if (ko.unwrap(params.x) && ko.unwrap(params.y)) {
+                var center = map.getCenter();
+            
+                lng = parseFloat(params.x());
+                lat = parseFloat(params.y());
+                
+                if (lng) { center.lng = lng; }
+                if (lat) { center.lat = lat; }
+    
+                map.setCenter(center);
+            }
+
+            if (ko.unwrap(params.zoom)) {
+                map.setZoom(ko.unwrap(params.zoom));
+            }
+
+            if (ko.unwrap(params.bounds)) {
+                map.fitBounds(ko.unwrap(params.bounds), boundingOptions);
+            }
+        })
+
+        this.bounds = ko.observable(ko.unwrap(params.bounds) || arches.hexBinBounds);
+        this.bounds.subscribe(function(bounds) {
+            if (bounds && self.map()) {
+                self.map().fitBounds(bounds, boundingOptions);
+            }
+
+            if (ko.isObservable(params.fitBounds) && params.fitBounds() !== bounds){
+                params.fitBounds(bounds);
+            }
+        });
+
+        this.centerX = ko.observable(ko.unwrap(params.x) || arches.mapDefaultX);
+        this.centerX.subscribe(function(lng) {
+            if (lng && self.map()) {
+                var center = self.map().getCenter();
+                center.lng = lng;
+            
+                self.map().setCenter(center);
+            }
+            if (ko.isObservable(params.x) && params.x() !== lng) {
+                params.x(lng);
+            }
+        });
+
+        this.centerY = ko.observable(ko.unwrap(params.y) || arches.mapDefaultY);
+        this.centerY.subscribe(function(lat) {
+            if (lat && self.map()) {
+                var center = self.map().getCenter();
+                center.lat = lat;
+            
+                self.map().setCenter(center);
+            }
+            if (ko.isObservable(params.y) && params.y() !== lat) {
+                params.y(lat);
+            }
+        });
         
-        var x = ko.unwrap(params.x) ? params.x : arches.mapDefaultX;
-        var y = ko.unwrap(params.y) ? params.y : arches.mapDefaultY;
-        var bounds = ko.unwrap(params.bounds) ? params.bounds : arches.hexBinBounds;
-        var zoom = ko.unwrap(params.zoom) ? params.zoom : arches.mapDefaultZoom;
-        var minZoom = arches.mapDefaultMinZoom;
-        var maxZoom = arches.mapDefaultMaxZoom;
+        this.zoom = ko.observable(ko.unwrap(params.zoom) || arches.mapDefaultZoom);
+        this.zoom.subscribe(function(level) {
+            if (level && self.map()) { self.map().setZoom(level) };
+
+            if (ko.isObservable(params.zoom) && params.zoom() !== level) {
+                params.zoom(level);
+            }
+        });
+
+        this.overlayConfigs = ko.observableArray(ko.unwrap(params.overlayConfigs));
+        this.overlayConfigs.subscribe(function(overlayConfigs) {
+            if (ko.isObservable(params.overlayConfigs)) {
+                params.overlayConfigs(overlayConfigs)
+            }
+        })
+        
+        this.activeBasemap = ko.observable();  // params.basemap is a string, activeBasemap is a map. Cannot initialize from params.
+        this.activeBasemap.subscribe(function(basemap) {
+            if (ko.isObservable(params.basemap) && params.basemap() !== basemap.name) {
+                params.basemap(basemap.name);
+            }
+        });
+
         var sources = Object.assign({
             "resource": geojsonSourceFactory(),
             "search-results-hex": geojsonSourceFactory(),
             "search-results-hashes": geojsonSourceFactory(),
             "search-results-points": geojsonSourceFactory()
         }, arches.mapSources, params.sources);
-        var mapLayers = params.mapLayers || arches.mapLayers;
-
-        this.map = ko.isObservable(params.map) ? params.map : ko.observable();
-        this.popupTemplate = popupTemplate;
+        
         this.basemaps = params.basemaps || [];
         this.overlays = params.overlaysObservable || ko.observableArray();
-        this.activeBasemap = params.activeBasemap || ko.observable();
-        this.activeTab = ko.observable(params.activeTab);
-        this.hideSidePanel = function() {
-            self.activeTab(undefined);
-        };
-        this.activeTab.subscribe(function() {
-            var map = self.map();
-            if (map && map.getStyle()) setTimeout(function() { map.resize(); }, 1);
-        });
-
+        
+        var mapLayers = params.mapLayers || arches.mapLayers;
         mapLayers.forEach(function(layer) {
             if (!layer.isoverlay) {
                 if (!params.basemaps) self.basemaps.push(layer);
-                if (layer.addtomap && !params.activeBasemap) self.activeBasemap(layer);
             }
             else if (!params.overlaysObservable) {
                 if (layer.searchonly && !params.search) return;
@@ -63,9 +143,63 @@ define([
                         layer.opacity(value ? 100 : 0);
                     }
                 });
+                
+                layer.updateParent = function(parent) {
+                    if (self.overlayConfigs.indexOf(layer.maplayerid) === -1) {
+                        self.overlayConfigs.push(layer.maplayerid)
+                        layer.opacity(100)
+                    } else {
+                        self.overlayConfigs.remove(layer.maplayerid);
+                        layer.opacity(0)
+                    }
+                    
+                    if (parent !== self) {
+                        parent.overlayConfigs(self.overlayConfigs())
+
+                        if (params.inWidget) {
+                            try {
+                                parent.overlays.valueHasMutated();
+                            } catch(e) {
+                                console.log(e);
+                            }
+                        }
+                    }
+                };
+
                 self.overlays.push(layer);
             }
         });
+        
+        if (!self.activeBasemap()) {
+            var basemap = ko.unwrap(self.basemaps).find(function(basemap) {
+                return ko.unwrap(params.basemap) === basemap.name;
+            });
+
+            if (!basemap && params.config) {
+                basemap = ko.unwrap(self.basemaps).find(function(basemap) {
+                    return params.config().basemap === basemap.name;
+                });
+            }
+
+            if (!basemap) {
+                basemap = ko.unwrap(self.basemaps).find(function(basemap) {
+                    return basemap.addtomap;
+                });
+            }
+
+            self.activeBasemap(basemap);
+        }
+
+        for (var overlay of self.overlays()) {
+            if (
+                ko.unwrap(self.overlayConfigs) && self.overlayConfigs.indexOf(overlay.maplayerid) > -1
+                || params.search && overlay.addtomap
+            ) {
+                overlay.opacity(100);
+            } else {
+                overlay.opacity(0);
+            }
+        }
 
         _.each(sources, function(sourceConfig) {
             if (sourceConfig.tiles) {
@@ -140,7 +274,9 @@ define([
                     }).concat(layers);
                 }
             });
-            layers = self.activeBasemap().layer_definitions.slice(0).concat(layers);
+            if (ko.unwrap(self.activeBasemap)) {
+                layers = ko.unwrap(self.activeBasemap).layer_definitions.slice(0).concat(layers);
+            }
             if (this.additionalLayers) {
                 layers = layers.concat(ko.unwrap(this.additionalLayers));
             }
@@ -155,18 +291,22 @@ define([
                 glyphs: arches.mapboxGlyphs,
                 layers: self.layers(),
                 center: [
-                    parseFloat(ko.unwrap(x)),
-                    parseFloat(ko.unwrap(y))
+                    parseFloat(self.centerX()),
+                    parseFloat(self.centerY()),
                 ],
-                zoom: parseFloat(ko.unwrap(zoom)),
+                zoom: parseFloat(self.zoom()),
             },
-            maxZoom: maxZoom,
-            minZoom: minZoom,
+            maxZoom: arches.mapDefaultMaxZoom,
+            minZoom: arches.mapDefaultMinZoom,
         };
         if (!params.usePosition) {
-            this.mapOptions.bounds = bounds;
+            this.mapOptions.bounds = self.bounds;
             this.mapOptions.fitBoundsOptions = params.fitBoundsOptions;
         }
+
+        this.hideSidePanel = function() {
+            self.activeTab(undefined);
+        };
 
         this.toggleTab = function(tabName) {
             if (self.activeTab() === tabName) {
@@ -177,11 +317,11 @@ define([
         };
 
         this.updateLayers = function(layers) {
-            var map = self.map();
-            var style = map.getStyle();
+            var style = self.map().getStyle();
+
             if (style) {
-                style.layers = layers;
-                map.setStyle(style);
+                style.layers = self.draw ? layers.concat(self.draw.options.styles) : layers;
+                self.map().setStyle(style);
             }
         };
 
@@ -237,6 +377,7 @@ define([
             }
         };
 
+        this.popupTemplate = popupTemplate;
         this.onFeatureClick = function(feature, lngLat) {
             var map = self.map();
             self.popup = new mapboxgl.Popup()
@@ -270,6 +411,7 @@ define([
                 self.layers.subscribe(self.updateLayers);
 
                 var hoverFeature;
+
                 map.on('mousemove', function(e) {
                     var style = map.getStyle();
                     if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: false });
@@ -278,8 +420,19 @@ define([
                         self.isFeatureClickable
                     );
                     if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: true });
+
                     map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
+                    if (self.map().draw_mode) {
+                        var crosshairModes = [
+                            "draw_point",
+                            "draw_line_string",
+                            "draw_polygon",
+                        ];
+                        map.getCanvas().style.cursor = crosshairModes.includes(self.map().draw_mode) ? "crosshair" : "";
+                    }
                 });
+
+                map.draw_mode = null;
 
                 map.on('click', function(e) {
                     if (hoverFeature) {
@@ -287,70 +440,23 @@ define([
                     }
                 });
 
+                map.on('zoomend', function() {
+                    self.zoom(
+                        parseFloat(map.getZoom())
+                    );
+                });
+
+                map.on('dragend', function() {
+                    var center = map.getCenter();
+                    self.centerX(parseFloat(center.lng));
+                });
+
+                map.on('dragend', function() {
+                    var center = map.getCenter();
+                    self.centerY(parseFloat(center.lat));
+                });
+
                 self.map(map);
-                if (params.fitBounds){
-                    var padding = 40;
-                    var activeTab = self.activeTab();
-                    var options = {
-                        padding: {
-                            top: padding,
-                            left: padding + (activeTab ? 200: 0),
-                            bottom: padding,
-                            right: padding + (activeTab ? 200: 0)
-                        },
-                        animate: false
-                    };
-                    var bounds = params.fitBounds();
-                    if (bounds) {
-                        map.fitBounds(bounds, options);
-                    } else {
-                        var fitBounds = params.fitBounds.subscribe(function(bounds) {
-                            map.fitBounds(bounds, options);
-                            fitBounds.dispose();
-                        });
-                    }
-                }
-                setTimeout(function() { map.resize(); }, 1);
-
-                if (ko.isObservable(zoom)) {
-                    map.on('zoomend', function() {
-                        zoom(map.getZoom());
-                    });
-                    zoom.subscribe(function(level) {
-                        level = parseFloat(level);
-                        if (level) map.setZoom(level);
-                    });
-                }
-
-                if (ko.isObservable(x)) {
-                    map.on('dragend', function() {
-                        var center = map.getCenter();
-                        x(center.lng);
-                    });
-                    x.subscribe(function(lng) {
-                        var center = map.getCenter();
-                        lng = parseFloat(lng);
-                        if (lng) {
-                            center.lng = lng;
-                            map.setCenter(center);
-                        }
-                    });
-                }
-
-                if (ko.isObservable(y)) {
-                    map.on('dragend', function() {
-                        var center = map.getCenter();
-                        y(center.lat);
-                    });
-                    y.subscribe(function(lat) {
-                        var center = map.getCenter();
-                        lat = parseFloat(lat);
-                        if (lat) {
-                            center.lat = lat;
-                            map.setCenter(center);
-                        }
-                    });
-                }
             });
         };
     };
