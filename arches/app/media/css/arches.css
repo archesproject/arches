@@ -12812,6 +12812,10 @@ a.jstree-anchor.permissions-widget {
     margin-right: 400px;
 }
 
+.hidden-file-input {
+    display: none;
+}
+
 .add-new-crumb {
     float: right;
     cursor: pointer;
@@ -12821,6 +12825,21 @@ a.jstree-anchor.permissions-widget {
     border: 1px solid #0A0737;
     border-radius: 2px;
     margin-top: -1px;
+}
+
+.map-data-drop-area {
+    padding: 15px;
+    border: 1px dashed #808080;
+    color: #808080;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.map-data-drop-area:hover,
+.map-data-drop-area.drag-hover {
+    border: 1px dashed black;
+    color: black;
+    background-color: #EEEEEE;
 }
 
 .iiif-gallery-content {
