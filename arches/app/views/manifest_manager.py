@@ -41,7 +41,9 @@ class ManifestManagerView(View):
             canvas_labels_in_use = [
                 item["label"] for item in canvases_in_manifest if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use
             ]
-            response = "This manifest cannot be deleted because the following canvases have resource annotations: {}".format(", ".join(canvas_labels_in_use))
+            response = "This manifest cannot be deleted because the following canvases have resource annotations: {}".format(
+                ", ".join(canvas_labels_in_use)
+            )
             return JSONResponse({"message": response}, status=500)
         manifest.delete()
         return JSONResponse({"success": True})
@@ -134,7 +136,9 @@ class ManifestManagerView(View):
                     item["label"] for item in canvases if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use
                 ]
                 raise ManifestValidationError(
-                    "The following canvases cannot be deleted because they have resource annotations: {}".format(", ".join(canvas_labels_in_use))
+                    "The following canvases cannot be deleted because they have resource annotations: {}".format(
+                        ", ".join(canvas_labels_in_use)
+                    )
                 )
             manifest.manifest["sequences"][0]["canvases"] = [
                 canvas for canvas in canvases if canvas["images"][0]["resource"]["service"]["@id"] not in canvas_ids_remove
