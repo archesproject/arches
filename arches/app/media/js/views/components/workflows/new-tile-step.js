@@ -118,16 +118,16 @@ define([
     
                 self.card.subscribe(function(card){
                     if (card) {
-                        if (params.preSaveCallback) {
+                        if (params.preSaveCallback && !ko.unwrap(params.preSaveCallback)) {
                             card.preSaveCallback = params.preSaveCallback;
                         }
-                        if (params.postSaveCallback) {
+                        if (params.postSaveCallback && !ko.unwrap(params.postSaveCallback)) {
                             card.postSaveCallback = params.postSaveCallback;
                         }
-                        if (params.preClearCallback) {
+                        if (params.preClearCallback && !ko.unwrap(params.preClearCallback)) {
                             card.preClearCallback = params.preClearCallback;
                         }
-                        if (params.postClearCallback) {
+                        if (params.postClearCallback && !ko.unwrap(params.postClearCallback)) {
                             card.postClearCallback = params.postClearCallback;
                         }
                     }

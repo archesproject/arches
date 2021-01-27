@@ -130,13 +130,14 @@ define([
                 currently SYNCHRONOUS, however async localStore interaction is
                 covered by value subscription. This should be refactored when we can.
             */ 
-
             var preClearCallback = ko.unwrap(self.preClearCallback);
             if (preClearCallback) {
                 preClearCallback();
             }
 
             self.value(null);
+            self.complete(false);
+            self.componentname.valueHasMutated();  /* forces UI refresh of component */
 
             var postClearCallback = ko.unwrap(self.postClearCallback);
             if (postClearCallback) {
