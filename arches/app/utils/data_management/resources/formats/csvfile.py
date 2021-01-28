@@ -410,6 +410,18 @@ class CsvReader(Reader):
     ):
         # errors = businessDataValidator(self.business_data)
         celery_worker_running = task_management.check_if_celery_available()
+        try:
+            mapping_filefieldname_to_nodeid_dict = {n["file_field_name"].upper(): n["arches_nodeid"] for n in mapping["nodes"]}
+            col_header_to_nodeid_dict = {header: mapping_filefieldname_to_nodeid_dict[header.upper()] for header in business_data[1].keys()}
+        except KeyError as e:
+            errors.append(
+                {
+                    "type": "WARNING",
+                    "message": f"Match failed between column header and mapping file_field_name. See detail: {e}.",
+                }
+            )
+            if len(errors) > 0:
+                self.errors += errors
 
         print("Starting import of business data")
         self.start = time()
@@ -709,6 +721,7 @@ class CsvReader(Reader):
                                     blanktilecache[str(key)] = blank_tile
 
                 def column_names_to_targetids(row, mapping, row_number):
+                    # TODO: utilize col_header_to_nodeid_dict at start of method to make this a dict lookup instead of loop
                     errors = []
                     new_row = []
                     if "ADDITIONAL" in row or "MISSING" in row:
