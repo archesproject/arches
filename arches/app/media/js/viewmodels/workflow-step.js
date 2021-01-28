@@ -4,6 +4,7 @@ define([
     'knockout-mapping',
     'uuid'
 ], function(ko, _, koMapping, uuid) {
+    STEPS_LABEL = 'workflow-steps';
     STEP_ID_LABEL = 'workflow-step-id';
 
     var WorkflowStep = function(config) {
@@ -27,6 +28,11 @@ define([
         this.required = ko.observable(ko.unwrap(config.required));
         this.autoAdvance = ko.observable(true);
 
+        this.preSaveCallback = ko.observable();
+        this.postSaveCallback = ko.observable();
+        this.preClearCallback = ko.observable();
+        this.postClearCallback = ko.observable();
+
         this.externalStepData = {};
 
         var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
@@ -44,7 +50,12 @@ define([
         this.value.subscribe(function(value) {
             /* if we have defined that this is part of a single-resource workflow, and that this step creates the desired resource */ 
             if (self.shouldtrackresource && !ko.unwrap(config.workflow.resourceId)) {
-                config.workflow.resourceId(value.resourceid)
+                if (value) {
+                    config.workflow.resourceId(value.resourceid);
+                } 
+                else {
+                    config.workflow.resourceId(null);
+                }
             }
         });
 
@@ -95,19 +106,65 @@ define([
                 })
             }
         };
+        
+        this.save = function() {
+            /* 
+                currently SYNCHRONOUS, however async localStore interaction is
+                covered by value subscription. This should be refactored when we can.
+            */ 
+            var preSaveCallback = ko.unwrap(self.preSaveCallback);
+            if (preSaveCallback) {
+                preSaveCallback();
+            }
+
+            self.setToLocalStorage('value', self.value())
+
+            var postSaveCallback = ko.unwrap(self.postSaveCallback);
+            if (postSaveCallback) {
+                postSaveCallback();
+            }
+        };
+
+        this.clear = function() {
+            /* 
+                currently SYNCHRONOUS, however async localStore interaction is
+                covered by value subscription. This should be refactored when we can.
+            */ 
+            var preClearCallback = ko.unwrap(self.preClearCallback);
+            if (preClearCallback) {
+                preClearCallback();
+            }
+
+            self.value(null);
+            self.complete(false);
+            self.componentname.valueHasMutated();  /* forces UI refresh of component */
+
+            var postClearCallback = ko.unwrap(self.postClearCallback);
+            if (postClearCallback) {
+                postClearCallback();
+            }
+        }
 
         this.setToLocalStorage = function(key, value) {
+            var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};
+
+            if (!allStepsLocalStorageData[self.id()]) {
+                allStepsLocalStorageData[self.id()] = {};
+            }
+            
+            allStepsLocalStorageData[self.id()][key] = value;
+
             localStorage.setItem(
-                `${STEP_ID_LABEL}-${self.id()}`, 
-                JSON.stringify({ [key]: value })
+                STEPS_LABEL, 
+                JSON.stringify(allStepsLocalStorageData)
             );
         };
 
         this.getFromLocalStorage = function(key) {
-            var localStorageData = JSON.parse(localStorage.getItem(`${STEP_ID_LABEL}-${self.id()}`));
+            var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};
 
-            if (localStorageData) {
-                return localStorageData[key];
+            if (allStepsLocalStorageData[self.id()]) {
+                return allStepsLocalStorageData[self.id()][key];
             }
         };
 
@@ -123,22 +180,16 @@ define([
             Object.keys(self.externalStepData).forEach(function(key) {
                 self.externalStepData[key]['data'] = config.workflow.getStepData(externalStepSourceData[key]);
             });
-        }
-
-        this.hideInformationBox = function() {
-            var informationBoxData = self.informationBoxData();
-            informationBoxData['hidden'] = true;
-
-            self.informationBoxData(informationBoxData);
-            self.setToLocalStorage('informationBoxHidden', true);
         };
 
-        this.showInformationBox = function() {
+        this.toggleInformationBox = function() {
             var informationBoxData = self.informationBoxData();
-            informationBoxData['hidden'] = false;
-            
+            var isHidden = informationBoxData['hidden'];
+
+            informationBoxData['hidden'] = !isHidden;
             self.informationBoxData(informationBoxData);
-            self.setToLocalStorage('informationBoxHidden', false);
+
+            self.setToLocalStorage('informationBoxHidden', !isHidden);
         };
 
         this.getInformationBoxHiddenStateFromLocalStorage = function() {

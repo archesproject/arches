@@ -147,6 +147,36 @@
                                                 }
                                             "></select>
                                         </div>
+                                        <div class="map-data-drop-area" data-bind="event: {
+                                            dragover: self.dropZoneOverHandler,
+                                            drop: self.dropZoneHandler,
+                                            click: self.dropZoneClickHandler,
+                                            dragenter: self.dropZoneEnterHandler,
+                                            dragleave: self.dropZoneLeaveHandler,
+                                            dragend: self.dropZoneLeaveHandler
+                                        }">
+                                            {% trans "Drag GeoJSON or KML files here to add..." %}
+                                        </div>
+                                        <div class="hidden-file-input">
+                                            <input type="file" accept=".json,.geojson,.kml" data-bind="event: {
+                                                change: self.dropZoneFileSelected
+                                            }"/>
+                                        </div>
+                                        <!-- ko if: self.featureLookup[widget.node_id()].dropErrors().length !== 0 -->
+                                        <div class="geojson-error-list">
+                                            <a href="javascript: void(0);" data-bind="click:function () {
+                                                self.featureLookup[widget.node_id()].dropErrors([]);
+                                            }">
+                                                <i class="fa fa-close"></i>
+                                            </a>
+                                            {% trans "The following errors occurred:" %}
+                                            <ul>
+                                                <!-- ko foreach: self.featureLookup[widget.node_id()].dropErrors() -->
+                                                <li data-bind="text: message"></li>
+                                                <!-- /ko-->
+                                            </ul>
+                                        </div>
+                                        <!-- /ko-->
                                         <table class="table">
                                             <tbody>
                                                 <!-- ko foreach: {data: self.featureLookup[widget.node_id()].features, as: 'feature'} -->

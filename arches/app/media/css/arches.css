@@ -591,6 +591,12 @@ input[type="checkbox"] {
     padding: 0 0 218px 25px;
 }
 
+.tabbed-workflow {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
 .tabbed-workflow-step-body {
     background-color: #fff;
     height: 100%;
@@ -651,6 +657,44 @@ input[type="checkbox"] {
 .tabbed-workflow-step-body > div {
     background-color: #fff !important;
     border: none !important;
+}
+
+.tabbed-workflow-step-body .install-buttons {
+    display: none;
+}
+
+.tabbed-workflow-footer {
+    background-color: #fafafa;
+    border-top: 1px solid #ddd;
+    padding: 10px 75px 10px 25px;
+    display: flex; 
+    justify-content: space-between;
+}
+
+.tabbed-workflow-footer .step-counter {
+    display: flex;
+    align-items: center;
+    border-right: 1px solid #ddd;
+    padding-right: 24px;
+    margin-right: 18px;
+}
+
+.tabbed-workflow-footer .toggle-container {
+    padding: unset;
+    padding-top: 6px;
+}
+
+.tabbed-workflow-footer .toggle-container .arches-toggle-subtitle{
+    display: none;
+}
+
+.tabbed-workflow-footer .btn {
+    border-radius: 2px;
+}
+
+.tabbed-workflow-footer .btn > i,
+.tabbed-workflow-footer .btn > span {
+    padding: 0px 2px;
 }
 
 .workflow-step-body .workbench-card-wrapper {
@@ -1773,6 +1817,13 @@ div.final-cons-step-separator>h4 {
 .workbench-card-sidepanel.expanded {
     width: 600px;
     z-index: 1001;
+}
+
+.manifest-manager-canvas-name {
+    width: 315px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .basemap-listing,
@@ -12769,6 +12820,7 @@ a.jstree-anchor.permissions-widget {
 
 .gallery-visible.show-gallery-control {
     bottom: 159px;
+    z-index: 2000;
 }
 
 .show-gallery-control.gallery-expanded {
@@ -12804,6 +12856,10 @@ a.jstree-anchor.permissions-widget {
     margin-right: 400px;
 }
 
+.hidden-file-input {
+    display: none;
+}
+
 .add-new-crumb {
     float: right;
     cursor: pointer;
@@ -12813,6 +12869,21 @@ a.jstree-anchor.permissions-widget {
     border: 1px solid #0A0737;
     border-radius: 2px;
     margin-top: -1px;
+}
+
+.map-data-drop-area {
+    padding: 15px;
+    border: 1px dashed #808080;
+    color: #808080;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.map-data-drop-area:hover,
+.map-data-drop-area.drag-hover {
+    border: 1px dashed black;
+    color: black;
+    background-color: #EEEEEE;
 }
 
 .iiif-gallery-content {
@@ -12861,6 +12932,7 @@ a.jstree-anchor.permissions-widget {
     padding-left: 0px;
     display: inline-block;
     white-space: nowrap;
+    vertical-align: top;
 }
 
 .iiif-viewer-gallery.gallery-expanded .iiif-gallery-canvas,
@@ -12899,6 +12971,13 @@ a.jstree-anchor.permissions-widget {
     text-decoration: none;
 }
 
+.iiif-gallery-panel {
+    display: flex;
+    flex-direction: column;
+    width: inherit;
+}
+
+
 .gallery-expanded .iiif-gallery-panel {
     padding-left: 15px;
     margin-left: 225px;
@@ -12909,6 +12988,9 @@ a.jstree-anchor.permissions-widget {
     padding-left: 10px;
     position: sticky;
     left: 0px;
+    display: inline-flex;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .gallery-expanded .iiif-gallery-header {
@@ -13005,6 +13087,15 @@ a.jstree-anchor.permissions-widget {
     font-size: 0.9em;
     font-weight: 650;
     color: rgb(91, 155, 215);
+    width: 110px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: initial;
+}
+
+.gallery-expanded .iiif-gallery-canvas-label {
+    width: 100%;
 }
 
 .iiif-gallery-canvas-label .annotation-count {

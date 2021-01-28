@@ -609,6 +609,9 @@ AUTO_REFRESH_GEOM_VIEW = True
 TILE_CACHE_TIMEOUT = 600  # seconds
 GRAPH_MODEL_CACHE_TIMEOUT = None  # seconds * hours * days = ~1mo
 
+CANTALOUPE_DIR = os.path.join(ROOT_DIR, "cantaloupe")
+CANTALOUPE_HTTP_ENDPOINT = "http://localhost:8182/"
+
 RENDERERS = [
     {
         "name": "imagereader",
