@@ -6,7 +6,7 @@ define([
     'knockout-mapping',
     'uuid',
     'viewmodels/alert',
-    'viewmodels/workflow-step'
+    'viewmodels/workflow-step',
 ], function(arches, $, _, ko, koMapping, uuid, AlertViewModel, Step) {
     WORKFLOW_LABEL = 'workflow';
     WORKFLOW_ID_LABEL = 'workflow-id';
@@ -20,7 +20,6 @@ define([
         this.id = ko.observable();
 
         this.steps = config.steps || [];
-        this.stepIds = ko.observableArray();
         
         this.hoverStep = ko.observable();
         this.previousStep = ko.observable();
@@ -266,7 +265,10 @@ define([
         this.next = function(){
             var activeStep = self.activeStep();
 
-            if (activeStep && (activeStep.complete() || !activeStep.required()) && activeStep._index < self.steps.length - 1) {
+            if (
+                (activeStep.complete() || !activeStep.required()) 
+                && activeStep._index < self.steps.length - 1
+            ) {
                 self.activeStep(self.steps[activeStep._index+1]);
             }
         };
