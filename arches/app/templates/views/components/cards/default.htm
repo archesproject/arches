@@ -379,7 +379,7 @@
                     <!-- /ko -->
                 <!-- /ko -->
                 
-                <!-- ko if: !tile.tileid && tile.parenttile_id-->
+                <!-- ko if: !tile.tileid && !showChildCards() -->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">{% trans 'Add'  %}</button>
                 <!-- /ko -->
             </div>
