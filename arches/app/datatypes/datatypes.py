@@ -1350,7 +1350,7 @@ class FileListDataType(BaseDataType):
                     else:
                         logger.warning(_("A file is not available for this tile"))
                 except ValueError:
-                    logger.warning(_("A file record needs uuid"))
+                    logger.warning(_("This file's fileid is not a valid UUID"))
 
     def transform_export_values(self, value, *args, **kwargs):
         return ",".join([settings.MEDIA_URL + "uploadedfiles/" + str(file["name"]) for file in value])
