@@ -354,7 +354,7 @@ class CsvReader(Reader):
             if bulk:
                 resources.append(newresourceinstance)
                 if len(resources) >= settings.BULK_IMPORT_BATCH_SIZE:
-                    Resource.bulk_save(resources=resources)
+                    Resource.bulk_save(resources=resources, flat=True)
                     del resources[:]  # clear out the array
             else:
                 try:
@@ -972,6 +972,8 @@ class CsvReader(Reader):
                                                 if len([item for item in list(prototype_tile_copy.data.values()) if item is not None]) > 0:
                                                     if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
                                                         populated_child_tiles.append(prototype_tile_copy)
+                                                        if bulk:
+                                                            populated_tiles.append(prototype_tile_copy)
 
                                             if prototype_tile_copy is not None:
                                                 if child_tile_cardinality == "1" and "NodeGroupID" not in row:
