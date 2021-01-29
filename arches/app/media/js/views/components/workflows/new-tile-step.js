@@ -23,7 +23,7 @@ define([
         if (ko.unwrap(params.resourceid)) {
             self.resourceId(ko.unwrap(params.resourceid));
         } 
-        else if (ko.unwrap(params.workflow.resourceId)) {
+        else if (params.workflow && ko.unwrap(params.workflow.resourceId)) {
             self.resourceId(ko.unwrap(params.workflow.resourceId));
         } 
 
@@ -39,7 +39,7 @@ define([
         
         this.complete = params.complete || ko.observable();
         this.complete.subscribe(function(isComplete) {
-            if (isComplete) {
+            if (isComplete && params.value) {
                 params.value(params.defineStateProperties());
             }
         });
@@ -237,7 +237,9 @@ define([
                 self.resourceId(tile.resourceinstance_id);
             }
 
-            params.value(params.defineStateProperties());
+            if (params.value) {
+                params.value(params.defineStateProperties());
+            }
             
             if (self.completeOnSave === true) { self.complete(true); }
         };
