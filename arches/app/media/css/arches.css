@@ -688,10 +688,13 @@ input[type="checkbox"] {
     display: none;
 }
 
-.tabbed-workflow-footer .btn {
+.tabbed-workflow-footer .btn,
+.tabbed-workflow-title-bar .btn {
     border-radius: 2px;
 }
 
+.tabbed-workflow-title-bar .btn > i,
+.tabbed-workflow-title-bar .btn > span, 
 .tabbed-workflow-footer .btn > i,
 .tabbed-workflow-footer .btn > span {
     padding: 0px 2px;
@@ -847,7 +850,7 @@ div.wf-multi-tile-card-info div {
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid #ddd;
-    padding: 6px 64px 6px 12px;
+    padding: 8px 66px 8px 16px;
     font-size: medium;
     font-weight: 600;
 }

@@ -16,12 +16,39 @@
 
             <div>
                 <!--ko if: activeStep()._index+1 !== steps.length -->
-                <button data-bind="click: finishWorkflow, css:{disabled: canFinish() === false}" class="btn btn-mint btn-labeled"><i class="btn-label ion-android-cloud-done"></i>{% trans "Finish" %}</button>
+                <button 
+                    data-bind="
+                        click: finishWorkflow, 
+                        css:{disabled: canFinish() === false}
+                    " 
+                    class="btn btn-success"
+                >
+                    <i class="ion-android-cloud-done"></i>
+                    <span>
+                        {% trans "Finish Workflow" %}
+                    </span>
+                </button>
                 <!--/ko-->
                 <!--ko if: activeStep()._index+1 === steps.length -->
-                <button disabled class="btn btn-mint btn-labeled"><i class="btn-label ion-android-cloud-done"></i>{% trans "Finished!" %}</button>
+                <button 
+                    disabled 
+                    class="btn btn-success"
+                >
+                    <i class="ion-android-cloud-done"></i>
+                    <span>
+                        {% trans "Workflow Finished!" %}
+                    </span>
+                </button>
                 <!--/ko-->
-                <button data-bind="click: quitWorkflow" class="btn btn-dark btn-labeled"><i class="btn-label ion-android-cancel"></i>{% trans "Quit" %}</button>
+                <button 
+                    data-bind="click: quitWorkflow" 
+                    class="btn btn-danger"
+                >
+                    <i class=" ion-android-cancel"></i>
+                    <span>
+                        {% trans "Quit Workflow" %}
+                    </span>
+                </button>
             </div>
         </div>
         
