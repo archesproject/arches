@@ -184,7 +184,7 @@ class Resource(models.ResourceInstance):
         term_list = []
 
         for resource in resources:
-            if flat is True:
+            if flat is False:
                 resource.tiles = resource.get_flattened_tiles()
             tiles.extend(resource.tiles)
 
