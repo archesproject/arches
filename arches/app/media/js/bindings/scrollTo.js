@@ -13,12 +13,12 @@ define([
 
                 if (scrollDirection === 'vertical') {
                     var top = $(window).height();
-                    var container_top = $(container).offset().top
-                    var bottom = $(target).offset().top + $(target).outerHeight();
+                    var container_top = container.offset().top
+                    var bottom = target.offset().top + target.outerHeight();
 
                     if (bottom > top || bottom < container_top) {
                         container.stop().animate({
-                            scrollTop: $(target).offset().top - container.offset().top + container.scrollTop() - 50
+                            scrollTop: target.offset().top - container.offset().top + container.scrollTop() - 50
                         }, 500);
                     }
                 }
