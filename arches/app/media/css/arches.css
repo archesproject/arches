@@ -660,8 +660,14 @@ input[type="checkbox"] {
     color: grey;
 }
 
+.tabbed-workflow-step-body .padded-workflow-step {
+    width: calc(100vw - 50px);
+    padding: 10px;
+}
+
 .tabbed-workflow-step-body .card-component {
     margin: unset;
+    width: calc(100vw - 50px);
     padding: 0 25px;
 }
 
@@ -675,8 +681,16 @@ input[type="checkbox"] {
     border: none !important;
 }
 
+.tabbed-workflow-step-body .workbench-card-wrapper {
+    width: calc(100vw - 50px);
+}
+
 .tabbed-workflow-step-body .install-buttons {
     display: none;
+}
+
+.tabbed-workflow-step-body .manifest-editor .install-buttons {
+    display: unset;
 }
 
 .tabbed-workflow-footer {
@@ -867,7 +881,7 @@ div.wf-multi-tile-card-info div {
 }
 
 .workflow-nav-tab-list {
-    padding: 0px 50px 0px 10px;
+    padding: 0px 55px 0px 10px;
     background-color: #fafafa;
     display: flex;
     min-width: max-content;
