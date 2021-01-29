@@ -23,10 +23,9 @@ define([
         if (ko.unwrap(params.resourceid)) {
             self.resourceId(ko.unwrap(params.resourceid));
         } 
-        else if (params.workflow) {
-            if (ko.unwrap(params.workflow.resourceId)) {
+        else if (params.workflow && ko.unwrap(params.workflow.resourceId)) {
                 self.resourceId(ko.unwrap(params.workflow.resourceId));
-            }} 
+        } 
 
         this.getCardResourceIdOrGraphId = function() { // override for different cases
             return (ko.unwrap(this.resourceId) || ko.unwrap(params.graphid));
@@ -40,7 +39,7 @@ define([
         
         this.complete = params.complete || ko.observable();
         this.complete.subscribe(function(isComplete) {
-            if (isComplete && params.workflow) {
+            if (isComplete && params.value) {
                 params.value(params.defineStateProperties());
             }
         });
@@ -238,7 +237,7 @@ define([
                 self.resourceId(tile.resourceinstance_id);
             }
 
-            if (params.workflow) {
+            if (params.value) {
                 params.value(params.defineStateProperties());
             }
             
