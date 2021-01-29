@@ -244,8 +244,8 @@
 <div class="iiif-gallery-header">
     <div>
         <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
-        |
-        {% trans "Filter" %}
+        <span class="iiif-gallery-manifest-label">|</span>
+        <span>{% trans "Filter" %}</span>
         <div class="list-filter" data-bind="">
             <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
 

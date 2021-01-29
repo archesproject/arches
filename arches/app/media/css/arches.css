@@ -13063,14 +13063,15 @@ a.jstree-anchor.permissions-widget {
 
 .iiif-gallery-manifest-label {
     max-width:300px;
-    display:inline-flex;
+    display:inline-block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    vertical-align: text-bottom;
 }
 
 .gallery-expanded .iiif-gallery-manifest-label {
-    white-space:normal;
+    display:none;
 }
 
 .iiif-image-tools {
