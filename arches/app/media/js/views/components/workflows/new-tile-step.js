@@ -26,7 +26,7 @@ define([
         else if (params.workflow) {
             if (ko.unwrap(params.workflow.resourceId)) {
                 self.resourceId(ko.unwrap(params.workflow.resourceId));
-        }} 
+            }} 
 
         this.getCardResourceIdOrGraphId = function() { // override for different cases
             return (ko.unwrap(this.resourceId) || ko.unwrap(params.graphid));
