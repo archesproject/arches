@@ -1,6 +1,7 @@
 os: linux
 dist: xenial
 filter_secrets: false
+sudo: false
 
 env:
   - ES_VERSION=7.4.0 ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz
