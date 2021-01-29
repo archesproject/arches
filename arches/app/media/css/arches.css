@@ -615,8 +615,7 @@ input[type="checkbox"] {
 }
 
 .tabbed-workflow-step-body .search-selection-controls {
-    /* display: none !important; */
-    margin-bottom: 53px;
+    display: none !important;
 }
 
 .tabbed-workflow-information-box-marker {
