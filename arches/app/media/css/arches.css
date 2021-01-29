@@ -869,7 +869,7 @@ div.wf-multi-tile-card-info div {
     align-items: center;
 }
 .workflow-nav-tab {
-    width: 450px;
+    min-width: 220px;
     padding: 10px 20px;
     border-right: 1px solid #ddd;
 }
