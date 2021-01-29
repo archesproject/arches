@@ -6,6 +6,7 @@ import os
 import re
 import sys
 import uuid
+import traceback
 from io import StringIO
 from oauth2_provider.views import ProtectedResourceView
 from pyld.jsonld import compact, frame, from_rdf
