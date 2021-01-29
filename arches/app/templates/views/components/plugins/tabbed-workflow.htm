@@ -28,7 +28,15 @@
         <div class="workflow-nav-tab-container">
             <ul class="nav nav-tabs workflow-nav-tab-list">
                 <!--ko foreach: {data: steps, as: 'step'} -->
-                    <li class="workflow-nav-tab-list-item" data-bind="css: { active: step.active() }">
+                    <li 
+                        class="workflow-nav-tab-list-item" 
+                        data-bind="
+                            css: { active: step.active() },
+                            container: '.workflow-nav-tab-container',
+                            scrollDirection: 'horizontal',
+                            scrollTo: step.active(),
+                        "
+                    >
                         <div
                             class='workflow-nav-tab'
                             data-bind="{
@@ -56,7 +64,7 @@
                                     <i class="fa fa-caret-left"></i>
                                 </span>
 
-                                <span style="font-size: 14px; white-space: nowrap;" data-bind="text: step.title()"></span>
+                                <span style="font-size: 14px;" data-bind="text: step.title()"></span>
 
                                 <span
                                     style="margin-left: 4px;"
@@ -79,7 +87,12 @@
             </ul>
         </div>
         
-        <div style="flex: 1;">
+        <div 
+            style="
+                flex: 1;
+                overflow-y: scroll;
+            "
+        >
             <workflow-step params='step: activeStep()' ></workflow-step>
         </div>
 
