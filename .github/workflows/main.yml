@@ -45,3 +45,12 @@ jobs:
           sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk python-dev postgresql-10-postgis-2.4 libgconf2-4
           echo Postgres and ES dependencies installed
 
+      - name: Install Postgis
+        run: |
+          echo 'ELASTICSEARCH_PREFIX="arches"' > arches/settings_local.py
+          psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
+          echo "*:*:*:postgres:postgis" >> ~/.pgpass
+          psql -d postgres -c "SET standard_conforming_strings = off;"
+          psql -c "CREATE DATABASE template_postgis;"
+          psql -d template_postgis -c "CREATE EXTENSION postgis;"
+
