@@ -15,14 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:10.8
+        image: postgis/postgis:10-2.5
         env:
-          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgis
           POSTGRES_DB: arches
         ports:
           - 5432:5432
-        # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
@@ -43,20 +41,12 @@ jobs:
 
       - name: Install Postgres and ES dependencies
         run: |
-          sudo apt-get update
           sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk python-dev postgresql-10-postgis-2.4 libgconf2-4
-          sudo apt-get install --yes --no-install-recommends postgresql-client
           echo Postgres and ES dependencies installed
 
       - name: Install Postgis
         run: |
           echo 'ELASTICSEARCH_PREFIX="arches"' > arches/settings_local.py
-          sudo service postgresql start
-          psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
-          echo "*:*:*:postgres:postgis" >> ~/.pgpass
-          psql -d postgres -c "SET standard_conforming_strings = off;"
-          psql -c "CREATE DATABASE template_postgis;"
-          psql -d template_postgis -c "CREATE EXTENSION postgis;"
+          psql -l
         env:
-          POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5432
+          PGPASSWORD: postgis
