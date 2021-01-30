@@ -13,11 +13,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    services:
+      postgres:
+        image: postgres:10.8
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgis
+          POSTGRES_DB: github_actions
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
       - name: Set up Python 3.8
         uses: actions/setup-python@v1
         with:
@@ -33,5 +42,6 @@ jobs:
 
       - name: Install Postgres and ES dependencies
         run: |
-          sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk python-dev postgresql-9.6-postgis-2.4 libgconf2-4
+          sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk python-dev postgresql-10-postgis-2.4 libgconf2-4
           echo Postgres and ES dependencies installed
+
