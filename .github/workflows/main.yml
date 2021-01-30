@@ -19,11 +19,12 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgis
-          POSTGRES_DB: github_actions
+          POSTGRES_DB: arches
         ports:
           - 5432:5432
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
@@ -54,3 +55,13 @@ jobs:
           psql -c "CREATE DATABASE template_postgis;"
           psql -d template_postgis -c "CREATE EXTENSION postgis;"
 
+      - name: Connect to PostgreSQL
+        echo 'ELASTICSEARCH_PREFIX="arches"' > arches/settings_local.py
+        psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
+        echo "*:*:*:postgres:postgis" >> ~/.pgpass
+        psql -d postgres -c "SET standard_conforming_strings = off;"
+        psql -c "CREATE DATABASE template_postgis;"
+        psql -d template_postgis -c "CREATE EXTENSION postgis;"
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
