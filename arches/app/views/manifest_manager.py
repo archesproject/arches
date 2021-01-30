@@ -7,6 +7,7 @@ import uuid
 from revproxy.views import ProxyView
 from django.core.files.storage import default_storage
 from django.http import HttpRequest
+from django.utils.translation import ugettext as _
 from django.views.generic import View
 from arches.app.utils.response import JSONResponse
 from arches.app.models import models
@@ -22,10 +23,28 @@ logger = logging.getLogger(__name__)
 class ManifestManagerView(View):
     cantaloupe_uri = f"{settings.CANTALOUPE_HTTP_ENDPOINT.rstrip('/')}/iiif"
 
+    def check_canvas_in_use(self, canvas_id):
+        canvas_ids_in_use = [annotation.canvas for annotation in models.VwAnnotation.objects.all()]
+        return canvas_id in canvas_ids_in_use
+
     def delete(self, request):
         data = JSONDeserializer().deserialize(request.body)
-        manifest = data.get("manifest")
-        manifest = models.IIIFManifest.objects.get(url=manifest)
+        manifest_url = data.get("manifest")
+        manifest = models.IIIFManifest.objects.get(url=manifest_url)
+        canvases_in_manifest = manifest.manifest["sequences"][0]["canvases"]
+        canvas_ids = [canvas["images"][0]["resource"]["service"]["@id"] for canvas in canvases_in_manifest]
+        canvases_in_use = []
+        for canvas_id in canvas_ids:
+            if self.check_canvas_in_use(canvas_id):
+                canvases_in_use.append(canvas_id)
+        if len(canvases_in_use) > 0:
+            canvas_labels_in_use = [
+                item["label"] for item in canvases_in_manifest if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use
+            ]
+            response = "This manifest cannot be deleted because the following canvases have resource annotations: {}".format(
+                ", ".join(canvas_labels_in_use)
+            )
+            return JSONResponse({"message": response}, status=500)
         manifest.delete()
         return JSONResponse({"success": True})
 
@@ -105,9 +124,22 @@ class ManifestManagerView(View):
         def add_canvases(manifest, canvases):
             manifest.manifest["sequences"][0]["canvases"] += canvases
 
-        def delete_canvas(manifest, canvases_to_remove):
+        def delete_canvases(manifest, canvases_to_remove):
             canvas_ids_remove = [canvas["images"][0]["resource"]["service"]["@id"] for canvas in canvases_to_remove]
+            canvases_in_use = []
+            for canvas_id in canvas_ids_remove:
+                if self.check_canvas_in_use(canvas_id):
+                    canvases_in_use.append(canvas_id)
             canvases = manifest.manifest["sequences"][0]["canvases"]
+            if len(canvases_in_use) > 0:
+                canvas_labels_in_use = [
+                    item["label"] for item in canvases if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use
+                ]
+                raise ManifestValidationError(
+                    "The following canvases cannot be deleted because they have resource annotations: {}".format(
+                        ", ".join(canvas_labels_in_use)
+                    )
+                )
             manifest.manifest["sequences"][0]["canvases"] = [
                 canvas for canvas in canvases if canvas["images"][0]["resource"]["service"]["@id"] not in canvas_ids_remove
             ]
@@ -206,7 +238,10 @@ class ManifestManagerView(View):
 
         if selected_canvases is not None:
             selected_canvases_json = json.loads(selected_canvases)
-            delete_canvas(manifest, selected_canvases_json)
+            try:
+                delete_canvases(manifest, selected_canvases_json)
+            except ManifestValidationError as e:
+                return JSONResponse({"message": e.message}, status=500)
 
         if len(files) > 0:
             try:
@@ -258,3 +293,13 @@ class IIIFServerProxyView(ProxyView):
         if settings.CANTALOUPE_HTTP_ENDPOINT is None:
             raise Http404(_("IIIF server proxy not configured"))
         return headers
+
+
+class ManifestValidationError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Manifest Validation Error")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self.message)

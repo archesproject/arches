@@ -45,9 +45,9 @@ define([
         });
 
         this.completeOnSave = params.completeOnSave === false ? false : true;
-        this.altButtons =  params.altButtons || ko.observable(null);
-        this.hideDefaultButtons = params.hideDefaultButtons || ko.observable(false);
+
         this.loading(true);
+
         this.customCardLabel = params.customCardLabel || false;
         var flattenTree = function(parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {
@@ -117,6 +117,20 @@ define([
                 });
     
                 self.card.subscribe(function(card){
+                    if (card) {
+                        if (params.preSaveCallback && !ko.unwrap(params.preSaveCallback)) {
+                            card.preSaveCallback = params.preSaveCallback;
+                        }
+                        if (params.postSaveCallback && !ko.unwrap(params.postSaveCallback)) {
+                            card.postSaveCallback = params.postSaveCallback;
+                        }
+                        if (params.preClearCallback && !ko.unwrap(params.preClearCallback)) {
+                            card.preClearCallback = params.preClearCallback;
+                        }
+                        if (params.postClearCallback && !ko.unwrap(params.postClearCallback)) {
+                            card.postClearCallback = params.postClearCallback;
+                        }
+                    }
                     if (ko.unwrap(card.widgets) && params.hiddenNodes) {
                         card.widgets().forEach(function(widget){
                             if (params.hiddenNodes.indexOf(widget.node_id()) > -1) {
