@@ -15,21 +15,7 @@
             </div>
 
             <div>
-                <!--ko if: activeStep()._index+1 !== steps.length -->
-                <button 
-                    data-bind="
-                        click: finishWorkflow, 
-                        css:{disabled: canFinish() === false}
-                    " 
-                    class="btn btn-success"
-                >
-                    <i class="ion-android-cloud-done"></i>
-                    <span>
-                        {% trans "Finish Workflow" %}
-                    </span>
-                </button>
-                <!--/ko-->
-                <!--ko if: activeStep()._index+1 === steps.length -->
+                <!--ko if: activeStep()._index === steps.length - 1 -->
                 <button 
                     disabled 
                     class="btn btn-success"
@@ -40,6 +26,21 @@
                     </span>
                 </button>
                 <!--/ko-->
+                <!--ko if: activeStep()._index !== steps.length - 1 -->
+                <button 
+                    data-bind="
+                        click: finishWorkflow, 
+                        css:{disabled: !isWorkflowFinished}
+                    " 
+                    class="btn btn-success"
+                >
+                    <i class="ion-android-cloud-done"></i>
+                    <span>
+                        {% trans "Finish Workflow" %}
+                    </span>
+                </button>
+                <!--/ko-->
+
                 <button 
                     data-bind="click: quitWorkflow" 
                     class="btn btn-danger"

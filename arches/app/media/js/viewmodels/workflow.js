@@ -21,16 +21,20 @@ define([
         this.id = ko.observable();
 
         this.steps = config.steps || [];
-        
-        this.hoverStep = ko.observable();
-        this.previousStep = ko.observable();
 
+        this.hoverStep = ko.observable();
+        
+        this.previousStep = ko.observable();
         this.activeStep = ko.observable();
-        this.activeStep.subscribe(function() {
-            self.checkCanFinish();
-        });
+
+        this.isWorkflowFinished = ko.observable(false);
 
         this.furthestValidStepIndex = ko.observable();
+        this.furthestValidStepIndex.subscribe(function(index){
+            if (index >= self.steps.length - 1) {
+                self.isWorkflowFinished(true)
+            }
+        });
 
         this.ready = ko.observable(false);
         this.ready.subscribe(function() {
@@ -40,8 +44,8 @@ define([
 
         this.loading = config.loading || ko.observable(false);
 
+        
         this.workflowName = ko.observable();
-        this.canFinish = ko.observable(false);
         this.alert = config.alert || ko.observable(null);
         this.quitUrl = arches.urls.home;
 
@@ -212,21 +216,8 @@ define([
             });
         };
 
-        this.checkCanFinish = function(){
-            var required = false, canFinish = true, complete = null;
-            for(var i = 0; i < self.steps.length; i++) {
-                required = ko.unwrap(self.steps[i].required);
-                complete = ko.unwrap(self.steps[i].complete);
-                if(!complete && required) {
-                    canFinish = false;
-                    break;
-                }
-            }
-            self.canFinish(canFinish);
-        };
-
         this.finishWorkflow = function() {
-            if(self.canFinish()){ self.activeStep(self.steps[self.steps.length-1]); }
+            if (self.isWorkflowFinished()) { self.activeStep(self.steps[self.steps.length - 1]); }
         };
 
         this.quitWorkflow = function(){
@@ -283,46 +274,11 @@ define([
             );
         };
 
-        this.canStepBecomeActive = function(step) {
-            var canStepBecomeActive = false;
-
-            
-            if (step && !step.active() ) {  /* prevents refresh if clicking on active tab */ 
-                
-                if (step.complete() || self.canFinish() === true) { 
-                    canStepBecomeActive = true; 
-                }
-                else {
-                    var previousStep = self.steps[step._index - 1];
-
-                    while (previousStep) {
-                        if (self.canStepBecomeActive(previousStep) === true) {
-                            canStepBecomeActive = true;
-                            break;
-                        }
-                        else if (!previousStep.required() && (previousStep._index - 1 < step._index) ) {
-                            previousStep = self.steps[previousStep._index - 1];
-                        }
-                        else {
-                            break;
-                        }
-                    }
-                }
-
-
-            }
-
-            return canStepBecomeActive;
-        };
-
         this.next = function(){
             var activeStep = self.activeStep();
 
-            if (
-                (activeStep.complete() || !activeStep.required()) 
-                && activeStep._index < self.steps.length - 1
-            ) {
-                self.activeStep(self.steps[activeStep._index+1]);
+            if ((!activeStep.required() || activeStep.complete()) && activeStep._index < self.steps.length - 1) {
+                self.activeStep(self.steps[activeStep._index + 1]);
             }
         };
 
