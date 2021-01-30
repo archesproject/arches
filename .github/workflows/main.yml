@@ -43,9 +43,9 @@ jobs:
 
       - name: Install Postgres and ES dependencies
         run: |
-          apt-get update
-          apt-get install libxml2-dev libpq-dev openjdk-8-jdk python-dev postgresql-10-postgis-2.4 libgconf2-4
-          apt-get install --yes --no-install-recommends postgresql-client
+          sudo apt-get update
+          sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk python-dev postgresql-10-postgis-2.4 libgconf2-4
+          sudo apt-get install --yes --no-install-recommends postgresql-client
           echo Postgres and ES dependencies installed
 
       - name: Install Postgis
