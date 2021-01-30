@@ -30,7 +30,7 @@
                 <button 
                     data-bind="
                         click: finishWorkflow, 
-                        css:{disabled: !isWorkflowFinished}
+                        css:{disabled: !isWorkflowFinished()}
                     " 
                     class="btn btn-success"
                 >
@@ -74,7 +74,7 @@
                                         !step.active() 
                                         && (
                                             step.complete()
-                                            || ( !step.required() && step._index <= $parent.furthestValidStepIndex())
+                                            || ( step._index <= $parent.furthestValidStepIndex() )
                                         )
 
                                     ),
