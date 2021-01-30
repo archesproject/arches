@@ -17,7 +17,10 @@ define([
         var cachedValue = ko.unwrap(params.value);
         if (cachedValue) {
             self.resourceId(cachedValue.resourceid);
-            params.tileid(cachedValue.tileid);
+
+            if (cachedValue.tileid) {
+                params.tileid(cachedValue.tileid);
+            }
         }
 
         if (ko.unwrap(params.resourceid)) {

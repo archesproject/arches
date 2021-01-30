@@ -30,6 +30,8 @@ define([
             self.checkCanFinish();
         });
 
+        this.furthestValidStepIndex = ko.observable();
+
         this.ready = ko.observable(false);
         this.ready.subscribe(function() {
             var components = _.unique(self.steps.map(function(step) {return step.component;}));
@@ -74,6 +76,8 @@ define([
                 self.setToLocalStorage(STEP_IDS_LABEL, stepIds);
             }
 
+            self.getFurthestValidStepIndex();
+
             /* cached activeStep logic */ 
             var cachedActiveStep = self.steps.find(function(step) {
                 return step.id() === self.getStepIdFromUrl();
@@ -105,6 +109,7 @@ define([
                     self.steps[i] = newStep;
 
                     self.steps[i].complete.subscribe(function(complete) {
+                        self.getFurthestValidStepIndex();
                         if (complete && self.steps[i].autoAdvance()) self.next();
                     });
                 }
@@ -130,6 +135,39 @@ define([
 
             var newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
             history.replaceState(null, '', newRelativePathQuery);
+        };
+
+        this.getFurthestValidStepIndex = function() {  /* useful for tab state logic */
+            var furthestValidStepIndex = self.furthestValidStepIndex() || 0;
+            var startIdx = 0;
+
+            /* furthest completed step index */ 
+            self.steps.forEach(function(step) {
+                if (ko.unwrap(step.complete)) {
+                    startIdx = step._index;
+                }
+            });
+
+            /* furthest non-required step directly after furthest completed step */ 
+            for (var i = startIdx; i < self.steps.length; i++) {
+                var step = self.steps[i];
+
+                if (ko.unwrap(step.complete) || !ko.unwrap(step.required)) {
+                    furthestValidStepIndex = step._index;
+                }
+                else { break; }
+            }
+
+            if (!ko.unwrap(self.steps[furthestValidStepIndex].required)) {
+                /* add onto index if furthest valid step isn't required */ 
+                if (furthestValidStepIndex < self.steps.length) {
+                    furthestValidStepIndex += 1;
+                }
+            }
+
+            if (furthestValidStepIndex !== self.furthestValidStepIndex()) {
+                self.furthestValidStepIndex(furthestValidStepIndex);
+            }
         };
 
         this.getWorkflowIdFromUrl = function() {
@@ -247,17 +285,31 @@ define([
 
         this.canStepBecomeActive = function(step) {
             var canStepBecomeActive = false;
-            
-            if (step && !step.active()) {  /* prevents refresh if clicking on active tab */ 
-                var previousStep = self.steps[step._index - 1];
 
-                if (
-                    step.complete() 
-                    || ( previousStep && previousStep.complete() )
-                    || self.canFinish() === true
-                ) { 
+            
+            if (step && !step.active() ) {  /* prevents refresh if clicking on active tab */ 
+                
+                if (step.complete() || self.canFinish() === true) { 
                     canStepBecomeActive = true; 
                 }
+                else {
+                    var previousStep = self.steps[step._index - 1];
+
+                    while (previousStep) {
+                        if (self.canStepBecomeActive(previousStep) === true) {
+                            canStepBecomeActive = true;
+                            break;
+                        }
+                        else if (!previousStep.required() && (previousStep._index - 1 < step._index) ) {
+                            previousStep = self.steps[previousStep._index - 1];
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                }
+
+
             }
 
             return canStepBecomeActive;

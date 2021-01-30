@@ -7,7 +7,7 @@
             <div class="nav-group">
                 <div
                     data-bind="{
-                        click: function() { if ($parent.canStepBecomeActive(step)) { $parent.activeStep(step) }},
+                        click: function() { if (step._index <= $parent.furthestValidStepIndex()) { $parent.activeStep(step) }},
                         event: { mouseover: function(){$parent.hoverStep(step)}, mouseout: function(){$parent.hoverStep(null)}},
                         css: { selectable: step.complete() || ($parent.steps[step._index - 1] && $parent.steps[step._index - 1].complete()) || $parent.canFinish() === true, 'can-advance': ($parent.steps[step._index - 1] && $parent.steps[step._index - 1].complete() === true) || $parent.canFinish() === true }
                     }"
