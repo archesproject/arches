@@ -141,7 +141,12 @@ define([
             history.replaceState(null, '', newRelativePathQuery);
         };
 
-        this.getFurthestValidStepIndex = function() {  /* useful for tab state logic */
+        this.getFurthestValidStepIndex = function() {
+            /*
+                valid index is the index directly after the furthest completed step
+                or furthest non-required step chained to the beginning/most-completed step
+            */ 
+
             var furthestValidStepIndex = self.furthestValidStepIndex() || 0;
             var startIdx = 0;
 
@@ -162,11 +167,15 @@ define([
                 else { break; }
             }
 
-            if (!ko.unwrap(self.steps[furthestValidStepIndex].required)) {
-                /* add onto index if furthest valid step isn't required */ 
-                if (furthestValidStepIndex < self.steps.length) {
-                    furthestValidStepIndex += 1;
-                }
+            /* add index position for furthest valid index if not incomplete beginning step */ 
+            if (
+                (
+                    furthestValidStepIndex === 0 
+                    && self.steps[furthestValidStepIndex].complete()
+                )
+                || furthestValidStepIndex > 0
+            ) { 
+                furthestValidStepIndex += 1; 
             }
 
             if (furthestValidStepIndex !== self.furthestValidStepIndex()) {
