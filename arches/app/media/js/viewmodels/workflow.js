@@ -236,14 +236,16 @@ define([
 
             self.steps.forEach(function(step) {
                 if (step.wastebin && step.wastebin.resourceid) {
-                    warnings.push(step.wastebin.description);
+                    warnings.push(ko.unwrap(step.wastebin.description));
                     resourcesToDelete.push(step.wastebin);
                 } else if (step.wastebin && step.wastebin.tile) {
-                    warnings.push(step.wastebin.description);
+                    warnings.push(ko.unwrap(step.wastebin.description));
                     tilesToDelete.push(step.wastebin);
                 }
             });
-            self.warning = self.wastebinWarning(warnings.join());
+
+            self.warning = self.wastebinWarning(warnings.join(', '));
+            
             var deleteObject = function(type, obj){
                 if (type === 'resource') {
                     $.ajax({
