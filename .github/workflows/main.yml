@@ -44,7 +44,10 @@ jobs:
           sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk python-dev libgconf2-4
           echo Postgres and ES dependencies installed
 
-      - name: Install Postgis
+      - uses: ankane/setup-elasticsearch@v1
+        with:
+          elasticsearch-version: 7
+
         run: |
           echo 'ELASTICSEARCH_PREFIX="arches"' > arches/settings_local.py
           psql -l
