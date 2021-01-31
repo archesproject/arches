@@ -118,7 +118,10 @@
                                         click: $parent.next, 
                                         clickBubble: false,
                                         css: {
-                                            disabled:  $parent.activeStep().required() && !$parent.activeStep().complete() || $parent.activeStep()._index === $parent.steps.length - 1,
+                                            disabled: (
+                                                ( $parent.activeStep().required() && !$parent.activeStep().complete() )
+                                                || $parent.activeStep()._index === $parent.steps.length - 1
+                                            ),
                                         },
                                         visible: step.active() && step._index !== $parent.steps.length - 1,
                                     }"

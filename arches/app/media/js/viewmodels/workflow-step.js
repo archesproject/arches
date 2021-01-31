@@ -24,7 +24,7 @@ define([
         this.description = '';
 
         this.informationBoxData = ko.observable();       
-         
+
         this.complete = ko.observable(false);
         this.required = ko.observable(ko.unwrap(config.required));
         this.autoAdvance = ko.observable(true);
@@ -138,7 +138,6 @@ define([
 
             self.value(null);
             self.complete(false);
-            self.componentname.valueHasMutated();  /* forces UI refresh of component */
 
             var postClearCallback = ko.unwrap(self.postClearCallback);
             if (postClearCallback) {
