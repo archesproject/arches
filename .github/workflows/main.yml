@@ -48,8 +48,6 @@ jobs:
         with:
           elasticsearch-version: 7
 
+      - name: Run tests
         run: |
-          echo 'ELASTICSEARCH_PREFIX="arches"' > arches/settings_local.py
-          psql -l
-        env:
-          PGPASSWORD: postgis
+          python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
