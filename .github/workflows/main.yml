@@ -48,6 +48,14 @@ jobs:
         with:
           elasticsearch-version: 7
 
+      - name: Set up CouchDB
+        uses: "cobot/couchdb-action@master"
+        with:
+          couchdb version: '2.3.1'
+      - name: Check if couchdb is running
+        run: |
+          curl http://127.0.0.1:5984/
+
       - name: Run tests
         run: |
           python manage.py test tests --pattern="*.py" --settings="tests.test_settings"

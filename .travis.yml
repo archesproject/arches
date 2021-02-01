@@ -9,12 +9,12 @@ addons:
   postgresql: 9.6
   apt:
     packages:
-      - libxml2-dev
-      - libpq-dev
-      - openjdk-8-jdk
-      - python-dev
-      - postgresql-9.6-postgis-2.4
-      - libgconf2-4
+      # - libxml2-dev
+      # - libpq-dev
+      # - openjdk-8-jdk
+      # - python-dev
+      # - postgresql-9.6-postgis-2.4
+      # - libgconf2-4
 
 services:
   - postgresql
@@ -27,9 +27,9 @@ before_install:
   - psql -d postgres -c "SET standard_conforming_strings = off;"
   - psql -c "CREATE DATABASE template_postgis;"
   - psql -d template_postgis -c "CREATE EXTENSION postgis;"
-  - "pip install -e ."
-  - pip install -r arches/install/requirements.txt
-  - pip install -r arches/install/requirements_dev.txt
+  # - "pip install -e ."
+  # - pip install -r arches/install/requirements.txt
+  # - pip install -r arches/install/requirements_dev.txt
   - npm install -g wait-on
   - pip install coveralls
   - wget ${ES_DOWNLOAD_URL}
