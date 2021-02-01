@@ -54,7 +54,7 @@ jobs:
           couchdb version: '2.3.1'
       - name: Check if couchdb is running
         run: |
-          chmod +x ./arches/install/ci_install/setup_couch.sh
+          chmod +x arches/install/ci_install/setup_couch.sh
           ./arches/install/ci_install/setup_couch.sh
           curl http://127.0.0.1:5984/
 
