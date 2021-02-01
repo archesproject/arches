@@ -79,6 +79,7 @@ BYPASS_CARDINALITY_TILE_VALIDATION = False
 
 OVERRIDE_RESOURCE_MODEL_LOCK = True
 
+COUCHDB_URL = "http://admin:password@localhost:5984"  # defaults to localhost:5984
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
 NOSE_ARGS = ["--with-coverage", "--nologcapture", "--cover-package=arches", "--verbosity=1", "--cover-erase"]
 
