@@ -84,8 +84,8 @@ define([
                             }
                             if (config[key]) {
                                 var oldJSON = koMapping.toJSON(config[key]);
-                                var newJSON = value[key] ? koMapping.toJSON(value[key]) : value[key];
-                                if (config[key] && oldJSON !== newJSON) {
+                                var newJSON = (value[key] !== null && value[key] !== undefined) ? koMapping.toJSON(value[key]) : value[key];
+                                if (oldJSON !== newJSON) {
                                     koMapping.fromJSON(
                                         newJSON,
                                         config[key]

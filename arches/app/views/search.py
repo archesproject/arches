@@ -16,9 +16,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
-import logging
+from base64 import b64decode
 from datetime import datetime
+import logging
+import os
+from django.contrib.auth import authenticate
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
 from django.http import HttpResponseNotFound
@@ -37,7 +39,7 @@ from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import MapBaseManagerView
-from arches.app.views.concept import get_preflabel_from_conceptid
+from arches.app.models.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer
 import arches.app.utils.zip as zip_utils
 import arches.app.utils.task_management as task_management
@@ -110,7 +112,7 @@ def home_page(request):
 
 
 def search_terms(request):
-    lang = request.GET.get("lang", settings.LANGUAGE_CODE)
+    lang = request.GET.get("lang", request.LANGUAGE_CODE)
     se = SearchEngineFactory().create()
     searchString = request.GET.get("q", "")
     user_is_reviewer = user_is_resource_reviewer(request.user)
@@ -196,7 +198,7 @@ def export_results(request):
     total = int(request.GET.get("total", 0))
     format = request.GET.get("format", "tilecsv")
     download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
-    if total > download_limit:
+    if total > download_limit and format != "geojson":
         celery_worker_running = task_management.check_if_celery_available()
         if celery_worker_running is True:
             request_values = dict(request.GET)
@@ -205,16 +207,17 @@ def export_results(request):
                 (request.user.id, request_values, format), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
             )
             message = _(
-                f"{total} instances have been submitted for export. \
+                "{total} instances have been submitted for export. \
                 Click the Bell icon to check for a link to download your data"
-            )
+            ).format(**locals())
             return JSONResponse({"success": True, "message": message})
         else:
-            message = _(f"Your search exceeds the {download_limit} instance download limit. Please refine your search")
+            message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(**locals())
             return JSONResponse({"success": False, "message": message})
     else:
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format)
+
         if len(export_files) == 0 and format == "shp":
             message = _(
                 "Either no instances were identified for export or no resources have exportable geometry nodes\
@@ -238,6 +241,7 @@ def append_instance_permission_filter_dsl(request, search_results_object):
 
 def search_results(request):
     for_export = request.GET.get("export")
+    pages = request.GET.get("pages", None)
     total = int(request.GET.get("total", "0"))
     resourceinstanceid = request.GET.get("id", None)
     se = SearchEngineFactory().create()
@@ -273,16 +277,15 @@ def search_results(request):
     dsl.include("provisional_resource")
     if request.GET.get("tiles", None) is not None:
         dsl.include("tiles")
-
-    if for_export is True:
+    if for_export or pages:
         results = dsl.search(index=RESOURCES_INDEX, scroll="1m")
         scroll_id = results["_scroll_id"]
-
-        if total <= settings.SEARCH_EXPORT_LIMIT:
-            pages = (total // settings.SEARCH_RESULT_LIMIT) + 1
-        if total > settings.SEARCH_EXPORT_LIMIT:
-            pages = int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT) - 1
-        for page in range(pages):
+        if not pages:
+            if total <= settings.SEARCH_EXPORT_LIMIT:
+                pages = (total // settings.SEARCH_RESULT_LIMIT) + 1
+            if total > settings.SEARCH_EXPORT_LIMIT:
+                pages = int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT) - 1
+        for page in range(int(pages)):
             results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
             results["hits"]["hits"] += results_scrolled["hits"]["hits"]
     else:

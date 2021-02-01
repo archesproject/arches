@@ -82,7 +82,7 @@ define([
         this.mouseoverInstanceId = ko.observable();
         this.mapLinkData = ko.observable(null);
         this.userIsReviewer = ko.observable(false);
-        this.userid = null;
+        this.userid = ko.observable(null);
         this.searchResults = {'timestamp': ko.observable()};
         this.selectPopup = function(componentname) {
             if(this.selectedPopup() !== '' && componentname === this.selectedPopup()) {
@@ -138,7 +138,6 @@ define([
             }
 
             this.viewModel.loading(true);
-
             this.updateRequest = $.ajax({
                 type: "GET",
                 url: arches.urls.search_results,
@@ -157,7 +156,7 @@ define([
                     }, this);
                     this.viewModel.sharedStateObject.searchResults.timestamp(response.timestamp);
                     this.viewModel.sharedStateObject.userIsReviewer(response.reviewer);
-                    this.viewModel.sharedStateObject.userid = response.userid;
+                    this.viewModel.sharedStateObject.userid(response.userid);
                     this.viewModel.total(response.total_results);
                     this.viewModel.alert(false);
                 },

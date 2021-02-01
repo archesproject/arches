@@ -1,5 +1,35 @@
+@import url(../packages/chosen-js/chosen.css);
 .auth-options {
     margin-top: 17px;
+}
+
+.lang-switch {
+    padding-top: 5px;
+    font-size: 14px;    
+    font-weight: 300;
+    background: #041b33;
+}
+
+.lang-switch .chosen-single {
+    border: none;
+    color: #454545;
+    margin-top: 8px;
+    box-shadow: none;
+    border-radius: 3px;
+    display: block;
+    height: 32px;
+    line-height: 1.42857;
+    overflow: hidden;
+    padding: 6px 12px;
+    white-space: nowrap;
+}
+
+.lang-switch .chosen-drop {
+    background: #041b33;
+}
+
+.lang-switch b {
+    margin-top: 5px;
 }
 
 .v5-splash-list {
@@ -35,6 +65,11 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
 .v5-splash-navbar .navbar-nav>li>a:hover {
     background: #000;
     color: #13ce67;
+}
+
+.nav>li>a:focus, .nav>li>a:hover {
+    text-decoration: none;
+    background-color: inherit;
 }
 
 .one-page-header .navbar-nav>li> .fa-chevron-circle-down {

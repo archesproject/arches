@@ -30,6 +30,7 @@ from arches.app.search.elasticsearch_dsl_builder import Term, Query, Bool, Match
 from arches.app.search.mappings import CONCEPTS_INDEX
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
+from django.utils.translation import get_language
 from django.db import IntegrityError
 import logging
 
@@ -491,13 +492,14 @@ class Concept(object):
         limit=20,
         order_hierarchically=False,
         query=None,
-        languageid=settings.LANGUAGE_CODE,
+        languageid=None,
     ):
         """
         Recursively builds a list of concept relations for a given concept and all it's subconcepts based on its relationship type and valuetypes.
 
         """
 
+        languageid = get_language() if languageid is None else languageid
         relationtypes = " or ".join(["r.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
         depth_limit = "and depth < %s" % depth_limit if depth_limit else ""
         child_valuetypes = ("','").join(
@@ -519,6 +521,7 @@ class Concept(object):
                             ORDER BY (
                                 CASE WHEN languageid = '{languageid}' THEN 10
                                 WHEN languageid like '{short_languageid}%' THEN 5
+                                WHEN languageid like '{default_languageid}%' THEN 2
                                 ELSE 0
                                 END
                             ) desc limit 1
@@ -552,6 +555,7 @@ class Concept(object):
                             ORDER BY (
                                 CASE WHEN languageid = '{languageid}' THEN 10
                                 WHEN languageid like '{short_languageid}%' THEN 5
+                                WHEN languageid like '{default_languageid}%' THEN 2
                                 ELSE 0
                                 END
                             ) desc limit 1
@@ -609,6 +613,7 @@ class Concept(object):
                         ORDER BY (
                             CASE WHEN languageid = '{languageid}' THEN 10
                             WHEN languageid like '{short_languageid}%' THEN 5
+                            WHEN languageid like '{default_languageid}%' THEN 2
                             ELSE 0
                             END
                         ) desc limit 1
@@ -650,6 +655,7 @@ class Concept(object):
                 recursive_table=recursive_table,
                 languageid=languageid,
                 short_languageid=languageid.split("-")[0],
+                default_languageid=settings.LANGUAGE_CODE,
             )
 
         else:
@@ -1434,13 +1440,7 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
     ]
 
 
-def get_concept_label_from_valueid(valueid):
-    concept_label = se.search(index=CONCEPTS_INDEX, id=valueid)
-    if concept_label["found"]:
-        return concept_label["_source"]
-
-
 def get_preflabel_from_valueid(valueid, lang):
     concept_label = se.search(index=CONCEPTS_INDEX, id=valueid)
     if concept_label["found"]:
-        return get_preflabel_from_conceptid(get_concept_label_from_valueid(valueid)["conceptid"], lang)
+        return get_preflabel_from_conceptid(concept_label["_source"]["conceptid"], lang)

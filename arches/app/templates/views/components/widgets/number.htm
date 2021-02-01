@@ -14,10 +14,10 @@
             <span class="input-group-addon" data-bind="text: prefix"></span>
             <!-- /ko -->
             <!-- ko if: format -->
-            <input type="text" data-bind="formattedNumber: value, format: format, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: disabled}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
+            <input type="text" data-bind="formattedNumber: value, format: format, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: uneditable}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
             <!-- /ko -->
             <!-- ko ifnot: format -->
-            <input type="number" data-bind="value: value, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: disabled}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
+            <input type="number" data-bind="value: value, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: uneditable}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
             <!-- /ko -->
             <!-- ko if: suffix -->
             <span class="input-group-addon" data-bind="text: suffix"></span>
@@ -32,17 +32,17 @@
 <dt data-bind="text: label"></dt>
 <dd>
     <div class='number-widget-report'>
-    <!-- ko if: value -->
+    <!-- ko if: displayValue -->
     <span data-bind="text: prefix(), css: {'number-prefix': prefix()}"></span>
         <!-- ko if: format -->
-        <span data-bind="formattedNumber: value(), format: format || '{% trans "None" %}'"></span>
+        <span data-bind="formattedNumber: displayValue(), format: format || '{% trans "None" %}'"></span>
         <!-- /ko -->
         <!-- ko ifnot: format -->
-        <span data-bind="text: value()"></span>
+        <span data-bind="text: displayValue()"></span>
         <!-- /ko -->
     <span data-bind="text: suffix(), css: {'number-suffix': suffix()}"></span>
     <!-- /ko -->
-    <!-- ko ifnot: value -->
+    <!-- ko ifnot: displayValue -->
     <span data-bind="text: '{% trans "None" %}'"></span>
     <!-- /ko -->
     </div>
@@ -103,5 +103,13 @@
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
   <input type="" placeholder="{% trans "Format" %}" id="" class="form-control input-md widget-input" data-bind="value: format, valueUpdate: 'keyup'">
+</div>
+<div class="node-config-item">
+    <div class="control-label">
+        {% trans "Disabled" %}
+    </div>
+    <div class="pad-no">
+        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: uneditable, config:{label: '{% trans "Disable Editing" %}', subtitle: '{% trans "Prevent users from editing value" %}'}}}"></div>
+    </div>
 </div>
 {% endblock config_form %}

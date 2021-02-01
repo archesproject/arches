@@ -53,6 +53,8 @@ from arches.app.views.tile import TileData
 from arches.app.views.notifications import NotificationView
 from arches.app.views.map import MapLayerManagerView, TileserverProxyView
 from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources, MobileSurveyDesignerView
+from arches.app.views.manifest_manager import ManifestManagerView
+from arches.app.views.manifest_manager import IIIFServerProxyView
 from arches.app.views.auth import (
     LoginView,
     SignupView,
@@ -221,6 +223,7 @@ urlpatterns = [
         name="mobile_survey_resources",
     ),
     url(r"^couchdb/(?P<path>.*)$", api.CouchdbProxy.as_view()),
+    url(r"^%s/(?P<path>.*)$" % settings.KIBANA_CONFIG_BASEPATH, api.KibanaProxy.as_view()),
     url(r"^mobileprojects/(?:(?P<surveyid>%s))?$" % uuid_regex, api.Surveys.as_view(), name="mobileprojects"),
     url(r"^sync/(?P<surveyid>%s|())$" % uuid_regex, api.Sync.as_view(), name="sync"),
     url(r"^checksyncstatus/(?P<synclogid>%s|())$" % uuid_regex, api.CheckSyncStatus.as_view(), name="checksyncstatus"),
@@ -232,6 +235,7 @@ urlpatterns = [
     url(r"^api/nodes/(?P<nodeid>%s|())$" % (uuid_regex), api.Node.as_view(), name="api_nodes"),
     url(r"^api/instance_permissions/$", api.InstancePermission.as_view(), name="api_instance_permissions"),
     url(r"^api/node_value/$", api.NodeValue.as_view(), name="api_node_value"),
+    url(r"^api/search/export_results$", api.SearchExport.as_view(), name="api_export_results"),
     url(r"^rdm/concepts/(?P<conceptid>%s|())$" % uuid_regex, api.Concepts.as_view(), name="concepts"),
     url(r"^plugins/(?P<pluginid>%s)$" % uuid_regex, PluginView.as_view(), name="plugins"),
     url(r"^plugins/(?P<slug>[-\w]+)$", PluginView.as_view(), name="plugins"),
@@ -253,6 +257,7 @@ urlpatterns = [
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     # Uncomment the next line to enable the admin:
     url(r"^admin/", admin.site.urls),
+    url("i18n/", include("django.conf.urls.i18n")),
     url(
         r"^password_reset/$",
         PasswordResetView.as_view(),
@@ -267,6 +272,11 @@ urlpatterns = [
     url(r"^reset/done/$", auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
     url(r"^o/", include("oauth2_provider.urls", namespace="oauth2")),
     url(r"^iiifmanifest$", api.IIIFManifest.as_view(), name="iiifmanifest"),
+    url(r"^iiifserver/(?P<path>.*)$", IIIFServerProxyView.as_view()),
+    url(r"^iiifannotations$", api.IIIFAnnotations.as_view(), name="iiifannotations"),
+    url(r"^iiifannotationnodes$", api.IIIFAnnotationNodes.as_view(), name="iiifannotationnodes"),
+    url(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
+    url(r"^manifest-manager", ManifestManagerView.as_view(), name="manifest_manager"),
 ]
 
 if settings.DEBUG:

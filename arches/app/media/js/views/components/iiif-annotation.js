@@ -117,8 +117,21 @@ define([
         };
         updateDrawFeatures();
 
-        params.activeTab = 'editor';
         IIIFViewerViewmodel.apply(this, [params]);
+
+        var setTab = this.canvas.subscribe(function(val){
+            if (val) {
+                self.expandGallery(false);
+                self.activeTab('editor');
+                setTab.dispose();
+            }
+        });
+
+        this.expandGallery.subscribe(function(val){
+            if (val) {
+                self.hideSidePanel();
+            }
+        });
 
         this.getAnnotationCount = function(canvas) {
             return drawFeatures().filter(function(feature) {

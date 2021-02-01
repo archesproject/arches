@@ -9,7 +9,7 @@
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12">
-            <input type="text" data-bind="textInput: value, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disabled}" class="form-control input-lg widget-input">
+            <input type="text" data-bind="textInput: value, attr: {placeholder: placeholder, maxlength: maxLength, disabled: uneditable}" class="form-control input-lg widget-input">
         </div>
     </div>
 </div>
@@ -34,5 +34,13 @@
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input type="" placeholder="{% trans "Default Value" %}" id="" class="form-control input-md widget-input" data-bind="textInput: defaultValue">
+</div>
+<div class="node-config-item">
+    <div class="control-label">
+        {% trans "Disabled" %}
+    </div>
+    <div class="pad-no">
+        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: uneditable, config:{label: '{% trans "Disable Editing" %}', subtitle: '{% trans "Prevent users from editing value" %}'}}}"></div>
+    </div>
 </div>
 {% endblock config_form %}

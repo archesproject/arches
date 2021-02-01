@@ -21,6 +21,7 @@ define([
     * the table of ontologyProperties below the dropdown otherwise the table will be hidden and you will have to populate params.graphids
     * @param  {boolean} params.graphids (optional) - if params.node is not supplied then you need to supply a list of graphids that can be used to get resource instances for the dropdown
     * @param  {boolean} params.multiple - whether to display multiple values in the dropdown/table
+    * @param  {boolean} params.allowInstanceCreation - whether the dropdown will give the user the option to create a new resource instance
     * @param  {function} params.termFilter (optional) - a function to override the default term filter used when typing into the dropdown to search for resources
     * this.termFilter = function(term, data){
     *    return data["advanced-search"] = JSON.stringify([{
@@ -37,9 +38,21 @@ define([
         this.graphLookup = graphCache;
         params.configKeys = ['placeholder'];
         this.preview = arches.graphs.length > 0;
+        this.allowInstanceCreation = params.allowInstanceCreation === false ? false : true;
         this.renderContext = params.renderContext;
+
+        /* 
+            shoehorn logic to piggyback off of search context functionality. 
+            Should be refactored when we get the chance for better component clarity.
+        */ 
+        if (params.renderContext === 'workflow') {
+            self.renderContext = 'search';
+        }
+
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
+
+        this.selectedItem = params.selectedItem || ko.observable();
         this.rootOntologyClass = '';
         this.graphIsSemantic = false;
         this.resourceTypesToDisplayInDropDown = !!params.graphids ? ko.toJS(params.graphids) : [];
@@ -52,7 +65,7 @@ define([
                 return fetch('/graphs/' + graphid)
                     .then(function(response){
                         if (!response.ok) {
-                            throw new Error('Network response was not ok');
+                            throw new Error(arches.translations.reNetworkReponseError);
                         }
                         return response.json();
                     })
@@ -109,7 +122,7 @@ define([
         };
         
         WidgetViewModel.apply(this, [params]);
-        
+
         this.displayValue = ko.observable('');
         
         //
@@ -180,7 +193,7 @@ define([
     
             self.value.subscribe(updateNameAndOntologyClass);
             // Resolve Resource Instance Names from the incoming values
-            updateNameAndOntologyClass(self.value);
+            self.value.valueHasMutated();
 
             this.relationshipsInFilter = ko.computed(function() {
                 if(!self.value()) {
@@ -194,12 +207,28 @@ define([
 
         var makeObject = function(id, esSource){
             var graph = self.graphLookup[esSource.graph_id];
-            var ontologyProperty = graph ? graph.config.ontologyProperty : '';
-            var inverseOntologyProperty = graph ? graph.config.inverseOntologyProperty : '';
+
+            var ontologyProperty;
+            var inverseOntologyProperty;
+
+            if (graph) {
+                ontologyProperty = graph.config.ontologyProperty;
+                inverseOntologyProperty = graph.config.inverseOntologyProperty;
+            }
+            
+            if (self.node && (!ontologyProperty || !inverseOntologyProperty) ) {
+                var ontologyProperties = self.node.config.graphs().find(function(nodeConfigGraph) {
+                    return nodeConfigGraph.graphid === graph.graphid;
+                });
+
+                ontologyProperty = ontologyProperty || ontologyProperties.ontologyProperty;
+                inverseOntologyProperty = inverseOntologyProperty || ontologyProperties.inverseOntologyProperty;
+            }
+
             var ret = {
                 "resourceId": ko.observable(id),
-                "ontologyProperty": ko.observable(ontologyProperty || ''),
-                "inverseOntologyProperty": ko.observable(inverseOntologyProperty || ''),
+                "ontologyProperty": ko.observable(ontologyProperty || ""),
+                "inverseOntologyProperty": ko.observable(inverseOntologyProperty || ""),
                 "resourceXresourceId": ""
             };            
             Object.defineProperty(ret, 'resourceName', {value: ko.observable(esSource.displayname)});
@@ -214,10 +243,11 @@ define([
             value: self.renderContext === 'search' ? self.value : resourceToAdd,
             clickBubble: true,
             multiple: !self.displayOntologyTable ? params.multiple : false,
-            placeholder: this.placeholder() || "Add new Relationship",
+            placeholder: this.placeholder() || arches.translations.riSelectPlaceholder,
             closeOnSelect: true,
             allowClear: self.renderContext === 'search' ? true : false,
             onSelect: function(item) {
+                self.selectedItem(item);
                 if (self.renderContext !== 'search') {
                     if (item._source) {
                         var ret = makeObject(item._id, item._source);
@@ -331,7 +361,9 @@ define([
                 if (item._source) {
                     return item._source.displayname;
                 } else {
-                    return '<b> Create a new ' + item.name + ' . . . </b>';
+                    if (self.allowInstanceCreation) {
+                        return '<b> ' + arches.translations.riSelectCreateNew.replace('${graphName}', item.name) + ' . . . </b>';
+                    }
                 }
             },
             formatSelection: function(item) {
@@ -347,22 +379,35 @@ define([
                     if(!Array.isArray(self.value())){
                         values = [self.value()];
                     }
+
                     var lookups = [];
+
                     values.forEach(function(val){
-                        lookups.push(lookupResourceInstanceData(val)
-                            .then(function(resourceInstance) {
-                                return resourceInstance;
-                            })
-                        );
-                    });
-                    Promise.all(lookups).then(function(val){
-                        var ret = val.map(function(item) {
-                            return {"_source":{"displayname": item["_source"].displayname}, "_id":item["_id"]};
-                        });
-                        if(self.multiple === false) {
-                            ret = ret[0];
+                        var resourceId;
+                        if (typeof val === 'string') {
+                            resourceId = val;
                         }
-                        callback(ret);
+                        else if (ko.unwrap(val.resourceId)) {
+                            resourceId = ko.unwrap(val.resourceId);
+                        }
+
+                        var resourceInstance = lookupResourceInstanceData(resourceId).then(
+                            function(resourceInstance) { return resourceInstance; }
+                        );
+           
+                        if (resourceInstance) { lookups.push(resourceInstance); }
+                    });
+
+                    Promise.all(lookups).then(function(arr){
+                        if (arr.length) {
+                            var ret = arr.map(function(item) {
+                                return {"_source":{"displayname": item["_source"].displayname}, "_id":item["_id"]};
+                            });
+                            if(self.multiple === false) {
+                                ret = ret[0];
+                            }
+                            callback(ret);
+                        }
                     });
                 }
             }

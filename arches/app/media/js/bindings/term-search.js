@@ -91,11 +91,11 @@ define([
                     var markup = [];
                     var indent = result.type === 'concept' || result.type === 'term' ? 'term-search-item indent' : (result.type === 'string' ? 'term-search-item' : 'term-search-group');
                     if (result.type === 'group') {
-                        _.each(result.text, function(searchType, i){
-                            var label = searchType === 'concepts' ? 'Concepts' : 'Term Matches';
+                        _.each(result.text, function(searchType, i) {
+                            var label = searchType === 'concepts' ? arches.translations.termSearchConcept : arches.translations.termSearchTerm;
                             var active = i === 0 ? 'active' : '';
                             markup.push('<button id="' + searchType + 'group" class="btn search-type-btn term-search-btn ' + active + ' ">' + label + '</button>');
-                        })
+                        });
                     } else {
                         window.Select2.util.markMatch(result.text, query.term, markup, escapeMarkup);
                     }

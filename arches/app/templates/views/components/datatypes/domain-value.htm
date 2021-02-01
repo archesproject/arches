@@ -30,11 +30,12 @@
     <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
         <option value="">{% trans "Equals" %}</option>
         <option value="!">{% trans "Not" %}</option>
+        <option value="null">{% trans "Has no value" %}</option>
+        <option value="not_null">{% trans "Has any value" %}</option>
     </select>
 </div>
-
-<div class="col-md-8 col-lg-9">
+<div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
     <select  type="" placeholder="{% trans " Value " %}" class="form-control library-search" data-bind="options: options, optionsText: 'text', optionsValue: 'id', value: searchValue, chosen: {width: '100%', disable_search: true}"></select>
 </div>
 <!-- /ko -->
-{% load i18n %}
+

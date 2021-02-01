@@ -1,6 +1,7 @@
 import json, urllib
 from django.urls import reverse
 from arches.app.models import models
+from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, Exists, Nested
 from django.utils.translation import ugettext as _
 import logging
 
@@ -13,6 +14,14 @@ class BaseDataType(object):
 
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
         return []
+
+    def create_error_message(self, value, source, row_number, message):
+        source_info = "{0} {1}".format(source, row_number) if row_number else ""
+        error_message = {
+            "type": "ERROR",
+            "message": _("{0} error, {1} {2} - {3}. Unable to save.").format(self.datatype_model.datatype, value, source_info, message),
+        }
+        return error_message
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         """
@@ -188,7 +197,12 @@ class BaseDataType(object):
         Returns a list of concept values for a given node
         """
         data = self.get_tile_data(tile)
-        return str(data[str(node.nodeid)])
+
+        if data:
+            display_value = data.get(str(node.nodeid))
+
+            if display_value:
+                return str(display_value)
 
     def get_search_terms(self, nodevalue, nodeid=None):
         """
@@ -203,6 +217,22 @@ class BaseDataType(object):
         """
         pass
 
+    def append_null_search_filters(self, value, node, query, request):
+        """
+        Appends the search query dsl to search for fields that haven't been populated
+        """
+        base_query = Bool()
+        null_query = Bool()
+        data_exists_query = Exists(field="tiles.data.%s" % (str(node.pk)))
+        nested_query = Nested(path="tiles", query=data_exists_query)
+        null_query.must(nested_query)
+        base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+        if value["op"] == "null":
+            base_query.must_not(null_query)
+        elif value["op"] == "not_null":
+            base_query.must(null_query)
+        query.must(base_query)
+
     def handle_request(self, current_tile, request, node):
         """
         Updates files
@@ -216,7 +246,7 @@ class BaseDataType(object):
         """
         pass
 
-    def post_tile_delete(self, tile, nodeid):
+    def post_tile_delete(self, tile, nodeid, index=True):
         """
         Called following the tile.delete operation
 
@@ -272,6 +302,9 @@ class BaseDataType(object):
 
     def from_rdf(self, json_ld_node):
         raise NotImplementedError
+
+    def validate_from_rdf(self, value):
+        return self.validate(value)
 
     def collects_multiple_values(self):
         """

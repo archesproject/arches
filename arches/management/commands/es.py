@@ -31,7 +31,7 @@ from arches.app.search.mappings import (
     prepare_resource_relations_index,
     delete_resource_relations_index,
 )
-import arches.app.utils.index_database as index_database
+import arches.app.utils.index_database as index_database_util
 
 
 class Command(BaseCommand):
@@ -49,6 +49,7 @@ class Command(BaseCommand):
                 "setup_indexes",
                 "delete_indexes",
                 "index_database",
+                "reindex_database",
                 "index_concepts",
                 "index_resources",
                 "index_resource_relations",
@@ -57,9 +58,10 @@ class Command(BaseCommand):
             ],
             help="Operation Type; "
             + "'setup_indexes'=Creates the indexes in Elastic Search needed by the system"
-            + "'delete_indexes'=Deletes all indexs in Elasticsearch required by the system"
+            + "'delete_indexes'=Deletes all indexes in Elasticsearch required by the system"
             + "'index_database'=Indexes all the data (resources, concepts, and resource relations) found in the database"
-            + "'index_concepts'=Indxes all concepts from the database"
+            + "'reindex_database'=Deletes and re-creates all indices in ElasticSearch, then indexes all data found in the database"
+            + "'index_concepts'=Indexes all concepts from the database"
             + "'index_resources'=Indexes all resources from the database"
             + "'index_resource_relations'=Indexes all resource to resource relation records"
             + "'add_index'=Register a new index in Elasticsearch"
@@ -93,37 +95,48 @@ class Command(BaseCommand):
             help="Set to True(default) to remove all the resources from the index before the reindexing operation",
         )
 
+        parser.add_argument(
+            "-q",
+            "--quiet",
+            action="store_true",
+            dest="quiet",
+            default=False,
+            help="Silences the status bar output during certain operations, use in celery operations for example",
+        )
+
         parser.add_argument("-n", "--name ", action="store", dest="name", default=None, help="Name of the custom index")
 
     def handle(self, *args, **options):
         if options["operation"] == "setup_indexes":
-            self.setup_indexes()
+            self.setup_indexes(name=options["name"])
 
         if options["operation"] == "add_index":
             self.register_index(name=options["name"])
 
         if options["operation"] == "delete_indexes":
-            self.delete_indexes()
+            self.delete_indexes(name=options["name"])
 
         if options["operation"] == "delete_index":
             self.remove_index(name=options["name"])
 
         if options["operation"] == "index_database":
-            if options["name"] is not None:
-                index_database.index_resources(
-                    clear_index=options["clear_index"], index_name=options["name"], batch_size=options["batch_size"]
-                )
-            else:
-                index_database.index_db(clear_index=options["clear_index"], batch_size=options["batch_size"])
+            self.index_database(
+                batch_size=options["batch_size"], clear_index=options["clear_index"], name=options["name"], quiet=options["quiet"]
+            )
+
+        if options["operation"] == "reindex_database":
+            self.reindex_database(batch_size=options["batch_size"], name=options["name"], quiet=options["quiet"])
 
         if options["operation"] == "index_concepts":
-            index_database.index_concepts(clear_index=options["clear_index"], batch_size=options["batch_size"])
+            index_database_util.index_concepts(clear_index=options["clear_index"], batch_size=options["batch_size"])
 
         if options["operation"] == "index_resources":
-            index_database.index_resources(clear_index=options["clear_index"], batch_size=options["batch_size"])
+            index_database_util.index_resources(
+                clear_index=options["clear_index"], batch_size=options["batch_size"], quiet=options["quiet"]
+            )
 
         if options["operation"] == "index_resource_relations":
-            index_database.index_resource_relations(clear_index=options["clear_index"], batch_size=options["batch_size"])
+            index_database_util.index_resource_relations(clear_index=options["clear_index"], batch_size=options["batch_size"])
 
     def register_index(self, name):
         es_index = get_index(name)
@@ -133,22 +146,39 @@ class Command(BaseCommand):
         es_index = get_index(name)
         es_index.delete_index()
 
-    def setup_indexes(self):
-        prepare_terms_index(create=True)
-        prepare_concepts_index(create=True)
-        prepare_resource_relations_index(create=True)
-        prepare_search_index(create=True)
+    def index_database(self, batch_size, clear_index=True, name=None, quiet=False):
+        if name is not None:
+            index_database_util.index_custom_indexes(index_name=name, clear_index=clear_index, batch_size=batch_size, quiet=quiet)
+        else:
+            index_database_util.index_db(clear_index=clear_index, batch_size=batch_size, quiet=quiet)
 
-        # add custom indexes
-        for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
-            self.register_index(index["name"])
+    def reindex_database(self, batch_size, name=None, quiet=False):
+        self.delete_indexes(name=name)
+        self.setup_indexes(name=name)
+        self.index_database(batch_size=batch_size, clear_index=False, name=name, quiet=quiet)
 
-    def delete_indexes(self):
-        delete_terms_index()
-        delete_concepts_index()
-        delete_search_index()
-        delete_resource_relations_index()
+    def setup_indexes(self, name=None):
+        if name is None:
+            prepare_terms_index(create=True)
+            prepare_concepts_index(create=True)
+            prepare_resource_relations_index(create=True)
+            prepare_search_index(create=True)
 
-        # remove custom indexes
-        for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
-            self.remove_index(index["name"])
+            # add custom indexes
+            for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
+                self.register_index(index["name"])
+        else:
+            self.register_index(name)
+
+    def delete_indexes(self, name=None):
+        if name is None:
+            delete_terms_index()
+            delete_concepts_index()
+            delete_search_index()
+            delete_resource_relations_index()
+
+            # remove custom indexes
+            for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
+                self.remove_index(index["name"])
+        else:
+            self.remove_index(name)

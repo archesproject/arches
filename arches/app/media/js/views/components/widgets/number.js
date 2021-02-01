@@ -7,18 +7,19 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber
     * @param {function} params.config - observable containing config object
     * @param {string} params.config().label - label to use alongside the text input
     * @param {string} params.config().placeholder - default text to show in the text input
+    * @param {string} params.config().uneditable - disables widget
     */
 
 
     var NumberWidget = function(params) {
-        params.configKeys = ['placeholder', 'width', 'min', 'max', 'step', 'precision', 'prefix', 'suffix', 'defaultValue', 'format'];
+        params.configKeys = ['placeholder', 'width', 'min', 'max', 'step', 'precision', 'prefix', 'suffix', 'defaultValue', 'format', 'uneditable'];
 
         WidgetViewModel.apply(this, [params]);
 
         var self = this;
 
         this.updateVal = ko.computed(function(){
-            if (self.value()){
+            if (self.value() !== null && self.value() !== undefined) { //allow a value of 0 to pass
                 var val = self.value();
                 if (typeof self.min() === 'number') {
                     val = Number(val) < Number(self.min()) ? Number(self.min()) : Number(val);
@@ -31,12 +32,18 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber
                 if (self.precision()) {
                     val = Number(val).toFixed(self.precision());
                 }
-                
+
             }
             return val || self.value();
         }, self).extend({throttle: 600});
 
-        this.value(this.updateVal());
+        this.value(Number(this.updateVal()));
+
+        this.displayValue = ko.pureComputed(function() {
+            if (self.value() !== null && self.value() !== undefined) {
+                return self.value().toString();
+            }
+        }, self);
 
         if (ko.isObservable(this.precision)) {
             var precisionSubscription = this.precision.subscribe(function(val){

@@ -1,15 +1,15 @@
 import uuid
 import csv
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models import concept
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory, get_value_from_jsonld
 from arches.app.models.concept import get_preflabel_from_valueid, get_preflabel_from_conceptid, get_valueids_from_concept_label
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested, Exists
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested, Exists, Terms
 from arches.app.utils.date_utils import ExtendedDateFormat
-from django.core.exceptions import ObjectDoesNotExist
-
 # for the RDF graph export helper functions
 from rdflib import Namespace, URIRef, Literal, BNode
 from rdflib import ConjunctiveGraph as Graph
@@ -84,50 +84,52 @@ class BaseConceptDataType(BaseDataType):
             )
             document["strings"].append({"string": value.value, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
 
+    def append_search_filters(self, value, node, query, request):
+        try:
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "":
+                base_query = Bool()
+                base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+                match_query = Nested(path="tiles", query=Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"]))
+                if "!" in value["op"]:
+                    base_query.must_not(match_query)
+                    # base_query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
+                else:
+                    base_query.must(match_query)
+                query.must(base_query)
+
+        except KeyError as e:
+            pass
+
 
 class ConceptDataType(BaseConceptDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
         errors = []
-
         # first check to see if the validator has been passed a valid UUID,
         # which should be the case at this point. return error if not.
         if value is not None:
             if type(value) == list:
-                message = "The widget used to save this data appears to be incorrect for this datatype. Contact system admin to resolve"
-                errors.append(
-                    {
-                        "type": "ERROR",
-                        "message": f"""datatype: {self.datatype_model.datatype}
-                        value: {value} {source} {row_number} - {message}. This data was not imported.""",
-                    }
-                )
+                message = _("The widget used to save this data appears to be incorrect for this datatype. Contact system admin to resolve")
+                error_message = self.create_error_message(value, source, row_number, message)
+                errors.append(error_message)
                 return errors
 
             try:
                 uuid.UUID(str(value))
             except ValueError:
-                message = "This is an invalid concept prefLabel, or an incomplete UUID"
-                errors.append(
-                    {
-                        "type": "ERROR",
-                        "message": f"""datatype: {self.datatype_model.datatype}
-                        value: {value} {source} {row_number} - {message}. This data was not imported.""",
-                    }
-                )
+                message = _("This is an invalid concept prefLabel, or an incomplete UUID")
+                error_message = self.create_error_message(value, source, row_number, message)
+                errors.append(error_message)
                 return errors
 
-            # if good UUID, test whether it corresponds to an actual Value object
             try:
                 models.Value.objects.get(pk=value)
             except ObjectDoesNotExist:
-                message = "This UUID does not correspond to a valid domain value"
-                errors.append(
-                    {
-                        "type": "ERROR",
-                        "message": f"""datatype: {self.datatype_model.datatype}
-                        value: {value} {source} {row_number} - {message}. This data was not imported.""",
-                    }
-                )
+                message = _("This UUID is not an available concept value")
+                error_message = self.create_error_message(value, source, row_number, message)
+                errors.append(error_message)
+                return errors
         return errors
 
     def transform_value_for_tile(self, value):
@@ -146,19 +148,6 @@ class ConceptDataType(BaseConceptDataType):
             return ""
         else:
             return self.get_value(uuid.UUID(data[str(node.nodeid)])).value
-
-    def append_search_filters(self, value, node, query, request):
-        try:
-            if value["val"] != "":
-                match_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
-                if "!" in value["op"]:
-                    query.must_not(match_query)
-                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
-                else:
-                    query.must(match_query)
-
-        except KeyError as e:
-            pass
 
     def get_rdf_uri(self, node, data, which="r"):
         if not data:
@@ -286,19 +275,6 @@ class ConceptListDataType(BaseConceptDataType):
                 new_val = self.get_value(uuid.UUID(val))
                 new_values.append(new_val.value)
         return ",".join(new_values)
-
-    def append_search_filters(self, value, node, query, request):
-        try:
-            if value["val"] != "":
-                match_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
-                if "!" in value["op"]:
-                    query.must_not(match_query)
-                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
-                else:
-                    query.must(match_query)
-
-        except KeyError as e:
-            pass
 
     def get_rdf_uri(self, node, data, which="r"):
         c = ConceptDataType()

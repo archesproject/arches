@@ -146,7 +146,6 @@ class SearchEngine(object):
         index = self._add_prefix(index)
         self.es.indices.create(index=index, ignore=400)
         self.es.indices.put_mapping(index=index, doc_type="_doc", body=body, include_type_name=True)
-        # print(f"adding mapping to {index} : {body}")
 
     def create_index(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
@@ -209,6 +208,10 @@ class SearchEngine(object):
             return count["count"]
         else:
             return None
+
+    def refresh(self, **kwargs):
+        kwargs = self._add_prefix(**kwargs)
+        self.es.indices.refresh(**kwargs)
 
     def BulkIndexer(outer_self, batch_size=500, **kwargs):
         class _BulkIndexer(object):

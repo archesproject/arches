@@ -1,0 +1,29 @@
+{% load i18n %}
+<div
+    style="height: 100%; padding: 10px 24px;"
+>
+    <!-- ko foreach: { data: pageLayout.sections(), as: 'layoutSection'} -->
+    <div
+        style="padding: 10px 0;"
+    >
+        <div 
+        >
+            <h4
+                style="font-weight: unset;"
+                data-bind="text: layoutSection.sectionTitle"
+            ></h4>
+        </div>
+        <!-- ko foreach: { data: layoutSection.componentConfigs(), as: 'componentConfig'} -->
+            <div data-bind='{
+                component: {
+                    name: componentConfig.componentName(),
+                    params: { 
+                        value: componentConfig.value,
+                        ...componentConfig.parameters()
+                    }
+                },
+            }'></div>
+        <!-- /ko -->
+    </div>
+    <!-- /ko -->
+</div>

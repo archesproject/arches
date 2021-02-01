@@ -73,14 +73,14 @@ class CommandLineTests(ArchesTestCase):
         self.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
         self.resource_instance_id = "f562c2fa-48d3-4798-a723-10209806c068"
         user = User.objects.get(username="ben")
-        edit_records = EditLog.objects.filter(resourceinstanceid=self.resource_instance_id).filter(edittype="created")
-        if len(edit_records) == 0:
-            edit = EditLog(userid=user.id, edittype="create", resourceinstanceid=self.resource_instance_id)
+        edit_records = EditLog.objects.filter(resourceinstanceid=self.resource_instance_id).filter(edittype="create")
+        for edit in edit_records:
+            edit.userid = user.id
             edit.save()
 
     def tearDown(self):
         ResourceInstance.objects.filter(graph_id=self.data_type_graphid).delete()
-        EditLog.objects.filter(resourceinstanceid=self.resource_instance_id).filter(edittype="created").delete()
+        EditLog.objects.filter(resourceinstanceid=self.resource_instance_id).filter(edittype="create").delete()
 
     @classmethod
     def setUpClass(cls):
