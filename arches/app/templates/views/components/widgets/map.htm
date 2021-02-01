@@ -18,6 +18,9 @@
 
 {% block report %}
 <dt data-bind="text: label"></dt>
+<!-- ko if: summaryDetails.length === 0 -->
+<dd>{% trans "None" %}</dd>
+<!-- /ko -->
 <dd data-bind="foreach: summaryDetails">
   <div style='margin-bottom:2px' data-bind="text: JSON.stringify($data.geometry)"></div>
 </dd>
