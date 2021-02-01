@@ -15,21 +15,7 @@
             </div>
 
             <div>
-                <!--ko if: activeStep()._index+1 !== steps.length -->
-                <button 
-                    data-bind="
-                        click: finishWorkflow, 
-                        css:{disabled: canFinish() === false}
-                    " 
-                    class="btn btn-success"
-                >
-                    <i class="ion-android-cloud-done"></i>
-                    <span>
-                        {% trans "Finish Workflow" %}
-                    </span>
-                </button>
-                <!--/ko-->
-                <!--ko if: activeStep()._index+1 === steps.length -->
+                <!--ko if: activeStep()._index === steps.length - 1 -->
                 <button 
                     disabled 
                     class="btn btn-success"
@@ -40,6 +26,21 @@
                     </span>
                 </button>
                 <!--/ko-->
+                <!--ko if: activeStep()._index !== steps.length - 1 -->
+                <button 
+                    data-bind="
+                        click: finishWorkflow, 
+                        css:{disabled: !isWorkflowFinished()}
+                    " 
+                    class="btn btn-success"
+                >
+                    <i class="ion-android-cloud-done"></i>
+                    <span>
+                        {% trans "Finish Workflow" %}
+                    </span>
+                </button>
+                <!--/ko-->
+
                 <button 
                     data-bind="click: quitWorkflow" 
                     class="btn btn-danger"
@@ -69,10 +70,27 @@
                             data-bind="{
                                 css: { 
                                     active: step.active(), 
-                                    inactive: !step.active() && $parent.canStepBecomeActive(step),
-                                    disabled: !step.active() && !$parent.canStepBecomeActive(step),
+                                    inactive: (
+                                        !step.active() 
+                                        && (
+                                            step.complete()
+                                            || ( step._index <= $parent.furthestValidStepIndex() )
+                                        )
+
+                                    ),
+                                    disabled: (
+                                        !step.active() 
+                                        && step._index > $parent.furthestValidStepIndex()
+                                    ),
                                 },
-                                click: function() { if ($parent.canStepBecomeActive(step)) { $parent.activeStep(step) }},
+                                click: function() { 
+                                    if (
+                                        !step.active() 
+                                        && step._index <= $parent.furthestValidStepIndex()
+                                    ) { 
+                                        $parent.activeStep(step) 
+                                    }
+                                },
                             }" 
                         >
                             <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
@@ -83,7 +101,7 @@
                                         click: $parent.back, 
                                         clickBubble: false ,
                                         css: {
-                                            disabled: !$parent.canStepBecomeActive($parent.steps[step._index - 1]),
+                                            disabled: $parent.activeStep()._index === 0,
                                         },
                                         visible: step.active() && step._index !== 0,
                                     }"
@@ -100,7 +118,10 @@
                                         click: $parent.next, 
                                         clickBubble: false,
                                         css: {
-                                            disabled: !$parent.canStepBecomeActive($parent.steps[step._index + 1]),
+                                            disabled: (
+                                                ( $parent.activeStep().required() && !$parent.activeStep().complete() )
+                                                || $parent.activeStep()._index === $parent.steps.length - 1
+                                            ),
                                         },
                                         visible: step.active() && step._index !== $parent.steps.length - 1,
                                     }"
@@ -159,7 +180,7 @@
                     data-bind="
                         click: back,
                         css: {
-                            disabled: !canStepBecomeActive(steps[activeStep()._index - 1]),
+                            disabled: activeStep()._index === 0,
                         }
                     "
                 >
@@ -187,12 +208,12 @@
                         {% trans  "Clear" %}
                     </span>
                 </button>
-                <button 
+                <button
                     class="btn btn-primary"
                     data-bind="
                         click: next,
                         css: {
-                            disabled: !canStepBecomeActive(steps[activeStep()._index + 1]),
+                            disabled: activeStep().required() && !activeStep().complete() || activeStep()._index === steps.length - 1,
                         }
                     "
                 >

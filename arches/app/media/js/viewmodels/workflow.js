@@ -21,13 +21,19 @@ define([
         this.id = ko.observable();
 
         this.steps = config.steps || [];
-        
-        this.hoverStep = ko.observable();
-        this.previousStep = ko.observable();
 
+        this.hoverStep = ko.observable();
+        
+        this.previousStep = ko.observable();
         this.activeStep = ko.observable();
-        this.activeStep.subscribe(function() {
-            self.checkCanFinish();
+
+        this.isWorkflowFinished = ko.observable(false);
+
+        this.furthestValidStepIndex = ko.observable();
+        this.furthestValidStepIndex.subscribe(function(index){
+            if (index >= self.steps.length - 1) {
+                self.isWorkflowFinished(true)
+            }
         });
 
         this.ready = ko.observable(false);
@@ -38,8 +44,8 @@ define([
 
         this.loading = config.loading || ko.observable(false);
 
+        
         this.workflowName = ko.observable();
-        this.canFinish = ko.observable(false);
         this.alert = config.alert || ko.observable(null);
         this.quitUrl = arches.urls.home;
 
@@ -74,6 +80,8 @@ define([
                 self.setToLocalStorage(STEP_IDS_LABEL, stepIds);
             }
 
+            self.getFurthestValidStepIndex();
+
             /* cached activeStep logic */ 
             var cachedActiveStep = self.steps.find(function(step) {
                 return step.id() === self.getStepIdFromUrl();
@@ -105,6 +113,7 @@ define([
                     self.steps[i] = newStep;
 
                     self.steps[i].complete.subscribe(function(complete) {
+                        self.getFurthestValidStepIndex();
                         if (complete && self.steps[i].autoAdvance()) self.next();
                     });
                 }
@@ -130,6 +139,48 @@ define([
 
             var newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
             history.replaceState(null, '', newRelativePathQuery);
+        };
+
+        this.getFurthestValidStepIndex = function() {
+            /*
+                valid index is the index directly after the furthest completed step
+                or furthest non-required step chained to the beginning/most-completed step
+            */ 
+
+            var furthestValidStepIndex = self.furthestValidStepIndex() || 0;
+            var startIdx = 0;
+
+            /* furthest completed step index */ 
+            self.steps.forEach(function(step) {
+                if (ko.unwrap(step.complete)) {
+                    startIdx = step._index;
+                }
+            });
+
+            /* furthest non-required step directly after furthest completed step */ 
+            for (var i = startIdx; i < self.steps.length; i++) {
+                var step = self.steps[i];
+
+                if (ko.unwrap(step.complete) || !ko.unwrap(step.required)) {
+                    furthestValidStepIndex = step._index;
+                }
+                else { break; }
+            }
+
+            /* add index position for furthest valid index if not incomplete beginning step */ 
+            if (
+                (
+                    furthestValidStepIndex === 0 
+                    && self.steps[furthestValidStepIndex].complete()
+                )
+                || furthestValidStepIndex > 0
+            ) { 
+                furthestValidStepIndex += 1; 
+            }
+
+            if (furthestValidStepIndex !== self.furthestValidStepIndex()) {
+                self.furthestValidStepIndex(furthestValidStepIndex);
+            }
         };
 
         this.getWorkflowIdFromUrl = function() {
@@ -174,21 +225,8 @@ define([
             });
         };
 
-        this.checkCanFinish = function(){
-            var required = false, canFinish = true, complete = null;
-            for(var i = 0; i < self.steps.length; i++) {
-                required = ko.unwrap(self.steps[i].required);
-                complete = ko.unwrap(self.steps[i].complete);
-                if(!complete && required) {
-                    canFinish = false;
-                    break;
-                }
-            }
-            self.canFinish(canFinish);
-        };
-
         this.finishWorkflow = function() {
-            if(self.canFinish()){ self.activeStep(self.steps[self.steps.length-1]); }
+            if (self.isWorkflowFinished()) { self.activeStep(self.steps[self.steps.length - 1]); }
         };
 
         this.quitWorkflow = function(){
@@ -198,14 +236,16 @@ define([
 
             self.steps.forEach(function(step) {
                 if (step.wastebin && step.wastebin.resourceid) {
-                    warnings.push(step.wastebin.description);
+                    warnings.push(ko.unwrap(step.wastebin.description));
                     resourcesToDelete.push(step.wastebin);
                 } else if (step.wastebin && step.wastebin.tile) {
-                    warnings.push(step.wastebin.description);
+                    warnings.push(ko.unwrap(step.wastebin.description));
                     tilesToDelete.push(step.wastebin);
                 }
             });
-            self.warning = self.wastebinWarning(warnings.join());
+
+            self.warning = self.wastebinWarning(warnings.join(', '));
+            
             var deleteObject = function(type, obj){
                 if (type === 'resource') {
                     $.ajax({
@@ -245,32 +285,11 @@ define([
             );
         };
 
-        this.canStepBecomeActive = function(step) {
-            var canStepBecomeActive = false;
-            
-            if (step && !step.active()) {  /* prevents refresh if clicking on active tab */ 
-                var previousStep = self.steps[step._index - 1];
-
-                if (
-                    step.complete() 
-                    || ( previousStep && previousStep.complete() )
-                    || self.canFinish() === true
-                ) { 
-                    canStepBecomeActive = true; 
-                }
-            }
-
-            return canStepBecomeActive;
-        };
-
         this.next = function(){
             var activeStep = self.activeStep();
 
-            if (
-                (activeStep.complete() || !activeStep.required()) 
-                && activeStep._index < self.steps.length - 1
-            ) {
-                self.activeStep(self.steps[activeStep._index+1]);
+            if ((!activeStep.required() || activeStep.complete()) && activeStep._index < self.steps.length - 1) {
+                self.activeStep(self.steps[activeStep._index + 1]);
             }
         };
 
