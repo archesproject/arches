@@ -83,7 +83,7 @@ OVERRIDE_RESOURCE_MODEL_LOCK = True
 NOSE_ARGS = ["--with-coverage", "--nologcapture", "--cover-package=arches", "--verbosity=1", "--cover-erase"]
 
 INSTALLED_APPS = INSTALLED_APPS + ("django_nose",)
-
+COUCHDB_URL = "http://admin:password@localhost:5984"  # defaults to localhost:5984
 
 DATATYPE_LOCATIONS.append('tests.fixtures.datatypes')
 
