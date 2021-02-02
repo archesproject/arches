@@ -1,7 +1,8 @@
 name: CI
 
-on: [push, pull_request]
-  # Allows you to run this workflow manually from the Actions tab
+on: 
+  push:
+  pull_request:
   workflow_dispatch:
 
 jobs:
