@@ -22,7 +22,12 @@
 
 {% block report %}
 <dt data-bind="text: label"></dt>
+<!-- ko if: value() !== null -->
 <dd data-bind="date: value(), dateFormat: dateFormat || '{% trans "No Date Entered" %}'"></dd>
+<!-- /ko -->
+<!-- ko if: value() === null -->
+<dd>{% trans "None" %}</dd>
+<!-- /ko -->
 {% endblock report %}
 
 {% block config_form %}

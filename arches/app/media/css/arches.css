@@ -13053,7 +13053,7 @@ a.jstree-anchor.permissions-widget {
     margin-left: -20px;
     padding: 15px 10px 150px 10px;
     height: 100%;
-    position: fixed;
+    position: absolute;
     overflow-y: scroll;
 }
 
@@ -13125,6 +13125,19 @@ a.jstree-anchor.permissions-widget {
     font-weight: normal;
     color: rgb(142, 142, 142);
     display: block;
+}
+
+.iiif-gallery-manifest-label {
+    max-width:300px;
+    display:inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: text-bottom;
+}
+
+.gallery-expanded .iiif-gallery-manifest-label {
+    display:none;
 }
 
 .iiif-image-tools {

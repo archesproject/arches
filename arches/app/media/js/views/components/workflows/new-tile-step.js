@@ -11,19 +11,21 @@ define([
 ], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel) {
     function viewModel(params) {
         var self = this;
-
         this.resourceId = ko.observable();
 
         var cachedValue = ko.unwrap(params.value);
         if (cachedValue) {
             self.resourceId(cachedValue.resourceid);
-            params.tileid(cachedValue.tileid);
+
+            if (cachedValue.tileid) {
+                params.tileid(cachedValue.tileid);
+            }
         }
 
         if (ko.unwrap(params.resourceid)) {
             self.resourceId(ko.unwrap(params.resourceid));
         } 
-        else if (ko.unwrap(params.workflow.resourceId)) {
+        else if (params.workflow && ko.unwrap(params.workflow.resourceId)) {
             self.resourceId(ko.unwrap(params.workflow.resourceId));
         } 
 
@@ -39,7 +41,7 @@ define([
         
         this.complete = params.complete || ko.observable();
         this.complete.subscribe(function(isComplete) {
-            if (isComplete) {
+            if (isComplete && params.value) {
                 params.value(params.defineStateProperties());
             }
         });
@@ -118,16 +120,16 @@ define([
     
                 self.card.subscribe(function(card){
                     if (card) {
-                        if (params.preSaveCallback && !ko.unwrap(params.preSaveCallback)) {
+                        if (params.preSaveCallback) {
                             card.preSaveCallback = params.preSaveCallback;
                         }
-                        if (params.postSaveCallback && !ko.unwrap(params.postSaveCallback)) {
+                        if (params.postSaveCallback) {
                             card.postSaveCallback = params.postSaveCallback;
                         }
-                        if (params.preClearCallback && !ko.unwrap(params.preClearCallback)) {
+                        if (params.preClearCallback) {
                             card.preClearCallback = params.preClearCallback;
                         }
-                        if (params.postClearCallback && !ko.unwrap(params.postClearCallback)) {
+                        if (params.postClearCallback) {
                             card.postClearCallback = params.postClearCallback;
                         }
                     }
@@ -251,7 +253,9 @@ define([
                 self.resourceId(tile.resourceinstance_id);
             }
 
-            params.value(params.defineStateProperties());
+            if (params.value) {
+                params.value(params.defineStateProperties());
+            }
             
             if (self.completeOnSave === true) { self.complete(true); }
         };

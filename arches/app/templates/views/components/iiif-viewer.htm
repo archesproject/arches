@@ -139,11 +139,6 @@
         text: showGallery() ? '{% trans "hide" %}' : '{% trans "show" %}'
     "></a>
 
-    <!--ko if: expandGallery() -->
-    <span style="padding-right: 3px; padding-left: 3px;">|</span>
-    <a href="">{% trans "close info" %}</a>
-    <!--/ko -->
-
 </div>
 <!--ko let: {canvasClick: canvasClick, getCanvasService: getCanvasService, selectedCanvas: canvas, getAnnotationCount: getAnnotationCount} -->
 <div class="iiif-viewer-gallery" data-bind="css: {
@@ -220,9 +215,9 @@
                 {% block gallery_header %}
                 <div class="iiif-gallery-header">
                     <div>
-                        <span data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
-                        |
-                        {% trans "Filter" %}
+                        <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
+                        <span class="iiif-gallery-manifest-label">|</span>
+                        <span>{% trans "Filter" %}</span>
                         <div class="list-filter" data-bind="">
                             <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
 
@@ -231,7 +226,7 @@
                         </div>
                     </div>
                     <div style="display: inline-flex; padding: 5px">
-                        <div class="iiif-gallery-sequence-label" style="padding:0 5px" data-bind="click: toggleManifestEditor">
+                        <div class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor">
                             {% trans "Switch Manifest" %}
                         </div>
                     </div>
