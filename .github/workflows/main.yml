@@ -1,7 +1,7 @@
 name: CI
 
 on: 
-  push:
+  # push: -- just run on PRs for now
   pull_request:
   workflow_dispatch:
 
