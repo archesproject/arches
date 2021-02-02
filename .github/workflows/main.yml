@@ -24,26 +24,26 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       - name: Set up Python 3.8
         uses: actions/setup-python@v1
         with:
           python-version: 3.8
 
-      - name: Install Python packages
+      - name: Install python packages
         run: |
           python -m pip install --upgrade pip
           pip install -e .
           pip install -r arches/install/requirements.txt
           pip install -r arches/install/requirements_dev.txt
-          echo python dependencies packages installed
+          echo Python packages installed
 
-      - name: Install Postgres and ES dependencies
+      - name: Install Java, GDAL, and other system dependencies
         run: |
           sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk python-dev libgconf2-4 libgdal-dev
           echo Postgres and ES dependencies installed
 
+      - name: Start Elasticsearch
       - uses: ankane/setup-elasticsearch@v1
         with:
           elasticsearch-version: 7
@@ -53,14 +53,10 @@ jobs:
         with:
           couchdb-version: 2.3
 
-      - name: Test Couch endpoint
-        run: |
-          curl -f http://127.0.0.1:5984/
-
-      - name: Test Couch auth
+      - name: Test CouchDB authentication
         run: |
           curl -X POST -H "Content-Type: application/json; charset=utf-8" -d '{"name": "admin", "password": "password"}' http://127.0.0.1:5984/_session
 
-      - name: Run tests
+      - name: Run Arches unit tests
         run: |
           python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
