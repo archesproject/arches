@@ -193,14 +193,7 @@
                 <button 
                     class="btn btn-success"
                     data-bind="{
-                        css: {
-                            disabled: !activeStep().hasDirtyTile(),
-                        },
-                        click: function() {
-                            if (activeStep().hasDirtyTile()) {
-                                activeStep().save()
-                            }
-                        },
+                        click: activeStep().save
                     }"
                 >
                     <i class="ion-android-cloud-done"></i>
