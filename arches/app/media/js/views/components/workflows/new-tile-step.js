@@ -39,7 +39,19 @@ define([
         this.tile.subscribe(function(tile) {
             if (tile && params.hasDirtyTile) {
                 tile.dirty.subscribe(function(dirty) {
-                    params.hasDirtyTile(dirty);
+                    /* 
+                        for proper function, need to interact with 
+                        card dirty state inside tile subscription 
+                    */
+                    
+                    if (self.card()) {
+                        /* prevents tile from maintaining false dirty state */ 
+                        if (dirty && !self.card().isDirty()) {
+                            self.tile()._tileData(koMapping.toJSON(self.tile().data))
+                        }
+
+                        params.hasDirtyTile(self.card().isDirty());
+                    }
                 });
             }
         });
@@ -128,6 +140,8 @@ define([
     
                 self.card.subscribe(function(card){
                     if (card) {
+                        card.context = 'workflow';
+
                         if (params.preSaveCallback) {
                             card.preSaveCallback = params.preSaveCallback;
                         }
