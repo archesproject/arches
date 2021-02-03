@@ -6,7 +6,7 @@ define([
     'arches',
     'require',
     'viewmodels/card'
-], function($, _, ko, koMapping, arches, require) {
+], function($, _, ko, koMapping, arches, require, CardViewModel) {
     /**
     * A viewmodel used for generic cards
     *
@@ -63,6 +63,9 @@ define([
         var loading = params.loading || ko.observable();
 
         _.extend(this, params.tile);
+
+
+        console.log('sososo', params, self)
 
         this._tileData = ko.observable(
             koMapping.toJSON(params.tile.data)
@@ -132,6 +135,23 @@ define([
                     handler(self);
                 });
                 params.provisionalTileViewModel.selectedProvisionalEdit(undefined);
+
+
+                /* add defaults defined in parent card if they exist && action isn't disabled */ 
+                if (!self.noDefaults && self.parent instanceof CardViewModel) {
+                    self.parent.widgets().forEach(function(widget) {
+                        Object.keys(self.data).forEach(function(nodeId) {
+                            if (nodeId === widget.node_id()) {
+                                var defaultValue = ko.unwrap(widget.config.defaultValue);
+        
+                                if (defaultValue) {
+                                    self.data[nodeId](defaultValue);
+                                }
+                            }
+                        });
+                    });
+                }
+
                 delete self.noDefaults;
             },
             getAttributes: function() {
