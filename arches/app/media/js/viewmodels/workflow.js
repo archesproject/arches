@@ -235,12 +235,17 @@ define([
             var warnings = []
 
             self.steps.forEach(function(step) {
-                if (step.wastebin && step.wastebin.resourceid) {
+                if (step.wastebin && ko.unwrap(step.wastebin.hasOwnProperty('resourceid'))) {
+                    step.wastebin.resourceid(ko.unwrap(step.resourceid));
+                } else if (step.wastebin && ko.unwrap(step.wastebin.hasOwnProperty('tile'))) {
+                    step.wastebin.tile(step.ko.unwrap(step.tile));
+                }
+                if (step.wastebin && ko.unwrap(step.wastebin.resourceid)) {
                     warnings.push(ko.unwrap(step.wastebin.description));
-                    resourcesToDelete.push(step.wastebin);
-                } else if (step.wastebin && step.wastebin.tile) {
+                    resourcesToDelete.push(ko.mapping.toJS(step.wastebin));
+                } else if (step.wastebin && ko.unwrap(step.wastebin.tile)) {
                     warnings.push(ko.unwrap(step.wastebin.description));
-                    tilesToDelete.push(step.wastebin);
+                    tilesToDelete.push(ko.mapping.toJS(step.wastebin));
                 }
             });
 
