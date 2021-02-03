@@ -207,11 +207,7 @@
                         css: {
                             disabled: !activeStep().hasDirtyTile(),
                         },
-                        click: function() {  
-                            if (activeStep().hasDirtyTile()) {
-                                activeStep().clear();
-                            }
-                        },
+                        click: activeStep().clear
                     }"
                 >
                     <i class="fa fa-undo"></i>

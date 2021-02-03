@@ -127,13 +127,9 @@ define([
         };
 
         this.clear = function() {
-
-            var tile = ko.unwrap(self.tile);
-
-            if (tile) {
-                tile.reset();
+            if (self.hasDirtyTile()) {
+                self.tile().reset();
             }
-
         }
 
         this.setToLocalStorage = function(key, value) {
