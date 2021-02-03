@@ -192,7 +192,16 @@
 
                 <button 
                     class="btn btn-success"
-                    data-bind="click: activeStep().save"
+                    data-bind="{
+                        css: {
+                            disabled: !activeStep().hasDirtyTile(),
+                        },
+                        click: function() {
+                            if (activeStep().hasDirtyTile()) {
+                                activeStep().save()
+                            }
+                        },
+                    }"
                 >
                     <i class="ion-android-cloud-done"></i>
                     <span>
@@ -212,9 +221,9 @@
                         },
                     }"
                 >
-                    <i class="fa fa-times-circle"></i>
+                    <i class="fa fa-undo"></i>
                     <span>
-                        {% trans  "Reset" %}
+                        {% trans  "Undo" %}
                     </span>
                 </button>
                 <button

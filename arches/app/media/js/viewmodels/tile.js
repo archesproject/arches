@@ -64,9 +64,6 @@ define([
 
         _.extend(this, params.tile);
 
-
-        console.log('sososo', params, self)
-
         this._tileData = ko.observable(
             koMapping.toJSON(params.tile.data)
         );
