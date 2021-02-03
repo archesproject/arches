@@ -133,22 +133,6 @@ define([
                 });
                 params.provisionalTileViewModel.selectedProvisionalEdit(undefined);
 
-
-                /* add defaults defined in parent card if they exist && action isn't disabled */ 
-                if (!self.noDefaults && self.parent instanceof CardViewModel) {
-                    self.parent.widgets().forEach(function(widget) {
-                        Object.keys(self.data).forEach(function(nodeId) {
-                            if (nodeId === widget.node_id()) {
-                                var defaultValue = ko.unwrap(widget.config.defaultValue);
-        
-                                if (defaultValue) {
-                                    self.data[nodeId](defaultValue);
-                                }
-                            }
-                        });
-                    });
-                }
-
                 delete self.noDefaults;
             },
             getAttributes: function() {
@@ -268,6 +252,26 @@ define([
                 });
             }
         });
+
+        /* add defaults defined in parent card if they exist && action isn't disabled */ 
+        if (!self.noDefaults && self.parent instanceof CardViewModel) {
+            var widgets = ko.unwrap(self.parent.widgets) || [];
+
+            widgets.forEach(function(widget) {
+                Object.keys(self.data).forEach(function(nodeId) {
+                    if (nodeId === widget.node_id()) {
+                        var defaultValue = ko.unwrap(widget.config.defaultValue);
+
+                        if (defaultValue) {
+                            self.data[nodeId](defaultValue);
+                        }
+                    }
+                });
+            });
+
+            self._tileData(koMapping.toJSON(self.data))
+        }
+
         this.selected.subscribe(function(selected) {
             if (selected) this.expanded(true);
         }, this);

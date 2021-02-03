@@ -40,16 +40,9 @@ define([
             if (tile && params.hasDirtyTile) {
                 tile.dirty.subscribe(function(dirty) {
                     /* 
-                        for proper function, need to interact with 
-                        card dirty state inside tile subscription 
+                        for proper function, need to interact with card dirty state inside tile subscription 
                     */
-                    
                     if (self.card()) {
-                        /* prevents tile from maintaining false dirty state */ 
-                        if (dirty && !self.card().isDirty()) {
-                            self.tile()._tileData(koMapping.toJSON(self.tile().data))
-                        }
-
                         params.hasDirtyTile(self.card().isDirty());
                     }
                 });
