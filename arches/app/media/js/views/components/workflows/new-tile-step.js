@@ -38,7 +38,7 @@ define([
         this.tile = ko.observable();
         this.tile.subscribe(function(tile) {
             if (tile && params.hasDirtyTile) {
-                tile.dirty.subscribe(function(dirty) {
+                tile.dirty.subscribe(function() {
                     /* 
                         for proper function, need to interact with card dirty state inside tile subscription 
                     */

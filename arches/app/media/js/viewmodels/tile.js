@@ -6,7 +6,7 @@ define([
     'arches',
     'require',
     'viewmodels/card'
-], function($, _, ko, koMapping, arches, require, CardViewModel) {
+], function($, _, ko, koMapping, arches, require) {
     /**
     * A viewmodel used for generic cards
     *
@@ -269,7 +269,7 @@ define([
                 });
             });
 
-            self._tileData(koMapping.toJSON(self.data))
+            self._tileData(koMapping.toJSON(self.data));
         }
 
         this.selected.subscribe(function(selected) {
