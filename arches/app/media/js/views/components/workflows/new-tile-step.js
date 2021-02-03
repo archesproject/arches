@@ -34,7 +34,15 @@ define([
         };
 
         this.card = ko.observable();
+
         this.tile = ko.observable();
+        this.tile.subscribe(function(tile) {
+            if (tile && params.hasDirtyTile) {
+                tile.dirty.subscribe(function(dirty) {
+                    params.hasDirtyTile(dirty);
+                });
+            }
+        });
         
         this.loading = params.loading || ko.observable(false);
         this.alert = params.alert || ko.observable(null);
@@ -125,12 +133,6 @@ define([
                         }
                         if (params.postSaveCallback) {
                             card.postSaveCallback = params.postSaveCallback;
-                        }
-                        if (params.preClearCallback) {
-                            card.preClearCallback = params.preClearCallback;
-                        }
-                        if (params.postClearCallback) {
-                            card.postClearCallback = params.postClearCallback;
                         }
                     }
                     if (ko.unwrap(card.widgets) && params.hiddenNodes) {

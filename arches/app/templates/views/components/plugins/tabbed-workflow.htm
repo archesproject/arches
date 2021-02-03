@@ -201,11 +201,20 @@
                 </button>
                 <button
                     class="btn btn-danger"
-                    data-bind="click: activeStep().clear"
+                    data-bind="{
+                        css: {
+                            disabled: !activeStep().hasDirtyTile(),
+                        },
+                        click: function() {  
+                            if (activeStep().hasDirtyTile()) {
+                                activeStep().clear();
+                            }
+                        },
+                    }"
                 >
                     <i class="fa fa-times-circle"></i>
                     <span>
-                        {% trans  "Clear" %}
+                        {% trans  "Reset" %}
                     </span>
                 </button>
                 <button
