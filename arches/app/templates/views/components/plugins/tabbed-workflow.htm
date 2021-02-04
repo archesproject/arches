@@ -192,7 +192,9 @@
 
                 <button 
                     class="btn btn-success"
-                    data-bind="click: activeStep().save"
+                    data-bind="{
+                        click: activeStep().save
+                    }"
                 >
                     <i class="ion-android-cloud-done"></i>
                     <span>
@@ -201,11 +203,16 @@
                 </button>
                 <button
                     class="btn btn-danger"
-                    data-bind="click: activeStep().clear"
+                    data-bind="{
+                        css: {
+                            disabled: !activeStep().hasDirtyTile(),
+                        },
+                        click: activeStep().clear
+                    }"
                 >
-                    <i class="fa fa-times-circle"></i>
+                    <i class="fa fa-undo"></i>
                     <span>
-                        {% trans  "Clear" %}
+                        {% trans  "Undo" %}
                     </span>
                 </button>
                 <button

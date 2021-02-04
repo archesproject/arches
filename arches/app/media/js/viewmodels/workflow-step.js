@@ -25,14 +25,14 @@ define([
 
         this.informationBoxData = ko.observable();       
 
+        this.hasDirtyTile = ko.observable(false);
+
         this.complete = ko.observable(false);
         this.required = ko.observable(ko.unwrap(config.required));
         this.autoAdvance = ko.observable(true);
 
         this.preSaveCallback = ko.observable();
         this.postSaveCallback = ko.observable();
-        this.preClearCallback = ko.observable();
-        this.postClearCallback = ko.observable();
 
         this.externalStepData = {};
 
@@ -127,21 +127,8 @@ define([
         };
 
         this.clear = function() {
-            /* 
-                currently SYNCHRONOUS, however async localStore interaction is
-                covered by value subscription. This should be refactored when we can.
-            */ 
-            var preClearCallback = ko.unwrap(self.preClearCallback);
-            if (preClearCallback) {
-                preClearCallback();
-            }
-
-            self.value(null);
-            self.complete(false);
-
-            var postClearCallback = ko.unwrap(self.postClearCallback);
-            if (postClearCallback) {
-                postClearCallback();
+            if (self.hasDirtyTile()) {
+                self.tile().reset();
             }
         }
 

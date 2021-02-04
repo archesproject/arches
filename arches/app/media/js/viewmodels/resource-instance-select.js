@@ -219,9 +219,11 @@ define([
                     var ontologyProperties = self.node.config.graphs().find(function(nodeConfigGraph) {
                         return nodeConfigGraph.graphid === graph.graphid;
                     });
-    
-                    ontologyProperty = ontologyProperty || ontologyProperties.ontologyProperty;
-                    inverseOntologyProperty = inverseOntologyProperty || ontologyProperties.inverseOntologyProperty;
+
+                    if (ontologyProperties) {
+                        ontologyProperty = ontologyProperty || ontologyProperties.ontologyProperty;
+                        inverseOntologyProperty = inverseOntologyProperty || ontologyProperties.inverseOntologyProperty;
+                    }
                 }
             }
             

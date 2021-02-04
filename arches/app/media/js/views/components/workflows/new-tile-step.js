@@ -34,7 +34,20 @@ define([
         };
 
         this.card = ko.observable();
+
         this.tile = ko.observable();
+        this.tile.subscribe(function(tile) {
+            if (tile && params.hasDirtyTile) {
+                tile.dirty.subscribe(function() {
+                    /* 
+                        for proper function, need to interact with card dirty state inside tile subscription 
+                    */
+                    if (self.card()) {
+                        params.hasDirtyTile(self.card().isDirty());
+                    }
+                });
+            }
+        });
         
         this.loading = params.loading || ko.observable(false);
         this.alert = params.alert || ko.observable(null);
@@ -120,17 +133,13 @@ define([
     
                 self.card.subscribe(function(card){
                     if (card) {
+                        card.context = 'workflow';
+
                         if (params.preSaveCallback) {
                             card.preSaveCallback = params.preSaveCallback;
                         }
                         if (params.postSaveCallback) {
                             card.postSaveCallback = params.postSaveCallback;
-                        }
-                        if (params.preClearCallback) {
-                            card.preClearCallback = params.preClearCallback;
-                        }
-                        if (params.postClearCallback) {
-                            card.postClearCallback = params.postClearCallback;
                         }
                     }
                     if (ko.unwrap(card.widgets) && params.hiddenNodes) {
