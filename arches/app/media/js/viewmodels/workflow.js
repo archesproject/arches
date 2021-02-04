@@ -235,10 +235,12 @@ define([
             var warnings = []
 
             self.steps.forEach(function(step) {
-                if (step.wastebin && ko.unwrap(step.wastebin.hasOwnProperty('resourceid'))) {
-                    step.wastebin.resourceid(ko.unwrap(step.resourceid));
-                } else if (step.wastebin && ko.unwrap(step.wastebin.hasOwnProperty('tile'))) {
-                    step.wastebin.tile(step.ko.unwrap(step.tile));
+                if (step.wastebin && ko.unwrap(step.wastebin.resources)) {
+                    var resources = ko.mapping.toJS(step.wastebin.resources);
+                    resources.forEach(function(resource) {
+                        warnings.push(resource.description);
+                        resourcesToDelete.push(resource);
+                    })
                 }
                 if (step.wastebin && ko.unwrap(step.wastebin.resourceid)) {
                     warnings.push(ko.unwrap(step.wastebin.description));
@@ -253,6 +255,7 @@ define([
             
             var deleteObject = function(type, obj){
                 if (type === 'resource') {
+                    console.log(obj);
                     $.ajax({
                         url: arches.urls.api_resources(obj),
                         type: 'DELETE',
