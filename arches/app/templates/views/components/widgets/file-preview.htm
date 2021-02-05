@@ -5,25 +5,20 @@
 <div class="row widget-wrapper">
     <div class="form-group">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+
         <!-- ko if: node -->
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
+        
         <div class="col-xs-12 dropzone" data-bind="dropzone: dropzoneOptions">
             <div class="file-select-window" data-bind="visible: filesJSON().length === 0">
                 <div 
                     class="bord-top pad-ver file-select"
-                    style="
-                        padding: 5px 10px 20px 10px;
-                    "
+                    style="padding: 5px 10px 20px 10px;"
                 >
-                    <div 
-                        style="
-                            padding: 5px;
-                        "
-                    >
+                    <div style="padding: 5px;">
                         <h4>{% trans "Drag & Drop files onto this panel" %}</h4>
                     </div>
-
 
                     <div class="separator">{% trans "or" %}</div>
 
@@ -62,57 +57,96 @@
                     </div>
                 </div>
             </div>
+
+            <!-- 
+                note that data-bind=visible must be in place (instead of ko if:) as DZ instantiates only once;
+                elements with its class name must exist at time of init 
+            -->
             <div data-bind="visible: filesJSON().length > 0">
-                <!-- note that data-bind=visible must be in place (instead of ko if:) as DZ instantiates only once;
-                    elements with its class name must exist at time of init -->
-                <h4>{% trans "Uploaded Files" %}</h4>
-                <div class="file-upload-options">
-                    <!--ko if: filesJSON().length > 1-->
-                    <input data-bind="textInput: filter" type="text" placeholder="{% trans 'find a file...' %}" class="file-upload-filter">
-                    <!-- /ko -->
+                <div
+                    style="
+                        display: flex;
+                        justify-content: space-between;
+                    "
+                >
+                    <h4>{% trans "Uploaded Files" %}</h4>
 
-                    <!-- Clear Search -->
-                    <span class="file-upload-clear-filter" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+                    <div 
+                        class="file-upload-options"
+                        style="padding: 10px 0px;"
+                    >
+                        <!--ko if: filesJSON().length > 1-->
+                        <input data-bind="textInput: filter" type="text" placeholder="{% trans 'find a file...' %}" class="file-upload-filter">
+                        <!-- /ko -->
+    
+                        <!-- Clear Search -->
+                        <span class="file-upload-clear-filter" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+    
+                        <!-- ko if: filter() -->
+                        <span data-bind="text: filteredList().length+' out of '+filesJSON().length+' files match filter'"></span>
+                        <!-- /ko -->
+                        <!-- ko if: (!filter() || filter() == "") -->
+                        <span data-bind="text: filesJSON().length + '{% trans " file(s) uploaded" %}'"></span>
+                        <!-- /ko -->
+                    </div>
+                </div>
 
-                    <!-- ko if: filter() -->
-                    <span data-bind="text: filteredList().length+' out of '+filesJSON().length+' files match filter'"></span>
-                    <!-- /ko -->
-                    <!-- ko if: (!filter() || filter() == "") -->
-                    <span data-bind="text: filesJSON().length + '{% trans " file(s) uploaded" %}'"></span>
-                    <!-- /ko -->
-                    <button type="button" class="btn btn-file-upload-reset" data-bind="click: reset">
-                        <span>{% trans "delete all files" %}</span>
+                <div
+                    style="
+                        display: flex;
+                    "
+                >
+                    <button 
+                        type="button" 
+                        class="btn btn-file-upload-reset"
+                        style="padding: unset;" 
+                        data-bind="click: reset"
+                    >
+                        <span>{% trans "Remove all files" %}</span>
                     </button>
-                    <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="css: uniqueidClass">
-                        <span>{% trans "add more files" %}</span>
+    
+                    <button 
+                        type="button" 
+                        class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" 
+                        style="margin-left: 8px;" 
+                        data-bind="css: uniqueidClass"
+                    >
+                        <span>{% trans "Add another file" %}</span>
                     </button>
                 </div>
             </div>
             <div class="dz-previews" data-bind="css: uniqueidClass">
             <!-- ko if: !filter() -->
                 <!-- ko foreach: pagedList(filesJSON()) -->
-                <div class="file-upload-card">
+                <div 
+                    class="file-upload-card"
+                    style="width: fit-content;"
+                >
                     <div class="media-body">
                         <div class="media-block">
                             <div class="media-left">
-                                <span><i class="fa fa-file fa-lg"></i></span>
+                                <button 
+                                    class="btn btn-xs btn-danger btn-file-cancel"
+                                    data-bind="click: $parent.removeFile"
+                                >
+                                    <i class="ion ion-close"></i>
+                                </button>
                             </div>
+
                             <div class="media-body file-upload-card-detail">
                                 <div class="media-left">
-                                    <span class="text-main mar-no text-overflow" data-bind="text: name"></span>
+                                    <span 
+                                        class="text-main mar-no text-overflow" 
+                                        style="padding-right: 25px;"
+                                        data-bind="text: name"
+                                    ></span>
+
                                     <!-- ko if: $data.error -->
                                     <span class="dz-error text-danger text-sm" data-bind="text: '{% trans "error" %}'"></span>
                                     <!-- /ko -->
-                                    <span class="text-sm"><a data-bind="attr: {href: ko.unwrap(url) ? url : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false"><span data-bind="text: ko.unwrap(url) ? '{% trans "Download" %}' : '{% trans "Unsaved" %}'"></span></a></span>
                                 </div>
-                                <div class="file-upload-card-detail-right">
-                                    <div class="media-right" data-bind="click: $parent.removeFile">
-                                        <button class="btn btn-xs btn-danger btn-file-cancel"><i class="ion ion-close"></i></button>
-                                    </div>
-                                    <div class="file-size-label">
-                                        <span class="text-sm" data-bind="html: $parent.formatSize($data)"></span>
-                                    </div>
-                                </div>
+
+                                <div class="text-sm" data-bind="html: $parent.formatSize($data)"></div>
                             </div>
                         </div>
                     </div>

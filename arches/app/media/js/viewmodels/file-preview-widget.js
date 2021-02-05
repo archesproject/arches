@@ -4,9 +4,10 @@ define([
     'underscore',
     'dropzone',
     'uuid',
+    'papaparse',
     'viewmodels/widget',
     'bindings/dropzone'
-], function($, ko, _, Dropzone, uuid, WidgetViewModel) {
+], function($, ko, _, Dropzone, uuid, Papa, WidgetViewModel) {
     /**
      * A viewmodel used for viewing and uploading external resource data 
      *
@@ -28,7 +29,7 @@ define([
 
         
 
-        console.log("JSDIFOFS", self, params)
+        console.log("JSDIFOFS", self, params, Papa)
 
 
         // if (this.form) {
@@ -91,40 +92,38 @@ define([
         //     }
         // });
 
-        // this.formatSize = function(file) {
-        //     var bytes = ko.unwrap(file.size);
-        //     if(bytes == 0) return '0 Byte';
-        //     var k = 1024;
-        //     var dm = 2;
-        //     var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-        //     var i = Math.floor(Math.log(bytes) / Math.log(k));
-        //     return '<span>' + parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + '</span> ' + sizes[i];
-        // };
+        this.formatSize = function(file) {
+            var bytes = ko.unwrap(file.size);
+            if(bytes == 0) return '0 Byte';
+            var k = 1024;
+            var dm = 2;
+            var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+            var i = Math.floor(Math.log(bytes) / Math.log(k));
+            return '<span>' + parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + '</span> ' + sizes[i];
+        };
 
-        this.filesJSON = ko.observable([])
-        // this.filesJSON = ko.computed(function() {
-        //     var filesForUpload = self.filesForUpload();
-        //     var uploadedFiles = self.uploadedFiles();
-        //     return ko.toJS(uploadedFiles.concat(
-        //         _.map(filesForUpload, function(file, i) {
-        //             return {
-        //                 name: file.name,
-        //                 accepted: file.accepted,
-        //                 height: file.height,
-        //                 lastModified: file.lastModified,
-        //                 size: file.size,
-        //                 status: file.status,
-        //                 type: file.type,
-        //                 width: file.width,
-        //                 url: null,
-        //                 file_id: null,
-        //                 index: i,
-        //                 content: URL.createObjectURL(file),
-        //                 error: file.error
-        //             };
-        //         })
-        //     ));
-        // }).extend({throttle: 100});
+        this.filesJSON = ko.computed(function() {
+            var filesForUpload = self.filesForUpload();
+            return ko.toJS([].concat(
+                _.map(filesForUpload, function(file, i) {
+                    return {
+                        name: file.name,
+                        accepted: file.accepted,
+                        height: file.height,
+                        lastModified: file.lastModified,
+                        size: file.size,
+                        status: file.status,
+                        type: file.type,
+                        width: file.width,
+                        url: null,
+                        file_id: null,
+                        index: i,
+                        content: URL.createObjectURL(file),
+                        error: file.error
+                    };
+                })
+            ));
+        }).extend({throttle: 100});
 
         // this.filesJSON.subscribe(function(value) {
         //     console.log("AAAAA", self, value)
@@ -172,23 +171,24 @@ define([
         // this.selectedFile = ko.observable(self.filesJSON()[0]);
         // this.selectFile = function(sFile) { self.selectedFile(sFile); };
 
-        // this.removeFile = function(file) {
-        //     var filePosition;
-        //     self.filesJSON().forEach(function(f, i) { if (f.file_id === file.file_id) { filePosition = i; } });
-        //     var newfilePosition = filePosition === 0 ? 1 : filePosition - 1;
-        //     var filesForUpload = self.filesForUpload();
-        //     var uploadedFiles = self.uploadedFiles();
-        //     if (file.file_id) {
-        //         file = _.find(uploadedFiles, function(uploadedFile) {
-        //             return file.file_id ===  ko.unwrap(uploadedFile.file_id);
-        //         });
-        //         self.uploadedFiles.remove(file);
-        //     } else {
-        //         file = filesForUpload[file.index];
-        //         self.filesForUpload.remove(file);
-        //     }
-        //     if (self.filesJSON().length > 0) { self.selectedFile(self.filesJSON()[newfilePosition]); }
-        // };
+        this.removeFile = function(file) {
+            self.filesForUpload.remove(file)
+            // var filePosition;
+            // self.filesJSON().forEach(function(f, i) { if (f.file_id === file.file_id) { filePosition = i; } });
+            // var newfilePosition = filePosition === 0 ? 1 : filePosition - 1;
+            // var filesForUpload = self.filesForUpload();
+            // var uploadedFiles = self.uploadedFiles();
+            // if (file.file_id) {
+            //     file = _.find(uploadedFiles, function(uploadedFile) {
+            //         return file.file_id ===  ko.unwrap(uploadedFile.file_id);
+            //     });
+            //     self.uploadedFiles.remove(file);
+            // } else {
+            //     file = filesForUpload[file.index];
+            //     self.filesForUpload.remove(file);
+            // }
+            // if (self.filesJSON().length > 0) { self.selectedFile(self.filesJSON()[newfilePosition]); }
+        };
         
         // this.pageCt = ko.observable(5);
         // this.pageCtReached = ko.computed(function() {
@@ -225,17 +225,22 @@ define([
                 self.dropzone = this;
 
                 this.on("addedfile", function(file) {
-                    console.log('ADDED FILE', file)
-                    // self.filesForUpload.push(file);
+                    var foo = Papa.parse(file, {
+                        worker: true,
+                        complete: function(results, file) {
+                            console.log("AAAAAAAAA", results, file)
+                        },
+                    });
+
+                    self.filesForUpload.push(file);
                 });
 
                 this.on("error", function(file, error) {
                     file.error = error;
-                    // self.filesForUpload.valueHasMutated();
+                    /* ALERT USER HERE */ 
                 });
 
                 this.on("removedfile", function(file) {
-                    // self.filesForUpload.remove(file);
                 });
             }
         };

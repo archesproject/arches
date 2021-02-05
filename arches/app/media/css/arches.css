@@ -7694,7 +7694,7 @@ span.file-upload-clear-filter {
     display: flex;
     align-items: center;
     text-align: center;
-    padding: 0px 28px;
+    margin: 0px 32px;
 }
 .separator::before, .separator::after {
     content: '';
