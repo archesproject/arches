@@ -11,7 +11,7 @@
         <!-- /ko -->
         
         <div class="col-xs-12 dropzone" data-bind="dropzone: dropzoneOptions">
-            <div class="file-select-window" data-bind="visible: filesJSON().length === 0">
+            <div class="file-select-window" data-bind="visible: addedFiles().length === 0">
                 <div 
                     class="bord-top pad-ver file-select"
                     style="padding: 5px 10px 20px 10px;"
@@ -62,7 +62,7 @@
                 note that data-bind=visible must be in place (instead of ko if:) as DZ instantiates only once;
                 elements with its class name must exist at time of init 
             -->
-            <div data-bind="visible: filesJSON().length > 0">
+            <div data-bind="visible: addedFiles().length > 0">
                 <div
                     style="
                         display: flex;
@@ -75,7 +75,7 @@
                         class="file-upload-options"
                         style="padding: 10px 0px;"
                     >
-                        <!--ko if: filesJSON().length > 1-->
+                        <!--ko if: addedFiles().length > 1-->
                         <input data-bind="textInput: filter" type="text" placeholder="{% trans 'find a file...' %}" class="file-upload-filter">
                         <!-- /ko -->
     
@@ -83,19 +83,15 @@
                         <span class="file-upload-clear-filter" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
     
                         <!-- ko if: filter() -->
-                        <span data-bind="text: filteredList().length+' out of '+filesJSON().length+' files match filter'"></span>
+                        <span data-bind="text: filteredList().length+' out of '+addedFiles().length+' files match filter'"></span>
                         <!-- /ko -->
                         <!-- ko if: (!filter() || filter() == "") -->
-                        <span data-bind="text: filesJSON().length + '{% trans " file(s) uploaded" %}'"></span>
+                        <span data-bind="text: addedFiles().length + '{% trans " file(s) uploaded" %}'"></span>
                         <!-- /ko -->
                     </div>
                 </div>
 
-                <div
-                    style="
-                        display: flex;
-                    "
-                >
+                <div style="display: flex;">
                     <button 
                         type="button" 
                         class="btn btn-file-upload-reset"
@@ -117,7 +113,7 @@
             </div>
             <div class="dz-previews" data-bind="css: uniqueidClass">
             <!-- ko if: !filter() -->
-                <!-- ko foreach: pagedList(filesJSON()) -->
+                <!-- ko foreach: addedFiles() -->
                 <div 
                     class="file-upload-card"
                     style="width: fit-content;"
@@ -154,7 +150,7 @@
                 <!-- /ko -->
             <!-- /ko -->
             <!-- ko if: filter() -->
-                <!-- ko foreach: pagedList(filteredList()) -->
+                <!-- ko foreach: filteredList() -->
                 <div class="file-upload-card">
                     <div class="media-body">
                         <div class="media-block">
@@ -207,24 +203,3 @@
 </div>
 
 {% endblock config_form %}
-
-{% block report %}
-<dt data-bind="text: label"></dt>
-
-<!-- ko if: uploadedFiles().length === 0 -->
-<dd>{% trans "None" %}</dd>
-<!-- /ko -->
-
-<!-- ko foreach: reportFiles() -->
-<dd>
-    <a class="" data-bind="attr: {href: url}">
-        <i class="ion ion-forward"></i>
-        <span data-bind="text: name"></span>
-    </a>
-</dd>
-<!-- /ko -->
-{% endblock report %}
-
-{% block display_value %}
-<span data-bind="text: Number.isInteger(displayValue()) ? displayValue() + ' {% trans "files uploaded" %}' : displayValue()"></span>
-{% endblock display_value %}
