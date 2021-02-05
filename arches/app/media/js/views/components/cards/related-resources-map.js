@@ -4,29 +4,13 @@ define([
     'knockout',
     'knockout-mapping',
     'geojson-extent',
-    'xlsx',
     'viewmodels/card-component',
     'viewmodels/map-editor',
     'viewmodels/map-filter',
     'views/components/cards/select-related-feature-layers',
     'text!templates/views/components/cards/related-resources-map-popup.htm'
-], function($, arches, ko, koMapping, geojsonExtent, foo, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
-
-
-
-
-    
-
-
-
+], function($, arches, ko, koMapping, geojsonExtent, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
-
-
-        console.log(foo)
-
-
-
-
         var self = this;
 
         this.widgets = [];

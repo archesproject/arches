@@ -30,7 +30,23 @@ define([
                 }
             }
         });
+
         this.value = params.value || ko.observable(null);
+
+        
+        // this.value = ko.observable(ko.unwrap(params.value));
+
+        // console.log("DDDD", this.value())
+
+        // if (ko.isObservable(params.value)) {
+        //     this.value.subscribe(function(value) {
+        //         console.log("CCCCC", value)
+        //         params.value(value);
+        //     });
+        // }
+
+
+
         this.formData = params.formData || null;
         this.form = params.form || null;
         this.tile = params.tile || null;

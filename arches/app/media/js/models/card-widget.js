@@ -30,6 +30,7 @@ define([
             this.disposables = [];
             this.widgetLookup = widgets;
             this.widgetList = function() {
+                console.log("HDDHD")
                 var widgets = _.map(self.widgetLookup, function(widget, id) {
                     widget.id = id;
                     return widget;
