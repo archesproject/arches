@@ -79,8 +79,8 @@ class SearchEngine(object):
 
                 return helpers.bulk(self.es, data, refresh=refresh, **kwargs)
             except BulkIndexError as detail:
-                if detail.errors[0]['delete']['status'] == 404:
-                        pass
+                if detail.errors[0]["delete"]["status"] == 404:
+                    pass
                 else:
                     self.logger.warning(
                         "%s: WARNING: failed to delete document by query: %s \nException detail: %s\n" % (datetime.now(), body, detail)
