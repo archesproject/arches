@@ -75,6 +75,16 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 #     'name': 'my_new_custom_index'
 # }]
 
+ELASTICSEARCH_EXPLICIT_NULL_VALUES = {
+    "string": None,
+    "number": None,
+    "boolean": None,
+    "date": "0001-01-01",
+    "edtf": None,
+    # "resource-instance": "NULL-VALUE"
+    # "geometry": None,  # currently not supported
+}
+
 
 KIBANA_URL = "http://localhost:5601/"
 KIBANA_CONFIG_BASEPATH = "kibana"  # must match Kibana config.yml setting (server.basePath) but without the leading slash,
@@ -277,7 +287,7 @@ OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 36000}
 
 # This is the client id you get when you register a new application
 # see https://arches.readthedocs.io/en/stable/api/#authentication
-MOBILE_OAUTH_CLIENT_ID = ""  #'9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
+MOBILE_OAUTH_CLIENT_ID = "s5lS0IbV0kkx9D2AdICLtlq3RZPSTy8UfRwOCmmV"  #'9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
 MOBILE_DEFAULT_ONLINE_BASEMAP = {"default": "mapbox://styles/mapbox/streets-v9"}
 MOBILE_IMAGE_SIZE_LIMITS = {
     # These limits are meant to be approximates. Expect to see uploaded sizes range +/- 20%
@@ -456,7 +466,7 @@ TIMEWHEEL_DATE_TIERS = None
 # Identify the usernames and duration (seconds) for which you want to cache the timewheel
 CACHE_BY_USER = {"anonymous": 3600 * 24}
 
-BYPASS_CARDINALITY_TILE_VALIDATION = True
+BYPASS_CARDINALITY_TILE_VALIDATION = False
 BYPASS_UNIQUE_CONSTRAINT_TILE_VALIDATION = False
 BYPASS_REQUIRED_VALUE_TILE_VALIDATION = False
 

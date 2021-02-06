@@ -236,8 +236,17 @@ class NumberDataType(BaseDataType):
         except (AttributeError, KeyError) as e:
             pass
 
+    def null_value_placeholder(self):
+        try:
+            return settings.ELASTICSEARCH_EXPLICIT_NULL_VALUES["number"]
+        except:
+            return None
+
     def default_es_mapping(self):
-        return {"type": "double"}
+        mapping = {"type": "double"}
+        if self.null_value_placeholder() is not None:
+            mapping["null_value"] = self.null_value_placeholder()
+        return mapping
 
 
 class BooleanDataType(BaseDataType):
@@ -307,8 +316,17 @@ class BooleanDataType(BaseDataType):
         except (AttributeError, KeyError) as e:
             pass
 
+    def null_value_placeholder(self):
+        try:
+            return settings.ELASTICSEARCH_EXPLICIT_NULL_VALUES["boolean"]
+        except:
+            return None
+
     def default_es_mapping(self):
-        return {"type": "boolean"}
+        mapping = {"type": "boolean"}
+        if self.null_value_placeholder() is not None:
+            mapping["null_value"] = self.null_value_placeholder()
+        return mapping
 
 
 class DateDataType(BaseDataType):
@@ -362,6 +380,37 @@ class DateDataType(BaseDataType):
             {"date": ExtendedDateFormat(nodevalue).lower, "nodegroup_id": tile.nodegroup_id, "nodeid": nodeid, "provisional": provisional}
         )
 
+    # def append_null_search_filters(self, value, node, query, request):
+    #     base_query = Bool()
+    #     null_query = Bool()
+    #     data_exists_query = Exists(field="tiles.data.%s" % (str(node.pk)))
+    #     nested_query = Nested(path="tiles", query=data_exists_query)
+    #     null_query.must(nested_query)
+    #     base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+    #     if value["op"] == "null":
+    #         nn = Bool()
+    #         nn.must_not(null_query)
+    #         base_query.should(nn)
+    #         if self.null_value_placeholder() is not None:
+    #             data_exists_query = Bool()
+    #             date_value = self.null_value_placeholder()
+    #             value["op"] = "eq"
+    #             value["val"] = date_value
+    #             self.append_search_filters(value, node, data_exists_query, request)
+    #             # operators = {"gte": date_value, "lte": date_value}
+    #             # search_query = Nested(path="tiles", query=Range(field="tiles.data.%s" % (str(node.pk)), **operators))
+    #             # # base_query.should(search_query)
+    #             # data_exists_query.must(search_query)
+    #             base_query.should(data_exists_query)
+    #             # import ipdb
+    #             # ipdb.sset_trace()
+    #             # base_query.should(data_exists_query)
+
+    #     elif value["op"] == "not_null":
+    #         base_query.must(null_query)
+    #     query.must(base_query)
+    #     # print(query.dsl)
+
     def append_search_filters(self, value, node, query, request):
         try:
             if value["op"] == "null" or value["op"] == "not_null":
@@ -410,9 +459,18 @@ class DateDataType(BaseDataType):
         except (AttributeError, KeyError) as e:
             pass
 
+    def null_value_placeholder(self):
+        try:
+            return settings.ELASTICSEARCH_EXPLICIT_NULL_VALUES["date"]
+        except:
+            return None
+
     def default_es_mapping(self):
         es_date_formats = "||".join(settings.DATE_FORMATS["Elasticsearch"])
-        return {"type": "date", "format": es_date_formats}
+        mapping = {"type": "date", "format": es_date_formats}
+        if self.null_value_placeholder() is not None:
+            mapping["null_value"] = self.null_value_placeholder()
+        return mapping
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
@@ -528,8 +586,17 @@ class EDTFDataType(BaseDataType):
             else:
                 add_date_to_doc(query, edtf)
 
+    def null_value_placeholder(self):
+        try:
+            return settings.ELASTICSEARCH_EXPLICIT_NULL_VALUES["edtf"]
+        except:
+            return None
+
     def default_es_mapping(self):
-        return {"properties": {"value": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}}}
+        mapping = {"properties": {"value": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}}}
+        if self.null_value_placeholder() is not None:
+            mapping["properties"]["value"]["fields"]["keyword"]["null_value"] = self.null_value_placeholder()
+        return mapping
 
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
@@ -1976,8 +2043,14 @@ class ResourceInstanceDataType(BaseDataType):
 
         return True
 
+    def null_value_placeholder(self):
+        try:
+            return settings.ELASTICSEARCH_EXPLICIT_NULL_VALUES["resource-instance"]
+        except:
+            return None
+
     def default_es_mapping(self):
-        return {
+        mapping = {
             "properties": {
                 "resourceId": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
                 "ontologyProperty": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
@@ -1985,6 +2058,10 @@ class ResourceInstanceDataType(BaseDataType):
                 "resourceXresourceId": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
             }
         }
+
+        if self.null_value_placeholder() is not None:
+            mapping["null_value"] = self.null_value_placeholder()
+        return mapping
 
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):

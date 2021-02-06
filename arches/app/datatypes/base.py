@@ -1,6 +1,7 @@
 import json, urllib
 from django.urls import reverse
 from arches.app.models import models
+from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, Exists, Nested
 from django.utils.translation import ugettext as _
 import logging
@@ -217,10 +218,23 @@ class BaseDataType(object):
         """
         pass
 
+    # def append_null_search_filters(self, value, node, query, request):
+    #     """
+    #     Appends the search query dsl to search for fields that haven't been populated
+    #     """
+    #     base_query = Bool()
+    #     null_query = Bool()
+    #     data_exists_query = Exists(field="tiles.data.%s" % (str(node.pk)))
+    #     nested_query = Nested(path="tiles", query=data_exists_query)
+    #     null_query.must(nested_query)
+    #     base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+    #     if value["op"] == "null":
+    #         base_query.must_not(null_query)
+    #     elif value["op"] == "not_null":
+    #         base_query.must(null_query)
+    #     query.must(base_query)
+
     def append_null_search_filters(self, value, node, query, request):
-        """
-        Appends the search query dsl to search for fields that haven't been populated
-        """
         base_query = Bool()
         null_query = Bool()
         data_exists_query = Exists(field="tiles.data.%s" % (str(node.pk)))
@@ -228,7 +242,39 @@ class BaseDataType(object):
         null_query.must(nested_query)
         base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
         if value["op"] == "null":
-            base_query.must_not(null_query)
+            nn = Bool()
+            nn.must_not(null_query)
+            base_query.must(nn)
+            # print('here')
+            # import ipdb; ipdb.sset_trace()
+            # from arches.app.search.elasticsearch_dsl_builder import Dsl
+            # dd = Dsl()
+            # dd.dsl = {
+            #     "script": {
+            #         "script": {
+            #             "source": "return doc[tiles.data.%s].length==0" % (str(node.pk)),
+            #         }
+            #     }
+            # }
+
+            # nested_query = Nested(path="tiles", query=dd)
+            # base_query.must(nested_query)
+            
+            if self.null_value_placeholder() is not None:
+                data_exists_query = Bool()
+                date_value = self.null_value_placeholder()
+                value["op"] = "eq"
+                value["val"] = date_value
+                self.append_search_filters(value, node, data_exists_query, request)
+                # operators = {"gte": date_value, "lte": date_value}
+                # search_query = Nested(path="tiles", query=Range(field="tiles.data.%s" % (str(node.pk)), **operators))
+                # # base_query.should(search_query)
+                # data_exists_query.must(search_query)
+                base_query.should(data_exists_query)
+                # import ipdb
+                # ipdb.sset_trace()
+                # base_query.should(data_exists_query)
+
         elif value["op"] == "not_null":
             base_query.must(null_query)
         query.must(base_query)
@@ -338,7 +384,25 @@ class BaseDataType(object):
         """
 
         text_mapping = {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}
+        if self.null_value_placeholder() is not None:
+            text_mapping["fields"]["keyword"]["null_value"] = self.null_value_placeholder()
         return text_mapping
+
+    def null_value_placeholder(self):
+        """
+        Optional placeholder that applies explict known values to incomming null data
+        This allows very accurate searching capability for data with null values
+
+        Setting this value will allow you to find tiles of cardinality n where SOME or ALL values are null
+        Without setting this value, you will only be able to find tiles of cardinality n were ALL values are null
+
+        https://www.elastic.co/guide/en/elasticsearch/reference/7.10/null-value.html
+        """
+
+        try:
+            return settings.ELASTICSEARCH_EXPLICIT_NULL_VALUES["string"]
+        except:
+            return None
 
     def get_es_mapping(self, nodeid):
         """
