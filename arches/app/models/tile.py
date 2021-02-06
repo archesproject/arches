@@ -225,7 +225,7 @@ class Tile(models.TileModel):
             existing_tiles = list(models.TileModel.objects.filter(**kwargs).values_list("tileid", flat=True))
 
             # this should only ever return at most one tile
-            if len(existing_tiles) > 0 and uuid.UUID(self.tileid) not in existing_tiles:
+            if len(existing_tiles) > 0 and uuid.UUID(str(self.tileid)) not in existing_tiles:
                 card = models.CardModel.objects.get(nodegroup=self.nodegroup)
                 message = _("Unable to save a tile to a card with cardinality 1 where a tile has previously been saved.")
                 details = _(
