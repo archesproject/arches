@@ -11,7 +11,11 @@
         <!-- /ko -->
         
         <div class="col-xs-12 dropzone" data-bind="dropzone: dropzoneOptions">
-            <div class="file-select-window" data-bind="visible: addedFiles().length === 0">
+            <div 
+                class="file-select-window" 
+                style="min-width: unset;"
+                data-bind="visible: addedFiles().length === 0"
+            >
                 <div 
                     class="bord-top pad-ver file-select"
                     style="padding: 5px 10px 20px 10px;"
@@ -75,39 +79,70 @@
                         class="file-upload-options"
                         style="padding: 10px 0px;"
                     >
-                        <!--ko if: addedFiles().length > 1-->
-                        <input data-bind="textInput: filter" type="text" placeholder="{% trans 'find a file...' %}" class="file-upload-filter">
-                        <!-- /ko -->
-    
-                        <!-- Clear Search -->
-                        <span class="file-upload-clear-filter" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
-    
                         <!-- ko if: filter() -->
                         <span data-bind="text: filteredList().length+' out of '+addedFiles().length+' files match filter'"></span>
                         <!-- /ko -->
+
                         <!-- ko if: (!filter() || filter() == "") -->
                         <span data-bind="text: addedFiles().length + '{% trans " file(s) uploaded" %}'"></span>
                         <!-- /ko -->
                     </div>
                 </div>
 
-                <div style="display: flex;">
+                    <!--ko if: addedFiles().length > 1-->
+                    <input 
+                        data-bind="textInput: filter" 
+                        type="text" placeholder="{% trans 'find a file...' %}" 
+                        class="file-upload-filter"
+                        style="
+                            width:100%;
+                            margin-bottom: 6px;
+                        "
+                    >
+                    <!-- /ko -->
+    
+                    <!-- Clear Search -->
+                    <div 
+                        style="
+                            position: absolute;
+                            top: 44px;
+                            left: 320px;
+                            cursor: pointer;
+                        " 
+                        data-bind="visible: filter().length > 0, click: function() { filter(''); }"
+                    >
+                        <i class="fa fa-times-circle"></i>
+                    </div>
+
+                <div 
+                    style="
+                        display: flex;
+                        justify-content: space-between;
+                        padding-bottom: 8px;
+                    "
+                >
+
+                    <div>
+
+                        <button 
+                            type="button" 
+                            class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" 
+                            style="padding: unset;"
+                            data-bind="css: uniqueidClass"
+                        >
+                            <span>{% trans "Add another file" %}</span>
+                        </button>
+                    </div>
+
                     <button 
                         type="button" 
                         class="btn btn-file-upload-reset"
-                        style="padding: unset;" 
+                        style="
+                            padding: unset;
+                        " 
                         data-bind="click: reset"
                     >
                         <span>{% trans "Remove all files" %}</span>
-                    </button>
-    
-                    <button 
-                        type="button" 
-                        class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" 
-                        style="margin-left: 8px;" 
-                        data-bind="css: uniqueidClass"
-                    >
-                        <span>{% trans "Add another file" %}</span>
                     </button>
                 </div>
             </div>
@@ -120,7 +155,10 @@
                 >
                     <div class="media-body">
                         <div class="media-block">
-                            <div class="media-left">
+                            <div 
+                                class="media-left"
+                                style="margin-top: 6px;"
+                            >
                                 <button 
                                     class="btn btn-xs btn-danger btn-file-cancel"
                                     data-bind="click: $parent.removeFile"
