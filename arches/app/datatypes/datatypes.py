@@ -1284,8 +1284,11 @@ class FileListDataType(BaseDataType):
 
     def transform_value_for_tile(self, value, **kwargs):
         """
-        Supports csv import by taking a file name as 'value' and creating a file datatype
-        value with corresponding file record in the files table.
+        Supports csv import by taking a comma delimited string of file paths as 'value'
+        and creating a file datatype value with corresponding file record in the files table. The
+        file path is not important as long as the name of each file matches the name of a
+        file in the directory from which Arches will request files. By default, this is the 'uploadedfiles'
+        directory in a project.
 
         """
 
