@@ -1284,27 +1284,9 @@ class FileListDataType(BaseDataType):
 
     def transform_value_for_tile(self, value, **kwargs):
         """
-        # TODO: Following commented code can be used if user does not already have file in final location using django ORM:
+        Supports csv import by taking a file name as 'value' and creating a file datatype
+        value with corresponding file record in the files table.
 
-        request = HttpRequest()
-        # request.FILES['file-list_' + str(nodeid)] = None
-        files = []
-        # request_list = []
-
-        for val in value.split(','):
-            val_dict = {}
-            val_dict['content'] = val
-            val_dict['name'] = val.split('/')[-1].split('.')[0]
-            val_dict['url'] = None
-            # val_dict['size'] = None
-            # val_dict['width'] = None
-            # val_dict['height'] = None
-            files.append(val_dict)
-            f = open(val, 'rb')
-            django_file = InMemoryUploadedFile(f,'file',val.split('/')[-1].split('.')[0],None,None,None)
-            request.FILES.appendlist('file-list_' + str(nodeid), django_file)
-        print request.FILES
-        value = files
         """
 
         mime = MimeTypes()
