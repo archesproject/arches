@@ -1303,7 +1303,7 @@ class FileListDataType(BaseDataType):
             except FileNotFoundError as e:
                 pass
             tile_file["status"] = "uploaded"
-            tile_file["name"] = file_path.split("/")[-1]
+            tile_file["name"] = os.path.basename(file_path)
             tile_file["type"] = mime.guess_type(file_path)[0]
             tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
             file_path = "uploadedfiles/" + str(tile_file["name"])
