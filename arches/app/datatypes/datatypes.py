@@ -1310,14 +1310,14 @@ class FileListDataType(BaseDataType):
         mime = MimeTypes()
         tile_data = []
         for file_path in value.split(","):
+            tile_file = {}
             try:
                 file_stats = os.stat(file_path)
                 tile_file["lastModified"] = file_stats.st_mtime
                 tile_file["size"] = file_stats.st_size
-            except Exception:
+            except FileNotFoundError as e:
                 pass
-            tile_file = {}
-            tile_file["status"] = ""
+            tile_file["status"] = "uploaded"
             tile_file["name"] = file_path.split("/")[-1]
             tile_file["type"] = mime.guess_type(file_path)[0]
             tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
