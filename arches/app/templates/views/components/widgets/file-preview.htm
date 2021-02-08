@@ -220,6 +220,17 @@
             </div>
         </div>
     </div>
+
+    <!-- ko if: barfoo().length > 0 -->
+    <table>
+        <tbody data-bind="foreach: barfoo()">
+            <tr>
+                <div style="display:none" data-bind="text: console.log($data.barfoo()[$index()])"></div>
+                <td data-bind="text: $parent.barfoo()[$index()]['data']['columnNames'][0]"></td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- /ko -->
 </div>
 
 <template id="file-widget-dz-preview"><span></span></template>

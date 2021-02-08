@@ -103,6 +103,13 @@ class Resource(models.ResourceInstance):
         edit.edittype = edit_type
         edit.save()
 
+    def foo(graph_ids, *args, **kwargs):
+        print("HERE", graph_ids)
+        graph = models.GraphModel.objects.get(graphid=graph_ids[0])
+        import pdb; pdb.set_trace();
+        print('THERE', graph)
+
+
     def save(self, *args, **kwargs):
         """
         Saves and indexes a single resource

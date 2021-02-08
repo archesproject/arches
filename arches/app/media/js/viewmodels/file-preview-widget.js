@@ -2,12 +2,13 @@ define([
     'jquery',
     'knockout',
     'underscore',
+    'arches',
     'dropzone',
     'uuid',
     'papaparse',
     'viewmodels/widget',
     'bindings/dropzone'
-], function($, ko, _, Dropzone, uuid, Papa, WidgetViewModel) {
+], function($, ko, _, arches, Dropzone, uuid, Papa, WidgetViewModel) {
     /**
      * A viewmodel used for viewing and uploading external resource data 
      *
@@ -32,6 +33,60 @@ define([
         this.uploadMultiple = ko.observable(true);
         this.addedFiles = ko.observableArray();
         this.selectedFile = ko.observable(self.addedFiles()[0]);
+
+
+        this.barfoo = ko.observable([]);
+        this.barfoo.subscribe(function(barfoo) {
+            self.foo(barfoo)
+        });
+
+
+        // console.log("SHS", arches, arches.resources[1]['graphid'])
+
+
+
+
+        // // WORKING
+        // $.ajax({
+        //     dataType: "json",
+        //     url: arches.urls.graph + arches.resources[1]['graphid'] + '/nodes',
+        //     success: function (response) {
+        //         console.log('!!!', response)
+        //     }
+        // });
+
+
+
+        this.callMe = function(data) {
+            $.ajax({
+                dataType: "json",
+                url: arches.urls.resource + '/data/',
+                method: 'POST',
+                data: JSON.stringify({
+                    graph_ids: [ arches.resources[1]['graphid'] ],
+                    data: data,
+                }),
+                success: function (response) {
+                    console.log('!!!', response)
+                }
+            });
+        };
+
+
+
+        this.foo = function(barfoo) {
+
+            console.log("SHS", barfoo, arches)
+            // self.callMe()
+
+
+            // Object.values(bar).forEach(function(foobar) {
+            //     console.log(foobar);
+            // })
+        };
+
+
+
 
         this.dropzoneOptions = {
             url: "arches.urls.root",
@@ -76,15 +131,9 @@ define([
 
         this.dropZoneInit = function() {
             self.dropzone.on("addedfile", function(file) {
-                console.log("SSSSS", file)
-                var foo = Papa.parse(file, {
-                    worker: true,
-                    complete: function(results, file) {
-                        console.log("AAAAAAAAA", results, file)
-                    },
-                });
-
-                self.addedFiles.push(file);
+                if (file.type === 'text/csv') {
+                    self.parseCSVFile(file);
+                }
             });
 
             self.dropzone.on("error", function(file, error) {
@@ -104,6 +153,44 @@ define([
             var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
             var i = Math.floor(Math.log(bytes) / Math.log(k));
             return '<span>' + parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + '</span> ' + sizes[i];
+        };
+
+        this.parseCSVFile = function(file) {
+            Papa.parse(file, {
+                worker: true,
+                complete: function(results) {
+                    if (results.errors.length) {
+                        console.log("ERROR ALERT HERE")
+                    }
+                    else {
+                        var barfoo = self.barfoo();
+    
+                        barfoo.push({
+                            'file': file,
+                            'data': {
+                                columnNames: results['data'].shift(),
+                                rows: results['data'],
+                            },
+                        });
+    
+                        self.barfoo(barfoo);
+
+                        self.addedFiles.push(file);
+
+
+
+
+
+                        // self.barfoo.push({
+                        //     'file': file,
+                        //     'data': {
+                        //         columnsNames: results['data'].shift(),
+                        //         rows: results['data'],
+                        //     },
+                        // });
+                    }
+                },
+            });
         };
 
         this.selectFile = function(file) { 

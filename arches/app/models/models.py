@@ -395,6 +395,8 @@ class GraphModel(models.Model):
     config = JSONField(db_column="config", default=dict)
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
 
+    foo = 'bar'
+
     @property
     def disable_instance_creation(self):
         if not self.isresource:

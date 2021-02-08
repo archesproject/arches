@@ -183,6 +183,7 @@ urlpatterns = [
     url(r"^resource/(?P<resourceid>%s)/copy$" % uuid_regex, ResourceEditorView.as_view(action="copy"), name="resource_copy"),
     url(r"^resource/(?P<resourceid>%s)/history$" % uuid_regex, ResourceEditLogView.as_view(), name="resource_edit_log"),
     url(r"^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$" % (uuid_regex, uuid_regex), ResourceData.as_view(), name="resource_data"),
+    url(r"^resource/data/", ResourceData.as_view(), name="validate_resource_data"),
     url(r"^resource/(?P<resourceid>%s)/cards$" % uuid_regex, ResourceCards.as_view(), name="resource_cards"),
     url(r"^resource/history$", ResourceEditLogView.as_view(), name="edit_history"),
     url(r"^resource/related/(?P<resourceid>%s|())$" % uuid_regex, RelatedResourcesView.as_view(), name="related_resources"),

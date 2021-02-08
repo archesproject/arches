@@ -615,6 +615,48 @@ class ResourceData(View):
 
         return HttpResponseNotFound()
 
+    def post(self, request):
+        graph_ids = json.loads(
+            request.POST.get('graph_ids')
+        )
+
+
+        graph = models.GraphModel.objects.get(graphid=graph_ids[0])
+
+        foo =  models.Node.objects.filter(graph_id=graph_ids[0])
+
+        bar = foo[1]
+        
+
+        datatype_factory = DataTypeFactory()
+        datatype = datatype_factory.get_instance(bar.datatype)
+
+        import pdb; pdb.set_trace()
+
+        # errors = []
+
+        # for nodeid, value in self.data.items():
+        #     node = models.Node.objects.get(nodeid=nodeid)
+        #     datatype = datatype_factory.get_instance(node.datatype)
+        #     error = datatype.validate(value, node=node)
+        #     for error_instance in error:
+        #         if error_instance["type"] == "ERROR":
+        #             raise TileValidationError(_("{0}".format(error_instance["message"])))
+        #     if errors is not None:
+        #         errors.append(error)
+
+        # # return errors
+
+
+
+
+
+
+
+
+        # return Resource.foo(graph_ids=res['graph_ids'])
+
+
 
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceTiles(View):

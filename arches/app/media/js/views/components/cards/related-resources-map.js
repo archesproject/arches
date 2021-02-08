@@ -33,6 +33,9 @@ define([
             'strokepointopacity'
         ];
         CardComponentViewModel.apply(this, [params]);
+
+
+        console.log("AHAHAHA", self, params, self.selectRelatedSource(), arches.mapSources[self.selectRelatedSource()].data)
         var selectLayerConfig = {};
         selectLayerConfig.defaultcolor = this.defaultcolor()
         selectLayerConfig.selectioncolor = this.selectioncolor()
@@ -150,6 +153,7 @@ define([
             fetch(arches.urls.api_nodes(nodeid))
               .then(response => response.json())
               .then(data => {
+                  console.log("JSHSHSHS", data)
                 self.nodeDetails.push(data[0]);
               })
               .catch((error) => {
