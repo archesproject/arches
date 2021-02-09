@@ -17,6 +17,44 @@ define([
      *
      * @param  {string} params - a configuration object
      */
+
+
+
+
+    OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS = {
+        'ObserverName*': "0da1fe5e-04fd-11eb-9978-02e99e44e93e", 
+        'ObserverContact*': "12bd77bb-04fd-11eb-9978-02e99e44e93e", 
+        'ObserverAffiliation': "21f08600-04fd-11eb-9978-02e99e44e93e", 
+        'SpeciesName*': "fca0475a-04fc-11eb-9978-02e99e44e93e", 
+        'Positive Observation': "abdaf060-37ef-11eb-a206-acde48001122", 
+        'SpDetermine': "", 
+        'ID_Confidence': "", 
+        'ObservationDate*': "d7628ae4-3f2f-11eb-a2e2-73ab08a728ea", 
+        'NoPlantsObsvd*': "", 
+        'Phenology': "347a1388-3be2-11eb-8a94-acde48001122", 
+        'Collection': "", 
+        'NoAnimalsObs': "", 
+        'AnimalAgeClass': "fd0dd812-3be1-11eb-8a94-acde48001122", 
+        'AnimalSiteUse*': "fd0dd6b4-3be1-11eb-8a94-acde48001122", 
+        'AnimalBehavior*': "fd0dd5c4-3be1-11eb-8a94-acde48001122", 
+        'AnimalDetectionMethod*': "fd0dd768-3be1-11eb-8a94-acde48001122", 
+        'LocationDescription': "e9f6767e-033f-11eb-9978-02e99e44e93e", 
+        'X_Coordinate*': "", 
+        'Y_Coordinate*': "", 
+        'CoordSource*': "fc55d878-033f-11eb-9978-02e99e44e93e", 
+        'CoordAccuracy': "084ba470-050a-11eb-9978-02e99e44e93e", 
+        'SurveyEffort*': "cd7dac4e-3be1-11eb-8a94-acde48001122", 
+        'HabitatDesc': "a9cb687e-0340-11eb-9978-02e99e44e93e", 
+        'SiteQuality': "b08729f0-0340-11eb-9978-02e99e44e93e", 
+        'LandUse': "b94ac2ae-0340-11eb-9978-02e99e44e93e", 
+        'Disturbances': "bffb3b10-0340-11eb-9978-02e99e44e93e", 
+        'Threats': "c8b1ce90-0340-11eb-9978-02e99e44e93e", 
+        'Comments': "bffb3b10-0340-11eb-9978-02e99e44e93e"
+    }
+
+
+
+
     var ExternalResourceDataViewModel = function(params) {
         params.configKeys = ['acceptedFiles', 'maxFilesize', 'maxFiles'];
         WidgetViewModel.apply(this, [params]);
@@ -62,10 +100,11 @@ define([
                 dataType: "json",
                 url: arches.urls.resource + '/data/',
                 method: 'POST',
-                data: JSON.stringify({
-                    graph_ids: [ arches.resources[1]['graphid'] ],
-                    data: data,
-                }),
+                data: {
+                    graph_ids: JSON.stringify([ arches.resources[1]['graphid'] ]),
+                    barfoo: JSON.stringify(self.barfoo()),
+
+                },
                 success: function (response) {
                     console.log('!!!', response)
                 }
@@ -76,8 +115,12 @@ define([
 
         this.foo = function(barfoo) {
 
+            barfoo.forEach(function(barfooObj) {
+
+            });
+
             console.log("SHS", barfoo, arches)
-            // self.callMe()
+            self.callMe()
 
 
             // Object.values(bar).forEach(function(foobar) {
@@ -164,11 +207,21 @@ define([
                     }
                     else {
                         var barfoo = self.barfoo();
+
+
+
+
+
+                        var node_ids = 
+
+
+
     
                         barfoo.push({
                             'file': file,
                             'data': {
-                                columnNames: results['data'].shift(),
+                                // columnNames: results['data'].shift(),
+                                node_ids: [],  /* list order must match csv cell order */
                                 rows: results['data'],
                             },
                         });

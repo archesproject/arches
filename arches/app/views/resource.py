@@ -620,12 +620,22 @@ class ResourceData(View):
             request.POST.get('graph_ids')
         )
 
+        barfoo = json.loads(
+            request.POST.get('barfoo')
+        )
+
+        # columns_names
+
 
         graph = models.GraphModel.objects.get(graphid=graph_ids[0])
 
         foo =  models.Node.objects.filter(graph_id=graph_ids[0])
 
         bar = foo[1]
+
+        qux = [
+            nnn for nnn in foo if str(nnn.nodeid) == "0da1fe5e-04fd-11eb-9978-02e99e44e93e"
+        ]
         
 
         datatype_factory = DataTypeFactory()
