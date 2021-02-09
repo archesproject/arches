@@ -224,13 +224,13 @@ define([
              * Keep in mind that anything extending newTileStep that overrides this method should include similar logic to handle for wastebin if there is a wastebin use case for that particular step in the workflow.
             **/
             var wastebin = !!(ko.unwrap(params.wastebin)) ? koMapping.toJS(params.wastebin) : undefined;
-            if (wastebin && ko.unwrap(wastebin.hasOwnProperty('resources'))) {
+            if (wastebin && 'resources' in wastebin) {
                 wastebin.resources.push(ko.unwrap(params.resourceid));
             }
-            if (wastebin && ko.unwrap(wastebin.hasOwnProperty('resourceid'))) {
+            if (wastebin && 'resourceid' in wastebin) {
                 wastebin.resourceid = ko.unwrap(params.resourceid);
             }
-            if (wastebin && ko.unwrap(wastebin.hasOwnProperty('tile'))) {
+            if (wastebin && 'tile' in wastebin) {
                 if (!!ko.unwrap(params.tile)) {
                     wastebin.tile = koMapping.toJS(params.tile().data);
                     wastebin.tile.tileid = (ko.unwrap(params.tile)).tileid;
