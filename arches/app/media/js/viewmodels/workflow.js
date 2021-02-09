@@ -235,12 +235,19 @@ define([
             var warnings = []
 
             self.steps.forEach(function(step) {
-                if (step.wastebin && step.wastebin.resourceid) {
+                if (step.wastebin && ko.unwrap(step.wastebin.resources)) {
+                    var resources = ko.mapping.toJS(step.wastebin.resources);
+                    resources.forEach(function(resource) {
+                        warnings.push(resource.description);
+                        resourcesToDelete.push(resource);
+                    })
+                }
+                if (step.wastebin && ko.unwrap(step.wastebin.resourceid)) {
                     warnings.push(ko.unwrap(step.wastebin.description));
-                    resourcesToDelete.push(step.wastebin);
-                } else if (step.wastebin && step.wastebin.tile) {
+                    resourcesToDelete.push(ko.mapping.toJS(step.wastebin));
+                } else if (step.wastebin && ko.unwrap(step.wastebin.tile)) {
                     warnings.push(ko.unwrap(step.wastebin.description));
-                    tilesToDelete.push(step.wastebin);
+                    tilesToDelete.push(ko.mapping.toJS(step.wastebin));
                 }
             });
 
@@ -248,6 +255,7 @@ define([
             
             var deleteObject = function(type, obj){
                 if (type === 'resource') {
+                    console.log(obj);
                     $.ajax({
                         url: arches.urls.api_resources(obj),
                         type: 'DELETE',
