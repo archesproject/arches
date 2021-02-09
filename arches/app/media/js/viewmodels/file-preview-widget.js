@@ -73,6 +73,9 @@ define([
         this.selectedFile = ko.observable(self.addedFiles()[0]);
 
 
+        this.resourceModelNodes = ko.observable({});
+
+
         this.barfoo = ko.observable([]);
         this.barfoo.subscribe(function(barfoo) {
             self.foo(barfoo)
@@ -112,6 +115,19 @@ define([
         };
 
 
+        this.fetchResourceModelNodes = function() {
+            $.ajax({
+                dataType: "json",
+                url: arches.urls.graph_nodes(arches.resources[1]['graphid']),
+                success: function (response) {
+                    self.resourceModelNodes(response);
+                }
+            });
+        };
+
+        this.fetchResourceModelNodes();
+
+
 
         this.foo = function(barfoo) {
 
@@ -119,8 +135,9 @@ define([
 
             });
 
-            console.log("SHS", barfoo, arches)
             self.callMe()
+            
+            console.log("___", self)
 
 
             // Object.values(bar).forEach(function(foobar) {
@@ -208,13 +225,8 @@ define([
                     else {
                         var barfoo = self.barfoo();
 
-
-
-
-
                         var columnNames = results['data'].shift();
 
-    
                         barfoo.push({
                             file: file,
                             data: {

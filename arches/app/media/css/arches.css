@@ -7689,6 +7689,9 @@ span.file-upload-clear-filter {
 }
 
 
+.file-preview .workbench-card-sidepanel {
+    width: 600px;
+}
 
 .separator {
     display: flex;

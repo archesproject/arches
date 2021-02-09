@@ -648,6 +648,7 @@ class ResourceData(View):
                                 'parsed_file': parsed_file,
                             })
 
+        print(errors)
         return JSONResponse({'errors': errors})
 
 

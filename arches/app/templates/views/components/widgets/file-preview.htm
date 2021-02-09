@@ -154,7 +154,7 @@
                     style="width: fit-content;"
                 >
                     <div class="media-body">
-                        <div class="media-block">
+                        <div style="display: flex;">
                             <div 
                                 class="media-left"
                                 style="margin-top: 6px;"
@@ -219,18 +219,44 @@
             <!-- /ko -->
             </div>
         </div>
+
+
+        <!-- ko if: Object.values(resourceModelNodes()).length > 0 && barfoo().length > 0-->
+        <div>
+            <div>Observations Resource Model</div>
+    
+            <div
+                style="
+                    width: 100%;
+                    overflow-x: scroll;
+                "
+            >
+                <table data-bind="foreach: barfoo()">
+                    <thead>
+                        <tr data-bind="foreach: Object.values($parent.resourceModelNodes())">
+                            <th 
+                                scope="column" 
+                                data-bind="text: name"
+                                style="
+                                    min-width: 90px;
+                                    padding: 0px 10px;
+                                "
+                            ></th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach: $data.data.rows">
+                        <tr data-bind="foreach: $data">
+                            <td data-bind="text: $data"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- /ko -->
+    
+    
     </div>
 
-    <!-- ko if: barfoo().length > 0 -->
-    <table>
-        <tbody data-bind="foreach: barfoo()">
-            <tr>
-                <div style="display:none" data-bind="text: console.log($data.barfoo()[$index()])"></div>
-                <td data-bind="text: $parent.barfoo()[$index()]['data']['columnNames'][0]"></td>
-            </tr>
-        </tbody>
-    </table>
-    <!-- /ko -->
 </div>
 
 <template id="file-widget-dz-preview"><span></span></template>
