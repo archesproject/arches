@@ -1284,41 +1284,26 @@ class FileListDataType(BaseDataType):
 
     def transform_value_for_tile(self, value, **kwargs):
         """
-        # TODO: Following commented code can be used if user does not already have file in final location using django ORM:
+        Accepts a comma delimited string of file paths as 'value' to create a file datatype value
+        with corresponding file record in the files table for each path. Only the basename of each path is used, so
+        the accuracy of the full path is not important. However the name of each file must match the name of a file in
+        the directory from which Arches will request files. By default, this is the 'uploadedfiles' directory
+        in a project.
 
-        request = HttpRequest()
-        # request.FILES['file-list_' + str(nodeid)] = None
-        files = []
-        # request_list = []
-
-        for val in value.split(','):
-            val_dict = {}
-            val_dict['content'] = val
-            val_dict['name'] = val.split('/')[-1].split('.')[0]
-            val_dict['url'] = None
-            # val_dict['size'] = None
-            # val_dict['width'] = None
-            # val_dict['height'] = None
-            files.append(val_dict)
-            f = open(val, 'rb')
-            django_file = InMemoryUploadedFile(f,'file',val.split('/')[-1].split('.')[0],None,None,None)
-            request.FILES.appendlist('file-list_' + str(nodeid), django_file)
-        print request.FILES
-        value = files
         """
 
         mime = MimeTypes()
         tile_data = []
         for file_path in value.split(","):
+            tile_file = {}
             try:
                 file_stats = os.stat(file_path)
                 tile_file["lastModified"] = file_stats.st_mtime
                 tile_file["size"] = file_stats.st_size
-            except Exception:
+            except FileNotFoundError as e:
                 pass
-            tile_file = {}
-            tile_file["status"] = ""
-            tile_file["name"] = file_path.split("/")[-1]
+            tile_file["status"] = "uploaded"
+            tile_file["name"] = os.path.basename(file_path)
             tile_file["type"] = mime.guess_type(file_path)[0]
             tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
             file_path = "uploadedfiles/" + str(tile_file["name"])
