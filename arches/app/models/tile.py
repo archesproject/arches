@@ -257,7 +257,7 @@ class Tile(models.TileModel):
                         for node in nodes:
                             datatype = self.datatype_factory.get_instance(node.datatype)
                             nodeid = str(node.nodeid)
-                            tile_data = ''
+                            tile_data = ""
                             if tile.provisionaledits is None:
                                 # If this is not a provisional tile, the data should
                                 # exist, so we check it normally
@@ -267,8 +267,8 @@ class Tile(models.TileModel):
                                 # provisional edits for clashing values
                                 for edit_id in tile.provisionaledits.keys():
                                     edit_data = tile.provisionaledits[str(edit_id)]
-                                    if nodeid in edit_data['value']:
-                                        tile_data = edit_data['value'][nodeid]
+                                    if nodeid in edit_data["value"]:
+                                        tile_data = edit_data["value"][nodeid]
                                         break
                             if datatype.values_match(tile_data, self.data[nodeid]):
                                 match = True
