@@ -411,9 +411,12 @@ class Resource(models.ResourceInstance):
         query.add_query(bool_query)
         results = query.search(index=RESOURCES_INDEX)["hits"]["hits"]
         for result in results:
-            res = Resource.objects.get(pk=result["_id"])
-            res.load_tiles()
-            res.index()
+            try:
+                res = Resource.objects.get(pk=result["_id"])
+                res.load_tiles()
+                res.index()
+            except ObjectDoesNotExist:
+                pass
 
         # delete resource index
         se.delete(index=RESOURCES_INDEX, id=resourceinstanceid)
