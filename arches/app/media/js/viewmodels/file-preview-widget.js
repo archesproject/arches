@@ -212,16 +212,15 @@ define([
 
 
 
-                        var node_ids = 
-
-
+                        var columnNames = results['data'].shift();
 
     
                         barfoo.push({
-                            'file': file,
-                            'data': {
-                                // columnNames: results['data'].shift(),
-                                node_ids: [],  /* list order must match csv cell order */
+                            file: file,
+                            data: {
+                                node_ids: columnNames.map(function(columnName) {
+                                    return OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[columnName];
+                                }),  
                                 rows: results['data'],
                             },
                         });

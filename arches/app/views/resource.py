@@ -616,56 +616,39 @@ class ResourceData(View):
         return HttpResponseNotFound()
 
     def post(self, request):
-        graph_ids = json.loads(
-            request.POST.get('graph_ids')
-        )
-
-        barfoo = json.loads(
+        parsed_files = json.loads(
             request.POST.get('barfoo')
         )
 
-        # columns_names
-
-
-        graph = models.GraphModel.objects.get(graphid=graph_ids[0])
-
-        foo =  models.Node.objects.filter(graph_id=graph_ids[0])
-
-        bar = foo[1]
-
-        qux = [
-            nnn for nnn in foo if str(nnn.nodeid) == "0da1fe5e-04fd-11eb-9978-02e99e44e93e"
-        ]
-        
-
         datatype_factory = DataTypeFactory()
-        datatype = datatype_factory.get_instance(bar.datatype)
 
-        import pdb; pdb.set_trace()
+        errors = []
 
-        # errors = []
+        # triple-nested for-loop, but not scary because max input size should be small enough
+        for parsed_file in parsed_files:
+            for row_idx, row in enumerate(parsed_file['data']['rows']):
+                for cell_idx, cell_value in enumerate(row):
+                    node_id = parsed_file['data']['node_ids'][cell_idx]
 
-        # for nodeid, value in self.data.items():
-        #     node = models.Node.objects.get(nodeid=nodeid)
-        #     datatype = datatype_factory.get_instance(node.datatype)
-        #     error = datatype.validate(value, node=node)
-        #     for error_instance in error:
-        #         if error_instance["type"] == "ERROR":
-        #             raise TileValidationError(_("{0}".format(error_instance["message"])))
-        #     if errors is not None:
-        #         errors.append(error)
+                    if (node_id):
+                        node = models.Node.objects.get(pk=node_id)
 
-        # # return errors
+                        # cache this
+                        datatype = datatype_factory.get_instance(node.datatype)
+                        
+                        try:
+                            datatype.validate(cell_value, node=node)
+                        except Exception as e:
+                            errors.append({
+                                'error': e,
+                                'cell_value': cell_value,
+                                'cell_idx': cell_idx,
+                                'row_idx': row_idx,
+                                'node_id': node_id,
+                                'parsed_file': parsed_file,
+                            })
 
-
-
-
-
-
-
-
-        # return Resource.foo(graph_ids=res['graph_ids'])
-
+        return JSONResponse({'errors': errors})
 
 
 @method_decorator(can_read_resource_instance, name="dispatch")
