@@ -146,6 +146,10 @@ define([
         };
 
 
+        this.getFoo = function(nodeIdsToSortIndex, row) {
+            console.log('OLOLO', nodeIdsToSortIndex, row)
+        }; 
+
 
 
         this.dropzoneOptions = {
@@ -227,12 +231,18 @@ define([
 
                         var columnNames = results['data'].shift();
 
+                        var nodeIds = columnNames.map(function(columnName) {
+                            return OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[columnName];
+                        });
+
                         barfoo.push({
                             file: file,
                             data: {
-                                node_ids: columnNames.map(function(columnName) {
-                                    return OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[columnName];
-                                }),  
+                                node_ids: nodeIds,
+                                node_ids_to_sort_index: nodeIds.reduce(function(acc, nodeId, idx) {
+                                    acc[nodeId] = idx;
+                                    return acc;
+                                  }, {}),  
                                 rows: results['data'],
                             },
                         });

@@ -229,6 +229,7 @@
                 style="
                     width: 100%;
                     overflow-x: scroll;
+                    padding-bottom: 12px;
                 "
             >
                 <table data-bind="foreach: barfoo()">
@@ -245,8 +246,17 @@
                         </tr>
                     </thead>
                     <tbody data-bind="foreach: $data.data.rows">
-                        <tr data-bind="foreach: $data">
-                            <td data-bind="text: $data"></td>
+                        <tr data-bind="foreach: Object.values($parents[1].resourceModelNodes())">
+                            <td>
+                                <input 
+                                    data-bind="
+                                        value: (function() {
+                                            var idx = $parents[1]['data']['node_ids_to_sort_index'][$data.nodeid];
+                                            if (idx) { return $parent[idx]; }
+                                        })()
+                                    " 
+                                />
+                            </td>
                         </tr>
                     </tbody>
                 </table>
