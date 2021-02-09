@@ -236,44 +236,69 @@ class BaseDataType(object):
 
     def append_null_search_filters(self, value, node, query, request):
         base_query = Bool()
+        base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+        
         null_query = Bool()
         data_exists_query = Exists(field="tiles.data.%s" % (str(node.pk)))
         nested_query = Nested(path="tiles", query=data_exists_query)
         null_query.must(nested_query)
-        base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
         if value["op"] == "null":
             nn = Bool()
             nn.must_not(null_query)
-            base_query.must(nn)
+            base_query.should(nn)
             # print('here')
             # import ipdb; ipdb.sset_trace()
-            # from arches.app.search.elasticsearch_dsl_builder import Dsl
-            # dd = Dsl()
+            from arches.app.search.elasticsearch_dsl_builder import Dsl
+            dd = Dsl()
             # dd.dsl = {
             #     "script": {
             #         "script": {
-            #             "source": "return doc[tiles.data.%s].length==0" % (str(node.pk)),
+            #             "source": "return tiles.data.%s.length==0" % (str(node.pk)),
             #         }
             #     }
             # }
+            dd.dsl = {
+                "function_score": {
+                    "min_score": 1,
+                    "query": {
+                        "match_all": {}
+                    },
+                    "functions": [
+                    {
+                        "script_score": {
+                        "script": {
+                            "source": "int null_docs = 0;for(tile in params._source.tiles){if(tile.data.containsKey(params.node_id)){def val = tile.data.get(params.node_id);if (val == null || (val instanceof List && val.length==0)) {null_docs++;}}}return null_docs;",
+                            "lang": "painless",
+                            "params": {
+                                "node_id": "%s" % (str(node.pk))
+                            }
+                        }
+                        }
+                    }
+                    ],
+                    "score_mode": "max",
+                    "boost": 1,
+                    "boost_mode": "replace"
+                }
+            }
 
             # nested_query = Nested(path="tiles", query=dd)
-            # base_query.must(nested_query)
-            
-            if self.null_value_placeholder() is not None:
-                data_exists_query = Bool()
-                date_value = self.null_value_placeholder()
-                value["op"] = "eq"
-                value["val"] = date_value
-                self.append_search_filters(value, node, data_exists_query, request)
-                # operators = {"gte": date_value, "lte": date_value}
-                # search_query = Nested(path="tiles", query=Range(field="tiles.data.%s" % (str(node.pk)), **operators))
-                # # base_query.should(search_query)
-                # data_exists_query.must(search_query)
-                base_query.should(data_exists_query)
-                # import ipdb
-                # ipdb.sset_trace()
-                # base_query.should(data_exists_query)
+            base_query.should(dd)
+            # print(json.dumps(base_query.dsl))
+            # if self.null_value_placeholder() is not None:
+            #     data_exists_query = Bool()
+            #     date_value = self.null_value_placeholder()
+            #     value["op"] = "eq"
+            #     value["val"] = date_value
+            #     self.append_search_filters(value, node, data_exists_query, request)
+            #     # operators = {"gte": date_value, "lte": date_value}
+            #     # search_query = Nested(path="tiles", query=Range(field="tiles.data.%s" % (str(node.pk)), **operators))
+            #     # # base_query.should(search_query)
+            #     # data_exists_query.must(search_query)
+            #     base_query.should(data_exists_query)
+            #     # import ipdb
+            #     # ipdb.sset_trace()
+            #     # base_query.should(data_exists_query)
 
         elif value["op"] == "not_null":
             base_query.must(null_query)
