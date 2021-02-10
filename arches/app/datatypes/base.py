@@ -240,18 +240,31 @@ class BaseDataType(object):
             func_query.dsl = {
                 "function_score": {
                     "min_score": 1,
-                    "query": {"match_all": {}},
-                    "functions": [
-                        {
-                            "script_score": {
-                                "script": {
-                                    "source": "int null_docs = 0;for(tile in params._source.tiles){if(tile.data.containsKey(params.node_id)){def val = tile.data.get(params.node_id);if (val == null || (val instanceof List && val.length==0)) {null_docs++;}}}return null_docs;",
-                                    "lang": "painless",
-                                    "params": {"node_id": "%s" % (str(node.pk))},
+                    "query": {
+                        "match_all": {}
+                    },
+                    "functions": [{
+                        "script_score": {
+                            "script": {
+                                "source": """
+                                    int null_docs = 0;
+                                    for(tile in params._source.tiles){
+                                        if(tile.data.containsKey(params.node_id)){
+                                            def val = tile.data.get(params.node_id);
+                                            if (val == null || (val instanceof List && val.length==0)) {
+                                                null_docs++;
+                                            }
+                                        }
+                                    }
+                                    return null_docs;
+                                """,
+                                "lang": "painless",
+                                "params": {
+                                    "node_id": "%s" % (str(node.pk))
                                 }
                             }
                         }
-                    ],
+                    }],
                     "score_mode": "max",
                     "boost": 1,
                     "boost_mode": "replace",
