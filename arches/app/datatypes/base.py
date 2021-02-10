@@ -240,13 +240,12 @@ class BaseDataType(object):
             func_query.dsl = {
                 "function_score": {
                     "min_score": 1,
-                    "query": {
-                        "match_all": {}
-                    },
-                    "functions": [{
-                        "script_score": {
-                            "script": {
-                                "source": """
+                    "query": {"match_all": {}},
+                    "functions": [
+                        {
+                            "script_score": {
+                                "script": {
+                                    "source": """
                                     int null_docs = 0;
                                     for(tile in params._source.tiles){
                                         if(tile.data.containsKey(params.node_id)){
@@ -258,13 +257,12 @@ class BaseDataType(object):
                                     }
                                     return null_docs;
                                 """,
-                                "lang": "painless",
-                                "params": {
-                                    "node_id": "%s" % (str(node.pk))
+                                    "lang": "painless",
+                                    "params": {"node_id": "%s" % (str(node.pk))},
                                 }
                             }
                         }
-                    }],
+                    ],
                     "score_mode": "max",
                     "boost": 1,
                     "boost_mode": "replace",
