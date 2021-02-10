@@ -53,7 +53,7 @@ class AdvancedSearch(BaseSearchFilter):
             advanced_query.should(grouped_query)
         search_query.must(advanced_query)
         search_results_object["query"].add_query(search_query)
-        
+
     def view_data(self):
         ret = {}
         resource_graphs = (
