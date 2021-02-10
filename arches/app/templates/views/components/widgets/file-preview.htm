@@ -149,42 +149,42 @@
             <div class="dz-previews" data-bind="css: uniqueidClass">
             <!-- ko if: !filter() -->
                 <!-- ko foreach: addedFiles() -->
-                <div 
-                    class="file-upload-card"
-                    style="width: fit-content;"
-                >
-                    <div class="media-body">
-                        <div style="display: flex;">
-                            <div 
-                                class="media-left"
-                                style="margin-top: 6px;"
-                            >
-                                <button 
-                                    class="btn btn-xs btn-danger btn-file-cancel"
-                                    data-bind="click: $parent.removeFile"
+                    <div 
+                        class="file-upload-card"
+                        style="width: fit-content;"
+                    >
+                        <div class="media-body">
+                            <div style="display: flex;">
+                                <div 
+                                    class="media-left"
+                                    style="margin-top: 6px;"
                                 >
-                                    <i class="ion ion-close"></i>
-                                </button>
-                            </div>
-
-                            <div class="media-body file-upload-card-detail">
-                                <div class="media-left">
-                                    <span 
-                                        class="text-main mar-no text-overflow" 
-                                        style="padding-right: 25px;"
-                                        data-bind="text: name"
-                                    ></span>
-
-                                    <!-- ko if: $data.error -->
-                                    <span class="dz-error text-danger text-sm" data-bind="text: '{% trans "error" %}'"></span>
-                                    <!-- /ko -->
+                                    <button 
+                                        class="btn btn-xs btn-danger btn-file-cancel"
+                                        data-bind="click: $parent.removeFile"
+                                    >
+                                        <i class="ion ion-close"></i>
+                                    </button>
                                 </div>
 
-                                <div class="text-sm" data-bind="html: $parent.formatSize($data)"></div>
+                                <div class="media-body file-upload-card-detail">
+                                    <div class="media-left">
+                                        <span 
+                                            class="text-main mar-no text-overflow" 
+                                            style="padding-right: 25px;"
+                                            data-bind="text: name"
+                                        ></span>
+
+                                        <!-- ko if: $data.error -->
+                                        <span class="dz-error text-danger text-sm" data-bind="text: '{% trans "error" %}'"></span>
+                                        <!-- /ko -->
+                                    </div>
+
+                                    <div class="text-sm" data-bind="html: $parent.formatSize($data)"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
                 <!-- /ko -->
             <!-- /ko -->
             <!-- ko if: filter() -->
@@ -232,32 +232,35 @@
                     padding-bottom: 12px;
                 "
             >
-                <table data-bind="foreach: barfoo()">
+                <table>
                     <thead>
-                        <tr data-bind="foreach: Object.values($parent.resourceModelNodes())">
+                        <tr data-bind="foreach: Object.values(resourceModelNodes())">
                             <th 
                                 scope="column" 
                                 data-bind="text: name"
                                 style="
-                                    min-width: 90px;
                                     padding: 0px 10px;
                                 "
                             ></th>
                         </tr>
                     </thead>
-                    <tbody data-bind="foreach: $data.data.rows">
-                        <tr data-bind="foreach: Object.values($parents[1].resourceModelNodes())">
-                            <td>
-                                <input 
-                                    data-bind="
-                                        value: (function() {
-                                            var idx = $parents[1]['data']['node_ids_to_sort_index'][$data.nodeid];
-                                            if (idx) { return $parent[idx]; }
-                                        })()
-                                    " 
-                                />
-                            </td>
-                        </tr>
+                    <tbody>
+                        <!-- ko foreach: barfoo() -->
+                            <!-- ko foreach: $data.data.rows -->
+                                <tr data-bind="foreach: Object.values($parents[1].resourceModelNodes())">
+                                    <td>
+                                        <input 
+                                            data-bind="
+                                                value: (function() {
+                                                    var idx = $parents[1]['data']['node_ids_to_sort_index'][$data.nodeid];
+                                                    if (idx) { return $parent[idx]; }
+                                                })()
+                                            " 
+                                        />
+                                    </td>
+                                </tr>
+                            <!-- /ko -->
+                        <!-- /ko -->
                     </tbody>
                 </table>
             </div>

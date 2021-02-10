@@ -616,39 +616,38 @@ class ResourceData(View):
         return HttpResponseNotFound()
 
     def post(self, request):
-        parsed_files = json.loads(
-            request.POST.get('barfoo')
+        ordered_node_ids = json.loads(
+            request.POST.get('ordered_node_ids')
+        )
+        rows = json.loads(
+            request.POST.get('rows')
         )
 
         datatype_factory = DataTypeFactory()
 
         errors = []
 
-        # triple-nested for-loop, but not scary because max input size should be small enough
-        for parsed_file in parsed_files:
-            for row_idx, row in enumerate(parsed_file['data']['rows']):
-                for cell_idx, cell_value in enumerate(row):
-                    node_id = parsed_file['data']['node_ids'][cell_idx]
+        for row_idx, row in enumerate(rows):
+            for cell_idx, cell_value in enumerate(row):
+                node_id = ordered_node_ids[cell_idx]
 
-                    if (node_id):
-                        node = models.Node.objects.get(pk=node_id)
+                if (node_id):
+                    node = models.Node.objects.get(pk=node_id)
 
-                        # cache this
-                        datatype = datatype_factory.get_instance(node.datatype)
-                        
-                        try:
-                            datatype.validate(cell_value, node=node)
-                        except Exception as e:
-                            errors.append({
-                                'error': e,
-                                'cell_value': cell_value,
-                                'cell_idx': cell_idx,
-                                'row_idx': row_idx,
-                                'node_id': node_id,
-                                'parsed_file': parsed_file,
-                            })
+                    # cache this
+                    datatype = datatype_factory.get_instance(node.datatype)
+                    
+                    try:
+                        datatype.validate(cell_value, node=node)
+                    except Exception as e:
+                        errors.append({
+                            'error': str(e),
+                            'cell_value': cell_value,
+                            'cell_idx': cell_idx,
+                            'row_idx': row_idx,
+                            'node_id': node_id,
+                        })
 
-        print(errors)
         return JSONResponse({'errors': errors})
 
 

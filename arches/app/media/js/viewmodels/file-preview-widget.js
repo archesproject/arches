@@ -75,41 +75,31 @@ define([
 
         this.resourceModelNodes = ko.observable({});
 
+        this.callMe = function(file, parsedFileData) {
+            var columnNames = parsedFileData.shift();
 
-        this.barfoo = ko.observable([]);
-        this.barfoo.subscribe(function(barfoo) {
-            self.foo(barfoo)
-        });
+            var orderedNodeIds = columnNames.map(function(columnName) {
+                return OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[columnName];
+            });
 
+            var nodeIdsToSortIndex = orderedNodeIds.reduce(function(acc, nodeId, idx) {
+                acc[nodeId] = idx;
+                return acc;
+            }, {});
 
-        // console.log("SHS", arches, arches.resources[1]['graphid'])
-
-
-
-
-        // // WORKING
-        // $.ajax({
-        //     dataType: "json",
-        //     url: arches.urls.graph + arches.resources[1]['graphid'] + '/nodes',
-        //     success: function (response) {
-        //         console.log('!!!', response)
-        //     }
-        // });
-
-
-
-        this.callMe = function(data) {
             $.ajax({
                 dataType: "json",
                 url: arches.urls.resource + '/data/',
                 method: 'POST',
                 data: {
-                    graph_ids: JSON.stringify([ arches.resources[1]['graphid'] ]),
-                    barfoo: JSON.stringify(self.barfoo()),
-
+                    ordered_node_ids: JSON.stringify(orderedNodeIds),
+                    rows: JSON.stringify(parsedFileData),
                 },
                 success: function (response) {
                     console.log('!!!', response)
+                    
+
+                    self.addedFiles.push(file);
                 }
             });
         };
@@ -126,24 +116,6 @@ define([
         };
 
         this.fetchResourceModelNodes();
-
-
-
-        this.foo = function(barfoo) {
-
-            barfoo.forEach(function(barfooObj) {
-
-            });
-
-            self.callMe()
-            
-            console.log("___", self)
-
-
-            // Object.values(bar).forEach(function(foobar) {
-            //     console.log(foobar);
-            // })
-        };
 
 
         this.getFoo = function(nodeIdsToSortIndex, row) {
@@ -227,41 +199,7 @@ define([
                         console.log("ERROR ALERT HERE")
                     }
                     else {
-                        var barfoo = self.barfoo();
-
-                        var columnNames = results['data'].shift();
-
-                        var nodeIds = columnNames.map(function(columnName) {
-                            return OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[columnName];
-                        });
-
-                        barfoo.push({
-                            file: file,
-                            data: {
-                                node_ids: nodeIds,
-                                node_ids_to_sort_index: nodeIds.reduce(function(acc, nodeId, idx) {
-                                    acc[nodeId] = idx;
-                                    return acc;
-                                  }, {}),  
-                                rows: results['data'],
-                            },
-                        });
-    
-                        self.barfoo(barfoo);
-
-                        self.addedFiles.push(file);
-
-
-
-
-
-                        // self.barfoo.push({
-                        //     'file': file,
-                        //     'data': {
-                        //         columnsNames: results['data'].shift(),
-                        //         rows: results['data'],
-                        //     },
-                        // });
+                        self.callMe(file, results['data']);
                     }
                 },
             });
