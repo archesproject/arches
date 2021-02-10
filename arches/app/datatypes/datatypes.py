@@ -230,16 +230,8 @@ class NumberDataType(BaseDataType):
         except (AttributeError, KeyError) as e:
             pass
 
-    def null_value_placeholder(self):
-        try:
-            return settings.ELASTICSEARCH_EXPLICIT_NULL_VALUES["number"]
-        except:
-            return None
-
     def default_es_mapping(self):
         mapping = {"type": "double"}
-        if self.null_value_placeholder() is not None:
-            mapping["null_value"] = self.null_value_placeholder()
         return mapping
 
 
@@ -291,16 +283,8 @@ class BooleanDataType(BaseDataType):
         except (AttributeError, KeyError) as e:
             pass
 
-    def null_value_placeholder(self):
-        try:
-            return settings.ELASTICSEARCH_EXPLICIT_NULL_VALUES["boolean"]
-        except:
-            return None
-
     def default_es_mapping(self):
         mapping = {"type": "boolean"}
-        if self.null_value_placeholder() is not None:
-            mapping["null_value"] = self.null_value_placeholder()
         return mapping
 
 
@@ -400,17 +384,9 @@ class DateDataType(BaseDataType):
         except (AttributeError, KeyError) as e:
             pass
 
-    def null_value_placeholder(self):
-        try:
-            return settings.ELASTICSEARCH_EXPLICIT_NULL_VALUES["date"]
-        except:
-            return None
-
     def default_es_mapping(self):
         es_date_formats = "||".join(settings.DATE_FORMATS["Elasticsearch"])
         mapping = {"type": "date", "format": es_date_formats}
-        if self.null_value_placeholder() is not None:
-            mapping["null_value"] = self.null_value_placeholder()
         return mapping
 
     def get_display_value(self, tile, node):
@@ -516,16 +492,8 @@ class EDTFDataType(BaseDataType):
             else:
                 add_date_to_doc(query, edtf)
 
-    def null_value_placeholder(self):
-        try:
-            return settings.ELASTICSEARCH_EXPLICIT_NULL_VALUES["edtf"]
-        except:
-            return None
-
     def default_es_mapping(self):
         mapping = {"properties": {"value": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}}}
-        if self.null_value_placeholder() is not None:
-            mapping["properties"]["value"]["fields"]["keyword"]["null_value"] = self.null_value_placeholder()
         return mapping
 
 
@@ -1966,12 +1934,6 @@ class ResourceInstanceDataType(BaseDataType):
 
         return True
 
-    def null_value_placeholder(self):
-        try:
-            return settings.ELASTICSEARCH_EXPLICIT_NULL_VALUES["resource-instance"]
-        except:
-            return None
-
     def default_es_mapping(self):
         mapping = {
             "properties": {
@@ -1981,9 +1943,6 @@ class ResourceInstanceDataType(BaseDataType):
                 "resourceXresourceId": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
             }
         }
-
-        if self.null_value_placeholder() is not None:
-            mapping["null_value"] = self.null_value_placeholder()
         return mapping
 
 

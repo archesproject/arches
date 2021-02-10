@@ -75,15 +75,6 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 #     'name': 'my_new_custom_index'
 # }]
 
-ELASTICSEARCH_EXPLICIT_NULL_VALUES = {
-    "string": None,
-    "number": None,
-    "boolean": None,
-    "date": "0001-01-01",
-    "edtf": None,
-    # "resource-instance": "NULL-VALUE"
-    # "geometry": None,  # currently not supported
-}
 
 
 KIBANA_URL = "http://localhost:5601/"

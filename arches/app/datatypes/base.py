@@ -369,25 +369,7 @@ class BaseDataType(object):
         """
 
         text_mapping = {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}
-        if self.null_value_placeholder() is not None:
-            text_mapping["fields"]["keyword"]["null_value"] = self.null_value_placeholder()
         return text_mapping
-
-    def null_value_placeholder(self):
-        """
-        Optional placeholder that applies explict known values to incomming null data
-        This allows very accurate searching capability for data with null values
-
-        Setting this value will allow you to find tiles of cardinality n where SOME or ALL values are null
-        Without setting this value, you will only be able to find tiles of cardinality n were ALL values are null
-
-        https://www.elastic.co/guide/en/elasticsearch/reference/7.10/null-value.html
-        """
-
-        try:
-            return settings.ELASTICSEARCH_EXPLICIT_NULL_VALUES["string"]
-        except:
-            return None
 
     def get_es_mapping(self, nodeid):
         """
