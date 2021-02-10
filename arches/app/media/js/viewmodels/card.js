@@ -398,15 +398,26 @@ define([
 
         this.isDirty = function(){
             // Returns true if a tile is dirty and dirty state is not triggered by default values.
-            if(self.newTile) {
-                if(self.newTile.dirty()) {
+            var tile = self.newTile;
+
+            /* corner case for accessing previously saved tiles within workflows */ 
+            if (
+                !tile
+                && self.context === 'workflow'
+                && self.tiles()[0]
+            ) {
+                tile = self.tiles()[0];
+            }
+
+            if(tile) {
+                if(tile.dirty()) {
                     var res = {};
                     self.widgets().forEach(function(w){
                         res[w.node.nodeid] = ko.unwrap(w.config.defaultValue);
                     });
-                    for (var k in self.newTile.data) {
+                    for (var k in tile.data) {
                         if (Object.keys(res).indexOf(k) > -1) {
-                            if ((res[k]||null) == (self.newTile.data[k]()||null) !== true) {
+                            if ((res[k]||null) == (tile.data[k]()||null) !== true) {
                                 return true;
                             } else {
                                 return false;
@@ -415,6 +426,7 @@ define([
                     }
                 }
             }
+
             return false;
         };
 

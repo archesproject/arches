@@ -131,11 +131,12 @@ class Reader(object):
                 relation["datestarted"] = None
             if relation["dateended"] == "" or relation["dateended"] == "None":
                 relation["dateended"] = None
-
             if resourceinstancefrom is not None and resourceinstanceto is not None:
                 relation = ResourceXResource(
                     resourceinstanceidfrom=Resource(resourceinstancefrom),
                     resourceinstanceidto=Resource(resourceinstanceto),
+                    resourceinstancefrom_graphid_id=relation["resourceinstancefrom_graphid"],
+                    resourceinstanceto_graphid_id=relation["resourceinstanceto_graphid"],
                     relationshiptype=str(relation["relationshiptype"]),
                     datestarted=relation["datestarted"],
                     dateended=relation["dateended"],
