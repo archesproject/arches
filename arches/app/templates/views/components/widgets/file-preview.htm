@@ -221,7 +221,7 @@
         </div>
 
 
-        <!-- ko if: Object.values(resourceModelNodes()).length > 0 && barfoo().length > 0-->
+        <!-- ko if: Object.values(resourceModelNodes()).length > 0 && addedFiles().length > 0-->
         <div>
             <div>Observations Resource Model</div>
     
@@ -245,21 +245,14 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- ko foreach: barfoo() -->
-                            <!-- ko foreach: $data.data.rows -->
-                                <tr data-bind="foreach: Object.values($parents[1].resourceModelNodes())">
-                                    <td>
-                                        <input 
-                                            data-bind="
-                                                value: (function() {
-                                                    var idx = $parents[1]['data']['node_ids_to_sort_index'][$data.nodeid];
-                                                    if (idx) { return $parent[idx]; }
-                                                })()
-                                            " 
-                                        />
-                                    </td>
-                                </tr>
-                            <!-- /ko -->
+                        <!-- ko foreach: parsedFileData() -->
+                            <tr data-bind="foreach: Object.values($parent.resourceModelNodes())">
+                                <td>
+                                    <input 
+                                        data-bind="value: $parent[$data.nodeid]" 
+                                    />
+                                </td>
+                            </tr>
                         <!-- /ko -->
                     </tbody>
                 </table>

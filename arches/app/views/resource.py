@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import csv
 import json
 import uuid
 
@@ -616,39 +617,44 @@ class ResourceData(View):
         return HttpResponseNotFound()
 
     def post(self, request):
-        ordered_node_ids = json.loads(
-            request.POST.get('ordered_node_ids')
+        column_name_to_node_id_map = json.loads(
+            request.POST.get('column_name_to_node_id_map')
         )
-        rows = json.loads(
-            request.POST.get('rows')
-        )
+
+        uploaded_file = request.FILES.get('uploaded_file')
+        decoded_file = uploaded_file.read().decode('utf-8').splitlines()
+
+        parsed_rows = []
 
         datatype_factory = DataTypeFactory()
 
-        errors = []
+        for row_dict in csv.DictReader(decoded_file):
+            parsed_row = {}
+            errors = []
 
-        for row_idx, row in enumerate(rows):
-            for cell_idx, cell_value in enumerate(row):
-                node_id = ordered_node_ids[cell_idx]
+            for key, value in row_dict.items():
+                node_id = column_name_to_node_id_map[key]
 
-                if (node_id):
+                if node_id:
                     node = models.Node.objects.get(pk=node_id)
-
-                    # cache this
                     datatype = datatype_factory.get_instance(node.datatype)
                     
                     try:
-                        datatype.validate(cell_value, node=node)
+                        datatype.validate(value, node=node)
                     except Exception as e:
+                        # CHANGE TO VALIDATION EXCEPTION AFTER PERFECTING READ
                         errors.append({
                             'error': str(e),
-                            'cell_value': cell_value,
-                            'cell_idx': cell_idx,
-                            'row_idx': row_idx,
+                            'cell_value': value,
                             'node_id': node_id,
                         })
 
-        return JSONResponse({'errors': errors})
+                    parsed_row[node_id] = value
+
+            parsed_row['errors'] = errors
+            parsed_rows.append(parsed_row)
+
+        return JSONResponse({'data': parsed_rows})
 
 
 @method_decorator(can_read_resource_instance, name="dispatch")

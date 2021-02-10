@@ -5,10 +5,9 @@ define([
     'arches',
     'dropzone',
     'uuid',
-    'papaparse',
     'viewmodels/widget',
     'bindings/dropzone'
-], function($, ko, _, arches, Dropzone, uuid, Papa, WidgetViewModel) {
+], function($, ko, _, arches, Dropzone, uuid, WidgetViewModel) {
     /**
      * A viewmodel used for viewing and uploading external resource data 
      *
@@ -17,8 +16,6 @@ define([
      *
      * @param  {string} params - a configuration object
      */
-
-
 
 
     OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS = {
@@ -54,12 +51,11 @@ define([
 
 
 
-
     var ExternalResourceDataViewModel = function(params) {
+        var self = this;
+
         params.configKeys = ['acceptedFiles', 'maxFilesize', 'maxFiles'];
         WidgetViewModel.apply(this, [params]);
-        
-        var self = this;
 
         this.unique_id = uuid.generate();
         this.uniqueidClass = ko.computed(function() {
@@ -67,62 +63,14 @@ define([
         });
 
         this.filter = ko.observable("");
-
         this.uploadMultiple = ko.observable(true);
+
         this.addedFiles = ko.observableArray();
         this.selectedFile = ko.observable(self.addedFiles()[0]);
 
+        this.parsedFileData = ko.observableArray();
 
         this.resourceModelNodes = ko.observable({});
-
-        this.callMe = function(file, parsedFileData) {
-            var columnNames = parsedFileData.shift();
-
-            var orderedNodeIds = columnNames.map(function(columnName) {
-                return OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[columnName];
-            });
-
-            var nodeIdsToSortIndex = orderedNodeIds.reduce(function(acc, nodeId, idx) {
-                acc[nodeId] = idx;
-                return acc;
-            }, {});
-
-            $.ajax({
-                dataType: "json",
-                url: arches.urls.resource + '/data/',
-                method: 'POST',
-                data: {
-                    ordered_node_ids: JSON.stringify(orderedNodeIds),
-                    rows: JSON.stringify(parsedFileData),
-                },
-                success: function (response) {
-                    console.log('!!!', response)
-                    
-
-                    self.addedFiles.push(file);
-                }
-            });
-        };
-
-
-        this.fetchResourceModelNodes = function() {
-            $.ajax({
-                dataType: "json",
-                url: arches.urls.graph_nodes(arches.resources[1]['graphid']),
-                success: function (response) {
-                    self.resourceModelNodes(response);
-                }
-            });
-        };
-
-        this.fetchResourceModelNodes();
-
-
-        this.getFoo = function(nodeIdsToSortIndex, row) {
-            console.log('OLOLO', nodeIdsToSortIndex, row)
-        }; 
-
-
 
         this.dropzoneOptions = {
             url: "arches.urls.root",
@@ -165,10 +113,61 @@ define([
             return arr;
         });
 
+        this.initialize = function() {
+            this.fetchResourceModelNodes();
+        };
+
+        this.fetchResourceModelNodes = function() {
+            $.ajax({
+                dataType: "json",
+                url: arches.urls.graph_nodes(arches.resources[1]['graphid']),
+                success: function (response) {
+                    self.resourceModelNodes(response);
+                }
+            });
+        };
+
+        this.parseCSVFile = function(file) {
+            var formData = new FormData();
+
+            formData.append('uploaded_file', file);
+            formData.append(
+                'column_name_to_node_id_map', 
+                JSON.stringify(OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS)
+            );
+
+            $.ajax({
+                dataType: "json",
+                url: arches.urls.resource + '/data/',
+                processData: false, /* important! */
+                contentType: false, /* important! */
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    self.addedFiles.push(file);
+
+                    response.data.forEach(function(parsedRow) {
+                        parsedRow['meta'] = {
+                            'file': file,
+                            'errors': parsedRow['errors'],
+                        };
+
+                        delete parsedRow['errors'];
+
+                        self.parsedFileData.push(parsedRow);
+                    });
+                }
+            });
+        };
+
+        this.getFoo = function(nodeIdsToSortIndex, row) {
+            console.log('OLOLO', nodeIdsToSortIndex, row)
+        }; 
+
         this.dropZoneInit = function() {
             self.dropzone.on("addedfile", function(file) {
                 if (file.type === 'text/csv') {
-                    self.parseCSVFile(file);
+                    self.parseCSVFile(file)
                 }
             });
 
@@ -191,20 +190,6 @@ define([
             return '<span>' + parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + '</span> ' + sizes[i];
         };
 
-        this.parseCSVFile = function(file) {
-            Papa.parse(file, {
-                worker: true,
-                complete: function(results) {
-                    if (results.errors.length) {
-                        console.log("ERROR ALERT HERE")
-                    }
-                    else {
-                        self.callMe(file, results['data']);
-                    }
-                },
-            });
-        };
-
         this.selectFile = function(file) { 
             self.selectedFile(file); 
         };
@@ -219,6 +204,8 @@ define([
                 self.addedFiles.removeAll();
             }
         };
+
+        this.initialize();
     };
 
     return ExternalResourceDataViewModel;
