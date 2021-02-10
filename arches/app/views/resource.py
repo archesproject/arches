@@ -630,7 +630,7 @@ class ResourceData(View):
 
         for row_dict in csv.DictReader(decoded_file):
             parsed_row = {}
-            errors = []
+            errors = {}
 
             for key, value in row_dict.items():
                 node_id = column_name_to_node_id_map[key]
@@ -643,11 +643,11 @@ class ResourceData(View):
                         datatype.validate(value, node=node)
                     except Exception as e:
                         # CHANGE TO VALIDATION EXCEPTION AFTER PERFECTING READ
-                        errors.append({
+                        errors[node_id] = {
                             'error': str(e),
-                            'cell_value': value,
                             'node_id': node_id,
-                        })
+                            'cell_value': value,
+                        }
 
                     parsed_row[node_id] = value
 

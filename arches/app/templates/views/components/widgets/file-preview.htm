@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block form %}
-<div class="row widget-wrapper">
+<div class="row widget-wrapper file-preview">
     <div class="form-group">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
@@ -153,7 +153,10 @@
                         class="file-upload-card"
                         style="width: fit-content;"
                     >
-                        <div class="media-body">
+                        <div 
+                            class="media-body"
+                            style="width: 100%;"
+                        >
                             <div style="display: flex;">
                                 <div 
                                     class="media-left"
@@ -229,28 +232,33 @@
                 style="
                     width: 100%;
                     overflow-x: scroll;
-                    padding-bottom: 12px;
+                    padding-bottom: 14px;
                 "
             >
                 <table>
                     <thead>
-                        <tr data-bind="foreach: Object.values(resourceModelNodes())">
-                            <th 
-                                scope="column" 
-                                data-bind="text: name"
-                                style="
-                                    padding: 0px 10px;
-                                "
-                            ></th>
+                        <tr> 
+                            <!-- ko foreach: Object.values(resourceModelNodes()) -->
+                                <th 
+                                    scope="column" 
+                                    data-bind="text: name"
+                                    style="
+                                        padding: 0px 10px;
+                                    "
+                                ></th>
+                            <!-- /ko -->
                         </tr>
                     </thead>
                     <tbody>
                         <!-- ko foreach: parsedFileData() -->
-                            <tr data-bind="foreach: Object.values($parent.resourceModelNodes())">
+                            <tr data-bind="foreach: Object.values($parent.resourceModelNodes()),">
                                 <td>
-                                    <input 
-                                        data-bind="value: $parent[$data.nodeid]" 
-                                    />
+                                    <div
+                                        style="padding: 10px"
+                                        data-bind="style: { backgroundColor: $parent.meta.errors[$data.nodeid] ? 'red' : 'blue' },"
+                                    >
+                                        <input data-bind="value: $parent[$data.nodeid]" />
+                                    </div>
                                 </td>
                             </tr>
                         <!-- /ko -->
