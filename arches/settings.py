@@ -76,7 +76,6 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 # }]
 
 
-
 KIBANA_URL = "http://localhost:5601/"
 KIBANA_CONFIG_BASEPATH = "kibana"  # must match Kibana config.yml setting (server.basePath) but without the leading slash,
 # also make sure to set server.rewriteBasePath: true

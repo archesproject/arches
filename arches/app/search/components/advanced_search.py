@@ -36,8 +36,9 @@ class AdvancedSearch(BaseSearchFilter):
                     node = models.Node.objects.get(pk=key)
                     if self.request.user.has_perm("read_nodegroup", node.nodegroup):
                         datatype = datatype_factory.get_instance(node.datatype)
-                        if ("op" in val and (val["op"] == "null" or val["op"] == "not_null")) or \
-                            ("val" in val and (val["val"] == "null" or val["val"] == "not_null")):
+                        if ("op" in val and (val["op"] == "null" or val["op"] == "not_null")) or (
+                            "val" in val and (val["val"] == "null" or val["val"] == "not_null")
+                        ):
                             # don't use a nested query with the null/not null search
                             datatype.append_search_filters(val, node, null_query, self.request)
                         else:

@@ -224,7 +224,7 @@ class BaseDataType(object):
         #     """
         base_query = Bool()
         base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
-        
+
         null_query = Bool()
         data_exists_query = Exists(field="tiles.data.%s" % (str(node.pk)))
         nested_query = Nested(path="tiles", query=data_exists_query)
@@ -234,29 +234,27 @@ class BaseDataType(object):
             exists_query = Bool()
             exists_query.must_not(null_query)
             base_query.should(exists_query)
-        
+
             # search for tiles that do exist, but that have null or [] as values
             func_query = Dsl()
             func_query.dsl = {
                 "function_score": {
                     "min_score": 1,
-                    "query": {
-                        "match_all": {}
-                    },
-                    "functions": [{
-                        "script_score": {
-                        "script": {
-                            "source": "int null_docs = 0;for(tile in params._source.tiles){if(tile.data.containsKey(params.node_id)){def val = tile.data.get(params.node_id);if (val == null || (val instanceof List && val.length==0)) {null_docs++;}}}return null_docs;",
-                            "lang": "painless",
-                            "params": {
-                                "node_id": "%s" % (str(node.pk))
+                    "query": {"match_all": {}},
+                    "functions": [
+                        {
+                            "script_score": {
+                                "script": {
+                                    "source": "int null_docs = 0;for(tile in params._source.tiles){if(tile.data.containsKey(params.node_id)){def val = tile.data.get(params.node_id);if (val == null || (val instanceof List && val.length==0)) {null_docs++;}}}return null_docs;",
+                                    "lang": "painless",
+                                    "params": {"node_id": "%s" % (str(node.pk))},
+                                }
                             }
                         }
-                        }
-                    }],
+                    ],
                     "score_mode": "max",
                     "boost": 1,
-                    "boost_mode": "replace"
+                    "boost_mode": "replace",
                 }
             }
             base_query.should(func_query)
