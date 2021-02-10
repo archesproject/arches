@@ -616,6 +616,8 @@ class ResourceData(View):
 
         return HttpResponseNotFound()
 
+
+class ResourceFOO(View):
     def post(self, request):
         column_name_to_node_id_map = json.loads(
             request.POST.get('column_name_to_node_id_map')
@@ -639,15 +641,18 @@ class ResourceData(View):
                     node = models.Node.objects.get(pk=node_id)
                     datatype = datatype_factory.get_instance(node.datatype)
                     
+                    # GET RID OF TRY AFTER DOMAIN VALUE REFACTOR!
                     try:
-                        datatype.validate(value, node=node)
+                        validation_errors = datatype.validate(value, node=node)
+
+                        if validation_errors:
+                            errors[node_id] = {
+                                'errors': validation_errors,
+                                'node_id': node_id,
+                                'cell_value': value,
+                            }
                     except Exception as e:
-                        # CHANGE TO VALIDATION EXCEPTION AFTER PERFECTING READ
-                        errors[node_id] = {
-                            'error': str(e),
-                            'node_id': node_id,
-                            'cell_value': value,
-                        }
+                        print(str(e))
 
                     parsed_row[node_id] = value
 
@@ -656,6 +661,40 @@ class ResourceData(View):
 
         return JSONResponse({'data': parsed_rows})
 
+
+class ResourceBAR(View):
+    def post(self, request):
+        node_id = json.loads(
+            request.POST.get('node_id')
+        )
+
+        cell_value = json.loads(
+            request.POST.get('cell_value')
+        )
+
+        datatype_factory = DataTypeFactory()
+
+        node = models.Node.objects.get(pk=node_id)
+        datatype = datatype_factory.get_instance(node.datatype)
+
+        errors = []
+        
+        # GET RID OF TRY AFTER DOMAIN VALUE REFACTOR!
+        try:
+            validation_errors = datatype.validate(cell_value, node=node)
+
+            if validation_errors:
+                errors.append({
+                    'errors': validation_errors,
+                    'node_id': node_id,
+                    'cell_value': cell_value
+                })
+
+        except Exception as e:
+            print(str(e))
+
+        return JSONResponse({ 'errors': errors })
+        
 
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceTiles(View):

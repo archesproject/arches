@@ -149,20 +149,42 @@ define([
                     response.data.forEach(function(parsedRow) {
                         parsedRow['meta'] = {
                             'file': file,
-                            'errors': parsedRow['errors'],
+                            'errors': ko.observable(parsedRow['errors']),
                         };
 
                         delete parsedRow['errors'];
 
                         self.parsedFileData.push(parsedRow);
                     });
+
+                    console.log(response)
                 }
             });
         };
 
-        this.getFoo = function(nodeIdsToSortIndex, row) {
-            console.log('OLOLO', nodeIdsToSortIndex, row)
-        }; 
+        this.validateNodeData = function(parsedFile, nodeId, cellValue) {
+            $.ajax({
+                dataType: "json",
+                url: arches.urls.resource + '/node_data/',
+                method: 'POST',
+                data: {
+                    node_id: JSON.stringify(nodeId),
+                    cell_value: JSON.stringify(cellValue)
+                },
+                success: function (response) {
+                    var errors = parsedFile.meta.errors();
+                    
+                    if (response.errors.length) {
+                        errors[nodeId] = response.errors;
+                    }
+                    else {
+                        delete errors[nodeId];
+                    }
+
+                    parsedFile.meta.errors(errors);
+                }
+            });
+        };
 
         this.dropZoneInit = function() {
             self.dropzone.on("addedfile", function(file) {

@@ -255,9 +255,12 @@
                                 <td>
                                     <div
                                         style="padding: 10px"
-                                        data-bind="style: { backgroundColor: $parent.meta.errors[$data.nodeid] ? 'red' : 'blue' },"
+                                        data-bind="style: { backgroundColor: $parent.meta.errors()[$data.nodeid] ? 'red' : 'blue' },"
                                     >
-                                        <input data-bind="value: $parent[$data.nodeid]" />
+                                        <input data-bind="{
+                                            textInput: $parent[$data.nodeid],
+                                            event: { input: function() { $parents[1].validateNodeData($parent, $data.nodeid, $parent[$data.nodeid]) } }
+                                        }" />
                                     </div>
                                 </td>
                             </tr>
@@ -265,6 +268,7 @@
                     </tbody>
                 </table>
             </div>
+            <button data-bind="click: console.log($data, $parent)"></button>
         </div>
         <!-- /ko -->
     

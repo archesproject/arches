@@ -7689,6 +7689,12 @@ span.file-upload-clear-filter {
 }
 
 
+
+/* UNDO THIS!!! */
+.workbench-card-sidepanel {
+    width: 600px;
+}
+
 .file-preview .media-body {
     width: unset;
 }
