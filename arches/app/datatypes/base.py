@@ -1,7 +1,8 @@
 import json, urllib
 from django.urls import reverse
 from arches.app.models import models
-from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, Exists, Nested
+from arches.app.models.system_settings import settings
+from arches.app.search.elasticsearch_dsl_builder import Dsl, Bool, Terms, Exists, Nested
 from django.utils.translation import ugettext as _
 import logging
 
@@ -219,16 +220,55 @@ class BaseDataType(object):
 
     def append_null_search_filters(self, value, node, query, request):
         """
-        Appends the search query dsl to search for fields that haven't been populated
+        Appends the search query dsl to search for fields that have not been populated
         """
         base_query = Bool()
+        base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+
         null_query = Bool()
         data_exists_query = Exists(field="tiles.data.%s" % (str(node.pk)))
         nested_query = Nested(path="tiles", query=data_exists_query)
         null_query.must(nested_query)
-        base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
         if value["op"] == "null":
-            base_query.must_not(null_query)
+            # search for tiles that don't exist
+            exists_query = Bool()
+            exists_query.must_not(null_query)
+            base_query.should(exists_query)
+
+            # search for tiles that do exist, but that have null or [] as values
+            func_query = Dsl()
+            func_query.dsl = {
+                "function_score": {
+                    "min_score": 1,
+                    "query": {"match_all": {}},
+                    "functions": [
+                        {
+                            "script_score": {
+                                "script": {
+                                    "source": """
+                                    int null_docs = 0;
+                                    for(tile in params._source.tiles){
+                                        if(tile.data.containsKey(params.node_id)){
+                                            def val = tile.data.get(params.node_id);
+                                            if (val == null || (val instanceof List && val.length==0)) {
+                                                null_docs++;
+                                            }
+                                        }
+                                    }
+                                    return null_docs;
+                                """,
+                                    "lang": "painless",
+                                    "params": {"node_id": "%s" % (str(node.pk))},
+                                }
+                            }
+                        }
+                    ],
+                    "score_mode": "max",
+                    "boost": 1,
+                    "boost_mode": "replace",
+                }
+            }
+            base_query.should(func_query)
         elif value["op"] == "not_null":
             base_query.must(null_query)
         query.must(base_query)
