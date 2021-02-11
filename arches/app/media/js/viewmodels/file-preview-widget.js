@@ -83,9 +83,13 @@ define([
         this.addedFiles = ko.observableArray();
         this.selectedFile = ko.observable(self.addedFiles()[0]);
 
-        this.parsedFileData = ko.observableArray();
-
         this.resourceModelNodeData = ko.observable();
+
+        this.parsedFileData = ko.observableArray();
+        this.parsedFileData.subscribe(function(nodeData) {
+            self.value(nodeData)
+        });
+
 
         this.dropzoneOptions = {
             url: "arches.urls.root",
@@ -177,7 +181,7 @@ define([
                         self.parsedFileData.push(parsedRow);
                     });
 
-                    console.log(response)
+                    console.log(response, self, params)
                 }
             });
         };
