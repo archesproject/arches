@@ -7690,9 +7690,8 @@ span.file-upload-clear-filter {
 
 
 
-/* UNDO THIS!!! */
-.workbench-card-sidepanel {
-    width: 600px;
+.file-preview th,td {
+    border: 1px solid #ddd;
 }
 
 .file-preview .media-body {

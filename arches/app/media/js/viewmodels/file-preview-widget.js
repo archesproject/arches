@@ -17,6 +17,13 @@ define([
      * @param  {string} params - a configuration object
      */
 
+    
+
+    VISIBLE_COLUMN_IDS = [
+        "fca0475a-04fc-11eb-9978-02e99e44e93e",  /* species */
+        "d7628ae4-3f2f-11eb-a2e2-73ab08a728ea",  /* date of observation */
+
+    ]
 
     OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS = {
         'ObserverName*': "0da1fe5e-04fd-11eb-9978-02e99e44e93e", 
@@ -27,17 +34,25 @@ define([
         'SpDetermine': "", 
         'ID_Confidence': "", 
         'ObservationDate*': "d7628ae4-3f2f-11eb-a2e2-73ab08a728ea", 
-        'NoPlantsObsvd*': "", 
+        'NoPlantsObsvd*': "347a1450-3be2-11eb-8a94-acde48001122", 
         'Phenology': "347a1388-3be2-11eb-8a94-acde48001122", 
         'Collection': "", 
-        'NoAnimalsObs': "", 
+        'NoAnimalsObs': "fd0dd8bc-3be1-11eb-8a94-acde48001122", 
         'AnimalAgeClass': "fd0dd812-3be1-11eb-8a94-acde48001122", 
         'AnimalSiteUse*': "fd0dd6b4-3be1-11eb-8a94-acde48001122", 
         'AnimalBehavior*': "fd0dd5c4-3be1-11eb-8a94-acde48001122", 
         'AnimalDetectionMethod*': "fd0dd768-3be1-11eb-8a94-acde48001122", 
         'LocationDescription': "e9f6767e-033f-11eb-9978-02e99e44e93e", 
-        'X_Coordinate*': "", 
-        'Y_Coordinate*': "", 
+        'X_Coordinate*': {
+            flag: 'format_location', 
+            args: ['x'], 
+            node_id: 'df79c02a-033f-11eb-9978-02e99e44e93e'
+        }, 
+        'Y_Coordinate*': {
+            flag: 'format_location', 
+            args: ['y'], 
+            node_id: 'df79c02a-033f-11eb-9978-02e99e44e93e'
+        }, 
         'CoordSource*': "fc55d878-033f-11eb-9978-02e99e44e93e", 
         'CoordAccuracy': "084ba470-050a-11eb-9978-02e99e44e93e", 
         'SurveyEffort*': "cd7dac4e-3be1-11eb-8a94-acde48001122", 
@@ -70,7 +85,7 @@ define([
 
         this.parsedFileData = ko.observableArray();
 
-        this.resourceModelNodes = ko.observable({});
+        this.resourceModelNodeData = ko.observable();
 
         this.dropzoneOptions = {
             url: "arches.urls.root",
@@ -114,15 +129,20 @@ define([
         });
 
         this.initialize = function() {
-            this.fetchResourceModelNodes();
+            this.fetchResourceModelNodeData();
         };
 
-        this.fetchResourceModelNodes = function() {
+        this.fetchResourceModelNodeData = function() {
             $.ajax({
                 dataType: "json",
                 url: arches.urls.graph_nodes(arches.resources[1]['graphid']),
                 success: function (response) {
-                    self.resourceModelNodes(response);
+                    Object.values(response).forEach(function(nodeData) {
+                        nodeData['visible'] = VISIBLE_COLUMN_IDS.some(function(columnId) { 
+                            return columnId === nodeData.nodeid; 
+                        });
+                    });
+                    self.resourceModelNodeData(response);
                 }
             });
         };
@@ -163,6 +183,10 @@ define([
         };
 
         this.validateNodeData = function(parsedFile, nodeId, cellValue) {
+            /* 
+                we should refactor this to use a cancellable event that fires only 
+                after the user has stopped interacting with the input for some amount of time 
+            */ 
             $.ajax({
                 dataType: "json",
                 url: arches.urls.resource + '/node_data/',

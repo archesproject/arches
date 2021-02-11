@@ -635,65 +635,91 @@ class ResourceFOO(View):
             errors = {}
 
             for key, value in row_dict.items():
-                node_id = column_name_to_node_id_map[key]
+                node_data = column_name_to_node_id_map[key]
 
-                if node_id:
-                    node = models.Node.objects.get(pk=node_id)
-                    datatype = datatype_factory.get_instance(node.datatype)
+                if node_data:
+                    # edge case for converting columns into complex node values
+                    if isinstance(node_data, dict):
+                        if (node_data['flag'] == 'format_location'):
+                            if not parsed_row.get(node_data['node_id']):
+                                # parsed_row[node_data['node_id']] = {
+                                #     "geometry": {
+                                #         "type": "Point", 
+                                #         "coordinates": [0, 0],
+                                #     },
+                                #     "type": "Feature",
+                                #     "properties": {},
+                                # }
+
+                                parsed_row[node_data['node_id']] = {
+                                    "type": "Point", 
+                                    "coordinates": [0, 0],
+                                }
+                            
+                            if 'x' in node_data['args']:
+                                parsed_row[node_data['node_id']]['coordinates'][0] = value
+                            if 'y' in node_data['args']:
+                                parsed_row[node_data['node_id']]['coordinates'][1] = value
                     
-                    # GET RID OF TRY AFTER DOMAIN VALUE REFACTOR!
-                    try:
-                        validation_errors = datatype.validate(value, node=node)
+                    else:
+                        node_id = node_data  # node_data is a uuid string
 
-                        if validation_errors:
-                            errors[node_id] = {
-                                'errors': validation_errors,
-                                'node_id': node_id,
-                                'cell_value': value,
-                            }
-                    except Exception as e:
-                        print(str(e))
+                        node = models.Node.objects.get(pk=node_id)
+                        datatype = datatype_factory.get_instance(node.datatype)
+                        
+                        # GET RID OF TRY AFTER DOMAIN VALUE REFACTOR!
+                        try:
+                            validation_errors = datatype.validate(value, node=node)
 
-                    parsed_row[node_id] = value
+                            if validation_errors:
+                                errors[node_id] = {
+                                    'errors': validation_errors,
+                                    'node_id': node_id,
+                                    'cell_value': value,
+                                }
+                        except Exception as e:
+                            print(str(e))
+
+                        parsed_row[node_id] = value
 
             parsed_row['errors'] = errors
             parsed_rows.append(parsed_row)
-
+        
         return JSONResponse({'data': parsed_rows})
 
 
-class ResourceBAR(View):
-    def post(self, request):
-        node_id = json.loads(
-            request.POST.get('node_id')
-        )
+# class ResourceBAR(View):
+#     def post(self, request):
+#         node_id = json.loads(
+#             request.POST.get('node_id')
+#         )
 
-        cell_value = json.loads(
-            request.POST.get('cell_value')
-        )
+#         cell_value = json.loads(
+#             request.POST.get('cell_value')
+#         )
 
-        datatype_factory = DataTypeFactory()
+#         datatype_factory = DataTypeFactory()
 
-        node = models.Node.objects.get(pk=node_id)
-        datatype = datatype_factory.get_instance(node.datatype)
+#         node = models.Node.objects.get(pk=node_id)
+#         datatype = datatype_factory.get_instance(node.datatype)
 
-        errors = []
+#         errors = []
         
-        # GET RID OF TRY AFTER DOMAIN VALUE REFACTOR!
-        try:
-            validation_errors = datatype.validate(cell_value, node=node)
+#         # GET RID OF TRY AFTER DOMAIN VALUE REFACTOR!
+#         try:
+#             validation_errors = datatype.validate(cell_value, node=node)
 
-            if validation_errors:
-                errors.append({
-                    'errors': validation_errors,
-                    'node_id': node_id,
-                    'cell_value': cell_value
-                })
+#             if validation_errors:
+#                 errors.append({
+#                     'errors': validation_errors,
+#                     'node_id': node_id,
+#                     'cell_value': cell_value
+#                 })
 
-        except Exception as e:
-            print(str(e))
+#         except Exception as e:
+#             print(str(e))
 
-        return JSONResponse({ 'errors': errors })
+#         return JSONResponse({ 'errors': errors })
         
 
 @method_decorator(can_read_resource_instance, name="dispatch")

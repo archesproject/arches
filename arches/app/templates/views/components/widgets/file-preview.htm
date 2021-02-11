@@ -224,7 +224,7 @@
         </div>
 
 
-        <!-- ko if: Object.values(resourceModelNodes()).length > 0 && addedFiles().length > 0-->
+        <!-- ko if: resourceModelNodeData() && addedFiles().length > 0-->
         <div>
             <div>Observations Resource Model</div>
     
@@ -238,7 +238,8 @@
                 <table>
                     <thead>
                         <tr> 
-                            <!-- ko foreach: Object.values(resourceModelNodes()) -->
+                            <!-- ko foreach: Object.values(resourceModelNodeData()) -->
+                                <!-- ko if: visible -->
                                 <th 
                                     scope="column" 
                                     data-bind="text: name"
@@ -246,24 +247,41 @@
                                         padding: 0px 10px;
                                     "
                                 ></th>
+                                <!-- /ko -->
                             <!-- /ko -->
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         <!-- ko foreach: parsedFileData() -->
-                            <tr data-bind="foreach: Object.values($parent.resourceModelNodes()),">
+                            <tr>
+                                <!-- ko foreach: Object.values($parent.resourceModelNodeData()) -->
+                                    <!-- ko if: visible -->
+                                    <td>
+                                        <div
+                                            style="
+                                                padding: 10px;
+                                            "
+                                        >
+                                            <span data-bind="{text: $parent[$data.nodeid]}"></span>
+                                        </div>
+                                    </td>
+                                    <!-- /ko -->
+                                <!-- /ko -->
                                 <td>
                                     <div
-                                        style="padding: 10px"
-                                        data-bind="style: { backgroundColor: $parent.meta.errors()[$data.nodeid] ? 'red' : 'blue' },"
+                                        style="display: flex;"
                                     >
-                                        <input data-bind="{
-                                            textInput: $parent[$data.nodeid],
-                                            event: { input: function() { $parents[1].validateNodeData($parent, $data.nodeid, $parent[$data.nodeid]) } }
-                                        }" />
+                                        <button class="btn btn-link">
+                                            <i class="fa fa-info"></i>
+                                        </button>
+                                        <button class="btn btn-link">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
+
                         <!-- /ko -->
                     </tbody>
                 </table>
