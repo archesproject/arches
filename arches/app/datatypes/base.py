@@ -219,9 +219,9 @@ class BaseDataType(object):
         pass
 
     def append_null_search_filters(self, value, node, query, request):
-        #     """
-        #     Appends the search query dsl to search for fields that haven't been populated
-        #     """
+        """
+        Appends the search query dsl to search for fields that have not been populated
+        """
         base_query = Bool()
         base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
 
